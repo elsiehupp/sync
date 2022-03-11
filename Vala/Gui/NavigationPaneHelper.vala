@@ -105,7 +105,7 @@ class NavigationPaneHelper : GLib.Object {
         }
 
         // Then remove anything that isn't in our folder list anymore.
-        foreach (var clsid, entries_to_remove) {
+        foreach (var clsid in entries_to_remove) {
             string clsid_str = clsid.to_string ();
             string clsid_path = "" % R" (Software\Classes\CLSID\)" % clsid_str;
             string clsid_path_wow64 = "" % R" (Software\Classes\Wow6432Node\CLSID\)" % clsid_str;

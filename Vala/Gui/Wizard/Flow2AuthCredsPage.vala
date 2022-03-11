@@ -138,7 +138,7 @@ class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
     public void on_signal_flow_2_auth_result (Flow2Auth.Result result, string error_string, string user, string app_password) {
         //  Q_UNUSED (error_string)
         switch (result) {
-            case Flow2Auth.NotSupported: {
+            case Flow2Auth.Result.NOT_SUPPORTED: {
                 /* Flow2Auth not supported (can't open browser) */
                 wizard ().show ();
 
@@ -152,7 +152,7 @@ class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
                 /* Error while getting the access token.  (Timeout, or the server did not accept our client credentials */
                 wizard ().show ();
                 break;
-            case Flow2Auth.LoggedIn: {
+            case Flow2Auth.Result.LOGGED_IN: {
                 this.user = user;
                 this.app_password = app_password;
                 var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());

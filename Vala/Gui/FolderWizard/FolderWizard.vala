@@ -34,61 +34,47 @@ class FolderWizard : QWizard {
 
     /***********************************************************
     ***********************************************************/
-    public enum {
-        Page_Source,
-        Page_Target,
-        Page_Selective_sync
+    public enum Page {
+        SOURCE,
+        TARGET,
+        SELECTIVE_SYNC
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public FolderWizard (AccountPointer account, Gtk.Widget parent = null);
-
-    /***********************************************************
-    ***********************************************************/
-    public bool event_filter (GLib.Object watched, QEvent event) override;
-    public void resize_event (QResizeEvent event) override;
-
-
-    /***********************************************************
-    ***********************************************************/
-    private Folder_wizard_local_path this.folder_wizard_source_page;
-    private Folder_wizard_remote_path this.folder_wizard_target_page;
-    private Folder_wizard_selective_sync this.folder_wizard_selective_sync_page;
-}
-
-
-
+    private FolderWizardLocalPath folder_wizard_source_page;
+    private FolderWizardRemotePath folder_wizard_target_page;
+    private FolderWizardSelectiveSync folder_wizard_selective_sync_page;
 
 
     /***********************************************************
     Folder wizard itself
     ***********************************************************/
-
-    FolderWizard.FolderWizard (AccountPointer account, Gtk.Widget parent)
-        : QWizard (parent)
-        this.folder_wizard_source_page (new Folder_wizard_local_path (account))
-        this.folder_wizard_target_page (null)
-        this.folder_wizard_selective_sync_page (new Folder_wizard_selective_sync (account)) {
+    public FolderWizard (AccountPointer account, Gtk.Widget parent = null) {
+        base (parent);
+        this.folder_wizard_source_page = new FolderWizardLocalPath (account);
+        this.folder_wizard_target_page = null;
+        this.folder_wizard_selective_sync_page = new FolderWizardSelectiveSync (account);
         window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
-        page (Page_Source, this.folder_wizard_source_page);
+        page (Page.SOURCE, this.folder_wizard_source_page);
         this.folder_wizard_source_page.install_event_filter (this);
         if (!Theme.instance ().single_sync_folder ()) {
-            this.folder_wizard_target_page = new Folder_wizard_remote_path (account);
-            page (Page_Target, this.folder_wizard_target_page);
+            this.folder_wizard_target_page = new FolderWizardRemotePath (account);
+            page (Page.TARGET, this.folder_wizard_target_page);
             this.folder_wizard_target_page.install_event_filter (this);
         }
-        page (Page_Selective_sync, this.folder_wizard_selective_sync_page);
+        page (Page.SELECTIVE_SYNC, this.folder_wizard_selective_sync_page);
 
         window_title (_("Add Folder Sync Connection"));
         options (QWizard.Cancel_button_on_signal_left);
         button_text (QWizard.FinishButton, _("Add Sync Connection"));
     }
 
-    FolderWizard.~FolderWizard () = default;
 
-    bool FolderWizard.event_filter (GLib.Object watched, QEvent event) {
+    /***********************************************************
+    ***********************************************************/
+    public override bool event_filter (GLib.Object watched, QEvent event) {
         if (event.type () == QEvent.Layout_request) {
             // Workaround QTBUG-3396 :  forces QWizard_private.update_layout ()
             QTimer.single_shot (0, this, [this] {
@@ -98,7 +84,10 @@ class FolderWizard : QWizard {
         return QWizard.event_filter (watched, event);
     }
 
-    void FolderWizard.resize_event (QResizeEvent event) {
+
+    /***********************************************************
+    ***********************************************************/
+    public override void resize_event (QResizeEvent event) {
         QWizard.resize_event (event);
 
         // workaround for QTBUG-22819 : when the error label word wrap, the minimum height is not adjusted
@@ -111,5 +100,7 @@ class FolderWizard : QWizard {
         }
     }
 
-    } // end namespace
-    
+} // class FolderWizard
+
+} // namespace Ui
+} // namespace Occ

@@ -11,26 +11,18 @@ class FileActivityListModel : ActivityListModel {
 
     /***********************************************************
     ***********************************************************/
-    public FileActivityListModel (GLib.Object parent = new GLib.Object ());
+    private string file_id;
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_load (AccountState account_state, string file_id);
-
-
-    protected void start_fetch_job () override;
-
-
-    /***********************************************************
-    ***********************************************************/
-    private string this.file_id;
-}
-    FileActivityListModel.FileActivityListModel (GLib.Object parent)
-        : ActivityListModel (null, parent) {
+    public FileActivityListModel (GLib.Object parent = new GLib.Object ()) {
+        base (null, parent);
         display_actions (false);
     }
 
-    void FileActivityListModel.on_signal_load (AccountState account_state, string local_path) {
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_load (AccountState account_state, string file_id) {
         //  Q_ASSERT (account_state);
         if (!account_state || currently_fetching ()) {
             return;
@@ -52,7 +44,10 @@ class FileActivityListModel : ActivityListModel {
         on_signal_refresh_activity ();
     }
 
-    void FileActivityListModel.start_fetch_job () {
+
+    /***********************************************************
+    ***********************************************************/
+    protected override void start_fetch_job () {
         if (!account_state ().is_connected ()) {
             return;
         }
@@ -72,5 +67,8 @@ class FileActivityListModel : ActivityListModel {
         hide_old_activities (true);
         job.on_signal_start ();
     }
-    }
-    
+
+} // class FileActivityListModel
+
+} // namespace Ui
+} // namespace Occ

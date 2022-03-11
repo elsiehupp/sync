@@ -110,7 +110,7 @@ class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
     public void on_signal_async_auth_result (OAuth.Result result_string, string user,
         string token, string refresh_token) {
         switch (result_string) {
-        case OAuth.NotSupported: {
+        case OAuth.Result.NOT_SUPPORTED: {
             /* OAuth not supported (can't open browser), fallback to HTTP credentials */
             var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
             oc_wizard.back ();
@@ -122,7 +122,7 @@ class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
             this.ui.error_label.show ();
             wizard ().show ();
             break;
-        case OAuth.LoggedIn: {
+        case OAuth.Result.LOGGED_IN: {
             this.token = token;
             this.user = user;
             this.refresh_token = refresh_token;

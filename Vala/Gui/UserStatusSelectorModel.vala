@@ -422,11 +422,11 @@ class UserStatusSelectorModel : GLib.Object {
             error (_("Could not fetch user status. Make sure you are connected to the server."));
             return;
 
-        case UserStatusConnector.Error.UserStatusNotSupported:
+        case UserStatusConnector.Error.UserStatusResult.NOT_SUPPORTED:
             error (_("User status feature is not supported. You will not be able to set your user status."));
             return;
 
-        case UserStatusConnector.Error.EmojisNotSupported:
+        case UserStatusConnector.Error.EmojisResult.NOT_SUPPORTED:
             error (_("Emojis feature is not supported. Some user status functionality may not work."));
             return;
 

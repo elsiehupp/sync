@@ -10,44 +10,37 @@ namespace Occ {
 namespace Ui {
 
 /***********************************************************
-@brief The Legal_notice class
+@brief The LegalNotice class
 @ingroup gui
 ***********************************************************/
-class Legal_notice : Gtk.Dialog {
+class LegalNotice : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public Legal_notice (Gtk.Dialog parent = null);
-    ~Legal_notice () override;
-
-
-    protected void change_event (QEvent *) override;
-
+    private Ui.LegalNotice ui;
 
     /***********************************************************
     ***********************************************************/
-    private void customize_style ();
-
-    /***********************************************************
-    ***********************************************************/
-    private Ui.Legal_notice this.ui;
-}
-
-    Legal_notice.Legal_notice (Gtk.Dialog parent)
-        : Gtk.Dialog (parent)
-        this.ui (new Ui.Legal_notice) {
+    public LegalNotice (Gtk.Dialog parent = null) {
+        base (parent);
+        this.ui = new Ui.LegalNotice ();
         this.ui.up_ui (this);
 
-        connect (this.ui.close_button, &QPushButton.clicked, this, &Legal_notice.accept);
+        connect (this.ui.close_button, &QPushButton.clicked, this, &LegalNotice.accept);
 
         customize_style ();
     }
 
-    Legal_notice.~Legal_notice () {
+
+    override ~LegalNotice () {
         delete this.ui;
     }
 
-    void Legal_notice.change_event (QEvent e) {
+
+
+    /***********************************************************
+    ***********************************************************/
+    protected override void change_event (QEvent e) {
         switch (e.type ()) {
         case QEvent.StyleChange:
         case QEvent.PaletteChange:
@@ -61,9 +54,12 @@ class Legal_notice : Gtk.Dialog {
         Gtk.Dialog.change_event (e);
     }
 
-    void Legal_notice.customize_style () {
+
+    /***********************************************************
+    ***********************************************************/
+    private void customize_style () {
         string notice = _("<p>Copyright 2017-2021 Nextcloud Gmb_h<br />"
-                            "Copyright 2012-2021 own_cloud Gmb_h</p>");
+                        + "Copyright 2012-2021 own_cloud Gmb_h</p>");
 
         notice += _("<p>Licensed under the GNU General Public License (GPL) Version 2.0 or any later version.</p>");
 
@@ -78,5 +74,7 @@ class Legal_notice : Gtk.Dialog {
         this.ui.notice.open_external_links (true);
     }
 
-    } // namespace Occ
-    
+} // class LegalNotice
+
+} // namespace Ui
+} // namespace Occ

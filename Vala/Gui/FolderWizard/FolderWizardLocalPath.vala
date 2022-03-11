@@ -13,44 +13,22 @@ namespace Ui {
 @brief Page to ask for the local source folder
 @ingroup gui
 ***********************************************************/
-class Folder_wizard_local_path : Format_warnings_wizard_page {
+class FolderWizardLocalPath : FormatWarningsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public Folder_wizard_local_path (AccountPointer account);
+    private Ui_Folder_wizard_source_page ui;
+    private Folder.Map folder_map;
+    private AccountPointer account;
 
     /***********************************************************
     ***********************************************************/
-    public bool is_complete () override;
-    public void initialize_page () override;
-    public void clean_up_page () override;
-
-    /***********************************************************
-    ***********************************************************/
-    public void folder_map (Folder.Map font_metrics) {
-        this.folder_map = font_metrics;
-    }
-protected slots:
-    void on_signal_choose_local_folder ();
-
-
-    /***********************************************************
-    ***********************************************************/
-    private Ui_Folder_wizard_source_page this.ui;
-    private Folder.Map this.folder_map;
-    private AccountPointer this.account;
-}
-
-
-
-
-
-    Folder_wizard_local_path.Folder_wizard_local_path (AccountPointer account)
-        : Format_warnings_wizard_page ()
-        this.account (account) {
+    public FolderWizardLocalPath (AccountPointer account) {
+        base ();
+        this.account = account;
         this.ui.up_ui (this);
         register_field ("source_folder*", this.ui.local_folder_line_edit);
-        connect (this.ui.local_folder_choose_btn, &QAbstractButton.clicked, this, &Folder_wizard_local_path.on_signal_choose_local_folder);
+        connect (this.ui.local_folder_choose_btn, &QAbstractButton.clicked, this, &FolderWizardLocalPath.on_signal_choose_local_folder);
         this.ui.local_folder_choose_btn.tool_tip (_("Click to select a local folder to sync."));
 
         GLib.Uri server_url = this.account.url ();
@@ -64,17 +42,10 @@ protected slots:
         this.ui.warn_label.hide ();
     }
 
-    Folder_wizard_local_path.~Folder_wizard_local_path () = default;
 
-    void Folder_wizard_local_path.initialize_page () {
-        this.ui.warn_label.hide ();
-    }
-
-    void Folder_wizard_local_path.clean_up_page () {
-        this.ui.warn_label.hide ();
-    }
-
-    bool Folder_wizard_local_path.is_complete () {
+    /***********************************************************
+    ***********************************************************/
+    public override bool is_complete () {
         GLib.Uri server_url = this.account.url ();
         server_url.user_name (this.account.credentials ().user ());
 
@@ -99,7 +70,31 @@ protected slots:
         return is_ok;
     }
 
-    void Folder_wizard_local_path.on_signal_choose_local_folder () {
+
+    /***********************************************************
+    ***********************************************************/
+    public override void initialize_page () {
+        this.ui.warn_label.hide ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public override void clean_up_page () {
+        this.ui.warn_label.hide ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public void folder_map (Folder.Map font_metrics) {
+        this.folder_map = font_metrics;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    protected void on_signal_choose_local_folder () {
         string sf = QStandardPaths.writable_location (QStandardPaths.Home_location);
         QDir d (sf);
 
@@ -120,3 +115,8 @@ protected slots:
         }
         /* emit */ complete_changed ();
     }
+
+} // class FolderWizardLocalPath
+
+} // namespace Ui
+} // namespace Occ

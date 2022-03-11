@@ -144,11 +144,11 @@ class SettingsDialog : Gtk.Dialog {
         QAction general_action = create_color_aware_action (":/client/theme/settings.svg", _("General"));
         this.action_group.add_action (general_action);
         this.tool_bar.add_action (general_action);
-        var general_settings = new General_settings;
+        var general_settings = new GeneralSettings;
         this.ui.stack.add_widget (general_settings);
 
         // Connect signal_style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
-        connect (this, &SettingsDialog.signal_style_changed, general_settings, &General_settings.on_signal_style_changed);
+        connect (this, &SettingsDialog.signal_style_changed, general_settings, &GeneralSettings.on_signal_style_changed);
 
         QAction network_action = create_color_aware_action (":/client/theme/network.svg", _("Network"));
         this.action_group.add_action (network_action);

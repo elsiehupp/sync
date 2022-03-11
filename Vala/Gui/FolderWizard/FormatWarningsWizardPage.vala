@@ -10,17 +10,12 @@ namespace Occ {
 namespace Ui {
 
 /***********************************************************
-@brief The Format_warnings_wizard_page class
+@brief The FormatWarningsWizardPage class
 @ingroup gui
 ***********************************************************/
-class Format_warnings_wizard_page : QWizardPage {
+class FormatWarningsWizardPage : QWizardPage {
 
-    protected string format_warnings (string[] warnings);
-}
-
-
-
-    string Format_warnings_wizard_page.format_warnings (string[] warnings) {
+    protected string format_warnings (string[] warnings) {
         string ret;
         if (warnings.count () == 1) {
             ret = _("<b>Warning:</b> %1").arg (warnings.first ());
@@ -34,3 +29,8 @@ class Format_warnings_wizard_page : QWizardPage {
 
         return ret;
     }
+
+} // class FormatWarningsWizardPage
+
+} // namespace Ui
+} // namespace Occ

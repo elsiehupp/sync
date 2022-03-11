@@ -15,10 +15,12 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 namespace Occ {
 namespace Ui {
 
-namespace {
-    string find_svg_file_path (string filename, string[] possible_colors) {
-        string result;
-        result = string{Occ.Theme.theme_prefix} + filename;
+class IconUtils {
+
+    /***********************************************************
+    ***********************************************************/
+    public static string find_svg_file_path (string filename, string[] possible_colors) {
+        string result = Occ.Theme.theme_prefix + filename;
         if (GLib.File.exists (result)) {
             return result;
         } else {
@@ -34,18 +36,11 @@ namespace {
 
         return result;
     }
-}
 
-namespace Occ {
-namespace Ui {
-namespace IconUtils {
 
-QPixmap pixmap_for_background (string filename, Gtk.Color background_color);
-Gtk.Image create_svg_image_with_custom_color (string filename, Gtk.Color custom_color, QSize original_size = null, QSize requested_size = {});
-QPixmap create_svg_pixmap_with_custom_color_cached (string filename, Gtk.Color custom_color, QSize original_size = null, QSize requested_size = {});
-Gtk.Image draw_svg_with_custom_fill_color (string source_svg_path, Gtk.Color fill_color, QSize original_size = null, QSize requested_size = {});
-
-    QPixmap pixmap_for_background (string filename, Gtk.Color background_color) {
+    /***********************************************************
+    ***********************************************************/
+    public static QPixmap pixmap_for_background (string filename, Gtk.Color background_color) {
         //  Q_ASSERT (!filename.is_empty ());
 
         const var pixmap_color = background_color.is_valid () && !Theme.is_dark_color (background_color)
@@ -55,7 +50,10 @@ Gtk.Image draw_svg_with_custom_fill_color (string source_svg_path, Gtk.Color fil
         return create_svg_pixmap_with_custom_color_cached (filename, pixmap_color);
     }
 
-    Gtk.Image create_svg_image_with_custom_color (string filename, Gtk.Color custom_color, QSize original_size, QSize requested_size) {
+
+    /***********************************************************
+    ***********************************************************/
+    public static Gtk.Image create_svg_image_with_custom_color (string filename, Gtk.Color custom_color, QSize original_size = null, QSize requested_size = {}) {
         //  Q_ASSERT (!filename.is_empty ());
         //  Q_ASSERT (custom_color.is_valid ());
 
@@ -114,7 +112,10 @@ Gtk.Image draw_svg_with_custom_fill_color (string source_svg_path, Gtk.Color fil
         return result;
     }
 
-    QPixmap create_svg_pixmap_with_custom_color_cached (string filename, Gtk.Color custom_color, QSize original_size, QSize requested_size) {
+
+    /***********************************************************
+    ***********************************************************/
+    public static QPixmap create_svg_pixmap_with_custom_color_cached (string filename, Gtk.Color custom_color, QSize original_size = null, QSize requested_size = {}) {
         QPixmap cached_pixmap;
 
         const var custom_color_name = custom_color.name ();
@@ -138,8 +139,10 @@ Gtk.Image draw_svg_with_custom_fill_color (string source_svg_path, Gtk.Color fil
         return cached_pixmap;
     }
 
-    Gtk.Image draw_svg_with_custom_fill_color (
-        const string source_svg_path, Gtk.Color fill_color, QSize original_size, QSize requested_size) {
+
+    /***********************************************************
+    ***********************************************************/
+    public static Gtk.Image draw_svg_with_custom_fill_color (string source_svg_path, Gtk.Color fill_color, QSize original_size = null, QSize requested_size = {}) {
         QSvgRenderer svg_renderer;
 
         if (!svg_renderer.on_signal_load (source_svg_path)) {
@@ -154,14 +157,14 @@ Gtk.Image draw_svg_with_custom_fill_color (string source_svg_path, Gtk.Color fil
         }
 
         // render source image
-        Gtk.Image svg_image (req_size, Gtk.Image.FormatARGB32); {
+        Gtk.Image svg_image = new Gtk.Image (req_size, Gtk.Image.FormatARGB32); {
             QPainter svg_image_painter (&svg_image);
             svg_image.fill (Qt.GlobalColor.transparent);
             svg_renderer.render (&svg_image_painter);
         }
 
         // draw target image with custom fill_color
-        Gtk.Image image (req_size, Gtk.Image.FormatARGB32);
+        Gtk.Image image = new Gtk.Image (req_size, Gtk.Image.FormatARGB32);
         image.fill (Gtk.Color (fill_color)); {
             QPainter image_painter (&image);
             image_painter.composition_mode (QPainter.Composition_mode_Destination_in);
@@ -170,7 +173,8 @@ Gtk.Image draw_svg_with_custom_fill_color (string source_svg_path, Gtk.Color fil
 
         return image;
     }
-    }
-    }
-    }
-    
+
+} // class IconUtils
+
+} // namespace Ui
+} // namespace Occ

@@ -105,17 +105,16 @@ namespace Ui {
 class HeaderBanner : Gtk.Widget {
 
     /***********************************************************
+    These fudge terms were needed a few places to obtain
+    pixel-perfect results
     ***********************************************************/
-    public HeaderBanner (Gtk.Widget parent = null);
+    const int GAP_BETWEEN_LOGO_AND_RIGHT_EDGE = 5;
 
     /***********************************************************
+    These fudge terms were needed a few places to obtain
+    pixel-perfect results
     ***********************************************************/
-    public void setup (string title, QPixmap logo, QPixmap banner,
-               const Qt.Text_format title_format, string style_sheet);
-
-
-    protected void paint_event (QPaintEvent event) override;
-
+    const int MODERN_HEADER_TOP_MARGIN = 2;
 
     /***********************************************************
     ***********************************************************/
@@ -123,16 +122,11 @@ class HeaderBanner : Gtk.Widget {
     private Gtk.Label logo_label;
     private QGridLayout layout;
     private QPixmap banner_pixmap;
-}
 
-
-
-    // These fudge terms were needed a few places to obtain pixel-perfect results
-    const int Gap_between_logo_and_right_edge = 5;
-    const int Modern_header_top_margin = 2;
-
-    HeaderBanner.HeaderBanner (Gtk.Widget parent)
-        : Gtk.Widget (parent) {
+    /***********************************************************
+    ***********************************************************/
+    public HeaderBanner (Gtk.Widget parent = null) {
+        base (parent);
         size_policy (QSizePolicy.Expanding, QSizePolicy.Fixed);
         background_role (QPalette.Base);
         title_label = new Gtk.Label (this);
@@ -147,14 +141,18 @@ class HeaderBanner : Gtk.Widget {
         layout.row_minimum_height (3, 1);
         layout.row_stretch (4, 1);
         layout.column_stretch (2, 1);
-        layout.column_minimum_width (4, 2 * Gap_between_logo_and_right_edge);
-        layout.column_minimum_width (6, Gap_between_logo_and_right_edge);
+        layout.column_minimum_width (4, 2 * GAP_BETWEEN_LOGO_AND_RIGHT_EDGE);
+        layout.column_minimum_width (6, GAP_BETWEEN_LOGO_AND_RIGHT_EDGE);
         layout.add_widget (title_label, 1, 1, 5, 1);
         layout.add_widget (logo_label, 1, 5, 5, 1);
     }
 
-    void HeaderBanner.setup (string title, QPixmap logo, QPixmap banner,
-                             const Qt.Text_format title_format, string style_sheet) {
+
+    /***********************************************************
+    ***********************************************************/
+    public void setup (
+        string title, QPixmap logo, QPixmap banner,
+        Qt.Text_format title_format, string style_sheet) {
         QStyle style = parent_widget ().style ();
         //const int layout_horizontal_spacing = style.pixel_metric (QStyle.PM_Layout_horizontal_spacing);
         int top_level_margin_left = style.pixel_metric (QStyle.PM_Layout_left_margin, null, parent_widget ());
@@ -162,8 +160,8 @@ class HeaderBanner : Gtk.Widget {
         int top_level_margin_top = style.pixel_metric (QStyle.PM_Layout_top_margin, null, parent_widget ());
         //int top_level_margin_bottom = style.pixel_metric (QStyle.PM_Layout_bottom_margin, 0, parent_widget ());
 
-        layout.row_minimum_height (0, Modern_header_top_margin);
-        layout.row_minimum_height (1, top_level_margin_top - Modern_header_top_margin - 1);
+        layout.row_minimum_height (0, MODERN_HEADER_TOP_MARGIN);
+        layout.row_minimum_height (1, top_level_margin_top - MODERN_HEADER_TOP_MARGIN - 1);
         layout.row_minimum_height (6, 3);
         int min_column_width0 = top_level_margin_left + top_level_margin_right;
         int min_column_width1 = top_level_margin_left + top_level_margin_right + 1;
@@ -185,7 +183,10 @@ class HeaderBanner : Gtk.Widget {
         update_geometry ();
     }
 
-    void HeaderBanner.paint_event (QPaintEvent * /* event */) {
+
+    /***********************************************************
+    ***********************************************************/
+    protected override void paint_event (QPaintEvent event) {
         QPainter painter (this);
         painter.draw_pixmap (0, 0, width (), banner_pixmap.height (), banner_pixmap);
         int x = width () - 2;
@@ -198,5 +199,7 @@ class HeaderBanner : Gtk.Widget {
         painter.draw_line (0, y + 1, x + 1, y + 1);
     }
 
-    } // namespace Occ
-    
+} // class HeaderBanner
+
+} // namespace Ui
+} // namespace Occ

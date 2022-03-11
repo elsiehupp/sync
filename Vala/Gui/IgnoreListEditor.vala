@@ -15,36 +15,19 @@ namespace Occ {
 namespace Ui {
 
 /***********************************************************
-@brief The Ignore_list_editor class
+@brief The IgnoreListEditor class
 @ingroup gui
 ***********************************************************/
-class Ignore_list_editor : Gtk.Dialog {
+class IgnoreListEditor : Gtk.Dialog {
 
-    /***********************************************************
-    ***********************************************************/
-    public Ignore_list_editor (Gtk.Widget parent = null);
-
-    /***********************************************************
-    ***********************************************************/
-    public bool ignore_hidden_files ();
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void on_signal_restore_defaults (QAbstractButton button);
-
-    /***********************************************************
-    ***********************************************************/
-    private 
-    private void setup_table_read_only_items ();
     private string read_only_tooltip;
-    private Ui.Ignore_list_editor ui;
-}
+    private Ui.IgnoreListEditor ui;
 
-
-    Ignore_list_editor.Ignore_list_editor (Gtk.Widget parent)
-        : Gtk.Dialog (parent)
-        , ui (new Ui.Ignore_list_editor) {
+    /***********************************************************
+    ***********************************************************/
+    public IgnoreListEditor (Gtk.Widget parent = null) {
+        base (parent);
+        this.ui = new Ui.IgnoreListEditor ();
         window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
         ui.up_ui (this);
 
@@ -64,32 +47,33 @@ class Ignore_list_editor : Gtk.Dialog {
 
             /* the ignore_hidden_files flag is a folder specific setting, but for now, it is
            handled globally. Save it to every folder that is defined.
-           TODO this can now be fixed, simply attach this Ignore_list_editor to top-level account
+           TODO this can now be fixed, simply attach this IgnoreListEditor to top-level account
            settings
             */
             FolderMan.instance ().ignore_hidden_files (ignore_hidden_files ());
         });
         connect (ui.button_box, &QDialogButtonBox.clicked,
-                this, &Ignore_list_editor.on_signal_restore_defaults);
+                this, &IgnoreListEditor.on_signal_restore_defaults);
 
         ui.sync_hidden_files_check_box.checked (!FolderMan.instance ().ignore_hidden_files ());
     }
 
-    Ignore_list_editor.~Ignore_list_editor () {
+
+    ~IgnoreListEditor () {
         delete ui;
     }
 
-    void Ignore_list_editor.setup_table_read_only_items () {
-        ui.ignore_table_widget.add_pattern (".csync_journal.db*", /*deletable=*/false, /*read_only=*/true);
-        ui.ignore_table_widget.add_pattern (".sync_*.db*", /*deletable=*/false, /*read_only=*/true);
-        ui.ignore_table_widget.add_pattern (".sync_*.db*", /*deletable=*/false, /*read_only=*/true);
-    }
 
-    bool Ignore_list_editor.ignore_hidden_files () {
+    /***********************************************************
+    ***********************************************************/
+    public bool ignore_hidden_files () {
         return !ui.sync_hidden_files_check_box.is_checked ();
     }
 
-    void Ignore_list_editor.on_signal_restore_defaults (QAbstractButton button) {
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_restore_defaults (QAbstractButton button) {
         if (ui.button_box.button_role (button) != QDialogButtonBox.Reset_role)
             return;
 
@@ -100,5 +84,16 @@ class Ignore_list_editor : Gtk.Dialog {
         ui.ignore_table_widget.read_ignore_file (cfg_file.exclude_file (ConfigFile.SYSTEM_SCOPE), false);
     }
 
-    } // namespace Occ
-    
+
+    /***********************************************************
+    ***********************************************************/
+    private void setup_table_read_only_items () {
+        ui.ignore_table_widget.add_pattern (".csync_journal.db*", /*deletable=*/false, /*read_only=*/true);
+        ui.ignore_table_widget.add_pattern (".sync_*.db*", /*deletable=*/false, /*read_only=*/true);
+        ui.ignore_table_widget.add_pattern (".sync_*.db*", /*deletable=*/false, /*read_only=*/true);
+    }
+
+} // class IgnoreListEditor
+
+} // namespace Ui
+} // namespace Occ

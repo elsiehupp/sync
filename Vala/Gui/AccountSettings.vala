@@ -340,7 +340,7 @@ class AccountSettings : Gtk.Widget {
             case AccountState.State.ASKING_CREDENTIALS: {
                 GLib.Uri url;
                 if (var credentials = qobject_cast<HttpCredentialsGui> (account.credentials ())) {
-                    connect (credentials, &HttpCredentialsGui.authorisation_link_changed,
+                    connect (credentials, &HttpCredentialsGui.signal_authorisation_link_changed,
                         this, &AccountSettings.on_signal_account_state_changed, Qt.UniqueConnection);
                     url = credentials.authorisation_link ();
                 }
@@ -1293,12 +1293,12 @@ class AccountSettings : Gtk.Widget {
             return;
         }
 
-        const bool show_warning = this.model.is_dirty () && this.account_state.is_connected () && info.checked == Qt.Unchecked;
+        const bool on_signal_show_warninging = this.model.is_dirty () && this.account_state.is_connected () && info.checked == Qt.Unchecked;
 
         // FIXME: the model is not precise enough to handle extra cases
         // e.g. the user clicked on the same checkbox 2x without applying the change in between.
         // We don't know which checkbox changed to be able to toggle the selective_sync_label display.
-        if (show_warning) {
+        if (on_signal_show_warninging) {
             this.ui.selective_sync_label.show ();
         }
 

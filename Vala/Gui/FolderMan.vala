@@ -1543,7 +1543,7 @@ class FolderMan : GLib.Object {
     private void on_signal_watched_file_unlocked (string path) {
         if (Folder folder = folder_for_path (path)) {
             // Treat this equivalently to the file being reported by the file watcher
-            folder.on_signal_watched_path_changed (path, Folder.ChangeReason.UnLock);
+            folder.on_signal_watched_path_changed (path, Folder.ChangeReason.ChangeReason.UNLOCK);
         }
     }
 

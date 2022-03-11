@@ -1,9 +1,9 @@
 /***********************************************************
-
 Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
 
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
+
 //  #include <QtGlobal>
 //  #include <cmath>
 //  #include <csignal>
@@ -177,3 +177,6 @@ int main (int argc, char **argv) {
 
     return app.exec ();
 }
+
+} // namespace Ui
+} // namespace Occ

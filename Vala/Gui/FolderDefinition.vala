@@ -19,30 +19,37 @@ class FolderDefinition {
     The name of the folder in the ui and internally
     ***********************************************************/
     public string alias;
+
     /***********************************************************
     path on local machine (always trailing /)
     ***********************************************************/
     public string local_path;
+
     /***********************************************************
     path to the journal, usually relative to local_path
     ***********************************************************/
     public string journal_path;
+
     /***********************************************************
     path on remote (usually no trailing /, exception "/")
     ***********************************************************/
     public string target_path;
+
     /***********************************************************
     whether the folder is paused
     ***********************************************************/
     public bool paused = false;
+
     /***********************************************************
     whether the folder syncs hidden files
     ***********************************************************/
     public bool ignore_hidden_files = false;
+
     /***********************************************************
     Which virtual files setting the folder uses
     ***********************************************************/
     public Vfs.Mode virtual_files_mode = Vfs.Off;
+
     /***********************************************************
     The CLSID where this folder appears in registry for the Explorer navigation pane entry.
     ***********************************************************/

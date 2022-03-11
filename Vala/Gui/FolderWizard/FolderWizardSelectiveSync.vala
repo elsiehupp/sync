@@ -10,49 +10,26 @@ namespace Occ {
 namespace Ui {
 
 /***********************************************************
-@brief The Folder_wizard_selective_sync class
+@brief The FolderWizardSelectiveSync class
 @ingroup gui
 ***********************************************************/
-class Folder_wizard_selective_sync : QWizardPage {
+class FolderWizardSelectiveSync : QWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public Folder_wizard_selective_sync (AccountPointer account);
+    private SelectiveSyncWidget selective_sync;
+    private QCheckBox virtual_files_check_box = null;
 
     /***********************************************************
     ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public void initialize_page () override;
-    public void clean_up_page () override;
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void on_signal_virtual_files_checkbox_clicked ();
-
-    /***********************************************************
-    ***********************************************************/
-    private 
-    private SelectiveSyncWidget this.selective_sync;
-    private QCheckBox this.virtual_files_check_box = null;
-}
-
-
-
-
-
-
-    Folder_wizard_selective_sync.Folder_wizard_selective_sync (AccountPointer account) {
+    public FolderWizardSelectiveSync (AccountPointer account) {
         var layout = new QVBoxLayout (this);
         this.selective_sync = new SelectiveSyncWidget (account, this);
         layout.add_widget (this.selective_sync);
 
         if (Theme.instance ().show_virtual_files_option () && best_available_vfs_mode () != Vfs.Off) {
             this.virtual_files_check_box = new QCheckBox (_("Use virtual files instead of downloading content immediately %1").arg (best_available_vfs_mode () == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
-            connect (this.virtual_files_check_box, &QCheckBox.clicked, this, &Folder_wizard_selective_sync.on_signal_virtual_files_checkbox_clicked);
+            connect (this.virtual_files_check_box, &QCheckBox.clicked, this, &FolderWizardSelectiveSync.on_signal_virtual_files_checkbox_clicked);
             connect (this.virtual_files_check_box, &QCheckBox.state_changed, this, [this] (int state) {
                 this.selective_sync.enabled (state == Qt.Unchecked);
             });
@@ -61,9 +38,29 @@ class Folder_wizard_selective_sync : QWizardPage {
         }
     }
 
-    Folder_wizard_selective_sync.~Folder_wizard_selective_sync () = default;
 
-    void Folder_wizard_selective_sync.initialize_page () {
+    /***********************************************************
+    ***********************************************************/
+    public bool validate_page () {
+        const bool use_virtual_files = this.virtual_files_check_box && this.virtual_files_check_box.is_checked ();
+        if (use_virtual_files) {
+            const var availability = Vfs.check_availability (wizard ().field ("source_folder").to_string ());
+            if (!availability) {
+                var message = new QMessageBox (QMessageBox.Warning, _("Virtual files are not available for the selected folder"), availability.error (), QMessageBox.Ok, this);
+                message.attribute (Qt.WA_DeleteOnClose);
+                message.open ();
+                return false;
+            }
+        }
+        wizard ().property ("selective_sync_block_list", use_virtual_files ? GLib.Variant () : GLib.Variant (this.selective_sync.create_block_list ()));
+        wizard ().property ("use_virtual_files", GLib.Variant (use_virtual_files));
+        return true;
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public override void initialize_page () {
         string target_path = wizard ().property ("target_path").to_string ();
         if (target_path.starts_with ('/')) {
             target_path = target_path.mid (1);
@@ -99,23 +96,10 @@ class Folder_wizard_selective_sync : QWizardPage {
         QWizardPage.initialize_page ();
     }
 
-    bool Folder_wizard_selective_sync.validate_page () {
-        const bool use_virtual_files = this.virtual_files_check_box && this.virtual_files_check_box.is_checked ();
-        if (use_virtual_files) {
-            const var availability = Vfs.check_availability (wizard ().field ("source_folder").to_string ());
-            if (!availability) {
-                var message = new QMessageBox (QMessageBox.Warning, _("Virtual files are not available for the selected folder"), availability.error (), QMessageBox.Ok, this);
-                message.attribute (Qt.WA_DeleteOnClose);
-                message.open ();
-                return false;
-            }
-        }
-        wizard ().property ("selective_sync_block_list", use_virtual_files ? GLib.Variant () : GLib.Variant (this.selective_sync.create_block_list ()));
-        wizard ().property ("use_virtual_files", GLib.Variant (use_virtual_files));
-        return true;
-    }
 
-    void Folder_wizard_selective_sync.clean_up_page () {
+    /***********************************************************
+    ***********************************************************/
+    public override void clean_up_page () {
         string target_path = wizard ().property ("target_path").to_string ();
         string alias = GLib.FileInfo (target_path).filename ();
         if (alias.is_empty ())
@@ -124,7 +108,10 @@ class Folder_wizard_selective_sync : QWizardPage {
         QWizardPage.clean_up_page ();
     }
 
-    void Folder_wizard_selective_sync.on_signal_virtual_files_checkbox_clicked () {
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_virtual_files_checkbox_clicked () {
         // The click has already had an effect on the box, so if it's
         // checked it was newly activated.
         if (this.virtual_files_check_box.is_checked ()) {
@@ -134,3 +121,8 @@ class Folder_wizard_selective_sync : QWizardPage {
             });
         }
     }
+
+} // class FolderWizardSelectiveSync
+
+} // namespace Ui
+} // namespace Occ

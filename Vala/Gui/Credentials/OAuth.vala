@@ -39,9 +39,9 @@ class OAuth : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public enum Result {
-        NotSupported,
-        LoggedIn,
-        Error
+        NOT_SUPPORTED,
+        LOGGED_IN,
+        ERROR
     }
 
 
@@ -60,7 +60,6 @@ class OAuth : GLib.Object {
     ***********************************************************/
     signal void signal_result (OAuth.Result result, string user = "", string token = "", string refresh_token = "");
 
-
     /***********************************************************
     ***********************************************************/
     public OAuth (Account account, GLib.Object parent = new GLib.Object ()) {
@@ -74,7 +73,7 @@ class OAuth : GLib.Object {
     public void on_signal_start () {
         // Listen on the socket to get a port which will be used in the redirect_uri
         if (!this.server.listen (QHostAddress.LocalLost)) {
-            /* emit */ signal_result (NotSupported, "");
+            /* emit */ signal_result (Result.NOT_SUPPORTED, "");
             return;
         }
 
@@ -172,7 +171,7 @@ class OAuth : GLib.Object {
                         } else {
                             http_reply_and_close (socket, "200 OK", login_successfull_html);
                         }
-                        /* emit */ signal_result (LoggedIn, user, access_token, refresh_token);
+                        /* emit */ signal_result (Result.LOGGED_IN, user, access_token, refresh_token);
                     });
                 });
             }
@@ -185,7 +184,7 @@ class OAuth : GLib.Object {
     public bool open_browser () {
         if (!Utility.open_browser (authorisation_link ())) {
             // We cannot open the browser, then we claim we don't support OAuth.
-            /* emit */ signal_result (NotSupported, "");
+            /* emit */ signal_result (Result.NOT_SUPPORTED, "");
             return false;
         }
         return true;

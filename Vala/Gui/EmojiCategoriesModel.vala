@@ -7,7 +7,6 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 //  #include <QtGlobal>
 //  #include <memory>
 
-
 //  #include <QQmlEngine>
 //  #include <QAbstractItemModel>
 
@@ -16,18 +15,12 @@ namespace Ui {
 
 class EmojiCategoriesModel : QAbstractListModel {
 
-    /***********************************************************
-    ***********************************************************/
-    public GLib.Variant data (QModelIndex index, int role) override;
-    public int row_count (QModelIndex parent = QModelIndex ()) override;
-    public GLib.HashMap<int, GLib.ByteArray> role_names () override;
-
 
     /***********************************************************
     ***********************************************************/
     private enum Roles {
-        EmojiRole = 0,
-        LabelRole
+        EMOJI_ROLE = 0,
+        LABEL_ROLE
     }
 
 
@@ -41,40 +34,7 @@ class EmojiCategoriesModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private const GLib.Vector<Category> categories;
-}
-
-
-
-    GLib.Variant EmojiCategoriesModel.data (QModelIndex index, int role) {
-        if (!index.is_valid ()) {
-            return {};
-        }
-
-        switch (role) {
-        case Roles.EmojiRole:
-            return categories[index.row ()].emoji;
-
-        case Roles.LabelRole:
-            return categories[index.row ()].label;
-        }
-
-        return {};
-    }
-
-    int EmojiCategoriesModel.row_count (QModelIndex parent) {
-        //  Q_UNUSED (parent);
-        return static_cast<int> (categories.size ());
-    }
-
-    GLib.HashMap<int, GLib.ByteArray> EmojiCategoriesModel.role_names () {
-        GLib.HashMap<int, GLib.ByteArray> roles;
-        roles[Roles.EmojiRole] = "emoji";
-        roles[Roles.LabelRole] = "label";
-        return roles;
-    }
-
-    const GLib.Vector<EmojiCategoriesModel.Category> EmojiCategoriesModel.categories = {
+    private const GLib.Vector<Category> CATEGORIES = {
         {
             "⌛️",
             "history"
@@ -112,3 +72,44 @@ class EmojiCategoriesModel : QAbstractListModel {
             "flags"
         },
     }
+
+    /***********************************************************
+    ***********************************************************/
+    public override GLib.Variant data (QModelIndex index, int role) {
+        if (!index.is_valid ()) {
+            return {};
+        }
+
+        switch (role) {
+        case Roles.EMOJI_ROLE:
+            return CATEGORIES[index.row ()].emoji;
+
+        case Roles.LABEL_ROLE:
+            return CATEGORIES[index.row ()].label;
+        }
+
+        return {};
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public override int row_count (QModelIndex parent = QModelIndex ()) {
+        //  Q_UNUSED (parent);
+        return static_cast<int> (CATEGORIES.size ());
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public override GLib.HashMap<int, GLib.ByteArray> role_names () {
+        GLib.HashMap<int, GLib.ByteArray> roles;
+        roles[Roles.EMOJI_ROLE] = "emoji";
+        roles[Roles.LABEL_ROLE] = "label";
+        return roles;
+    }
+
+} // class EmojiCategoriesModel
+
+} // namespace Ui
+} // namespace Occ

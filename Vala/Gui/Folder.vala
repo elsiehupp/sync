@@ -34,22 +34,22 @@ class Folder : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public enum ChangeReason {
-        Other,
-        //  UnLock
+        OTHER,
+        //  UNLOCK
     }
 
 
     /***********************************************************
     ***********************************************************/
     private enum LogStatus {
-        Log_status_remove,
-        Log_status_rename,
-        Log_status_move,
-        Log_status_new,
-        Log_status_error,
-        Log_status_conflict,
-        Log_status_updated,
-        //  Log_status_file_locked
+        REMOVE,
+        RENAME,
+        MOVE,
+        NEW,
+        ERROR,
+        CONFLICT,
+        UPDATED,
+        //  FILE_LOCKED
     }
 
     private const string VERSION_C = "version";
@@ -100,7 +100,6 @@ class Folder : GLib.Object {
     ***********************************************************/
     private QTimer schedule_self_timer;
 
-
     /***********************************************************
     When the same local path is synced to multiple accounts,
     only one of them can be stored in the settings in a way
@@ -110,7 +109,6 @@ class Folder : GLib.Object {
     instance that was configured for each local path.
     ***********************************************************/
     private bool save_backwards_compatible = false;
-
 
     /***********************************************************
     Whether the folder should be saved in that settings group
@@ -123,7 +121,6 @@ class Folder : GLib.Object {
     ***********************************************************/
     private bool save_in_folders_with_placeholders = false;
 
-
     /***********************************************************
     Whether a vfs mode switch is pending
 
@@ -133,12 +130,10 @@ class Folder : GLib.Object {
     ***********************************************************/
     private bool vfs_on_signal_off_pending = false;
 
-
     /***********************************************************
     Whether this folder has just switched to VFS or not
     ***********************************************************/
     private bool has_switched_to_vfs = false;
-
 
     /***********************************************************
     Watches this folder's local directory for changes.
@@ -148,19 +143,16 @@ class Folder : GLib.Object {
     ***********************************************************/
     private QScopedPointer<FolderWatcher> folder_watcher;
 
-
     /***********************************************************
     Keeps track of locally dirty files so we can skip local
     discovery sometimes.
     ***********************************************************/
     private QScopedPointer<LocalDiscoveryTracker> local_discovery_tracker;
 
-
     /***********************************************************
     The vfs mode instance (created by plugin) to use. Never null.
     ***********************************************************/
     private unowned<Vfs> vfs;
-
 
     /***********************************************************
     Create a new Folder
@@ -770,7 +762,7 @@ class Folder : GLib.Object {
         this.folder_watcher.on_signal_reset (new FolderWatcher (this));
         connect (this.folder_watcher.data (), &FolderWatcher.signal_path_changed,
             this, [this] (string path) {
-                on_signal_watched_path_changed (path, Folder.ChangeReason.Other);
+                on_signal_watched_path_changed (path, Folder.ChangeReason.ChangeReason.OTHER);
             });
         connect (this.folder_watcher.data (), &FolderWatcher.signal_lost_changes,
             this, &Folder.on_signal_next_sync_full_local_discovery);
@@ -1127,7 +1119,7 @@ class Folder : GLib.Object {
     
         SyncJournalFileRecord record;
         this.journal.get_file_record (relative_path_bytes, record);
-        if (reason != ChangeReason.UnLock) {
+        if (reason != ChangeReason.ChangeReason.UNLOCK) {
             // Check that the mtime/size actually changed or there was
             // an attribute change (pin state) that caused the notification
             bool spurious = false;
@@ -1609,36 +1601,36 @@ class Folder : GLib.Object {
     ***********************************************************/
     private void show_sync_result_popup () {
         if (this.sync_result.first_item_new ()) {
-            create_gui_log (this.sync_result.first_item_new ().destination (), Log_status_new, this.sync_result.num_new_items ());
+            create_gui_log (this.sync_result.first_item_new ().destination (), LogStatus.NEW, this.sync_result.num_new_items ());
         }
         if (this.sync_result.first_item_deleted ()) {
-            create_gui_log (this.sync_result.first_item_deleted ().destination (), Log_status_remove, this.sync_result.num_removed_items ());
+            create_gui_log (this.sync_result.first_item_deleted ().destination (), LogStatus.REMOVE, this.sync_result.num_removed_items ());
         }
         if (this.sync_result.first_item_updated ()) {
-            create_gui_log (this.sync_result.first_item_updated ().destination (), Log_status_updated, this.sync_result.num_updated_items ());
+            create_gui_log (this.sync_result.first_item_updated ().destination (), LogStatus.UPDATED, this.sync_result.num_updated_items ());
         }
     
         if (this.sync_result.first_item_renamed ()) {
-            LogStatus status (Log_status_rename);
+            LogStatus status (LogStatus.RENAME);
             // if the path changes it's rather a move
             QDir ren_target = GLib.FileInfo (this.sync_result.first_item_renamed ().rename_target).directory ();
             QDir ren_source = GLib.FileInfo (this.sync_result.first_item_renamed ().file).directory ();
             if (ren_target != ren_source) {
-                status = Log_status_move;
+                status = LogStatus.MOVE;
             }
             create_gui_log (this.sync_result.first_item_renamed ().file, status,
                 this.sync_result.num_renamed_items (), this.sync_result.first_item_renamed ().rename_target);
         }
     
         if (this.sync_result.first_new_conflict_item ()) {
-            create_gui_log (this.sync_result.first_new_conflict_item ().destination (), Log_status_conflict, this.sync_result.num_new_conflict_items ());
+            create_gui_log (this.sync_result.first_new_conflict_item ().destination (), LogStatus.CONFLICT, this.sync_result.num_new_conflict_items ());
         }
         if (int error_count = this.sync_result.num_error_items ()) {
-            create_gui_log (this.sync_result.first_item_error ().file, Log_status_error, error_count);
+            create_gui_log (this.sync_result.first_item_error ().file, LogStatus.ERROR, error_count);
         }
     
         if (int locked_count = this.sync_result.num_locked_items ()) {
-            create_gui_log (this.sync_result.first_item_locked ().file, Log_status_file_locked, locked_count);
+            create_gui_log (this.sync_result.first_item_locked ().file, LogStatus.FILE_LOCKED, locked_count);
         }
     
         GLib.info ("Folder" + this.sync_result.folder ("sync result: " + this.sync_result.status ();
@@ -1711,56 +1703,56 @@ class Folder : GLib.Object {
             string text;
     
             switch (status) {
-            case Log_status_remove:
+            case LogStatus.REMOVE:
                 if (count > 1) {
                     text = _("%1 and %n other file (s) have been removed.", "", count - 1).arg (file);
                 } else {
                     text = _("%1 has been removed.", "%1 names a file.").arg (file);
                 }
                 break;
-            case Log_status_new:
+            case LogStatus.NEW:
                 if (count > 1) {
                     text = _("%1 and %n other file (s) have been added.", "", count - 1).arg (file);
                 } else {
                     text = _("%1 has been added.", "%1 names a file.").arg (file);
                 }
                 break;
-            case Log_status_updated:
+            case LogStatus.UPDATED:
                 if (count > 1) {
                     text = _("%1 and %n other file (s) have been updated.", "", count - 1).arg (file);
                 } else {
                     text = _("%1 has been updated.", "%1 names a file.").arg (file);
                 }
                 break;
-            case Log_status_rename:
+            case LogStatus.RENAME:
                 if (count > 1) {
                     text = _("%1 has been renamed to %2 and %n other file (s) have been renamed.", "", count - 1).arg (file, rename_target);
                 } else {
                     text = _("%1 has been renamed to %2.", "%1 and %2 name files.").arg (file, rename_target);
                 }
                 break;
-            case Log_status_move:
+            case LogStatus.MOVE:
                 if (count > 1) {
                     text = _("%1 has been moved to %2 and %n other file (s) have been moved.", "", count - 1).arg (file, rename_target);
                 } else {
                     text = _("%1 has been moved to %2.").arg (file, rename_target);
                 }
                 break;
-            case Log_status_conflict:
+            case LogStatus.CONFLICT:
                 if (count > 1) {
                     text = _("%1 has and %n other file (s) have sync conflicts.", "", count - 1).arg (file);
                 } else {
                     text = _("%1 has a sync conflict. Please check the conflict file!").arg (file);
                 }
                 break;
-            case Log_status_error:
+            case LogStatus.ERROR:
                 if (count > 1) {
                     text = _("%1 and %n other file (s) could not be synced due to errors. See the log for details.", "", count - 1).arg (file);
                 } else {
                     text = _("%1 could not be synced due to an error. See the log for details.").arg (file);
                 }
                 break;
-            case Log_status_file_locked:
+            case LogStatus.FILE_LOCKED:
                 if (count > 1) {
                     text = _("%1 and %n other file (s) are currently locked.", "", count -1).arg (file);
                 } else {
@@ -1771,7 +1763,7 @@ class Folder : GLib.Object {
     
             if (!text.is_empty ()) {
                 // Ignores the settings in case of an error or conflict
-                if (status == Log_status_error || status == Log_status_conflict)
+                if (status == LogStatus.ERROR || status == LogStatus.CONFLICT)
                     logger.post_optional_gui_log (_("Sync Activity"), text);
             }
         }

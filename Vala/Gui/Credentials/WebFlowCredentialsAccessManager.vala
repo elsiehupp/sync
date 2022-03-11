@@ -1,24 +1,31 @@
 
-
-
 namespace Occ {
 namespace Ui {
 
 class WebFlowCredentialsAccessManager : AccessManager {
+
     private const string USER_C = "user";
     private const string CLIENT_CERTIFICATE_PEM_C = "this.client_certificate_pem";
     private const string CLIENT_KEY_PEM_C = "this.client_key_pem";
     private const string client_ca_certificate_pemC = "this.client_ca_certificate_pem";
 
     /***********************************************************
+    The credentials object dies along with the account, while
+    the QNAM might outlive both.
     ***********************************************************/
-    public WebFlowCredentialsAccessManager (WebFlowCredentials credentials, GLib.Object parent = new GLib.Object ())
-        : AccessManager (parent)
-        this.credentials (credentials) {
+    private QPointer<const WebFlowCredentials> credentials;
+
+    /***********************************************************
+    ***********************************************************/
+    public WebFlowCredentialsAccessManager (WebFlowCredentials credentials, GLib.Object parent = new GLib.Object ()) {
+        base (parent);
+        this.credentials = credentials;
     }
 
 
-    protected Soup.Reply create_request (Operation operation, Soup.Request request, QIODevice outgoing_data) override {
+    /***********************************************************
+    ***********************************************************/
+    protected override Soup.Reply create_request (Operation operation, Soup.Request request, QIODevice outgoing_data) {
         Soup.Request req (request);
         if (!req.attribute (WebFlowCredentials.DontAddCredentialsAttribute).to_bool ()) {
             if (this.credentials && !this.credentials.password ().is_empty ()) {
@@ -45,16 +52,17 @@ class WebFlowCredentialsAccessManager : AccessManager {
     }
 
 
-    // The credentials object dies along with the account, while the QNAM might
-    // outlive both.
-    private QPointer<const WebFlowCredentials> this.credentials;
-}
+    /***********************************************************
+    #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
+    ***********************************************************/
+    private static void add_settings_to_job (Account account, QKeychain.Job job) {
+        //  Q_UNUSED (account)
+        var settings = ConfigFile.settings_with_group (Theme.instance ().app_name ());
+        settings.parent (job); // make the job parent to make setting deleted properly
+        job.settings (settings.release ());
+    }
 
-#if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
-static void add_settings_to_job (Account account, QKeychain.Job job) {
-    //  Q_UNUSED (account)
-    var settings = ConfigFile.settings_with_group (Theme.instance ().app_name ());
-    settings.parent (job); // make the job parent to make setting deleted properly
-    job.settings (settings.release ());
-}
-//  #endif
+} // class WebFlowCredentialsAccessManager
+
+} // namespace Ui
+} // namespace Occ

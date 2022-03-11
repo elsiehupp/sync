@@ -52,7 +52,7 @@ class OwncloudGui : GLib.Object {
     ***********************************************************/
     private QPointer<Systray> tray;
     private QPointer<SettingsDialog> settings_dialog;
-    private QPointer<Log_browser> log_browser;
+    private QPointer<LogBrowser> log_browser;
 
     private QDBusConnection bus;
 
@@ -535,7 +535,7 @@ class OwncloudGui : GLib.Object {
     public void on_signal_toggle_log_browser () {
         if (this.log_browser.is_null ()) {
             // init the log browser.
-            this.log_browser = new Log_browser;
+            this.log_browser = new LogBrowser;
             // ## TODO: allow new log name maybe?
         }
 
