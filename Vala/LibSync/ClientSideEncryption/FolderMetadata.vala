@@ -89,10 +89,19 @@ public class FolderMetadata : GLib.Object {
         ***********************************************************/
 
         QJsonObject metadata = new QJsonObject (
-            {"metadata_keys", metadata_keys},
-            {"sharing", sharing_encrypted},
-            {"version", 1}
-        )
+            {
+                "metadata_keys",
+                metadata_keys
+            },
+            {
+                "sharing",
+                sharing_encrypted
+            },
+            {
+                "version",
+                1
+            }
+        );
 
         QJsonObject files;
         foreach (var each_file in this.files) {
@@ -119,9 +128,15 @@ public class FolderMetadata : GLib.Object {
         }
 
         QJsonObject meta_object = new QJsonObject (
-            {"metadata", metadata},
-            {"files", files}
-        )
+            {
+                "metadata",
+                metadata
+            },
+            {
+                "files",
+                files
+            }
+        );
 
         QJsonDocument internal_metadata;
         internal_metadata.object (meta_object);
@@ -170,11 +185,11 @@ public class FolderMetadata : GLib.Object {
     ***********************************************************/
     private void up_existing_metadata (GLib.ByteArray metadata) {
         /***********************************************************
-        This is the json response from the server, it contains two extra objects that we are not* interested.
-        * ocs and data.
-        */
+        This is the json response from the server, it contains two
+        extra objects that we are *not* interested in, ocs and data.
+        ***********************************************************/
         QJsonDocument doc = QJsonDocument.from_json (metadata);
-        GLib.info (doc.to_json (QJsonDocument.Compact);
+        GLib.info (doc.to_json (QJsonDocument.Compact));
 
         // The metadata is being retrieved as a string stored in a json.
         // This seems* to be broken but the RFC doesn't explicits how it wants.
@@ -195,7 +210,7 @@ public class FolderMetadata : GLib.Object {
 
         QJsonDocument debug_helper;
         debug_helper.object (metadata_keys);
-        GLib.debug ("Keys: " + debug_helper.to_json (QJsonDocument.Compact);
+        GLib.debug ("Keys: " + debug_helper.to_json (QJsonDocument.Compact));
 
         // Iterate over the document to store the keys. I'm unsure that the keys are in order,
         // perhaps it's better to store a map instead of a vector, perhaps this just doesn't matter.
@@ -207,8 +222,8 @@ public class FolderMetadata : GLib.Object {
             ***********************************************************/
             GLib.ByteArray b64Decrypted_key = decrypt_metadata_key (curr_b64Pass);
             if (b64Decrypted_key.is_empty ()) {
-            GLib.debug ("Could not decrypt metadata for key" + it.key ();
-            continue;
+                GLib.debug ("Could not decrypt metadata for key " + it.key ());
+                continue;
             }
 
             GLib.ByteArray decrypted_key = new GLib.ByteArray.from_base64 (b64Decrypted_key);
@@ -216,10 +231,10 @@ public class FolderMetadata : GLib.Object {
         }
 
         // Cool, We actually have the key, we can decrypt the rest of the metadata.
-        GLib.debug ("Sharing: " + sharing;
+        GLib.debug ("Sharing: " + sharing);
         if (sharing.size ()) {
             var sharing_decrypted = decrypt_json_object (sharing, this.metadata_keys.last ());
-            GLib.debug ("Sharing Decrypted" + sharing_decrypted;
+            GLib.debug ("Sharing Decrypted " + sharing_decrypted);
 
             //Sharing is also a JSON object, so extract it and populate.
             var sharing_doc = QJsonDocument.from_json (sharing_decrypted);
@@ -228,7 +243,7 @@ public class FolderMetadata : GLib.Object {
                 this.sharing.push_back ({it.key (), it.value ().to_string ()});
             }
         } else {
-            GLib.debug ("Skipping sharing section since it is empty";
+            GLib.debug ("Skipping sharing section since it is empty.");
         }
 
         for (var it = files.const_begin (), end = files.const_end (); it != end; it++) {

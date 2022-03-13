@@ -29,14 +29,9 @@ public class CookieJar : QNetworkCookieJar {
 
     /***********************************************************
     ***********************************************************/
-    public CookieJar (GLib.Object parent = new GLib.Object ())
+    public CookieJar (GLib.Object parent = new GLib.Object ()) {
         base (parent);
     }
-
-
-    /***********************************************************
-    ***********************************************************/
-    ~CookieJar () = default;
 
 
     /***********************************************************
@@ -55,7 +50,7 @@ public class CookieJar : QNetworkCookieJar {
     ***********************************************************/
     public GLib.List<QNetworkCookie> cookies_for_url (GLib.Uri url) {
         GLib.List<QNetworkCookie> cookies = QNetworkCookieJar.cookies_for_url (url);
-        GLib.debug (url + "requests:" + cookies;
+        GLib.debug (url + " requests: " + cookies);
         return cookies;
     }
 
@@ -70,18 +65,18 @@ public class CookieJar : QNetworkCookieJar {
     /***********************************************************
     ***********************************************************/
     public bool save (string filename) {
-        const GLib.FileInfo info (filename);
+        const GLib.FileInfo info = new GLib.FileInfo (filename);
         if (!info.directory ().exists ()) {
             info.directory ().mkpath (".");
         }
 
-        GLib.debug (filename;
+        GLib.debug (filename);
         GLib.File file = GLib.File.new_for_path (filename);
         if (!file.open (QIODevice.WriteOnly)) {
             return false;
         }
-        QDataStream stream (&file);
-        stream + remove_expired (all_cookies ());
+        QDataStream stream = new QDataStream (file);
+        stream += remove_expired (all_cookies ());
         file.close ();
         return true;
     }
@@ -90,7 +85,7 @@ public class CookieJar : QNetworkCookieJar {
     /***********************************************************
     ***********************************************************/
     public bool restore (string filename) {
-        const GLib.FileInfo info (filename);
+        const GLib.FileInfo info = new GLib.FileInfo (filename);
         if (!info.exists ()) {
             return false;
         }
@@ -99,7 +94,7 @@ public class CookieJar : QNetworkCookieJar {
         if (!file.open (QIODevice.ReadOnly)) {
             return false;
         }
-        QDataStream stream (&file);
+        QDataStream stream = new QDataStream (file);
         GLib.List<QNetworkCookie> list;
         stream >> list;
         all_cookies (remove_expired (list));
@@ -114,7 +109,7 @@ public class CookieJar : QNetworkCookieJar {
         GLib.List<QNetworkCookie> updated_list;
         foreach (QNetworkCookie cookie in cookies) {
             if (cookie.expiration_date () > GLib.DateTime.current_date_time_utc () && !cookie.is_session_cookie ()) {
-                updated_list + cookie;
+                updated_list += cookie;
             }
         }
         return updated_list;

@@ -383,7 +383,7 @@ public class AbstractNetworkJob : GLib.Object {
         connect (reply, Soup.Reply.on_signal_finished, this, AbstractNetworkJob.on_signal_finished);
         connect (reply, Soup.Reply.encrypted, this, AbstractNetworkJob.signal_network_activity);
         connect (reply.manager (), QNetworkAccessManager.signal_proxy_authentication_required, this, AbstractNetworkJob.signal_network_activity);
-        connect (reply, Soup.Reply.ssl_errors, this, AbstractNetworkJob.signal_network_activity);
+        connect (reply, Soup.Reply.signal_ssl_errors, this, AbstractNetworkJob.signal_network_activity);
         connect (reply, Soup.Reply.meta_data_changed, this, AbstractNetworkJob.signal_network_activity);
         connect (reply, Soup.Reply.download_progress, this, AbstractNetworkJob.signal_network_activity);
         connect (reply, Soup.Reply.signal_upload_progress, this, AbstractNetworkJob.signal_network_activity);

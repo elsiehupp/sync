@@ -17,7 +17,7 @@ public class PrivateKey : GLib.Object {
     and we have a static functions that return
     an instance of this class
     ***********************************************************/
-    public PrivateKey (PrivateKey&& other) {
+    public PrivateKey (PrivateKey other) {
         std.swap (this.pkey, other.pkey);
     }
 
@@ -41,7 +41,7 @@ public class PrivateKey : GLib.Object {
     }
 
 
-    public static PrivateKey generate (PrivateKeyContext& context) {
+    public static PrivateKey generate (PrivateKeyContext context) {
         PrivateKey result;
         if (EVP_PKEY_keygen (context, result.pkey) <= 0) {
             result.pkey = null;

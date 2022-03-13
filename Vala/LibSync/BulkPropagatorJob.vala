@@ -369,10 +369,11 @@ public class BulkPropagatorJob : PropagatorJob {
 
         current_headers["X-File-MD5"] = transmission_checksum_header;
 
-        BulkUploadItem new_upload_file = new BulkUploadItem (
+        BulkUploadItem new_upload_file = BulkUploadItem (
             propagator ().account (), item, file_to_upload,
             remote_path, file_to_upload.path,
-            file_to_upload.size, current_headers);
+            file_to_upload.size, current_headers
+        );
 
         GLib.info (remote_path + " transmission checksum " + transmission_checksum_header + file_to_upload.path);
         this.files_to_upload.push_back (std.move (new_upload_file));
@@ -468,21 +469,13 @@ public class BulkPropagatorJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    private 
-
-    /***********************************************************
-    ***********************************************************/
-    private 
-
-    /***********************************************************
-    ***********************************************************/
     private void on_signal_put_finished_one_file (
         BulkUploadItem single_file,
         PutMultiFileJob job,
         QJsonObject file_reply) {
         bool finished = false;
 
-        GLib.info (single_file.item.file + "file headers" + file_reply;
+        GLib.info (single_file.item.file + " file headers " + file_reply);
 
         if (file_reply.contains ("error") && !file_reply["error"].to_bool ()) {
             single_file.item.http_error_code = static_cast<uint16> (200);
@@ -511,7 +504,7 @@ public class BulkPropagatorJob : PropagatorJob {
         var etag = get_etag_from_json_reply (file_reply);
         finished = etag.length () > 0;
 
-        var full_file_path (propagator ().full_local_path (single_file.item.file));
+        var full_file_path = propagator ().full_local_path (single_file.item.file);
 
         // Check if the file still exists
         if (!check_file_still_exists (single_file.item, finished, full_file_path)) {
@@ -531,7 +524,7 @@ public class BulkPropagatorJob : PropagatorJob {
         if (get_header_from_json_reply (file_reply, "X-OC-MTime") != "accepted") {
             // X-OC-MTime is supported since owncloud 5.0.   But not when chunking.
             // Normally Owncloud 6 always puts X-OC-MTime
-            GLib.warning ("Server does not support X-OC-MTime" + get_header_from_json_reply (file_reply, "X-OC-MTime");
+            GLib.warning ("Server does not support X-OC-MTime " + get_header_from_json_reply (file_reply, "X-OC-MTime"));
             // Well, the mtime was not set
         }
     }

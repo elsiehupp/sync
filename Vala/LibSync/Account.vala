@@ -290,7 +290,7 @@ public class Account : GLib.Object {
             if (proxy.type () != QNetworkProxy.DefaultProxy) {
                 this.access_manager.proxy (proxy);
             }
-            this.ssl_errors.connect (
+            this.signal_ssl_errors.connect (
                 this.access_manager.data (),
                 this.on_signal_handle_ssl_errors);
             QNetworkAccessManager.signal_proxy_authentication_required.connect (
@@ -392,7 +392,7 @@ public class Account : GLib.Object {
     /***********************************************************
     e.g. when the approved SSL certificates changed
     ***********************************************************/
-    signal void signal_wants_account_saved (Account acc);
+    signal void signal_wants_account_saved (Account account);
 
     /***********************************************************
     ***********************************************************/
@@ -425,7 +425,7 @@ public class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    signal void ssl_errors (Soup.Reply reply, GLib.List<QSslError> error_list);
+    signal void signal_ssl_errors (Soup.Reply reply, GLib.List<QSslError> error_list);
 
     /***********************************************************
     ***********************************************************/
@@ -446,9 +446,9 @@ public class Account : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static unowned Account create () {
-        unowned Account acc = unowned Account (new Account ());
-        acc.shared_this (acc);
-        return acc;
+        unowned Account account = new Account ();
+        account.shared_this (account);
+        return account;
     }
 
 
@@ -577,9 +577,9 @@ public class Account : GLib.Object {
     public SimpleNetworkJob send_request (GLib.ByteArray verb,
         GLib.Uri url, Soup.Request request = Soup.Request (),
         QIODevice data = null) {
-        var job = new SimpleNetworkJob (shared_from_this ());
-        job.start_request (verb, url, request, data);
-        return job;
+        var simple_network_job = new SimpleNetworkJob (shared_from_this ());
+        simple_network_job.start_request (verb, url, request, data);
+        return simple_network_job;
     }
 
 
@@ -787,20 +787,28 @@ public class Account : GLib.Object {
             return;
         }
 
-        var job = new DeletePasswordJob (Theme.instance ().app_name ());
-        job.insecure_fallback (false);
-        job.key (kck);
-        connect (job, DeletePasswordJob.on_signal_finished, (Job incoming) => {
-            var delete_job = static_cast<DeletePasswordJob> (incoming);
-            if (delete_job.error () == NoError)
-                GLib.info ("app_password deleted from keychain");
-            else
-                GLib.warning ("Unable to delete app_password from keychain" + delete_job.error_string ());
+        var delete_password_job = new DeletePasswordJob (Theme.instance ().app_name ());
+        delete_password_job.insecure_fallback (false);
+        delete_password_job.key (kck);
+        connect (
+            delete_password_job,
+            DeletePasswordJob.signal_finished,
+            this.on_signal_delete_password_job_finished
+        );
+        delete_password_job.on_signal_start ();
+    }
 
-            // Allow storing a new app password on re-login
-            this.wrote_app_password = false;
-        });
-        job.on_signal_start ();
+
+    private void on_signal_delete_password_job_finished (Job incoming) {
+        var delete_job = static_cast<DeletePasswordJob> (incoming);
+        if (delete_job.error () == NoError) {
+            GLib.info ("app_password deleted from keychain.");
+        } else {
+            GLib.warning ("Unable to delete app_password from keychain " + delete_job.error_string ());
+        }
+
+        // Allow storing a new app password on re-login
+        this.wrote_app_password = false;
     }
 
 
@@ -829,8 +837,11 @@ public class Account : GLib.Object {
         this.access_manager.cookie_jar (jar); // takes ownership of the old cookie jar
         this.access_manager.proxy (proxy);   // Remember proxy (issue #2108)
 
-        connect (this.access_manager.data (), SIGNAL (ssl_errors (Soup.Reply reply, GLib.List<QSslError> error_list)),
-            SLOT (on_signal_handle_ssl_errors (Soup.Reply reply, GLib.List<QSslError> error_list)));
+        connect (
+            this.access_manager.data (),
+            signal_ssl_errors (reply, error_list),
+            on_signal_handle_ssl_errors (reply, error_list)
+        );
         Account.signal_proxy_authentication_required.connect (this.access_manager.data (), QNetworkAccessManager.signal_proxy_authentication_required);
     }
 
@@ -873,21 +884,27 @@ public class Account : GLib.Object {
             identifier ()
         );
 
-        var job = new ReadPasswordJob (Theme.instance ().app_name ());
-        job.insecure_fallback (false);
-        job.key (kck);
-        connect (job, ReadPasswordJob.on_signal_finished, (Job incoming) => {
-            var read_job = (ReadPasswordJob) (incoming);
-            string pwd "";
-            // Error or no valid public key error out
-            if (read_job.error () == NoError &&
-                    read_job.binary_data ().length () > 0) {
-                pwd = read_job.binary_data ();
-            }
+        var read_password_job = new ReadPasswordJob (Theme.instance ().app_name ());
+        read_password_job.insecure_fallback (false);
+        read_password_job.key (kck);
+        connect (
+            read_password_job,
+            ReadPasswordJob.signal_finished,
+            this.on_signal_read_password_job_finished);
+        read_password_job.on_signal_start ();
+    }
 
-            /* emit */ signal_app_password_retrieved (pwd);
-        });
-        job.on_signal_start ();
+
+    private void on_signal_read_password_job_finished (Job incoming) {
+        var read_job = (ReadPasswordJob) incoming;
+        string password = "";
+        // Error or no valid public key error out
+        if (read_job.error () == NoError &&
+                read_job.binary_data ().length () > 0) {
+            password = read_job.binary_data ();
+        }
+
+        /* emit */ signal_app_password_retrieved (password);
     }
 
 
@@ -911,21 +928,29 @@ public class Account : GLib.Object {
                     identifier ()
         );
 
-        var job = new WritePasswordJob (Theme.instance ().app_name ());
-        job.insecure_fallback (false);
-        job.key (kck);
-        job.binary_data (app_password.to_latin1 ());
-        connect (job, WritePasswordJob.on_signal_finished, (Job incoming) => {
-            var write_job = (WritePasswordJob) (incoming);
-            if (write_job.error () == NoError)
-                GLib.info ("app_password stored in keychain");
-            else
-                GLib.warning ("Unable to store app_password in keychain" + write_job.error_string ());
+        var write_password_job = new WritePasswordJob (Theme.instance ().app_name ());
+        write_password_job.insecure_fallback (false);
+        write_password_job.key (kck);
+        write_password_job.binary_data (app_password.to_latin1 ());
+        connect (
+            write_password_job,
+            WritePasswordJob.signal_finished,
+            this.on_signal_write_password_job_finished
+        );
+        write_password_job.on_signal_start ();
+    }
 
-            // We don't try this again on error, to not raise CPU consumption
-            this.wrote_app_password = true;
-        });
-        job.on_signal_start ();
+
+    private void on_signal_write_password_job_finished (Job incoming) {
+        var write_job = (WritePasswordJob) (incoming);
+        if (write_job.error () == NoError) {
+            GLib.info ("app_password stored in keychain.");
+        } else {
+            GLib.warning ("Unable to store app_password in keychain " + write_job.error_string ());
+        }
+
+        // We don't try this again on error, to not raise CPU consumption
+        this.wrote_app_password = true;
     }
 
 
@@ -933,23 +958,30 @@ public class Account : GLib.Object {
     ***********************************************************/
     public void delete_app_token () {
         var delete_app_token_job = new DeleteJob (shared_from_this (), "/ocs/v2.php/core/apppassword");
-        connect (delete_app_token_job, DeleteJob.signal_finished, this, () => {
-            var delete_job = (DeleteJob)GLib.Object.sender ();
-            if (delete_job) {
-                var http_code = delete_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-                if (http_code != 200) {
-                    GLib.warning ("AppToken remove failed for user: " + display_name () + " with code: " + http_code);
-                } else {
-                    GLib.info ("AppToken for user: " + display_name () + " has been removed.");
-                }
-            } else {
-                //  Q_ASSERT (false);
-                GLib.warning ("The sender is not a DeleteJob instance.");
-            }
-        });
+        connect (
+            delete_app_token_job,
+            DeleteJob.signal_finished,
+            this,
+            this.on_signal_delete_job_finished
+        );
         delete_app_token_job.on_signal_start ();
     }
 
+
+    private void on_signal_delete_job_finished () {
+        var delete_job = (DeleteJob)GLib.Object.sender ();
+        if (delete_job) {
+            var http_code = delete_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+            if (http_code != 200) {
+                GLib.warning ("AppToken remove failed for user: " + display_name () + " with code: " + http_code);
+            } else {
+                GLib.info ("AppToken for user: " + display_name () + " has been removed.");
+            }
+        } else {
+            //  Q_ASSERT (false);
+            GLib.warning ("The sender is not a DeleteJob instance.");
+        }
+    }
 
 
     /***********************************************************
@@ -964,9 +996,9 @@ public class Account : GLib.Object {
         if (!direct_editing_url.is_empty () &&
             (direct_editing_e_tag.is_empty () || direct_editing_e_tag != this.last_direct_editing_e_tag)) {
                 // Fetch the available editors and their mime types
-                var job = new JsonApiJob (shared_from_this (), QLatin1String ("ocs/v2.php/apps/files/api/v1/direct_editing"));
-                GLib.Object.JsonApiJob.signal_json_received.connect (job, this, Account.on_signal_direct_editing_recieved);
-                job.on_signal_start ();
+                var json_api_job = new JsonApiJob (shared_from_this (), QLatin1String ("ocs/v2.php/apps/files/api/v1/direct_editing"));
+                GLib.Object.JsonApiJob.signal_json_received.connect (json_api_job, this, Account.on_signal_direct_editing_recieved);
+                json_api_job.on_signal_start ();
         }
     }
 
@@ -975,15 +1007,29 @@ public class Account : GLib.Object {
     ***********************************************************/
     public void setup_user_status_connector () {
         this.user_status_connector = std.make_shared<OcsUserStatusConnector> (shared_from_this ());
-        connect (this.user_status_connector, UserStatusConnector.user_status_fetched, this, (UserStatus status) => {
-            /* emit */ signal_user_status_changed ();
-        });
-        connect (this.user_status_connector, UserStatusConnector.message_cleared, this, () => {
-            /* emit */ signal_user_status_changed ();
-        });
+        connect (
+            this.user_status_connector,
+            UserStatusConnector.user_status_fetched,
+            this,
+            this.on_signal_user_status_connector_user_status_fetched
+        );
+        connect (
+            this.user_status_connector,
+            UserStatusConnector.message_cleared,
+            this,
+            this.on_signal_user_status_connector_message_cleared
+        );
     }
 
 
+    private void on_signal_user_status_connector_user_status_fetched (UserStatus status) {
+        /* emit */ signal_user_status_changed ();
+    }
+
+
+    private void on_signal_user_status_connector_message_cleared () {
+        /* emit */ signal_user_status_changed ();
+    }
 
 
     /***********************************************************
@@ -1084,24 +1130,32 @@ public class Account : GLib.Object {
         if (this.dav_user.is_empty ()) {
             GLib.debug ("User identifier not set. Fetch it.");
             var fetch_user_name_job = new JsonApiJob (shared_from_this (), "/ocs/v1.php/cloud/user");
-            connect (fetch_user_name_job, JsonApiJob.signal_json_received, this, /*[this, fetch_user_name_job]*/ (QJsonDocument json, int status_code) => {
-                fetch_user_name_job.delete_later ();
-                if (status_code != 100) {
-                    GLib.warning ("Could not fetch user identifier. Login will probably not work.");
-                    /* emit */ signal_credentials_fetched (this.credentials.data ());
-                    return;
-                }
-
-                var obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
-                var user_id = obj_data.value ("identifier").to_string ();
-                dav_user (user_id);
-                /* emit */ signal_credentials_fetched (this.credentials.data ());
-            });
+            connect (
+                fetch_user_name_job,
+                JsonApiJob.signal_json_received,
+                this,
+                this.on_signal_json_api_job_user_name_fetched
+            );
             fetch_user_name_job.on_signal_start ();
         } else {
             GLib.debug ("User identifier already fetched.");
             /* emit */ signal_credentials_fetched (this.credentials.data ());
         }
+    }
+
+
+    private void on_signal_json_api_job_user_name_fetched (JsonApiJob fetch_user_name_job, QJsonDocument json, int status_code) {
+        fetch_user_name_job.delete_later ();
+        if (status_code != 100) {
+            GLib.warning ("Could not fetch user identifier. Login will probably not work.");
+            /* emit */ signal_credentials_fetched (this.credentials.data ());
+            return;
+        }
+
+        var obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
+        var user_id = obj_data.value ("identifier").to_string ();
+        dav_user (user_id);
+        /* emit */ signal_credentials_fetched (this.credentials.data ());
     }
 
 

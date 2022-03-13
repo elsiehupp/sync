@@ -133,7 +133,7 @@ public class ConfigFile : GLib.Object {
             }
             if (file_info.exists () && file_info.is_dir ()) {
                 dir_path = file_info.absolute_file_path ();
-                GLib.info ("Using custom config directory " + dir_path;
+                GLib.info ("Using custom config directory " + dir_path);
                 this.conf_dir = dir_path;
                 return true;
             }
@@ -198,11 +198,6 @@ public class ConfigFile : GLib.Object {
 
 
     /***********************************************************
-    ***********************************************************/
-    public 
-
-
-    /***********************************************************
     Prefer sync-exclude.lst, but if it does not exist, check for
     exclude.lst for compatibility reasons in the user writeable
     directories.
@@ -236,21 +231,21 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     public static string exclude_file_from_system () {
         GLib.FileInfo file_info;
-        file_info.file (string (SYSCONFDIR "/" + Theme.instance ().app_name ()), EXCL_FILE);
+        file_info.file (SYSCONFDIR + "/" + Theme.instance ().app_name (), EXCL_FILE);
         if (!file_info.exists ()) {
             // Prefer to return the preferred path! Only use the fallback location
             // if the other path does not exist and the fallback is valid.
-            GLib.FileInfo next_to_binary (QCoreApplication.application_dir_path (), EXCL_FILE);
+            GLib.FileInfo next_to_binary = new GLib.FileInfo (QCoreApplication.application_dir_path (), EXCL_FILE);
             if (next_to_binary.exists ()) {
                 file_info = next_to_binary;
             } else {
                 // For AppImage, the file might reside under a temporary mount path
-                QDir d (QCoreApplication.application_dir_path ()); // supposed to be /tmp/mount.xyz/usr/bin
+                QDir d = new QDir (QCoreApplication.application_dir_path ()); // supposed to be /tmp/mount.xyz/usr/bin
                 d.cd_up (); // go out of bin
                 d.cd_up (); // go out of usr
                 if (!d.is_root ()) { // it is really a mountpoint
                     if (d.cd ("etc") && d.cd (Theme.instance ().app_name ())) {
-                        GLib.FileInfo in_mount_dir (d, EXCL_FILE);
+                        GLib.FileInfo in_mount_dir = new GLib.FileInfo (d, EXCL_FILE);
                         if (in_mount_dir.exists ()) {
                             file_info = in_mount_dir;
                         }
@@ -274,16 +269,17 @@ public class ConfigFile : GLib.Object {
         if (!version_string.is_empty ())
             version_string.prepend ('_');
         string backup_file =
-            string ("%1.backup_%2%3")
-                .arg (base_file)
-                .arg (GLib.DateTime.current_date_time ().to_string () + "yyyy_mMdd_HHmmss"))
-                .arg (version_string);
+            "%1.backup_%2%3"
+                .arg (
+                    base_file,
+                    GLib.DateTime.current_date_time ().to_string () + "yyyyMMdd_HHmmss",
+                    version_string);
 
         // If this exact file already exists it's most likely that a backup was
         // already done. (two backup calls directly after each other, potentially
         // even with source alterations in between!)
         if (!GLib.File.exists (backup_file)) {
-            GLib.File f (base_file);
+            GLib.File f = new GLib.File (base_file);
             f.copy (backup_file);
         }
         return backup_file;
@@ -331,7 +327,7 @@ public class ConfigFile : GLib.Object {
         var default_poll_interval = chrono.milliseconds (DEFAULT_REMOTE_POLL_INTERVAL);
         var remote_interval = milliseconds_value (settings, REMOTE_POLL_INTERVAL_C, default_poll_interval);
         if (remote_interval < chrono.seconds (5)) {
-            GLib.warning ("Remote Interval is less than 5 seconds, reverting to" + DEFAULT_REMOTE_POLL_INTERVAL;
+            GLib.warning ("Remote Interval is less than 5 seconds, reverting to " + DEFAULT_REMOTE_POLL_INTERVAL);
             remote_interval = default_poll_interval;
         }
         return remote_interval;
@@ -349,7 +345,7 @@ public class ConfigFile : GLib.Object {
             connection_string = default_connection ();
 
         if (interval < chrono.seconds (5)) {
-            GLib.warning ("Remote Poll interval of " + interval.count (" is below five seconds.";
+            GLib.warning ("Remote Poll interval of " + interval.count () + " is below five seconds.");
             return;
         }
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
@@ -372,7 +368,7 @@ public class ConfigFile : GLib.Object {
         var default_interval = chrono.minutes (5);
         var interval = milliseconds_value (settings, NOTIFICATION_REFRESH_INTERVAL_C, default_interval);
         if (interval < chrono.minutes (1)) {
-            GLib.warning ("Notification refresh interval smaller than one minute, setting to one minute";
+            GLib.warning ("Notification refresh interval smaller than one minute; setting to one minute.");
             interval = chrono.minutes (1);
         }
         return interval;
@@ -394,7 +390,7 @@ public class ConfigFile : GLib.Object {
         var default_interval = chrono.hours (2);
         var interval = milliseconds_value (settings, FORCE_SYNC_INTERVAL_C, default_interval);
         if (interval < poll_interval) {
-            GLib.warning ("Force sync interval is less than the remote poll inteval, reverting to" + poll_interval.count ();
+            GLib.warning ("Force sync interval is less than the remote poll inteval; reverting to " + poll_interval.count ());
             interval = poll_interval;
         }
         return interval;
@@ -450,16 +446,6 @@ public class ConfigFile : GLib.Object {
             settings.value (QLatin1String (PROMPT_DELETE_C), value);
         }
     }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-
-    /***********************************************************
-    ***********************************************************/
-    public 
 
 
     /***********************************************************
@@ -602,41 +588,28 @@ public class ConfigFile : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public string proxy_host_name () {
-        return get_value (QLatin1String (PROXY_HOST_C)).to_string ();
+        return get_value (PROXY_HOST_C).to_string ();
     }
 
-
     /***********************************************************
     ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public int proxy_port ();
-    int ConfigFile.proxy_port () {
-        return get_value (QLatin1String (PROXY_PORT_C)).to_int ();
+    public int proxy_port () {
+        return get_value (PROXY_PORT_C).to_int ();
     }
 
 
 
     /***********************************************************
     ***********************************************************/
-    public 
-    bool ConfigFile.proxy_needs_auth () {
-        return get_value (QLatin1String (PROXY_NEEDS_AUTH_C)).to_bool ();
+    public bool proxy_needs_auth () {
+        return get_value (PROXY_NEEDS_AUTH_C).to_bool ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public 
-
-
-    /***********************************************************
-    ***********************************************************/
-    public string proxy_user ();
-    string ConfigFile.proxy_user () {
-        return get_value (QLatin1String (PROXY_USER_C)).to_string ();
+    public string proxy_user () {
+        return get_value (PROXY_USER_C).to_string ();
     }
 
 
@@ -657,7 +630,7 @@ public class ConfigFile : GLib.Object {
             if (job.exec ()) {
                 GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
                 settings.remove (QLatin1String (PROXY_PASS_C));
-                GLib.info ("Migrated proxy password to keychain";
+                GLib.info ("Migrated proxy password to keychain.");
             }
         } else {
             // Read password from keychain
@@ -682,29 +655,21 @@ public class ConfigFile : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public int use_download_limit ();
-    int ConfigFile.use_download_limit () {
+    public int use_download_limit () {
         return get_value (USE_DOWNLOAD_LIMIT_C, "", 0).to_int ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public 
-    void ConfigFile.use_upload_limit (int val) {
+    public void use_upload_limit_value (int val) {
         value (USE_UPLOAD_LIMIT_C, val);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public 
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void use_download_limit (int);
-    void ConfigFile.use_download_limit (int val) {
+    public void use_download_limit_vlaue (int val) {
         value (USE_DOWNLOAD_LIMIT_C, val);
     }
 
@@ -731,29 +696,25 @@ public class ConfigFile : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public 
-    void ConfigFile.upload_limit (int kbytes) {
+    public void upload_limit (int kbytes) {
         value (UPLOAD_LIMIT_C, kbytes);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public 
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void download_limit (int kbytes);
-    void ConfigFile.download_limit (int kbytes) {
+    public void download_limit (int kbytes) {
         value (DOWNLOAD_LIMIT_C, kbytes);
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public struct SizeLimit {
         bool is_checked;
         int64 mbytes;
     }
+
 
     /***********************************************************
     [checked, size in MB]
@@ -930,12 +891,7 @@ public class ConfigFile : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-    int64 ConfigFile.chunk_size () {
+    public int64 chunk_size () {
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
         return settings.value (QLatin1String (CHUNK_SIZE_C), 10 * 1000 * 1000).to_long_long (); // default to 10 MB
     }
@@ -943,8 +899,7 @@ public class ConfigFile : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public int64 max_chunk_size ();
-    int64 ConfigFile.max_chunk_size () {
+    public int64 max_chunk_size () {
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
         return settings.value (QLatin1String (MAX_CHUNK_SIZE_C), 1000 * 1000 * 1000).to_long_long (); // default to 1000 MB
     }
@@ -952,8 +907,7 @@ public class ConfigFile : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public 
-    int64 ConfigFile.min_chunk_size () {
+    public int64 min_chunk_size () {
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
         return settings.value (QLatin1String (MIN_CHUNK_SIZE_C), 1000 * 1000).to_long_long (); // default to 1 MB
     }
@@ -1039,7 +993,7 @@ public class ConfigFile : GLib.Object {
 
         var min_interval = chrono.minutes (5);
         if (interval < min_interval) {
-            GLib.warning ("Update check interval less than five minutes, resetting to 5 minutes";
+            GLib.warning ("Update check interval less than five minutes; resetting to 5 minutes.");
             interval = min_interval;
         }
         return interval;
@@ -1148,43 +1102,28 @@ public class ConfigFile : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public 
-    void ConfigFile.update_channel (string channel) {
+    public void update_channel (string channel) {
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
         settings.value (QLatin1String (UPDATE_CHANNEL_C), channel);
     }
 
-
     /***********************************************************
     ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public void restore_geometry_header
-
-
-    /***********************************************************
-    ***********************************************************/
-    public 
+    //  public void restore_geometry_header
 
 
     /***********************************************************
     ***********************************************************/
     public string certificate_path () {
-        return retrieve_data ("", QLatin1String (CERT_PATH)).to_string ();
+        return retrieve_data ("", CERT_PATH).to_string ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void certificate_path (string c_path) {
+    public void certificate_path_for_path (string c_path) {
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-        settings.value (QLatin1String (CERT_PATH), c_path);
+        settings.value (CERT_PATH, c_path);
         settings.sync ();
     }
 
@@ -1223,13 +1162,13 @@ public class ConfigFile : GLib.Object {
     Returns a new settings pre-set in a specific group.  The Settings will be created
     with the given parent. If no parent is specified, the caller must destroy the settings
     ***********************************************************/
-    public static std.unique_ptr<GLib.Settings> settings_with_group (string group, GLib.Object parent = new GLib.Object ()) {
+    public static GLib.Settings settings_with_group (string group, GLib.Object parent = new GLib.Object ()) {
         if (g_config_filename ().is_empty ()) {
             // cache file name
             ConfigFile config;
             *g_config_filename () = config.config_file ();
         }
-        std.unique_ptr<GLib.Settings> settings (new GLib.Settings (*g_config_filename (), GLib.Settings.IniFormat, parent));
+        GLib.Settings settings = new GLib.Settings (*g_config_filename (), GLib.Settings.IniFormat, parent);
         settings.begin_group (group);
         return settings;
     }
@@ -1244,17 +1183,17 @@ public class ConfigFile : GLib.Object {
         string user_list = config.exclude_file (ConfigFile.USER_SCOPE);
 
         if (!GLib.File.exists (user_list)) {
-            GLib.info ("User defined ignore list does not exist:" + user_list;
+            GLib.info ("User defined ignore list does not exist: " + user_list);
             if (!GLib.File.copy (system_list, user_list)) {
-                GLib.info ("Could not copy over default list to:" + user_list;
+                GLib.info ("Could not copy over default list to: " + user_list);
             }
         }
 
         if (!GLib.File.exists (user_list)) {
-            GLib.info ("Adding system ignore list to csync:" + system_list;
+            GLib.info ("Adding system ignore list to csync: " + system_list);
             excluded_files.add_exclude_file_path (system_list);
         } else {
-            GLib.info ("Adding user defined ignore list to csync:" + user_list;
+            GLib.info ("Adding user defined ignore list to csync: " + user_list);
             excluded_files.add_exclude_file_path (user_list);
         }
     }
@@ -1265,15 +1204,17 @@ public class ConfigFile : GLib.Object {
     protected GLib.Variant get_policy_setting (string policy, GLib.Variant default_value = GLib.Variant ()) {
         if (Utility.is_windows ()) {
             // check for policies first and return immediately if a value is found.
-            GLib.Settings user_policy = new GLib.Settings(string.from_latin1 (R" (HKEY_CURRENT_USER\Software\Policies\%1\%2)")
-                                    .arg (APPLICATION_VENDOR, Theme.instance ().app_name_gui ()),
+            GLib.Settings user_policy = new GLib.Settings(
+                " (HKEY_CURRENT_USER\Software\Policies\%1\%2)"
+                    .arg (APPLICATION_VENDOR, Theme.instance ().app_name_gui ()),
                 GLib.Settings.NativeFormat);
             if (user_policy.contains (setting)) {
                 return user_policy.value (setting);
             }
 
-            GLib.Settings machine_policy = new GLib.Settings (string.from_latin1 (R" (HKEY_LOCAL_MACHINE\Software\Policies\%1\%2)")
-                                        .arg (APPLICATION_VENDOR, Theme.instance ().app_name_gui ()),
+            GLib.Settings machine_policy = new GLib.Settings (
+                " (HKEY_LOCAL_MACHINE\Software\Policies\%1\%2)"
+                    .arg (APPLICATION_VENDOR, Theme.instance ().app_name_gui ()),
                 GLib.Settings.NativeFormat);
             if (machine_policy.contains (setting)) {
                 return machine_policy.value (setting);
@@ -1346,8 +1287,9 @@ public class ConfigFile : GLib.Object {
             }
             system_setting = system_settings.value (param, default_value);
         } else { // Windows
-            GLib.Settings system_settings = new GLib.Settings (" (HKEY_LOCAL_MACHINE\\Software\\%1\\%2)")
-                .arg (APPLICATION_VENDOR, Theme.instance ().app_name_gui ()),
+            GLib.Settings system_settings = new GLib.Settings (
+                " (HKEY_LOCAL_MACHINE\\Software\\%1\\%2)"
+                    .arg (APPLICATION_VENDOR, Theme.instance ().app_name_gui ()),
                 GLib.Settings.NativeFormat);
             if (group != "") {
                 system_settings.begin_group (group);

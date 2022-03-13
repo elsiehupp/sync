@@ -87,7 +87,7 @@ public class PushNotifications : GLib.Object {
         this.is_ready = false;
         this.web_socket = new QWeb_socket ("", QWeb_socket_protocol.Version_latest, this);
         connect (this.web_socket, QOverload<QAbstractSocket.SocketError>.of (&QWeb_socket.error), this, PushNotifications.on_signal_web_socket_error);
-        connect (this.web_socket, QWeb_socket.ssl_errors, this, PushNotifications.on_signal_web_socket_ssl_errors);
+        connect (this.web_socket, QWeb_socket.signal_ssl_errors, this, PushNotifications.on_signal_web_socket_ssl_errors);
         connect (this.web_socket, QWeb_socket.connected, this, PushNotifications.on_signal_web_socket_connected);
         connect (this.web_socket, QWeb_socket.disconnected, this, PushNotifications.on_signal_web_socket_disconnected);
         connect (this.web_socket, QWeb_socket.pong, this, PushNotifications.on_signal_web_socket_pong_received);
@@ -230,7 +230,7 @@ public class PushNotifications : GLib.Object {
 
         GLib.info ("Open connection to websocket on" + web_socket_url + "for account" + this.account.url ();
         connect (this.web_socket, QOverload<QAbstractSocket.SocketError>.of (&QWeb_socket.error), this, PushNotifications.on_signal_web_socket_error);
-        connect (this.web_socket, QWeb_socket.ssl_errors, this, PushNotifications.on_signal_web_socket_ssl_errors);
+        connect (this.web_socket, QWeb_socket.signal_ssl_errors, this, PushNotifications.on_signal_web_socket_ssl_errors);
         this.web_socket.open (web_socket_url);
     }
 
@@ -258,7 +258,7 @@ public class PushNotifications : GLib.Object {
         }
 
         disconnect (this.web_socket, QOverload<QAbstractSocket.SocketError>.of (&QWeb_socket.error), this, PushNotifications.on_signal_web_socket_error);
-        disconnect (this.web_socket, QWeb_socket.ssl_errors, this, PushNotifications.on_signal_web_socket_ssl_errors);
+        disconnect (this.web_socket, QWeb_socket.signal_ssl_errors, this, PushNotifications.on_signal_web_socket_ssl_errors);
 
         this.web_socket.close ();
     }

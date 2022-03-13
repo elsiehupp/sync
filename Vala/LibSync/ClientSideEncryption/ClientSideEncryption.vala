@@ -218,10 +218,10 @@ public class ClientSideEncryption : GLib.Object {
         GLib.info ("Returning the certificate:");
         GLib.info (output);
 
-        var job = new SignPublicKeyApiJob (account, E2EE_BASE_URL + "public-key", this);
-        job.csr (output);
+        var sign_public_key_api_job = new SignPublicKeyApiJob (account, E2EE_BASE_URL + "public-key", this);
+        sign_public_key_api_job.csr (output);
 
-        SignPublicKeyApiJob.signal_json_received.connect ((job, json, return_code) => {
+        SignPublicKeyApiJob.signal_json_received.connect ((sign_public_key_api_job, json, return_code) => {
             if (return_code == 200) {
                 string cert = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("public-key").to_string ();
                 this.certificate = QSslCertificate (cert.to_local8Bit (), QSsl.Pem);
@@ -230,7 +230,7 @@ public class ClientSideEncryption : GLib.Object {
             }
             GLib.info ("Return code: " + return_code);
         });
-        job.on_signal_start ();
+        sign_public_key_api_job.on_signal_start ();
     }
 
 
@@ -252,9 +252,9 @@ public class ClientSideEncryption : GLib.Object {
         var crypted_text = EncryptionHelper.encrypt_private_key (secret_key, EncryptionHelper.private_key_to_pem (this.private_key), salt);
 
         // Send private key to the server
-        var job = new StorePrivateKeyApiJob (account, E2EE_BASE_URL + "private-key", this);
-        job.private_key (crypted_text);
-        StorePrivateKeyApiJob.signal_json_received.connect ((job, doc, return_code) => {
+        var store_private_key_api_job = new StorePrivateKeyApiJob (account, E2EE_BASE_URL + "private-key", this);
+        store_private_key_api_job.private_key (crypted_text);
+        StorePrivateKeyApiJob.signal_json_received.connect ((store_private_key_api_job, doc, return_code) => {
             //  Q_UNUSED (doc);
             switch (return_code) {
                 case 200:
@@ -268,7 +268,7 @@ public class ClientSideEncryption : GLib.Object {
                     GLib.info ("Store private key failed, return code: " + return_code);
             }
         });
-        job.on_signal_start ();
+        store_private_key_api_job.on_signal_start ();
     }
 
 
@@ -280,17 +280,18 @@ public class ClientSideEncryption : GLib.Object {
         this.public_key = new QSslKey ();
         this.mnemonic = "";
 
-        var start_delete_job = [account] (string user) => {
-            var job = new DeletePasswordJob (Theme.instance ().app_name ());
-            job.insecure_fallback (false);
-            job.key (AbstractCredentials.keychain_key (account.url ().to_string (), user, account.identifier ()));
-            job.on_signal_start ();
-        }
-
         var user = account.credentials ().user ();
-        start_delete_job (user + E2E_PRIVATE);
-        start_delete_job (user + E2E_CERTIFICATE);
-        start_delete_job (user + E2E_MNEMONIC);
+        start_delete_job (account, user + E2E_PRIVATE);
+        start_delete_job (account, user + E2E_CERTIFICATE);
+        start_delete_job (account, user + E2E_MNEMONIC);
+    }
+
+
+    private void start_delete_job (Account account, string user) {
+        var delete_password_job = new DeletePasswordJob (Theme.instance ().app_name ());
+        delete_password_job.insecure_fallback (false);
+        delete_password_job.key (AbstractCredentials.keychain_key (account.url ().to_string (), user, account.identifier ()));
+        delete_password_job.on_signal_start ();
     }
 
 
@@ -331,12 +332,12 @@ public class ClientSideEncryption : GLib.Object {
             account.identifier ()
         );
 
-        var job = new ReadPasswordJob (Theme.instance ().app_name ());
-        job.property (ACCOUNT_PROPERTY, GLib.Variant.from_value (account));
-        job.insecure_fallback (false);
-        job.key (kck);
-        connect (job, ReadPasswordJob.on_signal_finished, this, ClientSideEncryption.on_signal_private_key_fetched);
-        job.on_signal_start ();
+        var read_password_job = new ReadPasswordJob (Theme.instance ().app_name ());
+        read_password_job.property (ACCOUNT_PROPERTY, GLib.Variant.from_value (account));
+        read_password_job.insecure_fallback (false);
+        read_password_job.key (kck);
+        connect (read_password_job, ReadPasswordJob.on_signal_finished, this, ClientSideEncryption.on_signal_private_key_fetched);
+        read_password_job.on_signal_start ();
     }
 
 
@@ -371,12 +372,12 @@ public class ClientSideEncryption : GLib.Object {
                     account.identifier ()
         );
 
-        var job = new ReadPasswordJob (Theme.instance ().app_name ());
-        job.property (ACCOUNT_PROPERTY, GLib.Variant.from_value (account));
-        job.insecure_fallback (false);
-        job.key (kck);
-        connect (job, ReadPasswordJob.on_signal_finished, this, ClientSideEncryption.on_signal_mnemonic_key_fetched);
-        job.on_signal_start ();
+        var read_password_job = new ReadPasswordJob (Theme.instance ().app_name ());
+        read_password_job.property (ACCOUNT_PROPERTY, GLib.Variant.from_value (account));
+        read_password_job.insecure_fallback (false);
+        read_password_job.key (kck);
+        connect (read_password_job, ReadPasswordJob.on_signal_finished, this, ClientSideEncryption.on_signal_mnemonic_key_fetched);
+        read_password_job.on_signal_start ();
     }
 
 
@@ -408,8 +409,8 @@ public class ClientSideEncryption : GLib.Object {
     ***********************************************************/
     private void get_private_key_from_server (unowned Account account) {
         GLib.info ("Retrieving private key from server.");
-        var job = new JsonApiJob (account, E2EE_BASE_URL + "private-key", this);
-        JsonApiJob.signal_json_received.connect ((job, doc, return_code) => {
+        var json_api_job = new JsonApiJob (account, E2EE_BASE_URL + "private-key", this);
+        JsonApiJob.signal_json_received.connect ((json_api_job, doc, return_code) => {
             if (return_code == 200) {
                 string key = doc.object ()["ocs"].to_object ()["data"].to_object ()["private-key"].to_string ();
                 GLib.info (key);
@@ -421,16 +422,16 @@ public class ClientSideEncryption : GLib.Object {
                 GLib.info ("Error while requesting public key: " + return_code);
             }
         });
-        job.on_signal_start ();
+        json_api_job.on_signal_start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void get_public_key_from_server (unowned Account account) {
+    private void get_public_key_from_server (Account account) {
         GLib.info ("Retrieving public key from server.");
-        var job = new JsonApiJob (account, E2EE_BASE_URL + "public-key", this);
-        JsonApiJob.signal_json_received.connect ((job, doc, return_code) => {
+        var json_api_job = new JsonApiJob (account, E2EE_BASE_URL + "public-key", this);
+        JsonApiJob.signal_json_received.connect ((json_api_job, doc, return_code) => {
                 if (return_code == 200) {
                     string public_key = doc.object ()["ocs"].to_object ()["data"].to_object ()["public-keys"].to_object ()[account.dav_user ()].to_string ();
                     this.certificate = QSslCertificate (public_key.to_local8Bit (), QSsl.Pem);
@@ -444,16 +445,17 @@ public class ClientSideEncryption : GLib.Object {
                     GLib.info ("Error while requesting public key: " + return_code);
                 }
         });
-        job.on_signal_start ();
+        json_api_job.on_signal_start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void fetch_and_validate_public_key_from_server (unowned Account account) {
+    private void fetch_and_validate_public_key_from_server (Account account) {
         GLib.info ("Retrieving public key from server.");
-        var job = new JsonApiJob (account, E2EE_BASE_URL + "server-key", this);
-        JsonApiJob.signal_json_received.connect (job, doc, return_code) => {
+        var json_api_job = new JsonApiJob (account, E2EE_BASE_URL + "server-key", this);
+        JsonApiJob.signal_json_received.connect (
+            (json_api_job, doc, return_code) => {
             if (return_code == 200) {
                 var server_public_key = doc.object ()["ocs"].to_object ()["data"].to_object ()["public-key"].to_string ().to_latin1 ();
                 GLib.info ("Found Server Public key, checking it. Server public key: " + server_public_key);
@@ -477,7 +479,7 @@ public class ClientSideEncryption : GLib.Object {
                 GLib.info ("Error while requesting server public key: " + return_code);
             }
         });
-        job.on_signal_start ();
+        json_api_job.on_signal_start ();
     }
 
 
@@ -551,12 +553,12 @@ public class ClientSideEncryption : GLib.Object {
                     account.identifier ()
         );
 
-        var job = new ReadPasswordJob (Theme.instance ().app_name ());
-        job.property (ACCOUNT_PROPERTY, GLib.Variant.from_value (account));
-        job.insecure_fallback (false);
-        job.key (kck);
-        connect (job, ReadPasswordJob.on_signal_finished, this, ClientSideEncryption.on_signal_public_key_fetched);
-        job.on_signal_start ();
+        var read_password_job = new ReadPasswordJob (Theme.instance ().app_name ());
+        read_password_job.property (ACCOUNT_PROPERTY, GLib.Variant.from_value (account));
+        read_password_job.insecure_fallback (false);
+        read_password_job.key (kck);
+        connect (read_password_job, ReadPasswordJob.on_signal_finished, this, ClientSideEncryption.on_signal_public_key_fetched);
+        read_password_job.on_signal_start ();
     }
 
 
@@ -623,15 +625,15 @@ public class ClientSideEncryption : GLib.Object {
                     account.identifier ()
         );
 
-        var job = new WritePasswordJob (Theme.instance ().app_name ());
-        job.insecure_fallback (false);
-        job.key (kck);
-        job.binary_data (this.private_key);
-        WritePasswordJob.on_signal_finished.connect ((job, incoming) => {
+        var write_password_job = new WritePasswordJob (Theme.instance ().app_name ());
+        write_password_job.insecure_fallback (false);
+        write_password_job.key (kck);
+        write_password_job.binary_data (this.private_key);
+        WritePasswordJob.on_signal_finished.connect ((write_password_job, incoming) => {
             //  Q_UNUSED (incoming);
             GLib.info ("Private key stored in keychain.");
         });
-        job.on_signal_start ();
+        write_password_job.on_signal_start ();
     }
 
 
@@ -644,15 +646,15 @@ public class ClientSideEncryption : GLib.Object {
                     account.identifier ()
         );
 
-        var job = new WritePasswordJob (Theme.instance ().app_name ());
-        job.insecure_fallback (false);
-        job.key (kck);
-        job.binary_data (this.certificate.to_pem ());
-        WritePasswordJob.on_signal_finished.connect ((job, incoming) => {
+        var write_password_job = new WritePasswordJob (Theme.instance ().app_name ());
+        write_password_job.insecure_fallback (false);
+        write_password_job.key (kck);
+        write_password_job.binary_data (this.certificate.to_pem ());
+        WritePasswordJob.on_signal_finished.connect ((write_password_job, incoming) => {
             //  Q_UNUSED (incoming);
             GLib.info ("Certificate stored in keychain.");
         });
-        job.on_signal_start ();
+        write_password_job.on_signal_start ();
     }
 
 
@@ -665,15 +667,15 @@ public class ClientSideEncryption : GLib.Object {
             account.identifier ()
         );
 
-        var job = new WritePasswordJob (Theme.instance ().app_name ());
-        job.insecure_fallback (false);
-        job.key (kck);
-        job.text_data (this.mnemonic);
-        WritePasswordJob.on_signal_finished.connect ((job, incoming) => {
+        var write_password_job = new WritePasswordJob (Theme.instance ().app_name ());
+        write_password_job.insecure_fallback (false);
+        write_password_job.key (kck);
+        write_password_job.text_data (this.mnemonic);
+        WritePasswordJob.on_signal_finished.connect ((write_password_job, incoming) => {
             //  Q_UNUSED (incoming);
             GLib.info ("Mnemonic stored in keychain.");
         });
-        job.on_signal_start ();
+        write_password_job.on_signal_start ();
     }
 
     GLib.List<GLib.ByteArray> old_cipher_format_split (GLib.ByteArray cipher) {

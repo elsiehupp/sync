@@ -66,8 +66,12 @@ public class TokenCredentials : AbstractCredentials {
     public new QNetworkAccessManager create_qnam () {
         AccessManager qnam = new TokenCredentialsAccessManager (this);
 
-        connect (qnam, SIGNAL (authentication_required (Soup.Reply reply, QAuthenticator auth)),
-            this, SLOT (on_signal_authentication (Soup.Reply reply, QAuthenticator auth)));
+        connect (
+            qnam,
+            authentication_required (reply, auth),
+            this,
+            on_signal_authentication (reply, auth)
+        );
 
         return qnam;
     }

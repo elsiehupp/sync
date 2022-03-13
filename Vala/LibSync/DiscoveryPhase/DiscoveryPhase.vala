@@ -144,7 +144,8 @@ public class DiscoveryPhase : GLib.Object {
     /***********************************************************
     Input
     ***********************************************************/
-    public std.function<bool (string )> should_discover_localy;
+    public delegate bool ShouldDiscoverLocally (string value);
+    public ShouldDiscoverLocally should_discover_localy;
 
     /***********************************************************
     ***********************************************************/
@@ -231,13 +232,18 @@ public class DiscoveryPhase : GLib.Object {
     }
 
 
+    private delegate void Callback (bool value);
+
+
     /***********************************************************
     Check if the new folder should be deselected or not.
     May be async. "Return" via the callback, true if the item
     is blocklisted.
     ***********************************************************/
-    void check_selective_sync_new_folder (string path, RemotePermissions remote_perm,
-        std.function<void (bool)> callback) {
+    void check_selective_sync_new_folder (
+        string path,
+        RemotePermissions remote_perm,
+        Callback callback) {
         if (this.sync_options.confirm_external_storage && this.sync_options.vfs.mode () == Vfs.Off
             && remote_perm.has_permission (RemotePermissions.Permissions.IS_MOUNTED)) {
             // external storage.
@@ -268,31 +274,43 @@ public class DiscoveryPhase : GLib.Object {
 
         // do a PROPFIND to know the size of this folder
         var propfind_job = new PropfindJob (this.account, this.remote_folder + path, this);
-        propfind_job.properties (GLib.List<GLib.ByteArray> ("resourcetype"
-                                                        + "http://owncloud.org/ns:size");
-        GLib.Object.connect (propfind_job, PropfindJob.finished_with_error,
-            this, [=] {
+        propfind_job.properties (
+            new GLib.List<GLib.ByteArray> (
+                "resourcetype"
+                + "http://owncloud.org/ns:size"));
+        GLib.Object.connect (
+            propfind_job,
+            PropfindJob.finished_with_error,
+            this, () => {
                 return callback (false);
             });
-        GLib.Object.connect (propfind_job, PropfindJob.result, this, [=] (GLib.HashTable<string, GLib.Variant> values) {
-            var result = values.value (QLatin1String ("size")).to_long_long ();
-            if (result >= limit) {
-                // we tell the UI there is a new folder
-                /* emit */ new_big_folder (path, false);
-                return callback (true);
-            } else {
-                // it is not too big, put it in the allow list (so we will not do more query for the children)
-                // and and do not block.
-                var p = path;
-                if (!p.has_suffix ('/'))
-                    p += '/';
-                this.selective_sync_allow_list.insert (
-                    std.upper_bound (this.selective_sync_allow_list.begin (), this.selective_sync_allow_list.end (), p),
-                    p);
-                return callback (false);
-            }
-        });
+        GLib.Object.connect (
+            propfind_job,
+            PropfindJob.result,
+            this,
+            this.on_signal_prop_find_job_result
+        );
         propfind_job.on_signal_start ();
+    }
+
+
+    private void on_signal_prop_find_job_result (GLib.HashTable<string, GLib.Variant> values) {
+        var result = values.value (QLatin1String ("size")).to_long_long ();
+        if (result >= limit) {
+            // we tell the UI there is a new folder
+            /* emit */ new_big_folder (path, false);
+            return callback (true);
+        } else {
+            // it is not too big, put it in the allow list (so we will not do more query for the children)
+            // and and do not block.
+            var p = path;
+            if (!p.has_suffix ('/'))
+                p += '/';
+            this.selective_sync_allow_list.insert (
+                std.upper_bound (this.selective_sync_allow_list.begin (), this.selective_sync_allow_list.end (), p),
+                p);
+            return callback (false);
+        }
     }
 
 
@@ -355,15 +373,15 @@ public class DiscoveryPhase : GLib.Object {
                         // re-creation of virtual files count as a delete
                         || ( (*it).type == ItemTypeVirtualFile && instruction == CSYNC_INSTRUCTION_NEW)
                         || ( (*it).is_restoration && instruction == CSYNC_INSTRUCTION_NEW))) {
-                    GLib.warning ("ENFORCE (FAILING)" + original_path;
-                    GLib.warning ("instruction == CSYNC_INSTRUCTION_REMOVE" + (instruction == CSYNC_INSTRUCTION_REMOVE);
+                    GLib.warning ("ENFORCE (FAILING) " + original_path);
+                    GLib.warning ("instruction == CSYNC_INSTRUCTION_REMOVE " + (instruction == CSYNC_INSTRUCTION_REMOVE));
                     GLib.warning (" ( (*it).type == ItemTypeVirtualFile && instruction == CSYNC_INSTRUCTION_NEW)"
-                                           + ( (*it).type == ItemTypeVirtualFile && instruction == CSYNC_INSTRUCTION_NEW);
+                                           + ( (*it).type == ItemTypeVirtualFile && instruction == CSYNC_INSTRUCTION_NEW));
                     GLib.warning (" ( (*it).is_restoration && instruction == CSYNC_INSTRUCTION_NEW))"
-                                           + ( (*it).is_restoration && instruction == CSYNC_INSTRUCTION_NEW);
-                    GLib.warning ("instruction" + instruction;
-                    GLib.warning (" (*it).type" + (*it).type;
-                    GLib.warning (" (*it).is_restoration " + (*it).is_restoration;
+                                           + ( (*it).is_restoration && instruction == CSYNC_INSTRUCTION_NEW));
+                    GLib.warning ("instruction" + instruction);
+                    GLib.warning (" (*it).type" + (*it).type);
+                    GLib.warning (" (*it).is_restoration " + (*it).is_restoration);
                     //  Q_ASSERT (false);
                     add_error_to_gui (SyncFileItem.Status.FatalError, _("Error while canceling delete of a file"), original_path);
                     /* emit */ fatal_error (_("Error while canceling delete of %1").arg (original_path));
@@ -374,14 +392,15 @@ public class DiscoveryPhase : GLib.Object {
             }
             this.deleted_item.erase (it);
         }
-        if (var other_job = this.queued_deleted_directories.take (original_path)) {
+        var other_job = this.queued_deleted_directories.take (original_path);
+        if (other_job) {
             old_etag = other_job.dir_item.etag;
             delete other_job;
             result = true;
         }
-        return {
+        return new QPair<bool, GLib.ByteArray> (
             result, old_etag
-        }
+        );
     }
 
 
@@ -389,24 +408,32 @@ public class DiscoveryPhase : GLib.Object {
     ***********************************************************/
     public void start_job (ProcessDirectoryJob job) {
         //  ENFORCE (!this.current_root_job);
-        connect (job, ProcessDirectoryJob.on_signal_finished, this, [this, job] {
-            //  ENFORCE (this.current_root_job == sender ());
-            this.current_root_job = null;
-            if (job.dir_item)
-                /* emit */ item_discovered (job.dir_item);
-            job.delete_later ();
-
-            // Once the main job has on_signal_finished recurse here to execute the remaining
-            // jobs for queued deleted directories.
-            if (!this.queued_deleted_directories.is_empty ()) {
-                var next_job = this.queued_deleted_directories.take (this.queued_deleted_directories.first_key ());
-                start_job (next_job);
-            } else {
-                /* emit */ finished ();
-            }
-        });
+        connect (
+            job,
+            ProcessDirectoryJob.signal_finished,
+            this,
+            this.on_signal_process_directory_job_finished
+        );
         this.current_root_job = job;
         job.on_signal_start ();
+    }
+
+
+    private void on_signal_process_directory_job_finished (ProcessDirectoryJob job) {
+        //  ENFORCE (this.current_root_job == sender ());
+        this.current_root_job = null;
+        if (job.dir_item)
+            /* emit */ item_discovered (job.dir_item);
+        job.delete_later ();
+
+        // Once the main job has on_signal_finished recurse here to execute the remaining
+        // jobs for queued deleted directories.
+        if (!this.queued_deleted_directories.is_empty ()) {
+            var next_job = this.queued_deleted_directories.take (this.queued_deleted_directories.first_key ());
+            start_job (next_job);
+        } else {
+            /* emit */ finished ();
+        }
     }
 
 
@@ -493,7 +520,7 @@ public class DiscoveryPhase : GLib.Object {
             } else if (property == "share-types" && !value.is_empty ()) {
                 // Since GLib.HashTable is sorted, "share-types" is always after "permissions".
                 if (result.remote_perm.is_null ()) {
-                    GLib.warning ("Server returned a share type, but no permissions?";
+                    GLib.warning ("Server returned a share type but no permissions?");
                 } else {
                     // S means shared with me.
                     // But for our purpose, we want to know if the file is shared. It does not matter
