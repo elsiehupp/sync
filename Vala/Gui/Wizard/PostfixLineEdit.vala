@@ -24,53 +24,44 @@ class PostfixLineEdit : QLineEdit {
     const int VERTICAL_MARGIN = 4;
 
     /***********************************************************
+    @brief an optional postfix shown greyed out
     ***********************************************************/
-    private string postfix;
+    string postfix {
+        public get {
+            return this.postfix;
+        }
+        public set {
+            this.postfix = value;
+            QFontMetricsF font_metrics = new QFontMetricsF (font ());
+            QMargins text_margins_i = text_margins ();
+            text_margins_i.right (text_margins_i.right () + q_round (font_metrics.width (this.postfix)) + VERTICAL_MARGIN);
+            text_margins (text_margins_i);
+        }
+    }
+
+    string full_text {
+        /***********************************************************
+        @brief retrieves combined text () and postfix ()
+        ***********************************************************/
+        public get {
+            return text () + this.postfix;
+        }
+        /***********************************************************
+        @brief sets text () from full text, discarding prefix ()
+        ***********************************************************/
+        public set {
+            string prefix_string = value;
+            if (prefix_string.ends_with (postfix ())) {
+                prefix_string.chop (postfix ().length ());
+            }
+            on_signal_text (prefix_string);
+        }
+    }
 
     /***********************************************************
     ***********************************************************/
     public PostfixLineEdit (Gtk.Widget parent) {
         base (parent);
-    }
-
-
-    /***********************************************************
-    @brief sets an optional postfix shown greyed out
-    ***********************************************************/
-    public void postfix (string postfix) {
-        this.postfix = postfix;
-        QFontMetricsF font_metrics = new QFontMetricsF (font ());
-        QMargins text_margins_i = text_margins ();
-        text_margins_i.right (text_margins_i.right () + q_round (font_metrics.width (this.postfix)) + VERTICAL_MARGIN);
-        text_margins (text_margins_i);
-    }
-
-
-    /***********************************************************
-    @brief retrives the postfix
-    ***********************************************************/
-    public string postfix () {
-        return this.postfix;
-    }
-
-
-    /***********************************************************
-    @brief retrieves combined text () and postfix ()
-    ***********************************************************/
-    public string full_text () {
-        return text () + this.postfix;
-    }
-
-
-    /***********************************************************
-    @brief sets text () from full text, discarding prefix ()
-    ***********************************************************/
-    public void full_text (string text) {
-        string prefix_string = text;
-        if (prefix_string.ends_with (postfix ())) {
-            prefix_string.chop (postfix ().length ());
-        }
-        on_signal_text (prefix_string);
     }
 
 

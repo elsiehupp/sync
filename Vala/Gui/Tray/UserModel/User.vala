@@ -6,9 +6,16 @@ class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private AccountStatePtr account;
-    private bool is_current_user;
-    private ActivityListModel activity_model;
+    AccountPointer account {
+        public get {
+            this.account_state.account ();
+        }
+    }
+    AccountStatePtr account_state { public get; private set; }
+    bool is_current_user { public get; public set; }
+
+    ActivityListModel activity_model { public get; private set; }
+
     private UnifiedSearchResultsListModel unified_search_results_model;
     private ActivityList blocklisted_notifications;
 
@@ -44,10 +51,10 @@ class User : GLib.Object {
     ***********************************************************/
     public User (AccountStatePtr account, bool is_current = false, GLib.Object parent = new GLib.Object ()) {
         base (parent);
-        this.account = account;
+        this.account_state = account;
         this.is_current_user = is_current;
-        this.activity_model = new ActivityListModel (this.account.data (), this);
-        this.unified_search_results_model = new UnifiedSearchResultsListModel (this.account.data (), this);
+        this.activity_model = new ActivityListModel (this.account_state.data (), this);
+        this.unified_search_results_model = new UnifiedSearchResultsListModel (this.account_state.data (), this);
         this.notification_requests_running = 0;
         connect (
             ProgressDispatcher.instance (),
@@ -86,24 +93,24 @@ class User : GLib.Object {
             User.on_signal_check_expired_activities
         );
         connect (
-            this.account.data (),
+            this.account_state.data (),
             AccountState.state_changed,
             this.on_signal_account_state_changed
         );
         connect (
-            this.account.data (),
+            this.account_state.data (),
             AccountState.state_changed,
             this,
             User.signal_account_state_changed
         );
         connect (
-            this.account.data (),
+            this.account_state.data (),
             AccountState.has_fetched_navigation_apps,
             this,
             User.on_signal_rebuild_navigation_app_list
         );
         connect (
-            this.account.account ().data (),
+            this.account_state.account ().data (),
             Account.account_changed_display_name,
             this,
             User.signal_name_changed
@@ -121,19 +128,19 @@ class User : GLib.Object {
             Logger.signal_gui_log
         );
         connect (
-            this.account.account ().data (),
+            this.account_state.account ().data (),
             Account.account_changed_avatar,
             this,
             User.signal_avatar_changed
         );
         connect (
-            this.account.account ().data (),
+            this.account_state.account ().data (),
             Account.user_status_changed,
             this,
             User.signal_status_changed
         );
         connect (
-            this.account.data (),
+            this.account_state.data (),
             AccountState.signal_desktop_notifications_allowed_changed,
             this,
             User.signal_desktop_notifications_allowed_changed
@@ -159,22 +166,8 @@ class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public AccountPointer account () {
-        return this.account.account ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public AccountStatePtr account_state () {
-        return this.account;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
     public string server (bool shortened) {
-        string server_url = this.account.account ().url ().to_string ();
+        string server_url = this.account_state.account ().url ().to_string ();
         if (shortened) {
             server_url.replace (QLatin1String ("https://"), QLatin1String (""));
             server_url.replace (QLatin1String ("http://"), QLatin1String (""));
@@ -186,28 +179,14 @@ class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public AccountAppList app_list () {
-        return this.account.app_list ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public bool is_current_user () {
-        return this.is_current_user;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void is_current_user (bool is_current_user) {
-        this.is_current_user = is_current_user;
+        return this.account_state.app_list ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool is_connected () {
-        return (this.account.connection_status () == AccountState.ConnectionStatus.Connected);
+        return (this.account_state.connection_status () == AccountState.ConnectionStatus.Connected);
     }
 
 
@@ -215,19 +194,12 @@ class User : GLib.Object {
     ***********************************************************/
     public Folder folder () {
         foreach (Folder folder in FolderMan.instance ().map ()) {
-            if (folder.account_state () == this.account.data ()) {
+            if (folder.account_state () == this.account_state.data ()) {
                 return folder;
             }
         }
 
         return null;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public ActivityListModel activity_model () {
-        return this.activity_model;
     }
 
 
@@ -243,9 +215,9 @@ class User : GLib.Object {
     the simplest is missing login at startup), fall back to username
     ***********************************************************/
     public string name () {
-        string name = this.account.account ().dav_display_name ();
+        string name = this.account_state.account ().dav_display_name ();
         if (name == "") {
-            name = this.account.account ().credentials ().user ();
+            name = this.account_state.account ().credentials ().user ();
         }
         return name;
     }
@@ -254,10 +226,10 @@ class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool check_push_notifications_are_ready () {
-        const var push_notifications = this.account.account ().push_notifications ();
+        const var push_notifications = this.account_state.account ().push_notifications ();
 
-        const var push_activities_available = this.account.account ().capabilities ().available_push_notifications () & PushNotificationType.ACTIVITIES;
-        const var push_notifications_available = this.account.account ().capabilities ().available_push_notifications () & PushNotificationType.NOTIFICATIONS;
+        const var push_activities_available = this.account_state.account ().capabilities ().available_push_notifications () & PushNotificationType.ACTIVITIES;
+        const var push_notifications_available = this.account_state.account ().capabilities ().available_push_notifications () & PushNotificationType.NOTIFICATIONS;
 
         const var push_activities_and_notifications_available = push_activities_available && push_notifications_available;
 
@@ -265,7 +237,7 @@ class User : GLib.Object {
             connect_push_notifications ();
             return true;
         } else {
-            connect (this.account.account ().data (), Account.push_notifications_ready, this, User.on_signal_push_notifications_ready, Qt.UniqueConnection);
+            connect (this.account_state.account ().data (), Account.push_notifications_ready, this, User.on_signal_push_notifications_ready, Qt.UniqueConnection);
             return false;
         }
     }
@@ -300,43 +272,43 @@ class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public AccountApp talk_app () {
-        return this.account.find_app ("spreed");
+        return this.account_state.find_app ("spreed");
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool has_activities () {
-        return this.account.account ().capabilities ().has_activities ();
+        return this.account_state.account ().capabilities ().has_activities ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public Gtk.Image avatar () {
-        return AvatarJob.make_circular_avatar (this.account.account ().avatar ());
+        return AvatarJob.make_circular_avatar (this.account_state.account ().avatar ());
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void log_in () {
-        this.account.account ().reset_rejected_certificates ();
-        this.account.sign_in ();
+        this.account_state.account ().reset_rejected_certificates ();
+        this.account_state.sign_in ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void log_out () {
-        this.account.sign_out_by_ui ();
+        this.account_state.sign_out_by_ui ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void remove_account () {
-        AccountManager.instance ().delete_account (this.account.data ());
+        AccountManager.instance ().delete_account (this.account_state.data ());
         AccountManager.instance ().save ();
     }
 
@@ -348,49 +320,49 @@ class User : GLib.Object {
             return "";
         }
 
-        return "image://avatars/" + this.account.account ().identifier ();
+        return "image://avatars/" + this.account_state.account ().identifier ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool are_desktop_notifications_allowed () {
-        return this.account.data ().are_desktop_notifications_allowed ();
+        return this.account_state.data ().are_desktop_notifications_allowed ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public UserStatus.OnlineStatus status () {
-        return this.account.account ().user_status_connector ().user_status ().state ();
+        return this.account_state.account ().user_status_connector ().user_status ().state ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public string status_message () {
-        return this.account.account ().user_status_connector ().user_status ().message ();
+        return this.account_state.account ().user_status_connector ().user_status ().message ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public GLib.Uri status_icon () {
-        return this.account.account ().user_status_connector ().user_status ().state_icon ();
+        return this.account_state.account ().user_status_connector ().user_status ().state_icon ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public string status_emoji () {
-        return this.account.account ().user_status_connector ().user_status ().icon ();
+        return this.account_state.account ().user_status_connector ().user_status ().icon ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool server_has_user_status () {
-        return this.account.account ().capabilities ().user_status ();
+        return this.account_state.account ().capabilities ().user_status ();
     }
 
 
@@ -472,7 +444,7 @@ class User : GLib.Object {
         if (!folder_instance)
             return;
 
-        if (folder_instance.account_state () == this.account.data ()) {
+        if (folder_instance.account_state () == this.account_state.data ()) {
             GLib.warning ("Item " + folder_instance.short_gui_local_path () + " retrieved resulted in " + message);
 
             Activity activity;
@@ -508,7 +480,7 @@ class User : GLib.Object {
             return;
         }
 
-        if (folder_instance.account_state () == this.account.data ()) {
+        if (folder_instance.account_state () == this.account_state.data ()) {
             GLib.warning ("Item " + folder_instance.short_gui_local_path () + " retrieved resulted in " + error_message);
 
             Activity activity;
@@ -723,7 +695,7 @@ class User : GLib.Object {
     ***********************************************************/
     public void on_signal_refresh_notifications () {
         if (this.notification_requests_running == 0) {
-            var snh = new ServerNotificationHandler (this.account.data ());
+            var snh = new ServerNotificationHandler (this.account_state.data ());
             connect (snh, ServerNotificationHandler.signal_new_notification_list,
                 this, User.on_signal_build_notification_display);
 
@@ -748,22 +720,22 @@ class User : GLib.Object {
 
         if (check_push_notifications_are_ready ()) {
             // we are relying on Web_socket push notifications - ignore refresh attempts from UI
-            this.time_since_last_check[this.account.data ()].invalidate ();
+            this.time_since_last_check[this.account_state.data ()].invalidate ();
             return;
         }
 
         // QElapsedTimer isn't actually constructed as invalid.
-        if (!this.time_since_last_check.contains (this.account.data ())) {
-            this.time_since_last_check[this.account.data ()].invalidate ();
+        if (!this.time_since_last_check.contains (this.account_state.data ())) {
+            this.time_since_last_check[this.account_state.data ()].invalidate ();
         }
-        QElapsedTimer timer = this.time_since_last_check[this.account.data ()];
+        QElapsedTimer timer = this.time_since_last_check[this.account_state.data ()];
 
         // Fetch Activities only if visible and if last check is longer than 15 secs ago
         if (timer.is_valid () && timer.elapsed () < NOTIFICATION_REQUEST_FREE_PERIOD) {
             GLib.debug ("Do not check as last check is only secs ago: " + timer.elapsed () / 1000);
             return;
         }
-        if (this.account.data () && this.account.data ().is_connected ()) {
+        if (this.account_state.data () && this.account_state.data ().is_connected ()) {
             if (!timer.is_valid ()) {
                 on_signal_refresh_activities ();
             }
@@ -776,8 +748,8 @@ class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_refresh_user_status () {
-        if (this.account.data () && this.account.data ().is_connected ()) {
-            this.account.account ().user_status_connector ().fetch_user_status ();
+        if (this.account_state.data () && this.account_state.data ().is_connected ()) {
+            this.account_state.account ().user_status_connector ().fetch_user_status ();
         }
     }
 
@@ -785,7 +757,7 @@ class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_refresh_immediately () {
-        if (this.account.data () && this.account.data ().is_connected ()) {
+        if (this.account_state.data () && this.account_state.data ().is_connected ()) {
             on_signal_refresh_activities ();
         }
         on_signal_refresh_notifications ();
@@ -828,10 +800,10 @@ class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_disconnect_push_notifications () {
-        disconnect (this.account.account ().push_notifications (), PushNotifications.notifications_changed, this, User.on_signal_received_push_notification);
-        disconnect (this.account.account ().push_notifications (), PushNotifications.activities_changed, this, User.on_signal_received_push_activity);
+        disconnect (this.account_state.account ().push_notifications (), PushNotifications.notifications_changed, this, User.on_signal_received_push_notification);
+        disconnect (this.account_state.account ().push_notifications (), PushNotifications.activities_changed, this, User.on_signal_received_push_activity);
 
-        disconnect (this.account.account ().data (), Account.push_notifications_disabled, this, User.on_signal_disconnect_push_notifications);
+        disconnect (this.account_state.account ().data (), Account.push_notifications_disabled, this, User.on_signal_disconnect_push_notifications);
 
         // connection to Web_socket may have dropped or an error occured, so we need to bring back the polling until we have re-established the connection
         on_signal_notification_refresh_interval (ConfigFile ().notification_refresh_interval ());
@@ -841,7 +813,7 @@ class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_received_push_notification (Account account) {
-        if (account.identifier () == this.account.account ().identifier ()) {
+        if (account.identifier () == this.account_state.account ().identifier ()) {
             on_signal_refresh_notifications ();
         }
     }
@@ -850,7 +822,7 @@ class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_received_push_activity (Account account) {
-        if (account.identifier () == this.account.account ().identifier ()) {
+        if (account.identifier () == this.account_state.account ().identifier ()) {
             on_signal_refresh_activities ();
         }
     }
@@ -875,7 +847,7 @@ class User : GLib.Object {
     ***********************************************************/
     private void connect_push_notifications () {
         connect (
-            this.account.account ().data (),
+            this.account_state.account ().data (),
             Account.push_notifications_disabled,
             this,
             User.on_signal_disconnect_push_notifications,
@@ -883,14 +855,14 @@ class User : GLib.Object {
         );
 
         connect (
-            this.account.account ().push_notifications (),
+            this.account_state.account ().push_notifications (),
             PushNotifications.notifications_changed,
             this,
             User.on_signal_received_push_notification,
             Qt.UniqueConnection
         );
         connect (
-            this.account.account ().push_notifications (),
+            this.account_state.account ().push_notifications (),
             PushNotifications.activities_changed,
             this,
             User.on_signal_received_push_activity,
@@ -902,7 +874,7 @@ class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private bool is_activity_of_current_account (Folder folder) {
-        return folder.account_state () == this.account.data ();
+        return folder.account_state () == this.account_state.data ();
     }
 
 

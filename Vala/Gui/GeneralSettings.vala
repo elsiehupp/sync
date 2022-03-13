@@ -400,7 +400,7 @@ class GeneralSettings : Gtk.Widget {
             );
 
             string status = ocupdater.status_string (
-                OCUpdater.Update_status_string_format.Html
+                OCUpdater.UpdateStatusStringFormat.UpdateStatusStringFormat.HTML
             );
             Theme.replace_link_color_string_background_aware (status);
 
@@ -414,13 +414,13 @@ class GeneralSettings : Gtk.Widget {
             this.ui.update_state_label.on_signal_text (status);
 
             this.ui.restart_button.visible (
-                ocupdater.download_state () == OCUpdater.Download_complete
+                ocupdater.download_state () == OCUpdater.DownloadState.DOWNLOAD_COMPLETE
             );
 
             this.ui.update_button.enabled (
-                ocupdater.download_state () != OCUpdater.Checking_server &&
-                ocupdater.download_state () != OCUpdater.Downloading &&
-                ocupdater.download_state () != OCUpdater.Download_complete
+                ocupdater.download_state () != OCUpdater.DownloadState.CHECKING_SERVER &&
+                ocupdater.download_state () != OCUpdater.DownloadState.DOWNLOADING &&
+                ocupdater.download_state () != OCUpdater.DownloadState.DOWNLOAD_COMPLETE
             );
 
             this.ui.auto_check_for_updates_check_box.checked (

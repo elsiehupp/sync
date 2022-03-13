@@ -66,8 +66,9 @@ class UserInfo : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private int64 last_quota_total_bytes;
-    private int64 last_quota_used_bytes;
+    int64 last_quota_total_bytes { public get; private set; }
+    int64 last_quota_used_bytes { public get; private set; }
+
     private QTimer job_restart_timer;
 
     /***********************************************************
@@ -77,8 +78,21 @@ class UserInfo : GLib.Object {
 
     /***********************************************************
     If we should check at regular interval (when the UI is visible)
+
+    When the quotainfo is active, it requests the quota at
+    regular interval. When setting it to active it will request
+    the quota immediately if the last time the quota was
+    requested was more than the interval
     ***********************************************************/
-    private bool active;
+    bool active {
+        private get {
+            return this.active;
+        }
+        public set {
+            this.active = value;
+            on_signal_account_state_changed ();
+        }
+    }
 
     /***********************************************************
     The currently running job
@@ -104,31 +118,6 @@ class UserInfo : GLib.Object {
             this, UserInfo.on_signal_account_state_changed);
         connect (this.job_restart_timer, QTimer.timeout, this, UserInfo.on_signal_fetch_info);
         this.job_restart_timer.single_shot (true);
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public int64 last_quota_total_bytes () {
-        return this.last_quota_total_bytes;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public int64 last_quota_used_bytes () {
-        return this.last_quota_used_bytes;
-    }
-
-
-    /***********************************************************
-    When the quotainfo is active, it requests the quota at regular interval.
-    When setting it to active it will request the quota immediately if the last time
-    the quota was requested was more than the interval
-    ***********************************************************/
-    public void active (bool active) {
-        this.active = active;
-        on_signal_account_state_changed ();
     }
 
 

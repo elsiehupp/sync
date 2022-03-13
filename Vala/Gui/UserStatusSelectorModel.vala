@@ -107,7 +107,7 @@ class UserStatusSelectorModel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public UserStatusSelectorModel.with_provider (
+    public UserStatusSelectorModel.with_user_status_and_provider (
         UserStatus user_status,
         std.unique_ptr<DateTimeProvider> date_time_provider,
         GLib.Object parent = new GLib.Object ()) {
@@ -120,7 +120,7 @@ class UserStatusSelectorModel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public UserStatusSelectorModel (
+    public UserStatusSelectorModel.with_user_status (
         UserStatus user_status,
         GLib.Object parent = new GLib.Object ()) {
         base (parent);
@@ -200,7 +200,7 @@ class UserStatusSelectorModel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void user_status () {
+    public void update_user_status () {
         //  Q_ASSERT (this.user_status_connector);
         if (!this.user_status_connector) {
             return;

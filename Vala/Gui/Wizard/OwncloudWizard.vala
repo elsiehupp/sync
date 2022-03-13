@@ -65,8 +65,6 @@ class OwncloudWizard : QWizard {
         }
     }
 
-    bool registration = false;
-
     //  friend class OwncloudSetupWizard;
 
     /***********************************************************
@@ -120,6 +118,7 @@ class OwncloudWizard : QWizard {
     public OwncloudWizard (Gtk.Widget parent = null) {
         base (parent);
         this.account = null;
+        this.registration = false;
         this.welcome_page = new WelcomePage (this);
         this.setup_page = new OwncloudSetupPage (this);
         this.http_creds_page = new OwncloudHttpCredsPage (this);

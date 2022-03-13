@@ -34,7 +34,7 @@ class AuthenticationDialog : Gtk.Dialog {
         window_title (_("Authentication Required"));
         var lay = new QVBoxLayout (this);
         var label = new Gtk.Label (_("Enter username and password for \"%1\" at %2.").arg (realm, domain));
-        label.text_format (Qt.PlainText);
+        label.text_format (Qt.UpdateStatusStringFormat.PLAIN_TEXT);
         lay.add_widget (label);
 
         var form = new QFormLayout ();

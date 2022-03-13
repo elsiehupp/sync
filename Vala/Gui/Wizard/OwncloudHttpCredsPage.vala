@@ -159,7 +159,7 @@ class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public void connected () {
+    public void connected_true () {
         this.connected = true;
         on_signal_stop_spinner ();
     }

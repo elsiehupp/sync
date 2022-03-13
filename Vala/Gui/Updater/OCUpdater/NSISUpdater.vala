@@ -74,7 +74,7 @@ class NSISUpdater : OCUpdater {
         var reply = qobject_cast<Soup.Reply> (sender ());
         reply.delete_later ();
         if (reply.error () != Soup.Reply.NoError) {
-            download_state (Download_failed);
+            download_state (DownloadState.DOWNLOAD_FAILED);
             return;
         }
 
@@ -91,7 +91,7 @@ class NSISUpdater : OCUpdater {
         }
 
         GLib.File.copy (this.file.filename (), this.target_file);
-        download_state (Download_complete);
+        download_state (DownloadState.DOWNLOAD_COMPLETE);
         GLib.info ("Downloaded " + url.to_string () + "to" + this.target_file);
         settings.value (update_target_version_c, update_info ().version ());
         settings.value (update_target_version_string_c, update_info ().version_string ());
@@ -292,11 +292,11 @@ class NSISUpdater : OCUpdater {
                 + "Download url:" + info.download_url ());
         if (info.version ().is_empty ()) {
             GLib.info ("No version information available at the moment.");
-            download_state (Up_to_date);
+            download_state (DownloadState.UP_TO_DATE);
         } else if (info_version <= curr_version
                    || info_version <= seen_version) {
             GLib.info ("Client is on latest version!");
-            download_state (Up_to_date);
+            download_state (DownloadState.UP_TO_DATE);
         } else {
             string url = info.download_url ();
             if (url.is_empty ()) {
@@ -304,14 +304,14 @@ class NSISUpdater : OCUpdater {
             } else {
                 this.target_file = config.config_path () + url.mid (url.last_index_of ('/')+1);
                 if (GLib.File (this.target_file).exists ()) {
-                    download_state (Download_complete);
+                    download_state (DownloadState.DOWNLOAD_COMPLETE);
                 } else {
                     var request = Soup.Request (GLib.Uri (url));
                     request.attribute (Soup.Request.Redirect_policy_attribute, Soup.Request.No_less_safe_redirect_policy);
                     Soup.Reply reply = qnam ().get (request);
                     connect (reply, QIODevice.ready_read, this, NSISUpdater.on_signal_write_file);
                     connect (reply, Soup.Reply.on_signal_finished, this, NSISUpdater.on_signal_download_finished);
-                    download_state (Downloading);
+                    download_state (DownloadState.DOWNLOADING);
                     this.file.on_signal_reset (new QTemporaryFile ());
                     this.file.auto_remove (true);
                     this.file.open ();

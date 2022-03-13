@@ -67,29 +67,48 @@ class OCUpdater : Updater {
 
     /***********************************************************
     ***********************************************************/
-    public enum Download_state {
-        Unknown = 0,
-        Checking_server,
-        Up_to_date,
-        Downloading,
-        Download_complete,
-        Download_failed,
-        Download_timed_out,
-        Update_only_available_through_system
+    public enum DownloadState {
+        UNKOWN = 0,
+        CHECKING_SERVER,
+        UP_TO_DATE,
+        DOWNLOADING,
+        DOWNLOAD_COMPLETE,
+        DOWNLOAD_FAILED,
+        DOWNLOAD_TIMED_OUT,
+        UIPLOAD_ONLY_AVAILABLE_THROUGH_SYSTEM
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public enum Update_status_string_format {
-        PlainText,
-        Html,
+    public enum UpdateStatusStringFormat {
+        PLAIN_TEXT,
+        HTML
+    }
+
+    int download_state {
+        public get {
+            return this.state;
+        }
+        public set {
+            var old_state = this.state;
+            this.state = value;
+            /* emit */ signal_download_state_changed ();
+    
+            // show the notification if the download is complete (on every check)
+            // or once for system based updates.
+            if (this.state == OCUpdater.DownloadState.DOWNLOAD_COMPLETE || (old_state != OCUpdater.DownloadState.UIPLOAD_ONLY_AVAILABLE_THROUGH_SYSTEM
+                                                             && this.state == OCUpdater.DownloadState.UIPLOAD_ONLY_AVAILABLE_THROUGH_SYSTEM)) {
+                /* emit */ signal_new_update_available (_("Update Check"), status_string ());
+            }
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Uri update_url;
+    new GLib.Uri update_url { private get; public set; }
+
     private int state;
     private QNetworkAccessManager access_manager;
 
@@ -97,7 +116,8 @@ class OCUpdater : Updater {
     Timer to guard the timeout of an individual network request
     ***********************************************************/
     private QTimer timeout_watchdog;
-    private UpdateInfo update_info;
+
+    UpdateInfo update_info { protected get; private set; }
 
 
     signal void signal_download_state_changed ();
@@ -113,13 +133,6 @@ class OCUpdater : Updater {
         this.state = Unknown;
         this.access_manager = new AccessManager (this);
         this.timeout_watchdog = new QTimer (this);
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void update_url (GLib.Uri url) {
-        this.update_url = url;
     }
 
 
@@ -161,66 +174,43 @@ class OCUpdater : Updater {
         this.timeout_watchdog.on_signal_start (30 * 1000);
         connect (reply, Soup.Reply.on_signal_finished, this, OCUpdater.on_signal_version_info_arrived);
 
-        download_state (Checking_server);
+        download_state (DownloadState.CHECKING_SERVER);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public string status_string (Update_status_string_format format = PlainText) {
+    public string status_string (UpdateStatusStringFormat format = UpdateStatusStringFormat.PLAIN_TEXT) {
         string update_version = this.update_info.version_string ();
 
         switch (download_state ()) {
-        case Downloading:
+        case DownloadState.DOWNLOADING:
             return _("Downloading %1. Please wait …").arg (update_version);
-        case Download_complete:
+        case DownloadState.DOWNLOAD_COMPLETE:
             return _("%1 available. Restart application to on_signal_start the update.").arg (update_version);
-        case Download_failed: {
-            if (format == Update_status_string_format.Html) {
+        case DownloadState.DOWNLOAD_FAILED: {
+            if (format == UpdateStatusStringFormat.UpdateStatusStringFormat.HTML) {
                 return _("Could not download update. Please open <a href='%1'>%1</a> to download the update manually.").arg (this.update_info.web ());
             }
             return _("Could not download update. Please open %1 to download the update manually.").arg (this.update_info.web ());
         }
-        case Download_timed_out:
+        case DownloadState.DOWNLOAD_TIMED_OUT:
             return _("Could not check for new updates.");
-        case Update_only_available_through_system: {
-            if (format == Update_status_string_format.Html) {
+        case DownloadState.UIPLOAD_ONLY_AVAILABLE_THROUGH_SYSTEM: {
+            if (format == UpdateStatusStringFormat.UpdateStatusStringFormat.HTML) {
                 return _("New %1 is available. Please open <a href='%2'>%2</a> to download the update.").arg (update_version, this.update_info.web ());
             }
             return _("New %1 is available. Please open %2 to download the update.").arg (update_version, this.update_info.web ());
         }
-        case Checking_server:
+        case DownloadState.CHECKING_SERVER:
             return _("Checking update server …");
         case Unknown:
             return _("Update status is unknown : Did not check for new updates.");
-        case Up_to_date:
+        case DownloadState.UP_TO_DATE:
         // fall through
         default:
             return _("No updates available. Your installation is at the latest version.");
         }
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void download_state (Download_state state) {
-        var old_state = this.state;
-        this.state = state;
-        /* emit */ signal_download_state_changed ();
-
-        // show the notification if the download is complete (on every check)
-        // or once for system based updates.
-        if (this.state == OCUpdater.Download_complete || (old_state != OCUpdater.Update_only_available_through_system
-                                                         && this.state == OCUpdater.Update_only_available_through_system)) {
-            /* emit */ signal_new_update_available (_("Update Check"), status_string ());
-        }
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public int download_state () {
-        return this.state;
     }
 
 
@@ -280,16 +270,16 @@ class OCUpdater : Updater {
         // do the real update check depending on the internal state of updater.
         switch (dl_state) {
         case Unknown:
-        case Up_to_date:
-        case Download_failed:
-        case Download_timed_out:
+        case DownloadState.UP_TO_DATE:
+        case DownloadState.DOWNLOAD_FAILED:
+        case DownloadState.DOWNLOAD_TIMED_OUT:
             GLib.info ("Checking for available update.");
             check_for_update ();
             break;
-        case Download_complete:
+        case DownloadState.DOWNLOAD_COMPLETE:
             GLib.info ("Update is downloaded, skip new check.");
             break;
-        case Update_only_available_through_system:
+        case DownloadState.UIPLOAD_ONLY_AVAILABLE_THROUGH_SYSTEM:
             GLib.info ("Update is only available through system, skip check.");
             break;
         }
@@ -311,7 +301,7 @@ class OCUpdater : Updater {
         reply.delete_later ();
         if (reply.error () != Soup.Reply.NoError) {
             GLib.warning ("Failed to reach version check url: " + reply.error_string ());
-            download_state (Download_timed_out);
+            download_state (DownloadState.DOWNLOAD_TIMED_OUT);
             return;
         }
 
@@ -323,7 +313,7 @@ class OCUpdater : Updater {
             version_info_arrived (this.update_info);
         } else {
             GLib.warning ("Could not parse update information.");
-            download_state (Download_timed_out);
+            download_state (DownloadState.DOWNLOAD_TIMED_OUT);
         }
     }
 
@@ -331,7 +321,7 @@ class OCUpdater : Updater {
     /***********************************************************
     ***********************************************************/
     private void on_signal_timed_out () {
-        download_state (Download_timed_out);
+        download_state (DownloadState.DOWNLOAD_TIMED_OUT);
     }
 
 
@@ -356,13 +346,6 @@ class OCUpdater : Updater {
     ***********************************************************/
     protected QNetworkAccessManager qnam () {
         return this.access_manager;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    protected UpdateInfo update_info () {
-        return this.update_info;
     }
 
 } // class OCUpdater

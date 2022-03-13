@@ -31,21 +31,63 @@ class SlideShow : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private bool reverse = false;
-    private int interval = 3500;
-    private int current_index = 0;
+
+    int interval {
+        public get {
+            return this.interval;
+        }
+        public set {
+            if (this.interval == value) {
+                return;
+            }
+
+            this.interval = value;
+            maybe_restart_timer ();
+        }
+    }
+
+    int current_slide {
+        public get {
+            return this.current_slide;
+        }
+        public set {
+            if (this.current_slide == value)
+                return;
+    
+            if (!this.animation) {
+                this.animation = new QVariantAnimation (this);
+                this.animation.duration (SLIDE_DURATION);
+                this.animation.easing_curve (QEasing_curve.Out_cubic);
+                this.animation.start_value (static_cast<qreal> (this.current_slide));
+                connect (this.animation.data (), SIGNAL (value_changed (GLib.Variant)), this, SLOT (update ()));
+            }
+            this.animation.end_value (static_cast<qreal> (value));
+            this.animation.on_signal_start (QAbstractAnimation.DeleteWhenStopped);
+    
+            this.reverse = value < this.current_slide;
+            this.current_slide = value;
+            maybe_restart_timer ();
+            update ();
+            /* emit */ signal_current_slide_changed (value);
+        }
+    }
+
+
     private QPoint press_point;
     private QBasic_timer timer;
     private string[] labels;
     private GLib.Vector<QPixmap> pixmaps;
     private QPointer<QVariantAnimation> animation = null;
 
-    signal void clicked ();
-    signal void current_slide_changed (int index);
+    signal void signal_clicked ();
+    signal void signal_current_slide_changed (int index);
 
     /***********************************************************
     ***********************************************************/
     public SlideShow (Gtk.Widget parent = null) {
         base (parent);
+        this.current_slide = 0;
+        this.interval = 3500;
         this.size_policy (QSizePolicy.Minimum, QSizePolicy.Minimum);
     }
 
@@ -68,24 +110,6 @@ class SlideShow : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public int interval () {
-        return this.interval;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void interval (int interval) {
-        if (this.interval == interval)
-            return;
-
-        this.interval = interval;
-        maybe_restart_timer ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
     public void draw_slide (QPainter painter, int index) {
         string label = this.labels.value (index);
         QRect label_rect = style ().item_text_rect (font_metrics (), rect (), Qt.Align_bottom | Qt.AlignHCenter, is_enabled (), label);
@@ -94,37 +118,6 @@ class SlideShow : Gtk.Widget {
         QPixmap pixmap = this.pixmaps.value (index);
         QRect pixmap_rect = style ().item_pixmap_rect (QRect (0, 0, width (), label_rect.top () - SPACING), Qt.AlignCenter, pixmap);
         style ().draw_item_pixmap (painter, pixmap_rect, Qt.AlignCenter, pixmap);
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public int current_slide () {
-        return this.current_index;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void current_slide (int index) {
-        if (this.current_index == index)
-            return;
-
-        if (!this.animation) {
-            this.animation = new QVariantAnimation (this);
-            this.animation.duration (SLIDE_DURATION);
-            this.animation.easing_curve (QEasing_curve.Out_cubic);
-            this.animation.start_value (static_cast<qreal> (this.current_index));
-            connect (this.animation.data (), SIGNAL (value_changed (GLib.Variant)), this, SLOT (update ()));
-        }
-        this.animation.end_value (static_cast<qreal> (index));
-        this.animation.on_signal_start (QAbstractAnimation.DeleteWhenStopped);
-
-        this.reverse = index < this.current_index;
-        this.current_index = index;
-        maybe_restart_timer ();
-        update ();
-        /* emit */ current_slide_changed (index);
     }
 
 
@@ -167,7 +160,7 @@ class SlideShow : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public void on_signal_next_slide () {
-        current_slide ( (this.current_index + 1) % this.labels.count ());
+        current_slide ( (this.current_slide + 1) % this.labels.count ());
         this.reverse = false;
     }
 
@@ -175,7 +168,7 @@ class SlideShow : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public void on_signal_prev_slide () {
-        current_slide ( (this.current_index > 0 ? this.current_index : this.labels.count ()) - 1);
+        current_slide ( (this.current_slide > 0 ? this.current_slide : this.labels.count ()) - 1);
         this.reverse = true;
     }
 
@@ -202,7 +195,7 @@ class SlideShow : Gtk.Widget {
     ***********************************************************/
     protected void mouse_release_event (QMouseEvent event) {
         if (!this.animation && QLine_f (this.press_point, event.position ()).length () < QGuiApplication.style_hints ().start_drag_distance ())
-            /* emit */ clicked ();
+            /* emit */ signal_clicked ();
     }
 
 
@@ -226,7 +219,7 @@ class SlideShow : Gtk.Widget {
             painter.translate ( (1.0 - progress) * (this.reverse ? -SLIDE_DISTANCE : SLIDE_DISTANCE), 0);
             draw_slide (painter, to);
         } else {
-            draw_slide (painter, this.current_index);
+            draw_slide (painter, this.current_slide);
         }
     }
 
