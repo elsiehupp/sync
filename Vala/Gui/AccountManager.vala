@@ -15,6 +15,7 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 
 
 namespace Occ {
+namespace Ui {
 
 /***********************************************************
 @brief The AccountManager class
@@ -56,7 +57,7 @@ class AccountManager : GLib.Object {
     signal void on_signal_account_added (AccountState account);
     signal void on_signal_account_removed (AccountState account);
     signal void account_sync_connection_removed (AccountState account);
-    signal void remove_account_folders (AccountState account);
+    signal void signal_remove_account_folders (AccountState account);
 
 
     /***********************************************************
@@ -527,7 +528,7 @@ class AccountManager : GLib.Object {
         this.accounts.clear ();
         for (var acc : accounts_copy) {
             /* emit */ account_removed (acc.data ());
-            /* emit */ remove_account_folders (acc.data ());
+            /* emit */ signal_remove_account_folders (acc.data ());
         }
     }
 
@@ -564,5 +565,9 @@ class AccountManager : GLib.Object {
         this.accounts + ptr;
         /* emit */ account_added (account_state);
     }
-    }
+
+} // class AccountManager
+
+} // namespace Ui
+} // namespace Occ
     

@@ -16,7 +16,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QPointer>
 //  #include <memory>
 
-
 namespace Occ {
 namespace Ui {
 
@@ -25,7 +24,6 @@ namespace Ui {
 @ingroup gui
 ***********************************************************/
 class AccountState : GLib.Object, QSharedData {
-
 
     class AccountStatePtr : unowned AccountState { }
     class AccountAppList : GLib.List<AccountApp> { }
@@ -113,13 +111,11 @@ class AccountState : GLib.Object, QSharedData {
     ***********************************************************/
     private int maintenance_to_connected_delay;
 
-
     /***********************************************************
     Connects remote wipe check with the account
     the log out triggers the check (loads app password . create request)
     ***********************************************************/
     private RemoteWipe remote_wipe;
-
 
     /***********************************************************
     Holds the App names and URLs available on the server
@@ -145,7 +141,7 @@ class AccountState : GLib.Object, QSharedData {
         base ();
         this.account = account;
         this.state = AccountState.State.DISCONNECTED;
-        this.connection_status = ConnectionValidator.Undefined;
+        this.connection_status = ConnectionValidator.Status.UNDEFINED;
         this.waiting_for_new_credentials = false;
         this.maintenance_to_connected_delay = 60000 + (qrand () % (4 * 60000)); // 1-5min delay
         this.remote_wipe = new RemoteWipe (this.account);
@@ -203,11 +199,6 @@ class AccountState : GLib.Object, QSharedData {
 
     /***********************************************************
     ***********************************************************/
-    public 
-
-
-    /***********************************************************
-    ***********************************************************/
     public string[] connection_errors () {
         return this.connection_errors;
     }
@@ -249,7 +240,7 @@ class AccountState : GLib.Object, QSharedData {
     ***********************************************************/
     public bool is_signed_out () {
         return this.state == State.SIGNED_OUT;
-    }s
+    }
 
 
     /***********************************************************
@@ -306,8 +297,7 @@ class AccountState : GLib.Object, QSharedData {
     /***********************************************************
     Move from State.SIGNED_OUT state to State.DISCONNECTED(attempting to connect)
     ***********************************************************/
-    public void sign_in ();
-    void AccountState.sign_in () {
+    public void sign_in () {
         if (this.state == State.SIGNED_OUT) {
             this.waiting_for_new_credentials = false;
             state (State.DISCONNECTED);
@@ -330,7 +320,7 @@ class AccountState : GLib.Object, QSharedData {
         var s = ConfigFile.settings_with_group ("Accounts");
         s.begin_group (this.account.identifier ());
         return s;
-    }s
+    }
 
 
     /***********************************************************
@@ -463,7 +453,7 @@ class AccountState : GLib.Object, QSharedData {
 
         var con_validator = new ConnectionValidator (AccountStatePtr (this));
         this.connection_validator = con_validator;
-        connect (con_validator, &ConnectionValidator.connection_result,
+        connect (con_validator, &ConnectionValidator.signal_connection_result,
             this, &AccountState.on_signal_connection_validator_result);
         if (is_connected ()) {
             // Use a small authed propfind as a minimal ping when we're
@@ -500,7 +490,7 @@ class AccountState : GLib.Object, QSharedData {
             this.state = state;
 
             if (this.state == State.SIGNED_OUT) {
-                this.connection_status = ConnectionValidator.Undefined;
+                this.connection_status = ConnectionValidator.Status.UNDEFINED;
                 this.connection_errors.clear ();
             } else if (old_state == State.SIGNED_OUT && this.state == State.DISCONNECTED) {
                 // If we stop being voluntarily signed-out, try to connect and
@@ -580,11 +570,11 @@ class AccountState : GLib.Object, QSharedData {
                 account ().try_setup_push_notifications ();
             }
             break;
-        case ConnectionValidator.Undefined:
-        case ConnectionValidator.NotConfigured:
+        case ConnectionValidator.Status.UNDEFINED:
+        case ConnectionValidator.Status.NOT_CONFIGURED:
             state (State.DISCONNECTED);
             break;
-        case ConnectionValidator.ServerVersionMismatch:
+        case ConnectionValidator.Status.SERVER_VERSION_MISMATCH:
             state (State.CONFIGURATION_ERROR);
             break;
         case ConnectionValidator.StatusNotFound:
@@ -593,8 +583,8 @@ class AccountState : GLib.Object, QSharedData {
             // much more likely, so keep trying to connect.
             state (State.NETWORK_ERROR);
             break;
-        case ConnectionValidator.CredentialsWrong:
-        case ConnectionValidator.CredentialsNotReady:
+        case ConnectionValidator.Status.CREDENTIALS_WRONG:
+        case ConnectionValidator.Status.CREDENTIALS_NOT_READY:
             handle_invalid_credentials ();
             break;
         case ConnectionValidator.SslError:

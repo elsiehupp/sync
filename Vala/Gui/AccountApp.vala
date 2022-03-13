@@ -5,6 +5,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace Ui {
 
 class AccountApp : GLib.Object {
 
@@ -12,13 +13,15 @@ class AccountApp : GLib.Object {
     ***********************************************************/
     string name { public get; private set; }
     string identifier { public get; private set; }
+    GLib.Uri url { public get; private set; }
     GLib.Uri icon_url { public get; private set; }
 
 
     /***********************************************************
     ***********************************************************/
-    public AccountApp (string name, GLib.Uri url,
-        const string identifier, GLib.Uri icon_url,
+    public AccountApp (
+        string name, GLib.Uri url,
+        string identifier, GLib.Uri icon_url,
         GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.name = name;

@@ -22,36 +22,22 @@ class AuthenticationDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public AuthenticationDialog (string realm, string domain, Gtk.Widget parent = null);
+    private QLineEdit user;
+    private QLineEdit password;
 
     /***********************************************************
     ***********************************************************/
-    public string user ();
-
-    /***********************************************************
-    ***********************************************************/
-    public string password ();
-
-
-    /***********************************************************
-    ***********************************************************/
-    private QLineEdit this.user;
-    private QLineEdit this.password;
-}
-
-
-
-    AuthenticationDialog.AuthenticationDialog (string realm, string domain, Gtk.Widget parent)
-        : Gtk.Dialog (parent)
-        this.user (new QLineEdit)
-        this.password (new QLineEdit) {
+    public AuthenticationDialog (string realm, string domain, Gtk.Widget parent = null) {
+        base (parent);
+        this.user = new QLineEdit ();
+        this.password = new QLineEdit ();
         window_title (_("Authentication Required"));
         var lay = new QVBoxLayout (this);
         var label = new Gtk.Label (_("Enter username and password for \"%1\" at %2.").arg (realm, domain));
         label.text_format (Qt.PlainText);
         lay.add_widget (label);
 
-        var form = new QFormLayout;
+        var form = new QFormLayout ();
         form.add_row (_("&User:"), this.user);
         form.add_row (_("&Password:"), this.password);
         lay.add_layout (form);
@@ -63,13 +49,21 @@ class AuthenticationDialog : Gtk.Dialog {
         lay.add_widget (box);
     }
 
-    string AuthenticationDialog.user () {
+
+    /***********************************************************
+    ***********************************************************/
+    public string user_text () {
         return this.user.text ();
     }
 
-    string AuthenticationDialog.password () {
+
+    /***********************************************************
+    ***********************************************************/
+    public string password_text () {
         return this.password.text ();
     }
 
-    } // namespace Occ
-    
+} // class AuthenticationDialog
+
+} // namespace Ui
+} // namespace Occ

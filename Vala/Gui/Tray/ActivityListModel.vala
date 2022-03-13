@@ -316,11 +316,11 @@ class ActivityListModel : QAbstractListModel {
                 if (!local_files.empty ()) {
                     return local_files.const_first ();
                 } else {
-                    q_warning ("File not local folders while processing absolute path request.");
+                    GLib.warn ("File not local folders while processing absolute path request.");
                     return "";
                 }
             } else {
-                q_warning ("Received an absolute path request for an activity without a file path.");
+                GLib.warn ("Received an absolute path request for an activity without a file path.");
                 return "";
             }
         }

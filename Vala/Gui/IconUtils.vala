@@ -60,7 +60,7 @@ class IconUtils {
         Gtk.Image result{};
 
         if (filename.is_empty () || !custom_color.is_valid ()) {
-            q_warning ("invalid filename or custom_color";
+            GLib.warn ("invalid filename or custom_color";
             return result;
         }
 
@@ -98,7 +98,7 @@ class IconUtils {
 
         //  Q_ASSERT (!source_svg.is_empty ());
         if (source_svg.is_empty ()) {
-            q_warning ("Failed to find base SVG file for" + filename;
+            GLib.warn ("Failed to find base SVG file for" + filename;
             return result;
         }
 
@@ -106,7 +106,7 @@ class IconUtils {
 
         //  Q_ASSERT (!result.is_null ());
         if (result.is_null ()) {
-            q_warning ("Failed to load pixmap for" + filename;
+            GLib.warn ("Failed to load pixmap for" + filename;
         }
 
         return result;

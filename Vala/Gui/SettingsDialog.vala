@@ -332,8 +332,8 @@ class SettingsDialog : Gtk.Dialog {
         this.action_for_account.insert (s.account ().data (), account_action);
         account_action.trigger ();
 
-        connect (account_settings, &AccountSettings.folder_changed, this.gui, &OwncloudGui.on_signal_folders_changed);
-        connect (account_settings, &AccountSettings.open_folder_alias,
+        connect (account_settings, &AccountSettings.signal_folder_changed, this.gui, &OwncloudGui.on_signal_folders_changed);
+        connect (account_settings, &AccountSettings.signal_open_folder_alias,
             this.gui, &OwncloudGui.on_signal_folder_open_action);
         connect (account_settings, &AccountSettings.on_signal_show_issues_list, this, &SettingsDialog.on_signal_show_issues_list);
         connect (s.account ().data (), &Account.account_changed_avatar, this, &SettingsDialog.on_signal_account_avatar_changed);

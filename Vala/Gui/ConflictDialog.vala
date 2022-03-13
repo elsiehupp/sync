@@ -11,8 +11,6 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 //  #include <QPushButton>
 //  #include <Gtk.Dialog>
 
-
-
 namespace Occ {
 namespace Ui {
 
@@ -20,75 +18,16 @@ class ConflictDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public ConflictDialog (Gtk.Widget parent = null);
+    private string base_filename;
+    private QScopedPointer<Ui.ConflictDialog> ui;
+    private ConflictSolver solver;
 
     /***********************************************************
     ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public string local_version_filename ();
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public void on_signal_base_filename (string base_filename);
-
-
-    public void on_signal_local_version_filename (string local_version_filename);
-
-
-    public void on_signal_remote_version_filename (string remote_version_filename);
-
-    void on_signal_accept () override;
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void update_widgets ();
-
-    /***********************************************************
-    ***********************************************************/
-    private 
-    private string this.base_filename;
-    private QScopedPointer<Ui.ConflictDialog> this.ui;
-    private ConflictSolver this.solver;
-}
-
-} // namespace Occ
-
-
-
-namespace {
-    void force_header_font (Gtk.Widget widget) {
-        var font = widget.font ();
-        font.point_size_f (font.point_size_f () * 1.5);
-        widget.font (font);
-    }
-
-    void bold_font (Gtk.Widget widget, bool bold) {
-        var font = widget.font ();
-        font.bold (bold);
-        widget.font (font);
-    }
-
-
-    ConflictDialog.ConflictDialog (Gtk.Widget parent)
-        : Gtk.Dialog (parent)
-        this.ui (new Ui.ConflictDialog)
-        this.solver (new ConflictSolver (this)) {
+    public ConflictDialog (Gtk.Widget parent = null) {
+        base (parent);
+        this.ui = new Ui.ConflictDialog ();
+        this.solver = new ConflictSolver (this);
         this.ui.up_ui (this);
         force_header_font (this.ui.conflict_message);
         this.ui.button_box.button (QDialogButtonBox.Ok).enabled (false);
@@ -108,21 +47,31 @@ namespace {
         connect (this.solver, &ConflictSolver.signal_remote_version_filename_changed, this, &ConflictDialog.update_widgets);
     }
 
-    string ConflictDialog.base_filename () {
+
+    /***********************************************************
+    ***********************************************************/
+    public string base_filename () {
         return this.base_filename;
     }
 
-    ConflictDialog.~ConflictDialog () = default;
 
-    string ConflictDialog.local_version_filename () {
+    /***********************************************************
+    ***********************************************************/
+    public string local_version_filename () {
         return this.solver.local_version_filename ();
     }
 
-    string ConflictDialog.remote_version_filename () {
+
+    /***********************************************************
+    ***********************************************************/
+    public string remote_version_filename () {
         return this.solver.remote_version_filename ();
     }
 
-    void ConflictDialog.on_signal_base_filename (string base_filename) {
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_base_filename (string base_filename) {
         if (this.base_filename == base_filename) {
             return;
         }
@@ -131,15 +80,24 @@ namespace {
         this.ui.conflict_message.on_signal_text (_("Conflicting versions of %1.").arg (this.base_filename));
     }
 
-    void ConflictDialog.on_signal_local_version_filename (string local_version_filename) {
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_local_version_filename (string local_version_filename) {
         this.solver.on_signal_local_version_filename (local_version_filename);
     }
 
-    void ConflictDialog.on_signal_remote_version_filename (string remote_version_filename) {
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_signal_remote_version_filename (string remote_version_filename) {
         this.solver.on_signal_remote_version_filename (remote_version_filename);
     }
 
-    void ConflictDialog.on_signal_accept () {
+
+    /***********************************************************
+    ***********************************************************/
+    private override void on_signal_accept () {
         const var is_local_picked = this.ui.local_version_radio.is_checked ();
         const var is_remote_picked = this.ui.remote_version_radio.is_checked ();
 
@@ -156,7 +114,10 @@ namespace {
         }
     }
 
-    void ConflictDialog.update_widgets () {
+
+    /***********************************************************
+    ***********************************************************/
+    private void update_widgets () {
         QMimeDatabase mime_database;
 
         const var update_group = [this, mime_database] (string filename, Gtk.Label link_label, string link_text, Gtk.Label mtime_label, Gtk.Label size_label, QToolButton button) {
@@ -198,7 +159,10 @@ namespace {
         bold_font (this.ui.remote_version_mtime, remote_mtime > local_mtime);
     }
 
-    void ConflictDialog.update_button_states () {
+
+    /***********************************************************
+    ***********************************************************/
+    private void update_button_states () {
         const var is_local_picked = this.ui.local_version_radio.is_checked ();
         const var is_remote_picked = this.ui.remote_version_radio.is_checked ();
         this.ui.button_box.button (QDialogButtonBox.Ok).enabled (is_local_picked || is_remote_picked);
@@ -210,5 +174,25 @@ namespace {
         this.ui.button_box.button (QDialogButtonBox.Ok).on_signal_text (text);
     }
 
-    } // namespace Occ
-    
+
+    /***********************************************************
+    ***********************************************************/
+    private static void force_header_font (Gtk.Widget widget) {
+        var font = widget.font ();
+        font.point_size_f (font.point_size_f () * 1.5);
+        widget.font (font);
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private static void bold_font (Gtk.Widget widget, bool bold) {
+        var font = widget.font ();
+        font.bold (bold);
+        widget.font (font);
+    }
+
+} // class ConflictDialog
+
+} // namespace Ui
+} // namespace Occ

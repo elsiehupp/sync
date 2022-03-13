@@ -162,7 +162,7 @@ class FolderMan : GLib.Object {
             this, &FolderMan.on_signal_schedule_folder_by_time);
         this.time_scheduler.on_signal_start ();
     
-        connect (AccountManager.instance (), &AccountManager.remove_account_folders,
+        connect (AccountManager.instance (), &AccountManager.signal_remove_account_folders,
             this, &FolderMan.on_signal_remove_folders_for_account);
     
         connect (AccountManager.instance (), &AccountManager.account_sync_connection_removed,
