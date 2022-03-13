@@ -8,11 +8,9 @@ srcs = files([
     'Application.vala',
     'AuthenticationDialog.vala',
 
-    'CloudProviders/CloudProviderConfig.vala',
     'CloudProviders/CloudProviderManager.vala',
     'CloudProviders/CloudProviderWrapper.vala',
 
-    'ConfigGui.vala',
     'ConflictDialog.vala',
     'ConflictSolver.vala',
     'ConnectionValidator.vala',
