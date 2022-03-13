@@ -11,15 +11,105 @@ class SyncStatusSummary : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private AccountStatePtr account_state;
+    AccountStatePtr account_state {
+        private get {
+            return this.account_state;
+        }
+        private set {
+            if (!reload_needed (value.data ())) {
+                return;
+            }
+            if (this.account_state) {
+                disconnect (
+                    this.account_state.data (),
+                    AccountState.is_connected_changed,
+                    this,
+                    SyncStatusSummary.on_signal_is_connected_changed
+                );
+            }
+            this.account_state = value;
+            connect (
+                this.account_state.data (),
+                AccountState.is_connected_changed,
+                this,
+                SyncStatusSummary.on_signal_is_connected_changed
+            );
+        }
+    }
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Uri sync_icon = Theme.instance ().sync_status_ok ();
     private double progress = 1.0;
-    private bool is_syncing = false;
-    private string sync_status_string = _("All synced!");
-    private string sync_status_detail_string;
+
+    GLib.Uri sync_icon {
+        public get {
+            return this.sync_icon;
+        }
+        private set {
+            if (this.sync_icon == value) {
+                return;
+            }
+    
+            this.sync_icon = value;
+            /* emit */ signal_sync_icon_changed ();
+        }
+    }
+
+    bool syncing {
+        public get {
+            return this.is_syncing;
+        }
+        private set {
+            if (value == this.is_syncing) {
+                return;
+            }
+    
+            this.is_syncing = value;
+            /* emit */ signal_syncing_changed ();
+        }
+    }
+
+    string sync_status_string {
+        public get {
+            return this.sync_status_string;
+        }
+        private set {
+            if (this.sync_status_string == value) {
+                return;
+            }
+    
+            this.sync_status_string = value;
+            /* emit */ signal_sync_status_string_changed ();
+        }
+    }
+
+    string sync_status_detail_string {
+        public get {
+            return this.sync_status_detail_string;
+        }
+        private set {
+            if (this.sync_status_detail_string == value) {
+                return;
+            }
+    
+            this.sync_status_detail_string = value;
+            /* emit */ signal_sync_status_detail_string_changed ();
+        }
+    }
+
+    double sync_progress {
+        public get {
+            return this.progress;
+        }
+        private set {
+            if (this.progress == value) {
+                return;
+            }
+    
+            this.progress = value;
+            /* emit */ signal_sync_progress_changed ();
+        }
+    }
 
 
     signal void signal_sync_progress_changed ();
@@ -33,28 +123,12 @@ class SyncStatusSummary : GLib.Object {
     ***********************************************************/
     public SyncStatusSummary (GLib.Object parent = new GLib.Object ()) {
         base (parent);
-        const var folder_man = FolderMan.instance ();
+        const FolderMan folder_man = FolderMan.instance ();
+        this.is_syncing = false;
+        this.sync_icon = Theme.instance ().sync_status_ok ();
+        this.sync_status_string = _("All synced!");
         connect (folder_man, FolderMan.signal_folder_list_changed, this, SyncStatusSummary.on_signal_folder_list_changed);
         connect (folder_man, FolderMan.signal_folder_sync_state_change, this, SyncStatusSummary.on_signal_folder_sync_state_changed);
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public double sync_progress () {
-        return this.progress;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void sync_progress (double value) {
-        if (this.progress == value) {
-            return;
-        }
-
-        this.progress = value;
-        /* emit */ signal_sync_progress_changed ();
     }
 
 
@@ -72,65 +146,6 @@ class SyncStatusSummary : GLib.Object {
             return Occ.SyncResult.Status.SYNC_RUNNING;
         }
         return status;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public bool syncing () {
-        return this.is_syncing;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public bool syncing (bool value) {
-        if (value == this.is_syncing) {
-            return;
-        }
-
-        this.is_syncing = value;
-        /* emit */ signal_syncing_changed ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public string sync_status_string ();
-    string SyncStatusSummary.sync_status_string () {
-        return this.sync_status_string;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void sync_status_string (string value);
-    void SyncStatusSummary.sync_status_string (string value) {
-        if (this.sync_status_string == value) {
-            return;
-        }
-
-        this.sync_status_string = value;
-        /* emit */ signal_sync_status_string_changed ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public string sync_status_detail_string () {
-        return this.sync_status_detail_string;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void sync_status_detail_string (string value) {
-        if (this.sync_status_detail_string == value) {
-            return;
-        }
-
-        this.sync_status_detail_string = value;
-        /* emit */ signal_sync_status_detail_string_changed ();
     }
 
 
@@ -236,7 +251,7 @@ class SyncStatusSummary : GLib.Object {
     ***********************************************************/
     private void sync_state_for_folder (Folder folder) {
         if (this.account_state && !this.account_state.is_connected ()) {
-            syncing (false);
+            is_syncing (false);
             sync_status_string (_("Offline"));
             sync_status_detail_string ("");
             sync_icon (Theme.instance ().folder_offline ());
@@ -250,7 +265,7 @@ class SyncStatusSummary : GLib.Object {
         case SyncResult.Status.SYNC_PREPARE:
             // Success should only be shown if all folders were fine
             if (!folder_errors () || folder_error (folder)) {
-                syncing (false);
+                is_syncing (false);
                 sync_status_string (_("All synced!"));
                 sync_status_detail_string ("");
                 sync_icon (Theme.instance ().sync_status_ok ());
@@ -259,7 +274,7 @@ class SyncStatusSummary : GLib.Object {
             break;
         case SyncResult.Status.ERROR:
         case SyncResult.Status.SETUP_ERROR:
-            syncing (false);
+            is_syncing (false);
             sync_status_string (_("Some files couldn't be synced!"));
             sync_status_detail_string (_("See below for errors"));
             sync_icon (Theme.instance ().sync_status_error ());
@@ -267,21 +282,21 @@ class SyncStatusSummary : GLib.Object {
             break;
         case SyncResult.Status.SYNC_RUNNING:
         case SyncResult.Status.NOT_YET_STARTED:
-            syncing (true);
+            is_syncing (true);
             sync_status_string (_("Syncing"));
             sync_status_detail_string ("");
             sync_icon (Theme.instance ().sync_status_running ());
             break;
         case SyncResult.Status.PAUSED:
         case SyncResult.Status.SYNC_ABORT_REQUESTED:
-            syncing (false);
+            is_syncing (false);
             sync_status_string (_("Sync paused"));
             sync_status_detail_string ("");
             sync_icon (Theme.instance ().sync_status_pause ());
             break;
         case SyncResult.Status.PROBLEM:
         case SyncResult.Status.UNDEFINED:
-            syncing (false);
+            is_syncing (false);
             sync_status_string (_("Some files could not be synced!"));
             sync_status_detail_string (_("See below for warnings"));
             sync_icon (Theme.instance ().sync_status_warning ());
@@ -329,7 +344,7 @@ class SyncStatusSummary : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void sync_state_to_connected_state () {
-        syncing (false);
+        is_syncing (false);
         sync_status_detail_string ("");
         if (this.account_state && !this.account_state.is_connected ()) {
             sync_status_string (_("Offline"));
@@ -363,46 +378,6 @@ class SyncStatusSummary : GLib.Object {
         if (sync_state_fallback_needed) {
             sync_state_to_connected_state ();
         }
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    //  private void syncing (bool value);
-
-
-    /***********************************************************
-    ***********************************************************/
-    GLib.Uri SyncStatusSummary.sync_icon () {
-        return this.sync_icon;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void sync_icon (GLib.Uri value);
-    void SyncStatusSummary.sync_icon (GLib.Uri value) {
-        if (this.sync_icon == value) {
-            return;
-        }
-
-        this.sync_icon = value;
-        /* emit */ signal_sync_icon_changed ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void account_state (AccountStatePtr account_state) {
-        if (!reload_needed (account_state.data ())) {
-            return;
-        }
-        if (this.account_state) {
-            disconnect (
-                this.account_state.data (), AccountState.is_connected_changed, this, SyncStatusSummary.on_signal_is_connected_changed);
-        }
-        this.account_state = account_state;
-        connect (this.account_state.data (), AccountState.is_connected_changed, this, SyncStatusSummary.on_signal_is_connected_changed);
     }
 
 

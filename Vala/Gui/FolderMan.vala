@@ -57,21 +57,79 @@ class FolderMan : GLib.Object {
     private const string PAR_O_TAG = "__PAR_OPEN__";
     private const string PAR_C_TAG = "__PAR_CLOSE__";
 
-    private FolderMan instance = null;
+    static private FolderMan instance = null;
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Set<Folder> disabled_folders;
+    private GLib.List<Folder> disabled_folders;
     private Folder.Map folder_map;
     private string folder_config_path;
-    private Folder current_sync_folder = null;
+
+    /***********************************************************
+    Access to the currently syncing folder.
+
+    Note: This is only the folder that's currently syncing
+    as-scheduled may be externally-managed syncs such as from
+    placeholder hydrations.
+
+    See also is_any_sync_running ()
+    ***********************************************************/
+    Folder current_sync_folder { public get; private set; }
+
     private QPointer<Folder> last_sync_folder;
-    private bool sync_enabled = true;
+
+    /***********************************************************
+    If enabled is set to false, no new folders will start to
+    sync. The current one will finish.
+
+    Only enable or disable foldermans will schedule and do syncs.
+    this is not the same as Pause and Resume of folders.
+    ***********************************************************/
+    bool sync_enabled {
+        public set {
+            if (!this.sync_enabled && value && !this.scheduled_folders.is_empty ()) {
+                // We have things in our queue that were waiting for the connection to come back on.
+                start_scheduled_sync_soon ();
+            }
+            this.sync_enabled = value;
+            // force a redraw in case the network connect status changed
+            /* emit */ (signal_folder_sync_state_change (null));
+        }
+    }
+
+    bool ignore_hidden_files {
+        /***********************************************************
+        While ignoring hidden files can theoretically be switched
+        per folder, it's currently a global setting that users can
+        only change for all folders at once.
+
+        These helper functions can be removed once it's properly
+        per-folder.
+        ***********************************************************/
+        public get {
+            if (this.folder_map.empty ()) {
+                // Currently no folders in the manager . return default
+                return false;
+            }
+            // Since the hidden_files settings is the same for all folders, just return the settings of the first folder
+            return this.folder_map.begin ().value ().ignore_hidden_files ();
+        }
+        /***********************************************************
+        Note that the setting will revert to 'true' if all folders
+        are deleted...
+        ***********************************************************/
+        public set {
+            foreach (Folder folder in this.folder_map) {
+                folder.ignore_hidden_files (value);
+                folder.save_to_settings ();
+            }
+        }
+    }
 
     /***********************************************************
     Folder aliases from the settings that weren't read
     ***********************************************************/
-    private GLib.Set<string> additional_blocked_folder_aliases;
+    private GLib.List<string> additional_blocked_folder_aliases;
 
     /***********************************************************
     Starts regular etag query jobs
@@ -100,15 +158,17 @@ class FolderMan : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private QScopedPointer<SocketApi> socket_api;
+    SocketApi socket_api {
+        public get {
+            return this.socket_api.data ();
+        }
+        private set {
+            this.socket_api = value;
+        }
+    }
 
     /***********************************************************
     ***********************************************************/
-    //  private 
-
-    /***********************************************************
-    ***********************************************************/
-    private static FolderMan instance;
 
     //  private friend class Occ.Application;
     //  private friend class .TestFolderMan;
@@ -142,6 +202,8 @@ class FolderMan : GLib.Object {
         this.navigation_pane_helper = this;
         //  ASSERT (!this.instance);
         this.instance = this;
+        this.sync_enabled = true;
+        this.current_sync_folder = null;
     
         this.socket_api.on_signal_reset (new SocketApi ());
     
@@ -839,13 +901,6 @@ class FolderMan : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public SocketApi socket_api () {
-        return this.socket_api.data ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
     public NavigationPaneHelper navigation_pane_helper () {
         return this.navigation_pane_helper;
     }
@@ -955,54 +1010,10 @@ class FolderMan : GLib.Object {
 
 
     /***********************************************************
-    While ignoring hidden files can theoretically be switched
-    per folder, it's currently a global setting that users can
-    only change for all folders at once.
-
-    These helper functions can be removed once it's properly
-    per-folder.
-    ***********************************************************/
-    public bool ignore_hidden_files () {
-        if (this.folder_map.empty ()) {
-            // Currently no folders in the manager . return default
-            return false;
-        }
-        // Since the hidden_files settings is the same for all folders, just return the settings of the first folder
-        return this.folder_map.begin ().value ().ignore_hidden_files ();
-    }
-
-
-    /***********************************************************
-    Note that the setting will revert to 'true' if all folders
-    are deleted...
-    ***********************************************************/
-    public void ignore_hidden_files (bool ignore) {
-        foreach (Folder folder in this.folder_map) {
-            folder.ignore_hidden_files (ignore);
-            folder.save_to_settings ();
-        }
-    }
-
-
-    /***********************************************************
     Access to the current queue of scheduled folders.
     ***********************************************************/
     public QQueue<Folder> schedule_queue () {
         return this.scheduled_folders;
-    }
-
-
-    /***********************************************************
-    Access to the currently syncing folder.
-
-    Note: This is only the folder that's currently syncing
-    as-scheduled may be externally-managed syncs such as from
-    placeholder hydrations.
-
-    See also is_any_sync_running ()
-    ***********************************************************/
-    public Folder current_sync_folder () {
-        return this.current_sync_folder;
     }
 
 
@@ -1047,24 +1058,6 @@ class FolderMan : GLib.Object {
         /* emit */ signal_schedule_queue_changed ();
     
         return count;
-    }
-
-
-    /***********************************************************
-    If enabled is set to false, no new folders will start to
-    sync. The current one will finish.
-
-    Only enable or disable foldermans will schedule and do syncs.
-    this is not the same as Pause and Resume of folders.
-    ***********************************************************/
-    public void sync_enabled (bool enabled) {
-        if (!this.sync_enabled && enabled && !this.scheduled_folders.is_empty ()) {
-            // We have things in our queue that were waiting for the connection to come back on.
-            start_scheduled_sync_soon ();
-        }
-        this.sync_enabled = enabled;
-        // force a redraw in case the network connect status changed
-        /* emit */ (signal_folder_sync_state_change (null));
     }
 
 

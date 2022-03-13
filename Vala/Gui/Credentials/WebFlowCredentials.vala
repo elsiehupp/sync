@@ -44,13 +44,14 @@ class WebFlowCredentials : AbstractCredentials {
     private const int client_ssl_ca_certificates_max_count = 10;
     private QQueue<QSslCertificate> client_ssl_ca_certificates_write_queue;
 
-    protected string user;
-    protected string password;
+    string user { public get; protected set; }
+    string password { public get; protected set; }
+    bool ready { public get; protected set; }
+
     protected QSslKey client_ssl_key;
     protected QSslCertificate client_ssl_certificate;
     protected GLib.List<QSslCertificate> client_ssl_ca_certificates;
 
-    protected bool ready = false;
     protected bool credentials_valid = false;
     protected bool keychain_migration = false;
 
@@ -83,20 +84,6 @@ class WebFlowCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public override string user () {
-        return this.user;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public override string password () {
-        return this.password;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
     public override QNetworkAccessManager create_qnam () {
         GLib.info ("Getting QNAM");
         AccessManager qnam = new WebFlowCredentialsAccessManager (this);
@@ -115,13 +102,6 @@ class WebFlowCredentials : AbstractCredentials {
         );
 
         return qnam;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public override bool ready () {
-        return this.ready;
     }
 
 

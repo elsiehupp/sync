@@ -157,7 +157,7 @@ class ServerNotificationHandler : GLib.Object {
     private void on_signal_allow_desktop_notifications_changed (bool is_allowed) {
         var account = qvariant_cast<AccountState> (sender ().property (PROPERTY_ACCOUNT_STATE));
         if (account != null) {
-           account.desktop_notifications_allowed (is_allowed);
+           account.are_desktop_notifications_allowed (is_allowed);
         }
     }
 

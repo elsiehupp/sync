@@ -55,7 +55,7 @@ class SocketApi : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Set<string> registered_aliases;
+    private GLib.List<string> registered_aliases;
     private GLib.HashMap<QIODevice *, SocketListener> listeners;
     private SocketApiServer local_server;
 

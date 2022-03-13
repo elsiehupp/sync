@@ -62,22 +62,38 @@ class Systray : QSystemTrayIcon {
 
     /***********************************************************
     ***********************************************************/
-    private static Systray instance;
-
-    /***********************************************************
-    ***********************************************************/
-    public static Systray instance () {
-        if (!this.instance) {
-            this.instance = new Systray ();
+    static Systray instance {
+        public get {
+            if (!this.instance) {
+                this.instance = new Systray ();
+            }
+            return this.instance;
         }
-        return this.instance;
+        private set {
+            this.instance = value;
+        }
     }
 
     /***********************************************************
     ***********************************************************/
-    private bool is_open = false;
-    private bool sync_is_paused = true;
-    private QPointer<QQmlApplicationEngine> tray_engine;
+    bool is_open { public get; private set; }
+    bool sync_is_paused { public get; private set; }
+
+    QQmlApplicationEngine tray_engine {
+        private get {
+            return this.tray_engine;
+        }
+        public set {
+            this.tray_engine = value;
+    
+            this.tray_engine.network_access_manager_factory (this.access_manager_factory);
+    
+            this.tray_engine.add_import_path ("qrc:/qml/theme");
+            this.tray_engine.add_ImageProvider ("avatars", new ImageProvider ());
+            this.tray_engine.add_ImageProvider ("svgimage-custom-color", new Occ.Ui.SvgImageProvider ());
+            this.tray_engine.add_ImageProvider ("unified-search-result-icon", new UnifiedSearchResultImageProvider ());
+        }
+    }
 
     /***********************************************************
     ***********************************************************/
@@ -99,6 +115,9 @@ class Systray : QSystemTrayIcon {
 
     private Systray () {
         base ();
+        this.is_open = false;
+        this.sync_is_paused = true;
+
         qml_register_singleton_type<UserModel> (
             "com.nextcloud.desktopclient",
             1,
@@ -215,20 +234,6 @@ class Systray : QSystemTrayIcon {
 
     /***********************************************************
     ***********************************************************/
-    public void tray_engine (QQmlApplicationEngine tray_engine) {
-        this.tray_engine = tray_engine;
-
-        this.tray_engine.network_access_manager_factory (this.access_manager_factory);
-
-        this.tray_engine.add_import_path ("qrc:/qml/theme");
-        this.tray_engine.add_ImageProvider ("avatars", new ImageProvider ());
-        this.tray_engine.add_ImageProvider ("svgimage-custom-color", new Occ.Ui.SvgImageProvider ());
-        this.tray_engine.add_ImageProvider ("unified-search-result-icon", new UnifiedSearchResultImageProvider ());
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
     public void create () {
         if (this.tray_engine) {
             if (!AccountManager.instance ().accounts ().is_empty ()) {
@@ -266,13 +271,6 @@ class Systray : QSystemTrayIcon {
 
     /***********************************************************
     ***********************************************************/
-    public bool is_open () {
-        return this.is_open;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
     public string window_title () {
         return Theme.instance ().app_name_gui ();
     }
@@ -288,6 +286,7 @@ class Systray : QSystemTrayIcon {
         ConfigFile config;
         return config.show_main_dialog_as_normal_window ();
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -306,13 +305,6 @@ class Systray : QSystemTrayIcon {
     ***********************************************************/
     public void tool_tip (string tip) {
         QSystemTrayIcon.tool_tip (_("%1 : %2").arg (Theme.instance ().app_name_gui (), tip));
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public bool sync_is_paused () {
-        return this.sync_is_paused;
     }
 
 

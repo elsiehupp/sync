@@ -190,14 +190,79 @@ class FolderStatusModel : QAbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    private AccountState account_state = null;
+    AccountState account_state {
+        private get {
+            return this.account_state;
+        }
+        public set {
+            begin_reset_model ();
+            this.dirty = false;
+            this.folders.clear ();
+            this.account_state = value;
+    
+            connect (
+                FolderMan.instance (),
+                FolderMan.signal_folder_sync_state_change,
+                this,
+                FolderStatusModel.on_signal_folder_sync_state_change,
+                Qt.UniqueConnection
+            );
+            connect (
+                FolderMan.instance (),
+                FolderMan.signal_schedule_queue_changed,
+                this,
+                FolderStatusModel.on_signal_folder_schedule_queue_changed,
+                Qt.UniqueConnection
+            );
+    
+            var folders = FolderMan.instance ().map ();
+            foreach (var folder_i in folders) {
+                if (!this.account_state) {
+                    break;
+                }
+                if (folder_i.account_state () != this.account_state) {
+                    continue;
+                }
+                SubFolderInfo info;
+                info.name = folder_i.alias ();
+                info.path = "/";
+                info.folder = folder_i;
+                info.checked = Qt.PartiallyChecked;
+                this.folders + info;
+    
+                connect (
+                    folder_i,
+                    Folder.signal_progress_info,
+                    this,
+                    FolderStatusModel.on_signal_progress,
+                    Qt.UniqueConnection);
+                connect (
+                    folder_i,
+                    Folder.signal_new_big_folder_discovered,
+                    this,
+                    FolderStatusModel.on_signal_new_big_folder,
+                    Qt.UniqueConnection
+                );
+            }
+    
+            // Sort by header text
+            std.sort (this.folders.begin (), this.folders.end (), sort_by_folder_header);
+    
+            // Set the root this.path_index after the sorting
+            for (int i = 0; i < this.folders.size (); ++i) {
+                this.folders[i].path_index + i;
+            }
+    
+            end_reset_model ();
+            /* emit */ dirty_changed ();
+        }
+    }
 
 
     /***********************************************************
     If the selective sync checkboxes were changed
     ***********************************************************/
     private bool dirty = false;
-
 
     /***********************************************************
     Keeps track of items that are fetching data from the server.
@@ -224,49 +289,7 @@ class FolderStatusModel : QAbstractItemModel {
     ***********************************************************/
     public FolderStatusModel (GLib.Object parent = new GLib.Object ()) {
         base (parent);
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void account_state (AccountState account_state) {
-        begin_reset_model ();
-        this.dirty = false;
-        this.folders.clear ();
-        this.account_state = account_state;
-
-        connect (FolderMan.instance (), FolderMan.signal_folder_sync_state_change,
-            this, FolderStatusModel.on_signal_folder_sync_state_change, Qt.UniqueConnection);
-        connect (FolderMan.instance (), FolderMan.signal_schedule_queue_changed,
-            this, FolderStatusModel.on_signal_folder_schedule_queue_changed, Qt.UniqueConnection);
-
-        var folders = FolderMan.instance ().map ();
-        foreach (var folder_i in folders) {
-            if (!account_state)
-                break;
-            if (folder_i.account_state () != account_state)
-                continue;
-            SubFolderInfo info;
-            info.name = folder_i.alias ();
-            info.path = "/";
-            info.folder = folder_i;
-            info.checked = Qt.PartiallyChecked;
-            this.folders + info;
-
-            connect (folder_i, Folder.signal_progress_info, this, FolderStatusModel.on_signal_progress, Qt.UniqueConnection);
-            connect (folder_i, Folder.signal_new_big_folder_discovered, this, FolderStatusModel.on_signal_new_big_folder, Qt.UniqueConnection);
-        }
-
-        // Sort by header text
-        std.sort (this.folders.begin (), this.folders.end (), sort_by_folder_header);
-
-        // Set the root this.path_index after the sorting
-        for (int i = 0; i < this.folders.size (); ++i) {
-            this.folders[i].path_index + i;
-        }
-
-        end_reset_model ();
-        /* emit */ dirty_changed ();
+        this.account_state = null;
     }
 
 
@@ -306,12 +329,14 @@ class FolderStatusModel : QAbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.Variant data (QModelIndex index, int role) {
-        if (!index.is_valid ())
+    public GLib.Variant data_for_index_and_role (QModelIndex index, int role) {
+        if (!index.is_valid ()) {
             return GLib.Variant ();
+        }
 
-        if (role == Qt.EditRole)
+        if (role == Qt.EditRole) {
             return GLib.Variant ();
+        }
 
         switch (classify (index)) {
         case ItemType.ADD_BUTTON: {
@@ -480,7 +505,7 @@ class FolderStatusModel : QAbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    public bool data (QModelIndex index, GLib.Variant value, int role = Qt.EditRole) {
+    public bool data_for_index_value_and_role (QModelIndex index, GLib.Variant value, int role = Qt.EditRole) {
         if (role == Qt.CheckStateRole) {
             var info = info_for_index (index);
             //  Q_ASSERT (info.folder && info.folder.supports_selective_sync ());
@@ -502,15 +527,15 @@ class FolderStatusModel : QAbstractItemModel {
                             }
                         }
                         if (!has_unchecked) {
-                            data (parent, Qt.Checked, Qt.CheckStateRole);
+                            data_for_index_value_and_role (parent, Qt.Checked, Qt.CheckStateRole);
                         } else if (parent_info.checked == Qt.Unchecked) {
-                            data (parent, Qt.PartiallyChecked, Qt.CheckStateRole);
+                            data_for_index_value_and_role (parent, Qt.PartiallyChecked, Qt.CheckStateRole);
                         }
                     }
                     // also check all the children
                     for (int i = 0; i < info.subs.count (); ++i) {
                         if (info.subs.at (i).checked != Qt.Checked) {
-                            data (this.index (i, 0, index), Qt.Checked, Qt.CheckStateRole);
+                            data_for_index_value_and_role (this.index (i, 0, index), Qt.Checked, Qt.CheckStateRole);
                         }
                     }
                 }
@@ -519,13 +544,13 @@ class FolderStatusModel : QAbstractItemModel {
                     QModelIndex parent = index.parent ();
                     var parent_info = info_for_index (parent);
                     if (parent_info && parent_info.checked == Qt.Checked) {
-                        data (parent, Qt.PartiallyChecked, Qt.CheckStateRole);
+                        data_for_index_value_and_role (parent, Qt.PartiallyChecked, Qt.CheckStateRole);
                     }
 
                     // Uncheck all the children
                     for (int i = 0; i < info.subs.count (); ++i) {
                         if (info.subs.at (i).checked != Qt.Unchecked) {
-                            data (this.index (i, 0, index), Qt.Unchecked, Qt.CheckStateRole);
+                            data_for_index_value_and_role (this.index (i, 0, index), Qt.Unchecked, Qt.CheckStateRole);
                         }
                     }
                 }
@@ -534,7 +559,7 @@ class FolderStatusModel : QAbstractItemModel {
                     QModelIndex parent = index.parent ();
                     var parent_info = info_for_index (parent);
                     if (parent_info && parent_info.checked != Qt.PartiallyChecked) {
-                        data (parent, Qt.PartiallyChecked, Qt.CheckStateRole);
+                        data_for_index_value_and_role (parent, Qt.PartiallyChecked, Qt.CheckStateRole);
                     }
                 }
             }
@@ -1248,7 +1273,7 @@ class FolderStatusModel : QAbstractItemModel {
             return;
         }
 
-        GLib.Set<string> selective_sync_undecided_set; // not GLib.Set because it's not sorted
+        GLib.List<string> selective_sync_undecided_set; // not GLib.List because it's not sorted
         foreach (string string_value in selective_sync_undecided_list) {
             if (string_value.starts_with (parent_info.path) || parent_info.path == "/") {
                 selective_sync_undecided_set.insert (string_value);

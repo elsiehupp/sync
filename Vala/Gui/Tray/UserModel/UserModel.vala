@@ -37,7 +37,7 @@ class UserModel : QAbstractListModel {
             roles[UserRoles.STATUS_ICON] = "status_icon";
             roles[UserRoles.STATUS_EMOJI] = "status_emoji";
             roles[UserRoles.STATUS_MESSAGE] = "status_message";
-            roles[UserRoles.DESKTOP_NOTIFICATION] = "desktop_notifications_allowed";
+            roles[UserRoles.DESKTOP_NOTIFICATION] = "are_desktop_notifications_allowed";
             roles[UserRoles.AVATAR] = "avatar";
             roles[UserRoles.IS_CURRENT_USER] = "is_current_user";
             roles[UserRoles.IS_CONNECTED] = "is_connected";

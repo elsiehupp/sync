@@ -31,7 +31,7 @@ calls that are fairly complicated to handle.
 ***********************************************************/
 class ProxyAuthHandler : GLib.Object {
 
-    static ProxyAuthHandler instance;
+    static ProxyAuthHandler instance { public get; private set; }
 
     /***********************************************************
     The hostname:port of the current proxy, used for detecting
@@ -84,13 +84,7 @@ class ProxyAuthHandler : GLib.Object {
     credentials failing for an existing QNAM, we keep track of
     the senders of the proxy_auth_required signal here.
     ***********************************************************/
-    private GLib.Set<GLib.Object> gave_credentials_to;
-
-    /***********************************************************
-    ***********************************************************/
-    public static ProxyAuthHandler instance () {
-        return instance;
-    }
+    private GLib.List<GLib.Object> gave_credentials_to;
 
     ~ProxyAuthHandler () {
         delete this.dialog;

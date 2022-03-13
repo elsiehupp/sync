@@ -84,19 +84,75 @@ class AccountState : GLib.Object, QSharedData {
         ASKING_CREDENTIALS
     }
 
+    AccountPointer account { public get; private set; }
+    State state {
+        public get {
+            return this.state;
+        }
+        private set {
+            if (this.state != state) {
+                GLib.info ("AccountState state change: "
+                          + state_string (this.state) + "." + state_string (state));
+                State old_state = this.state;
+                this.state = state;
+    
+                if (this.state == State.SIGNED_OUT) {
+                    this.connection_status = ConnectionValidator.Status.UNDEFINED;
+                    this.connection_errors.clear ();
+                } else if (old_state == State.SIGNED_OUT && this.state == State.DISCONNECTED) {
+                    // If we stop being voluntarily signed-out, try to connect and
+                    // auth right now!
+                    on_signal_check_connectivity ();
+                } else if (this.state == State.SERVICE_UNAVAILABLE) {
+                    // Check if we are actually down for maintenance.
+                    // To do this we must clear the connection validator that just
+                    // produced the 503. It's on_signal_finished anyway and will delete itself.
+                    this.connection_validator.clear ();
+                    on_signal_check_connectivity ();
+                }
+                if (old_state == State.CONNECTED || this.state == State.CONNECTED) {
+                    /* emit */ is_connected_changed ();
+                }
+            }
+    
+            // might not have changed but the underlying this.connection_errors might have
+            /* emit */ state_changed (this.state);
+        }
+    }
 
-    /***********************************************************
-    ***********************************************************/
-    private AccountPointer account;
-    private State state;
-    private ConnectionStatus connection_status;
-    private string[] connection_errors;
+    ConnectionStatus connection_status { public get; private set; }
+    string[] connection_errors { public get; private set; }
+
+
     private bool waiting_for_new_credentials;
     private GLib.DateTime time_of_last_e_tag_check;
     private QPointer<ConnectionValidator> connection_validator;
-    private GLib.ByteArray notifications_etag_response_header;
-    private GLib.ByteArray navigation_apps_etag_response_header;
 
+    GLib.ByteArray notifications_etag_response_header {
+        /***********************************************************
+        Returns the ETag Response header from the last Notifications
+        API request with status_code 200.
+        ***********************************************************/
+        public get;
+        /***********************************************************
+        Saves the ETag Response header from the last Notifications
+        API request with status_code 200.
+        ***********************************************************/
+        public set;
+    }
+
+    GLib.ByteArray navigation_apps_etag_response_header {
+        /***********************************************************
+        Saves the ETag Response header from the last Navigation Apps
+        API request with status_code 200.
+        ***********************************************************/
+        public get;
+        /***********************************************************
+        Returns the ETag Response header from the last Navigation
+        Apps API request with status_code 200.
+        ***********************************************************/
+        public set;
+    }
 
     /***********************************************************
     Starts counting when the server starts being back up after 503 or
@@ -104,7 +160,6 @@ class AccountState : GLib.Object, QSharedData {
     timer exceeds the this.maintenance_to_connected_delay value.
     ***********************************************************/
     private QElapsedTimer time_since_maintenance_over;
-
 
     /***********************************************************
     Milliseconds for which to delay reconnection after 503/maintenance.
@@ -122,9 +177,28 @@ class AccountState : GLib.Object, QSharedData {
     ***********************************************************/
     private AccountAppList apps;
 
-    /***********************************************************
-    ***********************************************************/
-    private bool are_desktop_notifications_allowed;
+    bool are_desktop_notifications_allowed {
+        /***********************************************************
+        Returns the notifications status retrieved by the
+        notificatons endpoint
+        https://github.com/nextcloud/desktop/issues/2318#issuecomment-680698429
+        ***********************************************************/
+        public get {
+            return this.are_desktop_notifications_allowed;
+        }
+        /***********************************************************
+        Set desktop notifications status retrieved by the
+        notificatons endpoint
+        ***********************************************************/
+        public set {
+            if (this.are_desktop_notifications_allowed == value) {
+                return;
+            }
+
+            this.are_desktop_notifications_allowed = value;
+            /* emit */ signal_desktop_notifications_allowed_changed ();
+        }
+    }
 
 
     signal void state_changed (State state);
@@ -169,12 +243,12 @@ class AccountState : GLib.Object, QSharedData {
         connect (
             this,
             AccountState.is_connected_changed,
-            this.is_connected_changed
+            this.on_signal_is_connected_changed
         );
     }
 
 
-    private void is_connected_changed () {
+    private void on_signal_is_connected_changed () {
         // Get the Apps available on the server if we're now connected.
         if (is_connected ()) {
             fetch_navigation_apps ();
@@ -200,34 +274,6 @@ class AccountState : GLib.Object, QSharedData {
     It does not write the Account data.
     ***********************************************************/
     public void write_to_settings (QSettings settings) { }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public AccountPointer account () {
-        return this.account;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public ConnectionStatus connection_status () {
-        return this.connection_status;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public string[] connection_errors () {
-        return this.connection_errors;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public AccountState.State state () {
-        return this.state;
-    }
 
 
     /***********************************************************
@@ -351,40 +397,10 @@ class AccountState : GLib.Object, QSharedData {
     }
 
 
-    /***********************************************************
-    Saves the ETag Response header from the last Notifications
-    API request with status_code 200.
-    ***********************************************************/
-    public GLib.ByteArray notifications_etag_response_header () {
-        return this.notifications_etag_response_header;
-    }
 
 
-    /***********************************************************
-    Returns the ETag Response header from the last Notifications
-    API request with status_code 200.
-    ***********************************************************/
-    public void notifications_etag_response_header (GLib.ByteArray value) {
-        this.notifications_etag_response_header = value;
-    }
 
 
-    /***********************************************************
-    Saves the ETag Response header from the last Navigation Apps
-    API request with status_code 200.
-    ***********************************************************/
-    public GLib.ByteArray navigation_apps_etag_response_header () {
-        return this.navigation_apps_etag_response_header;
-    }
-
-
-    /***********************************************************
-    Returns the ETag Response header from the last Navigation
-    Apps API request with status_code 200.
-    ***********************************************************/
-    public void navigation_apps_etag_response_header (GLib.ByteArray value) {
-        this.navigation_apps_etag_response_header = value;
-    }
 
 
     /***********************************************************
@@ -411,28 +427,6 @@ class AccountState : GLib.Object, QSharedData {
     }
 
 
-    /***********************************************************
-    Returns the notifications status retrieved by the
-    notificatons endpoint
-    https://github.com/nextcloud/desktop/issues/2318#issuecomment-680698429
-    ***********************************************************/
-    public bool are_desktop_notifications_allowed () {
-        return this.are_desktop_notifications_allowed;
-    }
-
-
-    /***********************************************************
-    Set desktop notifications status retrieved by the
-    notificatons endpoint
-    ***********************************************************/
-    public void desktop_notifications_allowed (bool is_allowed) {
-        if (this.are_desktop_notifications_allowed == is_allowed) {
-            return;
-        }
-
-        this.are_desktop_notifications_allowed = is_allowed;
-        /* emit */ signal_desktop_notifications_allowed_changed ();
-    }
 
 
     /***********************************************************
@@ -500,37 +494,6 @@ class AccountState : GLib.Object, QSharedData {
     }
 
 
-    /***********************************************************
-    ***********************************************************/
-    private void state (State state) {
-        if (this.state != state) {
-            GLib.info ("AccountState state change: "
-                      + state_string (this.state) + "." + state_string (state));
-            State old_state = this.state;
-            this.state = state;
-
-            if (this.state == State.SIGNED_OUT) {
-                this.connection_status = ConnectionValidator.Status.UNDEFINED;
-                this.connection_errors.clear ();
-            } else if (old_state == State.SIGNED_OUT && this.state == State.DISCONNECTED) {
-                // If we stop being voluntarily signed-out, try to connect and
-                // auth right now!
-                on_signal_check_connectivity ();
-            } else if (this.state == State.SERVICE_UNAVAILABLE) {
-                // Check if we are actually down for maintenance.
-                // To do this we must clear the connection validator that just
-                // produced the 503. It's on_signal_finished anyway and will delete itself.
-                this.connection_validator.clear ();
-                on_signal_check_connectivity ();
-            }
-            if (old_state == State.CONNECTED || this.state == State.CONNECTED) {
-                /* emit */ is_connected_changed ();
-            }
-        }
-
-        // might not have changed but the underlying this.connection_errors might have
-        /* emit */ state_changed (this.state);
-    }
 
 
     /***********************************************************

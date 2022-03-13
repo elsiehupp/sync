@@ -16,46 +16,35 @@ class ElidedLabel : Gtk.Label {
 
     /***********************************************************
     ***********************************************************/
-    private string text;
-    private Qt.TextElideMode elide_mode = Qt.ElideNone;
+    string text {
+        public get {
+            return this.text;
+        }
+        public set {
+            this.text = value;
+            Gtk.Label.on_signal_text (this.text);
+            update ();
+        }
+    }
+
+
+    Qt.TextElideMode elide_mode {
+        public get {
+            return this.elide_mode;
+        }
+        public set {
+            this.elide_mode = value;
+            update ();
+        }
+    }
 
 
     /***********************************************************
     ***********************************************************/
-    public ElidedLabel (string text = "", Gtk.Widget parent) {
+    public ElidedLabel (string text = "", Qt.TextElideMode elide_mode = Qt.ElideNone, Gtk.Widget parent) {
         base (text, parent);
-        this.text = text;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void text (string text) {
-        this.text = text;
-        Gtk.Label.on_signal_text (text);
-        update ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public string text () {
-        return this.text;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void elide_mode (Qt.TextElideMode elide_mode) {
         this.elide_mode = elide_mode;
-        update ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public Qt.TextElideMode elide_mode () {
-        return this.elide_mode;
+        this.text = text;
     }
 
 

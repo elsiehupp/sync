@@ -55,8 +55,10 @@ class Folder : GLib.Object {
     private const string VERSION_C = "version";
 
     /***********************************************************
+    The account the folder is configured on.
     ***********************************************************/
-    private AccountStatePtr account_state;
+    AccountStatePtr account_state { public get; private set; }
+
     private FolderDefinition definition;
 
     /***********************************************************
@@ -66,27 +68,33 @@ class Folder : GLib.Object {
     private string canonical_local_path;
 
     /***********************************************************
+    The last sync result with error message and status
     ***********************************************************/
-    private SyncResult sync_result;
+    SyncResult sync_result { public get; private set; }
+
     private QScopedPointer<SyncEngine> engine;
     private QPointer<RequestEtagJob> request_etag_job;
     private GLib.ByteArray last_etag;
     private QElapsedTimer time_since_last_sync_done;
     private QElapsedTimer time_since_last_sync_start;
     private QElapsedTimer time_since_last_full_local_discovery;
-    private std.chrono.milliseconds last_sync_duration;
+
+    /***********************************************************
+    std.chrono.milliseconds
+    ***********************************************************/
+    int last_sync_duration { public get; private set; }
 
     /***********************************************************
     The number of syncs that failed in a row.
     Reset when a sync is successful.
     ***********************************************************/
-    private int consecutive_failing_syncs;
+    int consecutive_failing_syncs { public get; private set; }
 
     /***********************************************************
     The number of requested follow-up syncs.
     Reset when no follow-up is requested.
     ***********************************************************/
-    private int consecutive_follow_up_syncs;
+    int consecutive_follow_up_syncs { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
@@ -107,8 +115,11 @@ class Folder : GLib.Object {
     This flag marks folders that shall be written in a
     backwards-compatible way, by being set on the first Folder
     instance that was configured for each local path.
+
+    Migration: When this flag is true, this folder will save to
+    the backwards-compatible 'Folders' section in the config file.
     ***********************************************************/
-    private bool save_backwards_compatible = false;
+    bool save_backwards_compatible { public get; private set; }
 
     /***********************************************************
     Whether the folder should be saved in that settings group
@@ -118,8 +129,56 @@ class Folder : GLib.Object {
     suffix-virtual files even if they are disabled right now.
     This flag ensures folders that were in that group once
     never go back.
+
+    Used to have placeholders: save in placeholder config section
+
+    Behavior should be that this defaults to false but is always true when toggled
+    void set -> this.save_in_folders_with_placeholders = true;
     ***********************************************************/
-    private bool save_in_folders_with_placeholders = false;
+    bool save_in_folders_with_placeholders { public get; private set; }
+
+    /***********************************************************
+    virtual files of some kind are enabled
+
+    This is independent of whether new files will be virtual.
+    It's possible to have this enabled and never have an
+    automatic virtual file. But when it's on, the shell context
+    menu will allow users to make existing files virtual.
+    ***********************************************************/
+    bool virtual_files_enabled {
+        public get {
+            return this.definition.virtual_files_mode != Vfs.Off && !is_vfs_on_signal_off_switch_pending ();
+        }
+        public set {
+            Vfs.Mode new_mode = this.definition.virtual_files_mode;
+            if (value && this.definition.virtual_files_mode == Vfs.Off) {
+                new_mode = best_available_vfs_mode ();
+            } else if (!value && this.definition.virtual_files_mode != Vfs.Off) {
+                new_mode = Vfs.Off;
+            }
+        
+            if (new_mode != this.definition.virtual_files_mode) {
+                // TODO: Must wait for current sync to finish!
+                SyncEngine.wipe_virtual_files (path (), this.journal, this.vfs);
+        
+                this.vfs.stop ();
+                this.vfs.unregister_folder ();
+        
+                disconnect (this.vfs.data (), null, this, null);
+                disconnect (this.engine.sync_file_status_tracker (), null, this.vfs.data (), null);
+        
+                this.vfs.on_signal_reset (create_vfs_from_plugin (new_mode).release ());
+        
+                this.definition.virtual_files_mode = new_mode;
+                start_vfs ();
+                if (new_mode != Vfs.Off) {
+                    this.save_in_folders_with_placeholders = true;
+                    switch_to_virtual_files ();
+                }
+                save_to_settings ();
+            }
+        }
+    }
 
     /***********************************************************
     Whether a vfs mode switch is pending
@@ -152,7 +211,46 @@ class Folder : GLib.Object {
     /***********************************************************
     The vfs mode instance (created by plugin) to use. Never null.
     ***********************************************************/
-    private unowned Vfs vfs;
+    unowned Vfs vfs { public get; private set; }
+
+    /***********************************************************
+    ***********************************************************/
+    QUuid navigation_pane_clsid {
+        public get {
+            return this.definition.navigation_pane_clsid;
+        }
+        public set {
+            this.definition.navigation_pane_clsid = valie;
+        }
+    }
+
+
+
+    /***********************************************************
+    Switch sync on or off
+    ***********************************************************/
+    bool sync_paused {
+        public set {
+            if (value == this.definition.paused) {
+                return;
+            }
+        
+            this.definition.paused = value;
+            save_to_settings ();
+        
+            if (!value) {
+                sync_state (SyncResult.Status.NOT_YET_STARTED);
+            } else {
+                sync_state (SyncResult.Status.PAUSED);
+            }
+            /* emit */ signal_sync_paused_changed (this, value);
+            /* emit */ signal_sync_state_change ();
+            /* emit */ signal_can_sync_changed ();
+        }
+        public get {
+            return this.definition.paused;
+        }
+    }
 
     /***********************************************************
     Create a new Folder
@@ -167,6 +265,8 @@ class Folder : GLib.Object {
         this.journal = this.definition.absolute_journal_path ();
         this.file_log = new SyncRunFileLog ();
         this.vfs = vfs.release ();
+        this.save_backwards_compatible = false;
+        this.save_in_folders_with_placeholders = false;
         this.time_since_last_sync_start.on_signal_start ();
         this.time_since_last_sync_done.on_signal_start ();
     
@@ -356,14 +456,6 @@ class Folder : GLib.Object {
 
 
     /***********************************************************
-    The account the folder is configured on.
-    ***********************************************************/
-    public AccountState account_state () {
-        return this.account_state.data ();
-    }
-
-
-    /***********************************************************
     Alias or nickname
     ***********************************************************/
     public string alias () {
@@ -452,53 +544,10 @@ class Folder : GLib.Object {
 
 
     /***********************************************************
-    ***********************************************************/
-    public void navigation_pane_clsid (QUuid clsid) {
-        this.definition.navigation_pane_clsid = clsid;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public QUuid navigation_pane_clsid () {
-        return this.definition.navigation_pane_clsid;
-    }
-
-
-    /***********************************************************
     Remote folder path with server url
     ***********************************************************/
     public GLib.Uri remote_url () {
         return Utility.concat_url_path (this.account_state.account ().dav_url (), remote_path ());
-    }
-
-
-    /***********************************************************
-    Switch sync on or off
-    ***********************************************************/
-    public void sync_paused (bool paused) {
-        if (paused == this.definition.paused) {
-            return;
-        }
-    
-        this.definition.paused = paused;
-        save_to_settings ();
-    
-        if (!paused) {
-            sync_state (SyncResult.Status.NOT_YET_STARTED);
-        } else {
-            sync_state (SyncResult.Status.PAUSED);
-        }
-        /* emit */ signal_sync_paused_changed (this, paused);
-        /* emit */ signal_sync_state_change ();
-        /* emit */ signal_can_sync_changed ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public bool sync_paused () {
-        return this.definition.paused;
     }
 
 
@@ -532,14 +581,6 @@ class Folder : GLib.Object {
     ***********************************************************/
     public bool is_sync_running () {
         return this.engine.is_sync_running () || (this.vfs && this.vfs.is_hydrating ());
-    }
-
-
-    /***********************************************************
-    Return the last sync result with error message and status
-    ***********************************************************/
-    public SyncResult sync_result () {
-        return this.sync_result;
     }
 
 
@@ -657,13 +698,6 @@ class Folder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public Vfs vfs () {
-        return this.vfs;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
     public RequestEtagJob etag_job () {
         return this.request_etag_job;
     }
@@ -672,27 +706,6 @@ class Folder : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public std.chrono.milliseconds msec_since_last_sync () { }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public int last_sync_duration () {
-        return this.last_sync_duration;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public int consecutive_follow_up_syncs () {
-        return this.consecutive_follow_up_syncs;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public int consecutive_failing_syncs () {
-        return this.consecutive_failing_syncs;
-    }
 
 
     /***********************************************************
@@ -791,23 +804,6 @@ class Folder : GLib.Object {
 
 
     /***********************************************************
-    Migration: When this flag is true, this folder will save to
-    the backwards-compatible 'Folders' section in the config file.
-    ***********************************************************/
-    public void save_backwards_compatible (bool save) {
-        this.save_backwards_compatible = save;
-    }
-
-
-    /***********************************************************
-    Used to have placeholders : save in placeholder config section
-    ***********************************************************/
-    public void save_in_folders_with_placeholders () {
-        this.save_in_folders_with_placeholders = true;
-    }
-
-
-    /***********************************************************
     Sets up this folder's folder_watcher if possible.
 
     May be called several times.
@@ -843,52 +839,6 @@ class Folder : GLib.Object {
 
     private void on_signal_path_changed (string path) {
         on_signal_watched_path_changed (path, Folder.ChangeReason.ChangeReason.OTHER);
-    }
-
-
-    /***********************************************************
-    virtual files of some kind are enabled
-
-    This is independent of whether new files will be virtual.
-    It's possible to have this enabled and never have an
-    automatic virtual file. But when it's on, the shell context
-    menu will allow users to make existing files virtual.
-    ***********************************************************/
-    public bool virtual_files_enabled () {
-        return this.definition.virtual_files_mode != Vfs.Off && !is_vfs_on_signal_off_switch_pending ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void virtual_files_enabled (bool enabled) {
-        Vfs.Mode new_mode = this.definition.virtual_files_mode;
-        if (enabled && this.definition.virtual_files_mode == Vfs.Off) {
-            new_mode = best_available_vfs_mode ();
-        } else if (!enabled && this.definition.virtual_files_mode != Vfs.Off) {
-            new_mode = Vfs.Off;
-        }
-    
-        if (new_mode != this.definition.virtual_files_mode) {
-            // TODO: Must wait for current sync to finish!
-            SyncEngine.wipe_virtual_files (path (), this.journal, this.vfs);
-    
-            this.vfs.stop ();
-            this.vfs.unregister_folder ();
-    
-            disconnect (this.vfs.data (), null, this, null);
-            disconnect (this.engine.sync_file_status_tracker (), null, this.vfs.data (), null);
-    
-            this.vfs.on_signal_reset (create_vfs_from_plugin (new_mode).release ());
-    
-            this.definition.virtual_files_mode = new_mode;
-            start_vfs ();
-            if (new_mode != Vfs.Off) {
-                this.save_in_folders_with_placeholders = true;
-                switch_to_virtual_files ();
-            }
-            save_to_settings ();
-        }
     }
 
 
@@ -1146,7 +1096,7 @@ class Folder : GLib.Object {
     public int on_signal_discard_download_progress () {
         // Delete from journal and from filesystem.
         QDir folderpath = new QDir (this.definition.local_path);
-        GLib.Set<string> keep_nothing;
+        GLib.List<string> keep_nothing;
         const GLib.Vector<SyncJournalDb.DownloadInfo> deleted_infos =
             this.journal.and_delete_stale_download_infos (keep_nothing);
         foreach (var deleted_info in deleted_infos) {

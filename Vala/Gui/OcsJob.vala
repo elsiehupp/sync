@@ -36,8 +36,12 @@ class OcsJob : AbstractNetworkJob {
     private const int OCS_NOT_MODIFIED_STATUS_CODE_V2 = 304;
 
     /***********************************************************
+    Set the verb for the job
+
+    @param verb currently supported PUT POST DELETE
     ***********************************************************/
-    private GLib.ByteArray verb;
+    GLib.ByteArray verb { private get; protected set; }
+
     private GLib.List<QPair<string, string>> params;
     private GLib.Vector<int> pass_status_codes;
     private Soup.Request request;
@@ -59,16 +63,6 @@ class OcsJob : AbstractNetworkJob {
         this.pass_status_codes.append (OCS_SUCCESS_STATUS_CODE_V2);
         this.pass_status_codes.append (OCS_NOT_MODIFIED_STATUS_CODE_V2);
         ignore_credential_failure (true);
-    }
-
-
-    /***********************************************************
-    Set the verb for the job
-
-    @param verb currently supported PUT POST DELETE
-    ***********************************************************/
-    protected void verb (GLib.ByteArray verb) {
-        this.verb = verb;
     }
 
 

@@ -42,16 +42,19 @@ class AccountManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static AccountManager instance;
+    static AccountManager instance { public get; private set; }
 
     /***********************************************************
+    Return a list of all accounts.
+    (this is a list of unowned for internal reasons, one should
+    normally not keep a copy of them)
     ***********************************************************/
-    private GLib.List<AccountStatePtr> accounts;
+    GLib.List<AccountStatePtr> accounts { public get; private set; }
 
     /***********************************************************
     Account ids from settings that weren't read
     ***********************************************************/
-    private GLib.Set<string> additional_blocked_account_ids;
+    private GLib.List<string> additional_blocked_account_ids;
 
 
     signal void on_signal_account_added (AccountState account);
@@ -62,12 +65,6 @@ class AccountManager : GLib.Object {
     /***********************************************************
     Uses default constructor and destructor
     ***********************************************************/
-
-    /***********************************************************
-    ***********************************************************/
-    public static AccountManager instance () {
-        return instance;
-    }
 
 
     /***********************************************************
@@ -173,16 +170,6 @@ class AccountManager : GLib.Object {
             /* emit */ account_removed (acc.data ());
             /* emit */ signal_remove_account_folders (acc.data ());
         }
-    }
-
-
-    /***********************************************************
-    Return a list of all accounts.
-    (this is a list of unowned for internal reasons, one should
-    normally not keep a copy of them)
-    ***********************************************************/
-    public GLib.List<AccountStatePtr> accounts () {
-         return this.accounts;
     }
 
 

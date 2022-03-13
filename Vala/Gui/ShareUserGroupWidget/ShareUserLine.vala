@@ -16,7 +16,9 @@ class ShareUserLine : Gtk.Widget {
     ***********************************************************/
     private Ui.ShareUserLine ui;
     private AccountPointer account;
-    private unowned UserGroupShare share;
+
+    unowned UserGroupShare share { public get; private set; }
+
     private bool is_file;
 
     /***********************************************************
@@ -314,13 +316,6 @@ class ShareUserLine : Gtk.Widget {
 
     override ~ShareUserLine () {
         delete this.ui;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public unowned Share share () {
-        return this.share;
     }
 
 

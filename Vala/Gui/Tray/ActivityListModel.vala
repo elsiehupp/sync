@@ -61,10 +61,6 @@ class ActivityListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private bool display_actions = true;
-
-    /***********************************************************
-    ***********************************************************/
     private int total_activities_fetched = 0;
     private int max_activities = 100;
     private int max_activities_days = 30;
@@ -76,10 +72,11 @@ class ActivityListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private AccountState account_state = null;
-    private bool currently_fetching = false;
-    private bool done_fetching = false;
-    private bool hide_old_activities = true;
+    AccountState account_state { public get; protected set; }
+    bool currently_fetching { protected get; protected set; }
+    bool display_actions { private get; protected set; }
+    bool done_fetching { private get; protected set; }
+    bool hide_old_activities { private get; protected set; }
 
 
     signal void activity_job_status_code (int status_code);
@@ -93,6 +90,10 @@ class ActivityListModel : QAbstractListModel {
         GLib.Object parent) {
         base (parent);
         this.account_state = account_state;
+        this.currently_fetching = false;
+        this.display_actions = true;
+        this.done_fetching = false;
+        this.hide_old_activities = true;
     }
 
 
@@ -209,7 +210,7 @@ class ActivityListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public void remove_activity_from_activity_list (int row) {
+    public void remove_activity_from_activity_list_by_row (int row) {
         Activity activity = this.final_list.at (row);
         remove_activity_from_activity_list (activity);
         combine_activity_lists ();
@@ -218,7 +219,7 @@ class ActivityListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public void remove_activity_from_activity_list (Activity activity) {
+    public void remove_activity_from_activity_list_by_reference (Activity activity) {
         GLib.info ("Activity/Notification/Error successfully dismissed: " + activity.subject);
         GLib.info ("Trying to remove Activity/Notification/Error from view... ");
 
@@ -532,13 +533,6 @@ class ActivityListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public AccountState account_state () {
-        return this.account_state;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
     public void on_signal_refresh_activity () {
         this.activity_lists.clear ();
         this.done_fetching = false;
@@ -643,48 +637,6 @@ class ActivityListModel : QAbstractListModel {
         roles[DataRole.DISPLAY_ACTIONS] = "display_actions";
         roles[DataRole.SHAREABLE] = "is_shareable";
         return roles;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    protected void account_state (AccountState state) {
-        this.account_state = state;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    protected void currently_fetching (bool value) {
-        this.currently_fetching = value;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    protected bool currently_fetching () {
-        return this.currently_fetching;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    protected void done_fetching (bool value) {
-        this.done_fetching = value;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    protected void hide_old_activities (bool value) {
-        this.hide_old_activities = value;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    protected void display_actions (bool value) {
-        this.display_actions = value;
     }
 
 

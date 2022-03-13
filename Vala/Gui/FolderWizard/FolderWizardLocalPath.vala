@@ -18,7 +18,9 @@ class FolderWizardLocalPath : FormatWarningsWizardPage {
     /***********************************************************
     ***********************************************************/
     private Ui_Folder_wizard_source_page ui;
-    private Folder.Map folder_map;
+
+    Folder.Map folder_map { private get; public set; }
+
     private AccountPointer account;
 
     /***********************************************************
@@ -82,13 +84,6 @@ class FolderWizardLocalPath : FormatWarningsWizardPage {
     ***********************************************************/
     public override void clean_up_page () {
         this.ui.warn_label.hide ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void folder_map (Folder.Map font_metrics) {
-        this.folder_map = font_metrics;
     }
 
 

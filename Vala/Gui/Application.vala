@@ -58,7 +58,7 @@ class Application : Gtk.Application {
 
     /***********************************************************
     ***********************************************************/
-    private QPointer<OwncloudGui> gui;
+    QPointer<OwncloudGui> gui { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
@@ -115,12 +115,26 @@ class Application : Gtk.Application {
     /***********************************************************
     Option from command line
     ***********************************************************/
-    private bool debug_mode;
+    bool debug_mode {
+        /***********************************************************
+        Helper for displaying messages. Note that there is no
+        console on Windows.
+        ***********************************************************/
+        public get;
+        private set;
+    }
 
     /***********************************************************
     Option from command line
     ***********************************************************/
-    private bool background_mode;
+    bool background_mode {
+        /***********************************************************
+        Helper for displaying messages. Note that there is no
+        console on Windows.
+        ***********************************************************/
+        public get;
+        private set;
+    }
 
     /***********************************************************
     ***********************************************************/
@@ -402,22 +416,8 @@ class Application : Gtk.Application {
     }
 
 
-    /***********************************************************
-    Helper for displaying messages. Note that there is no
-    console on Windows.
-    ***********************************************************/
-    public bool debug_mode () {
-        return this.debug_mode;
-    }
 
 
-    /***********************************************************
-    Helper for displaying messages. Note that there is no
-    console on Windows.
-    ***********************************************************/
-    public bool background_mode () {
-        return this.background_mode;
-    }
 
 
     /***********************************************************
@@ -453,11 +453,6 @@ class Application : Gtk.Application {
     }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public OwncloudGui gui () {
-        return this.gui;
-    }
 
 
     /***********************************************************

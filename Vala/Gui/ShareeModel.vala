@@ -10,7 +10,7 @@ namespace Ui {
 class ShareeModel : QAbstractListModel {
 
     /***********************************************************
-    FIXME: make it a GLib.Set<Sharee> when Sharee can be compared
+    FIXME: make it a GLib.List<Sharee> when Sharee can be compared
     ***********************************************************/
     public class ShareeSet : GLib.Vector<unowned Sharee> { }
 

@@ -92,11 +92,23 @@ class CloudProviderWrapper : GLib.Object {
         }
     };
 
-    GSimpleActionGroup action_group = null;
+    GSimpleActionGroup action_group {
+        public get {
+            g_clear_object (action_group);
+            action_group = g_simple_action_group_new ();
+            g_action_map_add_action_entries (G_ACTION_MAP (action_group), actions, G_N_ELEMENTS (actions), this);
+            bool state = this.folder.sync_paused ();
+            GAction pause = g_action_map_lookup_action (G_ACTION_MAP (action_group), "pause");
+            g_simple_action_state (G_SIMPLE_ACTION (pause), g_variant_new_boolean (state));
+            return G_ACTION_GROUP (g_object_ref (action_group));
+        }
+        private set {
+            this.action_group = value;
+        }
+    }
 
-    /***********************************************************
-    ***********************************************************/
-    private Folder folder;
+    Folder folder { public get; private set; }
+
     private CloudProvidersProviderExporter cloud_provider;
     private CloudProvidersAccountExporter cloud_provider_account;
     private GLib.List<QPair<string, string>> recently_changed;
@@ -174,13 +186,6 @@ class CloudProviderWrapper : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public Folder folder () {
-        return this.folder;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
     public GMenuModel menu_model () {
 
         GMenu section;
@@ -235,17 +240,6 @@ class CloudProviderWrapper : GLib.Object {
     }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public GActionGroup action_group () {
-        g_clear_object (action_group);
-        action_group = g_simple_action_group_new ();
-        g_action_map_add_action_entries (G_ACTION_MAP (action_group), actions, G_N_ELEMENTS (actions), this);
-        bool state = this.folder.sync_paused ();
-        GAction pause = g_action_map_lookup_action (G_ACTION_MAP (action_group), "pause");
-        g_simple_action_state (G_SIMPLE_ACTION (pause), g_variant_new_boolean (state));
-        return G_ACTION_GROUP (g_object_ref (action_group));
-    }
 
 
     /***********************************************************

@@ -39,9 +39,17 @@ class FolderWatcher : GLib.Object {
     ***********************************************************/
     private QScopedPointer<FolderWatcherPrivate> d;
     private QElapsedTimer timer;
-    private GLib.Set<string> last_paths;
+    private GLib.List<string> last_paths;
     private Folder folder;
-    private bool is_reliable = true;
+
+    /***********************************************************
+    Returns false if the folder watcher can't be trusted to capture all
+    notifications.
+
+    For example, this can happen on linux if the inotify user limit from
+    /proc/sys/fs/inotify/max_user_watches is exceeded.
+    ***********************************************************/
+    bool is_reliable { public get; private set; }
 
     /***********************************************************
     Path of the expected test notification
@@ -80,6 +88,7 @@ class FolderWatcher : GLib.Object {
     public FolderWatcher (Folder folder = null) {
         base (folder);
         this.folder = folder;
+        this.is_reliable = true;
     }
 
 
@@ -112,18 +121,6 @@ class FolderWatcher : GLib.Object {
 
 
     /***********************************************************
-    Returns false if the folder watcher can't be trusted to capture all
-    notifications.
-
-    For example, this can happen on linux if the inotify user limit from
-    /proc/sys/fs/inotify/max_user_watches is exceeded.
-    ***********************************************************/
-    public bool is_reliable () {
-        return this.is_reliable;
-    }
-
-
-    /***********************************************************
     Triggers a change in the path and verifies a notification arrives.
 
     If no notification is seen, the folderwatcher marks itself as unreliable.
@@ -150,28 +147,28 @@ class FolderWatcher : GLib.Object {
     /***********************************************************
     Called from the implementations to indicate a change in path
     ***********************************************************/
-    protected void on_signal_change_detected (string path) {
+    protected void on_signal_change_detected_for_single_path (string path) {
         GLib.FileInfo file_info = new GLib.FileInfo (path);
         string[] paths = { path };
         if (file_info.is_dir ()) {
             QDir directory = new QDir (path);
             append_sub_paths (directory, paths);
         }
-        on_signal_change_detected (paths);
+        on_signal_change_detected_for_multiple_paths (paths);
     }
 
 
     /***********************************************************
     Called from the implementations to indicate a change in path
     ***********************************************************/
-    protected void on_signal_change_detected (string[] paths) {
+    protected void on_signal_change_detected_for_multiple_paths (string[] paths) {
         // TODO: this shortcut doesn't look very reliable:
         //   - why is the timeout only 1 second?
         //   - what if there is more than one file being updated frequently?
         //   - why do we skip the file altogether instead of e.g. reducing the upload frequency?
 
         // Check if the same path was reported within the last second.
-        GLib.Set<string> paths_set = paths.to_set ();
+        GLib.List<string> paths_set = paths.to_set ();
         if (paths_set == this.last_paths && this.timer.elapsed () < 1000) {
             // the same path was reported within the last second. Skip.
             return;
@@ -179,7 +176,7 @@ class FolderWatcher : GLib.Object {
         this.last_paths = paths_set;
         this.timer.restart ();
 
-        GLib.Set<string> changed_paths;
+        GLib.List<string> changed_paths;
 
         // ------- handle ignores:
         for (int i = 0; i < paths.size (); ++i) {

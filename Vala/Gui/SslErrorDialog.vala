@@ -22,7 +22,8 @@ class SslErrorDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.List<QSslCertificate> unknown_certificates;
+    GLib.List<QSslCertificate> unknown_certificates { public get; private set; }
+
     private string custom_config_handle;
     private Ui.SslErrorDialog ui;
     private AccountPointer account;
@@ -150,13 +151,6 @@ class SslErrorDialog : Gtk.Dialog {
         GLib.info ("SSL-Connection is trusted: " + stat);
 
         return stat;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public GLib.List<QSslCertificate> unknown_certificates () {
-        return this.unknown_certificates;
     }
 
 

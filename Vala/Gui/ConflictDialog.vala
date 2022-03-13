@@ -18,7 +18,8 @@ class ConflictDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private string base_filename;
+    string base_filename { public get; private set; }
+
     private QScopedPointer<Ui.ConflictDialog> ui;
     private ConflictSolver solver;
 
@@ -83,13 +84,6 @@ class ConflictDialog : Gtk.Dialog {
     ***********************************************************/
     private void on_remote_version_button_clicked () {
         QDesktopServices.open_url (GLib.Uri.from_local_file (this.solver.remote_version_filename ()));
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public string base_filename () {
-        return this.base_filename;
     }
 
 
