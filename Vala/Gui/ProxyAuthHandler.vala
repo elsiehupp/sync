@@ -131,7 +131,8 @@ class ProxyAuthHandler : GLib.Object {
 
         // Find the responsible QNAM if possible.
         QPointer<QNetworkAccessManager> sending_qnam = null;
-        if (var account = qobject_cast<Account> (sender ())) {
+        var account = (Account) sender ();
+        if (account) {
             // Since we go into an event loop, it's possible for the account's qnam
             // to be destroyed before we get back. We can use this to check for its
             // liveness.
@@ -192,7 +193,7 @@ class ProxyAuthHandler : GLib.Object {
     private ProxyAuthHandler () {
         this.dialog = new ProxyAuthDialog ();
 
-        this.config_file.on_signal_reset (new ConfigFile);
+        this.config_file.on_signal_reset (new ConfigFile ());
         this.settings.on_signal_reset (new QSettings (this.config_file.config_file (), QSettings.IniFormat));
         this.settings.begin_group ("Proxy");
         this.settings.begin_group ("Credentials");
@@ -222,7 +223,7 @@ class ProxyAuthHandler : GLib.Object {
         }
 
         if (this.dialog && this.dialog.result () == Gtk.Dialog.Accepted) {
-            GLib.info ("got creds for" + this.proxy + "from dialog";
+            GLib.info ("Got credentials for " + this.proxy + " from dialog.");
             this.username = this.dialog.username ();
             this.password = this.dialog.password ();
             return true;

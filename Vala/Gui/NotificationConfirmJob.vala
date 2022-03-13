@@ -57,7 +57,7 @@ class NotificationConfirmJob : AbstractNetworkJob {
     ***********************************************************/
     public override void on_signal_start () {
         if (!this.link.is_valid ()) {
-            GLib.warning ("Attempt to trigger invalid URL: " + this.link.to_string ();
+            GLib.warning ("Attempt to trigger invalid URL: " + this.link.to_string ());
             return;
         }
         Soup.Request req;
@@ -78,8 +78,7 @@ class NotificationConfirmJob : AbstractNetworkJob {
         const string reply_str = reply ().read_all ();
 
         if (reply_str.contains ("<?xml version=\"1.0\"?>")) {
-            const QRegularExpression rex ("<statuscode> (\\d+)</statuscode>");
-            const var rex_match = rex.match (reply_str);
+            const var rex_match = new QRegularExpression ("<statuscode> (\\d+)</statuscode>").match (reply_str);
             if (rex_match.has_match ()) {
                 // this is a error message coming back from ocs.
                 reply_code = rex_match.captured (1).to_int ();

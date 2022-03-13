@@ -34,28 +34,41 @@ class IgnoreListEditor : Gtk.Dialog {
         ConfigFile config_file;
         //FIXME This is not true. The entries are hardcoded below in setup_table_read_only_items
         read_only_tooltip = _("This entry is provided by the system at \"%1\" "
-                             "and cannot be modified in this view.")
+                            + "and cannot be modified in this view.")
                               .arg (QDir.to_native_separators (config_file.exclude_file (ConfigFile.SYSTEM_SCOPE)));
 
         setup_table_read_only_items ();
         const var user_config = config_file.exclude_file (ConfigFile.Scope.USER_SCOPE);
         ui.ignore_table_widget.read_ignore_file (user_config);
 
-        connect (this, Gtk.Dialog.accepted, [=] () {
-            ui.ignore_table_widget.on_signal_write_ignore_file (user_config);
-            /* handle the hidden file checkbox */
-
-            /* the ignore_hidden_files flag is a folder specific setting, but for now, it is
-           handled globally. Save it to every folder that is defined.
-           TODO this can now be fixed, simply attach this IgnoreListEditor to top-level account
-           settings
-            */
-            FolderMan.instance ().ignore_hidden_files (ignore_hidden_files ());
-        });
-        connect (ui.button_box, QDialogButtonBox.clicked,
-                this, IgnoreListEditor.on_signal_restore_defaults);
+        connect (
+            this,
+            Gtk.Dialog.accepted,
+            this.on_dialog_accepted
+        );
+        connect (
+            ui.button_box,
+            QDialogButtonBox.clicked,
+            this,
+            IgnoreListEditor.on_signal_restore_defaults
+        );
 
         ui.sync_hidden_files_check_box.checked (!FolderMan.instance ().ignore_hidden_files ());
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_dialog_accepted () {
+        ui.ignore_table_widget.on_signal_write_ignore_file (user_config);
+        /* handle the hidden file checkbox */
+
+        /* the ignore_hidden_files flag is a folder specific setting, but for now, it is
+       handled globally. Save it to every folder that is defined.
+       TODO this can now be fixed, simply attach this IgnoreListEditor to top-level account
+       settings
+        */
+        FolderMan.instance ().ignore_hidden_files (ignore_hidden_files ());
     }
 
 

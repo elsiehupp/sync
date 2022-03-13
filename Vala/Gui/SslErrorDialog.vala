@@ -101,10 +101,10 @@ class SslErrorDialog : Gtk.Dialog {
         message += QL ("<h3>") + _("Cannot connect securely to <i>%1</i>:").arg (host) + QL ("</h3>");
         // loop over the unknown certificates and line up their errors.
         message += QL ("<div identifier=\"ca_errors\">");
-        foreach (QSslCertificate cert, this.unknown_certificates) {
+        foreach (QSslCertificate cert in this.unknown_certificates) {
             message += QL ("<div identifier=\"ca_error\">");
             // add the errors for this cert
-            foreach (QSslError err, errors) {
+            foreach (QSslError err in errors) {
                 if (err.certificate () == cert) {
                     message += QL ("<p>") + err.error_string () + QL ("</p>");
                 }
@@ -119,7 +119,7 @@ class SslErrorDialog : Gtk.Dialog {
         if (!additional_error_strings.is_empty ()) {
             message += QL ("<h4>") + _("Additional errors:") + QL ("</h4>");
 
-            for (var error_string : additional_error_strings) {
+            foreach (var error_string in additional_error_strings) {
                 message += QL ("<div identifier=\"ca_error\">");
                 message += QL ("<p>") + error_string + QL ("</p>");
                 message += QL ("</div>");
@@ -147,7 +147,7 @@ class SslErrorDialog : Gtk.Dialog {
             return true;
 
         bool stat = (this.ui.cb_trust_connect.check_state () == Qt.Checked);
-        GLib.info ("SSL-Connection is trusted: " + stat;
+        GLib.info ("SSL-Connection is trusted: " + stat);
 
         return stat;
     }
@@ -191,9 +191,9 @@ class SslErrorDialog : Gtk.Dialog {
             org = _("&lt;not specified&gt;");
         if (country.is_empty ())
             country = _("&lt;not specified&gt;");
-        li + _("Organization : %1").arg (org);
-        li + _("Unit : %1").arg (unit);
-        li + _("Country : %1").arg (country);
+        li += _("Organization : %1").arg (org);
+        li += _("Unit : %1").arg (unit);
+        li += _("Country : %1").arg (country);
         message += QL ("<p>") + li.join (QL ("<br/>")) + QL ("</p>");
 
         message += QL ("<p>");
@@ -216,9 +216,9 @@ class SslErrorDialog : Gtk.Dialog {
         message += QL ("<h3>") + _("Issuer : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Common_name))) + QL ("</h3>");
         message += QL ("<div identifier=\"issuer\">");
         li.clear ();
-        li + _("Organization : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Organization)));
-        li + _("Unit : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Organizational_unit_name)));
-        li + _("Country : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Country_name)));
+        li += _("Organization : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Organization)));
+        li += _("Unit : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Organizational_unit_name)));
+        li += _("Country : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Country_name)));
         message += QL ("<p>") + li.join (QL ("<br/>")) + QL ("</p>");
         message += QL ("</div>");
         message += QL ("</div>");

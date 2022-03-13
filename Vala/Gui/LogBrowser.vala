@@ -42,7 +42,7 @@ class LogBrowser : Gtk.Dialog {
         window_title (_("Log Output"));
         minimum_width (600);
 
-        var main_layout = new QVBoxLayout;
+        var main_layout = new QVBoxLayout ();
 
         var label = new Gtk.Label (
             _("The client can write debug logs to a temporary folder. "
@@ -58,7 +58,7 @@ class LogBrowser : Gtk.Dialog {
         main_layout.add_widget (label);
 
         // button to permanently save logs
-        var enable_logging_button = new QCheckBox;
+        var enable_logging_button = new QCheckBox ();
         enable_logging_button.on_signal_text (_("Enable logging to temporary folder"));
         enable_logging_button.checked (ConfigFile ().automatic_log_dir ());
         connect (enable_logging_button, QCheckBox.toggled, this, LogBrowser.toggle_permanent_logging);
@@ -66,23 +66,29 @@ class LogBrowser : Gtk.Dialog {
 
         label = new Gtk.Label (
             _("This setting persists across client restarts.\n"
-               "Note that using any logging command line options will override this setting."));
+            + "Note that using any logging command line options will override this setting."));
         label.word_wrap (true);
         label.size_policy (QSizePolicy.Expanding, QSizePolicy.Minimum_expanding);
         main_layout.add_widget (label);
 
-        var open_folder_button = new QPushButton;
+        var open_folder_button = new QPushButton ();
         open_folder_button.on_signal_text (_("Open folder"));
-        connect (open_folder_button, QPushButton.clicked, this, [] () {
-            string path = Logger.instance ().temporary_folder_log_dir_path ();
-            QDir ().mkpath (path);
-            QDesktopServices.open_url (GLib.Uri.from_local_file (path));
-        });
+        connect (
+            open_folder_button,
+            QPushButton.clicked,
+            this,
+            this.on_open_folder_button_clicked
+        );
         main_layout.add_widget (open_folder_button);
 
-        var btnbox = new QDialogButtonBox;
+        var btnbox = new QDialogButtonBox ();
         QPushButton close_btn = btnbox.add_button (QDialogButtonBox.Close);
-        connect (close_btn, QAbstractButton.clicked, this, Gtk.Widget.close);
+        connect (
+            close_btn,
+            QAbstractButton.clicked,
+            this,
+            Gtk.Widget.close
+        );
 
         main_layout.add_stretch ();
         main_layout.add_widget (btnbox);
@@ -98,6 +104,15 @@ class LogBrowser : Gtk.Dialog {
 
         ConfigFile config;
         config.restore_geometry (this);
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_open_folder_button_clicked () {
+        string path = Logger.instance ().temporary_folder_log_dir_path ();
+        QDir ().mkpath (path);
+        QDesktopServices.open_url (GLib.Uri.from_local_file (path));
     }
 
 

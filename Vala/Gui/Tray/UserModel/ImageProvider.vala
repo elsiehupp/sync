@@ -17,25 +17,28 @@ class ImageProvider : QQuickImageProvider {
         //  Q_UNUSED (size)
         //  Q_UNUSED (requested_size)
 
-        const var make_icon = [] (string path) {
-            Gtk.Image image (128, 128, Gtk.Image.FormatARGB32);
-            image.fill (Qt.GlobalColor.transparent);
-            QPainter painter (image);
-            QSvgRenderer renderer (path);
-            renderer.render (painter);
-            return image;
-        }
-
         if (identifier == "fallback_white") {
             return make_icon (":/client/theme/white/user.svg");
         }
 
-        if (identifier == "fallback_black"\) {
+        if (identifier == "fallback_black") {
             return make_icon (":/client/theme/black/user.svg");
         }
 
         const int uid = identifier.to_int ();
         return UserModel.instance ().avatar_by_identifier (uid);
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private static Gtk.Image make_icon (string path) {
+        Gtk.Image image = new Gtk.Image (128, 128, Gtk.Image.FormatARGB32);
+        image.fill (Qt.GlobalColor.transparent);
+        QPainter painter = new QPainter (image);
+        QSvgRenderer renderer = new QSvgRenderer (path);
+        renderer.render (painter);
+        return image;
     }
 
 } // class ImageProvider

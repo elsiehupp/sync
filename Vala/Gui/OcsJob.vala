@@ -151,7 +151,7 @@ class OcsJob : AbstractNetworkJob {
         add_raw_header ("Ocs-APIREQUEST", "true");
         add_raw_header ("Content-Type", "application/x-www-form-urlencoded");
 
-        var buffer = new QBuffer;
+        var buffer = new QBuffer ();
 
         QUrlQuery query_items;
         if (this.verb == "GET") {
@@ -159,7 +159,7 @@ class OcsJob : AbstractNetworkJob {
         } else if (this.verb == "POST" || this.verb == "PUT") {
             // Url encode the this.post_params and put them in a buffer.
             GLib.ByteArray post_data;
-            foreach (var tmp, this.params) {
+            foreach (var tmp in this.params) {
                 if (!post_data.is_empty ()) {
                     post_data.append ("&");
                 }
@@ -208,12 +208,12 @@ class OcsJob : AbstractNetworkJob {
         // when it is null we might have a 304 so get status code from reply () and gives a warning...
         if (error.error != QJsonParseError.NoError) {
             status_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-            GLib.warning ("Could not parse reply to"
-                             + this.verb
-                             + Utility.concat_url_path (account ().url (), path ())
-                             + this.params
-                             + error.error_string ()
-                             + ":" + reply_data;
+            GLib.warning ("Could not parse reply to "
+                        + this.verb
+                        + Utility.concat_url_path (account ().url (), path ())
+                        + this.params
+                        + error.error_string ()
+                        + ":" + reply_data);
         } else {
             status_code  = get_json_return_code (json, message);
         }
@@ -221,10 +221,10 @@ class OcsJob : AbstractNetworkJob {
         //... then it checks for the status_code
         if (!this.pass_status_codes.contains (status_code)) {
             GLib.warning ("Reply to"
-                             + this.verb
-                             + Utility.concat_url_path (account ().url (), path ())
-                             + this.params
-                             + "has unexpected status code:" + status_code + reply_data;
+                        + this.verb
+                        + Utility.concat_url_path (account ().url (), path ())
+                        + this.params
+                        + " has unexpected status code: " + status_code + reply_data);
             /* emit */ ocs_error (status_code, message);
 
         } else {
@@ -241,14 +241,15 @@ class OcsJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private static QUrlQuery percent_encode_query_items (
-        const GLib.List<QPair<string, string>> items) {
+        GLib.List<QPair<string, string>> items) {
         QUrlQuery result;
         // Note: QUrlQuery.query_items () does not fully percent encode
         // the query items, see #5042
-        foreach (var item, items) {
+        foreach (var item in items) {
             result.add_query_item (
                 GLib.Uri.to_percent_encoding (item.first),
-                GLib.Uri.to_percent_encoding (item.second));
+                GLib.Uri.to_percent_encoding (item.second)
+            );
         }
         return result;
     }

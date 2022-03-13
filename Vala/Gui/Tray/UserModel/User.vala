@@ -73,29 +73,22 @@ class User : GLib.Object {
             this,
             User.on_signal_add_error_to_gui
         );
-
         connect (
             this.notification_check_timer,
             QTimer.timeout,
             this,
             User.on_signal_refresh
         );
-
         connect (
             this.expired_activities_check_timer,
             QTimer.timeout,
             this,
             User.on_signal_check_expired_activities
         );
-
         connect (
             this.account.data (),
             AccountState.state_changed,
-            [=] () {
-                if (is_connected ()) {
-                    on_signal_refresh_immediately ();
-                }
-            }
+            this.on_signal_account_state_changed
         );
         connect (
             this.account.data (),
@@ -115,21 +108,18 @@ class User : GLib.Object {
             this,
             User.signal_name_changed
         );
-
         connect (
             FolderMan.instance (),
             FolderMan.signal_folder_list_changed,
             this,
             User.signal_has_local_folder_changed
         );
-
         connect (
             this,
             User.signal_gui_log,
             Logger.instance (),
             Logger.signal_gui_log
         );
-
         connect (
             this.account.account ().data (),
             Account.account_changed_avatar,
@@ -155,6 +145,15 @@ class User : GLib.Object {
             this,
             User.on_signal_send_notification_request
         );
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_account_state_changed () {
+        if (is_connected ()) {
+            on_signal_refresh_immediately ();
+        }
     }
 
 
@@ -215,7 +214,7 @@ class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public Folder get_folder () {
-        foreach (Folder folder, FolderMan.instance ().map ()) {
+        foreach (Folder folder in FolderMan.instance ().map ()) {
             if (folder.account_state () == this.account.data ()) {
                 return folder;
             }
@@ -420,7 +419,7 @@ class User : GLib.Object {
         }
 
         if (item.status == SyncFileItem.Status.NO_STATUS || item.status == SyncFileItem.Status.SUCCESS) {
-            GLib.warning ("Item " + item.file + " retrieved successfully.";
+            GLib.warning ("Item " + item.file + " retrieved successfully.");
 
             if (item.direction != SyncFileItem.Direction.UP) {
                 activity.message = _("Synced %1").arg (item.original_file);
@@ -436,7 +435,7 @@ class User : GLib.Object {
 
             this.activity_model.add_sync_file_item_to_activity_list (activity);
         } else {
-            GLib.warning ("Item " + item.file + " retrieved resulted in error " + item.error_string;
+            GLib.warning ("Item " + item.file + " retrieved resulted in error " + item.error_string);
             activity.subject = item.error_string;
 
             if (item.status == SyncFileItem.Status.FileIgnored) {
@@ -461,7 +460,7 @@ class User : GLib.Object {
             return;
         }
 
-        GLib.warning ("Item " + item.file + " retrieved resulted in " + item.error_string;
+        GLib.warning ("Item " + item.file + " retrieved resulted in " + item.error_string);
         process_completed_sync_item (folder_instance, item);
     }
 
@@ -474,7 +473,7 @@ class User : GLib.Object {
             return;
 
         if (folder_instance.account_state () == this.account.data ()) {
-            GLib.warning ("Item " + folder_instance.short_gui_local_path (" retrieved resulted in " + message;
+            GLib.warning ("Item " + folder_instance.short_gui_local_path () + " retrieved resulted in " + message);
 
             Activity activity;
             activity.type = Activity.Type.SYNC_RESULT;
@@ -510,7 +509,7 @@ class User : GLib.Object {
         }
 
         if (folder_instance.account_state () == this.account.data ()) {
-            GLib.warning ("Item " + folder_instance.short_gui_local_path (" retrieved resulted in " + error_message;
+            GLib.warning ("Item " + folder_instance.short_gui_local_path () + " retrieved resulted in " + error_message);
 
             Activity activity;
             activity.type = Activity.Type.SYNC_FILE_ITEM;
@@ -543,10 +542,10 @@ class User : GLib.Object {
 
         // the ocs API returns stat code 100 or 200 inside the xml if it succeeded.
         if (status_code != OCS_SUCCESS_STATUS_CODE && status_code != OCS_SUCCESS_STATUS_CODE_V2) {
-            GLib.warning ("Notification Request to Server failed, leave notification visible.";
+            GLib.warning ("Notification Request to Server failed, leave notification visible.");
         } else {
             // to do use the model to rebuild the list or remove the item
-            GLib.warning ("Notification Request to Server successed, rebuilding list.";
+            GLib.warning ("Notification Request to Server successed, rebuilding list.");
             this.activity_model.remove_activity_from_activity_list (row);
         }
     }
@@ -571,7 +570,7 @@ class User : GLib.Object {
         int result_code = reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
 
         on_signal_end_notification_request (result_code);
-        GLib.warning ("Server notify job failed with code " + result_code;
+        GLib.warning ("Server notify job failed with code " + result_code);
     }
 
 
@@ -586,7 +585,7 @@ class User : GLib.Object {
                 return;
             const var engine = f.sync_engine ();
             const var style = engine.last_local_discovery_style ();
-            foreach (Activity activity, this.activity_model.errors_list ()) {
+            foreach (Activity activity in this.activity_model.errors_list ()) {
                 if (activity.expire_at_msecs != -1) {
                     // we process expired activities in a different slot
                     continue;
@@ -633,7 +632,7 @@ class User : GLib.Object {
             // We keep track very well of pending conflicts.
             // Inform other components about them.
             string[] conflicts;
-            foreach (Activity activity, this.activity_model.errors_list ()) {
+            foreach (Activity activity in this.activity_model.errors_list ()) {
                 if (activity.folder == folder
                     && activity.status == SyncFileItem.Status.CONFLICT) {
                     conflicts.append (activity.file);
@@ -648,25 +647,34 @@ class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_send_notification_request (string account_name, string link, GLib.ByteArray verb, int row) {
-        GLib.info ("Server Notification Request " + verb + link + "on account" + account_name;
+        GLib.info ("Server Notification Request " + verb + link + " on account " + account_name);
 
-        const string[] valid_verbs = new string[4] {"GET",
-                                                    "PUT",
-                                                    "POST",
-                                                    "DELETE"
-                                                   };
+        const string[] valid_verbs = {
+            "GET",
+            "PUT",
+            "POST",
+            "DELETE"
+        };
 
         if (valid_verbs.contains (verb)) {
             AccountStatePtr acc = AccountManager.instance ().account (account_name);
             if (acc) {
                 var job = new NotificationConfirmJob (acc.account ());
-                GLib.Uri l (link);
+                GLib.Uri l = new GLib.Uri (link);
                 job.link_and_verb (l, verb);
                 job.property ("activity_row", GLib.Variant.from_value (row));
-                connect (job, AbstractNetworkJob.network_error,
-                    this, User.on_signal_notify_network_error);
-                connect (job, NotificationConfirmJob.signal_job_finished,
-                    this, User.on_signal_notify_server_finished);
+                connect (
+                    job,
+                    AbstractNetworkJob.network_error,
+                    this,
+                    User.on_signal_notify_network_error
+                );
+                connect (
+                    job,
+                    NotificationConfirmJob.signal_job_finished,
+                    this,
+                    User.on_signal_notify_server_finished
+                );
                 job.on_signal_start ();
 
                 // count the number of running notification requests. If this member var
@@ -674,7 +682,7 @@ class User : GLib.Object {
                 this.notification_requests_running++;
             }
         } else {
-            GLib.warning ("Notification Links: Invalid verb:" + verb);
+            GLib.warning ("Notification Links: Invalid verb: " + verb);
         }
     }
 
@@ -688,7 +696,7 @@ class User : GLib.Object {
         }
 
         on_signal_end_notification_request (reply_code);
-        GLib.info ("Server Notification reply code" + reply_code + reply;
+        GLib.info ("Server Notification reply code " + reply_code + reply);
     }
 
 
@@ -699,7 +707,7 @@ class User : GLib.Object {
 
         foreach (var activity in list) {
             if (this.blocklisted_notifications.contains (activity)) {
-                GLib.info ("Activity in blocklist, skip";
+                GLib.info ("Activity in blocklist; skipping.");
                 continue;
             }
             const var message = AccountManager.instance ().accounts ().count () == 1 ? "" : activity.acc_name;
@@ -721,7 +729,7 @@ class User : GLib.Object {
 
             snh.on_signal_fetch_notifications ();
         } else {
-            GLib.warning ("Notification request counter not zero.";
+            GLib.warning ("Notification request counter not zero.");
         }
     }
 
@@ -752,7 +760,7 @@ class User : GLib.Object {
 
         // Fetch Activities only if visible and if last check is longer than 15 secs ago
         if (timer.is_valid () && timer.elapsed () < NOTIFICATION_REQUEST_FREE_PERIOD) {
-            GLib.debug ("Do not check as last check is only secs ago: " + timer.elapsed () / 1000;
+            GLib.debug ("Do not check as last check is only secs ago: " + timer.elapsed () / 1000);
             return;
         }
         if (this.account.data () && this.account.data ().is_connected ()) {
@@ -788,7 +796,7 @@ class User : GLib.Object {
     ***********************************************************/
     public void on_signal_notification_refresh_interval (std.chrono.milliseconds interval) {
         if (!check_push_notifications_are_ready ()) {
-            GLib.debug ("Starting Notification refresh timer with " + interval.count () / 1000 + " sec interval";
+            GLib.debug ("Starting Notification refresh timer with " + interval.count () / 1000 + " sec interval");
             this.notification_check_timer.on_signal_start (interval.count ());
         }
     }
@@ -806,7 +814,7 @@ class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_push_notifications_ready () {
-        GLib.info ("Push notifications are ready";
+        GLib.info ("Push notifications are ready.");
 
         if (this.notification_check_timer.is_active ()) {
             // as we are now able to use push notifications - let's stop the polling timer
@@ -851,7 +859,7 @@ class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_check_expired_activities () {
-        for (Activity activity : this.activity_model.errors_list ()) {
+        foreach (Activity activity in this.activity_model.errors_list ()) {
             if (activity.expire_at_msecs > 0 && GLib.DateTime.current_date_time ().to_m_secs_since_epoch () >= activity.expire_at_msecs) {
                 this.activity_model.remove_activity_from_activity_list (activity);
             }
@@ -921,10 +929,10 @@ class User : GLib.Object {
             this.notification_cache.clear ();
         }
 
-        const NotificationCache.Notification notification {
+        const NotificationCache.Notification notification = new NotificationCache.Notification (
             title,
             message
-        }
+        );
         if (this.notification_cache.contains (notification)) {
             return;
         }

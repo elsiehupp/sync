@@ -42,12 +42,20 @@ class ProfilePageMenu : Gtk.Widget {
         foreach (var hovercard_action in hovercard_actions) {
             const var action = this.menu.add_action (hovercard_action.icon, hovercard_action.title);
             const var link = hovercard_action.link;
-            connect (action, QAction.triggered, action, [link] (bool) {
-                Utility.open_browser (link);
-            });
+            connect (
+                action,
+                QAction.triggered,
+                action,
+                this.on_signal_hovercard_open_browser);
         }
     }
 
+
+    /***********************************************************
+    ***********************************************************/
+    private static void on_signal_hovercard_open_browser (string link) {
+        Utility.open_browser (link);
+    }
 
 
     /***********************************************************

@@ -416,7 +416,7 @@ class ShareLinkWidget : Gtk.Widget {
     void ShareLinkWidget.on_signal_server_error (int code, string message) {
         on_signal_toggle_share_link_animation (false);
 
-        GLib.warning ("Error from server" + code + message;
+        GLib.warning ("Error from server " + code + message);
         on_signal_display_error (message);
     }
 
@@ -553,12 +553,18 @@ class ShareLinkWidget : Gtk.Widget {
 
 
     /***********************************************************
+    There is a painting bug where a small line of this widget
+    isn't properly cleared. This explicit repaint () call makes
+    sure any trace of the share widget is removed once it's
+    destroyed. #4189
     ***********************************************************/
     private void on_signal_delete_animation_finished () {
-        // There is a painting bug where a small line of this widget isn't
-        // properly cleared. This explicit repaint () call makes sure any trace of
-        // the share widget is removed once it's destroyed. #4189
-        connect (this, SIGNAL (destroyed (GLib.Object *)), parent_widget (), SLOT (repaint ()));
+        connect (
+            this,
+            GLib.Object.destroyed,
+            parent_widget (),
+            repaint ()
+        );
     }
 
 
@@ -673,7 +679,7 @@ class ShareLinkWidget : Gtk.Widget {
             QMessageBox.Question,
             _("Confirm Link Share Deletion"),
             _("<p>Do you really want to delete the public link share <i>%1</i>?</p>"
-            "<p>Note: This action cannot be undone.</p>")
+            + "<p>Note: This action cannot be undone.</p>")
                 .arg (share_name ()),
             QMessageBox.NoButton,
             this);
@@ -681,26 +687,36 @@ class ShareLinkWidget : Gtk.Widget {
             message_box.add_button (_("Delete"), QMessageBox.YesRole);
         message_box.add_button (_("Cancel"), QMessageBox.NoRole);
 
-        connect (message_box, QMessageBox.on_signal_finished, this,
-            [message_box, yes_button, this] () {
-                if (message_box.clicked_button () == yes_button) {
-                    this.on_signal_toggle_share_link_animation (true);
-                    this.link_share.delete_share ();
-                }
-            });
+        connect (
+            message_box,
+            QMessageBox.signal_finished,
+            this,
+            this.on_message_box_signal_finished);
         message_box.open ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_message_box_signal_finished (QMessageBox message_box, Gtk.Button yes_button) {
+        if (message_box.clicked_button () == yes_button) {
+            this.on_signal_toggle_share_link_animation (true);
+            this.link_share.delete_share ();
+        }
     }
 
 
     /***********************************************************
     Retrieve a share's name, accounting for this.names_supported
     ***********************************************************/
-    string share_name () {
+    private static string share_name () {
         string name = this.link_share.get_name ();
-        if (!name.is_empty ())
+        if (!name.is_empty ()) {
             return name;
-        if (!this.names_supported)
+        }
+        if (!this.names_supported) {
             return _("Public link");
+        }
         return this.link_share.get_token ();
     }
 

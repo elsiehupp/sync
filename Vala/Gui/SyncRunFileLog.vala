@@ -35,11 +35,6 @@ class SyncRunFileLog : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public 
-
-
-    /***********************************************************
-    ***********************************************************/
     public void on_signal_start (string folder_path) {
         const int64 logfile_max_size = 10 * 1024 * 1024; // 10Mi_b
 
@@ -56,9 +51,8 @@ class SyncRunFileLog : GLib.Object {
         while (GLib.File.exists (filename)) {
 
             GLib.File file = GLib.File.new_for_path (filename);
-            file.open (QIODevice.ReadOnly| QIODevice.Text);
-            QTextStream in (file);
-            string line = in.read_line ();
+            file.open (QIODevice.ReadOnly | QIODevice.Text);
+            string line = new QTextStream (file).read_line ();
 
             if (string.compare (folder_path,line,Qt.CaseSensitive)!=0) {
                 depth_index++;
@@ -92,10 +86,10 @@ class SyncRunFileLog : GLib.Object {
         if (!exists) {
             this.out + folder_path + endl;
             // We are creating a new file, add the note.
-            this.out + "# timestamp | duration | file | instruction | directory | modtime | etag | "
-                    "size | file_id | status | error_string | http result code | "
-                    "other size | other modtime | X-Request-ID"
-                 + endl;
+            this.out += "# timestamp | duration | file | instruction | directory | modtime | etag | "
+                      + "size | file_id | status | error_string | http result code | "
+                      + "other size | other modtime | X-Request-ID"
+                      + endl;
 
             FileSystem.file_hidden (filename, true);
         }
@@ -116,7 +110,7 @@ class SyncRunFileLog : GLib.Object {
         }
         string ts = string.from_latin1 (item.response_time_stamp);
         if (ts.length () > 6) {
-            const QRegularExpression rx (R" ( (\d\d:\d\d:\d\d))");
+            const QRegularExpression rx = new QRegularExpression (" ( (\d\d:\d\d:\d\d))");
             const var rx_match = rx.match (ts);
             if (rx_match.has_match ()) {
                 ts = rx_match.captured (0);
@@ -152,8 +146,8 @@ class SyncRunFileLog : GLib.Object {
     ***********************************************************/
     public void log_lap (string name) {
         this.out += "#=#=#=#=# " + name + " " + date_time_str (GLib.DateTime.current_date_time_utc ())
-                 + " (last step: " + this.lap_duration.restart (" msec"
-                 + ", total: " + this.total_duration.elapsed (" msec)" + endl;
+                  + " (last step: " + this.lap_duration.restart () + " msec"
+                  + ", total: " + this.total_duration.elapsed () + " msec) " + endl;
     }
 
 
@@ -161,8 +155,8 @@ class SyncRunFileLog : GLib.Object {
     ***********************************************************/
     public void finish () {
         this.out += "#=#=#=# Syncrun on_signal_finished " + date_time_str (GLib.DateTime.current_date_time_utc ())
-                 + " (last step: " + this.lap_duration.elapsed (" msec"
-                 + ", total: " + this.total_duration.elapsed (" msec)" + endl;
+                  + " (last step: " + this.lap_duration.elapsed () + " msec"
+                  + ", total: " + this.total_duration.elapsed () + " msec) " + endl;
         this.file.close ();
     }
 
