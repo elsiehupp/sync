@@ -38,26 +38,26 @@ class RemoteWipe : GLib.Object {
         this.network_manager = null;
         this.network_reply_check = null;
         this.network_reply_success = null;
-        GLib.Object.connect (
+        connect (
             AccountManager.instance (),
             AccountManager.on_signal_account_removed,
             this, [=] (AccountState *) {
                 this.account_removed = true;
             }
         );
-        GLib.Object.connect (
+        connect (
             this,
             RemoteWipe.signal_authorized,
             FolderMan.instance (),
             FolderMan.on_signal_wipe_folder_for_account
         );
-        GLib.Object.connect (
+        connect (
             FolderMan.instance (),
             FolderMan.signal_wipe_done,
             this,
             RemoteWipe.on_signal_notify_server_success_job
         );
-        GLib.Object.connect (
+        connect (
             this.account.data (),
             Account.app_password_retrieved,
             this,
@@ -103,13 +103,13 @@ class RemoteWipe : GLib.Object {
         QUrlQuery arguments = new QUrlQuery ("token=%1".arg (this.app_password));
         request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
         this.network_reply_check = this.network_manager.post (request, request_body);
-        GLib.Object.connect (
+        connect (
             this.network_manager,
             SIGNAL (ssl_errors (Soup.Reply *, GLib.List<QSslError>)),
             this.account.data (),
             SLOT (on_signal_handle_ssl_errors (Soup.Reply *, GLib.List<QSslError>))
         );
-        GLib.Object.connect (
+        connect (
             this.network_reply_check,
             Soup.Reply.on_signal_finished,
             this,
@@ -202,7 +202,7 @@ class RemoteWipe : GLib.Object {
             QUrlQuery arguments = new QUrlQuery ("token=%1".arg (this.app_password));
             request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
             this.network_reply_success = this.network_manager.post (request, request_body);
-            GLib.Object.connect (
+            connect (
                 this.network_reply_success,
                 Soup.Reply.on_signal_finished,
                 this,

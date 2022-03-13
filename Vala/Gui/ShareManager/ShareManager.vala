@@ -136,8 +136,8 @@ void ShareManager.create_link_share (string path,
     private const string name,
     private const string password) {
     var job = new OcsShareJob (this.account);
-    connect (job, &OcsShareJob.share_job_finished, this, &ShareManager.on_signal_link_share_created);
-    connect (job, &OcsJob.ocs_error, this, &ShareManager.on_signal_ocs_error);
+    connect (job, OcsShareJob.share_job_finished, this, ShareManager.on_signal_link_share_created);
+    connect (job, OcsJob.ocs_error, this, ShareManager.on_signal_ocs_error);
     job.create_link_share (path, name, password);
 }
 
@@ -170,8 +170,8 @@ void ShareManager.create_share (string path,
     private const string ermissions desired_permissions,
     const string password) {
     var job = new OcsShareJob (this.account);
-    connect (job, &OcsJob.ocs_error, this, &ShareManager.on_signal_ocs_error);
-    connect (job, &OcsShareJob.share_job_finished, this,
+    connect (job, OcsJob.ocs_error, this, ShareManager.on_signal_ocs_error);
+    connect (job, OcsShareJob.share_job_finished, this,
         [=] (QJsonDocument reply) {
             // Find existing share permissions (if this was shared with us)
             Share.Permissions existing_permissions = Share_permission_default;
@@ -192,8 +192,8 @@ void ShareManager.create_share (string path,
             }
 
             var job = new OcsShareJob (this.account);
-            connect (job, &OcsShareJob.share_job_finished, this, &ShareManager.on_signal_share_created);
-            connect (job, &OcsJob.ocs_error, this, &ShareManager.on_signal_ocs_error);
+            connect (job, OcsShareJob.share_job_finished, this, ShareManager.on_signal_share_created);
+            connect (job, OcsJob.ocs_error, this, ShareManager.on_signal_ocs_error);
             job.create_share (path, share_type, share_with, valid_permissions, password);
         });
     job.get_shared_with_me ();
@@ -211,8 +211,8 @@ void ShareManager.on_signal_share_created (QJsonDocument reply) {
 
 void ShareManager.fetch_shares (string path) {
     var job = new OcsShareJob (this.account);
-    connect (job, &OcsShareJob.share_job_finished, this, &ShareManager.on_signal_shares_fetched);
-    connect (job, &OcsJob.ocs_error, this, &ShareManager.on_signal_ocs_error);
+    connect (job, OcsShareJob.share_job_finished, this, ShareManager.on_signal_shares_fetched);
+    connect (job, OcsJob.ocs_error, this, ShareManager.on_signal_ocs_error);
     job.on_signal_get_shares (path);
 }
 

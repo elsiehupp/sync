@@ -85,8 +85,8 @@ User_group_share.User_group_share (AccountPointer account,
 
 void User_group_share.note (string note) {
     var job = new OcsShareJob (this.account);
-    connect (job, &OcsShareJob.share_job_finished, this, &User_group_share.on_signal_note_set);
-    connect (job, &OcsJob.ocs_error, this, &User_group_share.note_error);
+    connect (job, OcsShareJob.share_job_finished, this, User_group_share.on_signal_note_set);
+    connect (job, OcsJob.ocs_error, this, User_group_share.note_error);
     job.note (get_id (), note);
 }
 
@@ -110,8 +110,8 @@ void User_group_share.expire_date (QDate date) {
     }
 
     var job = new OcsShareJob (this.account);
-    connect (job, &OcsShareJob.share_job_finished, this, &User_group_share.on_signal_expire_date_set);
-    connect (job, &OcsJob.ocs_error, this, &User_group_share.on_signal_ocs_error);
+    connect (job, OcsShareJob.share_job_finished, this, User_group_share.on_signal_expire_date_set);
+    connect (job, OcsJob.ocs_error, this, User_group_share.on_signal_ocs_error);
     job.expire_date (get_id (), date);
 }
 

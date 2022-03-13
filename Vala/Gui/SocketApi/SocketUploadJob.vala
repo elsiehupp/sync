@@ -7,7 +7,7 @@ Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
 //  #include <GLib.FileInfo>
 //  #include <QJsonArray>
 //  #include <QRegularExpression>
-//  #include <QTemporary_file>
+//  #include <QTemporaryFile>
 
 namespace Occ {
 namespace Ui {
@@ -20,7 +20,7 @@ class SocketUploadJob : GLib.Object {
     private string local_path;
     private string remote_path;
     private string pattern;
-    private QTemporary_file tmp;
+    private QTemporaryFile tmp;
     private SyncJournalDb database;
     private SyncEngine engine;
     private string[] synced_files;
@@ -29,7 +29,7 @@ class SocketUploadJob : GLib.Object {
     ***********************************************************/
     public SocketUploadJob (unowned SocketApiJobV2 job) {
         this.api_job = job;
-        connect (job.data (), &SocketApiJobV2.on_signal_finished, this, &SocketUploadJob.delete_later);
+        connect (job.data (), SocketApiJobV2.on_signal_finished, this, SocketUploadJob.delete_later);
 
         this.local_path = this.api_job.arguments ()[QLatin1String ("local_path")].to_string ();
         this.remote_path = this.api_job.arguments ()[QLatin1String ("remote_path")].to_string ();
@@ -55,11 +55,11 @@ class SocketUploadJob : GLib.Object {
         this.engine = new SyncEngine (account.account (), this.local_path.ends_with ('/') ? this.local_path : this.local_path + '/', this.remote_path, this.database);
         this.engine.parent (this.database);
 
-        connect (this.engine, &Occ.SyncEngine.item_completed, this, [this] (Occ.SyncFileItemPtr item) {
+        connect (this.engine, Occ.SyncEngine.item_completed, this, [this] (Occ.SyncFileItemPtr item) {
             this.synced_files.append (item.file);
         });
 
-        connect (this.engine, &Occ.SyncEngine.on_signal_finished, this, [this] (bool ok) {
+        connect (this.engine, Occ.SyncEngine.on_signal_finished, this, [this] (bool ok) {
             if (ok) {
                 this.api_job.on_signal_success ({
                     {
@@ -73,7 +73,7 @@ class SocketUploadJob : GLib.Object {
                 });
             }
         });
-        connect (this.engine, &Occ.SyncEngine.sync_error, this, [this] (string error, ErrorCategory) {
+        connect (this.engine, Occ.SyncEngine.sync_error, this, [this] (string error, ErrorCategory) {
             this.api_job.failure (error);
         });
     }
@@ -91,8 +91,8 @@ class SocketUploadJob : GLib.Object {
 
         // create the directory, fail if it already exists
         var mkdir = new Occ.MkColJob (this.engine.account (), this.remote_path);
-        connect (mkdir, &Occ.MkColJob.finished_without_error, this.engine, &Occ.SyncEngine.on_signal_start_sync);
-        connect (mkdir, &Occ.MkColJob.finished_with_error, this, [this] (Soup.Reply reply) {
+        connect (mkdir, Occ.MkColJob.finished_without_error, this.engine, Occ.SyncEngine.on_signal_start_sync);
+        connect (mkdir, Occ.MkColJob.finished_with_error, this, [this] (Soup.Reply reply) {
             if (reply.error () == 202) {
                 this.api_job.failure ("Destination %1 already exists".arg (this.remote_path));
             } else {

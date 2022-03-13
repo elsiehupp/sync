@@ -28,10 +28,10 @@ class Utility {
             "http",
             "https",
             "oauthtest"
-        }
+        };
 
         if (!allowed_url_schemes.contains (url.scheme ())) {
-            GLib.warning ("URL format is not supported, or it has been compromised for:" + url.to_string ();
+            GLib.warning ("URL format is not supported, or it has been compromised for: " + url.to_string ());
             return false;
         }
 
@@ -41,11 +41,11 @@ class Utility {
                     error_widget_parent,
                     _("utility", "Could not open browser"),
                     _("utility",
-                        "There was an error when launching the browser to go to "
-                        "URL %1. Maybe no default browser is configured?")
+                    + "There was an error when launching the browser to go to "
+                    + "URL %1. Maybe no default browser is configured?")
                         .arg (url.to_string ()));
             }
-            GLib.warning ("QDesktopServices.open_url failed for" + url;
+            GLib.warning ("QDesktopServices.open_url failed for " + url);
             return false;
         }
         return true;
@@ -59,18 +59,20 @@ class Utility {
     ***********************************************************/
     public static bool open_email_composer (string subject, string body,
         Gtk.Widget error_widget_parent) {
-        GLib.Uri url ("mailto:");
+        GLib.Uri url = new GLib.Uri ("mailto:");
         QUrlQuery query;
-        query.query_items ({
+        query.query_items (
             {
-                "subject",
-                subject
-            },
-            {
-                "body",
-                body
+                {
+                    "subject",
+                    subject
+                },
+                {
+                    "body",
+                    body
+                }
             }
-        });
+        );
         url.query (query);
 
         if (!QDesktopServices.open_url (url)) {
@@ -79,11 +81,11 @@ class Utility {
                     error_widget_parent,
                     _("utility", "Could not open email client"),
                     _("utility",
-                        "There was an error when launching the email client to "
-                        "create a new message. Maybe no default email client is "
-                        "configured?"));
+                    + "There was an error when launching the email client to "
+                    + "create a new message. Maybe no default email client is "
+                    + "configured?"));
             }
-            GLib.warning ("QDesktopServices.open_url failed for" + url;
+            GLib.warning ("QDesktopServices.open_url failed for " + url);
             return false;
         }
         return true;

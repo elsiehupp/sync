@@ -21,7 +21,7 @@ class FormatWarningsWizardPage : QWizardPage {
             ret = _("<b>Warning:</b> %1").arg (warnings.first ());
         } else if (warnings.count () > 1) {
             ret = _("<b>Warning:</b>") + " <ul>";
-            Q_FOREACH (string warning, warnings) {
+            foreach (string warning, warnings) {
                 ret += string.from_latin1 ("<li>%1</li>").arg (warning);
             }
             ret += "</ul>";

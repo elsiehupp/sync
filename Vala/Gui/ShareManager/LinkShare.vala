@@ -206,11 +206,11 @@ string LinkShare.get_label () {
 }
 
 void LinkShare.name (string name) {
-    create_share_job (&LinkShare.on_signal_name_set).name (get_id (), name);
+    create_share_job (LinkShare.on_signal_name_set).name (get_id (), name);
 }
 
 void LinkShare.note (string note) {
-    create_share_job (&LinkShare.on_signal_note_set).note (get_id (), note);
+    create_share_job (LinkShare.on_signal_note_set).note (get_id (), note);
 }
 
 void LinkShare.on_signal_note_set (QJsonDocument &, GLib.Variant note) {
@@ -223,18 +223,18 @@ string LinkShare.get_token () {
 }
 
 void LinkShare.expire_date (QDate date) {
-    create_share_job (&LinkShare.on_signal_expire_date_set).expire_date (get_id (), date);
+    create_share_job (LinkShare.on_signal_expire_date_set).expire_date (get_id (), date);
 }
 
 void LinkShare.label (string label) {
-    create_share_job (&LinkShare.on_signal_label_set).label (get_id (), label);
+    create_share_job (LinkShare.on_signal_label_set).label (get_id (), label);
 }
 
 template <typename Link_share_slot>
 OcsShareJob *LinkShare.create_share_job (Link_share_slot on_signal_function) {
     var job = new OcsShareJob (this.account);
-    connect (job, &OcsShareJob.share_job_finished, this, on_signal_function);
-    connect (job, &OcsJob.ocs_error, this, &LinkShare.on_signal_ocs_error);
+    connect (job, OcsShareJob.share_job_finished, this, on_signal_function);
+    connect (job, OcsJob.ocs_error, this, LinkShare.on_signal_ocs_error);
     return job;
 }
 

@@ -266,8 +266,8 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
         job.add_query_params (parameters);
         const var was_search_in_progress = is_search_in_progress ();
         this.search_job_connections.insert (provider_id,
-            GLib.Object.connect (
-                job, &JsonApiJob.json_received, this, &UnifiedSearchResultsListModel.on_signal_search_for_provider_finished));
+            connect (
+                job, JsonApiJob.json_received, this, UnifiedSearchResultsListModel.on_signal_search_for_provider_finished));
         if (is_search_in_progress () && !was_search_in_progress) {
             /* emit */ signal_is_search_in_progress_changed ();
         }
@@ -508,7 +508,7 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
 
         clear_current_fetch_more_in_progress_provider_id ();
 
-        disconnect (&this.unified_search_text_editing_finished_timer, &QTimer.timeout, this,
+        disconnect (this.unified_search_text_editing_finished_timer, QTimer.timeout, this,
             &UnifiedSearchResultsListModel.on_signal_search_term_editing_finished);
 
         if (this.unified_search_text_editing_finished_timer.is_active ()) {
@@ -517,7 +517,7 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
 
         if (!this.search_term.is_empty ()) {
             this.unified_search_text_editing_finished_timer.interval (SEARCH_TERM_EDITING_FINISHED_SEARCH_START_DELAY);
-            connect (&this.unified_search_text_editing_finished_timer, &QTimer.timeout, this,
+            connect (this.unified_search_text_editing_finished_timer, QTimer.timeout, this,
                 &UnifiedSearchResultsListModel.on_signal_search_term_editing_finished);
             this.unified_search_text_editing_finished_timer.on_signal_start ();
         }
@@ -533,7 +533,7 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     private void on_signal_search_term_editing_finished () {
-        disconnect (&this.unified_search_text_editing_finished_timer, &QTimer.timeout, this,
+        disconnect (this.unified_search_text_editing_finished_timer, QTimer.timeout, this,
             &UnifiedSearchResultsListModel.on_signal_search_term_editing_finished);
 
         if (!this.account_state || !this.account_state.account ()) {
@@ -543,7 +543,7 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
 
         if (this.providers.is_empty ()) {
             var job = new JsonApiJob (this.account_state.account (), QLatin1String ("ocs/v2.php/search/providers"));
-            GLib.Object.connect (job, &JsonApiJob.json_received, this, &UnifiedSearchResultsListModel.on_signal_fetch_providers_finished);
+            connect (job, JsonApiJob.json_received, this, UnifiedSearchResultsListModel.on_signal_fetch_providers_finished);
             job.on_signal_start ();
         } else {
             start_search ();

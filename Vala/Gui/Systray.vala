@@ -127,18 +127,18 @@ class Systray : QSystemTrayIcon {
 
         var context_menu = new QMenu ();
         if (AccountManager.instance ().accounts ().is_empty ()) {
-            context_menu.add_action (_("Add account"), this, &Systray.signal_open_account_wizard);
+            context_menu.add_action (_("Add account"), this, Systray.signal_open_account_wizard);
         } else {
-            context_menu.add_action (_("Open main dialog"), this, &Systray.signal_open_main_dialog);
+            context_menu.add_action (_("Open main dialog"), this, Systray.signal_open_main_dialog);
         }
 
-        var pause_action = context_menu.add_action (_("Pause sync"), this, &Systray.on_signal_pause_all_folders);
-        var resume_action = context_menu.add_action (_("Resume sync"), this, &Systray.on_signal_unpause_all_folders);
-        context_menu.add_action (_("Settings"), this, &Systray.signal_open_settings);
-        context_menu.add_action (_("Exit %1").arg (Theme.instance ().app_name_gui ()), this, &Systray.signal_shutdown);
+        var pause_action = context_menu.add_action (_("Pause sync"), this, Systray.on_signal_pause_all_folders);
+        var resume_action = context_menu.add_action (_("Resume sync"), this, Systray.on_signal_unpause_all_folders);
+        context_menu.add_action (_("Settings"), this, Systray.signal_open_settings);
+        context_menu.add_action (_("Exit %1").arg (Theme.instance ().app_name_gui ()), this, Systray.signal_shutdown);
         context_menu (context_menu);
 
-        connect (context_menu, &QMenu.about_to_show, [=] {
+        connect (context_menu, QMenu.about_to_show, [=] {
             const var folders = FolderMan.instance ().map ();
 
             const var all_paused = std.all_of (std.cbegin (folders), std.cend (folders), [] (Folder f) {
@@ -158,13 +158,13 @@ class Systray : QSystemTrayIcon {
             resume_action.enabled (any_paused);
         });
 
-        connect (UserModel.instance (), &UserModel.signal_new_user_selected,
-            this, &Systray.on_signal_new_user_selected);
-        connect (UserModel.instance (), &UserModel.signal_add_account,
-                this, &Systray.signal_open_account_wizard);
+        connect (UserModel.instance (), UserModel.signal_new_user_selected,
+            this, Systray.on_signal_new_user_selected);
+        connect (UserModel.instance (), UserModel.signal_add_account,
+                this, Systray.signal_open_account_wizard);
 
-        connect (AccountManager.instance (), &AccountManager.on_signal_account_added,
-            this, &Systray.show_window);
+        connect (AccountManager.instance (), AccountManager.on_signal_account_added,
+            this, Systray.show_window);
     }
 
 
@@ -173,7 +173,7 @@ class Systray : QSystemTrayIcon {
     public void tray_engine (QQmlApplicationEngine tray_engine) {
         this.tray_engine = tray_engine;
 
-        this.tray_engine.network_access_manager_factory (&this.access_manager_factory);
+        this.tray_engine.network_access_manager_factory (this.access_manager_factory);
 
         this.tray_engine.add_import_path ("qrc:/qml/theme");
         this.tray_engine.add_ImageProvider ("avatars", new ImageProvider ());

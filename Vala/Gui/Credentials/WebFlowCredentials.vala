@@ -98,11 +98,21 @@ class WebFlowCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     public override QNetworkAccessManager create_qnam () {
-        GLib.info ()) + "Get QNAM";
+        GLib.info ("Getting QNAM");
         AccessManager qnam = new WebFlowCredentialsAccessManager (this);
 
-        connect (qnam, &AccessManager.authentication_required, this, &WebFlowCredentials.on_signal_authentication);
-        connect (qnam, &AccessManager.on_signal_finished, this, &WebFlowCredentials.on_signal_finished);
+        connect (
+            qnam,
+            AccessManager.authentication_required,
+            this,
+            WebFlowCredentials.on_signal_authentication
+        );
+        connect (
+            qnam,
+            AccessManager.on_signal_finished,
+            this,
+            WebFlowCredentials.on_signal_finished
+        );
 
         return qnam;
     }
@@ -110,7 +120,7 @@ class WebFlowCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public bool override ready () {
+    public override bool ready () {
         return this.ready;
     }
 
@@ -126,7 +136,7 @@ class WebFlowCredentials : AbstractCredentials {
         if (ready ()) {
             /* emit */ fetched ();
         } else {
-            GLib.info ()) + "Fetch from keychain!";
+            GLib.info ("Fetching from keychain!");
             fetch_from_keychain_helper ();
         }
     }
@@ -136,8 +146,8 @@ class WebFlowCredentials : AbstractCredentials {
     ***********************************************************/
     public override bool still_valid (Soup.Reply reply) {
         if (reply.error () != Soup.Reply.NoError) {
-            GLib.warning ()) + reply.error ();
-            GLib.warning ()) + reply.error_string ();
+            GLib.warning (reply.error ());
+            GLib.warning (reply.error_string ());
         }
         return (reply.error () != Soup.Reply.AuthenticationRequiredError);
     }
@@ -160,7 +170,7 @@ class WebFlowCredentials : AbstractCredentials {
                                                 this.user + CLIENT_CERTIFICATE_PEM_C,
                                                 this.client_ssl_certificate.to_pem (),
                                                 this);
-            connect (job, &KeychainChunk.WriteJob.on_signal_finished, this, &WebFlowCredentials.on_signal_write_client_cert_pem_job_done);
+            connect (job, KeychainChunk.WriteJob.on_signal_finished, this, WebFlowCredentials.on_signal_write_client_cert_pem_job_done);
             job.on_signal_start ();
         } else {
             // no cert, just write credentials
@@ -180,7 +190,7 @@ class WebFlowCredentials : AbstractCredentials {
         // indirectly) from QNetworkAccessManagerPrivate.authentication_required, which itself
         // is a called from a BlockingQueuedConnection from the Qt HTTP thread. And clearing the
         // cache needs to synchronize again with the HTTP thread.
-        QTimer.single_shot (0, this.account, &Account.on_signal_clear_qnam_cache);
+        QTimer.single_shot (0, this.account, Account.on_signal_clear_qnam_cache);
     }
 
 
@@ -194,9 +204,9 @@ class WebFlowCredentials : AbstractCredentials {
 
         this.account.delete_app_password ();
 
-        private const string kck = keychain_key (this.account.url ().to_string (), this.user, this.account.identifier ());
+        const string kck = keychain_key (this.account.url ().to_string (), this.user, this.account.identifier ());
         if (kck.is_empty ()) {
-            GLib.debug ()) + "InvalidateToken : User is empty, bailing out!";
+            GLib.debug ("InvalidateToken: User is empty, bailing out!");
             return;
         }
 
@@ -235,7 +245,7 @@ class WebFlowCredentials : AbstractCredentials {
             return;
         }
 
-        GLib.debug ()) + "Requires authentication";
+        GLib.debug ("Requires authentication.");
 
         authenticator.user (this.user);
         authenticator.password (this.password);
@@ -249,35 +259,44 @@ class WebFlowCredentials : AbstractCredentials {
         // Determine if the old flow has to be used (GS for now)
         // Do a DetermineAuthTypeJob to make sure that the server is still using Flow2
         var job = new DetermineAuthTypeJob (this.account.shared_from_this (), this);
-        connect (job, &DetermineAuthTypeJob.auth_type, [this] (DetermineAuthTypeJob.AuthType type) {
-        // LoginFlowV2 > WEB_VIEW_FLOW > OAuth > Shib > Basic
-    //  #ifdef WITH_WEBENGINE
-            bool use_flow2 = (type != DetermineAuthTypeJob.WEB_VIEW_FLOW);
-    //  #else // WITH_WEBENGINE
-            bool use_flow2 = true;
-    //  #endif // WITH_WEBENGINE
-
-            this.ask_dialog = new WebFlowCredentialsDialog (this.account, use_flow2);
-
-            if (!use_flow2) {
-                GLib.Uri url = this.account.url ();
-                string path = url.path () + "/index.php/login/flow";
-                url.path (path);
-                this.ask_dialog.url (url);
-            }
-
-            string message = _("You have been logged out of %1 as user %2. Please log in again.")
-                            .arg (this.account.display_name (), this.user);
-            this.ask_dialog.info (message);
-
-            this.ask_dialog.show ();
-
-            connect (this.ask_dialog, &WebFlowCredentialsDialog.on_signal_url_catched, this, &WebFlowCredentials.on_signal_ask_from_user_credentials_provided);
-            connect (this.ask_dialog, &WebFlowCredentialsDialog.on_signal_close, this, &WebFlowCredentials.on_signal_ask_from_user_cancelled);
-        });
+        connect (
+            job,
+            DetermineAuthTypeJob.auth_type,
+            on_signal_determine_auth_type
+        );
         job.on_signal_start ();
 
-        GLib.debug ()) + "User needs to reauth!";
+        GLib.debug ("User needs to reauth!");
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_determine_auth_type (DetermineAuthTypeJob.AuthType type) {
+    // LoginFlowV2 > WEB_VIEW_FLOW > OAuth > Shib > Basic
+//  #ifdef WITH_WEBENGINE
+        bool use_flow2 = (type != DetermineAuthTypeJob.WEB_VIEW_FLOW);
+//  #else // WITH_WEBENGINE
+        bool use_flow2 = true;
+//  #endif // WITH_WEBENGINE
+
+        this.ask_dialog = new WebFlowCredentialsDialog (this.account, use_flow2);
+
+        if (!use_flow2) {
+            GLib.Uri url = this.account.url ();
+            string path = url.path () + "/index.php/login/flow";
+            url.path (path);
+            this.ask_dialog.url (url);
+        }
+
+        string message = _("You have been logged out of %1 as user %2. Please log in again.")
+                        .arg (this.account.display_name (), this.user);
+        this.ask_dialog.info (message);
+
+        this.ask_dialog.show ();
+
+        connect (this.ask_dialog, WebFlowCredentialsDialog.on_signal_url_catched, this, WebFlowCredentials.on_signal_ask_from_user_credentials_provided);
+        connect (this.ask_dialog, WebFlowCredentialsDialog.on_signal_close, this, WebFlowCredentials.on_signal_ask_from_user_cancelled);
     }
 
 
@@ -285,7 +304,7 @@ class WebFlowCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     private void on_signal_ask_from_user_cancelled () {
-        GLib.debug ()) + "User cancelled reauth!";
+        GLib.debug ("User cancelled reauth!");
 
         /* emit */ asked ();
 
@@ -310,7 +329,7 @@ class WebFlowCredentials : AbstractCredentials {
                                             this.user + CLIENT_KEY_PEM_C,
                                             this.keychain_migration,
                                             this);
-        connect (job, &KeychainChunk.ReadJob.on_signal_finished, this, &WebFlowCredentials.on_signal_read_client_key_pem_job_done);
+        connect (job, KeychainChunk.ReadJob.on_signal_finished, this, WebFlowCredentials.on_signal_read_client_key_pem_job_done);
         job.on_signal_start ();
     }
 
@@ -331,11 +350,11 @@ class WebFlowCredentials : AbstractCredentials {
                 this.client_ssl_key = QSslKey (client_key_pem, QSsl.Ec);
             }
             if (this.client_ssl_key.is_null ()) {
-                GLib.warning ("Could not load SSL key into Qt!";
+                GLib.warning ("Could not load SSL key into Qt!");
             }
             client_key_pem.clear ();
         } else {
-            GLib.warning ("Unable to read client key" + read_job.error_string ();
+            GLib.warning ("Unable to read client key " + read_job.error_string ());
         }
 
         // Start fetching client CA certificates
@@ -362,16 +381,17 @@ class WebFlowCredentials : AbstractCredentials {
             } else {
                 if (read_job.error () != QKeychain.Error.EntryNotFound ||
                     ( (read_job.error () == QKeychain.Error.EntryNotFound) && this.client_ssl_ca_certificates.count () == 0)) {
-                    GLib.warning ("Unable to read client CA cert slot" + string.number (this.client_ssl_ca_certificates.count ()) + read_job.error_string ();
+                    GLib.warning ("Unable to read client CA cert slot " + this.client_ssl_ca_certificates.count ().to_string () + read_job.error_string ());
                 }
             }
         }
 
         // Now fetch the actual server password
-        private const string kck = keychain_key (
+        const string kck = keychain_key (
             this.account.url ().to_string (),
             this.user,
-            this.keychain_migration ? "" : this.account.identifier ());
+            this.keychain_migration ? "" : this.account.identifier ()
+        );
 
         var job = new ReadPasswordJob (Theme.instance ().app_name (), this);
     //  #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
@@ -379,7 +399,7 @@ class WebFlowCredentials : AbstractCredentials {
     //  #endif
         job.insecure_fallback (false);
         job.key (kck);
-        connect (job, &Job.on_signal_finished, this, &WebFlowCredentials.on_signal_read_password_job_done);
+        connect (job, Job.on_signal_finished, this, WebFlowCredentials.on_signal_read_password_job_done);
         job.on_signal_start ();
     }
 
@@ -398,7 +418,7 @@ class WebFlowCredentials : AbstractCredentials {
         }
 
         if (this.user.is_empty ()) {
-            GLib.warning ("Strange : User is empty!";
+            GLib.warning ("Strange: User is empty!");
         }
 
         if (error == QKeychain.NoError) {
@@ -414,8 +434,8 @@ class WebFlowCredentials : AbstractCredentials {
         if (this.keychain_migration && this.ready) {
             this.keychain_migration = false;
             persist ();
-            delete_keychain_entries (true); // true : delete old entries
-            GLib.info ("Migrated old keychain entries";
+            delete_keychain_entries (true); // true: delete old entries
+            GLib.info ("Migrated old keychain entries.");
         }
     }
 
@@ -430,7 +450,7 @@ class WebFlowCredentials : AbstractCredentials {
                                                 this.user + CLIENT_KEY_PEM_C,
                                                 this.client_ssl_key.to_pem (),
                                                 this);
-            connect (job, &KeychainChunk.WriteJob.on_signal_finished, this, &WebFlowCredentials.on_signal_write_client_key_pem_job_done);
+            connect (job, KeychainChunk.WriteJob.on_signal_finished, this, WebFlowCredentials.on_signal_write_client_key_pem_job_done);
             job.on_signal_start ();
         } else {
             // no key, just write credentials
@@ -464,7 +484,7 @@ class WebFlowCredentials : AbstractCredentials {
         // errors / next ca cert?
         if (write_job && !this.client_ssl_ca_certificates.is_empty ()) {
             if (write_job.error () != NoError) {
-                GLib.warning ("Error while writing client CA cert" + write_job.error_string ();
+                GLib.warning ("Error while writing client CA cert " + write_job.error_string ());
             }
 
             if (!this.client_ssl_ca_certificates_write_queue.is_empty ()) {
@@ -480,7 +500,7 @@ class WebFlowCredentials : AbstractCredentials {
         add_settings_to_job (this.account, job);
     //  #endif
         job.insecure_fallback (false);
-        connect (job, &Job.on_signal_finished, this, &WebFlowCredentials.on_signal_write_job_done);
+        connect (job, Job.on_signal_finished, this, WebFlowCredentials.on_signal_write_job_done);
         job.key (keychain_key (this.account.url ().to_string (), this.user, this.account.identifier ()));
         job.text_data (this.password);
         job.on_signal_start ();
@@ -495,7 +515,7 @@ class WebFlowCredentials : AbstractCredentials {
         case NoError:
             break;
         default:
-            GLib.warning ("Error while writing password" + job.error_string ();
+            GLib.warning ("Error while writing password " + job.error_string ());
         }
     }
 
@@ -509,14 +529,21 @@ class WebFlowCredentials : AbstractCredentials {
     private void read_single_client_ca_cert_pem () {
         // try to fetch a client ca cert
         if (this.client_ssl_ca_certificates.count () < this.client_ssl_ca_certificates_max_count) {
-            var job = new KeychainChunk.ReadJob (this.account,
-                                                this.user + client_ca_certificate_pemC + string.number (this.client_ssl_ca_certificates.count ()),
-                                                this.keychain_migration,
-                                                this);
-            connect (job, &KeychainChunk.ReadJob.on_signal_finished, this, &WebFlowCredentials.on_signal_read_client_ca_certificates_pem_job_done);
+            var job = new KeychainChunk.ReadJob (
+                this.account,
+                this.user + client_ca_certificate_pemC + this.client_ssl_ca_certificates.count ().to_string (),
+                this.keychain_migration,
+                this
+            );
+            connect (
+                job,
+                KeychainChunk.ReadJob.on_signal_finished,
+                this,
+                WebFlowCredentials.on_signal_read_client_ca_certificates_pem_job_done
+            );
             job.on_signal_start ();
         } else {
-            GLib.warning ("Maximum client CA cert count exceeded while reading, ignoring after" + this.client_ssl_ca_certificates_max_count;
+            GLib.warning ("Maximum client CA cert count exceeded while reading, ignoring after " + this.client_ssl_ca_certificates_max_count);
 
             on_signal_read_client_ca_certificates_pem_job_done (null);
         }
@@ -535,7 +562,7 @@ class WebFlowCredentials : AbstractCredentials {
 
             // keep the limit
             if (index > (this.client_ssl_ca_certificates_max_count - 1)) {
-                GLib.warning ("Maximum client CA cert count exceeded while writing slot" + string.number (index) + "cutting off after" + string.number (this.client_ssl_ca_certificates_max_count) + "certificates";
+                GLib.warning ("Maximum client CA cert count exceeded while writing slot " + index.to_string () + " cutting off after " + this.client_ssl_ca_certificates_max_count.to_string () + " certificates.");
 
                 this.client_ssl_ca_certificates_write_queue.clear ();
 
@@ -547,7 +574,7 @@ class WebFlowCredentials : AbstractCredentials {
                                                 this.user + client_ca_certificate_pemC + string.number (index),
                                                 cert.to_pem (),
                                                 this);
-            connect (job, &KeychainChunk.WriteJob.on_signal_finished, this, &WebFlowCredentials.on_signal_write_client_ca_certificates_pem_job_done);
+            connect (job, KeychainChunk.WriteJob.on_signal_finished, this, WebFlowCredentials.on_signal_write_client_ca_certificates_pem_job_done);
             job.on_signal_start ();
         } else {
             on_signal_write_client_ca_certificates_pem_job_done (null);
@@ -570,7 +597,7 @@ class WebFlowCredentials : AbstractCredentials {
                                             this.user + CLIENT_CERTIFICATE_PEM_C,
                                             this.keychain_migration,
                                             this);
-        connect (job, &KeychainChunk.ReadJob.on_signal_finished, this, &WebFlowCredentials.on_signal_read_client_cert_pem_job_done);
+        connect (job, KeychainChunk.ReadJob.on_signal_finished, this, WebFlowCredentials.on_signal_read_client_cert_pem_job_done);
         job.on_signal_start ();
     }
 
@@ -579,11 +606,6 @@ class WebFlowCredentials : AbstractCredentials {
     Wipes legacy keychain locations
     ***********************************************************/
     protected void delete_keychain_entries (bool old_keychain_entries = false) {
-        var start_delete_job = [this, old_keychain_entries] (string key) {
-            var job = new KeychainChunk.DeleteJob (this.account, key, old_keychain_entries, this);
-            job.on_signal_start ();
-        }
-
         start_delete_job (this.user);
 
         /* IMPORTANT - remove later - FIXME MS@2019-12-07 -.
@@ -611,6 +633,13 @@ class WebFlowCredentials : AbstractCredentials {
         // FIXME MS@2019-12-07 -.
         }
         // <-- FIXME MS@2019-12-07
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void start_delete_job (bool old_keychain_entries, string key) {
+        new KeychainChunk.DeleteJob (this.account, key, old_keychain_entries, this).on_signal_start ();
     }
 
 
@@ -648,7 +677,7 @@ class WebFlowCredentials : AbstractCredentials {
         if (string.compare (this.user, user, Qt.CaseInsensitive) == 0) {
             this.user = user;
         } else {
-            GLib.info ()) + "Authed with the wrong user!";
+            GLib.info ("Authed with the wrong user!");
 
             string message = _("Please log in with the user: %1")
                     .arg (this.user);

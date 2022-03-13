@@ -29,7 +29,7 @@ class ConflictSolver : GLib.Object {
             return this.local_version_filename;
         }
         private set {
-            this.local_version_filename; = value;
+            this.local_version_filename = value;
         }
     }
     string remote_version_filename {
@@ -37,7 +37,7 @@ class ConflictSolver : GLib.Object {
             return this.remote_version_filename;
         }
         private set {
-            this.remote_version_filename; = value;
+            this.remote_version_filename = value;
         }
     }
 
@@ -101,16 +101,16 @@ class ConflictSolver : GLib.Object {
             return false;
         }
 
-        GLib.FileInfo info (this.local_version_filename);
+        GLib.FileInfo info = new GLib.FileInfo (this.local_version_filename);
         if (!info.exists ()) {
             return false;
         }
 
-        const var message = info.is_dir () ? _("Do you want to delete the directory <i>%1</i> and all its contents permanently?").arg (info.directory ().dir_name ())
+        const string message = info.is_dir () ? _("Do you want to delete the directory <i>%1</i> and all its contents permanently?").arg (info.directory ().dir_name ())
                                           : _("Do you want to delete the file <i>%1</i> permanently?").arg (info.filename ());
-        const var result = QMessageBox.question (this.parent_widget, _("Confirm deletion"), message, QMessageBox.Yes, QMessageBox.No);
-        if (result != QMessageBox.Yes)
+        if (QMessageBox.question (this.parent_widget, _("Confirm deletion"), message, QMessageBox.Yes, QMessageBox.No) != QMessageBox.Yes) {
             return false;
+        }
 
         if (info.is_dir ()) {
             return FileSystem.remove_recursively (this.local_version_filename);
@@ -127,36 +127,42 @@ class ConflictSolver : GLib.Object {
             return false;
         }
 
-        GLib.FileInfo info (this.local_version_filename);
+        GLib.FileInfo info = new GLib.FileInfo (this.local_version_filename);
         if (!info.exists ()) {
             return false;
         }
-
-        const var rename_pattern = [=] {
-            var result = string.from_utf8 (Occ.Utility.conflict_file_base_name_from_pattern (this.local_version_filename.to_utf8 ()));
-            const var dot_index = result.last_index_of ('.');
-            return string (result.left (dot_index) + "this.%1" + result.mid (dot_index));
-        } ();
-
-        const var target_filename = [=] {
-            uint32 i = 1;
-            var result = rename_pattern.arg (i);
-            while (GLib.FileInfo.exists (result)) {
-                //  Q_ASSERT (i > 0);
-                i++;
-                result = rename_pattern.arg (i);
-            }
-            return result;
-        } ();
 
         string error;
         if (FileSystem.unchecked_rename_replace (this.local_version_filename, target_filename, error)) {
             return true;
         } else {
-            GLib.warning ("Rename error:" + error;
+            GLib.warning ("Rename error: " + error);
             QMessageBox.warning (this.parent_widget, _("Error"), _("Moving file failed:\n\n%1").arg (error));
             return false;
         }
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private string rename_pattern () {
+        string result = Occ.Utility.conflict_file_base_name_from_pattern (this.local_version_filename.to_utf8 ());
+        const string dot_index = result.last_index_of ('.');
+        return result.left (dot_index) + "this.%1" + result.mid (dot_index);
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private string target_filename () {
+        uint32 i = 1;
+        var result = rename_pattern ().arg (i);
+        while (GLib.FileInfo.exists (result)) {
+            //  Q_ASSERT (i > 0);
+            i++;
+            result = rename_pattern ().arg (i);
+        }
+        return result;
     }
 
 
@@ -171,7 +177,7 @@ class ConflictSolver : GLib.Object {
             return false;
         }
 
-        GLib.FileInfo info (this.local_version_filename);
+        GLib.FileInfo info = new GLib.FileInfo (this.local_version_filename);
         if (!info.exists ()) {
             return false;
         }
@@ -180,7 +186,7 @@ class ConflictSolver : GLib.Object {
         if (FileSystem.unchecked_rename_replace (this.local_version_filename, this.remote_version_filename, error)) {
             return true;
         } else {
-            GLib.warning ("Rename error:" + error;
+            GLib.warning ("Rename error: " + error);
             QMessageBox.warning (this.parent_widget, _("Error"), _("Moving file failed:\n\n%1").arg (error));
             return false;
         }

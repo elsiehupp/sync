@@ -100,9 +100,9 @@ class UserInfo : GLib.Object {
         this.last_quota_total_bytes = 0;
         this.last_quota_used_bytes = 0;
         this.active = false;
-        connect (account_state, &AccountState.state_changed,
-            this, &UserInfo.on_signal_account_state_changed);
-        connect (&this.job_restart_timer, &QTimer.timeout, this, &UserInfo.on_signal_fetch_info);
+        connect (account_state, AccountState.state_changed,
+            this, UserInfo.on_signal_account_state_changed);
+        connect (this.job_restart_timer, QTimer.timeout, this, UserInfo.on_signal_fetch_info);
         this.job_restart_timer.single_shot (true);
     }
 
@@ -147,8 +147,8 @@ class UserInfo : GLib.Object {
         AccountPointer account = this.account_state.account ();
         this.job = new JsonApiJob (account, "ocs/v1.php/cloud/user", this);
         this.job.on_signal_timeout (20 * 1000);
-        connect (this.job.data (), &JsonApiJob.json_received, this, &UserInfo.on_signal_update_last_info);
-        connect (this.job.data (), &AbstractNetworkJob.network_error, this, &UserInfo.on_signal_request_failed);
+        connect (this.job.data (), JsonApiJob.json_received, this, UserInfo.on_signal_update_last_info);
+        connect (this.job.data (), AbstractNetworkJob.network_error, this, UserInfo.on_signal_request_failed);
         this.job.on_signal_start ();
     }
 
@@ -188,7 +188,7 @@ class UserInfo : GLib.Object {
         if (this.fetch_avatar_image) {
             var job = new AvatarJob (account, account.dav_user (), 128, this);
             job.on_signal_timeout (20 * 1000);
-            GLib.Object.connect (job, &AvatarJob.avatar_pixmap, this, &UserInfo.on_signal_avatar_image);
+            connect (job, AvatarJob.avatar_pixmap, this, UserInfo.on_signal_avatar_image);
             job.on_signal_start ();
         }
         else

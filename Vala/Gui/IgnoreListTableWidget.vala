@@ -34,13 +34,13 @@ class IgnoreListTableWidget : Gtk.Widget {
 
         ui.remove_push_button.enabled (false);
         connect (ui.table_widget,         &QTable_widget.item_selection_changed,
-                this, &IgnoreListTableWidget.on_signal_item_selection_changed);
+                this, IgnoreListTableWidget.on_signal_item_selection_changed);
         connect (ui.remove_push_button,    &QAbstractButton.clicked,
-                this, &IgnoreListTableWidget.on_signal_remove_current_item);
+                this, IgnoreListTableWidget.on_signal_remove_current_item);
         connect (ui.add_push_button,       &QAbstractButton.clicked,
-                this, &IgnoreListTableWidget.on_signal_add_pattern);
-        connect (ui.remove_all_push_button, &QAbstractButton.clicked,
-                this, &IgnoreListTableWidget.on_signal_remove_all_items);
+                this, IgnoreListTableWidget.on_signal_add_pattern);
+        connect (ui.remove_all_push_button, QAbstractButton.clicked,
+                this, IgnoreListTableWidget.on_signal_remove_all_items);
 
         ui.table_widget.resize_columns_to_contents ();
         ui.table_widget.horizontal_header ().section_resize_mode (pattern_col, QHeaderView.Stretch);

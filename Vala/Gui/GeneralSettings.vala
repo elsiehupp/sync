@@ -66,7 +66,7 @@ class GeneralSettings : Gtk.Widget {
             if (!logger.log_dir ().is_empty ()) {
                 list.append ({"", "logs"});
 
-                QDir directory (logger.log_dir ());
+                QDir directory = new QDir (logger.log_dir ());
                 const var info_list = directory.entry_info_list (QDir.Files);
                 std.transform (std.cbegin (info_list), std.cend (info_list),
                             std.back_inserter (list),
@@ -86,8 +86,8 @@ class GeneralSettings : Gtk.Widget {
         public static void create_debug_archive (string filename) {
             const var entries = create_file_list ();
 
-            QZip_writer zip (filename);
-            for (var entry : entries) {
+            QZipWriter zip = new QZipWriter (filename);
+            foreach (var entry in entries) {
                 if (entry.local_filename.is_empty ()) {
                     zip.add_directory (entry.zip_filename);
                 } else {
@@ -119,11 +119,11 @@ class GeneralSettings : Gtk.Widget {
         this.ui = new Ui.GeneralSettings ();
         this.ui.up_ui (this);
 
-        connect (this.ui.server_notifications_check_box, &QAbstractButton.toggled,
-            this, &GeneralSettings.on_signal_toggle_optional_server_notifications);
+        connect (this.ui.server_notifications_check_box, QAbstractButton.toggled,
+            this, GeneralSettings.on_signal_toggle_optional_server_notifications);
         this.ui.server_notifications_check_box.tool_tip (_("Server notifications that require attention."));
 
-        connect (this.ui.show_in_explorer_navigation_pane_check_box, &QAbstractButton.toggled, this, &GeneralSettings.on_signal_show_in_explorer_navigation_pane);
+        connect (this.ui.show_in_explorer_navigation_pane_check_box, QAbstractButton.toggled, this, GeneralSettings.on_signal_show_in_explorer_navigation_pane);
 
         // Rename 'Explorer' appropriately on non-Windows
 
@@ -136,7 +136,7 @@ class GeneralSettings : Gtk.Widget {
             // make sure the binary location is correctly set
             on_signal_toggle_launch_on_signal_startup (has_auto_start);
             this.ui.autostart_check_box.checked (has_auto_start);
-            connect (this.ui.autostart_check_box, &QAbstractButton.toggled, this, &GeneralSettings.on_signal_toggle_launch_on_signal_startup);
+            connect (this.ui.autostart_check_box, QAbstractButton.toggled, this, GeneralSettings.on_signal_toggle_launch_on_signal_startup);
         }
 
         // setup about section
@@ -146,18 +146,42 @@ class GeneralSettings : Gtk.Widget {
         this.ui.about_label.open_external_links (true);
 
         // About legal notice
-        connect (this.ui.legal_notice_button, &QPushButton.clicked, this, &GeneralSettings.on_signal_show_legal_notice);
+        connect (this.ui.legal_notice_button, QPushButton.clicked, this, GeneralSettings.on_signal_show_legal_notice);
 
         on_signal_load_misc_settings ();
         // updater info now set in : customize_style
         //on_signal_update_info ();
 
         // misc
-        connect (this.ui.mono_icons_check_box, &QAbstractButton.toggled, this, &GeneralSettings.on_signal_save_misc_settings);
-        connect (this.ui.crashreporter_check_box, &QAbstractButton.toggled, this, &GeneralSettings.on_signal_save_misc_settings);
-        connect (this.ui.new_folder_limit_check_box, &QAbstractButton.toggled, this, &GeneralSettings.on_signal_save_misc_settings);
-        connect (this.ui.new_folder_limit_spin_box, static_cast<void (QSpin_box.*) (int)> (&QSpin_box.value_changed), this, &GeneralSettings.on_signal_save_misc_settings);
-        connect (this.ui.new_external_storage, &QAbstractButton.toggled, this, &GeneralSettings.on_signal_save_misc_settings);
+        connect (
+            this.ui.mono_icons_check_box,
+            QAbstractButton.toggled,
+            this,
+            GeneralSettings.on_signal_save_misc_settings
+        );
+        connect (
+            this.ui.crashreporter_check_box,
+            QAbstractButton.toggled,
+            this,
+            GeneralSettings.on_signal_save_misc_settings
+        );
+        connect (
+            this.ui.new_folder_limit_check_box,
+            QAbstractButton.toggled,
+            this,
+            GeneralSettings.on_signal_save_misc_settings
+        );
+        connect (
+            this.ui.new_folder_limit_spin_box,
+            (SpinBoxValueChanged) QSpinBox.value_changed,
+            this, GeneralSettings.on_signal_save_misc_settings
+        );
+        connect (
+            this.ui.new_external_storage,
+            QAbstractButton.toggled,
+            this,
+            GeneralSettings.on_signal_save_misc_settings
+        );
 
     //  #ifndef WITH_CRASHREPORTER
         this.ui.crashreporter_check_box.visible (false);
@@ -173,21 +197,41 @@ class GeneralSettings : Gtk.Widget {
         int m1 = 0;
         int m2 = 0;
         int m3 = 0;
-        this.ui.horizontal_layout_3.get_contents_margins (&m0, m1, m2, m3);
+        this.ui.horizontal_layout_3.get_contents_margins (m0, m1, m2, m3);
         this.ui.horizontal_layout_3.contents_margins (0, m1, m2, m3);
 
         // OEM themes are not obliged to ship mono icons, so there
         // is no point in offering an option
-        this.ui.mono_icons_check_box.visible (Theme.instance ().mono_icons_available ());
+        this.ui.mono_icons_check_box.visible (
+            Theme.instance ().mono_icons_available ()
+        );
 
-        connect (this.ui.ignored_files_button, &QAbstractButton.clicked, this, &GeneralSettings.on_signal_ignore_files_editor);
-        connect (this.ui.debug_archive_button, &QAbstractButton.clicked, this, &GeneralSettings.on_signal_create_debug_archive);
+        connect (
+            this.ui.ignored_files_button,
+            QAbstractButton.clicked,
+            this,
+            GeneralSettings.on_signal_ignore_files_editor
+        );
+        connect (
+            this.ui.debug_archive_button,
+            QAbstractButton.clicked,
+            this,
+            GeneralSettings.on_signal_create_debug_archive
+        );
 
         // on_signal_account_added means the wizard was on_signal_finished and the wizard might change some options.
-        connect (AccountManager.instance (), &AccountManager.on_signal_account_added, this, &GeneralSettings.on_signal_load_misc_settings);
+        connect (
+            AccountManager.instance (),
+            AccountManager.on_signal_account_added,
+            this,
+            GeneralSettings.on_signal_load_misc_settings
+        );
 
         customize_style ();
     }
+
+
+    private delegate void SpinBoxValueChanged (QSpinBox spinbox, int value);
 
 
     override ~GeneralSettings () {
@@ -198,10 +242,10 @@ class GeneralSettings : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public override QSize size_hint () {
-        return {
+        return new QSize (
             OwncloudGui.settings_dialog_size ().width (),
             Gtk.Widget.size_hint ().height ()
-        }
+        );
     }
 
 
@@ -217,15 +261,15 @@ class GeneralSettings : Gtk.Widget {
     private void on_signal_save_misc_settings () {
         if (this.currently_loading)
             return;
-        ConfigFile cfg_file;
+        ConfigFile config_file;
         bool is_checked = this.ui.mono_icons_check_box.is_checked ();
-        cfg_file.mono_icons (is_checked);
+        config_file.mono_icons (is_checked);
         Theme.instance ().systray_use_mono_icons (is_checked);
-        cfg_file.crash_reporter (this.ui.crashreporter_check_box.is_checked ());
+        config_file.crash_reporter (this.ui.crashreporter_check_box.is_checked ());
 
-        cfg_file.new_big_folder_size_limit (this.ui.new_folder_limit_check_box.is_checked (),
+        config_file.new_big_folder_size_limit (this.ui.new_folder_limit_check_box.is_checked (),
             this.ui.new_folder_limit_spin_box.value ());
-        cfg_file.confirm_external_storage (this.ui.new_external_storage.is_checked ());
+        config_file.confirm_external_storage (this.ui.new_external_storage.is_checked ());
     }
 
 
@@ -240,16 +284,16 @@ class GeneralSettings : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_toggle_optional_server_notifications (bool enable) {
-        ConfigFile cfg_file;
-        cfg_file.optional_server_notifications (enable);
+        ConfigFile config_file;
+        config_file.optional_server_notifications (enable);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_signal_show_in_explorer_navigation_pane (bool checked) {
-        ConfigFile cfg_file;
-        cfg_file.show_in_explorer_navigation_pane (checked);
+        ConfigFile config_file;
+        config_file.show_in_explorer_navigation_pane (checked);
         // Now update the registry with the change.
         FolderMan.instance ().navigation_pane_helper ().show_in_explorer_navigation_pane (checked);
     }
@@ -259,7 +303,7 @@ class GeneralSettings : Gtk.Widget {
     ***********************************************************/
     private void on_signal_ignore_files_editor () {
         if (this.ignore_editor.is_null ()) {
-            ConfigFile cfg_file;
+            ConfigFile config_file;
             this.ignore_editor = new IgnoreListEditor (this);
             this.ignore_editor.attribute (Qt.WA_DeleteOnClose, true);
             this.ignore_editor.open ();
@@ -285,17 +329,17 @@ class GeneralSettings : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_load_misc_settings () {
-        QScopedValueRollback<bool> scope (this.currently_loading, true);
-        ConfigFile cfg_file;
-        this.ui.mono_icons_check_box.checked (cfg_file.mono_icons ());
-        this.ui.server_notifications_check_box.checked (cfg_file.optional_server_notifications ());
-        this.ui.show_in_explorer_navigation_pane_check_box.checked (cfg_file.show_in_explorer_navigation_pane ());
-        this.ui.crashreporter_check_box.checked (cfg_file.crash_reporter ());
-        var new_folder_limit = cfg_file.new_big_folder_size_limit ();
+        var scope = new QScopedValueRollback<bool> (this.currently_loading, true);
+        ConfigFile config_file;
+        this.ui.mono_icons_check_box.checked (config_file.mono_icons ());
+        this.ui.server_notifications_check_box.checked (config_file.optional_server_notifications ());
+        this.ui.show_in_explorer_navigation_pane_check_box.checked (config_file.show_in_explorer_navigation_pane ());
+        this.ui.crashreporter_check_box.checked (config_file.crash_reporter ());
+        var new_folder_limit = config_file.new_big_folder_size_limit ();
         this.ui.new_folder_limit_check_box.checked (new_folder_limit.first);
         this.ui.new_folder_limit_spin_box.value (new_folder_limit.second);
-        this.ui.new_external_storage.checked (cfg_file.confirm_external_storage ());
-        this.ui.mono_icons_check_box.checked (cfg_file.mono_icons ());
+        this.ui.new_external_storage.checked (config_file.confirm_external_storage ());
+        this.ui.mono_icons_check_box.checked (config_file.mono_icons ());
     }
 
 
@@ -321,34 +365,88 @@ class GeneralSettings : Gtk.Widget {
         // Note: the sparkle-updater is not an OCUpdater
         var ocupdater = qobject_cast<OCUpdater> (Updater.instance ());
         if (ocupdater) {
-            connect (ocupdater, &OCUpdater.signal_download_state_changed, this, &GeneralSettings.on_signal_update_info, Qt.UniqueConnection);
-            connect (this.ui.restart_button, &QAbstractButton.clicked, ocupdater, &OCUpdater.on_signal_start_installer, Qt.UniqueConnection);
-            connect (this.ui.restart_button, &QAbstractButton.clicked, Gtk.Application, &QApplication.quit, Qt.UniqueConnection);
-            connect (this.ui.update_button, &QAbstractButton.clicked, this, &GeneralSettings.on_signal_update_check_now, Qt.UniqueConnection);
-            connect (this.ui.auto_check_for_updates_check_box, &QAbstractButton.toggled, this, &GeneralSettings.on_signal_toggle_auto_update_check);
+            connect (
+                ocupdater,
+                OCUpdater.signal_download_state_changed,
+                this,
+                GeneralSettings.on_signal_update_info, Qt.UniqueConnection
+            );
+            connect (
+                this.ui.restart_button,
+                QAbstractButton.clicked,
+                ocupdater,
+                OCUpdater.on_signal_start_installer,
+                Qt.UniqueConnection
+            );
+            connect (
+                this.ui.restart_button,
+                QAbstractButton.clicked,
+                Gtk.Application,
+                QApplication.quit,
+                Qt.UniqueConnection
+            );
+            connect (
+                this.ui.update_button,
+                QAbstractButton.clicked,
+                this,
+                GeneralSettings.on_signal_update_check_now,
+                Qt.UniqueConnection
+            );
+            connect (
+                this.ui.auto_check_for_updates_check_box,
+                QAbstractButton.toggled,
+                this,
+                GeneralSettings.on_signal_toggle_auto_update_check
+            );
 
-            string status = ocupdater.status_string (OCUpdater.Update_status_string_format.Html);
+            string status = ocupdater.status_string (
+                OCUpdater.Update_status_string_format.Html
+            );
             Theme.replace_link_color_string_background_aware (status);
 
             this.ui.update_state_label.open_external_links (false);
-            connect (this.ui.update_state_label, &Gtk.Label.link_activated, this, [] (string link) {
-                Utility.open_browser (GLib.Uri (link));
-            });
+            connect (
+                this.ui.update_state_label,
+                Gtk.Label.link_activated,
+                this,
+                this.on_update_link_activated_state_label
+            );
             this.ui.update_state_label.on_signal_text (status);
 
-            this.ui.restart_button.visible (ocupdater.download_state () == OCUpdater.Download_complete);
+            this.ui.restart_button.visible (
+                ocupdater.download_state () == OCUpdater.Download_complete
+            );
 
-            this.ui.update_button.enabled (ocupdater.download_state () != OCUpdater.Checking_server &&
-                                        ocupdater.download_state () != OCUpdater.Downloading &&
-                                        ocupdater.download_state () != OCUpdater.Download_complete);
+            this.ui.update_button.enabled (
+                ocupdater.download_state () != OCUpdater.Checking_server &&
+                ocupdater.download_state () != OCUpdater.Downloading &&
+                ocupdater.download_state () != OCUpdater.Download_complete
+            );
 
-            this.ui.auto_check_for_updates_check_box.checked (ConfigFile ().auto_update_check ());
+            this.ui.auto_check_for_updates_check_box.checked (
+                ConfigFile ().auto_update_check ()
+            );
         }
 
         // Channel selection
-        this.ui.update_channel.current_index (ConfigFile ().update_channel () == "beta" ? 1 : 0);
-        connect (this.ui.update_channel, &QCombo_box.current_text_changed,
-            this, &GeneralSettings.on_signal_update_channel_changed, Qt.UniqueConnection);
+        this.ui.update_channel.current_index (
+            ConfigFile ().update_channel () == "beta" ? 1 : 0
+        );
+        connect (
+            this.ui.update_channel,
+            QCombo_box.current_text_changed,
+            this,
+            GeneralSettings.on_signal_update_channel_changed,
+            Qt.UniqueConnection
+        );
+    }
+
+
+    /***********************************************************
+    #if defined (BUILD_UPDATER)
+    ***********************************************************/
+    private void on_update_link_activated_state_label (string link) {
+        Utility.open_browser (GLib.Uri (link));
     }
 
 
@@ -356,40 +454,53 @@ class GeneralSettings : Gtk.Widget {
     #if defined (BUILD_UPDATER)
     ***********************************************************/
     private void on_signal_update_channel_changed (string channel) {
-        if (channel == ConfigFile ().update_channel ())
+        if (channel == ConfigFile ().update_channel ()) {
             return;
+        }
 
-        var msg_box = new QMessageBox (
+        var message_box = new QMessageBox (
             QMessageBox.Warning,
             _("Change update channel?"),
             _("The update channel determines which client updates will be offered "
-            "for installation. The \"stable\" channel contains only upgrades that "
-            "are considered reliable, while the versions in the \"beta\" channel "
-            "may contain newer features and bugfixes, but have not yet been tested "
-            "thoroughly."
-            "\n\n"
-            "Note that this selects only what pool upgrades are taken from, and that "
-            "there are no downgrades : So going back from the beta channel to "
-            "the stable channel usually cannot be done immediately and means waiting "
-            "for a stable version that is newer than the currently installed beta "
-            "version."),
+            + "for installation. The \"stable\" channel contains only upgrades that "
+            + "are considered reliable, while the versions in the \"beta\" channel "
+            + "may contain newer features and bugfixes, but have not yet been tested "
+            + "thoroughly."
+            + "\n\n"
+            + "Note that this selects only what pool upgrades are taken from, and that "
+            + "there are no downgrades : So going back from the beta channel to "
+            + "the stable channel usually cannot be done immediately and means waiting "
+            + "for a stable version that is newer than the currently installed beta "
+            + "version."),
             QMessageBox.NoButton,
             this);
-        var accept_button = msg_box.add_button (_("Change update channel"), QMessageBox.AcceptRole);
-        msg_box.add_button (_("Cancel"), QMessageBox.RejectRole);
-        connect (msg_box, &QMessageBox.on_signal_finished, msg_box, [this, channel, msg_box, accept_button] {
-            msg_box.delete_later ();
-            if (msg_box.clicked_button () == accept_button) {
-                ConfigFile ().update_channel (channel);
-                if (var updater = qobject_cast<OCUpdater> (Updater.instance ())) {
-                    updater.update_url (Updater.update_url ());
-                    updater.check_for_update ();
-                }
-            } else {
-                this.ui.update_channel.current_text (ConfigFile ().update_channel ());
+        var accept_button = message_box.add_button (_("Change update channel"), QMessageBox.AcceptRole);
+        message_box.add_button (_("Cancel"), QMessageBox.RejectRole);
+        connect (
+            message_box,
+            QMessageBox.signal_finished,
+            message_box,
+            this.on_message_box_signal_finished
+        );
+        message_box.open ();
+    }
+
+
+    /***********************************************************
+    #if defined (BUILD_UPDATER)
+    ***********************************************************/
+    private void on_message_box_signal_finished (string channel, QMessageBox message_box, Gtk.Button accept_button) {
+        message_box.delete_later ();
+        if (message_box.clicked_button () == accept_button) {
+            ConfigFile ().update_channel (channel);
+            var updater = (OCUpdater) Updater.instance ();
+            if (updater) {
+                updater.update_url (Updater.update_url ());
+                updater.check_for_update ();
             }
-        });
-        msg_box.open ();
+        } else {
+            this.ui.update_channel.current_text (ConfigFile ().update_channel ());
+        }
     }
 
 
@@ -414,9 +525,9 @@ class GeneralSettings : Gtk.Widget {
     #if defined (BUILD_UPDATER)
     ***********************************************************/
     private void on_signal_toggle_auto_update_check () {
-        ConfigFile cfg_file;
+        ConfigFile config_file;
         bool is_checked = this.ui.auto_check_for_updates_check_box.is_checked ();
-        cfg_file.auto_update_check (is_checked, "");
+        config_file.auto_update_check (is_checked, "");
     }
 
 
@@ -428,10 +539,10 @@ class GeneralSettings : Gtk.Widget {
         Theme.replace_link_color_string_background_aware (about);
         this.ui.about_label.on_signal_text (about);
 
-    #if defined (BUILD_UPDATER)
+    //  #if defined (BUILD_UPDATER)
         // updater info
         on_signal_update_info ();
-    #else
+    //  #else
         this.ui.updates_group_box.visible (false);
     //  #endif
     }

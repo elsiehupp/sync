@@ -41,39 +41,39 @@ class NetworkSettings : Gtk.Widget {
         this.ui.user_line_edit.enabled (true);
         this.ui.password_line_edit.enabled (true);
         this.ui.auth_widgets.enabled (this.ui.auth_requiredcheck_box.is_checked ());
-        connect (this.ui.auth_requiredcheck_box, &QAbstractButton.toggled,
-            this.ui.auth_widgets, &Gtk.Widget.enabled);
+        connect (this.ui.auth_requiredcheck_box, QAbstractButton.toggled,
+            this.ui.auth_widgets, Gtk.Widget.enabled);
 
-        connect (this.ui.manual_proxy_radio_button, &QAbstractButton.toggled,
-            this.ui.manual_settings, &Gtk.Widget.enabled);
-        connect (this.ui.manual_proxy_radio_button, &QAbstractButton.toggled,
-            this.ui.type_combo_box, &Gtk.Widget.enabled);
-        connect (this.ui.manual_proxy_radio_button, &QAbstractButton.toggled,
-            this, &NetworkSettings.on_signal_check_account_localhost);
+        connect (this.ui.manual_proxy_radio_button, QAbstractButton.toggled,
+            this.ui.manual_settings, Gtk.Widget.enabled);
+        connect (this.ui.manual_proxy_radio_button, QAbstractButton.toggled,
+            this.ui.type_combo_box, Gtk.Widget.enabled);
+        connect (this.ui.manual_proxy_radio_button, QAbstractButton.toggled,
+            this, NetworkSettings.on_signal_check_account_localhost);
 
         load_proxy_settings ();
         load_bandwidth_limit_settings ();
 
         // proxy
-        connect (this.ui.type_combo_box, static_cast<void (QCombo_box.*) (int)> (&QCombo_box.current_index_changed), this, &NetworkSettings.on_signal_save_proxy_settings);
-        connect (this.ui.proxy_button_group, static_cast<void (QButton_group.*) (int)> (&QButton_group.button_clicked), this, &NetworkSettings.on_signal_save_proxy_settings);
-        connect (this.ui.host_line_edit, &QLineEdit.editing_finished, this, &NetworkSettings.on_signal_save_proxy_settings);
-        connect (this.ui.user_line_edit, &QLineEdit.editing_finished, this, &NetworkSettings.on_signal_save_proxy_settings);
-        connect (this.ui.password_line_edit, &QLineEdit.editing_finished, this, &NetworkSettings.on_signal_save_proxy_settings);
-        connect (this.ui.port_spin_box, &QAbstract_spin_box.editing_finished, this, &NetworkSettings.on_signal_save_proxy_settings);
-        connect (this.ui.auth_requiredcheck_box, &QAbstractButton.toggled, this, &NetworkSettings.on_signal_save_proxy_settings);
+        connect (this.ui.type_combo_box, static_cast<void (QCombo_box.*) (int)> (QCombo_box.current_index_changed), this, NetworkSettings.on_signal_save_proxy_settings);
+        connect (this.ui.proxy_button_group, static_cast<void (QButton_group.*) (int)> (QButton_group.button_clicked), this, NetworkSettings.on_signal_save_proxy_settings);
+        connect (this.ui.host_line_edit, QLineEdit.editing_finished, this, NetworkSettings.on_signal_save_proxy_settings);
+        connect (this.ui.user_line_edit, QLineEdit.editing_finished, this, NetworkSettings.on_signal_save_proxy_settings);
+        connect (this.ui.password_line_edit, QLineEdit.editing_finished, this, NetworkSettings.on_signal_save_proxy_settings);
+        connect (this.ui.port_spin_box, QAbstract_spin_box.editing_finished, this, NetworkSettings.on_signal_save_proxy_settings);
+        connect (this.ui.auth_requiredcheck_box, QAbstractButton.toggled, this, NetworkSettings.on_signal_save_proxy_settings);
 
-        connect (this.ui.upload_limit_radio_button, &QAbstractButton.clicked, this, &NetworkSettings.on_signal_save_bandwidth_limit_settings);
-        connect (this.ui.no_upload_limit_radio_button, &QAbstractButton.clicked, this, &NetworkSettings.on_signal_save_bandwidth_limit_settings);
-        connect (this.ui.auto_upload_limit_radio_button, &QAbstractButton.clicked, this, &NetworkSettings.on_signal_save_bandwidth_limit_settings);
-        connect (this.ui.download_limit_radio_button, &QAbstractButton.clicked, this, &NetworkSettings.on_signal_save_bandwidth_limit_settings);
-        connect (this.ui.no_download_limit_radio_button, &QAbstractButton.clicked, this, &NetworkSettings.on_signal_save_bandwidth_limit_settings);
-        connect (this.ui.auto_download_limit_radio_button, &QAbstractButton.clicked, this, &NetworkSettings.on_signal_save_bandwidth_limit_settings);
-        connect (this.ui.download_spin_box, static_cast<void (QSpin_box.*) (int)> (&QSpin_box.value_changed), this, &NetworkSettings.on_signal_save_bandwidth_limit_settings);
-        connect (this.ui.upload_spin_box, static_cast<void (QSpin_box.*) (int)> (&QSpin_box.value_changed), this, &NetworkSettings.on_signal_save_bandwidth_limit_settings);
+        connect (this.ui.upload_limit_radio_button, QAbstractButton.clicked, this, NetworkSettings.on_signal_save_bandwidth_limit_settings);
+        connect (this.ui.no_upload_limit_radio_button, QAbstractButton.clicked, this, NetworkSettings.on_signal_save_bandwidth_limit_settings);
+        connect (this.ui.auto_upload_limit_radio_button, QAbstractButton.clicked, this, NetworkSettings.on_signal_save_bandwidth_limit_settings);
+        connect (this.ui.download_limit_radio_button, QAbstractButton.clicked, this, NetworkSettings.on_signal_save_bandwidth_limit_settings);
+        connect (this.ui.no_download_limit_radio_button, QAbstractButton.clicked, this, NetworkSettings.on_signal_save_bandwidth_limit_settings);
+        connect (this.ui.auto_download_limit_radio_button, QAbstractButton.clicked, this, NetworkSettings.on_signal_save_bandwidth_limit_settings);
+        connect (this.ui.download_spin_box, static_cast<void (QSpinBox.*) (int)> (QSpinBox.value_changed), this, NetworkSettings.on_signal_save_bandwidth_limit_settings);
+        connect (this.ui.upload_spin_box, static_cast<void (QSpinBox.*) (int)> (QSpinBox.value_changed), this, NetworkSettings.on_signal_save_bandwidth_limit_settings);
 
         // Warn about empty proxy host
-        connect (this.ui.host_line_edit, &QLineEdit.text_changed, this, &NetworkSettings.on_signal_check_empty_proxy_host);
+        connect (this.ui.host_line_edit, QLineEdit.text_changed, this, NetworkSettings.on_signal_check_empty_proxy_host);
         on_signal_check_empty_proxy_host ();
         on_signal_check_account_localhost ();
     }
@@ -97,9 +97,9 @@ class NetworkSettings : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void load_bandwidth_limit_settings () {
-        ConfigFile cfg_file;
+        ConfigFile config_file;
 
-        int use_download_limit = cfg_file.use_download_limit ();
+        int use_download_limit = config_file.use_download_limit ();
         if (use_download_limit >= 1) {
             this.ui.download_limit_radio_button.checked (true);
         } else if (use_download_limit == 0) {
@@ -107,9 +107,9 @@ class NetworkSettings : Gtk.Widget {
         } else {
             this.ui.auto_download_limit_radio_button.checked (true);
         }
-        this.ui.download_spin_box.value (cfg_file.download_limit ());
+        this.ui.download_spin_box.value (config_file.download_limit ());
 
-        int use_upload_limit = cfg_file.use_upload_limit ();
+        int use_upload_limit = config_file.use_upload_limit ();
         if (use_upload_limit >= 1) {
             this.ui.upload_limit_radio_button.checked (true);
         } else if (use_upload_limit == 0) {
@@ -117,20 +117,20 @@ class NetworkSettings : Gtk.Widget {
         } else {
             this.ui.auto_upload_limit_radio_button.checked (true);
         }
-        this.ui.upload_spin_box.value (cfg_file.upload_limit ());
+        this.ui.upload_spin_box.value (config_file.upload_limit ());
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_signal_save_proxy_settings () {
-        ConfigFile cfg_file;
+        ConfigFile config_file;
 
         on_signal_check_empty_proxy_host ();
         if (this.ui.no_proxy_radio_button.is_checked ()) {
-            cfg_file.proxy_type (QNetworkProxy.NoProxy);
+            config_file.proxy_type (QNetworkProxy.NoProxy);
         } else if (this.ui.system_proxy_radio_button.is_checked ()) {
-            cfg_file.proxy_type (QNetworkProxy.DefaultProxy);
+            config_file.proxy_type (QNetworkProxy.DefaultProxy);
         } else if (this.ui.manual_proxy_radio_button.is_checked ()) {
             int type = this.ui.type_combo_box.item_data (this.ui.type_combo_box.current_index ()).to_int ();
             string host = this.ui.host_line_edit.text ();
@@ -139,7 +139,7 @@ class NetworkSettings : Gtk.Widget {
             bool needs_auth = this.ui.auth_requiredcheck_box.is_checked ();
             string user = this.ui.user_line_edit.text ();
             string pass = this.ui.password_line_edit.text ();
-            cfg_file.proxy_type (type, this.ui.host_line_edit.text (),
+            config_file.proxy_type (type, this.ui.host_line_edit.text (),
                 this.ui.port_spin_box.value (), needs_auth, user, pass);
         }
 
@@ -161,24 +161,24 @@ class NetworkSettings : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_save_bandwidth_limit_settings () {
-        ConfigFile cfg_file;
+        ConfigFile config_file;
         if (this.ui.download_limit_radio_button.is_checked ()) {
-            cfg_file.use_download_limit (1);
+            config_file.use_download_limit (1);
         } else if (this.ui.no_download_limit_radio_button.is_checked ()) {
-            cfg_file.use_download_limit (0);
+            config_file.use_download_limit (0);
         } else if (this.ui.auto_download_limit_radio_button.is_checked ()) {
-            cfg_file.use_download_limit (-1);
+            config_file.use_download_limit (-1);
         }
-        cfg_file.download_limit (this.ui.download_spin_box.value ());
+        config_file.download_limit (this.ui.download_spin_box.value ());
 
         if (this.ui.upload_limit_radio_button.is_checked ()) {
-            cfg_file.use_upload_limit (1);
+            config_file.use_upload_limit (1);
         } else if (this.ui.no_upload_limit_radio_button.is_checked ()) {
-            cfg_file.use_upload_limit (0);
+            config_file.use_upload_limit (0);
         } else if (this.ui.auto_upload_limit_radio_button.is_checked ()) {
-            cfg_file.use_upload_limit (-1);
+            config_file.use_upload_limit (-1);
         }
-        cfg_file.upload_limit (this.ui.upload_spin_box.value ());
+        config_file.upload_limit (this.ui.upload_spin_box.value ());
 
         FolderMan.instance ().dirty_network_limits ();
     }
@@ -239,8 +239,8 @@ class NetworkSettings : Gtk.Widget {
             return;
         }
         // load current proxy settings
-        Occ.ConfigFile cfg_file;
-        int type = cfg_file.proxy_type ();
+        Occ.ConfigFile config_file;
+        int type = config_file.proxy_type ();
         switch (type) {
         case QNetworkProxy.NoProxy:
             this.ui.no_proxy_radio_button.checked (true);
@@ -257,14 +257,14 @@ class NetworkSettings : Gtk.Widget {
             break;
         }
 
-        this.ui.host_line_edit.on_signal_text (cfg_file.proxy_host_name ());
-        int port = cfg_file.proxy_port ();
+        this.ui.host_line_edit.on_signal_text (config_file.proxy_host_name ());
+        int port = config_file.proxy_port ();
         if (port == 0)
             port = 8080;
         this.ui.port_spin_box.value (port);
-        this.ui.auth_requiredcheck_box.checked (cfg_file.proxy_needs_auth ());
-        this.ui.user_line_edit.on_signal_text (cfg_file.proxy_user ());
-        this.ui.password_line_edit.on_signal_text (cfg_file.proxy_password ());
+        this.ui.auth_requiredcheck_box.checked (config_file.proxy_needs_auth ());
+        this.ui.user_line_edit.on_signal_text (config_file.proxy_user ());
+        this.ui.password_line_edit.on_signal_text (config_file.proxy_password ());
     }
 
 } // class NetworkSettings

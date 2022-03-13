@@ -103,7 +103,7 @@ class FolderWatcher : GLib.Object {
 
     //  #ifndef OWNCLOUD_TEST
         if (this.folder.is_file_excluded_absolute (path) && !Utility.is_conflict_file (path)) {
-            GLib.debug ("* Ignoring file" + path;
+            GLib.debug ("* Ignoring file " + path);
             return true;
         }
     //  #endif
@@ -151,10 +151,10 @@ class FolderWatcher : GLib.Object {
     Called from the implementations to indicate a change in path
     ***********************************************************/
     protected void on_signal_change_detected (string path) {
-        GLib.FileInfo file_info (path);
-        string[] paths (path);
+        GLib.FileInfo file_info = new GLib.FileInfo (path);
+        string[] paths = { path };
         if (file_info.is_dir ()) {
-            QDir directory (path);
+            QDir directory = new QDir (path);
             append_sub_paths (directory, paths);
         }
         on_signal_change_detected (paths);
@@ -198,8 +198,8 @@ class FolderWatcher : GLib.Object {
             return;
         }
 
-        GLib.info ("Detected changes in paths:" + changed_paths;
-        foreach (string path, changed_paths) {
+        GLib.info ("Detected changes in paths: " + changed_paths);
+        foreach (string path in changed_paths) {
             /* emit */ signal_path_changed (path);
         }
     }
@@ -209,7 +209,7 @@ class FolderWatcher : GLib.Object {
     ***********************************************************/
     private void on_signal_start_notification_test_when_ready () {
         if (!this.d.ready) {
-            QTimer.single_shot (1000, this, &FolderWatcher.on_signal_start_notification_test_when_ready);
+            QTimer.single_shot (1000, this, FolderWatcher.on_signal_start_notification_test_when_ready);
             return;
         }
 
@@ -218,28 +218,33 @@ class FolderWatcher : GLib.Object {
             var mtime = FileSystem.get_mod_time (path);
             FileSystem.mod_time (path, mtime + 1);
         } else {
-            GLib.File f (path);
+            GLib.File f = new GLib.File (path);
             f.open (QIODevice.WriteOnly | QIODevice.Append);
         }
 
-        QTimer.single_shot (5000, this, [this] () {
-            if (!this.test_notification_path.is_empty ())
-                /* emit */ signal_became_unreliable (_("The watcher did not receive a test notification."));
-            this.test_notification_path.clear ();
-        });
+        QTimer.single_shot (5000, this, on_timer);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void append_sub_paths (QDir directory, string[]& sub_paths) {
+    private void on_timer () {
+        if (!this.test_notification_path.is_empty ())
+            /* emit */ signal_became_unreliable (_("The watcher did not receive a test notification."));
+        this.test_notification_path.clear ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void append_sub_paths (QDir directory, string[] sub_paths) {
         string[] new_sub_paths = directory.entry_list (QDir.NoDotAndDotDot | QDir.Dirs | QDir.Files);
         for (int i = 0; i < new_sub_paths.size (); i++) {
             string path = directory.path () + "/" + new_sub_paths[i];
-            GLib.FileInfo file_info (path);
+            GLib.FileInfo file_info = new GLib.FileInfo (path);
             sub_paths.append (path);
             if (file_info.is_dir ()) {
-                QDir directory (path);
+                QDir directory = new QDir (path);
                 append_sub_paths (directory, sub_paths);
             }
         }

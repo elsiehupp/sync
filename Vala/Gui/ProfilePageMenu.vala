@@ -20,8 +20,8 @@ class ProfilePageMenu : Gtk.Widget {
     public ProfilePageMenu (AccountPointer account, string share_with_user_id, Gtk.Widget parent = null) {
         base (parent);
         this.profile_connector = account;
-        connect (&this.profile_connector, &OcsProfileConnector.hovercard_fetched, this, &ProfilePageMenu.on_signal_hovercard_fetched);
-        connect (&this.profile_connector, &OcsProfileConnector.icon_loaded, this, &ProfilePageMenu.on_signal_icon_loaded);
+        connect (this.profile_connector, OcsProfileConnector.hovercard_fetched, this, ProfilePageMenu.on_signal_hovercard_fetched);
+        connect (this.profile_connector, OcsProfileConnector.icon_loaded, this, ProfilePageMenu.on_signal_icon_loaded);
         this.profile_connector.fetch_hovercard (share_with_user_id);
     }
 
@@ -42,7 +42,7 @@ class ProfilePageMenu : Gtk.Widget {
         foreach (var hovercard_action in hovercard_actions) {
             const var action = this.menu.add_action (hovercard_action.icon, hovercard_action.title);
             const var link = hovercard_action.link;
-            connect (action, &QAction.triggered, action, [link] (bool) {
+            connect (action, QAction.triggered, action, [link] (bool) {
                 Utility.open_browser (link);
             });
         }

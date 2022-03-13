@@ -3750,7 +3750,7 @@ class EmojiModel : GLib.Object {
             string.from_utf8 ("\xf0\x9f\x87\xab\xf0\x9f\x87\xb0"), ":flag_fk:"
         }),
         GLib.Variant.from_value (Emoji {
-            string.from_utf8 ("\xf0\x9f\x87\xab\xf0\x9f\x87\xb2"), ":flag_fm:"
+            string.from_utf8 ("\xf0\x9f\x87\xab\xf0\x9f\x87\xb2"), ":flag_font_metrics:"
         }),
         GLib.Variant.from_value (Emoji {
             string.from_utf8 ("\xf0\x9f\x87\xab\xf0\x9f\x87\xb4"), ":flag_fo:"

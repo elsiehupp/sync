@@ -18,11 +18,11 @@ class SslDialogErrorHandler : AbstractSslErrorHandler {
     public override bool handle_errors (GLib.List<QSslError> errors, QSslConfiguration conf, GLib.List<QSslCertificate> certificates, AccountPointer account) {
         //  (void)conf;
         if (!certificates) {
-            GLib.critical ("Certs parameter required but is NULL!";
+            GLib.critical ("Certs parameter required but is NULL!");
             return false;
         }
 
-        SslErrorDialog dialog (account);
+        SslErrorDialog dialog = new SslErrorDialog (account);
         // whether the failing certificates have previously been accepted
         if (dialog.check_failing_certificates_known (errors)) {
             *certificates = dialog.unknown_certificates ();

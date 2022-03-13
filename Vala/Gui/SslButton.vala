@@ -34,7 +34,7 @@ class SslButton : QToolButton {
         auto_raise (true);
 
         this.menu = new QMenu (this);
-        GLib.Object.connect (
+        connect (
             this.menu,
             QMenu.about_to_show,
             this,SslButton.on_signal_update_menu
@@ -159,7 +159,7 @@ class SslButton : QToolButton {
         string sna = string[] (cert.subject_alternative_names ().values ()).join (" ");
 
         string details;
-        QTextStream stream (&details);
+        QTextStream stream (details);
 
         stream += "<html><body>";
 

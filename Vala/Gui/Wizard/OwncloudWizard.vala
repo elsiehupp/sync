@@ -340,50 +340,63 @@ class OwncloudWizard : QWizard {
     }
 
 
+    private delegate void CallBack (bool enable);
+
+
     /***********************************************************
     Shows a dialog explaining the virtual files mode and warning about it
     being experimental. Calles the callback with true if enabling was
     chosen.
     ***********************************************************/
-    public static void ask_experimental_virtual_files_feature (Gtk.Widget receiver, std.function<void (bool enable)> callback) {
+    public static void ask_experimental_virtual_files_feature (Gtk.Widget receiver, CallBack callback) {
         const var best_vfs_mode = best_available_vfs_mode ();
-        QMessageBox msg_box = null;
+        QMessageBox message_box = null;
         QPushButton accept_button = null;
         switch (best_vfs_mode) {
         case Vfs.WindowsCfApi:
             callback (true);
             return;
         case Vfs.WithSuffix:
-            msg_box = new QMessageBox (
+            message_box = new QMessageBox (
                 QMessageBox.Warning,
                 _("Enable experimental feature?"),
                 _("When the \"virtual files\" mode is enabled no files will be downloaded initially. "
-                   "Instead, a tiny \"%1\" file will be created for each file that exists on the server. "
-                   "The contents can be downloaded by running these files or by using their context menu."
-                   "\n\n"
-                   "The virtual files mode is mutually exclusive with selective sync. "
-                   "Currently unselected folders will be translated to online-only folders "
-                   "and your selective sync settings will be reset."
-                   "\n\n"
-                   "Switching to this mode will on_signal_abort any currently running synchronization."
-                   "\n\n"
-                   "This is a new, experimental mode. If you decide to use it, please report any "
-                   "issues that come up.")
+                + "Instead, a tiny \"%1\" file will be created for each file that exists on the server. "
+                + "The contents can be downloaded by running these files or by using their context menu."
+                + "\n\n"
+                + "The virtual files mode is mutually exclusive with selective sync. "
+                + "Currently unselected folders will be translated to online-only folders "
+                + "and your selective sync settings will be reset."
+                + "\n\n"
+                + "Switching to this mode will on_signal_abort any currently running synchronization."
+                + "\n\n"
+                + "This is a new, experimental mode. If you decide to use it, please report any "
+                + "issues that come up.")
                     .arg (APPLICATION_DOTVIRTUALFILE_SUFFIX),
                 QMessageBox.NoButton, receiver);
-            accept_button = msg_box.add_button (_("Enable experimental placeholder mode"), QMessageBox.AcceptRole);
-            msg_box.add_button (_("Stay safe"), QMessageBox.RejectRole);
+            accept_button = message_box.add_button (_("Enable experimental placeholder mode"), QMessageBox.AcceptRole);
+            message_box.add_button (_("Stay safe"), QMessageBox.RejectRole);
             break;
         case Vfs.XAttr:
         case Vfs.Off:
             GLib.assert_not_reached ();
         }
 
-        connect (msg_box, &QMessageBox.accepted, receiver, [callback, msg_box, accept_button] {
-            callback (msg_box.clicked_button () == accept_button);
-            msg_box.delete_later ();
-        });
-        msg_box.open ();
+        connect (
+            message_box,
+            QMessageBox.accepted,
+            receiver,
+            this.on_message_box_accepted
+        );
+        message_box.open ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_message_box_accepted (CallBack callback, QMessageBox message_box, QPushButton accept_button) {
+        callback (message_box.clicked_button () == accept_button);
+        message_box.delete_later ();
     }
 
 
@@ -411,7 +424,7 @@ class OwncloudWizard : QWizard {
     ***********************************************************/
     public void on_signal_append_to_configuration_log (string message, LogType type) {
         this.setup_log + message;
-        GLib.debug ("Setup-Log: " + message;
+        GLib.debug ("Setup-Log: " + message);
     }
 
 
@@ -419,14 +432,7 @@ class OwncloudWizard : QWizard {
     TODO: update this function
     ***********************************************************/
     public void on_signal_current_page_changed (int identifier) {
-        GLib.debug ("Current Wizard page changed to " + identifier;
-
-        const var next_button_as_default = [this] () {
-            var next_button = qobject_cast<QPushButton> (button (QWizard.NextButton));
-            if (next_button) {
-                next_button.default (true);
-            }
-        }
+        GLib.debug ("Current Wizard page changed to " + identifier);
 
         if (identifier == WizardCommon.Pages.PAGE_WELCOME) {
             // Set next button to just hidden so it retains it's layout
@@ -473,8 +479,18 @@ class OwncloudWizard : QWizard {
 
     /***********************************************************
     ***********************************************************/
+    private void next_button_as_default () {
+        var next_button = (QPushButton) button (QWizard.NextButton);
+        if (next_button) {
+            next_button.default (true);
+        }
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
     public void on_signal_successful_step () {
-        const int identifier (current_id ());
+        const int identifier = current_id ();
 
         switch (identifier) {
         case WizardCommon.Pages.PAGE_HTTP_CREDS:
@@ -506,7 +522,7 @@ class OwncloudWizard : QWizard {
 
         OwncloudGui.raise_dialog (this);
         if (next_id () == -1) {
-            disconnect (this, &Gtk.Dialog.on_signal_finished, this, &OwncloudWizard.basic_setup_finished);
+            disconnect (this, Gtk.Dialog.on_signal_finished, this, OwncloudWizard.basic_setup_finished);
             /* emit */ basic_setup_finished (Gtk.Dialog.Accepted);
         } else {
             next ();
@@ -568,11 +584,15 @@ class OwncloudWizard : QWizard {
     /***********************************************************
     ***********************************************************/
     private int calculate_longest_side_of_wizard_pages (GLib.List<QSize> page_sizes) {
-        return std.accumulate (std.cbegin (page_sizes), std.cend (page_sizes), 0, [] (int current, QSize size) {
-            return std.max ({
-                current, size.width (), size.height ()
-            });
-        });
+        //  return std.accumulate (
+        //      std.cbegin (page_sizes),
+        //      std.cend (page_sizes),
+        //      0,
+        //      [] (int current, QSize size) {
+        //      return std.max ({
+        //          current, size.width (), size.height ()
+        //      });
+        //  });
     }
 
 
@@ -582,11 +602,16 @@ class OwncloudWizard : QWizard {
         GLib.List<QSize> page_sizes;
         const var p_ids = page_ids ();
 
-        std.transform (p_ids.cbegin (), p_ids.cend (), std.back_inserter (page_sizes), [this] (int page_id) {
-            var p = page (page_id);
-            p.adjust_size ();
-            return p.size_hint ();
-        });
+        //  std.transform (
+        //      p_ids.cbegin (),
+        //      p_ids.cend (),
+        //      std.back_inserter (page_sizes),
+        //      [this] (int page_id) {
+        //          var p = page (page_id);
+        //          p.adjust_size ();
+        //          return p.size_hint ();
+        //      }
+        //  );
 
         return page_sizes;
     }

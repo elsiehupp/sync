@@ -56,7 +56,7 @@ class UserStatusSelectorModel : GLib.Object {
         ClearStageType.FOUR_HOUR,
         ClearStageType.TODAY,
         ClearStageType.WEEK
-    }
+    };
 
 
     signal void error_message_changed ();
@@ -71,7 +71,7 @@ class UserStatusSelectorModel : GLib.Object {
     ***********************************************************/
     public UserStatusSelectorModel (GLib.Object parent = new GLib.Object ()) {
         base (parent);
-        this.date_time_provider = new DateTimeProvider;
+        this.date_time_provider = new DateTimeProvider ();
         this.user_status.icon ("😀");
     }
 
@@ -82,9 +82,9 @@ class UserStatusSelectorModel : GLib.Object {
         std.shared_ptr<UserStatusConnector> user_status_connector,
         GLib.Object parent = new GLib.Object ()) {
         base (parent);
-        this.user_status_connector (user_status_connector)
-        this.user_status ("no-identifier", "", "😀", UserStatus.OnlineStatus.Online, false, {})
-        this.date_time_provider (new DateTimeProvider) {
+        this.user_status_connector = user_status_connector;
+        this.user_status = new UserStatus ("no-identifier", "", "😀", UserStatus.OnlineStatus.Online, false, {});
+        this.date_time_provider = new DateTimeProvider ();
         this.user_status.icon ("😀");
         on_signal_init ();
     }
@@ -99,6 +99,7 @@ class UserStatusSelectorModel : GLib.Object {
         base (parent);
         this.user_status_connector = user_status_connector;
         this.date_time_provider = std.move (date_time_provider);
+        this.user_status = new UserStatus ();
         this.user_status.icon ("😀");
         on_signal_init ();
     }
@@ -267,11 +268,14 @@ class UserStatusSelectorModel : GLib.Object {
     ***********************************************************/
     public string[] clear_at_values () {
         string[] clear_at_stages;
-        std.transform (this.clear_stages.begin (), this.clear_stages.end (),
-            std.back_inserter (clear_at_stages),
-            [this] (ClearStageType stage) {
-                return clear_at_stage_to_string (stage);
-            });
+        std.transform (
+            this.clear_stages.begin (),
+            this.clear_stages.end (),
+            std.back_inserter (clear_at_stages)
+            //  [this] (ClearStageType stage) => {
+            //      return clear_at_stage_to_string (stage);
+            //  }
+        );
 
         return clear_at_stages;
     }
@@ -350,15 +354,15 @@ class UserStatusSelectorModel : GLib.Object {
     ***********************************************************/
     private void on_signal_reset () {
         if (this.user_status_connector) {
-            disconnect (this.user_status_connector.get (), &UserStatusConnector.user_status_fetched, this,
+            disconnect (this.user_status_connector.get (), UserStatusConnector.user_status_fetched, this,
                 &UserStatusSelectorModel.on_signal_user_status_fetched);
-            disconnect (this.user_status_connector.get (), &UserStatusConnector.predefined_statuses_fetched, this,
+            disconnect (this.user_status_connector.get (), UserStatusConnector.predefined_statuses_fetched, this,
                 &UserStatusSelectorModel.on_signal_predefined_statuses_fetched);
-            disconnect (this.user_status_connector.get (), &UserStatusConnector.error, this,
+            disconnect (this.user_status_connector.get (), UserStatusConnector.error, this,
                 &UserStatusSelectorModel.on_signal_error);
-            disconnect (this.user_status_connector.get (), &UserStatusConnector.user_status_set, this,
+            disconnect (this.user_status_connector.get (), UserStatusConnector.user_status_set, this,
                 &UserStatusSelectorModel.on_signal_user_status_set);
-            disconnect (this.user_status_connector.get (), &UserStatusConnector.message_cleared, this,
+            disconnect (this.user_status_connector.get (), UserStatusConnector.message_cleared, this,
                 &UserStatusSelectorModel.on_signal_message_cleared);
         }
         this.user_status_connector = null;
@@ -411,7 +415,7 @@ class UserStatusSelectorModel : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_error (UserStatusConnector.Error error) {
-        GLib.warning ("Error:" + error;
+        GLib.warning ("Error: " + error);
 
         switch (error) {
         case UserStatusConnector.Error.CouldNotFetchPredefinedUserStatuses:

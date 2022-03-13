@@ -78,11 +78,11 @@ class OwncloudSetupPage : QWizardPage {
         set_up_customization ();
 
         on_signal_url_changed (QLatin1String ("")); // don't jitter UI
-        connect (this.ui.le_url, &QLineEdit.text_changed, this, &OwncloudSetupPage.on_signal_url_changed);
-        connect (this.ui.le_url, &QLineEdit.editing_finished, this, &OwncloudSetupPage.on_signal_url_edit_finished);
+        connect (this.ui.le_url, QLineEdit.text_changed, this, OwncloudSetupPage.on_signal_url_changed);
+        connect (this.ui.le_url, QLineEdit.editing_finished, this, OwncloudSetupPage.on_signal_url_edit_finished);
 
         add_cert_dial = new AddCertificateDialog (this);
-        connect (add_cert_dial, &Gtk.Dialog.accepted, this, &OwncloudSetupPage.on_signal_certificate_accepted);
+        connect (add_cert_dial, Gtk.Dialog.accepted, this, OwncloudSetupPage.on_signal_certificate_accepted);
     }
 
 
@@ -137,7 +137,7 @@ class OwncloudSetupPage : QWizardPage {
         if (!this.auth_type_known) {
             on_signal_url_edit_finished ();
             string u = url ();
-            GLib.Uri qurl (u);
+            GLib.Uri qurl = new GLib.Uri (u);
             if (!qurl.is_valid () || qurl.host ().is_empty ()) {
                 on_signal_error_string (_("Server address does not seem to be valid"), false);
                 return false;
@@ -229,7 +229,7 @@ class OwncloudSetupPage : QWizardPage {
             this.ui.error_label.visible (false);
         } else {
             if (retry_http_only) {
-                GLib.Uri url (this.ui.le_url.full_text ());
+                GLib.Uri url = new GLib.Uri (this.ui.le_url.full_text ());
                 if (url.scheme () == "https") {
                     // Ask the user how to proceed when connecting to a https:// URL fails.
                     // It is possible that the server is secured with client-side TLS certificates,
@@ -290,14 +290,14 @@ class OwncloudSetupPage : QWizardPage {
     Called during the validation of the client certificate.
     ***********************************************************/
     public void on_signal_certificate_accepted () {
-        GLib.File cert_file (add_cert_dial.get_certificate_path ());
+        GLib.File cert_file = new GLib.File (add_cert_dial.get_certificate_path ());
         cert_file.open (GLib.File.ReadOnly);
         GLib.ByteArray cert_data = cert_file.read_all ();
         GLib.ByteArray cert_password = add_cert_dial.get_certificate_password ().to_local8Bit ();
 
-        QBuffer cert_data_buffer (&cert_data);
+        QBuffer cert_data_buffer = new QBuffer (cert_data);
         cert_data_buffer.open (QIODevice.ReadOnly);
-        if (QSslCertificate.import_pkcs12 (&cert_data_buffer,
+        if (QSslCertificate.import_pkcs12 (cert_data_buffer,
                 this.oc_wizard.client_ssl_key, this.oc_wizard.client_ssl_certificate,
                 this.oc_wizard.client_ssl_ca_certificates, cert_password)) {
             this.oc_wizard.client_cert_bundle = cert_data;

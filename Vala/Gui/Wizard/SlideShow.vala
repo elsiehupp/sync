@@ -132,23 +132,19 @@ class SlideShow : Gtk.Widget {
     ***********************************************************/
     public QSize size_hint () {
         QFontMetrics font_metrics = font_metrics ();
-        QSize label_size (0, font_metrics.height ());
-        for (string label : this.labels) {
-    //  #if (HASQT5_11)
+        QSize label_size = new QSize (0, font_metrics.height ());
+        foreach (string label in this.labels) {
             label_size.width (std.max (font_metrics.horizontal_advance (label), label_size.width ()));
-    //  #else
-    //          label_size.width (std.max (font_metrics.width (label), label_size.width ()));
-    //  #endif
         }
         QSize pixmap_size;
-        for (QPixmap pixmap : this.pixmaps) {
+        foreach (QPixmap pixmap in this.pixmaps) {
             pixmap_size.width (std.max (pixmap.width (), pixmap_size.width ()));
             pixmap_size.height (std.max (pixmap.height (), pixmap_size.height ()));
         }
-        return {
+        return new QSize (
             std.max (label_size.width (), pixmap_size.width ()),
             label_size.height () + SPACING + pixmap_size.height ()
-        }
+        );
     }
 
 
@@ -213,7 +209,7 @@ class SlideShow : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     protected void paint_event (QPaintEvent event) {
-        QPainter painter (this);
+        QPainter painter = new QPainter (this);
 
         if (this.animation) {
             int from = this.animation.start_value ().to_int ();
@@ -223,14 +219,14 @@ class SlideShow : Gtk.Widget {
             painter.save ();
             painter.opacity (1.0 - progress);
             painter.translate (progress * (this.reverse ? SLIDE_DISTANCE : -SLIDE_DISTANCE), 0);
-            draw_slide (&painter, from);
+            draw_slide (painter, from);
 
             painter.restore ();
             painter.opacity (progress);
             painter.translate ( (1.0 - progress) * (this.reverse ? -SLIDE_DISTANCE : SLIDE_DISTANCE), 0);
-            draw_slide (&painter, to);
+            draw_slide (painter, to);
         } else {
-            draw_slide (&painter, this.current_index);
+            draw_slide (painter, this.current_index);
         }
     }
 

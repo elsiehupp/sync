@@ -29,13 +29,28 @@ class FolderWizardSelectiveSync : QWizardPage {
 
         if (Theme.instance ().show_virtual_files_option () && best_available_vfs_mode () != Vfs.Off) {
             this.virtual_files_check_box = new QCheckBox (_("Use virtual files instead of downloading content immediately %1").arg (best_available_vfs_mode () == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
-            connect (this.virtual_files_check_box, &QCheckBox.clicked, this, &FolderWizardSelectiveSync.on_signal_virtual_files_checkbox_clicked);
-            connect (this.virtual_files_check_box, &QCheckBox.state_changed, this, [this] (int state) {
-                this.selective_sync.enabled (state == Qt.Unchecked);
-            });
+            connect (
+                this.virtual_files_check_box,
+                QCheckBox.clicked,
+                this,
+                FolderWizardSelectiveSync.on_signal_virtual_files_checkbox_clicked
+            );
+            connect (
+                this.virtual_files_check_box,
+                QCheckBox.state_changed,
+                this,
+                this.on_virtual_files_check_box_state_changed
+            );
             this.virtual_files_check_box.checked (best_available_vfs_mode () == Vfs.WindowsCfApi);
             layout.add_widget (this.virtual_files_check_box);
         }
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_virtual_files_check_box_state_changed (int state) {
+        this.selective_sync.enabled (state == Qt.Unchecked);
     }
 
 
@@ -70,7 +85,7 @@ class FolderWizardSelectiveSync : QWizardPage {
             alias = Theme.instance ().app_name ();
         string[] initial_blocklist;
         if (Theme.instance ().wizard_selective_sync_default_nothing ()) {
-            initial_blocklist = string[] ("/");
+            initial_blocklist = { "/" };
         }
         this.selective_sync.folder_info (target_path, alias, initial_blocklist);
 
@@ -115,10 +130,19 @@ class FolderWizardSelectiveSync : QWizardPage {
         // The click has already had an effect on the box, so if it's
         // checked it was newly activated.
         if (this.virtual_files_check_box.is_checked ()) {
-            OwncloudWizard.ask_experimental_virtual_files_feature (this, [this] (bool enable) {
-                if (!enable)
-                    this.virtual_files_check_box.checked (false);
-            });
+            OwncloudWizard.ask_experimental_virtual_files_feature (
+                this,
+                this.on_experimental_virtual_files_feature_enabled
+            );
+        }
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_experimental_virtual_files_feature_enabled (bool enable) {
+        if (!enable) {
+            this.virtual_files_check_box.checked (false);
         }
     }
 

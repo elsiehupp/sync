@@ -148,19 +148,38 @@ class AccountState : GLib.Object, QSharedData {
         this.are_desktop_notifications_allowed = true;
         q_register_meta_type<AccountState> ("AccountState*");
 
-        connect (account.data (), &Account.invalid_credentials,
-            this, &AccountState.on_signal_handle_remote_wipe_check);
-        connect (account.data (), &Account.credentials_fetched,
-            this, &AccountState.on_signal_credentials_fetched);
-        connect (account.data (), &Account.credentials_asked,
-            this, &AccountState.on_signal_credentials_asked);
+        connect (
+            account.data (),
+            Account.invalid_credentials,
+            this,
+            AccountState.on_signal_handle_remote_wipe_check
+        );
+        connect (
+            account.data (),
+            Account.credentials_fetched,
+            this,
+            AccountState.on_signal_credentials_fetched
+        );
+        connect (
+            account.data (),
+            Account.credentials_asked,
+            this,
+            AccountState.on_signal_credentials_asked
+        );
+        connect (
+            this,
+            AccountState.is_connected_changed,
+            this.is_connected_changed
+        );
+    }
 
-        connect (this, &AccountState.is_connected_changed, [=]{
-            // Get the Apps available on the server if we're now connected.
-            if (is_connected ()) {
-                fetch_navigation_apps ();
-            }
-        });
+
+    private void is_connected_changed () {
+        // Get the Apps available on the server if we're now connected.
+        if (is_connected ()) {
+            fetch_navigation_apps ();
+        }
+
     }
 
 
@@ -253,16 +272,13 @@ class AccountState : GLib.Object, QSharedData {
     /***********************************************************
     ***********************************************************/
     public AccountApp find_app (string app_id) {
-        if (!app_id.is_empty ()) {
-            const var apps = app_list ();
-            const var it = std.find_if (apps.cbegin (), apps.cend (), [app_id] (var app) {
-                return app.identifier () == app_id;
-            });
-            if (it != apps.cend ()) {
-                return it;
+        if (!app_id != "") {
+            foreach (var app in app_list ()) {
+                if (app.identifier () == app_id) {
+                    return app;
+                }
             }
         }
-
         return null;
     }
 
@@ -378,8 +394,8 @@ class AccountState : GLib.Object, QSharedData {
         if (is_signed_out () || this.waiting_for_new_credentials)
             return;
 
-        GLib.info ("Invalid credentials for" + this.account.url ().to_string ()
-                               + "asking user";
+        GLib.info ("Invalid credentials for " + this.account.url ().to_string ()
+                               + " asking user.");
 
         this.waiting_for_new_credentials = true;
         state (State.ASKING_CREDENTIALS);
@@ -387,9 +403,9 @@ class AccountState : GLib.Object, QSharedData {
         if (account ().credentials ().ready ()) {
             account ().credentials ().invalidate_token ();
         }
-        if (var creds = qobject_cast<HttpCredentials> (account ().credentials ())) {
-            if (creds.refresh_access_token ())
-                return;
+        var creds = qobject_cast<HttpCredentials> (account ().credentials ());
+        if (creds && creds.refresh_access_token ()) {
+            return;
         }
         account ().credentials ().ask_from_user ();
     }
@@ -429,7 +445,7 @@ class AccountState : GLib.Object, QSharedData {
         }
 
         if (this.connection_validator) {
-            GLib.warning ("ConnectionValidator already running, ignoring" + account ().display_name ();
+            GLib.warning ("ConnectionValidator already running, ignoring " + account ().display_name ());
             return;
         }
 
@@ -447,18 +463,22 @@ class AccountState : GLib.Object, QSharedData {
         const var elapsed = this.time_of_last_e_tag_check.secs_to (GLib.DateTime.current_date_time_utc ());
         if (is_connected () && this.time_of_last_e_tag_check.is_valid ()
             && elapsed <= polltime.count ()) {
-            GLib.debug () + account ().display_name ("The last ETag check succeeded within the last " + polltime.count ("s (" + elapsed + "s). No connection check needed!";
+            GLib.debug (account ().display_name () + "The last ETag check succeeded within the last " + polltime.count () + "s (" + elapsed + "s). No connection check needed!");
             return;
         }
 
-        var con_validator = new ConnectionValidator (AccountStatePtr (this));
-        this.connection_validator = con_validator;
-        connect (con_validator, &ConnectionValidator.signal_connection_result,
-            this, &AccountState.on_signal_connection_validator_result);
+        this.connection_validator = new ConnectionValidator (AccountStatePtr (this));
+        connect (
+            this.connection_validator,
+            ConnectionValidator.signal_connection_result,
+            this,
+            AccountState.on_signal_connection_validator_result
+        );
+
         if (is_connected ()) {
             // Use a small authed propfind as a minimal ping when we're
             // already connected.
-            con_validator.on_signal_check_authentication ();
+            this.connection_validator.on_signal_check_authentication ();
         } else {
             // Check the server and then the auth.
 
@@ -475,7 +495,7 @@ class AccountState : GLib.Object, QSharedData {
             // ssl config that does not have a sensible certificate chain.
             account ().ssl_configuration (QSslConfiguration ());
             //#endif
-            con_validator.on_signal_check_server_and_auth ();
+            this.connection_validator.on_signal_check_server_and_auth ();
         }
     }
 
@@ -485,7 +505,7 @@ class AccountState : GLib.Object, QSharedData {
     private void state (State state) {
         if (this.state != state) {
             GLib.info ("AccountState state change: "
-                                   + state_string (this.state) + "." + state_string (state);
+                      + state_string (this.state) + "." + state_string (state));
             State old_state = this.state;
             this.state = state;
 
@@ -518,9 +538,9 @@ class AccountState : GLib.Object, QSharedData {
     private void fetch_navigation_apps () {
         var job = new OcsNavigationAppsJob (this.account);
         job.add_raw_header ("If-None-Match", navigation_apps_etag_response_header ());
-        connect (job, &OcsNavigationAppsJob.signal_apps_job_finished, this, &AccountState.on_signal_navigation_apps_fetched);
-        connect (job, &OcsNavigationAppsJob.etag_response_header_received, this, &AccountState.on_signal_etag_response_header_received);
-        connect (job, &OcsNavigationAppsJob.ocs_error, this, &AccountState.on_signal_ocs_error);
+        connect (job, OcsNavigationAppsJob.signal_apps_job_finished, this, AccountState.on_signal_navigation_apps_fetched);
+        connect (job, OcsNavigationAppsJob.etag_response_header_received, this, AccountState.on_signal_etag_response_header_received);
+        connect (job, OcsNavigationAppsJob.ocs_error, this, AccountState.on_signal_ocs_error);
         job.get_navigation_apps ();
     }
 
@@ -529,7 +549,7 @@ class AccountState : GLib.Object, QSharedData {
     ***********************************************************/
     protected void on_signal_connection_validator_result (ConnectionValidator.Status status, string[] errors) {
         if (is_signed_out ()) {
-            GLib.warning ("Signed out, ignoring" + status + this.account.url ().to_string ();
+            GLib.warning ("Signed out, ignoring " + status + this.account.url ().to_string ());
             return;
         }
 
@@ -538,22 +558,22 @@ class AccountState : GLib.Object, QSharedData {
             && (this.connection_status == ConnectionValidator.State.SERVICE_UNAVAILABLE
                 || this.connection_status == ConnectionValidator.State.MAINTENANCE_MODE)) {
             if (!this.time_since_maintenance_over.is_valid ()) {
-                GLib.info ("AccountState reconnection : delaying for"
-                                       + this.maintenance_to_connected_delay + "ms";
+                GLib.info ("AccountState reconnection: delaying for "
+                    + this.maintenance_to_connected_delay + "ms.");
                 this.time_since_maintenance_over.on_signal_start ();
-                QTimer.single_shot (this.maintenance_to_connected_delay + 100, this, &AccountState.on_signal_check_connectivity);
+                QTimer.single_shot (this.maintenance_to_connected_delay + 100, this, AccountState.on_signal_check_connectivity);
                 return;
             } else if (this.time_since_maintenance_over.elapsed () < this.maintenance_to_connected_delay) {
-                GLib.info ("AccountState reconnection : only"
-                                       + this.time_since_maintenance_over.elapsed ("ms have passed";
+                GLib.info ("AccountState reconnection: only"
+                    + this.time_since_maintenance_over.elapsed () + "ms have passed.");
                 return;
             }
         }
 
         if (this.connection_status != status) {
             GLib.info ("AccountState connection status change: "
-                                   + this.connection_status + "."
-                                   + status;
+                      + this.connection_status + "."
+                      + status);
             this.connection_status = status;
         }
         this.connection_errors = errors;
@@ -613,8 +633,8 @@ class AccountState : GLib.Object, QSharedData {
         // make sure it changes account state and icons
         sign_out_by_ui ();
 
-        GLib.info ("Invalid credentials for" + this.account.url ().to_string ()
-                               + "checking for remote wipe request";
+        GLib.info ("Invalid credentials for " + this.account.url ().to_string ()
+                               + "; checking for remote wipe request.");
 
         this.waiting_for_new_credentials = false;
         state (State.SIGNED_OUT);
@@ -627,8 +647,8 @@ class AccountState : GLib.Object, QSharedData {
         // Make a connection attempt, no matter whether the credentials are
         // ready or not - we want to check whether we can get an SSL connection
         // going before bothering the user for a password.
-        GLib.info ("Fetched credentials for" + this.account.url ().to_string ()
-                               + "attempting to connect";
+        GLib.info ("Fetched credentials for " + this.account.url ().to_string ()
+                  + "; attempting to connect.");
         this.waiting_for_new_credentials = false;
         on_signal_check_connectivity ();
     }
@@ -637,8 +657,8 @@ class AccountState : GLib.Object, QSharedData {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_credentials_asked (AbstractCredentials credentials) {
-        GLib.info ("Credentials asked for" + this.account.url ().to_string ()
-                               + "are they ready?" + credentials.ready ();
+        GLib.info ("Credentials asked for " + this.account.url ().to_string ()
+                  + "; are they ready? " + credentials.ready ());
 
         this.waiting_for_new_credentials = false;
 
@@ -664,7 +684,7 @@ class AccountState : GLib.Object, QSharedData {
     protected void on_signal_navigation_apps_fetched (QJsonDocument reply, int status_code) {
         if (this.account) {
             if (status_code == 304) {
-                GLib.warning ("Status code " + status_code + " Not Modified - No new navigation apps.";
+                GLib.warning ("Status code " + status_code + " Not Modified - No new navigation apps.");
             } else {
                 this.apps.clear ();
 
@@ -673,7 +693,7 @@ class AccountState : GLib.Object, QSharedData {
                     const var nav_links = element.to_array ();
 
                     if (nav_links.size () > 0) {
-                        for (QJsonValue value : nav_links) {
+                        foreach (QJsonValue value in nav_links) {
                             var nav_link = value.to_object ();
 
                             var app = new AccountApp (nav_link.value ("name").to_string (), GLib.Uri (nav_link.value ("href").to_string ()),
@@ -694,7 +714,7 @@ class AccountState : GLib.Object, QSharedData {
     ***********************************************************/
     protected void on_signal_etag_response_header_received (GLib.ByteArray value, int status_code) {
         if (status_code == 200) {
-            GLib.debug ("New navigation apps ETag Response Header received " + value;
+            GLib.debug ("New navigation apps ETag Response Header received " + value);
             navigation_apps_etag_response_header (value);
         }
     }
@@ -703,7 +723,7 @@ class AccountState : GLib.Object, QSharedData {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_ocs_error (int status_code, string message) {
-        GLib.debug ("Error " + status_code + " while fetching new navigation apps: " + message;
+        GLib.debug ("Error " + status_code + " while fetching new navigation apps: " + message);
     }
 
 } // class AccountState

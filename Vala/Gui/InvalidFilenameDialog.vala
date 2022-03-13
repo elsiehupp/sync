@@ -65,10 +65,10 @@ class InvalidFilenameDialog : Gtk.Dialog {
         this.ui.explanation_label.on_signal_text (_("The following characters are not allowed on the system : * \" | & ? , ; : \\ / ~ < >"));
         this.ui.filename_line_edit.on_signal_text (file_path_file_info.filename ());
 
-        connect (this.ui.button_box, &QDialogButtonBox.accepted, this, &Gtk.Dialog.accept);
-        connect (this.ui.button_box, &QDialogButtonBox.rejected, this, &Gtk.Dialog.reject);
+        connect (this.ui.button_box, QDialogButtonBox.accepted, this, Gtk.Dialog.accept);
+        connect (this.ui.button_box, QDialogButtonBox.rejected, this, Gtk.Dialog.reject);
 
-        connect (this.ui.filename_line_edit, &QLineEdit.text_changed, this,
+        connect (this.ui.filename_line_edit, QLineEdit.text_changed, this,
             &InvalidFilenameDialog.on_signal_filename_line_edit_text_changed);
 
         check_if_allowed_to_rename ();
@@ -80,8 +80,8 @@ class InvalidFilenameDialog : Gtk.Dialog {
     public void override on_signal_accept () {
         this.new_filename = this.relative_file_path + this.ui.filename_line_edit.text ().trimmed ();
         const var propfind_job = new PropfindJob (this.account, QDir.clean_path (this.folder.remote_path () + this.new_filename));
-        connect (propfind_job, &PropfindJob.result, this, &InvalidFilenameDialog.on_signal_remote_file_already_exists);
-        connect (propfind_job, &PropfindJob.finished_with_error, this, &InvalidFilenameDialog.on_signal_remote_file_does_not_exist);
+        connect (propfind_job, PropfindJob.result, this, InvalidFilenameDialog.on_signal_remote_file_already_exists);
+        connect (propfind_job, PropfindJob.finished_with_error, this, InvalidFilenameDialog.on_signal_remote_file_does_not_exist);
         propfind_job.on_signal_start ();
     }
 
@@ -140,7 +140,7 @@ class InvalidFilenameDialog : Gtk.Dialog {
         const var remote_source = QDir.clean_path (this.folder.remote_path () + this.original_filename);
         const var remote_destionation = QDir.clean_path (this.account.dav_url ().path () + this.folder.remote_path () + this.new_filename);
         const var move_job = new MoveJob (this.account, remote_source, remote_destionation, this);
-        connect (move_job, &MoveJob.finished_signal, this, &InvalidFilenameDialog.on_signal_move_job_finished);
+        connect (move_job, MoveJob.finished_signal, this, InvalidFilenameDialog.on_signal_move_job_finished);
         move_job.on_signal_start ();
     }
 
@@ -152,7 +152,7 @@ class InvalidFilenameDialog : Gtk.Dialog {
         propfind_job.properties ({
             "http://owncloud.org/ns:permissions"
         });
-        connect (propfind_job, &PropfindJob.result, this, &InvalidFilenameDialog.on_signal_propfind_permission_success);
+        connect (propfind_job, PropfindJob.result, this, InvalidFilenameDialog.on_signal_propfind_permission_success);
         propfind_job.on_signal_start ();
     }
 

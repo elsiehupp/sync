@@ -266,7 +266,7 @@ class User : GLib.Object {
             connect_push_notifications ();
             return true;
         } else {
-            connect (this.account.account ().data (), &Account.push_notifications_ready, this, &User.on_signal_push_notifications_ready, Qt.UniqueConnection);
+            connect (this.account.account ().data (), Account.push_notifications_ready, this, User.on_signal_push_notifications_ready, Qt.UniqueConnection);
             return false;
         }
     }
@@ -663,10 +663,10 @@ class User : GLib.Object {
                 GLib.Uri l (link);
                 job.link_and_verb (l, verb);
                 job.property ("activity_row", GLib.Variant.from_value (row));
-                connect (job, &AbstractNetworkJob.network_error,
-                    this, &User.on_signal_notify_network_error);
-                connect (job, &NotificationConfirmJob.signal_job_finished,
-                    this, &User.on_signal_notify_server_finished);
+                connect (job, AbstractNetworkJob.network_error,
+                    this, User.on_signal_notify_network_error);
+                connect (job, NotificationConfirmJob.signal_job_finished,
+                    this, User.on_signal_notify_server_finished);
                 job.on_signal_start ();
 
                 // count the number of running notification requests. If this member var
@@ -716,8 +716,8 @@ class User : GLib.Object {
     public void on_signal_refresh_notifications () {
         if (this.notification_requests_running == 0) {
             var snh = new ServerNotificationHandler (this.account.data ());
-            connect (snh, &ServerNotificationHandler.signal_new_notification_list,
-                this, &User.on_signal_build_notification_display);
+            connect (snh, ServerNotificationHandler.signal_new_notification_list,
+                this, User.on_signal_build_notification_display);
 
             snh.on_signal_fetch_notifications ();
         } else {
@@ -820,10 +820,10 @@ class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_disconnect_push_notifications () {
-        disconnect (this.account.account ().push_notifications (), &PushNotifications.notifications_changed, this, &User.on_signal_received_push_notification);
-        disconnect (this.account.account ().push_notifications (), &PushNotifications.activities_changed, this, &User.on_signal_received_push_activity);
+        disconnect (this.account.account ().push_notifications (), PushNotifications.notifications_changed, this, User.on_signal_received_push_notification);
+        disconnect (this.account.account ().push_notifications (), PushNotifications.activities_changed, this, User.on_signal_received_push_activity);
 
-        disconnect (this.account.account ().data (), &Account.push_notifications_disabled, this, &User.on_signal_disconnect_push_notifications);
+        disconnect (this.account.account ().data (), Account.push_notifications_disabled, this, User.on_signal_disconnect_push_notifications);
 
         // connection to Web_socket may have dropped or an error occured, so we need to bring back the polling until we have re-established the connection
         on_signal_notification_refresh_interval (ConfigFile ().notification_refresh_interval ());

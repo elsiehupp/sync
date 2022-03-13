@@ -125,15 +125,35 @@ class CloudProviderWrapper : GLib.Object {
         action_group = get_action_group ();
         cloud_providers_account_exporter_action_group (this.cloud_provider_account, action_group);
 
-        connect (ProgressDispatcher.instance (), SIGNAL (progress_info (string, ProgressInfo)), this, SLOT (on_signal_update_progress (string, ProgressInfo)));
-        connect (this.folder, SIGNAL (signal_sync_started ()), this, SLOT (on_signal_sync_started ()));
-        connect (this.folder, SIGNAL (signal_sync_finished (SyncResult)), this, SLOT (on_signal_sync_finished (SyncResult)));
-        connect (this.folder, SIGNAL (signal_sync_paused_changed (Folder*,bool)), this, SLOT (on_signal_sync_paused_changed (Folder*, bool)));
+        connect (
+            ProgressDispatcher.instance (),
+            signal_progress_info (string, ProgressInfo),
+            this,
+            on_signal_update_progress (string, ProgressInfo)
+        );
+        connect (
+            this.folder,
+            signal_sync_started (),
+            this,
+            on_signal_sync_started ()
+        );
+        connect (
+            this.folder,
+            signal_sync_finished (SyncResult),
+            this,
+            on_signal_sync_finished (SyncResult)
+        );
+        connect (
+            this.folder,
+            signal_sync_paused_changed (Folder, bool),
+            this,
+            on_signal_sync_paused_changed (Folder, bool)
+        );
 
         this.paused = this.folder.sync_paused ();
         update_pause_status ();
-        g_clear_object (&model);
-        g_clear_object (&action_group);
+        g_clear_object (model);
+        g_clear_object (action_group);
     }
 
 
@@ -172,44 +192,44 @@ class CloudProviderWrapper : GLib.Object {
         section = g_menu_new ();
         item = menu_item_new (_("Open website"), "cloudprovider.openwebsite");
         g_menu_append_item (section, item);
-        g_clear_object (&item);
+        g_clear_object (item);
         g_menu_append_section (this.main_menu, null, G_MENU_MODEL (section));
-        g_clear_object (&section);
+        g_clear_object (section);
 
         this.recent_menu = g_menu_new ();
         item = menu_item_new (_("No recently changed files"), null);
         g_menu_append_item (this.recent_menu, item);
-        g_clear_object (&item);
+        g_clear_object (item);
 
         section = g_menu_new ();
         item = menu_item_new_submenu (_("Recently changed"), G_MENU_MODEL (this.recent_menu));
         g_menu_append_item (section, item);
-        g_clear_object (&item);
+        g_clear_object (item);
         g_menu_append_section (this.main_menu, null, G_MENU_MODEL (section));
-        g_clear_object (&section);
+        g_clear_object (section);
 
         section = g_menu_new ();
         item = menu_item_new (_("Pause synchronization"), "cloudprovider.pause");
         g_menu_append_item (section, item);
-        g_clear_object (&item);
+        g_clear_object (item);
         g_menu_append_section (this.main_menu, null, G_MENU_MODEL (section));
-        g_clear_object (&section);
+        g_clear_object (section);
 
         section = g_menu_new ();
         item = menu_item_new (_("Help"), "cloudprovider.openhelp");
         g_menu_append_item (section, item);
-        g_clear_object (&item);
+        g_clear_object (item);
         item = menu_item_new (_("Settings"), "cloudprovider.opensettings");
         g_menu_append_item (section, item);
-        g_clear_object (&item);
+        g_clear_object (item);
         item = menu_item_new (_("Log out"), "cloudprovider.log_out");
         g_menu_append_item (section, item);
-        g_clear_object (&item);
+        g_clear_object (item);
         item = menu_item_new (_("Quit sync client"), "cloudprovider.quit");
         g_menu_append_item (section, item);
-        g_clear_object (&item);
+        g_clear_object (item);
         g_menu_append_section (this.main_menu, null, G_MENU_MODEL (section));
-        g_clear_object (&section);
+        g_clear_object (section);
 
         return G_MENU_MODEL (this.main_menu);
     }
@@ -218,7 +238,7 @@ class CloudProviderWrapper : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public GActionGroup get_action_group () {
-        g_clear_object (&action_group);
+        g_clear_object (action_group);
         action_group = g_simple_action_group_new ();
         g_action_map_add_action_entries (G_ACTION_MAP (action_group), actions, G_N_ELEMENTS (actions), this);
         bool state = this.folder.sync_paused ();
@@ -329,19 +349,18 @@ class CloudProviderWrapper : GLib.Object {
             GMenuItem* item;
             g_menu_remove_all (G_MENU (this.recent_menu));
             if (!this.recently_changed.is_empty ()) {
-                GLib.List<QPair<string, string>>.iterator i;
-                for (i = this.recently_changed.begin (); i != this.recently_changed.end (); i++) {
-                    string label = i.first;
-                    string full_path = i.second;
-                    item = menu_item_new (label, "cloudprovider.showfile");
-                    g_menu_item_action_and_target_value (item, "cloudprovider.showfile", g_variant_new_string (full_path.to_utf8 ().data ()));
-                    g_menu_append_item (this.recent_menu, item);
-                    g_clear_object (&item);
+                foreach (var item in this.recently_changed) {
+                    string label = item.first;
+                    string full_path = item.second;
+                    menu_item = menu_item_new (label, "cloudprovider.showfile");
+                    g_menu_item_action_and_target_value (menu_item, "cloudprovider.showfile", g_variant_new_string (full_path.to_utf8 ().data ()));
+                    g_menu_append_item (this.recent_menu, menu_item);
+                    g_clear_object (menu_item);
                 }
             } else {
-                item = menu_item_new (_("No recently changed files"), null);
-                g_menu_append_item (this.recent_menu, item);
-                g_clear_object (&item);
+                menu_item = menu_item_new (_("No recently changed files"), null);
+                g_menu_append_item (this.recent_menu, menu_item);
+                g_clear_object (menu_item);
             }
         }
     }
@@ -360,12 +379,15 @@ class CloudProviderWrapper : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static void activate_action_pause (GSimpleAction action,
-                        GVariant      *parameter,
-                        gpointer       user_data) {
+    private static void activate_action_pause (
+        GSimpleAction action,
+        GVariant parameter,
+        Gpointer user_data
+    ) {
         //  Q_UNUSED (parameter);
-        var self = static_cast<CloudProviderWrapper> (user_data);
-        GVariant old_state, *new_state;
+        var self = (CloudProviderWrapper) user_data;
+        GVariant old_state;
+        GVariant new_state;
 
         old_state = g_action_get_state (G_ACTION (action));
         new_state = g_variant_new_boolean (! (bool)g_variant_get_boolean (old_state));

@@ -44,8 +44,8 @@ class AuthenticationDialog : Gtk.Dialog {
         this.password.echo_mode (QLineEdit.Password);
 
         var box = new QDialogButtonBox (QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal);
-        connect (box, &QDialogButtonBox.accepted, this, &Gtk.Dialog.accept);
-        connect (box, &QDialogButtonBox.rejected, this, &Gtk.Dialog.reject);
+        connect (box, QDialogButtonBox.accepted, this, Gtk.Dialog.accept);
+        connect (box, QDialogButtonBox.rejected, this, Gtk.Dialog.reject);
         lay.add_widget (box);
     }
 

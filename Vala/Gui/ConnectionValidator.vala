@@ -205,8 +205,8 @@ class ConnectionValidator : GLib.Object {
         var job = new PropfindJob (this.account, "/", this);
         job.on_signal_timeout (TIMEOUT_TO_USE_MILLISECONDS);
         job.properties (GLib.List<GLib.ByteArray> ("getlastmodified"));
-        connect (job, &PropfindJob.result, this, &ConnectionValidator.on_signal_auth_success);
-        connect (job, &PropfindJob.finished_with_error, this, &ConnectionValidator.on_signal_auth_failed);
+        connect (job, PropfindJob.result, this, ConnectionValidator.on_signal_auth_success);
+        connect (job, PropfindJob.finished_with_error, this, ConnectionValidator.on_signal_auth_failed);
         job.on_signal_start ();
     }
 
@@ -220,9 +220,9 @@ class ConnectionValidator : GLib.Object {
         var check_job = new CheckServerJob (this.account, this);
         check_job.on_signal_timeout (TIMEOUT_TO_USE_MILLISECONDS);
         check_job.ignore_credential_failure (true);
-        connect (check_job, &CheckServerJob.instance_found, this, &ConnectionValidator.on_signal_status_found);
-        connect (check_job, &CheckServerJob.instance_not_found, this, &ConnectionValidator.on_signal_no_status_found);
-        connect (check_job, &CheckServerJob.timeout, this, &ConnectionValidator.on_signal_job_timeout);
+        connect (check_job, CheckServerJob.instance_found, this, ConnectionValidator.on_signal_status_found);
+        connect (check_job, CheckServerJob.instance_not_found, this, ConnectionValidator.on_signal_no_status_found);
+        connect (check_job, CheckServerJob.timeout, this, ConnectionValidator.on_signal_job_timeout);
         check_job.on_signal_start ();
     }
 
@@ -260,7 +260,7 @@ class ConnectionValidator : GLib.Object {
         }
 
         // now check the authentication
-        QTimer.single_shot (0, this, &ConnectionValidator.on_signal_check_authentication);
+        QTimer.single_shot (0, this, ConnectionValidator.on_signal_check_authentication);
     }
 
 
@@ -346,7 +346,7 @@ class ConnectionValidator : GLib.Object {
     ***********************************************************/
     protected void on_signal_capabilities_recieved (QJsonDocument json) {
         var capabilities = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("capabilities").to_object ();
-        GLib.info ("Server capabilities" + capabilities;
+        GLib.info ("Server capabilities: " + capabilities);
         this.account.capabilities (capabilities.to_variant_map ());
 
         // New servers also report the version in the capabilities
@@ -373,7 +373,7 @@ class ConnectionValidator : GLib.Object {
         }
 
     //  #ifndef TOKEN_AUTH_ONLY
-        connect (this.account.e2e (), &ClientSideEncryption.initialization_finished, this, &ConnectionValidator.on_signal_report_connected);
+        connect (this.account.e2e (), ClientSideEncryption.initialization_finished, this, ConnectionValidator.on_signal_report_connected);
         this.account.e2e ().initialize (this.account);
     //  #else
         report_result (Connected);
@@ -404,7 +404,7 @@ class ConnectionValidator : GLib.Object {
         // The main flow now needs the capabilities
         var job = new JsonApiJob (this.account, "ocs/v1.php/cloud/capabilities", this);
         job.on_signal_timeout (TIMEOUT_TO_USE_MILLISECONDS);
-        GLib.Object.connect (job, &JsonApiJob.json_received, this, &ConnectionValidator.on_signal_capabilities_recieved);
+        connect (job, JsonApiJob.json_received, this, ConnectionValidator.on_signal_capabilities_recieved);
         job.on_signal_start ();
     }
 
@@ -413,7 +413,7 @@ class ConnectionValidator : GLib.Object {
     ***********************************************************/
     private void fetch_user () {
         var user_info = new UserInfo (this.account_state.data (), true, true, this);
-        GLib.Object.connect (user_info, &UserInfo.fetched_last_info, this, &ConnectionValidator.on_signal_user_fetched);
+        connect (user_info, UserInfo.fetched_last_info, this, ConnectionValidator.on_signal_user_fetched);
         user_info.active (true);
     }
 
@@ -442,10 +442,14 @@ class ConnectionValidator : GLib.Object {
     //  #if QT_VERSION >= QT_VERSION_CHECK (5, 9, 0)
         // Record that the server supports HTTP/2
         // Actual decision if we should use HTTP/2 is done in AccessManager.create_request
-        if (var job = qobject_cast<AbstractNetworkJob> (sender ())) {
-            if (var reply = job.reply ()) {
+        var job = (AbstractNetworkJob) sender ();
+        if (job) {
+            if (job.reply ()) {
                 this.account.http2Supported (
-                    reply.attribute (Soup.Request.HTTP2WasUsedAttribute).to_bool ());
+                    job.reply ().attribute (
+                        Soup.Request.HTTP2WasUsedAttribute
+                    ).to_bool ()
+                );
             }
         }
     }

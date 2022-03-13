@@ -209,8 +209,8 @@ unowned Sharee Share.get_share_with () {
 
 void Share.password (string password) {
     var * const job = new OcsShareJob (this.account);
-    connect (job, &OcsShareJob.share_job_finished, this, &Share.on_signal_password_set);
-    connect (job, &OcsJob.ocs_error, this, &Share.on_signal_password_error);
+    connect (job, OcsShareJob.share_job_finished, this, Share.on_signal_password_set);
+    connect (job, OcsJob.ocs_error, this, Share.on_signal_password_error);
     job.password (get_id (), password);
 }
 
@@ -220,8 +220,8 @@ bool Share.is_password_set () {
 
 void Share.permissions (Permissions permissions) {
     var job = new OcsShareJob (this.account);
-    connect (job, &OcsShareJob.share_job_finished, this, &Share.on_signal_permissions_set);
-    connect (job, &OcsJob.ocs_error, this, &Share.on_signal_ocs_error);
+    connect (job, OcsShareJob.share_job_finished, this, Share.on_signal_permissions_set);
+    connect (job, OcsJob.ocs_error, this, Share.on_signal_ocs_error);
     job.permissions (get_id (), permissions);
 }
 
@@ -236,8 +236,8 @@ Share.Permissions Share.get_permissions () {
 
 void Share.delete_share () {
     var job = new OcsShareJob (this.account);
-    connect (job, &OcsShareJob.share_job_finished, this, &Share.on_signal_deleted);
-    connect (job, &OcsJob.ocs_error, this, &Share.on_signal_ocs_error);
+    connect (job, OcsShareJob.share_job_finished, this, Share.on_signal_deleted);
+    connect (job, OcsJob.ocs_error, this, Share.on_signal_ocs_error);
     job.delete_share (get_id ());
 }
 

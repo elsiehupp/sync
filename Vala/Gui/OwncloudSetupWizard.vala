@@ -189,9 +189,9 @@ class OwncloudSetupWizard : GLib.Object {
         // Step 1: Check url/status.php
         var job = new CheckServerJob (account, this);
         job.ignore_credential_failure (true);
-        connect (job, &CheckServerJob.instance_found, this, &OwncloudSetupWizard.on_signal_found_server);
-        connect (job, &CheckServerJob.instance_not_found, this, &OwncloudSetupWizard.on_signal_find_server_behind_redirect);
-        connect (job, &CheckServerJob.timeout, this, &OwncloudSetupWizard.on_signal_no_server_found_timeout);
+        connect (job, CheckServerJob.instance_found, this, OwncloudSetupWizard.on_signal_found_server);
+        connect (job, CheckServerJob.instance_not_found, this, OwncloudSetupWizard.on_signal_find_server_behind_redirect);
+        connect (job, CheckServerJob.timeout, this, OwncloudSetupWizard.on_signal_no_server_found_timeout);
         job.on_signal_timeout ( (account.url ().scheme () == "https") ? 30 * 1000 : 10 * 1000);
         job.on_signal_start ();
 
@@ -214,7 +214,7 @@ class OwncloudSetupWizard : GLib.Object {
         // Grab the chain of permanent redirects and adjust the account url
         // accordingly
         var permanent_redirects = std.make_shared<int> (0);
-        connect (redirect_check_job, &AbstractNetworkJob.redirected, this,
+        connect (redirect_check_job, AbstractNetworkJob.redirected, this,
             [permanent_redirects, account] (Soup.Reply reply, GLib.Uri target_url, int count) {
                 int http_code = reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
                 if (count == *permanent_redirects && (http_code == 301 || http_code == 308)) {
@@ -225,13 +225,13 @@ class OwncloudSetupWizard : GLib.Object {
             });
 
         // Step 3: When done, on_signal_start checking status.php.
-        connect (redirect_check_job, &SimpleNetworkJob.finished_signal, this,
+        connect (redirect_check_job, SimpleNetworkJob.finished_signal, this,
             [this, account] () {
                 var job = new CheckServerJob (account, this);
                 job.ignore_credential_failure (true);
-                connect (job, &CheckServerJob.instance_found, this, &OwncloudSetupWizard.on_signal_found_server);
-                connect (job, &CheckServerJob.instance_not_found, this, &OwncloudSetupWizard.on_signal_no_server_found);
-                connect (job, &CheckServerJob.timeout, this, &OwncloudSetupWizard.on_signal_no_server_found_timeout);
+                connect (job, CheckServerJob.instance_found, this, OwncloudSetupWizard.on_signal_found_server);
+                connect (job, CheckServerJob.instance_not_found, this, OwncloudSetupWizard.on_signal_no_server_found);
+                connect (job, CheckServerJob.timeout, this, OwncloudSetupWizard.on_signal_no_server_found_timeout);
                 job.on_signal_timeout ( (account.url ().scheme () == "https") ? 30 * 1000 : 10 * 1000);
                 job.on_signal_start ();
         });
@@ -303,8 +303,8 @@ class OwncloudSetupWizard : GLib.Object {
     ***********************************************************/
     private void on_signal_determine_auth_type () {
         var job = new DetermineAuthTypeJob (this.oc_wizard.account (), this);
-        connect (job, &DetermineAuthTypeJob.auth_type,
-            this.oc_wizard, &OwncloudWizard.on_signal_auth_type);
+        connect (job, DetermineAuthTypeJob.auth_type,
+            this.oc_wizard, OwncloudWizard.on_signal_auth_type);
         job.on_signal_start ();
     }
 
@@ -317,7 +317,7 @@ class OwncloudSetupWizard : GLib.Object {
         this.oc_wizard.account ().credentials (creds);
 
         const var fetch_user_name_job = new JsonApiJob (this.oc_wizard.account ().shared_from_this (), "/ocs/v1.php/cloud/user");
-        connect (fetch_user_name_job, &JsonApiJob.json_received, this, [this, url] (QJsonDocument json, int status_code) {
+        connect (fetch_user_name_job, JsonApiJob.json_received, this, [this, url] (QJsonDocument json, int status_code) {
             if (status_code != 100) {
                 GLib.warning ("Could not fetch username.";
             }
@@ -406,7 +406,7 @@ class OwncloudSetupWizard : GLib.Object {
             ***********************************************************/
 
             var job = new EntityExistsJob (this.oc_wizard.account (), new_url_path, this);
-            connect (job, &EntityExistsJob.exists, this, &OwncloudSetupWizard.on_signal_remote_folder_exists);
+            connect (job, EntityExistsJob.exists, this, OwncloudSetupWizard.on_signal_remote_folder_exists);
             job.on_signal_start ();
         } else {
             finalize_setup (false);
@@ -540,8 +540,8 @@ class OwncloudSetupWizard : GLib.Object {
     private void on_signal_skip_folder_configuration () {
         apply_account_changes ();
 
-        disconnect (this.oc_wizard, &OwncloudWizard.basic_setup_finished,
-            this, &OwncloudSetupWizard.on_signal_assistant_finished);
+        disconnect (this.oc_wizard, OwncloudWizard.basic_setup_finished,
+            this, OwncloudSetupWizard.on_signal_assistant_finished);
         this.oc_wizard.close ();
         /* emit */ signal_own_cloud_wizard_done (Gtk.Dialog.Accepted);
     }

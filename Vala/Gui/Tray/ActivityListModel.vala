@@ -452,7 +452,7 @@ class ActivityListModel : QAbstractListModel {
             this.current_conflict_dialog.on_signal_local_version_filename (conflicted_path);
             this.current_conflict_dialog.on_signal_remote_version_filename (base_path);
             this.current_conflict_dialog.attribute (Qt.WA_DeleteOnClose);
-            connect (this.current_conflict_dialog, &ConflictDialog.accepted, folder, [folder] () {
+            connect (this.current_conflict_dialog, ConflictDialog.accepted, folder, [folder] () {
                 folder.schedule_this_folder_soon ();
             });
             this.current_conflict_dialog.open ();
@@ -467,7 +467,7 @@ class ActivityListModel : QAbstractListModel {
             const var folder_dir = QDir (folder.path ());
             this.current_invalid_filename_dialog = new InvalidFilenameDialog (this.account_state.account (), folder,
                 folder_dir.file_path (activity.file));
-            connect (this.current_invalid_filename_dialog, &InvalidFilenameDialog.accepted, folder, [folder] () {
+            connect (this.current_invalid_filename_dialog, InvalidFilenameDialog.accepted, folder, [folder] () {
                 folder.schedule_this_folder_soon ();
             });
             this.current_invalid_filename_dialog.open ();
@@ -675,8 +675,8 @@ class ActivityListModel : QAbstractListModel {
             return;
         }
         var job = new JsonApiJob (this.account_state.account (), QLatin1String ("ocs/v2.php/apps/activity/api/v2/activity"), this);
-        GLib.Object.connect (job, &JsonApiJob.json_received,
-            this, &ActivityListModel.activities_received);
+        connect (job, JsonApiJob.json_received,
+            this, ActivityListModel.activities_received);
 
         QUrlQuery parameters;
         parameters.add_query_item (QLatin1String ("since"), string.number (this.current_item));

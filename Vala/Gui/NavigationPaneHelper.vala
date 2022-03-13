@@ -45,7 +45,7 @@ class NavigationPaneHelper : GLib.Object {
         this.show_in_explorer_navigation_pane = config.show_in_explorer_navigation_pane ();
 
         this.update_cloud_storage_registry_timer.single_shot (true);
-        connect (&this.update_cloud_storage_registry_timer, &QTimer.timeout, this, &NavigationPaneHelper.update_cloud_storage_registry);
+        connect (this.update_cloud_storage_registry_timer, QTimer.timeout, this, NavigationPaneHelper.update_cloud_storage_registry);
 
         // Ensure that the folder integration stays persistent in Explorer,
         // the uninstaller removes the folder upon updating the client.
@@ -88,8 +88,9 @@ class NavigationPaneHelper : GLib.Object {
 
                     string title = folder.short_gui_remote_path_or_app_name ();
                     // Write the account name in the sidebar only when using more than one account.
-                    if (AccountManager.instance ().accounts ().size () > 1)
+                    if (AccountManager.instance ().accounts ().size () > 1) {
                         title = title % " - " % folder.account_state ().account ().display_name ();
+                    }
                     string icon_path = QDir.to_native_separators (Gtk.Application.application_file_path ());
                     string target_folder_path = QDir.to_native_separators (folder.clean_path ());
 

@@ -26,7 +26,7 @@ class WebViewPageUrlSchemeHandler : QWebEngineUrlSchemeHandler {
         string user;
         string password;
 
-        for (string part : parts) {
+        foreach (string part in parts) {
             if (part.starts_with ("server:")) {
                 server = part.mid (7);
             } else if (part.starts_with ("user:")) {
@@ -36,7 +36,7 @@ class WebViewPageUrlSchemeHandler : QWebEngineUrlSchemeHandler {
             }
         }
 
-        GLib.debug ()) + "Got raw user from request path: " + user;
+        GLib.debug ("Got raw user from request path: " + user);
 
         user = user.replace (char ('+'), char (' '));
         password = password.replace (char ('+'), char (' '));
@@ -47,7 +47,7 @@ class WebViewPageUrlSchemeHandler : QWebEngineUrlSchemeHandler {
         if (!server.starts_with ("http://") && !server.starts_with ("https://")) {
             server = "https://" + server;
         }
-        GLib.info ()) + "Got user: " + user + ", server: " + server;
+        GLib.info ("Got user: " + user + ", server: " + server);
 
         /* emit */ url_catched (user, password, server);
     }

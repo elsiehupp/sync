@@ -63,12 +63,12 @@ class Updater : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static GLib.Uri update_url () {
-        GLib.Uri update_base_url (string.from_local8Bit (qgetenv ("OCC_UPDATE_URL")));
+        GLib.Uri update_base_url = GLib.Uri (qgetenv ("OCC_UPDATE_URL").to_string ());
         if (update_base_url.is_empty ()) {
             update_base_url = GLib.Uri (APPLICATION_UPDATE_URL);
         }
         if (!update_base_url.is_valid () || update_base_url.host () == ".") {
-            return GLib.Uri ();
+            return new GLib.Uri ();
         }
 
         var url_query = get_query_params ();
@@ -110,7 +110,7 @@ class Updater : GLib.Object {
         });
         process.wait_for_finished ();
         GLib.ByteArray output = process.read_all_standard_output ();
-        GLib.debug ("Sys Info size: " + output.length ();
+        GLib.debug ("Sys Info size: " + output.length ());
         if (output.length () > 1024)
             output.clear (); // don't send too much.
 
@@ -171,7 +171,7 @@ class Updater : GLib.Object {
         var url = update_url ();
         GLib.debug () + url;
         if (url.is_empty ()) {
-            GLib.warning ("Not a valid updater URL, will not do update check";
+            GLib.warning ("Not a valid updater URL; will not do update check.");
             return null;
         }
         // the best we can do is notify about updates

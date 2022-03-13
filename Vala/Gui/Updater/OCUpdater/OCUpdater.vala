@@ -9,7 +9,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QtGui>
 //  #include <Qt_widgets>
 //  #include <cstdio>
-//  #include <QTemporary_file>
+//  #include <QTemporaryFile>
 //  #include <QTimer>
 
 namespace Occ {
@@ -134,16 +134,19 @@ class OCUpdater : Updater {
             const var message_box_start_installer = new QMessageBox (QMessageBox.Information,
                 _("New %1 update ready").arg (Theme.instance ().app_name_gui ()),
                 _("A new update for %1 is about to be installed. The updater may ask "
-                   "for additional privileges during the process. Your computer may reboot to complete the installation.")
+                + "for additional privileges during the process. Your computer may reboot to complete the installation.")
                     .arg (Theme.instance ().app_name_gui ()),
                 QMessageBox.Ok,
                 null);
 
             message_box_start_installer.attribute (Qt.WA_DeleteOnClose);
 
-            connect (message_box_start_installer, &QMessageBox.on_signal_finished, this, [this] {
-                on_signal_start_installer ();
-            });
+            connect (
+                message_box_start_installer,
+                QMessageBox.on_signal_finished,
+                this,
+                this.on_signal_start_installer
+            );
             message_box_start_installer.open ();
         }
         return false;
@@ -154,9 +157,9 @@ class OCUpdater : Updater {
     ***********************************************************/
     public override void check_for_update () {
         Soup.Reply reply = this.access_manager.get (Soup.Request (this.update_url));
-        connect (this.timeout_watchdog, &QTimer.timeout, this, &OCUpdater.on_signal_timed_out);
+        connect (this.timeout_watchdog, QTimer.timeout, this, OCUpdater.on_signal_timed_out);
         this.timeout_watchdog.on_signal_start (30 * 1000);
-        connect (reply, &Soup.Reply.on_signal_finished, this, &OCUpdater.on_signal_version_info_arrived);
+        connect (reply, Soup.Reply.on_signal_finished, this, OCUpdater.on_signal_version_info_arrived);
 
         download_state (Checking_server);
     }
@@ -231,22 +234,22 @@ class OCUpdater : Updater {
         string update_file = settings.value (update_available_c).to_string ();
         settings.value (auto_update_attempted_c, true);
         settings.sync ();
-        GLib.info ("Running updater" + update_file;
+        GLib.info ("Running updater " + update_file);
 
         if (update_file.ends_with (".exe")) {
-            QProcess.start_detached (update_file, string[] ("/S"
-                                                              + "/launch");
+            QProcess.start_detached (
+                update_file,
+                {
+                    "/S",
+                    "/launch"
+                }
+            );
         } else if (update_file.ends_with (".msi")) {
             // When MSIs are installed without gui they cannot launch applications
             // as they lack the user context. That is why we need to run the client
             // manually here. We wrap the msiexec and client invocation in a powershell
             // script because owncloud.exe will be shut down for installation.
             // | Out-Null forces powershell to wait for msiexec to finish.
-            var prepare_path_for_powershell = [] (string path) {
-                path.replace ("'", "''");
-
-                return QDir.to_native_separators (path);
-            }
 
             string msi_log_file = config.config_path () + "msi.log";
             string command = string ("&{msiexec /promptrestart /passive /i '%1' /L*V '%2'| Out-Null ; &'%3'}")
@@ -254,9 +257,18 @@ class OCUpdater : Updater {
                  .arg (prepare_path_for_powershell (msi_log_file))
                  .arg (prepare_path_for_powershell (QCoreApplication.application_file_path ()));
 
-            QProcess.start_detached ("powershell.exe", string[]{"-Command", command});
+            QProcess.start_detached ("powershell.exe", {"-Command", command});
         }
         Gtk.Application.quit ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private static QDir prepare_path_for_powershell (string path) {
+        path.replace ("'", "''");
+
+        return QDir.to_native_separators (path);
     }
 
 
@@ -271,14 +283,14 @@ class OCUpdater : Updater {
         case Up_to_date:
         case Download_failed:
         case Download_timed_out:
-            GLib.info ("Checking for available update";
+            GLib.info ("Checking for available update.");
             check_for_update ();
             break;
         case Download_complete:
-            GLib.info ("Update is downloaded, skip new check.";
+            GLib.info ("Update is downloaded, skip new check.");
             break;
         case Update_only_available_through_system:
-            GLib.info ("Update is only available through system, skip check.";
+            GLib.info ("Update is only available through system, skip check.");
             break;
         }
     }
@@ -295,10 +307,10 @@ class OCUpdater : Updater {
     ***********************************************************/
     private void on_signal_version_info_arrived () {
         this.timeout_watchdog.stop ();
-        var reply = qobject_cast<Soup.Reply> (sender ());
+        var reply = (Soup.Reply) sender ();
         reply.delete_later ();
         if (reply.error () != Soup.Reply.NoError) {
-            GLib.warning ("Failed to reach version check url: " + reply.error_string ();
+            GLib.warning ("Failed to reach version check url: " + reply.error_string ());
             download_state (Download_timed_out);
             return;
         }
@@ -310,7 +322,7 @@ class OCUpdater : Updater {
         if (ok) {
             version_info_arrived (this.update_info);
         } else {
-            GLib.warning ("Could not parse update information.";
+            GLib.warning ("Could not parse update information.");
             download_state (Download_timed_out);
         }
     }

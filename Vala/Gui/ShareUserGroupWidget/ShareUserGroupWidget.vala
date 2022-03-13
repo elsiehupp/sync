@@ -110,8 +110,8 @@ class ShareUserGroupWidget : Gtk.Widget {
         this.completer_model = new ShareeModel (this.account,
             this.is_file ? QLatin1String ("file") : QLatin1String ("folder"),
             this.completer);
-        connect (this.completer_model, &ShareeModel.signal_sharees_ready, this, &ShareUserGroupWidget.on_signal_sharees_ready);
-        connect (this.completer_model, &ShareeModel.signal_display_error_message, this, &ShareUserGroupWidget.on_signal_display_error);
+        connect (this.completer_model, ShareeModel.signal_sharees_ready, this, ShareUserGroupWidget.on_signal_sharees_ready);
+        connect (this.completer_model, ShareeModel.signal_display_error_message, this, ShareUserGroupWidget.on_signal_display_error);
 
         this.completer.model (this.completer_model);
         this.completer.case_sensitivity (Qt.CaseInsensitive);
@@ -122,19 +122,19 @@ class ShareUserGroupWidget : Gtk.Widget {
         search_globally_action.icon (QIcon (":/client/theme/magnifying-glass.svg"));
         search_globally_action.tool_tip (_("Search globally"));
 
-        connect (search_globally_action, &QAction.triggered, this, [this] () {
+        connect (search_globally_action, QAction.triggered, this, [this] () {
             on_signal_search_for_sharees (ShareeModel.LookupMode.GLOBAL_SEARCH);
         });
 
         this.ui.sharee_line_edit.add_action (search_globally_action, QLineEdit.Leading_position);
 
         this.manager = new ShareManager (this.account, this);
-        connect (this.manager, &ShareManager.on_signal_shares_fetched, this, &ShareUserGroupWidget.on_signal_shares_fetched);
-        connect (this.manager, &ShareManager.share_created, this, &ShareUserGroupWidget.on_signal_share_created);
-        connect (this.manager, &ShareManager.on_signal_server_error, this, &ShareUserGroupWidget.on_signal_display_error);
-        connect (this.ui.sharee_line_edit, &QLineEdit.return_pressed, this, &ShareUserGroupWidget.on_signal_line_edit_return);
-        connect (this.ui.confirm_share, &QAbstractButton.clicked, this, &ShareUserGroupWidget.on_signal_line_edit_return);
-        // TODO connect (this.ui.private_link_text, &Gtk.Label.link_activated, this, &ShareUserGroupWidget.on_signal_private_link_share);
+        connect (this.manager, ShareManager.on_signal_shares_fetched, this, ShareUserGroupWidget.on_signal_shares_fetched);
+        connect (this.manager, ShareManager.share_created, this, ShareUserGroupWidget.on_signal_share_created);
+        connect (this.manager, ShareManager.on_signal_server_error, this, ShareUserGroupWidget.on_signal_display_error);
+        connect (this.ui.sharee_line_edit, QLineEdit.return_pressed, this, ShareUserGroupWidget.on_signal_line_edit_return);
+        connect (this.ui.confirm_share, QAbstractButton.clicked, this, ShareUserGroupWidget.on_signal_line_edit_return);
+        // TODO connect (this.ui.private_link_text, Gtk.Label.link_activated, this, ShareUserGroupWidget.on_signal_private_link_share);
 
         // By making the next two Queued_connections we can override
         // the strings the completer sets on the line edit.
@@ -144,10 +144,10 @@ class ShareUserGroupWidget : Gtk.Widget {
             Qt.QueuedConnection);
 
         // Queued connection so this signal is recieved after text_changed
-        connect (this.ui.sharee_line_edit, &QLineEdit.text_edited,
-            this, &ShareUserGroupWidget.on_signal_line_edit_text_edited, Qt.QueuedConnection);
+        connect (this.ui.sharee_line_edit, QLineEdit.text_edited,
+            this, ShareUserGroupWidget.on_signal_line_edit_text_edited, Qt.QueuedConnection);
         this.ui.sharee_line_edit.install_event_filter (this);
-        connect (&this.completion_timer, &QTimer.timeout, this, [this] () {
+        connect (this.completion_timer, QTimer.timeout, this, [this] () {
             on_signal_search_for_sharees (ShareeModel.LookupMode.LOCAL_SEARCH);
         });
         this.completion_timer.single_shot (true);
@@ -157,7 +157,7 @@ class ShareUserGroupWidget : Gtk.Widget {
 
         // TODO Progress Indicator where should it go?
         // Setup the sharee search progress indicator
-        //this.ui.sharee_horizontal_layout.add_widget (&this.pi_sharee);
+        //this.ui.sharee_horizontal_layout.add_widget (this.pi_sharee);
 
         this.parent_scroll_area = parent_widget ().find_child<QScroll_area> ("scroll_area");
 
@@ -231,12 +231,12 @@ class ShareUserGroupWidget : Gtk.Widget {
             //  Q_ASSERT (Share.is_share_type_user_group_email_room_or_remote (share.get_share_type ()));
             var user_group_share = q_shared_pointer_dynamic_cast<User_group_share> (share);
             var s = new ShareUserLine (this.account, user_group_share, this.max_sharing_permissions, this.is_file, this.parent_scroll_area);
-            connect (s, &ShareUserLine.resize_requested, this, &ShareUserGroupWidget.on_signal_adjust_scroll_widget_size);
-            connect (s, &ShareUserLine.visual_deletion_done, this, &ShareUserGroupWidget.on_signal_get_shares);
+            connect (s, ShareUserLine.resize_requested, this, ShareUserGroupWidget.on_signal_adjust_scroll_widget_size);
+            connect (s, ShareUserLine.visual_deletion_done, this, ShareUserGroupWidget.on_signal_get_shares);
             s.background_role (layout.count () % 2 == 0 ? QPalette.Base : QPalette.Alternate_base);
 
             // Connect signal_style_changed events to our widget, so it can adapt (Dark-/Light-Mode switching)
-            connect (this, &ShareUserGroupWidget.signal_style_changed, s, &ShareUserLine.on_signal_style_changed);
+            connect (this, ShareUserGroupWidget.signal_style_changed, s, ShareUserLine.on_signal_style_changed);
 
             layout.add_widget (s);
 

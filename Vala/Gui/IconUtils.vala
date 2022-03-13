@@ -158,15 +158,15 @@ class IconUtils {
 
         // render source image
         Gtk.Image svg_image = new Gtk.Image (req_size, Gtk.Image.FormatARGB32); {
-            QPainter svg_image_painter (&svg_image);
+            QPainter svg_image_painter (svg_image);
             svg_image.fill (Qt.GlobalColor.transparent);
-            svg_renderer.render (&svg_image_painter);
+            svg_renderer.render (svg_image_painter);
         }
 
         // draw target image with custom fill_color
         Gtk.Image image = new Gtk.Image (req_size, Gtk.Image.FormatARGB32);
         image.fill (Gtk.Color (fill_color)); {
-            QPainter image_painter (&image);
+            QPainter image_painter (image);
             image_painter.composition_mode (QPainter.Composition_mode_Destination_in);
             image_painter.draw_image (0, 0, svg_image);
         }

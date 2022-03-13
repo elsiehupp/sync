@@ -118,10 +118,10 @@ class SocketApi : GLib.Object {
             GLib.info ("server started, listening at " + socket_path;
         }
 
-        connect (&this.local_server, &SocketApiServer.new_connection, this, &SocketApi.on_signal_new_connection);
+        connect (this.local_server, SocketApiServer.new_connection, this, SocketApi.on_signal_new_connection);
 
         // folder watcher
-        connect (FolderMan.instance (), &FolderMan.signal_folder_sync_state_change, this, &SocketApi.on_signal_update_folder_view);
+        connect (FolderMan.instance (), FolderMan.signal_folder_sync_state_change, this, SocketApi.on_signal_update_folder_view);
     }
 
 
@@ -244,9 +244,9 @@ class SocketApi : GLib.Object {
             return;
         }
         GLib.info ("New connection " + socket);
-        connect (socket, &QIODevice.ready_read, this, &SocketApi.on_signal_read_socket);
+        connect (socket, QIODevice.ready_read, this, SocketApi.on_signal_read_socket);
         connect (socket, SIGNAL (disconnected ()), this, SLOT (on_signal_lost_connection ()));
-        connect (socket, &GLib.Object.destroyed, this, &SocketApi.on_signal_socket_destroyed);
+        connect (socket, GLib.Object.destroyed, this, SocketApi.on_signal_socket_destroyed);
         //  ASSERT (socket.read_all ().is_empty ());
 
         var listener = unowned SocketListener.create (socket);
@@ -333,7 +333,7 @@ class SocketApi : GLib.Object {
                 var job_id = arguments[0];
 
                 var socket_api_job = unowned SocketApiJob (
-                    new SocketApiJob (job_id.to_string (), listener, json), &GLib.Object.delete_later);
+                    new SocketApiJob (job_id.to_string (), listener, json), GLib.Object.delete_later);
                 if (index_of_method != -1) {
                     static_meta_object.method (index_of_method)
                         .invoke (this, Qt.QueuedConnection,
@@ -428,7 +428,7 @@ class SocketApi : GLib.Object {
             + "http://owncloud.org/ns:fileid" // numeric file identifier for fallback private link generation
             + "http://owncloud.org/ns:privatelink");
         job.on_signal_timeout (10 * 1000);
-        GLib.Object.connect (job, &PropfindJob.result, target, [=] (QVariantMap result) {
+        connect (job, PropfindJob.result, target, [=] (QVariantMap result) {
             var private_link_url = result["privatelink"].to_string ();
             var numeric_file_id = result["fileid"].to_byte_array ();
             if (!private_link_url.is_empty ()) {
@@ -439,7 +439,7 @@ class SocketApi : GLib.Object {
                 target_function (old_url);
             }
         });
-        GLib.Object.connect (job, &PropfindJob.finished_with_error, target, [=] (Soup.Reply *) {
+        connect (job, PropfindJob.finished_with_error, target, [=] (Soup.Reply *) {
             target_function (old_url);
         });
         job.on_signal_start ();
@@ -682,11 +682,11 @@ class SocketApi : GLib.Object {
 
         AccountPointer account = file_data.folder.account_state ().account ();
         var job = new GetOrCreatePublicLinkShare (account, file_data.server_relative_path, this);
-        connect (job, &GetOrCreatePublicLinkShare.done, this,
+        connect (job, GetOrCreatePublicLinkShare.done, this,
             [] (string url) {
                 copy_url_to_clipboard (url);
             });
-        connect (job, &GetOrCreatePublicLinkShare.error, this,
+        connect (job, GetOrCreatePublicLinkShare.error, this,
             [=] () {
                 /* emit */ signal_share_command_received (file_data.server_relative_path, file_data.local_path, ShareDialogStartPage.PUBLIC_LINKS);
             });
@@ -698,7 +698,7 @@ class SocketApi : GLib.Object {
     Context menu action
     ***********************************************************/
     private void command_COPY_PRIVATE_LINK (string local_file, SocketListener listener) {
-        fetch_private_link_url_helper (local_file, &SocketApi.copy_url_to_clipboard);
+        fetch_private_link_url_helper (local_file, SocketApi.copy_url_to_clipboard);
     }
 
 
@@ -706,7 +706,7 @@ class SocketApi : GLib.Object {
     Context menu action
     ***********************************************************/
     private void command_EMAIL_PRIVATE_LINK (string local_file, SocketListener listener) {
-        fetch_private_link_url_helper (local_file, &SocketApi.email_private_link);
+        fetch_private_link_url_helper (local_file, SocketApi.email_private_link);
     }
 
 
@@ -714,7 +714,7 @@ class SocketApi : GLib.Object {
     Context menu action
     ***********************************************************/
     private void command_OPEN_PRIVATE_LINK (string local_file, SocketListener listener) {
-        fetch_private_link_url_helper (local_file, &SocketApi.open_private_link);
+        fetch_private_link_url_helper (local_file, SocketApi.open_private_link);
     }
 
 
@@ -1177,7 +1177,7 @@ class SocketApi : GLib.Object {
         job.add_query_params (parameters);
         job.verb (JsonApiJob.Verb.POST);
 
-        GLib.Object.connect (job, &JsonApiJob.json_received, [] (QJsonDocument json) {
+        connect (job, JsonApiJob.json_received, [] (QJsonDocument json) {
             var data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
             var url = GLib.Uri (data.value ("url").to_string ());
 

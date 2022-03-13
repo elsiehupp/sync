@@ -33,26 +33,21 @@ class HttpCredentialsGui : HttpCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public HttpCredentialsGui () 
+    public HttpCredentialsGui () {
         base ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public HttpCredentialsGui (
+    public HttpCredentialsGui.with_username_and_password (
         string user, string password,
+        string refresh_token = "",
         GLib.ByteArray client_cert_bundle, GLib.ByteArray client_cert_password) {
         base (user, password, client_cert_bundle, client_cert_password);
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public HttpCredentialsGui (string user, string password, string refresh_token,
-        GLib.ByteArray client_cert_bundle, GLib.ByteArray client_cert_password) {
-        base (user, password, client_cert_bundle, client_cert_password);
-        this.refresh_token = refresh_token;
+        if (refresh_token != "") {
+            this.refresh_token = refresh_token;
+        }
     }
 
 
@@ -65,7 +60,7 @@ class HttpCredentialsGui : HttpCredentials {
         // which (indirectly, through HttpCredentials.invalidate_token) schedules
         // a cache wipe of the qnam. We can only execute a network job again once
         // the cache has been cleared, otherwise we'd interfere with the job.
-        QTimer.single_shot (100, this, &HttpCredentialsGui.on_signal_ask_from_user_async);
+        QTimer.single_shot (100, this, HttpCredentialsGui.on_signal_ask_from_user_async);
     }
 
 
@@ -158,21 +153,32 @@ class HttpCredentialsGui : HttpCredentials {
         dialog.label_text (message);
         dialog.text_value (this.previous_password);
         dialog.text_echo_mode (QLineEdit.Password);
-        if (var dialog_label = dialog.find_child<Gtk.Label> ()) {
+        var dialog_label = dialog.find_child<Gtk.Label> ();
+        if (dialog_label) {
             dialog_label.open_external_links (true);
             dialog_label.text_format (Qt.RichText);
         }
 
         dialog.open ();
-        connect (dialog, &Gtk.Dialog.on_signal_finished, this, [this, dialog] (int result) {
-            if (result == Gtk.Dialog.Accepted) {
-                this.password = dialog.text_value ();
-                this.refresh_token.clear ();
-                this.ready = true;
-                persist ();
-            }
-            /* emit */ asked ();
-        });
+        connect (
+            dialog,
+            Gtk.Dialog.signal_finished,
+            this,
+            this.on_signal_finished_with_result
+        );
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_finished_with_result (Gtk.Dialog dialog, int result) {
+        if (result == Gtk.Dialog.Accepted) {
+            this.password = dialog.text_value ();
+            this.refresh_token.clear ();
+            this.ready = true;
+            persist ();
+        }
+        /* emit */ asked ();
     }
 
 
@@ -180,26 +186,46 @@ class HttpCredentialsGui : HttpCredentials {
     ***********************************************************/
     private void on_signal_ask_from_user_async () {
         // First, we will check what kind of auth we need.
-        var job = new DetermineAuthTypeJob (this.account.shared_from_this (), this);
-        GLib.Object.connect (job, &DetermineAuthTypeJob.auth_type, this, [this] (DetermineAuthTypeJob.AuthType type) {
-            if (type == DetermineAuthTypeJob.AuthType.OAUTH) {
-                this.async_auth.on_signal_reset (new OAuth (this.account, this));
-                this.async_auth.expected_user = this.account.dav_user ();
-                connect (this.async_auth.data (), &OAuth.result,
-                    this, &HttpCredentialsGui.on_signal_async_auth_result);
-                connect (this.async_auth.data (), &OAuth.destroyed,
-                    this, &HttpCredentialsGui.signal_authorisation_link_changed);
-                this.async_auth.on_signal_start ();
-                /* emit */ signal_authorisation_link_changed ();
-            } else if (type == DetermineAuthTypeJob.AuthType.BASIC) {
-                on_signal_show_dialog ();
-            } else {
-                // Shibboleth?
-                GLib.warning ("Bad http auth type:" + type;
-                /* emit */ asked ();
-            }
-        });
+        var job = new DetermineAuthTypeJob (
+            this.account.shared_from_this (), this
+        );
+        connect (
+            job,
+            DetermineAuthTypeJob.auth_type,
+            this, on_signal_auth_type
+        );
         job.on_signal_start ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_auth_type (DetermineAuthTypeJob.AuthType type) {
+        if (type == DetermineAuthTypeJob.AuthType.OAUTH) {
+
+            this.async_auth.on_signal_reset (new OAuth (this.account, this));
+            this.async_auth.expected_user = this.account.dav_user ();
+            connect (
+                this.async_auth.data (),
+                OAuth.result,
+                this,
+                HttpCredentialsGui.on_signal_async_auth_result
+            );
+            connect (
+                this.async_auth.data (),
+                OAuth.destroyed,
+                this,
+                HttpCredentialsGui.signal_authorisation_link_changed
+            );
+            this.async_auth.on_signal_start ();
+            /* emit */ signal_authorisation_link_changed ();
+        } else if (type == DetermineAuthTypeJob.AuthType.BASIC) {
+            on_signal_show_dialog ();
+        } else {
+            // Shibboleth?
+            GLib.warning ("Bad http auth type: " + type);
+            /* emit */ asked ();
+        }
     }
 
 } // class HttpCredentialsGui

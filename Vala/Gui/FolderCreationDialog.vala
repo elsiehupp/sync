@@ -22,7 +22,7 @@ class FolderCreationDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public FolderCreationDialog (string destination, Gtk.Widget parent = null)
+    public FolderCreationDialog (string destination, Gtk.Widget parent = null) {
         base (parent);
         ui = new Ui.FolderCreationDialog ();
         this.destination = destination;
@@ -32,9 +32,9 @@ class FolderCreationDialog : Gtk.Dialog {
 
         window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
 
-        connect (ui.new_folder_name_edit, &QLineEdit.text_changed, this, &FolderCreationDialog.on_signal_new_folder_name_edit_text_edited);
+        connect (ui.new_folder_name_edit, QLineEdit.text_changed, this, FolderCreationDialog.on_signal_new_folder_name_edit_text_edited);
 
-        const string suggested_folder_name_prefix = GLib.Object._("New folder");
+        const string suggested_folder_name_prefix = _("New folder");
 
         const string new_folder_full_path = this.destination + '/' + suggested_folder_name_prefix;
         if (!QDir (new_folder_full_path).exists ()) {

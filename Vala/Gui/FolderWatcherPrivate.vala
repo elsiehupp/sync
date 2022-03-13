@@ -45,9 +45,9 @@ class FolderWatcherPrivate : GLib.Object {
         this.fd = inotify_init ();
         if (this.fd != -1) {
             this.socket.on_signal_reset (new QSocket_notifier (this.fd, QSocket_notifier.Read));
-            connect (this.socket.data (), &QSocket_notifier.activated, this, &FolderWatcherPrivate.on_signal_received_notification);
+            connect (this.socket.data (), QSocket_notifier.activated, this, FolderWatcherPrivate.on_signal_received_notification);
         } else {
-            GLib.warning ("notify_init () failed: " + strerror (errno);
+            GLib.warning ("notify_init () failed: " + strerror (errno));
         }
 
         QMetaObject.invoke_method (this, "on_signal_add_folder_recursive", Q_ARG (string, path));
@@ -65,10 +65,10 @@ class FolderWatcherPrivate : GLib.Object {
     ***********************************************************/
     protected void on_signal_received_notification (int fd) {
         int len = 0;
-        struct inotify_event event = null;
+        INotifyEvent event = null;
         size_t i = 0;
         int error = 0;
-        QVarLengthArray<char, 2048> buffer (2048);
+        char[] buffer = char[2048]; // previously QVarLengthArray<char, 2048>
 
         len = read (fd, buffer.data (), buffer.size ());
         error = errno;
@@ -91,18 +91,19 @@ class FolderWatcherPrivate : GLib.Object {
 
         // iterate events in buffer
         uint32 ulen = len;
-        for (i = 0; i + sizeof (inotify_event) < ulen; i += sizeof (inotify_event) + (event ? event.len : 0)) {
-            // cast an inotify_event
-            event = (struct inotify_event *)&buffer[i];
+        for (i = 0; i + sizeof (INotifyEvent) < ulen; i += sizeof (INotifyEvent) + (event ? event.len : 0)) {
+            // cast an INotifyEvent
+            event = (INotifyEvent)buffer[i];
             if (!event) {
-                GLib.debug ("NULL event";
+                GLib.debug ("NULL event");
                 continue;
             }
 
             // Fire event for the path that was changed.
-            if (event.len == 0 || event.wd <= -1)
+            if (event.len == 0 || event.wd <= -1) {
                 continue;
-            GLib.ByteArray filename (event.name);
+            }
+            GLib.ByteArray filename = new GLib.ByteArray (event.name);
             // Filter out journal changes - redundant with filtering in
             // FolderWatcher.path_is_ignored.
             if (filename.starts_with (".sync_")
@@ -132,33 +133,33 @@ class FolderWatcherPrivate : GLib.Object {
             return;
 
         int subdirectories = 0;
-        GLib.debug (" (+) Watcher:" + path;
+        GLib.debug (" (+) Watcher: " + path);
 
-        QDir in_path (path);
+        QDir in_path = new QDir (path);
         inotify_register_path (in_path.absolute_path ());
 
         string[] all_subfolders;
         if (!find_folders_below (QDir (path), all_subfolders)) {
-            GLib.warning ("Could not traverse all sub folders";
+            GLib.warning ("Could not traverse all subfolders.");
         }
-        QStringListIterator subfolders_it (all_subfolders);
+        var subfolders_it = new QStringListIterator (all_subfolders);
         while (subfolders_it.has_next ()) {
             string subfolder = subfolders_it.next ();
-            QDir folder (subfolder);
+            QDir folder = new QDir (subfolder);
             if (folder.exists () && !this.path_to_watch.contains (folder.absolute_path ())) {
                 subdirectories++;
                 if (this.parent.path_is_ignored (subfolder)) {
-                    GLib.debug ("* Not adding" + folder.path ();
+                    GLib.debug ("* Not adding " + folder.path ());
                     continue;
                 }
                 inotify_register_path (folder.absolute_path ());
             } else {
-                GLib.debug ("    `. discarded:" + folder.path ();
+                GLib.debug ("    `. discarded: " + folder.path ());
             }
         }
 
         if (subdirectories > 0) {
-            GLib.debug ("    `. and" + subdirectories + "subdirectories";
+            GLib.debug ("    `. and " + subdirectories + " subdirectories");
         }
     }
 
@@ -169,21 +170,22 @@ class FolderWatcherPrivate : GLib.Object {
     protected bool find_folders_below (QDir directory, string[] full_list) {
         bool ok = true;
         if (! (directory.exists () && directory.is_readable ())) {
-            GLib.debug ("Non existing path coming in: " + directory.absolute_path ();
+            GLib.debug ("Non existing path coming in: " + directory.absolute_path ());
             ok = false;
         } else {
             string[] name_filter;
-            name_filter + "*";
+            name_filter += "*";
             QDir.Filters filter = QDir.Dirs | QDir.NoDotAndDotDot | QDir.No_sym_links | QDir.Hidden;
             const string[] pathes = directory.entry_list (name_filter, filter);
 
-            string[].ConstIterator ConstIterator;
-            for (ConstIterator = pathes.const_begin (); ConstIterator != pathes.const_end ();
-                 ++ConstIterator) {
-                const string full_path (directory.path () + "/" + (*ConstIterator));
-                full_list.append (full_path);
-                ok = find_folders_below (QDir (full_path), full_list);
-            }
+            // FIXME: need to iterate through string[]
+            //  string[].ConstIterator ConstIterator;
+            //  for (ConstIterator = pathes.const_begin (); ConstIterator != pathes.const_end ();
+            //       ++ConstIterator) {
+            //      const string full_path (directory.path () + "/" + (*ConstIterator));
+            //      full_list.append (full_path);
+            //      ok = find_folders_below (QDir (full_path), full_list);
+            //  }
         }
 
         return ok;
@@ -208,7 +210,7 @@ class FolderWatcherPrivate : GLib.Object {
                 this.parent.is_reliable = false;
                 /* emit */ this.parent.signal_became_unreliable (
                     _("This problem usually happens when the inotify watches are exhausted. "
-                       "Check the FAQ for details."));
+                     + "Check the FAQ for details."));
             }
         }
     }
@@ -238,7 +240,7 @@ class FolderWatcherPrivate : GLib.Object {
             inotify_rm_watch (this.fd, wid);
             this.watch_to_path.remove (wid);
             it = this.path_to_watch.erase (it);
-            GLib.debug ("Removed watch for" + it_path;
+            GLib.debug ("Removed watch for " + it_path);
         }
     }
 

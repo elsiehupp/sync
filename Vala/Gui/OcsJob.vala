@@ -159,7 +159,7 @@ class OcsJob : AbstractNetworkJob {
         } else if (this.verb == "POST" || this.verb == "PUT") {
             // Url encode the this.post_params and put them in a buffer.
             GLib.ByteArray post_data;
-            Q_FOREACH (var tmp, this.params) {
+            foreach (var tmp, this.params) {
                 if (!post_data.is_empty ()) {
                     post_data.append ("&");
                 }

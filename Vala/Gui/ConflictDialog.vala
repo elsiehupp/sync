@@ -33,18 +33,56 @@ class ConflictDialog : Gtk.Dialog {
         this.ui.button_box.button (QDialogButtonBox.Ok).enabled (false);
         this.ui.button_box.button (QDialogButtonBox.Ok).on_signal_text (_("Keep selected version"));
 
-        connect (this.ui.local_version_radio, &QCheckBox.toggled, this, &ConflictDialog.update_button_states);
-        connect (this.ui.local_version_button, &QToolButton.clicked, this, [=] {
-            QDesktopServices.open_url (GLib.Uri.from_local_file (this.solver.local_version_filename ()));
-        });
+        connect (
+            this.ui.local_version_radio,
+            QCheckBox.toggled,
+            this,
+            ConflictDialog.update_button_states
+        );
+        connect (
+            this.ui.local_version_button,
+            QToolButton.clicked,
+            this,
+            this.on_local_version_button_clicked
+        );
+        connect (
+            this.ui.remote_version_radio,
+            QCheckBox.toggled,
+            this,
+            ConflictDialog.update_button_states
+        );
+        connect (
+            this.ui.remote_version_button,
+            QToolButton.clicked,
+            this,
+            this.on_remote_version_button_clicked
+        );
+        connect (
+            this.solver,
+            ConflictSolver.signal_local_version_filename_changed,
+            this,
+            ConflictDialog.update_widgets
+        );
+        connect (
+            this.solver,
+            ConflictSolver.signal_remote_version_filename_changed,
+            this,
+            ConflictDialog.update_widgets
+        );
+    }
 
-        connect (this.ui.remote_version_radio, &QCheckBox.toggled, this, &ConflictDialog.update_button_states);
-        connect (this.ui.remote_version_button, &QToolButton.clicked, this, [=] {
-            QDesktopServices.open_url (GLib.Uri.from_local_file (this.solver.remote_version_filename ()));
-        });
 
-        connect (this.solver, &ConflictSolver.signal_local_version_filename_changed, this, &ConflictDialog.update_widgets);
-        connect (this.solver, &ConflictSolver.signal_remote_version_filename_changed, this, &ConflictDialog.update_widgets);
+    /***********************************************************
+    ***********************************************************/
+    private void on_local_version_button_clicked () {
+        QDesktopServices.open_url (GLib.Uri.from_local_file (this.solver.local_version_filename ()));
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_remote_version_button_clicked () {
+        QDesktopServices.open_url (GLib.Uri.from_local_file (this.solver.remote_version_filename ()));
     }
 
 
@@ -120,22 +158,6 @@ class ConflictDialog : Gtk.Dialog {
     private void update_widgets () {
         QMimeDatabase mime_database;
 
-        const var update_group = [this, mime_database] (string filename, Gtk.Label link_label, string link_text, Gtk.Label mtime_label, Gtk.Label size_label, QToolButton button) {
-            const var file_url = GLib.Uri.from_local_file (filename).to_string ();
-            link_label.on_signal_text ("<a href='%1'>%2</a>".arg (file_url).arg (link_text));
-
-            const var info = GLib.FileInfo (filename);
-            mtime_label.on_signal_text (info.last_modified ().to_string ());
-            size_label.on_signal_text (locale ().formatted_data_size (info.size ()));
-
-            const var mime = mime_database.mime_type_for_file (filename);
-            if (QIcon.has_theme_icon (mime.icon_name ())) {
-                button.icon (QIcon.from_theme (mime.icon_name ()));
-            } else {
-                button.icon (QIcon (":/qt-project.org/styles/commonstyle/images/file-128.png"));
-            }
-        }
-
         const var local_version = this.solver.local_version_filename ();
         update_group (local_version,
                     this.ui.local_version_link,
@@ -144,19 +166,39 @@ class ConflictDialog : Gtk.Dialog {
                     this.ui.local_version_size,
                     this.ui.local_version_button);
 
-        const var remote_version = this.solver.remote_version_filename ();
+        const string remote_version = this.solver.remote_version_filename ();
         update_group (remote_version,
                     this.ui.remote_version_link,
                     _("Open server version"),
                     this.ui.remote_version_mtime,
                     this.ui.remote_version_size,
-                    this.ui.remote_version_button);
+                    this.ui.remote_version_button
+                );
 
-        const var local_mtime = GLib.FileInfo (local_version).last_modified ();
-        const var remote_mtime = GLib.FileInfo (remote_version).last_modified ();
+        const Time local_mtime = GLib.FileInfo (local_version).last_modified ();
+        const Time remote_mtime = GLib.FileInfo (remote_version).last_modified ();
 
         bold_font (this.ui.local_version_mtime, local_mtime > remote_mtime);
         bold_font (this.ui.remote_version_mtime, remote_mtime > local_mtime);
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void update_group (QMimeDatabase mime_database, string filename, Gtk.Label link_label, string link_text, Gtk.Label mtime_label, Gtk.Label size_label, QToolButton button) {
+        const string file_url = GLib.Uri.from_local_file (filename).to_string ();
+        link_label.on_signal_text ("<a href='%1'>%2</a>".arg (file_url).arg (link_text));
+
+        const GLib.FileInfo info = new GLib.FileInfo (filename);
+        mtime_label.on_signal_text (info.last_modified ().to_string ());
+        size_label.on_signal_text (locale ().formatted_data_size (info.size ()));
+
+        const string mime = mime_database.mime_type_for_file (filename);
+        if (QIcon.has_theme_icon (mime.icon_name ())) {
+            button.icon (QIcon.from_theme (mime.icon_name ()));
+        } else {
+            button.icon (QIcon (":/qt-project.org/styles/commonstyle/images/file-128.png"));
+        }
     }
 
 

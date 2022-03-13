@@ -9,7 +9,7 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 //  #include <QRadioButton>
 //  #include <QAbstractButton>
 //  #include <QCheckBox>
-//  #include <QSpin_box>
+//  #include <QSpinBox>
 
 namespace Occ {
 namespace Ui {
@@ -66,7 +66,7 @@ class WizardCommon {
     /***********************************************************
     ***********************************************************/
     public static string title_template () {
-        return " (<font color="%1" size="5">)".arg (Theme.instance ().wizard_header_title_color ().name ()) + "%1</font>";
+        return " (<font color=\"%1\" size=\"5\">)".arg (Theme.instance ().wizard_header_title_color ().name ()) + "%1</font>";
     }
 
 

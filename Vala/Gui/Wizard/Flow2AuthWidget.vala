@@ -22,7 +22,7 @@ class Flow2AuthWidget : Gtk.Widget {
     private QProgressIndicator progress_indicator;
     private int status_update_skip_count = 0;
 
-    signal void auth_result (Flow2Auth.Result, string error_string, string user, string app_password);
+    signal void auth_result (Flow2Auth.Result result, string error_string, string user, string app_password);
     signal void poll_now ();
 
     /***********************************************************

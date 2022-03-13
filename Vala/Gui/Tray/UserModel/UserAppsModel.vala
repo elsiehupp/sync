@@ -59,7 +59,7 @@ class UserAppsModel : QAbstractListModel {
 
         if (UserModel.instance ().app_list ().count () > 0) {
             const var talk_app = UserModel.instance ().is_current_user ().talk_app ();
-            foreach (AccountApp app, UserModel.instance ().app_list ()) {
+            foreach (AccountApp app in UserModel.instance ().app_list ()) {
                 // Filter out Talk because we have a dedicated button for it
                 if (talk_app && app.identifier () == talk_app.identifier ())
                     continue;

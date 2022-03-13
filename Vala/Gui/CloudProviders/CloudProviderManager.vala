@@ -45,39 +45,41 @@ class CloudProviderManager : GLib.Object {
         //  Q_UNUSED (connection);
         //  Q_UNUSED (name);
         //  Q_UNUSED (user_data);
-        g_clear_object (&this.provider_exporter);
+        g_clear_object (this.provider_exporter);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void register_signals () {
-        Occ.FolderMan folder_manager = Occ.FolderMan.instance ();
-        connect (folder_manager, SIGNAL (signal_folder_list_changed (Folder.Map &)), SLOT (on_signal_folder_list_changed (Folder.Map &)));
+        connect (
+            Occ.FolderMan.instance (),
+            signal_folder_list_changed,
+            on_signal_folder_list_changed
+        );
         on_signal_folder_list_changed (folder_manager.map ());
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_folder_list_changed (Folder.Map folder_map);
-    void CloudProviderManager.on_signal_folder_list_changed (Folder.Map folder_map) {
-        QMapIterator<string, CloudProviderWrapper> i (this.map);
-        while (i.has_next ()) {
-            i.next ();
-            if (!folder_map.contains (i.key ())) {
-                cloud_providers_provider_exporter_remove_account (this.provider_exporter, i.value ().account_exporter ());
-                delete this.map.find (i.key ()).value ();
-                this.map.remove (i.key ());
+    public void on_signal_folder_list_changed (Folder.Map folder_map) {
+        var iterator = new QMapIterator<string, CloudProviderWrapper> (this.map);
+        while (iterator.has_next ()) {
+            iterator.next ();
+            if (!folder_map.contains (iterator.key ())) {
+                cloud_providers_provider_exporter_remove_account (this.provider_exporter, iterator.value ().account_exporter ());
+                delete this.map.find (iterator.key ()).value ();
+                this.map.remove (iterator.key ());
             }
         }
 
-        Folder.MapIterator j (folder_map);
-        while (j.has_next ()) {
-            j.next ();
-            if (!this.map.contains (j.key ())) {
-                var cpo = new CloudProviderWrapper (this, j.value (), this.folder_index++, this.provider_exporter);
-                this.map.insert (j.key (), cpo);
+        Folder.MapIterator iterator2 = new Folder.MapIterator (folder_map);
+        while (iterator2.has_next ()) {
+            iterator2.next ();
+            if (!this.map.contains (iterator2.key ())) {
+                var cpo = new CloudProviderWrapper (this, iterator2.value (), this.folder_index++, this.provider_exporter);
+                this.map.insert (iterator2.key (), cpo);
             }
         }
     }

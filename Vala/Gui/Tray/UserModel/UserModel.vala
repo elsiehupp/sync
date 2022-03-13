@@ -91,9 +91,9 @@ class UserModel : QAbstractListModel {
         private set {
             this.current_user_id = value;
         }
-        construct {
-            this.current_user_id = 0;
-        }
+        //  construct {
+        //      this.current_user_id = 0;
+        //  }
     }
 
     private bool init = true;
@@ -112,8 +112,8 @@ class UserModel : QAbstractListModel {
             build_user_list ();
         }
 
-        connect (AccountManager.instance (), &AccountManager.on_signal_account_added,
-            this, &UserModel.build_user_list);
+        connect (AccountManager.instance (), AccountManager.on_signal_account_added,
+            this, UserModel.build_user_list);
     }
 
 
@@ -209,15 +209,16 @@ class UserModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     public int find_identifier_for_account (AccountState account) {
-        const var it = std.find_if (std.cbegin (this.users), std.cend (this.users), [=] (User user) {
-            return user.account ().identifier () == account.account ().identifier ();
-        });
-
-        if (it == std.cend (this.users)) {
-            return -1;
+        int identifier = 0;
+        foreach (var user in this.users) {
+            identifer++;
+            if (user.account ().identifier () == account.account ().identifier ()) {
+                break;
+            }
         }
-
-        const var identifier = std.distance (std.cbegin (this.users), it);
+        if (identifier == this.users.length) {
+            identifier =-1;
+        }
         return identifier;
     }
 
@@ -236,7 +237,7 @@ class UserModel : QAbstractListModel {
     ***********************************************************/
     public void add_user (AccountStatePtr user, bool is_current) {
         bool contains_user = false;
-        for (var u : q_as_const (this.users)) {
+        foreach (var u in this.users) {
             if (u.account () == user.account ()) {
                 contains_user = true;
                 continue;
@@ -253,42 +254,28 @@ class UserModel : QAbstractListModel {
                 u,
                 User.signal_avatar_changed,
                 this,
-                [this, row] () => {
-                    /* emit */ data_changed (index (row, 0), index (row, 0), {UserModel.UserRoles.AVATAR});
-                }
+                this.on_signal_avatar_changed
             );
 
             connect (
                 u,
                 User.signal_status_changed,
                 this,
-                [this, row] () => {
-                    /* emit */ data_changed (index (row, 0), index (row, 0), {UserModel.UserRoles.STATUS_ICON,
-                                        UserModel.UserRoles.STATUS_EMOJI,
-                                                                UserModel.UserRoles.STATUS_MESSAGE});
-                }
+                this.on_signal_status_changed
             );
 
             connect (
                 u,
                 User.signal_desktop_notifications_allowed_changed,
                 this,
-                [this, row] () => {
-                    /* emit */ data_changed (index (row, 0), index (row, 0), {
-                        UserModel.UserRoles.DESKTOP_NOTIFICATION
-                    });
-                }
+                this.on_signal_desktop_notifications_allowed_changed
             );
 
             connect (
                 u,
                 User.signal_account_state_changed,
                 this,
-                [this, row] () => {
-                    /* emit */ data_changed (index (row, 0), index (row, 0), {
-                        UserModel.UserRoles.IS_CONNECTED
-                    });
-                }
+                this.on_signal_account_state_changed
             );
 
             this.users += u;
@@ -303,6 +290,62 @@ class UserModel : QAbstractListModel {
             /* emit */ signal_new_user_selected ();
         }
     }
+
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_avatar_changed (int row) {
+        /* emit */ data_changed (
+            index (row, 0),
+            index (row, 0),
+            {
+                UserModel.UserRoles.AVATAR
+            }
+        );
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_status_changed (int row) {
+        /* emit */ data_changed (
+            index (row, 0),
+            index (row, 0),
+            {
+                UserModel.UserRoles.STATUS_ICON,
+                UserModel.UserRoles.STATUS_EMOJI,
+                UserModel.UserRoles.STATUS_MESSAGE
+            }
+        );
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_desktop_notifications_allowed_changed (int row) {
+        /* emit */ data_changed (
+            index (row, 0),
+            index (row, 0),
+            {
+                UserModel.UserRoles.DESKTOP_NOTIFICATION
+            }
+        );
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_account_state_changed (int row) {
+        /* emit */ data_changed (
+            index (row, 0),
+            index (row, 0),
+            {
+                UserModel.UserRoles.IS_CONNECTED
+            }
+        );
+    }
+
 
     /***********************************************************
     ***********************************************************/
@@ -326,7 +369,7 @@ class UserModel : QAbstractListModel {
         if (talk_app) {
             Utility.open_browser (talk_app.url ());
         } else {
-            GLib.warning ("The Talk app is not enabled on" + current_user ().server ();
+            GLib.warning ("The Talk app is not enabled on " + current_user ().server ());
         }
     }
 
@@ -396,10 +439,11 @@ class UserModel : QAbstractListModel {
         if (identifier < 0 || identifier >= this.users.size ())
             return;
 
-        QMessageBox message_box (QMessageBox.Question,
+        QMessageBox message_box = new QMessageBox (
+            QMessageBox.Question,
             _("Confirm Account Removal"),
             _("<p>Do you really want to remove the connection to the account <i>%1</i>?</p>"
-            "<p><b>Note:</b> This will <b>not</b> delete any files.</p>")
+            + "<p><b>Note:</b> This will <b>not</b> delete any files.</p>")
                 .arg (this.users[identifier].name ()),
             QMessageBox.NoButton);
         QPushButton yes_button =
@@ -412,7 +456,11 @@ class UserModel : QAbstractListModel {
         }
 
         if (this.users[identifier].is_current_user () && this.users.count () > 1) {
-            identifier == 0 ? switch_current_user (1) : switch_current_user (0);
+            if (identifier == 0) {
+                switch_current_user (1);
+            } else {
+                switch_current_user (0);
+            }
         }
 
         this.users[identifier].log_out ();

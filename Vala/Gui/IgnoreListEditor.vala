@@ -31,17 +31,17 @@ class IgnoreListEditor : Gtk.Dialog {
         window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
         ui.up_ui (this);
 
-        ConfigFile cfg_file;
+        ConfigFile config_file;
         //FIXME This is not true. The entries are hardcoded below in setup_table_read_only_items
         read_only_tooltip = _("This entry is provided by the system at \"%1\" "
                              "and cannot be modified in this view.")
-                              .arg (QDir.to_native_separators (cfg_file.exclude_file (ConfigFile.SYSTEM_SCOPE)));
+                              .arg (QDir.to_native_separators (config_file.exclude_file (ConfigFile.SYSTEM_SCOPE)));
 
         setup_table_read_only_items ();
-        const var user_config = cfg_file.exclude_file (ConfigFile.Scope.USER_SCOPE);
+        const var user_config = config_file.exclude_file (ConfigFile.Scope.USER_SCOPE);
         ui.ignore_table_widget.read_ignore_file (user_config);
 
-        connect (this, &Gtk.Dialog.accepted, [=] () {
+        connect (this, Gtk.Dialog.accepted, [=] () {
             ui.ignore_table_widget.on_signal_write_ignore_file (user_config);
             /* handle the hidden file checkbox */
 
@@ -52,8 +52,8 @@ class IgnoreListEditor : Gtk.Dialog {
             */
             FolderMan.instance ().ignore_hidden_files (ignore_hidden_files ());
         });
-        connect (ui.button_box, &QDialogButtonBox.clicked,
-                this, &IgnoreListEditor.on_signal_restore_defaults);
+        connect (ui.button_box, QDialogButtonBox.clicked,
+                this, IgnoreListEditor.on_signal_restore_defaults);
 
         ui.sync_hidden_files_check_box.checked (!FolderMan.instance ().ignore_hidden_files ());
     }
@@ -79,9 +79,9 @@ class IgnoreListEditor : Gtk.Dialog {
 
         ui.ignore_table_widget.on_signal_remove_all_items ();
 
-        ConfigFile cfg_file;
+        ConfigFile config_file;
         setup_table_read_only_items ();
-        ui.ignore_table_widget.read_ignore_file (cfg_file.exclude_file (ConfigFile.SYSTEM_SCOPE), false);
+        ui.ignore_table_widget.read_ignore_file (config_file.exclude_file (ConfigFile.SYSTEM_SCOPE), false);
     }
 
 

@@ -30,7 +30,7 @@ class OcsShareeJob : OcsJob {
     OcsShareeJob.OcsShareeJob (AccountPointer account)
         : OcsJob (account) {
         path ("ocs/v2.php/apps/files_sharing/api/v1/sharees");
-        connect (this, &OcsJob.signal_job_finished, this, &OcsShareeJob.on_signal_job_done);
+        connect (this, OcsJob.signal_job_finished, this, OcsShareeJob.on_signal_job_done);
     }
 
 

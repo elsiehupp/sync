@@ -44,17 +44,14 @@ class WebView : Gtk.Widget {
         base (parent);
         this.ui ();
         this.ui.up_ui (this);
-    //  #if QT_VERSION >= 0x051200
-        QWebEngineUrlScheme this.ncsheme ("nc");
-        QWebEngineUrlScheme.register_scheme (this.ncsheme);
-    //  #endif
+        QWebEngineUrlScheme.register_scheme (new QWebEngineUrlScheme ("nc"));
         this.webview = new QWebEngineView (this);
         this.profile = new QWebEngineProfile (this);
         this.page = new WebEnginePage (this.profile);
         this.interceptor = new WebViewPageUrlRequestInterceptor (this);
         this.scheme_handler = new WebViewPageUrlSchemeHandler (this);
 
-        const string user_agent (Utility.user_agent_string ());
+        const string user_agent = Utility.user_agent_string ();
         this.profile.http_user_agent (user_agent);
         QWebEngineProfile.default_profile ().http_user_agent (user_agent);
         this.profile.request_interceptor (this.interceptor);
@@ -80,8 +77,8 @@ class WebView : Gtk.Widget {
         this.webview.page (this.page);
         this.ui.vertical_layout.add_widget (this.webview);
 
-        connect (this.webview, &QWebEngineView.load_progress, this.ui.progress_bar, &QProgressBar.value);
-        connect (this.scheme_handler, &WebViewPageUrlSchemeHandler.on_signal_url_catched, this, &WebView.on_signal_url_catched);
+        connect (this.webview, QWebEngineView.load_progress, this.ui.progress_bar, QProgressBar.value);
+        connect (this.scheme_handler, WebViewPageUrlSchemeHandler.on_signal_url_catched, this, WebView.on_signal_url_catched);
     }
 
 

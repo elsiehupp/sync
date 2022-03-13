@@ -99,45 +99,45 @@ class OwncloudGui : GLib.Object {
 
         this.tray.show ();
 
-        connect (this.tray.data (), &QSystemTrayIcon.activated,
-            this, &OwncloudGui.on_signal_tray_clicked);
+        connect (this.tray.data (), QSystemTrayIcon.activated,
+            this, OwncloudGui.on_signal_tray_clicked);
 
-        connect (this.tray.data (), &Systray.signal_open_help,
-            this, &OwncloudGui.on_signal_help);
+        connect (this.tray.data (), Systray.signal_open_help,
+            this, OwncloudGui.on_signal_help);
 
-        connect (this.tray.data (), &Systray.signal_open_account_wizard,
-            this, &OwncloudGui.on_signal_new_account_wizard);
+        connect (this.tray.data (), Systray.signal_open_account_wizard,
+            this, OwncloudGui.on_signal_new_account_wizard);
 
-        connect (this.tray.data (), &Systray.signal_open_main_dialog,
-            this, &OwncloudGui.on_signal_open_main_dialog);
+        connect (this.tray.data (), Systray.signal_open_main_dialog,
+            this, OwncloudGui.on_signal_open_main_dialog);
 
-        connect (this.tray.data (), &Systray.signal_open_settings,
-            this, &OwncloudGui.on_signal_show_settings);
+        connect (this.tray.data (), Systray.signal_open_settings,
+            this, OwncloudGui.on_signal_show_settings);
 
-        connect (this.tray.data (), &Systray.signal_shutdown,
-            this, &OwncloudGui.on_signal_shutdown);
+        connect (this.tray.data (), Systray.signal_shutdown,
+            this, OwncloudGui.on_signal_shutdown);
 
-        connect (this.tray.data (), &Systray.open_share_dialog,
+        connect (this.tray.data (), Systray.open_share_dialog,
             this, [=] (string share_path, string local_path) {
                     on_signal_show_share_dialog (share_path, local_path, ShareDialogStartPage.USERS_AND_GROUPS);
                 });
 
         ProgressDispatcher pd = ProgressDispatcher.instance ();
-        connect (pd, &ProgressDispatcher.progress_info, this,
+        connect (pd, ProgressDispatcher.progress_info, this,
             &OwncloudGui.on_signal_update_progress);
 
         FolderMan folder_man = FolderMan.instance ();
-        connect (folder_man, &FolderMan.signal_folder_sync_state_change,
-            this, &OwncloudGui.on_signal_sync_state_change);
+        connect (folder_man, FolderMan.signal_folder_sync_state_change,
+            this, OwncloudGui.on_signal_sync_state_change);
 
-        connect (Logger.instance (), &Logger.signal_gui_log,
-            this, &OwncloudGui.on_signal_show_tray_message);
+        connect (Logger.instance (), Logger.signal_gui_log,
+            this, OwncloudGui.on_signal_show_tray_message);
 
-        connect (Logger.instance (), &Logger.optional_gui_log,
-            this, &OwncloudGui.on_signal_show_optional_tray_message);
+        connect (Logger.instance (), Logger.optional_gui_log,
+            this, OwncloudGui.on_signal_show_optional_tray_message);
 
-        connect (Logger.instance (), &Logger.gui_message,
-            this, &OwncloudGui.on_signal_show_gui_message);
+        connect (Logger.instance (), Logger.gui_message,
+            this, OwncloudGui.on_signal_show_gui_message);
     }
 
 
@@ -379,7 +379,7 @@ class OwncloudGui : GLib.Object {
             }
     //  #endif
         } else if (progress.status () == ProgressInfo.Status.DONE) {
-            QTimer.single_shot (2000, this, &OwncloudGui.on_signal_compute_overall_sync_status);
+            QTimer.single_shot (2000, this, OwncloudGui.on_signal_compute_overall_sync_status);
         }
         if (progress.status () != ProgressInfo.Status.PROPAGATION) {
             return;
@@ -423,7 +423,7 @@ class OwncloudGui : GLib.Object {
             if (f) {
                 string full_path = f.path () + '/' + progress.last_completed_item.file;
                 if (GLib.File (full_path).exists ()) {
-                    connect (action, &QAction.triggered, this, [this, full_path] {
+                    connect (action, QAction.triggered, this, [this, full_path] {
                         this.on_signal_open_path (full_path);
                     });
                 } else {
@@ -461,7 +461,7 @@ class OwncloudGui : GLib.Object {
                 // brought wizard to front
             } else if (this.share_dialogs.size () > 0) {
                 // Share dialog (s) be hidden by other apps, bring them back
-                Q_FOREACH (QPointer<ShareDialog> share_dialog, this.share_dialogs) {
+                foreach (QPointer<ShareDialog> share_dialog, this.share_dialogs) {
                     //  Q_ASSERT (share_dialog.data ());
                     raise_dialog (share_dialog);
                 }
@@ -505,13 +505,13 @@ class OwncloudGui : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_show_gui_message (string title, string message) {
-        var msg_box = new QMessageBox;
-        msg_box.window_flags (msg_box.window_flags () | Qt.Window_stays_on_signal_top_hint);
-        msg_box.attribute (Qt.WA_DeleteOnClose);
-        msg_box.on_signal_text (message);
-        msg_box.window_title (title);
-        msg_box.icon (QMessageBox.Information);
-        msg_box.open ();
+        var message_box = new QMessageBox;
+        message_box.window_flags (message_box.window_flags () | Qt.Window_stays_on_signal_top_hint);
+        message_box.attribute (Qt.WA_DeleteOnClose);
+        message_box.on_signal_text (message);
+        message_box.window_title (title);
+        message_box.icon (QMessageBox.Information);
+        message_box.open ();
     }
 
 
@@ -676,7 +676,7 @@ class OwncloudGui : GLib.Object {
             w.attribute (Qt.WA_DeleteOnClose, true);
 
             this.share_dialogs[local_path] = w;
-            connect (w, &GLib.Object.destroyed, this, &OwncloudGui.on_signal_remove_destroyed_share_dialogs);
+            connect (w, GLib.Object.destroyed, this, OwncloudGui.on_signal_remove_destroyed_share_dialogs);
         }
         raise_dialog (w);
     }
@@ -685,7 +685,7 @@ class OwncloudGui : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_remove_destroyed_share_dialogs () {
-        QMutable_map_iterator<string, QPointer<ShareDialog>> it (this.share_dialogs);
+        QMutableMapIterator<string, QPointer<ShareDialog>> it (this.share_dialogs);
         while (it.has_next ()) {
             it.next ();
             if (!it.value () || it.value () == sender ()) {

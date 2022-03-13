@@ -187,7 +187,7 @@ class HeaderBanner : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     protected override void paint_event (QPaintEvent event) {
-        QPainter painter (this);
+        QPainter painter = new QPainter (this);
         painter.draw_pixmap (0, 0, width (), banner_pixmap.height (), banner_pixmap);
         int x = width () - 2;
         int y = height () - 2;

@@ -47,8 +47,8 @@ class AsyncImageResponse : QQuickImageResponse {
 
     /***********************************************************
     ***********************************************************/
-    public QQuick_texture_factory texture_factory () override {
-        return QQuick_texture_factory.texture_factory_for_image (this.image);
+    public override QQuickTextureFactory texture_factory () {
+        return QQuickTextureFactory.texture_factory_for_image (this.image);
     }
 
 
@@ -67,11 +67,11 @@ class AsyncImageResponse : QQuickImageResponse {
 
         const var current_user = Occ.UserModel.instance ().is_current_user ();
         if (current_user && current_user.account ()) {
-            const GLib.Uri icon_url (this.image_paths.at (this.index));
+            const GLib.Uri icon_url = new GLib.Uri (this.image_paths.at (this.index));
             if (icon_url.is_valid () && !icon_url.scheme ().is_empty ()) {
                 // fetch the remote resource
                 const var reply = current_user.account ().send_raw_request (QByteArrayLiteral ("GET"), icon_url);
-                connect (reply, &Soup.Reply.on_signal_finished, this, &AsyncImageResponse.on_signal_process_network_reply);
+                connect (reply, Soup.Reply.on_signal_finished, this, AsyncImageResponse.on_signal_process_network_reply);
                 ++this.index;
                 return;
             }
@@ -100,10 +100,10 @@ class AsyncImageResponse : QQuickImageResponse {
                 // SVG image needs proper scaling, let's do it with QPainter and QSvgRenderer
                 QSvgRenderer svg_renderer;
                 if (svg_renderer.on_signal_load (image_data)) {
-                    Gtk.Image scaled_svg (this.requested_image_size, Gtk.Image.FormatARGB32);
+                    Gtk.Image scaled_svg = new Gtk.Image (this.requested_image_size, Gtk.Image.FormatARGB32);
                     scaled_svg.fill ("transparent");
-                    QPainter painter_for_svg (&scaled_svg);
-                    svg_renderer.render (&painter_for_svg);
+                    QPainter painter_for_svg = new QPainter (scaled_svg);
+                    svg_renderer.render (painter_for_svg);
                     image_and_emit_finished (scaled_svg);
                     return;
                 } else {

@@ -13,19 +13,19 @@ namespace Ui {
 @brief The HttpCredentialsGui namespace
 @ingroup gui
 ***********************************************************/
-namespace CredentialsFactory {
+class CredentialsFactory {
 
-    AbstractCredentials create (string type) {
+    public static AbstractCredentials create (string type) {
         // empty string might happen for old version of configuration
         if (type == "http" || type == "") {
-            return new HttpCredentialsGui;
+            return new HttpCredentialsGui ();
         } else if (type == "dummy") {
-            return new DummyCredentials;
+            return new DummyCredentials ();
         } else if (type == "webflow") {
-            return new WebFlowCredentials;
+            return new WebFlowCredentials ();
         } else {
-            GLib.warning ());
-            return new DummyCredentials;
+            GLib.warning ("Did not recognize preferred credential type; defaulting to dummy credentials.");
+            return new DummyCredentials ();
         }
     }
 

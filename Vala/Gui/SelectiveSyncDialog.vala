@@ -52,7 +52,7 @@ class SelectiveSyncDialog : Gtk.Dialog {
             this.ok_button.enabled (false);
         }
         // Make sure we don't get crashes if the folder is destroyed while we are still open
-        connect (this.folder, &GLib.Object.destroyed, this, &GLib.Object.delete_later);
+        connect (this.folder, GLib.Object.destroyed, this, GLib.Object.delete_later);
     }
 
 
@@ -88,7 +88,7 @@ class SelectiveSyncDialog : Gtk.Dialog {
             // (the ones that are no longer in the blocklist)
             var block_list_set = block_list.to_set ();
             var changes = (old_block_list_set - block_list_set) + (block_list_set - old_block_list_set);
-            foreach (var it, changes) {
+            foreach (var it in changes) {
                 this.folder.journal_database ().schedule_path_for_remote_discovery (it);
                 this.folder.on_signal_schedule_path_for_local_discovery (it);
             }
@@ -130,10 +130,10 @@ class SelectiveSyncDialog : Gtk.Dialog {
         layout.add_widget (this.selective_sync);
         var button_box = new QDialogButtonBox (Qt.Horizontal);
         this.ok_button = button_box.add_button (QDialogButtonBox.Ok);
-        connect (this.ok_button, &QPushButton.clicked, this, &SelectiveSyncDialog.accept);
+        connect (this.ok_button, QPushButton.clicked, this, SelectiveSyncDialog.accept);
         QPushButton button = null;
         button = button_box.add_button (QDialogButtonBox.Cancel);
-        connect (button, &QAbstractButton.clicked, this, &Gtk.Dialog.reject);
+        connect (button, QAbstractButton.clicked, this, Gtk.Dialog.reject);
         layout.add_widget (button_box);
     }
 

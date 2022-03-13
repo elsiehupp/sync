@@ -61,13 +61,13 @@ class WebFlowCredentialsDialog : Gtk.Dialog {
             this.flow_2_auth_widget = new Flow2AuthWidget ();
             this.container_layout.add_widget (this.flow_2_auth_widget);
 
-            connect (this.flow_2_auth_widget, &Flow2AuthWidget.auth_result, this, &WebFlowCredentialsDialog.on_signal_flow_2_auth_result);
+            connect (this.flow_2_auth_widget, Flow2AuthWidget.auth_result, this, WebFlowCredentialsDialog.on_signal_flow_2_auth_result);
 
             // Connect signal_style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
-            connect (this, &WebFlowCredentialsDialog.signal_style_changed, this.flow_2_auth_widget, &Flow2AuthWidget.on_signal_style_changed);
+            connect (this, WebFlowCredentialsDialog.signal_style_changed, this.flow_2_auth_widget, Flow2AuthWidget.on_signal_style_changed);
 
             // allow Flow2 page to poll on window activation
-            connect (this, &WebFlowCredentialsDialog.on_signal_activate, this.flow_2_auth_widget, &Flow2AuthWidget.on_signal_poll_now);
+            connect (this, WebFlowCredentialsDialog.on_signal_activate, this.flow_2_auth_widget, Flow2AuthWidget.on_signal_poll_now);
 
             this.flow_2_auth_widget.start_auth (account);
         } else {
@@ -75,12 +75,12 @@ class WebFlowCredentialsDialog : Gtk.Dialog {
             this.web_view = new WebView ();
             this.container_layout.add_widget (this.web_view);
 
-            connect (this.web_view, &WebView.on_signal_url_catched, this, &WebFlowCredentialsDialog.on_signal_url_catched);
+            connect (this.web_view, WebView.on_signal_url_catched, this, WebFlowCredentialsDialog.on_signal_url_catched);
     //  #endif // WITH_WEBENGINE
         }
 
         var app = static_cast<Application> (Gtk.Application);
-        connect (app, &Application.signal_is_showing_settings_dialog, this, &WebFlowCredentialsDialog.on_signal_show_settings_dialog);
+        connect (app, Application.signal_is_showing_settings_dialog, this, WebFlowCredentialsDialog.on_signal_show_settings_dialog);
 
         this.error_label = new Gtk.Label ();
         this.error_label.hide ();
@@ -206,9 +206,14 @@ class WebFlowCredentialsDialog : Gtk.Dialog {
     ***********************************************************/
     public void on_signal_show_settings_dialog () {
         // bring window to top but slightly delay, to avoid being hidden behind the SettingsDialog
-        QTimer.single_shot (100, this, [this] {
-            OwncloudGui.raise_dialog (this);
-        });
+        QTimer.single_shot (100, this, on_signal_show_delayed);
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_show_delayed () {
+        OwncloudGui.raise_dialog (this);
     }
 
 

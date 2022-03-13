@@ -57,7 +57,7 @@ class SyncRunFileLog : GLib.Object {
 
             GLib.File file = GLib.File.new_for_path (filename);
             file.open (QIODevice.ReadOnly| QIODevice.Text);
-            QTextStream in (&file);
+            QTextStream in (file);
             string line = in.read_line ();
 
             if (string.compare (folder_path,line,Qt.CaseSensitive)!=0) {

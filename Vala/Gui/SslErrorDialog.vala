@@ -44,13 +44,13 @@ class SslErrorDialog : Gtk.Dialog {
         ok_button.enabled (false);
 
         this.ui.cb_trust_connect.enabled (!Theme.instance ().forbid_bad_ssl ());
-        connect (this.ui.cb_trust_connect, &QAbstractButton.clicked,
-            ok_button, &Gtk.Widget.enabled);
+        connect (this.ui.cb_trust_connect, QAbstractButton.clicked,
+            ok_button, Gtk.Widget.enabled);
 
         if (ok_button) {
             ok_button.default (true);
-            connect (ok_button, &QAbstractButton.clicked, this, &Gtk.Dialog.accept);
-            connect (cancel_button, &QAbstractButton.clicked, this, &Gtk.Dialog.reject);
+            connect (ok_button, QAbstractButton.clicked, this, Gtk.Dialog.accept);
+            connect (cancel_button, QAbstractButton.clicked, this, Gtk.Dialog.reject);
         }
     }
 

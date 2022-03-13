@@ -70,7 +70,7 @@ class OwncloudConnectionMethodDialog : Gtk.Dialog {
     The URL that was tried
     ***********************************************************/
     public void url (GLib.Uri url) {
-        ui.label.on_signal_text (_("<html><head/><body><p>Failed to connect to the secure server address <em>%1</em>. How do you wish to proceed?</p></body></html>").arg (url.to_display_"".to_html_escaped ()));
+        ui.label.on_signal_text (_("<html><head/><body><p>Failed to connect to the secure server address <em>%1</em>. How do you wish to proceed?</p></body></html>").arg (url.to_display_string ().to_html_escaped ()));
     }
 
 

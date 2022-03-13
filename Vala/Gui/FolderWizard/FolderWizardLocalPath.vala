@@ -28,7 +28,7 @@ class FolderWizardLocalPath : FormatWarningsWizardPage {
         this.account = account;
         this.ui.up_ui (this);
         register_field ("source_folder*", this.ui.local_folder_line_edit);
-        connect (this.ui.local_folder_choose_btn, &QAbstractButton.clicked, this, &FolderWizardLocalPath.on_signal_choose_local_folder);
+        connect (this.ui.local_folder_choose_btn, QAbstractButton.clicked, this, FolderWizardLocalPath.on_signal_choose_local_folder);
         this.ui.local_folder_choose_btn.tool_tip (_("Click to select a local folder to sync."));
 
         GLib.Uri server_url = this.account.url ();
@@ -55,7 +55,7 @@ class FolderWizardLocalPath : FormatWarningsWizardPage {
         bool is_ok = error_str.is_empty ();
         string[] warn_strings;
         if (!is_ok) {
-            warn_strings + error_str;
+            warn_strings += error_str;
         }
 
         this.ui.warn_label.word_wrap (true);
@@ -95,8 +95,8 @@ class FolderWizardLocalPath : FormatWarningsWizardPage {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_choose_local_folder () {
-        string sf = QStandardPaths.writable_location (QStandardPaths.Home_location);
-        QDir d (sf);
+        string sf = QStandardPaths.writable_location (QStandardPaths.HomeLocation);
+        QDir d = new QDir (sf);
 
         // open the first entry of the home directory. Otherwise the directory picker comes
         // up with the closed home directory icon, stupid Qt default...

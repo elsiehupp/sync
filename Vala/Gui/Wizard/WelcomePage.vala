@@ -27,7 +27,7 @@ class WelcomePage : QWizardPage {
     ***********************************************************/
     public WelcomePage (OwncloudWizard oc_wizard) {
         base ();
-        this.ui = new Ui.WelcomePage ()
+        this.ui = new Ui.WelcomePage ();
         this.oc_wizard = oc_wizard;
         this.up_ui ();
     }
@@ -102,40 +102,58 @@ class WelcomePage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void set_up_slide_show () {
-        connect (this.ui.slide_show, &SlideShow.clicked, this.ui.slide_show, &SlideShow.on_signal_stop_show);
-        connect (this.ui.slide_show_next_button, &QPushButton.clicked, this.ui.slide_show, &SlideShow.on_signal_next_slide);
-        connect (this.ui.slide_show_previous_button, &QPushButton.clicked, this.ui.slide_show, &SlideShow.on_signal_prev_slide);
+        connect (this.ui.slide_show, SlideShow.clicked, this.ui.slide_show, SlideShow.on_signal_stop_show);
+        connect (this.ui.slide_show_next_button, QPushButton.clicked, this.ui.slide_show, SlideShow.on_signal_next_slide);
+        connect (this.ui.slide_show_previous_button, QPushButton.clicked, this.ui.slide_show, SlideShow.on_signal_prev_slide);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void set_up_login_button () {
-        const var app_name = Theme.instance ().app_name_gui ();
+        const string app_name = Theme.instance ().app_name_gui ();
 
         this.ui.login_button.on_signal_text (_("Log in to your %1").arg (app_name));
-        connect (this.ui.login_button, &QPushButton.clicked, this, [this] (bool /*checked*/) {
-            this.next_page = WizardCommon.Pages.PAGE_SERVER_SETUP;
-            this.oc_wizard.next ();
-        });
+        connect (
+            this.ui.login_button,
+            QPushButton.clicked,
+            this,
+            this.on_login_button_clicked
+        );
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_login_button_clicked (bool checked) {
+        this.next_page = WizardCommon.Pages.PAGE_SERVER_SETUP;
+        this.oc_wizard.next ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void set_up_create_account_button () {
-    #ifdef WITH_WEBENGINE
-        connect (this.ui.create_account_button, &QPushButton.clicked, this, [this] (bool /*checked*/) {
-            this.oc_wizard.registration (true);
-            this.next_page = WizardCommon.Pages.PAGE_WEB_VIEW;
-            this.oc_wizard.next ();
-        });
-    #else // WITH_WEBENGINE
-        connect (this.ui.create_account_button, &QPushButton.clicked, this, [this] (bool /*checked*/) {
-            this.oc_wizard.registration (true);
-            Utility.open_browser ("https://nextcloud.com/register");
-        });
-    #endif // WITH_WEBENGINE
+        connect (
+            this.ui.create_account_button,
+            QPushButton.clicked,
+            this,
+            this.on_create_account_button_clicked
+        );
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_create_account_button_clicked (bool checked) {
+    //  #ifdef WITH_WEBENGINE
+        this.oc_wizard.registration (true);
+        this.next_page = WizardCommon.Pages.PAGE_WEB_VIEW;
+        this.oc_wizard.next ();
+    //  #else // WITH_WEBENGINE
+        this.oc_wizard.registration (true);
+        Utility.open_browser ("https://nextcloud.com/register");
+    //  #endif // WITH_WEBENGINE
     }
 
 

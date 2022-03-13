@@ -57,10 +57,10 @@ class SelectiveSyncWidget : Gtk.Widget {
 
         layout.add_widget (this.folder_tree);
 
-        connect (this.folder_tree, &QTreeWidget.item_expanded,
-            this, &SelectiveSyncWidget.on_signal_item_expanded);
-        connect (this.folder_tree, &QTreeWidget.item_changed,
-            this, &SelectiveSyncWidget.on_signal_item_changed);
+        connect (this.folder_tree, QTreeWidget.item_expanded,
+            this, SelectiveSyncWidget.on_signal_item_expanded);
+        connect (this.folder_tree, QTreeWidget.item_changed,
+            this, SelectiveSyncWidget.on_signal_item_changed);
         this.folder_tree.sorting_enabled (true);
         this.folder_tree.sort_by_column (0, Qt.AscendingOrder);
         this.folder_tree.column_count (2);
@@ -291,8 +291,8 @@ class SelectiveSyncWidget : Gtk.Widget {
         var job = new LsColJob (this.account, prefix + directory, this);
         job.properties (GLib.List<GLib.ByteArray> ("resourcetype"
                                                + "http://owncloud.org/ns:size");
-        connect (job, &LsColJob.directory_listing_subfolders,
-            this, &SelectiveSyncWidget.on_signal_update_directories);
+        connect (job, LsColJob.directory_listing_subfolders,
+            this, SelectiveSyncWidget.on_signal_update_directories);
         job.on_signal_start ();
     }
 
@@ -396,12 +396,12 @@ class SelectiveSyncWidget : Gtk.Widget {
             props + "http://nextcloud.org/ns:is-encrypted";
         }
         job.properties (props);
-        connect (job, &LsColJob.directory_listing_subfolders,
-            this, &SelectiveSyncWidget.on_signal_update_directories);
-        connect (job, &LsColJob.finished_with_error,
-            this, &SelectiveSyncWidget.on_signal_lscol_finished_with_error);
-        connect (job, &LsColJob.directory_listing_iterated,
-            this, &SelectiveSyncWidget.on_signal_gather_encrypted_paths);
+        connect (job, LsColJob.directory_listing_subfolders,
+            this, SelectiveSyncWidget.on_signal_update_directories);
+        connect (job, LsColJob.finished_with_error,
+            this, SelectiveSyncWidget.on_signal_lscol_finished_with_error);
+        connect (job, LsColJob.directory_listing_iterated,
+            this, SelectiveSyncWidget.on_signal_gather_encrypted_paths);
         job.on_signal_start ();
         this.folder_tree.clear ();
         this.loading.show ();

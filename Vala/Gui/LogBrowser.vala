@@ -61,7 +61,7 @@ class LogBrowser : Gtk.Dialog {
         var enable_logging_button = new QCheckBox;
         enable_logging_button.on_signal_text (_("Enable logging to temporary folder"));
         enable_logging_button.checked (ConfigFile ().automatic_log_dir ());
-        connect (enable_logging_button, &QCheckBox.toggled, this, &LogBrowser.toggle_permanent_logging);
+        connect (enable_logging_button, QCheckBox.toggled, this, LogBrowser.toggle_permanent_logging);
         main_layout.add_widget (enable_logging_button);
 
         label = new Gtk.Label (
@@ -73,7 +73,7 @@ class LogBrowser : Gtk.Dialog {
 
         var open_folder_button = new QPushButton;
         open_folder_button.on_signal_text (_("Open folder"));
-        connect (open_folder_button, &QPushButton.clicked, this, [] () {
+        connect (open_folder_button, QPushButton.clicked, this, [] () {
             string path = Logger.instance ().temporary_folder_log_dir_path ();
             QDir ().mkpath (path);
             QDesktopServices.open_url (GLib.Uri.from_local_file (path));
@@ -82,7 +82,7 @@ class LogBrowser : Gtk.Dialog {
 
         var btnbox = new QDialogButtonBox;
         QPushButton close_btn = btnbox.add_button (QDialogButtonBox.Close);
-        connect (close_btn, &QAbstractButton.clicked, this, &Gtk.Widget.close);
+        connect (close_btn, QAbstractButton.clicked, this, Gtk.Widget.close);
 
         main_layout.add_stretch ();
         main_layout.add_widget (btnbox);
@@ -93,7 +93,7 @@ class LogBrowser : Gtk.Dialog {
 
         var show_log_window = new QAction (this);
         show_log_window.shortcut (QKeySequence ("F12"));
-        connect (show_log_window, &QAction.triggered, this, &Gtk.Widget.close);
+        connect (show_log_window, QAction.triggered, this, Gtk.Widget.close);
         add_action (show_log_window);
 
         ConfigFile config;

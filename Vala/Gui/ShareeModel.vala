@@ -62,8 +62,8 @@ class ShareeModel : QAbstractListModel {
         this.search = search;
         this.sharee_blocklist = blocklist;
         var job = new OcsShareeJob (this.account);
-        connect (job, &OcsShareeJob.signal_sharee_job_finished, this, &ShareeModel.on_signal_sharees_fetched);
-        connect (job, &OcsJob.ocs_error, this, &ShareeModel.signal_display_error_message);
+        connect (job, OcsShareeJob.signal_sharee_job_finished, this, ShareeModel.on_signal_sharees_fetched);
+        connect (job, OcsJob.ocs_error, this, ShareeModel.signal_display_error_message);
         job.get_sharees (this.search, this.type, 1, 50, lookup_mode == LookupMode.GLOBAL_SEARCH ? true : false);
     }
 

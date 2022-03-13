@@ -26,14 +26,14 @@ class UpdateInfo {
     ***********************************************************/
     public UpdateInfo.parse_element (QDomElement element) {
         if (element.tag_name () != "owncloudclient") {
-            GLib.critical ("Expected 'owncloudclient', got '" + element.tag_name ("'.";
+            GLib.critical ("Expected 'owncloudclient', got '" + element.tag_name () + "'.");
             if (this.ok) {
                 this.ok = false;
             }
             return UpdateInfo ();
         }
 
-        UpdateInfo this = UpdateInfo ();
+        //  UpdateInfo this = UpdateInfo ();
 
         QDomNode n;
         for (n = element.first_child (); !n.is_null (); n = n.next_sibling ()) {

@@ -55,8 +55,8 @@ class FileActivityListModel : ActivityListModel {
 
         const string url = "ocs/v2.php/apps/activity/api/v2/activity/filter";
         var job = new JsonApiJob (account_state ().account (), url, this);
-        GLib.Object.connect (job, &JsonApiJob.json_received,
-            this, &FileActivityListModel.activities_received);
+        connect (job, JsonApiJob.json_received,
+            this, FileActivityListModel.activities_received);
 
         QUrlQuery parameters;
         parameters.add_query_item ("sort", "asc");
