@@ -197,7 +197,7 @@ class GeneralSettings : Gtk.Widget {
         int m1 = 0;
         int m2 = 0;
         int m3 = 0;
-        this.ui.horizontal_layout_3.get_contents_margins (m0, m1, m2, m3);
+        this.ui.horizontal_layout_3.contents_margins (m0, m1, m2, m3);
         this.ui.horizontal_layout_3.contents_margins (0, m1, m2, m3);
 
         // OEM themes are not obliged to ship mono icons, so there
@@ -316,7 +316,7 @@ class GeneralSettings : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_create_debug_archive () {
-        const var filename = QFileDialog.get_save_filename (this, _("Create Debug Archive"), "", _("Zip Archives") + " (*.zip)");
+        const var filename = QFileDialog.save_filename (this, _("Create Debug Archive"), "", _("Zip Archives") + " (*.zip)");
         if (filename.is_empty ()) {
             return;
         }
@@ -434,7 +434,7 @@ class GeneralSettings : Gtk.Widget {
         );
         connect (
             this.ui.update_channel,
-            QCombo_box.current_text_changed,
+            QComboBox.current_text_changed,
             this,
             GeneralSettings.on_signal_update_channel_changed,
             Qt.UniqueConnection

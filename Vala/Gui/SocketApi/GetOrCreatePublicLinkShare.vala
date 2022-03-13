@@ -79,9 +79,9 @@ class GetOrCreatePublicLinkShare : GLib.Object {
             if (!link_share)
                 continue;
 
-            if (link_share.get_name () == share_name) {
+            if (link_share.name () == share_name) {
                 GLib.debug ("Found existing share, reusing";
-                return on_signal_success (link_share.get_link ().to_string ());
+                return on_signal_success (link_share.share_link ().to_string ());
             }
         }
 
@@ -95,7 +95,7 @@ class GetOrCreatePublicLinkShare : GLib.Object {
     ***********************************************************/
     private void on_signal_link_share_created (unowned LinkShare share) {
         GLib.debug ("New share created";
-        on_signal_success (share.get_link ().to_string ());
+        on_signal_success (share.share_link ().to_string ());
     }
 
 
@@ -103,7 +103,7 @@ class GetOrCreatePublicLinkShare : GLib.Object {
     ***********************************************************/
     private void on_signal_password_required () {
         bool ok = false;
-        string password = QInputDialog.get_text (null,
+        string password = QInputDialog.text (null,
                                                  _("Password for share required"),
                                                  _("Please enter a password for your link share:"),
                                                  QLineEdit.Normal,

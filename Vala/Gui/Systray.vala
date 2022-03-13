@@ -32,9 +32,9 @@ namespace Ui {
 ***********************************************************/
 class Systray : QSystemTrayIcon {
 
-    const int NOTIFICATIONS_SERVICE "org.freedesktop.Notifications"
-    const int NOTIFICATIONS_PATH "/org/freedesktop/Notifications"
-    const int NOTIFICATIONS_IFACE "org.freedesktop.Notifications"
+    const string NOTIFICATIONS_SERVICE = "org.freedesktop.Notifications";
+    const string NOTIFICATIONS_PATH = "/org/freedesktop/Notifications";
+    const string NOTIFICATIONS_IFACE = "org.freedesktop.Notifications";
 
     class AccessManagerFactory : QQmlNetworkAccessManagerFactory {
 
@@ -53,11 +53,11 @@ class Systray : QSystemTrayIcon {
 
     /***********************************************************
     ***********************************************************/
-    public enum Task_bar_position {
-        Bottom,
-        Left,
-        Top,
-        Right
+    public enum TaskBarPosition {
+        BOTTOM,
+        LEFT,
+        TOP,
+        RIGHT
     }
 
     /***********************************************************
@@ -99,28 +99,36 @@ class Systray : QSystemTrayIcon {
 
     private Systray () {
         base ();
-        qml_register_singleton_type<UserModel> ("com.nextcloud.desktopclient", 1, 0, "UserModel",
-            [] (QQmlEngine *, QJSEngine *) . GLib.Object * {
-                return UserModel.instance ();
-            }
+        qml_register_singleton_type<UserModel> (
+            "com.nextcloud.desktopclient",
+            1,
+            0,
+            "UserModel",
+            on_signal_user_model_instance_for_engineon_signal_instance_for_engine
         );
 
-        qml_register_singleton_type<UserAppsModel> ("com.nextcloud.desktopclient", 1, 0, "UserAppsModel",
-            [] (QQmlEngine *, QJSEngine *) . GLib.Object * {
-                return UserAppsModel.instance ();
-            }
+        qml_register_singleton_type<UserAppsModel> (
+            "com.nextcloud.desktopclient",
+            1,
+            0,
+            "UserAppsModel",
+            on_signal_user_apps_model_instance_for_engineon_signal_instance_for_engine
         );
 
-        qml_register_singleton_type<Systray> ("com.nextcloud.desktopclient", 1, 0, "Theme",
-            [] (QQmlEngine *, QJSEngine *) . GLib.Object * {
-                return Theme.instance ();
-            }
+        qml_register_singleton_type<Systray> (
+            "com.nextcloud.desktopclient",
+            1,
+            0,
+            "Theme",
+            on_signal_theme_instance_for_engineon_signal_instance_for_engine
         );
 
-        qml_register_singleton_type<Systray> ("com.nextcloud.desktopclient", 1, 0, "Systray",
-            [] (QQmlEngine *, QJSEngine *) . GLib.Object * {
-                return Systray.instance ();
-            }
+        qml_register_singleton_type<Systray> (
+            "com.nextcloud.desktopclient",
+            1,
+            0,
+            "Systray",
+            on_signal_systray_instance_for_engineon_signal_instance_for_engine
         );
 
         qml_register_type<WheelHandler> ("com.nextcloud.desktopclient", 1, 0, "WheelHandler");
@@ -138,25 +146,11 @@ class Systray : QSystemTrayIcon {
         context_menu.add_action (_("Exit %1").arg (Theme.instance ().app_name_gui ()), this, Systray.signal_shutdown);
         context_menu (context_menu);
 
-        connect (context_menu, QMenu.about_to_show, [=] {
-            const var folders = FolderMan.instance ().map ();
-
-            const var all_paused = std.all_of (std.cbegin (folders), std.cend (folders), [] (Folder f) {
-                return f.sync_paused ();
-            });
-            const var pause_text = folders.size () > 1 ? _("Pause sync for all") : _("Pause sync");
-            pause_action.on_signal_text (pause_text);
-            pause_action.visible (!all_paused);
-            pause_action.enabled (!all_paused);
-
-            const var any_paused = std.any_of (std.cbegin (folders), std.cend (folders), [] (Folder f) {
-                return f.sync_paused ();
-            });
-            const var resume_text = folders.size () > 1 ? _("Resume sync for all") : _("Resume sync");
-            resume_action.on_signal_text (resume_text);
-            resume_action.visible (any_paused);
-            resume_action.enabled (any_paused);
-        });
+        connect (
+            context_menu,
+            QMenu.about_to_show,
+            on_signal_context_menu_about_to_show
+        );
 
         connect (UserModel.instance (), UserModel.signal_new_user_selected,
             this, Systray.on_signal_new_user_selected);
@@ -165,6 +159,57 @@ class Systray : QSystemTrayIcon {
 
         connect (AccountManager.instance (), AccountManager.on_signal_account_added,
             this, Systray.show_window);
+    }
+
+
+    private UserModel on_signal_user_model_instance_for_engineon_signal_instance_for_engine (QQmlEngine qml_engine, QJSEngine qjs_engine) {
+        return UserModel.instance ();
+    }
+
+
+    private UserAppsModel on_signal_user_apps_model_instance_for_engineon_signal_instance_for_engine (QQmlEngine qml_engine, QJSEngine qjs_engine) {
+        return UserAppsModel.instance ();
+    }
+
+
+    private Theme on_signal_theme_instance_for_engineon_signal_instance_for_engine (QQmlEngine qml_engine, QJSEngine qjs_engine) {
+        return Theme.instance ();
+    }
+
+
+    private Systray on_signal_systray_instance_for_engineon_signal_instance_for_engine (QQmlEngine qml_engine, QJSEngine qjs_engine) {
+        return Systray.instance ();
+    }
+
+
+    private void on_signal_context_menu_about_to_show () {
+        const var folders = FolderMan.instance ().map ();
+
+        GLib.List<Folder> all_paused = new GLib.List<Folder> ();
+
+        foreach (Folder folder in folders) {
+            if (folder.sync_paused ()) {
+                all_paused.append (folder);
+            }
+        }
+
+        const string pause_text = folders.size () > 1 ? _("Pause sync for all") : _("Pause sync");
+        pause_action.on_signal_text (pause_text);
+        pause_action.visible (!all_paused);
+        pause_action.enabled (!all_paused);
+
+        GLib.List<Folder> any_paused = new GLib.List<Folder> ();
+
+        foreach (Folder folder in folders) {
+            if (folder.sync_paused ()) {
+                any_paused.append (folder);
+            }
+        }
+
+        const string resume_text = folders.size () > 1 ? _("Resume sync for all") : _("Resume sync");
+        resume_action.on_signal_text (resume_text);
+        resume_action.visible (any_paused);
+        resume_action.enabled (any_paused);
     }
 
 
@@ -177,8 +222,8 @@ class Systray : QSystemTrayIcon {
 
         this.tray_engine.add_import_path ("qrc:/qml/theme");
         this.tray_engine.add_ImageProvider ("avatars", new ImageProvider ());
-        this.tray_engine.add_ImageProvider ("svgimage-custom-color", new Occ.Ui.SvgImageProvider);
-        this.tray_engine.add_ImageProvider ("unified-search-result-icon", new UnifiedSearchResultImageProvider);
+        this.tray_engine.add_ImageProvider ("svgimage-custom-color", new Occ.Ui.SvgImageProvider ());
+        this.tray_engine.add_ImageProvider ("unified-search-result-icon", new UnifiedSearchResultImageProvider ());
     }
 
 
@@ -195,7 +240,7 @@ class Systray : QSystemTrayIcon {
         /* emit */ activated (QSystemTrayIcon.Activation_reason.Unknown);
 
         const var folder_map = FolderMan.instance ().map ();
-        for (var folder : folder_map) {
+        foreach (var folder in folder_map) {
             if (!folder.sync_paused ()) {
                 this.sync_is_paused = false;
                 break;
@@ -209,7 +254,7 @@ class Systray : QSystemTrayIcon {
         if (QDBusInterface (NOTIFICATIONS_SERVICE, NOTIFICATIONS_PATH, NOTIFICATIONS_IFACE).is_valid ()) {
             const QVariantMap hints = {{"desktop-entry", LINUX_APPLICATION_ID}};
             GLib.List<GLib.Variant> args = GLib.List<GLib.Variant> () + APPLICATION_NAME + uint32 (0) + APPLICATION_ICON_NAME
-                                                    + title + message + string[] () + hints + int32 (-1);
+                                                    + title + message + { } + hints + int32 (-1);
             QDBus_message method = QDBus_message.create_method_call (NOTIFICATIONS_SERVICE, NOTIFICATIONS_PATH, NOTIFICATIONS_IFACE, "Notify");
             method.arguments (args);
             QDBusConnection.session_bus ().async_call (method);
@@ -343,27 +388,30 @@ class Systray : QSystemTrayIcon {
     /***********************************************************
     ***********************************************************/
     private void pause_on_signal_all_folders_helper (bool pause) {
-        // For some reason we get the raw pointer from Folder.account_state ()
-        // that's why we need a list of raw pointers for the call to contains
-        // later on...
-        const var accounts = [=] {
-            const var ptr_list = AccountManager.instance ().accounts ();
-            var result = GLib.List<AccountState> ();
-            result.reserve (ptr_list.size ());
-            std.transform (std.cbegin (ptr_list), std.cend (ptr_list), std.back_inserter (result), [] (AccountStatePtr account) {
-                return account.data ();
-            });
-            return result;
-        } ();
         const var folders = FolderMan.instance ().map ();
-        for (var f : folders) {
-            if (accounts.contains (f.account_state ())) {
-                f.sync_paused (pause);
+        foreach (var folder in folders) {
+            if (accounts.contains (folder.account_state ())) {
+                folder.sync_paused (pause);
                 if (pause) {
-                    f.on_signal_terminate_sync ();
+                    folder.on_signal_terminate_sync ();
                 }
             }
         }
+    }
+
+
+
+    /***********************************************************
+    For some reason we get the raw pointer from Folder.account_state ()
+    that's why we need a list of raw pointers for the call to
+    contains later on...
+    ***********************************************************/
+    private static AccountState accounts () {
+        GLib.List<AccountState> account_state_list = new GLib.List<AccountState> ();
+        foreach (AccountState account in AccountManager.instance ().accounts ()) {
+            account_state_list.append (account.data ());
+        }
+        return account_state_list;
     }
 
 
@@ -373,7 +421,7 @@ class Systray : QSystemTrayIcon {
         const var screens = QGuiApplication.screens ();
         const var cursor_pos = QCursor.position ();
 
-        for (var screen : screens) {
+        foreach (var screen in screens) {
             if (screen.geometry ().contains (cursor_pos)) {
                 return screen;
             }
@@ -397,38 +445,38 @@ class Systray : QSystemTrayIcon {
     /***********************************************************
     ***********************************************************/
     private QPoint compute_window_reference_point () {
-        constexpr var spacing = 4;
+        const int spacing = 4;
         const var tray_icon_center = calc_tray_icon_center ();
         const var taskbar_rect = taskbar_geometry ();
         const var taskbar_screen_edge = taskbar_orientation ();
         const var screen_rect = current_screen_rect ();
 
-        GLib.debug ("screen_rect:" + screen_rect;
-        GLib.debug ("taskbar_rect:" + taskbar_rect;
-        GLib.debug ("taskbar_screen_edge:" + taskbar_screen_edge;
-        GLib.debug ("tray_icon_center:" + tray_icon_center;
+        GLib.debug ("screen_rect: " + screen_rect);
+        GLib.debug ("taskbar_rect: " + taskbar_rect);
+        GLib.debug ("taskbar_screen_edge: " + taskbar_screen_edge);
+        GLib.debug ("tray_icon_center: " + tray_icon_center);
 
         switch (taskbar_screen_edge) {
-        case Task_bar_position.Bottom:
-            return {
+        case TaskBarPosition.BOTTOM:
+            return new QPoint (
                 tray_icon_center.x (),
                 screen_rect.bottom () - taskbar_rect.height () - spacing
-            }
-        case Task_bar_position.Left:
-            return {
+            );
+        case TaskBarPosition.LEFT:
+            return new QPoint (
                 screen_rect.left () + taskbar_rect.width () + spacing,
                 tray_icon_center.y ()
-            }
-        case Task_bar_position.Top:
-            return {
+            );
+        case TaskBarPosition.TOP:
+            return new QPoint (
                 tray_icon_center.x (),
                 screen_rect.top () + taskbar_rect.height () + spacing
-            }
-        case Task_bar_position.Right:
-            return {
+            );
+        case TaskBarPosition.RIGHT:
+            return new QPoint (
                 screen_rect.right () - taskbar_rect.width () - spacing,
                 tray_icon_center.y ()
-            }
+            );
         }
         GLib.assert_not_reached ();
     }
@@ -444,7 +492,7 @@ class Systray : QSystemTrayIcon {
 
     /***********************************************************
     ***********************************************************/
-    private Task_bar_position taskbar_orientation () {
+    private TaskBarPosition taskbar_orientation () {
         const var screen_rect = current_screen_rect ();
         const var tray_icon_center = calc_tray_icon_center ();
 
@@ -456,13 +504,13 @@ class Systray : QSystemTrayIcon {
         const var min_dist = std.min ({dist_right, dist_top, dist_bottom});
 
         if (min_dist == dist_bottom) {
-            return Task_bar_position.Bottom;
+            return TaskBarPosition.BOTTOM;
         } else if (min_dist == dist_left) {
-            return Task_bar_position.Left;
+            return TaskBarPosition.LEFT;
         } else if (min_dist == dist_top) {
-            return Task_bar_position.Top;
+            return TaskBarPosition.TOP;
         } else {
-            return Task_bar_position.Right;
+            return TaskBarPosition.RIGHT;
         }
     }
 
@@ -471,7 +519,7 @@ class Systray : QSystemTrayIcon {
     TODO: Get real taskbar dimensions on Linux as well
     ***********************************************************/
     private QRect taskbar_geometry () {
-        if (taskbar_orientation () == Task_bar_position.Bottom || taskbar_orientation () == Task_bar_position.Top) {
+        if (taskbar_orientation () == TaskBarPosition.BOTTOM || taskbar_orientation () == TaskBarPosition.TOP) {
             var screen_width = current_screen_rect ().width ();
             return {0, 0, screen_width, 32};
         } else {
@@ -486,48 +534,68 @@ class Systray : QSystemTrayIcon {
     private QPoint compute_window_position (int width, int height) {
         const var reference_point = compute_window_reference_point ();
 
-        const var taskbar_screen_edge = taskbar_orientation ();
+        const TaskBarPosition taskbar_screen_edge = taskbar_orientation ();
         const var screen_rect = current_screen_rect ();
 
-        const var top_left = [=] () {
-            switch (taskbar_screen_edge) {
-            case Task_bar_position.Bottom:
-                return reference_point - QPoint (width / 2, height);
-            case Task_bar_position.Left:
-                return reference_point;
-            case Task_bar_position.Top:
-                return reference_point - QPoint (width / 2, 0);
-            case Task_bar_position.Right:
-                return reference_point - QPoint (width, 0);
-            }
-            GLib.assert_not_reached ();
-        } ();
-        const var bottom_right = top_left + QPoint (width, height);
-        const var window_rect = [=] () {
-            const var rect = QRect (top_left, bottom_right);
-            var offset = QPoint ();
-
-            if (rect.left () < screen_rect.left ()) {
-                offset.x (screen_rect.left () - rect.left () + 4);
-            } else if (rect.right () > screen_rect.right ()) {
-                offset.x (screen_rect.right () - rect.right () - 4);
-            }
-
-            if (rect.top () < screen_rect.top ()) {
-                offset.y (screen_rect.top () - rect.top () + 4);
-            } else if (rect.bottom () > screen_rect.bottom ()) {
-                offset.y (screen_rect.bottom () - rect.bottom () - 4);
-            }
-
-            return rect.translated (offset);
-        } ();
+        const QPoint bottom_right = top_left (reference_point) + QPoint (width, height);
 
         GLib.debug ("taskbar_screen_edge: " + taskbar_screen_edge.to_string ());
         GLib.debug ("screen_rect: " + screen_rect.to_string ());
-        GLib.debug ("window_rect (reference) " + QRect (top_left, bottom_right).to_string ());
+        GLib.debug ("window_rect (reference) " + QRect (top_left (reference_point), bottom_right).to_string ());
         GLib.debug ("window_rect (adjusted) " + window_rect.to_string ());
 
-        return window_rect.top_left ();
+        return window_rect (
+            screen_rect,
+            reference_point,
+            bottom_right
+        ).top_left (
+            taskbar_screen_edge,
+            reference_point,
+            bottom_right,
+            width,
+            height
+        );
+    }
+
+
+    private static QPoint top_left (
+        TaskBarPosition taskbar_screen_edge,
+        QPoint reference_point,
+        QPoint bottom_right,
+        int width,
+        int height
+    ) {
+        switch (taskbar_screen_edge) {
+        case TaskBarPosition.BOTTOM:
+            return reference_point - QPoint (width / 2, height);
+        case TaskBarPosition.LEFT:
+            return reference_point;
+        case TaskBarPosition.TOP:
+            return reference_point - QPoint (width / 2, 0);
+        case TaskBarPosition.RIGHT:
+            return reference_point - QPoint (width, 0);
+        }
+        GLib.assert_not_reached ();
+    }
+
+
+    private static QRect window_rect (QRect screen_rect, QPoint reference_point, QPoint bottom_right) {
+        const QRect rect = QRect (top_left (reference_point), bottom_right);
+        var offset = QPoint ();
+
+        if (rect.left () < screen_rect.left ()) {
+            offset.x (screen_rect.left () - rect.left () + 4);
+        } else if (rect.right () > screen_rect.right ()) {
+            offset.x (screen_rect.right () - rect.right () - 4);
+        }
+
+        if (rect.top () < screen_rect.top ()) {
+            offset.y (screen_rect.top () - rect.top () + 4);
+        } else if (rect.bottom () > screen_rect.bottom ()) {
+            offset.y (screen_rect.bottom () - rect.bottom () - 4);
+        }
+
+        return rect.translated (offset);
     }
 
 } // class Systray

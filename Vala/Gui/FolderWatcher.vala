@@ -215,7 +215,7 @@ class FolderWatcher : GLib.Object {
 
         var path = this.test_notification_path;
         if (GLib.File.exists (path)) {
-            var mtime = FileSystem.get_mod_time (path);
+            var mtime = FileSystem.mod_time (path);
             FileSystem.mod_time (path, mtime + 1);
         } else {
             GLib.File f = new GLib.File (path);

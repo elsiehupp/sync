@@ -726,7 +726,7 @@ class AccountSettings : Gtk.Widget {
 
         // Wipe selective sync blocklist
         bool ok = false;
-        var old_blocklist = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
+        var old_blocklist = folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
         folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, {});
 
         // Change the folder vfs mode and load the plugin
@@ -993,7 +993,7 @@ class AccountSettings : Gtk.Widget {
             }
 
             bool ok = false;
-            var undecided_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok);
+            var undecided_list = folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok);
             foreach (var item in undecided_list) {
                 // FIXME: add the folder alias in a hoover hint.
                 // folder.alias () + "/"
@@ -1133,7 +1133,7 @@ class AccountSettings : Gtk.Widget {
             // It might be an E2EE mangled path, so let's try to demangle it
             const var journal = info.folder.journal_database ();
             SyncJournalFileRecord record;
-            journal.get_file_record_by_e2e_mangled_name (remote_path, record);
+            journal.file_record_by_e2e_mangled_name (remote_path, record);
 
             const var path = record.is_valid () ? record.path : remote_path;
 

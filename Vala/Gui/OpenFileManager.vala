@@ -28,7 +28,9 @@ namespace Ui {
 class OpenFileManager {
 
     static string default_manager;
-    static string name;;
+    static string name;
+
+    static bool dolphin_can_select;
 
     /***********************************************************
     Inspired by Qt Creator's show_in_graphical_shell ();
@@ -49,7 +51,7 @@ class OpenFileManager {
         if (args.count () > 0)
             app = args.take_first ();
 
-        string kde_select_param ("--select");
+        string kde_select_param = "--select";
 
         if (app.contains ("konqueror") && !args.contains (kde_select_param)) {
             // konq needs '--select' in order not to launch the file
@@ -58,7 +60,7 @@ class OpenFileManager {
         }
 
         if (app.contains ("dolphin")) {
-            static bool dolphin_can_select = check_dolphin_can_select ();
+            OpenFileManager.dolphin_can_select = check_dolphin_can_select ();
             if (dolphin_can_select && !args.contains (kde_select_param)) {
                 args.prepend (kde_select_param);
                 can_handle_file = true;
@@ -84,17 +86,18 @@ class OpenFileManager {
         std.replace (args.begin (), args.end (), string.from_latin1 ("%F"), file_to_open);
 
         // fixme: needs to append --icon, according to http://standards.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html#exec-variables
-        string[].iterator it = std.find (args.begin (), args.end (), string.from_latin1 ("%i"));
-        if (it != args.end ()) {
-            (*it) = desktop_file.value ("Desktop Entry/Icon").to_string ();
-            args.insert (it, string.from_latin1 ("--icon")); // before
+        foreach (string arg in args) {
+            if (arg == "%i") {
+                args.insert (desktop_file.value ("Desktop Entry/Icon").to_string (), "--icon"); // before
+            }
         }
 
-        if (args.count () == 0)
-            args + file_to_open;
+        if (args.count () == 0) {
+            args += file_to_open;
+        }
 
         if (app.is_empty () || args.is_empty () || !can_handle_file) {
-            // fall back : open the default file manager, without ever selecting the file
+            // fallback: open the default file manager, without ever selecting the file
             QDesktopServices.open_url (GLib.Uri.from_local_file (path_to_open));
         } else {
             QProcess.start_detached (app, args);
@@ -131,22 +134,28 @@ class OpenFileManager {
     ***********************************************************/
     public static string find_default_file_manager () {
         QProcess p;
-        p.on_signal_start ("xdg-mime", string[] ("query"
-                                        + "default"
-                                        + "inode/directory",
-            GLib.File.ReadOnly);
+        p.on_signal_start (
+            "xdg-mime",
+            {
+                "query",
+                "default",
+                "inode/directory"
+            },
+            GLib.File.ReadOnly
+        );
         p.wait_for_finished ();
-        string filename = string.from_utf8 (p.read_all ().trimmed ());
-        if (filename.is_empty ())
+        string filename = p.read_all ().trimmed ();
+        if (filename.is_empty ()) {
             return "";
+        }
 
         GLib.FileInfo file_info;
         string[] dirs = xdg_data_dirs ();
         string[] subdirectories;
-        subdirectories + "/applications/"
+        subdirectories += "/applications/"
                 + "/applications/kde4/";
-        foreach (string directory, dirs) {
-            foreach (string subdir, subdirectories) {
+        foreach (string directory in dirs) {
+            foreach (string subdir in subdirectories) {
                 file_info.file (directory + subdir + filename);
                 if (file_info.exists ()) {
                     return file_info.absolute_file_path ();
@@ -162,7 +171,7 @@ class OpenFileManager {
     ***********************************************************/
     public static bool check_dolphin_can_select () {
         QProcess p;
-        p.on_signal_start ("dolphin", string[] ("--help", GLib.File.ReadOnly);
+        p.on_signal_start ("dolphin", { "--help", GLib.File.ReadOnly });
         p.wait_for_finished ();
         return p.read_all ().contains ("--select");
     }

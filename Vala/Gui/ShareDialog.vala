@@ -60,7 +60,7 @@ class ShareDialog : Gtk.Dialog {
         ShareDialogStartPage start_page,
         Gtk.Widget parent = null) {
         base (parent);
-        this.ui = new Ui.ShareDialog ()
+        this.ui = new Ui.ShareDialog ();
         this.account_state = account_state;
         this.share_path = share_path;
         this.local_path = local_path;
@@ -74,12 +74,17 @@ class ShareDialog : Gtk.Dialog {
         this.ui.up_ui (this);
 
         // We want to act on account state changes
-        connect (this.account_state.data (), AccountState.state_changed, this, ShareDialog.on_signal_account_state_changed);
+        connect (
+            this.account_state.data (),
+            AccountState.state_changed,
+            this,
+            ShareDialog.on_signal_account_state_changed
+        );
 
         // Set icon
-        GLib.FileInfo f_info (this.local_path);
+        GLib.FileInfo file_info = new GLib.FileInfo (this.local_path);
         QFileIconProvider icon_provider;
-        QIcon icon = icon_provider.icon (f_info);
+        QIcon icon = icon_provider.icon (file_info);
         var pixmap = icon.pixmap (THUMBNAIL_SIZE, THUMBNAIL_SIZE);
         if (pixmap.width () > 0) {
             this.ui.label_icon.pixmap (pixmap);
@@ -88,11 +93,11 @@ class ShareDialog : Gtk.Dialog {
         // Set filename
         string filename = GLib.FileInfo (this.share_path).filename ();
         this.ui.label_name.on_signal_text (_("%1").arg (filename));
-        QFont f (this.ui.label_name.font ());
-        f.point_size (q_round (f.point_size () * 1.4));
-        this.ui.label_name.font (f);
+        QFont font = new QFont (this.ui.label_name.font ());
+        font.point_size (q_round (font.point_size () * 1.4));
+        this.ui.label_name.font (font);
 
-        string oc_dir (this.share_path);
+        string oc_dir = this.share_path;
         oc_dir.truncate (oc_dir.length () - filename.length ());
 
         oc_dir.replace (QRegularExpression ("^/*"), "");
@@ -136,10 +141,10 @@ class ShareDialog : Gtk.Dialog {
 
         bool sharing_possible = true;
         if (!account_state.account ().capabilities ().share_public_link ()) {
-            GLib.warning ("Link shares have been disabled";
+            GLib.warning ("Link shares have been disabled.");
             sharing_possible = false;
-        } else if (! (max_sharing_permissions & Share_permission_share)) {
-            GLib.warning ("The file cannot be shared because it does not have sharing permission.";
+        } else if (!(max_sharing_permissions & Share_permission_share)) {
+            GLib.warning ("The file cannot be shared because it does not have sharing permission.");
             sharing_possible = false;
         }
 
@@ -174,15 +179,15 @@ class ShareDialog : Gtk.Dialog {
         const GLib.Variant received_permissions = result["share-permissions"];
         if (!received_permissions.to_string ().is_empty ()) {
             this.max_sharing_permissions = static_cast<SharePermissions> (received_permissions.to_int ());
-            GLib.info ("Received sharing permissions for" + this.share_path + this.max_sharing_permissions;
+            GLib.info ("Received sharing permissions for " + this.share_path + this.max_sharing_permissions);
         }
         var private_link_url = result["privatelink"].to_string ();
         var numeric_file_id = result["fileid"].to_byte_array ();
         if (!private_link_url.is_empty ()) {
-            GLib.info ("Received private link url for" + this.share_path + private_link_url;
+            GLib.info ("Received private link url for " + this.share_path + private_link_url);
             this.private_link_url = private_link_url;
         } else if (!numeric_file_id.is_empty ()) {
-            GLib.info ("Received numeric file identifier for" + this.share_path + numeric_file_id;
+            GLib.info ("Received numeric file identifier for " + this.share_path + numeric_file_id);
             this.private_link_url = this.account_state.account ().deprecated_private_link_url (numeric_file_id).to_string (GLib.Uri.FullyEncoded);
         }
 
@@ -205,7 +210,7 @@ class ShareDialog : Gtk.Dialog {
     ***********************************************************/
     private void on_signal_thumbnail_fetched (int status_code, GLib.ByteArray reply) {
         if (status_code != 200) {
-            GLib.warning ("Thumbnail status code: " + status_code;
+            GLib.warning ("Thumbnail status code: " + status_code);
             return;
         }
 
@@ -221,14 +226,14 @@ class ShareDialog : Gtk.Dialog {
     ***********************************************************/
     private void on_signal_account_state_changed (int state) {
         bool enabled = (state == AccountState.State.Connected);
-        GLib.debug ("Account connected?" + enabled;
+        GLib.debug ("Account connected? " + enabled);
 
         if (this.user_group_widget) {
             this.user_group_widget.enabled (enabled);
         }
 
         if (this.link_widget_list.size () > 0) {
-            foreach (ShareLinkWidget widget, this.link_widget_list) {
+            foreach (ShareLinkWidget widget in this.link_widget_list) {
                 widget.enabled (state);
             }
         }
@@ -241,9 +246,9 @@ class ShareDialog : Gtk.Dialog {
         /* emit */ signal_toggle_share_link_animation (true);
 
         const string version_string = this.account_state.account ().server_version ();
-        GLib.info () + version_string + "Fetched" + shares.count ("shares";
-        foreach (var share, shares) {
-            if (share.get_share_type () != Share.Type_link || share.get_uid_owner () != share.account ().dav_user ()) {
+        GLib.info (version_string + "Fetched" + shares.count () + "shares");
+        foreach (var share in shares) {
+            if (share.share_type () != Share.Type.LINK || share.owner_uid () != share.account ().dav_user ()) {
                 continue;
             }
 
@@ -301,7 +306,7 @@ class ShareDialog : Gtk.Dialog {
             connect (share_link_widget, ShareLinkWidget.create_password_processed, this, ShareDialog.on_signal_create_password_for_link_share_processed);
             share_link_widget.link_share ().password (password);
         } else {
-            GLib.critical ("share_link_widget is not a sender!";
+            GLib.critical ("share_link_widget is not a sender!");
         }
     }
 
@@ -315,7 +320,7 @@ class ShareDialog : Gtk.Dialog {
             disconnect (this.manager, ShareManager.on_signal_link_share_requires_password, share_link_widget, ShareLinkWidget.on_signal_create_share_requires_password);
             disconnect (share_link_widget, ShareLinkWidget.create_password_processed, this, ShareDialog.on_signal_create_password_for_link_share_processed);
         } else {
-            GLib.critical ("share_link_widget is not a sender!";
+            GLib.critical ("share_link_widget is not a sender!");
         }
     }
 
@@ -324,7 +329,7 @@ class ShareDialog : Gtk.Dialog {
     ***********************************************************/
     private void on_signal_link_share_requires_password () {
         bool ok = false;
-        string password = QInputDialog.get_text (this,
+        string password = QInputDialog.text (this,
                                                  _("Password for share required"),
                                                  _("Please enter a password for your link share:"),
                                                  QLineEdit.Password,
@@ -423,7 +428,7 @@ class ShareDialog : Gtk.Dialog {
         link_share_widget.link_share (link_share);
 
         connect (link_share.data (), Share.on_signal_server_error, link_share_widget, ShareLinkWidget.on_signal_server_error);
-        connect (link_share.data (), Share.share_deleted, link_share_widget, ShareLinkWidget.on_signal_delete_share_fetched);
+        connect (link_share.data (), Share.signal_share_deleted, link_share_widget, ShareLinkWidget.on_signal_delete_share_fetched);
 
         if (this.manager) {
             connect (this.manager, ShareManager.on_signal_server_error, link_share_widget, ShareLinkWidget.on_signal_server_error);
@@ -474,13 +479,11 @@ class ShareDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private static string create_random_password () {
-        const var words = Occ.Word_list.get_random_words (10);
-
-        const var add_first_letter = [] (string current, string next) . string {
-            return current + next.at (0);
+        string password;
+        foreach (string word in Occ.Word_list.random_words (10)) {
+            password += word;
         }
-
-        return std.accumulate (std.cbegin (words), std.cend (words), "", add_first_letter);
+        return password;
     }
 
 } // class ShareDialog

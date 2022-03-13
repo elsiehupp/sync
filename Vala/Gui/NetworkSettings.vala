@@ -55,8 +55,8 @@ class NetworkSettings : Gtk.Widget {
         load_bandwidth_limit_settings ();
 
         // proxy
-        connect (this.ui.type_combo_box, static_cast<void (QCombo_box.*) (int)> (QCombo_box.current_index_changed), this, NetworkSettings.on_signal_save_proxy_settings);
-        connect (this.ui.proxy_button_group, static_cast<void (QButton_group.*) (int)> (QButton_group.button_clicked), this, NetworkSettings.on_signal_save_proxy_settings);
+        connect (this.ui.type_combo_box, (CurrentIndexChanged) QComboBox.current_index_changed, this, NetworkSettings.on_signal_save_proxy_settings);
+        connect (this.ui.proxy_button_group, (ProxyButtonGroupClicked) QButtonGroup.button_clicked, this, NetworkSettings.on_signal_save_proxy_settings);
         connect (this.ui.host_line_edit, QLineEdit.editing_finished, this, NetworkSettings.on_signal_save_proxy_settings);
         connect (this.ui.user_line_edit, QLineEdit.editing_finished, this, NetworkSettings.on_signal_save_proxy_settings);
         connect (this.ui.password_line_edit, QLineEdit.editing_finished, this, NetworkSettings.on_signal_save_proxy_settings);
@@ -69,14 +69,20 @@ class NetworkSettings : Gtk.Widget {
         connect (this.ui.download_limit_radio_button, QAbstractButton.clicked, this, NetworkSettings.on_signal_save_bandwidth_limit_settings);
         connect (this.ui.no_download_limit_radio_button, QAbstractButton.clicked, this, NetworkSettings.on_signal_save_bandwidth_limit_settings);
         connect (this.ui.auto_download_limit_radio_button, QAbstractButton.clicked, this, NetworkSettings.on_signal_save_bandwidth_limit_settings);
-        connect (this.ui.download_spin_box, static_cast<void (QSpinBox.*) (int)> (QSpinBox.value_changed), this, NetworkSettings.on_signal_save_bandwidth_limit_settings);
-        connect (this.ui.upload_spin_box, static_cast<void (QSpinBox.*) (int)> (QSpinBox.value_changed), this, NetworkSettings.on_signal_save_bandwidth_limit_settings);
+        connect (this.ui.download_spin_box, (DownloadSpinBoxValueChanged) QSpinBox.value_changed, this, NetworkSettings.on_signal_save_bandwidth_limit_settings);
+        connect (this.ui.upload_spin_box, (UploadSpinBoxValueChanged) QSpinBox.value_changed, this, NetworkSettings.on_signal_save_bandwidth_limit_settings);
 
         // Warn about empty proxy host
         connect (this.ui.host_line_edit, QLineEdit.text_changed, this, NetworkSettings.on_signal_check_empty_proxy_host);
         on_signal_check_empty_proxy_host ();
         on_signal_check_account_localhost ();
     }
+
+
+    private delegate void CurrentIndexChanged (QComboBox box, int index);
+    private delegate void ProxyButtonGroupClicked (QButtonGroup group, int index);
+    private delegate void DownloadSpinBoxValueChanged (QSpinBox spin_box, int value);
+    private delegate void UploadSpinBoxValueChanged (QSpinBox spin_box, int value);
 
 
     override ~NetworkSettings () {
@@ -87,10 +93,10 @@ class NetworkSettings : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public override QSize size_hint () {
-        return {
+        return new QSize (
             OwncloudGui.settings_dialog_size ().width (),
             Gtk.Widget.size_hint ().height ()
-        }
+        );
     }
 
 
@@ -152,7 +158,7 @@ class NetworkSettings : Gtk.Widget {
         FolderMan.instance ().dirty_proxy ();
 
         const var accounts = AccountManager.instance ().accounts ();
-        for (var account : accounts) {
+        foreach (var account in accounts) {
             account.fresh_connection_attempt ();
         }
     }
@@ -203,11 +209,12 @@ class NetworkSettings : Gtk.Widget {
         if (this.ui.manual_proxy_radio_button.is_checked ()) {
             // Check if at least one account is using localhost, because Qt proxy settings have no
             // effect for localhost (#7169)
-            for (var account : AccountManager.instance ().accounts ()) {
+            foreach (var account in AccountManager.instance ().accounts ()) {
                 const var host = account.account ().url ().host ();
                 // Some typical url for localhost
-                if (host == "localhost" || host.starts_with ("127.") || host == "[.1]")
+                if (host == "localhost" || host.starts_with ("127.") || host == "[.1]") {
                     visible = true;
+                }
             }
         }
         this.ui.label_localhost.visible (visible);

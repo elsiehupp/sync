@@ -296,7 +296,7 @@ class ActivityListModel : QAbstractListModel {
                 // hiding the share button which is what we want
                 if (folder) {
                     SyncJournalFileRecord record;
-                    folder.journal_database ().get_file_record (a.file.mid (1), record);
+                    folder.journal_database ().file_record (a.file.mid (1), record);
                     if (record.is_valid () && (record.is_e2e_encrypted || !record.e2e_mangled_name.is_empty ())) {
                         return "";
                     }

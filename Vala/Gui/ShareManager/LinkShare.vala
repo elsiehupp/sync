@@ -16,252 +16,216 @@ class LinkShare : Share {
 
     /***********************************************************
     ***********************************************************/
-    public LinkShare (AccountPointer account,
-        const string identifier,
-        const string uidowner,
-        const string owner_display_name,
-        const string path,
-        const string name,
-        const string token,
-        const Permissions permissions,
-        bool is_password_set,
-        const GLib.Uri url,
-        const QDate expire_date,
-        const string note,
-        const string label);
+    string name {
+        /***********************************************************
+        Returns the name of the link share. Can be empty.
+        ***********************************************************/
+        public get {
+            return this.name;
+        }
+        /***********************************************************
+        Set the name of the link share.
+
+        Emits either signal_name_set () or on_signal_server_error ().
+        ***********************************************************/
+        public set {
+            create_share_job (LinkShare.on_signal_name_set).name (identifier (), value);
+        }
+    }
+
+
+    string token {
+        /***********************************************************
+        Returns the token of the link share.
+        ***********************************************************/
+        public get {
+            return this.token;
+        }
+        private set {
+            this.token = value;
+        }
+    }
+
+
+    string note {
+        /***********************************************************
+        Returns the note of the link share.
+        ***********************************************************/
+        public get {
+            return this.note;
+        }
+        /***********************************************************
+        Set the note of the link share.
+        ***********************************************************/
+        public set {
+            create_share_job (LinkShare.on_signal_note_set).note (identifier (), value);
+        }
+    }
+
+
+    QDate expire_date {
+        /***********************************************************
+        Get the expiration date
+        ***********************************************************/
+        public get {
+            return this.expire_date;
+        }
+        /***********************************************************
+        Set the expiration date
+    
+        On on_signal_success the signal_expire_date_set signal is emitted
+        In case of a server error the on_signal_server_error signal is emitted.
+        ***********************************************************/
+        public set {
+            create_share_job (LinkShare.on_signal_expire_date_set).expire_date (identifier (), value);
+        }
+    }
+
+
+    GLib.Uri share_link {
+        /***********************************************************
+        Get the share link
+        ***********************************************************/
+        public get {
+            return this.share_link;
+        }
+        private set {
+            this.share_link = value;
+        }
+    }
+
+
+    string label {
+        /***********************************************************
+        Returns the label of the link share.
+        ***********************************************************/
+        public get {
+            return this.label;
+        }
+        /***********************************************************
+        Set the label of the share link.
+        ***********************************************************/
+        public set {
+            create_share_job (LinkShare.on_signal_label_set).label (identifier (), value);
+        }
+    }
+
+
+    signal void signal_expire_date_set ();
+    signal void signal_note_set ();
+    signal void signal_name_set ();
+    signal void signal_label_set ();
 
 
     /***********************************************************
-    Get the share link
     ***********************************************************/
-    public GLib.Uri get_link ();
+    public LinkShare (
+        AccountPointer account,
+        string identifier,
+        string owner_uid,
+        string owner_display_name,
+        string path,
+        string name,
+        string token,
+        Permissions permissions,
+        bool is_password_set,
+        GLib.Uri url,
+        QDate expire_date,
+        string note,
+        string label) {
+        base (account, identifier, owner_uid, owner_display_name, path, Share.Type.LINK, is_password_set, permissions);
+        this.name = name;
+        this.token = token;
+        this.note = note;
+        this.expire_date = expire_date;
+        this.url = url;
+        this.label = label;
+    }
 
 
     /***********************************************************
     The share's link for direct downloading.
     ***********************************************************/
-    public GLib.Uri get_direct_download_link ();
+    public GLib.Uri direct_download_link () {
+        GLib.Uri url = this.share_link;
+        url.path (url.path () + "/download");
+        return url;
+    }
 
 
     /***********************************************************
     Get the public_upload status of this share
     ***********************************************************/
-    public bool get_public_upload ();
+    public bool public_upload () {
+        return this.permissions & Share_permission_create;
+    }
 
 
     /***********************************************************
     Whether directory listings are available (READ permission)
     ***********************************************************/
-    public bool get_show_file_listing ();
-
-
-    /***********************************************************
-    Returns the name of the link share. Can be empty.
-    ***********************************************************/
-    public string get_name ();
-
-
-    /***********************************************************
-    Returns the note of the link share.
-    ***********************************************************/
-    public string get_note ();
-
-
-    /***********************************************************
-    Returns the label of the link share.
-    ***********************************************************/
-    public string get_label ();
-
-
-    /***********************************************************
-    Set the name of the link share.
-
-    Emits either name_set () or on_signal_server_error ().
-    ***********************************************************/
-    public void name (string name);
-
-
-    /***********************************************************
-    Set the note of the link share.
-    ***********************************************************/
-    public void note (string note);
-
-
-    /***********************************************************
-    Returns the token of the link share.
-    ***********************************************************/
-    public string get_token ();
-
-
-    /***********************************************************
-    Get the expiration date
-    ***********************************************************/
-    public QDate get_expire_date ();
-
-
-    /***********************************************************
-    Set the expiration date
-
-    On on_signal_success the expire_date_set signal is emitted
-    In case of a server error the on_signal_server_error signal is emitted.
-    ***********************************************************/
-    public void expire_date (QDate expire_date);
-
-
-    /***********************************************************
-    Set the label of the share link.
-    ***********************************************************/
-    public void label (string label);
+    public bool show_file_listing () {
+        return this.permissions & SharePermissionRead;
+    }
 
 
     /***********************************************************
     Create OcsShareJob and connect to signal/slots
-    ***********************************************************/
+
     public template <typename Link_share_slot>
-    public OcsShareJob create_share_job (Link_share_slot on_signal_function);
-
-signals:
-    void expire_date_set ();
-    void note_set ();
-    void name_set ();
-    void label_set ();
-
-
-    /***********************************************************
     ***********************************************************/
-    private void on_signal_note_set (QJsonDocument &, GLib.Variant value);
-    private void on_signal_expire_date_set (QJsonDocument reply, GLib.Variant value);
-    private void on_signal_name_set (QJsonDocument &, GLib.Variant value);
-    private void on_signal_label_set (QJsonDocument &, GLib.Variant value);
-
-
-    /***********************************************************
-    ***********************************************************/
-    private string this.name;
-    private string this.token;
-    private string this.note;
-    private QDate this.expire_date;
-    private GLib.Uri this.url;
-    private string this.label;
-}
-
-
-
-
-
-GLib.Uri LinkShare.get_link () {
-    return this.url;
-}
-
-GLib.Uri LinkShare.get_direct_download_link () {
-    GLib.Uri url = this.url;
-    url.path (url.path () + "/download");
-    return url;
-}
-
-QDate LinkShare.get_expire_date () {
-    return this.expire_date;
-}
-
-LinkShare.LinkShare (AccountPointer account,
-    private const string identifier,
-    private const string uidowner,
-    private const string owner_display_name,
-    private const string path,
-    private const string name,
-    private const string token,
-    Permissions permissions,
-    bool is_password_set,
-    const GLib.Uri url,
-    const QDate expire_date,
-    private const string note,
-    private const string label)
-    : Share (account, identifier, uidowner, owner_display_name, path, Share.Type_link, is_password_set, permissions)
-    this.name (name)
-    this.token (token)
-    this.note (note)
-    this.expire_date (expire_date)
-    this.url (url)
-    this.label (label) {
-}
-
-bool LinkShare.get_public_upload () {
-    return this.permissions & Share_permission_create;
-}
-
-bool LinkShare.get_show_file_listing () {
-    return this.permissions & SharePermissionRead;
-}
-
-string LinkShare.get_name () {
-    return this.name;
-}
-
-string LinkShare.get_note () {
-    return this.note;
-}
-
-string LinkShare.get_label () {
-    return this.label;
-}
-
-void LinkShare.name (string name) {
-    create_share_job (LinkShare.on_signal_name_set).name (get_id (), name);
-}
-
-void LinkShare.note (string note) {
-    create_share_job (LinkShare.on_signal_note_set).note (get_id (), note);
-}
-
-void LinkShare.on_signal_note_set (QJsonDocument &, GLib.Variant note) {
-    this.note = note.to_string ();
-    /* emit */ note_set ();
-}
-
-string LinkShare.get_token () {
-    return this.token;
-}
-
-void LinkShare.expire_date (QDate date) {
-    create_share_job (LinkShare.on_signal_expire_date_set).expire_date (get_id (), date);
-}
-
-void LinkShare.label (string label) {
-    create_share_job (LinkShare.on_signal_label_set).label (get_id (), label);
-}
-
-template <typename Link_share_slot>
-OcsShareJob *LinkShare.create_share_job (Link_share_slot on_signal_function) {
-    var job = new OcsShareJob (this.account);
-    connect (job, OcsShareJob.share_job_finished, this, on_signal_function);
-    connect (job, OcsJob.ocs_error, this, LinkShare.on_signal_ocs_error);
-    return job;
-}
-
-void LinkShare.on_signal_expire_date_set (QJsonDocument reply, GLib.Variant value) {
-    var data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
-
-
-    /***********************************************************
-    If the reply provides a data back (more REST style)
-    they use this date.
-    ***********************************************************/
-    if (data.value ("expiration").is_"") {
-        this.expire_date = QDate.from_string (data.value ("expiration").to_string (), "yyyy-MM-dd 00:00:00");
-    } else {
-        this.expire_date = value.to_date ();
+    public OcsShareJob create_share_job (Link_share_slot on_signal_function) {
+        var job = new OcsShareJob (this.account);
+        connect (job, OcsShareJob.share_job_finished, this, on_signal_function);
+        connect (job, OcsJob.ocs_error, this, LinkShare.on_signal_ocs_error);
+        return job;
     }
-    /* emit */ expire_date_set ();
-}
 
-void LinkShare.on_signal_name_set (QJsonDocument &, GLib.Variant value) {
-    this.name = value.to_string ();
-    /* emit */ name_set ();
-}
 
-void LinkShare.on_signal_label_set (QJsonDocument &, GLib.Variant label) {
-    if (this.label != label.to_string ()) {
-        this.label = label.to_string ();
-        /* emit */ label_set ();
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_note_set (QJsonDocument reply, GLib.Variant value) {
+        this.note = note.to_string ();
+        /* emit */ signal_note_set ();
     }
-}
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_expire_date_set (QJsonDocument reply, GLib.Variant value) {
+        var data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
+
+        /***********************************************************
+        If the reply provides a data back (more REST style)
+        they use this date.
+        ***********************************************************/
+        if (data.value ("expiration").is_string ()) {
+            this.expire_date = QDate.from_string (data.value ("expiration").to_string (), "yyyy-MM-dd 00:00:00");
+        } else {
+            this.expire_date = value.to_date ();
+        }
+        /* emit */ signal_expire_date_set ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_name_set (QJsonDocument reply, GLib.Variant value) {
+        this.name = value.to_string ();
+        /* emit */ signal_name_set ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_label_set (QJsonDocument reply, GLib.Variant value) {
+        if (this.label != label.to_string ()) {
+            this.label = label.to_string ();
+            /* emit */ signal_label_set ();
+        }
+    }
+
+} // class LinkShare
+
+} // namespace Ui
+} // namespace Occ

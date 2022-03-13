@@ -489,7 +489,7 @@ class UserModel : QAbstractListModel {
         if (current_user_index () < 0 || current_user_index () >= this.users.size ())
             return null;
 
-        return this.users[current_user_index ()].get_activity_model ();
+        return this.users[current_user_index ()].activity_model ();
     }
 
 

@@ -36,7 +36,7 @@ class FileActivityListModel : ActivityListModel {
 
         const var file = folder.file_from_local_path (local_path);
         SyncJournalFileRecord file_record;
-        if (!folder.journal_database ().get_file_record (file, file_record) || !file_record.is_valid ()) {
+        if (!folder.journal_database ().file_record (file, file_record) || !file_record.is_valid ()) {
             return;
         }
 

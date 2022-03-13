@@ -55,13 +55,41 @@ class SocketUploadJob : GLib.Object {
         this.engine = new SyncEngine (account.account (), this.local_path.ends_with ('/') ? this.local_path : this.local_path + '/', this.remote_path, this.database);
         this.engine.parent (this.database);
 
-        connect (this.engine, Occ.SyncEngine.item_completed, this, [this] (Occ.SyncFileItemPtr item) {
-            this.synced_files.append (item.file);
-        });
+        connect (
+            this.engine,
+            Occ.SyncEngine.signal_item_completed,
+            this,
+            this.on_signal_sync_engine_item_completed
+        );
 
-        connect (this.engine, Occ.SyncEngine.on_signal_finished, this, [this] (bool ok) {
-            if (ok) {
-                this.api_job.on_signal_success ({
+        connect (
+            this.engine,
+            Occ.SyncEngine.signal_finished,
+            this,
+            this.on_signal_sync_engine_finished
+        );
+        connect (
+            this.engine,
+            Occ.SyncEngine.sync_error,
+            this,
+            this.on_signal_sync_engine_sync_error
+        );
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_sync_engine_item_completed (Occ.SyncFileItemPtr item) {
+        this.synced_files.append (item.file);
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_sync_engine_finished (bool ok) {
+        if (ok) {
+            this.api_job.on_signal_success (
+                {
                     {
                         "local_path",
                         this.local_path
@@ -70,13 +98,18 @@ class SocketUploadJob : GLib.Object {
                         "synced_files",
                         QJsonArray.from_string_list (this.synced_files)
                     }
-                });
-            }
-        });
-        connect (this.engine, Occ.SyncEngine.sync_error, this, [this] (string error, ErrorCategory) {
-            this.api_job.failure (error);
-        });
+                }
+            );
+        }
     }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_sync_engine_sync_error (string error, ErrorCategory category) {
+        this.api_job.failure (error);
+    }
+
 
     /***********************************************************
     ***********************************************************/
@@ -90,16 +123,31 @@ class SocketUploadJob : GLib.Object {
         this.engine.sync_options (opt);
 
         // create the directory, fail if it already exists
-        var mkdir = new Occ.MkColJob (this.engine.account (), this.remote_path);
-        connect (mkdir, Occ.MkColJob.finished_without_error, this.engine, Occ.SyncEngine.on_signal_start_sync);
-        connect (mkdir, Occ.MkColJob.finished_with_error, this, [this] (Soup.Reply reply) {
-            if (reply.error () == 202) {
-                this.api_job.failure ("Destination %1 already exists".arg (this.remote_path));
-            } else {
-                this.api_job.failure (reply.error_string ());
-            }
-        });
-        mkdir.on_signal_start ();
+        var mkcol_job = new Occ.MkColJob (this.engine.account (), this.remote_path);
+        connect (
+            mkcol_job,
+            Occ.MkColJob.finished_without_error,
+            this.engine,
+            Occ.SyncEngine.on_signal_start_sync
+        );
+        connect (
+            mkcol_job,
+            Occ.MkColJob.finished_with_error,
+            this,
+            this.on_signal_mkcol_job_finished_with_error
+        );
+        mkcol_job.on_signal_start ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_mkcol_job_finished_with_error (Soup.Reply reply) {
+        if (reply.error () == 202) {
+            this.api_job.failure ("Destination %1 already exists".arg (this.remote_path));
+        } else {
+            this.api_job.failure (reply.error_string ());
+        }
     }
 
 } // class SocketUploadJob

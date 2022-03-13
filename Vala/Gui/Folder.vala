@@ -1148,7 +1148,7 @@ class Folder : GLib.Object {
         QDir folderpath = new QDir (this.definition.local_path);
         GLib.Set<string> keep_nothing;
         const GLib.Vector<SyncJournalDb.DownloadInfo> deleted_infos =
-            this.journal.get_and_delete_stale_download_infos (keep_nothing);
+            this.journal.and_delete_stale_download_infos (keep_nothing);
         foreach (var deleted_info in deleted_infos) {
             const string temporary_path = folderpath.file_path (deleted_info.tmpfile);
             GLib.info ("Deleting temporary file: " + temporary_path);
@@ -1213,7 +1213,7 @@ class Folder : GLib.Object {
     
     
         SyncJournalFileRecord record;
-        this.journal.get_file_record (relative_path_bytes, record);
+        this.journal.file_record (relative_path_bytes, record);
         if (reason != ChangeReason.ChangeReason.UNLOCK) {
             // Check that the mtime/size actually changed or there was
             // an attribute change (pin state) that caused the notification
@@ -1270,7 +1270,7 @@ class Folder : GLib.Object {
     
         // Set in the database that we should download the file
         SyncJournalFileRecord record;
-        this.journal.get_file_record (relative_path.to_utf8 (), record);
+        this.journal.file_record (relative_path.to_utf8 (), record);
         if (!record.is_valid ()) {
             GLib.info ("Did not find file in database.");
             return;
@@ -1539,15 +1539,15 @@ class Folder : GLib.Object {
         // Add the entry to the blocklist if it is neither in the blocklist or allowlist already
         bool ok1 = false;
         bool ok2 = false;
-        var blocklist = journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok1);
-        var allowlist = journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, ok2);
+        var blocklist = journal.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok1);
+        var allowlist = journal.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, ok2);
         if (ok1 && ok2 && !blocklist.contains (new_folder) && !allowlist.contains (new_folder)) {
             blocklist.append (new_folder);
             journal.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, blocklist);
         }
     
         // And add the entry to the undecided list and signal the UI
-        var undecided_list = journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok1);
+        var undecided_list = journal.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok1);
         if (ok1) {
             if (!undecided_list.contains (new_folder)) {
                 undecided_list.append (new_folder);
@@ -1619,7 +1619,7 @@ class Folder : GLib.Object {
         }
     
         bool ok = false;
-        var blocklist = this.journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
+        var blocklist = this.journal.selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
         if (!ok) {
             return;
         }

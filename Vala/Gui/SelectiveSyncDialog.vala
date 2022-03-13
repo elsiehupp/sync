@@ -45,7 +45,7 @@ class SelectiveSyncDialog : Gtk.Dialog {
         this.ok_button = null; // defined in on_signal_init ()
         bool ok = false;
         on_signal_init (account);
-        string[] selective_sync_list = this.folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
+        string[] selective_sync_list = this.folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
         if (ok) {
             this.selective_sync.folder_info (this.folder.remote_path (), this.folder.alias (), selective_sync_list);
         } else {
@@ -72,7 +72,7 @@ class SelectiveSyncDialog : Gtk.Dialog {
     public override void on_signal_accept () {
         if (this.folder) {
             bool ok = false;
-            var old_block_list_set = this.folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok).to_set ();
+            var old_block_list_set = this.folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok).to_set ();
             if (!ok) {
                 return;
             }

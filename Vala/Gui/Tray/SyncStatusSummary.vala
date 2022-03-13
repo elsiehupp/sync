@@ -151,12 +151,22 @@ class SyncStatusSummary : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void connect_to_folders_progress (Folder.Map map) {
-        for (var folder : folder_map) {
+        foreach (Folder folder in folder_map) {
             if (folder.account_state () == this.account_state.data ()) {
                 connect (
-                    folder, Folder.signal_progress_info, this, SyncStatusSummary.on_signal_folder_progress_info, Qt.UniqueConnection);
+                    folder,
+                    Folder.signal_progress_info,
+                    this,
+                    SyncStatusSummary.on_signal_folder_progress_info,
+                    Qt.UniqueConnection
+                );
             } else {
-                disconnect (folder, Folder.signal_progress_info, this, SyncStatusSummary.on_signal_folder_progress_info);
+                disconnect (
+                    folder,
+                    Folder.signal_progress_info,
+                    this,
+                    SyncStatusSummary.on_signal_folder_progress_info
+                );
             }
         }
     }
@@ -345,7 +355,7 @@ class SyncStatusSummary : GLib.Object {
     ***********************************************************/
     private void init_sync_state () {
         var sync_state_fallback_needed = true;
-        for (var folder : FolderMan.instance ().map ()) {
+        foreach (Folder folder in FolderMan.instance ().map ()) {
             on_signal_folder_sync_state_changed (folder);
             sync_state_fallback_needed = false;
         }

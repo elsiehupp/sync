@@ -124,7 +124,7 @@ class OcsJob : AbstractNetworkJob {
     @param message The message that is set in the metadata
     @return The statuscode of the OCS response
     ***********************************************************/
-    public static int get_json_return_code (QJsonDocument json, string message) {
+    public static int json_return_code (QJsonDocument json, string message) {
         // TODO proper checking
         var meta = json.object ().value ("ocs").to_object ().value ("meta").to_object ();
         int code = meta.value ("statuscode").to_int ();
@@ -215,7 +215,7 @@ class OcsJob : AbstractNetworkJob {
                         + error.error_string ()
                         + ":" + reply_data);
         } else {
-            status_code  = get_json_return_code (json, message);
+            status_code  = json_return_code (json, message);
         }
 
         //... then it checks for the status_code

@@ -27,10 +27,12 @@ class IgnoreListTableWidget : Gtk.Widget {
         window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
         ui.up_ui (this);
 
-        ui.description_label.on_signal_text (_("Files or folders matching a pattern will not be synchronized.\n\n"
-                                         "Items where deletion is allowed will be deleted if they prevent a "
-                                         "directory from being removed. "
-                                         "This is useful for meta data."));
+        ui.description_label.on_signal_text (
+            _("Files or folders matching a pattern will not be synchronized.\n\n"
+            + "Items where deletion is allowed will be deleted if they prevent a "
+            + "directory from being removed. "
+            + "This is useful for metadata.")
+        );
 
         ui.remove_push_button.enabled (false);
         connect (ui.table_widget,         &QTable_widget.item_selection_changed,
@@ -55,7 +57,7 @@ class IgnoreListTableWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public void read_ignore_file (string file, bool read_only) {
-        GLib.File ignores (file);
+        GLib.File ignores = new GLib.File (file);
         if (ignores.open (QIODevice.ReadOnly)) {
             while (!ignores.at_end ()) {
                 string line = string.from_utf8 (ignores.read_line ());
@@ -79,11 +81,11 @@ class IgnoreListTableWidget : Gtk.Widget {
         int new_row = ui.table_widget.row_count ();
         ui.table_widget.row_count (new_row + 1);
 
-        var pattern_item = new QTableWidgetItem;
+        var pattern_item = new QTableWidgetItem ();
         pattern_item.on_signal_text (pattern);
         ui.table_widget.item (new_row, pattern_col, pattern_item);
 
-        var deletable_item = new QTableWidgetItem;
+        var deletable_item = new QTableWidgetItem ();
         deletable_item.flags (Qt.ItemIsUserCheckable | Qt.ItemIsEnabled);
         deletable_item.check_state (deletable ? Qt.Checked : Qt.Unchecked);
         ui.table_widget.item (new_row, deletable_col, deletable_item);
@@ -138,7 +140,7 @@ class IgnoreListTableWidget : Gtk.Widget {
         // We need to force a remote discovery after a change of the ignore list.
         // Otherwise we would not download the files/directories that are no longer
         // ignored (because the remote etag did not change)   (issue #3172)
-        foreach (Folder folder, folder_man.map ()) {
+        foreach (Folder folder in folder_man.map ()) {
             folder.journal_database ().force_remote_discovery_next_sync ();
             folder_man.schedule_folder (folder);
         }
@@ -172,7 +174,7 @@ class IgnoreListTableWidget : Gtk.Widget {
     ***********************************************************/
     private void on_signal_add_pattern () {
         bool ok_clicked = false;
-        string pattern = QInputDialog.get_text (this, _("Add Ignore Pattern"),
+        string pattern = QInputDialog.text (this, _("Add Ignore Pattern"),
             _("Add a new ignore pattern:"),
             QLineEdit.Normal, "", ok_clicked);
 

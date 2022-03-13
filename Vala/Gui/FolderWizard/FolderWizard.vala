@@ -76,12 +76,21 @@ class FolderWizard : QWizard {
     ***********************************************************/
     public override bool event_filter (GLib.Object watched, QEvent event) {
         if (event.type () == QEvent.Layout_request) {
-            // Workaround QTBUG-3396 :  forces QWizard_private.update_layout ()
-            QTimer.single_shot (0, this, [this] {
-                title_format (title_format ());
-            });
+            // Workaround QTBUG-3396: forces QWizard_private.update_layout ()
+            QTimer.single_shot (
+                0,
+                this,
+                this.on_event_filter_timer
+            );
         }
         return QWizard.event_filter (watched, event);
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_event_filter_timer () {
+        title_format (title_format ());
     }
 
 
@@ -90,8 +99,9 @@ class FolderWizard : QWizard {
     public override void resize_event (QResizeEvent event) {
         QWizard.resize_event (event);
 
-        // workaround for QTBUG-22819 : when the error label word wrap, the minimum height is not adjusted
-        if (var page = current_page ()) {
+        // workaround for QTBUG-22819: when the error label word wrap, the minimum height is not adjusted
+        var page = current_page ();
+        if (page) {
             int hfw = page.height_for_width (page.width ());
             if (page.height () < hfw) {
                 page.minimum_size (page.minimum_size_hint ().width (), hfw);

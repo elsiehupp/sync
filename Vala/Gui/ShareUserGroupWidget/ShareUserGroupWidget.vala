@@ -78,7 +78,7 @@ class ShareUserGroupWidget : Gtk.Widget {
     ***********************************************************/
     private string last_created_share_id;
 
-    signal void signal_toggle_public_link_share (bool);
+    signal void signal_toggle_public_link_share (bool value);
     signal void signal_style_changed ();
 
     /***********************************************************
@@ -122,15 +122,18 @@ class ShareUserGroupWidget : Gtk.Widget {
         search_globally_action.icon (QIcon (":/client/theme/magnifying-glass.svg"));
         search_globally_action.tool_tip (_("Search globally"));
 
-        connect (search_globally_action, QAction.triggered, this, [this] () {
-            on_signal_search_for_sharees (ShareeModel.LookupMode.GLOBAL_SEARCH);
-        });
+        connect (
+            search_globally_action,
+            QAction.triggered,
+            this,
+            this.on_search_globally_action
+        );
 
         this.ui.sharee_line_edit.add_action (search_globally_action, QLineEdit.Leading_position);
 
         this.manager = new ShareManager (this.account, this);
         connect (this.manager, ShareManager.on_signal_shares_fetched, this, ShareUserGroupWidget.on_signal_shares_fetched);
-        connect (this.manager, ShareManager.share_created, this, ShareUserGroupWidget.on_signal_share_created);
+        connect (this.manager, ShareManager.signal_share_created, this, ShareUserGroupWidget.on_signal_share_created);
         connect (this.manager, ShareManager.on_signal_server_error, this, ShareUserGroupWidget.on_signal_display_error);
         connect (this.ui.sharee_line_edit, QLineEdit.return_pressed, this, ShareUserGroupWidget.on_signal_line_edit_return);
         connect (this.ui.confirm_share, QAbstractButton.clicked, this, ShareUserGroupWidget.on_signal_line_edit_return);
@@ -147,9 +150,11 @@ class ShareUserGroupWidget : Gtk.Widget {
         connect (this.ui.sharee_line_edit, QLineEdit.text_edited,
             this, ShareUserGroupWidget.on_signal_line_edit_text_edited, Qt.QueuedConnection);
         this.ui.sharee_line_edit.install_event_filter (this);
-        connect (this.completion_timer, QTimer.timeout, this, [this] () {
-            on_signal_search_for_sharees (ShareeModel.LookupMode.LOCAL_SEARCH);
-        });
+        connect (
+            this.completion_timer,
+            QTimer.timeout,
+            this,
+            this.on_completion_timer);
         this.completion_timer.single_shot (true);
         this.completion_timer.interval (600);
 
@@ -162,6 +167,16 @@ class ShareUserGroupWidget : Gtk.Widget {
         this.parent_scroll_area = parent_widget ().find_child<QScroll_area> ("scroll_area");
 
         customize_style ();
+    }
+
+
+    private void on_search_globally_action () {
+        on_signal_search_for_sharees (ShareeModel.LookupMode.GLOBAL_SEARCH);
+    }
+
+
+    private void on_completion_timer () {
+        on_signal_search_for_sharees (ShareeModel.LookupMode.LOCAL_SEARCH);
     }
 
 
@@ -182,7 +197,7 @@ class ShareUserGroupWidget : Gtk.Widget {
     public void on_signal_share_created (unowned Share share) {
         if (share && this.account.capabilities ().share_email_password_enabled () && !this.account.capabilities ().share_email_password_enforced ()) {
             // remember this share Id so we can set it's password Line Edit to focus later
-            this.last_created_share_id = share.get_id ();
+            this.last_created_share_id = share.identifier ();
         }
         // fetch all shares including the one we've just created
         on_signal_get_shares ();
@@ -208,28 +223,28 @@ class ShareUserGroupWidget : Gtk.Widget {
         layout.contents_margins (0, 0, 0, 0);
         int x = 0;
         int height = 0;
-        GLib.List<string> link_owners ({});
+        GLib.List<string> link_owners = new GLib.List<string> ();
 
-        ShareUserLine just_created_share_that_needs_password = null;
+        ShareUserLine just_created_share_that_needs_password;
 
         foreach (var share in shares) {
-            // We don't handle link shares, only Type_user or Type_group
-            if (share.get_share_type () == Share.Type_link) {
-                if (!share.get_uid_owner ().is_empty () &&
-                        share.get_uid_owner () != share.account ().dav_user ()) {
-                    link_owners.append (share.get_owner_display_name ());
+            // We don't handle link shares, only Share.Type.USER or Share.Type.GROUP
+            if (share.share_type () == Share.Type.LINK) {
+                if (!share.owner_uid ().is_empty () &&
+                        share.owner_uid () != share.account ().dav_user ()) {
+                    link_owners.append (share.owner_display_name ());
                  }
                 continue;
             }
 
             // the owner of the file that shared it first
             // leave out if it's the current user
-            if (x == 0 && !share.get_uid_owner ().is_empty () && ! (share.get_uid_owner () == this.account.credentials ().user ())) {
-                this.ui.main_owner_label.on_signal_text (string ("SharedFlag.SHARED with you by ").append (share.get_owner_display_name ()));
+            if (x == 0 && !share.owner_uid ().is_empty () && ! (share.owner_uid () == this.account.credentials ().user ())) {
+                this.ui.main_owner_label.on_signal_text (string ("SharedFlag.SHARED with you by ").append (share.owner_display_name ()));
             }
 
-            //  Q_ASSERT (Share.is_share_type_user_group_email_room_or_remote (share.get_share_type ()));
-            var user_group_share = q_shared_pointer_dynamic_cast<User_group_share> (share);
+            //  Q_ASSERT (Share.is_share_type_user_group_email_room_or_remote (share.share_type ()));
+            var user_group_share = q_shared_pointer_dynamic_cast<UserGroupShare> (share);
             var s = new ShareUserLine (this.account, user_group_share, this.max_sharing_permissions, this.is_file, this.parent_scroll_area);
             connect (s, ShareUserLine.resize_requested, this, ShareUserGroupWidget.on_signal_adjust_scroll_widget_size);
             connect (s, ShareUserLine.visual_deletion_done, this, ShareUserGroupWidget.on_signal_get_shares);
@@ -240,7 +255,7 @@ class ShareUserGroupWidget : Gtk.Widget {
 
             layout.add_widget (s);
 
-            if (!this.last_created_share_id.is_empty () && share.get_id () == this.last_created_share_id) {
+            if (!this.last_created_share_id.is_empty () && share.identifier () == this.last_created_share_id) {
                 this.last_created_share_id = "";
                 if (this.account.capabilities ().share_email_password_enabled () && !this.account.capabilities ().share_email_password_enforced ()) {
                     just_created_share_that_needs_password = s;
@@ -300,11 +315,11 @@ class ShareUserGroupWidget : Gtk.Widget {
         ShareeModel.ShareeSet blocklist;
 
         // Add the current user to this.sharees since we can't share with ourself
-        unowned Sharee current_user (new Sharee (this.account.credentials ().user (), "", Sharee.Type.User));
-        blocklist + current_user;
+        unowned Sharee current_user = new Sharee (this.account.credentials ().user (), "", Sharee.Type.USER);
+        blocklist += current_user;
 
-        foreach (var sw, this.parent_scroll_area.find_children<ShareUserLine> ()) {
-            blocklist + sw.share ().get_share_with ();
+        foreach (var share_widget in this.parent_scroll_area.find_children<ShareUserLine> ()) {
+            blocklist += share_widget.share ().share_with ();
         }
         this.ui.error_label.hide ();
         this.completer_model.fetch (this.ui.sharee_line_edit.text (), blocklist, lookup_mode);
@@ -331,8 +346,8 @@ class ShareUserGroupWidget : Gtk.Widget {
         // did the user type in one of the options?
         const var text = this.ui.sharee_line_edit.text ();
         for (int i = 0; i < this.completer_model.row_count (); ++i) {
-            const var sharee = this.completer_model.get_sharee (i);
-            if (sharee.format () == text
+            const var sharee = this.completer_model.sharee (i);
+            if (sharee.to_string () == text
                 || sharee.display_name () == text
                 || sharee.share_with () == text) {
                 on_signal_completer_activated (this.completer_model.index (i));
@@ -379,13 +394,13 @@ class ShareUserGroupWidget : Gtk.Widget {
         this.last_created_share_id = "";
 
         string password;
-        if (sharee.type () == Sharee.Email && this.account.capabilities ().share_email_password_enforced ()) {
+        if (sharee.type () == Sharee.Type.EMAIL && this.account.capabilities ().share_email_password_enforced ()) {
             this.ui.sharee_line_edit.clear ();
             // always show a dialog for password-enforced email shares
             bool ok = false;
 
             do {
-                password = QInputDialog.get_text (
+                password = QInputDialog.text (
                     this,
                     _("Password for share required"),
                     _("Please enter a password for your email share:"),
@@ -399,7 +414,7 @@ class ShareUserGroupWidget : Gtk.Widget {
             }
         }
 
-        this.manager.create_share (this.share_path, Share.ShareType (sharee.type ()),
+        this.manager.create_share (this.share_path, Share.Type (sharee.type ()),
             sharee.share_with (), this.max_sharing_permissions, password);
 
         this.ui.sharee_line_edit.enabled (false);
@@ -435,14 +450,14 @@ class ShareUserGroupWidget : Gtk.Widget {
     ***********************************************************/
     private void on_signal_adjust_scroll_widget_size () {
         QScroll_area scroll_area = this.parent_scroll_area;
-        const var share_user_line_childs = scroll_area.find_children<ShareUserLine> ();
+        const ShareUserLine share_user_line_childs = scroll_area.find_children<ShareUserLine> ();
 
         // Ask the child widgets to calculate their size
-        for (var share_user_line_child : share_user_line_childs) {
+        foreach (var share_user_line_child in share_user_line_childs) {
             share_user_line_child.adjust_size ();
         }
 
-        const var share_user_line_childs_count = share_user_line_childs.count ();
+        const int share_user_line_childs_count = share_user_line_childs.count ();
         scroll_area.visible (share_user_line_childs_count > 0);
         if (share_user_line_childs_count > 0 && share_user_line_childs_count <= 3) {
             scroll_area.fixed_height (scroll_area.widget ().size_hint ().height ());
@@ -458,9 +473,12 @@ class ShareUserGroupWidget : Gtk.Widget {
         menu.attribute (Qt.WA_DeleteOnClose);
 
         // this icon is not handled by on_signal_style_changed () . customize_style but we can live with that
-        menu.add_action (Theme.create_color_aware_icon (":/client/theme/copy.svg"),
-                        _("Copy link"),
-            this, SLOT (on_signal_private_link_copy ()));
+        menu.add_action (
+            Theme.create_color_aware_icon (":/client/theme/copy.svg"),
+            _("Copy link"),
+            this,
+            on_signal_private_link_copy ()
+        );
 
         menu.exec (QCursor.position ());
     }
@@ -472,11 +490,11 @@ class ShareUserGroupWidget : Gtk.Widget {
         this.pi_sharee.on_signal_stop_animation ();
 
         // Also remove the spinner in the widget list, if any
-        foreach (var pi, this.parent_scroll_area.find_children<QProgressIndicator> ()) {
-            delete pi;
+        foreach (var progress_indicator in this.parent_scroll_area.find_children<QProgressIndicator> ()) {
+            delete progress_indicator;
         }
 
-        GLib.warning ("Sharing error from server" + code + message;
+        GLib.warning ("Sharing error from server " + code + message);
         this.ui.error_label.on_signal_text (message);
         this.ui.error_label.show ();
         activate_sharee_line_edit ();
@@ -514,8 +532,8 @@ class ShareUserGroupWidget : Gtk.Widget {
 
         this.pi_sharee.on_signal_color (QGuiApplication.palette ().color (QPalette.Text));
 
-        foreach (var pi, this.parent_scroll_area.find_children<QProgressIndicator> ()) {
-            pi.on_signal_color (QGuiApplication.palette ().color (QPalette.Text));;
+        foreach (var progress_indicator in this.parent_scroll_area.find_children<QProgressIndicator> ()) {
+            progress_indicator.on_signal_color (QGuiApplication.palette ().color (QPalette.Text));;
         }
     }
 

@@ -316,7 +316,7 @@ class OwncloudAdvancedSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void on_signal_select_folder () {
-        string directory = QFileDialog.get_existing_directory (null, _("Local Sync Folder"), QDir.home_path ());
+        string directory = QFileDialog.existing_directory (null, _("Local Sync Folder"), QDir.home_path ());
         if (!directory.is_empty ()) {
             // TODO: remove when UX decision is made
             refresh_virtual_files_availibility (directory);
@@ -561,7 +561,7 @@ class OwncloudAdvancedSetupPage : QWizardPage {
     ***********************************************************/
     private GLib.Uri server_url () {
         const string url_string = static_cast<OwncloudWizard> (wizard ()).oc_url ();
-        const string user = static_cast<OwncloudWizard> (wizard ()).get_credentials ().user ();
+        const string user = static_cast<OwncloudWizard> (wizard ()).credentials ().user ();
 
         GLib.Uri url = new GLib.Uri (url_string);
         url.user_name (user);

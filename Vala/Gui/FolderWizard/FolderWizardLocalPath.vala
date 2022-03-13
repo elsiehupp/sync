@@ -106,7 +106,7 @@ class FolderWizardLocalPath : FormatWarningsWizardPage {
         if (dirs.count () > 0)
             sf += "/" + dirs.at (0); // Take the first directory in home directory.
 
-        string directory = QFileDialog.get_existing_directory (this,
+        string directory = QFileDialog.existing_directory (this,
             _("Select the source folder"),
             sf);
         if (!directory.is_empty ()) {

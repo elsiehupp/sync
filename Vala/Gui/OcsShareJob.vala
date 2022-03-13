@@ -210,7 +210,7 @@ class OcsShareJob : OcsJob {
         verb ("POST");
 
         add_param (string.from_latin1 ("path"), path);
-        add_param (string.from_latin1 ("share_type"), string.number (Share.Type_link));
+        add_param (string.from_latin1 ("share_type"), string.number (Share.Type.LINK));
 
         if (!name.is_empty ()) {
             add_param (string.from_latin1 ("name"), name);
@@ -236,7 +236,7 @@ class OcsShareJob : OcsJob {
     ***********************************************************/
     public void create_share (
         string path,
-        Share.ShareType share_type,
+        Share.Type share_type,
         string share_with = "",
         Share.Permissions permissions = SharePermissionRead,
         string password = "") {
@@ -258,7 +258,7 @@ class OcsShareJob : OcsJob {
     /***********************************************************
     Returns information on the items shared with the current user.
     ***********************************************************/
-    public void get_shared_with_me () {
+    public void shared_with_me () {
         verb ("GET");
         add_param ("shared_with_me", "true");
         on_signal_start ();

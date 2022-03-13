@@ -213,7 +213,7 @@ class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public Folder get_folder () {
+    public Folder folder () {
         foreach (Folder folder in FolderMan.instance ().map ()) {
             if (folder.account_state () == this.account.data ()) {
                 return folder;
@@ -226,14 +226,14 @@ class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public ActivityListModel get_activity_model () {
+    public ActivityListModel activity_model () {
         return this.activity_model;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public UnifiedSearchResultsListModel get_unified_search_results_list_model () {
+    public UnifiedSearchResultsListModel unified_search_results_list_model () {
         return this.unified_search_results_model;
     }
 
@@ -274,7 +274,7 @@ class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void open_local_folder () {
-        const var folder = get_folder ();
+        const var folder = folder ();
 
         if (folder) {
             QDesktopServices.open_url (GLib.Uri.from_local_file (folder.path ()));
@@ -285,7 +285,7 @@ class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool has_local_folder () {
-        return get_folder () != null;
+        return folder () != null;
     }
 
 

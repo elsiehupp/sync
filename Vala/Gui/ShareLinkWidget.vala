@@ -163,14 +163,14 @@ class ShareLinkWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public void setup_ui_options () {
-        connect (this.link_share.data (), LinkShare.note_set, this, ShareLinkWidget.on_signal_note_set);
-        connect (this.link_share.data (), LinkShare.password_set, this, ShareLinkWidget.on_signal_password_set);
-        connect (this.link_share.data (), LinkShare.password_error, this, ShareLinkWidget.on_signal_password_error);
-        connect (this.link_share.data (), LinkShare.label_set, this, ShareLinkWidget.on_signal_label_set);
+        connect (this.link_share.data (), LinkShare.signal_note_set, this, ShareLinkWidget.on_signal_note_set);
+        connect (this.link_share.data (), LinkShare.signal_password_set, this, ShareLinkWidget.on_signal_password_set);
+        connect (this.link_share.data (), LinkShare.signal_password_error, this, ShareLinkWidget.on_signal_password_error);
+        connect (this.link_share.data (), LinkShare.signal_label_set, this, ShareLinkWidget.on_signal_label_set);
 
         // Prepare permissions check and create group action
-        const QDate expire_date = this.link_share.data ().get_expire_date ().is_valid () ? this.link_share.data ().get_expire_date () : QDate ();
-        const SharePermissions perm = this.link_share.data ().get_permissions ();
+        const QDate expire_date = this.link_share.data ().expire_date ().is_valid () ? this.link_share.data ().expire_date () : QDate ();
+        const SharePermissions perm = this.link_share.data ().permissions ();
         var checked = false;
         var permissions_group = new QAction_group (this);
 
@@ -218,7 +218,7 @@ class ShareLinkWidget : Gtk.Widget {
         this.share_link_edit = new QLineEdit (this);
         connect (this.share_link_edit, QLineEdit.return_pressed, this, ShareLinkWidget.on_signal_create_label);
         this.share_link_edit.placeholder_text (_("Link name"));
-        this.share_link_edit.on_signal_text (this.link_share.data ().get_label ());
+        this.share_link_edit.on_signal_text (this.link_share.data ().label ());
         this.share_link_layout.add_widget (this.share_link_edit);
 
         this.share_link_button = new QToolButton (this);
@@ -252,8 +252,8 @@ class ShareLinkWidget : Gtk.Widget {
         this.note_link_action = this.link_context_menu.add_action (_("Note to recipient"));
         this.note_link_action.checkable (true);
 
-        if (this.link_share.get_note ().is_simple_text () && !this.link_share.get_note ().is_empty ()) {
-            this.ui.text_edit_note.on_signal_text (this.link_share.get_note ());
+        if (this.link_share.note ().is_simple_text () && !this.link_share.note ().is_empty ()) {
+            this.ui.text_edit_note.on_signal_text (this.link_share.note ());
             this.note_link_action.checked (true);
             toggle_note_options ();
         }
@@ -285,8 +285,8 @@ class ShareLinkWidget : Gtk.Widget {
             this.expiration_date_link_action.checked (true);
             toggle_expire_date_options ();
         }
-        connect (this.ui.calendar, QDate_time_edit.date_changed, this, ShareLinkWidget.on_signal_expire_date);
-        connect (this.link_share.data (), LinkShare.expire_date_set, this, ShareLinkWidget.on_signal_expire_date_set);
+        connect (this.ui.calendar, QDateTimeEdit.date_changed, this, ShareLinkWidget.on_signal_expire_date);
+        connect (this.link_share.data (), LinkShare.signal_expire_date_set, this, ShareLinkWidget.on_signal_expire_date_set);
 
         // If expiredate is enforced do not allow disable and set max days
         if (this.account.capabilities ().share_public_link_enforce_expire_date ()) {
@@ -507,7 +507,7 @@ class ShareLinkWidget : Gtk.Widget {
     private void on_signal_create_note ();
     void ShareLinkWidget.on_signal_create_note () {
         const var note = this.ui.text_edit_note.to_plain_text ();
-        if (!this.link_share || this.link_share.get_note () == note || note.is_empty ()) {
+        if (!this.link_share || this.link_share.note () == note || note.is_empty ()) {
             return;
         }
 
@@ -522,7 +522,7 @@ class ShareLinkWidget : Gtk.Widget {
     private void on_signal_copy_link_share (bool clicked) {
         //  Q_UNUSED (clicked);
 
-        QApplication.clipboard ().on_signal_text (this.link_share.get_link ().to_string ());
+        QApplication.clipboard ().on_signal_text (this.link_share.share_link ().to_string ());
     }
 
 
@@ -580,7 +580,7 @@ class ShareLinkWidget : Gtk.Widget {
     ***********************************************************/
     private void on_signal_create_label () {
         const var label_text = this.share_link_edit.text ();
-        if (!this.link_share || this.link_share.get_label () == label_text || label_text.is_empty ()) {
+        if (!this.link_share || this.link_share.label () == label_text || label_text.is_empty ()) {
             return;
         }
         this.share_link_widget_action.checked (true);
@@ -626,9 +626,9 @@ class ShareLinkWidget : Gtk.Widget {
         this.ui.note_label.visible (enable);
         this.ui.text_edit_note.visible (enable);
         this.ui.confirm_note.visible (enable);
-        this.ui.text_edit_note.on_signal_text (enable && this.link_share ? this.link_share.get_note (): "");
+        this.ui.text_edit_note.on_signal_text (enable && this.link_share ? this.link_share.note (): "");
 
-        if (!enable && this.link_share && !this.link_share.get_note ().is_empty ()) {
+        if (!enable && this.link_share && !this.link_share.note ().is_empty ()) {
             this.link_share.note ({});
         }
     }
@@ -641,14 +641,14 @@ class ShareLinkWidget : Gtk.Widget {
         this.ui.calendar.visible (enable);
         this.ui.confirm_expiration_date.visible (enable);
 
-        const var date = enable ? this.link_share.get_expire_date () : QDate.current_date ().add_days (1);
+        const var date = enable ? this.link_share.expire_date () : QDate.current_date ().add_days (1);
         this.ui.calendar.date (date);
         this.ui.calendar.minimum_date (QDate.current_date ().add_days (1));
         this.ui.calendar.maximum_date (
             QDate.current_date ().add_days (this.account.capabilities ().share_public_link_expire_date_days ()));
         this.ui.calendar.focus ();
 
-        if (!enable && this.link_share && this.link_share.get_expire_date ().is_valid ()) {
+        if (!enable && this.link_share && this.link_share.expire_date ().is_valid ()) {
             this.link_share.expire_date ({});
         }
     }
@@ -710,14 +710,14 @@ class ShareLinkWidget : Gtk.Widget {
     Retrieve a share's name, accounting for this.names_supported
     ***********************************************************/
     private static string share_name () {
-        string name = this.link_share.get_name ();
+        string name = this.link_share.name ();
         if (!name.is_empty ()) {
             return name;
         }
         if (!this.names_supported) {
             return _("Public link");
         }
-        return this.link_share.get_token ();
+        return this.link_share.token ();
     }
 
 
@@ -764,8 +764,8 @@ class ShareLinkWidget : Gtk.Widget {
     ***********************************************************/
     private void display_share_link_label () {
         this.share_link_elided_label.clear ();
-        if (!this.link_share.get_label ().is_empty ()) {
-            this.share_link_elided_label.on_signal_text (string (" (%1)").arg (this.link_share.get_label ()));
+        if (!this.link_share.label ().is_empty ()) {
+            this.share_link_elided_label.on_signal_text (string (" (%1)").arg (this.link_share.label ()));
         }
     }
 

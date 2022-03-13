@@ -71,7 +71,7 @@ class Updater : GLib.Object {
             return new GLib.Uri ();
         }
 
-        var url_query = get_query_params ();
+        var url_query = query_params ();
 
         update_base_url.query (url_query);
 
@@ -103,7 +103,7 @@ class Updater : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static string get_system_info () {
+    private static string system_info () {
         QProcess process;
         process.on_signal_start ("lsb_release", {
             "-a"
@@ -120,7 +120,7 @@ class Updater : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static QUrlQuery get_query_params () {
+    private static QUrlQuery query_params () {
         QUrlQuery query;
         Theme theme = Theme.instance ();
         string platform = "stranger";
@@ -134,7 +134,7 @@ class Updater : GLib.Object {
             platform = "macos";
         }
 
-        string sys_info = get_system_info ();
+        string sys_info = system_info ();
         if (!sys_info.is_empty ()) {
             query.add_query_item ("client", sys_info);
         }

@@ -43,7 +43,7 @@ class OcsShareeJob : OcsJob {
 
     @param path Path to request shares for (default all shares)
     ***********************************************************/
-    public void get_sharees (string search, string item_type, int page = 1, int per_page = 50, bool lookup = false) {
+    public void sharees (string search, string item_type, int page = 1, int per_page = 50, bool lookup = false) {
         verb ("GET");
 
         add_param (string.from_latin1 ("search"), search);

@@ -120,9 +120,9 @@ class CloudProviderWrapper : GLib.Object {
         cloud_providers_account_exporter_icon (this.cloud_provider_account, g_icon_new_for_string (APPLICATION_ICON_NAME, null));
         cloud_providers_account_exporter_path (this.cloud_provider_account, folder.clean_path ().to_utf8 ().data ());
         cloud_providers_account_exporter_status (this.cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_IDLE);
-        model = get_menu_model ();
+        model = menu_model ();
         cloud_providers_account_exporter_menu_model (this.cloud_provider_account, model);
-        action_group = get_action_group ();
+        action_group = action_group ();
         cloud_providers_account_exporter_action_group (this.cloud_provider_account, action_group);
 
         connect (
@@ -181,7 +181,7 @@ class CloudProviderWrapper : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public GMenuModel get_menu_model () {
+    public GMenuModel menu_model () {
 
         GMenu section;
         GMenuItem item;
@@ -237,7 +237,7 @@ class CloudProviderWrapper : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public GActionGroup get_action_group () {
+    public GActionGroup action_group () {
         g_clear_object (action_group);
         action_group = g_simple_action_group_new ();
         g_action_map_add_action_entries (G_ACTION_MAP (action_group), actions, G_N_ELEMENTS (actions), this);

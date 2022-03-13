@@ -15,90 +15,60 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 namespace Occ {
 namespace Ui {
 
-class Sharee {
+class Sharee : GLib.Object {
 
-    // Keep in sync with Share.ShareType
+    /***********************************************************
+    Keep in sync with Share.Type
+    ***********************************************************/
     public enum Type {
-        User = 0,
-        Group = 1,
-        Email = 4,
-        Federated = 6,
-        Circle = 7,
-        Room = 10
+        USER = 0,
+        GROUP = 1,
+        EMAIL = 4,
+        FEDERATED = 6,
+        CIRCLE = 7,
+        ROOM = 10
     }
+
+
+    /***********************************************************
+    ***********************************************************/
+    string share_with { public get; private set; }
+    string display_name { public get; private set; }
+    Type type { public get; private set; }
 
 
     /***********************************************************
     ***********************************************************/
     public Sharee (string share_with,
-        const string display_name,
-        const Type type);
-
-    /***********************************************************
-    ***********************************************************/
-    public string format ();
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public string display_name ();
-
-
-    public Type type ();
-
-
-    /***********************************************************
-    ***********************************************************/
-    private string this.share_with;
-    private string this.display_name;
-    private Type this.type;
-}
-
-
-    Sharee.Sharee (string share_with,
-        const string display_name,
-        const Type type)
-        : this.share_with (share_with)
-        this.display_name (display_name)
-        this.type (type) {
+        string display_name,
+        Type type) {
+        this.share_with = share_with;
+        this.display_name = display_name;
+        this.type = type;
     }
 
-    string Sharee.format () {
+
+    /***********************************************************
+    ***********************************************************/
+    public string to_string () {
         string formatted = this.display_name;
 
-        if (this.type == Type.Group) {
+        if (this.type == Type.GROUP) {
             formatted += " (group)";
-        } else if (this.type == Type.Email) {
+        } else if (this.type == Type.EMAIL) {
             formatted += " (email)";
-        } else if (this.type == Type.Federated) {
+        } else if (this.type == Type.FEDERATED) {
             formatted += " (remote)";
-        } else if (this.type == Type.Circle) {
+        } else if (this.type == Type.CIRCLE) {
             formatted += " (circle)";
-        } else if (this.type == Type.Room) {
+        } else if (this.type == Type.ROOM) {
             formatted += " (conversation)";
         }
 
         return formatted;
     }
 
-    string Sharee.share_with () {
-        return this.share_with;
-    }
+} // class Sharee
 
-    string Sharee.display_name () {
-        return this.display_name;
-    }
-
-    Sharee.Type Sharee.type () {
-        return this.type;
-    }
-
-    }
-    
+} // namespace Ui
+} // namespace Occ

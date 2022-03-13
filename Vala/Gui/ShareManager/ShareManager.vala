@@ -15,15 +15,40 @@ namespace Occ {
 namespace Ui {
 
 /***********************************************************
-The share manager allows for creating, retrieving and deletion
-of shares. It abstracts away from the OCS Share API, all the usages
-shares should talk to this manager and not use OCS Share Job directly
+The share manager allows for creating, retrieving and
+deletion of shares. It abstracts away from the OCS Share
+API, all the usages shares should talk to this manager and
+not use OCS Share Job directly/
 ***********************************************************/
 class ShareManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public ShareManager (AccountPointer this.account, GLib.Object parent = new GLib.Object ());
+    private AccountPointer account;
+
+    signal void signal_share_created (Share share);
+    signal void signal_link_share_created (LinkShare share);
+    signal void signal_shares_fetched (GLib.List<unowned Share> shares);
+    signal void signal_server_error (int code, string message);
+
+
+    /***********************************************************
+    Emitted when creating a link share with password fails.
+
+    @param message the error message reported by the server
+
+    See create_link_share ().
+    ***********************************************************/
+    signal void signal_link_share_requires_password (string message);
+
+    /***********************************************************
+    ***********************************************************/
+    public ShareManager (
+        AccountPointer account,
+        GLib.Object parent = new GLib.Object ()) {
+        base (parent);
+        this.account = account;
+    }
 
 
     /***********************************************************
@@ -37,9 +62,25 @@ class ShareManager : GLib.Object {
     For older server the on_signal_link_share_requires_password signal is emitted when it seems appropiate
     In case of a server error the on_signal_server_error signal is emitted
     ***********************************************************/
-    public void create_link_share (string path,
-        const string name,
-        const string password);
+    public void create_link_share (
+        string path,
+        string name,
+        string password) {
+        var ocs_share_job = new OcsShareJob (this.account);
+        connect (
+            ocs_share_job,
+            OcsShareJob.share_job_finished,
+            this,
+            ShareManager.on_signal_link_share_created
+        );
+        connect (
+            ocs_share_job,
+            OcsJob.ocs_error,
+            this,
+            ShareManager.on_signal_ocs_error
+        );
+        ocs_share_job.create_link_share (path, name, password);
+    }
 
 
     /***********************************************************
@@ -49,14 +90,29 @@ class ShareManager : GLib.Object {
     @param share_type The type of share (Type_u
     @param Permissions The share permissions
 
-    On on_signal_success the signal share_created is emitted
+    On on_signal_success the signal signal_share_created is emitted
     In case of a server error the on_signal_server_error signal is emitted
     ***********************************************************/
     public void create_share (string path,
-        const Share.ShareType share_type,
-        const string share_with,
-        const Share.Permissions permissions,
-        const string password = "");
+        Share.Type share_type,
+        string share_with,
+        Share.Permissions permissions,
+        string password = "") {
+        var ocs_share_job = new OcsShareJob (this.account);
+        connect (
+            ocs_share_job,
+            OcsJob.ocs_error,
+            this,
+            ShareManager.on_signal_ocs_error
+        );
+        connect (
+            ocs_share_job,
+            OcsShareJob.share_job_finished,
+            this,
+            this.on_signal_share_job_finished
+        );
+        ocs_share_job.shared_with_me ();
+    }
 
 
     /***********************************************************
@@ -67,270 +123,274 @@ class ShareManager : GLib.Object {
     On on_signal_success the on_signal_shares_fetched signal is emitted
     In case of a server error the on_signal_server_error signal is emitted
     ***********************************************************/
-    public void fetch_shares (string path);
-
-signals:
-    void share_created (unowned Share share);
-    void on_signal_link_share_created (unowned LinkShare share);
-    void on_signal_shares_fetched (GLib.List<unowned Share> shares);
-    void on_signal_server_error (int code, string message);
+    public void fetch_shares (string path) {
+        var ocs_share_job = new OcsShareJob (this.account);
+        connect (
+            ocs_share_job,
+            OcsShareJob.share_job_finished,
+            this,
+            ShareManager.on_signal_shares_fetched
+        );
+        connect (
+            ocs_share_job,
+            OcsJob.ocs_error,
+            this,
+            ShareManager.on_signal_ocs_error
+        );
+        ocs_share_job.on_signal_get_shares (path);
+    }
 
 
     /***********************************************************
-    Emitted when creating a link share with password fails.
-
-    @param message the error message reported by the server
-
-    See create_link_share ().
     ***********************************************************/
-    void on_signal_link_share_requires_password (string message);
+    private void on_signal_share_job_finished (QJsonDocument reply) {
+        // Find existing share permissions (if this was shared with us)
+        Share.Permissions existing_permissions = Share_permission_default;
+        foreach (QJsonValue element in reply.object ()["ocs"].to_object ()["data"].to_array ()) {
+            var map = element.to_object ();
+            if (map["file_target"] == path) {
+                existing_permissions = Share.Permissions (map["permissions"].to_int ());
+            }
+        }
+
+        // Limit the permissions we request for a share to the ones the item
+        // was shared with initially.
+        var valid_permissions = desired_permissions;
+        if (valid_permissions == Share_permission_default) {
+            valid_permissions = existing_permissions;
+        }
+        if (existing_permissions != Share_permission_default) {
+            valid_permissions &= existing_permissions;
+        }
+
+        var ocs_share_job = new OcsShareJob (this.account);
+        connect (
+            ocs_share_job,
+            OcsShareJob.share_job_finished,
+            this,
+            ShareManager.on_signal_share_created
+        );
+        connect (
+            ocs_share_job,
+            OcsJob.ocs_error,
+            this,
+            ShareManager.on_signal_ocs_error
+        );
+        ocs_share_job.create_share (
+            path,
+            share_type,
+            share_with,
+            valid_permissions,
+            password
+        );
+    }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_shares_fetched (QJsonDocument reply);
-    private void on_signal_link_share_created (QJsonDocument reply);
-    private void on_signal_share_created (QJsonDocument reply);
-    private void on_signal_ocs_error (int status_code, string message);
+    private void on_signal_shares_fetched (QJsonDocument reply) {
+        var temporary_shares = reply.object ().value ("ocs").to_object ().value ("data").to_array ();
+        GLib.debug (this.account.server_version () + " Fetched " + temporary_shares.count () + "shares");
+
+        GLib.List<unowned Share> shares;
+
+        foreach (var share in temporary_shares) {
+            var data = share.to_object ();
+
+            var share_type = data.value ("share_type").to_int ();
+
+            unowned Share new_share;
+
+            if (share_type == Share.Type.LINK) {
+                new_share = parse_link_share (data);
+            } else if (Share.is_share_type_user_group_email_room_or_remote (static_cast <Share.Type> (share_type))) {
+                new_share = parse_user_group_share (data);
+            } else {
+                new_share = parse_share (data);
+            }
+
+            shares.append (new Share (new_share));
+        }
+
+        GLib.debug ("Sending " + shares.count () + " shares.");
+        /* emit */ shares_fetched (shares);
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_link_share_created (QJsonDocument reply) {
+        string message;
+        int code = OcsShareJob.json_return_code (reply, message);
+
+
+        /***********************************************************
+        Before we had decent sharing capabilities on the server a 403 "generally"
+        meant that a share was password protected
+        ***********************************************************/
+        if (code == 403) {
+            /* emit */ link_share_requires_password (message);
+            return;
+        }
+
+        //Parse share
+        var data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
+        unowned LinkShare share = new LinkShare (parse_link_share (data));
+
+        /* emit */ link_share_created (share);
+
+        update_folder (this.account, share.path ());
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_share_created (QJsonDocument reply) {
+        //Parse share
+        var data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
+        unowned Share share = new Share (parse_share (data));
+
+        /* emit */ signal_share_created (share);
+
+        update_folder (this.account, share.path ());
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_ocs_error (int status_code, string message) {
+        /* emit */ server_error (status_code, message);
+    }
+
 
     /***********************************************************
     ***********************************************************/
     private unowned LinkShare parse_link_share (QJsonObject data);
-    private unowned<User_group_share> parse_user_group_share (QJsonObject data);
-    private unowned Share parse_share (QJsonObject data);
+    unowned LinkShare ShareManager.parse_link_share (QJsonObject data) {
+        GLib.Uri url;
 
-    /***********************************************************
-    ***********************************************************/
-    private AccountPointer this.account;
-}
-
-
-/***********************************************************
-When a share is modified, we need to tell the folders so they can adjust overlay icons
-***********************************************************/
-static void update_folder (AccountPointer account, string path) {
-    foreach (Folder f, FolderMan.instance ().map ()) {
-        if (f.account_state ().account () != account)
-            continue;
-        var folder_path = f.remote_path ();
-        if (path.starts_with (folder_path) && (path == folder_path || folder_path.ends_with ('/') || path[folder_path.size ()] == '/')) {
-            // Workaround the fact that the server does not invalidate the etags of parent directories
-            // when something is shared.
-            var relative = path.mid_ref (f.remote_path_trailing_slash ().length ());
-            f.journal_database ().schedule_path_for_remote_discovery (relative.to_string ());
-
-            // Schedule a sync so it can update the remote permission flag and let the socket API
-            // know about the shared icon.
-            f.schedule_this_folder_soon ();
-        }
-    }
-}
-
-
-ShareManager.ShareManager (AccountPointer account, GLib.Object parent)
-    : GLib.Object (parent)
-    this.account (account) {
-}
-
-void ShareManager.create_link_share (string path,
-    private const string name,
-    private const string password) {
-    var job = new OcsShareJob (this.account);
-    connect (job, OcsShareJob.share_job_finished, this, ShareManager.on_signal_link_share_created);
-    connect (job, OcsJob.ocs_error, this, ShareManager.on_signal_ocs_error);
-    job.create_link_share (path, name, password);
-}
-
-void ShareManager.on_signal_link_share_created (QJsonDocument reply) {
-    string message;
-    int code = OcsShareJob.get_json_return_code (reply, message);
-
-
-    /***********************************************************
-    Before we had decent sharing capabilities on the server a 403 "generally"
-    meant that a share was password protected
-    ***********************************************************/
-    if (code == 403) {
-        /* emit */ link_share_requires_password (message);
-        return;
-    }
-
-    //Parse share
-    var data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
-    unowned LinkShare share (parse_link_share (data));
-
-    /* emit */ link_share_created (share);
-
-    update_folder (this.account, share.path ());
-}
-
-void ShareManager.create_share (string path,
-    const Share.ShareType share_type,
-    private const string share_with,
-    private const string ermissions desired_permissions,
-    const string password) {
-    var job = new OcsShareJob (this.account);
-    connect (job, OcsJob.ocs_error, this, ShareManager.on_signal_ocs_error);
-    connect (job, OcsShareJob.share_job_finished, this,
-        [=] (QJsonDocument reply) {
-            // Find existing share permissions (if this was shared with us)
-            Share.Permissions existing_permissions = Share_permission_default;
-            foreach (QJsonValue element, reply.object ()["ocs"].to_object ()["data"].to_array ()) {
-                var map = element.to_object ();
-                if (map["file_target"] == path)
-                    existing_permissions = Share.Permissions (map["permissions"].to_int ());
-            }
-
-            // Limit the permissions we request for a share to the ones the item
-            // was shared with initially.
-            var valid_permissions = desired_permissions;
-            if (valid_permissions == Share_permission_default) {
-                valid_permissions = existing_permissions;
-            }
-            if (existing_permissions != Share_permission_default) {
-                valid_permissions &= existing_permissions;
-            }
-
-            var job = new OcsShareJob (this.account);
-            connect (job, OcsShareJob.share_job_finished, this, ShareManager.on_signal_share_created);
-            connect (job, OcsJob.ocs_error, this, ShareManager.on_signal_ocs_error);
-            job.create_share (path, share_type, share_with, valid_permissions, password);
-        });
-    job.get_shared_with_me ();
-}
-
-void ShareManager.on_signal_share_created (QJsonDocument reply) {
-    //Parse share
-    var data = reply.object ().value ("ocs").to_object ().value ("data").to_object ();
-    unowned Share share (parse_share (data));
-
-    /* emit */ share_created (share);
-
-    update_folder (this.account, share.path ());
-}
-
-void ShareManager.fetch_shares (string path) {
-    var job = new OcsShareJob (this.account);
-    connect (job, OcsShareJob.share_job_finished, this, ShareManager.on_signal_shares_fetched);
-    connect (job, OcsJob.ocs_error, this, ShareManager.on_signal_ocs_error);
-    job.on_signal_get_shares (path);
-}
-
-void ShareManager.on_signal_shares_fetched (QJsonDocument reply) {
-    var tmp_shares = reply.object ().value ("ocs").to_object ().value ("data").to_array ();
-    private const string version_string = this.account.server_version ();
-    GLib.debug () + version_string + "Fetched" + tmp_shares.count ("shares";
-
-    GLib.List<unowned Share> shares;
-
-    foreach (var share, tmp_shares) {
-        var data = share.to_object ();
-
-        var share_type = data.value ("share_type").to_int ();
-
-        unowned Share new_share;
-
-        if (share_type == Share.Type_link) {
-            new_share = parse_link_share (data);
-        } else if (Share.is_share_type_user_group_email_room_or_remote (static_cast <Share.ShareType> (share_type))) {
-            new_share = parse_user_group_share (data);
+        // From own_cloud server 8.2 the url field is always set for public shares
+        if (data.contains ("url")) {
+            url = GLib.Uri (data.value ("url").to_string ());
+        } else if (this.account.server_version_int () >= Account.make_server_version (8, 0, 0)) {
+            // From own_cloud server version 8 on, a different share link scheme is used.
+            url = GLib.Uri (Utility.concat_url_path (this.account.url (), QLatin1String ("index.php/s/") + data.value ("token").to_string ())).to_string ();
         } else {
-            new_share = parse_share (data);
+            QUrlQuery query_args;
+            query_args.add_query_item (QLatin1String ("service"), QLatin1String ("files"));
+            query_args.add_query_item (QLatin1String ("t"), data.value ("token").to_string ());
+            url = GLib.Uri (Utility.concat_url_path (this.account.url (), QLatin1String ("public.php"), query_args).to_string ());
         }
 
-        shares.append (unowned Share (new_share));
+        QDate expire_date;
+        if (data.value ("expiration").is_string ()) {
+            expire_date = QDate.from_string (data.value ("expiration").to_string (), "yyyy-MM-dd 00:00:00");
+        }
+
+        string note;
+        if (data.value ("note").is_string ()) {
+            note = data.value ("note").to_string ();
+        }
+
+        return new LinkShare (
+            this.account,
+            data.value ("identifier").to_variant ().to_string (), // "identifier" used to be an integer, support both
+            data.value ("owner_uid").to_string (),
+            data.value ("displayname_owner").to_string (),
+            data.value ("path").to_string (),
+            data.value ("name").to_string (),
+            data.value ("token").to_string (),
+            (Share.Permissions)data.value ("permissions").to_int (),
+            data.value ("share_with").is_string (), // has password?
+            url,
+            expire_date,
+            note,
+            data.value ("label").to_string ()
+        );
     }
 
-    GLib.debug ("Sending " + shares.count ("shares";
-    /* emit */ shares_fetched (shares);
-}
 
-unowned<User_group_share> ShareManager.parse_user_group_share (QJsonObject data) {
-    unowned Sharee sharee (new Sharee (data.value ("share_with").to_string (),
-        data.value ("share_with_displayname").to_string (),
-        static_cast<Sharee.Type> (data.value ("share_type").to_int ())));
+    /***********************************************************
+    ***********************************************************/
+    private unowned UserGroupShare parse_user_group_share (QJsonObject data) {
+        unowned Sharee sharee = new Sharee (
+            data.value ("share_with").to_string (),
+            data.value ("share_with_displayname").to_string (),
+            (Sharee.Type) data.value ("share_type").to_int ()
+        );
 
-    QDate expire_date;
-    if (data.value ("expiration").is_"") {
-        expire_date = QDate.from_string (data.value ("expiration").to_string (), "yyyy-MM-dd 00:00:00");
+        QDate expire_date;
+        if (data.value ("expiration").is_string ()) {
+            expire_date = QDate.from_string (data.value ("expiration").to_string (), "yyyy-MM-dd 00:00:00");
+        }
+
+        string note;
+        if (data.value ("note").is_string ()) {
+            note = data.value ("note").to_string ();
+        }
+
+        return new UserGroupShare (
+            this.account,
+            data.value ("identifier").to_variant ().to_string (), // "identifier" used to be an integer, support both
+            data.value ("owner_uid").to_variant ().to_string (),
+            data.value ("displayname_owner").to_variant ().to_string (),
+            data.value ("path").to_string (),
+            static_cast<Share.Type> (data.value ("share_type").to_int ()),
+            !data.value ("password").to_string ().is_empty (),
+            static_cast<Share.Permissions> (data.value ("permissions").to_int ()),
+            sharee,
+            expire_date,
+            note
+        );
     }
 
-    string note;
-    if (data.value ("note").is_"") {
-        note = data.value ("note").to_string ();
+
+    /***********************************************************
+    ***********************************************************/
+    private unowned Share parse_share (QJsonObject data) {
+        unowned Sharee sharee = new Sharee (
+            data.value ("share_with").to_string (),
+            data.value ("share_with_displayname").to_string (),
+            (Sharee.Type) data.value ("share_type").to_int ()
+        );
+
+        return new Share (
+            this.account,
+            data.value ("identifier").to_variant ().to_string (), // "identifier" used to be an integer, support both
+            data.value ("owner_uid").to_variant ().to_string (),
+            data.value ("displayname_owner").to_variant ().to_string (),
+            data.value ("path").to_string (),
+            (Share.Type) data.value ("share_type").to_int (),
+            !data.value ("password").to_string ().is_empty (),
+            (Share.Permissions) data.value ("permissions").to_int (),
+            sharee
+        );
     }
 
-    return unowned<User_group_share> (new User_group_share (this.account,
-        data.value ("identifier").to_variant ().to_string (), // "identifier" used to be an integer, support both
-        data.value ("uid_owner").to_variant ().to_string (),
-        data.value ("displayname_owner").to_variant ().to_string (),
-        data.value ("path").to_string (),
-        static_cast<Share.ShareType> (data.value ("share_type").to_int ()),
-        !data.value ("password").to_string ().is_empty (),
-        static_cast<Share.Permissions> (data.value ("permissions").to_int ()),
-        sharee,
-        expire_date,
-        note));
-}
 
-unowned LinkShare ShareManager.parse_link_share (QJsonObject data) {
-    GLib.Uri url;
+    /***********************************************************
+    When a share is modified, we need to tell the folders so they can adjust overlay icons
+    ***********************************************************/
+    private static void update_folder (AccountPointer account, string path) {
+        foreach (Folder folder in FolderMan.instance ().map ()) {
+            if (folder.account_state ().account () != account) {
+                continue;
+            }
+            var folder_path = folder.remote_path ();
+            if (path.starts_with (folder_path) && (path == folder_path || folder_path.ends_with ('/') || path[folder_path.size ()] == '/')) {
+                // Workaround the fact that the server does not invalidate the etags of parent directories
+                // when something is shared.
+                var relative = path.mid_ref (folder.remote_path_trailing_slash ().length ());
+                folder.journal_database ().schedule_path_for_remote_discovery (relative.to_string ());
 
-    // From own_cloud server 8.2 the url field is always set for public shares
-    if (data.contains ("url")) {
-        url = GLib.Uri (data.value ("url").to_string ());
-    } else if (this.account.server_version_int () >= Account.make_server_version (8, 0, 0)) {
-        // From own_cloud server version 8 on, a different share link scheme is used.
-        url = GLib.Uri (Utility.concat_url_path (this.account.url (), QLatin1String ("index.php/s/") + data.value ("token").to_string ())).to_string ();
-    } else {
-        QUrlQuery query_args;
-        query_args.add_query_item (QLatin1String ("service"), QLatin1String ("files"));
-        query_args.add_query_item (QLatin1String ("t"), data.value ("token").to_string ());
-        url = GLib.Uri (Utility.concat_url_path (this.account.url (), QLatin1String ("public.php"), query_args).to_string ());
+                // Schedule a sync so it can update the remote permission flag and let the socket API
+                // know about the shared icon.
+                folder.schedule_this_folder_soon ();
+            }
+        }
     }
 
-    QDate expire_date;
-    if (data.value ("expiration").is_"") {
-        expire_date = QDate.from_string (data.value ("expiration").to_string (), "yyyy-MM-dd 00:00:00");
-    }
+} // class ShareManager
 
-    string note;
-    if (data.value ("note").is_"") {
-        note = data.value ("note").to_string ();
-    }
-
-    return unowned LinkShare (new LinkShare (this.account,
-        data.value ("identifier").to_variant ().to_string (), // "identifier" used to be an integer, support both
-        data.value ("uid_owner").to_string (),
-        data.value ("displayname_owner").to_string (),
-        data.value ("path").to_string (),
-        data.value ("name").to_string (),
-        data.value ("token").to_string (),
-        (Share.Permissions)data.value ("permissions").to_int (),
-        data.value ("share_with").is_"", // has password?
-        url,
-        expire_date,
-        note,
-        data.value ("label").to_string ()));
-}
-
-unowned Share ShareManager.parse_share (QJsonObject data) {
-    unowned Sharee sharee (new Sharee (data.value ("share_with").to_string (),
-        data.value ("share_with_displayname").to_string (),
-        (Sharee.Type)data.value ("share_type").to_int ()));
-
-    return unowned Share (new Share (this.account,
-        data.value ("identifier").to_variant ().to_string (), // "identifier" used to be an integer, support both
-        data.value ("uid_owner").to_variant ().to_string (),
-        data.value ("displayname_owner").to_variant ().to_string (),
-        data.value ("path").to_string (),
-        (Share.ShareType)data.value ("share_type").to_int (),
-        !data.value ("password").to_string ().is_empty (),
-        (Share.Permissions)data.value ("permissions").to_int (),
-        sharee));
-}
-
-void ShareManager.on_signal_ocs_error (int status_code, string message) {
-    /* emit */ server_error (status_code, message);
-}
-}
+} // namespace Ui
+} // namespace Occ

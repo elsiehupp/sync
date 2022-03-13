@@ -105,7 +105,7 @@ class WebViewPage : AbstractCredentialsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public AbstractCredentials get_credentials () {
+    public AbstractCredentials credentials () {
         return new WebFlowCredentials (this.user, this.pass, this.oc_wizard.client_ssl_certificate, this.oc_wizard.client_ssl_key);
     }
 

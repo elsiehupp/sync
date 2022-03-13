@@ -309,9 +309,9 @@ class OwncloudWizard : QWizard {
 
     /***********************************************************
     ***********************************************************/
-    public AbstractCredentials get_credentials () {
+    public AbstractCredentials credentials () {
         if (this.credentials_page) {
-            return this.credentials_page.get_credentials ();
+            return this.credentials_page.credentials ();
         }
 
         return null;

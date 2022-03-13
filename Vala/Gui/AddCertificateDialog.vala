@@ -42,14 +42,14 @@ class AddCertificateDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public string get_certificate_path () {
+    public string certificate_path () {
         return ui.line_edit_certificate_path.text ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public string get_certificate_password () {
+    public string certificate_password () {
         return ui.line_edit_p_wDCertificate.text ();
     }
 
@@ -73,7 +73,7 @@ class AddCertificateDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void on_signal_push_button_browse_certificate_clicked () {
-        string filename = QFileDialog.get_open_filename (this, _("Select a certificate"), "", _("Certificate files (*.p12 *.pfx)"));
+        string filename = QFileDialog.open_filename (this, _("Select a certificate"), "", _("Certificate files (*.p12 *.pfx)"));
         ui.line_edit_certificate_path.on_signal_text (filename);
     }
 

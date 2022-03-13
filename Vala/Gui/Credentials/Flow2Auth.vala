@@ -181,7 +181,7 @@ class Flow2Auth : GLib.Object {
         this.login_url = login_url;
 
         if (this.account.is_username_prefill_supported ()) {
-            const var user_name = Utility.get_current_user_name ();
+            const var user_name = Utility.current_user_name ();
             if (!user_name.is_empty ()) {
                 var query = QUrlQuery (this.login_url);
                 query.add_query_item ("user", user_name);

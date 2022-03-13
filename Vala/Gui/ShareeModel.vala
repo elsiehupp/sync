@@ -29,7 +29,7 @@ class ShareeModel : QAbstractListModel {
         const Sharee sharee;
 
         bool operator (unowned Sharee s2) {
-            return s2.format () == sharee.format () && s2.display_name () == sharee.format ();
+            return s2.to_string () == sharee.to_string () && s2.display_name () == sharee.to_string ();
         }
     }
 
@@ -64,7 +64,7 @@ class ShareeModel : QAbstractListModel {
         var job = new OcsShareeJob (this.account);
         connect (job, OcsShareeJob.signal_sharee_job_finished, this, ShareeModel.on_signal_sharees_fetched);
         connect (job, OcsJob.ocs_error, this, ShareeModel.signal_display_error_message);
-        job.get_sharees (this.search, this.type, 1, 50, lookup_mode == LookupMode.GLOBAL_SEARCH ? true : false);
+        job.sharees (this.search, this.type, 1, 50, lookup_mode == LookupMode.GLOBAL_SEARCH ? true : false);
     }
 
 
@@ -182,7 +182,7 @@ class ShareeModel : QAbstractListModel {
 
         const var sharee = this.sharees.at (index.row ());
         if (role == Qt.Display_role) {
-            return sharee.format ();
+            return sharee.to_string ();
 
         } else if (role == Qt.EditRole) {
             // This role is used by the completer - it should match
@@ -201,7 +201,7 @@ class ShareeModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private unowned Sharee get_sharee (int at) {
+    private unowned Sharee sharee (int at) {
         if (at < 0 || at > this.sharees.size ()) {
             return unowned Sharee (null);
         }

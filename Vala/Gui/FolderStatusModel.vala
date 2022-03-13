@@ -878,7 +878,7 @@ class FolderStatusModel : QAbstractItemModel {
             const Folder folder = folder_info.folder;
 
             bool ok = false;
-            var old_block_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
+            var old_block_list = folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
             if (!ok) {
                 GLib.warning ("Could not read selective sync list from database.");
                 continue;
@@ -891,10 +891,10 @@ class FolderStatusModel : QAbstractItemModel {
 
             // The folders that were undecided or blocklisted and that are now checked should go on the allow list.
             // The user confirmed them already just now.
-            string[] to_add_to_allow_list = ( (old_block_list_set + folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok).to_set ()) - block_list_set).values ();
+            string[] to_add_to_allow_list = ( (old_block_list_set + folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok).to_set ()) - block_list_set).values ();
 
             if (!to_add_to_allow_list.is_empty ()) {
-                var allow_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, ok);
+                var allow_list = folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, ok);
                 if (ok) {
                     allow_list += to_add_to_allow_list;
                     folder.journal_database ().selective_sync_list (
@@ -950,7 +950,7 @@ class FolderStatusModel : QAbstractItemModel {
             var folder = this.folders.at (i).folder;
 
             bool ok = false;
-            var undecided_list = folder.journal_database ().get_selective_sync_list (
+            var undecided_list = folder.journal_database ().selective_sync_list (
                 SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST,
                 ok
             );
@@ -965,7 +965,7 @@ class FolderStatusModel : QAbstractItemModel {
             }
 
             // Remove all undecided folders from the blocklist
-            var block_list = folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
+            var block_list = folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
             if (!ok) {
                 GLib.warning ("Could not read selective sync list from database.");
                 return;
@@ -979,7 +979,7 @@ class FolderStatusModel : QAbstractItemModel {
             );
 
             // Add all undecided folders to the allow list
-            var allow_list = folder.journal_database ().get_selective_sync_list (
+            var allow_list = folder.journal_database ().selective_sync_list (
                 SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST,
                 ok
             );
@@ -1239,9 +1239,9 @@ class FolderStatusModel : QAbstractItemModel {
         bool ok1 = true;
         bool ok2 = true;
         if (parent_info.checked == Qt.PartiallyChecked) {
-            selective_sync_block_list = parent_info.folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok1);
+            selective_sync_block_list = parent_info.folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok1);
         }
-        var selective_sync_undecided_list = parent_info.folder.journal_database ().get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok2);
+        var selective_sync_undecided_list = parent_info.folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok2);
 
         if (! (ok1 && ok2)) {
             GLib.warning ("Could not retrieve selective sync info from journal.");
@@ -1281,7 +1281,7 @@ class FolderStatusModel : QAbstractItemModel {
             new_info.path = relative_path;
 
             SyncJournalFileRecord record;
-            parent_info.folder.journal_database ().get_file_record_by_e2e_mangled_name (remove_trailing_slash (relative_path), record);
+            parent_info.folder.journal_database ().file_record_by_e2e_mangled_name (remove_trailing_slash (relative_path), record);
             if (record.is_valid ()) {
                 new_info.name = remove_trailing_slash (record.path).split ('/').last ();
                 if (record.is_e2e_encrypted && !record.e2e_mangled_name.is_empty ()) {
@@ -1345,14 +1345,17 @@ class FolderStatusModel : QAbstractItemModel {
         foreach (int undecided_index in undecided_indexes) {
             suggest_expand (index (undecided_index, 0, index));
         }
+
         /* Try to remove the the undecided lists the items that are not on the server. */
-        var it = std.remove_if (
-            selective_sync_undecided_list.begin (), selective_sync_undecided_list.end (),
-            [&] (string s) {
-                return selective_sync_undecided_set.count (s);
+        string iterator;
+        foreach (string undecided in selective_sync_undecided_list) {
+            if (selective_sync_undecided_set.count (undecided)) {
+                selective_sync_undecided_set.remove (undecided);
+            } else {
+                iterator = undecided;
             }
-        );
-        if (it != selective_sync_undecided_list.end ()) {
+        }
+        if (iterator != selective_sync_undecided_list.end ()) {
             selective_sync_undecided_list.erase (it, selective_sync_undecided_list.end ());
             parent_info.folder.journal_database ().selective_sync_list (
                 SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, selective_sync_undecided_list);

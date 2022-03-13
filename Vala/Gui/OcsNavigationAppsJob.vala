@@ -36,7 +36,7 @@ class OcsNavigationAppsJob : OcsJob {
     Get a list of enabled apps and external sites
     visible in the Navigation menu
     ***********************************************************/
-    public void get_navigation_apps () {
+    public void navigation_apps () {
         verb ("GET");
         add_param ("absolute", "true");
         on_signal_start ();

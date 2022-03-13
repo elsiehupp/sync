@@ -159,8 +159,8 @@ class ProxyAuthHandler : GLib.Object {
         }
 
         if (this.username.is_empty () || this.waiting_for_keychain) {
-            if (invalidated || !get_creds_from_keychain ()) {
-                if (get_creds_from_dialog ()) {
+            if (invalidated || !creds_from_keychain ()) {
+                if (creds_from_dialog ()) {
                     store_creds_in_keychain ();
                 } else {
                     // dialog was cancelled, never ask for that proxy again
@@ -204,7 +204,7 @@ class ProxyAuthHandler : GLib.Object {
     Runs the ProxyAuthDialog and returns true if new
     credentials were entered.
     ***********************************************************/
-    private bool get_creds_from_dialog () {
+    private bool creds_from_dialog () {
         // Open the credentials dialog
         if (!this.waiting_for_dialog) {
             this.dialog.on_signal_reset ();
@@ -235,7 +235,7 @@ class ProxyAuthHandler : GLib.Object {
     /***********************************************************
     Checks the keychain for credentials of the current proxy.
     ***********************************************************/
-    private bool get_creds_from_keychain () {
+    private bool creds_from_keychain () {
         if (this.waiting_for_dialog) {
             return false;
         }

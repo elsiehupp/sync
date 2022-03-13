@@ -64,7 +64,7 @@ class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public AbstractCredentials get_credentials () {
+    public AbstractCredentials credentials () {
         var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
         //  Q_ASSERT (oc_wizard);
         return new WebFlowCredentials (

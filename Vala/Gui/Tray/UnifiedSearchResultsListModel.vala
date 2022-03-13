@@ -52,7 +52,7 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
         RESOURCE_URL,
         ROUNDED,
         TYPE,
-        TYPE_AS_STRING,
+        TYPE_AS_STRING;
 
         /***********************************************************
         ***********************************************************/
@@ -179,12 +179,12 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     public void result_clicked (string provider_id, GLib.Uri resource_url) {
-        const QUrlQuery url_query{resource_url};
-        const var directory = url_query.query_item_value (QStringLiteral ("directory"), GLib.Uri.Component_formatting_option.Fully_decoded);
+        const QUrlQuery url_query = new QUrlQuery (resource_url);
+        const var directory = url_query.query_item_value ("directory", GLib.Uri.Component_formatting_option.Fully_decoded);
         const var filename =
-            url_query.query_item_value (QStringLiteral ("scrollto"), GLib.Uri.Component_formatting_option.Fully_decoded);
+            url_query.query_item_value ("scrollto", GLib.Uri.Component_formatting_option.Fully_decoded);
 
-        if (provider_id.contains (QStringLiteral ("file"), Qt.CaseInsensitive) && !directory.is_empty () && !filename.is_empty ()) {
+        if (provider_id.contains ("file", Qt.CaseInsensitive) && !directory.is_empty () && !filename.is_empty ()) {
             if (!this.account_state || !this.account_state.account ()) {
                 return;
             }
@@ -194,7 +194,7 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
                 FolderMan.instance ().find_file_in_local_folders (GLib.FileInfo (relative_path).path (), this.account_state.account ());
 
             if (!local_files.is_empty ()) {
-                GLib.info ("Opening file:" + local_files.const_first ();
+                GLib.info ("Opening file: " + local_files.const_first ());
                 QDesktopServices.open_url (GLib.Uri.from_local_file (local_files.const_first ()));
                 return;
             }
@@ -238,7 +238,7 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
             end_reset_model ();
         }
 
-        for (var provider : this.providers) {
+        foreach (var provider in this.providers) {
             start_search_for_provider (provider.id);
         }
     }
@@ -317,16 +317,7 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
 
         GLib.Vector<UnifiedSearchResult> new_entries;
 
-        const var make_resource_url = [] (string resource_url, GLib.Uri account_url) {
-            GLib.Uri final_resurce_url (resource_url);
-            if (final_resurce_url.scheme ().is_empty () && account_url.scheme ().is_empty ()) {
-                final_resurce_url = account_url;
-                final_resurce_url.path (resource_url);
-            }
-            return final_resurce_url;
-        }
-
-        for (var entry : entries) {
+        foreach (var entry in entries) {
             const var entry_map = entry.to_map ();
             if (entry_map.is_empty ()) {
                 continue;
@@ -357,6 +348,16 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
     }
 
 
+    private static GLib.Uri make_resource_url (string resource_url, GLib.Uri account_url) {
+        GLib.Uri final_resurce_url = new GLib.Uri  (resource_url);
+        if (final_resurce_url.scheme ().is_empty () && account_url.scheme ().is_empty ()) {
+            final_resurce_url = account_url;
+            final_resurce_url.path (resource_url);
+        }
+        return final_resurce_url;
+    }
+
+
     /***********************************************************
     Append initial search results to the list
     ***********************************************************/
@@ -377,27 +378,31 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
             return;
         }
 
-        // insertion is done with sorting (first . by order, then . by name)
-        const var it_to_insert_to = std.find_if (std.begin (this.results), std.end (this.results),
-            [&provider] (UnifiedSearchResult current) {
-                // insert before other results of higher order when possible
-                if (current.order > provider.order) {
-                    return true;
-                } else {
-                    if (current.order == provider.order) {
-                        // insert before results of higher string value when possible
-                        return current.provider_name > provider.name;
+        UnifiedSearchResult to_insert_to;
+        int first = 0;
+        foreach (var result in this.results) {
+            // insert before other results of higher order when possible
+            if (result.order > provider.order) {
+                to_insert_to = result;
+            } else {
+                if (result.order == provider.order) {
+                    // insert before results of higher string value when possible
+                    if (result.provider_name > provider.name) {
+                        to_insert_to = result;
                     }
-
-                    return false;
                 }
-            });
-
-        const var first = static_cast<int> (std.distance (std.begin (this.results), it_to_insert_to));
-        const var last = first + results.size () - 1;
+                first++;
+            }
+        }
+        
+        const int last = first + results.size () - 1;
 
         begin_insert_rows ({}, first, last);
-        std.copy (std.begin (results), std.end (results), std.inserter (this.results, it_to_insert_to));
+        std.copy (
+            std.begin (results),
+            std.end (results),
+            std.inserter (this.results, it_to_insert_to)
+        );
         end_insert_rows ();
     }
 
@@ -412,14 +417,18 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
         }
 
         const var provider_id = provider.id;
+
         /* we need to find the last result that is not a fetch-more-trigger or category-separator for the current
            provider */
-        const var it_last_result_for_provider_reverse =
-            std.find_if (std.rbegin (this.results), std.rend (this.results), [&provider_id] (UnifiedSearchResult result) {
-                return result.provider_id == provider_id && result.type == UnifiedSearchResult.Type.DEFAULT;
-            });
+        UnifiedSearchResult last_result_for_provider_reverse;
+        foreach (var result in this.results) {
+            if (result.provider_id == provider_id && result.type == UnifiedSearchResult.Type.DEFAULT) {
+                last_result_for_provider_reverse = result;
+                break;
+            }
+        }
 
-        if (it_last_result_for_provider_reverse != std.rend (this.results)) {
+        if (last_result_for_provider_reverse != std.rend (this.results)) {
             // #1 Insert rows
             // convert reverse_iterator to iterator
             const var it_last_result_for_provider = (it_last_result_for_provider_reverse + 1).base ();
@@ -440,16 +449,19 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     private void remove_fetch_more_trigger (string provider_id) {
-        const var it_fetch_more_trigger_for_provider_reverse = std.find_if (
-            std.rbegin (this.results),
-            std.rend (this.results),
-            [provider_id] (UnifiedSearchResult result) {
-                return result.provider_id == provider_id && result.type == UnifiedSearchResult.Type.FETCH_MORE_TRIGGER;
-            });
 
-        if (it_fetch_more_trigger_for_provider_reverse != std.rend (this.results)) {
+        UnifiedSearchResult fetch_more_trigger_for_provider_reverse;
+
+        foreach (var result in this.results) {
+            if (result.provider_id == provider_id && result.type == UnifiedSearchResult.Type.FETCH_MORE_TRIGGER) {
+                fetch_more_trigger_for_provider_reverse = result;
+                break;
+            }
+        }
+
+        if (fetch_more_trigger_for_provider_reverse != std.rend (this.results)) {
             // convert reverse_iterator to iterator
-            const var it_fetch_more_trigger_for_provider = (it_fetch_more_trigger_for_provider_reverse + 1).base ();
+            const var it_fetch_more_trigger_for_provider = (fetch_more_trigger_for_provider_reverse + 1).base ();
 
             if (it_fetch_more_trigger_for_provider != std.end (this.results)
                 && it_fetch_more_trigger_for_provider != std.begin (this.results)) {
@@ -466,7 +478,7 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     private void disconnect_and_clear_search_jobs () {
-        for (var connection : this.search_job_connections) {
+        foreach (var connection in this.search_job_connections) {
             if (connection) {
                 GLib.Object.disconnect (connection);
             }
@@ -574,10 +586,8 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
             /* emit */ signal_error_string_changed ();
             return;
         }
-        const var provider_list =
-            json.object ().value (QStringLiteral ("ocs")).to_object ().value (QStringLiteral ("data")).to_variant ().to_list ();
 
-        for (var provider : provider_list) {
+        foreach (var provider in json.object ().value (QStringLiteral ("ocs")).to_object ().value ("data").to_variant ().to_list ()) {
             const var provider_map = provider.to_map ();
             const var identifier = provider_map[QStringLiteral ("identifier")].to_string ();
             const var name = provider_map[QStringLiteral ("name")].to_string ();
@@ -693,17 +703,17 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     private static string icon_url_for_default_icon_name (string default_icon_name) {
-        const GLib.Uri url_for_icon{default_icon_name};
+        const GLib.Uri url_for_icon = new GLib.Uri (default_icon_name);
 
         if (url_for_icon.is_valid () && !url_for_icon.scheme ().is_empty ()) {
             return default_icon_name;
         }
 
-        if (default_icon_name.starts_with (QStringLiteral ("icon-"))) {
+        if (default_icon_name.starts_with ("icon-")) {
             const var parts = default_icon_name.split ('-');
 
             if (parts.size () > 1) {
-                const string icon_file_path = QStringLiteral (":/client/theme/") + parts[1] + QStringLiteral (".svg");
+                const string icon_file_path = ":/client/theme/" + parts[1] + ".svg";
 
                 if (GLib.File.exists (icon_file_path)) {
                     return icon_file_path;
@@ -738,7 +748,7 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
             // some icons may contain parameters after (?)
             const string[] thumbnail_url_copy_splitted = thumbnail_url_copy.contains ('?')
                 ? thumbnail_url_copy.split ('?', Qt.SkipEmptyParts)
-                : string[]{thumbnail_url_copy};
+                : { thumbnail_url_copy };
             //  Q_ASSERT (!thumbnail_url_copy_splitted.is_empty ());
             server_url_copy.path (thumbnail_url_copy_splitted[0]);
             thumbnail_url_copy = server_url_copy.to_string ();
@@ -762,7 +772,7 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
             // relative image resource URL, just needs some concatenation with current server URL
             // some icons may contain parameters after (?)
             const string[] fallack_icon_path_splitted =
-                fallack_icon_copy.contains ('?') ? fallack_icon_copy.split ('?') : string[]{fallack_icon_copy};
+                fallack_icon_copy.contains ('?') ? fallack_icon_copy.split ('?') : { fallack_icon_copy };
             //  Q_ASSERT (!fallack_icon_path_splitted.is_empty ());
             server_url_copy.path (fallack_icon_path_splitted[0]);
             fallack_icon_copy = server_url_copy.to_string ();
@@ -804,7 +814,10 @@ class UnifiedSearchResultsListModel : QAbstractListModel {
             return url_for_thumbnail;
         }
 
-        const string[] list_images{url_for_thumbnail, url_for_fallack_icon};
+        const string[] list_images = {
+            url_for_thumbnail,
+            url_for_fallack_icon
+        };
         return list_images.join (';');
     }
 

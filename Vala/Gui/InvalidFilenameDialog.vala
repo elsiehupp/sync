@@ -40,17 +40,16 @@ class InvalidFilenameDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public InvalidFilenameDialog (AccountPointer account, Folder folder, string file_path, Gtk.Widget parent = null);
-    InvalidFilenameDialog.InvalidFilenameDialog (AccountPointer account, Folder folder, string file_path, Gtk.Widget parent)
-        : Gtk.Dialog (parent)
-        this.ui (new Ui.InvalidFilenameDialog)
-        this.account (account)
-        this.folder (folder)
-        this.file_path (std.move (file_path)) {
+    public InvalidFilenameDialog (AccountPointer account, Folder folder, string file_path, Gtk.Widget parent = null) {
+        base (parent);
+        this.ui = new Ui.InvalidFilenameDialog ();
+        this.account = account;
+        this.folder = folder;
+        this.file_path = std.move (file_path);
         //  Q_ASSERT (this.account);
         //  Q_ASSERT (this.folder);
 
-        const var file_path_file_info = GLib.FileInfo (this.file_path);
+        const GLib.FileInfo file_path_file_info = GLib.FileInfo (this.file_path);
         this.relative_file_path = file_path_file_info.path () + "/";
         this.relative_file_path = this.relative_file_path.replace (folder.path (), "");
         this.relative_file_path = this.relative_file_path.is_empty () ? "" : this.relative_file_path + "/";
@@ -65,11 +64,24 @@ class InvalidFilenameDialog : Gtk.Dialog {
         this.ui.explanation_label.on_signal_text (_("The following characters are not allowed on the system : * \" | & ? , ; : \\ / ~ < >"));
         this.ui.filename_line_edit.on_signal_text (file_path_file_info.filename ());
 
-        connect (this.ui.button_box, QDialogButtonBox.accepted, this, Gtk.Dialog.accept);
-        connect (this.ui.button_box, QDialogButtonBox.rejected, this, Gtk.Dialog.reject);
+        connect (
+            this.ui.button_box,
+            QDialogButtonBox.accepted,
+            this,
+            Gtk.Dialog.accept
+        );
+        connect (
+            this.ui.button_box,
+            QDialogButtonBox.rejected,
+            this,
+            Gtk.Dialog.reject);
 
-        connect (this.ui.filename_line_edit, QLineEdit.text_changed, this,
-            &InvalidFilenameDialog.on_signal_filename_line_edit_text_changed);
+        connect (
+            this.ui.filename_line_edit,
+            QLineEdit.text_changed,
+            this,
+            InvalidFilenameDialog.on_signal_filename_line_edit_text_changed
+        );
 
         check_if_allowed_to_rename ();
     }
@@ -77,11 +89,21 @@ class InvalidFilenameDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public void override on_signal_accept () {
+    public override void on_signal_accept () {
         this.new_filename = this.relative_file_path + this.ui.filename_line_edit.text ().trimmed ();
         const var propfind_job = new PropfindJob (this.account, QDir.clean_path (this.folder.remote_path () + this.new_filename));
-        connect (propfind_job, PropfindJob.result, this, InvalidFilenameDialog.on_signal_remote_file_already_exists);
-        connect (propfind_job, PropfindJob.finished_with_error, this, InvalidFilenameDialog.on_signal_remote_file_does_not_exist);
+        connect (
+            propfind_job,
+            PropfindJob.result,
+            this,
+            InvalidFilenameDialog.on_signal_remote_file_already_exists
+        );
+        connect (
+            propfind_job,
+            PropfindJob.finished_with_error,
+            this,
+            InvalidFilenameDialog.on_signal_remote_file_does_not_exist
+        );
         propfind_job.on_signal_start ();
     }
 
@@ -89,10 +111,10 @@ class InvalidFilenameDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void on_signal_filename_line_edit_text_changed (string text) {
-        const var is_new_filename_different = text != this.original_filename;
-        const var illegal_contained_characters = get_illegal_chars_from_string (text);
+        const bool is_new_filename_different = text != this.original_filename;
+        const var illegal_contained_characters = illegal_chars_from_string (text);
         const var contains_illegal_chars = !illegal_contained_characters.empty () || text.ends_with ('.');
-        const var is_text_valid = is_new_filename_different && !contains_illegal_chars;
+        const bool is_text_valid = is_new_filename_different && !contains_illegal_chars;
 
         if (is_text_valid) {
             this.ui.error_label.on_signal_text ("");
@@ -176,16 +198,24 @@ class InvalidFilenameDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private static constexpr std.array<char, 9> illegal_characters ({
-        '\\', '/', ':', '?', '*', '\"', '<', '>', '|'
-    });
+    private const char[] illegal_characters = {
+        '\\',
+        '/',
+        ':',
+        '?',
+        '*',
+        '\"',
+        '<',
+        '>',
+        '|'
+    };
 
 
     /***********************************************************
     ***********************************************************/
-    private static GLib.Vector<char> get_illegal_chars_from_string (string string) {
+    private static GLib.Vector<char> illegal_chars_from_string (string string) {
         GLib.Vector<char> result;
-        for (var character : string) {
+        foreach (var character in string) {
             if (std.find (illegal_characters.begin (), illegal_characters.end (), character)
                 != illegal_characters.end ()) {
                 result.push_back (character);

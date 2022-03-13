@@ -290,10 +290,10 @@ class OwncloudSetupPage : QWizardPage {
     Called during the validation of the client certificate.
     ***********************************************************/
     public void on_signal_certificate_accepted () {
-        GLib.File cert_file = new GLib.File (add_cert_dial.get_certificate_path ());
+        GLib.File cert_file = new GLib.File (add_cert_dial.certificate_path ());
         cert_file.open (GLib.File.ReadOnly);
         GLib.ByteArray cert_data = cert_file.read_all ();
-        GLib.ByteArray cert_password = add_cert_dial.get_certificate_password ().to_local8Bit ();
+        GLib.ByteArray cert_password = add_cert_dial.certificate_password ().to_local8Bit ();
 
         QBuffer cert_data_buffer = new QBuffer (cert_data);
         cert_data_buffer.open (QIODevice.ReadOnly);

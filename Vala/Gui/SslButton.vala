@@ -84,7 +84,7 @@ class SslButton : QToolButton {
         }
 
         if (account.url ().scheme () == "https") {
-            string ssl_version = account.session_cipher.protocol_""
+            string ssl_version = account.session_cipher.protocol_string ()
                 + ", " + account.session_cipher.authentication_method ()
                 + ", " + account.session_cipher.key_exchange_method ()
                 + ", " + account.session_cipher.encryption_method ();
@@ -97,7 +97,7 @@ class SslButton : QToolButton {
             GLib.List<QSslCertificate> chain = account.peer_certificate_chain;
 
             if (chain.is_empty ()) {
-                GLib.warning ("Empty certificate chain";
+                GLib.warning ("Empty certificate chain.");
                 return;
             }
 
@@ -106,28 +106,35 @@ class SslButton : QToolButton {
             const var system_certificates = QSslConfiguration.system_ca_certificates ();
 
             GLib.List<QSslCertificate> tmp_chain;
-            foreach (QSslCertificate cert, chain) {
-                tmp_chain + cert;
-                if (system_certificates.contains (cert))
+            foreach (QSslCertificate cert in chain) {
+                tmp_chain.append (cert);
+                if (system_certificates.contains (cert)) {
                     break;
+                }
             }
             chain = tmp_chain;
 
             // find trust anchor (informational only, verification is done by QSslSocket!)
-            for (QSslCertificate root_cA : system_certificates) {
-                if (root_cA.issuer_info (QSslCertificate.Common_name) == chain.last ().issuer_info (QSslCertificate.Common_name)
-                    && root_cA.issuer_info (QSslCertificate.Organization) == chain.last ().issuer_info (QSslCertificate.Organization)) {
-                    chain.append (root_cA);
+            foreach (QSslCertificate root_ca in system_certificates) {
+                if (root_ca.issuer_info (QSslCertificate.Common_name) == chain.last ().issuer_info (QSslCertificate.Common_name)
+                    && root_ca.issuer_info (QSslCertificate.Organization) == chain.last ().issuer_info (QSslCertificate.Organization)) {
+                    chain.append (root_ca);
                     break;
                 }
             }
 
-            QList_iterator<QSslCertificate> it (chain);
-            it.to_back ();
-            int i = 0;
-            while (it.has_previous ()) {
-                this.menu.add_menu (build_cert_menu (this.menu, it.previous (), account.approved_certificates (), i, system_certificates));
-                i++;
+            chain.reverse_order ();
+            int index = 0;
+            foreach (var link in chain) {
+                this.menu.add_menu (
+                    build_cert_menu (
+                        this.menu,
+                        account.approved_certificates (),
+                        index,
+                        system_certificates
+                    )
+                );
+                index++;
             }
         } else {
             this.menu.add_action (_("The connection is not secure")).enabled (false);
@@ -139,14 +146,15 @@ class SslButton : QToolButton {
     ***********************************************************/
     private QMenu build_cert_menu (QMenu parent, QSslCertificate cert,
         GLib.List<QSslCertificate> user_approved, int position, GLib.List<QSslCertificate> system_ca_certificates) {
-        string cn = string[] (cert.subject_info (QSslCertificate.Common_name)).join (char (';'));
-        string ou = string[] (cert.subject_info (QSslCertificate.Organizational_unit_name)).join (char (';'));
-        string org = string[] (cert.subject_info (QSslCertificate.Organization)).join (char (';'));
-        string country = string[] (cert.subject_info (QSslCertificate.Country_name)).join (char (';'));
-        string state = string[] (cert.subject_info (QSslCertificate.State_or_province_name)).join (char (';'));
-        string issuer = string[] (cert.issuer_info (QSslCertificate.Common_name)).join (char (';'));
-        if (issuer.is_empty ())
-            issuer = string[] (cert.issuer_info (QSslCertificate.Organizational_unit_name)).join (char (';'));
+        string cn = cert.subject_info (QSslCertificate.Common_name).join (char (';'));
+        string ou = cert.subject_info (QSslCertificate.Organizational_unit_name).join (char (';'));
+        string org = cert.subject_info (QSslCertificate.Organization).join (char (';'));
+        string country = cert.subject_info (QSslCertificate.Country_name).join (char (';'));
+        string state = cert.subject_info (QSslCertificate.State_or_province_name).join (char (';'));
+        string issuer = cert.issuer_info (QSslCertificate.Common_name).join (char (';'));
+        if (issuer.is_empty ()) {
+            issuer = cert.issuer_info (QSslCertificate.Organizational_unit_name).join (char (';'));
+        }
         string sha1 = Utility.format_fingerprint (cert.digest (QCryptographicHash.Sha1).to_hex (), false);
         GLib.ByteArray sha265hash = cert.digest (QCryptographicHash.Sha256).to_hex ();
         string sha256escaped =
@@ -156,10 +164,10 @@ class SslButton : QToolButton {
         string serial = string.from_utf8 (cert.serial_number ());
         string effective_date = cert.effective_date ().date ().to_string ();
         string expiry_date = cert.expiry_date ().date ().to_string ();
-        string sna = string[] (cert.subject_alternative_names ().values ()).join (" ");
+        string sna = cert.subject_alternative_names ().values ().join (" ");
 
         string details;
-        QTextStream stream (details);
+        QTextStream stream = new QTextStream (details);
 
         stream += "<html><body>";
 

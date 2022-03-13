@@ -24,8 +24,8 @@ class IconUtils {
         if (GLib.File.exists (result)) {
             return result;
         } else {
-            for (var color : possible_colors) {
-                result = string{Occ.Theme.theme_prefix} + color + "/" + filename;
+            foreach (var color in possible_colors) {
+                result = Occ.Theme.theme_prefix.to_string () + color + "/" + filename;
 
                 if (GLib.File.exists (result)) {
                     return result;
@@ -57,48 +57,36 @@ class IconUtils {
         //  Q_ASSERT (!filename.is_empty ());
         //  Q_ASSERT (custom_color.is_valid ());
 
-        Gtk.Image result{};
+        Gtk.Image result = new Gtk.Image ();
 
         if (filename.is_empty () || !custom_color.is_valid ()) {
-            GLib.warn ("invalid filename or custom_color";
+            GLib.warn ("invalid filename or custom_color");
             return result;
         }
 
         // some icons are present in white or black only, so, we need to check both when needed
         const string[] icon_base_colors = {
-            "black", "white"
+            "black",
+            "white"
         };
 
-        // check if there is an existing image matching the custom color {
-            const var custom_color_name = [&custom_color] () {
-                var result = custom_color.name ();
-                if (result.starts_with ("#")) {
-                    if (result == "#000000") {
-                        result = "black";
-                    }
-                    if (result == "#ffffff") {
-                        result = "white";
-                    }
-                }
-                return result;
-            } ();
 
-            if (icon_base_colors.contains (custom_color_name)) {
-                result = new Gtk.Image (
-                    string (Occ.Theme.theme_prefix) + custom_color_name + "/" + filename
-                );
-                if (!result.is_null ()) {
-                    return result;
-                }
+        if (icon_base_colors.contains (custom_color_name)) {
+            result = new Gtk.Image (
+                string (Occ.Theme.theme_prefix) + custom_color_name + "/" + filename
+            );
+            if (!result.is_null ()) {
+                return result;
             }
         }
+
 
         // find the first matching svg file
         const var source_svg = find_svg_file_path (filename, icon_base_colors);
 
         //  Q_ASSERT (!source_svg.is_empty ());
         if (source_svg.is_empty ()) {
-            GLib.warn ("Failed to find base SVG file for" + filename;
+            GLib.warn ("Failed to find base SVG file for " + filename);
             return result;
         }
 
@@ -106,9 +94,26 @@ class IconUtils {
 
         //  Q_ASSERT (!result.is_null ());
         if (result.is_null ()) {
-            GLib.warn ("Failed to load pixmap for" + filename;
+            GLib.warn ("Failed to load pixmap for " + filename);
         }
 
+        return result;
+    }
+
+
+    /***********************************************************
+    check if there is an existing image matching the custom color
+    ***********************************************************/
+    private static string custom_color_name (string custom_color) {
+        var result = custom_color.name ();
+        if (result.starts_with ("#")) {
+            if (result == "#000000") {
+                result = "black";
+            }
+            if (result == "#ffffff") {
+                result = "white";
+            }
+        }
         return result;
     }
 
@@ -146,7 +151,7 @@ class IconUtils {
         QSvgRenderer svg_renderer;
 
         if (!svg_renderer.on_signal_load (source_svg_path)) {
-            GLib.warning ("Could no load initial SVG image";
+            GLib.warning ("Could no load initial SVG image.");
             return {};
         }
 
@@ -158,7 +163,7 @@ class IconUtils {
 
         // render source image
         Gtk.Image svg_image = new Gtk.Image (req_size, Gtk.Image.FormatARGB32); {
-            QPainter svg_image_painter (svg_image);
+            QPainter svg_image_painter = new QPainter (svg_image);
             svg_image.fill (Qt.GlobalColor.transparent);
             svg_renderer.render (svg_image_painter);
         }
@@ -166,7 +171,7 @@ class IconUtils {
         // draw target image with custom fill_color
         Gtk.Image image = new Gtk.Image (req_size, Gtk.Image.FormatARGB32);
         image.fill (Gtk.Color (fill_color)); {
-            QPainter image_painter (image);
+            QPainter image_painter = new QPainter (image);
             image_painter.composition_mode (QPainter.Composition_mode_Destination_in);
             image_painter.draw_image (0, 0, svg_image);
         }

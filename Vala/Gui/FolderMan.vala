@@ -350,13 +350,13 @@ class FolderMan : GLib.Object {
         // Migration: The first account that's configured for a local folder shall
         // be saved in a backwards-compatible way.
         const var folder_list = FolderMan.instance ().map ();
-        const var one_account_only = std.none_of (
-            folder_list.cbegin (),
-            folder_list.cend (),
-            [folder] (var other) {
-                return other != folder && other.clean_path () == folder.clean_path ();
+        int count = 0;
+        foreach (var Folder in FolderMan.instance ().map ()) {
+            if (other != folder && other.clean_path () == folder.clean_path ()) {
+                count++;
             }
-        );
+        }
+        const bool one_account_only = count < 2;
     
         folder.save_backwards_compatible (one_account_only);
     
@@ -420,15 +420,12 @@ class FolderMan : GLib.Object {
     Returns the folder which the file or directory stored in path is in
     ***********************************************************/
     public Folder folder_for_path (string path) {
-        string absolute_path = QDir.clean_path (path) + '/';
-    
-        const var folders = this.map ().values ();
-        const var it = std.find_if (folders.cbegin (), folders.cend (), [absolute_path] (var folder) {
-            const string folder_path = folder.clean_path () + '/';
-            return absolute_path.starts_with (folder_path, (Utility.is_windows () || Utility.is_mac ()) ? Qt.CaseInsensitive : Qt.CaseSensitive);
-        });
-    
-        return it != folders.cend () ? *it : null;
+        foreach (var folder in this.map ().values ()) {
+            if ((QDir.clean_path (path) + '/').starts_with (folder.clean_path () + '/', (Utility.is_windows () || Utility.is_mac ()) ? Qt.CaseInsensitive : Qt.CaseSensitive)) {
+                return folder;
+            }
+        }
+        return null;
     }
 
 
@@ -442,15 +439,17 @@ class FolderMan : GLib.Object {
     
         // We'll be comparing against Folder.remote_path which always starts with /
         string server_path = rel_path;
-        if (!server_path.starts_with ('/'))
+        if (!server_path.starts_with ('/')) {
             server_path.prepend ('/');
+        }
     
-        for (Folder folder : this.map ().values ()) {
+        foreach (Folder folder in this.map ().values ()) {
             if (acc && folder.account_state ().account () != acc) {
                 continue;
             }
-            if (!server_path.starts_with (folder.remote_path ()))
+            if (!server_path.starts_with (folder.remote_path ())) {
                 continue;
+            }
     
             string path = folder.clean_path () + '/';
             path += server_path.mid_ref (folder.remote_path_trailing_slash ().length ());
@@ -489,12 +488,12 @@ class FolderMan : GLib.Object {
     public Folder set_up_folder_from_old_config_file (string file, AccountState account_state) {
         Folder folder = null;
     
-        GLib.info ("  ` . setting up:" + file;
-        string escaped_alias (file);
+        GLib.info ("  ` . setting up: " + file);
+        string escaped_alias = file;
         // check the unescaped variant (for the case when the filename comes out
         // of the directory listing). If the file does not exist, escape the
         // file and try again.
-        GLib.FileInfo config_file (this.folder_config_path, file);
+        GLib.FileInfo config_file = new GLib.FileInfo (this.folder_config_path, file);
     
         if (!config_file.exists ()) {
             // try the escaped variant.
@@ -502,12 +501,12 @@ class FolderMan : GLib.Object {
             config_file.file (this.folder_config_path, escaped_alias);
         }
         if (!config_file.is_readable ()) {
-            GLib.warning ("Cannot read folder definition for alias " + config_file.file_path ();
+            GLib.warning ("Cannot read folder definition for alias " + config_file.file_path ());
             return folder;
         }
     
         QSettings settings = new QSettings (this.folder_config_path + '/' + escaped_alias, QSettings.IniFormat);
-        GLib.info ("    . file path: " + settings.filename ();
+        GLib.info ("    . file path: " + settings.filename ());
     
         // Check if the filename is equal to the group setting. If not, use the group
         // name as an alias.
@@ -561,7 +560,7 @@ class FolderMan : GLib.Object {
     
             folder.save_to_settings ();
         }
-        GLib.info ("Migrated!" + folder;
+        GLib.info ("Migrated! " + folder);
         settings.sync ();
         return folder;
     }
@@ -575,11 +574,11 @@ class FolderMan : GLib.Object {
     public static bool ensure_journal_gone (string journal_database_file) {
         // remove the old journal file
         while (GLib.File.exists (journal_database_file) && !GLib.File.remove (journal_database_file)) {
-            GLib.warning ("Could not remove old database file at" + journal_database_file;
+            GLib.warning ("Could not remove old database file at " + journal_database_file);
             int ret = QMessageBox.warning (null, _("Could not reset folder state"),
                 _("An old sync journal \"%1\" was found, "
-                   "but could not be removed. Please make sure "
-                   "that no application is currently using it.")
+                + "but could not be removed. Please make sure "
+                + "that no application is currently using it.")
                     .arg (QDir.from_native_separators (QDir.clean_path (journal_database_file))),
                 QMessageBox.Retry | QMessageBox.Abort);
             if (ret == QMessageBox.Abort) {
@@ -598,8 +597,8 @@ class FolderMan : GLib.Object {
             return false;
         }
     
-        GLib.FileInfo file_info (local_folder);
-        QDir parent_dir (file_info.directory ());
+        GLib.FileInfo file_info = new GLib.FileInfo (local_folder);
+        QDir parent_dir = new QDir (file_info.directory ());
         string folder_name = file_info.filename ();
     
         // Adjust for case where local_folder ends with a /
@@ -626,17 +625,18 @@ class FolderMan : GLib.Object {
             }
     
             // Make a backup of the folder/file.
-            string new_name = get_backup_name (parent_dir.absolute_file_path (folder_name));
+            string new_name = backup_name (parent_dir.absolute_file_path (folder_name));
             string rename_error;
             if (!FileSystem.rename (file_info.absolute_file_path (), new_name, rename_error)) {
-                GLib.warning ("start_from_scratch : Could not rename" + file_info.absolute_file_path ()
-                                       + "to" + new_name + "error:" + rename_error;
+                GLib.warning (
+                    "start_from_scratch: Could not rename " + file_info.absolute_file_path ()
+                    + " to " + new_name + " error: " + rename_error);
                 return false;
             }
         }
     
         if (!parent_dir.mkdir (file_info.absolute_file_path ())) {
-            GLib.warning ("start_from_scratch : Could not mkdir" + file_info.absolute_file_path ();
+            GLib.warning ("start_from_scratch: Could not mkdir " + file_info.absolute_file_path ());
             return false;
         }
     
@@ -787,7 +787,7 @@ class FolderMan : GLib.Object {
     file system, thus need to be escaped.
     ***********************************************************/
     public static string escape_alias (string alias) {
-        string a (alias);
+        string a = alias;
     
         a.replace ('/', SLASH_TAG);
         a.replace ('\\', BSLASH_TAG);
@@ -808,7 +808,7 @@ class FolderMan : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static string unescape_alias (string alias) {
-        string a (alias);
+        string a = alias;
     
         a.replace (SLASH_TAG, "/");
         a.replace (BSLASH_TAG, "\\");
@@ -880,14 +880,14 @@ class FolderMan : GLib.Object {
             bool different_paths = string.compare (folder_dir, user_dir, cs) != 0;
             if (different_paths && folder_dir.starts_with (user_dir, cs)) {
                 return _("The local folder %1 already contains a folder used in a folder sync connection. "
-                          "Please pick another one!")
-                    .arg (QDir.to_native_separators (path));
+                       + "Please pick another one!")
+                            .arg (QDir.to_native_separators (path));
             }
     
             if (different_paths && user_dir.starts_with (folder_dir, cs)) {
                 return _("The local folder %1 is already contained in a folder used in a folder sync connection. "
-                          "Please pick another one!")
-                    .arg (QDir.to_native_separators (path));
+                       + "Please pick another one!")
+                            .arg (QDir.to_native_separators (path));
             }
     
             // if both pathes are equal, the server url needs to be different
@@ -900,7 +900,7 @@ class FolderMan : GLib.Object {
     
                 if (server_url == folder_url) {
                     return _("There is already a sync from the server to this local folder. "
-                              "Please pick another local folder!");
+                           + "Please pick another local folder!");
                 }
             }
         }
@@ -977,7 +977,7 @@ class FolderMan : GLib.Object {
     are deleted...
     ***********************************************************/
     public void ignore_hidden_files (bool ignore) {
-        for (Folder folder : q_as_const (this.folder_map)) {
+        foreach (Folder folder in this.folder_map) {
             folder.ignore_hidden_files (ignore);
             folder.save_to_settings ();
         }
@@ -1013,12 +1013,14 @@ class FolderMan : GLib.Object {
     managed sync like a placeholder hydration.
     ***********************************************************/
     public bool is_any_sync_running () {
-        if (this.current_sync_folder)
+        if (this.current_sync_folder) {
             return true;
+        }
     
-        for (var folder : this.folder_map) {
-            if (folder.is_sync_running ())
+        foreach (var folder in this.folder_map) {
+            if (folder.is_sync_running ()) {
                 return true;
+            }
         }
         return false;
     }
@@ -1031,10 +1033,7 @@ class FolderMan : GLib.Object {
         int count = 0;
     
         // clear the list of existing folders.
-        Folder.MapIterator i (this.folder_map);
-        while (i.has_next ()) {
-            i.next ();
-            Folder folder = i.value ();
+        foreach (Folder folder in this.folder_map) {
             unload_folder (folder);
             delete folder;
             count++;
@@ -1058,8 +1057,7 @@ class FolderMan : GLib.Object {
     Only enable or disable foldermans will schedule and do syncs.
     this is not the same as Pause and Resume of folders.
     ***********************************************************/
-    public void sync_enabled (bool);
-    void FolderMan.sync_enabled (bool enabled) {
+    public void sync_enabled (bool enabled) {
         if (!this.sync_enabled && enabled && !this.scheduled_folders.is_empty ()) {
             // We have things in our queue that were waiting for the connection to come back on.
             start_scheduled_sync_soon ();
@@ -1089,7 +1087,7 @@ class FolderMan : GLib.Object {
     
         if (!this.scheduled_folders.contains (folder)) {
             if (!folder.can_sync ()) {
-                GLib.info ("Folder is not ready to sync, not scheduled!";
+                GLib.info ("Folder is not ready to sync, not scheduled!");
                 this.socket_api.on_signal_update_folder_view (folder);
                 return;
             }
@@ -1110,10 +1108,10 @@ class FolderMan : GLib.Object {
     ***********************************************************/
     public void schedule_folder_next (Folder folder) {
         var alias = folder.alias ();
-        GLib.info ("Schedule folder " + alias + " to sync! Front-of-queue.";
+        GLib.info ("Schedule folder " + alias + " to sync! Front-of-queue.");
     
         if (!folder.can_sync ()) {
-            GLib.info ("Folder is not ready to sync, not scheduled!";
+            GLib.info ("Folder is not ready to sync, not scheduled!");
             return;
         }
     
@@ -1132,7 +1130,7 @@ class FolderMan : GLib.Object {
     Queues all folders for syncing.
     ***********************************************************/
     public void schedule_all_folders () {
-        for (Folder folder : this.folder_map.values ()) {
+        foreach (Folder folder in this.folder_map.values ()) {
             if (folder && folder.can_sync ()) {
                 schedule_folder (folder);
             }
@@ -1143,7 +1141,7 @@ class FolderMan : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void dirty_proxy () {
-        for (Folder folder : this.folder_map.values ()) {
+        foreach (Folder folder in this.folder_map.values ()) {
             if (folder) {
                 if (folder.account_state () && folder.account_state ().account ()
                     && folder.account_state ().account ().network_access_manager ()) {
@@ -1159,7 +1157,7 @@ class FolderMan : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void dirty_network_limits () {
-        for (Folder folder : this.folder_map.values ()) {
+        foreach (Folder folder in this.folder_map.values ()) {
             // set only in busy folders. Otherwise they read the config anyway.
             if (folder && folder.is_busy ()) {
                 folder.dirty_network_limits ();
@@ -1180,9 +1178,9 @@ class FolderMan : GLib.Object {
         string account_name = account_state.account ().display_name ();
     
         if (account_state.is_connected ()) {
-            GLib.info ("Account" + account_name + "connected, scheduling its folders";
+            GLib.info ("Account " + account_name + " connected, scheduling its folders.");
     
-            for (Folder folder : this.folder_map.values ()) {
+            foreach (Folder folder in this.folder_map.values ()) {
                 if (folder
                     && folder.can_sync ()
                     && folder.account_state () == account_state) {
@@ -1190,22 +1188,20 @@ class FolderMan : GLib.Object {
                 }
             }
         } else {
-            GLib.info ("Account" + account_name + "disconnected or paused, "
-                                                               "terminating or descheduling sync folders";
+            GLib.info ("Account " + account_name
+                + " disconnected or paused, terminating or descheduling sync folders.");
     
-            foreach (Folder folder, this.folder_map.values ()) {
+            foreach (Folder folder in this.folder_map.values ()) {
                 if (folder
                     && folder.is_sync_running ()
                     && folder.account_state () == account_state) {
                     folder.on_signal_terminate_sync ();
                 }
             }
-    
-            QMutableListIterator<Folder> it (this.scheduled_folders);
-            while (it.has_next ()) {
-                Folder folder = it.next ();
+
+            foreach (Folder folder in this.scheduled_folders) {
                 if (folder.account_state () == account_state) {
-                    it.remove ();
+                    this.scheduled_folders.remove (folder);
                 }
             }
             /* emit */ signal_schedule_queue_changed ();
@@ -1218,17 +1214,26 @@ class FolderMan : GLib.Object {
     ***********************************************************/
     public void on_signal_schedule_app_restart () {
         this.app_restart_required = true;
-        GLib.info ("Application restart requested!";
+        GLib.info ("Application restart requested!");
     }
 
 
     /***********************************************************
     Slot to schedule an ETag job (from Folder only)
     ***********************************************************/
-    public void on_signal_schedule_e_tag_job (string  /*alias*/, RequestEtagJob job) {
-        connect (job, GLib.Object.destroyed, this, FolderMan.on_signal_etag_job_destroyed);
-        QMetaObject.invoke_method (this, "on_signal_run_one_etag_job", Qt.QueuedConnection);
-        // maybe : add to queue
+    public void on_signal_schedule_e_tag_job (string alias, RequestEtagJob job) {
+        connect (
+            job,
+            GLib.Object.destroyed,
+            this,
+            FolderMan.on_signal_etag_job_destroyed
+        );
+        QMetaObject.invoke_method (
+            this,
+            "on_signal_run_one_etag_job",
+            Qt.QueuedConnection
+        );
+        // maybe: add to queue
     }
 
 
@@ -1236,24 +1241,22 @@ class FolderMan : GLib.Object {
     Wipe folder
     ***********************************************************/
     public void on_signal_wipe_folder_for_account (AccountState account_state) {
-        QVarLengthArray<Folder *, 16> folders_to_remove;
-        Folder.MapIterator i (this.folder_map);
-        while (i.has_next ()) {
-            i.next ();
-            Folder folder = i.value ();
+        GLib.List<Folder> folders_to_remove; // QVarLengthArray<Folder *, 16>
+
+        foreach (Folder folder in this.folder_map) {
             if (folder.account_state () == account_state) {
                 folders_to_remove.append (folder);
             }
         }
     
         bool on_signal_success = false;
-        for (var folder : q_as_const (folders_to_remove)) {
+        foreach (Folder folder in folders_to_remove) {
             if (!folder) {
-                GLib.critical ("Can not remove null folder";
+                GLib.critical ("Can not remove null folder.");
                 return;
             }
     
-            GLib.info ("Removing " + folder.alias ();
+            GLib.info ("Removing " + folder.alias ());
     
             const bool currently_running = (this.current_sync_folder == folder);
             if (currently_running) {
@@ -1269,18 +1272,18 @@ class FolderMan : GLib.Object {
             folder.wipe_for_removal ();
     
             // wipe data
-            QDir user_folder (folder.path ());
+            QDir user_folder = new QDir (folder.path ());
             if (user_folder.exists ()) {
                 on_signal_success = user_folder.remove_recursively ();
                 if (!on_signal_success) {
-                    GLib.warning ("Failed to remove existing folder " + folder.path ();
+                    GLib.warning ("Failed to remove existing folder " + folder.path ());
                 } else {
-                    GLib.info ("wipe : Removed  file " + folder.path ();
+                    GLib.info ("Wipe: Removed  file " + folder.path ());
                 }
     
             } else {
                 on_signal_success = true;
-                GLib.warning ("folder does not exist, can not remove.";
+                GLib.warning ("Folder does not exist, can not remove.");
             }
     
             folder.sync_paused (true);
@@ -1305,7 +1308,7 @@ class FolderMan : GLib.Object {
     ***********************************************************/
     private void on_signal_folder_sync_paused (Folder folder, bool paused) {
         if (!folder) {
-            GLib.critical ("on_signal_folder_sync_paused called with empty folder";
+            GLib.critical ("on_signal_folder_sync_paused called with empty folder.");
             return;
         }
     
@@ -1376,8 +1379,7 @@ class FolderMan : GLib.Object {
     ***********************************************************/
     private void on_signal_run_one_etag_job () {
         if (this.current_etag_job.is_null ()) {
-            Folder folder = null;
-            for (Folder folder : q_as_const (this.folder_map)) {
+            foreach (Folder folder in this.folder_map) {
                 if (folder.etag_job ()) {
                     // Caveat: always grabs the first folder with a job, but we think this is Ok for now and avoids us having a seperate queue.
                     this.current_etag_job = folder.etag_job ();
@@ -1393,7 +1395,7 @@ class FolderMan : GLib.Object {
                     restart_application ();
                 }
             } else {
-                GLib.debug ("Scheduling" + folder.remote_url ().to_string ("to check remote ETag";
+                GLib.debug ("Scheduling " + folder.remote_url ().to_string () + "to check remote ETag.");
                 this.current_etag_job.on_signal_start (); // on destroy/end it will continue the queue via on_signal_etag_job_destroyed
             }
         }
@@ -1420,19 +1422,20 @@ class FolderMan : GLib.Object {
     ***********************************************************/
     private void on_signal_start_scheduled_folder_sync () {
         if (is_any_sync_running ()) {
-            for (var folder : this.folder_map) {
-                if (folder.is_sync_running ())
-                    GLib.info ("Currently folder " + folder.remote_url ().to_string (" is running, wait for finish!";
+            foreach (Folder folder in this.folder_map) {
+                if (folder.is_sync_running ()) {
+                    GLib.info ("Currently folder " + folder.remote_url ().to_string () + " is running, wait for finish!");
+                }
             }
             return;
         }
     
         if (!this.sync_enabled) {
-            GLib.info ("FolderMan : Syncing is disabled, no scheduling.";
+            GLib.info ("FolderMan: Syncing is disabled; no scheduling.");
             return;
         }
     
-        GLib.debug ("folder_queue size: " + this.scheduled_folders.count ();
+        GLib.debug ("folder_queue size: " + this.scheduled_folders.count ());
         if (this.scheduled_folders.is_empty ()) {
             return;
         }
@@ -1457,7 +1460,7 @@ class FolderMan : GLib.Object {
             register_folder_with_socket_api (folder);
     
             this.current_sync_folder = folder;
-            folder.on_signal_start_sync (string[] ());
+            folder.on_signal_start_sync ({});
         }
     }
 
@@ -1465,21 +1468,18 @@ class FolderMan : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_etag_poll_timer_timeout () {
-        GLib.info ("Etag poll timer timeout";
-    
-        const var folder_map_values = this.folder_map.values ();
-    
-        GLib.info ("Folders to sync:" + folder_map_values.size ();
-    
-        GLib.List<Folder> folders_to_run;
+        GLib.info ("Etag poll timer timeout.");
+        GLib.info ("Folders to sync: " + this.folder_map.size ());
+        GLib.List<Folder> folders_to_run = new GLib.List<Folder> ();
     
         // Some folders need not to be checked because they use the push notifications
-        std.copy_if (folder_map_values.begin (), folder_map_values.end (), std.back_inserter (folders_to_run), [this] (Folder folder) . bool {
-            const var account = folder.account_state ().account ();
-            return !push_notifications_files_ready (account.data ());
-        });
-    
-        GLib.info ("Number of folders that don't use push notifications:" + folders_to_run.size ();
+        foreach (Folder folder in this.folder_map) {
+            if (!push_notifications_files_ready (folder.account_state ().account ().data ())) {
+                folders_to_run.append (folder);
+            }
+        }
+
+        GLib.info ("Number of folders that don't use push notifications: " + folders_to_run.size ());
     
         run_etag_jobs_if_possible (folders_to_run);
     }
@@ -1488,7 +1488,7 @@ class FolderMan : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_account_removed (AccountState account_state) {
-        for (var folder : q_as_const (this.folder_map)) {
+        foreach (Folder folder in this.folder_map) {
             if (folder.account_state () == account_state) {
                 folder.on_signal_associated_account_removed ();
             }
@@ -1499,17 +1499,14 @@ class FolderMan : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_remove_folders_for_account (AccountState account_state) {
-        QVarLengthArray<Folder *, 16> folders_to_remove;
-        Folder.MapIterator i (this.folder_map);
-        while (i.has_next ()) {
-            i.next ();
-            Folder folder = i.value ();
+        GLib.List<Folder> folders_to_remove = new GLib.List<Folder> ();
+        foreach (Folder folder in this.folder_map) {
             if (folder.account_state () == account_state) {
                 folders_to_remove.append (folder);
             }
         }
     
-        for (var folder : q_as_const (folders_to_remove)) {
+        foreach (Folder folder in folders_to_remove) {
             remove_folder (folder);
         }
         /* emit */ signal_folder_list_changed (this.folder_map);
@@ -1521,7 +1518,8 @@ class FolderMan : GLib.Object {
     FolderMan.signal_folder_sync_state_change (Folder*) signal.
     ***********************************************************/
     private void on_signal_forward_folder_sync_state_change () {
-        if (var folder = qobject_cast<Folder> (sender ())) {
+        var folder = (Folder) sender ();
+        if (folder) {
             /* emit */ signal_folder_sync_state_change (folder);
         }
     }
@@ -1532,10 +1530,12 @@ class FolderMan : GLib.Object {
     private void on_signal_server_version_changed (Account account) {
         // Pause folders if the server version is unsupported
         if (account.server_version_unsupported ()) {
-            GLib.warning ("The server version is unsupported:" + account.server_version ()
-                                   + "pausing all folders on the account";
+            GLib.warning (
+                "The server version is unsupported: "
+                + account.server_version ()
+                + "pausing all folders on the account.");
     
-            for (var folder : q_as_const (this.folder_map)) {
+            foreach (Folder folder in this.folder_map) {
                 if (folder.account_state ().account ().data () == account) {
                     folder.sync_paused (true);
                 }
@@ -1551,7 +1551,8 @@ class FolderMan : GLib.Object {
     the file with the given path.
     ***********************************************************/
     private void on_signal_watched_file_unlocked (string path) {
-        if (Folder folder = folder_for_path (path)) {
+        Folder folder = folder_for_path (path);
+        if (folder) {
             // Treat this equivalently to the file being reported by the file watcher
             folder.on_signal_watched_path_changed (path, Folder.ChangeReason.ChangeReason.UNLOCK);
         }
@@ -1565,7 +1566,7 @@ class FolderMan : GLib.Object {
     because of previous failures.
     ***********************************************************/
     private void on_signal_schedule_folder_by_time () {
-        for (var folder : q_as_const (this.folder_map)) {
+        foreach (Folder folder in this.folder_map) {
             // Never schedule if syncing is disabled or when we're currently
             // querying the server for etags
             if (!folder.can_sync () || folder.etag_job ()) {
@@ -1577,9 +1578,10 @@ class FolderMan : GLib.Object {
             // Possibly it's just time for a new sync run
             bool force_sync_interval_expired = msecs_since_sync > ConfigFile ().force_sync_interval ();
             if (force_sync_interval_expired) {
-                GLib.info ("Scheduling folder" + folder.alias ()
-                                    + "because it has been" + msecs_since_sync.count ("ms "
-                                    + "since the last sync";
+                GLib.info (
+                    "Scheduling folder " + folder.alias ()
+                    + " because it has been " + msecs_since_sync.count () + "ms "
+                    + " since the last sync.");
     
                 schedule_folder (folder);
                 continue;
@@ -1593,11 +1595,12 @@ class FolderMan : GLib.Object {
             if (folder.consecutive_failing_syncs () > 1)
                 sync_again_delay = std.chrono.seconds (60); // 60s for each further attempt
             if (sync_again && msecs_since_sync > sync_again_delay) {
-                GLib.info ("Scheduling folder" + folder.alias ()
-                                    + ", the last" + folder.consecutive_failing_syncs ("syncs failed"
-                                    + ", another_sync_needed" + folder.sync_engine ().is_another_sync_needed ()
-                                    + ", last status:" + folder.sync_result ().status_string ()
-                                    + ", time since last sync:" + msecs_since_sync.count ();
+                GLib.info (
+                    "Scheduling folder " + folder.alias ()
+                    + ", the last " + folder.consecutive_failing_syncs () + " syncs failed "
+                    + ", another_sync_needed " + folder.sync_engine ().is_another_sync_needed ()
+                    + ", last status: " + folder.sync_result ().status_string ()
+                    + ", time since last sync: " + msecs_since_sync.count ());
     
                 schedule_folder (folder);
                 continue;
@@ -1611,14 +1614,20 @@ class FolderMan : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_setup_push_notifications (Folder.Map folder_map) {
-        for (var folder : folder_map) {
+        foreach (Folder folder in folder_map) {
             const var account = folder.account_state ().account ();
     
             // See if the account already provides the PushNotifications object and if yes connect to it.
             // If we can't connect at this point, the signals will be connected in on_signal_push_notifications_ready ()
             // after the Push_notification object emitted the ready signal
             on_signal_connect_to_push_notifications (account.data ());
-            connect (account.data (), Account.push_notifications_ready, this, FolderMan.on_signal_connect_to_push_notifications, Qt.UniqueConnection);
+            connect (
+                account.data (),
+                Account.push_notifications_ready,
+                this,
+                FolderMan.on_signal_connect_to_push_notifications,
+                Qt.UniqueConnection
+            );
         }
     }
 
@@ -1628,7 +1637,7 @@ class FolderMan : GLib.Object {
     private void on_signal_process_files_push_notification (Account account) {
         GLib.info ("Got files push notification for account " + account);
     
-        for (var folder : this.folder_map) {
+        foreach (Folder folder in this.folder_map) {
             // Just run on the folders that belong to this account
             if (folder.account_state ().account () != account) {
                 continue;
@@ -1646,7 +1655,7 @@ class FolderMan : GLib.Object {
         const var push_notifications = account.push_notifications ();
     
         if (push_notifications_files_ready (account)) {
-            GLib.info ("Push notifications ready";
+            GLib.info ("Push notifications ready.");
             connect (push_notifications, PushNotifications.files_changed, this, FolderMan.on_signal_process_files_push_notification, Qt.UniqueConnection);
         }
     }
@@ -1674,22 +1683,55 @@ class FolderMan : GLib.Object {
             folder.save_to_settings ();
         }
     
-        GLib.info ("Adding folder to Folder Map " + folder + folder.alias ();
+        GLib.info ("Adding folder to Folder Map " + folder + folder.alias ());
         this.folder_map[folder.alias ()] = folder;
         if (folder.sync_paused ()) {
             this.disabled_folders.insert (folder);
         }
     
         // See matching disconnects in unload_folder ().
-        connect (folder, Folder.signal_sync_started, this, FolderMan.on_signal_folder_sync_started);
-        connect (folder, Folder.signal_sync_finished, this, FolderMan.on_signal_folder_sync_finished);
-        connect (folder, Folder.signal_sync_state_change, this, FolderMan.on_signal_forward_folder_sync_state_change);
-        connect (folder, Folder.signal_sync_paused_changed, this, FolderMan.on_signal_folder_sync_paused);
-        connect (folder, Folder.signal_can_sync_changed, this, FolderMan.on_signal_folder_can_sync_changed);
-        connect (folder.sync_engine ().sync_file_status_tracker (), SyncFileStatusTracker.file_status_changed,
-            this.socket_api.data (), SocketApi.on_signal_broadcast_status_push_message);
-        connect (folder, Folder.signal_watched_file_changed_externally,
-            folder.sync_engine ().sync_file_status_tracker (), SyncFileStatusTracker.on_signal_path_touched);
+        connect (
+            folder,
+            Folder.signal_sync_started,
+            this,
+            FolderMan.on_signal_folder_sync_started
+        );
+        connect (
+            folder,
+            Folder.signal_sync_finished,
+            this,
+            FolderMan.on_signal_folder_sync_finished
+        );
+        connect (
+            folder,
+            Folder.signal_sync_state_change,
+            this,
+            FolderMan.on_signal_forward_folder_sync_state_change
+        );
+        connect (
+            folder,
+            Folder.signal_sync_paused_changed,
+            this,
+            FolderMan.on_signal_folder_sync_paused
+        );
+        connect (
+            folder,
+            Folder.signal_can_sync_changed,
+            this,
+            FolderMan.on_signal_folder_can_sync_changed
+        );
+        connect (
+            folder.sync_engine ().sync_file_status_tracker (),
+            SyncFileStatusTracker.file_status_changed,
+            this.socket_api.data (),
+            SocketApi.on_signal_broadcast_status_push_message
+        );
+        connect (
+            folder,
+            Folder.signal_watched_file_changed_externally,
+            folder.sync_engine ().sync_file_status_tracker (),
+            SyncFileStatusTracker.on_signal_path_touched
+        );
     
         folder.register_folder_watcher ();
         register_folder_with_socket_api (folder);
@@ -1709,18 +1751,42 @@ class FolderMan : GLib.Object {
     
         this.folder_map.remove (folder.alias ());
     
-        disconnect (folder, Folder.signal_sync_started,
-            this, FolderMan.on_signal_folder_sync_started);
-        disconnect (folder, Folder.signal_sync_finished,
-            this, FolderMan.on_signal_folder_sync_finished);
-        disconnect (folder, Folder.signal_sync_state_change,
-            this, FolderMan.on_signal_forward_folder_sync_state_change);
-        disconnect (folder, Folder.signal_sync_paused_changed,
-            this, FolderMan.on_signal_folder_sync_paused);
-        disconnect (folder.sync_engine ().sync_file_status_tracker (), SyncFileStatusTracker.file_status_changed,
-            this.socket_api.data (), SocketApi.on_signal_broadcast_status_push_message);
-        disconnect (folder, Folder.signal_watched_file_changed_externally,
-            folder.sync_engine ().sync_file_status_tracker (), SyncFileStatusTracker.on_signal_path_touched);
+        disconnect (
+            folder,
+            Folder.signal_sync_started,
+            this,
+            FolderMan.on_signal_folder_sync_started
+        );
+        disconnect (
+            folder,
+            Folder.signal_sync_finished,
+            this,
+            FolderMan.on_signal_folder_sync_finished
+        );
+        disconnect (
+            folder,
+            Folder.signal_sync_state_change,
+            this,
+            FolderMan.on_signal_forward_folder_sync_state_change
+        );
+        disconnect (
+            folder,
+            Folder.signal_sync_paused_changed,
+            this,
+            FolderMan.on_signal_folder_sync_paused
+        );
+        disconnect (
+            folder.sync_engine ().sync_file_status_tracker (),
+            SyncFileStatusTracker.file_status_changed,
+            this.socket_api.data (),
+            SocketApi.on_signal_broadcast_status_push_message
+        );
+        disconnect (
+            folder,
+            Folder.signal_watched_file_changed_externally,
+            folder.sync_engine ().sync_file_status_tracker (),
+            SyncFileStatusTracker.on_signal_path_touched
+        );
     }
 
 
@@ -1742,7 +1808,8 @@ class FolderMan : GLib.Object {
         int64 ms_since_last_sync = 0;
     
         // Require a pause based on the duration of the last sync run.
-        if (Folder last_folder = this.last_sync_folder) {
+        Folder last_folder = this.last_sync_folder;
+        if (last_folder) {
             ms_since_last_sync = last_folder.msec_since_last_sync ().count ();
     
             //  1s   . 1.5s pause
@@ -1761,7 +1828,7 @@ class FolderMan : GLib.Object {
         // Time since the last sync run counts against the delay
         ms_delay = q_max (1ll, ms_delay - ms_since_last_sync);
     
-        GLib.info ("Starting the next scheduled sync in" + (ms_delay / 1000) + "seconds";
+        GLib.info ("Starting the next scheduled sync in " + (ms_delay / 1000) + " seconds.");
         this.start_scheduled_sync_timer.on_signal_start (ms_delay);
     }
 
@@ -1769,15 +1836,17 @@ class FolderMan : GLib.Object {
     /***********************************************************
     Finds all folder configuration files and create the folders
     ***********************************************************/
-    private string get_backup_name (string full_path_name) {
-        if (full_path_name.ends_with ("/"))
+    private string backup_name (string full_path_name) {
+        if (full_path_name.ends_with ("/")) {
             full_path_name.chop (1);
+        }
     
-        if (full_path_name.is_empty ())
+        if (full_path_name.is_empty ()) {
             return "";
+        }
     
         string new_name = full_path_name + _(" (backup)");
-        GLib.FileInfo file_info (new_name);
+        GLib.FileInfo file_info = new GLib.FileInfo (new_name);
         int count = 2;
         do {
             if (file_info.exists ()) {
@@ -1811,14 +1880,14 @@ class FolderMan : GLib.Object {
     private void restart_application () {
         if (Utility.is_linux ()) {
             // restart:
-            GLib.info ("Restarting application NOW, PID" + Gtk.Application.application_pid ("is ending.";
+            GLib.info ("Restarting application NOW, PID " + Gtk.Application.application_pid () + " is ending.");
             Gtk.Application.quit ();
             string[] args = Gtk.Application.arguments ();
             string prg = args.take_first ();
     
             QProcess.start_detached (prg, args);
         } else {
-            GLib.debug ("On this platform we do not restart.";
+            GLib.debug ("On this platform we do not restart.");
         }
     }
 
@@ -1830,7 +1899,7 @@ class FolderMan : GLib.Object {
             // Skip folders with too-new version
             settings.begin_group (folder_alias);
             if (ignore_keys.contains (settings.group ())) {
-                GLib.info ("Folder" + folder_alias + "is too new, ignoring";
+                GLib.info ("Folder " + folder_alias + " is too new; ignoring.");
                 this.additional_blocked_folder_aliases.insert (folder_alias);
                 settings.end_group ();
                 continue;
@@ -1871,14 +1940,14 @@ class FolderMan : GLib.Object {
                     }
     
                     if (!journal_file_move_success) {
-                        GLib.warning ("Wasn't able to move 3.0 syncjournal database files to new location. One-time loss off sync settings possible.";
+                        GLib.warning ("Wasn't able to move 3.0 syncjournal database files to new location. One-time loss off sync settings possible.");
                     } else {
-                        GLib.info ("Successfully migrated syncjournal database.";
+                        GLib.info ("Successfully migrated syncjournal database.");
                     }
     
                     var vfs = create_vfs_from_plugin (folder_definition.virtual_files_mode);
                     if (!vfs && folder_definition.virtual_files_mode != Vfs.Off) {
-                        GLib.warning ("Could not load plugin for mode" + folder_definition.virtual_files_mode;
+                        GLib.warning ("Could not load plugin for mode " + folder_definition.virtual_files_mode);
                     }
     
                     Folder folder = add_folder_internal (folder_definition, account.data (), std.move (vfs));
@@ -1960,7 +2029,7 @@ class FolderMan : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void run_etag_jobs_if_possible (GLib.List<Folder> folder_map) {
-        for (var folder : folder_map) {
+        foreach (Folder folder in folder_map) {
             run_etag_job_if_possible (folder);
         }
     }
@@ -1969,39 +2038,43 @@ class FolderMan : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void run_etag_job_if_possible (Folder folder) {
-        const ConfigFile config;
+        const ConfigFile config = new ConfigFile ();
         const var polltime = config.remote_poll_interval ();
     
-        GLib.info ("Run etag job on folder" + folder;
+        GLib.info ("Run etag job on folder " + folder);
     
         if (!folder) {
             return;
         }
         if (folder.is_sync_running ()) {
-            GLib.info ("Can not run etag job : Sync is running";
+            GLib.info ("Can not run etag job: Sync is running");
             return;
         }
         if (this.scheduled_folders.contains (folder)) {
-            GLib.info ("Can not run etag job : Folder is alreday scheduled";
+            GLib.info ("Can not run etag job: Folder is alreday scheduled.");
             return;
         }
         if (this.disabled_folders.contains (folder)) {
-            GLib.info ("Can not run etag job : Folder is disabled";
+            GLib.info ("Can not run etag job: Folder is disabled.");
             return;
         }
         if (folder.etag_job () || folder.is_busy () || !folder.can_sync ()) {
-            GLib.info ("Can not run etag job : Folder is busy";
+            GLib.info ("Can not run etag job: Folder is busy.");
             return;
         }
         // When not using push notifications, make sure polltime is reached
         if (!push_notifications_files_ready (folder.account_state ().account ().data ())) {
             if (folder.msec_since_last_sync () < polltime) {
-                GLib.info ("Can not run etag job : Polltime not reached";
+                GLib.info ("Can not run etag job: Polltime not reached.");
                 return;
             }
         }
     
-        QMetaObject.invoke_method (folder, "on_signal_run_etag_job", Qt.QueuedConnection);
+        QMetaObject.invoke_method (
+            folder,
+            "on_signal_run_etag_job",
+            Qt.QueuedConnection
+        );
     }
 
 
@@ -2012,21 +2085,20 @@ class FolderMan : GLib.Object {
             return FolderMan._("No valid folder selected!");
         }
     
-        const GLib.FileInfo sel_file (path);
+        const GLib.FileInfo sel_file = new GLib.FileInfo (path);
     
         if (!sel_file.exists ()) {
             string parent_path = sel_file.directory ().path ();
-            if (parent_path != path)
+            if (parent_path != path) {
                 return check_path_validity_recursive (parent_path);
-            return FolderMan._("The selected path does not exist!");
+            }
+            return _("The selected path does not exist!");
         }
-    
         if (!sel_file.is_dir ()) {
-            return FolderMan._("The selected path is not a folder!");
+            return _("The selected path is not a folder!");
         }
-    
         if (!sel_file.is_writable ()) {
-            return FolderMan._("You have no permission to write to the selected folder!");
+            return _("You have no permission to write to the selected folder!");
         }
         return "";
     }
@@ -2039,7 +2111,7 @@ class FolderMan : GLib.Object {
     directories.
     ***********************************************************/
     private static string canonical_path (string path) {
-        GLib.FileInfo sel_file (path);
+        GLib.FileInfo sel_file = new GLib.FileInfo (path);
         if (!sel_file.exists ()) {
             const var parent_path = sel_file.directory ().path ();
     

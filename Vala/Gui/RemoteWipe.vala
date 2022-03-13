@@ -41,9 +41,8 @@ class RemoteWipe : GLib.Object {
         connect (
             AccountManager.instance (),
             AccountManager.on_signal_account_removed,
-            this, [=] (AccountState *) {
-                this.account_removed = true;
-            }
+            this,
+            this.on_signal_account_removed
         );
         connect (
             this,
@@ -63,6 +62,11 @@ class RemoteWipe : GLib.Object {
             this,
             RemoteWipe.on_signal_start_check_job_with_app_password
         );
+    }
+
+
+    private void on_signal_account_removed (AccountState state) {
+        this.account_removed = true;
     }
 
 
@@ -98,16 +102,16 @@ class RemoteWipe : GLib.Object {
             "application/x-www-form-urlencoded"
         );
         request.url (request_url);
-        request.ssl_configuration (this.account.get_or_create_ssl_config ());
-        var request_body = new QBuffer;
+        request.ssl_configuration (this.account.or_create_ssl_config ());
+        var request_body = new QBuffer ();
         QUrlQuery arguments = new QUrlQuery ("token=%1".arg (this.app_password));
         request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
         this.network_reply_check = this.network_manager.post (request, request_body);
         connect (
             this.network_manager,
-            SIGNAL (ssl_errors (Soup.Reply *, GLib.List<QSslError>)),
+            ssl_errors, // (Soup.Reply reply, GLib.List<QSslError> error_list),
             this.account.data (),
-            SLOT (on_signal_handle_ssl_errors (Soup.Reply *, GLib.List<QSslError>))
+            on_signal_handle_ssl_errors // (Soup.Reply reply, GLib.List<QSslError> error_list)
         );
         connect (
             this.network_reply_check,
@@ -137,11 +141,15 @@ class RemoteWipe : GLib.Object {
                 GLib.warning ("Error returned from the server : <em>%1<em>"
                     .arg (error_from_json.to_html_escaped ()));
             } else if (this.network_reply_check.error () != Soup.Reply.NoError) {
-                GLib.warning ("There was an error accessing the 'token' endpoint: <br><em>%1</em>"
-                    .arg (this.network_reply_check.error_string ().to_html_escaped ()));
+                GLib.warning (
+                    "There was an error accessing the 'token' endpoint: <br><em>%1</em>"
+                        .arg (this.network_reply_check.error_string ().to_html_escaped ())
+                    );
             } else if (json_parse_error.error != QJsonParseError.NoError) {
-                GLib.warning ("Could not parse the JSON returned from the server : <br><em>%1</em>")
-                    .arg (json_parse_error.error_string ()));
+                GLib.warning (
+                    "Could not parse the JSON returned from the server: <br><em>%1</em>"
+                        .arg (json_parse_error.error_string ())
+                    );
             } else {
                 GLib.warning ("The reply from the server did not contain all expected fields");
             }
@@ -187,7 +195,7 @@ class RemoteWipe : GLib.Object {
     Once the client has wiped all the required data a POST to
     <server>/index.php/core/wipe/on_signal_success
     ***********************************************************/
-    private void on_signal_notify_server_success_job (AccountState account_state, bool) {
+    private void on_signal_notify_server_success_job (AccountState account_state, bool value) {
         if (this.account_removed && data_wiped && this.account == account_state.account ()) {
             GLib.Uri request_url = Utility.concat_url_path (
                 this.account.url ().to_string (),
@@ -197,8 +205,8 @@ class RemoteWipe : GLib.Object {
                 Soup.Request.ContentTypeHeader,
                 "application/x-www-form-urlencoded");
             request.url (request_url);
-            request.ssl_configuration (this.account.get_or_create_ssl_config ());
-            var request_body = new QBuffer;
+            request.ssl_configuration (this.account.or_create_ssl_config ());
+            var request_body = new QBuffer ();
             QUrlQuery arguments = new QUrlQuery ("token=%1".arg (this.app_password));
             request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
             this.network_reply_success = this.network_manager.post (request, request_body);

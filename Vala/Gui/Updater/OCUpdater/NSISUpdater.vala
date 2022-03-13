@@ -164,14 +164,14 @@ class NSISUpdater : OCUpdater {
         var bb = new QDialogButtonBox ();
         QPushButton skip = bb.add_button (_("Skip this version"), QDialogButtonBox.Reset_role);
         QPushButton reject = bb.add_button (_("Skip this time"), QDialogButtonBox.AcceptRole);
-        QPushButton get_update = bb.add_button (_("Get update"), QDialogButtonBox.AcceptRole);
+        QPushButton update = bb.add_button (_("Get update"), QDialogButtonBox.AcceptRole);
 
         connect (skip, QAbstractButton.clicked, message_box, Gtk.Dialog.reject);
         connect (reject, QAbstractButton.clicked, message_box, Gtk.Dialog.reject);
-        connect (get_update, QAbstractButton.clicked, message_box, Gtk.Dialog.accept);
+        connect (update, QAbstractButton.clicked, message_box, Gtk.Dialog.accept);
 
         connect (skip, QAbstractButton.clicked, this, NSISUpdater.on_signal_seen_version);
-        connect (get_update, QAbstractButton.clicked, this, NSISUpdater.on_signal_open_update_url);
+        connect (update, QAbstractButton.clicked, this, NSISUpdater.on_signal_open_update_url);
 
         layout.add_widget (bb);
 
@@ -219,12 +219,12 @@ class NSISUpdater : OCUpdater {
         var skip = bb.add_button (_("Skip this version"), QDialogButtonBox.Reset_role);
         var askagain = bb.add_button (_("Ask again later"), QDialogButtonBox.Reset_role);
         var retry = bb.add_button (_("Restart and update"), QDialogButtonBox.AcceptRole);
-        var get_update = bb.add_button (_("Update manually"), QDialogButtonBox.AcceptRole);
+        var update = bb.add_button (_("Update manually"), QDialogButtonBox.AcceptRole);
 
         connect (skip, QAbstractButton.clicked, message_box, Gtk.Dialog.reject);
         connect (askagain, QAbstractButton.clicked, message_box, Gtk.Dialog.reject);
         connect (retry, QAbstractButton.clicked, message_box, Gtk.Dialog.accept);
-        connect (get_update, QAbstractButton.clicked, message_box, Gtk.Dialog.accept);
+        connect (update, QAbstractButton.clicked, message_box, Gtk.Dialog.accept);
 
         connect (
             skip,
@@ -240,7 +240,7 @@ class NSISUpdater : OCUpdater {
             this.on_retry_button_clicked
         );
         connect (
-            get_update,
+            update,
             QAbstractButton.clicked,
             this,
             this.on_get_update_button_clicked

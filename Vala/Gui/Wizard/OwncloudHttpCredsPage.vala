@@ -67,7 +67,7 @@ class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public AbstractCredentials get_credentials () {
+    public AbstractCredentials credentials () {
         return new HttpCredentialsGui (this.ui.le_username.text (), this.ui.le_password.text (), this.oc_wizard.client_cert_bundle, this.oc_wizard.client_cert_password);
     }
 
