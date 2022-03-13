@@ -453,7 +453,7 @@ class AccountState : GLib.Object /*, QSharedData*/ {
             return;
         }
 
-        this.connection_validator = new ConnectionValidator (unowned AccountState (this));
+        this.connection_validator = new ConnectionValidator (new AccountState (this));
         connect (
             this.connection_validator,
             ConnectionValidator.signal_connection_result,

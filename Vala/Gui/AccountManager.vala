@@ -183,7 +183,7 @@ class AccountManager : GLib.Object {
                 return acc;
             }
         }
-        return new unowned AccountState ();
+        return new AccountState ();
     }
 
 
@@ -309,7 +309,7 @@ class AccountManager : GLib.Object {
         if (!url_config.is_valid ()) {
             // No URL probably means a corrupted entry in the account settings
             GLib.warning ("No URL for account " + settings.group ());
-            return unowned Account ();
+            return new Account ();
         }
 
         var acc = create_account ();
@@ -481,7 +481,7 @@ class AccountManager : GLib.Object {
             this, AccountManager.on_signal_save_account
         );
 
-        unowned AccountState ptr = new unowned AccountState (account_state);
+        unowned AccountState ptr = new AccountState (account_state);
         this.accounts += ptr;
         /* emit */ account_added (account_state);
     }

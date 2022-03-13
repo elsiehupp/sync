@@ -901,7 +901,7 @@ class User : GLib.Object {
             this.notification_cache.clear ();
         }
 
-        const NotificationCache.Notification notification = new NotificationCache.Notification (
+        const NotificationCache.Notification notification = NotificationCache.Notification (
             title,
             message
         );

@@ -607,7 +607,7 @@ class OwncloudGui : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_open_owncloud () {
-        var account = (unowned Account) sender ().property (PROPERTY_ACCOUNT_C);
+        var account = (Account) sender ().property (PROPERTY_ACCOUNT_C);
         if (account) {
             Utility.open_browser (account.url ());
         }
@@ -769,7 +769,7 @@ class OwncloudGui : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_login () {
-        var account = (unowned AccountState) sender ().property (PROPERTY_ACCOUNT_C);
+        var account = (AccountState) sender ().property (PROPERTY_ACCOUNT_C);
         if (account) {
             account.account ().reset_rejected_certificates ();
             account.sign_in ();
@@ -785,7 +785,7 @@ class OwncloudGui : GLib.Object {
     ***********************************************************/
     private void on_signal_logout () {
         var list = AccountManager.instance ().accounts ();
-        var account = (unowned AccountState) sender ().property (PROPERTY_ACCOUNT_C);
+        var account = (AccountState) sender ().property (PROPERTY_ACCOUNT_C);
         if (account) {
             list.clear ();
             list.append (account);
