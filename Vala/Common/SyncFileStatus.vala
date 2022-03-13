@@ -12,7 +12,7 @@ namespace Occ {
 @brief The SyncFileStatus class
 @ingroup libsync
 ***********************************************************/
-class SyncFileStatus {
+public class SyncFileStatus {
 
     /***********************************************************
     ***********************************************************/

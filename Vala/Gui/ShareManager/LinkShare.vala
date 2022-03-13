@@ -12,7 +12,7 @@ A Link share is just like a regular share but then slightly different.
 There are several methods in the API that either work differently for
 link shares or are only available to link shares.
 ***********************************************************/
-class LinkShare : Share {
+public class LinkShare : Share {
 
     /***********************************************************
     ***********************************************************/

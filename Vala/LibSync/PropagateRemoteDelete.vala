@@ -13,7 +13,7 @@ namespace LibSync {
 @brief The PropagateRemoteDelete class
 @ingroup libsync
 ***********************************************************/
-class PropagateRemoteDelete : PropagateItemJob {
+public class PropagateRemoteDelete : PropagateItemJob {
 
     QPointer<DeleteJob> job;
     AbstractPropagateRemoteDeleteEncrypted delete_encrypted_helper = null;

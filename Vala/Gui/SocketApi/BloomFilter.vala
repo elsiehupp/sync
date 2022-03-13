@@ -9,7 +9,7 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 namespace Occ {
 namespace Ui {
 
-class BloomFilter : Glib.Object {
+public class BloomFilter : Glib.Object {
 
     /***********************************************************
     Initialize with m=1024 bits and k=2 (high and low 16 bits of a q_hash).

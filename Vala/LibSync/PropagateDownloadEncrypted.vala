@@ -4,7 +4,7 @@
 namespace Occ {
 namespace LibSync {
 
-class PropagateDownloadEncrypted : GLib.Object {
+public class PropagateDownloadEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

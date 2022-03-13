@@ -12,7 +12,7 @@ namespace LibSync {
 @brief The CheckServerJob class
 @ingroup libsync
 ***********************************************************/
-class CheckServerJob : AbstractNetworkJob {
+public class CheckServerJob : AbstractNetworkJob {
 
     const string STATUS_PHP_C = "status.php";
     const string NEXTCLOUD_DIR_C = "nextcloud/";

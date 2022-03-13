@@ -11,7 +11,7 @@ namespace LibSync {
 @brief The UploadDevice class
 @ingroup libsync
 ***********************************************************/
-class UploadDevice : QIODevice {
+public class UploadDevice : QIODevice {
 
     /***********************************************************
     The local file to read data from

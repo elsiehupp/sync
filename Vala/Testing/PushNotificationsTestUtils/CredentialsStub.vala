@@ -11,7 +11,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 namespace Testing {
 
-class CredentialsStub : Occ.AbstractCredentials {
+public class CredentialsStub : Occ.AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/

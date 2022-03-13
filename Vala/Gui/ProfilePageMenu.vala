@@ -8,7 +8,7 @@
 namespace Occ {
 namespace Ui {
 
-class ProfilePageMenu : Gtk.Widget {
+public class ProfilePageMenu : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/

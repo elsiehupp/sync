@@ -25,7 +25,7 @@ namespace Ui {
 @brief The OwncloudSetupPage class
 @ingroup gui
 ***********************************************************/
-class OwncloudSetupPage : QWizardPage {
+public class OwncloudSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private Ui.OwncloudeSetupPage ui;

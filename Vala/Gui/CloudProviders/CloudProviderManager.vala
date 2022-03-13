@@ -9,7 +9,7 @@ Copyright (C) by Julius Härtl <jus@bitgrid.net>
 namespace Occ {
 namespace Ui {
 
-class CloudProviderManager : GLib.Object {
+public class CloudProviderManager : GLib.Object {
 
     CloudProvidersProviderExporter provider_exporter;
 

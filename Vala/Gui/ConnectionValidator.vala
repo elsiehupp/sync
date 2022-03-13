@@ -66,7 +66,7 @@ Here follows the state machine
   +. Client Side Encryption Checks --+ --report_result ()
     \endcode
 ***********************************************************/
-class ConnectionValidator : GLib.Object {
+public class ConnectionValidator : GLib.Object {
 
     /***********************************************************
     The actual current connectivity status.

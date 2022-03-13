@@ -10,7 +10,7 @@ using Occ;
 
 namespace Testing {
 
-class TestInotifyWatcher : FolderWatcherPrivate {
+public class TestInotifyWatcher : FolderWatcherPrivate {
 
     /***********************************************************
     ***********************************************************/

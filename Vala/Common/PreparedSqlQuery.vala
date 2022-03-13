@@ -8,7 +8,7 @@ using Sqlite3;
 
 namespace Occ {
 
-class PreparedSqlQuery {
+public class PreparedSqlQuery {
 
     /***********************************************************
     ***********************************************************/

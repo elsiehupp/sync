@@ -12,7 +12,7 @@ namespace LibSync {
 @brief Checks with auth type to use for a server
 @ingroup libsync
 ***********************************************************/
-class DetermineAuthTypeJob : GLib.Object {
+public class DetermineAuthTypeJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

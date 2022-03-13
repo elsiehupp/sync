@@ -10,7 +10,7 @@ namespace Testing {
 @brief The FakeDesktopServicesUrlHandler
 overrides QDesktopServices.open_url
 ***********************************************************/
-class FakeDesktopServicesUrlHandler : GLib.Object {
+public class FakeDesktopServicesUrlHandler : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

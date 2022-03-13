@@ -12,7 +12,7 @@ namespace LibSync {
 @brief The MkColJob class
 @ingroup libsync
 ***********************************************************/
-class MkColJob : AbstractNetworkJob {
+public class MkColJob : AbstractNetworkJob {
 
     /***********************************************************
     Only used if the constructor taking a url is taken.

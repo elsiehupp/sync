@@ -57,7 +57,7 @@ unowned<Vfs> set_up_vfs (FakeFolder folder) {
     return suffix_vfs;
 }
 
-class TestSyncVirtualFiles : GLib.Object {
+public class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

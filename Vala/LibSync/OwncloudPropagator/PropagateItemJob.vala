@@ -11,7 +11,7 @@ namespace LibSync {
 /***********************************************************
 Abstract class to propagate a single item
 ***********************************************************/
-class PropagateItemJob : PropagatorJob {
+public class PropagateItemJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/

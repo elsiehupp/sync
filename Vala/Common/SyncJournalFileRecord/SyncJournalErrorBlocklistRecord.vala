@@ -6,7 +6,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 namespace Occ {
 
-class SyncJournalErrorBlocklistRecord {
+public class SyncJournalErrorBlocklistRecord {
 
     /***********************************************************
     ***********************************************************/

@@ -3,7 +3,7 @@
 namespace Occ {
 namespace Ui {
 
-class WebViewPageUrlRequestInterceptor : QWebEngineUrlRequestInterceptor {
+public class WebViewPageUrlRequestInterceptor : QWebEngineUrlRequestInterceptor {
 
     /***********************************************************
     ***********************************************************/

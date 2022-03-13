@@ -100,7 +100,7 @@ unowned<Vfs> set_up_vfs (FakeFolder folder) {
     return cfapi_vfs;
 }
 
-class TestSyncCfApi : GLib.Object {
+public class TestSyncCfApi : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

@@ -11,7 +11,7 @@ namespace KeychainChunk {
 /***********************************************************
 @brief : Simple wrapper class for QKeychain.DeletePasswordJob
 ***********************************************************/
-class DeleteJob : KeychainChunk.Job {
+public class DeleteJob : KeychainChunk.Job {
 
     signal void signal_finished (KeychainChunk.DeleteJob incoming_job);
 

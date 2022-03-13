@@ -22,7 +22,7 @@ Removing the root encrypted folder is consisted of multiple steps:
 namespace Occ {
 namespace LibSync {
 
-class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteDeleteEncrypted {
+public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteDeleteEncrypted {
 
     const string ENCRYPTED_FILENAME_PROPERTY_KEY = "encrypted_filename";
 

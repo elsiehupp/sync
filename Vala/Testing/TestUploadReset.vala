@@ -12,7 +12,7 @@ using Occ;
 
 namespace Testing {
 
-class TestUploadReset : GLib.Object {
+public class TestUploadReset : GLib.Object {
 
     // Verify that the chunked transfer eventually gets reset with the new chunking
     private void on_signal_test_file_upload_ng () {

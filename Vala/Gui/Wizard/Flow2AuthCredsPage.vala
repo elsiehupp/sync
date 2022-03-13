@@ -12,7 +12,7 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 namespace Occ {
 namespace Ui {
 
-class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
+public class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
 
     /***********************************************************
     ***********************************************************/

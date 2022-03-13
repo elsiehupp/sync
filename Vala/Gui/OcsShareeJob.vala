@@ -15,7 +15,7 @@ namespace Ui {
 
 Fetching sharees from the OCS Sharee API
 ***********************************************************/
-class OcsShareeJob : OcsJob {
+public class OcsShareeJob : OcsJob {
 
     /***********************************************************
     Result of the OCS request

@@ -1,7 +1,7 @@
 namespace Occ {
 namespace LibSync {
 
-class HovercardAction : GLib.Object {
+public class HovercardAction : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

@@ -25,7 +25,7 @@ namespace LibSync {
 @brief The Logger class
 @ingroup libsync
 ***********************************************************/
-class Logger : GLib.Object {
+public class Logger : GLib.Object {
 
     const int CRASH_LOG_SIZE = 20;
 

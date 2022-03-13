@@ -22,7 +22,7 @@ namespace Ui {
 @brief The OwncloudAdvancedSetupPage class
 @ingroup gui
 ***********************************************************/
-class OwncloudAdvancedSetupPage : QWizardPage {
+public class OwncloudAdvancedSetupPage : QWizardPage {
 
     /***********************************************************
     ***********************************************************/

@@ -10,7 +10,7 @@ namespace Testing {
 @brief The FakeSearchResultsStorage
 emulates the real server storage that contains all the results that UnifiedSearchListmodel will search for
 ***********************************************************/
-class FakeSearchResultsStorage {
+public class FakeSearchResultsStorage {
 
     /***********************************************************
     ***********************************************************/

@@ -21,7 +21,7 @@
 //  #include <QLocalSocket>
 //  #include <QRegularExpression>
 
-class OWNCLOUDDOLPHINPLUGINHELPER_EXPORT OwncloudDolphinPluginHelper : GLib.Object {
+public class OWNCLOUDDOLPHINPLUGINHELPER_EXPORT OwncloudDolphinPluginHelper : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

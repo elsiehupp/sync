@@ -18,7 +18,7 @@ is correctly called and that when we the user choose to
 remove all files SyncJournalDb.clear_file_table makes works
 as expected
 ***********************************************************/
-class TestAllFilesDeleted : GLib.Object {
+public class TestAllFilesDeleted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

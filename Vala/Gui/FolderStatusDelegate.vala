@@ -20,7 +20,7 @@ namespace Ui {
 @brief The FolderStatusDelegate class
 @ingroup gui
 ***********************************************************/
-class FolderStatusDelegate : QStyledItemDelegate {
+public class FolderStatusDelegate : QStyledItemDelegate {
 
     /***********************************************************
     ***********************************************************/

@@ -16,7 +16,7 @@ file that it's a conflict for. So if "a/foo.txt" is the
 base file, its conflict file could be
 "a/foo (conflicted copy 1234).txt".
 ***********************************************************/
-class ConflictRecord {
+public class ConflictRecord {
 
     /***********************************************************
     Path to the file with the conflict tag in the name

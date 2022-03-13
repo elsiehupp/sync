@@ -33,7 +33,7 @@ namespace LibSync {
 @brief The AbstractNetworkJob class
 @ingroup libsync
 ***********************************************************/
-class AbstractNetworkJob : GLib.Object {
+public class AbstractNetworkJob : GLib.Object {
 
     /***********************************************************
     @brief Internal Helper class

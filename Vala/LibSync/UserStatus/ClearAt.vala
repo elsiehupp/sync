@@ -8,7 +8,7 @@ namespace Occ {
 namespace LibSync {
 
 // TODO: If we can use C++17 make it a std.variant
-class ClearAt : GLib.Object {
+public class ClearAt : GLib.Object {
     enum ClearAtType {
         Period,
         EndOf,

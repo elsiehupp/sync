@@ -11,7 +11,7 @@ Copyright (C) by Jocelyn Turcotte <jturcotte@woboq.com>
 namespace Occ {
 namespace Ui {
 
-class NavigationPaneHelper : GLib.Object {
+public class NavigationPaneHelper : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

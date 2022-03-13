@@ -14,7 +14,7 @@ namespace LibSync {
 
 Primarily adds timeout and redirection handling.
 ***********************************************************/
-class SimpleNetworkJob : AbstractNetworkJob {
+public class SimpleNetworkJob : AbstractNetworkJob {
 
     signal void signal_finished (Soup.Reply reply);
 

@@ -13,7 +13,7 @@ namespace Ui {
 
 contains all the information describing a single activity.
 ***********************************************************/
-class Activity {
+public class Activity {
 
     /***********************************************************
     ***********************************************************/

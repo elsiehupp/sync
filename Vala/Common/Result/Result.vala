@@ -9,7 +9,7 @@ namespace Occ {
 /***********************************************************
 A Result of type T, or an Error
 ***********************************************************/
-class Result<T> {
+public class Result<T> {
 
     struct NoResultData {}
     struct OptionalNoErrorData {}

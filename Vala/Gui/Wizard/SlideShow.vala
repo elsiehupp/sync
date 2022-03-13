@@ -22,7 +22,7 @@ namespace Ui {
 @brief The SlideShow class
 @ingroup gui
 ***********************************************************/
-class SlideShow : Gtk.Widget {
+public class SlideShow : Gtk.Widget {
 
     const int SPACING = 6;
     const int SLIDE_DURATION = 1000;

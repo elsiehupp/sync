@@ -13,7 +13,7 @@ namespace Ui {
 @brief The FormatWarningsWizardPage class
 @ingroup gui
 ***********************************************************/
-class FormatWarningsWizardPage : QWizardPage {
+public class FormatWarningsWizardPage : QWizardPage {
 
     protected static string format_warnings (string[] warnings) {
         string ret;

@@ -13,7 +13,7 @@ namespace LibSync {
 @brief The DeleteJob class
 @ingroup libsync
 ***********************************************************/
-class DeleteJob : AbstractNetworkJob {
+public class DeleteJob : AbstractNetworkJob {
 
     /***********************************************************
     Only used if the constructor taking a url is taken.

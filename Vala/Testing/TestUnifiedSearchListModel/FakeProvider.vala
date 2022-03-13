@@ -10,7 +10,7 @@ namespace Testing {
 @brief The FakeProvider
 is a simple structure that represents initial list of providers and their properties
 ***********************************************************/
-class FakeProvider {
+public class FakeProvider {
 
     /***********************************************************
     ***********************************************************/

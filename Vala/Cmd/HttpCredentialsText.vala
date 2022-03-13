@@ -9,7 +9,7 @@ Copyright (C) by Daniel Heule <daniel.heule@gmail.com>
 using Occ;
 
 //  #ifndef TOKEN_AUTH_ONLY
-class HttpCredentialsText : HttpCredentials {
+public class HttpCredentialsText : HttpCredentials {
 
     /***********************************************************
     ***********************************************************/

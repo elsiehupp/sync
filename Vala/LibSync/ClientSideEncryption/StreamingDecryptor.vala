@@ -5,7 +5,7 @@ namespace LibSync {
 Simple classes for safe (RAII) handling of OpenSSL
 data structures
 ***********************************************************/
-class StreamingDecryptor : GLib.Object {
+public class StreamingDecryptor : GLib.Object {
 
     //  Q_DISABLE_COPY (StreamingDecryptor)
 

@@ -7,7 +7,7 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 namespace Occ {
 namespace Ui {
 
-class SelectiveSyncTreeViewItem : QTreeWidgetItem {
+public class SelectiveSyncTreeViewItem : QTreeWidgetItem {
 
     /***********************************************************
     ***********************************************************/

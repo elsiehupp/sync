@@ -6,7 +6,7 @@ implied, as to its usefulness for any purpose.
 
 namespace Testing {
 
-class FakeGetReply : FakeReply {
+public class FakeGetReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/

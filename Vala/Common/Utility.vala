@@ -46,7 +46,7 @@ namespace Occ {
 \addtogroup libsync
  @{
 ***********************************************************/
-class Utility {
+public class Utility {
 
     /***********************************************************
     OCSYNC_EXPORT

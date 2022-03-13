@@ -14,7 +14,7 @@ The implementation does not show popups
 
 @ingroup gui
 ***********************************************************/
-class PassiveUpdateNotifier : OCUpdater {
+public class PassiveUpdateNotifier : OCUpdater {
 
     private GLib.ByteArray running_app_version;
 

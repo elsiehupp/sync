@@ -2,7 +2,7 @@
 namespace Occ {
 namespace Ui {
 
-class NotificationCache {
+public class NotificationCache {
 
     /***********************************************************
     ***********************************************************/

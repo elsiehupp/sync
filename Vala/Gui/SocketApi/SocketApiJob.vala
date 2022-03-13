@@ -9,7 +9,7 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 namespace Occ {
 namespace Ui {
 
-class SocketApiJob : GLib.Object {
+public class SocketApiJob : GLib.Object {
 
     protected string job_id;
     protected unowned SocketListener socket_listener;

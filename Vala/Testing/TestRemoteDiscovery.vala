@@ -42,7 +42,7 @@ enum ErrorKind : int {
 
 // Q_DECLARE_METATYPE (ErrorCategory)
 
-class TestRemoteDiscovery : GLib.Object {
+public class TestRemoteDiscovery : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

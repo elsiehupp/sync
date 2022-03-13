@@ -23,7 +23,7 @@ namespace LibSync {
 @brief The AccessManager class
 @ingroup libsync
 ***********************************************************/
-class AccessManager : QNetworkAccessManager {
+public class AccessManager : QNetworkAccessManager {
 
     /***********************************************************
     ***********************************************************/

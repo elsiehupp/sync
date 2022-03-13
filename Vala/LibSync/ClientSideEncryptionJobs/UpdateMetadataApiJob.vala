@@ -7,7 +7,7 @@ expects a response is here.
 namespace Occ {
 namespace LibSync {
 
-class UpdateMetadataApiJob : AbstractNetworkJob {
+public class UpdateMetadataApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/

@@ -10,7 +10,7 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 namespace Occ {
 namespace Ui {
 
-class SvgImageProvider : QQuickImageProvider {
+public class SvgImageProvider : QQuickImageProvider {
 
     /***********************************************************
     ***********************************************************/

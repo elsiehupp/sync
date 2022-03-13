@@ -11,7 +11,7 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 
 namespace Testing {
 
-class TestUnifiedSearchListmodel : GLib.Object {
+public class TestUnifiedSearchListmodel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

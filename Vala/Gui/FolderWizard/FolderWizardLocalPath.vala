@@ -13,7 +13,7 @@ namespace Ui {
 @brief Page to ask for the local source folder
 @ingroup gui
 ***********************************************************/
-class FolderWizardLocalPath : FormatWarningsWizardPage {
+public class FolderWizardLocalPath : FormatWarningsWizardPage {
 
     /***********************************************************
     ***********************************************************/

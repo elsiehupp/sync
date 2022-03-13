@@ -18,7 +18,7 @@ namespace LibSync {
 @brief The ClientProxy class
 @ingroup libsync
 ***********************************************************/
-class ClientProxy : GLib.Object {
+public class ClientProxy : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

@@ -18,7 +18,7 @@ namespace Ui {
 Handle talking to the OCS Share API.
 For creation, deletion and modification of shares.
 ***********************************************************/
-class OcsShareJob : OcsJob {
+public class OcsShareJob : OcsJob {
 
     /***********************************************************
     ***********************************************************/

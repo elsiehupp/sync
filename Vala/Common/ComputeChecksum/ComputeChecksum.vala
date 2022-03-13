@@ -77,7 +77,7 @@ Checksum Algorithms
 Computes the checksum of a file.
 \ingroup libsync
 ***********************************************************/
-class ComputeChecksum : ComputeChecksumBase {
+public class ComputeChecksum : ComputeChecksumBase {
 
     /***********************************************************
     ***********************************************************/

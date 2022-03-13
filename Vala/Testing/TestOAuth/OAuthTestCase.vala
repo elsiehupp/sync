@@ -8,7 +8,7 @@ using Occ;
 
 namespace Testing {
 
-class OAuthTestCase : GLib.Object {
+public class OAuthTestCase : GLib.Object {
 
     DesktopServiceHook desktop_service_hook;
 

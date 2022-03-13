@@ -6,7 +6,7 @@ implied, as to its usefulness for any purpose.
 
 namespace Testing {
 
-class DiskFileModifier : FileModifier {
+public class DiskFileModifier : FileModifier {
 
     QDir root_directory;
 

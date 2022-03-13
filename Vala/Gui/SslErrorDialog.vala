@@ -18,7 +18,7 @@ namespace Ui {
 @brief The SslErrorDialog class
 @ingroup gui
 ***********************************************************/
-class SslErrorDialog : Gtk.Dialog {
+public class SslErrorDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/

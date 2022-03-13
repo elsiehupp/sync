@@ -21,7 +21,7 @@ using CSync;
 namespace Occ {
 namespace LibSync {
 
-class DiscoveryPhase : GLib.Object {
+public class DiscoveryPhase : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

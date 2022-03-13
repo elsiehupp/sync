@@ -5,7 +5,7 @@
 namespace Occ {
 namespace Ui {
 
-class WebFlowCredentialsDialog : Gtk.Dialog {
+public class WebFlowCredentialsDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/

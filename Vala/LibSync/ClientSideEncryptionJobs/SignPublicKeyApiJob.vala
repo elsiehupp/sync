@@ -20,7 +20,7 @@ this.job.on_signal_start
 
 @ingroup libsync
 ***********************************************************/
-class SignPublicKeyApiJob : AbstractNetworkJob {
+public class SignPublicKeyApiJob : AbstractNetworkJob {
 
     /***********************************************************
     @brief csr - the CSR with the public key.

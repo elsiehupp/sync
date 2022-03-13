@@ -9,7 +9,7 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 namespace Occ {
 namespace Ui {
 
-class SocketListener {
+public class SocketListener {
 
     public QPointer<QIODevice> socket;
 

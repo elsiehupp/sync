@@ -19,7 +19,7 @@ the server. All the communication logic is handled in this
 class.
 
 ***********************************************************/
-class NotificationConfirmJob : AbstractNetworkJob {
+public class NotificationConfirmJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/

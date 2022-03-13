@@ -82,7 +82,7 @@ unowned<Vfs> set_up_vfs (FakeFolder folder) {
     return xattr_vfs;
 }
 
-class TestSyncXAttr : GLib.Object {
+public class TestSyncXAttr : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

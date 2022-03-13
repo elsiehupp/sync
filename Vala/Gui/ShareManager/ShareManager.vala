@@ -20,7 +20,7 @@ deletion of shares. It abstracts away from the OCS Share
 API, all the usages shares should talk to this manager and
 not use OCS Share Job directly/
 ***********************************************************/
-class ShareManager : GLib.Object {
+public class ShareManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

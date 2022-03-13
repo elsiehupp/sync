@@ -15,7 +15,7 @@ Job that allows fetching a preview (of 150x150 for now) of
 a given file. Once the job has finished the
 signal_job_finished signal will be emitted.
 ***********************************************************/
-class ThumbnailJob : AbstractNetworkJob {
+public class ThumbnailJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/

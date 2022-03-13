@@ -27,7 +27,7 @@ namespace Ui {
 @brief The ShareDialog class
 @ingroup gui
 ***********************************************************/
-class ShareLinkWidget : Gtk.Widget {
+public class ShareLinkWidget : Gtk.Widget {
 
     private const string PASSWORD_IS_PLACEHOLDER = "●●●●●●●●";
 

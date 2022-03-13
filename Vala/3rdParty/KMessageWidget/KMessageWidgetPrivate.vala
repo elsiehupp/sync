@@ -23,7 +23,7 @@ Copyright (c) 2014 Dominik Haumann <dhaumann@kde.org>
 //---------------------------------------------------------------------
 // KMessageWidgetPrivate
 //---------------------------------------------------------------------
-class KMessageWidgetPrivate {
+public class KMessageWidgetPrivate {
     public void on_init (KMessageWidget *);
 
     /***********************************************************

@@ -31,7 +31,7 @@ using Occ;
 @brief Helper class for command line client
 @ingroup cmd
 ***********************************************************/
-class Cmd : GLib.Object {
+public class Cmd : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
@@ -252,7 +252,7 @@ int main (int argc, char **argv) {
     }
 
     if (options.target_url.contains ("/webdav", Qt.CaseInsensitive) || options.target_url.contains ("/dav", Qt.CaseInsensitive)) {
-        q_warning ("Dav or webdav in server URL.");
+        GLib.warning ("Dav or webdav in server URL.");
         std.cerr + "Error! Please specify only the base URL of your host with username and password. Example:" + std.endl
                   + "http (s)://username:password@cloud.example.com" + std.endl;
         return EXIT_FAILURE;
@@ -419,7 +419,7 @@ restart_sync:
     GLib.Object.connect (&engine, &SyncEngine.transmission_progress, cmd, &Cmd.on_signal_transmission_progress_slot);
     GLib.Object.connect (&engine, &SyncEngine.sync_error,
         [] (string error) {
-            q_warning ("Sync error:" + error;
+            GLib.warning ("Sync error:" + error;
         });
 
     // Exclude lists
@@ -452,7 +452,7 @@ restart_sync:
             GLib.debug ("Restarting Sync, because another sync is needed" + restart_count;
             goto restart_sync;
         }
-        q_warning ("Another sync is needed, but not done because restart count is exceeded" + restart_count;
+        GLib.warning ("Another sync is needed, but not done because restart count is exceeded" + restart_count;
     }
 
     return result_code;

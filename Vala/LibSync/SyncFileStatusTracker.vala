@@ -17,7 +17,7 @@ files as they go through the SyncEngine, to be reported as
 overlay icons in the shell.
 @ingroup libsync
 ***********************************************************/
-class SyncFileStatusTracker : GLib.Object {
+public class SyncFileStatusTracker : GLib.Object {
 
 
     /***********************************************************

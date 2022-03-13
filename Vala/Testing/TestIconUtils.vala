@@ -8,7 +8,7 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 
 namespace Testing {
 
-class TestIconUtils : GLib.Object {
+public class TestIconUtils : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

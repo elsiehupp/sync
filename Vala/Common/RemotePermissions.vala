@@ -18,7 +18,7 @@ namespace Occ {
 /***********************************************************
 Class that store in a memory efficient way the remote permission
 ***********************************************************/
-class RemotePermissions {
+public class RemotePermissions {
 
     // The first bit tells if the value is set or not
     // The remaining bits correspond to know if the value is set

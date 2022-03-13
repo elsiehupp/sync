@@ -18,7 +18,7 @@ namespace Ui {
 @brief The IgnoreListEditor class
 @ingroup gui
 ***********************************************************/
-class IgnoreListEditor : Gtk.Dialog {
+public class IgnoreListEditor : Gtk.Dialog {
 
     private string read_only_tooltip;
     private Ui.IgnoreListEditor ui;

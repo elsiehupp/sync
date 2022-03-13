@@ -18,7 +18,7 @@ namespace Occ {
 @brief The SqlDatabase class
 @ingroup libsync
 ***********************************************************/
-class SqlDatabase {
+public class SqlDatabase {
     // Q_DISABLE_COPY (SqlDatabase)
 
     /***********************************************************

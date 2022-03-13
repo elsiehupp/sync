@@ -11,7 +11,7 @@ namespace LibSync {
 @brief The GETFileJob class
 @ingroup libsync
 ***********************************************************/
-class GETFileJob : AbstractNetworkJob {
+public class GETFileJob : AbstractNetworkJob {
 
     QIODevice device;
     GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers;

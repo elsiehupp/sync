@@ -12,7 +12,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 namespace Testing {
 
-class FakeWebSocketServer : GLib.Object {
+public class FakeWebSocketServer : GLib.Object {
 
 
     /***********************************************************

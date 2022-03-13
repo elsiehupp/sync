@@ -33,7 +33,7 @@ There is basically 3 ways to initialize and use a query:
     q3.exec (...)
 
 ***********************************************************/
-class SqlQuery {
+public class SqlQuery {
     // Q_DISABLE_COPY (SqlQuery)
 
     /***********************************************************

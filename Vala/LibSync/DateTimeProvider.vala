@@ -2,7 +2,7 @@
 namespace Occ {
 namespace LibSync {
 
-class DateTimeProvider : GLib.Object {
+public class DateTimeProvider : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

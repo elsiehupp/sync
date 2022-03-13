@@ -7,7 +7,7 @@ LGPL-2.0-or-later
 /***********************************************************
 Describes the mouse wheel event
 ***********************************************************/
-class KirigamiWheelEvent : GLib.Object {
+public class KirigamiWheelEvent : GLib.Object {
 
     /***********************************************************
     x : real

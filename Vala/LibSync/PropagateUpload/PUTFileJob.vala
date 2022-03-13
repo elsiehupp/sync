@@ -11,7 +11,7 @@ namespace LibSync {
 @brief The PUTFileJob class
 @ingroup libsync
 ***********************************************************/
-class PUTFileJob : AbstractNetworkJob {
+public class PUTFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/

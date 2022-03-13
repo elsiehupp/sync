@@ -16,7 +16,7 @@ namespace LibSync {
 @brief The NextcloudTheme class
 @ingroup libsync
 ***********************************************************/
-class NextcloudTheme : Theme {
+public class NextcloudTheme : Theme {
 
     /***********************************************************
     ***********************************************************/

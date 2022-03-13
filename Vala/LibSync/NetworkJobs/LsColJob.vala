@@ -8,7 +8,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 namespace Occ {
 namespace LibSync {
 
-class LsColJob : AbstractNetworkJob {
+public class LsColJob : AbstractNetworkJob {
 
     public GLib.HashTable<string, ExtraFolderInfo> folder_infos;
 

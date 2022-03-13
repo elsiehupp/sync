@@ -11,7 +11,7 @@ using Occ;
 
 namespace Testing {
 
-class TestSelectiveSync : GLib.Object {
+public class TestSelectiveSync : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

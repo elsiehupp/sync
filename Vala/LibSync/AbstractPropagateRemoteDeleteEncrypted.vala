@@ -17,7 +17,7 @@ namespace LibSync {
 the base class for Propagate Remote Delete Encrypted jobs
 @ingroup libsync
 ***********************************************************/
-class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
+public class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

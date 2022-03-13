@@ -2,7 +2,7 @@
 
 namespace Testing {
 
-class TestCapabilities : GLib.Object {
+public class TestCapabilities : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

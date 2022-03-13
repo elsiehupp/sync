@@ -2,7 +2,7 @@
 namespace Occ {
 namespace Ui {
 
-class User : GLib.Object {
+public class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

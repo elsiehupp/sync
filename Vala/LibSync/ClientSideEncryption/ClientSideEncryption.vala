@@ -44,7 +44,7 @@
 namespace Occ {
 namespace LibSync {
 
-class ClientSideEncryption : GLib.Object {
+public class ClientSideEncryption : GLib.Object {
 
     const string E2EE_BASE_URL = "ocs/v2.php/apps/end_to_end_encryption/api/v1/";
 

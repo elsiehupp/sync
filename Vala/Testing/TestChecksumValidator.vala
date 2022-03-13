@@ -12,7 +12,7 @@ using Occ.Utility;
 
 namespace Testing {
 
-class TestChecksumValidator : GLib.Object {
+public class TestChecksumValidator : GLib.Object {
 
     private QTemporaryDir root;
     private string testfile;

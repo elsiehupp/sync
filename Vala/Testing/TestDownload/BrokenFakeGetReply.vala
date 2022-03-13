@@ -10,7 +10,7 @@ namespace Testing {
 A FakeGetReply that sends max 'fake_size' bytes, but whose
 ContentLength has the corect size
 ***********************************************************/
-class BrokenFakeGetReply : FakeGetReply {
+public class BrokenFakeGetReply : FakeGetReply {
 
     //  using FakeGetReply.FakeGetReply;
     public int fake_size = STOP_AFTER;

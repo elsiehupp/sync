@@ -12,7 +12,7 @@ namespace LibSync {
 @brief Declaration of the other propagation jobs
 @ingroup libsync
 ***********************************************************/
-class PropagateLocalRemove : PropagateItemJob {
+public class PropagateLocalRemove : PropagateItemJob {
 
     private string error;
     private bool move_to_trash;

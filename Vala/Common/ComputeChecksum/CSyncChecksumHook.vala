@@ -11,7 +11,7 @@ namespace Occ {
 Hooks checksum computations into csync.
 @ingroup libsync
 ***********************************************************/
-class CSyncChecksumHook : ComputeChecksumBase {
+public class CSyncChecksumHook : ComputeChecksumBase {
 
     /***********************************************************
     ***********************************************************/

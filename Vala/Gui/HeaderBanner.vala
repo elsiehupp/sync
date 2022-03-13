@@ -102,7 +102,7 @@ https://www.gnu.org/licenses/gpl-3.0.html.
 namespace Occ {
 namespace Ui {
 
-class HeaderBanner : Gtk.Widget {
+public class HeaderBanner : Gtk.Widget {
 
     /***********************************************************
     These fudge terms were needed a few places to obtain

@@ -7,7 +7,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 namespace Occ {
 namespace Ui {
 
-class FileActivityListModel : ActivityListModel {
+public class FileActivityListModel : ActivityListModel {
 
     /***********************************************************
     ***********************************************************/

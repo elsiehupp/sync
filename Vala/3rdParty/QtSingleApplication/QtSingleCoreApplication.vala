@@ -16,7 +16,7 @@ file LGPL_EXCEPTION.txt in this package.
 
 namespace SharedTools {
 
-class QtSingleCoreApplication : QCoreApplication {
+public class QtSingleCoreApplication : QCoreApplication {
 
     /***********************************************************
     ***********************************************************/
@@ -24,7 +24,7 @@ class QtSingleCoreApplication : QCoreApplication {
     private bool block;
 
 
-    signal void message_received (string message);
+    signal void signal_message_received (string message);
 
 
     /***********************************************************
@@ -33,7 +33,7 @@ class QtSingleCoreApplication : QCoreApplication {
         base (argc, argv);
         peer = new QtLocalPeer (this);
         block = false;
-        connect (peer, &QtLocalPeer.message_received, this, &QtSingleCoreApplication.message_received);
+        connect (peer, &QtLocalPeer.signal_message_received, this, &QtSingleCoreApplication.signal_message_received);
     }
 
 
@@ -42,7 +42,7 @@ class QtSingleCoreApplication : QCoreApplication {
     public QtSingleCoreApplication (string app_id, int argc, char **argv) {
         base (argc, argv);
         peer = new QtLocalPeer (this, app_id);
-        connect (peer, &QtLocalPeer.message_received, this, &QtSingleCoreApplication.message_received);
+        connect (peer, &QtLocalPeer.signal_message_received, this, &QtSingleCoreApplication.signal_message_received);
     }
 
     /***********************************************************

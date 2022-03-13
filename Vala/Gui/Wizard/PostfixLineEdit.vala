@@ -18,7 +18,7 @@ namespace Ui {
 
 Useful e.g. for setting a fixed domain name.
 ***********************************************************/
-class PostfixLineEdit : QLineEdit {
+public class PostfixLineEdit : QLineEdit {
 
     const int HORIZONTAL_MARGIN = 4;
     const int VERTICAL_MARGIN = 4;

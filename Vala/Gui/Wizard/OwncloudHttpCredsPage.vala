@@ -11,7 +11,7 @@ namespace Ui {
 /***********************************************************
 @brief The OwncloudHttpCredsPage class
 ***********************************************************/
-class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
+public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
 
     /***********************************************************
     ***********************************************************/

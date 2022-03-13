@@ -11,7 +11,7 @@ using Occ;
 
 namespace Testing {
 
-class TestExcludedFiles : GLib.Object {
+public class TestExcludedFiles : GLib.Object {
 
     const string EXCLUDE_LIST_FILE SOURCEDIR = "/../../sync-exclude.lst"
     

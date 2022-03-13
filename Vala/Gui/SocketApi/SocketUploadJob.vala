@@ -12,7 +12,7 @@ Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
 namespace Occ {
 namespace Ui {
 
-class SocketUploadJob : GLib.Object {
+public class SocketUploadJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

@@ -19,7 +19,7 @@ this.job.on_signal_start ();
 
 @ingroup libsync
 ***********************************************************/
-class SetEncryptionFlagApiJob : AbstractNetworkJob {
+public class SetEncryptionFlagApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/

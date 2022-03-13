@@ -16,7 +16,7 @@ namespace Ui {
 
 These are part of notifications which are mapped into activities.
 ***********************************************************/
-class ActivityLink {
+public class ActivityLink {
 
     /***********************************************************
     ***********************************************************/

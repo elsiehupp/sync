@@ -22,7 +22,7 @@ finalized () if the encrypted file is ready to be
 error () if there was an error with the encryption
 folder_not_encrypted () if the file is within a folder that's not encrypted.
 ***********************************************************/
-class PropagateUploadEncrypted : GLib.Object {
+public class PropagateUploadEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

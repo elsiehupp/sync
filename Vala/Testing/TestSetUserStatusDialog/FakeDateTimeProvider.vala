@@ -6,7 +6,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 namespace Testing {
 
-class FakeDateTimeProvider : Occ.DateTimeProvider {
+public class FakeDateTimeProvider : Occ.DateTimeProvider {
 
     /***********************************************************
     ***********************************************************/

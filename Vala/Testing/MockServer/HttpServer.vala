@@ -13,7 +13,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 namespace Testing {
 
-class HttpServer : QTcpServer {
+public class HttpServer : QTcpServer {
 
     /***********************************************************
     ***********************************************************/

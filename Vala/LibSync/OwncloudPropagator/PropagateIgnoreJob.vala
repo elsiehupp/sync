@@ -12,7 +12,7 @@ namespace LibSync {
 @brief Dummy job that just mark it as completed and ignored
 @ingroup libsync
 ***********************************************************/
-class PropagateIgnoreJob : PropagateItemJob {
+public class PropagateIgnoreJob : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/

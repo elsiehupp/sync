@@ -11,7 +11,7 @@ using Occ;
 
 namespace Testing {
 
-class TestDatabaseError : GLib.Object {
+public class TestDatabaseError : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

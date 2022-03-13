@@ -29,7 +29,7 @@ using Soup;
 namespace Occ {
 namespace LibSync {
 
-class OwncloudPropagator : GLib.Object {
+public class OwncloudPropagator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

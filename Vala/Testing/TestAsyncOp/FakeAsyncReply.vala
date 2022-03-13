@@ -6,7 +6,7 @@ implied, as to its usefulness for any purpose.
 
 namespace Testing {
 
-class FakeAsyncReply : FakeReply {
+public class FakeAsyncReply : FakeReply {
 
     GLib.ByteArray poll_location;
 

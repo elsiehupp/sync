@@ -12,7 +12,7 @@ namespace LibSync {
 @brief The EntityExistsJob class
 @ingroup libsync
 ***********************************************************/
-class EntityExistsJob : AbstractNetworkJob {
+public class EntityExistsJob : AbstractNetworkJob {
 
     signal void exists (Soup.Reply reply);
 

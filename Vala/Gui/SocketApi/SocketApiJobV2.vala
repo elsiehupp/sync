@@ -9,7 +9,7 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 namespace Occ {
 namespace Ui {
 
-class SocketApiJobV2 : GLib.Object {
+public class SocketApiJobV2 : GLib.Object {
 
     private unowned SocketListener this.socket_listener;
     private const GLib.ByteArray this.command;

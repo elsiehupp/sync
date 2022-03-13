@@ -19,7 +19,7 @@ namespace LibSync {
 @brief The CookieJar class
 @ingroup libsync
 ***********************************************************/
-class CookieJar : QNetworkCookieJar {
+public class CookieJar : QNetworkCookieJar {
 
     const uint32 JAR_VERSION = 23;
 

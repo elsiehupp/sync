@@ -50,7 +50,7 @@ Excluded files and ignored files are the same thing. But the
 selective sync blocklist functionality is a different thing
 entirely.
 ***********************************************************/
-class ExcludedFiles : GLib.Object {
+public class ExcludedFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
@@ -622,7 +622,7 @@ bool ExcludedFiles.on_signal_reload_exclude_files () {
                 on_signal_load_exclude_file_patterns (base_path, file);
             } else {
                 on_signal_success = false;
-                q_warning ("System exclude list file could not be opened:" + exclude_file;
+                GLib.warning ("System exclude list file could not be opened:" + exclude_file;
             }
         }
     }
@@ -718,7 +718,7 @@ CSYNC_EXCLUDE_TYPE ExcludedFiles.traversal_pattern_match (string path, ItemType 
             add_exclude_file_path (absolute_path);
             on_signal_reload_exclude_files ();
         } else {
-            q_warning ("System exclude list file could not be read:" + absolute_path;
+            GLib.warning ("System exclude list file could not be read:" + absolute_path;
         }
     }
 

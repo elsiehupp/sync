@@ -8,7 +8,7 @@ We need a separate class here, since we cannot simply return
 the same WebEnginePage object. This leads to a strange
 segfault somewhere deep inside of the QWebEngine code.
 ***********************************************************/
-class ExternalWebEnginePage : QWebEnginePage {
+public class ExternalWebEnginePage : QWebEnginePage {
 
     /***********************************************************
     ***********************************************************/

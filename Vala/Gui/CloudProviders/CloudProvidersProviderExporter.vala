@@ -9,11 +9,11 @@ Copyright (C) by Julius Härtl <jus@bitgrid.net>
 namespace Occ {
 namespace Ui {
 
-class CloudProvidersProviderExporter : GLib.Object {
+public class CloudProvidersProviderExporter : GLib.Object {
 
 } // class CloudProvidersProviderExporter
 
-class CloudProvidersAccountExporter : GLib.Object {
+public class CloudProvidersAccountExporter : GLib.Object {
 
 } // class CloudProvidersAccountExporter
 

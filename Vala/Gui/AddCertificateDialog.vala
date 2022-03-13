@@ -16,7 +16,7 @@ namespace Ui {
 @brief The AddCertificateDialog class
 @ingroup gui
 ***********************************************************/
-class AddCertificateDialog : Gtk.Dialog {
+public class AddCertificateDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/

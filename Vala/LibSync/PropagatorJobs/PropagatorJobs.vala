@@ -17,7 +17,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 namespace Occ {
 namespace LibSync {
 
-class PropagatorJobs : GLib.Object {
+public class PropagatorJobs : GLib.Object {
 
     /***********************************************************
     Tags for checksum header.

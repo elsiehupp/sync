@@ -1,7 +1,7 @@
 
 namespace Testing {
 
-class FakeChunkMoveReply : FakeReply {
+public class FakeChunkMoveReply : FakeReply {
 
     FileInfo file_info;
 

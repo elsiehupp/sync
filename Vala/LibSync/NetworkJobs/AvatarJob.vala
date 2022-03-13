@@ -16,7 +16,7 @@ If the server does not have the avatar, the result Pixmap is empty.
 
 @ingroup libsync
 ***********************************************************/
-class AvatarJob : AbstractNetworkJob {
+public class AvatarJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/

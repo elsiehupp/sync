@@ -18,7 +18,7 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 namespace Occ {
 namespace Ui {
 
-class ShareDialog : Gtk.Dialog {
+public class ShareDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/

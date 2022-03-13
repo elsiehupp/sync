@@ -18,7 +18,7 @@ Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
 namespace Occ {
 namespace LibSync {
 
-class BulkPropagatorJob : PropagatorJob {
+public class BulkPropagatorJob : PropagatorJob {
 
     const int BATCH_SIZE = 100;
     const int PARALLEL_JOBS_MAXIMUM_COUNT = 1;

@@ -10,7 +10,7 @@ namespace Occ {
 @brief The SimpleSslErrorHandler class
 @ingroup cmd
 ***********************************************************/
-class SimpleSslErrorHandler : Occ.AbstractSslErrorHandler {
+public class SimpleSslErrorHandler : Occ.AbstractSslErrorHandler {
 
     /***********************************************************
     ***********************************************************/

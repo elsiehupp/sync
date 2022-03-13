@@ -12,7 +12,7 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 namespace Occ {
 namespace Ui {
 
-class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
+public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
 
     /***********************************************************
     ***********************************************************/

@@ -13,7 +13,7 @@ namespace Ui {
 @brief The FolderDefinition class
 @ingroup gui
 ***********************************************************/
-class FolderDefinition {
+public class FolderDefinition {
 
     /***********************************************************
     The name of the folder in the ui and internally

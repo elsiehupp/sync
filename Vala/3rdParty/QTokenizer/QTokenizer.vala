@@ -103,7 +103,7 @@ struct QTokenizerPrivate {
 }
 
 template <class T, class ConstIterator = typename T.ConstIterator>
-class QTokenizer {
+public class QTokenizer {
 
     /***********************************************************
     ***********************************************************/

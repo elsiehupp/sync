@@ -9,7 +9,7 @@ using Occ;
 namespace Testing {
 
 // Reply with a small delay
-class SlowFakePostReply : FakePostReply {
+public class SlowFakePostReply : FakePostReply {
 
     /***********************************************************
     ***********************************************************/

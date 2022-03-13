@@ -9,7 +9,7 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 namespace Occ {
 namespace Ui {
 
-class ListenerClosure : GLib.Object {
+public class ListenerClosure : GLib.Object {
 
     public delegate void CallbackFunction ();
 

@@ -2,7 +2,7 @@
 
 namespace Testing {
 
-class TestNotificationCache : GLib.Object {
+public class TestNotificationCache : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

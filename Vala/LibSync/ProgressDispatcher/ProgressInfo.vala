@@ -12,7 +12,7 @@ namespace Progress {
 @brief The ProgressInfo class
 @ingroup libsync
 ***********************************************************/
-class ProgressInfo : GLib.Object {
+public class ProgressInfo : GLib.Object {
 
     /***********************************************************
     Records the status of the sync run

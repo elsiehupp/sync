@@ -7,7 +7,7 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 namespace Occ {
 namespace Ui {
 
-class AvatarEventFilter : GLib.Object {
+public class AvatarEventFilter : GLib.Object {
 
     signal void signal_clicked ();
     signal void signal_context_menu (QPoint global_position);

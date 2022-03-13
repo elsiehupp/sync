@@ -25,7 +25,7 @@ namespace Ui {
 @brief The OwncloudSetupWizard class
 @ingroup gui
 ***********************************************************/
-class OwncloudSetupWizard : GLib.Object {
+public class OwncloudSetupWizard : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

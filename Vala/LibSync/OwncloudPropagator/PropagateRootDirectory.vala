@@ -15,7 +15,7 @@ namespace LibSync {
 Primary difference to PropagateDirectory is that it keeps track of directory
 deletions that must happen at the very end.
 ***********************************************************/
-class PropagateRootDirectory : PropagateDirectory {
+public class PropagateRootDirectory : PropagateDirectory {
 
     /***********************************************************
     ***********************************************************/

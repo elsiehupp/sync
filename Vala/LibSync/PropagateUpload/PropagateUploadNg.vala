@@ -46,7 +46,7 @@ State machine:
     +. MOVE -----. move_job_finished () --. on_signal_finalize ()
 
 ***********************************************************/
-class PropagateUploadFileNG : PropagateUploadFileCommon {
+public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
     /***********************************************************
     Map chunk number with its size  from the PROPFIND on resume.

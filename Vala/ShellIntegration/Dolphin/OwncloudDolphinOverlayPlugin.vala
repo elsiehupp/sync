@@ -24,7 +24,7 @@
 //  #include <QDir>
 //  #include <QTimer>
 
-class OwncloudDolphinPlugin : KOverlayIconPlugin {
+public class OwncloudDolphinPlugin : KOverlayIconPlugin {
     Q_PLUGIN_METADATA (IID "com.owncloud.ovarlayiconplugin" FILE "ownclouddolphinoverlayplugin.json")
 
     using StatusMap = GLib.HashMap<GLib.ByteArray, GLib.ByteArray>;

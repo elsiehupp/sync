@@ -32,7 +32,7 @@ SOFTWARE.
     Progress indicators are indeterminate and do nothing more than spin to show that the application is busy.
     \sa QProgressBar
 ***********************************************************/
-class QProgressIndicator : Gtk.Widget {
+public class QProgressIndicator : Gtk.Widget {
     //  Q_PROPERTY (int delay READ animation_delay WRITE on_set_animation_delay)
     //  Q_PROPERTY (bool displayed_when_stopped READ is_displayed_when_stopped WRITE on_set_displayed_when_stopped)
     //  Q_PROPERTY (Gtk.Color color READ color WRITE on_set_color)

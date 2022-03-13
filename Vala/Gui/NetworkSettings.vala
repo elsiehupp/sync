@@ -14,7 +14,7 @@ namespace Ui {
 @brief The NetworkSettings class
 @ingroup gui
 ***********************************************************/
-class NetworkSettings : Gtk.Widget {
+public class NetworkSettings : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/

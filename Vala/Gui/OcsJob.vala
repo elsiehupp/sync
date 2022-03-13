@@ -21,7 +21,7 @@ All the communication logic is handled in this class.
 
 All OCS jobs (e.g. sharing) should extend this class.
 ***********************************************************/
-class OcsJob : AbstractNetworkJob {
+public class OcsJob : AbstractNetworkJob {
 
     private const int OCS_SUCCESS_STATUS_CODE = 100;
 

@@ -31,7 +31,7 @@ namespace Ui {
 @brief The LogBrowser class
 @ingroup gui
 ***********************************************************/
-class LogBrowser : Gtk.Dialog {
+public class LogBrowser : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/

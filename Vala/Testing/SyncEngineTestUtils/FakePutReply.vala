@@ -6,7 +6,7 @@ implied, as to its usefulness for any purpose.
 
 namespace Testing {
 
-class FakePutReply : FakeReply {
+public class FakePutReply : FakeReply {
 
     FileInfo file_info;
 

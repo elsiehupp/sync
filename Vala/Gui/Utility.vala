@@ -16,7 +16,7 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 namespace Occ {
 namespace Ui {
 
-class Utility {
+public class Utility {
 
     /***********************************************************
     Open an url in the browser.

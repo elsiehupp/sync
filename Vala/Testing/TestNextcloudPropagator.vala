@@ -14,7 +14,7 @@ string create_download_tmp_filename (string previous);
 
 namespace Testing {
 
-class TestNextcloudPropagator : GLib.Object {
+public class TestNextcloudPropagator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

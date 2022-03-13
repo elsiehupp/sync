@@ -10,7 +10,7 @@ using Occ;
 
 namespace Testing {
 
-class TestXmlParse : GLib.Object {
+public class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

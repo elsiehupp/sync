@@ -7,7 +7,7 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 namespace Occ {
 namespace LibSync {
 
-class DirectEditor : GLib.Object {
+public class DirectEditor : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

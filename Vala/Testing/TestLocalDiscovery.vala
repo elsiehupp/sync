@@ -12,7 +12,7 @@ using Occ;
 
 namespace Testing {
 
-class TestLocalDiscovery : GLib.Object {
+public class TestLocalDiscovery : GLib.Object {
 
     // Check correct behavior when local discovery is partially drawn from the database
     private void test_local_discovery_style () {

@@ -6,7 +6,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 namespace Testing {
 
-class FakeUserStatusConnector : Occ.UserStatusConnector {
+public class FakeUserStatusConnector : Occ.UserStatusConnector {
 
 
     /***********************************************************

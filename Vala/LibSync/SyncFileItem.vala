@@ -17,7 +17,7 @@ namespace LibSync {
 @brief The SyncFileItem class
 @ingroup libsync
 ***********************************************************/
-class SyncFileItem : GLib.Object {
+public class SyncFileItem : GLib.Object {
 
     private class SyncFileItemPtr : unowned SyncFileItem { }
     private class SyncFileItemVector : GLib.List<SyncFileItemPtr> { }

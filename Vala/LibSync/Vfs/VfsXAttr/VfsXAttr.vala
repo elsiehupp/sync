@@ -13,7 +13,7 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 namespace Occ {
 namespace LibSync {
 
-class VfsXAttr : Vfs {
+public class VfsXAttr : Vfs {
 
     /***********************************************************
     ***********************************************************/

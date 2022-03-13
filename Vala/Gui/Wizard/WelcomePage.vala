@@ -9,7 +9,7 @@ Copyright (C) 2021 by Felix Weilbach <felix.weilbach@nextcloud.com>
 namespace Occ {
 namespace Ui {
 
-class WelcomePage : QWizardPage {
+public class WelcomePage : QWizardPage {
 
     /***********************************************************
     ***********************************************************/

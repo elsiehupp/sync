@@ -15,7 +15,7 @@ namespace LibSync {
 @brief Job to fetch a icon
 @ingroup gui
 ***********************************************************/
-class IconJob : GLib.Object {
+public class IconJob : GLib.Object {
 
     signal void signal_job_finished (GLib.ByteArray icon_data);
     signal void error (Soup.Reply.NetworkError error_type);

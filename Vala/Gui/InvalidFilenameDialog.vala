@@ -23,7 +23,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 namespace Occ {
 namespace Ui {
 
-class InvalidFilenameDialog : Gtk.Dialog {
+public class InvalidFilenameDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/

@@ -19,7 +19,7 @@ namespace Ui {
 Simple list model to provide the list view with data for
 the Unified Search results.
 ***********************************************************/
-class UnifiedSearchResultsListModel : QAbstractListModel {
+public class UnifiedSearchResultsListModel : QAbstractListModel {
 
     struct UnifiedSearchProvider {
         string identifier;

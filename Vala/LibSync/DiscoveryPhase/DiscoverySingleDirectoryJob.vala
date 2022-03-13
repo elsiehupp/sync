@@ -14,7 +14,7 @@ namespace LibSync {
 
 @ingroup libsync
 ***********************************************************/
-class DiscoverySingleDirectoryJob : GLib.Object {
+public class DiscoverySingleDirectoryJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

@@ -7,7 +7,7 @@ Copyright (C) by Roeland Jago Douma <rullzer@owncloud.com>
 namespace Occ {
 namespace Ui {
 
-class UserGroupShare : Share {
+public class UserGroupShare : Share {
 
     string note {
         public get {

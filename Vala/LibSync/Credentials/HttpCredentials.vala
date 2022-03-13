@@ -62,7 +62,7 @@ from the keychain
 emitted, the ui, will call ask_from_user () which is
 implemented in HttpCredentialsGui
 ***********************************************************/
-class HttpCredentials : AbstractCredentials {
+public class HttpCredentials : AbstractCredentials {
 
     const string USER_C = "user";
     const string IS_OAUTH_C = "oauth";

@@ -12,7 +12,7 @@ namespace LibSync {
 @brief Job that runs subjobs. It becomes on_signal_finished only when all subjobs are on_signal_finished.
 @ingroup libsync
 ***********************************************************/
-class PropagatorCompositeJob : PropagatorJob {
+public class PropagatorCompositeJob : PropagatorJob {
 
     public GLib.List<PropagatorJob> jobs_to_do;
     public SyncFileItemVector tasks_to_do;

@@ -14,7 +14,7 @@ namespace Ui {
 
 Used by ProxyAuthHandler.
 ***********************************************************/
-class ProxyAuthDialog : Gtk.Dialog {
+public class ProxyAuthDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/

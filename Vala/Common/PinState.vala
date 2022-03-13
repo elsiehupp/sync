@@ -57,7 +57,7 @@ enum PinState {
     where the user requested access to the file's data) its pin state changes
     to PinState.UNSPECIFIED.
     ***********************************************************/
-    VfsItemAvailability.ONLINE_ONLY = 2,
+    ONLINE_ONLY = 2,
 
     /***********************************************************
     The user hasn't made a decision. The client or platform may hydrate or

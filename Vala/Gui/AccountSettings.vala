@@ -28,7 +28,7 @@ namespace Ui {
 @brief The AccountSettings class
 @ingroup gui
 ***********************************************************/
-class AccountSettings : Gtk.Widget {
+public class AccountSettings : Gtk.Widget {
 
     /***********************************************************
     Adjusts the mouse cursor based on the region it is on over the folder tree view.

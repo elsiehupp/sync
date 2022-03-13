@@ -29,7 +29,7 @@ data from synchron
 storage are asynchronous operations. This leads to reentrant
 calls that are fairly complicated to handle.
 ***********************************************************/
-class ProxyAuthHandler : GLib.Object {
+public class ProxyAuthHandler : GLib.Object {
 
     static ProxyAuthHandler instance { public get; private set; }
 

@@ -6,7 +6,7 @@ implied, as to its usefulness for any purpose.
 
 namespace Testing {
 
-class FakeFolder {
+public class FakeFolder {
 
     /***********************************************************
     ***********************************************************/
@@ -312,7 +312,7 @@ void FakeFolder.from_disk (QDir directory, FileInfo template_file_info) {
             f.open (GLib.File.ReadOnly);
             var content = f.read (1);
             if (content.size () == 0) {
-                GLib.warn ("Empty file at:" + disk_child.file_path ();
+                GLib.warning ("Empty file at:" + disk_child.file_path ();
                 continue;
             }
             char content_char = content.at (0);

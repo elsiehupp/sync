@@ -7,7 +7,7 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 namespace Occ {
 namespace LibSync {
 
-class HttpCredentialsAccessManager : AccessManager {
+public class HttpCredentialsAccessManager : AccessManager {
 
     /***********************************************************
     The credentials object dies along with the account, while

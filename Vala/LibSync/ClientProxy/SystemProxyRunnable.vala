@@ -15,7 +15,7 @@ using CSync;
 namespace Occ {
 namespace LibSync {
 
-class SystemProxyRunnable : GLib.Object /*, QRunnable*/ {
+public class SystemProxyRunnable : GLib.Object /*, QRunnable*/ {
 
     /***********************************************************
     ***********************************************************/

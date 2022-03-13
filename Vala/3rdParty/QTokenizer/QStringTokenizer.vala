@@ -1,5 +1,5 @@
 
-class QStringTokenizer : QTokenizer<string> {
+public class QStringTokenizer : QTokenizer<string> {
 
     /***********************************************************
     ***********************************************************/

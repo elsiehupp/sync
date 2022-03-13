@@ -8,8 +8,8 @@ Copyright (C) by Dominik Schmidt <dschmidt@owncloud.com>
 
 namespace Occ {
 
-template<class PluginClass>
-class DefaultPluginFactory : PluginFactory {
+//  template<class PluginClass>
+public class DefaultPluginFactory : PluginFactory {
 
     /***********************************************************
     ***********************************************************/

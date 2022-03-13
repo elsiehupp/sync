@@ -30,7 +30,7 @@ namespace Ui {
 @brief The Systray class
 @ingroup gui
 ***********************************************************/
-class Systray : QSystemTrayIcon {
+public class Systray : QSystemTrayIcon {
 
     const string NOTIFICATIONS_SERVICE = "org.freedesktop.Notifications";
     const string NOTIFICATIONS_PATH = "/org/freedesktop/Notifications";

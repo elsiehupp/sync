@@ -14,7 +14,7 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 namespace Occ {
 namespace Ui {
 
-class WizardCommon {
+public class WizardCommon {
 
 
     /***********************************************************

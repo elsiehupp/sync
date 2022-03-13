@@ -8,7 +8,7 @@ Copyright (C) by Daniel Heule <daniel.heule@gmail.com>
 
 using Occ;
 
-class EchoDisabler {
+public class EchoDisabler {
 
     /***********************************************************
     ***********************************************************/

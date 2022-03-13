@@ -22,7 +22,7 @@ namespace Occ {
 This class is thread safe. All public functions lock the mutex.
 @ingroup libsync
 ***********************************************************/
-class SyncJournalDb : GLib.Object {
+public class SyncJournalDb : GLib.Object {
 
     const string GET_FILE_RECORD_QUERY
         = "SELECT path, inode, modtime, type, md5, fileid, remote_perm, filesize,"

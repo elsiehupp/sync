@@ -15,7 +15,7 @@ using Occ.Utility;
 
 namespace Testing {
 
-class TestUtility : GLib.Object {
+public class TestUtility : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

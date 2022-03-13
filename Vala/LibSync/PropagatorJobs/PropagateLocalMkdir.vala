@@ -12,7 +12,7 @@ namespace LibSync {
 @brief The PropagateLocalMkdir class
 @ingroup libsync
 ***********************************************************/
-class PropagateLocalMkdir : PropagateItemJob {
+public class PropagateLocalMkdir : PropagateItemJob {
 
     /***********************************************************
     Whether an existing file with the same name may be deleted before

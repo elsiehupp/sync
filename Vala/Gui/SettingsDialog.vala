@@ -27,7 +27,7 @@ namespace Ui {
 @brief The SettingsDialog class
 @ingroup gui
 ***********************************************************/
-class SettingsDialog : Gtk.Dialog {
+public class SettingsDialog : Gtk.Dialog {
 
     class ToolButtonAction : QWidgetAction {
 

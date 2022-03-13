@@ -18,7 +18,7 @@ There is also the LsColJob which can be used to list collections
 
 @ingroup libsync
 ***********************************************************/
-class PropfindJob : AbstractNetworkJob {
+public class PropfindJob : AbstractNetworkJob {
 
     /***********************************************************
     Used to specify which properties shall be retrieved.

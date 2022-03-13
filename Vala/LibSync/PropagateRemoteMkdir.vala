@@ -13,7 +13,7 @@ namespace LibSync {
 @brief The PropagateRemoteMkdir class
 @ingroup libsync
 ***********************************************************/
-class PropagateRemoteMkdir : PropagateItemJob {
+public class PropagateRemoteMkdir : PropagateItemJob {
 
     QPointer<AbstractNetworkJob> job;
 

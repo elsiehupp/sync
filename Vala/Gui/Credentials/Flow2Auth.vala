@@ -25,7 +25,7 @@ access token via Login Flow v2
 
 See: https://docs.nextcloud.com/server/latest/developer_manual/client_apis/LoginFlow/index.html#login-flow-v2
 ***********************************************************/
-class Flow2Auth : GLib.Object {
+public class Flow2Auth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

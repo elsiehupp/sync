@@ -23,7 +23,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 namespace Occ {
 namespace Ui {
 
-class UserStatusSelectorModel : GLib.Object {
+public class UserStatusSelectorModel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

@@ -8,7 +8,7 @@ using Occ;
 
 namespace Testing {
 
-class StatusPushSpy : QSignalSpy {
+public class StatusPushSpy : QSignalSpy {
 
     SyncEngine sync_engine;
 

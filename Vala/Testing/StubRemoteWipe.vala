@@ -3,7 +3,7 @@
 namespace Testing {
 
 // stub to prevent linker error
-class StubRemoteWipe : Occ.AccountManager {
+public class StubRemoteWipe : Occ.AccountManager {
 
     //  const QMetaObject static_meta_object = GLib.Object.static_meta_object;
 

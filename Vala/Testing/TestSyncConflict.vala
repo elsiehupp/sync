@@ -55,7 +55,7 @@ SyncJournalFileRecord database_record (FakeFolder folder, string path) {
     return record;
 }
 
-class TestSyncConflict : GLib.Object {
+public class TestSyncConflict : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

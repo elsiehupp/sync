@@ -29,7 +29,7 @@
 //  #include <QtCore/QTimer>
 //  #include <QtCore/QEventLoop>
 
-class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
+public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
 
     /***********************************************************
     ***********************************************************/

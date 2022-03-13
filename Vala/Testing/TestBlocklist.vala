@@ -11,7 +11,7 @@ using Occ;
 
 namespace Testing {
 
-class TestBlocklist : GLib.Object {
+public class TestBlocklist : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

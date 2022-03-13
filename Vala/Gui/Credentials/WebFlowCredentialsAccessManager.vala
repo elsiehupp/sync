@@ -2,7 +2,7 @@
 namespace Occ {
 namespace Ui {
 
-class WebFlowCredentialsAccessManager : AccessManager {
+public class WebFlowCredentialsAccessManager : AccessManager {
 
     private const string USER_C = "user";
     private const string CLIENT_CERTIFICATE_PEM_C = "this.client_certificate_pem";

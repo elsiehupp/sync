@@ -13,7 +13,7 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 namespace Occ {
 namespace Ui {
 
-class AsyncImageResponse : QQuickImageResponse {
+public class AsyncImageResponse : QQuickImageResponse {
 
     Gtk.Image image;
     string[] image_paths;

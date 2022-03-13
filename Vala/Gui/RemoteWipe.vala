@@ -13,7 +13,7 @@ Copyright (C) by Camila Ayres <hello@camila.codes>
 namespace Occ {
 namespace Ui {
 
-class RemoteWipe : GLib.Object {
+public class RemoteWipe : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

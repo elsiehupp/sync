@@ -19,7 +19,7 @@ namespace Ui {
 Allows to fetch Unified Search result icon from the server
 or used a local resource
 ***********************************************************/
-class UnifiedSearchResultImageProvider : QQuickAsyncImageProvider {
+public class UnifiedSearchResultImageProvider : QQuickAsyncImageProvider {
 
     /***********************************************************
     ***********************************************************/

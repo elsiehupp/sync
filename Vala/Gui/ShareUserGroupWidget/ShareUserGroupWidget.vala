@@ -40,7 +40,7 @@ namespace Ui {
 @brief The ShareDialog (user/group) class
 @ingroup gui
 ***********************************************************/
-class ShareUserGroupWidget : Gtk.Widget {
+public class ShareUserGroupWidget : Gtk.Widget {
 
     private const string PASSWORD_IS_PLACEHOLDER = "●●●●●●●●";
 

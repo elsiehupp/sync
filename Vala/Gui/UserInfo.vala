@@ -53,7 +53,7 @@ Here follows the state machine
    +. Client Side Encryption Checks --+ --report_result ()
 \endcode
 ***********************************************************/
-class UserInfo : GLib.Object {
+public class UserInfo : GLib.Object {
 
     const int DEFAULT_INTERVAL_T = 30 * 1000;
     const int FAIL_INTERVAL_T = 5 * 1000;

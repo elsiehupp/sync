@@ -15,7 +15,7 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 namespace Occ {
 namespace Ui {
 
-class IconUtils {
+public class IconUtils {
 
     /***********************************************************
     ***********************************************************/
@@ -60,7 +60,7 @@ class IconUtils {
         Gtk.Image result = new Gtk.Image ();
 
         if (filename.is_empty () || !custom_color.is_valid ()) {
-            GLib.warn ("invalid filename or custom_color");
+            GLib.warning ("invalid filename or custom_color");
             return result;
         }
 
@@ -86,7 +86,7 @@ class IconUtils {
 
         //  Q_ASSERT (!source_svg.is_empty ());
         if (source_svg.is_empty ()) {
-            GLib.warn ("Failed to find base SVG file for " + filename);
+            GLib.warning ("Failed to find base SVG file for " + filename);
             return result;
         }
 
@@ -94,7 +94,7 @@ class IconUtils {
 
         //  Q_ASSERT (!result.is_null ());
         if (result.is_null ()) {
-            GLib.warn ("Failed to load pixmap for " + filename);
+            GLib.warning ("Failed to load pixmap for " + filename);
         }
 
         return result;

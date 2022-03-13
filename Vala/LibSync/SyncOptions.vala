@@ -15,7 +15,7 @@ namespace LibSync {
 /***********************************************************
 Value class containing the options given to the sync engine
 ***********************************************************/
-class SyncOptions : GLib.Object {
+public class SyncOptions : GLib.Object {
 
 
     /***********************************************************

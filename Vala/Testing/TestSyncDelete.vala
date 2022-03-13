@@ -11,7 +11,7 @@ using Occ;
 
 namespace Testing {
 
-class TestSyncDelete : GLib.Object {
+public class TestSyncDelete : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

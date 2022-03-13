@@ -5,7 +5,7 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 ***********************************************************/
 
 namespace Occ {
-class Constants {
+public class Constants {
     public const int32 E2EE_TAG_SIZE = 16;
 }
 }

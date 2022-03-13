@@ -10,7 +10,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 namespace Occ {
 namespace LibSync {
 
-class PushNotifications : GLib.Object {
+public class PushNotifications : GLib.Object {
 
     const int MAX_ALLOWED_FAILED_AUTHENTICATION_ATTEMPTS = 3;
     const int PING_INTERVAL = 30 * 1000;

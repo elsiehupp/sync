@@ -38,7 +38,7 @@ namespace Ui {
 @brief The OwncloudGui class
 @ingroup gui
 ***********************************************************/
-class OwncloudGui : GLib.Object {
+public class OwncloudGui : GLib.Object {
 
     private const string PROPERTY_ACCOUNT_C = "oc_account";
 

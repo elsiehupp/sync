@@ -26,7 +26,7 @@ using QKeychain;
 namespace Occ {
 namespace Ui {
 
-class WebFlowCredentials : AbstractCredentials {
+public class WebFlowCredentials : AbstractCredentials {
 
     //  friend class WebFlowCredentialsAccessManager;
 

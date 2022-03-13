@@ -7,7 +7,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 namespace Occ {
 namespace Ui {
 
-class AccountApp : GLib.Object {
+public class AccountApp : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

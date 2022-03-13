@@ -60,7 +60,7 @@ This is the flow:
 
 \endcode
 ***********************************************************/
-class PropagateDownloadFile : PropagateItemJob {
+public class PropagateDownloadFile : PropagateItemJob {
 
     const string OWNCLOUD_CUSTOM_SOFT_ERROR_STRING_C = "owncloud-custom-soft-error-string";
 

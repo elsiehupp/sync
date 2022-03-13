@@ -10,7 +10,7 @@ Copyright (C) 2021 by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 namespace Testing {
 
-class FakePaintDevice : QPaintDevice {
+public class FakePaintDevice : QPaintDevice {
 
     /***********************************************************
     ***********************************************************/

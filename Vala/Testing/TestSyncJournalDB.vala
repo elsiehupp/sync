@@ -11,7 +11,7 @@ using Occ;
 
 namespace Testing {
 
-class TestSyncJournalDB : GLib.Object {
+public class TestSyncJournalDB : GLib.Object {
 
     QTemporaryDir temporary_directory;
 
@@ -312,7 +312,7 @@ class TestSyncJournalDB : GLib.Object {
                 SyncJournalFileRecord record;
                 this.database.get_file_record (element, record);
                 if (!record.is_valid ()) {
-                    GLib.warn ("Missing record: " + element);
+                    GLib.warning ("Missing record: " + element);
                     ok = false;
                 }
             }

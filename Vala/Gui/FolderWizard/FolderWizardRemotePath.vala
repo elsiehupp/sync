@@ -13,7 +13,7 @@ namespace Ui {
 @brief page to ask for the target folder
 @ingroup gui
 ***********************************************************/
-class FolderWizardRemotePath : FormatWarningsWizardPage {
+public class FolderWizardRemotePath : FormatWarningsWizardPage {
 
     /***********************************************************
     ***********************************************************/

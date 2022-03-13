@@ -26,7 +26,7 @@ the details of how a particular VFS solution works.
 An instance is usually created through a plugin via the create_vfs_from_plugin ()
 function.
 ***********************************************************/
-class Vfs : GLib.Object {
+public class Vfs : GLib.Object {
 
     struct csync_file_stat_t : csync_file_stat_s { }
     public class AvailabilityResult : Result<VfsItemAvailability, AvailabilityError> { }

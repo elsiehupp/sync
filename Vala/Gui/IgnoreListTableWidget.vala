@@ -8,7 +8,7 @@
 namespace Occ {
 namespace Ui {
 
-class IgnoreListTableWidget : Gtk.Widget {
+public class IgnoreListTableWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/

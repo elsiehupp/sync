@@ -7,7 +7,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 namespace Occ {
 namespace Ui {
 
-class UpdaterScheduler : GLib.Object {
+public class UpdaterScheduler : GLib.Object {
 
     /***********************************************************
     Timer for the regular update check

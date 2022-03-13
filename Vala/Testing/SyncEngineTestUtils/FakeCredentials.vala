@@ -1,7 +1,7 @@
 
 namespace Testing {
 
-class FakeCredentials : Occ.AbstractCredentials {
+public class FakeCredentials : Occ.AbstractCredentials {
 
     Soup qnam;
 

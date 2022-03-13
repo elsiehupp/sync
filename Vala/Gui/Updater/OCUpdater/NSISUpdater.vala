@@ -11,7 +11,7 @@ namespace Ui {
 @brief Windows Updater Using NSIS
 @ingroup gui
 ***********************************************************/
-class NSISUpdater : OCUpdater {
+public class NSISUpdater : OCUpdater {
 
     /***********************************************************
     ***********************************************************/

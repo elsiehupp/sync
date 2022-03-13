@@ -16,7 +16,7 @@ namespace Ui {
 @brief The FolderStatusModel class
 @ingroup gui
 ***********************************************************/
-class FolderStatusModel : QAbstractItemModel {
+public class FolderStatusModel : QAbstractItemModel {
 
     /***********************************************************
     ***********************************************************/

@@ -7,7 +7,7 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 namespace Occ {
 namespace Ui {
 
-class ShareeModel : QAbstractListModel {
+public class ShareeModel : QAbstractListModel {
 
     /***********************************************************
     FIXME: make it a GLib.List<Sharee> when Sharee can be compared

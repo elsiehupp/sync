@@ -7,7 +7,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 namespace Occ {
 namespace LibSync {
 
-class UserStatus : GLib.Object {
+public class UserStatus : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

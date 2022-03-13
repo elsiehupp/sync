@@ -8,7 +8,7 @@ using Occ;
 
 namespace Testing {
 
-class DesktopServiceHook : GLib.Object {
+public class DesktopServiceHook : GLib.Object {
 
     signal void signal_hooked (GLib.Uri uri);
 

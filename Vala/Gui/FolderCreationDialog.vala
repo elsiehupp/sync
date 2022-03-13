@@ -14,7 +14,7 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 namespace Occ {
 namespace Ui {
 
-class FolderCreationDialog : Gtk.Dialog {
+public class FolderCreationDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/

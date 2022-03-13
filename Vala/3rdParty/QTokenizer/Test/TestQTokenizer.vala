@@ -1,22 +1,20 @@
 // #include <Qt_test>
 
-namespace {
-    const string simple = "A simple tokenizer test";
-    const string quoted = "\"Wait for me!\" he shouted";
-}
+public class TestTokenizer : GLib.Object {
 
-class TestTokenizer : GLib.Object {
+    const string SIMPLE = "A SIMPLE tokenizer test";
+    const string quoted = "\"Wait for me!\" he shouted";
 
     /***********************************************************
     ***********************************************************/
-    private void on_tokenize_q_string_simple () {
-        QStringTokenizer tokenizer = new QStringTokenizer (simple, " ");
+    private void on_tokenize_q_string_SIMPLE () {
+        QStringTokenizer tokenizer = new QStringTokenizer (SIMPLE, " ");
 
         QCOMPARE (tokenizer.has_next (), true);
         QCOMPARE (tokenizer.next (), "A");
 
         QCOMPARE (tokenizer.has_next (), true);
-        QCOMPARE (tokenizer.next (), "simple");
+        QCOMPARE (tokenizer.next (), "SIMPLE");
 
         QCOMPARE (tokenizer.has_next (), true);
         QCOMPARE (tokenizer.next (), "tokenizer");
@@ -30,14 +28,14 @@ class TestTokenizer : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void tokenize_q_string_simple_ref () {
-        QStringTokenizer tokenizer = new QStringTokenizer (simple, " ");
+    private void on_tokenize_q_string_SIMPLE_ref () {
+        QStringTokenizer tokenizer = new QStringTokenizer (SIMPLE, " ");
 
         QCOMPARE (tokenizer.has_next (), true);
         QVERIFY (tokenizer.string_ref () == "A");
 
         QCOMPARE (tokenizer.has_next (), true);
-        QVERIFY (tokenizer.string_ref () == "simple");
+        QVERIFY (tokenizer.string_ref () == "SIMPLE");
 
         QCOMPARE (tokenizer.has_next (), true);
         QVERIFY (tokenizer.string_ref () == "tokenizer");
@@ -51,7 +49,7 @@ class TestTokenizer : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void tokenize_q_string_quoted () {
+    private void on_tokenize_q_string_quoted () {
         const string multiquote = "\"'Billy - the Kid' is dead!\"";
         QStringTokenizer tokenizer = new QStringTokenizer (multiquote, " -");
         tokenizer.set_quote_characters ("\"");
@@ -66,8 +64,8 @@ class TestTokenizer : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void tokenize_q_string_skip_quotes () {
-        const string multiquote ("\"'Billy - the Kid' is dead!\"");
+    private void on_tokenize_q_string_skip_quotes () {
+        const string multiquote = "\"'Billy - the Kid' is dead!\"";
         QStringTokenizer tokenizer = new QStringTokenizer (multiquote, " ");
         tokenizer.set_quote_characters ("\"");
         tokenizer.set_return_quote_characters (false);
@@ -82,8 +80,8 @@ class TestTokenizer : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void tokenize_q_string_with_delims () {
-        const string delims ("I;Insist,On/a-Delimiter");
+    private void on_tokenize_q_string_with_delims () {
+        const string delims = "I;Insist,On/a-Delimiter";
         QStringTokenizer tokenizer = new QStringTokenizer (delims, ";,/-");
         tokenizer.set_return_delimiters (true);
 
@@ -120,15 +118,15 @@ class TestTokenizer : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void reset_tokenizer () {
+    private void on_reset_tokenizer () {
         for (int i = 0; i < 2; i++) {
-            QStringTokenizer tokenizer = new QStringTokenizer (simple, " ");
+            QStringTokenizer tokenizer = new QStringTokenizer (SIMPLE, " ");
 
             QCOMPARE (tokenizer.has_next (), true);
             QCOMPARE (tokenizer.next (), "A");
 
             QCOMPARE (tokenizer.has_next (), true);
-            QCOMPARE (tokenizer.next (), "simple");
+            QCOMPARE (tokenizer.next (), "SIMPLE");
 
             QCOMPARE (tokenizer.has_next (), true);
             QCOMPARE (tokenizer.next (), "tokenizer");
@@ -144,6 +142,3 @@ class TestTokenizer : GLib.Object {
 
     // ### GLib.ByteArray, other types
 }
-
-QTEST_APPLESS_MAIN (TestTokenizer)
-

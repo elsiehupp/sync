@@ -55,7 +55,7 @@ Simple class diagram of the updater:
 @brief Class that uses an own_cloud proprietary XML format to fetch update information
 @ingroup gui
 ***********************************************************/
-class OCUpdater : Updater {
+public class OCUpdater : Updater {
 
     /***********************************************************
     ***********************************************************/

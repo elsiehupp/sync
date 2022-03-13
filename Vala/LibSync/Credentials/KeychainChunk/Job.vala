@@ -19,7 +19,7 @@ namespace KeychainChunk {
 /***********************************************************
 @brief : Abstract base class for KeychainChunk jobs.
 ***********************************************************/
-class Job : GLib.Object {
+public class Job : GLib.Object {
 
     // We don't support insecure fallback
     // const bool KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK = true;

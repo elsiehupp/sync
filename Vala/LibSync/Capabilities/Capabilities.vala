@@ -21,7 +21,7 @@ namespace LibSync {
 server
 @ingroup libsync
 ***********************************************************/
-class Capabilities : GLib.Object {
+public class Capabilities : GLib.Object {
 
     public enum PushNotificationType {
         NONE = 0,

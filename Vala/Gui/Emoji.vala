@@ -7,7 +7,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 namespace Occ {
 namespace Ui {
 
-class Emoji : GLib.Object {
+public class Emoji : GLib.Object {
 
     string unicode;
     string shortname;

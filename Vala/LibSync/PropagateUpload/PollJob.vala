@@ -14,7 +14,7 @@ If the server replies
 replies with an etag.
 @ingroup libsync
 ***********************************************************/
-class PollJob : AbstractNetworkJob {
+public class PollJob : AbstractNetworkJob {
 
     SyncJournalDb journal;
     string local_path;

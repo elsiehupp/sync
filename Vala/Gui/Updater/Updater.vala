@@ -12,7 +12,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 namespace Occ {
 namespace Ui {
 
-class Updater : GLib.Object {
+public class Updater : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

@@ -6,7 +6,7 @@ implied, as to its usefulness for any purpose.
 
 namespace Testing {
 
-class PathComponents : string[] {
+public class PathComponents : string[] {
 
     /***********************************************************
     ***********************************************************/

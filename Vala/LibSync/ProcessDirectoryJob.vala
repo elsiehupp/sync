@@ -38,7 +38,7 @@ the job is finished.
 
 Results are fed outwards via the DiscoveryPhase.item_discovered () signal.
 ***********************************************************/
-class ProcessDirectoryJob : GLib.Object {
+public class ProcessDirectoryJob : GLib.Object {
 
     //  struct PathTuple;
 

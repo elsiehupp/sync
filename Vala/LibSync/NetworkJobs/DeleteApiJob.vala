@@ -15,7 +15,7 @@ See Nextcloud API usage for the possible DELETE requests.
 
 This does not* delete files, it does a http request.
 ***********************************************************/
-class DeleteApiJob : AbstractNetworkJob {
+public class DeleteApiJob : AbstractNetworkJob {
 
     signal void signal_result (int http_code);
 

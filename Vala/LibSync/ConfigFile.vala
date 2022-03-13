@@ -34,7 +34,7 @@ namespace LibSync {
 @brief The ConfigFile class
 @ingroup libsync
 ***********************************************************/
-class ConfigFile : GLib.Object {
+public class ConfigFile : GLib.Object {
 
     //  Q_GLOBAL_STATIC (string, g_config_filename)
 

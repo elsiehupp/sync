@@ -51,7 +51,7 @@ int item_successfully_completed_get_rank (ItemCompletedSpy spy, string path) {
     return -1;
 }
 
-class TestSyncEngine : GLib.Object {
+public class TestSyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

@@ -12,7 +12,7 @@ namespace LibSync {
 @brief Propagate a directory, and all its sub entries.
 @ingroup libsync
 ***********************************************************/
-class PropagateDirectory : PropagatorJob {
+public class PropagateDirectory : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/

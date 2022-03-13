@@ -10,7 +10,7 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 namespace Occ {
 namespace LibSync {
 
-class PropagateRemoteCeleteEncrypted : AbstractPropagateRemoteDeleteEncrypted {
+public class PropagateRemoteCeleteEncrypted : AbstractPropagateRemoteDeleteEncrypted {
 
     /***********************************************************
     ***********************************************************/

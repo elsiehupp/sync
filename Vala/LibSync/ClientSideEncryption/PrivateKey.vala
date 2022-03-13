@@ -5,7 +5,7 @@ namespace LibSync {
 Simple classes for safe (RAII) handling of OpenSSL
 data structures
 ***********************************************************/
-class PrivateKey : GLib.Object {
+public class PrivateKey : GLib.Object {
 
     //  private Q_DISABLE_COPY (PrivateKey)
 

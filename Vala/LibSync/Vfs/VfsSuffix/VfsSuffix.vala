@@ -9,7 +9,7 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 namespace Occ {
 namespace LibSync {
 
-class VfsSuffix : Vfs {
+public class VfsSuffix : Vfs {
 
     /***********************************************************
     ***********************************************************/

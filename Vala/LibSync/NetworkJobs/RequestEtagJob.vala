@@ -11,7 +11,7 @@ namespace LibSync {
 /***********************************************************
 @brief The RequestEtagJob class
 ***********************************************************/
-class RequestEtagJob : AbstractNetworkJob {
+public class RequestEtagJob : AbstractNetworkJob {
 
     signal void on_signal_etag_retrieved (GLib.ByteArray etag, GLib.DateTime time);
     signal void finished_with_result (HttpResult<GLib.ByteArray> etag);

@@ -1,7 +1,7 @@
 namespace Occ {
 namespace LibSync {
 
-class FolderMetadata : GLib.Object {
+public class FolderMetadata : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

@@ -21,7 +21,7 @@ namespace Ui {
 @brief The AccountManager class
 @ingroup gui
 ***********************************************************/
-class AccountManager : GLib.Object {
+public class AccountManager : GLib.Object {
 
     private const string URL_C = "url";
     private const string AUTH_TYPE_C = "auth_type";

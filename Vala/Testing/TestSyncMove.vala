@@ -72,7 +72,7 @@ bool expect_and_wipe_conflict (FileModifier local, FileInfo state, string path) 
     return false;
 }
 
-class TestSyncMove : GLib.Object {
+public class TestSyncMove : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

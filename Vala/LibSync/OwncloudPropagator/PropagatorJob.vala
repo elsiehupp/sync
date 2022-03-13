@@ -16,7 +16,7 @@ If it is a composite job, it then inherits from PropagateDirectory
 
 @ingroup libsync
 ***********************************************************/
-class PropagatorJob : GLib.Object {
+public class PropagatorJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

@@ -4,7 +4,7 @@ SPDX-FileCopyrightText : 2019 Marco Martin <mart@kde.org>
 LGPL-2.0-or-later
 ***********************************************************/
 
-class GlobalWheelFilter : GLib.Object {
+public class GlobalWheelFilter : GLib.Object {
 
 
     /***********************************************************
@@ -95,7 +95,7 @@ class GlobalWheelFilter : GLib.Object {
                 if (handler.m_scroll_flickable_target) {
                     should_scroll_flickable = true;
                 }
-                /* emit */ handler.wheel (&m_wheel_event);
+                /* emit */ handler.signal_wheel (&m_wheel_event);
             }
 
             if (should_scroll_flickable && !m_wheel_event.is_accepted ()) {

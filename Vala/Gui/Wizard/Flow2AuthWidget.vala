@@ -9,7 +9,7 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 namespace Occ {
 namespace Ui {
 
-class Flow2AuthWidget : Gtk.Widget {
+public class Flow2AuthWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/

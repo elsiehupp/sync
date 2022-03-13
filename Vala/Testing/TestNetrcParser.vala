@@ -10,7 +10,7 @@ using Occ;
 
 namespace Testing {
 
-class TestNetrcParser : GLib.Object {
+public class TestNetrcParser : GLib.Object {
 
     const string testfile_c = "netrctest";
     const string testfile_with_default_c = "netrctest_default";

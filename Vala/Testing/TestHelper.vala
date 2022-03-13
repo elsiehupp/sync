@@ -2,7 +2,7 @@
 
 namespace Testing {
 
-class HttpCredentialsTest : Occ.HttpCredentials {
+public class HttpCredentialsTest : Occ.HttpCredentials {
 
     /***********************************************************
     ***********************************************************/

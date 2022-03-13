@@ -14,7 +14,7 @@
 namespace Occ {
 namespace Ui {
 
-class UserModel : QAbstractListModel {
+public class UserModel : QAbstractListModel {
 
     public enum UserRoles {
         NAME = Qt.USER_ROLE + 1,

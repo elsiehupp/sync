@@ -11,7 +11,7 @@ using Occ;
 
 namespace Testing {
 
-class TestOAuth : GLib.Object {
+public class TestOAuth : GLib.Object {
 
     const GLib.Uri s_oauth_test_server = new GLib.Uri ("oauthtest://someserver/owncloud");
 

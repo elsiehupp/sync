@@ -15,7 +15,7 @@
 namespace Occ {
 namespace LibSync {
 
-class OcsProfileConnector : GLib.Object {
+public class OcsProfileConnector : GLib.Object {
 
     private unowned Account account;
     private Hovercard current_hovercard;

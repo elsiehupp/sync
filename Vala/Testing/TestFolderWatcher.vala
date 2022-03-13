@@ -11,7 +11,7 @@ namespace Testing {
 
 using Occ;
 
-class TestFolderWatcher : GLib.Object {
+public class TestFolderWatcher : GLib.Object {
 
     QTemporaryDir root;
     string root_path;

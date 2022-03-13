@@ -10,7 +10,7 @@ using Occ;
 
 namespace Testing {
 
-class TestSyncFileStatusTracker : GLib.Object {
+public class TestSyncFileStatusTracker : GLib.Object {
 
     void verify_that_push_matches_pull (FakeFolder fake_folder, StatusPushSpy status_spy) {
         string root = fake_folder.local_path ();

@@ -51,7 +51,7 @@ static void set_chunk_size (SyncEngine engine, int64 size) {
     engine.set_sync_options (options);
 }
 
-class TestChunkingNG : GLib.Object {
+public class TestChunkingNG : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

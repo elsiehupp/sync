@@ -11,7 +11,7 @@ namespace LibSync {
 @brief The GETEncryptedFileJob class that provides file decryption on the fly while the download is running
 @ingroup libsync
 ***********************************************************/
-class GETEncryptedFileJob : GETFileJob {
+public class GETEncryptedFileJob : GETFileJob {
 
     /***********************************************************
     ***********************************************************/

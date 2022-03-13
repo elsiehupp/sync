@@ -12,7 +12,7 @@ namespace KeychainChunk {
 @brief : Simple wrapper class for QKeychain.WritePasswordJob,
 splits too large keychain entry's data into chunks on Windows
 ***********************************************************/
-class WriteJob : KeychainChunk.Job {
+public class WriteJob : KeychainChunk.Job {
 
     signal void signal_finished (KeychainChunk.WriteJob incoming_job);
 

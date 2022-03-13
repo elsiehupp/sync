@@ -12,7 +12,7 @@ namespace KeychainChunk {
 @brief : Simple wrapper class for QKeychain.ReadPasswordJob,
 splits too large keychain entry's data into chunks on Windows
 ***********************************************************/
-class ReadJob : KeychainChunk.Job {
+public class ReadJob : KeychainChunk.Job {
 
     /***********************************************************
     true if we haven't done yet any reading from keychain

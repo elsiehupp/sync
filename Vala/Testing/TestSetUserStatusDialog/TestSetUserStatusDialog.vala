@@ -10,7 +10,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 namespace Testing {
 
-class TestSetUserStatusDialog : GLib.Object {
+public class TestSetUserStatusDialog : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

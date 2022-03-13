@@ -24,7 +24,7 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 //  #include <QScopedPointer>
 //  #include <QDir>
 //  #include <QApplication>
-//  #include <QLocal_socket>
+//  #include <QLocalSocket>
 //  #include <QString_builder>
 //  #include <QMessageBox>
 //  #include <QInputDialog>
@@ -40,7 +40,7 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 //  #include <QProcess>
 //  #include <QStandardPaths>
 
-//  #include <QLocal_server>
+//  #include <QLocalServer>
 
 namespace Occ {
 namespace Ui {
@@ -49,9 +49,9 @@ namespace Ui {
 @brief The SocketApi class
 @ingroup gui
 ***********************************************************/
-class SocketApi : GLib.Object {
+public class SocketApi : GLib.Object {
 
-    class SocketApiServer : QLocal_server { }
+    class SocketApiServer : QLocalServer { }
 
     /***********************************************************
     ***********************************************************/

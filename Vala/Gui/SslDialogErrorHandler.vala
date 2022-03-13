@@ -11,7 +11,7 @@ namespace Ui {
 @brief The SslDialogErrorHandler class
 @ingroup gui
 ***********************************************************/
-class SslDialogErrorHandler : AbstractSslErrorHandler {
+public class SslDialogErrorHandler : AbstractSslErrorHandler {
 
     /***********************************************************
     ***********************************************************/

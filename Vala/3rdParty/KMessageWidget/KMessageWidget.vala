@@ -80,7 +80,7 @@ Example of acceptable uses:
 @author Aurélien Gâteau <agateau@kde.org>
 @since 4.7
 ***********************************************************/
-class KMessageWidget : QFrame {
+public class KMessageWidget : QFrame {
 
     //  Q_PROPERTY (string text READ text WRITE on_set_text)
     //  Q_PROPERTY (bool word_wrap READ word_wrap WRITE set_word_wrap)

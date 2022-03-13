@@ -2,7 +2,7 @@
 namespace Occ {
 namespace Ui {
 
-class UserAppsModel : QAbstractListModel {
+public class UserAppsModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/

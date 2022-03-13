@@ -10,7 +10,7 @@ using Occ;
 
 namespace Testing {
 
-class TestCookies : GLib.Object {
+public class TestCookies : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

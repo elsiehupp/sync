@@ -13,7 +13,7 @@ namespace Ui {
 Don't pull the share manager into socketapi unittests
 #ifndef OWNCLOUD_TEST
 ***********************************************************/
-class GetOrCreatePublicLinkShare : GLib.Object {
+public class GetOrCreatePublicLinkShare : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

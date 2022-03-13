@@ -6,7 +6,7 @@ implied, as to its usefulness for any purpose.
 
 namespace Testing {
 
-class ItemCompletedSpy : QSignalSpy {
+public class ItemCompletedSpy : QSignalSpy {
 
     ItemCompletedSpy (FakeFolder folder) {
         base (&folder.sync_engine (), &Occ.SyncEngine.item_completed);

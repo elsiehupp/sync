@@ -25,7 +25,7 @@ namespace Ui {
 @brief The SelectiveSyncDialog class
 @ingroup gui
 ***********************************************************/
-class SelectiveSyncDialog : Gtk.Dialog {
+public class SelectiveSyncDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/

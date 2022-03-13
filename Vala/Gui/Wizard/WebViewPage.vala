@@ -8,7 +8,7 @@
 namespace Occ {
 namespace Ui {
 
-class WebViewPage : AbstractCredentialsWizardPage {
+public class WebViewPage : AbstractCredentialsWizardPage {
 
     /***********************************************************
     ***********************************************************/

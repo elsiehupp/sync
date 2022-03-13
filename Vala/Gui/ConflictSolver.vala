@@ -10,7 +10,7 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 namespace Occ {
 namespace Ui {
 
-class ConflictSolver : GLib.Object {
+public class ConflictSolver : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

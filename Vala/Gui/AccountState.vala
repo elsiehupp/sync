@@ -23,7 +23,7 @@ namespace Ui {
 @brief Extra info about an own_cloud server account.
 @ingroup gui
 ***********************************************************/
-class AccountState : GLib.Object /*, QSharedData*/ {
+public class AccountState : GLib.Object /*, QSharedData*/ {
 
     class AccountAppList : GLib.List<AccountApp> { }
 

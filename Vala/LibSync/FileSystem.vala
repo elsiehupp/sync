@@ -25,7 +25,7 @@ namespace LibSync {
  \addtogroup libsync
  @{
 ***********************************************************/
-class FileSystem : GLib.Object {
+public class FileSystem : GLib.Object {
 
     /***********************************************************
     @brief compare two files with given filename and return true if they have the same content

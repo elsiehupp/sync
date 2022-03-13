@@ -6,7 +6,7 @@ using Soup.Reply.set_attribute;
 
 namespace Testing {
 
-class FakeErrorReply : FakeReply {
+public class FakeErrorReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/

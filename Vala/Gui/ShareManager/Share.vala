@@ -7,7 +7,7 @@ Copyright (C) by Roeland Jago Douma <rullzer@owncloud.com>
 namespace Occ {
 namespace Ui {
 
-class Share : GLib.Object {
+public class Share : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

@@ -11,7 +11,7 @@ using Occ;
 
 namespace Testing {
 
-class TestAsyncOp : GLib.Object {
+public class TestAsyncOp : GLib.Object {
 
     // This test is made of several testcases.
     // the test_cases maps a filename to a couple of callback.

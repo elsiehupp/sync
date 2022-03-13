@@ -13,7 +13,7 @@ namespace LibSync {
 @brief The MoveJob class
 @ingroup libsync
 ***********************************************************/
-class MoveJob : AbstractNetworkJob {
+public class MoveJob : AbstractNetworkJob {
 
     const string destination;
 

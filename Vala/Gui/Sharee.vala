@@ -15,7 +15,7 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 namespace Occ {
 namespace Ui {
 
-class Sharee : GLib.Object {
+public class Sharee : GLib.Object {
 
     /***********************************************************
     Keep in sync with Share.Type

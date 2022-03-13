@@ -23,7 +23,7 @@ The received GLib.HashTable<string, GLib.Variant> is null in case of error
 
 @ingroup libsync
 ***********************************************************/
-class JsonApiJob : AbstractNetworkJob {
+public class JsonApiJob : AbstractNetworkJob {
 
     const int NOT_MODIFIED_STATUS_CODE = 304;
 

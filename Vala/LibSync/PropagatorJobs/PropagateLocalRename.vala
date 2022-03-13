@@ -12,7 +12,7 @@ namespace LibSync {
 @brief The PropagateLocalRename class
 @ingroup libsync
 ***********************************************************/
-class PropagateLocalRename : PropagateItemJob {
+public class PropagateLocalRename : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/

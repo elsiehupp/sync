@@ -51,7 +51,7 @@ ownCloud Server
 The Account has a name and url. It also has information
 about credentials, SSL errors and certificates.
 ***********************************************************/
-class Account : GLib.Object {
+public class Account : GLib.Object {
 
     const string app_password = "app-password";
 

@@ -18,7 +18,7 @@ namespace Ui {
 their credentials
 @ingroup gui
 ***********************************************************/
-class AuthenticationDialog : Gtk.Dialog {
+public class AuthenticationDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/

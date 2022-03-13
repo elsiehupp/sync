@@ -12,7 +12,7 @@ using Occ;
 
 namespace Testing {
 
-class TestDownload : GLib.Object {
+public class TestDownload : GLib.Object {
 
     const int64 STOP_AFTER = 3123668;
 

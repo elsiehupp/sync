@@ -8,7 +8,7 @@ using Occ;
 
 namespace Testing {
 
-class FakePostReply : Soup.Reply {
+public class FakePostReply : Soup.Reply {
 
     /***********************************************************
     ***********************************************************/

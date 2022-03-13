@@ -19,7 +19,7 @@ namespace Ui {
 @brief The SyncRunFileLog class
 @ingroup gui
 ***********************************************************/
-class SyncRunFileLog : GLib.Object {
+public class SyncRunFileLog : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

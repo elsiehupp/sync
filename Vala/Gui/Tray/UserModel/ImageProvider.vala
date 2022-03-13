@@ -2,7 +2,7 @@
 namespace Occ {
 namespace Ui {
 
-class ImageProvider : QQuickImageProvider {
+public class ImageProvider : QQuickImageProvider {
 
     /***********************************************************
     ***********************************************************/

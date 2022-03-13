@@ -25,7 +25,7 @@ namespace Ui {
 @brief The Folder class
 @ingroup gui
 ***********************************************************/
-class Folder : GLib.Object {
+public class Folder : GLib.Object {
 
     class Map : GLib.HashMap<string, Folder> { }
     class MapIterator : QMapIterator<string, Folder> { }

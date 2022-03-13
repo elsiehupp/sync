@@ -19,7 +19,7 @@ namespace LibSync {
 
 Propagation job, impementing the old chunking agorithm
 ***********************************************************/
-class PropagateUploadFileV1 : PropagateUploadFileCommon {
+public class PropagateUploadFileV1 : PropagateUploadFileCommon {
 
     /***********************************************************
     That's the on_signal_start chunk that was stored in the database for resuming.

@@ -39,7 +39,7 @@ A folder is scheduled if:
   (this.time_scheduler and on_signal_schedule_folder_by_time ()
    and Folder.on_signal_sync_finished ())
 ***********************************************************/
-class FolderMan : GLib.Object {
+public class FolderMan : GLib.Object {
 
     private const string VERSION_C = "version";
     const int MAX_FOLDERS_VERSION = 1;

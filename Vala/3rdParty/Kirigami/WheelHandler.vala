@@ -17,52 +17,7 @@ SPDX-License-Identifier : LGPL-2.0-or-later
 This class intercepts the mouse wheel events of its target, and gives them to the user code as a signal, which can be used for custom mouse wheel management code.
 The handler can block completely the wheel events from its target, and if it's a Flickable, it can automatically handle scrolling on it
 ***********************************************************/
-class WheelHandler : GLib.Object {
-
-    /***********************************************************
-    target : Item
-
-    The target we want to manage wheel events.
-    We will receive wheel () signals every time the user
-    the mouse wheel (or scrolls with the touchpad) on top
-    of that item.
-    ***********************************************************/
-    //  Q_PROPERTY (QQuickItem target READ target WRITE set_target NOTIFY target_changed)
-
-    /***********************************************************
-    block_target_wheel : bool
-
-    If true, the target won't receive any wheel event at all (default true)
-    ***********************************************************/
-    //  Q_PROPERTY (bool block_target_wheel MEMBER m_block_target_wheel NOTIFY block_target_wheel_changed)
-
-    /***********************************************************
-    scroll_flickable_target : bool
-    If this property is true and the target is a Flickable, wheel events will cause the Flickable to scroll (default true)
-    ***********************************************************/
-    //  Q_PROPERTY (bool scroll_flickable_target MEMBER m_scroll_flickable_target NOTIFY scroll_flickable_target_changed)
-
-
-    /***********************************************************
-    ***********************************************************/
-    public WheelHandler (GLib.Object parent = new GLib.Object ());
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    public void set_target (QQuickItem target);
-
-signals:
-    void target_changed ();
-    void block_target_wheel_changed ();
-    void scroll_flickable_target_changed ();
-    void wheel (KirigamiWheelEvent wheel);
-
+public class WheelHandler : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
@@ -73,21 +28,54 @@ signals:
 
     /***********************************************************
     ***********************************************************/
-    private friend class GlobalWheelFilter;
-}
+    //  private friend class GlobalWheelFilter;
+
+    signal void signal_target_changed ();
+    signal void signal_block_target_wheel_changed ();
+    signal void signal_scroll_flickable_target_changed ();
+    signal void signal_wheel (KirigamiWheelEvent wheel);
+
+    /***********************************************************
+    target : Item
+
+    The target we want to manage wheel events.
+    We will receive signal_wheel () signals every time the user
+    the mouse signal_wheel (or scrolls with the touchpad) on top
+    of that item.
+    ***********************************************************/
+    //  Q_PROPERTY (QQuickItem target READ target WRITE set_target NOTIFY signal_target_changed)
+
+    /***********************************************************
+    block_target_wheel : bool
+
+    If true, the target won't receive any wheel event at all (default true)
+    ***********************************************************/
+    //  Q_PROPERTY (bool block_target_wheel MEMBER m_block_target_wheel NOTIFY signal_block_target_wheel_changed)
+
+    /***********************************************************
+    scroll_flickable_target : bool
+    If this property is true and the target is a Flickable, wheel events will cause the Flickable to scroll (default true)
+    ***********************************************************/
+    //  Q_PROPERTY (bool scroll_flickable_target MEMBER m_scroll_flickable_target NOTIFY signal_scroll_flickable_target_changed)
 
 
-    WheelHandler.WheelHandler (GLib.Object parent) {
+    /***********************************************************
+    ***********************************************************/
+    public WheelHandler (GLib.Object parent = new GLib.Object ()) {
         base (parent);
     }
 
-    WheelHandler.~WheelHandler () = default;
 
-    QQuickItem *WheelHandler.target () {
+    /***********************************************************
+    ***********************************************************/
+    public QQuickItem target () {
         return m_target;
     }
 
-    void WheelHandler.set_target (QQuickItem target) {
+
+    /***********************************************************
+    ***********************************************************/
+    public void set_target (QQuickItem target) {
         if (m_target == target) {
             return;
         }
@@ -100,8 +88,7 @@ signals:
 
         GlobalWheelFilter.self ().set_item_handler_association (target, this);
 
-        /* emit */ target_changed ();
+        /* emit */ signal_target_changed ();
     }
 
-    #include "moc_wheelhandler.cpp"
-    
+}

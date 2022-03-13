@@ -15,7 +15,7 @@ for Discovery
 
 @ingroup libsync
 ***********************************************************/
-class DiscoverySingleLocalDirectoryJob : GLib.Object /*, QRunnable*/ {
+public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, QRunnable*/ {
 
     /***********************************************************
     ***********************************************************/

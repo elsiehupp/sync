@@ -25,7 +25,7 @@ namespace Ui {
 @brief Open the file manager with the specified file pre-selected
 @ingroup gui
 ***********************************************************/
-class OpenFileManager {
+public class OpenFileManager {
 
     static string default_manager;
     static string name;

@@ -30,7 +30,7 @@ namespace Ui {
 @brief The FolderWizard class
 @ingroup gui
 ***********************************************************/
-class FolderWizard : QWizard {
+public class FolderWizard : QWizard {
 
     /***********************************************************
     ***********************************************************/

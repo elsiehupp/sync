@@ -23,7 +23,7 @@ namespace Ui {
 @brief The HttpCredentialsGui class
 @ingroup gui
 ***********************************************************/
-class HttpCredentialsGui : HttpCredentials {
+public class HttpCredentialsGui : HttpCredentials {
 
     /***********************************************************
     ***********************************************************/

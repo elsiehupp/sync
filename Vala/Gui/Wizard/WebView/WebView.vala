@@ -19,7 +19,7 @@
 namespace Occ {
 namespace Ui {
 
-class WebView : Gtk.Widget {
+public class WebView : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/

@@ -19,7 +19,7 @@ namespace Ui {
 @brief The SslButton class
 @ingroup gui
 ***********************************************************/
-class SslButton : QToolButton {
+public class SslButton : QToolButton {
 
     /***********************************************************
     ***********************************************************/

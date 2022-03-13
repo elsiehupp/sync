@@ -12,7 +12,7 @@ using Occ;
 
 namespace Testing {
 
-class TestRemoteWipe : GLib.Object {
+public class TestRemoteWipe : GLib.Object {
 
     // TODO
     private void test_wipe () {

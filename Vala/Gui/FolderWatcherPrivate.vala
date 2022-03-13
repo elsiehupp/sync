@@ -17,7 +17,7 @@ namespace Ui {
 @brief Linux (inotify) API implementation of FolderWatcher
 @ingroup gui
 ***********************************************************/
-class FolderWatcherPrivate : GLib.Object {
+public class FolderWatcherPrivate : GLib.Object {
 
     /***********************************************************
     On linux the watcher is ready when the ctor finished.

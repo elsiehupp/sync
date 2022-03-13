@@ -14,7 +14,7 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 namespace Occ {
 namespace Ui {
 
-class ConflictDialog : Gtk.Dialog {
+public class ConflictDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/

@@ -21,7 +21,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 namespace Occ {
 namespace LibSync {
 
-class OcsUserStatusConnector : UserStatusConnector {
+public class OcsUserStatusConnector : UserStatusConnector {
 
     const string BASE_URL = "/ocs/v2.php/apps/user_status/api/v1";
     const string USER_STATUS_BASE_URL = BASE_URL + "/user_status";

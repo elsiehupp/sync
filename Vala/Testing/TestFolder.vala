@@ -10,7 +10,7 @@ using Occ;
 
 namespace Testing {
 
-class TestFolder : GLib.Object {
+public class TestFolder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

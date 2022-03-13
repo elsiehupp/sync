@@ -22,7 +22,7 @@ namespace Ui {
 
 Simple list model to provide the list view with data.
 ***********************************************************/
-class ActivityListModel : QAbstractListModel {
+public class ActivityListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
@@ -317,11 +317,11 @@ class ActivityListModel : QAbstractListModel {
                 if (!local_files.empty ()) {
                     return local_files.const_first ();
                 } else {
-                    GLib.warn ("File not local folders while processing absolute path request.");
+                    GLib.warning ("File not local folders while processing absolute path request.");
                     return "";
                 }
             } else {
-                GLib.warn ("Received an absolute path request for an activity without a file path.");
+                GLib.warning ("Received an absolute path request for an activity without a file path.");
                 return "";
             }
         }

@@ -12,7 +12,7 @@ namespace LibSync {
 @brief Job that wait for all the poll jobs to be completed
 @ingroup libsync
 ***********************************************************/
-class CleanupPollsJob : GLib.Object {
+public class CleanupPollsJob : GLib.Object {
     GLib.List<SyncJournalDb.PollInfo> poll_infos;
     unowned Account account;
     SyncJournalDb journal;

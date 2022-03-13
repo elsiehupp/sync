@@ -10,7 +10,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 namespace Testing {
 
-class TestPushNotifications : GLib.Object {
+public class TestPushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

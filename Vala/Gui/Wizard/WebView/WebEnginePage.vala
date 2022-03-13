@@ -3,7 +3,7 @@
 namespace Occ {
 namespace Ui {
 
-class WebEnginePage : QWebEnginePage {
+public class WebEnginePage : QWebEnginePage {
 
     /***********************************************************
     ***********************************************************/

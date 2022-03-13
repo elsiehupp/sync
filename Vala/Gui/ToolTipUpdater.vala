@@ -25,7 +25,7 @@ To accomplish that, the event_filter () stores the tooltip's position
 and the on_signal_data_changed () slot updates the tooltip if Qt.ToolTipRole
 gets updated while a tooltip is shown.
 ***********************************************************/
-class ToolTipUpdater : GLib.Object {
+public class ToolTipUpdater : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

@@ -14,7 +14,7 @@ namespace Ui {
 @brief The OwncloudConnectionMethodDialog class
 @ingroup gui
 ***********************************************************/
-class OwncloudConnectionMethodDialog : Gtk.Dialog {
+public class OwncloudConnectionMethodDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/

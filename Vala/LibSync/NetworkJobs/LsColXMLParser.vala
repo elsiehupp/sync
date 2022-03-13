@@ -12,7 +12,7 @@ namespace LibSync {
 @brief The LsColJob class
 @ingroup libsync
 ***********************************************************/
-class LsColXMLParser : GLib.Object {
+public class LsColXMLParser : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

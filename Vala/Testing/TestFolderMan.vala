@@ -12,7 +12,7 @@ using Occ;
 
 namespace Testing {
 
-class TestFolderMan : GLib.Object {
+public class TestFolderMan : GLib.Object {
 
     FolderMan folder_manager;
 

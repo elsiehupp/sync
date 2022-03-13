@@ -13,7 +13,7 @@ namespace Ui {
 @brief The HttpCredentialsGui namespace
 @ingroup gui
 ***********************************************************/
-class CredentialsFactory {
+public class CredentialsFactory {
 
     public static AbstractCredentials create (string type) {
         // empty string might happen for old version of configuration

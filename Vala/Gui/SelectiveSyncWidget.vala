@@ -11,7 +11,7 @@ namespace Ui {
 @brief The SelectiveSyncWidget contains a folder tree with labels
 @ingroup gui
 ***********************************************************/
-class SelectiveSyncWidget : Gtk.Widget {
+public class SelectiveSyncWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private string folder_path;

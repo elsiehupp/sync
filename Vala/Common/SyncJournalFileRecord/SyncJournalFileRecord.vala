@@ -10,7 +10,7 @@ namespace Occ {
 @brief The SyncJournalFileRecord class
 @ingroup libsync
 ***********************************************************/
-class SyncJournalFileRecord {
+public class SyncJournalFileRecord {
 
     /***********************************************************
     ***********************************************************/

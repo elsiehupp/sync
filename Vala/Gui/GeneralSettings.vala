@@ -29,7 +29,7 @@ namespace Ui {
 @brief The GeneralSettings class
 @ingroup gui
 ***********************************************************/
-class GeneralSettings : Gtk.Widget {
+public class GeneralSettings : Gtk.Widget {
 
     class ZipEntry {
 

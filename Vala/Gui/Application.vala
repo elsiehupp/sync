@@ -35,7 +35,7 @@ namespace Ui {
 @brief The Application class
 @ingroup gui
 ***********************************************************/
-class Application : Gtk.Application {
+public class Application : Gtk.Application {
 
     /***********************************************************
     ***********************************************************/
@@ -280,7 +280,7 @@ class Application : Gtk.Application {
 
         this.folder_manager.on_signal_reset (new FolderMan ());
 
-        connect (this, SharedTools.QtSingleApplication.message_received, this, Application.on_signal_parse_message);
+        connect (this, SharedTools.QtSingleApplication.signal_message_received, this, Application.on_signal_parse_message);
 
         if (!AccountManager.instance ().restore ()) {
             // If there is an error reading the account settings, try again
@@ -499,12 +499,12 @@ class Application : Gtk.Application {
     public void on_signal_open_virtual_file (string filename) {
         string virtual_file_ext = APPLICATION_DOTVIRTUALFILE_SUFFIX;
         if (!filename.ends_with (virtual_file_ext)) {
-            GLib.warn ("Can only handle file ending in .owncloud. Unable to open " + filename);
+            GLib.warning ("Can only handle file ending in .owncloud. Unable to open " + filename);
             return;
         }
         var folder = FolderMan.instance ().folder_for_path (filename);
         if (!folder) {
-            GLib.warn ("Can't find sync folder for " + filename);
+            GLib.warning ("Can't find sync folder for " + filename);
             // TODO: show a QMessageBox for errors
             return;
         }

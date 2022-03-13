@@ -7,7 +7,7 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 namespace Occ {
 namespace LibSync {
 
-class DummyCredentials : AbstractCredentials {
+public class DummyCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/

@@ -13,7 +13,7 @@ namespace Ui {
 @brief The FolderStatusView class
 @ingroup gui
 ***********************************************************/
-class FolderStatusView : QTreeView {
+public class FolderStatusView : QTreeView {
 
     /***********************************************************
     ***********************************************************/

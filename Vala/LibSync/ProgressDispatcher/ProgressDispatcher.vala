@@ -24,7 +24,7 @@ Just connect to the two signals either to progress for every individual file
 or the overall sync progress.
 
 ***********************************************************/
-class ProgressDispatcher : GLib.Object {
+public class ProgressDispatcher : GLib.Object {
 
     //  friend class Folder; // only allow Folder class to access the setting slots.
 

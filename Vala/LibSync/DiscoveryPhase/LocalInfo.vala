@@ -9,7 +9,7 @@ using CSync;
 namespace Occ {
 namespace LibSync {
 
-class LocalInfo : GLib.Object {
+public class LocalInfo : GLib.Object {
     /***********************************************************
     FileName of the entry (this does not contains any directory
     or path, just the plain name)

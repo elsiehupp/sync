@@ -28,7 +28,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 namespace Testing {
 
-class CheckVioExt {
+public class CheckVioExt {
 
     const int WD_BUFFER_SIZE = 255;
 

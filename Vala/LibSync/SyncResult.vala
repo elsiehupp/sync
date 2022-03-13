@@ -11,7 +11,7 @@ namespace LibSync {
 @brief The SyncResult class
 @ingroup libsync
 ***********************************************************/
-class SyncResult : GLib.Object {
+public class SyncResult : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

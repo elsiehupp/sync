@@ -13,7 +13,7 @@ namespace Ui {
 @brief The LegalNotice class
 @ingroup gui
 ***********************************************************/
-class LegalNotice : Gtk.Dialog {
+public class LegalNotice : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/

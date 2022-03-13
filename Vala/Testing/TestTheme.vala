@@ -8,7 +8,7 @@ Copyright (C) 2021 by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 namespace Testing {
 
-class TestTheme : GLib.Object {
+public class TestTheme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

@@ -5,7 +5,7 @@
 namespace Occ {
 namespace LibSync {
 
-class WordList : GLib.Object {
+public class WordList : GLib.Object {
 
     public static string[] get_random_words (int nr) {
         string[] word_list = {

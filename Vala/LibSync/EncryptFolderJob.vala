@@ -9,7 +9,7 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 namespace Occ {
 namespace LibSync {
 
-class EncryptFolderJob : GLib.Object {
+public class EncryptFolderJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

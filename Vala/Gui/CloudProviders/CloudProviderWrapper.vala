@@ -15,7 +15,7 @@ Copyright (C) by Julius Härtl <jus@bitgrid.net>
 namespace Occ {
 namespace Ui {
 
-class CloudProviderWrapper : GLib.Object {
+public class CloudProviderWrapper : GLib.Object {
 
     static GActionEntry actions[] = {
         {

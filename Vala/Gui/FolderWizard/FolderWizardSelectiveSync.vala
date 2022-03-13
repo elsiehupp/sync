@@ -13,7 +13,7 @@ namespace Ui {
 @brief The FolderWizardSelectiveSync class
 @ingroup gui
 ***********************************************************/
-class FolderWizardSelectiveSync : QWizardPage {
+public class FolderWizardSelectiveSync : QWizardPage {
 
     /***********************************************************
     ***********************************************************/

@@ -30,7 +30,7 @@ relative to the folder that is being synced, without a starting slash.
 
 @ingroup libsync
 ***********************************************************/
-class LocalDiscoveryTracker : GLib.Object {
+public class LocalDiscoveryTracker : GLib.Object {
 
     struct SyncFileItemPtr : unowned SyncFileItem { }
 

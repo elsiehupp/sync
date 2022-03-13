@@ -29,7 +29,7 @@ namespace LibSync {
 @brief The Theme class
 @ingroup libsync
 ***********************************************************/
-class Theme : GLib.Object {
+public class Theme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

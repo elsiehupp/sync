@@ -27,7 +27,7 @@ State Machine:
                                  v
        on_signal_finalize () or abort_with_error ()  or start_poll_job ()
 ***********************************************************/
-class PropagateUploadFileCommon : PropagateItemJob {
+public class PropagateUploadFileCommon : PropagateItemJob {
 
     struct UploadStatus {
         SyncFileItem.Status status = SyncFileItem.Status.NO_STATUS;

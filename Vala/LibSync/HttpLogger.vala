@@ -13,7 +13,7 @@ using Soup;
 namespace Occ {
 namespace LibSync {
 
-class HttpLogger {
+public class HttpLogger {
 
     const int64 PEEK_SIZE = 1024 * 1024;
 

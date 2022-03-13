@@ -37,7 +37,7 @@ namespace LibSync {
 @brief The SyncEngine class
 @ingroup libsync
 ***********************************************************/
-class SyncEngine : GLib.Object {
+public class SyncEngine : GLib.Object {
 
     enum AnotherSyncNeeded {
         NO_FOLLOW_UP_SYNC,

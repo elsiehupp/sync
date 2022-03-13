@@ -11,7 +11,7 @@ namespace Occ {
 Checks whether a file's checksum matches the expected value.
 @ingroup libsync
 ***********************************************************/
-class ValidateChecksumHeader : ComputeChecksumBase {
+public class ValidateChecksumHeader : ComputeChecksumBase {
 
     /***********************************************************
     ***********************************************************/

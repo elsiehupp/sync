@@ -1,7 +1,7 @@
 
 namespace Testing {
 
-class FakeDeleteReply : FakeReply {
+public class FakeDeleteReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/

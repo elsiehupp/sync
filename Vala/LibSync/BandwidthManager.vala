@@ -17,7 +17,7 @@ namespace LibSync {
 @brief The BandwidthManager class
 @ingroup libsync
 ***********************************************************/
-class BandwidthManager : GLib.Object {
+public class BandwidthManager : GLib.Object {
 
     /***********************************************************
     For switching between absolute and relative bw limiting

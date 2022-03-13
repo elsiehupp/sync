@@ -13,7 +13,7 @@ namespace Ui {
 
 Fetching enabled apps from the OCS Apps API
 ***********************************************************/
-class OcsNavigationAppsJob : OcsJob {
+public class OcsNavigationAppsJob : OcsJob {
 
     /***********************************************************
     Result of the OCS request

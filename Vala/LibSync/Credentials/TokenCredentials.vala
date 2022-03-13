@@ -13,7 +13,7 @@ Copyright (c) by Markus Goetz <guruz@owncloud.com>
 namespace Occ {
 namespace LibSync {
 
-class TokenCredentials : AbstractCredentials {
+public class TokenCredentials : AbstractCredentials {
 
     const string AUTHENTICATION_FAILED_C = "owncloud-authentication-failed";
 

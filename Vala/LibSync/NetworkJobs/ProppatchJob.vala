@@ -17,7 +17,7 @@ WARNING : Untested!
 
 @ingroup libsync
 ***********************************************************/
-class ProppatchJob : AbstractNetworkJob {
+public class ProppatchJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/

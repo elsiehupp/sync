@@ -31,7 +31,7 @@ through the signal_path_changed () signal.
 
 @ingroup gui
 ***********************************************************/
-class FolderWatcher : GLib.Object {
+public class FolderWatcher : GLib.Object {
 
     protected GLib.HashMap<string, int> pending_pathes;
 

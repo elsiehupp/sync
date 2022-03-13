@@ -5,7 +5,7 @@ namespace LibSync {
 Simple classes for safe (RAII) handling of OpenSSL
 data structures
 ***********************************************************/
-class CipherContext : GLib.Object {
+public class CipherContext : GLib.Object {
 
     //  Q_DISABLE_COPY (CipherContext)
     private EVP_CIPHER_CTX context;

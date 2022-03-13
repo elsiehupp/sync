@@ -6,7 +6,7 @@
 namespace Occ {
 namespace Ui {
 
-class ServerNotificationHandler : GLib.Object {
+public class ServerNotificationHandler : GLib.Object {
 
     private const string NOTIFICATIONS_PATH = "ocs/v2.php/apps/notifications/api/v2/notifications";
     private const string PROPERTY_ACCOUNT_STATE = "oc_account_state";

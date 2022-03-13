@@ -3,7 +3,7 @@
 namespace Testing {
 
 // stub to prevent linker error
-class StubFolderMan : Occ.AccountManager {
+public class StubFolderMan : Occ.AccountManager {
 
     //  const QMetaObject static_meta_object = GLib.Object.static_meta_object;
 

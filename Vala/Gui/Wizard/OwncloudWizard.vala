@@ -22,7 +22,7 @@ namespace Ui {
 @brief The OwncloudWizard class
 @ingroup gui
 ***********************************************************/
-class OwncloudWizard : QWizard {
+public class OwncloudWizard : QWizard {
 
     /***********************************************************
     ***********************************************************/

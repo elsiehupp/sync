@@ -15,7 +15,7 @@ namespace Ui {
 @brief The AbstractCredentialsWizardPage class
 @ingroup gui
 ***********************************************************/
-class AbstractCredentialsWizardPage : QWizardPage {
+public class AbstractCredentialsWizardPage : QWizardPage {
 
     /***********************************************************
     ***********************************************************/

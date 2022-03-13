@@ -8,7 +8,7 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 namespace Occ {
 
 //  template <typename T>
-class Optional : Result<T, OptionalNoErrorData> {
+public class Optional : Result<T, OptionalNoErrorData> {
 
     /***********************************************************
     ***********************************************************/

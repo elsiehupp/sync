@@ -19,7 +19,7 @@ namespace LibSync {
 @brief The PutMultiFileJob class
 @ingroup libsync
 ***********************************************************/
-class PutMultiFileJob : AbstractNetworkJob {
+public class PutMultiFileJob : AbstractNetworkJob {
 
     struct SingleUploadFileData {
         std.unique_ptr<UploadDevice> device;

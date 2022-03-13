@@ -14,7 +14,7 @@ using Occ;
 
 namespace Testing {
 
-class TestClientSideEncryption : GLib.Object {
+public class TestClientSideEncryption : GLib.Object {
 
     GLib.ByteArray convert_to_old_storage_format (GLib.ByteArray data) {
         return data.split ('|').join ("fA==");

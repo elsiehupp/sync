@@ -12,7 +12,7 @@ using Occ;
 
 namespace Testing {
 
-class TestAccount : GLib.Object {
+public class TestAccount : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

@@ -18,7 +18,7 @@ QT_FORWARD_DECLARE_CLASS (QShared_memory)
 namespace SharedTools {
 
 
-class QtSingleApplication : QApplication {
+public class QtSingleApplication : QApplication {
 
     /***********************************************************
     ***********************************************************/
@@ -63,7 +63,7 @@ class QtSingleApplication : QApplication {
     public void on_activate_window ();
 
 signals:
-    void message_received (string message, GLib.Object socket);
+    void signal_message_received (string message, GLib.Object socket);
     void file_open_request (string file);
 
 
@@ -131,7 +131,7 @@ namespace SharedTools {
         const bool created = instances.create (instances_size);
         if (!created) {
             if (!instances.attach ()) {
-                q_warning () << "Failed to initialize instances shared memory: "
+                GLib.warning () << "Failed to initialize instances shared memory: "
                            << instances.error_string ();
                 delete instances;
                 instances = null;
@@ -153,7 +153,7 @@ namespace SharedTools {
         *pids = 0;
         pid_peer = new QtLocalPeer (this, app_id + '-' +
                                   string.number (QCoreApplication.application_pid ()));
-        connect (pid_peer, &QtLocalPeer.message_received, this, &QtSingleApplication.message_received);
+        connect (pid_peer, &QtLocalPeer.signal_message_received, this, &QtSingleApplication.signal_message_received);
         pid_peer.is_client ();
     }
 
@@ -215,9 +215,9 @@ namespace SharedTools {
         if (!pid_peer)
             return;
         if (activate_on_message)
-            connect (pid_peer, &QtLocalPeer.message_received, this, &QtSingleApplication.on_activate_window);
+            connect (pid_peer, &QtLocalPeer.signal_message_received, this, &QtSingleApplication.on_activate_window);
         else
-            disconnect (pid_peer, &QtLocalPeer.message_received, this, &QtSingleApplication.on_activate_window);
+            disconnect (pid_peer, &QtLocalPeer.signal_message_received, this, &QtSingleApplication.on_activate_window);
     }
 
     Gtk.Widget* QtSingleApplication.activation_window () {
