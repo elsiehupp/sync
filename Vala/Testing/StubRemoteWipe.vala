@@ -13,7 +13,7 @@ class StubRemoteWipe : Occ.AccountManager {
 
     void save (bool value) { }
 
-    Occ.AccountState add_account (AccountPointer account) {
+    Occ.AccountState add_account (unowned Account account) {
         return new Occ.AccountState (account);
     }
 
@@ -21,12 +21,12 @@ class StubRemoteWipe : Occ.AccountManager {
 
     void account_removed (Occ.AccountState state) { }
 
-    GLib.List<Occ.AccountStatePtr> accounts () {
-        return new GLib.List<Occ.AccountStatePtr> ();
+    GLib.List<Occ.unowned AccountState> accounts () {
+        return new GLib.List<Occ.unowned AccountState> ();
     }
 
-    Occ.AccountStatePtr account (string value) {
-        return AccountStatePtr ();
+    Occ.unowned AccountState account (string value) {
+        return unowned AccountState ();
     }
 
 } // class StubRemoteWipe

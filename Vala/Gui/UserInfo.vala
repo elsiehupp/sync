@@ -133,7 +133,7 @@ class UserInfo : GLib.Object {
             this.job.delete_later ();
         }
 
-        AccountPointer account = this.account_state.account ();
+        unowned Account account = this.account_state.account ();
         this.job = new JsonApiJob (account, "ocs/v1.php/cloud/user", this);
         this.job.on_signal_timeout (20 * 1000);
         connect (this.job.data (), JsonApiJob.json_received, this, UserInfo.on_signal_update_last_info);
@@ -147,7 +147,7 @@ class UserInfo : GLib.Object {
     private void on_signal_update_last_info (QJsonDocument json) {
         var obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
 
-        AccountPointer account = this.account_state.account ();
+        unowned Account account = this.account_state.account ();
 
         // User Info
         string user = obj_data.value ("identifier").to_string ();
@@ -227,7 +227,7 @@ class UserInfo : GLib.Object {
         if (!this.account_state || !this.active) {
             return false;
         }
-        AccountPointer account = this.account_state.account ();
+        unowned Account account = this.account_state.account ();
         return (this.account_state.is_connected () || this.allow_disconnected_account_state)
             && account.credentials ()
             && account.credentials ().ready ();

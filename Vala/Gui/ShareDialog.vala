@@ -480,7 +480,7 @@ class ShareDialog : Gtk.Dialog {
     ***********************************************************/
     private static string create_random_password () {
         string password;
-        foreach (string word in Occ.Word_list.random_words (10)) {
+        foreach (string word in Occ.WordList.random_words (10)) {
             password += word;
         }
         return password;

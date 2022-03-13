@@ -6,6 +6,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief sends a DELETE http request to a url.
@@ -20,7 +21,7 @@ class DeleteApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public DeleteApiJob.for_account (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+    public DeleteApiJob.for_account (unowned Account account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
@@ -59,4 +60,5 @@ class DeleteApiJob : AbstractNetworkJob {
 
 } // class DeleteApiJob
 
+} // namespace LibSync
 } // namespace Occ

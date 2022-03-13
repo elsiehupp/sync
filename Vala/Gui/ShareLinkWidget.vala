@@ -32,7 +32,7 @@ class ShareLinkWidget : Gtk.Widget {
     private const string PASSWORD_IS_PLACEHOLDER = "●●●●●●●●";
 
     private Ui.ShareLinkWidget ui;
-    private AccountPointer account;
+    private unowned Account account;
     private string share_path;
     private string local_path;
     private string share_url;
@@ -76,7 +76,7 @@ class ShareLinkWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public ShareLinkWidget (
-        AccountPointer account,
+        unowned Account account,
         string share_path,
         string local_path,
         SharePermissions max_sharing_permissions,

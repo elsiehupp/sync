@@ -6,6 +6,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief Job that runs subjobs. It becomes on_signal_finished only when all subjobs are on_signal_finished.
@@ -228,4 +229,5 @@ class PropagatorCompositeJob : PropagatorJob {
 
 } // class PropagatorCompositeJob
 
+} // namespace LibSync
 } // namespace Occ

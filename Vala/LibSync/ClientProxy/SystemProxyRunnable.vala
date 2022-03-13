@@ -13,8 +13,9 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 using CSync;
 
 namespace Occ {
+namespace LibSync {
 
-class SystemProxyRunnable : GLib.Object, QRunnable {
+class SystemProxyRunnable : GLib.Object /*, QRunnable*/ {
 
     /***********************************************************
     ***********************************************************/
@@ -45,6 +46,8 @@ class SystemProxyRunnable : GLib.Object, QRunnable {
             // FIXME Would we really ever return more?
         }
     }
+
 } // class SystemProxyRunnable
 
+} // namespace LibSync
 } // namespace Occ

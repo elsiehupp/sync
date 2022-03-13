@@ -1,19 +1,20 @@
 namespace Occ {
+namespace LibSync {
 
-class FolderMetadata {
+class FolderMetadata : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
     GLib.List<EncryptedFile> files { public get; private set; }
 
     private GLib.HashTable<int, GLib.ByteArray> metadata_keys;
-    private AccountPointer account;
+    private unowned Account account;
     private GLib.List<QPair<string, string>> sharing;
 
 
     /***********************************************************
     ***********************************************************/
-    public FolderMetadata.for_account (AccountPointer account, GLib.ByteArray metadata = new GLib.ByteArray (), int status_code = -1) {
+    public FolderMetadata.for_account (unowned Account account, GLib.ByteArray metadata = new GLib.ByteArray (), int status_code = -1) {
         this.account = account;
         if (metadata.is_empty () || status_code == 404) {
             GLib.info ("Setting up empty metadata.");
@@ -291,4 +292,5 @@ class FolderMetadata {
 
 } // class FolderMetadata
 
+} // namespace LibSync
 } // namespace Occ

@@ -6,6 +6,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The EntityExistsJob class
@@ -17,7 +18,7 @@ class EntityExistsJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public EntityExistsJob.for_account (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+    public EntityExistsJob.for_account (unowned Account account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
@@ -39,4 +40,5 @@ class EntityExistsJob : AbstractNetworkJob {
 
 } // class EntityExistsJob
 
+} // namespace LibSync
 } // namespace Occ

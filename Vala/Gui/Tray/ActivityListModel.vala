@@ -255,7 +255,7 @@ class ActivityListModel : QAbstractListModel {
             return GLib.Variant ();
 
         a = this.final_list.at (index.row ());
-        AccountStatePtr ast = AccountManager.instance ().account (a.acc_name);
+        unowned AccountState ast = AccountManager.instance ().account (a.acc_name);
         if (!ast && this.account_state != ast.data ())
             return GLib.Variant ();
 

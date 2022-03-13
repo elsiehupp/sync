@@ -11,6 +11,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 using CSync;
 
 namespace Occ {
+namespace LibSync {
 
 abstract class AbstractCredentials : GLib.Object {
 
@@ -163,5 +164,6 @@ abstract class AbstractCredentials : GLib.Object {
 
 } // class AbstractCredentials
 
+} // namespace LibSync
 } // namespace Occ
     

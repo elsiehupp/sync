@@ -1,4 +1,7 @@
 
+namespace Occ {
+namespace LibSync {
+
 class TokenCredentialsAccessManager : AccessManager {
 
     private const TokenCredentials credentials;
@@ -32,4 +35,5 @@ class TokenCredentialsAccessManager : AccessManager {
 
 } // class TokenCredentialsAccessManager
 
+} // namespace LibSync
 } // namespace Occ

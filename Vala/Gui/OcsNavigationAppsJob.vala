@@ -25,7 +25,7 @@ class OcsNavigationAppsJob : OcsJob {
 
     /***********************************************************
     ***********************************************************/
-    public OcsNavigationAppsJob (AccountPointer account) {
+    public OcsNavigationAppsJob (unowned Account account) {
         base (account);
         path ("ocs/v2.php/core/navigation/apps");
         connect (this, OcsNavigationAppsJob.signal_job_finished, this, OcsNavigationAppsJob.on_signal_job_done);

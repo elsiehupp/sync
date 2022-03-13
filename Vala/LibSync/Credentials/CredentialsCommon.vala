@@ -9,6 +9,8 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 //  #include <QSslConfiguration>
 
 namespace Occ {
+namespace LibSync {
 
 
+} // namespace LibSync
 } // namespace Occ

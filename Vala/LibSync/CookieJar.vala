@@ -11,9 +11,9 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QNetworkCookieJar>
 
 namespace Occ {
+namespace LibSync {
 
-using QNetworkCookieJar.all_cookies;
-using QNetworkCookieJar.all_cookies;
+//  using QNetworkCookieJar.all_cookies;
 
 /***********************************************************
 @brief The CookieJar class
@@ -158,5 +158,6 @@ class CookieJar : QNetworkCookieJar {
 
 } // class CookieJar
 
+} // namespace LibSync
 } // namespace Occ
     

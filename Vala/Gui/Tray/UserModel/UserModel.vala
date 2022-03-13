@@ -235,7 +235,7 @@ class UserModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public void add_user (AccountStatePtr user, bool is_current) {
+    public void add_user (unowned AccountState user, bool is_current) {
         bool contains_user = false;
         foreach (var u in this.users) {
             if (u.account () == user.account ()) {

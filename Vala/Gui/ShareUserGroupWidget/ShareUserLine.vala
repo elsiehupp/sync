@@ -15,7 +15,7 @@ class ShareUserLine : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private Ui.ShareUserLine ui;
-    private AccountPointer account;
+    private unowned Account account;
 
     unowned UserGroupShare share { public get; private set; }
 
@@ -42,7 +42,7 @@ class ShareUserLine : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public ShareUserLine (AccountPointer account,
+    public ShareUserLine (unowned Account account,
         UserGroupShare Share,
         SharePermissions max_sharing_permissions,
         bool is_file,

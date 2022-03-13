@@ -5,6 +5,7 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 class DummyCredentials : AbstractCredentials {
 
@@ -74,5 +75,6 @@ class DummyCredentials : AbstractCredentials {
 
 } // class DummyCredentials
 
+} // namespace LibSync
 } // namespace Occ
     

@@ -10,11 +10,12 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 //  #include <chrono>
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 Value class containing the options given to the sync engine
 ***********************************************************/
-class SyncOptions {
+class SyncOptions : GLib.Object {
 
 
     /***********************************************************
@@ -167,4 +168,5 @@ class SyncOptions {
 
 } // class SyncOptions
 
+} // namespace LibSync
 } // namespace Occ

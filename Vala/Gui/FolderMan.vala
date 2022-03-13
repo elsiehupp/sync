@@ -496,7 +496,7 @@ class FolderMan : GLib.Object {
     incoming relative server path. The method checks with all existing sync
     folders.
     ***********************************************************/
-    public string[] find_file_in_local_folders (string rel_path, AccountPointer acc) {
+    public string[] find_file_in_local_folders (string rel_path, unowned Account acc) {
         string[] re;
     
         // We'll be comparing against Folder.remote_path which always starts with /
@@ -1887,7 +1887,7 @@ class FolderMan : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void setup_folders_helper (QSettings settings, AccountStatePtr account, string[] ignore_keys, bool backwards_compatible, bool folders_with_placeholders) {
+    private void setup_folders_helper (QSettings settings, unowned AccountState account, string[] ignore_keys, bool backwards_compatible, bool folders_with_placeholders) {
         foreach (var folder_alias in settings.child_groups ()) {
             // Skip folders with too-new version
             settings.begin_group (folder_alias);

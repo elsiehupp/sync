@@ -26,7 +26,7 @@ class OcsShareeJob : OcsJob {
 
     /***********************************************************
     ***********************************************************/
-    public OcsShareeJob (AccountPointer account) {
+    public OcsShareeJob (unowned Account account) {
         base (account);
         path ("ocs/v2.php/apps/files_sharing/api/v1/sharees");
         connect (

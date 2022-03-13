@@ -17,7 +17,7 @@ class RemoteWipe : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private AccountPointer account;
+    private unowned Account account;
     private string app_password;
     private bool account_removed;
     private QNetworkAccessManager network_manager;
@@ -30,7 +30,7 @@ class RemoteWipe : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public RemoteWipe (AccountPointer account, GLib.Object parent = new GLib.Object ()) {
+    public RemoteWipe (unowned Account account, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.account = account;
         this.app_password = "";

@@ -54,7 +54,7 @@ class SslButton : QToolButton {
         }
         this.account_state = account_state;
 
-        AccountPointer account = this.account_state.account ();
+        unowned Account account = this.account_state.account ();
         if (account.url ().scheme () == "https") {
             icon (QIcon (":/client/theme/lock-https.svg"));
             QSslCipher cipher = account.session_cipher;
@@ -75,7 +75,7 @@ class SslButton : QToolButton {
             return;
         }
 
-        AccountPointer account = this.account_state.account ();
+        unowned Account account = this.account_state.account ();
 
         this.menu.add_action (_("Server version : %1").arg (account.server_version ())).enabled (false);
 

@@ -6,8 +6,8 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
 //  #include <QLoggingCategory>
 
-
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The DeleteJob class
@@ -30,14 +30,14 @@ class DeleteJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public DeleteJob.for_path (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+    public DeleteJob.for_path (unowned Account account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public DeleteJob.for_url (AccountPointer account, GLib.Uri url, GLib.Object parent) {
+    public DeleteJob.for_url (unowned Account account, GLib.Uri url, GLib.Object parent) {
         base (account, "", parent);
         this.url = url;
     }
@@ -78,5 +78,6 @@ class DeleteJob : AbstractNetworkJob {
 
 } // class DeleteJob
 
+} // namespace LibSync
 } // namespace Occ
     

@@ -5,6 +5,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The GETEncryptedFileJob class that provides file decryption on the fly while the download is running
@@ -22,7 +23,7 @@ class GETEncryptedFileJob : GETFileJob {
     /***********************************************************
     DOES NOT take ownership of the device.
     ***********************************************************/
-    public GETEncryptedFileJob.for_path (AccountPointer account, string path, QIODevice device,
+    public GETEncryptedFileJob.for_path (unowned Account account, string path, QIODevice device,
         GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers, GLib.ByteArray expected_etag_for_resume,
         int64 resume_start, EncryptedFile encrypted_info, GLib.Object parent = new GLib.Object ()) {
         base (account, path, device, headers, expected_etag_for_resume, resume_start, parent);
@@ -32,7 +33,7 @@ class GETEncryptedFileJob : GETFileJob {
 
     /***********************************************************
     ***********************************************************/
-    public GETEncryptedFileJob.for_url (AccountPointer account, GLib.Uri url, QIODevice device,
+    public GETEncryptedFileJob.for_url (unowned Account account, GLib.Uri url, QIODevice device,
         GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers, GLib.ByteArray expected_etag_for_resume,
         int64 resume_start, EncryptedFile encrypted_info, GLib.Object parent = new GLib.Object ()) {
         base (account, url, device, headers, expected_etag_for_resume, resume_start, parent);
@@ -94,4 +95,5 @@ class GETEncryptedFileJob : GETFileJob {
 
 } // class GETEncryptedFileJob
 
+} // namespace LibSync
 } // namespace Occ

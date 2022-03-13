@@ -6,6 +6,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief Propagate a directory, and all its sub entries.
@@ -192,4 +193,5 @@ class PropagateDirectory : PropagatorJob {
 
 } // class PropagateDirectory
 
+} // namespace LibSync
 } // namespace Occ

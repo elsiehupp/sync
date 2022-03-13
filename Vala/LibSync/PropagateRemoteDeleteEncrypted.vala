@@ -8,12 +8,13 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 //  #include <GLib.FileInfo>
 
 namespace Occ {
+namespace LibSync {
 
-class Propagate_remote_delete_encrypted : AbstractPropagateRemoteDeleteEncrypted {
+class PropagateRemoteCeleteEncrypted : AbstractPropagateRemoteDeleteEncrypted {
 
     /***********************************************************
     ***********************************************************/
-    public Propagate_remote_delete_encrypted (OwncloudPropagator propagator, SyncFileItemPtr item, GLib.Object parent) {
+    public PropagateRemoteCeleteEncrypted (OwncloudPropagator propagator, SyncFileItemPtr item, GLib.Object parent) {
         base (propagator, item, parent);
 
     }
@@ -76,10 +77,11 @@ class Propagate_remote_delete_encrypted : AbstractPropagateRemoteDeleteEncrypted
             //  Q_UNUSED (file_identifier);
             delete_remote_item (this.item.encrypted_filename);
         });
-        connect (job, UpdateMetadataApiJob.error, this, Propagate_remote_delete_encrypted.task_failed);
+        connect (job, UpdateMetadataApiJob.error, this, PropagateRemoteCeleteEncrypted.task_failed);
         job.on_signal_start ();
     }
 
-} // class Propagate_remote_delete_encrypted
+} // class PropagateRemoteCeleteEncrypted
 
+} // namespace LibSync
 } // namespace Occ

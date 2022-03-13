@@ -17,10 +17,10 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 //  #include <unistd.h>
 //  #endif
 
-
 //  #include <Soup.Buffer>
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The PropagateDownloadFile class
@@ -993,4 +993,5 @@ class PropagateDownloadFile : PropagateItemJob {
 
 } // class PropagateDownloadFile
 
+} // namespace LibSync
 } // namespace Occ

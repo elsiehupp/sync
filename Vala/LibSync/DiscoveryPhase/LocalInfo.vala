@@ -7,8 +7,9 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 using CSync;
 
 namespace Occ {
+namespace LibSync {
 
-class LocalInfo {
+class LocalInfo : GLib.Object {
     /***********************************************************
     FileName of the entry (this does not contains any directory
     or path, just the plain name)
@@ -31,4 +32,5 @@ class LocalInfo {
 
 } // class LocalInfo
 
+} // namespace LibSync
 } // namespace Occ

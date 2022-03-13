@@ -35,7 +35,7 @@ class ShareeModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private AccountPointer account;
+    private unowned Account account;
     private string search;
     private string type;
 
@@ -49,7 +49,7 @@ class ShareeModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public ShareeModel (AccountPointer account, string type, GLib.Object parent = new GLib.Object ()) {
+    public ShareeModel (unowned Account account, string type, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.account = account;
         this.type = type;

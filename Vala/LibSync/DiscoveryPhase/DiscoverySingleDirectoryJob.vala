@@ -5,7 +5,9 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 ***********************************************************/
 
 using CSync;
+
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief Run a PROPFIND on a directory and process the results for Discovery
@@ -21,7 +23,7 @@ class DiscoverySingleDirectoryJob : GLib.Object {
     private GLib.ByteArray first_etag;
     private GLib.ByteArray file_identifier;
     private GLib.ByteArray local_file_id;
-    private AccountPointer account;
+    private unowned Account account;
 
 
     /***********************************************************
@@ -73,7 +75,7 @@ class DiscoverySingleDirectoryJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public DiscoverySingleDirectoryJob.for_account (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+    public DiscoverySingleDirectoryJob.for_account (unowned Account account, string path, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.sub_path = path;
         this.account = account;
@@ -171,9 +173,7 @@ class DiscoverySingleDirectoryJob : GLib.Object {
     ***********************************************************/
     private void on_signal_metadata_error (GLib.ByteArray file_identifier, int http_return_code);
 
-}
+} // class DiscoverySingleDirectoryJob
 
-
-
-
-
+} // namespace LibSync
+} // namespace Occ

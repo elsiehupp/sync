@@ -120,7 +120,7 @@ class LinkShare : Share {
     /***********************************************************
     ***********************************************************/
     public LinkShare (
-        AccountPointer account,
+        unowned Account account,
         string identifier,
         string owner_uid,
         string owner_display_name,

@@ -5,6 +5,7 @@ expects a response is here.
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 class LockEncryptFolderApiJob : AbstractNetworkJob {
 
@@ -17,7 +18,7 @@ class LockEncryptFolderApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public LockEncryptFolderApiJob (AccountPointer account, GLib.ByteArray file_identifier, GLib.Object parent = new GLib.Object ()) {
+    public LockEncryptFolderApiJob (unowned Account account, GLib.ByteArray file_identifier, GLib.Object parent = new GLib.Object ()) {
         base (account, E2EE_BASE_URL + "lock/" + file_identifier, parent);
         this.file_identifier = file_identifier;
     }
@@ -58,4 +59,5 @@ class LockEncryptFolderApiJob : AbstractNetworkJob {
 
 } // class LockEncryptFolderApiJob
 
+} // namespace LibSync
 } // namespace Occ

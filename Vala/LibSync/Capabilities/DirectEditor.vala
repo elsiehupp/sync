@@ -5,6 +5,7 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 class DirectEditor : GLib.Object {
 
@@ -62,4 +63,5 @@ class DirectEditor : GLib.Object {
 
 } // class DirectEditor
 
+} // namespace LibSync
 } // namespace Occ

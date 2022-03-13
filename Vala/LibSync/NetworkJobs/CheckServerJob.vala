@@ -6,6 +6,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The CheckServerJob class
@@ -65,7 +66,7 @@ class CheckServerJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public CheckServerJob.for_account (AccountPointer account, GLib.Object parent = new GLib.Object ()) {
+    public CheckServerJob.for_account (unowned Account account, GLib.Object parent = new GLib.Object ()) {
         base (account, QLatin1String (STATUS_PHP_C), parent);
         this.subdir_fallback = false;
         this.permanent_redirects = 0;
@@ -201,7 +202,7 @@ class CheckServerJob : AbstractNetworkJob {
     }
 
 
-    private static void merge_ssl_configuration_for_ssl_button (QSslConfiguration config, AccountPointer account) {
+    private static void merge_ssl_configuration_for_ssl_button (QSslConfiguration config, unowned Account account) {
         if (config.peer_certificate_chain ().length () > 0) {
             account.peer_certificate_chain = config.peer_certificate_chain ();
         }
@@ -215,4 +216,5 @@ class CheckServerJob : AbstractNetworkJob {
 
 } // class CheckServerJob
 
+} // namespace LibSync
 } // namespace Occ

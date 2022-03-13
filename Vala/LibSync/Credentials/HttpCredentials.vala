@@ -19,11 +19,8 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 //  #include <QSslKey>
 //  #include <Soup.Request>
 
-
-namespace QKeychain {
-}
-
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 The authentication system is this way because of Shibboleth.
@@ -59,7 +56,7 @@ from the keychain
             refresh_access_token ()
                 |
                 v
-            /* emit */ fetched ()
+              emit fetched ()
 
 2) If the credentials is still not valid when fetched () is
 emitted, the ui, will call ask_from_user () which is
@@ -773,5 +770,6 @@ class HttpCredentials : AbstractCredentials {
 
 } // class HttpCredentials
 
+} // namespace LibSync
 } // namespace Occ
     

@@ -5,6 +5,7 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 namespace KeychainChunk {
 
 /***********************************************************
@@ -12,9 +13,7 @@ namespace KeychainChunk {
 ***********************************************************/
 class DeleteJob : KeychainChunk.Job {
 
-
     signal void signal_finished (KeychainChunk.DeleteJob incoming_job);
-
 
     /***********************************************************
     ***********************************************************/
@@ -116,4 +115,5 @@ class DeleteJob : KeychainChunk.Job {
 } // class DeleteJob
 
 } // namespace KeychainChunk
+} // namespace LibSync
 } // namespace Occ

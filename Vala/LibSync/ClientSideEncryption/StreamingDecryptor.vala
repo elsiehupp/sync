@@ -1,10 +1,11 @@
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 Simple classes for safe (RAII) handling of OpenSSL
 data structures
 ***********************************************************/
-class StreamingDecryptor {
+class StreamingDecryptor : GLib.Object {
 
     //  Q_DISABLE_COPY (StreamingDecryptor)
 
@@ -192,4 +193,5 @@ class StreamingDecryptor {
 
 } // class StreamingDecryptor
 
+} // namespace LibSync
 } // namespace Occ

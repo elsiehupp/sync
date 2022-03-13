@@ -14,10 +14,10 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QCoreApplication>
 //  #include <ctime>
 
-
 namespace Occ {
+namespace LibSync {
 
-class PropagatorJobs {
+class PropagatorJobs : GLib.Object {
 
     /***********************************************************
     Tags for checksum header.
@@ -32,5 +32,6 @@ class PropagatorJobs {
 
 } // class PropagatorJobs
 
+} // namespace LibSync
 } //namespace Occ
     

@@ -6,6 +6,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The PropfindJob class
@@ -34,7 +35,7 @@ class PropfindJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public PropfindJob.for_account (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+    public PropfindJob.for_account (unowned Account account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
@@ -125,4 +126,5 @@ class PropfindJob : AbstractNetworkJob {
 
 } // class PropfindJob
 
+} // namespace LibSync
 } // namespace Occ

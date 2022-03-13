@@ -258,7 +258,7 @@ class OwncloudGui : GLib.Object {
         bool all_signed_out = true;
         bool all_paused = true;
         bool all_disconnected = true;
-        GLib.Vector<AccountStatePtr> problem_accounts;
+        GLib.Vector<unowned AccountState> problem_accounts;
 
         foreach (var account in AccountManager.instance ().accounts ()) {
             if (!account.is_signed_out ()) {
@@ -285,7 +285,7 @@ class OwncloudGui : GLib.Object {
             }
             string[] messages;
             messages.append (_("Disconnected from accounts:"));
-            foreach (AccountStatePtr account in problem_accounts) {
+            foreach (unowned AccountState account in problem_accounts) {
                 string message = _("Account %1 : %2").arg (account.account ().display_name (), account.state_string (account.state ()));
                 if (!account.connection_errors ().empty ()) {
                     message += "\n";
@@ -607,7 +607,7 @@ class OwncloudGui : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_open_owncloud () {
-        var account = (AccountPointer) sender ().property (PROPERTY_ACCOUNT_C);
+        var account = (unowned Account) sender ().property (PROPERTY_ACCOUNT_C);
         if (account) {
             Utility.open_browser (account.url ());
         }
@@ -769,7 +769,7 @@ class OwncloudGui : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_login () {
-        var account = (AccountStatePtr) sender ().property (PROPERTY_ACCOUNT_C);
+        var account = (unowned AccountState) sender ().property (PROPERTY_ACCOUNT_C);
         if (account) {
             account.account ().reset_rejected_certificates ();
             account.sign_in ();
@@ -785,7 +785,7 @@ class OwncloudGui : GLib.Object {
     ***********************************************************/
     private void on_signal_logout () {
         var list = AccountManager.instance ().accounts ();
-        var account = (AccountStatePtr) sender ().property (PROPERTY_ACCOUNT_C);
+        var account = (unowned AccountState) sender ().property (PROPERTY_ACCOUNT_C);
         if (account) {
             list.clear ();
             list.append (account);

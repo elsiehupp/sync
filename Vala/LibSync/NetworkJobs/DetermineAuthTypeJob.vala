@@ -6,6 +6,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief Checks with auth type to use for a server
@@ -45,7 +46,7 @@ class DetermineAuthTypeJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private AccountPointer account;
+    private unowned Account account;
     private AuthType result_get = AuthType.NO_AUTH_TYPE;
     private AuthType result_propfind = AuthType.NO_AUTH_TYPE;
     private AuthType result_old_flow = AuthType.NO_AUTH_TYPE;
@@ -59,7 +60,7 @@ class DetermineAuthTypeJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public DetermineAuthTypeJob.for_account (AccountPointer account, GLib.Object parent = new GLib.Object ()) {
+    public DetermineAuthTypeJob.for_account (unowned Account account, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.account = account;
     }
@@ -196,4 +197,5 @@ class DetermineAuthTypeJob : GLib.Object {
 
 } // class DetermineAuthTypeJob
 
+} // namespace LibSync
 } // namespace Occ

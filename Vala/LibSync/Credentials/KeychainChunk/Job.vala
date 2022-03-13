@@ -5,6 +5,7 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 Workaround for Windows:
@@ -94,4 +95,5 @@ class Job : GLib.Object {
 } // class Job
 
 } // namespace KeychainChunk
+} // namespace LibSync
 } // namespace Occ

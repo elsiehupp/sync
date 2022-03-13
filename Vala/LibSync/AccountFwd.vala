@@ -5,10 +5,9 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
-class AccountPointer : unowned Account {}
-class AccountStatePtr : unowned AccountState {}
-
+} // namespace LibSync
 } // namespace Occ
 
 //  #endif //SERVERFWD

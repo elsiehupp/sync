@@ -24,7 +24,7 @@ class ShareManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private AccountPointer account;
+    private unowned Account account;
 
     signal void signal_share_created (Share share);
     signal void signal_link_share_created (LinkShare share);
@@ -44,7 +44,7 @@ class ShareManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public ShareManager (
-        AccountPointer account,
+        unowned Account account,
         GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.account = account;
@@ -371,7 +371,7 @@ class ShareManager : GLib.Object {
     /***********************************************************
     When a share is modified, we need to tell the folders so they can adjust overlay icons
     ***********************************************************/
-    private static void update_folder (AccountPointer account, string path) {
+    private static void update_folder (unowned Account account, string path) {
         foreach (Folder folder in FolderMan.instance ().map ()) {
             if (folder.account_state ().account () != account) {
                 continue;

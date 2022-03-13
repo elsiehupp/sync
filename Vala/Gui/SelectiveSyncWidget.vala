@@ -40,7 +40,7 @@ class SelectiveSyncWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public SelectiveSyncWidget (AccountPointer account, Gtk.Widget parent = null) {
+    public SelectiveSyncWidget (unowned Account account, Gtk.Widget parent = null) {
         base (parent);
         this.account = account;
         this.inserting = false;

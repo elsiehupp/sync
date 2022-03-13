@@ -24,15 +24,14 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <GLib.FileInfo>
 //  #include <qtextcodec.h>
 
-
 //  #include <cstdint>
 //  #include <QMutex>
 //  #include <QThread>
 
 //  #include <set>
 
-
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The SyncEngine class
@@ -82,7 +81,7 @@ class SyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    AccountPointer account { public get; private set; }
+    unowned Account account { public get; private set; }
 
     private bool needs_update;
     private bool sync_running;
@@ -271,7 +270,7 @@ class SyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public SyncEngine.for_account (AccountPointer account, string local_path,
+    public SyncEngine.for_account (unowned Account account, string local_path,
         string remote_path, SyncJournalDb journal) {
         this.account = account;
         this.needs_update = false;
@@ -1415,5 +1414,6 @@ class SyncEngine : GLib.Object {
 
 } // class SyncEngine
 
+} // namespace LibSync
 } // namespace Occ
     

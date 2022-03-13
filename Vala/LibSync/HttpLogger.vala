@@ -11,14 +11,15 @@ Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
 using Soup;
 
 namespace Occ {
+namespace LibSync {
 
-static class HttpLogger {
+class HttpLogger {
 
     const int64 PEEK_SIZE = 1024 * 1024;
 
     const string X_REQUEST_ID = "X-Request-ID";
 
-    static void log_request (Soup.Reply reply, QNetworkAccessManager.Operation operation, QIODevice device) {
+    public static void log_request (Soup.Reply reply, QNetworkAccessManager.Operation operation, QIODevice device) {
         var request = reply.request ();
         if (!lc_network_http ().is_info_enabled ()) {
             return;
@@ -50,7 +51,7 @@ static class HttpLogger {
     /***********************************************************
     Helper to construct the HTTP verb used in the request
     ***********************************************************/
-    static GLib.ByteArray request_verb (QNetworkAccessManager.Operation operation, Soup.Request request) {
+    public static GLib.ByteArray request_verb (QNetworkAccessManager.Operation operation, Soup.Request request) {
         switch (operation) {
         case QNetworkAccessManager.HeadOperation:
             return GLib.ByteArray ("HEAD");
@@ -71,13 +72,13 @@ static class HttpLogger {
     }
 
 
-    static bool is_text_body (string s) {
+    public static bool is_text_body (string s) {
         const QRegularExpression regexp ("^ (text/.*| (application/ (xml|json|x-www-form-urlencoded) (;|$)))");
         return regexp.match (s).has_match ();
     }
 
 
-    static void log_http (GLib.ByteArray verb, string url, GLib.ByteArray identifier, string content_type, GLib.List<Soup.Reply.RawHeaderPair> header, QIODevice device) {
+    public static void log_http (GLib.ByteArray verb, string url, GLib.ByteArray identifier, string content_type, GLib.List<Soup.Reply.RawHeaderPair> header, QIODevice device) {
         var reply = qobject_cast<Soup.Reply> (device);
         var content_length = device ? device.size () : 0;
         string message;
@@ -120,10 +121,11 @@ static class HttpLogger {
                 stream + content_length + " bytes of " + content_type + " data";
             }
         }
-        stream + "]";
-        GLib.info (message;
+        stream += "]";
+        GLib.info (message);
     }
 
-} // static class HttpLogger
+} // class HttpLogger
 
+} // namespace LibSync
 } // namespace Occ

@@ -4,12 +4,13 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-
 using Soup;
+
 //  #include <GLib.FileInfo>
 //  #include <QLoggingCategory>
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The AbstractPropagateRemoteDeleteEncrypted class is
@@ -255,4 +256,5 @@ class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
     }
 } // class AbstractPropagateRemoteDeleteEncrypted
 
+} // namespace LibSync
 } // namespace Occ

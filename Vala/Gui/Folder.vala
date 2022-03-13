@@ -57,7 +57,7 @@ class Folder : GLib.Object {
     /***********************************************************
     The account the folder is configured on.
     ***********************************************************/
-    AccountStatePtr account_state { public get; private set; }
+    unowned AccountState account_state { public get; private set; }
 
     private FolderDefinition definition;
 
@@ -1410,7 +1410,7 @@ class Folder : GLib.Object {
     private void on_signal_run_etag_job () {
         GLib.info ("Trying to check " + remote_url ().to_string () + " for changes via ETag check. (time since last sync: " + (this.time_since_last_sync_done.elapsed () / 1000) + "s)");
     
-        AccountPointer account = this.account_state.account ();
+        unowned Account account = this.account_state.account ();
     
         if (this.request_etag_job) {
             GLib.info (remote_url ().to_string () + " has ETag job queued, not trying to sync");

@@ -9,6 +9,7 @@ Copyright (C) by Jocelyn Turcotte <jturcotte@woboq.com>
 //  #include <map>
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief Takes care of tracking the status of individual
@@ -429,4 +430,5 @@ class SyncFileStatusTracker : GLib.Object {
 
 } // class SyncFileStatusTracker
 
+} // namespace LibSync
 } // namespace Occ

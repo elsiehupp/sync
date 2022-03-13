@@ -38,10 +38,10 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QPixmap>
 //  #endif
 
-
 //  #include <memory>
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The Account class represents an account on an
@@ -53,8 +53,6 @@ about credentials, SSL errors and certificates.
 ***********************************************************/
 class Account : GLib.Object {
 
-    class AccountPointer : unowned Account { }
-
     const string app_password = "app-password";
 
     const int PUSH_NOTIFICATIONS_RECONNECT_INTERVAL = 1000 * 60 * 2;
@@ -65,7 +63,7 @@ class Account : GLib.Object {
     @ingroup libsync
     ***********************************************************/
     class AbstractSslErrorHandler {
-        public virtual bool handle_errors (GLib.List<QSslError> error_list, QSslConfiguration conf, GLib.List<QSslCertificate> cert_list, AccountPointer account);
+        public virtual bool handle_errors (GLib.List<QSslError> error_list, QSslConfiguration conf, GLib.List<QSslCertificate> cert_list, unowned Account account);
     }
 
 
@@ -437,7 +435,7 @@ class Account : GLib.Object {
         this.http2Supported = false;
         this.push_notifications = null;
         this.is_remote_wipe_requested_HACK = false;
-        q_register_meta_type<AccountPointer> ("AccountPointer");
+        q_register_meta_type<unowned Account> ("unowned Account");
         q_register_meta_type<Account> ("Account*");
 
         this.push_notifications_reconnect_timer.interval (PUSH_NOTIFICATIONS_RECONNECT_INTERVAL);
@@ -447,8 +445,8 @@ class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static AccountPointer create () {
-        AccountPointer acc = AccountPointer (new Account ());
+    public static unowned Account create () {
+        unowned Account acc = unowned Account (new Account ());
         acc.shared_this (acc);
         return acc;
     }
@@ -456,7 +454,7 @@ class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public AccountPointer shared_from_this () {
+    public unowned Account shared_from_this () {
         return this.shared_this.to_strong_ref ();
     }
 
@@ -1145,6 +1143,7 @@ class Account : GLib.Object {
         }
     }
 
-}
+} // class Account
 
+} // namespace LibSync
 } // namespace Occ

@@ -26,11 +26,11 @@ class SslErrorDialog : Gtk.Dialog {
 
     private string custom_config_handle;
     private Ui.SslErrorDialog ui;
-    private AccountPointer account;
+    private unowned Account account;
 
     /***********************************************************
     ***********************************************************/
-    public SslErrorDialog (AccountPointer account, Gtk.Widget parent = new Gtk.Widget ()) {
+    public SslErrorDialog (unowned Account account, Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.all_trusted = false;
         this.ui = new Ui.SslErrorDialog ();

@@ -27,6 +27,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QTimer>
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The AbstractNetworkJob class
@@ -98,7 +99,7 @@ class AbstractNetworkJob : GLib.Object {
     ***********************************************************/
     public bool follow_redirects;
 
-    AccountPointer account { public get; protected set; }
+    unowned Account account { public get; protected set; }
 
     public bool ignore_credential_failure;
 
@@ -156,7 +157,7 @@ class AbstractNetworkJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public AbstractNetworkJob.for_account (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+    public AbstractNetworkJob.for_account (unowned Account account, string path, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.timedout = false;
         this.follow_redirects = true;
@@ -656,4 +657,5 @@ class AbstractNetworkJob : GLib.Object {
 
 } // class AbstractNetworkJob
 
+} // namespace LibSync
 } // namespace Occ

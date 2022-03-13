@@ -5,6 +5,8 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
+
 /***********************************************************
 @brief The PropagateUploadFileCommon class is the code common between all chunking algorithms
 @ingroup libsync
@@ -81,7 +83,7 @@ class PropagateUploadFileCommon : PropagateItemJob {
     /***********************************************************
     Whether an on_signal_abort is currently ongoing.
 
-    Important to avoid duplicate aborts since each finishing PUTFile_job might
+    Important to avoid duplicate aborts since each finishing PUTFileJob might
     trigger an on_signal_abort on error.
     ***********************************************************/
     protected bool aborting = BITFIELD (1);
@@ -743,4 +745,5 @@ class PropagateUploadFileCommon : PropagateItemJob {
 
 } // class PropagateUploadFileCommon
 
+} // namespace LibSync
 } // namespace Occ

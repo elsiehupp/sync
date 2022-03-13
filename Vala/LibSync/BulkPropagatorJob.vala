@@ -16,6 +16,7 @@ Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
 //  #include <deque>
 
 namespace Occ {
+namespace LibSync {
 
 class BulkPropagatorJob : PropagatorJob {
 
@@ -44,7 +45,7 @@ class BulkPropagatorJob : PropagatorJob {
     }
 
     struct BulkUploadItem {
-        AccountPointer account;
+        unowned Account account;
         SyncFileItemPtr item;
         UploadFileInfo file_to_upload;
         string remote_path;
@@ -820,5 +821,6 @@ class BulkPropagatorJob : PropagatorJob {
 
 } // class BulkPropagatorJob
 
+} // namespace LibSync
 } // namespace Occ
     

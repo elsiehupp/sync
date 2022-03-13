@@ -347,7 +347,7 @@ class OwncloudAdvancedSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void on_signal_selective_sync_clicked () {
-        AccountPointer acc = ((OwncloudWizard) wizard ()).account ();
+        unowned Account acc = ((OwncloudWizard) wizard ()).account ();
         var dialog = new SelectiveSyncDialog (acc, this.remote_folder, this.selective_sync_blocklist, this);
         dialog.attribute (Qt.WA_DeleteOnClose);
 

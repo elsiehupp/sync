@@ -23,17 +23,9 @@ namespace Ui {
 @brief Extra info about an own_cloud server account.
 @ingroup gui
 ***********************************************************/
-class AccountState : GLib.Object, QSharedData {
+class AccountState : GLib.Object /*, QSharedData*/ {
 
-    class AccountStatePtr : unowned AccountState { }
     class AccountAppList : GLib.List<AccountApp> { }
-
-
-    /***********************************************************
-    The actual current connectivity status.
-    ***********************************************************/
-    public class ConnectionStatus : ConnectionValidator.Status { }
-
 
     /***********************************************************
     ***********************************************************/
@@ -84,7 +76,7 @@ class AccountState : GLib.Object, QSharedData {
         ASKING_CREDENTIALS
     }
 
-    AccountPointer account { public get; private set; }
+    unowned Account account { public get; private set; }
     State state {
         public get {
             return this.state;
@@ -120,7 +112,7 @@ class AccountState : GLib.Object, QSharedData {
         }
     }
 
-    ConnectionStatus connection_status { public get; private set; }
+    ConnectionValidator.Status connection_status { public get; private set; }
     string[] connection_errors { public get; private set; }
 
 
@@ -211,7 +203,7 @@ class AccountState : GLib.Object, QSharedData {
     /***********************************************************
     Use the account as parent
     ***********************************************************/
-    public AccountState (AccountPointer account) {
+    public AccountState (unowned Account account) {
         base ();
         this.account = account;
         this.state = AccountState.State.DISCONNECTED;
@@ -262,7 +254,7 @@ class AccountState : GLib.Object, QSharedData {
 
     Use from AccountManager with a prepared QSettings object only.
     ***********************************************************/
-    public static AccountState load_from_settings (AccountPointer account, QSettings settings) {
+    public static AccountState load_from_settings (unowned Account account, QSettings settings) {
         var account_state = new AccountState (account);
         return account_state;
     }
@@ -461,7 +453,7 @@ class AccountState : GLib.Object, QSharedData {
             return;
         }
 
-        this.connection_validator = new ConnectionValidator (AccountStatePtr (this));
+        this.connection_validator = new ConnectionValidator (unowned AccountState (this));
         connect (
             this.connection_validator,
             ConnectionValidator.signal_connection_result,

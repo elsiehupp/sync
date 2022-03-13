@@ -11,6 +11,7 @@ Copyright (C) by Markus Goetz <markus@woboq.com>
 //  #include <list>
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The BandwidthManager class
@@ -496,7 +497,9 @@ class BandwidthManager : GLib.Object {
 
         // now we're in measuring state
     }
+
 } // class BandwidthManager
 
+} // namespace LibSync
 } // namespace Occ
     

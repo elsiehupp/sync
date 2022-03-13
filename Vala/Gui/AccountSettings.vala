@@ -297,7 +297,7 @@ class AccountSettings : Gtk.Widget {
         const AccountState.State state = this.account_state ? this.account_state.state () : AccountState.State.DISCONNECTED;
         if (state != AccountState.State.DISCONNECTED) {
             this.ui.ssl_button.update_account_state (this.account_state);
-            AccountPointer account = this.account_state.account ();
+            unowned Account account = this.account_state.account ();
             GLib.Uri safe_url = new GLib.Uri (account.url ());
             safe_url.password (""); // Remove the password from the URL to avoid showing it in the UI
             foreach (Folder folder in FolderMan.instance ().map ().values ()) {

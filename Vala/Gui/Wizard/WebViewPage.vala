@@ -125,7 +125,7 @@ class WebViewPage : AbstractCredentialsWizardPage {
         this.user = user;
         this.pass = pass;
 
-        AccountPointer account = this.oc_wizard.account ();
+        unowned Account account = this.oc_wizard.account ();
         account.url (host);
 
         GLib.info ("URL: " + field ("OCUrl").to_string ());

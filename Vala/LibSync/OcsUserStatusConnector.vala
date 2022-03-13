@@ -16,10 +16,10 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 //  #include <qjsonobject.h>
 //  #include <qloggingcategory.h>
 
-
 //  #include <QPointer>
 
 namespace Occ {
+namespace LibSync {
 
 class OcsUserStatusConnector : UserStatusConnector {
 
@@ -28,7 +28,7 @@ class OcsUserStatusConnector : UserStatusConnector {
 
     /***********************************************************
     ***********************************************************/
-    private AccountPointer account;
+    private unowned Account account;
 
     /***********************************************************
     ***********************************************************/
@@ -67,7 +67,7 @@ class OcsUserStatusConnector : UserStatusConnector {
 
     /***********************************************************
     ***********************************************************/
-    public OcsUserStatusConnector (AccountPointer account, GLib.Object parent = new GLib.Object ()) {
+    public OcsUserStatusConnector (unowned Account account, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.account = account;
         //  Q_ASSERT (this.account);
@@ -511,5 +511,6 @@ class OcsUserStatusConnector : UserStatusConnector {
 
 } // class OcsUserStatusConnector
 
+} // namespace LibSync
 } // namespace Occ
     

@@ -6,6 +6,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 Abstract class to propagate a single item
@@ -201,4 +202,5 @@ class PropagateItemJob : PropagatorJob {
 
 } // class PropagateItemJob
 
+} // namespace LibSync
 } // namespace Occ

@@ -1,10 +1,11 @@
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 Simple classes for safe (RAII) handling of OpenSSL
 data structures
 ***********************************************************/
-class CipherContext {
+class CipherContext : GLib.Object {
 
     //  Q_DISABLE_COPY (CipherContext)
     private EVP_CIPHER_CTX context;
@@ -26,4 +27,5 @@ class CipherContext {
 
 } // class CipherContext
 
+} // namespace LibSync
 } // namespace Occ

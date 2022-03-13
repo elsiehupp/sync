@@ -8,6 +8,7 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 //  #include <set>
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief Tracks files that must be rediscovered locally
@@ -144,6 +145,5 @@ class LocalDiscoveryTracker : GLib.Object {
 
 } // class LocalDiscoveryTracker
 
+} // namespace LibSync
 } // namespace Occ
-
-//  #endif

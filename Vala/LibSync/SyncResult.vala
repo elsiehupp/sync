@@ -4,14 +4,14 @@ Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The SyncResult class
 @ingroup libsync
 ***********************************************************/
-class SyncResult {
+class SyncResult : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
@@ -333,7 +333,7 @@ class SyncResult {
         }
     }
 
-}
+} // class SyncResult
 
-} // namespace mirall
-    
+} // namespace LibSync
+} // namespace Occ

@@ -6,6 +6,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The LsColJob class
@@ -167,4 +168,5 @@ class LsColXMLParser : GLib.Object {
 
 } // class LsColXMLParser
 
+} // namespace LibSync
 } // namespace Occ

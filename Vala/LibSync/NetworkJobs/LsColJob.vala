@@ -6,9 +6,9 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 class LsColJob : AbstractNetworkJob {
-
 
     public GLib.HashTable<string, ExtraFolderInfo> folder_infos;
 
@@ -36,14 +36,14 @@ class LsColJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public LsColJob.for_path (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+    public LsColJob.for_path (unowned Account account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public LsColJob.for_url (AccountPointer account, GLib.Uri url, GLib.Object parent = new GLib.Object ()) {
+    public LsColJob.for_url (unowned Account account, GLib.Uri url, GLib.Object parent = new GLib.Object ()) {
         base (account, "", parent);
         this.url = url;
     }
@@ -129,4 +129,5 @@ class LsColJob : AbstractNetworkJob {
 
 } // class LsColJob
 
+} // namespace LibSync
 } // namespace Occ

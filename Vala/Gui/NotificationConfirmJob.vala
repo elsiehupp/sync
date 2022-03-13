@@ -35,7 +35,7 @@ class NotificationConfirmJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public NotificationConfirmJob (AccountPointer account) {
+    public NotificationConfirmJob (unowned Account account) {
         base (account, "");
         ignore_credential_failure (true);
     }

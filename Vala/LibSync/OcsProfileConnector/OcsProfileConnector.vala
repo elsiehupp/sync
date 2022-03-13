@@ -13,10 +13,11 @@
 //  #include <QPixmapCache>
 
 namespace Occ {
+namespace LibSync {
 
 class OcsProfileConnector : GLib.Object {
 
-    private AccountPointer account;
+    private unowned Account account;
     private Hovercard current_hovercard;
 
     signal void error ();
@@ -25,8 +26,8 @@ class OcsProfileConnector : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public OcsProfileConnector.for_account (AccountPointer account, GLib.Object parent = new GLib.Object ());
-    OcsProfileConnector.OcsProfileConnector.for_account (AccountPointer account, GLib.Object parent)
+    public OcsProfileConnector.for_account (unowned Account account, GLib.Object parent = new GLib.Object ());
+    OcsProfileConnector.OcsProfileConnector.for_account (unowned Account account, GLib.Object parent)
         : GLib.Object (parent)
         this.account (account) {
     }
@@ -177,5 +178,6 @@ class OcsProfileConnector : GLib.Object {
 
 } // class OcsProfileConnector
 
+} // namespace LibSync
 } // namespace Occ
     

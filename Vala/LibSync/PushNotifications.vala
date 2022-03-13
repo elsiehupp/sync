@@ -4,11 +4,11 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-
 //  #include <QWeb_socket>
 //  #include <QTimer>
 
 namespace Occ {
+namespace LibSync {
 
 class PushNotifications : GLib.Object {
 
@@ -408,5 +408,6 @@ class PushNotifications : GLib.Object {
 
 } // class PushNotifications
 
+} // namespace LibSync
 } // namespace Occ
     

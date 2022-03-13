@@ -16,8 +16,8 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
 //  #include <QNetworkAccessManager>
 
-
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The AccessManager class
@@ -80,7 +80,9 @@ class AccessManager : QNetworkAccessManager {
         HttpLogger.log_request (reply, operation, outgoing_data);
         return reply;
     }
+
 } // class AccessManager
 
+} // namespace LibSync
 } // namespace Occ
     

@@ -7,6 +7,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 //  #include <QLoggingCategory>
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The PropagateRemoteDelete class
@@ -34,7 +35,7 @@ class PropagateRemoteDelete : PropagateItemJob {
 
         if (!this.item.encrypted_filename.is_empty () || this.item.is_encrypted) {
             if (!this.item.encrypted_filename.is_empty ()) {
-                this.delete_encrypted_helper = new Propagate_remote_delete_encrypted (propagator (), this.item, this);
+                this.delete_encrypted_helper = new PropagateRemoteCeleteEncrypted (propagator (), this.item, this);
             } else {
                 this.delete_encrypted_helper = new PropagateRemoteDeleteEncryptedRootFolder (propagator (), this.item, this);
             }
@@ -133,4 +134,5 @@ class PropagateRemoteDelete : PropagateItemJob {
 
 } // class PropagateRemoteDelete
 
+} // namespace LibSync
 } // namespace Occ

@@ -6,6 +6,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief Send a Proppatch request
@@ -42,7 +43,7 @@ class ProppatchJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public ProppatchJob.for_account (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+    public ProppatchJob.for_account (unowned Account account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
@@ -109,4 +110,5 @@ class ProppatchJob : AbstractNetworkJob {
 
 } // class ProppatchJob
 
+} // namespace LibSync
 } // namespace Occ

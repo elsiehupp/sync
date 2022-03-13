@@ -6,6 +6,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief Dummy job that just mark it as completed and ignored
@@ -37,4 +38,5 @@ class PropagateIgnoreJob : PropagateItemJob {
 
 } // class PropagateIgnoreJob
 
+} // namespace LibSync
 } // namespace Occ

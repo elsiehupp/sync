@@ -5,6 +5,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 class UserStatus : GLib.Object {
 
@@ -85,4 +86,5 @@ class UserStatus : GLib.Object {
 
 } // class UserStatus
 
+} // namespace LibSync
 } // namespace Occ

@@ -5,6 +5,7 @@ expects a response is here.
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief Job to upload the PrivateKey that return JSON
@@ -47,7 +48,7 @@ class StorePrivateKeyApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public StorePrivateKeyApiJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+    public StorePrivateKeyApiJob (unowned Account account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
@@ -83,4 +84,5 @@ class StorePrivateKeyApiJob : AbstractNetworkJob {
 
 } // class StorePrivateKeyApiJob
 
+} // namespace LibSync
 } // namespace Occ

@@ -31,7 +31,7 @@ class InvalidFilenameDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private AccountPointer account;
+    private unowned Account account;
     private Folder folder;
     private string file_path;
     private string relative_file_path;
@@ -40,7 +40,7 @@ class InvalidFilenameDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public InvalidFilenameDialog (AccountPointer account, Folder folder, string file_path, Gtk.Widget parent = null) {
+    public InvalidFilenameDialog (unowned Account account, Folder folder, string file_path, Gtk.Widget parent = null) {
         base (parent);
         this.ui = new Ui.InvalidFilenameDialog ();
         this.account = account;

@@ -5,6 +5,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 namespace Progress {
 
 /***********************************************************
@@ -19,4 +20,5 @@ enum ErrorCategory {
 }
 
 } // namespace Progress
+} // namespace LibSync
 } // namespace Occ

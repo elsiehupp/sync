@@ -17,7 +17,7 @@ class ProfilePageMenu : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public ProfilePageMenu (AccountPointer account, string share_with_user_id, Gtk.Widget parent = null) {
+    public ProfilePageMenu (unowned Account account, string share_with_user_id, Gtk.Widget parent = null) {
         base (parent);
         this.profile_connector = account;
         connect (this.profile_connector, OcsProfileConnector.hovercard_fetched, this, ProfilePageMenu.on_signal_hovercard_fetched);

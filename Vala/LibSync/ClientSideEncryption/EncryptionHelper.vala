@@ -1,6 +1,7 @@
 namespace Occ {
+namespace LibSync {
 
-class EncryptionHelper {
+class EncryptionHelper : GLib.Object {
 
     public static GLib.ByteArray generate_random_filename () {
         return QUuid.create_uuid ().to_rfc4122 ().to_hex ();
@@ -700,4 +701,5 @@ class EncryptionHelper {
 
 } // class EncryptionHelper
 
+} // namespace LibSync
 } // namespace Occ

@@ -48,7 +48,7 @@ class ShareUserGroupWidget : Gtk.Widget {
     ***********************************************************/
     private Ui.ShareUserGroupWidget ui;
     private QScroll_area parent_scroll_area;
-    private AccountPointer account;
+    private unowned Account account;
     private string share_path;
     private string local_path;
     private SharePermissions max_sharing_permissions;
@@ -84,7 +84,7 @@ class ShareUserGroupWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public ShareUserGroupWidget (
-        AccountPointer account,
+        unowned Account account,
         string share_path,
         string local_path,
         SharePermissions max_sharing_permissions,

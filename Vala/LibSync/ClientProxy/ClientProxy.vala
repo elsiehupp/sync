@@ -12,6 +12,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 using CSync;
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The ClientProxy class
@@ -142,7 +143,9 @@ class ClientProxy : GLib.Object {
                 break;
         }
     }
+
 } // class ClientProxy
 
+} // namespace LibSync
 } // namespace Occ
     

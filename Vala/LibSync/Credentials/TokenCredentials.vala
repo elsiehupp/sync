@@ -11,6 +11,7 @@ Copyright (c) by Markus Goetz <guruz@owncloud.com>
 //  #include <QNetworkCookieJar>
 
 namespace Occ {
+namespace LibSync {
 
 class TokenCredentials : AbstractCredentials {
 
@@ -135,5 +136,6 @@ class TokenCredentials : AbstractCredentials {
 
 } // class TokenCredentials
 
+} // namespace LibSync
 } // namespace Occ
     

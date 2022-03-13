@@ -10,17 +10,16 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 //  #include <QTextCodec>
 //  #include <cstring>
 
-
 //  #include <QElapsedTimer>
 //  #include <QMutex>
 //  #include <QWaitCondition>
 //  #include <QRunnable>
 //  #include <deque>
 
-
 using CSync;
 
 namespace Occ {
+namespace LibSync {
 
 class DiscoveryPhase : GLib.Object {
 
@@ -113,7 +112,7 @@ class DiscoveryPhase : GLib.Object {
     /***********************************************************
     Input
     ***********************************************************/
-    public AccountPointer account;
+    public unowned Account account;
 
     /***********************************************************
     Input
@@ -514,5 +513,6 @@ class DiscoveryPhase : GLib.Object {
 
 } // class DiscoveryPhase
 
+} // namespace LibSync
 } // namespace Occ
     

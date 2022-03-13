@@ -430,7 +430,7 @@ class SocketApi : GLib.Object {
     through the event loop and never directly.
     ***********************************************************/
     private static void fetch_private_link_url (
-        AccountPointer account,
+        unowned Account account,
         string remote_path,
         GLib.ByteArray numeric_file_id,
         GLib.Object target,
@@ -721,7 +721,7 @@ class SocketApi : GLib.Object {
         if (!file_data.folder)
             return;
 
-        AccountPointer account = file_data.folder.account_state ().account ();
+        unowned Account account = file_data.folder.account_state ().account ();
         var get_or_create_public_link_share_job = new GetOrCreatePublicLinkShare (account, file_data.server_relative_path, this);
         connect (
             get_or_create_public_link_share_job,

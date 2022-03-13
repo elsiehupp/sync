@@ -15,10 +15,8 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 //  #include <common/checksums.h>
 //  #include <common/constants.h>
 
-
-
-
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 Job that handles discovery of a directory.
@@ -2126,4 +2124,5 @@ class ProcessDirectoryJob : GLib.Object {
 
 } // class ProcessDirectoryJob
 
+} // namespace LibSync
 } // namespace Occ

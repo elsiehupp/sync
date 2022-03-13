@@ -20,6 +20,7 @@ Removing the root encrypted folder is consisted of multiple steps:
 
 
 namespace Occ {
+namespace LibSync {
 
 class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteDeleteEncrypted {
 
@@ -193,4 +194,5 @@ class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteDeleteEn
 
 } // class PropagateRemoteDeleteEncryptedRootFolder
 
+} // namespace LibSync
 } // namespace Occ

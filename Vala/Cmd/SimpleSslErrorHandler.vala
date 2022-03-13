@@ -14,11 +14,11 @@ class SimpleSslErrorHandler : Occ.AbstractSslErrorHandler {
 
     /***********************************************************
     ***********************************************************/
-    public bool handle_errors (GLib.List<QSslError> errors, QSslConfiguration conf, GLib.List<QSslCertificate> *certificates, Occ.AccountPointer) override;
+    public bool handle_errors (GLib.List<QSslError> errors, QSslConfiguration conf, GLib.List<QSslCertificate> *certificates, Occ.unowned Account) override;
 }
 
 
-    bool SimpleSslErrorHandler.handle_errors (GLib.List<QSslError> errors, QSslConfiguration conf, GLib.List<QSslCertificate> *certificates, Occ.AccountPointer account) {
+    bool SimpleSslErrorHandler.handle_errors (GLib.List<QSslError> errors, QSslConfiguration conf, GLib.List<QSslCertificate> *certificates, Occ.unowned Account account) {
         (void)account;
         (void)conf;
 

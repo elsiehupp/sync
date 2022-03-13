@@ -6,12 +6,12 @@ class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    AccountPointer account {
+    unowned Account account {
         public get {
             this.account_state.account ();
         }
     }
-    AccountStatePtr account_state { public get; private set; }
+    unowned AccountState account_state { public get; private set; }
     bool is_current_user { public get; public set; }
 
     ActivityListModel activity_model { public get; private set; }
@@ -49,7 +49,7 @@ class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public User (AccountStatePtr account, bool is_current = false, GLib.Object parent = new GLib.Object ()) {
+    public User (unowned AccountState account, bool is_current = false, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.account_state = account;
         this.is_current_user = is_current;
@@ -186,7 +186,7 @@ class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool is_connected () {
-        return (this.account_state.connection_status () == AccountState.ConnectionStatus.Connected);
+        return (this.account_state.connection_status () == AccountState.ConnectionValidator.Status.Connected);
     }
 
 
@@ -629,7 +629,7 @@ class User : GLib.Object {
         };
 
         if (valid_verbs.contains (verb)) {
-            AccountStatePtr acc = AccountManager.instance ().account (account_name);
+            unowned AccountState acc = AccountManager.instance ().account (account_name);
             if (acc) {
                 var job = new NotificationConfirmJob (acc.account ());
                 GLib.Uri l = new GLib.Uri (link);

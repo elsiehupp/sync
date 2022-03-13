@@ -6,6 +6,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The MkColJob class
@@ -27,14 +28,14 @@ class MkColJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public MkColJob.for_account (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+    public MkColJob.for_account (unowned Account account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public MkColJob.for_url (AccountPointer account, GLib.Uri url,
+    public MkColJob.for_url (unowned Account account, GLib.Uri url,
         GLib.HashTable<GLib.ByteArray, GLib.ByteArray> extra_headers, GLib.Object parent) {
         base (account, "", parent);
         this.url = url;
@@ -44,7 +45,7 @@ class MkColJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public MkColJob.for_path (AccountPointer account, string path,
+    public MkColJob.for_path (unowned Account account, string path,
         GLib.HashTable<GLib.ByteArray, GLib.ByteArray> extra_headers, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
         this.extra_headers = extra_headers;
@@ -87,4 +88,5 @@ class MkColJob : AbstractNetworkJob {
 
 } // class MkColJobs
 
+} // namespace LibSync
 } // namespace Occ

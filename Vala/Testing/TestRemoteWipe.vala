@@ -25,7 +25,7 @@ class TestRemoteWipe : GLib.Object {
 
 //        string directory_path = dir_to_remove.canonical_path ();
 
-//        AccountPointer account = Account.create ();
+//        unowned Account account = Account.create ();
 //        GLib.assert_true (account);
 
 //        var manager = AccountManager.instance ();

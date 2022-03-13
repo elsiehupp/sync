@@ -12,6 +12,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QTimer>
 
 namespace Occ {
+namespace LibSync {
 namespace Progress {
 
 /***********************************************************
@@ -124,5 +125,6 @@ class ProgressDispatcher : GLib.Object {
 } // class ProgressDispatcher
 
 } // namespace Progress
+} // namespace LibSync
 } // namespace Occ
     

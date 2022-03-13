@@ -49,7 +49,7 @@ class AccountManager : GLib.Object {
     (this is a list of unowned for internal reasons, one should
     normally not keep a copy of them)
     ***********************************************************/
-    GLib.List<AccountStatePtr> accounts { public get; private set; }
+    GLib.List<unowned AccountState> accounts { public get; private set; }
 
     /***********************************************************
     Account ids from settings that weren't read
@@ -147,7 +147,7 @@ class AccountManager : GLib.Object {
     Add this account in the list of saved accounts.
     Typically called from the wizard
     ***********************************************************/
-    public AccountState add_account (AccountPointer new_account) {
+    public AccountState add_account (unowned Account new_account) {
         var identifier = new_account.identifier ();
         if (identifier.is_empty () || !is_account_id_available (identifier)) {
             identifier = generate_free_account_id ();
@@ -177,13 +177,13 @@ class AccountManager : GLib.Object {
     Return the account state pointer for an account identified
     by its display name
     ***********************************************************/
-    public AccountStatePtr account (string name) {
+    public unowned AccountState account (string name) {
         foreach (Account acc in this.accounts) {
             if (acc.account ().display_name () == name) {
                 return acc;
             }
         }
-        return new AccountStatePtr ();
+        return new unowned AccountState ();
     }
 
 
@@ -219,8 +219,8 @@ class AccountManager : GLib.Object {
     Creates an account and sets up some basic handlers.
     Does not* add the account to the account manager just yet.
     ***********************************************************/
-    public static AccountPointer create_account () {
-        AccountPointer acc = Account.create ();
+    public static unowned Account create_account () {
+        unowned Account acc = Account.create ();
         acc.ssl_error_handler (new SslDialogErrorHandler ());
         connect (acc.data (), Account.proxy_authentication_required,
             ProxyAuthHandler.instance (), ProxyAuthHandler.on_signal_handle_proxy_authentication_required);
@@ -304,12 +304,12 @@ class AccountManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private AccountPointer load_account_helper (QSettings settings) {
+    private unowned Account load_account_helper (QSettings settings) {
         var url_config = settings.value (URL_C);
         if (!url_config.is_valid ()) {
             // No URL probably means a corrupted entry in the account settings
             GLib.warning ("No URL for account " + settings.group ());
-            return AccountPointer ();
+            return unowned Account ();
         }
 
         var acc = create_account ();
@@ -481,7 +481,7 @@ class AccountManager : GLib.Object {
             this, AccountManager.on_signal_save_account
         );
 
-        AccountStatePtr ptr = new AccountStatePtr (account_state);
+        unowned AccountState ptr = new unowned AccountState (account_state);
         this.accounts += ptr;
         /* emit */ account_added (account_state);
     }

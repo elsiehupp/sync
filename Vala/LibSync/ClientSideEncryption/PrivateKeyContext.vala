@@ -1,10 +1,11 @@
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 Simple classes for safe (RAII) handling of OpenSSL
 data structures
 ***********************************************************/
-class PrivateKeyContext {
+class PrivateKeyContext : GLib.Object {
 
     //  Q_DISABLE_COPY (PrivateKeyContext)
 
@@ -45,4 +46,5 @@ class PrivateKeyContext {
 
 } // class PrivateKeyContext
 
+} // namespace LibSync
 } // namespace Occ

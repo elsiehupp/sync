@@ -4,10 +4,10 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-
 //  #include <QScopedPointer>
 
 namespace Occ {
+namespace LibSync {
 
 class VfsSuffix : Vfs {
 
@@ -24,11 +24,13 @@ class VfsSuffix : Vfs {
         return WithSuffix;
     }
 
+
     /***********************************************************
     ***********************************************************/
     public string file_suffix () {
         return APPLICATION_DOTVIRTUALFILE_SUFFIX;
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -42,7 +44,6 @@ class VfsSuffix : Vfs {
     public void unregister_folder () {
         return;
     }
-
 
 
     /***********************************************************
@@ -136,6 +137,7 @@ class VfsSuffix : Vfs {
         return Vfs.ConvertToPlaceholderResult.Ok;
     }
 
+
     /***********************************************************
     ***********************************************************/
     public bool needs_metadata_update (SyncFileItem item) {
@@ -209,4 +211,5 @@ class VfsSuffix : Vfs {
 
 } // class VfsSuffix
 
+} // namespace LibSync
 } // namespace Occ

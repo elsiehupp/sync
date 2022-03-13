@@ -11,8 +11,7 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 //  #include <QMimeDatabase>
 
 namespace Occ {
-
-
+namespace LibSync {
 
 // Q_DECLARE_FLAGS (PushNotificationTypes, PushNotificationType)
 // Q_DECLARE_OPERATORS_FOR_FLAGS (PushNotificationTypes)
@@ -22,7 +21,7 @@ namespace Occ {
 server
 @ingroup libsync
 ***********************************************************/
-class Capabilities {
+class Capabilities : GLib.Object {
 
     public enum PushNotificationType {
         NONE = 0,
@@ -482,7 +481,9 @@ class Capabilities {
 
         return null;
     }
-}
 
-}
+} // class Capabilities
+
+} // namespace LibSync
+} // namespace Occ
     

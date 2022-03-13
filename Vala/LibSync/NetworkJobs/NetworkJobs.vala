@@ -32,8 +32,8 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QJsonDocument>
 //  #include <functional>
 
-
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 Strips quotes and gzip annotations
@@ -70,4 +70,5 @@ struct ExtraFolderInfo {
     int64 size = -1;
 }
 
+} // namespace LibSync
 } // namespace Occ

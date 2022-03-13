@@ -11,6 +11,7 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 //  }
 
 namespace Occ {
+namespace LibSync {
 
 class VfsXAttr : Vfs {
 
@@ -20,11 +21,13 @@ class VfsXAttr : Vfs {
         base (parent);
     }
 
+
     /***********************************************************
     ***********************************************************/
     public Vfs.Mode mode () {
         return XAttr;
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -32,22 +35,26 @@ class VfsXAttr : Vfs {
         return "";
     }
 
+
     /***********************************************************
     ***********************************************************/
-    public void stop ();
-    void VfsXAttr.stop () {
+    public void stop () {
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public 
-    void VfsXAttr.unregister_folder () {
+    public void unregister_folder () {
+        return;
     }
 
-    bool VfsXAttr.socket_api_pin_state_actions_shown () {
+
+    /***********************************************************
+    ***********************************************************/
+    public bool socket_api_pin_state_actions_shown () {
         return true;
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -201,11 +208,14 @@ class VfsXAttr : Vfs {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     protected void start_impl (VfsSetupParams parameters) {
         return;
     }
 
 } // class VfsXAttr
 
+} // namespace LibSync
 } // namespace Occ
     

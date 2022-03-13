@@ -263,7 +263,7 @@ class TestPushNotifications : GLib.Object {
         }
     }
     
-    static bool verify_called_once_with_account (QSignalSpy spy, Occ.AccountPointer account) {
+    static bool verify_called_once_with_account (QSignalSpy spy, Occ.unowned Account account) {
         return_false_on_fail (spy.count () == 1);
         var account_from_spy = spy.at (0).at (0).value<Occ.Account> ();
         return_false_on_fail (account_from_spy == account.data ());
@@ -271,7 +271,7 @@ class TestPushNotifications : GLib.Object {
         return true;
     }
     
-    static bool fail_three_authentication_attempts (FakeWebSocketServer fake_server, Occ.AccountPointer account) {
+    static bool fail_three_authentication_attempts (FakeWebSocketServer fake_server, Occ.unowned Account account) {
         return_false_on_fail (account);
         return_false_on_fail (account.push_notifications ());
     

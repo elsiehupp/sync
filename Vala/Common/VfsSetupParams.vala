@@ -43,7 +43,7 @@ struct VfsSetupParams {
     /***********************************************************
     Account url, credentials etc for network calls
     ***********************************************************/
-    AccountPointer account;
+    unowned Account account;
 
 
     /***********************************************************

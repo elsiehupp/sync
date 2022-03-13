@@ -5,6 +5,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 namespace Progress {
 
 /***********************************************************
@@ -590,4 +591,5 @@ class ProgressInfo : GLib.Object {
 } // class ProgressInfo
 
 } // namespace Progress
+} // namespace LibSync
 } // namespace Occ

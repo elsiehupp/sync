@@ -1,9 +1,10 @@
 namespace Occ {
-
+namespace LibSync {
+    
 /***********************************************************
 Generates the Metadata for the folder
 ***********************************************************/
-struct EncryptedFile {
+class EncryptedFile : GLib.Object {
     GLib.ByteArray encryption_key;
     GLib.ByteArray mimetype;
     GLib.ByteArray initialization_vector;
@@ -14,4 +15,5 @@ struct EncryptedFile {
     int metadata_key;
 }
 
+} // namespace LibSync
 } // namespace Occ

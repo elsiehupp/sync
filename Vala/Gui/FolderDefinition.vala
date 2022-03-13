@@ -182,7 +182,7 @@ class FolderDefinition {
     Returns the relative journal path that's appropriate for
     this folder and account.
     ***********************************************************/
-    public string default_journal_path (AccountPointer account) {
+    public string default_journal_path (unowned Account account) {
         return SyncJournalDb.make_database_name (local_path, account.url (), target_path, account.credentials ().user ());
     }
 

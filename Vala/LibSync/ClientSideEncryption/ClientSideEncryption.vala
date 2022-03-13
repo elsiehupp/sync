@@ -42,6 +42,7 @@
 //  #include <openssl/evp.h>
 
 namespace Occ {
+namespace LibSync {
 
 class ClientSideEncryption : GLib.Object {
 
@@ -104,7 +105,7 @@ class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void initialize (AccountPointer account) {
+    public void initialize (unowned Account account) {
         //  Q_ASSERT (account);
 
         GLib.info ("Initializing");
@@ -120,7 +121,7 @@ class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void generate_key_pair (AccountPointer account) {
+    private void generate_key_pair (unowned Account account) {
         // AES/GCM/No_padding,
         // metadata_keys with RSA/ECB/OAEPWith_sHA-256And_mGF1Padding
         GLib.info ("No public key, generating a pair.");
@@ -164,7 +165,7 @@ class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void generate_csr.for_account (AccountPointer account, EVP_PKEY key_pair) {
+    private void generate_csr.for_account (unowned Account account, EVP_PKEY key_pair) {
         // OpenSSL expects const char.
         var cn_array = account.dav_user ().to_local8Bit ();
         GLib.info ("Getting the following array for the account identifier " + cn_array);
@@ -235,8 +236,8 @@ class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void encrypt_private_key (AccountPointer account) {
-        string[] list = Word_list.get_random_words (12);
+    private void encrypt_private_key (unowned Account account) {
+        string[] list = WordList.get_random_words (12);
         this.mnemonic = string.joinv (" ", list);
         this.new_mnemonic_generated = true;
         GLib.info ("Generated mnemonic: " + this.mnemonic);
@@ -273,7 +274,7 @@ class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void forget_sensitive_data (AccountPointer account) {
+    public void forget_sensitive_data (unowned Account account) {
         this.private_key = new GLib.ByteArray ();
         this.certificate = new QSslCertificate ();
         this.public_key = new QSslKey ();
@@ -304,7 +305,7 @@ class ClientSideEncryption : GLib.Object {
     ***********************************************************/
     private void on_signal_public_key_fetched (Job incoming) {
         var read_job = static_cast<ReadPasswordJob> (incoming);
-        var account = read_job.property (ACCOUNT_PROPERTY).value<AccountPointer> ();
+        var account = read_job.property (ACCOUNT_PROPERTY).value<unowned Account> ();
         //  Q_ASSERT (account);
 
         // Error or no valid public key error out
@@ -343,7 +344,7 @@ class ClientSideEncryption : GLib.Object {
     ***********************************************************/
     private void on_signal_private_key_fetched (QKeychain.Job incoming) {
         var read_job = static_cast<ReadPasswordJob> (incoming);
-        var account = read_job.property (ACCOUNT_PROPERTY).value<AccountPointer> ();
+        var account = read_job.property (ACCOUNT_PROPERTY).value<unowned Account> ();
         //  Q_ASSERT (account);
 
         // Error or no valid public key error out
@@ -383,7 +384,7 @@ class ClientSideEncryption : GLib.Object {
     ***********************************************************/
     private void on_signal_mnemonic_key_fetched (QKeychain.Job incoming) {
         var read_job = static_cast<ReadPasswordJob> (incoming);
-        var account = read_job.property (ACCOUNT_PROPERTY).value<AccountPointer> ();
+        var account = read_job.property (ACCOUNT_PROPERTY).value<unowned Account> ();
         //  Q_ASSERT (account);
 
         // Error or no valid public key error out
@@ -405,7 +406,7 @@ class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void get_private_key_from_server (AccountPointer account) {
+    private void get_private_key_from_server (unowned Account account) {
         GLib.info ("Retrieving private key from server.");
         var job = new JsonApiJob (account, E2EE_BASE_URL + "private-key", this);
         JsonApiJob.signal_json_received.connect ((job, doc, return_code) => {
@@ -426,7 +427,7 @@ class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void get_public_key_from_server (AccountPointer account) {
+    private void get_public_key_from_server (unowned Account account) {
         GLib.info ("Retrieving public key from server.");
         var job = new JsonApiJob (account, E2EE_BASE_URL + "public-key", this);
         JsonApiJob.signal_json_received.connect ((job, doc, return_code) => {
@@ -449,7 +450,7 @@ class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void fetch_and_validate_public_key_from_server (AccountPointer account) {
+    private void fetch_and_validate_public_key_from_server (unowned Account account) {
         GLib.info ("Retrieving public key from server.");
         var job = new JsonApiJob (account, E2EE_BASE_URL + "server-key", this);
         JsonApiJob.signal_json_received.connect (job, doc, return_code) => {
@@ -482,7 +483,7 @@ class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void decrypt_private_key.for_account (AccountPointer account, GLib.ByteArray key) {
+    private void decrypt_private_key.for_account (unowned Account account, GLib.ByteArray key) {
         string message = _("Please enter your end to end encryption passphrase:<br>"
                         + "<br>"
                         + "User : %2<br>"
@@ -543,7 +544,7 @@ class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void fetch_from_key_chain (AccountPointer account) {
+    private void fetch_from_key_chain (unowned Account account) {
         const string kck = AbstractCredentials.keychain_key (
                     account.url ().to_string (),
                     account.credentials ().user () + E2E_CERTIFICATE,
@@ -561,7 +562,7 @@ class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private bool check_public_key_validity (AccountPointer account) {
+    private bool check_public_key_validity (unowned Account account) {
         GLib.ByteArray data = EncryptionHelper.generate_random (64);
 
         Biometric public_key_bio;
@@ -615,7 +616,7 @@ class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void write_private_key (AccountPointer account) {
+    private void write_private_key (unowned Account account) {
         const string kck = AbstractCredentials.keychain_key (
                     account.url ().to_string (),
                     account.credentials ().user () + E2E_PRIVATE,
@@ -636,7 +637,7 @@ class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void write_certificate (AccountPointer account) {
+    private void write_certificate (unowned Account account) {
         const string kck = AbstractCredentials.keychain_key (
                     account.url ().to_string (),
                     account.credentials ().user () + E2E_CERTIFICATE,
@@ -657,7 +658,7 @@ class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void write_mnemonic (AccountPointer account) {
+    private void write_mnemonic (unowned Account account) {
         const string kck = AbstractCredentials.keychain_key (
             account.url ().to_string (),
             account.credentials ().user () + E2E_MNEMONIC,
@@ -722,4 +723,5 @@ class ClientSideEncryption : GLib.Object {
 
 } // class ClientSideEncryption
 
+} // namespace LibSync
 } // namespace Occ

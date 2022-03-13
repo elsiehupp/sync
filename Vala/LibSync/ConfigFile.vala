@@ -28,12 +28,13 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <chrono>
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The ConfigFile class
 @ingroup libsync
 ***********************************************************/
-class ConfigFile {
+class ConfigFile : GLib.Object {
 
     //  Q_GLOBAL_STATIC (string, g_config_filename)
 
@@ -46,13 +47,11 @@ class ConfigFile {
 
     //  const int QTLEGACY (QT_VERSION < QT_VERSION_CHECK (5,9,0))
 
-    const int DEFAULT_REMOTE_POLL_INTERVAL = 30000 // default remote poll time in milliseconds
-    const int DEFAULT_MAX_LOG_LINES = 20000
-    
+    const int DEFAULT_REMOTE_POLL_INTERVAL = 30000; // default remote poll time in milliseconds
+    const int DEFAULT_MAX_LOG_LINES = 20000;
     
     //  namespace chrono = std.chrono;
-    
-    
+
     //  const string CA_CERTS_KEY_C = "CaCertificates"; only used from account
     const string REMOTE_POLL_INTERVAL_C = "remote_poll_interval";
     const string FORCE_SYNC_INTERVAL_C = "force_sync_interval";
@@ -1375,4 +1374,5 @@ class ConfigFile {
 
 } // class ConfigFile
 
+} // namespace LibSync
 } // namespace Occ

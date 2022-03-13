@@ -5,7 +5,9 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 ***********************************************************/
 
 using CSync;
+
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief Run list on a local directory and process the results
@@ -13,12 +15,12 @@ for Discovery
 
 @ingroup libsync
 ***********************************************************/
-class DiscoverySingleLocalDirectoryJob : GLib.Object, QRunnable {
+class DiscoverySingleLocalDirectoryJob : GLib.Object /*, QRunnable*/ {
 
     /***********************************************************
     ***********************************************************/
     private string local_path;
-    private AccountPointer account;
+    private unowned Account account;
     private Occ.Vfs vfs;
 
 
@@ -31,7 +33,7 @@ class DiscoverySingleLocalDirectoryJob : GLib.Object, QRunnable {
 
     /***********************************************************
     ***********************************************************/
-    public DiscoverySingleLocalDirectoryJob.for_account (AccountPointer account, string local_path, Occ.Vfs vfs, GLib.Object parent = new GLib.Object ()) {
+    public DiscoverySingleLocalDirectoryJob.for_account (unowned Account account, string local_path, Occ.Vfs vfs, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.local_path = local_path;
         this.account = account;
@@ -122,4 +124,5 @@ class DiscoverySingleLocalDirectoryJob : GLib.Object, QRunnable {
 
 } // class DiscoverySingleLocalDirectoryJob
 
+} // namespace LibSync
 } // namespace Occ

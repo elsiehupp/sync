@@ -2,6 +2,7 @@
 //  #include <GLib.FileInfo>
 
 namespace Occ {
+namespace LibSync {
 
 class PropagateDownloadEncrypted : GLib.Object {
 
@@ -162,4 +163,5 @@ class PropagateDownloadEncrypted : GLib.Object {
 
 } // class PropagateDownloadEncrypted
 
+} // namespace LibSync
 } // namespace Occ

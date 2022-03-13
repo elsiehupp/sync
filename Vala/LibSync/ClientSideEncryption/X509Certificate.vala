@@ -1,10 +1,11 @@
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 Simple classes for safe (RAII) handling of OpenSSL
 data structures
 ***********************************************************/
-class X509Certificate {
+class X509Certificate : GLib.Object {
 
     //  private Q_DISABLE_COPY (X509Certificate)
 
@@ -44,4 +45,5 @@ class X509Certificate {
 
 } // class X509Certificate
 
+} // namespace LibSync
 } // namespace Occ

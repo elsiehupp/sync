@@ -9,6 +9,7 @@
 //  #include <QMimeDatabase>
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 This class is used if the server supports end to end
@@ -21,7 +22,6 @@ finalized () if the encrypted file is ready to be
 error () if there was an error with the encryption
 folder_not_encrypted () if the file is within a folder that's not encrypted.
 ***********************************************************/
-
 class PropagateUploadEncrypted : GLib.Object {
 
     /***********************************************************
@@ -379,5 +379,6 @@ class PropagateUploadEncrypted : GLib.Object {
 
 } // class PropagateUploadEncrypted
 
+} // namespace LibSync
 } // namespace Occ
   

@@ -135,7 +135,7 @@ class OwncloudSetupWizard : GLib.Object {
         if (!fixed_url.starts_with ("http://") && !fixed_url.starts_with ("https://")) {
             url.scheme ("https");
         }
-        AccountPointer account = this.oc_wizard.account ();
+        unowned Account account = this.oc_wizard.account ();
         account.url (url);
 
         // Reset the proxy which might had been determined previously in ConnectionValidator.on_signal_check_server_and_auth ()
@@ -176,7 +176,7 @@ class OwncloudSetupWizard : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_find_server () {
-        AccountPointer account = this.oc_wizard.account ();
+        unowned Account account = this.oc_wizard.account ();
 
         // Set fake credentials before we check what credential it actually is.
         account.credentials (CredentialsFactory.create ("dummy"));
@@ -204,7 +204,7 @@ class OwncloudSetupWizard : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_find_server_behind_redirect () {
-        AccountPointer account = this.oc_wizard.account ();
+        unowned Account account = this.oc_wizard.account ();
 
         // Step 2: Resolve any permanent redirect chains on the base url
         var redirect_check_job = account.send_request ("GET", account.url ());
@@ -233,7 +233,7 @@ class OwncloudSetupWizard : GLib.Object {
     }
 
 
-    private void on_redirect_check_job (int permanent_redirects, AccountPointer account, Soup.Reply reply, GLib.Uri target_url, int count) {
+    private void on_redirect_check_job (int permanent_redirects, unowned Account account, Soup.Reply reply, GLib.Uri target_url, int count) {
         int http_code = reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (count == *permanent_redirects && (http_code == 301 || http_code == 308)) {
             GLib.info (account.url () + " was redirected to " + target_url);
@@ -243,7 +243,7 @@ class OwncloudSetupWizard : GLib.Object {
     }
 
 
-    private void on_redirect_check_job_finished (AccountPointer account) {
+    private void on_redirect_check_job_finished (unowned Account account) {
         var job = new CheckServerJob (account, this);
         job.ignore_credential_failure (true);
         connect (job, CheckServerJob.instance_found, this, OwncloudSetupWizard.on_signal_found_server);
@@ -590,7 +590,7 @@ class OwncloudSetupWizard : GLib.Object {
         } else {
             GLib.info ("No system proxy set by OS.");
         }
-        AccountPointer account = this.oc_wizard.account ();
+        unowned Account account = this.oc_wizard.account ();
         account.network_access_manager ().proxy (proxy);
 
         on_signal_find_server ();
@@ -664,7 +664,7 @@ class OwncloudSetupWizard : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void start_wizard () {
-        AccountPointer account = AccountManager.create_account ();
+        unowned Account account = AccountManager.create_account ();
         account.credentials (CredentialsFactory.create ("dummy"));
         account.url (Theme.instance ().override_server_url ());
         this.oc_wizard.account (account);
@@ -709,7 +709,7 @@ class OwncloudSetupWizard : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void test_owncloud_connect () {
-        AccountPointer account = this.oc_wizard.account ();
+        unowned Account account = this.oc_wizard.account ();
 
         var job = new PropfindJob (account, "/", this);
         job.ignore_credential_failure (true);
@@ -820,7 +820,7 @@ class OwncloudSetupWizard : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private AccountState apply_account_changes () {
-        AccountPointer new_account = this.oc_wizard.account ();
+        unowned Account new_account = this.oc_wizard.account ();
 
         // Detach the account that is going to be saved from the
         // wizard to ensure it doesn't accidentally get modified

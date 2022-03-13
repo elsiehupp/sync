@@ -23,7 +23,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QIcon>
 
 namespace Occ {
-
+namespace LibSync {
 
 /***********************************************************
 @brief The Theme class
@@ -1252,6 +1252,8 @@ class Theme : GLib.Object {
     private static bool should_prefer_svg () {
         return GLib.ByteArray (APPLICATION_ICON_SET).to_upper () == GLib.ByteArray ("SVG");
     }
-}
 
-} // end namespace client
+} // class Theme
+
+} // namespace LibSync
+} // namespace Occ

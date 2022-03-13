@@ -19,13 +19,13 @@ class FolderWizardRemotePath : FormatWarningsWizardPage {
     ***********************************************************/
     private Ui_Folder_wizard_target_page ui;
     private bool warn_was_visible;
-    private AccountPointer account;
+    private unowned Account account;
     private QTimer lscol_timer;
     private string[] encrypted_paths;
 
     /***********************************************************
     ***********************************************************/
-    public FolderWizardRemotePath (AccountPointer account) {
+    public FolderWizardRemotePath (unowned Account account) {
         base ();
         this.warn_was_visible = false;
         this.account = account;

@@ -28,7 +28,7 @@ class FakeFolder {
 
     // FIXME: Clarify ownership, double delete
     FakeQNAM fake_qnam;
-    Occ.AccountPointer account;
+    Occ.unowned Account account;
     std.unique_ptr<Occ.SyncJournalDb> journal_database;
     std.unique_ptr<Occ.SyncEngine> sync_engine;
 
@@ -84,7 +84,7 @@ class FakeFolder {
 
     /***********************************************************
     ***********************************************************/
-    public Occ.AccountPointer account () {
+    public Occ.unowned Account account () {
         return this.account;
     }
 

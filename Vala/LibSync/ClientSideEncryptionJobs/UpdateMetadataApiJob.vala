@@ -5,6 +5,7 @@ expects a response is here.
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 class UpdateMetadataApiJob : AbstractNetworkJob {
 
@@ -22,7 +23,7 @@ class UpdateMetadataApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public UpdateMetadataApiJob (
-        AccountPointer account,
+        unowned Account account,
         GLib.ByteArray file_identifier,
         GLib.ByteArray b64_metadata,
         GLib.ByteArray locked_token,
@@ -77,4 +78,5 @@ class UpdateMetadataApiJob : AbstractNetworkJob {
 
 } // class UpdateMetadataApiJob
 
+} // namespace LibSync
 } // namespace Occ

@@ -22,7 +22,7 @@ class FolderWizardSelectiveSync : QWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public FolderWizardSelectiveSync (AccountPointer account) {
+    public FolderWizardSelectiveSync (unowned Account account) {
         var layout = new QVBoxLayout (this);
         this.selective_sync = new SelectiveSyncWidget (account, this);
         layout.add_widget (this.selective_sync);

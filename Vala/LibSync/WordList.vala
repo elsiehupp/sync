@@ -3,7 +3,9 @@
 // #include <initializer_list>
 
 namespace Occ {
-class Word_list {
+namespace LibSync {
+
+class WordList : GLib.Object {
 
     public static string[] get_random_words (int nr) {
         string[] word_list = {
@@ -2088,10 +2090,11 @@ class Word_list {
             num += c;
         }
 
-        return static_cast<int> (num % max);
+        return (int) (num % max);
     }
 
 
-} // class Word_list
+} // class WordList
 
+} // namespace LibSync
 } // namespace Occ

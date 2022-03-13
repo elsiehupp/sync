@@ -12,6 +12,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @ingroup libsync
@@ -122,7 +123,7 @@ class PropagateUploadFileV1 : PropagateUploadFileCommon {
         abort_network_jobs (
             abort_type,
             [this, abort_type] (AbstractNetworkJob job) {
-                if (var put_job = qobject_cast<PUTFile_job> (job)) {
+                if (var put_job = qobject_cast<PUTFileJob> (job)) {
                     if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS
                         && this.chunk_count > 0
                         && ( ( (this.current_chunk + this.start_chunk) % this.chunk_count) == 0)
@@ -201,11 +202,11 @@ class PropagateUploadFileV1 : PropagateUploadFileCommon {
 
         // job takes ownership of device via a QScopedPointer. Job deletes itself when finishing
         var device_ptr = device; // for connections later
-        var job = new PUTFile_job (propagator ().account (), propagator ().full_remote_path (path), std.move (device), headers, this.current_chunk, this);
+        var job = new PUTFileJob (propagator ().account (), propagator ().full_remote_path (path), std.move (device), headers, this.current_chunk, this);
         this.jobs.append (job);
-        connect (job, PUTFile_job.signal_finished, this, PropagateUploadFileV1.on_signal_put_finished);
-        connect (job, PUTFile_job.signal_upload_progress, this, PropagateUploadFileV1.on_signal_upload_progress);
-        connect (job, PUTFile_job.signal_upload_progress, device_ptr, UploadDevice.on_signal_job_upload_progress);
+        connect (job, PUTFileJob.signal_finished, this, PropagateUploadFileV1.on_signal_put_finished);
+        connect (job, PUTFileJob.signal_upload_progress, this, PropagateUploadFileV1.on_signal_upload_progress);
+        connect (job, PUTFileJob.signal_upload_progress, device_ptr, UploadDevice.on_signal_job_upload_progress);
         connect (job, GLib.Object.destroyed, this, PropagateUploadFileCommon.on_signal_job_destroyed);
         if (is_final_chunk)
             adjust_last_job_timeout (job, file_size);
@@ -251,7 +252,7 @@ class PropagateUploadFileV1 : PropagateUploadFileCommon {
     /***********************************************************
     ***********************************************************/
     private void on_signal_put_finished () {
-        var job = qobject_cast<PUTFile_job> (sender ());
+        var job = qobject_cast<PUTFileJob> (sender ());
         //  ASSERT (job);
 
         on_signal_job_destroyed (job); // remove it from the this.jobs list
@@ -344,7 +345,7 @@ class PropagateUploadFileV1 : PropagateUploadFileCommon {
             var current_chunk = job.chunk;
             foreach (var job in this.jobs) {
                 // Take the minimum on_signal_finished one
-                if (var put_job = qobject_cast<PUTFile_job> (job)) {
+                if (var put_job = qobject_cast<PUTFileJob> (job)) {
                     current_chunk = q_min (current_chunk, put_job.chunk - 1);
                 }
             }
@@ -421,6 +422,7 @@ class PropagateUploadFileV1 : PropagateUploadFileCommon {
         propagator ().report_progress (*this.item, amount);
     }
 
-}
+} // class PropagateUploadV1
 
-}
+} // namespace LibSync
+} // namespace Occ

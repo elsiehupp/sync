@@ -7,6 +7,7 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 //  #include <QLoggingCategory>
 
 namespace Occ {
+namespace LibSync {
 
 class EncryptFolderJob : GLib.Object {
 
@@ -20,7 +21,7 @@ class EncryptFolderJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private AccountPointer account;
+    private unowned Account account;
     private SyncJournalDb journal;
     private string path;
     private GLib.ByteArray file_identifier;
@@ -33,7 +34,7 @@ class EncryptFolderJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public EncryptFolderJob.for_account (AccountPointer account, SyncJournalDb journal, string path, GLib.ByteArray file_identifier, GLib.Object parent = new GLib.Object ()) {
+    public EncryptFolderJob.for_account (unowned Account account, SyncJournalDb journal, string path, GLib.ByteArray file_identifier, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.account = account;
         this.journal = journal;
@@ -154,5 +155,6 @@ class EncryptFolderJob : GLib.Object {
 
 } // class EncryptFolderJob
 
+} // namespace LibSync
 } // namespace Occ
     

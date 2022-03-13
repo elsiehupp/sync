@@ -244,7 +244,7 @@ int main (int argc, char **argv) {
         q_message_pattern ("%{time MM-dd hh:mm:ss:zzz} [ %{type} %{category} ]%{if-debug}\t[ %{function} ]%{endif}:\t%{message}");
     }
 
-    AccountPointer account = Account.create ();
+    unowned Account account = Account.create ();
 
     if (!account) {
         q_fatal ("Could not initialize account!");

@@ -11,7 +11,7 @@ class SyncStatusSummary : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    AccountStatePtr account_state {
+    unowned AccountState account_state {
         private get {
             return this.account_state;
         }

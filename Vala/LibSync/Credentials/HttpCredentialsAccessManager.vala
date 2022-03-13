@@ -5,6 +5,7 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 namespace Occ {
+namespace LibSync {
 
 class HttpCredentialsAccessManager : AccessManager {
 
@@ -60,4 +61,5 @@ class HttpCredentialsAccessManager : AccessManager {
 
 } // class HttpCredentialsAccessManager
 
+} // namespace LibSync
 } // namespace Occ

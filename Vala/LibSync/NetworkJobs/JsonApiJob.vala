@@ -6,6 +6,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief Job to check an API that return JSON
@@ -89,7 +90,7 @@ class JsonApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public JsonApiJob.for_account (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+    public JsonApiJob.for_account (unowned Account account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
@@ -193,4 +194,5 @@ class JsonApiJob : AbstractNetworkJob {
 
 } // class JsonApiJob
 
+} // namespace LibSync
 } // namespace Occ

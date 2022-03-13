@@ -1,4 +1,5 @@
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 Simple classes for safe (RAII) handling of OpenSSL
@@ -26,4 +27,5 @@ class Biometric {
 
 } // class Biometric
 
+} // namespace LibSync
 } // namespace Occ

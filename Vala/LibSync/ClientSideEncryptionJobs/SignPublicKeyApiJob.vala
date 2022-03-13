@@ -5,6 +5,7 @@ expects a response is here.
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief Job to sigh the CSR that return JSON
@@ -47,7 +48,7 @@ class SignPublicKeyApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public SignPublicKeyApiJob (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+    public SignPublicKeyApiJob (unowned Account account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
@@ -82,4 +83,5 @@ class SignPublicKeyApiJob : AbstractNetworkJob {
 
 } // class SignPublicKeyApiJob
 
+} // namespace LibSync
 } // namespace Occ

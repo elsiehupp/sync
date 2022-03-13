@@ -7,11 +7,12 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 using CSync;
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 Represent all the meta-data about a file in the server
 ***********************************************************/
-class RemoteInfo {
+class RemoteInfo : Glib.Object {
     /***********************************************************
     FileName of the entry (this does not contains any directory
     or path, just the plain name).
@@ -37,4 +38,5 @@ class RemoteInfo {
 
 } // class RemoteInfo
 
+} // namespace LibSync
 } // namespace Occ

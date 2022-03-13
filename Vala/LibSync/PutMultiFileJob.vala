@@ -13,6 +13,7 @@ Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
 //  #include <memory>
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The PutMultiFileJob class
@@ -49,7 +50,7 @@ class PutMultiFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public PutMultiFileJob.for_account (AccountPointer account, GLib.Uri url,
+    public PutMultiFileJob.for_account (unowned Account account, GLib.Uri url,
         GLib.List<SingleUploadFileData> devices, GLib.Object parent = new GLib.Object ()) {
         base (account, {}, parent);
         this.devices = std.move (devices);
@@ -120,5 +121,6 @@ class PutMultiFileJob : AbstractNetworkJob {
 
 } // class PutMultiFileJob
 
+} // namespace LibSync
 } // namespace Occ
     

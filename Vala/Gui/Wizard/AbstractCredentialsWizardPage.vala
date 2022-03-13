@@ -22,7 +22,7 @@ class AbstractCredentialsWizardPage : QWizardPage {
     public void clean_up_page () {
         // Reset the credentials when the 'Back' button is used.
 
-        AccountPointer account = static_cast<OwncloudWizard> (wizard ()).account ();
+        unowned Account account = static_cast<OwncloudWizard> (wizard ()).account ();
         AbstractCredentials creds = account.credentials ();
         if (creds) {
             if (!creds.inherits ("DummyCredentials")) {

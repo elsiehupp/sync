@@ -11,12 +11,13 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 using CSync;
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The SyncFileItem class
 @ingroup libsync
 ***********************************************************/
-class SyncFileItem {
+class SyncFileItem : GLib.Object {
 
     private class SyncFileItemPtr : unowned SyncFileItem { }
     private class SyncFileItemVector : GLib.List<SyncFileItemPtr> { }
@@ -505,5 +506,6 @@ class SyncFileItem {
 
 } // class SyncFileItem
 
+} // namespace LibSync
 } // namespace Occ
     

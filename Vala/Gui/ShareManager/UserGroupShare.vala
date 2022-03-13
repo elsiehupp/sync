@@ -58,7 +58,7 @@ class UserGroupShare : Share {
     /***********************************************************
     ***********************************************************/
     public UserGroupShare (
-        AccountPointer account,
+        unowned Account account,
         string identifier,
         string owner,
         string owner_display_name,

@@ -33,13 +33,13 @@ class TestFolderMan : GLib.Object {
         }
         string directory_path = dir2.canonical_path ();
 
-        AccountPointer account = Account.create ();
+        unowned Account account = Account.create ();
         GLib.Uri url = new GLib.Uri ("http://example.de");
         var credentials = new HttpCredentialsTest ("testuser", "secret");
         account.set_credentials (credentials);
         account.set_url ( url );
 
-        AccountStatePtr new_account_state = new AccountStatePtr (new AccountState (account));
+        unowned AccountState new_account_state = new unowned AccountState (new AccountState (account));
         FolderMan folder_manager = FolderMan.instance ();
         GLib.assert_cmp (folder_manager, this.folder_manager);
         GLib.assert_true (folder_manager.add_folder (new_account_state.data (), folder_definition (directory_path + "/sub/own_cloud1")));
@@ -145,14 +145,14 @@ class TestFolderMan : GLib.Object {
         GLib.assert_true (dir2.mkpath ("free2/sub"));
         string directory_path = dir2.canonical_path ();
 
-        AccountPointer account = Account.create ();
+        unowned Account account = Account.create ();
         GLib.Uri url = new GLib.Uri ("http://example.de");
         var credentials = new HttpCredentialsTest ("testuser", "secret");
         account.set_credentials (credentials);
         account.set_url (url);
         url.set_user_name (credentials.user ());
 
-        AccountStatePtr new_account_state = new AccountStatePtr (new AccountState (account));
+        unowned AccountState new_account_state = new unowned AccountState (new AccountState (account));
         FolderMan folder_manager = FolderMan.instance ();
         GLib.assert_cmp (folder_manager, this.folder_manager);
         GLib.assert_true (folder_manager.add_folder (new_account_state.data (), folder_definition (directory_path + "/sub/own_cloud/")));

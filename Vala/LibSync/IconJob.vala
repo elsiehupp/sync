@@ -9,6 +9,7 @@ Copyright (C) by Camila Ayres <hello@camila.codes>
 using Soup;
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief Job to fetch a icon
@@ -22,7 +23,7 @@ class IconJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public IconJob.for_account (AccountPointer account, GLib.Uri url, GLib.Object parent = new GLib.Object ()) {
+    public IconJob.for_account (unowned Account account, GLib.Uri url, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         Soup.Request request = new Soup.Request (url);
     // #if (QT_VERSION >= 0x050600)
@@ -53,4 +54,5 @@ class IconJob : GLib.Object {
 
 } // class IconJob
 
+} // namespace LibSync
 } // namespace Occ

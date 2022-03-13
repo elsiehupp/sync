@@ -10,6 +10,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QCoreApplication>
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The NextcloudTheme class
@@ -29,4 +30,5 @@ class NextcloudTheme : Theme {
 
 } // class NextcloudTheme
 
+} // namespace LibSync
 } // namespace Occ

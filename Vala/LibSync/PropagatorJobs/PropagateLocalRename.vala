@@ -6,6 +6,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The PropagateLocalRename class
@@ -108,4 +109,5 @@ class PropagateLocalRename : PropagateItemJob {
 
 } // class PropagateLocalRenames
 
+} // namespace LibSync
 } // namespace Occ

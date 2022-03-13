@@ -5,6 +5,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The UploadDevice class
@@ -240,4 +241,5 @@ class UploadDevice : QIODevice {
 
 } // class UploadDevice
 
+} // namespace LibSync
 } // namespace Occ

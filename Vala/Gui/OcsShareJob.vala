@@ -42,7 +42,7 @@ class OcsShareJob : OcsJob {
     /***********************************************************
     Constructor for new shares or listing of shares
     ***********************************************************/
-    public OcsShareJob (AccountPointer account) {
+    public OcsShareJob (unowned Account account) {
         base (account);
         path ("ocs/v2.php/apps/files_sharing/api/v1/shares");
         connect (

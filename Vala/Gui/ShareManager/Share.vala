@@ -30,7 +30,7 @@ class Share : GLib.Object {
     /***********************************************************
     The account the share is defined on.
     ***********************************************************/
-    AccountPointer account { public get; protected set; }
+    unowned Account account { public get; protected set; }
 
     string identifier { public get; protected set; }
     string owner_uid { public get; protected set; }
@@ -82,7 +82,7 @@ class Share : GLib.Object {
     Constructor for shares
     ***********************************************************/
     public Share (
-        AccountPointer account,
+        unowned Account account,
         string identifier,
         string owner,
         string owner_display_name,

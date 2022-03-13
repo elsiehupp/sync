@@ -6,6 +6,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The PropagateLocalMkdir class
@@ -103,4 +104,5 @@ class PropagateLocalMkdir : PropagateItemJob {
 
 } // class PropagateLocalMkdir
 
+} // namespace LibSync
 } // namespace Occ

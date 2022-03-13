@@ -5,6 +5,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The GETFileJob class
@@ -81,7 +82,7 @@ class GETFileJob : AbstractNetworkJob {
     /***********************************************************
     DOES NOT take ownership of the device.
     ***********************************************************/
-    public GETFileJob.for_account (AccountPointer account, string path, QIODevice device,
+    public GETFileJob.for_account (unowned Account account, string path, QIODevice device,
         GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers, GLib.ByteArray expected_etag_for_resume,
         int64 resume_start, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
@@ -105,7 +106,7 @@ class GETFileJob : AbstractNetworkJob {
     /***********************************************************
     For direct_download_url:
     ***********************************************************/
-    public GETFileJob.direct.for_account (AccountPointer account, GLib.Uri url, QIODevice device,
+    public GETFileJob.direct.for_account (unowned Account account, GLib.Uri url, QIODevice device,
         GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers, GLib.ByteArray expected_etag_for_resume,
         int64 resume_start, GLib.Object parent = new GLib.Object ()) {
         base (account, url.to_encoded (), parent);
@@ -451,6 +452,9 @@ class GETFileJob : AbstractNetworkJob {
 
         this.save_body_to_file = true;
     }
-}
 
+} // class GETFileJob
+
+} // namespace LibSync
+} // namespace Occ
 

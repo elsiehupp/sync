@@ -7,6 +7,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 //  #include <QDir>
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The MoveJob class
@@ -27,14 +28,14 @@ class MoveJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public MoveJob.for_path (AccountPointer account, string path, string destination, GLib.Object parent = new GLib.Object ()) {
+    public MoveJob.for_path (unowned Account account, string path, string destination, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
         this.destination = destination;
     }
 
     /***********************************************************
     ***********************************************************/
-    public MoveJob.for_url (AccountPointer account, GLib.Uri url, string destination,
+    public MoveJob.for_url (unowned Account account, GLib.Uri url, string destination,
         GLib.HashTable<GLib.ByteArray, GLib.ByteArray> extra_headers, GLib.Object parent) {
         base (account, "", parent);
         this.destination = destination;
@@ -76,4 +77,5 @@ class MoveJob : AbstractNetworkJob {
 
 } // class MoveJob
 
+} // namespace LibSync
 } // namespace Occ

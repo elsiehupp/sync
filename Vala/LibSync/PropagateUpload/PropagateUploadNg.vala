@@ -11,6 +11,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 //  #include <cstring>
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @ingroup libsync
@@ -250,12 +251,12 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
 
         // job takes ownership of device via a QScopedPointer. Job deletes itself when finishing
         var device_ptr = device; // for connections later
-        var job = new PUTFile_job (propagator ().account (), url, std.move (device), headers, this.current_chunk, this);
+        var job = new PUTFileJob (propagator ().account (), url, std.move (device), headers, this.current_chunk, this);
         this.jobs.append (job);
-        connect (job, PUTFile_job.signal_finished, this, PropagateUploadFileNG.on_signal_put_finished);
-        connect (job, PUTFile_job.signal_upload_progress,
+        connect (job, PUTFileJob.signal_finished, this, PropagateUploadFileNG.on_signal_put_finished);
+        connect (job, PUTFileJob.signal_upload_progress,
             this, PropagateUploadFileNG.on_signal_upload_progress);
-        connect (job, PUTFile_job.signal_upload_progress,
+        connect (job, PUTFileJob.signal_upload_progress,
             device_ptr, UploadDevice.on_signal_job_upload_progress);
         connect (job, GLib.Object.destroyed, this, PropagateUploadFileCommon.on_signal_job_destroyed);
         job.on_signal_start ();
@@ -418,7 +419,7 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
     /***********************************************************
     ***********************************************************/
     private void on_signal_put_finished () {
-        var job = qobject_cast<PUTFile_job> (sender ());
+        var job = qobject_cast<PUTFileJob> (sender ());
         //  ASSERT (job);
 
         on_signal_job_destroyed (job); // remove it from the this.jobs list
@@ -582,4 +583,5 @@ class PropagateUploadFileNG : PropagateUploadFileCommon {
 
 } // class PropagateUploadFileNG
 
+} // namespace LibSync
 } // namespace Occ

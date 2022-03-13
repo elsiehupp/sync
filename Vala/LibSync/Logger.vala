@@ -19,6 +19,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <qmutex.h>
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The Logger class
@@ -367,4 +368,5 @@ class Logger : GLib.Object {
 
 } // class Logger
 
+} // namespace LibSync
 } // namespace Occ

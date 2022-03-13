@@ -6,6 +6,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief the base class of propagator jobs
@@ -140,4 +141,5 @@ class PropagatorJob : GLib.Object {
 
 } // class PropagatorJob
 
+} // namespace LibSync
 } // namespace Occ

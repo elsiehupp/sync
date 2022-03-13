@@ -6,6 +6,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief A basic job around a network request without extra funtionality
@@ -20,7 +21,7 @@ class SimpleNetworkJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public SimpleNetworkJob.for_account (AccountPointer account, GLib.Object parent = new GLib.Object ()) {
+    public SimpleNetworkJob.for_account (unowned Account account, GLib.Object parent = new GLib.Object ()) {
         base (account, "", parent);
     }
 
@@ -46,4 +47,5 @@ class SimpleNetworkJob : AbstractNetworkJob {
 
 } // class SimpleNetworkJob
 
+} // namespace LibSync
 } // namespace Occ

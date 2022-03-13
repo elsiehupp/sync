@@ -34,7 +34,7 @@ class OwncloudWizard : QWizard {
 
     /***********************************************************
     ***********************************************************/
-    AccountPointer account { public get; public set; }
+    unowned Account account { public get; public set; }
     private WelcomePage welcome_page;
     private OwncloudSetupPage setup_page;
     private OwncloudHttpCredsPage http_creds_page;

@@ -51,7 +51,7 @@ class FolderWizard : QWizard {
     /***********************************************************
     Folder wizard itself
     ***********************************************************/
-    public FolderWizard (AccountPointer account, Gtk.Widget parent = null) {
+    public FolderWizard (unowned Account account, Gtk.Widget parent = null) {
         base (parent);
         this.folder_wizard_source_page = new FolderWizardLocalPath (account);
         this.folder_wizard_target_page = null;

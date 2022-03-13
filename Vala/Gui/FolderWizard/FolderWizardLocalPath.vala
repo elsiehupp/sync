@@ -21,11 +21,11 @@ class FolderWizardLocalPath : FormatWarningsWizardPage {
 
     Folder.Map folder_map { private get; public set; }
 
-    private AccountPointer account;
+    private unowned Account account;
 
     /***********************************************************
     ***********************************************************/
-    public FolderWizardLocalPath (AccountPointer account) {
+    public FolderWizardLocalPath (unowned Account account) {
         base ();
         this.account = account;
         this.ui.up_ui (this);

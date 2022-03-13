@@ -6,6 +6,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The RequestEtagJob class
@@ -17,7 +18,7 @@ class RequestEtagJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public RequestEtagJob.for_account (AccountPointer account, string path, GLib.Object parent = new GLib.Object ()) {
+    public RequestEtagJob.for_account (unowned Account account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
@@ -87,4 +88,5 @@ class RequestEtagJob : AbstractNetworkJob {
 
 } // class RequestEtagJob
 
+} // namespace LibSync
 } // namespace Occ

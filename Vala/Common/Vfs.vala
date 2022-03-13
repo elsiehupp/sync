@@ -29,7 +29,6 @@ function.
 class Vfs : GLib.Object {
 
     struct csync_file_stat_t : csync_file_stat_s { }
-    class AccountPointer : unowned Account { }
     public class AvailabilityResult : Result<VfsItemAvailability, AvailabilityError> { }
 
     /***********************************************************

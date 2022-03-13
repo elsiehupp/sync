@@ -7,6 +7,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 //  #include <QDir>
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The PropagateRemoteMove class
@@ -277,4 +278,5 @@ class PropagateRemoteMove : PropagateItemJob {
 
 } // class PropagateRemoteMove
 
+} // namespace LibSync
 } // namespace Occ

@@ -1,5 +1,6 @@
 
 namespace Occ {
+namespace LibSync {
 
 class DateTimeProvider : GLib.Object {
 
@@ -18,4 +19,5 @@ class DateTimeProvider : GLib.Object {
 
 } // class DateTimeProvider
 
+} // namespace LibSync
 } // namespace Occ

@@ -69,6 +69,7 @@ Here follows the state machine
 class ConnectionValidator : GLib.Object {
 
     /***********************************************************
+    The actual current connectivity status.
     ***********************************************************/
     public enum Status {
         UNDEFINED,
@@ -124,8 +125,8 @@ class ConnectionValidator : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private string[] errors;
-    private AccountStatePtr account_state;
-    private AccountPointer account;
+    private unowned AccountState account_state;
+    private unowned Account account;
     private bool is_checking_server_and_auth;
 
     /***********************************************************
@@ -134,7 +135,7 @@ class ConnectionValidator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public ConnectionValidator (AccountStatePtr account_state, GLib.Object parent = new GLib.Object ()) {
+    public ConnectionValidator (unowned AccountState account_state, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.account_state = account_state;
         this.account = account_state.account ();

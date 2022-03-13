@@ -6,6 +6,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief Job that wait for all the poll jobs to be completed
@@ -13,7 +14,7 @@ namespace Occ {
 ***********************************************************/
 class CleanupPollsJob : GLib.Object {
     GLib.List<SyncJournalDb.PollInfo> poll_infos;
-    AccountPointer account;
+    unowned Account account;
     SyncJournalDb journal;
     string local_path;
     unowned Vfs vfs;
@@ -23,7 +24,7 @@ class CleanupPollsJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public CleanupPollsJob (GLib.List<SyncJournalDb.PollInfo> poll_infos, AccountPointer account, SyncJournalDb journal, string local_path,
+    public CleanupPollsJob (GLib.List<SyncJournalDb.PollInfo> poll_infos, unowned Account account, SyncJournalDb journal, string local_path,
         unowned Vfs vfs, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.poll_infos = poll_infos;
@@ -87,4 +88,5 @@ class CleanupPollsJob : GLib.Object {
 
 } // namespace Occ
 
+} // namespace LibSync
 } // class CleanupPollsJob

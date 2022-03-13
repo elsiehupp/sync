@@ -7,6 +7,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 //  #include <QLoggingCategory>
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief The PropagateRemoteMkdir class
@@ -278,5 +279,6 @@ class PropagateRemoteMkdir : PropagateItemJob {
 
 } // class PropagateRemoteMkdir
 
+} // namespace LibSync
 } // namespace Occ
     

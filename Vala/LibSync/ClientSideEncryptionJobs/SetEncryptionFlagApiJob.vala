@@ -5,6 +5,7 @@ expects a response is here.
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief Job to mark a folder as encrypted JSON
@@ -39,7 +40,7 @@ class SetEncryptionFlagApiJob : AbstractNetworkJob {
     
     /***********************************************************
     ***********************************************************/
-    public SetEncryptionFlagApiJob (AccountPointer account, GLib.ByteArray file_identifier, FlagAction flag_action = Set, GLib.Object parent = new GLib.Object ()) {
+    public SetEncryptionFlagApiJob (unowned Account account, GLib.ByteArray file_identifier, FlagAction flag_action = Set, GLib.Object parent = new GLib.Object ()) {
         base (account, E2EE_BASE_URL + "encrypted/" + file_identifier, parent);
         this.file_identifier = file_identifier;
         this.flag_action = flag_action;
@@ -77,4 +78,5 @@ class SetEncryptionFlagApiJob : AbstractNetworkJob {
 
 } // class SetEncryptionFlagApiJob
 
+} // namespace LibSync
 } // namespace Occ

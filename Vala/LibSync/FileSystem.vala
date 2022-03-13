@@ -17,6 +17,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
 // Chain in the base include and extend the namespace
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief This file contains file system helper
@@ -24,12 +25,12 @@ namespace Occ {
  \addtogroup libsync
  @{
 ***********************************************************/
-static class FileSystem {
+class FileSystem : GLib.Object {
 
     /***********************************************************
     @brief compare two files with given filename and return true if they have the same content
     ***********************************************************/
-    bool file_equals (string fn1, string fn2) {
+    public static bool file_equals (string fn1, string fn2) {
         // compare two files with given filename and return true if they have the same content
         GLib.File f1 (fn1);
         GLib.File f2 (fn2);
@@ -63,7 +64,7 @@ static class FileSystem {
     Use this over GLib.FileInfo.last_modified () to avoid timezone related bugs. See
     owncloud/core#9781 for details.
     ***********************************************************/
-    time_t get_mod_time (string filename) {
+    public static time_t get_mod_time (string filename) {
         csync_file_stat_t stat;
         int64 result = -1;
         if (csync_vio_local_stat (filename, stat) != -1
@@ -78,7 +79,7 @@ static class FileSystem {
     }
 
 
-    bool mod_time (string filename, time_t mod_time) {
+    public static bool mod_time (string filename, time_t mod_time) {
         struct timeval times[2];
         times[0].tv_sec = times[1].tv_sec = mod_time;
         times[0].tv_usec = times[1].tv_usec = 0;
@@ -98,7 +99,7 @@ static class FileSystem {
     Use this over GLib.FileInfo.size () to avoid bugs with lnk files on Windows.
     See https://bugreports.qt.io/browse/QTBUG-24831.
     ***********************************************************/
-    int64 get_size (string filename) {
+    public static int64 get_size (string filename) {
         return GLib.FileInfo (filename).size ();
     }
 
@@ -106,7 +107,7 @@ static class FileSystem {
     /***********************************************************
     @brief Retrieve a file inode with csync
     ***********************************************************/
-    bool get_inode (string filename, uint64 inode) {
+    public static bool get_inode (string filename, uint64 inode) {
         csync_file_stat_t fs;
         if (csync_vio_local_stat (filename, fs) == 0) {
             *inode = fs.inode;
@@ -123,7 +124,7 @@ static class FileSystem {
 
     @return true if the file's mtime or size are not what is expected.
     ***********************************************************/
-    bool file_changed (string filename,
+    public static bool file_changed (string filename,
         int64 previous_size,
         time_t previous_mtime) {
         return get_size (filename) != previous_size
@@ -134,7 +135,7 @@ static class FileSystem {
     /***********************************************************
     @brief Like !file_changed () but with verbose logging if the file did* change.
     ***********************************************************/
-    bool verify_file_unchanged (string filename,
+    public static bool verify_file_unchanged (string filename,
         int64 previous_size,
         time_t previous_mtime) {
         const int64 actual_size = get_size (filename);
@@ -158,7 +159,7 @@ static class FileSystem {
 
     Code inspired from Qt5's QDir.remove_recursively
     ***********************************************************/
-    bool remove_recursively (string path,
+    public static bool remove_recursively (string path,
         const std.function<void (string path, bool is_dir)> on_signal_deleted = null,
         string[] errors = null) {
         bool all_removed = true;
@@ -206,7 +207,8 @@ static class FileSystem {
         return all_removed;
     }
 
-} // static class FileSystem
+} // class FileSystem
 
+} // namespace LibSync
 } // namespace Occ
     

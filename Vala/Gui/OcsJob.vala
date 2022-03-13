@@ -57,7 +57,7 @@ class OcsJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    protected OcsJob (AccountPointer account) {
+    protected OcsJob (unowned Account account) {
         base (account, "");
         this.pass_status_codes.append (OCS_SUCCESS_STATUS_CODE);
         this.pass_status_codes.append (OCS_SUCCESS_STATUS_CODE_V2);

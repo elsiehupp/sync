@@ -5,12 +5,13 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
-@brief The PUTFile_job class
+@brief The PUTFileJob class
 @ingroup libsync
 ***********************************************************/
-class PUTFile_job : AbstractNetworkJob {
+class PUTFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
@@ -39,7 +40,7 @@ class PUTFile_job : AbstractNetworkJob {
     /***********************************************************
     Takes ownership of the device
     ***********************************************************/
-    public PUTFile_job.for_path (AccountPointer account, string path, std.unique_ptr<QIODevice> device,
+    public PUTFileJob.for_path (unowned Account account, string path, std.unique_ptr<QIODevice> device,
         GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers, int chunk, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
         this.device = device.release ();
@@ -51,7 +52,7 @@ class PUTFile_job : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public PUTFile_job.for_url (AccountPointer account, GLib.Uri url, std.unique_ptr<QIODevice> device,
+    public PUTFileJob.for_url (unowned Account account, GLib.Uri url, std.unique_ptr<QIODevice> device,
         GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers, int chunk, GLib.Object parent = new GLib.Object ()) {
         base (account, "", parent);
         this.device = device.release ();
@@ -62,7 +63,7 @@ class PUTFile_job : AbstractNetworkJob {
     }
 
 
-    ~PUTFile_job () {
+    ~PUTFileJob () {
         // Make sure that we destroy the Soup.Reply before our this.device of which it keeps an internal pointer.
         reply (null);
     }
@@ -87,7 +88,7 @@ class PUTFile_job : AbstractNetworkJob {
             GLib.warning (" Network error: " + reply ().error_string ());
         }
 
-        connect (reply (), Soup.Reply.signal_upload_progress, this, PUTFile_job.signal_upload_progress);
+        connect (reply (), Soup.Reply.signal_upload_progress, this, PUTFileJob.signal_upload_progress);
         connect (this, AbstractNetworkJob.signal_network_activity, account ().data (), Account.signal_propagator_network_activity);
         this.request_timer.on_signal_start ();
         AbstractNetworkJob.on_signal_start ();
@@ -115,6 +116,7 @@ class PUTFile_job : AbstractNetworkJob {
         return std.chrono.milliseconds (this.request_timer.elapsed ());
     }
 
-} // class PUTFile_job
+} // class PUTFileJob
 
+} // namespace LibSync
 } // namespace Occ

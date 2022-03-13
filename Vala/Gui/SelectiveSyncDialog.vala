@@ -39,7 +39,7 @@ class SelectiveSyncDialog : Gtk.Dialog {
     /***********************************************************
     Dialog for a specific folder (used from the account settings button)
     ***********************************************************/
-    public SelectiveSyncDialog.for_folder (AccountPointer account, Folder folder, Gtk.Widget parent = null, Qt.Window_flags f = {}) {
+    public SelectiveSyncDialog.for_folder (unowned Account account, Folder folder, Gtk.Widget parent = null, Qt.Window_flags f = {}) {
         base (parent, f);
         this.folder = folder;
         this.ok_button = null; // defined in on_signal_init ()
@@ -59,7 +59,7 @@ class SelectiveSyncDialog : Gtk.Dialog {
     /***********************************************************
     Dialog for the whole account (Used from the wizard)
     ***********************************************************/
-    public SelectiveSyncDialog.for_path (AccountPointer account, string folder, string[] blocklist, Gtk.Widget parent = null, Qt.Window_flags f = {}) {
+    public SelectiveSyncDialog.for_path (unowned Account account, string folder, string[] blocklist, Gtk.Widget parent = null, Qt.Window_flags f = {}) {
         base (parent, f);
         this.folder = null;
         on_signal_init (account);
@@ -123,7 +123,7 @@ class SelectiveSyncDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_init (AccountPointer account) {
+    private void on_signal_init (unowned Account account) {
         window_title (_("Choose What to Sync"));
         var layout = new QVBoxLayout (this);
         this.selective_sync = new SelectiveSyncWidget (account, this);

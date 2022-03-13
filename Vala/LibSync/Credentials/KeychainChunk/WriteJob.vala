@@ -5,6 +5,7 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 namespace KeychainChunk {
 
 /***********************************************************
@@ -145,4 +146,5 @@ class WriteJob : KeychainChunk.Job {
 } // class WriteJob
 
 } // namespace KeychainChunk
+} // namespace LibSync
 } // namespace Occ

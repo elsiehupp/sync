@@ -27,6 +27,7 @@ using Soup;
 
 
 namespace Occ {
+namespace LibSync {
 
 class OwncloudPropagator : GLib.Object {
 
@@ -38,7 +39,7 @@ class OwncloudPropagator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public OwncloudPropagator.for_account (AccountPointer account, string local_dir,
+    public OwncloudPropagator.for_account (unowned Account account, string local_dir,
                        const string remote_folder, SyncJournalDb progress_database,
                        GLib.List<string> bulk_upload_block_list)
         : this.journal (progress_database)
@@ -226,10 +227,10 @@ class OwncloudPropagator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    //  private AccountPointer account;
+    //  private unowned Account account;
     /***********************************************************
     ***********************************************************/
-    public AccountPointer account ();
+    public unowned Account account ();
 
     /***********************************************************
     ***********************************************************/
@@ -904,7 +905,7 @@ class OwncloudPropagator : GLib.Object {
         /* emit */ progress (item, bytes);
     }
 
-    AccountPointer OwncloudPropagator.account () {
+    unowned Account OwncloudPropagator.account () {
         return this.account;
     }
 

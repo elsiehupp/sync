@@ -7,9 +7,8 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 //  #include <QLoggingCategory>
 //  #include <sys/xattr.h>
 
-
-
 namespace Occ {
+namespace LibSync {
 
 namespace XAttrWrapper {
 
@@ -61,3 +60,7 @@ Occ.Result<void, string> Occ.XAttrWrapper.add_nextcloud_placeholder_attributes (
         return {};
     }
 }
+
+
+} // namespace LibSync
+} // namespace Occ

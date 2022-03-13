@@ -6,6 +6,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace LibSync {
 
 /***********************************************************
 @brief Declaration of the other propagation jobs
@@ -114,4 +115,5 @@ class PropagateLocalRemove : PropagateItemJob {
 
 } // class PropagateLocalRemove
 
+} // namespace LibSync
 } // namespace Occ

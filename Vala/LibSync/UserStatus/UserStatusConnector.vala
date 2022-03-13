@@ -10,6 +10,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 //  #include <vector>
 
 namespace Occ {
+namespace LibSync {
 
 abstract class UserStatusConnector : GLib.Object {
 
@@ -52,4 +53,5 @@ abstract class UserStatusConnector : GLib.Object {
 
 } // class UserStatusConnector
 
+} // namespace LibSync
 } // namespace Occ
