@@ -34,7 +34,7 @@ public class EncryptFolderJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public EncryptFolderJob.for_account (unowned Account account, SyncJournalDb journal, string path, string file_identifier, GLib.Object parent = new GLib.Object ()) {
+    public EncryptFolderJob.for_account (Account account, SyncJournalDb journal, string path, string file_identifier, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.account = account;
         this.journal = journal;
@@ -45,7 +45,7 @@ public class EncryptFolderJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void start () {
+    public new void start () {
         var job = new Occ.SetEncryptionFlagApiJob (this.account, this.file_identifier, Occ.SetEncryptionFlagApiJob.Set, this);
         connect (job, Occ.SetEncryptionFlagApiJob.on_signal_success, this, EncryptFolderJob.on_signal_encryption_flag_success);
         connect (job, Occ.SetEncryptionFlagApiJob.error, this, EncryptFolderJob.on_signal_encryption_flag_error);
@@ -87,7 +87,7 @@ public class EncryptFolderJob : GLib.Object {
 
         FolderMetadata empty_metadata = new FolderMetadata (this.account);
         var encrypted_metadata = empty_metadata.encrypted_metadata ();
-        if (encrypted_metadata.is_empty ()) {
+        if (encrypted_metadata == "") {
             // TODO: Mark the folder as unencrypted as the metadata generation failed.
             this.error_string = _("Could not generate the metadata for encryption, Unlocking the folder.\n"
                                 + "This can be an issue with your OpenSSL libraries.");

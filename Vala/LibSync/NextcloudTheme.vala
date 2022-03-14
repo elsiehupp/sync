@@ -5,7 +5,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 //  #ifndef TOKEN_AUTH_ONLY
-//  #include <QPixmap>
 //  #include <QIcon>
 //  #include <QCoreApplication>
 
@@ -20,7 +19,7 @@ public class NextcloudTheme : Theme {
 
     /***********************************************************
     ***********************************************************/
-    public const string WIZARD_URL_HINT = "https://try.nextcloud.com";
+    public new const string WIZARD_URL_HINT = "https://try.nextcloud.com";
 
     /***********************************************************
     ***********************************************************/

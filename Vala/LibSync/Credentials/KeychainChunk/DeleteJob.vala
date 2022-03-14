@@ -9,7 +9,7 @@ namespace LibSync {
 namespace KeychainChunk {
 
 /***********************************************************
-@brief : Simple wrapper class for QKeychain.DeletePasswordJob
+@brief Simple wrapper class for QKeychain.DeletePasswordJob
 ***********************************************************/
 public class DeleteJob : KeychainChunk.Job {
 
@@ -39,7 +39,7 @@ public class DeleteJob : KeychainChunk.Job {
 
     @see QKeychain.Job.start ()
     ***********************************************************/
-    public void start () {
+    public new void start () {
         this.chunk_count = 0;
         this.error = QKeychain.NoError;
 

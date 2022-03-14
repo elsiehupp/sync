@@ -22,7 +22,7 @@ public class StoreMetaDataApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public StoreMetaDataApiJob (
-        unowned Account account,
+        Account account,
         string file_identifier,
         string b64_metadata,
         GLib.Object parent = new GLib.Object ()) {
@@ -36,7 +36,7 @@ public class StoreMetaDataApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public new void start () {
-        Soup.Request request;
+        Soup.Request request = new Soup.Request ();
         request.raw_header ("OCS-APIREQUEST", "true");
         request.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
         QUrlQuery query;

@@ -16,7 +16,7 @@ public class PropagateItemJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     private QScopedPointer<PropagateItemJob> restore_job;
-    JobParallelism parallelism { public get; private set; }
+    new JobParallelism parallelism { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
@@ -38,15 +38,22 @@ public class PropagateItemJob : PropagatorJob {
 
 
     /***********************************************************
+    We should always execute jobs that process the E2EE API
+    calls as sequential jobs
+
+    TODO: In fact, we must make sure Lock/Unlock are not
+    colliding and always wait for each other to complete, so we
+    could refactor this "this.parallelism" later so every
+    "PropagateItemJob" that will potentially execute Lock job on
+    E2EE folder will get executed sequentially. As an
+    alternative, we could optimize Lock/Unlock calls, so we do a
+    batch-write on one folder and only lock and unlock a folder
+    once per batch.
     ***********************************************************/
-    public PropagateItemJob (OwncloudPropagator propagator, unowned SyncFileItem item) {
+    public PropagateItemJob (OwncloudPropagator propagator, SyncFileItem item) {
         base (propagator);
         this.parallelism = JobParallelism.FULL_PARALLELISM;
         this.item = item;
-        // we should always execute jobs that process the E2EE API calls as sequential jobs
-        // TODO: In fact, we must make sure Lock/Unlock are not colliding and always wait for each other to complete. So, we could refactor this "this.parallelism" later
-        // so every "PropagateItemJob" that will potentially execute Lock job on E2EE folder will get executed sequentially.
-        // As an alternative, we could optimize Lock/Unlock calls, so we do a batch-write on one folder and only lock and unlock a folder once per batch.
         this.parallelism = (this.item.is_encrypted || has_encrypted_ancestor ()) ? JobParallelism.WAIT_FOR_FINISHED : JobParallelism.FULL_PARALLELISM;
 
         this.restore_job_msg = "";
@@ -76,7 +83,7 @@ public class PropagateItemJob : PropagatorJob {
         var parent_path = slash_position >= 0 ? path.left (slash_position): "";
 
         var path_components = parent_path.split ("/");
-        while (!path_components.is_empty ()) {
+        while (!path_components == "") {
             SyncJournalFileRecord record;
             propagator ().journal.get_file_record (path_components.join ("/"), record);
             if (record.is_valid () && record.is_e2e_encrypted) {
@@ -102,14 +109,14 @@ public class PropagateItemJob : PropagatorJob {
             || status == SyncFileItem.Status.RESTORATION) {
             on_signal_done (SyncFileItem.Status.SOFT_ERROR, message);
         } else {
-            on_signal_done (status, _("A file or folder was removed from a read only share, but restoring failed : %1").arg (message));
+            on_signal_done (status, _("A file or folder was removed from a read only share, but restoring failed : %1").printf (message));
         }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public bool on_signal_schedule_self_or_child () {
+    public new bool on_signal_schedule_self_or_child () {
         if (this.state != NotYetStarted) {
             return false;
         }
@@ -144,17 +151,17 @@ public class PropagateItemJob : PropagatorJob {
                 || this.item.status == SyncFileItem.Status.CONFLICT) {
                 this.item.status = SyncFileItem.Status.RESTORATION;
             } else {
-                this.item.error_string += _("; Restoration Failed : %1").arg (error_string);
+                this.item.error_string += _("; Restoration Failed : %1").printf (error_string);
             }
         } else {
-            if (this.item.error_string.is_empty ()) {
+            if (this.item.error_string == "") {
                 this.item.error_string = error_string;
             }
         }
 
         if (propagator ().abort_requested && (this.item.status == SyncFileItem.Status.NORMAL_ERROR
                                             || this.item.status == SyncFileItem.Status.FATAL_ERROR)) {
-            // an on_signal_abort request is ongoing. Change the status to Soft-Error
+            // an abort request is ongoing. Change the status to Soft-Error
             this.item.status = SyncFileItem.Status.SOFT_ERROR;
         }
 
@@ -197,7 +204,7 @@ public class PropagateItemJob : PropagatorJob {
 
         if (this.item.status == SyncFileItem.Status.FATAL_ERROR) {
             // Abort all remaining jobs.
-            propagator ().on_signal_abort ();
+            propagator ().abort ();
         }
     }
 

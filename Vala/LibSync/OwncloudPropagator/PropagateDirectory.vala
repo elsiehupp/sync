@@ -29,7 +29,7 @@ public class PropagateDirectory : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public PropagateDirectory (OwncloudPropagator propagator, unowned SyncFileItem item) {
+    public PropagateDirectory (OwncloudPropagator propagator, SyncFileItem item) {
         base (propagator);
         this.item = item;
         this.first_job = propagator.create_job (item);
@@ -51,14 +51,14 @@ public class PropagateDirectory : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public void append_task (unowned SyncFileItem item) {
+    public void append_task (SyncFileItem item) {
         this.sub_jobs.append_task (item);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public bool on_signal_schedule_self_or_child () {
+    public new bool on_signal_schedule_self_or_child () {
         if (this.state == Finished) {
             return false;
         }
@@ -82,7 +82,7 @@ public class PropagateDirectory : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public JobParallelism parallelism () {
+    public new JobParallelism parallelism () {
         // If any of the non-on_signal_finished sub jobs is not parallel, we have to wait
         if (this.first_job && this.first_job.parallelism () != JobParallelism.FULL_PARALLELISM) {
             return JobParallelism.WAIT_FOR_FINISHED;
@@ -96,16 +96,16 @@ public class PropagateDirectory : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_abort (PropagatorJob.AbortType abort_type) {
+    public new void abort (PropagatorJob.AbortType abort_type) {
         if (this.first_job)
-            // Force first job to on_signal_abort synchronously
-            // even if caller allows async on_signal_abort (async_abort)
-            this.first_job.on_signal_abort (PropagatorJob.AbortType.SYNCHRONOUS);
+            // Force first job to abort synchronously
+            // even if caller allows async abort (async_abort)
+            this.first_job.abort (PropagatorJob.AbortType.SYNCHRONOUS);
 
         if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
             connect (&this.sub_jobs, PropagatorCompositeJob.signal_abort_finished, this, PropagateDirectory.signal_abort_finished);
         }
-        this.sub_jobs.on_signal_abort (abort_type);
+        this.sub_jobs.abort (abort_type);
     }
 
 
@@ -118,7 +118,7 @@ public class PropagateDirectory : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public int64 committed_disk_space () {
+    public new int64 committed_disk_space () {
         return this.sub_jobs.committed_disk_space ();
     }
 
@@ -132,8 +132,8 @@ public class PropagateDirectory : PropagatorJob {
             && status != SyncFileItem.Status.RESTORATION
             && status != SyncFileItem.Status.CONFLICT) {
             if (this.state != Finished) {
-                // Synchronously on_signal_abort
-                on_signal_abort (PropagatorJob.AbortType.SYNCHRONOUS);
+                // Synchronously abort
+                abort (PropagatorJob.AbortType.SYNCHRONOUS);
                 this.state = Finished;
                 GLib.info ("PropagateDirectory.on_signal_first_job_finished " + " emit finished " + status);
                 /* emit */ finished (status);
@@ -148,7 +148,7 @@ public class PropagateDirectory : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_sub_jobs_finished (SyncFileItem.Status status) {
-        if (!this.item.is_empty () && status == SyncFileItem.Status.SUCCESS) {
+        if (!this.item == "" && status == SyncFileItem.Status.SUCCESS) {
             // If a directory is renamed, recursively delete any stale items
             // that may still exist below the old path.
             if (this.item.instruction == CSYNC_INSTRUCTION_RENAME
@@ -178,7 +178,7 @@ public class PropagateDirectory : PropagatorJob {
                 var result = propagator ().update_metadata (*this.item);
                 if (!result) {
                     status = this.item.status = SyncFileItem.Status.FATAL_ERROR;
-                    this.item.error_string = _("Error updating metadata : %1").arg (result.error ());
+                    this.item.error_string = _("Error updating metadata : %1").printf (result.error ());
                     GLib.warning ("Error writing to the database for file " + this.item.file + " with " + result.error ());
                 } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
                     this.item.status = SyncFileItem.Status.SOFT_ERROR;

@@ -17,7 +17,7 @@ namespace LibSync {
 the base class for Propagate Remote Delete Encrypted jobs
 @ingroup libsync
 ***********************************************************/
-public class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
+public abstract class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
@@ -45,7 +45,7 @@ public class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    Soup.Reply.NetworkError signal_network_error { public get; protected set; }
+    Soup.Reply.NetworkError network_error { public get; protected set; }
 
     /***********************************************************
     ***********************************************************/
@@ -60,7 +60,7 @@ public class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
     ***********************************************************/
     public AbstractPropagateRemoteDeleteEncrypted (OwncloudPropagator propagator, SyncFileItem item, GLib.Object parent) {
         base (parent);
-        this.signal_network_error = Soup.Reply.NoError;
+        this.network_error = Soup.Reply.NoError;
         this.propagator = propagator;
         this.item = item;
     }
@@ -68,15 +68,14 @@ public class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public virtual void start ();
-
+    public abstract void start ();
 
 
     /***********************************************************
     ***********************************************************/
     protected void store_first_error (Soup.Reply.NetworkError err) {
-        if (this.signal_network_error == Soup.Reply.NetworkError.NoError) {
-            this.signal_network_error = err;
+        if (this.network_error == Soup.Reply.NetworkError.NoError) {
+            this.network_error = err;
         }
     }
 
@@ -188,8 +187,8 @@ public class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
             // If it is not the case, it might be because of a proxy or gateway intercepting the request, so we must
             // throw an error.
             store_first_error_string (_("Wrong HTTP code returned by server. Expected 204, but received \"%1 %2\".")
-                        .arg (this.item.http_error_code)
-                        .arg (delete_job.reply ().attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ()));
+                        .printf (this.item.http_error_code)
+                        .printf (delete_job.reply ().attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ()));
 
             task_failed ();
             return;
@@ -234,8 +233,8 @@ public class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
             this.folder_token = "";
             this.item.http_error_code = http_return_code;
             this.error_string = _("\"%1 Failed to unlock encrypted folder %2\".")
-                    .arg (http_return_code)
-                    .arg (string.from_utf8 (file_identifier));
+                    .printf (http_return_code)
+                    .printf (string.from_utf8 (file_identifier));
             this.item.error_string =this.error_string;
             task_failed ();
         });

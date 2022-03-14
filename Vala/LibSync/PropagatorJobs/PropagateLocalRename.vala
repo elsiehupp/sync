@@ -16,14 +16,14 @@ public class PropagateLocalRename : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public PropagateLocalRename (OwncloudPropagator propagator, unowned SyncFileItem item) {
+    public PropagateLocalRename (OwncloudPropagator propagator, SyncFileItem item) {
         base (propagator, item);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void start () {
+    public new void start () {
         if (propagator ().abort_requested)
             return;
 
@@ -45,8 +45,8 @@ public class PropagateLocalRename : PropagateItemJob {
                 // it would have to come out the local_filename_clash function
                 on_signal_done (SyncFileItem.Status.NORMAL_ERROR,
                     _("File %1 cannot be renamed to %2 because of a local file name clash")
-                        .arg (QDir.to_native_separators (this.item.file))
-                        .arg (QDir.to_native_separators (this.item.rename_target)));
+                        .printf (QDir.to_native_separators (this.item.file))
+                        .printf (QDir.to_native_separators (this.item.rename_target)));
                 return;
             }
 
@@ -78,10 +78,10 @@ public class PropagateLocalRename : PropagateItemJob {
             }
             var result = propagator ().update_metadata (signal_new_item);
             if (!result) {
-                on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").arg (result.error ()));
+                on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error ()));
                 return;
             } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
-                on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").arg (signal_new_item.file));
+                on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").printf (signal_new_item.file));
                 return;
             }
         } else {
@@ -103,7 +103,7 @@ public class PropagateLocalRename : PropagateItemJob {
     }
 
 
-    public JobParallelism parallelism () {
+    public new JobParallelism parallelism () {
         return this.item.is_directory () ? JobParallelism.WAIT_FOR_FINISHED : JobParallelism.FULL_PARALLELISM;
     }
 

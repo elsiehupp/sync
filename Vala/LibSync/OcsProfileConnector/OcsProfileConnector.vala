@@ -1,6 +1,5 @@
 //  #pragma once
 
-//  #include <QPixmap>
 //  #include <QJsonObject>
 //  #include <QJsonDocument>
 //  #include <QJsonArray>
@@ -9,7 +8,6 @@
 //  #include <QPainter>
 //  #include <Gtk.Image>
 //  #include <QSvgRenderer>
-//  #include <QPixmap>
 //  #include <QPixmapCache>
 
 namespace Occ {
@@ -41,7 +39,7 @@ public class OcsProfileConnector : GLib.Object {
             /* emit */ error ();
             return;
         }
-        const string url = "/ocs/v2.php/hovercard/v1/%1".arg (user_id);
+        const string url = "/ocs/v2.php/hovercard/v1/%1".printf (user_id);
         var job = new JsonApiJob (this.account, url, this);
         JsonApiJob.signal_json_received.connect (job, this, OcsProfileConnector.on_signal_hovercard_fetched);
         job.start ();
@@ -113,7 +111,7 @@ public class OcsProfileConnector : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void hovercard_action_icon (size_t index, QPixmap pixmap) {
+    private void hovercard_action_icon (size_t index, Gdk.Pixbuf pixmap) {
         var hovercard_action = this.current_hovercard.actions[index];
         QPixmapCache.insert (hovercard_action.icon_url.to_string (), pixmap);
         hovercard_action.icon = pixmap;
@@ -139,7 +137,7 @@ public class OcsProfileConnector : GLib.Object {
 
     private static Occ.HovercardAction json_to_action (QJsonObject json_action_object) {
         var icon_url = json_action_object.value ("icon").to_string ("no-icon");
-        QPixmap icon_pixmap;
+        Gdk.Pixbuf icon_pixmap;
         Occ.HovercardAction hovercard_action = new Occ.HovercardAction (
             json_action_object.value ("title").to_string ("No title"), icon_url,
             json_action_object.value ("hyperlink").to_string ("no-link")
@@ -165,7 +163,7 @@ public class OcsProfileConnector : GLib.Object {
     }
 
 
-    private static Occ.Optional<QPixmap> create_pixmap_from_svg_data (string icon_data) {
+    private static Occ.Optional<Gdk.Pixbuf> create_pixmap_from_svg_data (string icon_data) {
         QSvgRenderer svg_renderer;
         if (!svg_renderer.on_signal_load (icon_data)) {
             return {};
@@ -178,11 +176,11 @@ public class OcsProfileConnector : GLib.Object {
         scaled_svg.fill ("transparent");
         QPainter svg_painter = new QPainter (scaled_svg);
         svg_renderer.render (&svg_painter);
-        return QPixmap.from_image (scaled_svg);
+        return Gdk.Pixbuf.from_image (scaled_svg);
     }
 
 
-    private static Occ.Optional<QPixmap> icon_data_to_pixmap (string icon_data) {
+    private static Occ.Optional<Gdk.Pixbuf> icon_data_to_pixmap (string icon_data) {
         if (!icon_data.starts_with ("<svg")) {
             return {};
         }

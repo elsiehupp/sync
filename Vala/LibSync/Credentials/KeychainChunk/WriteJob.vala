@@ -9,7 +9,7 @@ namespace LibSync {
 namespace KeychainChunk {
 
 /***********************************************************
-@brief : Simple wrapper class for QKeychain.WritePasswordJob,
+@brief Simple wrapper class for QKeychain.WritePasswordJob,
 splits too large keychain entry's data into chunks on Windows
 ***********************************************************/
 public class WriteJob : KeychainChunk.Job {
@@ -43,7 +43,7 @@ public class WriteJob : KeychainChunk.Job {
 
     @see QKeychain.Job.start ()
     ***********************************************************/
-    public void start () {
+    public new void start () {
         this.error = QKeychain.NoError;
 
         on_signal_write_job_done (null);
@@ -89,7 +89,7 @@ public class WriteJob : KeychainChunk.Job {
         }
 
         // write a chunk if there is any in the buffer
-        if (!this.chunk_buffer.is_empty ()) {
+        if (!this.chunk_buffer == "") {
             // write full data in one chunk on non-Windows, as usual
             var chunk = this.chunk_buffer;
 

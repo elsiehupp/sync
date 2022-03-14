@@ -96,7 +96,7 @@ public class PropagateDownloadFile : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public PropagateDownloadFile (OwncloudPropagator propagator, unowned SyncFileItem item) {
+    public PropagateDownloadFile (OwncloudPropagator propagator, SyncFileItem item) {
         base (propagator, item);
         this.resume_start = 0;
         this.download_progress = 0;
@@ -106,7 +106,7 @@ public class PropagateDownloadFile : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public void start () {
+    public new void start () {
         if (propagator ().abort_requested)
             return;
         this.is_encrypted = false;
@@ -142,7 +142,7 @@ public class PropagateDownloadFile : PropagateItemJob {
                     on_signal_done (
                         SyncFileItem.Status.NORMAL_ERROR,
                         _("File %1 cannot be downloaded because encryption information is missing.")
-                            .arg (QDir.to_native_separators (this.item.file))
+                            .printf (QDir.to_native_separators (this.item.file))
                     );
                 }
             );
@@ -173,7 +173,7 @@ public class PropagateDownloadFile : PropagateItemJob {
     ***********************************************************/
     void delete_existing_folder () {
         string existing_dir = propagator ().full_local_path (this.item.file);
-        if (!GLib.FileInfo (existing_dir).is_dir ()) {
+        if (!GLib.File.new_for_path (existing_dir).query_info ().get_file_type () == FileType.DIRECTORY) {
             return;
         }
 
@@ -239,7 +239,7 @@ public class PropagateDownloadFile : PropagateItemJob {
 
         // do a klaas' case clash check.
         if (propagator ().local_filename_clash (this.item.file)) {
-            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 cannot be downloaded because of a local file name clash!").arg (QDir.to_native_separators (this.item.file)));
+            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 cannot be downloaded because of a local file name clash!").printf (QDir.to_native_separators (this.item.file)));
             return;
         }
 
@@ -259,7 +259,7 @@ public class PropagateDownloadFile : PropagateItemJob {
             }
         }
 
-        if (tmp_filename.is_empty ()) {
+        if (tmp_filename == "") {
             tmp_filename = create_download_tmp_filename (this.item.file);
         }
         this.tmp_file.filename (propagator ().full_local_path (tmp_filename));
@@ -295,7 +295,7 @@ public class PropagateDownloadFile : PropagateItemJob {
                 /* emit */ propagator ().signal_insufficient_local_storage ();
             } else if (disk_space_result == OwncloudPropagator.DiskSpaceCritical) {
                 on_signal_done (SyncFileItem.Status.FATAL_ERROR,
-                    _("Free space on disk is less than %1").arg (Utility.octets_to_string (critical_free_space_limit ())));
+                    _("Free space on disk is less than %1").printf (Utility.octets_to_string (critical_free_space_limit ())));
             }
 
             // Remove the temporary, if empty.
@@ -316,7 +316,7 @@ public class PropagateDownloadFile : PropagateItemJob {
 
         GLib.HashTable<string, string> headers;
 
-        if (this.item.direct_download_url.is_empty ()) {
+        if (this.item.direct_download_url == "") {
             // Normal job, download from o_c instance
             this.job = new GETFileJob (propagator ().account (),
                 propagator ().full_remote_path (this.is_encrypted ? this.item.encrypted_filename : this.item.file),
@@ -325,7 +325,7 @@ public class PropagateDownloadFile : PropagateItemJob {
             // We were provided a direct URL, use that one
             GLib.info ("direct_download_url given for " + this.item.file + this.item.direct_download_url);
 
-            if (!this.item.direct_download_cookies.is_empty ()) {
+            if (!this.item.direct_download_cookies == "") {
                 headers["Cookie"] = this.item.direct_download_cookies.to_utf8 ();
             }
 
@@ -384,7 +384,7 @@ public class PropagateDownloadFile : PropagateItemJob {
                 propagator ().journal.download_info (this.item.file, SyncJournalDb.DownloadInfo ());
             }
 
-            if (!this.item.direct_download_url.is_empty () && err != Soup.Reply.OperationCanceledError) {
+            if (!this.item.direct_download_url == "" && err != Soup.Reply.OperationCanceledError) {
                 // If this was with a direct download, retry without direct download
                 GLib.warning ("Direct download of" + this.item.direct_download_url + " failed. Retrying through owncloud.");
                 this.item.direct_download_url.clear ();
@@ -392,10 +392,10 @@ public class PropagateDownloadFile : PropagateItemJob {
                 return;
             }
 
-            // This gives a custom QNAM (by the user of libowncloudsync) to on_signal_abort () a Soup.Reply in its meta_data_changed () slot and
+            // This gives a custom QNAM (by the user of libowncloudsync) to abort () a GLib.InputStream in its meta_data_changed () slot and
             // set a custom error string to make this a soft error. In contrast to the default hard error this won't bring down
             // the whole sync and allows for a custom error message.
-            Soup.Reply reply = job.reply ();
+            GLib.InputStream reply = job.reply ();
             if (err == Soup.Reply.OperationCanceledError && reply.property (OWNCLOUD_CUSTOM_SOFT_ERROR_STRING_C).is_valid ()) {
                 job.on_signal_error_string (reply.property (OWNCLOUD_CUSTOM_SOFT_ERROR_STRING_C).to_string ());
                 job.error_status (SyncFileItem.Status.SOFT_ERROR);
@@ -428,7 +428,7 @@ public class PropagateDownloadFile : PropagateItemJob {
 
         this.item.response_time_stamp = job.response_timestamp ();
 
-        if (!job.etag ().is_empty ()) {
+        if (!job.etag () == "") {
             // The etag will be empty if we used a direct download URL.
             // (If it was really empty by the server, the GETFileJob will have errored
             this.item.etag = parse_etag (job.etag ());
@@ -452,7 +452,7 @@ public class PropagateDownloadFile : PropagateItemJob {
         ***********************************************************/
         string size_header = "Content-Length";
         int64 body_size = job.reply ().raw_header (size_header).to_long_long ();
-        bool has_size_header = !job.reply ().raw_header (size_header).is_empty ();
+        bool has_size_header = !job.reply ().raw_header (size_header) == "";
 
         // Qt removes the content-length header for transparently decompressed HTTP1 replies
         // but not for HTTP2 or SPDY replies. For these it remains and contains the size
@@ -485,7 +485,7 @@ public class PropagateDownloadFile : PropagateItemJob {
             FileSystem.remove (this.tmp_file.filename ());
             on_signal_done (SyncFileItem.Status.NORMAL_ERROR,
                 _("The downloaded file is empty, but the server said it should have been %1.")
-                    .arg (Utility.octets_to_string (this.item.size)));
+                    .printf (Utility.octets_to_string (this.item.size)));
             return;
         }
 
@@ -502,7 +502,7 @@ public class PropagateDownloadFile : PropagateItemJob {
             this.conflict_record.base_etag = job.reply ().raw_header ("OC-ConflictBaseEtag");
 
             var mtime_header = job.reply ().raw_header ("OC-ConflictBaseMtime");
-            if (!mtime_header.is_empty ())
+            if (!mtime_header == "")
                 this.conflict_record.base_modtime = mtime_header.to_long_long ();
 
             // We don't set it yet. That will only be done when the download on_signal_finished
@@ -520,7 +520,7 @@ public class PropagateDownloadFile : PropagateItemJob {
             this, PropagateDownloadFile.on_signal_checksum_fail);
         var checksum_header = find_best_checksum (job.reply ().raw_header (CHECK_SUM_HEADER_C));
         var content_md5Header = job.reply ().raw_header (CONTENT_MD5_HEADER_C);
-        if (checksum_header.is_empty () && !content_md5Header.is_empty ())
+        if (checksum_header == "" && !content_md5Header == "")
             checksum_header = "MD5:" + content_md5Header;
         validator.start (this.tmp_file.filename (), checksum_header);
     }
@@ -536,7 +536,7 @@ public class PropagateDownloadFile : PropagateItemJob {
         //
         // We could do this more aggressively and accept both MD5 and SHA1
         // instead of insisting on the exactly correct checksum type.
-        if (the_content_checksum_type == checksum_type || the_content_checksum_type.is_empty ()) {
+        if (the_content_checksum_type == checksum_type || the_content_checksum_type == "") {
             return on_signal_content_checksum_computed (checksum_type, checksum);
         }
 
@@ -578,13 +578,13 @@ public class PropagateDownloadFile : PropagateItemJob {
         // In case of file name clash, report an error
         // This can happen if another parallel download saved a clashing file.
         if (propagator ().local_filename_clash (this.item.file)) {
-            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 cannot be saved because of a local file name clash!").arg (QDir.to_native_separators (this.item.file)));
+            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 cannot be saved because of a local file name clash!").printf (QDir.to_native_separators (this.item.file)));
             return;
         }
 
         if (this.item.modtime <= 0) {
             FileSystem.remove (this.tmp_file.filename ());
-            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time reported by server. Do not save it.").arg (QDir.to_native_separators (this.item.file)));
+            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time reported by server. Do not save it.").printf (QDir.to_native_separators (this.item.file)));
             return;
         }
         GLib.assert (this.item.modtime > 0);
@@ -597,7 +597,7 @@ public class PropagateDownloadFile : PropagateItemJob {
         this.item.modtime = FileSystem.get_mod_time (this.tmp_file.filename ());
         if (this.item.modtime <= 0) {
             FileSystem.remove (this.tmp_file.filename ());
-            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time reported by server. Do not save it.").arg (QDir.to_native_separators (this.item.file)));
+            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time reported by server. Do not save it.").printf (QDir.to_native_separators (this.item.file)));
             return;
         }
         GLib.assert (this.item.modtime > 0);
@@ -608,7 +608,7 @@ public class PropagateDownloadFile : PropagateItemJob {
         bool previous_file_exists = FileSystem.file_exists (fn);
         if (previous_file_exists) {
             // Preserve the existing file permissions.
-            GLib.FileInfo existing_file = new GLib.FileInfo (fn);
+            GLib.FileInfo existing_file = GLib.File.new_for_path (fn);
             if (existing_file.permissions () != this.tmp_file.permissions ()) {
                 this.tmp_file.permissions (existing_file.permissions ());
             }
@@ -626,7 +626,7 @@ public class PropagateDownloadFile : PropagateItemJob {
         FileSystem.file_read_only_weak (this.tmp_file.filename (), !this.item.remote_perm.is_null () && !this.item.remote_perm.has_permission (RemotePermissions.Permissions.CAN_WRITE));
 
         bool is_conflict = this.item.instruction == CSYNC_INSTRUCTION_CONFLICT
-            && (GLib.FileInfo (fn).is_dir () || !FileSystem.file_equals (fn, this.tmp_file.filename ()));
+            && (GLib.File.new_for_path (fn).query_info ().get_file_type () == FileType.DIRECTORY || !FileSystem.file_equals (fn, this.tmp_file.filename ()));
         if (is_conflict) {
             string error;
             if (!propagator ().create_conflict (this.item, this.associated_composite, error)) {
@@ -660,7 +660,7 @@ public class PropagateDownloadFile : PropagateItemJob {
         /* emit */ propagator ().signal_touched_file (fn);
         // The file_changed () check is done above to generate better error messages.
         if (!FileSystem.unchecked_rename_replace (this.tmp_file.filename (), fn, error)) {
-            GLib.warning ("Rename failed: %1 => %2".arg (this.tmp_file.filename ()).arg (fn));
+            GLib.warning ("Rename failed: %1 => %2".printf (this.tmp_file.filename ()).printf (fn));
             // If the file is locked, we want to retry this sync when it
             // becomes available again, otherwise try again directly
             if (FileSystem.is_file_locked (fn)) {
@@ -725,10 +725,10 @@ public class PropagateDownloadFile : PropagateItemJob {
         const string fn = propagator ().full_local_path (this.item.file);
         var result = propagator ().update_metadata (*this.item);
         if (!result) {
-            on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").arg (result.error ()));
+            on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error ()));
             return;
         } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
-            on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").arg (this.item.file));
+            on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").printf (this.item.file));
             return;
         }
 
@@ -758,9 +758,9 @@ public class PropagateDownloadFile : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_abort (PropagatorJob.AbortType abort_type)  {
+    public new void abort (PropagatorJob.AbortType abort_type)  {
         if (this.job && this.job.reply ())
-            this.job.reply ().on_signal_abort ();
+            this.job.reply ().abort ();
 
         if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
             /* emit */ signal_abort_finished ();
@@ -826,14 +826,14 @@ public class PropagateDownloadFile : PropagateItemJob {
         }
         if (this.item.type == ItemTypeVirtualFile) {
             if (propagator ().local_filename_clash (this.item.file)) {
-                on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 cannot be downloaded because of a local file name clash!").arg (QDir.to_native_separators (this.item.file)));
+                on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 cannot be downloaded because of a local file name clash!").printf (QDir.to_native_separators (this.item.file)));
                 return;
             }
 
             GLib.debug ("Creating virtual file " + this.item.file);
             // do a klaas' case clash check.
             if (propagator ().local_filename_clash (this.item.file)) {
-                on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 can not be downloaded because of a local file name clash!").arg (QDir.to_native_separators (this.item.file)));
+                on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 can not be downloaded because of a local file name clash!").printf (QDir.to_native_separators (this.item.file)));
                 return;
             }
             var r = vfs.create_placeholder (*this.item);
@@ -866,7 +866,7 @@ public class PropagateDownloadFile : PropagateItemJob {
         }
         if (this.item.instruction == CSYNC_INSTRUCTION_CONFLICT
             && this.item.size == this.item.previous_size
-            && !this.item.checksum_header.is_empty ()
+            && !this.item.checksum_header == ""
             && (csync_is_collision_safe_hash (this.item.checksum_header)
                 || this.item.modtime == this.item.previous_modtime)) {
             GLib.debug (this.item.file + " may not need download; computing checksum.");
@@ -956,7 +956,7 @@ public class PropagateDownloadFile : PropagateItemJob {
             GLib.warning ("Could not open recall file: " + file.error_string ());
             return;
         }
-        GLib.FileInfo existing_file = new GLib.FileInfo (file_path);
+        GLib.FileInfo existing_file = GLib.File.new_for_path (file_path);
         QDir base_dir = existing_file.directory ();
 
         while (!file.at_end ()) {
@@ -998,7 +998,7 @@ public class PropagateDownloadFile : PropagateItemJob {
         int chown_err = chown (filename.to_local8Bit ().const_data (), -1, file_info.group_id ());
         if (chown_err) {
             // TODO: Consider further error handling!
-            GLib.warning ("preserve_group_ownership : chown error %1 : setting group %2 failed on file %3".arg (chown_err).arg (file_info.group_id ()).arg (filename));
+            GLib.warning ("preserve_group_ownership : chown error %1 : setting group %2 failed on file %3".printf (chown_err).printf (file_info.group_id ()).printf (filename));
         }
 //  #else
         //  Q_UNUSED (filename);

@@ -140,7 +140,7 @@ public class VfsXAttr : Vfs {
     /***********************************************************
     ***********************************************************/
     public bool is_dehydrated_placeholder (string file_path) {
-        var file_info = GLib.FileInfo (file_path);
+        var file_info = GLib.File.new_for_path (file_path);
         return file_info.exists () &&
                 xattr.has_nextcloud_placeholder_attributes (file_path);
     }

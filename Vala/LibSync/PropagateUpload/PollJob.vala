@@ -28,7 +28,7 @@ public class PollJob : AbstractNetworkJob {
     /***********************************************************
     Takes ownership of the device
     ***********************************************************/
-    public PollJob.for_account (unowned Account account, string path, unowned SyncFileItem item,
+    public PollJob.for_account (Account account, string path, SyncFileItem item,
         SyncJournalDb journal, string local_path, GLib.Object parent) {
         base (account, path, parent);
         this.journal = journal;
@@ -39,13 +39,13 @@ public class PollJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void start () {
+    public new void start () {
         on_signal_timeout (120 * 1000);
         GLib.Uri account_url = account ().url ();
         GLib.Uri final_url = GLib.Uri.from_user_input (account_url.scheme () + "://" + account_url.authority ()
             + (path ().starts_with ("/") ? "" : "/") + path ());
         send_request ("GET", final_url);
-        connect (reply (), Soup.Reply.download_progress, this, AbstractNetworkJob.on_signal_reset_timeout, Qt.UniqueConnection);
+        connect (reply (), Soup.Reply.download_progress, this, AbstractNetworkJob.reset_timeout, Qt.UniqueConnection);
         AbstractNetworkJob.start ();
     }
 

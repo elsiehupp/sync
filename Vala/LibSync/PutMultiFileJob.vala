@@ -50,7 +50,7 @@ public class PutMultiFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public PutMultiFileJob.for_account (unowned Account account, GLib.Uri url,
+    public PutMultiFileJob.for_account (Account account, GLib.Uri url,
         GLib.List<SingleUploadFileData> devices, GLib.Object parent = new GLib.Object ()) {
         base (account, {}, parent);
         this.devices = std.move (devices);
@@ -66,8 +66,8 @@ public class PutMultiFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void start () {
-        Soup.Request request;
+    public new void start () {
+        Soup.Request request = new Soup.Request ();
 
         foreach (var one_device in this.devices) {
             var one_part = new QHttp_part ();
@@ -114,9 +114,10 @@ public class PutMultiFileJob : AbstractNetworkJob {
 
 
     /***********************************************************
+    FIXME: GLib.TimeSpan is microseconds, not milliseconds!
     ***********************************************************/
-    public std.chrono.milliseconds ms_since_start () {
-        return std.chrono.milliseconds (this.request_timer.elapsed ());
+    public GLib.TimeSpan ms_since_start () {
+        return this.request_timer.elapsed ();
     }
 
 } // class PutMultiFileJob

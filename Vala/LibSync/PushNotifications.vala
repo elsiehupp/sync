@@ -189,7 +189,7 @@ public class PushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_web_socket_ssl_errors (GLib.List<QSslError> errors) {
+    private void on_signal_web_socket_ssl_errors (GLib.List<GnuTLS.ErrorCode> errors) {
         GLib.warning ("Websocket ssl errors with account " + this.account.url () + errors);
         close_web_socket ();
         /* emit */ authentication_failed ();

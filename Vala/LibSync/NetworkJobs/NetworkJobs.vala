@@ -8,10 +8,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QJsonDocument>
 //  #include <QLoggingCategory>
 //  #include <Soup.Request>
-//  #include <QNetworkAccessManager>
-//  #include <Soup.Request>
 //  #include <QSslConfigu
-//  #include <QSslCipher>
 //  #include <Soup.Buffer>
 //  #include <QXmlStrea
 //  #include <string[

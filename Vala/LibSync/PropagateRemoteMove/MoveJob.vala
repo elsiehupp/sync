@@ -28,14 +28,14 @@ public class MoveJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public MoveJob.for_path (unowned Account account, string path, string destination, GLib.Object parent = new GLib.Object ()) {
+    public MoveJob.for_path (Account account, string path, string destination, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
         this.destination = destination;
     }
 
     /***********************************************************
     ***********************************************************/
-    public MoveJob.for_url (unowned Account account, GLib.Uri url, string destination,
+    public MoveJob.for_url (Account account, GLib.Uri url, string destination,
         GLib.HashTable<string, string> extra_headers, GLib.Object parent) {
         base (account, "", parent);
         this.destination = destination;
@@ -46,8 +46,8 @@ public class MoveJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void start () {
-        Soup.Request request;
+    public new void start () {
+        Soup.Request request = new Soup.Request ();
         request.raw_header ("Destination", GLib.Uri.to_percent_encoding (this.destination, "/"));
         for (var it = this.extra_headers.const_begin (); it != this.extra_headers.const_end (); ++it) {
             request.raw_header (it.key (), it.value ());

@@ -14,18 +14,18 @@ namespace LibSync {
 ***********************************************************/
 public class EntityExistsJob : AbstractNetworkJob {
 
-    signal void exists (Soup.Reply reply);
+    signal void exists (GLib.InputStream reply);
 
     /***********************************************************
     ***********************************************************/
-    public EntityExistsJob.for_account (unowned Account account, string path, GLib.Object parent = new GLib.Object ()) {
+    public EntityExistsJob.for_account (Account account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void start () {
+    public new void start () {
         send_request ("HEAD", make_account_url (path ()));
         AbstractNetworkJob.start ();
     }

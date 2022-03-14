@@ -8,7 +8,7 @@ Copyright (c) by Markus Goetz <guruz@owncloud.com>
 //  #include <QLoggingCategory>
 //  #include <QMutex>
 //  #include <GLib.Settings>
-//  #include <QNetworkCookieJar>
+//  #include <Soup.CookieJar>
 
 namespace Occ {
 namespace LibSync {
@@ -63,7 +63,7 @@ public class TokenCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public new QNetworkAccessManager create_qnam () {
+    public new Soup.Session create_qnam () {
         AccessManager qnam = new TokenCredentialsAccessManager (this);
 
         connect (
@@ -94,7 +94,7 @@ public class TokenCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public new bool still_valid (Soup.Reply reply) {
+    public new bool still_valid (GLib.InputStream reply) {
         return ( (reply.error () != Soup.Reply.AuthenticationRequiredError)
             // returned if user/password or token are incorrect
             && (reply.error () != Soup.Reply.OperationCanceledError
@@ -128,7 +128,7 @@ public class TokenCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_authentication (Soup.Reply reply, QAuthenticator authenticator) {
+    private void on_signal_authentication (GLib.InputStream reply, QAuthenticator authenticator) {
         //  Q_UNUSED (authenticator)
         // we cannot use QAuthenticator, because it sends username and passwords with latin1
         // instead of utf8 encoding. Instead, we send it manually. Thus, if we reach this signal,

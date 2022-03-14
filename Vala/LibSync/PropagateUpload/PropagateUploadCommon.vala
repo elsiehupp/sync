@@ -81,10 +81,10 @@ public class PropagateUploadFileCommon : PropagateItemJob {
 
 
     /***********************************************************
-    Whether an on_signal_abort is currently ongoing.
+    Whether an abort is currently ongoing.
 
     Important to avoid duplicate aborts since each finishing PUTFileJob might
-    trigger an on_signal_abort on error.
+    trigger an abort on error.
     ***********************************************************/
     protected bool aborting = BITFIELD (1);
 
@@ -100,7 +100,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public PropagateUploadFileCommon (OwncloudPropagator propagator, unowned SyncFileItem item) {
+    public PropagateUploadFileCommon (OwncloudPropagator propagator, SyncFileItem item) {
         base (propagator, item);
         this.finished = false;
         this.delete_existing = false;
@@ -122,12 +122,12 @@ public class PropagateUploadFileCommon : PropagateItemJob {
     /***********************************************************
     start should set up the file, path and size that will be send to the server
     ***********************************************************/
-    public void start () {
+    public new void start () {
         var path = this.item.file;
         var slash_position = path.last_index_of ("/");
         var parent_path = slash_position >= 0 ? path.left (slash_position): "";
 
-        if (!this.item.rename_target.is_empty () && this.item.file != this.item.rename_target) {
+        if (!this.item.rename_target == "" && this.item.file != this.item.rename_target) {
             // Try to rename the file
             var original_file_path_absolute = propagator ().full_local_path (this.item.file);
             var new_file_path_absolute = propagator ().full_local_path (this.item.rename_target);
@@ -141,7 +141,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
             GLib.assert (this.item.modtime > 0);
             if (this.item.modtime <= 0) {
                 GLib.warning ("Invalid modified time " + this.item.file + this.item.modtime);
-                on_signal_error_start_folder_unlock (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (this.item.file)));
+                on_signal_error_start_folder_unlock (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").printf (QDir.to_native_separators (this.item.file)));
                 return;
             }
         }
@@ -162,7 +162,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
             return;
         }
 
-        var remote_parent_path = parent_rec.e2e_mangled_name.is_empty () ? parent_path : parent_rec.e2e_mangled_name;
+        var remote_parent_path = parent_rec.e2e_mangled_name == "" ? parent_path : parent_rec.e2e_mangled_name;
         this.upload_encrypted_helper = new PropagateUploadEncrypted (propagator (), remote_parent_path, this.item, this);
         connect (
             this.upload_encrypted_helper,
@@ -216,18 +216,18 @@ public class PropagateUploadFileCommon : PropagateItemJob {
 
         // Check if the specific file can be accessed
         if (propagator ().has_case_clash_accessibility_problem (this.file_to_upload.file)) {
-            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 cannot be uploaded because another file with the same name, differing only in case, exists").arg (QDir.to_native_separators (this.item.file)));
+            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 cannot be uploaded because another file with the same name, differing only in case, exists").printf (QDir.to_native_separators (this.item.file)));
             return;
         }
 
         // Check if we believe that the upload will fail due to remote quota limits
         const int64 quota_guess = propagator ().folder_quota.value (
-            GLib.FileInfo (this.file_to_upload.file).path (), std.numeric_limits<int64>.max ());
+            GLib.File.new_for_path (this.file_to_upload.file).path (), std.numeric_limits<int64>.max ());
         if (this.file_to_upload.size > quota_guess) {
             // Necessary for blocklisting logic
             this.item.http_error_code = 507;
             /* emit */ propagator ().signal_insufficient_remote_storage ();
-            on_signal_done (SyncFileItem.Status.DETAIL_ERROR, _("Upload of %1 exceeds the quota for the folder").arg (Utility.octets_to_string (this.file_to_upload.size)));
+            on_signal_done (SyncFileItem.Status.DETAIL_ERROR, _("Upload of %1 exceeds the quota for the folder").printf (Utility.octets_to_string (this.file_to_upload.size)));
             return;
         }
 
@@ -261,7 +261,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public bool is_likely_finished_quickly () {
+    public new bool is_likely_finished_quickly () {
         return this.item.size < propagator ().small_file_size ();
     }
 
@@ -283,7 +283,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         // probably temporary one.
         this.item.modtime = FileSystem.get_mod_time (file_path);
         if (this.item.modtime <= 0) {
-            on_signal_error_start_folder_unlock (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (this.item.file)));
+            on_signal_error_start_folder_unlock (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").printf (QDir.to_native_separators (this.item.file)));
             return;
         }
 
@@ -353,7 +353,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         this.transmission_checksum_header = make_checksum_header (transmission_checksum_type, transmission_checksum);
 
         // If no checksum header was not set, reuse the transmission checksum as the content checksum.
-        if (this.item.checksum_header.is_empty ()) {
+        if (this.item.checksum_header == "") {
             this.item.checksum_header = this.transmission_checksum_header;
         }
 
@@ -361,10 +361,10 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         const string original_file_path = propagator ().full_local_path (this.item.file);
 
         if (!FileSystem.file_exists (full_file_path)) {
-            return on_signal_error_start_folder_unlock (SyncFileItem.Status.SOFT_ERROR, _("File Removed (start upload) %1").arg (full_file_path));
+            return on_signal_error_start_folder_unlock (SyncFileItem.Status.SOFT_ERROR, _("File Removed (start upload) %1").printf (full_file_path));
         }
         if (this.item.modtime <= 0) {
-            on_signal_error_start_folder_unlock (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (this.item.file)));
+            on_signal_error_start_folder_unlock (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").printf (QDir.to_native_separators (this.item.file)));
             return;
         }
         GLib.assert (this.item.modtime > 0);
@@ -377,7 +377,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
 
         this.item.modtime = FileSystem.get_mod_time (original_file_path);
         if (this.item.modtime <= 0) {
-            on_signal_error_start_folder_unlock (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (this.item.file)));
+            on_signal_error_start_folder_unlock (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").printf (QDir.to_native_separators (this.item.file)));
             return;
         }
         GLib.assert (this.item.modtime > 0);
@@ -474,7 +474,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         if (this.aborting) {
             return;
         }
-        on_signal_abort (PropagatorJob.AbortType.SYNCHRONOUS);
+        abort (PropagatorJob.AbortType.SYNCHRONOUS);
         on_signal_done (status, error);
     }
 
@@ -506,17 +506,17 @@ public class PropagateUploadFileCommon : PropagateItemJob {
 
     void on_signal_finalize () {
         // Update the quota, if known
-        var quota_it = propagator ().folder_quota.find (GLib.FileInfo (this.item.file).path ());
+        var quota_it = propagator ().folder_quota.find (GLib.File.new_for_path (this.item.file).path ());
         if (quota_it != propagator ().folder_quota.end ())
             quota_it.value () -= this.file_to_upload.size;
 
         // Update the database entry
         var result = propagator ().update_metadata (*this.item);
         if (!result) {
-            on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").arg (result.error ()));
+            on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error ()));
             return;
         } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
-            on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").arg (this.item.file));
+            on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").printf (this.item.file));
             return;
         }
 
@@ -557,7 +557,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_done (SyncFileItem.Status status, string error_string = "") {
+    protected new void on_signal_done (SyncFileItem.Status status, string error_string = "") {
         this.finished = true;
         PropagateItemJob.on_signal_done (status, error_string);
     }
@@ -578,7 +578,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         this.aborting = true;
 
         // Count the number of jobs that need aborting, and emit the overall
-        // on_signal_abort signal when they're all done.
+        // abort signal when they're all done.
         unowned int running_count = 0;
 
         // Abort all running jobs, except for explicitly excluded ones
@@ -589,8 +589,8 @@ public class PropagateUploadFileCommon : PropagateItemJob {
 
             (*running_count)++;
 
-            // If a job should not be aborted that means we'll never on_signal_abort before
-            // the hard on_signal_abort timeout signal comes as running_count will never go to
+            // If a job should not be aborted that means we'll never abort before
+            // the hard abort timeout signal comes as running_count will never go to
             // zero.
             // We may however finish before that if the un-abortable job completes
             // normally.
@@ -599,10 +599,10 @@ public class PropagateUploadFileCommon : PropagateItemJob {
 
             // Abort the job
             if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
-                // Connect to on_signal_finished signal of job reply to asynchonously finish the on_signal_abort
+                // Connect to on_signal_finished signal of job reply to asynchonously finish the abort
                 connect (reply, Soup.Reply.on_signal_finished, this, one_abort_finished);
             }
-            reply.on_signal_abort ();
+            reply.abort ();
         }
 
         if (*running_count == 0 && abort_type == PropagatorJob.AbortType.ASYNCHRONOUS)
@@ -676,7 +676,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
             // store the quota for the real local file using the information
             // on the file to upload, that could have been modified by
             // filters or something.
-            var path = GLib.FileInfo (this.item.file).path ();
+            var path = GLib.File.new_for_path (this.item.file).path ();
             var quota_it = propagator ().folder_quota.find (path);
             if (quota_it != propagator ().folder_quota.end ()) {
                 quota_it.value () = q_min (quota_it.value (), this.file_to_upload.size - 1);
@@ -686,7 +686,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
 
             // Set up the error
             status = SyncFileItem.Status.DETAIL_ERROR;
-            error_string = _("Upload of %1 exceeds the quota for the folder").arg (Utility.octets_to_string (this.file_to_upload.size));
+            error_string = _("Upload of %1 exceeds the quota for the folder").printf (Utility.octets_to_string (this.file_to_upload.size));
             /* emit */ propagator ().signal_insufficient_remote_storage ();
         }
 
@@ -740,7 +740,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
             headers["OC-Tag"] = ".sys.admin#recall#";
         }
 
-        if (!this.item.etag.is_empty () && this.item.etag != "empty_etag"
+        if (!this.item.etag == "" && this.item.etag != "empty_etag"
             && this.item.instruction != CSYNC_INSTRUCTION_NEW // On new files never send a If-Match
             && this.item.instruction != CSYNC_INSTRUCTION_TYPE_CHANGE
             && !this.delete_existing) {
@@ -753,17 +753,17 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         var conflict_record = propagator ().journal.conflict_record (this.item.file.to_utf8 ());
         if (conflict_record.is_valid ()) {
             headers["OC-Conflict"] = "1";
-            if (!conflict_record.initial_base_path.is_empty ())
+            if (!conflict_record.initial_base_path == "")
                 headers["OC-ConflictInitialBasePath"] = conflict_record.initial_base_path;
-            if (!conflict_record.base_file_id.is_empty ())
+            if (!conflict_record.base_file_id == "")
                 headers["OC-ConflictBaseFileId"] = conflict_record.base_file_id;
             if (conflict_record.base_modtime != -1)
                 headers["OC-ConflictBaseMtime"] = new string.number (conflict_record.base_modtime);
-            if (!conflict_record.base_etag.is_empty ())
+            if (!conflict_record.base_etag == "")
                 headers["OC-ConflictBaseEtag"] = conflict_record.base_etag;
         }
 
-        if (this.upload_encrypted_helper && !this.upload_encrypted_helper.folder_token ().is_empty ()) {
+        if (this.upload_encrypted_helper && !this.upload_encrypted_helper.folder_token () == "") {
             headers.insert ("e2e-token", this.upload_encrypted_helper.folder_token ());
         }
 

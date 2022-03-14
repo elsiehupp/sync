@@ -4,7 +4,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <QNetworkAccessManager>
+//  #include <Soup.Session>
 //  #include <GLib.FileInfo>
 //  #include <QDir>
 //  #include <cmath>
@@ -105,14 +105,14 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
     /***********************************************************
     ***********************************************************/
-    public PropagateUploadFileNG (OwncloudPropagator propagator, unowned SyncFileItem item) {
+    public PropagateUploadFileNG (OwncloudPropagator propagator, SyncFileItem item) {
         base (propagator, item);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void do_start_upload () {
+    public new void do_start_upload () {
         propagator ().active_job_list.append (this);
 
         const SyncJournalDb.UploadInfo progress_info = propagator ().journal.get_upload_info (this.item.file);
@@ -219,7 +219,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         this.current_chunk_size = q_min (propagator ().chunk_size, file_size - this.sent);
 
         if (this.current_chunk_size == 0) {
-            GLib.assert (this.jobs.is_empty ()); // There should be no running job anymore
+            GLib.assert (this.jobs == ""); // There should be no running job anymore
             this.finished = true;
 
             // Finish with a MOVE
@@ -230,10 +230,10 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
             // "If-Match applies to the source, but we are interested in comparing the etag of the destination
             var if_match = headers.take ("If-Match");
-            if (!if_match.is_empty ()) {
+            if (!if_match == "") {
                 headers["If"] = "<" + GLib.Uri.to_percent_encoding (destination, "/") + "> ([" + if_match + "])";
             }
-            if (!this.transmission_checksum_header.is_empty ()) {
+            if (!this.transmission_checksum_header == "") {
                 GLib.info (destination + this.transmission_checksum_header);
                 headers[CHECK_SUM_HEADER_C] = this.transmission_checksum_header;
             }
@@ -284,7 +284,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
     /***********************************************************
     ***********************************************************/
-    public new void on_signal_abort (PropagatorJob.AbortType abort_type) {
+    public new void abort (PropagatorJob.AbortType abort_type) {
         abort_network_jobs (
             abort_type,
             PropagateUploadNg.abort_filter
@@ -333,14 +333,14 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
         GLib.info ("Resuming " + this.item.file + " from chunk " + this.current_chunk + "; sent =" + this.sent);
 
-        if (!this.server_chunks.is_empty ()) {
+        if (!this.server_chunks == "") {
             GLib.info ("To Delete " + this.server_chunks.keys ());
             propagator ().active_job_list.append (this);
             this.remove_job_error = false;
 
             // Make sure that if there is a "hole" and then a few more chunks, on the server
             // we should remove the later chunks. Otherwise when we do dynamic chunk sizing, we may end up
-            // with corruptions if there are too many chunks, or if we on_signal_abort and there are still stale chunks.
+            // with corruptions if there are too many chunks, or if we abort and there are still stale chunks.
             foreach (var server_chunk in q_as_const (this.server_chunks)) {
                 var job = new DeleteJob (propagator ().account (), Utility.concat_url_path (chunk_url (), server_chunk.original_name), this);
                 GLib.Object.connect (job, DeleteJob.signal_finished, this, PropagateUploadFileNG.on_signal_delete_job_finished);
@@ -411,7 +411,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
             }
         }
 
-        if (this.jobs.is_empty ()) {
+        if (this.jobs == "") {
             propagator ().active_job_list.remove_one (this);
             if (this.remove_job_error) {
                 // There was an error removing some files, just start over
@@ -558,7 +558,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
         if (this.item.http_error_code == 202) {
             string path = string.from_utf8 (job.reply ().raw_header ("OC-Job_status-Location"));
-            if (path.is_empty ()) {
+            if (path == "") {
                 on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Poll URL missing"));
                 return;
             }
@@ -568,18 +568,18 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         }
 
         if (this.item.http_error_code != 201 && this.item.http_error_code != 204) {
-            abort_with_error (SyncFileItem.Status.NORMAL_ERROR, _("Unexpected return code from server (%1)").arg (this.item.http_error_code));
+            abort_with_error (SyncFileItem.Status.NORMAL_ERROR, _("Unexpected return code from server (%1)").printf (this.item.http_error_code));
             return;
         }
 
         string fid = job.reply ().raw_header ("OC-FileID");
-        if (fid.is_empty ()) {
+        if (fid == "") {
             GLib.warning ("Server did not return a OC-FileID " + this.item.file);
             abort_with_error (SyncFileItem.Status.NORMAL_ERROR, _("Missing File ID from server"));
             return;
         } else {
             // the old file identifier should only be empty for new files uploaded
-            if (!this.item.file_id.is_empty () && this.item.file_id != fid) {
+            if (!this.item.file_id == "" && this.item.file_id != fid) {
                 GLib.warning ("File ID changed! " + this.item.file_id.to_string () + fid);
             }
             this.item.file_id = fid;
@@ -587,7 +587,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
         this.item.etag = get_etag_from_reply (job.reply ());
         ;
-        if (this.item.etag.is_empty ()) {
+        if (this.item.etag == "") {
             GLib.warning ("Server did not return an ETAG " + this.item.file);
             abort_with_error (SyncFileItem.Status.NORMAL_ERROR, _("Missing ETag from server"));
             return;

@@ -20,21 +20,21 @@ public class PropagateRemoteDelete : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public PropagateRemoteDelete (OwncloudPropagator propagator, unowned SyncFileItem item) {
+    public PropagateRemoteDelete (OwncloudPropagator propagator, SyncFileItem item) {
         base (propagator, item);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void start () {
+    public new void start () {
         GLib.info ("Start propagate remote delete job for" + this.item.file);
 
         if (propagator ().abort_requested)
             return;
 
-        if (!this.item.encrypted_filename.is_empty () || this.item.is_encrypted) {
-            if (!this.item.encrypted_filename.is_empty ()) {
+        if (!this.item.encrypted_filename == "" || this.item.is_encrypted) {
+            if (!this.item.encrypted_filename == "") {
                 this.delete_encrypted_helper = new PropagateRemoteCeleteEncrypted (propagator (), this.item, this);
             } else {
                 this.delete_encrypted_helper = new PropagateRemoteDeleteEncryptedRootFolder (propagator (), this.item, this);
@@ -55,8 +55,8 @@ public class PropagateRemoteDelete : PropagateItemJob {
     private void on_signal_abstract_propagate_remote_delete_encrypted_finished (bool on_signal_success) {
         if (!on_signal_success) {
             SyncFileItem.Status status = SyncFileItem.Status.NORMAL_ERROR;
-            if (this.delete_encrypted_helper.signal_network_error () != Soup.Reply.NoError && this.delete_encrypted_helper.signal_network_error () != Soup.Reply.ContentNotFoundError) {
-                status = classify_error (this.delete_encrypted_helper.signal_network_error (), this.item.http_error_code, propagator ().another_sync_needed);
+            if (this.delete_encrypted_helper.network_error () != Soup.Reply.NoError && this.delete_encrypted_helper.network_error () != Soup.Reply.ContentNotFoundError) {
+                status = classify_error (this.delete_encrypted_helper.network_error (), this.item.http_error_code, propagator ().another_sync_needed);
             }
             on_signal_done (status, this.delete_encrypted_helper.error_string ());
         } else {
@@ -82,9 +82,9 @@ public class PropagateRemoteDelete : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_abort (PropagatorJob.AbortType abort_type) {
+    public new void abort (PropagatorJob.AbortType abort_type) {
         if (this.job && this.job.reply ())
-            this.job.reply ().on_signal_abort ();
+            this.job.reply ().abort ();
 
         if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
             /* emit */ signal_abort_finished ();
@@ -94,7 +94,7 @@ public class PropagateRemoteDelete : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public bool is_likely_finished_quickly () {
+    public new bool is_likely_finished_quickly () {
         return !this.item.is_directory ();
     }
 
@@ -129,8 +129,8 @@ public class PropagateRemoteDelete : PropagateItemJob {
             // throw an error.
             on_signal_done (SyncFileItem.Status.NORMAL_ERROR,
                 _("Wrong HTTP code returned by server. Expected 204, but received \"%1 %2\".")
-                    .arg (this.item.http_error_code)
-                    .arg (this.job.reply ().attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ()));
+                    .printf (this.item.http_error_code)
+                    .printf (this.job.reply ().attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ()));
             return;
         }
 

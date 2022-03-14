@@ -49,7 +49,7 @@ public class Theme : GLib.Object {
     /***********************************************************
     returns a singleton instance.
     ***********************************************************/
-    static Theme instance {
+    public static Theme instance {
         public get {
             if (Theme.instance == null) {
                 Theme.instance = new THEME_CLASS ();
@@ -436,7 +436,7 @@ public class Theme : GLib.Object {
     ***********************************************************/
     public string conflict_help_url () {
         var base_url = help_url ();
-        if (base_url.is_empty ())
+        if (base_url == "")
             return "";
         if (!base_url.has_suffix ("/"))
             base_url.append ("/");
@@ -561,9 +561,9 @@ public class Theme : GLib.Object {
             break;
         }
 
-        string img_path = Theme.theme_prefix + "colored/%1.png".arg (key);
+        string img_path = Theme.theme_prefix + "colored/%1.png".printf (key);
         if (GLib.File.exists (img_path)) {
-            QPixmap pix = new QPixmap (img_path);
+            Gdk.Pixbuf pix = new Gdk.Pixbuf (img_path);
             if (pix.is_null ()) {
                 // pixmap loading hasn't succeeded. We take the text instead.
                 re.value (key);
@@ -593,9 +593,9 @@ public class Theme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public QPixmap wizard_application_logo () {
+    public Gdk.Pixbuf wizard_application_logo () {
         if (!Theme.is_branded ()) {
-            return new QPixmap (Theme.hidpi_filename (Theme.theme_prefix + "colored/wizard-nextcloud.png"));
+            return new Gdk.Pixbuf (Theme.hidpi_filename (Theme.theme_prefix + "colored/wizard-nextcloud.png"));
         }
     // #ifdef APPLICATION_WIZARD_USE_CUSTOM_LOGO
         var use_svg = should_prefer_svg ();
@@ -607,7 +607,7 @@ public class Theme : GLib.Object {
             var size = icon.actual_size (QSize (max_width, max_height));
             return icon.pixmap (size);
         } else {
-            return QPixmap (hidpi_filename (logo_base_path + ".png"));
+            return Gdk.Pixbuf (hidpi_filename (logo_base_path + ".png"));
         }
     // #else
         var size = Theme.is_hidpi () ? 200 : 100;
@@ -619,7 +619,7 @@ public class Theme : GLib.Object {
     /***********************************************************
     @return logo for the setup wizard.
     ***********************************************************/
-    public QPixmap wizard_header_logo () {
+    public Gdk.Pixbuf wizard_header_logo () {
     // #ifdef APPLICATION_WIZARD_USE_CUSTOM_LOGO
         var use_svg = should_prefer_svg ();
         const string logo_base_path = Theme.theme_prefix + "colored/wizard_logo";
@@ -630,7 +630,7 @@ public class Theme : GLib.Object {
             var size = icon.actual_size (QSize (max_width, max_height));
             return icon.pixmap (size);
         } else {
-            return QPixmap (hidpi_filename (logo_base_path + ".png"));
+            return Gdk.Pixbuf (hidpi_filename (logo_base_path + ".png"));
         }
     // #else
         return application_icon ().pixmap (64);
@@ -645,10 +645,10 @@ public class Theme : GLib.Object {
 
     @return banner for the setup wizard.
     ***********************************************************/
-    public QPixmap wizard_header_banner () {
+    public Gdk.Pixbuf wizard_header_banner () {
         Gtk.Color c = wizard_header_background_color ();
         if (!c.is_valid ()) {
-            return QPixmap ();
+            return Gdk.Pixbuf ();
         }
 
         QSize size = new QSize (750, 78);
@@ -661,7 +661,7 @@ public class Theme : GLib.Object {
                 size *= ratio;
             }
         }
-        QPixmap pix = new QPixmap (size);
+        Gdk.Pixbuf pix = new Gdk.Pixbuf (size);
         pix.fill (wizard_header_background_color ());
         return pix;
     }
@@ -679,12 +679,12 @@ public class Theme : GLib.Object {
         dev_string = _("nextcloud_theme.about ()"
                      + "<p><small>Built from Git revision <a href=\"%1\">%2</a>"
                      + " on %3, %4 using Qt %5, %6</small></p>")
-                        .arg (github_prefix + git_sha1)
-                        .arg (git_sha1.left (6))
-                        .arg (__DATE__)
-                        .arg (__TIME__)
-                        .arg (q_version ())
-                        .arg (QSslSocket.ssl_library_version_string ());
+                        .printf (github_prefix + git_sha1)
+                        .printf (git_sha1.left (6))
+                        .printf (__DATE__)
+                        .printf (__TIME__)
+                        .printf (q_version ())
+                        .printf (QSslSocket.ssl_library_version_string ());
     // #endif
         return dev_string;
     }
@@ -702,16 +702,16 @@ public class Theme : GLib.Object {
         string dev_string;
         // : Example text: "<p>Nextcloud Desktop Client</p>"   (%1 is the application name)
         dev_string = _("<p>%1 Desktop Client</p>")
-                .arg (APPLICATION_NAME);
+                .printf (APPLICATION_NAME);
 
         dev_string += _("<p>Version %1. For more information please click <a href='%2'>here</a>.</p>")
-                .arg (string.from_latin1 (MIRALL_STRINGIFY (MIRALL_VERSION)) + " (%1)".arg (os_name))
-                .arg (help_url ());
+                .printf (string.from_latin1 (MIRALL_STRINGIFY (MIRALL_VERSION)) + " (%1)".printf (os_name))
+                .printf (help_url ());
 
         dev_string += _("<p><small>Using files plugin : %1</small></p>")
-                        .arg (Vfs.Mode.to_string (best_available_vfs_mode ()));
+                        .printf (Vfs.Mode.to_string (best_available_vfs_mode ()));
         dev_string += "<br>%1"
-                .arg (QSysInfo.product_type () % '-' % QSysInfo.kernel_version ());
+                .printf (QSysInfo.product_type () % '-' % QSysInfo.kernel_version ());
 
         return dev_string;
     }
@@ -723,11 +723,11 @@ public class Theme : GLib.Object {
     string about_details () {
         string dev_string;
         dev_string = _("<p>Version %1. For more information please click <a href='%2'>here</a>.</p>")
-                .arg (MIRALL_VERSION_STRING)
-                .arg (help_url ());
+                .printf (MIRALL_VERSION_STRING)
+                .printf (help_url ());
 
         dev_string += _("<p>This release was supplied by %1</p>")
-                .arg (APPLICATION_VENDOR);
+                .printf (APPLICATION_VENDOR);
 
         dev_string += git_sha1 ();
 
@@ -741,7 +741,7 @@ public class Theme : GLib.Object {
     Check if mono icons are available
     ***********************************************************/
     public bool mono_icons_available () {
-        string theme_dir = Theme.theme_prefix + "%1/".arg (Theme.instance ().systray_icon_flavor (true));
+        string theme_dir = Theme.theme_prefix + "%1/".printf (Theme.instance.systray_icon_flavor (true));
         return QDir (theme_dir).exists ();
     }
 
@@ -945,7 +945,7 @@ public class Theme : GLib.Object {
     // #endif
         stream += "Using Qt " + q_version () + ", built against Qt " + QT_VERSION_STR + Qt.endl;
 
-        if (!QGuiApplication.platform_name ().is_empty ())
+        if (!QGuiApplication.platform_name () == "")
             stream += "Using Qt platform plugin '" + QGuiApplication.platform_name () + "'" + Qt.endl;
 
         stream += "Using '" + QSslSocket.ssl_library_version_string () + "'" + Qt.endl;
@@ -964,7 +964,7 @@ public class Theme : GLib.Object {
 	public QIcon ui_theme_icon (string icon_name, bool ui_has_dark_background) {
         string icon_path = Theme.theme_prefix + (ui_has_dark_background ? "white/": "black/") + icon_name;
         string icn_path = icon_path.to_utf8 ().const_data ();
-        return new Gtk.Icon (QPixmap (icon_path));
+        return new Gtk.Icon (Gdk.Pixbuf (icon_path));
     }
 
 
@@ -1033,7 +1033,7 @@ public class Theme : GLib.Object {
     on Transifex.
     ***********************************************************/
     public static void replace_link_color_string (string link_string, Gtk.Color new_color) {
-        link_string.replace (QRegularExpression (" (<a href|<a style='color:# ([a-z_a-Z0-9]{6});' href)"), string.from_latin1 ("<a style='color:%1;' href").arg (new_color.name ()));
+        link_string.replace (QRegularExpression (" (<a href|<a style='color:# ([a-z_a-Z0-9]{6});' href)"), string.from_latin1 ("<a style='color:%1;' href").printf (new_color.name ()));
     }
 
 
@@ -1061,14 +1061,14 @@ public class Theme : GLib.Object {
 
         QIcon icon;
         if (Theme.is_dark_color (palette.color (QPalette.Base))) {
-            icon.add_pixmap (QPixmap.from_image (inverted));
+            icon.add_pixmap (Gdk.Pixbuf.from_image (inverted));
         } else {
-            icon.add_pixmap (QPixmap.from_image (img));
+            icon.add_pixmap (Gdk.Pixbuf.from_image (img));
         }
         if (Theme.is_dark_color (palette.color (QPalette.HighlightedText))) {
-            icon.add_pixmap (QPixmap.from_image (img), QIcon.Normal, QIcon.On);
+            icon.add_pixmap (Gdk.Pixbuf.from_image (img), QIcon.Normal, QIcon.On);
         } else {
-            icon.add_pixmap (QPixmap.from_image (inverted), QIcon.Normal, QIcon.On);
+            icon.add_pixmap (Gdk.Pixbuf.from_image (inverted), QIcon.Normal, QIcon.On);
         }
         return icon;
     }
@@ -1078,20 +1078,20 @@ public class Theme : GLib.Object {
     @brief Creates a colour-aware pixmap based on the specified
     palette's base colour (Dark-/Light-Mode switching).
 
-    @return QPixmap, colour-aware (inverted on dark backgrounds).
+    @return Gdk.Pixbuf, colour-aware (inverted on dark backgrounds).
 
     2019/12/09: Adapted from create_color_aware_icon.
     ***********************************************************/
-    public static QPixmap create_color_aware_pixmap (string name, QPalette palette = QGuiApplication.palette ()) {
+    public static Gdk.Pixbuf create_color_aware_pixmap (string name, QPalette palette = QGuiApplication.palette ()) {
         Gtk.Image img = new Gtk.Image (name);
         Gtk.Image inverted = new Gtk.Image (img);
         inverted.invert_pixels (Gtk.Image.InvertRgb);
 
-        QPixmap pixmap;
+        Gdk.Pixbuf pixmap;
         if (Theme.is_dark_color (palette.color (QPalette.Base))) {
-            pixmap = QPixmap.from_image (inverted);
+            pixmap = Gdk.Pixbuf.from_image (inverted);
         } else {
-            pixmap = QPixmap.from_image (img);
+            pixmap = Gdk.Pixbuf.from_image (img);
         }
         return pixmap;
     }
@@ -1169,7 +1169,7 @@ public class Theme : GLib.Object {
                 return cached = QIcon.from_theme (name);
             }
 
-            const string svg_name = Theme.theme_prefix + "%1/%2.svg".arg (flavor).arg (name);
+            const string svg_name = Theme.theme_prefix + "%1/%2.svg".printf (flavor).printf (name);
             QSvgRenderer renderer = new QSvgRenderer (svg_name);
 
             var use_svg = should_prefer_svg ();
@@ -1196,18 +1196,18 @@ public class Theme : GLib.Object {
     }
 
 
-    private static QPixmap create_pixmap_from_svg (QSvgRenderer renderer, int size) {
+    private static Gdk.Pixbuf create_pixmap_from_svg (QSvgRenderer renderer, int size) {
         Gtk.Image img = new Gtk.Image (size, size, Gtk.Image.FormatARGB32);
         img.fill (Qt.GlobalColor.transparent);
         QPainter img_painter = new QPainter (img);
         renderer.render (img_painter);
-        return QPixmap.from_image (img);
+        return Gdk.Pixbuf.from_image (img);
     }
 
 
-    private static QPixmap load_pixmap (string flavor, string name, int size) {
-        const string pixmap_name = Theme.theme_prefix + "%1/%2-%3.png".arg (flavor).arg (name).arg (size);
-        return QPixmap (pixmap_name);
+    private static Gdk.Pixbuf load_pixmap (string flavor, string name, int size) {
+        const string pixmap_name = Theme.theme_prefix + "%1/%2-%3.png".printf (flavor).printf (name).printf (size);
+        return Gdk.Pixbuf (pixmap_name);
     }
 //  #endif
     /***********************************************************
@@ -1224,8 +1224,8 @@ public class Theme : GLib.Object {
 
         // branded client may have several sizes of the same icon
         const string file_path = (use_svg || size <= 0)
-                ? Theme.theme_prefix + "%1/%2".arg (flavor).arg (name)
-                : Theme.theme_prefix + "%1/%2-%3".arg (flavor).arg (name).arg (size);
+                ? Theme.theme_prefix + "%1/%2".printf (flavor).printf (name)
+                : Theme.theme_prefix + "%1/%2-%3".printf (flavor).printf (name).printf (size);
 
         // Use the SVG as fallback if a PNG is missing so that we get a chance to display something
         if (use_svg) {

@@ -14,7 +14,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <GLib.FileInfo>
 //  #include <QLoggingCategory>
 //  #include <GLib.Settings>
-//  #include <QNetworkProxy>
+//  #include <Soup.ProxyResolverDefault>
 //  #include <QStandardPaths>
 
 //  #if ! (QTLEGACY)
@@ -115,26 +115,27 @@ public class ConfigFile : GLib.Object {
     /***********************************************************
     How do I initialize a static attribute?
 
-    this.conf_dir = "";
+    ConfigFile.conf_dir = "";
     ***********************************************************/
     static string conf_dir {
         private get {
-            return this.conf_dir;
+            return ConfigFile.conf_dir;
         }
         public set {
             string dir_path = value;
-            if (dir_path.is_empty ())
+            if (dir_path == "") {
                 return false;
+            }
 
-            GLib.FileInfo file_info = new GLib.FileInfo (dir_path);
+            GLib.FileInfo file_info = GLib.File.new_for_path (dir_path);
             if (!file_info.exists ()) {
                 QDir ().mkpath (dir_path);
                 file_info.file (dir_path);
             }
-            if (file_info.exists () && file_info.is_dir ()) {
+            if (file_info.exists () && file_info.query_info ().get_file_type () == FileType.DIRECTORY) {
                 dir_path = file_info.absolute_file_path ();
                 GLib.info ("Using custom config directory " + dir_path);
-                this.conf_dir = dir_path;
+                ConfigFile.conf_dir = dir_path;
                 return true;
             }
             return false;
@@ -146,7 +147,7 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     public ConfigFile () {
         // QDesktopServices uses the application name to create a config path
-        Gtk.Application.application_name (Theme.instance ().app_name_gui ());
+        Gtk.Application.application_name (Theme.instance.app_name_gui ());
 
         GLib.Settings.default_format (GLib.Settings.IniFormat);
 
@@ -160,32 +161,15 @@ public class ConfigFile : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public string config_path () {
-        if (this.conf_dir.is_empty ()) {
-            if (!Utility.is_windows ()) {
-                // On Unix, use the AppConfigLocation for the settings, that's configurable with the XDG_CONFIG_HOME env variable.
-                this.conf_dir = QStandardPaths.writable_location (QStandardPaths.AppConfigLocation);
-            } else {
-                // On Windows, use AppDataLocation, that's where the roaming data is and where we should store the config file
-                var new_location = QStandardPaths.writable_location (QStandardPaths.AppDataLocation);
-
-                // Check if this is the first time loading the new location
-                if (!GLib.FileInfo (new_location).is_dir ()) {
-                    // Migrate data to the new locations
-                    var old_location = QStandardPaths.writable_location (QStandardPaths.AppConfigLocation);
-
-                    // Only migrate if the old location exists.
-                    if (GLib.FileInfo (old_location).is_dir ()) {
-                        QDir ().mkpath (new_location);
-                        copy_dir_recursive (old_location, new_location);
-                    }
-                }
-                this.conf_dir = new_location;
-            }
+        if (ConfigFile.conf_dir == "") {
+            // On Unix, use the AppConfigLocation for the settings, that's configurable with the XDG_CONFIG_HOME env variable.
+            ConfigFile.conf_dir = GLib.Environment.get_user_config_dir ();
         }
-        string directory = this.conf_dir;
+        string directory = ConfigFile.conf_dir;
 
-        if (!directory.has_suffix ("/"))
+        if (!directory.has_suffix ("/")) {
             directory.append ("/");
+        }
         return directory;
     }
 
@@ -193,7 +177,7 @@ public class ConfigFile : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public string config_file () {
-        return config_path () + Theme.instance ().config_filename ();
+        return config_path () + Theme.instance.config_filename ();
     }
 
 
@@ -231,11 +215,11 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     public static string exclude_file_from_system () {
         GLib.FileInfo file_info;
-        file_info.file (SYSCONFDIR + "/" + Theme.instance ().app_name (), EXCL_FILE);
+        file_info.file (SYSCONFDIR + "/" + Theme.instance.app_name (), EXCL_FILE);
         if (!file_info.exists ()) {
             // Prefer to return the preferred path! Only use the fallback location
             // if the other path does not exist and the fallback is valid.
-            GLib.FileInfo next_to_binary = new GLib.FileInfo (QCoreApplication.application_dir_path (), EXCL_FILE);
+            GLib.FileInfo next_to_binary = GLib.File.new_for_path (QCoreApplication.application_dir_path (), EXCL_FILE);
             if (next_to_binary.exists ()) {
                 file_info = next_to_binary;
             } else {
@@ -244,8 +228,8 @@ public class ConfigFile : GLib.Object {
                 d.cd_up (); // go out of bin
                 d.cd_up (); // go out of usr
                 if (!d.is_root ()) { // it is really a mountpoint
-                    if (d.cd ("etc") && d.cd (Theme.instance ().app_name ())) {
-                        GLib.FileInfo in_mount_dir = new GLib.FileInfo (d, EXCL_FILE);
+                    if (d.cd ("etc") && d.cd (Theme.instance.app_name ())) {
+                        GLib.FileInfo in_mount_dir = GLib.File.new_for_path (d, EXCL_FILE);
                         if (in_mount_dir.exists ()) {
                             file_info = in_mount_dir;
                         }
@@ -266,11 +250,11 @@ public class ConfigFile : GLib.Object {
     public string backup () {
         string base_file = config_file ();
         var version_string = client_version_string ();
-        if (!version_string.is_empty ())
+        if (!version_string == "")
             version_string.prepend ('_');
         string backup_file =
             "%1.backup_%2%3"
-                .arg (
+                .printf (
                     base_file,
                     GLib.DateTime.current_date_time ().to_string () + "yyyyMMdd_HHmmss",
                     version_string);
@@ -297,7 +281,7 @@ public class ConfigFile : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public string default_connection () {
-        return Theme.instance ().app_name ();
+        return Theme.instance.app_name ();
     }
 
 
@@ -314,8 +298,10 @@ public class ConfigFile : GLib.Object {
 
     /***********************************************************
     Server poll interval in milliseconds
+
+    FIXME: GLib.TimeSpan is microseconds, not milliseconds!
     ***********************************************************/
-    public std.chrono.milliseconds remote_poll_interval_for_connection (string connection = "") {
+    public GLib.TimeSpan remote_poll_interval_for_connection (string connection = "") {
         string connection_string = connection;
         if (connection == "") {
             connection_string = default_connection ();
@@ -338,10 +324,12 @@ public class ConfigFile : GLib.Object {
     /***********************************************************
     Set poll interval. Value in milliseconds has to be larger
     than 5000
+
+    FIXME: GLib.TimeSpan is microseconds, not milliseconds!
     ***********************************************************/
-    public void remote_poll_interval (std.chrono.milliseconds interval, string connection = "") {
+    public void remote_poll_interval (GLib.TimeSpan interval, string connection = "") {
         string connection_string = connection;
-        if (connection.is_empty ())
+        if (connection == "")
             connection_string = default_connection ();
 
         if (interval < chrono.seconds (5)) {
@@ -357,10 +345,12 @@ public class ConfigFile : GLib.Object {
 
     /***********************************************************
     Interval to check for new notifications
+
+    FIXME: GLib.TimeSpan is microseconds, not milliseconds!
     ***********************************************************/
-    public std.chrono.milliseconds notification_refresh_interval (string connection = "") {
+    public GLib.TimeSpan notification_refresh_interval (string connection = "") {
         string connection_string = connection;
-        if (connection.is_empty ())
+        if (connection == "")
             connection_string = default_connection ();
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
         settings.begin_group (connection_string);
@@ -377,12 +367,14 @@ public class ConfigFile : GLib.Object {
 
     /***********************************************************
     Force sync interval, in milliseconds
+
+    FIXME: GLib.TimeSpan is microseconds, not milliseconds!
     ***********************************************************/
-    public std.chrono.milliseconds force_sync_interval (string connection = "") {
+    public GLib.TimeSpan force_sync_interval (string connection = "") {
         var poll_interval = remote_poll_interval (connection);
 
         string connection_string = connection;
-        if (connection.is_empty ())
+        if (connection == "")
             connection_string = default_connection ();
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
         settings.begin_group (connection_string);
@@ -402,8 +394,10 @@ public class ConfigFile : GLib.Object {
     is required
 
     Use -1 to disable regular full local discoveries.
+
+    FIXME: GLib.TimeSpan is microseconds, not milliseconds!
     ***********************************************************/
-    public std.chrono.milliseconds full_local_discovery_interval () {
+    public GLib.TimeSpan full_local_discovery_interval () {
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
         settings.begin_group (default_connection ());
         return milliseconds_value (settings, FULL_LOCAL_DISCOVERY_INTERVAL_C, chrono.hours (1));
@@ -541,13 +535,13 @@ public class ConfigFile : GLib.Object {
 
         settings.value (PROXY_TYPE_C, proxy_type);
 
-        if (proxy_type == QNetworkProxy.HttpProxy || proxy_type == QNetworkProxy.Socks5Proxy) {
+        if (proxy_type == Soup.ProxyResolverDefault.HttpProxy || proxy_type == Soup.ProxyResolverDefault.Socks5Proxy) {
             settings.value (PROXY_HOST_C, host);
             settings.value (PROXY_PORT_C, port);
             settings.value (PROXY_NEEDS_AUTH_C, needs_auth);
             settings.value (PROXY_USER_C, user);
 
-            if (pass.is_empty ()) {
+            if (pass == "") {
                 // Security: Don't keep password in config file
                 settings.remove (PROXY_PASS_C);
 
@@ -571,9 +565,9 @@ public class ConfigFile : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public int proxy_type_from_instance () {
-        if (Theme.instance ().force_system_network_proxy ()) {
-            return QNetworkProxy.DefaultProxy;
+    public int proxy_type_from_instance {
+        if (Theme.instance.force_system_network_proxy ()) {
+            return Soup.ProxyResolverDefault.DefaultProxy;
         }
         return get_value (PROXY_TYPE_C).to_int ();
     }
@@ -619,7 +613,7 @@ public class ConfigFile : GLib.Object {
 
         var key = KEYCHAIN_PROXY_PASSWORD_KEY ();
 
-        if (!pass.is_empty ()) {
+        if (!pass == "") {
             // Security : Migrate password from config file to keychain
             var job = new KeychainChunk.WriteJob (key, pass.to_utf8 ());
             if (job.exec ()) {
@@ -716,7 +710,7 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     SizeLimit new_big_folder_size_limit {
         public get {
-            var default_value = Theme.instance ().new_big_folder_size_limit ();
+            var default_value = Theme.instance.new_big_folder_size_limit ();
             var fallback = get_value (NEW_BIG_FOLDER_SIZE_LIMIT_C, "", default_value).to_long_long ();
             var value = get_policy_setting (NEW_BIG_FOLDER_SIZE_LIMIT_C, fallback).to_long_long ();
             const bool use = value >= 0 && use_new_big_folder_size_limit ();
@@ -909,8 +903,9 @@ public class ConfigFile : GLib.Object {
 
 
     /***********************************************************
+    FIXME: GLib.TimeSpan is microseconds, not milliseconds!
     ***********************************************************/
-    public std.chrono.milliseconds target_chunk_upload_duration () {
+    public GLib.TimeSpan target_chunk_upload_duration () {
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
         return milliseconds_value (settings, TARGET_CHUNK_UPLOAD_DURATION_C, chrono.minutes (1));
     }
@@ -947,7 +942,7 @@ public class ConfigFile : GLib.Object {
     // #ifndef TOKEN_AUTH_ONLY
         if (!header)
             return;
-        //  ASSERT (!header.object_name ().is_empty ());
+        //  ASSERT (!header.object_name () == "");
 
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
         settings.begin_group (header.object_name ());
@@ -974,11 +969,12 @@ public class ConfigFile : GLib.Object {
 
     /***********************************************************
     How often the check about new versions runs
+
+    FIXME: GLib.TimeSpan is microseconds, not milliseconds!
     ***********************************************************/
-    public std.chrono.milliseconds update_check_interval (string connection = "");
-    chrono.milliseconds ConfigFile.update_check_interval (string connection) {
+    public GLib.TimeSpan update_check_interval (string connection = "") {
         string connection_string = connection;
-        if (connection.is_empty ())
+        if (connection == "")
             connection_string = default_connection ();
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
         settings.begin_group (connection_string);
@@ -1002,7 +998,7 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     public bool skip_update_check (string connection = "") {
         string connection_string = connection;
-        if (connection.is_empty ())
+        if (connection == "")
             connection_string = default_connection ();
 
         GLib.Variant fallback = get_value (SKIP_UPDATE_CHECK_C, connection_string, false);
@@ -1013,7 +1009,7 @@ public class ConfigFile : GLib.Object {
     }
     public void set_skip_update_check (bool skip, string connection) {
         string connection_string = connection;
-        if (connection.is_empty ())
+        if (connection == "")
             connection_string = default_connection ();
 
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
@@ -1029,7 +1025,7 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     public bool auto_update_check (string connection = "") {
         string connection_string = connection;
-        if (connection.is_empty ()) {
+        if (connection == "") {
             connection_string = default_connection ();
         }
 
@@ -1045,7 +1041,7 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     public void set_auto_update_check (bool auto_check, string connection) {
         string connection_string = connection;
-        if (connection.is_empty ())
+        if (connection == "")
             connection_string = default_connection ();
 
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
@@ -1159,7 +1155,7 @@ public class ConfigFile : GLib.Object {
     with the given parent. If no parent is specified, the caller must destroy the settings
     ***********************************************************/
     public static GLib.Settings settings_with_group (string group, GLib.Object parent = new GLib.Object ()) {
-        if (g_config_filename ().is_empty ()) {
+        if (g_config_filename () == "") {
             // cache file name
             ConfigFile config;
             *g_config_filename () = config.config_file ();
@@ -1202,7 +1198,7 @@ public class ConfigFile : GLib.Object {
             // check for policies first and return immediately if a value is found.
             GLib.Settings user_policy = new GLib.Settings(
                 " (HKEY_CURRENT_USER\Software\Policies\%1\%2)"
-                    .arg (APPLICATION_VENDOR, Theme.instance ().app_name_gui ()),
+                    .printf (APPLICATION_VENDOR, Theme.instance.app_name_gui ()),
                 GLib.Settings.NativeFormat);
             if (user_policy.contains (setting)) {
                 return user_policy.value (setting);
@@ -1210,7 +1206,7 @@ public class ConfigFile : GLib.Object {
 
             GLib.Settings machine_policy = new GLib.Settings (
                 " (HKEY_LOCAL_MACHINE\Software\Policies\%1\%2)"
-                    .arg (APPLICATION_VENDOR, Theme.instance ().app_name_gui ()),
+                    .printf (APPLICATION_VENDOR, Theme.instance.app_name_gui ()),
                 GLib.Settings.NativeFormat);
             if (machine_policy.contains (setting)) {
                 return machine_policy.value (setting);
@@ -1277,7 +1273,7 @@ public class ConfigFile : GLib.Object {
             }
             system_setting = system_settings.value (param, default_value);
         } else if (Utility.is_unix ()) {
-            GLib.Settings system_settings = new GLib.Settings (SYSCONFDIR + "/%1/%1.conf".arg (Theme.instance ().app_name ()), GLib.Settings.NativeFormat);
+            GLib.Settings system_settings = new GLib.Settings (SYSCONFDIR + "/%1/%1.conf".printf (Theme.instance.app_name ()), GLib.Settings.NativeFormat);
             if (group != "") {
                 system_settings.begin_group (group);
             }
@@ -1285,7 +1281,7 @@ public class ConfigFile : GLib.Object {
         } else { // Windows
             GLib.Settings system_settings = new GLib.Settings (
                 " (HKEY_LOCAL_MACHINE\\Software\\%1\\%2)"
-                    .arg (APPLICATION_VENDOR, Theme.instance ().app_name_gui ()),
+                    .printf (APPLICATION_VENDOR, Theme.instance.app_name_gui ()),
                 GLib.Settings.NativeFormat);
             if (group != "") {
                 system_settings.begin_group (group);

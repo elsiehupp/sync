@@ -19,7 +19,7 @@ public class PropagateRemoteMove : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public PropagateRemoteMove (OwncloudPropagator propagator, unowned SyncFileItem item) {
+    public PropagateRemoteMove (OwncloudPropagator propagator, SyncFileItem item) {
         base (propagator, item);
     }
 
@@ -39,7 +39,7 @@ public class PropagateRemoteMove : PropagateItemJob {
         if (origin == this.item.rename_target) {
             // The parent has been renamed already so there is nothing more to do.
 
-            if (!this.item.encrypted_filename.is_empty ()) {
+            if (!this.item.encrypted_filename == "") {
                 // when renaming non-encrypted folder that contains encrypted folder, nested files of its encrypted folder are incorrectly displayed in the Settings dialog
                 // encrypted name is displayed instead of a local folder name, unless the sync folder is removed, then added again and re-synced
                 // we are fixing it by modifying the "this.encrypted_filename" in such a way so it will have a renamed root path at the beginning of it as expected
@@ -56,12 +56,12 @@ public class PropagateRemoteMove : PropagateItemJob {
                     return;
                 }
 
-                var remote_parent_path = parent_rec.e2e_mangled_name.is_empty () ? parent_path : parent_rec.e2e_mangled_name;
+                var remote_parent_path = parent_rec.e2e_mangled_name == "" ? parent_path : parent_rec.e2e_mangled_name;
 
                 var last_slash_position = this.item.encrypted_filename.last_index_of ("/");
                 var encrypted_name = last_slash_position >= 0 ? this.item.encrypted_filename.mid (last_slash_position + 1): "";
 
-                if (!encrypted_name.is_empty ()) {
+                if (!encrypted_name == "") {
                     this.item.encrypted_filename = remote_parent_path + "/" + encrypted_name;
                 }
             }
@@ -121,7 +121,7 @@ public class PropagateRemoteMove : PropagateItemJob {
                 string error;
                 if (!FileSystem.unchecked_rename_replace (local_target_alt, local_target, error)) {
                     on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Could not rename %1 to %2, error : %3")
-                         .arg (folder_target_alt, folder_target, error));
+                         .printf (folder_target_alt, folder_target, error));
                     return;
                 }
                 GLib.info (
@@ -146,9 +146,9 @@ public class PropagateRemoteMove : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_abort (PropagatorJob.AbortType abort_type) {
+    public new void abort (PropagatorJob.AbortType abort_type) {
         if (this.job && this.job.reply ())
-            this.job.reply ().on_signal_abort ();
+            this.job.reply ().abort ();
 
         if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
             /* emit */ signal_abort_finished ();
@@ -158,7 +158,7 @@ public class PropagateRemoteMove : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public JobParallelism parallelism () {
+    public new JobParallelism parallelism () {
         return this.item.is_directory () ? JobParallelism.WAIT_FOR_FINISHED : JobParallelism.FULL_PARALLELISM;
     }
 
@@ -219,8 +219,8 @@ public class PropagateRemoteMove : PropagateItemJob {
             // throw an error.
             on_signal_done (SyncFileItem.Status.NORMAL_ERROR,
                 _("Wrong HTTP code returned by server. Expected 201, but received \"%1 %2\".")
-                    .arg (this.item.http_error_code)
-                    .arg (this.job.reply ().attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ()));
+                    .printf (this.item.http_error_code)
+                    .printf (this.job.reply ().attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ()));
             return;
         }
 
@@ -260,10 +260,10 @@ public class PropagateRemoteMove : PropagateItemJob {
         }
         var result = propagator ().update_metadata (signal_new_item);
         if (!result) {
-            on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").arg (result.error ()));
+            on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error ()));
             return;
         } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
-            on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").arg (signal_new_item.file));
+            on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").printf (signal_new_item.file));
             return;
         }
         if (pin_state && *pin_state != PinState.PinState.INHERITED

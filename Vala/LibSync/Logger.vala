@@ -39,11 +39,11 @@ public class Logger : GLib.Object {
         public set {
             QMutexLocker locker = new QMutexLocker (&this.mutex);
             if (this.logstream) {
-                this.logstream.on_signal_reset (null);
+                this.logstream.reset (null);
                 this.log_file_object.close ();
             }
     
-            if (value.is_empty ()) {
+            if (value == "") {
                 return;
             }
     
@@ -60,11 +60,11 @@ public class Logger : GLib.Object {
                 post_gui_message (_("Error"),
                     _("<nobr>File \"%1\"<br/>cannot be opened for writing.<br/><br/>"
                     + "The log output <b>cannot</b> be saved!</nobr>")
-                        .arg (value));
+                        .printf (value));
                 return;
             }
     
-            this.logstream.on_signal_reset (new QTextStream (&this.log_file));
+            this.logstream.reset (new QTextStream (&this.log_file));
             this.logstream.codec (QTextCodec.codec_for_name ("UTF-8"));
         }
     }
@@ -132,7 +132,7 @@ public class Logger : GLib.Object {
 
 
     private void message_handler (QtMsgType type, QMessageLogContext context, string message) {
-        Logger.instance ().do_log (type, context, message);
+        Logger.instance.do_log (type, context, message);
     }
 
 
@@ -146,7 +146,7 @@ public class Logger : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static Logger instance () {
+    public static Logger instance {
         return Logger.log;
     }
 
@@ -209,7 +209,7 @@ public class Logger : GLib.Object {
         if (this.logstream != null) {
             this.logstream.flush ();
             this.log_file_object.close ();
-            this.logstream.on_signal_reset ();
+            this.logstream.reset ();
         }
     }
 
@@ -298,7 +298,7 @@ public class Logger : GLib.Object {
             int max_number = -1;
             foreach (string s in files) {
                 if (this.log_expire > 0) {
-                    GLib.FileInfo file_info = new GLib.FileInfo (directory.absolute_file_path (s));
+                    GLib.FileInfo file_info = GLib.File.new_for_path (directory.absolute_file_path (s));
                     if (file_info.last_modified ().add_secs (60 * 60 * this.log_expire) < now) {
                         directory.remove (s);
                     }
@@ -316,9 +316,9 @@ public class Logger : GLib.Object {
             // Compress the previous log file. On a restart this can be the most recent
             // log file.
             var log_to_compress = previous_log;
-            if (log_to_compress.is_empty () && files.size () > 0 && !files.last ().has_suffix (".gz"))
+            if (log_to_compress == "" && files.size () > 0 && !files.last ().has_suffix (".gz"))
                 log_to_compress = directory.absolute_file_path (files.last ());
-            if (!log_to_compress.is_empty ()) {
+            if (!log_to_compress == "") {
                 string compressed_name = log_to_compress + ".gz";
                 if (compress_log (log_to_compress, compressed_name)) {
                     GLib.File.remove (log_to_compress);

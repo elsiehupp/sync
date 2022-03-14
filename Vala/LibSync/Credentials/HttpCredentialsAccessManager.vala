@@ -22,17 +22,17 @@ public class HttpCredentialsAccessManager : AccessManager {
     }
 
 
-    protected Soup.Reply create_request (Operation operation, Soup.Request request, QIODevice outgoing_data) {
+    protected GLib.InputStream create_request (Operation operation, Soup.Request request, QIODevice outgoing_data) {
         Soup.Request request = new Soup.Request (request);
         if (!request.attribute (HttpCredentials.DontAddCredentialsAttribute).to_bool ()) {
-            if (this.credentials && !this.credentials.password ().is_empty ()) {
+            if (this.credentials && !this.credentials.password () == "") {
                 if (this.credentials.is_using_oauth ()) {
                     request.raw_header ("Authorization", "Bearer " + this.credentials.password ().to_utf8 ());
                 } else {
                     string cred_hash = (this.credentials.user ().to_utf8 () + ":" + this.credentials.password ().to_utf8 ()).to_base64 ();
                     request.raw_header ("Authorization", "Basic " + cred_hash);
                 }
-            } else if (!request.url ().password ().is_empty ()) {
+            } else if (!request.url ().password () == "") {
                 // Typically the requests to get or refresh the OAuth access token. The client
                 // credentials are put in the URL from the code making the request.
                 string cred_hash = request.url ().user_info ().to_utf8 ().to_base64 ();

@@ -23,7 +23,7 @@ public class UnlockEncryptFolderApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public UnlockEncryptFolderApiJob (
-        unowned Account account,
+        Account account,
         string file_identifier,
         string token,
         GLib.Object parent = new GLib.Object ()) {
@@ -37,7 +37,7 @@ public class UnlockEncryptFolderApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public new void start () {
-        Soup.Request request;
+        Soup.Request request = new Soup.Request ();
         request.raw_header ("OCS-APIREQUEST", "true");
         request.raw_header ("e2e-token", this.token);
 

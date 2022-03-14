@@ -301,7 +301,7 @@ public class Capabilities : GLib.Object {
         var splitted_version = version.split ('.');
 
         bool ok = false;
-        var major = !splitted_version.is_empty () ? splitted_version.at (0).to_int (&ok) : 0;
+        var major = !splitted_version == "" ? splitted_version.at (0).to_int (&ok) : 0;
         if (!ok) {
             GLib.warning ("Didn't understand version scheme (major), E2EE disabled.");
             return false;
@@ -322,7 +322,7 @@ public class Capabilities : GLib.Object {
     Returns true if the capabilities are loaded already.
     ***********************************************************/
     public bool is_valid () {
-        return !this.capabilities.is_empty ();
+        return !this.capabilities == "";
     }
 
 
@@ -377,11 +377,11 @@ public class Capabilities : GLib.Object {
     ***********************************************************/
     public string upload_checksum_type () {
         string preferred = preferred_upload_checksum_type ();
-        if (!preferred.is_empty ()) {
+        if (!preferred == "") {
             return preferred;
         }
         GLib.List<string> supported = supported_checksum_types ();
-        if (!supported.is_empty ()) {
+        if (!supported == "") {
             return supported.first ();
         }
         return "";

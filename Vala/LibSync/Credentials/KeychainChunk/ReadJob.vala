@@ -9,7 +9,7 @@ namespace LibSync {
 namespace KeychainChunk {
 
 /***********************************************************
-@brief : Simple wrapper class for QKeychain.ReadPasswordJob,
+@brief Simple wrapper class for QKeychain.ReadPasswordJob,
 splits too large keychain entry's data into chunks on Windows
 ***********************************************************/
 public class ReadJob : KeychainChunk.Job {
@@ -48,7 +48,7 @@ public class ReadJob : KeychainChunk.Job {
 
     @see QKeychain.Job.start ()
     ***********************************************************/
-    public void start () {
+    public new void start () {
         this.chunk_count = 0;
         this.chunk_buffer.clear ();
         this.error = QKeychain.NoError;
@@ -103,7 +103,7 @@ public class ReadJob : KeychainChunk.Job {
         var read_job = qobject_cast<QKeychain.ReadPasswordJob> (incoming_job);
         GLib.assert (read_job);
 
-        if (read_job.error () == NoError && !read_job.binary_data ().is_empty ()) {
+        if (read_job.error () == NoError && !read_job.binary_data () == "") {
             this.chunk_buffer.append (read_job.binary_data ());
             this.chunk_count++;
         } else {

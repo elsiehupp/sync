@@ -16,14 +16,14 @@ public class PropagateIgnoreJob : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public PropagateIgnoreJob (OwncloudPropagator propagator, unowned SyncFileItem item) {
+    public PropagateIgnoreJob (OwncloudPropagator propagator, SyncFileItem item) {
         base (propagator, item);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void start () {
+    public new void start () {
         SyncFileItem.Status status = this.item.status;
         if (status == SyncFileItem.Status.NO_STATUS) {
             if (this.item.instruction == CSYNC_INSTRUCTION_ERROR) {

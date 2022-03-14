@@ -5,16 +5,14 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 ***********************************************************/
 
 //  #include <QLoggingCategory>
-//  #include <Soup.Request>
-//  #include <QNetworkProxy>
+//  #include <Soup.ProxyResolverDefault>
 //  #include <QAuthenticator>
 //  #include <QSslConfigurati
-//  #include <QNetworkCookie>
-//  #include <QNetworkCookieJar>
+//  #include <Soup.CookieJar>
 //  #include <QNetwor
 //  #include <QUuid>
 
-//  #include <QNetworkAccessManager>
+//  #include <Soup.Session>
 
 namespace Occ {
 namespace LibSync {
@@ -23,7 +21,7 @@ namespace LibSync {
 @brief The AccessManager class
 @ingroup libsync
 ***********************************************************/
-public class AccessManager : QNetworkAccessManager {
+public class AccessManager : Soup.Session {
 
     /***********************************************************
     ***********************************************************/
@@ -43,7 +41,7 @@ public class AccessManager : QNetworkAccessManager {
 
     /***********************************************************
     ***********************************************************/
-    protected Soup.Reply create_request (QNetworkAccessManager.Operation operation, Soup.Request request, QIODevice outgoing_data = null) {
+    protected GLib.InputStream create_request (Soup.Session.Operation operation, Soup.Request request, QIODevice outgoing_data = null) {
         Soup.Request new_request = new Soup.Request (request);
 
         // Respect request specific user agent if any
@@ -76,7 +74,7 @@ public class AccessManager : QNetworkAccessManager {
         }
     // #endif
 
-        var reply = QNetworkAccessManager.create_request (operation, new_request, outgoing_data);
+        var reply = Soup.Session.create_request (operation, new_request, outgoing_data);
         HttpLogger.log_request (reply, operation, outgoing_data);
         return reply;
     }

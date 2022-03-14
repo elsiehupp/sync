@@ -48,7 +48,7 @@ public class StorePrivateKeyApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public StorePrivateKeyApiJob (unowned Account account, string path, GLib.Object parent = new GLib.Object ()) {
+    public StorePrivateKeyApiJob (Account account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
@@ -56,7 +56,7 @@ public class StorePrivateKeyApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public new void start () {
-        Soup.Request request;
+        Soup.Request request = new Soup.Request ();
         request.raw_header ("OCS-APIREQUEST", "true");
         QUrlQuery query;
         query.add_query_item ("format", "json");

@@ -17,7 +17,7 @@ public class PUTFileJob : AbstractNetworkJob {
     ***********************************************************/
     QIODevice device { public get; private set; }
     private GLib.HashTable<string, string> headers;
-    string error_string {
+    new string error_string {
         public get {
             this.error_string == "" ? AbstractNetworkJob.error_string () : this.error_string;
         }
@@ -40,7 +40,7 @@ public class PUTFileJob : AbstractNetworkJob {
     /***********************************************************
     Takes ownership of the device
     ***********************************************************/
-    public PUTFileJob.for_path (unowned Account account, string path, std.unique_ptr<QIODevice> device,
+    public PUTFileJob.for_path (Account account, string path, std.unique_ptr<QIODevice> device,
         GLib.HashTable<string, string> headers, int chunk, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
         this.device = device.release ();
@@ -52,7 +52,7 @@ public class PUTFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public PUTFileJob.for_url (unowned Account account, GLib.Uri url, std.unique_ptr<QIODevice> device,
+    public PUTFileJob.for_url (Account account, GLib.Uri url, std.unique_ptr<QIODevice> device,
         GLib.HashTable<string, string> headers, int chunk, GLib.Object parent = new GLib.Object ()) {
         base (account, "", parent);
         this.device = device.release ();
@@ -64,14 +64,14 @@ public class PUTFileJob : AbstractNetworkJob {
 
 
     ~PUTFileJob () {
-        // Make sure that we destroy the Soup.Reply before our this.device of which it keeps an internal pointer.
+        // Make sure that we destroy the GLib.InputStream before our this.device of which it keeps an internal pointer.
         reply (null);
     }
 
     /***********************************************************
     ***********************************************************/
-    public void start () {
-        Soup.Request request;
+    public new void start () {
+        Soup.Request request = new Soup.Request ();
         foreach (var header in this.headers) {
             request.raw_header (header.key (), header.value ());
         }
@@ -112,8 +112,8 @@ public class PUTFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public std.chrono.milliseconds ms_since_start () {
-        return std.chrono.milliseconds (this.request_timer.elapsed ());
+    public GLib.TimeSpan ms_since_start () {
+        return GLib.TimeSpan (this.request_timer.elapsed ());
     }
 
 } // class PUTFileJob

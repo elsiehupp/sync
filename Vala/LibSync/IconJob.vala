@@ -4,8 +4,7 @@ Copyright (C) by Camila Ayres <hello@camila.codes>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <QNetworkAccessManager>
-//  #include <Soup.Request>
+//  #include <Soup.Session>
 using Soup;
 
 namespace Occ {
@@ -40,14 +39,14 @@ public class IconJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_finished () {
-        var reply = qobject_cast<Soup.Reply> (sender ());
+        var reply = qobject_cast<GLib.InputStream> (sender ());
         if (!reply) {
             return;
         }
         delete_later ();
 
-        var signal_network_error = reply.error ();
-        if (signal_network_error != Soup.Reply.NoError) {
+        var network_error = reply.error ();
+        if (network_error != Soup.Reply.NoError) {
             /* emit */ error (signal_network_error);
             return;
         }

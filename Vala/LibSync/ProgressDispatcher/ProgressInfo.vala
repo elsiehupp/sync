@@ -101,7 +101,7 @@ public class ProgressInfo : GLib.Object {
                 return _("progress", "Deleted");
             case CSYNC_INSTRUCTION_EVAL_RENAME:
             case CSYNC_INSTRUCTION_RENAME:
-                return _("progress", "Moved to %1").arg (item.rename_target);
+                return _("progress", "Moved to %1").printf (item.rename_target);
             case CSYNC_INSTRUCTION_IGNORE:
                 return _("progress", "Ignored");
             case CSYNC_INSTRUCTION_STAT_ERROR:
@@ -301,14 +301,14 @@ public class ProgressInfo : GLib.Object {
     ***********************************************************/
     public ProgressInfo () {
         connect (&this.update_estimates_timer, QTimer.timeout, this, ProgressInfo.on_signal_update_estimates);
-        on_signal_reset ();
+        reset ();
     }
 
 
     /***********************************************************
     Resets for a new sync run.
     ***********************************************************/
-    public void on_signal_reset () {
+    public void reset () {
         this.status = Starting;
 
         this.current_items.clear ();
@@ -344,7 +344,7 @@ public class ProgressInfo : GLib.Object {
     Returns true when start_estimate_updates () was called.
 
     This is used when the SyncEngine wants to indicate a new sync
-    is about to start via the transmission_progress () signal. The
+    is about to start via the signal_transmission_progress () signal. The
     first ProgressInfo will have is_updating_estimates () == false.
     ***********************************************************/
     public bool is_updating_estimates () {

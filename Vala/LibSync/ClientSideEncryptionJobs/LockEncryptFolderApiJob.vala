@@ -18,15 +18,15 @@ public class LockEncryptFolderApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public LockEncryptFolderApiJob (unowned Account account, string file_identifier, GLib.Object parent = new GLib.Object ()) {
+    public LockEncryptFolderApiJob (Account account, string file_identifier, GLib.Object parent = new GLib.Object ()) {
         base (account, E2EE_BASE_URL + "lock/" + file_identifier, parent);
         this.file_identifier = file_identifier;
     }
 
     /***********************************************************
     ***********************************************************/
-    public void start () {
-        Soup.Request request;
+    public new void start () {
+        Soup.Request request = new Soup.Request ();
         request.raw_header ("OCS-APIREQUEST", "true");
         QUrlQuery query;
         query.add_query_item ("format", "json");

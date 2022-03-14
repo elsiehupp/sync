@@ -18,7 +18,7 @@ public class RequestEtagJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public RequestEtagJob.for_account (unowned Account account, string path, GLib.Object parent = new GLib.Object ()) {
+    public RequestEtagJob.for_account (Account account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
@@ -26,7 +26,7 @@ public class RequestEtagJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public new void start () {
-        Soup.Request request;
+        Soup.Request request = new Soup.Request ();
         request.raw_header ("Depth", "0");
 
         string xml = "<?xml version=\"1.0\" ?>\n"
@@ -67,7 +67,7 @@ public class RequestEtagJob : AbstractNetworkJob {
                     if (name == "getetag") {
                         var etag_text = reader.read_element_text ();
                         var parsed_tag = parse_etag (etag_text.to_utf8 ());
-                        if (!parsed_tag.is_empty ()) {
+                        if (!parsed_tag == "") {
                             etag += parsed_tag;
                         } else {
                             etag += etag_text.to_utf8 ();

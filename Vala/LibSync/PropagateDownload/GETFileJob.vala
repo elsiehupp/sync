@@ -17,7 +17,7 @@ public class GETFileJob : AbstractNetworkJob {
     GLib.HashTable<string, string> headers;
     string error_string {
         public get {
-            if (!this.error_string.is_empty ()) {
+            if (!this.error_string == "") {
                 return this.error_string;
             }
             return AbstractNetworkJob.error_string ();
@@ -82,7 +82,7 @@ public class GETFileJob : AbstractNetworkJob {
     /***********************************************************
     DOES NOT take ownership of the device.
     ***********************************************************/
-    public GETFileJob.for_account (unowned Account account, string path, QIODevice device,
+    public GETFileJob.for_account (Account account, string path, QIODevice device,
         GLib.HashTable<string, string> headers, string expected_etag_for_resume,
         int64 resume_start, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
@@ -106,7 +106,7 @@ public class GETFileJob : AbstractNetworkJob {
     /***********************************************************
     For direct_download_url:
     ***********************************************************/
-    public GETFileJob.direct.for_account (unowned Account account, GLib.Uri url, QIODevice device,
+    public GETFileJob.direct_for_account (Account account, GLib.Uri url, QIODevice device,
         GLib.HashTable<string, string> headers, string expected_etag_for_resume,
         int64 resume_start, GLib.Object parent = new GLib.Object ()) {
         base (account, url.to_encoded (), parent);
@@ -137,21 +137,21 @@ public class GETFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void start () {
+    public new void start () {
         if (this.resume_start > 0) {
             this.headers["Range"] = "bytes=" + string.number (this.resume_start) + '-';
             this.headers["Accept-Ranges"] = "bytes";
             GLib.debug ("Retry with range " + this.headers["Range"]);
         }
 
-        Soup.Request request;
+        Soup.Request request = new Soup.Request ();
         foreach (var header in this.headers) {
             request.raw_header (header.key (), header.value ());
         }
 
         request.priority (Soup.Request.Low_priority); // Long downloads must not block non-propagation jobs.
 
-        if (this.direct_download_url.is_empty ()) {
+        if (this.direct_download_url == "") {
             send_request ("GET", make_dav_url (path ()), request);
         } else {
             // Use direct URL
@@ -192,7 +192,7 @@ public class GETFileJob : AbstractNetworkJob {
     public void cancel () {
         var network_reply = reply ();
         if (network_reply && network_reply.is_running ()) {
-            network_reply.on_signal_abort ();
+            network_reply.abort ();
         }
         if (this.device && this.device.is_open ()) {
             this.device.close ();
@@ -202,8 +202,8 @@ public class GETFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void new_reply_hook (Soup.Reply reply);
-    void GETFileJob.new_reply_hook (Soup.Reply reply) {
+    public void new_reply_hook (GLib.InputStream reply);
+    void GETFileJob.new_reply_hook (GLib.InputStream reply) {
         reply.read_buffer_size (16 * 1024); // keep low so we can easier limit the bandwidth
 
         connect (reply, Soup.Reply.meta_data_changed, this, GETFileJob.on_signal_meta_data_changed);
@@ -273,13 +273,13 @@ public class GETFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_timed_out () {
+    public new void on_signal_timed_out () {
         GLib.warning ("Timeout" + reply () ? reply ().request ().url () : path ());
         if (!reply ())
             return;
         this.error_string = _("Connection Timeout");
         this.error_status = SyncFileItem.Status.FATAL_ERROR;
-        reply ().on_signal_abort ();
+        reply ().abort ();
     }
 
 
@@ -320,7 +320,7 @@ public class GETFileJob : AbstractNetworkJob {
                 this.error_string = network_reply_error_string (*reply ());
                 this.error_status = SyncFileItem.Status.NORMAL_ERROR;
                 GLib.warning ("Error while reading from device: " + this.error_string);
-                reply ().on_signal_abort ();
+                reply ().abort ();
                 return;
             }
 
@@ -329,7 +329,7 @@ public class GETFileJob : AbstractNetworkJob {
                 this.error_string = this.device.error_string ();
                 this.error_status = SyncFileItem.Status.NORMAL_ERROR;
                 GLib.warning ("Error while writing to file " + written_bytes + read_bytes + this.error_string);
-                reply ().on_signal_abort ();
+                reply ().abort ();
                 return;
             }
         }
@@ -385,23 +385,23 @@ public class GETFileJob : AbstractNetworkJob {
         }
         this.etag = get_etag_from_reply (reply ());
 
-        if (!this.direct_download_url.is_empty () && !this.etag.is_empty ()) {
+        if (!this.direct_download_url == "" && !this.etag == "") {
             GLib.info ("Direct download used, ignoring server ETag " + this.etag);
             this.etag = ""; // reset received ETag
-        } else if (!this.direct_download_url.is_empty ()) {
+        } else if (!this.direct_download_url == "") {
             // All fine, ETag empty and direct_download_url used
-        } else if (this.etag.is_empty ()) {
+        } else if (this.etag == "") {
             GLib.warning ("No E-Tag reply by server, considering it invalid.");
             this.error_string = _("No E-Tag received from server, check Proxy/Gateway.");
             this.error_status = SyncFileItem.Status.NORMAL_ERROR;
-            reply ().on_signal_abort ();
+            reply ().abort ();
             return;
-        } else if (!this.expected_etag_for_resume.is_empty () && this.expected_etag_for_resume != this.etag) {
+        } else if (!this.expected_etag_for_resume == "" && this.expected_etag_for_resume != this.etag) {
             GLib.warning ("We received a different E-Tag for resuming!"
                         + this.expected_etag_for_resume + " vs " + this.etag);
             this.error_string = _("We received a different E-Tag for resuming. Retrying next time.");
             this.error_status = SyncFileItem.Status.NORMAL_ERROR;
-            reply ().on_signal_abort ();
+            reply ().abort ();
             return;
         }
 
@@ -412,13 +412,13 @@ public class GETFileJob : AbstractNetworkJob {
                     + this.expected_content_length + " vs " + this.content_length);
             this.error_string = _("We received an unexpected download Content-Length.");
             this.error_status = SyncFileItem.Status.NORMAL_ERROR;
-            reply ().on_signal_abort ();
+            reply ().abort ();
             return;
         }
 
         int64 start = 0;
         string ranges = reply ().raw_header ("Content-Range");
-        if (!ranges.is_empty ()) {
+        if (!ranges == "") {
             const QRegularExpression rx = new QRegularExpression ("bytes (\\d+)-");
             var rx_match = rx.match (ranges);
             if (rx_match.has_match ()) {
@@ -427,20 +427,20 @@ public class GETFileJob : AbstractNetworkJob {
         }
         if (start != this.resume_start) {
             GLib.warning ("Wrong content-range: " + ranges + " while expecting start was " + this.resume_start);
-            if (ranges.is_empty ()) {
+            if (ranges == "") {
                 // device doesn't support range, just try again from scratch
                 this.device.close ();
                 if (!this.device.open (QIODevice.WriteOnly)) {
                     this.error_string = this.device.error_string ();
                     this.error_status = SyncFileItem.Status.NORMAL_ERROR;
-                    reply ().on_signal_abort ();
+                    reply ().abort ();
                     return;
                 }
                 this.resume_start = 0;
             } else {
                 this.error_string = _("Server returned wrong content-range");
                 this.error_status = SyncFileItem.Status.NORMAL_ERROR;
-                reply ().on_signal_abort ();
+                reply ().abort ();
                 return;
             }
         }

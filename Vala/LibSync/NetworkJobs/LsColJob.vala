@@ -30,20 +30,20 @@ public class LsColJob : AbstractNetworkJob {
 
     signal void directory_listing_subfolders (string[] items);
     signal void directory_listing_iterated (string name, GLib.HashTable<string, string> properties);
-    signal void finished_with_error (Soup.Reply reply);
+    signal void finished_with_error (GLib.InputStream reply);
     signal void finished_without_error ();
 
 
     /***********************************************************
     ***********************************************************/
-    public LsColJob.for_path (unowned Account account, string path, GLib.Object parent = new GLib.Object ()) {
+    public LsColJob.for_path (Account account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public LsColJob.for_url (unowned Account account, GLib.Uri url, GLib.Object parent = new GLib.Object ()) {
+    public LsColJob.for_url (Account account, GLib.Uri url, GLib.Object parent = new GLib.Object ()) {
         base (account, "", parent);
         this.url = url;
     }
@@ -51,10 +51,10 @@ public class LsColJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void start () {
+    public new void start () {
         GLib.List<string> properties = this.properties;
 
-        if (properties.is_empty ()) {
+        if (properties == "") {
             GLib.warning ("Propfind with no properties!");
         }
         string prop_str;
@@ -72,7 +72,7 @@ public class LsColJob : AbstractNetworkJob {
             }
         }
 
-        Soup.Request request;
+        Soup.Request request = new Soup.Request ();
         request.raw_header ("Depth", "1");
         string xml = "<?xml version=\"1.0\" ?>\n"
                            + "<d:propfind xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\">\n"

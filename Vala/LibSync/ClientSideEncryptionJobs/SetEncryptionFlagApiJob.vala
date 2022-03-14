@@ -40,7 +40,7 @@ public class SetEncryptionFlagApiJob : AbstractNetworkJob {
     
     /***********************************************************
     ***********************************************************/
-    public SetEncryptionFlagApiJob (unowned Account account, string file_identifier, FlagAction flag_action = Set, GLib.Object parent = new GLib.Object ()) {
+    public SetEncryptionFlagApiJob (Account account, string file_identifier, FlagAction flag_action = Set, GLib.Object parent = new GLib.Object ()) {
         base (account, E2EE_BASE_URL + "encrypted/" + file_identifier, parent);
         this.file_identifier = file_identifier;
         this.flag_action = flag_action;
@@ -50,7 +50,7 @@ public class SetEncryptionFlagApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public new void start () {
-        Soup.Request request;
+        Soup.Request request = new Soup.Request ();
         request.raw_header ("OCS-APIREQUEST", "true");
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
 

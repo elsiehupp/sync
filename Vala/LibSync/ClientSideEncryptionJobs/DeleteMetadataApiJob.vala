@@ -21,7 +21,7 @@ public class DeleteMetadataApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public DeleteMetadataApiJob (
-        unowned Account account,
+        Account account,
         string file_identifier,
         GLib.Object parent = new GLib.Object ()) {
 
@@ -33,7 +33,7 @@ public class DeleteMetadataApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public new void start () {
-        Soup.Request request;
+        Soup.Request request = new Soup.Request ();
         request.raw_header ("OCS-APIREQUEST", "true");
 
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());

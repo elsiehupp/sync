@@ -36,7 +36,6 @@
 //  }
 
 //  #include <QJsonDocument>
-//  #include <QSslCertificate>
 //  #include <QSslKey>
 
 //  #include <openssl/evp.h>
@@ -74,7 +73,7 @@ public class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public QSslCertificate certificate;
+    public GLib.TlsCertificate certificate;
 
     /***********************************************************
     ***********************************************************/
@@ -105,7 +104,7 @@ public class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void initialize (unowned Account account) {
+    public void initialize (Account account) {
         GLib.assert (account);
 
         GLib.info ("Initializing");
@@ -120,10 +119,10 @@ public class ClientSideEncryption : GLib.Object {
 
 
     /***********************************************************
+    AES/GCM/No_padding,
+    metadata_keys with RSA/ECB/OAEPWith_sHA-256And_mGF1Padding
     ***********************************************************/
-    private void generate_key_pair (unowned Account account) {
-        // AES/GCM/No_padding,
-        // metadata_keys with RSA/ECB/OAEPWith_sHA-256And_mGF1Padding
+    private void generate_key_pair (Account account) {
         GLib.info ("No public key, generating a pair.");
         const int rsa_key_len = 2048;
 
@@ -165,7 +164,7 @@ public class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void generate_csr.for_account (unowned Account account, EVP_PKEY key_pair) {
+    private void generate_csr.for_account (Account account, EVP_PKEY key_pair) {
         // OpenSSL expects const char.
         var cn_array = account.dav_user ().to_local8Bit ();
         GLib.info ("Getting the following array for the account identifier " + cn_array);
@@ -224,7 +223,7 @@ public class ClientSideEncryption : GLib.Object {
         SignPublicKeyApiJob.signal_json_received.connect ((sign_public_key_api_job, json, return_code) => {
             if (return_code == 200) {
                 string cert = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("public-key").to_string ();
-                this.certificate = QSslCertificate (cert.to_local8Bit (), QSsl.Pem);
+                this.certificate = GLib.TlsCertificate (cert.to_local8Bit (), QSsl.Pem);
                 this.public_key = this.certificate.public_key ();
                 fetch_and_validate_public_key_from_server (account);
             }
@@ -236,7 +235,7 @@ public class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void encrypt_private_key (unowned Account account) {
+    private void encrypt_private_key (Account account) {
         string[] list = WordList.get_random_words (12);
         this.mnemonic = string.joinv (" ", list);
         this.new_mnemonic_generated = true;
@@ -274,9 +273,9 @@ public class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void forget_sensitive_data (unowned Account account) {
+    public void forget_sensitive_data (Account account) {
         this.private_key = "";
-        this.certificate = new QSslCertificate ();
+        this.certificate = new GLib.TlsCertificate ();
         this.public_key = new QSslKey ();
         this.mnemonic = "";
 
@@ -288,7 +287,7 @@ public class ClientSideEncryption : GLib.Object {
 
 
     private void start_delete_job (Account account, string user) {
-        var delete_password_job = new DeletePasswordJob (Theme.instance ().app_name ());
+        var delete_password_job = new DeletePasswordJob (Theme.instance.app_name ());
         delete_password_job.insecure_fallback (false);
         delete_password_job.key (AbstractCredentials.keychain_key (account.url ().to_string (), user, account.identifier ()));
         delete_password_job.start ();
@@ -315,7 +314,7 @@ public class ClientSideEncryption : GLib.Object {
             return;
         }
 
-        this.certificate = QSslCertificate (read_job.binary_data (), QSsl.Pem);
+        this.certificate = GLib.TlsCertificate (read_job.binary_data (), QSsl.Pem);
 
         if (this.certificate.is_null ()) {
             get_public_key_from_server (account);
@@ -332,7 +331,7 @@ public class ClientSideEncryption : GLib.Object {
             account.identifier ()
         );
 
-        var read_password_job = new ReadPasswordJob (Theme.instance ().app_name ());
+        var read_password_job = new ReadPasswordJob (Theme.instance.app_name ());
         read_password_job.property (ACCOUNT_PROPERTY, GLib.Variant.from_value (account));
         read_password_job.insecure_fallback (false);
         read_password_job.key (kck);
@@ -350,7 +349,7 @@ public class ClientSideEncryption : GLib.Object {
 
         // Error or no valid public key error out
         if (read_job.error () != NoError || read_job.binary_data ().length () == 0) {
-            this.certificate = QSslCertificate ();
+            this.certificate = GLib.TlsCertificate ();
             this.public_key = QSslKey ();
             get_public_key_from_server (account);
             return;
@@ -372,7 +371,7 @@ public class ClientSideEncryption : GLib.Object {
                     account.identifier ()
         );
 
-        var read_password_job = new ReadPasswordJob (Theme.instance ().app_name ());
+        var read_password_job = new ReadPasswordJob (Theme.instance.app_name ());
         read_password_job.property (ACCOUNT_PROPERTY, GLib.Variant.from_value (account));
         read_password_job.insecure_fallback (false);
         read_password_job.key (kck);
@@ -390,7 +389,7 @@ public class ClientSideEncryption : GLib.Object {
 
         // Error or no valid public key error out
         if (read_job.error () != NoError || read_job.text_data ().length () == 0) {
-            this.certificate = QSslCertificate ();
+            this.certificate = GLib.TlsCertificate ();
             this.public_key = QSslKey ();
             this.private_key = "";
             get_public_key_from_server (account);
@@ -407,7 +406,7 @@ public class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void get_private_key_from_server (unowned Account account) {
+    private void get_private_key_from_server (Account account) {
         GLib.info ("Retrieving private key from server.");
         var json_api_job = new JsonApiJob (account, E2EE_BASE_URL + "private-key", this);
         JsonApiJob.signal_json_received.connect ((json_api_job, doc, return_code) => {
@@ -434,7 +433,7 @@ public class ClientSideEncryption : GLib.Object {
         JsonApiJob.signal_json_received.connect ((json_api_job, doc, return_code) => {
                 if (return_code == 200) {
                     string public_key = doc.object ()["ocs"].to_object ()["data"].to_object ()["public-keys"].to_object ()[account.dav_user ()].to_string ();
-                    this.certificate = QSslCertificate (public_key.to_local8Bit (), QSsl.Pem);
+                    this.certificate = GLib.TlsCertificate (public_key.to_local8Bit (), QSsl.Pem);
                     this.public_key = this.certificate.public_key ();
                     GLib.info ("Found Public key, requesting Server Public Key. Public key: " + public_key);
                     fetch_and_validate_public_key_from_server (account);
@@ -460,7 +459,7 @@ public class ClientSideEncryption : GLib.Object {
                 var server_public_key = doc.object ()["ocs"].to_object ()["data"].to_object ()["public-key"].to_string ().to_latin1 ();
                 GLib.info ("Found Server Public key, checking it. Server public key: " + server_public_key);
                 if (check_server_public_key_validity (server_public_key)) {
-                    if (this.private_key.is_empty ()) {
+                    if (this.private_key == "") {
                         GLib.info ("Valid Server Public key, requesting Private Key.");
                         get_private_key_from_server (account);
                     } else {
@@ -469,7 +468,7 @@ public class ClientSideEncryption : GLib.Object {
                     }
                 } else {
                     GLib.info ("Error invalid server public key.");
-                    this.certificate = QSslCertificate ();
+                    this.certificate = GLib.TlsCertificate ();
                     this.public_key = QSslKey ();
                     this.private_key = "";
                     get_public_key_from_server (account);
@@ -485,12 +484,12 @@ public class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void decrypt_private_key.for_account (unowned Account account, string key) {
+    private void decrypt_private_key.for_account (Account account, string key) {
         string message = _("Please enter your end to end encryption passphrase:<br>"
                         + "<br>"
                         + "User : %2<br>"
                         + "Account : %3<br>")
-                        .arg (Utility.escape (account.credentials ().user ()),
+                        .printf (Utility.escape (account.credentials ().user ()),
                             Utility.escape (account.display_name ()));
 
         QInputDialog dialog;
@@ -501,7 +500,7 @@ public class ClientSideEncryption : GLib.Object {
         string prev;
 
         while (true) {
-            if (!prev.is_empty ()) {
+            if (!prev == "") {
                 dialog.text_value (prev);
             }
             bool ok = dialog.exec ();
@@ -546,14 +545,14 @@ public class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void fetch_from_key_chain (unowned Account account) {
+    private void fetch_from_key_chain (Account account) {
         const string kck = AbstractCredentials.keychain_key (
                     account.url ().to_string (),
                     account.credentials ().user () + E2E_CERTIFICATE,
                     account.identifier ()
         );
 
-        var read_password_job = new ReadPasswordJob (Theme.instance ().app_name ());
+        var read_password_job = new ReadPasswordJob (Theme.instance.app_name ());
         read_password_job.property (ACCOUNT_PROPERTY, GLib.Variant.from_value (account));
         read_password_job.insecure_fallback (false);
         read_password_job.key (kck);
@@ -564,7 +563,7 @@ public class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private bool check_public_key_validity (unowned Account account) {
+    private bool check_public_key_validity (Account account) {
         string data = EncryptionHelper.generate_random (64);
 
         Biometric public_key_bio;
@@ -618,14 +617,14 @@ public class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void write_private_key (unowned Account account) {
+    private void write_private_key (Account account) {
         const string kck = AbstractCredentials.keychain_key (
                     account.url ().to_string (),
                     account.credentials ().user () + E2E_PRIVATE,
                     account.identifier ()
         );
 
-        var write_password_job = new WritePasswordJob (Theme.instance ().app_name ());
+        var write_password_job = new WritePasswordJob (Theme.instance.app_name ());
         write_password_job.insecure_fallback (false);
         write_password_job.key (kck);
         write_password_job.binary_data (this.private_key);
@@ -639,14 +638,14 @@ public class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void write_certificate (unowned Account account) {
+    private void write_certificate (Account account) {
         const string kck = AbstractCredentials.keychain_key (
                     account.url ().to_string (),
                     account.credentials ().user () + E2E_CERTIFICATE,
                     account.identifier ()
         );
 
-        var write_password_job = new WritePasswordJob (Theme.instance ().app_name ());
+        var write_password_job = new WritePasswordJob (Theme.instance.app_name ());
         write_password_job.insecure_fallback (false);
         write_password_job.key (kck);
         write_password_job.binary_data (this.certificate.to_pem ());
@@ -660,14 +659,14 @@ public class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void write_mnemonic (unowned Account account) {
+    private void write_mnemonic (Account account) {
         const string kck = AbstractCredentials.keychain_key (
             account.url ().to_string (),
             account.credentials ().user () + E2E_MNEMONIC,
             account.identifier ()
         );
 
-        var write_password_job = new WritePasswordJob (Theme.instance ().app_name ());
+        var write_password_job = new WritePasswordJob (Theme.instance.app_name ());
         write_password_job.insecure_fallback (false);
         write_password_job.key (kck);
         write_password_job.text_data (this.mnemonic);

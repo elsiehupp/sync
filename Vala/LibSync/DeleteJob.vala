@@ -30,14 +30,14 @@ public class DeleteJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public DeleteJob.for_path (unowned Account account, string path, GLib.Object parent = new GLib.Object ()) {
+    public DeleteJob.for_path (Account account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public DeleteJob.for_url (unowned Account account, GLib.Uri url, GLib.Object parent) {
+    public DeleteJob.for_url (Account account, GLib.Uri url, GLib.Object parent) {
         base (account, "", parent);
         this.url = url;
     }
@@ -46,8 +46,8 @@ public class DeleteJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public new void start () {
-        Soup.Request request;
-        if (!this.folder_token.is_empty ()) {
+        Soup.Request request = new Soup.Request ();
+        if (!this.folder_token == "") {
             request.raw_header ("e2e-token", this.folder_token);
         }
 

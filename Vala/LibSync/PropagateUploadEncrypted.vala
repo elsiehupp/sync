@@ -96,7 +96,7 @@ public class PropagateUploadEncrypted : GLib.Object {
     - upload the metadata
     - unlock the folder.
     ***********************************************************/
-    public void start () {
+    public new void start () {
 
         GLib.debug ("Folder is encrypted; let's get the Id from it.");
         var job = new LsColJob (this.propagator.account (), absolute_remote_parent_path, this);
@@ -199,7 +199,7 @@ public class PropagateUploadEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_folder_encrypted_id_error (Soup.Reply reply) {
+    private void on_signal_folder_encrypted_id_error (GLib.InputStream reply) {
         //  Q_UNUSED (reply);
         GLib.debug ("Error retrieving the Id of the encrypted folder.");
     }
@@ -284,7 +284,7 @@ public class PropagateUploadEncrypted : GLib.Object {
         // Encrypt File!
         this.metadata = new FolderMetadata (this.propagator.account (), json.to_json (QJsonDocument.Compact), status_code);
 
-        GLib.FileInfo info = new GLib.FileInfo (this.propagator.full_local_path (this.item.file));
+        GLib.FileInfo info = GLib.File.new_for_path (this.propagator.full_local_path (this.item.file));
         const string filename = info.filename ();
 
         // Find existing metadata for this file
@@ -323,7 +323,7 @@ public class PropagateUploadEncrypted : GLib.Object {
 
         GLib.debug ("Creating the encrypted file.");
 
-        if (info.is_dir ()) {
+        if (info.query_info ().get_file_type () == FileType.DIRECTORY) {
             this.complete_filename = encrypted_file.encrypted_filename;
         } else {
             GLib.File input = new GLib.File (info.absolute_file_path ());
@@ -396,7 +396,7 @@ public class PropagateUploadEncrypted : GLib.Object {
     private void on_signal_update_metadata_success (string file_identifier) {
         //  Q_UNUSED (file_identifier);
         GLib.debug ("Uploading of the metadata succeeded; encrypting the file.");
-        GLib.FileInfo output_info = new GLib.FileInfo (this.complete_filename);
+        GLib.FileInfo output_info = GLib.File.new_for_path (this.complete_filename);
 
         GLib.debug ("Encrypted info: " + output_info.path () + output_info.filename () + output_info.size ());
         GLib.debug ("Finalizing the upload part; now the actual uploader will take over.");

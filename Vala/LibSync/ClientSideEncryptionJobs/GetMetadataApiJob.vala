@@ -21,7 +21,7 @@ public class GetMetadataApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public GetMetadataApiJob (
-        unowned Account account,
+        Account account,
         string file_identifier,
         GLib.Object parent = new GLib.Object ()) {
 
@@ -32,8 +32,8 @@ public class GetMetadataApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void start () {
-        Soup.Request request;
+    public new void start () {
+        Soup.Request request = new Soup.Request ();
         request.raw_header ("OCS-APIREQUEST", "true");
         QUrlQuery query;
         query.add_query_item ("format", "json");

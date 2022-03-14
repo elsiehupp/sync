@@ -22,20 +22,20 @@ public class MkColJob : AbstractNetworkJob {
     GLib.HashTable<string, string> extra_headers;
 
 
-    signal void finished_with_error (Soup.Reply reply);
+    signal void finished_with_error (GLib.InputStream reply);
     signal void finished_without_error ();
 
 
     /***********************************************************
     ***********************************************************/
-    public MkColJob.for_account (unowned Account account, string path, GLib.Object parent = new GLib.Object ()) {
+    public MkColJob.for_account (Account account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public MkColJob.for_url (unowned Account account, GLib.Uri url,
+    public MkColJob.for_url (Account account, GLib.Uri url,
         GLib.HashTable<string, string> extra_headers, GLib.Object parent) {
         base (account, "", parent);
         this.url = url;
@@ -45,7 +45,7 @@ public class MkColJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public MkColJob.for_path (unowned Account account, string path,
+    public MkColJob.for_path (Account account, string path,
         GLib.HashTable<string, string> extra_headers, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
         this.extra_headers = extra_headers;
@@ -54,9 +54,9 @@ public class MkColJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void start () {
+    public new void start () {
         // add 'Content-Length : 0' header (see https://github.com/owncloud/client/issues/3256)
-        Soup.Request request;
+        Soup.Request request = new Soup.Request ();
         request.raw_header ("Content-Length", "0");
         for (var it = this.extra_headers.const_begin (); it != this.extra_headers.const_end (); ++it) {
             request.raw_header (it.key (), it.value ());

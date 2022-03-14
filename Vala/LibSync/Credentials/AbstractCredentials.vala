@@ -71,7 +71,7 @@ abstract class AbstractCredentials : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public abstract QNetworkAccessManager create_qnam ();
+    public abstract Soup.Session create_qnam ();
 
 
     /***********************************************************
@@ -100,7 +100,7 @@ abstract class AbstractCredentials : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public abstract bool still_valid (Soup.Reply reply);
+    public abstract bool still_valid (GLib.InputStream reply);
 
 
     /***********************************************************

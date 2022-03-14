@@ -46,14 +46,14 @@ public class JsonApiJob : AbstractNetworkJob {
         public set {
             this.body = value.to_json ();
             GLib.debug ("Set body for request:" + this.body);
-            if (!this.body.is_empty ()) {
+            if (!this.body == "") {
                 this.request.header (Soup.Request.ContentTypeHeader, "application/json");
             }
         }
     }
 
     private QUrlQuery additional_params;
-    private Soup.Request request;
+    private Soup.Request request = new Soup.Request ();
 
     /***********************************************************
     ***********************************************************/
@@ -90,7 +90,7 @@ public class JsonApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public JsonApiJob.for_account (unowned Account account, string path, GLib.Object parent = new GLib.Object ()) {
+    public JsonApiJob.for_account (Account account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
@@ -120,13 +120,13 @@ public class JsonApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void start () {
+    public new void start () {
         add_raw_header ("OCS-APIREQUEST", "true");
         var query = this.additional_params;
         query.add_query_item ("format", "json");
         GLib.Uri url = Utility.concat_url_path (account ().url (), path (), query);
         const string http_verb = this.verb.to_string ();
-        if (!this.body.is_empty ()) {
+        if (!this.body == "") {
             send_request (http_verb, url, this.request, this.body);
         } else {
             send_request (http_verb, url, this.request);
@@ -158,7 +158,7 @@ public class JsonApiJob : AbstractNetworkJob {
                 // this is a error message coming back from ocs.
                 status_code = rex_match.captured (1).to_int ();
             }
-        } else if (json_str.is_empty () && http_status_code == NOT_MODIFIED_STATUS_CODE) {
+        } else if (json_str == "" && http_status_code == NOT_MODIFIED_STATUS_CODE) {
             GLib.warning ("Nothing changed so nothing to retrieve - status code: " + http_status_code);
             status_code = http_status_code;
         } else {
@@ -175,7 +175,7 @@ public class JsonApiJob : AbstractNetworkJob {
             /* emit */ etag_response_header_received (reply ().raw_header ("ETag"), status_code);
 
         var desktop_notifications_allowed = reply ().raw_header ("X-Nextcloud-User-Status");
-        if (!desktop_notifications_allowed.is_empty ()) {
+        if (!desktop_notifications_allowed == "") {
             /* emit */ allow_desktop_notifications_changed (desktop_notifications_allowed == "online");
         }
 

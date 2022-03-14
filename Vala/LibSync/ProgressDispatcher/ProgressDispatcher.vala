@@ -57,9 +57,9 @@ public class ProgressDispatcher : GLib.Object {
 
 
     /***********************************************************
-    @brief : the item was completed by a job
+    @brief the item was completed by a job
     ***********************************************************/
-    signal void signal_item_completed (string folder, unowned SyncFileItem item);
+    signal void signal_item_completed (string folder, SyncFileItem item);
 
 
     /***********************************************************
@@ -96,7 +96,7 @@ public class ProgressDispatcher : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected void progress_info (string folder, ProgressInfo progress) {
-        if (folder.is_empty ()) {
+        if (folder == "") {
         // The update phase now also has progress
         //            (progress.current_items.size () == 0
         //             && progress.total_file_count == 0) ) {

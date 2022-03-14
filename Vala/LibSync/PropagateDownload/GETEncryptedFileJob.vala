@@ -23,7 +23,7 @@ public class GETEncryptedFileJob : GETFileJob {
     /***********************************************************
     DOES NOT take ownership of the device.
     ***********************************************************/
-    public GETEncryptedFileJob.for_path (unowned Account account, string path, QIODevice device,
+    public GETEncryptedFileJob.for_path (Account account, string path, QIODevice device,
         GLib.HashTable<string, string> headers, string expected_etag_for_resume,
         int64 resume_start, EncryptedFile encrypted_info, GLib.Object parent = new GLib.Object ()) {
         base (account, path, device, headers, expected_etag_for_resume, resume_start, parent);
@@ -33,7 +33,7 @@ public class GETEncryptedFileJob : GETFileJob {
 
     /***********************************************************
     ***********************************************************/
-    public GETEncryptedFileJob.for_url (unowned Account account, GLib.Uri url, QIODevice device,
+    public GETEncryptedFileJob.for_url (Account account, GLib.Uri url, QIODevice device,
         GLib.HashTable<string, string> headers, string expected_etag_for_resume,
         int64 resume_start, EncryptedFile encrypted_info, GLib.Object parent = new GLib.Object ()) {
         base (account, url, device, headers, expected_etag_for_resume, resume_start, parent);
@@ -45,7 +45,7 @@ public class GETEncryptedFileJob : GETFileJob {
         if (!this.decryptor) {
             // only initialize the decryptor once, because, according to Qt documentation, metadata might get changed during the processing of the data sometimes
             // https://doc.qt.io/qt-5/qnetworkreply.html#meta_data_changed
-            this.decryptor.on_signal_reset (new EncryptionHelper.StreamingDecryptor (this.encrypted_file_info.encryption_key, this.encrypted_file_info.initialization_vector, this.content_length));
+            this.decryptor.reset (new EncryptionHelper.StreamingDecryptor (this.encrypted_file_info.encryption_key, this.encrypted_file_info.initialization_vector, this.content_length));
         }
 
         if (!this.decryptor.is_initialized ()) {
@@ -66,10 +66,10 @@ public class GETEncryptedFileJob : GETFileJob {
             }
         }
 
-        if (!this.pending_bytes.is_empty ()) {
+        if (!this.pending_bytes == "") {
             var decrypted_chunk = this.decryptor.chunk_decryption (this.pending_bytes.const_data (), this.pending_bytes.size ());
 
-            if (decrypted_chunk.is_empty ()) {
+            if (decrypted_chunk == "") {
                 GLib.critical ("Decryption failed!");
                 return -1;
             }
@@ -81,7 +81,7 @@ public class GETEncryptedFileJob : GETFileJob {
 
         var decrypted_chunk = this.decryptor.chunk_decryption (data.const_data (), data.length ());
 
-        if (decrypted_chunk.is_empty ()) {
+        if (decrypted_chunk == "") {
             GLib.critical ("Decryption failed!");
             return -1;
         }

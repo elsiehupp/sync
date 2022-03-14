@@ -7,7 +7,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QLoggingCategory>
 //  #include <QThreadPool>
 
-//  #include <QNetworkProxy>
+//  #include <Soup.ProxyResolverDefault>
 //  #include <QRunnable>
 
 using CSync;
@@ -23,7 +23,7 @@ public class SystemProxyRunnable : GLib.Object /*, QRunnable*/ {
 
     /***********************************************************
     ***********************************************************/
-    signal void system_proxy_looked_up (QNetworkProxy url);
+    signal void system_proxy_looked_up (Soup.ProxyResolverDefault url);
 
     /***********************************************************
     ***********************************************************/
@@ -36,11 +36,11 @@ public class SystemProxyRunnable : GLib.Object /*, QRunnable*/ {
     /***********************************************************
     ***********************************************************/
     public void run () {
-        q_register_meta_type<QNetworkProxy> ("QNetworkProxy");
-        GLib.List<QNetworkProxy> proxies = QNetworkProxyFactory.system_proxy_for_query (QNetworkProxyQuery (this.url));
+        q_register_meta_type<Soup.ProxyResolverDefault> ("Soup.ProxyResolverDefault");
+        GLib.List<Soup.ProxyResolverDefault> proxies = QNetworkProxyFactory.system_proxy_for_query (QNetworkProxyQuery (this.url));
 
-        if (proxies.is_empty ()) {
-            /* emit */ system_proxy_looked_up (QNetworkProxy (QNetworkProxy.NoProxy));
+        if (proxies == "") {
+            /* emit */ system_proxy_looked_up (Soup.ProxyResolverDefault (Soup.ProxyResolverDefault.NoProxy));
         } else {
             /* emit */ system_proxy_looked_up (proxies.first ());
             // FIXME Would we really ever return more?

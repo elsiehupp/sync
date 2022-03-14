@@ -75,7 +75,7 @@ public class SyncOptions : GLib.Object {
 
     Set to 0 it will disable dynamic chunk sizing.
     ***********************************************************/
-    public std.chrono.milliseconds target_chunk_upload_duration = std.chrono.minutes (1);
+    public GLib.TimeSpan target_chunk_upload_duration = std.chrono.minutes (1);
 
 
     /***********************************************************
@@ -114,20 +114,20 @@ public class SyncOptions : GLib.Object {
     ***********************************************************/
     public void fill_from_environment_variables () {
         string chunk_size_env = qgetenv ("OWNCLOUD_CHUNK_SIZE");
-        if (!chunk_size_env.is_empty ())
+        if (!chunk_size_env == "")
             this.initial_chunk_size = chunk_size_env.to_u_int ();
 
         string min_chunk_size_env = qgetenv ("OWNCLOUD_MIN_CHUNK_SIZE");
-        if (!min_chunk_size_env.is_empty ())
+        if (!min_chunk_size_env == "")
             this.min_chunk_size = min_chunk_size_env.to_u_int ();
 
         string max_chunk_size_env = qgetenv ("OWNCLOUD_MAX_CHUNK_SIZE");
-        if (!max_chunk_size_env.is_empty ())
+        if (!max_chunk_size_env == "")
             this.max_chunk_size = max_chunk_size_env.to_u_int ();
 
         string target_chunk_upload_duration_env = qgetenv ("OWNCLOUD_TARGET_CHUNK_UPLOAD_DURATION");
-        if (!target_chunk_upload_duration_env.is_empty ())
-            this.target_chunk_upload_duration = std.chrono.milliseconds (target_chunk_upload_duration_env.to_u_int ());
+        if (!target_chunk_upload_duration_env == "")
+            this.target_chunk_upload_duration = GLib.TimeSpan (target_chunk_upload_duration_env.to_u_int ());
 
         int max_parallel = qgetenv ("OWNCLOUD_MAX_PARALLEL").to_int ();
         if (max_parallel > 0)

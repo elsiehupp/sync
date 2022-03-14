@@ -68,17 +68,17 @@ public class UserStatus : GLib.Object {
     public GLib.Uri state_icon () {
         switch (this.state) {
         case UserStatus.OnlineStatus.Away:
-            return Theme.instance ().status_away_image_source ();
+            return Theme.instance.status_away_image_source ();
 
         case UserStatus.OnlineStatus.DoNotDisturb:
-            return Theme.instance ().status_do_not_disturb_image_source ();
+            return Theme.instance.status_do_not_disturb_image_source ();
 
         case UserStatus.OnlineStatus.Invisible:
         case UserStatus.OnlineStatus.Offline:
-            return Theme.instance ().status_invisible_image_source ();
+            return Theme.instance.status_invisible_image_source ();
 
         case UserStatus.OnlineStatus.Online:
-            return Theme.instance ().status_online_image_source ();
+            return Theme.instance.status_online_image_source ();
         }
 
         //  Q_UNREACHABLE ();

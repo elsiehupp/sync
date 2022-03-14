@@ -47,19 +47,19 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, QRunnable*/ {
     ***********************************************************/
     public void run () {
         string local_path = this.local_path;
-        if (local_path.has_suffix ("/")) // Happens if this.current_folder.local.is_empty ()
+        if (local_path.has_suffix ("/")) // Happens if this.current_folder.local == ""
             local_path.chop (1);
 
         var dh = csync_vio_local_opendir (local_path);
         if (!dh) {
             GLib.info ("Error while opening directory" + (local_path) + errno;
-            string error_string = _("Error while opening directory %1").arg (local_path);
+            string error_string = _("Error while opening directory %1").printf (local_path);
             if (errno == EACCES) {
                 error_string = _("Directory not accessible on client, permission denied");
                 /* emit */ finished_non_fatal_error (error_string);
                 return;
             } else if (errno == ENOENT) {
-                error_string = _("Directory not found : %1").arg (local_path);
+                error_string = _("Directory not found : %1").printf (local_path);
             } else if (errno == ENOTDIR) {
                 // Not a directory..
                 // Just consider it is empty
@@ -109,7 +109,7 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, QRunnable*/ {
 
             // Note: Windows vio converts any error into EACCES
             GLib.warning ("readdir failed for file in " + local_path + " - errno: " + errno;
-            /* emit */ finished_fatal_error (_("Error while reading directory %1").arg (local_path));
+            /* emit */ finished_fatal_error (_("Error while reading directory %1").printf (local_path));
             return;
         }
 

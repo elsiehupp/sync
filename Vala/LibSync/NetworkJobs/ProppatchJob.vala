@@ -43,7 +43,7 @@ public class ProppatchJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public ProppatchJob.for_account (unowned Account account, string path, GLib.Object parent = new GLib.Object ()) {
+    public ProppatchJob.for_account (Account account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
@@ -51,10 +51,10 @@ public class ProppatchJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public new void start () {
-        if (this.properties.is_empty ()) {
+        if (this.properties == "") {
             GLib.warning ("Proppatch with no properties!");
         }
-        Soup.Request request;
+        Soup.Request request = new Soup.Request ();
 
         string prop_str;
         QMapIterator<string, string> it = new QMapIterator<string, string> (this.properties);
@@ -69,7 +69,7 @@ public class ProppatchJob : AbstractNetworkJob {
             }
 
             prop_str += "    <" + key_name;
-            if (!key_ns.is_empty ()) {
+            if (!key_ns == "") {
                 prop_str += " xmlns=\"" + key_ns + "\" ";
             }
             prop_str += ">";

@@ -69,7 +69,7 @@ public class BulkPropagatorJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public bool on_signal_schedule_self_or_child () {
+    public new bool on_signal_schedule_self_or_child () {
         if (this.items.empty ()) {
             return false;
         }
@@ -97,21 +97,21 @@ public class BulkPropagatorJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public JobParallelism parallelism () {
-        return PropagatorJob.JobParallelism.JobParallelism.FULL_PARALLELISM;
+    public new JobParallelism parallelism () {
+        return PropagatorJob.JobParallelism.FULL_PARALLELISM;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_start_upload_file (unowned SyncFileItem item, UploadFileInfo file_to_upload) {
+    private void on_signal_start_upload_file (SyncFileItem item, UploadFileInfo file_to_upload) {
         if (propagator ().abort_requested) {
             return;
         }
 
         // Check if the specific file can be accessed
         if (propagator ().has_case_clash_accessibility_problem (file_to_upload.file)) {
-            on_signal_done (item, SyncFileItem.Status.NORMAL_ERROR, _("File %1 cannot be uploaded because another file with the same name, differing only in case, exists").arg (QDir.to_native_separators (item.file)));
+            on_signal_done (item, SyncFileItem.Status.NORMAL_ERROR, _("File %1 cannot be uploaded because another file with the same name, differing only in case, exists").printf (QDir.to_native_separators (item.file)));
             return;
         }
 
@@ -124,7 +124,7 @@ public class BulkPropagatorJob : PropagatorJob {
     Content checksum computed, compute the transmission checksum
     ***********************************************************/
     private void on_signal_compute_transmission_checksum (
-        unowned SyncFileItem item,
+        SyncFileItem item,
         UploadFileInfo file_to_upload) {
         // Reuse the content checksum as the transmission checksum if possible
         var supported_transmission_checksums =
@@ -151,7 +151,7 @@ public class BulkPropagatorJob : PropagatorJob {
     Transmission checksum computed, prepare the upload
     ***********************************************************/
     private void on_signal_start_upload (
-        unowned SyncFileItem item,
+        SyncFileItem item,
         UploadFileInfo file_to_upload,
         string transmission_checksum_type,
         string transmission_checksum) {
@@ -164,7 +164,7 @@ public class BulkPropagatorJob : PropagatorJob {
 
         if (!FileSystem.file_exists (full_file_path)) {
             this.pending_checksum_files.remove (item.file);
-            on_signal_error_start_folder_unlock (item, SyncFileItem.Status.SOFT_ERROR, _("File Removed (start upload) %1").arg (full_file_path));
+            on_signal_error_start_folder_unlock (item, SyncFileItem.Status.SOFT_ERROR, _("File Removed (start upload) %1").printf (full_file_path));
             check_propagation_is_done ();
             return;
         }
@@ -175,7 +175,7 @@ public class BulkPropagatorJob : PropagatorJob {
         item.modtime = FileSystem.get_mod_time (original_file_path);
         if (item.modtime <= 0) {
             this.pending_checksum_files.remove (item.file);
-            on_signal_error_start_folder_unlock (item, SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (item.file)));
+            on_signal_error_start_folder_unlock (item, SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").printf (QDir.to_native_separators (item.file)));
             check_propagation_is_done ();
             return;
         }
@@ -211,7 +211,7 @@ public class BulkPropagatorJob : PropagatorJob {
     Invoked on internal error to unlock a folder and faile
     ***********************************************************/
     private void on_signal_error_start_folder_unlock (
-        unowned SyncFileItem item,
+        SyncFileItem item,
         SyncFileItem.Status status,
         string error_string) {
         GLib.info (status + error_string);
@@ -272,10 +272,10 @@ public class BulkPropagatorJob : PropagatorJob {
         // Update the database entry
         var result = propagator ().update_metadata (*one_file.item);
         if (!result) {
-            on_signal_done (one_file.item, SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").arg (result.error ()));
+            on_signal_done (one_file.item, SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error ()));
             return;
         } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
-            on_signal_done (one_file.item, SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").arg (one_file.item.file));
+            on_signal_done (one_file.item, SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").printf (one_file.item.file));
             return;
         }
 
@@ -298,7 +298,7 @@ public class BulkPropagatorJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_upload_progress (unowned SyncFileItem item, int64 sent, int64 total) {
+    private void on_signal_upload_progress (SyncFileItem item, int64 sent, int64 total) {
         // Completion is signaled with sent=0, total=0; avoid accidentally
         // resetting progress due to the sent being zero by ignoring it.
         // signal_finished () is bound to be emitted soon anyway.
@@ -306,7 +306,7 @@ public class BulkPropagatorJob : PropagatorJob {
         if (sent == 0 && total == 0) {
             return;
         }
-        propagator ().report_progress (*item, sent - total);
+        propagator ().report_progress (item, sent - total);
     }
 
 
@@ -320,7 +320,7 @@ public class BulkPropagatorJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     private void do_start_upload (
-        unowned SyncFileItem item,
+        SyncFileItem item,
         UploadFileInfo file_to_upload,
         string transmission_checksum_header) {
         if (propagator ().abort_requested) {
@@ -344,7 +344,7 @@ public class BulkPropagatorJob : PropagatorJob {
         var current_headers = headers (item);
         current_headers["Content-Length"] = new string.number (file_to_upload.size);
 
-        if (!item.rename_target.is_empty () && item.file != item.rename_target) {
+        if (!item.rename_target == "" && item.file != item.rename_target) {
             // Try to rename the file
             var original_file_path_absolute = propagator ().full_local_path (item.file);
             var new_file_path_absolute = propagator ().full_local_path (item.rename_target);
@@ -359,7 +359,7 @@ public class BulkPropagatorJob : PropagatorJob {
             item.modtime = FileSystem.get_mod_time (new_file_path_absolute);
             if (item.modtime <= 0) {
                 this.pending_checksum_files.remove (item.file);
-                on_signal_error_start_folder_unlock (item, SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (item.file)));
+                on_signal_error_start_folder_unlock (item, SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").printf (QDir.to_native_separators (item.file)));
                 check_propagation_is_done ();
                 return;
             }
@@ -428,7 +428,7 @@ public class BulkPropagatorJob : PropagatorJob {
         adjust_last_job_timeout (job, timeout);
         this.jobs.append (job);
         job.release ().start ();
-        if (parallelism () == PropagatorJob.JobParallelism.JobParallelism.FULL_PARALLELISM && this.jobs.size () < PARALLEL_JOBS_MAXIMUM_COUNT) {
+        if (parallelism () == PropagatorJob.JobParallelism.FULL_PARALLELISM && this.jobs.size () < PARALLEL_JOBS_MAXIMUM_COUNT) {
             on_signal_schedule_self_or_child ();
         }
     }
@@ -537,10 +537,10 @@ public class BulkPropagatorJob : PropagatorJob {
         var ETag = Occ.parse_etag (reply.value ("ETag").to_string ().to_latin1 ());
         var  etag = Occ.parse_etag (reply.value ("etag").to_string ().to_latin1 ());
         string ret = oc_etag;
-        if (ret.is_empty ()) {
+        if (ret == "") {
             ret = ETag;
         }
-        if (ret.is_empty ()) {
+        if (ret == "") {
             ret = etag;
         }
         if (oc_etag.length () > 0 && oc_etag != etag && oc_etag != ETag) {
@@ -560,7 +560,7 @@ public class BulkPropagatorJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_done (
-        unowned SyncFileItem item,
+        SyncFileItem item,
         SyncFileItem.Status status,
         string error_string) {
         item.status = status;
@@ -572,7 +572,7 @@ public class BulkPropagatorJob : PropagatorJob {
 
         if (propagator ().abort_requested && (item.status == SyncFileItem.Status.NORMAL_ERROR
                                                 || item.status == SyncFileItem.Status.FATAL_ERROR)) {
-            // an on_signal_abort request is ongoing. Change the status to Soft-Error
+            // an abort request is ongoing. Change the status to Soft-Error
             item.status = SyncFileItem.Status.SOFT_ERROR;
         }
 
@@ -591,7 +591,7 @@ public class BulkPropagatorJob : PropagatorJob {
     /***********************************************************
     Bases headers that need to be sent on the PUT, or in the MOVE for chunking-ng
     ***********************************************************/
-    private GLib.HashTable<string, string> headers (unowned SyncFileItem item) {
+    private GLib.HashTable<string, string> headers (SyncFileItem item) {
         GLib.HashTable<string, string> headers;
         headers["Content-Type"] = "application/octet-stream";
         headers["X-File-Mtime"] = new string.number (int64 (item.modtime));
@@ -610,7 +610,7 @@ public class BulkPropagatorJob : PropagatorJob {
             headers["OC-Tag"] = ".sys.admin#recall#";
         }
 
-        if (!item.etag.is_empty () && item.etag != "empty_etag"
+        if (!item.etag == "" && item.etag != "empty_etag"
             && item.instruction != CSYNC_INSTRUCTION_NEW // On new files never send a If-Match
             && item.instruction != CSYNC_INSTRUCTION_TYPE_CHANGE) {
             // We add quotes because the owncloud server always adds quotes around the etag, and
@@ -622,16 +622,16 @@ public class BulkPropagatorJob : PropagatorJob {
         var conflict_record = propagator ().journal.conflict_record (item.file.to_utf8 ());
         if (conflict_record.is_valid ()) {
             headers["OC-Conflict"] = "1";
-            if (!conflict_record.initial_base_path.is_empty ()) {
+            if (!conflict_record.initial_base_path == "") {
                 headers["OC-ConflictInitialBasePath"] = conflict_record.initial_base_path;
             }
-            if (!conflict_record.base_file_id.is_empty ()) {
+            if (!conflict_record.base_file_id == "") {
                 headers["OC-ConflictBaseFileId"] = conflict_record.base_file_id;
             }
             if (conflict_record.base_modtime != -1) {
                 headers["OC-ConflictBaseMtime"] = new string.number (conflict_record.base_modtime);
             }
-            if (!conflict_record.base_etag.is_empty ()) {
+            if (!conflict_record.base_etag == "") {
                 headers["OC-ConflictBaseEtag"] = conflict_record.base_etag;
             }
         }
@@ -643,10 +643,10 @@ public class BulkPropagatorJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     private void abort_with_error (
-        unowned SyncFileItem item,
+        SyncFileItem item,
         SyncFileItem.Status status,
         string error) {
-        on_signal_abort (PropagatorJob.AbortType.SYNCHRONOUS);
+        abort (PropagatorJob.AbortType.SYNCHRONOUS);
         on_signal_done (item, status, error);
     }
 
@@ -656,14 +656,14 @@ public class BulkPropagatorJob : PropagatorJob {
     the whole transfer if it happens too often. If so: Bump
     UploadInfo.error_count and maybe perform the reset.
     ***********************************************************/
-    private void check_resetting_errors (unowned SyncFileItem item) {
+    private void check_resetting_errors (SyncFileItem item) {
         if (item.http_error_code == 412
             || propagator ().account ().capabilities ().http_error_codes_that_reset_failing_chunked_uploads ().contains (item.http_error_code)) {
             var upload_info = propagator ().journal.get_upload_info (item.file);
             upload_info.error_count += 1;
             if (upload_info.error_count > 3) {
                 GLib.info ("Reset transfer of " + item.file
-                            + " due to repeated error " + item.http_error_code);
+                            + " due to repeated error " + item.http_error_code.to_string ());
                 upload_info = SyncJournalDb.UploadInfo ();
             } else {
                 GLib.info ("Error count for maybe-reset error" + item.http_error_code
@@ -680,7 +680,7 @@ public class BulkPropagatorJob : PropagatorJob {
     Error handling functionality that is shared between jobs.
     ***********************************************************/
     private void common_error_handling (
-        unowned SyncFileItem item,
+        SyncFileItem item,
         string error_message) {
         // Ensure errors that should eventually reset the chunked upload are tracked.
         check_resetting_errors (item);
@@ -692,7 +692,7 @@ public class BulkPropagatorJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     private bool check_file_still_exists (
-        unowned SyncFileItem item,
+        SyncFileItem item,
         bool finished,
         string full_file_path) {
         if (!FileSystem.file_exists (full_file_path)) {
@@ -711,7 +711,7 @@ public class BulkPropagatorJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     private bool check_file_changed (
-        unowned SyncFileItem item,
+        SyncFileItem item,
         bool finished,
         string full_file_path) {
         if (!FileSystem.verify_file_unchanged (full_file_path, item.size, item.modtime)) {
@@ -731,11 +731,11 @@ public class BulkPropagatorJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     private void compute_file_id (
-        unowned SyncFileItem item,
+        SyncFileItem item,
         QJsonObject file_reply) {
         var fid = get_header_from_json_reply (file_reply, "OC-FileID");
-        if (!fid.is_empty ()) {
-            if (!item.file_id.is_empty () && item.file_id != fid) {
+        if (!fid == "") {
+            if (!item.file_id == "" && item.file_id != fid) {
                 GLib.warning ("File ID changed!" + item.file_id + fid);
             }
             item.file_id = fid;
@@ -746,17 +746,17 @@ public class BulkPropagatorJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     private void handle_file_restoration (
-        unowned SyncFileItem item,
+        SyncFileItem item,
         string error_string) {
         if (item.is_restoration) {
             if (item.status == SyncFileItem.Status.SUCCESS
                 || item.status == SyncFileItem.Status.CONFLICT) {
                 item.status = SyncFileItem.Status.RESTORATION;
             } else {
-                item.error_string += _("; Restoration Failed : %1").arg (error_string);
+                item.error_string += _("; Restoration Failed : %1").printf (error_string);
             }
         } else {
-            if (item.error_string.is_empty ()) {
+            if (item.error_string == "") {
                 item.error_string = error_string;
             }
         }
@@ -765,10 +765,7 @@ public class BulkPropagatorJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-
-    /***********************************************************
-    ***********************************************************/
-    private void handle_bulk_upload_block_list (unowned SyncFileItem item) {
+    private void handle_bulk_upload_block_list (SyncFileItem item) {
         propagator ().add_to_bulk_upload_block_list (item.file);
     }
 
@@ -776,17 +773,17 @@ public class BulkPropagatorJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     private void handle_job_done_errors (
-        unowned SyncFileItem item,
+        SyncFileItem item,
         SyncFileItem.Status status) {
         if (item.has_error_status ()) {
-            GLib.warning ("Could not complete propagation of " + item.destination () + " by " + this + " with status " + item.status + " and error: " + item.error_string);
+            GLib.warning ("Could not complete propagation of " + item.destination () + " by " + this.to_string () + " with status " + item.status + " and error: " + item.error_string);
         } else {
-            GLib.info ("Completed propagation of " + item.destination () + " by " + this +  "with status " + item.status);
+            GLib.info ("Completed propagation of " + item.destination () + " by " + this.to_string () + "with status " + item.status);
         }
 
         if (item.status == SyncFileItem.Status.FATAL_ERROR) {
             // Abort all remaining jobs.
-            propagator ().on_signal_abort ();
+            propagator ().abort ();
         }
 
         switch (item.status) {

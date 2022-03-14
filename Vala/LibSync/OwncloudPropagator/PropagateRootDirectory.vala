@@ -37,7 +37,7 @@ public class PropagateRootDirectory : PropagateDirectory {
 
     /***********************************************************
     ***********************************************************/
-    public bool on_signal_schedule_self_or_child () {
+    public new bool on_signal_schedule_self_or_child () {
         GLib.info ("on_signal_schedule_self_or_child " + this.state + " pending uploads" + propagator ().delayed_tasks ().size () + " subjobs state " + this.sub_jobs.state);
 
         if (this.state == Finished) {
@@ -63,7 +63,7 @@ public class PropagateRootDirectory : PropagateDirectory {
 
     /***********************************************************
     ***********************************************************/
-    public JobParallelism parallelism () {
+    public new JobParallelism parallelism () {
         // the root directory parallelism isn't important
         return JobParallelism.WAIT_FOR_FINISHED;
     }
@@ -77,11 +77,11 @@ public class PropagateRootDirectory : PropagateDirectory {
 
     /***********************************************************
     ***********************************************************/
-    public new void on_signal_abort (PropagatorJob.AbortType abort_type) {
+    public new void abort (PropagatorJob.AbortType abort_type) {
         if (this.first_job) {
-            // Force first job to on_signal_abort synchronously
-            // even if caller allows async on_signal_abort (async_abort)
-            this.first_job.on_signal_abort (PropagatorJob.AbortType.SYNCHRONOUS);
+            // Force first job to abort synchronously
+            // even if caller allows async abort (async_abort)
+            this.first_job.abort (PropagatorJob.AbortType.SYNCHRONOUS);
         }
 
         if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
@@ -100,8 +100,8 @@ public class PropagateRootDirectory : PropagateDirectory {
                 this.on_signal_propagator_abort_finished_2
             );
         }
-        this.sub_jobs.on_signal_abort (abort_type);
-        this.dir_deletion_jobs.on_signal_abort (abort_type);
+        this.sub_jobs.abort (abort_type);
+        this.dir_deletion_jobs.abort (abort_type);
     }
 
 
@@ -127,7 +127,7 @@ public class PropagateRootDirectory : PropagateDirectory {
 
     /***********************************************************
     ***********************************************************/
-    public int64 committed_disk_space () {
+    public new int64 committed_disk_space () {
         return this.sub_jobs.committed_disk_space () + this.dir_deletion_jobs.committed_disk_space ();
     }
 
@@ -155,8 +155,8 @@ public class PropagateRootDirectory : PropagateDirectory {
             && status != SyncFileItem.Status.RESTORATION
             && status != SyncFileItem.Status.CONFLICT) {
             if (this.state != Finished) {
-                // Synchronously on_signal_abort
-                on_signal_abort (PropagatorJob.AbortType.SYNCHRONOUS);
+                // Synchronously abort
+                abort (PropagatorJob.AbortType.SYNCHRONOUS);
                 this.state = Finished;
                 GLib.info ("PropagateRootDirectory.on_signal_sub_jobs_finished " + " emit finished " + status.to_string ());
                 /* emit */ signal_finished (status);

@@ -7,7 +7,7 @@ public class HovercardAction : GLib.Object {
     ***********************************************************/
     public string title;
     public GLib.Uri icon_url;
-    public QPixmap icon;
+    public Gdk.Pixbuf icon;
     public GLib.Uri link;
 
     /***********************************************************

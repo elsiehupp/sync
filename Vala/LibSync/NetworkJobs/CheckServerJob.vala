@@ -52,7 +52,7 @@ public class CheckServerJob : AbstractNetworkJob {
 
     \a reply is never null
     ***********************************************************/
-    signal void instance_not_found (Soup.Reply reply);
+    signal void instance_not_found (GLib.InputStream reply);
 
 
     /***********************************************************
@@ -66,7 +66,7 @@ public class CheckServerJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public CheckServerJob.for_account (unowned Account account, GLib.Object parent = new GLib.Object ()) {
+    public CheckServerJob.for_account (Account account, GLib.Object parent = new GLib.Object ()) {
         base (account, STATUS_PHP_C, parent);
         this.subdir_fallback = false;
         this.permanent_redirects = 0;
@@ -78,7 +78,7 @@ public class CheckServerJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void start () {
+    public new void start () {
         this.server_url = account ().url ();
         send_request ("GET", Utility.concat_url_path (this.server_url, path ()));
         connect (reply (), Soup.Reply.meta_data_changed, this, CheckServerJob.on_signal_metadata_changed);
@@ -89,7 +89,7 @@ public class CheckServerJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_timed_out () {
+    public new void on_signal_timed_out () {
         GLib.warning ("TIMEOUT");
         if (reply () && reply ().is_running ()) {
             /* emit */ timeout (reply ().url ());
@@ -125,7 +125,7 @@ public class CheckServerJob : AbstractNetworkJob {
     ***********************************************************/
     private bool on_signal_finished () {
         if (reply ().request ().url ().scheme () == "https"
-            && reply ().ssl_configuration ().session_ticket ().is_empty ()
+            && reply ().ssl_configuration ().session_ticket () == ""
             && reply ().error () == Soup.Reply.NoError) {
             GLib.warning ("No SSL session identifier / session ticket is used, this might impact sync performance negatively.");
         }
@@ -144,7 +144,7 @@ public class CheckServerJob : AbstractNetworkJob {
 
         string body = reply ().peek (4 * 1024);
         int http_status = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-        if (body.is_empty () || http_status != 200) {
+        if (body == "" || http_status != 200) {
             GLib.warning ("Error: status.php replied " + http_status + body);
             /* emit */ instance_not_found (reply ());
         } else {
@@ -184,7 +184,7 @@ public class CheckServerJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_redirected (Soup.Reply reply, GLib.Uri target_url, int redirect_count) {
+    private void on_signal_redirected (GLib.InputStream reply, GLib.Uri target_url, int redirect_count) {
         string slash_status_php = "/";
         slash_status_php.append (STATUS_PHP_C);
 
@@ -203,7 +203,7 @@ public class CheckServerJob : AbstractNetworkJob {
     }
 
 
-    private static void merge_ssl_configuration_for_ssl_button (QSslConfiguration config, unowned Account account) {
+    private static void merge_ssl_configuration_for_ssl_button (QSslConfiguration config, Account account) {
         if (config.peer_certificate_chain ().length () > 0) {
             account.peer_certificate_chain = config.peer_certificate_chain ();
         }

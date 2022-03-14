@@ -216,14 +216,14 @@ public class OwncloudPropagator : GLib.Object {
         }
 
         reset_delayed_upload_tasks ();
-        this.root_job.on_signal_reset (new PropagateRootDirectory (this));
+        this.root_job.reset (new PropagateRootDirectory (this));
         GLib.List<QPair<string /* directory name */, PropagateDirectory /* job */>> directories; // should be a LIFO stack
         directories.push (q_make_pair ("", this.root_job.data ()));
         GLib.List<PropagatorJob> directories_to_remove;
         string removed_directory;
         string maybe_conflict_directory;
         foreach (unowned SyncFileItem item in synced_items) {
-            if (!removed_directory.is_empty () && item.file.starts_with (removed_directory)) {
+            if (!removed_directory == "" && item.file.starts_with (removed_directory)) {
                 // this is an item in a directory which is going to be removed.
                 var del_dir_job = qobject_cast<PropagateDirectory> (directories_to_remove.first ());
 
@@ -257,7 +257,7 @@ public class OwncloudPropagator : GLib.Object {
             // If a CONFLICT item contains files these can't be processed because
             // the conflict handling is likely to rename the directory. This can happen
             // when there's a new local directory at the same time as a remote file.
-            if (!maybe_conflict_directory.is_empty ()) {
+            if (!maybe_conflict_directory == "") {
                 if (item.destination ().starts_with (maybe_conflict_directory)) {
                     GLib.info (
                         "Skipping job inside CONFLICT directory "
@@ -429,13 +429,13 @@ public class OwncloudPropagator : GLib.Object {
     ***********************************************************/
     public bool local_filename_clash (string relfile) {
         const string file = this.local_dir + rel_file;
-        GLib.assert (!file.is_empty ());
+        GLib.assert (!file == "");
 
-        if (!file.is_empty () && Utility.fs_case_preserving ()) {
+        if (!file == "" && Utility.fs_case_preserving ()) {
             GLib.debug ("CaseClashCheck for " + file);
             // On Linux, the file system is case sensitive, but this code is useful for testing.
             // Just check that there is no other file with the same name and different casing.
-            GLib.FileInfo file_info = new GLib.FileInfo (file);
+            GLib.FileInfo file_info = GLib.File.new_for_path (file);
             const string fn = file_info.filename ();
             const string[] list = file_info.directory ().entry_list ({
                 fn
@@ -502,8 +502,7 @@ public class OwncloudPropagator : GLib.Object {
     /***********************************************************
     Creates the job for an item.
     ***********************************************************/
-    public PropagateItemJob create_job (SyncFileItem item);
-    PropagateItemJob *OwncloudPropagator.create_job (unowned SyncFileItem item) {
+    public PropagateItemJob create_job (SyncFileItem item) {
         bool delete_existing = item.instruction == CSYNC_INSTRUCTION_TYPE_CHANGE;
         switch (item.instruction) {
         case CSYNC_INSTRUCTION_REMOVE:
@@ -576,19 +575,19 @@ public class OwncloudPropagator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_abort () {
+    public new void abort () {
         if (this.abort_requested) {
             return;
         }
         if (this.root_job) {
-            // Connect to signal_abort_finished  which signals that on_signal_abort has been asynchronously on_signal_finished
+            // Connect to signal_abort_finished  which signals that abort has been asynchronously on_signal_finished
             connect (this.root_job.data (), PropagateDirectory.signal_abort_finished, this, OwncloudPropagator.on_signal_emit_finished);
 
             // Use Queued Connection because we're possibly already in an item's on_signal_finished stack
-            QMetaObject.invoke_method (this.root_job.data (), "on_signal_abort", Qt.QueuedConnection,
+            QMetaObject.invoke_method (this.root_job.data (), "abort", Qt.QueuedConnection,
                                       Q_ARG (PropagatorJob.AbortType, PropagatorJob.AbortType.ASYNCHRONOUS));
 
-            // Give asynchronous on_signal_abort 5000 msec to finish on its own
+            // Give asynchronous abort 5000 msec to finish on its own
             QTimer.single_shot (5000, this, SLOT (on_signal_abort_timeout ()));
         } else {
             // No root job, call on_signal_emit_finished
@@ -649,7 +648,7 @@ public class OwncloudPropagator : GLib.Object {
         string rename_error;
         var conflict_mod_time = FileSystem.get_mod_time (fn);
         if (conflict_mod_time <= 0) {
-            *error = _("Impossible to get modification time for file in conflict %1").arg (fn);
+            *error = _("Impossible to get modification time for file in conflict %1").printf (fn);
             return false;
         }
         string conflict_user_name;
@@ -688,7 +687,7 @@ public class OwncloudPropagator : GLib.Object {
 
         // Create a new upload job if the new conflict file should be uploaded
         if (account ().capabilities ().upload_conflict_files ()) {
-            if (composite && !GLib.FileInfo (conflict_file_path).is_dir ()) {
+            if (composite && !GLib.File.new_for_path (conflict_file_path).query_info ().get_file_type () == FileType.DIRECTORY) {
                 SyncFileItem conflict_item = new SyncFileItem ();
                 conflict_item.file = conflict_filename;
                 conflict_item.type = ItemTypeFile;
@@ -761,8 +760,7 @@ public class OwncloudPropagator : GLib.Object {
     /***********************************************************
     Q_REQUIRED_RESULT
     ***********************************************************/
-    public bool is_delayed_upload_item (SyncFileItem item);
-    bool OwncloudPropagator.is_delayed_upload_item (unowned SyncFileItem item) {
+    public bool is_delayed_upload_item (SyncFileItem item) {
         return account ().capabilities ().bulk_upload () && !this.schedule_delayed_tasks && !item.is_encrypted && this.sync_options.min_chunk_size > item.size && !is_in_bulk_upload_block_list (item.file);
     }
 
@@ -809,7 +807,7 @@ public class OwncloudPropagator : GLib.Object {
     ***********************************************************/
     private void on_signal_abort_timeout () {
         // Abort synchronously and finish
-        this.root_job.data ().on_signal_abort (PropagatorJob.AbortType.SYNCHRONOUS);
+        this.root_job.data ().abort (PropagatorJob.AbortType.SYNCHRONOUS);
         on_signal_emit_finished (SyncFileItem.Status.NORMAL_ERROR);
     }
 
@@ -1066,18 +1064,18 @@ public class OwncloudPropagator : GLib.Object {
         var modtime = Occ.Utility.q_date_time_from_time_t (item.modtime);
         const int64 ms_since_mod = modtime.msecs_to (GLib.DateTime.current_date_time_utc ());
 
-        return std.chrono.milliseconds (ms_since_mod) < Occ.SyncEngine.minimum_file_age_for_upload
+        return GLib.TimeSpan (ms_since_mod) < Occ.SyncEngine.minimum_file_age_for_upload
             // if the mtime is too much in the future we do* upload the file
             && ms_since_mod > -10000;
     }
 
 
 
-    private string get_etag_from_reply (Soup.Reply reply) {
+    private string get_etag_from_reply (GLib.InputStream reply) {
         string oc_etag = parse_etag (reply.raw_header ("OC-ETag"));
         string etag = parse_etag (reply.raw_header ("ETag"));
         string ret = oc_etag;
-        if (ret.is_empty ()) {
+        if (ret == "") {
             ret = etag;
         }
         if (oc_etag.length () > 0 && oc_etag != etag) {

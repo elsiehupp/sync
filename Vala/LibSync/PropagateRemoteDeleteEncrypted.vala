@@ -14,24 +14,24 @@ public class PropagateRemoteCeleteEncrypted : AbstractPropagateRemoteDeleteEncry
 
     /***********************************************************
     ***********************************************************/
-    public PropagateRemoteCeleteEncrypted (OwncloudPropagator propagator, unowned SyncFileItem item, GLib.Object parent) {
+    public PropagateRemoteCeleteEncrypted (OwncloudPropagator propagator, SyncFileItem item, GLib.Object parent) {
         base (propagator, item, parent);
 
     }
 
     /***********************************************************
     ***********************************************************/
-    public void start () {
-        GLib.assert (!this.item.encrypted_filename.is_empty ());
+    public new void start () {
+        GLib.assert (!this.item.encrypted_filename == "");
 
-        const GLib.FileInfo info = new GLib.FileInfo (this.item.encrypted_filename);
+        const GLib.FileInfo info = GLib.File.new_for_path (this.item.encrypted_filename);
         start_ls_col_job (info.path ());
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_folder_unlocked_successfully (string folder_identifier) {
+    private new void on_signal_folder_unlocked_successfully (string folder_identifier) {
         AbstractPropagateRemoteDeleteEncrypted.on_signal_folder_unlocked_successfully (folder_identifier);
         /* emit */ finished (!this.is_task_failed);
     }
@@ -39,7 +39,7 @@ public class PropagateRemoteCeleteEncrypted : AbstractPropagateRemoteDeleteEncry
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_folder_encrypted_metadata_received (QJsonDocument json, int status_code){
+    private new void on_signal_folder_encrypted_metadata_received (QJsonDocument json, int status_code){
         if (status_code == 404) {
             GLib.debug (PROPAGATE_REMOVE_ENCRYPTED + "Metadata not found, but let's proceed with removing the file anyway.");
             delete_remote_item (this.item.encrypted_filename);
@@ -50,7 +50,7 @@ public class PropagateRemoteCeleteEncrypted : AbstractPropagateRemoteDeleteEncry
 
         GLib.debug (PROPAGATE_REMOVE_ENCRYPTED + "Metadata Received, preparing it for removal of the file");
 
-        const GLib.FileInfo info = new GLib.FileInfo (this.propagator.full_local_path (this.item.file));
+        const GLib.FileInfo info = GLib.File.new_for_path (this.propagator.full_local_path (this.item.file));
         const string filename = info.filename ();
 
         // Find existing metadata for this file

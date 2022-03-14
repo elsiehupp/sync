@@ -16,19 +16,19 @@ Primarily adds timeout and redirection handling.
 ***********************************************************/
 public class SimpleNetworkJob : AbstractNetworkJob {
 
-    signal void signal_finished (Soup.Reply reply);
+    signal void signal_finished (GLib.InputStream reply);
 
 
     /***********************************************************
     ***********************************************************/
-    public SimpleNetworkJob.for_account (unowned Account account, GLib.Object parent = new GLib.Object ()) {
+    public SimpleNetworkJob.for_account (Account account, GLib.Object parent = new GLib.Object ()) {
         base (account, "", parent);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public Soup.Reply start_request (string verb, GLib.Uri url,
+    public GLib.InputStream start_request (string verb, GLib.Uri url,
         Soup.Request request = Soup.Request (),
         QIODevice request_body = null) {
         var reply = send_request (verb, url, request, request_body);

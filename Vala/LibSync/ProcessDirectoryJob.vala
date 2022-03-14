@@ -118,7 +118,7 @@ public class ProcessDirectoryJob : GLib.Object {
 
 
         static string path_append (string base_record, string name) {
-            return base_record.is_empty () ? name : base_record + "/" + name;
+            return base_record == "" ? name : base_record + "/" + name;
         }
 
 
@@ -289,7 +289,7 @@ public class ProcessDirectoryJob : GLib.Object {
     /***********************************************************
     For creating subjobs
     ***********************************************************/
-    public ProcessDirectoryJob.sub_job (PathTuple path, unowned SyncFileItem dir_item,
+    public ProcessDirectoryJob.sub_job (PathTuple path, SyncFileItem dir_item,
         QueryMode query_local, QueryMode query_server, int64 last_sync_timestamp,
         ProcessDirectoryJob parent) {
         base_record (parent);
@@ -305,7 +305,7 @@ public class ProcessDirectoryJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void start () {
+    public new void start () {
         GLib.info ("STARTING " + this.current_folder.server + this.query_server + this.current_folder.local + this.query_local);
 
         if (this.query_server == NORMAL_QUERY) {
@@ -404,7 +404,7 @@ public class ProcessDirectoryJob : GLib.Object {
                 error_message = _("File contains trailing spaces and could not be renamed, because a file with the same name already exists locally.");
             }
 
-            if (!error_message.is_empty ()) {
+            if (!error_message == "") {
                 SyncFileItem item = SyncFileItem.create ();
                 if (entry.local_entry.is_directory) {
                     item.type = CSyncEnums.ItemTypeDirectory;
@@ -452,7 +452,7 @@ public class ProcessDirectoryJob : GLib.Object {
         // fetch all the name from the DB
         var path_u8 = this.current_folder.original.to_utf8 ();
         if (!this.discovery_data.statedatabase.list_files_in_path (path_u8, (record) => {
-                var name = path_u8.is_empty () ? record.path : string.from_utf8 (record.path.const_data () + (path_u8.size () + 1));
+                var name = path_u8 == "" ? record.path : string.from_utf8 (record.path.const_data () + (path_u8.size () + 1));
                 if (record.is_virtual_file () && is_vfs_with_suffix ()) {
                     chop_virtual_file_suffix (name);
                 }
@@ -505,7 +505,7 @@ public class ProcessDirectoryJob : GLib.Object {
             var e = f.second;
 
             PathTuple path;
-            path = this.current_folder.add_name (e.name_override.is_empty () ? f.first : e.name_override);
+            path = this.current_folder.add_name (e.name_override == "" ? f.first : e.name_override);
 
             if (is_vfs_with_suffix ()) {
                 // Without suffix vfs the paths would be good. But since the database_entry and local_entry
@@ -527,7 +527,7 @@ public class ProcessDirectoryJob : GLib.Object {
             }
 
             // On the server the path is mangled in case of E2EE
-            if (!e.server_entry.e2e_mangled_name.is_empty ()) {
+            if (!e.server_entry.e2e_mangled_name == "") {
                 GLib.assert (this.discovery_data.remote_folder.starts_with ("/"));
                 GLib.assert (this.discovery_data.remote_folder.has_suffix ("/"));
 
@@ -541,7 +541,7 @@ public class ProcessDirectoryJob : GLib.Object {
             // For windows, the hidden state is also discovered within the vio
             // local stat function.
             // Recall file shall not be ignored (#4420)
-            bool is_hidden = e.local_entry.is_hidden || (!f.first.is_empty () && f.first[0] == '.' && f.first != ".sys.admin#recall#");
+            bool is_hidden = e.local_entry.is_hidden || (!f.first == "" && f.first[0] == '.' && f.first != ".sys.admin#recall#");
             const bool is_server_entry_windows_shortcut = false;
             if (handle_excluded (path.target, e.local_entry.name,
                     e.local_entry.is_directory || e.server_entry.is_directory, is_hidden,
@@ -572,7 +572,7 @@ public class ProcessDirectoryJob : GLib.Object {
 
         // FIXME: move to ExcludedFiles 's regex ?
         bool is_invalid_pattern = false;
-        if (excluded == CSYNC_NOT_EXCLUDED && !this.discovery_data.invalid_filename_rx.pattern ().is_empty ()) {
+        if (excluded == CSYNC_NOT_EXCLUDED && !this.discovery_data.invalid_filename_rx.pattern () == "") {
             if (path.contains (this.discovery_data.invalid_filename_rx)) {
                 excluded = CSYNC_FILE_EXCLUDE_INVALID_CHAR;
                 is_invalid_pattern = true;
@@ -581,7 +581,7 @@ public class ProcessDirectoryJob : GLib.Object {
         if (excluded == CSYNC_NOT_EXCLUDED && this.discovery_data.ignore_hidden_files && is_hidden) {
             excluded = CSYNC_FILE_EXCLUDE_HIDDEN;
         }
-        if (excluded == CSYNC_NOT_EXCLUDED && !local_name.is_empty ()
+        if (excluded == CSYNC_NOT_EXCLUDED && !local_name == ""
                 && this.discovery_data.server_blocklisted_files.contains (local_name)) {
             excluded = CSYNC_FILE_EXCLUDE_SERVER_BLOCKLISTED;
             is_invalid_pattern = true;
@@ -637,7 +637,7 @@ public class ProcessDirectoryJob : GLib.Object {
                         }
                     }
                     if (invalid) {
-                        item.error_string = _("File names containing the character \"%1\" are not supported on this file system.").arg (invalid);
+                        item.error_string = _("File names containing the character \"%1\" are not supported on this file system.").printf (invalid);
                     } else if (is_invalid_pattern) {
                         item.error_string = _("File name contains at least one invalid character");
                     } else {
@@ -724,7 +724,7 @@ public class ProcessDirectoryJob : GLib.Object {
         item.original_file = path.original;
         item.previous_size = database_entry.file_size;
         item.previous_modtime = database_entry.modtime;
-        if (!local_entry.rename_name.is_empty ()) {
+        if (!local_entry.rename_name == "") {
             if (this.dir_item) {
                 item.rename_target = this.dir_item.file + "/" + local_entry.rename_name;
             } else {
@@ -797,7 +797,7 @@ public class ProcessDirectoryJob : GLib.Object {
         item.direct_download_cookies = server_entry.direct_download_cookies;
         item.is_encrypted = server_entry.is_e2e_encrypted;
         item.encrypted_filename = () => {
-            if (server_entry.e2e_mangled_name.is_empty ()) {
+            if (server_entry.e2e_mangled_name == "") {
                 return "";
             }
 
@@ -815,21 +815,21 @@ public class ProcessDirectoryJob : GLib.Object {
             missing_data.append (_("size"));
         if (server_entry.remote_perm.is_null ())
             missing_data.append (_("permission"));
-        if (server_entry.etag.is_empty ())
+        if (server_entry.etag == "")
             missing_data.append ("ETag");
-        if (server_entry.file_identifier.is_empty ())
+        if (server_entry.file_identifier == "")
             missing_data.append (_("file identifier"));
-        if (!missing_data.is_empty ()) {
+        if (!missing_data == "") {
             item.instruction = CSYNC_INSTRUCTION_ERROR;
             this.child_ignored = true;
-            item.error_string = _("Server reported no %1").arg (missing_data.join (", "));
+            item.error_string = _("Server reported no %1").printf (missing_data.join (", "));
             /* emit */ this.discovery_data.item_discovered (item);
             return;
         }
 
         // The file is known in the database already
         if (database_entry.is_valid ()) {
-            const bool is_database_entry_an_e2Ee_placeholder = database_entry.is_virtual_file () && !database_entry.e2e_mangled_name ().is_empty ();
+            const bool is_database_entry_an_e2Ee_placeholder = database_entry.is_virtual_file () && !database_entry.e2e_mangled_name () == "";
             GLib.assert (!is_database_entry_an_e2Ee_placeholder || server_entry.size >= Constants.E2EE_TAG_SIZE);
             const bool is_virtual_e2Ee_placeholder = is_database_entry_an_e2Ee_placeholder && server_entry.size >= Constants.E2EE_TAG_SIZE;
             const int64 size_on_signal_server = is_virtual_e2Ee_placeholder ? server_entry.size - Constants.E2EE_TAG_SIZE : server_entry.size;
@@ -976,7 +976,7 @@ public class ProcessDirectoryJob : GLib.Object {
                 add_virtual_file_suffix (path.original);
         }
 
-        if (opts.vfs.mode () != Vfs.Off && !item.encrypted_filename.is_empty ()) {
+        if (opts.vfs.mode () != Vfs.Off && !item.encrypted_filename == "") {
             // We are syncing a file for the first time (local entry is invalid) and it is encrypted file that will be virtual once synced
             // to avoid having error of "file has changed during sync" when trying to hydrate it excplicitly - we must remove Constants.E2EE_TAG_SIZE bytes from the end
             // as explicit hydration does not care if these bytes are present in the placeholder or not, but, the size must not change in the middle of the sync
@@ -1093,7 +1093,7 @@ public class ProcessDirectoryJob : GLib.Object {
 
         // A remote rename can also mean Encryption Mangled Name.
         // if we find one of those in the database, we ignore it.
-        if (!base_record.e2e_mangled_name.is_empty ()) {
+        if (!base_record.e2e_mangled_name == "") {
             GLib.warning ();
             done = true;
             return;
@@ -1114,7 +1114,7 @@ public class ProcessDirectoryJob : GLib.Object {
                 return;
             }
         } else {
-            if (!GLib.FileInfo (this.discovery_data.local_dir + original_path_adjusted).is_dir ()) {
+            if (!GLib.File.new_for_path (this.discovery_data.local_dir + original_path_adjusted).query_info ().get_file_type () == FileType.DIRECTORY) {
                 GLib.info ("Local directory does not exist anymore. " + original_path_adjusted);
                 return;
             }
@@ -1319,7 +1319,7 @@ public class ProcessDirectoryJob : GLib.Object {
                 // Checksum comparison at this stage is only enabled for .eml files,
                 // check #4754 #4755
                 bool is_eml_file = path.original.has_suffix (".eml", Qt.CaseInsensitive);
-                if (is_eml_file && database_entry.file_size == local_entry.size && !database_entry.checksum_header.is_empty ()) {
+                if (is_eml_file && database_entry.file_size == local_entry.size && !database_entry.checksum_header == "") {
                     if (compute_local_checksum (database_entry.checksum_header, this.discovery_data.local_dir + path.local, item)
                             && item.checksum_header == database_entry.checksum_header) {
                         GLib.info ("Note: Checksums are identical, file did not actually change: " + path.local);
@@ -1627,7 +1627,7 @@ public class ProcessDirectoryJob : GLib.Object {
         }
 
         // Verify the checksum where possible
-        if (!base_record.checksum_header.is_empty () && item.type == ItemTypeFile && base_record.type == ItemTypeFile) {
+        if (!base_record.checksum_header == "" && item.type == ItemTypeFile && base_record.type == ItemTypeFile) {
             if (compute_local_checksum (base_record.checksum_header, this.discovery_data.local_dir + path.original, item)) {
                 GLib.info ("checking checksum of potential rename " + path.original + item.checksum_header + base_record.checksum_header);
                 if (item.checksum_header != base_record.checksum_header) {
@@ -1649,7 +1649,7 @@ public class ProcessDirectoryJob : GLib.Object {
     /***********************************************************
     process_file helper for local/remote conflicts
     ***********************************************************/
-    private void process_file_conflict (unowned SyncFileItem item, ProcessDirectoryJob.PathTuple path, LocalInfo local_entry, RemoteInfo server_entry, SyncJournalFileRecord database_entry) {
+    private void process_file_conflict (SyncFileItem item, ProcessDirectoryJob.PathTuple path, LocalInfo local_entry, RemoteInfo server_entry, SyncJournalFileRecord database_entry) {
         item.previous_size = local_entry.size;
         item.previous_modtime = local_entry.modtime;
 
@@ -1664,7 +1664,7 @@ public class ProcessDirectoryJob : GLib.Object {
             item.type = ItemTypeVirtualFileDownload;
 
         // If there's no content hash, use heuristics
-        if (server_entry.checksum_header.is_empty ()) {
+        if (server_entry.checksum_header == "") {
             // If the size or mtime is different, it's definitely a conflict.
             bool is_conflict = (server_entry.size != local_entry.size) || (server_entry.modtime != local_entry.modtime);
 
@@ -1724,7 +1724,7 @@ public class ProcessDirectoryJob : GLib.Object {
     process_file helper for common final processing
     ***********************************************************/
     private void process_file_finalize (
-        unowned SyncFileItem item, PathTuple path, bool recurse,
+        SyncFileItem item, PathTuple path, bool recurse,
         QueryMode recurse_query_local, QueryMode recurse_query_server) {
         // Adjust target path for virtual-suffix files
         if (is_vfs_with_suffix ()) {
@@ -1737,7 +1737,7 @@ public class ProcessDirectoryJob : GLib.Object {
             }
             if (item.type == ItemTypeVirtualFileDehydration
                 && item.instruction == CSYNC_INSTRUCTION_SYNC) {
-                if (item.rename_target.is_empty ()) {
+                if (item.rename_target == "") {
                     item.rename_target = item.file;
                     add_virtual_file_suffix (item.rename_target);
                 }
@@ -2054,7 +2054,7 @@ public class ProcessDirectoryJob : GLib.Object {
         if (results) {
             this.server_normal_query_entries = *results;
             this.server_query_done = true;
-            if (!server_job.data_fingerprint.is_empty () && this.discovery_data.data_fingerprint.is_empty ())
+            if (!server_job.data_fingerprint == "" && this.discovery_data.data_fingerprint == "")
                 this.discovery_data.data_fingerprint = server_job.data_fingerprint;
             if (this.local_query_done)
                 this.process ();
@@ -2076,7 +2076,7 @@ public class ProcessDirectoryJob : GLib.Object {
             } else {
                 // Fatal for the root job since it has no SyncFileItem, or for the network errors
                 /* emit */ this.discovery_data.fatal_error (_("Server replied with an error while reading directory \"%1\" : %2")
-                    .arg (this.current_folder.server, results.error ().message));
+                    .printf (this.current_folder.server, results.error ().message));
             }
         }
     }
@@ -2134,7 +2134,7 @@ public class ProcessDirectoryJob : GLib.Object {
             this.on_signal_discovery_single_local_directory_job_finished
         );
 
-        QThreadPool pool = QThreadPool.global_instance ();
+        QThreadPool pool = QThreadPool.global_instance;
         pool.start (local_job); // QThreadPool takes ownership
     }
 
@@ -2148,7 +2148,7 @@ public class ProcessDirectoryJob : GLib.Object {
         this.discovery_data.currently_active_jobs--;
         this.pending_async_jobs--;
         if (this.server_job)
-            this.server_job.on_signal_abort ();
+            this.server_job.abort ();
 
         /* emit */ this.discovery_data.fatal_error (message);
     }
@@ -2235,12 +2235,12 @@ public class ProcessDirectoryJob : GLib.Object {
     in item.checksum_header. Returns true if the checksum was
     successfully computed.
     ***********************************************************/
-    private static bool compute_local_checksum (string header, string path, unowned SyncFileItem item) {
+    private static bool compute_local_checksum (string header, string path, SyncFileItem item) {
         var type = parse_checksum_header_type (header);
-        if (!type.is_empty ()) {
+        if (!type == "") {
             // TODO: compute async?
             string checksum = ComputeChecksum.compute_now_on_signal_file (path, type);
-            if (!checksum.is_empty ()) {
+            if (!checksum == "") {
                 item.checksum_header = make_checksum_header (type, checksum);
                 return true;
             }

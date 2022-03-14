@@ -27,7 +27,7 @@ public class LsColXMLParser : GLib.Object {
 
     signal void directory_listing_subfolders (string[] items);
     signal void directory_listing_iterated (string name, GLib.HashTable<string, string> properties);
-    signal void finished_with_error (Soup.Reply reply);
+    signal void finished_with_error (GLib.InputStream reply);
     signal void finished_without_error ();
 
 

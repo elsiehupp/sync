@@ -404,7 +404,7 @@ public class SyncFileItem : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public string destination () {
-        if (!this.rename_target.is_empty ()) {
+        if (!this.rename_target == "") {
             return this.rename_target;
         }
         return this.file;
@@ -413,8 +413,8 @@ public class SyncFileItem : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public bool is_empty () {
-        return this.file.is_empty ();
+    public bool == "" {
+        return this.file == "";
     }
 
 
@@ -432,7 +432,7 @@ public class SyncFileItem : GLib.Object {
         return this.status == Status.SOFT_ERROR
             || this.status == Status.NORMAL_ERROR
             || this.status == Status.FATAL_ERROR
-            || !this.error_string.is_empty ();
+            || !this.error_string == "";
     }
 
 

@@ -31,24 +31,24 @@ public class PropfindJob : AbstractNetworkJob {
     public GLib.List<string> properties;
 
     signal void signal_result (GLib.HashTable<string, GLib.Variant> values);
-    signal void finished_with_error (Soup.Reply reply = null);
+    signal void finished_with_error (GLib.InputStream reply = null);
 
     /***********************************************************
     ***********************************************************/
-    public PropfindJob.for_account (unowned Account account, string path, GLib.Object parent = new GLib.Object ()) {
+    public PropfindJob.for_account (Account account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void start () {
+    public new void start () {
         GLib.List<string> properties = this.properties;
 
-        if (properties.is_empty ()) {
+        if (properties == "") {
             GLib.warning ("Propfind with no properties!");
         }
-        Soup.Request request;
+        Soup.Request request = new Soup.Request ();
         // Always have a higher priority than the propagator because we use this from the UI
         // and really want this to be done first (no matter what internal scheduling QNAM uses).
         // Also possibly useful for avoiding false timeouts.
@@ -98,7 +98,7 @@ public class PropfindJob : AbstractNetworkJob {
             while (!reader.at_end ()) {
                 QXmlStreamReader.TokenType type = reader.read_next ();
                 if (type == QXmlStreamReader.StartElement) {
-                    if (!current_element.is_empty () && current_element.top () == "prop") {
+                    if (!current_element == "" && current_element.top () == "prop") {
                         items.insert (reader.name ().to_string (), reader.read_element_text (QXmlStreamReader.SkipChildElements));
                     } else {
                         current_element.push (reader.name ().to_string ());

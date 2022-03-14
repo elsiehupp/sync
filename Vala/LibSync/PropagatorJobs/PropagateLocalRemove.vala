@@ -38,7 +38,7 @@ public class PropagateLocalRemove : PropagateItemJob {
         GLib.info ("Going to delete:" + filename);
 
         if (propagator ().local_filename_clash (this.item.file)) {
-            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Could not remove %1 because of a local file name clash").arg (QDir.to_native_separators (filename)));
+            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Could not remove %1 because of a local file name clash").printf (QDir.to_native_separators (filename)));
             return;
         }
 
@@ -95,7 +95,7 @@ public class PropagateLocalRemove : PropagateItemJob {
             foreach (var it in deleted) {
                 if (!it.first.starts_with (propagator ().local_path ()))
                     continue;
-                if (!deleted_dir.is_empty () && it.first.starts_with (deleted_dir))
+                if (!deleted_dir == "" && it.first.starts_with (deleted_dir))
                     continue;
                 if (it.second) {
                     deleted_dir = it.first;

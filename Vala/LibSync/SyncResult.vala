@@ -183,7 +183,7 @@ public class SyncResult : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_reset () {
+    public void reset () {
         SyncResult ();
     }
 
@@ -191,7 +191,7 @@ public class SyncResult : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public string error_string () {
-        if (this.errors.is_empty ())
+        if (this.errors == "")
             return "";
         return this.errors.first ();
     }
@@ -261,7 +261,7 @@ public class SyncResult : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void process_completed_item (unowned SyncFileItem item) {
+    public void process_completed_item (SyncFileItem item) {
         if (Progress.is_warning_kind (item.status)) {
             // Count any error conditions, error strings will have priority anyway.
             this.found_files_not_synced = true;
@@ -284,7 +284,7 @@ public class SyncResult : GLib.Object {
         // Process the item to the gui
         if (item.status == SyncFileItem.Status.FATAL_ERROR || item.status == SyncFileItem.Status.NORMAL_ERROR) {
             // : this displays an error string (%2) for a file %1
-            append_error_string (GLib.Object._("%1 : %2").arg (item.file, item.error_string));
+            append_error_string (GLib.Object._("%1 : %2").printf (item.file, item.error_string));
             this.num_error_items++;
             if (!this.first_item_error) {
                 this.first_item_error = item;

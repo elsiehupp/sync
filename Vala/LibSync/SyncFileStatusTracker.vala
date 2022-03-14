@@ -119,7 +119,7 @@ public class SyncFileStatusTracker : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_about_to_propagate (SyncFileItemVector items) {
-        //  ASSERT (this.sync_count.is_empty ());
+        //  ASSERT (this.sync_count == "");
 
         ProblemsMap old_problems;
         std.swap (this.sync_problems, old_problems);
@@ -171,13 +171,13 @@ public class SyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_item_completed (unowned SyncFileItem item) {
+    private void on_signal_item_completed (SyncFileItem item) {
         GLib.debug ("Item completed " + item.destination () + item.status + item.instruction);
 
-        if (has_error_status (*item)) {
+        if (has_error_status (item)) {
             this.sync_problems[item.destination ()] = SyncFileStatus.SyncFileStatusTag.STATUS_ERROR;
             invalidate_parent_paths (item.destination ());
-        } else if (has_excluded_status (*item)) {
+        } else if (has_excluded_status (item)) {
             this.sync_problems[item.destination ()] = SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED;
         } else {
             this.sync_problems.erase (item.destination ());
@@ -199,7 +199,7 @@ public class SyncFileStatusTracker : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_sync_finished () {
-        // Clear the sync counts to reduce the impact of unsymetrical inc/dec calls (e.g. when directory job on_signal_abort)
+        // Clear the sync counts to reduce the impact of unsymetrical inc/dec calls (e.g. when directory job abort)
         GLib.HashTable<string, int> old_sync_count;
         std.swap (this.sync_count, old_sync_count);
         for (var it = old_sync_count.begin (); it != old_sync_count.end (); ++it) {
@@ -232,7 +232,7 @@ public class SyncFileStatusTracker : GLib.Object {
                 return severity;
             } else if (severity == SyncFileStatus.SyncFileStatusTag.STATUS_ERROR
                 && path_starts_with (problem_path, path_to_match)
-                && (path_to_match.is_empty () || problem_path.at (path_to_match.size ()) == "/")) {
+                && (path_to_match == "" || problem_path.at (path_to_match.size ()) == "/")) {
                 return SyncFileStatus.SyncFileStatusTag.STATUS_WARNING;
             } else if (!path_starts_with (problem_path, path_to_match)) {
                 // Starting at lower_bound we get the first path that is not smaller,
@@ -314,7 +314,7 @@ public class SyncFileStatusTracker : GLib.Object {
             int last_slash_index = relative_path.last_index_of ("/");
             if (last_slash_index != -1)
                 inc_sync_count_and_emit_status_changed (relative_path.left (last_slash_index), SharedFlag.UNKNOWN_SHARED);
-            else if (!relative_path.is_empty ())
+            else if (!relative_path == "")
                 inc_sync_count_and_emit_status_changed ("", SharedFlag.UNKNOWN_SHARED);
         }
     }
@@ -338,7 +338,7 @@ public class SyncFileStatusTracker : GLib.Object {
             int last_slash_index = relative_path.last_index_of ("/");
             if (last_slash_index != -1)
                 dec_sync_count_and_emit_status_changed (relative_path.left (last_slash_index), SharedFlag.UNKNOWN_SHARED);
-            else if (!relative_path.is_empty ())
+            else if (!relative_path == "")
                 dec_sync_count_and_emit_status_changed ("", SharedFlag.UNKNOWN_SHARED);
         }
     }
@@ -349,7 +349,7 @@ public class SyncFileStatusTracker : GLib.Object {
     private SyncFileStatus file_status (string relative_path) {
         //  ASSERT (!relative_path.has_suffix ("/"));
 
-        if (relative_path.is_empty ()) {
+        if (relative_path == "") {
             // This is the root sync folder, it doesn't have an entry in the database and won't be walked by csync, so resolve manually.
             return resolve_sync_and_error_status ("", SharedFlag.NOT_SHARED);
         }

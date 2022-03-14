@@ -23,7 +23,7 @@ public class DummyCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public override QNetworkAccessManager create_qnam () {
+    public override Soup.Session create_qnam () {
         return new AccessManager ();
     }
 
@@ -37,7 +37,7 @@ public class DummyCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public override bool still_valid (Soup.Reply reply) {
+    public override bool still_valid (GLib.InputStream reply) {
         //  Q_UNUSED (reply)
         return true;
     }

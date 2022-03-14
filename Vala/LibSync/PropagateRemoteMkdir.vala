@@ -31,7 +31,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public PropagateRemoteMkdir (OwncloudPropagator propagator, unowned SyncFileItem item) {
+    public PropagateRemoteMkdir (OwncloudPropagator propagator, SyncFileItem item) {
         base (propagator, item);
         this.delete_existing = false;
         this.upload_encrypted_helper = null;
@@ -73,9 +73,9 @@ public class PropagateRemoteMkdir : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_abort (PropagatorJob.AbortType abort_type) {
+    public new void abort (PropagatorJob.AbortType abort_type) {
         if (this.job && this.job.reply ())
-            this.job.reply ().on_signal_abort ();
+            this.job.reply ().abort ();
 
         if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
             /* emit */ signal_abort_finished ();
@@ -86,7 +86,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
     /***********************************************************
     Creating a directory should be fast.
     ***********************************************************/
-    public bool is_likely_finished_quickly () {
+    public new bool is_likely_finished_quickly () {
         return true;
     }
 
@@ -111,7 +111,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
         }
 
         // We should be encrypted as well since our parent is
-        var remote_parent_path = parent_rec.e2e_mangled_name.is_empty () ? parent_path : parent_rec.e2e_mangled_name;
+        var remote_parent_path = parent_rec.e2e_mangled_name == "" ? parent_path : parent_rec.e2e_mangled_name;
         this.upload_encrypted_helper = new PropagateUploadEncrypted (propagator (), remote_parent_path, this.item, this);
         connect (
             this.upload_encrypted_helper,
@@ -264,10 +264,10 @@ public class PropagateRemoteMkdir : PropagateItemJob {
         // save the file identifier already so we can detect rename or remove
         var result = propagator ().update_metadata (item_copy);
         if (!result) {
-            on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error writing metadata to the database : %1").arg (result.error ()));
+            on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error writing metadata to the database : %1").printf (result.error ()));
             return;
         } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
-            on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("The file %1 is currently in use").arg (this.item.file));
+            on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("The file %1 is currently in use").printf (this.item.file));
             return;
         }
 
@@ -295,8 +295,8 @@ public class PropagateRemoteMkdir : PropagateItemJob {
             // throw an error.
             on_signal_done (SyncFileItem.Status.NORMAL_ERROR,
                 _("Wrong HTTP code returned by server. Expected 201, but received \"%1 %2\".")
-                    .arg (this.item.http_error_code)
-                    .arg (job_http_reason_phrase_string));
+                    .printf (this.item.http_error_code)
+                    .printf (job_http_reason_phrase_string));
             return;
         }
 

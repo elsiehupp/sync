@@ -4,7 +4,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <QNetworkAccessManager>
+//  #include <Soup.Session>
 //  #include <GLib.FileInfo>
 //  #include <QDir>
 //  #include <cmath>
@@ -63,14 +63,14 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
 
     /***********************************************************
     ***********************************************************/
-    public PropagateUploadFileV1 (OwncloudPropagator propagator, unowned SyncFileItem item) {
+    public PropagateUploadFileV1 (OwncloudPropagator propagator, SyncFileItem item) {
         base (propagator, item);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void do_start_upload () {
+    public new void do_start_upload () {
         this.chunk_count = int (std.ceil (this.file_to_upload.size / double (chunk_size ())));
         this.start_chunk = 0;
         GLib.assert (this.item.modtime > 0);
@@ -86,11 +86,11 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
             GLib.warning ("Invalid modified time " + this.item.file.to_string () + this.item.modtime.to_string ());
         }
         if (progress_info.valid && progress_info.is_chunked () && progress_info.modtime == this.item.modtime && progress_info.size == this.item.size
-            && (progress_info.content_checksum == this.item.checksum_header || progress_info.content_checksum.is_empty () || this.item.checksum_header.is_empty ())) {
+            && (progress_info.content_checksum == this.item.checksum_header || progress_info.content_checksum == "" || this.item.checksum_header == "")) {
             this.start_chunk = progress_info.chunk;
             this.transfer_identifier = progress_info.transferid;
             GLib.info (this.item.file + ": Resuming from chunk " + this.start_chunk);
-        } else if (this.chunk_count <= 1 && !this.item.checksum_header.is_empty ()) {
+        } else if (this.chunk_count <= 1 && !this.item.checksum_header == "") {
             // If there is only one chunk, write the checksum in the database, so if the PUT is sent
             // to the server, but the connection drops before we get the etag, we can check the checksum
             // in reconcile (issue #5106)
@@ -119,7 +119,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
 
     /***********************************************************
     ***********************************************************/
-    public new void on_signal_abort (PropagatorJob.AbortType abort_type) {
+    public new void abort (PropagatorJob.AbortType abort_type) {
         abort_network_jobs (
             abort_type,
             PropagateUploadFileV1.abort_filter
@@ -147,7 +147,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
         if (propagator ().abort_requested)
             return;
 
-        if (!this.jobs.is_empty () && this.current_chunk + this.start_chunk >= this.chunk_count - 1) {
+        if (!this.jobs == "" && this.current_chunk + this.start_chunk >= this.chunk_count - 1) {
             // Don't do parallel upload of chunk if this might be the last chunk because the server cannot handle that
             // https://github.com/owncloud/core/issues/11106
             // We return now and when the this.jobs are on_signal_finished we will proceed with the last chunk
@@ -170,7 +170,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
             // XOR with chunk size to make sure everything goes well if chunk size changes between runs
             uint32 transid = this.transfer_identifier ^ uint32 (chunk_size ());
             GLib.info ("Upload chunk" + sending_chunk + "of" + this.chunk_count + "transferid (remote)=" + transid);
-            path += "-chunking-%1-%2-%3".arg (transid).arg (this.chunk_count).arg (sending_chunk);
+            path += "-chunking-%1-%2-%3".printf (transid).printf (this.chunk_count).printf (sending_chunk);
 
             headers["OC-Chunked"] = "1";
 
@@ -189,7 +189,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
         }
         GLib.debug (this.chunk_count.to_string () + is_final_chunk.to_string () + chunk_start.to_string () + current_chunk_size.to_string ());
 
-        if (is_final_chunk && !this.transmission_checksum_header.is_empty ()) {
+        if (is_final_chunk && !this.transmission_checksum_header == "") {
             GLib.info (propagator ().full_remote_path (path) + this.transmission_checksum_header);
             headers[CHECK_SUM_HEADER_C] = this.transmission_checksum_header;
         }
@@ -247,7 +247,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
             parallel_chunk_upload = false;
         } else {
             string env = qgetenv ("OWNCLOUD_PARALLEL_CHUNK");
-            if (!env.is_empty ()) {
+            if (!env == "") {
                 parallel_chunk_upload = env != "false" && env != "0";
             } else {
                 int version_num = propagator ().account ().server_version_int ();
@@ -302,7 +302,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
         // The server needs some time to process the request and provide us with a poll URL
         if (this.item.http_error_code == 202) {
             string path = string.from_utf8 (job.reply ().raw_header ("OC-Job_status-Location"));
-            if (path.is_empty ()) {
+            if (path == "") {
                 on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Poll URL missing"));
                 return;
             }
@@ -395,8 +395,8 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
 
         // the file identifier should only be empty for new files up- or downloaded
         string fid = job.reply ().raw_header ("OC-FileID");
-        if (!fid.is_empty ()) {
-            if (!this.item.file_id.is_empty () && this.item.file_id != fid) {
+        if (!fid == "") {
+            if (!this.item.file_id == "" && this.item.file_id != fid) {
                 GLib.warning ("File ID changed! " + this.item.file_id.to_string () + fid.to_string ());
             }
             this.item.file_id = fid;

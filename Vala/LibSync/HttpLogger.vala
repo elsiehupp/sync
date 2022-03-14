@@ -19,7 +19,7 @@ public class HttpLogger {
 
     const string X_REQUEST_ID = "X-Request-ID";
 
-    public static void log_request (Soup.Reply reply, QNetworkAccessManager.Operation operation, QIODevice device) {
+    public static void log_request (GLib.InputStream reply, Soup.Session.Operation operation, QIODevice device) {
         var request = reply.request ();
         if (!lc_network_http ().is_info_enabled ()) {
             return;
@@ -55,21 +55,21 @@ public class HttpLogger {
     /***********************************************************
     Helper to construct the HTTP verb used in the request
     ***********************************************************/
-    public static string request_verb (QNetworkAccessManager.Operation operation, Soup.Request request) {
+    public static string request_verb (Soup.Session.Operation operation, Soup.Request request) {
         switch (operation) {
-        case QNetworkAccessManager.HeadOperation:
+        case Soup.Session.HeadOperation:
             return "HEAD";
-        case QNetworkAccessManager.GetOperation:
+        case Soup.Session.GetOperation:
             return "GET";
-        case QNetworkAccessManager.PutOperation:
+        case Soup.Session.PutOperation:
             return "PUT";
-        case QNetworkAccessManager.PostOperation:
+        case Soup.Session.PostOperation:
             return "POST";
-        case QNetworkAccessManager.DeleteOperation:
+        case Soup.Session.DeleteOperation:
             return "DELETE";
-        case QNetworkAccessManager.CustomOperation:
+        case Soup.Session.CustomOperation:
             return request.attribute (Soup.Request.CustomVerbAttribute).to_byte_array ();
-        case QNetworkAccessManager.UnknownOperation:
+        case Soup.Session.UnknownOperation:
             break;
         }
         Q_UNREACHABLE ();
@@ -83,7 +83,7 @@ public class HttpLogger {
 
 
     public static void log_http (string verb, string url, string identifier, string content_type, GLib.List<Soup.Reply.RawHeaderPair> header, QIODevice device) {
-        var reply = (Soup.Reply) device;
+        var reply = (GLib.InputStream) device;
         var content_length = device ? device.size () : 0;
         string message;
         QTextStream stream = new QTextStream (&message);

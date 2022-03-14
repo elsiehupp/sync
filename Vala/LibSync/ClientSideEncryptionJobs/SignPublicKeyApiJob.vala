@@ -48,7 +48,7 @@ public class SignPublicKeyApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public SignPublicKeyApiJob (unowned Account account, string path, GLib.Object parent = new GLib.Object ()) {
+    public SignPublicKeyApiJob (Account account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
@@ -56,7 +56,7 @@ public class SignPublicKeyApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public new void start () {
-        Soup.Request request;
+        Soup.Request request = new Soup.Request ();
         request.raw_header ("OCS-APIREQUEST", "true");
         request.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
         QUrlQuery query;

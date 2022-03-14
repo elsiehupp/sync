@@ -20,22 +20,14 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QJsonArray>
 //  #include <QLoggingCategory>
 //  #include <QHttpMultiPart>
-//  #include <qsslconfiguration.h>
 //  #include <qt5keychain/keychain.h>
 
 //  using QKeychain;
 
-//  #include <QNetworkCookie>
-//  #include <Soup.Request>
 //  #include <QSslSocket>
-//  #include <QSslCertificate>
 //  #include <QSslConfiguration>
-//  #include <QSslCipher>
-//  #include <QSslError>
-
 
 //  #ifndef TOKEN_AUTH_ONLY
-//  #include <QPixmap>
 //  #endif
 
 //  #include <memory>
@@ -62,8 +54,8 @@ public class Account : GLib.Object {
     @brief Reimplement this to handle SSL errors from libsync
     @ingroup libsync
     ***********************************************************/
-    class AbstractSslErrorHandler {
-        public virtual bool handle_errors (GLib.List<QSslError> error_list, QSslConfiguration conf, GLib.List<QSslCertificate> cert_list, unowned Account account);
+    abstract class AbstractSslErrorHandler {
+        public abstract bool handle_errors (GLib.List<GnuTLS.ErrorCode> error_list, QSslConfiguration conf, GLib.List<GLib.TlsCertificate> cert_list, Account account);
     }
 
 
@@ -71,7 +63,7 @@ public class Account : GLib.Object {
     Because of bugs in Qt, we use this to store info needed for
     the SSL Button
     ***********************************************************/
-    public QSslCipher session_cipher;
+    public GnuTLS.CipherAlgorithm session_cipher;
 
 
     /***********************************************************
@@ -81,17 +73,17 @@ public class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.List<QSslCertificate> peer_certificate_chain;
+    public GLib.List<GLib.TlsCertificate> peer_certificate_chain;
 
     /***********************************************************
     ***********************************************************/
-    QWeakPointer<Account> shared_this {
+    unowned Account shared_this {
         private get {
             return this.shared_this;
         }
         public set {
-            this.shared_this = value.to_weak_ref ();
-            setup_user_status_connector ();
+            this.shared_this = value;
+            set_up_user_status_connector ();
         }
     }
 
@@ -108,7 +100,7 @@ public class Account : GLib.Object {
     ***********************************************************/
     string dav_user {
         public get {
-            return this.dav_user.is_empty () && this.credentials ? this.credentials.user () : this.dav_user;
+            return this.dav_user == "" && this.credentials ? this.credentials.user () : this.dav_user;
         }
         public set {
             if (this.dav_user == value) {
@@ -124,7 +116,7 @@ public class Account : GLib.Object {
     ***********************************************************/
     string display_name {
         public get {
-            string dn = "%1@%2".arg (credentials ().user (), this.url.host ());
+            string dn = "%1@%2".printf (credentials ().user (), this.url.host ());
             int port = url ().port ();
             if (port > 0 && port != 80 && port != 443) {
                 dn.append (':');
@@ -186,7 +178,7 @@ public class Account : GLib.Object {
     /***********************************************************
     The certificates of the account
     ***********************************************************/
-    GLib.List<QSslCertificate> approved_certificates {
+    GLib.List<GLib.TlsCertificate> approved_certificates {
         public get {
             return this.approved_certificates;
         }
@@ -203,14 +195,14 @@ public class Account : GLib.Object {
     /***********************************************************
     Access the server capabilities
     ***********************************************************/
-    Capabilities capabilities {
+    GLib.HashTable<string, GLib.Variant> capabilities {
         public get {
             return this.capabilities;
         }
         private set {
-            this.capabilities = Capabilities (value);
+            this.capabilities = value;
 
-            setup_user_status_connector ();
+            set_up_user_status_connector ();
             try_setup_push_notifications ();
         }
     }
@@ -244,64 +236,65 @@ public class Account : GLib.Object {
             return this.ssl_error_handler;
         }
         public set {
-            this.ssl_error_handler.on_signal_reset (value);
+            this.ssl_error_handler.reset (value);
         }
     }
 
     /***********************************************************
     ***********************************************************/
-    private unowned QNetworkAccessManager access_manager;
+    private Soup.Session soup_session;
 
     /***********************************************************
     Holds the accounts credentials
     ***********************************************************/
-    QScopedPointer<AbstractCredentials> credentials {
+    AbstractCredentials credentials {
         public get {
             return this.credentials.data ();
         }
         public set {
             // set active credential manager
-            QNetworkCookieJar jar = null;
-            QNetworkProxy proxy;
+            Soup.CookieJar jar = null;
+            Soup.ProxyResolverDefault proxy;
 
-            if (this.access_manager) {
-                jar = this.access_manager.cookie_jar ();
+            if (this.soup_session) {
+                jar = this.soup_session.add_feature ();
                 jar.parent (null);
 
                 // Remember proxy (issue #2108)
-                proxy = this.access_manager.proxy ();
+                proxy = (Soup.ProxyResolverDefault) this.soup_session.get_feature (typeof (Soup.ProxyResolverDefault));
 
-                this.access_manager = new /*unowned*/ QNetworkAccessManager ();
+                this.soup_session = new /*unowned*/ Soup.Session ();
             }
 
             // The order for these two is important! Reading the credential's
             // settings accesses the account as well as account.credentials,
-            this.credentials.on_signal_reset (value);
+            this.credentials.reset (value);
             value.account (this);
 
             // Note: This way the QNAM can outlive the Account and Credentials.
             // This is necessary to avoid issues with the QNAM being deleted while
             // processing on_signal_handle_ssl_errors ().
-            this.access_manager = new /*unowned*/ QNetworkAccessManager (this.credentials.create_qnam (), GLib.Object.delete_later);
+            this.soup_session = new /*unowned*/ Soup.Session (this.credentials.create_qnam (), GLib.Object.delete_later);
 
-            if (jar) {
-                this.access_manager.cookie_jar (jar);
-            }
-            if (proxy.type () != QNetworkProxy.DefaultProxy) {
-                this.access_manager.proxy (proxy);
+            if (jar != null) {
+                this.soup_session.add_feature (jar);
             }
             this.signal_ssl_errors.connect (
-                this.access_manager.data (),
-                this.on_signal_handle_ssl_errors);
-            QNetworkAccessManager.signal_proxy_authentication_required.connect (
-                this.access_manager.data (),
-                Account.signal_proxy_authentication_required);
+                this.soup_session.data (),
+                this.on_signal_handle_ssl_errors
+            );
+            Soup.Session.signal_proxy_authentication_required.connect (
+                this.soup_session.data (),
+                Account.signal_proxy_authentication_required
+            );
             AbstractCredentials.signal_fetched.connect (
                 this.credentials.data (),
-                Account.on_signal_credentials_fetched);
+                Account.on_signal_credentials_fetched
+            );
             AbstractCredentials.signal_asked.connect (
                 this.credentials.data (),
-                Account.on_signal_credentials_asked);
+                Account.on_signal_credentials_asked
+            );
 
             try_setup_push_notifications ();
         }
@@ -315,7 +308,7 @@ public class Account : GLib.Object {
     /***********************************************************
     Certificates that were explicitly rejected by the user
     ***********************************************************/
-    private GLib.List<QSslCertificate> rejected_certificates;
+    private GLib.List<GLib.TlsCertificate> rejected_certificates;
 
     /***********************************************************
     ***********************************************************/
@@ -347,10 +340,9 @@ public class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    std.shared_ptr<UserStatusConnector> user_status_connector { public get; private set; }
+    unowned UserStatusConnector user_status_connector { public get; private set; }
 
     /***********************************************************
-
     IMPORTANT - remove later - FIXME MS@2019-12-07 -.
     TODO: For "Log out" & "Remove account":
         Remove client CA certificates and KEY!
@@ -385,9 +377,9 @@ public class Account : GLib.Object {
     signal void signal_credentials_asked (AbstractCredentials credentials);
 
     /***********************************************************
-    Forwards from QNetworkAccessManager.signal_proxy_authentication_required ().
+    Forwards from Soup.Session.signal_proxy_authentication_required ().
     ***********************************************************/
-    signal void signal_proxy_authentication_required (QNetworkProxy proxy, QAuthenticator authenticator);
+    signal void signal_proxy_authentication_required (Soup.ProxyResolverDefault proxy, QAuthenticator authenticator);
 
     /***********************************************************
     e.g. when the approved SSL certificates changed
@@ -425,13 +417,13 @@ public class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    signal void signal_ssl_errors (Soup.Reply reply, GLib.List<QSslError> error_list);
+    signal void signal_ssl_errors (GLib.InputStream reply, GLib.List<GnuTLS.ErrorCode> error_list);
 
     /***********************************************************
     ***********************************************************/
     private Account (GLib.Object parent = new GLib.Object ()) {
         base (parent);
-        this.capabilities = new GLib.HashTable<string, GLib.Variant> ();
+        this.capabilities = new GLib.HashTable<string, GLib.Variant> (str_hash, str_equal);
         this.http2Supported = false;
         this.push_notifications = null;
         this.is_remote_wipe_requested_HACK = false;
@@ -510,61 +502,64 @@ public class Account : GLib.Object {
     this function. Other places should prefer to use jobs or
     send_request ().
     ***********************************************************/
-    public Soup.Reply send_raw_request_for_device (string verb,
+    public GLib.InputStream send_raw_request_for_device (string verb,
         GLib.Uri url, Soup.Request request = Soup.Request (),
         QIODevice data = null) {
         request.url (url);
         request.ssl_configuration (this.get_or_create_ssl_config ());
         if (verb == "HEAD" && !data) {
-            return this.access_manager.head (request);
+            return this.soup_session.head (request);
         } else if (verb == "GET" && !data) {
-            return this.access_manager.get (request);
+            return this.soup_session.get (request);
         } else if (verb == "POST") {
-            return this.access_manager.post (request, data);
+            return this.soup_session.post (request, data);
         } else if (verb == "PUT") {
-            return this.access_manager.put (request, data);
+            return this.soup_session.put (request, data);
         } else if (verb == "DELETE" && !data) {
-            return this.access_manager.delete_resource (request);
+            return this.soup_session.delete_resource (request);
         }
-        return this.access_manager.send_custom_request (request, verb, data);
+        return this.soup_session.send_custom_request (request, verb, data);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public Soup.Reply send_raw_request_for_data (string verb,
-        GLib.Uri url, Soup.Request request = Soup.Request (),
-        string data)  {
+    public GLib.InputStream send_raw_request_for_data (
+        string verb,
+        GLib.Uri url,
+        string data,
+        Soup.Request request = Soup.Request ())  {
         request.url (url);
         request.ssl_configuration (this.get_or_create_ssl_config ());
-        if (verb == "HEAD" && data.is_empty ()) {
-            return this.access_manager.head (request);
-        } else if (verb == "GET" && data.is_empty ()) {
-            return this.access_manager.get (request);
+        if (verb == "HEAD" && data == "") {
+            return this.soup_session.head (request);
+        } else if (verb == "GET" && data == "") {
+            return this.soup_session.get (request);
         } else if (verb == "POST") {
-            return this.access_manager.post (request, data);
+            return this.soup_session.post (request, data);
         } else if (verb == "PUT") {
-            return this.access_manager.put (request, data);
-        } else if (verb == "DELETE" && data.is_empty ()) {
-            return this.access_manager.delete_resource (request);
+            return this.soup_session.put (request, data);
+        } else if (verb == "DELETE" && data == "") {
+            return this.soup_session.delete_resource (request);
         }
-        return this.access_manager.send_custom_request (request, verb, data);
+        return this.soup_session.send_custom_request (request, verb, data);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public Soup.Reply send_raw_request_for_multipart (string verb,
-        GLib.Uri url, Soup.Request request = Soup.Request (),
-        QHttpMultiPart data) {
+    public GLib.InputStream send_raw_request_for_multipart (string verb,
+        GLib.Uri url,
+        QHttpMultiPart data,
+        Soup.Request request = Soup.Request ()) {
         request.url (url);
         request.ssl_configuration (this.get_or_create_ssl_config ());
         if (verb == "PUT") {
-            return this.access_manager.put (request, data);
+            return this.soup_session.put (request, data);
         } else if (verb == "POST") {
-            return this.access_manager.post (request, data);
+            return this.soup_session.post (request, data);
         }
-        return this.access_manager.send_custom_request (request, verb, data);
+        return this.soup_session.send_custom_request (request, verb, data);
     }
 
 
@@ -602,7 +597,7 @@ public class Account : GLib.Object {
         ssl_config.ssl_option (QSsl.SslOptionDisableSessionSharing, false);
         ssl_config.ssl_option (QSsl.SslOptionDisableSessionPersistence, false);
 
-        ssl_config.ocsp_stapling_enabled (Theme.instance ().enable_stapling_ocsp ());
+        ssl_config.ocsp_stapling_enabled (Theme.instance.enable_stapling_ocsp ());
 
         return ssl_config;
     }
@@ -610,7 +605,7 @@ public class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void add_approved_certificates (GLib.List<QSslCertificate> certificates) {
+    public void add_approved_certificates (GLib.List<GLib.TlsCertificate> certificates) {
         this.approved_certificates += certificates;
     }
 
@@ -713,9 +708,9 @@ public class Account : GLib.Object {
     clear all cookies. (Session cookies or not)
     ***********************************************************/
     public void clear_cookie_jar () {
-        var jar = (CookieJar) this.access_manager.cookie_jar ();
+        var jar = (CookieJar) this.soup_session.add_feature ();
         //  ASSERT (jar);
-        jar.all_cookies (new GLib.List<QNetworkCookie> ());
+        jar.all_cookies (new GLib.List<Soup.Cookie> ());
         /* emit */ signal_wants_account_saved (this);
     }
 
@@ -725,10 +720,10 @@ public class Account : GLib.Object {
     authentication cookies) with another QNAM while making sure
     of not losing its ownership.
     ***********************************************************/
-    public void lend_cookie_jar_to (QNetworkAccessManager guest) {
-        var jar = this.access_manager.cookie_jar ();
+    public void lend_cookie_jar_to (Soup.Session guest) {
+        var jar = this.soup_session.add_feature ();
         var old_parent = jar.parent ();
-        guest.cookie_jar (jar); // takes ownership of our precious cookie jar
+        guest.add_feature (jar); // takes ownership of our precious cookie jar
         jar.parent (old_parent); // takes it back
     }
 
@@ -782,12 +777,12 @@ public class Account : GLib.Object {
             identifier ()
         );
 
-        if (kck.is_empty ()) {
+        if (kck == "") {
             GLib.debug ("app_password is empty");
             return;
         }
 
-        var delete_password_job = new DeletePasswordJob (Theme.instance ().app_name ());
+        var delete_password_job = new DeletePasswordJob (Theme.instance.app_name ());
         delete_password_job.insecure_fallback (false);
         delete_password_job.key (kck);
         connect (
@@ -815,48 +810,48 @@ public class Account : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public string cookie_jar_path () {
-        return QStandardPaths.writable_location (QStandardPaths.AppConfigLocation) + "/cookies" + identifier () + ".db";
+        return GLib.Environment.get_user_config_dir () + "/cookies" + identifier () + ".db";
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void reset_network_access_manager () {
-        if (!this.credentials || !this.access_manager) {
+        if (!this.credentials || !this.soup_session) {
             return;
         }
 
         GLib.debug ("Resetting QNAM");
-        QNetworkCookieJar jar = this.access_manager.cookie_jar ();
-        QNetworkProxy proxy = this.access_manager.proxy ();
+        Soup.CookieJar jar = this.soup_session.add_feature ();
+        Soup.ProxyResolverDefault proxy = this.soup_session.add_feature ();
 
         // Use a unowned to allow locking the life of the QNAM on the stack.
         // Make it call delete_later to make sure that we can return to any QNAM stack frames safely.
-        this.access_manager = new /*unowned*/ QNetworkAccessManager (this.credentials.create_qnam (), GLib.Object.delete_later);
+        this.soup_session = new /*unowned*/ Soup.Session (this.credentials.create_qnam (), GLib.Object.delete_later);
 
-        this.access_manager.cookie_jar (jar); // takes ownership of the old cookie jar
-        this.access_manager.proxy (proxy);   // Remember proxy (issue #2108)
+        this.soup_session.add_feature (jar); // takes ownership of the old cookie jar
+        this.soup_session.add_feature (proxy);   // Remember proxy (issue #2108)
 
         connect (
-            this.access_manager.data (),
+            this.soup_session.data (),
             signal_ssl_errors (reply, error_list),
             on_signal_handle_ssl_errors (reply, error_list)
         );
-        Account.signal_proxy_authentication_required.connect (this.access_manager.data (), QNetworkAccessManager.signal_proxy_authentication_required);
+        Account.signal_proxy_authentication_required.connect (this.soup_session.data (), Soup.Session.signal_proxy_authentication_required);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public QNetworkAccessManager network_access_manager () {
-        return this.access_manager.data ();
+    public Soup.Session network_access_manager () {
+        return this.soup_session.data ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public unowned QNetworkAccessManager shared_network_access_manager () {
-        return this.access_manager;
+    public unowned Soup.Session shared_network_access_manager () {
+        return this.soup_session;
     }
 
 
@@ -884,7 +879,7 @@ public class Account : GLib.Object {
             identifier ()
         );
 
-        var read_password_job = new ReadPasswordJob (Theme.instance ().app_name ());
+        var read_password_job = new ReadPasswordJob (Theme.instance.app_name ());
         read_password_job.insecure_fallback (false);
         read_password_job.key (kck);
         connect (
@@ -919,7 +914,7 @@ public class Account : GLib.Object {
         // there'll be a zombie keychain slot forever, never used again ;p
         //
         // Also don't write empty passwords (Log out . Relaunch)
-        if (identifier ().is_empty () || app_password.is_empty ())
+        if (identifier () == "" || app_password == "")
             return;
 
         const string kck = AbstractCredentials.keychain_key (
@@ -928,7 +923,7 @@ public class Account : GLib.Object {
                     identifier ()
         );
 
-        var write_password_job = new WritePasswordJob (Theme.instance ().app_name ());
+        var write_password_job = new WritePasswordJob (Theme.instance.app_name ());
         write_password_job.insecure_fallback (false);
         write_password_job.key (kck);
         write_password_job.binary_data (app_password.to_latin1 ());
@@ -989,12 +984,12 @@ public class Account : GLib.Object {
     Check for the direct_editing capability
     ***********************************************************/
     public void fetch_direct_editors (GLib.Uri direct_editing_url, string direct_editing_e_tag) {
-        if (direct_editing_url.is_empty () || direct_editing_e_tag.is_empty ())
+        if (direct_editing_url == "" || direct_editing_e_tag == "")
             return;
 
         // Check for the direct_editing capability
-        if (!direct_editing_url.is_empty () &&
-            (direct_editing_e_tag.is_empty () || direct_editing_e_tag != this.last_direct_editing_e_tag)) {
+        if (!direct_editing_url == "" &&
+            (direct_editing_e_tag == "" || direct_editing_e_tag != this.last_direct_editing_e_tag)) {
                 // Fetch the available editors and their mime types
                 var json_api_job = new JsonApiJob (shared_from_this (), "ocs/v2.php/apps/files/api/v1/direct_editing");
                 GLib.Object.JsonApiJob.signal_json_received.connect (json_api_job, this, Account.on_signal_direct_editing_recieved);
@@ -1005,7 +1000,7 @@ public class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void setup_user_status_connector () {
+    public void set_up_user_status_connector () {
         this.user_status_connector = std.make_shared<OcsUserStatusConnector> (shared_from_this ());
         connect (
             this.user_status_connector,
@@ -1046,16 +1041,16 @@ public class Account : GLib.Object {
     Used when forgetting credentials
     ***********************************************************/
     public void on_signal_clear_qnam_cache () {
-        this.access_manager.clear_access_cache ();
+        this.soup_session.clear_access_cache ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_handle_ssl_errors (Soup.Reply reply, GLib.List<QSslError> errors) {
+    public void on_signal_handle_ssl_errors (GLib.InputStream reply, GLib.List<GnuTLS.ErrorCode> errors) {
         NetworkJobTimeoutPauser pauser = new NetworkJobTimeoutPauser (reply);
         GLib.debug ("SSL-Errors happened for url " + reply.url ().to_string ());
-        foreach (QSslError error in errors) {
+        foreach (GnuTLS.ErrorCode error in errors) {
             GLib.debug ("\t_error in " + error.certificate () + ":"
                         + error.error_string () + " (" + error.error () + ")"
                         + "\n");
@@ -1065,7 +1060,7 @@ public class Account : GLib.Object {
         GLib.info (reply.ssl_configuration ().peer_certificate_chain ());
 
         bool all_previously_rejected = true;
-        foreach (QSslError error in errors) {
+        foreach (GnuTLS.ErrorCode error in errors) {
             if (!this.rejected_certificates.contains (error.certificate ())) {
                 all_previously_rejected = false;
             }
@@ -1077,7 +1072,7 @@ public class Account : GLib.Object {
             return;
         }
 
-        GLib.List<QSslCertificate> approved_certificates;
+        GLib.List<GLib.TlsCertificate> approved_certificates;
         if (this.ssl_error_handler.is_null ()) {
             GLib.warning (output + "called without valid SSL error handler for account" + url ());
             return;
@@ -1087,14 +1082,14 @@ public class Account : GLib.Object {
         // the delete_later () of the QNAM before we have the chance of unwinding our stack.
         // Keep a ref here on our stackframe to make sure that it doesn't get deleted before
         // handle_errors returns.
-        unowned QNetworkAccessManager qnam_lock = this.access_manager;
+        unowned Soup.Session qnam_lock = this.soup_session;
         QPointer<GLib.Object> guard = reply;
 
         if (this.ssl_error_handler.handle_errors (errors, reply.ssl_configuration (), approved_certificates, shared_from_this ())) {
             if (!guard)
                 return;
 
-            if (!approved_certificates.is_empty ()) {
+            if (!approved_certificates == "") {
                 QSslConfiguration.default_configuration ().add_ca_certificates (approved_certificates);
                 add_approved_certificates (approved_certificates);
                 /* emit */ signal_wants_account_saved (this);
@@ -1112,7 +1107,7 @@ public class Account : GLib.Object {
                 return;
 
             // Mark all involved certificates as rejected, so we don't ask the user again.
-            foreach (QSslError error in errors) {
+            foreach (GnuTLS.ErrorCode error in errors) {
                 if (!this.rejected_certificates.contains (error.certificate ())) {
                     this.rejected_certificates.append (error.certificate ());
                 }
@@ -1127,7 +1122,7 @@ public class Account : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_credentials_fetched () {
-        if (this.dav_user.is_empty ()) {
+        if (this.dav_user == "") {
             GLib.debug ("User identifier not set. Fetch it.");
             var fetch_user_name_job = new JsonApiJob (shared_from_this (), "/ocs/v1.php/cloud/user");
             connect (
@@ -1178,7 +1173,7 @@ public class Account : GLib.Object {
             const string identifier = editor.value ("identifier").to_string ();
             const string name = editor.value ("name").to_string ();
 
-            if (!identifier.is_empty () && !name.is_empty ()) {
+            if (!identifier == "" && !name == "") {
                 var mime_types = editor.value ("mimetypes").to_array ();
                 var optional_mime_types = editor.value ("optional_mimetypes").to_array ();
 

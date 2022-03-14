@@ -68,10 +68,10 @@ public class DetermineAuthTypeJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void start () {
+    public new void start () {
         GLib.info ("Determining auth type for " + this.account.dav_url ());
 
-        Soup.Request request;
+        Soup.Request request = new Soup.Request ();
         // Prevent HttpCredentialsAccessManager from setting an Authorization header.
         request.attribute (HttpCredentials.DontAddCredentialsAttribute, true);
         // Don't reuse previous auth credentials
@@ -132,12 +132,12 @@ public class DetermineAuthTypeJob : GLib.Object {
     }
 
 
-    private void on_signal_propfind_finished (Soup.Reply reply) {
+    private void on_signal_propfind_finished (GLib.InputStream reply) {
         var auth_challenge = reply.raw_header ("WWW-Authenticate").down ();
         if (auth_challenge.contains ("bearer ")) {
             this.result_propfind = OAuth;
         } else {
-            if (auth_challenge.is_empty ()) {
+            if (auth_challenge == "") {
                 GLib.warning ("Did not receive WWW-Authenticate reply to auth-test PROPFIND");
             } else {
                 GLib.warning ("Unknown WWW-Authenticate reply to auth-test PROPFIND: " + auth_challenge);

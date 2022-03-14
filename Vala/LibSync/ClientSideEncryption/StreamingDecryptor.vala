@@ -26,7 +26,7 @@ public class StreamingDecryptor : GLib.Object {
     public StreamingDecryptor (string key, string initialization_vector, uint64 total_size) {
         this.is_initialized = false;
         this.total_size = total_size;
-        if (this.context && !key.is_empty () && !initialization_vector.is_empty () && total_size > 0) {
+        if (this.context && !key == "" && !initialization_vector == "" && total_size > 0) {
             this.is_initialized = true;
 
             // Initialize the decryption operation.

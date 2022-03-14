@@ -150,7 +150,7 @@ public class VfsSuffix : Vfs {
     public bool is_dehydrated_placeholder (string file_path) {
         if (!file_path.has_suffix (file_suffix ()))
             return false;
-        GLib.FileInfo file_info = new GLib.FileInfo (file_path);
+        GLib.FileInfo file_info = GLib.File.new_for_path (file_path);
         return file_info.exists () && file_info.size () == 1;
     }
 

@@ -52,14 +52,14 @@ public class PropagatorCompositeJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public void append_task (unowned SyncFileItem item) {
+    public void append_task (SyncFileItem item) {
         this.tasks_to_do.append (item);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public bool on_signal_schedule_self_or_child () {
+    public new bool on_signal_schedule_self_or_child () {
         if (this.state == Finished) {
             return false;
         }
@@ -87,7 +87,7 @@ public class PropagatorCompositeJob : PropagatorJob {
 
         // Now it's our turn, check if we have something left to do.
         // First, convert a task to a job if necessary
-        while (this.jobs_to_do.is_empty () && !this.tasks_to_do.is_empty ()) {
+        while (this.jobs_to_do == "" && !this.tasks_to_do == "") {
             unowned SyncFileItem next_task = this.tasks_to_do.first ();
             this.tasks_to_do.remove (0);
             PropagatorJob job = propagator ().create_job (next_task);
@@ -99,7 +99,7 @@ public class PropagatorCompositeJob : PropagatorJob {
             break;
         }
         // Then run the next job
-        if (!this.jobs_to_do.is_empty ()) {
+        if (!this.jobs_to_do == "") {
             PropagatorJob next_job = this.jobs_to_do.first ();
             this.jobs_to_do.remove (0);
             this.running_jobs.append (next_job);
@@ -108,7 +108,7 @@ public class PropagatorCompositeJob : PropagatorJob {
 
         // If neither us or our children had stuff left to do we could hang. Make sure
         // we mark this job as on_signal_finished so that the propagator can schedule a new one.
-        if (this.jobs_to_do.is_empty () && this.tasks_to_do.is_empty () && this.running_jobs.is_empty ()) {
+        if (this.jobs_to_do == "" && this.tasks_to_do == "" && this.running_jobs == "") {
             // Our parent jobs are already iterating over their running jobs, post to the event loop
             // to avoid removing ourself from that list while they iterate.
             QMetaObject.invoke_method (this, "on_signal_finalize", Qt.QueuedConnection);
@@ -119,7 +119,7 @@ public class PropagatorCompositeJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public JobParallelism parallelism () {
+    public new JobParallelism parallelism () {
         // If any of the running sub jobs is not parallel, we have to wait
         for (int i = 0; i < this.running_jobs.count (); ++i) {
             if (this.running_jobs.at (i).parallelism () != JobParallelism.FULL_PARALLELISM) {
@@ -132,10 +132,10 @@ public class PropagatorCompositeJob : PropagatorJob {
 
     /***********************************************************
     Abort synchronously or asynchronously - some jobs
-    require to be on_signal_finished without immediete on_signal_abort (on_signal_abort on job might
+    require to be on_signal_finished without immediete abort (abort on job might
     cause conflicts/duplicated files - owncloud/client/issues/5949)
     ***********************************************************/
-    public void on_signal_abort (PropagatorJob.AbortType abort_type) {
+    public new void abort (PropagatorJob.AbortType abort_type) {
         if (!this.running_jobs.empty ()) {
             this.aborts_count = this.running_jobs.size ();
             foreach (PropagatorJob j in this.running_jobs) {
@@ -143,7 +143,7 @@ public class PropagatorCompositeJob : PropagatorJob {
                     connect (j, PropagatorJob.signal_abort_finished,
                             this, PropagatorCompositeJob.on_signal_sub_job_abort_finished);
                 }
-                j.on_signal_abort (abort_type);
+                j.abort (abort_type);
             }
         } else if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
             /* emit */ signal_abort_finished ();
@@ -153,7 +153,7 @@ public class PropagatorCompositeJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public int64 committed_disk_space () {
+    public new int64 committed_disk_space () {
         int64 needed = 0;
         foreach (PropagatorJob job in this.running_jobs) {
             needed += job.committed_disk_space ();
@@ -168,7 +168,7 @@ public class PropagatorCompositeJob : PropagatorJob {
         // Count that job has been on_signal_finished
         this.aborts_count--;
 
-        // Emit on_signal_abort if last job has been aborted
+        // Emit abort if last job has been aborted
         if (this.aborts_count == 0) {
             /* emit */ signal_abort_finished ();
         }
@@ -207,7 +207,7 @@ public class PropagatorCompositeJob : PropagatorJob {
             this.has_error = status;
         }
 
-        if (this.jobs_to_do.is_empty () && this.tasks_to_do.is_empty () && this.running_jobs.is_empty ()) {
+        if (this.jobs_to_do == "" && this.tasks_to_do == "" && this.running_jobs == "") {
             on_signal_finalize ();
         } else {
             propagator ().schedule_next_job ();

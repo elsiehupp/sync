@@ -97,7 +97,7 @@ public class DiscoverySingleDirectoryJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void start () {
+    public new void start () {
         // Start the actual HTTP job
         var ls_col_job = new LsColJob (this.account, this.sub_path, this);
 
@@ -137,9 +137,9 @@ public class DiscoverySingleDirectoryJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_abort () {
+    public new void abort () {
         if (this.ls_col_job && this.ls_col_job.reply ()) {
-            this.ls_col_job.reply ().on_signal_abort ();
+            this.ls_col_job.reply ().abort ();
         }
     }
 
@@ -156,7 +156,7 @@ public class DiscoverySingleDirectoryJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_ls_job_finished_with_error_slot (Soup.Reply *);
+    private void on_signal_ls_job_finished_with_error_slot (GLib.InputStream *);
 
 
     /***********************************************************

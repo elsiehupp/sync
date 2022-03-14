@@ -171,7 +171,7 @@ public class DiscoveryPhase : GLib.Object {
 
 
     signal void fatal_error (string error_string);
-    signal void item_discovered (unowned SyncFileItem item);
+    signal void item_discovered (SyncFileItem item);
     signal void signal_finished ();
 
 
@@ -218,7 +218,7 @@ public class DiscoveryPhase : GLib.Object {
     /***********************************************************
     ***********************************************************/
     bool is_in_selective_sync_block_list (string path) {
-        if (this.selective_sync_block_list.is_empty ()) {
+        if (this.selective_sync_block_list == "") {
             // If there is no block list, everything is allowed
             return false;
         }
@@ -343,7 +343,7 @@ public class DiscoveryPhase : GLib.Object {
 
 
     /***********************************************************
-    If the database-path is scheduled for deletion, on_signal_abort it.
+    If the database-path is scheduled for deletion, abort it.
 
     Check if there is already a job to delete that item:
     If that's not the case, return { false, "" }.
@@ -384,7 +384,7 @@ public class DiscoveryPhase : GLib.Object {
                     GLib.warning (" (*it).is_restoration " + (*it).is_restoration);
                     GLib.assert (false);
                     add_error_to_gui (SyncFileItem.Status.FatalError, _("Error while canceling delete of a file"), original_path);
-                    /* emit */ fatal_error (_("Error while canceling delete of %1").arg (original_path));
+                    /* emit */ fatal_error (_("Error while canceling delete of %1").printf (original_path));
                 }
                 (*it).instruction = CSYNC_INSTRUCTION_NONE;
                 result = true;
@@ -428,7 +428,7 @@ public class DiscoveryPhase : GLib.Object {
 
         // Once the main job has on_signal_finished recurse here to execute the remaining
         // jobs for queued deleted directories.
-        if (!this.queued_deleted_directories.is_empty ()) {
+        if (!this.queued_deleted_directories == "") {
             var next_job = this.queued_deleted_directories.take (this.queued_deleted_directories.first_key ());
             start_job (next_job);
         } else {
@@ -517,7 +517,7 @@ public class DiscoveryPhase : GLib.Object {
                 result.remote_perm = RemotePermissions.from_server_string (value);
             } else if (property == "checksums") {
                 result.checksum_header = find_best_checksum (value.to_utf8 ());
-            } else if (property == "share-types" && !value.is_empty ()) {
+            } else if (property == "share-types" && !value == "") {
                 // Since GLib.HashTable is sorted, "share-types" is always after "permissions".
                 if (result.remote_perm.is_null ()) {
                     GLib.warning ("Server returned a share type but no permissions?");

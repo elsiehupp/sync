@@ -5,27 +5,26 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 //  #include <QLoggingCategory>
-//  #include <QNetworkCookie>
 //  #include <QDataStream>
 //  #include <QDir>
-//  #include <QNetworkCookieJar>
+//  #include <Soup.CookieJar>
 
 namespace Occ {
 namespace LibSync {
 
-//  using QNetworkCookieJar.all_cookies;
+//  using Soup.CookieJar.all_cookies;
 
 /***********************************************************
 @brief The CookieJar class
 @ingroup libsync
 ***********************************************************/
-public class CookieJar : QNetworkCookieJar {
+public class CookieJar : Soup.CookieJar {
 
     const uint32 JAR_VERSION = 23;
 
     /***********************************************************
     ***********************************************************/
-    signal void new_cookies_for_url (GLib.List<QNetworkCookie> cookie_list, GLib.Uri url);
+    signal void new_cookies_for_url (GLib.List<Soup.Cookie> cookie_list, GLib.Uri url);
 
     /***********************************************************
     ***********************************************************/
@@ -36,8 +35,8 @@ public class CookieJar : QNetworkCookieJar {
 
     /***********************************************************
     ***********************************************************/
-    public bool cookies_from_url (GLib.List<QNetworkCookie> cookie_list, GLib.Uri url) {
-        if (QNetworkCookieJar.cookies_from_url (cookie_list, url)) {
+    public bool cookies_from_url (GLib.List<Soup.Cookie> cookie_list, GLib.Uri url) {
+        if (Soup.CookieJar.cookies_from_url (cookie_list, url)) {
             /* Q_EMIT */ new_cookies_for_url (cookie_list, url);
             return true;
         }
@@ -48,8 +47,8 @@ public class CookieJar : QNetworkCookieJar {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.List<QNetworkCookie> cookies_for_url (GLib.Uri url) {
-        GLib.List<QNetworkCookie> cookies = QNetworkCookieJar.cookies_for_url (url);
+    public GLib.List<Soup.Cookie> cookies_for_url (GLib.Uri url) {
+        GLib.List<Soup.Cookie> cookies = Soup.CookieJar.cookies_for_url (url);
         GLib.debug (url + " requests: " + cookies);
         return cookies;
     }
@@ -65,7 +64,7 @@ public class CookieJar : QNetworkCookieJar {
     /***********************************************************
     ***********************************************************/
     public bool save (string filename) {
-        const GLib.FileInfo info = new GLib.FileInfo (filename);
+        const GLib.FileInfo info = GLib.File.new_for_path (filename);
         if (!info.directory ().exists ()) {
             info.directory ().mkpath (".");
         }
@@ -85,7 +84,7 @@ public class CookieJar : QNetworkCookieJar {
     /***********************************************************
     ***********************************************************/
     public bool restore (string filename) {
-        const GLib.FileInfo info = new GLib.FileInfo (filename);
+        const GLib.FileInfo info = GLib.File.new_for_path (filename);
         if (!info.exists ()) {
             return false;
         }
@@ -95,7 +94,7 @@ public class CookieJar : QNetworkCookieJar {
             return false;
         }
         QDataStream stream = new QDataStream (file);
-        GLib.List<QNetworkCookie> list;
+        GLib.List<Soup.Cookie> list;
         stream >> list;
         all_cookies (remove_expired (list));
         file.close ();
@@ -105,9 +104,9 @@ public class CookieJar : QNetworkCookieJar {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.List<QNetworkCookie> remove_expired (GLib.List<QNetworkCookie> cookies) {
-        GLib.List<QNetworkCookie> updated_list;
-        foreach (QNetworkCookie cookie in cookies) {
+    private GLib.List<Soup.Cookie> remove_expired (GLib.List<Soup.Cookie> cookies) {
+        GLib.List<Soup.Cookie> updated_list;
+        foreach (Soup.Cookie cookie in cookies) {
             if (cookie.expiration_date () > GLib.DateTime.current_date_time_utc () && !cookie.is_session_cookie ()) {
                 updated_list += cookie;
             }
@@ -116,7 +115,7 @@ public class CookieJar : QNetworkCookieJar {
     }
 
 
-    //  QDataStream operator<< (QDataStream stream, GLib.List<QNetworkCookie> list) {
+    //  QDataStream operator<< (QDataStream stream, GLib.List<Soup.Cookie> list) {
     //      stream + JAR_VERSION;
     //      stream + uint32 (list.size ());
     //      foreach (var cookie in list)
@@ -125,7 +124,7 @@ public class CookieJar : QNetworkCookieJar {
     //  }
 
 
-    //  QDataStream operator>> (QDataStream stream, GLib.List<QNetworkCookie> list) {
+    //  QDataStream operator>> (QDataStream stream, GLib.List<Soup.Cookie> list) {
     //      list.clear ();
 
     //      uint32 version = 0;
@@ -139,7 +138,7 @@ public class CookieJar : QNetworkCookieJar {
     //      for (uint32 i = 0; i < count; ++i) {
     //          string value;
     //          stream >> value;
-    //          GLib.List<QNetworkCookie> new_cookies = QNetworkCookie.parse_cookies (value);
+    //          GLib.List<Soup.Cookie> new_cookies = Soup.Cookie.parse_cookies (value);
     //          if (new_cookies.count () == 0 && value.length () != 0) {
     //              GLib.warning ("CookieJar : Unable to parse saved cookie:" + value;
     //          }

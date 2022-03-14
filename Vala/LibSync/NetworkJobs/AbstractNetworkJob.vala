@@ -7,8 +7,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 //  #include <QLoggingCategory>
 //  #include <Soup.Request>
-//  #include <QNetworkAccessManager>
-//  #include <Soup.Request>
 //  #include <QSslConfigur
 //  #include <Soup.Buffer>
 //  #include <QXmlStrea
@@ -21,7 +19,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QMetaEnum>
 //  #include <QRegularExpression>
 
-//  #include <Soup.Request>
 //  #include <QPointer>
 //  #include <QElapsedTimer>
 //  #include <QTimer>
@@ -46,7 +43,7 @@ public class AbstractNetworkJob : GLib.Object {
 
         /***********************************************************
         ***********************************************************/
-        public NetworkJobTimeoutPauser (Soup.Reply reply) {
+        public NetworkJobTimeoutPauser (GLib.InputStream reply) {
             this.timer = reply.property ("timer").value<QTimer> ();
             if (!this.timer.is_null ()) {
                 this.timer.stop ();
@@ -72,7 +69,7 @@ public class AbstractNetworkJob : GLib.Object {
 
     /***********************************************************
     On get ():
-    //  ASSERT (!this.response_timestamp.is_empty ());
+    //  ASSERT (!this.response_timestamp == "");
     ***********************************************************/
     string response_timestamp { public get; protected set; }
 
@@ -107,7 +104,7 @@ public class AbstractNetworkJob : GLib.Object {
     (QPointer because the NetworkManager may be destroyed before
     the jobs at exit)
     ***********************************************************/
-    QPointer<Soup.Reply> reply {
+    QPointer<GLib.InputStream> reply {
         public get {
             return this.reply;
         }
@@ -116,7 +113,7 @@ public class AbstractNetworkJob : GLib.Object {
                 value.property ("do_not_handle_auth", true);
             }
 
-            Soup.Reply old = this.reply;
+            GLib.InputStream old = this.reply;
             this.reply = value;
             delete old;
         }
@@ -142,7 +139,7 @@ public class AbstractNetworkJob : GLib.Object {
 
     \a reply is never null
     ***********************************************************/
-    signal void signal_network_error (Soup.Reply reply);
+    signal void signal_network_error (GLib.InputStream reply);
     signal void signal_network_activity ();
 
 
@@ -153,7 +150,7 @@ public class AbstractNetworkJob : GLib.Object {
     \a target_url Where to redirect to
     \a redirect_count Counts redirect hops, first is 0.
     ***********************************************************/
-    signal void redirected (Soup.Reply reply, GLib.Uri target_url, int redirect_count);
+    signal void redirected (GLib.InputStream reply, GLib.Uri target_url, int redirect_count);
 
     /***********************************************************
     ***********************************************************/
@@ -172,13 +169,13 @@ public class AbstractNetworkJob : GLib.Object {
         this.timer.interval ( (http_timeout ? http_timeout : 300) * 1000); // default to 5 minutes.
         connect (&this.timer, QTimer.timeout, this, AbstractNetworkJob.on_signal_timeout);
 
-        connect (this, AbstractNetworkJob.signal_network_activity, this, AbstractNetworkJob.on_signal_reset_timeout);
+        connect (this, AbstractNetworkJob.signal_network_activity, this, AbstractNetworkJob.reset_timeout);
 
         // Network activity on the propagator jobs (GET/PUT) keeps all requests alive.
         // This is a workaround for OC instances which only support one
         // parallel up and download
         if (this.account) {
-            connect (this.account.data (), Account.signal_propagator_network_activity, this, AbstractNetworkJob.on_signal_reset_timeout);
+            connect (this.account.data (), Account.signal_propagator_network_activity, this, AbstractNetworkJob.reset_timeout);
         }
     }
 
@@ -190,11 +187,11 @@ public class AbstractNetworkJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void start () {
+    public new void start () {
         this.timer.start ();
 
         const GLib.Uri url = account ().url ();
-        const string display_url = "%1://%2%3".arg (url.scheme ()).arg (url.host ()).arg (url.path ());
+        const string display_url = "%1://%2%3".printf (url.scheme ()).printf (url.host ()).printf (url.path ());
 
         string parent_meta_object_name = parent () ? parent ().meta_object ().class_name (): "";
         GLib.info (meta_object ().class_name () + " created for " + display_url + " + " + path () + parent_meta_object_name);
@@ -254,7 +251,7 @@ public class AbstractNetworkJob : GLib.Object {
     ***********************************************************/
     public string error_string_parsing_body (string body = null) {
         string base = error_string ();
-        if (base.is_empty () || !reply ()) {
+        if (base == "" || !reply ()) {
             return "";
         }
 
@@ -265,8 +262,8 @@ public class AbstractNetworkJob : GLib.Object {
 
         string extra = extract_error_message (reply_body);
         // Don't append the XML error message to a OC-ErrorString message.
-        if (!extra.is_empty () && !reply ().has_raw_header ("OC-ErrorString")) {
-            return string.from_latin1 ("%1 (%2)").arg (base, extra);
+        if (!extra == "" && !reply ().has_raw_header ("OC-ErrorString")) {
+            return string.from_latin1 ("%1 (%2)").printf (base, extra);
         }
 
         return base;
@@ -282,7 +279,7 @@ public class AbstractNetworkJob : GLib.Object {
         GLib.Uri requested_url = request.url ();
         string verb = HttpLogger.request_verb (*this.reply);
         GLib.info ("Restarting " + verb + requested_url);
-        on_signal_reset_timeout ();
+        reset_timeout ();
         if (this.request_body) {
             this.request_body.seek (0);
         }
@@ -307,7 +304,7 @@ public class AbstractNetworkJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_reset_timeout () {
+    public void reset_timeout () {
         int64 interval = this.timer.interval ();
         this.timer.stop ();
         this.timer.start (interval);
@@ -321,7 +318,7 @@ public class AbstractNetworkJob : GLib.Object {
 
     Takes ownership of the request_body (to allow redirects).
     ***********************************************************/
-    protected Soup.Reply send_request_for_device (
+    protected GLib.InputStream send_request_for_device (
         string verb,
         GLib.Uri url,
         Soup.Request request = Soup.Request (),
@@ -333,7 +330,7 @@ public class AbstractNetworkJob : GLib.Object {
     }
 
 
-    protected Soup.Reply send_request_for_multipart (
+    protected GLib.InputStream send_request_for_multipart (
         string verb,
         GLib.Uri url,
         Soup.Request request,
@@ -350,7 +347,7 @@ public class AbstractNetworkJob : GLib.Object {
     but the old API allowed that. We have this undefined
     overload to help catch usage errors
     ***********************************************************/
-    protected Soup.Reply send_request_for_relative_path (
+    protected GLib.InputStream send_request_for_relative_path (
         string verb,
         string relative_path,
         Soup.Request request = Soup.Request (),
@@ -366,12 +363,12 @@ public class AbstractNetworkJob : GLib.Object {
 
 
     /***********************************************************
-    Makes this job drive a pre-made Soup.Reply
+    Makes this job drive a pre-made GLib.InputStream
 
     This reply cannot have a QIODevice request body because we can't get
     at it and thus not resend it in case of redirects.
     ***********************************************************/
-    protected void adopt_request (Soup.Reply reply) {
+    protected void adopt_request (GLib.InputStream reply) {
         add_timer (reply);
         reply (reply);
         up_connections (reply);
@@ -379,10 +376,10 @@ public class AbstractNetworkJob : GLib.Object {
     }
 
 
-    protected void up_connections (Soup.Reply reply) {
+    protected void up_connections (GLib.InputStream reply) {
         connect (reply, Soup.Reply.on_signal_finished, this, AbstractNetworkJob.on_signal_finished);
         connect (reply, Soup.Reply.encrypted, this, AbstractNetworkJob.signal_network_activity);
-        connect (reply.manager (), QNetworkAccessManager.signal_proxy_authentication_required, this, AbstractNetworkJob.signal_network_activity);
+        connect (reply.manager (), Soup.Session.signal_proxy_authentication_required, this, AbstractNetworkJob.signal_network_activity);
         connect (reply, Soup.Reply.signal_ssl_errors, this, AbstractNetworkJob.signal_network_activity);
         connect (reply, Soup.Reply.meta_data_changed, this, AbstractNetworkJob.signal_network_activity);
         connect (reply, Soup.Reply.download_progress, this, AbstractNetworkJob.signal_network_activity);
@@ -397,7 +394,7 @@ public class AbstractNetworkJob : GLib.Object {
     reply () changes. For things like setting up additional
     signal connections on the new reply.
     ***********************************************************/
-    protected virtual void new_reply_hook (Soup.Reply reply) {}
+    protected virtual void new_reply_hook (GLib.InputStream reply) {}
 
 
     /***********************************************************
@@ -431,7 +428,7 @@ public class AbstractNetworkJob : GLib.Object {
     ***********************************************************/
     protected virtual void on_signal_timed_out () {
         if (reply ()) {
-            reply ().on_signal_abort ();
+            reply ().abort ();
         } else {
             delete_later ();
         }
@@ -444,14 +441,14 @@ public class AbstractNetworkJob : GLib.Object {
             return "OK";
         } else {
             string enum_str = QMetaEnum.from_type<Soup.Reply.NetworkError> ().value_to_key (static_cast<int> (reply ().error ()));
-            return "%1 %2".arg (enum_str, error_string ());
+            return "%1 %2".printf (enum_str, error_string ());
         }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private Soup.Reply add_timer (Soup.Reply reply) {
+    private GLib.InputStream add_timer (GLib.InputStream reply) {
         reply.property ("timer", GLib.Variant.from_value (&this.timer));
         return reply;
     }
@@ -474,7 +471,7 @@ public class AbstractNetworkJob : GLib.Object {
         if (this.reply.error () == Soup.Reply.ContentReSendError
             && this.reply.attribute (Soup.Request.HTTP2WasUsedAttribute).to_bool ()) {
 
-            if ( (this.request_body && !this.request_body.is_sequential ()) || verb.is_empty ()) {
+            if ( (this.request_body && !this.request_body.is_sequential ()) || verb == "") {
                 GLib.warning (
                     "Can't resend HTTP2 request; verb or body not suitable "
                     + this.reply.request ().url () + verb + this.request_body
@@ -488,7 +485,7 @@ public class AbstractNetworkJob : GLib.Object {
                 GLib.info ("HTTP2 resending " + this.reply.request ().url ());
                 this.http2_resend_count++;
 
-                on_signal_reset_timeout ();
+                reset_timeout ();
                 if (this.request_body) {
                     if (!this.request_body.is_open ()) {
                         this.request_body.open (QIODevice.ReadOnly);
@@ -524,7 +521,7 @@ public class AbstractNetworkJob : GLib.Object {
 
         GLib.Uri requested_url = reply ().request ().url ();
         GLib.Uri redirect_url = reply ().attribute (Soup.Request.RedirectionTargetAttribute).to_url ();
-        if (this.follow_redirects && !redirect_url.is_empty ()) {
+        if (this.follow_redirects && !redirect_url == "") {
             // Redirects may be relative
             if (redirect_url.is_relative ())
                 redirect_url = requested_url.resolved (redirect_url);
@@ -533,7 +530,7 @@ public class AbstractNetworkJob : GLib.Object {
             // moves these arguments to the body if no explicit body is specified.
             // This can cause problems with redirected requests, because the redirect url
             // will no longer contain these query arguments.
-            if (reply ().operation () == QNetworkAccessManager.PostOperation
+            if (reply ().operation () == Soup.Session.PostOperation
                 && requested_url.has_query ()
                 && !redirect_url.has_query ()
                 && !this.request_body) {
@@ -548,7 +545,7 @@ public class AbstractNetworkJob : GLib.Object {
                 GLib.warning (this + " Redirect loop detected!");
             } else if (this.request_body && this.request_body.is_sequential ()) {
                 GLib.warning (this + " cannot redirect request with sequential body.");
-            } else if (verb.is_empty ()) {
+            } else if (verb == "") {
                 GLib.warning (this + " cannot redirect request: could not detect original verb.");
             } else {
                 /* emit */ redirected (this.reply, redirect_url, this.redirect_count);
@@ -559,7 +556,7 @@ public class AbstractNetworkJob : GLib.Object {
 
                     // Create the redirected request and send it
                     GLib.info ("Redirecting " + verb + requested_url + redirect_url);
-                    on_signal_reset_timeout ();
+                    reset_timeout ();
                     if (this.request_body) {
                         if (!this.request_body.is_open ()) {
                             // Avoid the QIODevice.seek (Soup.Buffer) : The device is not open warning message
@@ -612,7 +609,7 @@ public class AbstractNetworkJob : GLib.Object {
             reader.read_next_start_element ();
             if (reader.name () == "message") {
                 string message = reader.read_element_text ();
-                if (!message.is_empty ()) {
+                if (!message == "") {
                     return message;
                 }
             } else if (reader.name () == "exception") {
@@ -630,15 +627,15 @@ public class AbstractNetworkJob : GLib.Object {
     string error_message (string base_error, string body) {
         string message = base_error;
         string extra = extract_error_message (body);
-        if (!extra.is_empty ()) {
-            message += string.from_latin1 (" (%1)").arg (extra);
+        if (!extra == "") {
+            message += string.from_latin1 (" (%1)").printf (extra);
         }
         return message;
     }
 
 
     /***********************************************************
-    Nicer error_string () for Soup.Reply
+    Nicer error_string () for GLib.InputStream
 
     By default Soup.Reply.error_string () often produces messages like
     "Error downloading <url> - server replied : <reason>"
@@ -647,17 +644,17 @@ public class AbstractNetworkJob : GLib.Object {
 
     This function produces clearer error messages for HTTP errors.
     ***********************************************************/
-    string network_reply_error_string (Soup.Reply reply) {
+    string network_reply_error_string (GLib.InputStream reply) {
         string base_string = reply.error_string ();
         int http_status = reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         string http_reason = reply.attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ();
 
         // Only adjust HTTP error messages of the expected format.
-        if (http_reason.is_empty () || http_status == 0 || !base_string.contains (http_reason)) {
+        if (http_reason == "" || http_status == 0 || !base_string.contains (http_reason)) {
             return base_string;
         }
 
-        return _(" (Server replied \"%1 %2\" to \"%3 %4\")").arg (string.number (http_status), http_reason, HttpLogger.request_verb (reply), reply.request ().url ().to_display_string ());
+        return _(" (Server replied \"%1 %2\" to \"%3 %4\")").printf (string.number (http_status), http_reason, HttpLogger.request_verb (reply), reply.request ().url ().to_display_string ());
     }
 
 } // class AbstractNetworkJob

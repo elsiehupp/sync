@@ -23,7 +23,7 @@ public class UpdateMetadataApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public UpdateMetadataApiJob (
-        unowned Account account,
+        Account account,
         string file_identifier,
         string b64_metadata,
         string locked_token,
@@ -39,7 +39,7 @@ public class UpdateMetadataApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public new void start () {
-        Soup.Request request;
+        Soup.Request request = new Soup.Request ();
         request.raw_header ("OCS-APIREQUEST", "true");
         request.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
 

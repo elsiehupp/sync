@@ -67,7 +67,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
 
     /***********************************************************
     ***********************************************************/
-    public OcsUserStatusConnector (unowned Account account, GLib.Object parent = new GLib.Object ()) {
+    public OcsUserStatusConnector (Account account, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.account = account;
         GLib.assert (this.account);

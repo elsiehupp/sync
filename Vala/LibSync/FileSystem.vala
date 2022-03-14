@@ -71,7 +71,7 @@ public class FileSystem : GLib.Object {
             && (stat.modtime != 0)) {
             result = stat.modtime;
         } else {
-            result = Utility.q_date_time_to_time_t (GLib.FileInfo (filename).last_modified ());
+            result = Utility.q_date_time_to_time_t (GLib.File.new_for_path (filename).last_modified ());
             GLib.warning ("Could not get modification time for " + filename
                         + "with csync, using GLib.FileInfo: " + result);
         }
@@ -100,7 +100,7 @@ public class FileSystem : GLib.Object {
     See https://bugreports.qt.io/browse/QTBUG-24831.
     ***********************************************************/
     public static int64 get_size (string filename) {
-        return GLib.FileInfo (filename).size ();
+        return GLib.File.new_for_path (filename).size ();
     }
 
 
@@ -174,7 +174,7 @@ public class FileSystem : GLib.Object {
             bool remove_ok = false;
             // The use of is_sym_link here is okay:
             // we never want to go into this branch for .lnk files
-            bool is_dir = file_info.is_dir () && !file_info.is_sym_link ();
+            bool is_dir = file_info.query_info ().get_file_type () == FileType.DIRECTORY && !file_info.is_sym_link ();
             if (is_dir) {
                 remove_ok = remove_recursively (path + "/" + dir_iterator.filename (), signal_delegate, errors); // recursive
             } else {
@@ -186,7 +186,7 @@ public class FileSystem : GLib.Object {
                 } else {
                     if (errors) {
                         errors.append (_("FileSystem", "Error removing \"%1\" : %2")
-                                            .arg (QDir.to_native_separators (dir_iterator.file_path ()), remove_error));
+                                            .printf (QDir.to_native_separators (dir_iterator.file_path ()), remove_error));
                     }
                     GLib.warning ("Error removing " + dir_iterator.file_path () + " : " + remove_error);
                 }
@@ -203,7 +203,7 @@ public class FileSystem : GLib.Object {
             } else {
                 if (errors) {
                     errors.append (_("FileSystem", "Could not remove folder \"%1\"")
-                                        .arg (QDir.to_native_separators (path)));
+                                        .printf (QDir.to_native_separators (path)));
                 }
                 GLib.warning ("Error removing folder " + path);
             }

@@ -44,7 +44,7 @@ public class CleanupPollsJob : GLib.Object {
     Start the job.  After the job is completed, it will emit either on_signal_finished or aborted, and it
     will destroy itself.
     ***********************************************************/
-    public void start () {
+    public new void start () {
         if (this.poll_infos.empty ()) {
             /* emit */ finished ();
             delete_later ();

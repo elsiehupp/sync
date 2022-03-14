@@ -94,13 +94,14 @@ public class LocalDiscoveryTracker : GLib.Object {
     /***********************************************************
     Success and failure of sync items adjust what the next sync is
     supposed to do.
+
+    For successes, we want to wipe the file from the list to
+    ensure we don't rediscover it even if this overall sync fails.
+
+    For failures, we want to add the file to the list so the
+    next sync will be able to retry it.
     ***********************************************************/
-    public void on_signal_item_completed (unowned SyncFileItem item) {
-        // For successes, we want to wipe the file from the list to ensure we don't
-        // rediscover it even if this overall sync fails.
-        //
-        // For failures, we want to add the file to the list so the next sync
-        // will be able to retry it.
+    public void on_signal_item_completed (SyncFileItem item) {
         if (item.status == SyncFileItem.Status.SUCCESS
             || item.status == SyncFileItem.Status.FILE_IGNORED
             || item.status == SyncFileItem.Status.RESTORATION
@@ -110,7 +111,7 @@ public class LocalDiscoveryTracker : GLib.Object {
                         || item.instruction == CSYNC_INSTRUCTION_UPDATE_METADATA))) {
             if (this.previous_local_discovery_paths.erase (item.file.to_utf8 ()))
                 GLib.debug ("Wiped successful item " + item.file);
-            if (!item.rename_target.is_empty () && this.previous_local_discovery_paths.erase (item.rename_target.to_utf8 ()))
+            if (!item.rename_target == "" && this.previous_local_discovery_paths.erase (item.rename_target.to_utf8 ()))
                 GLib.debug ("Wiped successful item " + item.rename_target);
         } else {
             this.local_discovery_paths.insert (item.file.to_utf8 ());

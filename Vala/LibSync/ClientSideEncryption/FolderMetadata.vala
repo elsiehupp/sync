@@ -14,9 +14,9 @@ public class FolderMetadata : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public FolderMetadata.for_account (unowned Account account, string metadata = "", int status_code = -1) {
+    public FolderMetadata.for_account (Account account, string metadata = "", int status_code = -1) {
         this.account = account;
-        if (metadata.is_empty () || status_code == 404) {
+        if (metadata == "" || status_code == 404) {
             GLib.info ("Setting up empty metadata.");
             up_empty_metadata ();
         } else {
@@ -38,7 +38,7 @@ public class FolderMetadata : GLib.Object {
         string decrypt_result = EncryptionHelper.decrypt_string_asymmetric (
                         key, string.from_base64 (encrypted_metadata));
 
-        if (decrypt_result.is_empty ()) {
+        if (decrypt_result == "") {
         GLib.debug ("ERROR. Could not decrypt the metadata key.");
         return {};
         }
@@ -114,7 +114,7 @@ public class FolderMetadata : GLib.Object {
             encrypted_doc.object (encrypted);
 
             string encrypted_encrypted = encrypt_json_object (encrypted_doc.to_json (QJsonDocument.Compact), this.metadata_keys.last ());
-            if (encrypted_encrypted.is_empty ()) {
+            if (encrypted_encrypted == "") {
                 GLib.debug ("Metadata generation failed!");
             }
 
@@ -221,7 +221,7 @@ public class FolderMetadata : GLib.Object {
             Now we should be compatible with Android and IOS. Maybe we can fix it later.
             ***********************************************************/
             string b64Decrypted_key = decrypt_metadata_key (curr_b64Pass);
-            if (b64Decrypted_key.is_empty ()) {
+            if (b64Decrypted_key == "") {
                 GLib.debug ("Could not decrypt metadata for key " + it.key ());
                 continue;
             }
