@@ -203,8 +203,8 @@ public class SyncFileStatusTracker : GLib.Object {
         GLib.HashTable<string, int> old_sync_count;
         std.swap (this.sync_count, old_sync_count);
         for (var it = old_sync_count.begin (); it != old_sync_count.end (); ++it) {
-            // Don't announce folders, file_status expect only paths without '/', otherwise it asserts
-            if (it.key ().has_suffix ('/')) {
+            // Don't announce folders, file_status expect only paths without "/", otherwise it asserts
+            if (it.key ().has_suffix ("/")) {
                 continue;
             }
 
@@ -232,7 +232,7 @@ public class SyncFileStatusTracker : GLib.Object {
                 return severity;
             } else if (severity == SyncFileStatus.SyncFileStatusTag.STATUS_ERROR
                 && path_starts_with (problem_path, path_to_match)
-                && (path_to_match.is_empty () || problem_path.at (path_to_match.size ()) == '/')) {
+                && (path_to_match.is_empty () || problem_path.at (path_to_match.size ()) == "/")) {
                 return SyncFileStatus.SyncFileStatusTag.STATUS_WARNING;
             } else if (!path_starts_with (problem_path, path_to_match)) {
                 // Starting at lower_bound we get the first path that is not smaller,
@@ -290,7 +290,7 @@ public class SyncFileStatusTracker : GLib.Object {
         string system_path = this.sync_engine.local_path () + relative_path;
         // SyncEngine.local_path () has a trailing slash, make sure to remove it if the
         // destination is empty.
-        if (system_path.has_suffix ('/')) {
+        if (system_path.has_suffix ("/")) {
             system_path.truncate (system_path.length () - 1);
         }
         return system_path;
@@ -310,8 +310,8 @@ public class SyncFileStatusTracker : GLib.Object {
 
             // We passed from OK to SYNC, increment the parent to keep it marked as
             // SYNC while we propagate ourselves and our own children.
-            //  ASSERT (!relative_path.has_suffix ('/'));
-            int last_slash_index = relative_path.last_index_of ('/');
+            //  ASSERT (!relative_path.has_suffix ("/"));
+            int last_slash_index = relative_path.last_index_of ("/");
             if (last_slash_index != -1)
                 inc_sync_count_and_emit_status_changed (relative_path.left (last_slash_index), SharedFlag.UNKNOWN_SHARED);
             else if (!relative_path.is_empty ())
@@ -334,8 +334,8 @@ public class SyncFileStatusTracker : GLib.Object {
             /* emit */ file_status_changed (get_system_destination (relative_path), status);
 
             // We passed from SYNC to OK, decrement our parent.
-            //  ASSERT (!relative_path.has_suffix ('/'));
-            int last_slash_index = relative_path.last_index_of ('/');
+            //  ASSERT (!relative_path.has_suffix ("/"));
+            int last_slash_index = relative_path.last_index_of ("/");
             if (last_slash_index != -1)
                 dec_sync_count_and_emit_status_changed (relative_path.left (last_slash_index), SharedFlag.UNKNOWN_SHARED);
             else if (!relative_path.is_empty ())
@@ -347,7 +347,7 @@ public class SyncFileStatusTracker : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private SyncFileStatus file_status (string relative_path) {
-        //  ASSERT (!relative_path.has_suffix ('/'));
+        //  ASSERT (!relative_path.has_suffix ("/"));
 
         if (relative_path.is_empty ()) {
             // This is the root sync folder, it doesn't have an entry in the database and won't be walked by csync, so resolve manually.

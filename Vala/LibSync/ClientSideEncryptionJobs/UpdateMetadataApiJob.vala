@@ -11,22 +11,22 @@ public class UpdateMetadataApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.ByteArray file_identifier;
-    private GLib.ByteArray b64_metadata;
-    private GLib.ByteArray token;
+    private string file_identifier;
+    private string b64_metadata;
+    private string token;
 
 
-    signal void success (GLib.ByteArray file_identifier);
-    signal void error (GLib.ByteArray file_identifier, int http_return_code);
+    signal void success (string file_identifier);
+    signal void error (string file_identifier, int http_return_code);
 
 
     /***********************************************************
     ***********************************************************/
     public UpdateMetadataApiJob (
         unowned Account account,
-        GLib.ByteArray file_identifier,
-        GLib.ByteArray b64_metadata,
-        GLib.ByteArray locked_token,
+        string file_identifier,
+        string b64_metadata,
+        string locked_token,
         GLib.Object parent = new GLib.Object ()) {
         
         base (account, E2EE_BASE_URL + "meta-data/" + file_identifier, parent);
@@ -38,7 +38,7 @@ public class UpdateMetadataApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public new void on_signal_start () {
+    public new void start () {
         Soup.Request request;
         request.raw_header ("OCS-APIREQUEST", "true");
         request.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
@@ -54,13 +54,13 @@ public class UpdateMetadataApiJob : AbstractNetworkJob {
         parameters.add_query_item ("meta_data",GLib.Uri.to_percent_encoding (this.b64_metadata));
         parameters.add_query_item ("e2e-token", this.token);
 
-        GLib.ByteArray data = parameters.query ().to_local8Bit ();
+        string data = parameters.query ().to_local8Bit ();
         var buffer = new Soup.Buffer (this);
         buffer.data (data);
 
         GLib.info ("Updating the metadata for the file_identifier " + this.file_identifier.to_string () + " as encrypted.");
         send_request ("PUT", url, request, buffer);
-        AbstractNetworkJob.on_signal_start ();
+        AbstractNetworkJob.start ();
     }
 
 

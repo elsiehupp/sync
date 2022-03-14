@@ -15,11 +15,11 @@ public class DirectEditor : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    GLib.List<GLib.ByteArray> mime_types { public get; private set; }
+    GLib.List<string> mime_types { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
-    GLib.List<GLib.ByteArray> optional_mime_types { public get; private set; }
+    GLib.List<string> optional_mime_types { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
@@ -36,14 +36,14 @@ public class DirectEditor : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void add_mimetype (GLib.ByteArray mime_type) {
+    public void add_mimetype (string mime_type) {
         this.mime_types.append (mime_type);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void add_optional_mimetype (GLib.ByteArray mime_type) {
+    public void add_optional_mimetype (string mime_type) {
         this.optional_mime_types.append (mime_type);
     }
 

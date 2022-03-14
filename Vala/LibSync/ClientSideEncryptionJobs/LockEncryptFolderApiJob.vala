@@ -11,21 +11,21 @@ public class LockEncryptFolderApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.ByteArray file_identifier;
+    private string file_identifier;
 
-    signal void success (GLib.ByteArray file_identifier, GLib.ByteArray token);
-    signal void error (GLib.ByteArray file_identifier, int httpd_error_code);
+    signal void success (string file_identifier, string token);
+    signal void error (string file_identifier, int httpd_error_code);
 
     /***********************************************************
     ***********************************************************/
-    public LockEncryptFolderApiJob (unowned Account account, GLib.ByteArray file_identifier, GLib.Object parent = new GLib.Object ()) {
+    public LockEncryptFolderApiJob (unowned Account account, string file_identifier, GLib.Object parent = new GLib.Object ()) {
         base (account, E2EE_BASE_URL + "lock/" + file_identifier, parent);
         this.file_identifier = file_identifier;
     }
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
+    public void start () {
         Soup.Request request;
         request.raw_header ("OCS-APIREQUEST", "true");
         QUrlQuery query;
@@ -35,7 +35,7 @@ public class LockEncryptFolderApiJob : AbstractNetworkJob {
 
         GLib.info ("Locking the folder with identifier " + this.file_identifier.to_string () + " as encrypted.");
         send_request ("POST", url, request);
-        AbstractNetworkJob.on_signal_start ();
+        AbstractNetworkJob.start ();
     }
 
     protected bool on_signal_finished () {

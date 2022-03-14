@@ -29,13 +29,13 @@ public class HttpCredentialsAccessManager : AccessManager {
                 if (this.credentials.is_using_oauth ()) {
                     request.raw_header ("Authorization", "Bearer " + this.credentials.password ().to_utf8 ());
                 } else {
-                    GLib.ByteArray cred_hash = new GLib.ByteArray (this.credentials.user ().to_utf8 () + ":" + this.credentials.password ().to_utf8 ()).to_base64 ();
+                    string cred_hash = new string (this.credentials.user ().to_utf8 () + ":" + this.credentials.password ().to_utf8 ()).to_base64 ();
                     request.raw_header ("Authorization", "Basic " + cred_hash);
                 }
             } else if (!request.url ().password ().is_empty ()) {
                 // Typically the requests to get or refresh the OAuth access token. The client
                 // credentials are put in the URL from the code making the request.
-                GLib.ByteArray cred_hash = request.url ().user_info ().to_utf8 ().to_base64 ();
+                string cred_hash = request.url ().user_info ().to_utf8 ().to_base64 ();
                 request.raw_header ("Authorization", "Basic " + cred_hash);
             }
         }

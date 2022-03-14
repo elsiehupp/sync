@@ -26,7 +26,7 @@ public class PropagateRemoteMove : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public new void on_signal_start () {
+    public new void start () {
         if (propagator ().abort_requested) {
             return;
         }
@@ -46,7 +46,7 @@ public class PropagateRemoteMove : PropagateItemJob {
                 // corrected "this.encrypted_filename" is later used in propagator ().update_metadata () call that will update the record in the Sync journal DB
 
                 var path = this.item.file;
-                var slash_position = path.last_index_of ('/');
+                var slash_position = path.last_index_of ("/");
                 var parent_path = slash_position >= 0 ? path.left (slash_position): "";
 
                 SyncJournalFileRecord parent_rec;
@@ -58,7 +58,7 @@ public class PropagateRemoteMove : PropagateItemJob {
 
                 var remote_parent_path = parent_rec.e2e_mangled_name.is_empty () ? parent_path : parent_rec.e2e_mangled_name;
 
-                var last_slash_position = this.item.encrypted_filename.last_index_of ('/');
+                var last_slash_position = this.item.encrypted_filename.last_index_of ("/");
                 var encrypted_name = last_slash_position >= 0 ? this.item.encrypted_filename.mid (last_slash_position + 1): "";
 
                 if (!encrypted_name.is_empty ()) {
@@ -73,7 +73,7 @@ public class PropagateRemoteMove : PropagateItemJob {
         string remote_source = propagator ().full_remote_path (origin);
         string remote_destination = QDir.clean_path (propagator ().account ().dav_url ().path () + propagator ().full_remote_path (this.item.rename_target));
 
-        var vfs = propagator ().sync_options ().vfs;
+        var vfs = propagator ().sync_options.vfs;
         var itype = this.item.type;
         //  ASSERT (itype != ItemTypeVirtualFileDownload && itype != ItemTypeVirtualFileDehydration);
         if (vfs.mode () == Vfs.WithSuffix && itype != ItemTypeDirectory) {
@@ -140,7 +140,7 @@ public class PropagateRemoteMove : PropagateItemJob {
             PropagateRemoteMove.on_signal_move_job_finished
         );
         propagator ().active_job_list.append (this);
-        this.job.on_signal_start ();
+        this.job.start ();
     }
 
 
@@ -238,7 +238,7 @@ public class PropagateRemoteMove : PropagateItemJob {
         // to the new record. It is not a problem to skip it here.
         SyncJournalFileRecord old_record;
         propagator ().journal.get_file_record (this.item.original_file, old_record);
-        var vfs = propagator ().sync_options ().vfs;
+        var vfs = propagator ().sync_options.vfs;
         var pin_state = vfs.pin_state (this.item.original_file);
 
         // Delete old database data.

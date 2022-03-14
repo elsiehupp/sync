@@ -55,7 +55,7 @@ public class AbstractNetworkJob : GLib.Object {
     
         ~NetworkJobTimeoutPauser () {
             if (!this.timer.is_null ()) {
-                this.timer.on_signal_start ();
+                this.timer.start ();
             }
         }
     }
@@ -74,7 +74,7 @@ public class AbstractNetworkJob : GLib.Object {
     On get ():
     //  ASSERT (!this.response_timestamp.is_empty ());
     ***********************************************************/
-    GLib.ByteArray response_timestamp { public get; protected set; }
+    string response_timestamp { public get; protected set; }
 
     /***********************************************************
     Set to true when the timeout slot is received
@@ -190,8 +190,8 @@ public class AbstractNetworkJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
-        this.timer.on_signal_start ();
+    public void start () {
+        this.timer.start ();
 
         const GLib.Uri url = account ().url ();
         const string display_url = string ("%1://%2%3").arg (url.scheme ()).arg (url.host ()).arg (url.path ());
@@ -205,8 +205,8 @@ public class AbstractNetworkJob : GLib.Object {
     Content of the X-Request-ID header. (Only set after the
     request is sent)
     ***********************************************************/
-    public GLib.ByteArray request_id () {
-        return  this.reply ? this.reply.request ().raw_header ("X-Request-ID") : GLib.ByteArray ();
+    public string request_id () {
+        return  this.reply ? this.reply.request ().raw_header ("X-Request-ID") : string ();
     }
 
 
@@ -252,13 +252,13 @@ public class AbstractNetworkJob : GLib.Object {
 
     Warning : Needs to call reply ().read_all ().
     ***********************************************************/
-    public string error_string_parsing_body (GLib.ByteArray body = null) {
+    public string error_string_parsing_body (string body = null) {
         string base = error_string ();
         if (base.is_empty () || !reply ()) {
             return "";
         }
 
-        GLib.ByteArray reply_body = reply ().read_all ();
+        string reply_body = reply ().read_all ();
         if (body) {
             *body = reply_body;
         }
@@ -280,14 +280,14 @@ public class AbstractNetworkJob : GLib.Object {
         //  ENFORCE (this.reply);
         var request = this.reply.request ();
         GLib.Uri requested_url = request.url ();
-        GLib.ByteArray verb = HttpLogger.request_verb (*this.reply);
+        string verb = HttpLogger.request_verb (*this.reply);
         GLib.info ("Restarting " + verb + requested_url);
         on_signal_reset_timeout ();
         if (this.request_body) {
             this.request_body.seek (0);
         }
         // The cookie will be added automatically, we don't want AccessManager.create_request to duplicate them
-        request.raw_header ("cookie", GLib.ByteArray ());
+        request.raw_header ("cookie", string ());
         send_request (verb, requested_url, request, this.request_body);
     }
 
@@ -295,7 +295,7 @@ public class AbstractNetworkJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_timeout (int64 msec) {
-        this.timer.on_signal_start (msec);
+        this.timer.start (msec);
     }
 
     //  private void on_signal_timeout () {
@@ -310,7 +310,7 @@ public class AbstractNetworkJob : GLib.Object {
     public void on_signal_reset_timeout () {
         int64 interval = this.timer.interval ();
         this.timer.stop ();
-        this.timer.on_signal_start (interval);
+        this.timer.start (interval);
     }
 
 
@@ -322,7 +322,7 @@ public class AbstractNetworkJob : GLib.Object {
     Takes ownership of the request_body (to allow redirects).
     ***********************************************************/
     protected Soup.Reply send_request_for_device (
-        GLib.ByteArray verb,
+        string verb,
         GLib.Uri url,
         Soup.Request request = Soup.Request (),
         QIODevice request_body = null) {
@@ -334,7 +334,7 @@ public class AbstractNetworkJob : GLib.Object {
 
 
     protected Soup.Reply send_request_for_multipart (
-        GLib.ByteArray verb,
+        string verb,
         GLib.Uri url,
         Soup.Request request,
         QHttpMultiPart request_body) {
@@ -351,7 +351,7 @@ public class AbstractNetworkJob : GLib.Object {
     overload to help catch usage errors
     ***********************************************************/
     protected Soup.Reply send_request_for_relative_path (
-        GLib.ByteArray verb,
+        string verb,
         string relative_path,
         Soup.Request request = Soup.Request (),
         QIODevice request_body = null) {
@@ -470,7 +470,7 @@ public class AbstractNetworkJob : GLib.Object {
         }
         // Qt doesn't yet transparently resend HTTP2 requests, do so here
         var max_http2Resends = 3;
-        GLib.ByteArray verb = HttpLogger.request_verb (*reply ());
+        string verb = HttpLogger.request_verb (*reply ());
         if (this.reply.error () == Soup.Reply.ContentReSendError
             && this.reply.attribute (Soup.Request.HTTP2WasUsedAttribute).to_bool ()) {
 
@@ -600,7 +600,7 @@ public class AbstractNetworkJob : GLib.Object {
 
     Returns a null string if no message was found.
     ***********************************************************/
-    string extract_error_message (GLib.ByteArray error_response) {
+    string extract_error_message (string error_response) {
         QXmlStreamReader reader = new QXmlStreamReader (error_response);
         reader.read_next_start_element ();
         if (reader.name () != "error") {
@@ -627,7 +627,7 @@ public class AbstractNetworkJob : GLib.Object {
     /***********************************************************
     Builds a error message based on the error and the reply body.
     ***********************************************************/
-    string error_message (string base_error, GLib.ByteArray body) {
+    string error_message (string base_error, string body) {
         string message = base_error;
         string extra = extract_error_message (body);
         if (!extra.is_empty ()) {

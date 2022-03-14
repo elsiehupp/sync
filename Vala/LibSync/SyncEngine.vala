@@ -87,7 +87,7 @@ public class SyncEngine : GLib.Object {
     private bool sync_running;
     string local_path { public get; private set; }
     private string remote_path;
-    private GLib.ByteArray remote_root_etag;
+    private string remote_root_etag;
     SyncJournalDb journal { public get; private set; }
     private QScopedPointer<DiscoveryPhase> discovery_phase;
     private unowned OwncloudPropagator propagator;
@@ -202,7 +202,7 @@ public class SyncEngine : GLib.Object {
     /***********************************************************
     During update, before reconcile
     ***********************************************************/
-    signal void root_etag (GLib.ByteArray value1, GLib.DateTime value2);
+    signal void root_etag (string value1, GLib.DateTime value2);
 
 
     /***********************************************************
@@ -293,7 +293,7 @@ public class SyncEngine : GLib.Object {
         q_register_meta_type<SyncFileItem.Direction> ("SyncFileItem.Direction");
 
         // Everything in the SyncEngine expects a trailing slash for the local_path.
-        //  ASSERT (local_path.has_suffix ('/'));
+        //  ASSERT (local_path.has_suffix ("/"));
 
         this.excluded_files.on_signal_reset (new ExcludedFiles (local_path));
 
@@ -325,7 +325,7 @@ public class SyncEngine : GLib.Object {
                     this.journal, this.local_path, this.sync_options.vfs, this);
                 connect (job, CleanupPollsJob.on_signal_finished, this, SyncEngine.on_signal_start_sync);
                 connect (job, CleanupPollsJob.aborted, this, SyncEngine.on_signal_clean_polls_job_aborted);
-                job.on_signal_start ();
+                job.start ();
                 return;
             }
         }
@@ -362,7 +362,7 @@ public class SyncEngine : GLib.Object {
                 GLib.warning ("Too little space available at" + this.local_path + ". Have"
                             + free_bytes + "bytes and require at least" + min_free + "bytes");
                 this.another_sync_needed = AnotherSyncNeeded.DELAYED_FOLLOW_UP;
-                /* Q_EMIT */ sync_error (_("Only %1 are available, need at least %2 to on_signal_start",
+                /* Q_EMIT */ sync_error (_("Only %1 are available, need at least %2 to start",
                     "Placeholders are postfixed with file sizes using Utility.octets_to_string ()")
                                      .arg (
                                          Utility.octets_to_string (free_bytes),
@@ -428,11 +428,11 @@ public class SyncEngine : GLib.Object {
             return;
         }
 
-        this.stop_watch.on_signal_start ();
+        this.stop_watch.start ();
         this.progress_info.status = ProgressInfo.Status.STARTING;
         /* emit */ transmission_progress (*this.progress_info);
 
-        GLib.info ("#### Discovery on_signal_start ####################################################");
+        GLib.info ("#### Discovery start ####################################################");
         GLib.info ("Server" + account ().server_version ()
                          + (account ().is_http2Supported () ? "Using HTTP/2": ""));
         this.progress_info.status = ProgressInfo.Status.DISCOVERY;
@@ -448,11 +448,11 @@ public class SyncEngine : GLib.Object {
         }
         this.discovery_phase.statedatabase = this.journal;
         this.discovery_phase.local_dir = this.local_path;
-        if (!this.discovery_phase.local_dir.has_suffix ('/'))
-            this.discovery_phase.local_dir+='/';
+        if (!this.discovery_phase.local_dir.has_suffix ("/"))
+            this.discovery_phase.local_dir+="/";
         this.discovery_phase.remote_folder = this.remote_path;
-        if (!this.discovery_phase.remote_folder.has_suffix ('/'))
-            this.discovery_phase.remote_folder+='/';
+        if (!this.discovery_phase.remote_folder.has_suffix ("/"))
+            this.discovery_phase.remote_folder+="/";
         this.discovery_phase.sync_options = this.sync_options;
         this.discovery_phase.should_discover_localy = [this] (string s) {
             return should_discover_locally (s);
@@ -530,7 +530,7 @@ public class SyncEngine : GLib.Object {
             this.propagator.on_signal_abort ();
         } else if (this.discovery_phase) {
             // Delete the discovery and all child jobs after ensuring
-            // it can't finish and on_signal_start the propagator
+            // it can't finish and start the propagator
             disconnect (this.discovery_phase.data (), null, this, null);
             this.discovery_phase.take ().delete_later ();
 
@@ -588,14 +588,14 @@ public class SyncEngine : GLib.Object {
         this.local_discovery_paths = std.move (paths);
 
         // Normalize to make sure that no path is a contained in another.
-        // Note: for simplicity, this code consider anything less than '/' as a path separator, so for
+        // Note: for simplicity, this code consider anything less than "/" as a path separator, so for
         // example, this will remove "foo.bar" if "foo" is in the list. This will mean we might have
         // some false positive, but that's Ok.
         // This invariant is used in SyncEngine.should_discover_locally
         string prev;
         var it = this.local_discovery_paths.begin ();
         while (it != this.local_discovery_paths.end ()) {
-            if (!prev.is_null () && it.starts_with (prev) && (prev.has_suffix ('/') || *it == prev || it.at (prev.size ()) <= '/')) {
+            if (!prev.is_null () && it.starts_with (prev) && (prev.has_suffix ("/") || *it == prev || it.at (prev.size ()) <= "/")) {
                 it = this.local_discovery_paths.erase (it);
             } else {
                 prev = *it;
@@ -629,7 +629,7 @@ public class SyncEngine : GLib.Object {
         if (it == this.local_discovery_paths.end () || !it.starts_with (path)) {
             // Maybe a subfolder of something in the list?
             if (it != this.local_discovery_paths.begin () && path.starts_with (* (--it))) {
-                return it.has_suffix ('/') || (path.size () > it.size () && path.at (it.size ()) <= '/');
+                return it.has_suffix ("/") || (path.size () > it.size () && path.at (it.size ()) <= "/");
             }
             return false;
         }
@@ -641,7 +641,7 @@ public class SyncEngine : GLib.Object {
         // Maybe a parent folder of something in the list?
         // check for a prefix + / match
         while (true) {
-            if (it.size () > path.size () && it.at (path.size ()) == '/')
+            if (it.size () > path.size () && it.at (path.size ()) == "/")
                 return true;
             ++it;
             if (it == this.local_discovery_paths.end () || !it.starts_with (path))
@@ -664,7 +664,7 @@ public class SyncEngine : GLib.Object {
     ***********************************************************/
     public static void wipe_virtual_files (string local_path, SyncJournalDb journal, Vfs vfs) {
         GLib.info ("Wiping virtual files inside" + local_path);
-        journal.get_files_below_path (GLib.ByteArray (), [&] (SyncJournalFileRecord record) {
+        journal.get_files_below_path (string (), [&] (SyncJournalFileRecord record) {
             if (record.type != ItemTypeVirtualFile && record.type != ItemTypeVirtualFileDownload)
                 return;
 
@@ -720,7 +720,7 @@ public class SyncEngine : GLib.Object {
     private void on_signal_folder_discovered (bool local, string folder) {
         // Don't wanna overload the UI
         if (!this.last_update_progress_callback_call.is_valid () || this.last_update_progress_callback_call.elapsed () >= 200) {
-            this.last_update_progress_callback_call.on_signal_start (); // first call or enough elapsed time
+            this.last_update_progress_callback_call.start (); // first call or enough elapsed time
         } else {
             return;
         }
@@ -738,7 +738,7 @@ public class SyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_root_etag_received (GLib.ByteArray e, GLib.DateTime time) {
+    private void on_signal_root_etag_received (string e, GLib.DateTime time) {
         if (this.remote_root_etag.is_empty ()) {
             GLib.debug ("Root etag:" + e;
             this.remote_root_etag = e;
@@ -932,7 +932,7 @@ public class SyncEngine : GLib.Object {
 
             GLib.info ("#### Reconcile (about_to_propagate OK) #################################################### "<< this.stop_watch.add_lap_time ("Reconcile (about_to_propagate OK)") + "ms");
 
-            // it's important to do this before ProgressInfo.on_signal_start (), to announce on_signal_start of new sync
+            // it's important to do this before ProgressInfo.start (), to announce start of new sync
             this.progress_info.status = ProgressInfo.Status.PROPAGATION;
             /* emit */ transmission_progress (*this.progress_info);
             this.progress_info.start_estimate_updates ();
@@ -982,7 +982,7 @@ public class SyncEngine : GLib.Object {
             if (this.needs_update)
                 /* Q_EMIT */ started ();
 
-            this.propagator.on_signal_start (std.move (this.sync_items));
+            this.propagator.start (std.move (this.sync_items));
 
             GLib.info ("#### Post-Reconcile end #################################################### " + this.stop_watch.add_lap_time ("Post-Reconcile Finished") + "ms");
         }
@@ -1068,7 +1068,7 @@ public class SyncEngine : GLib.Object {
     ***********************************************************/
     private void on_signal_add_touched_file (string fn) {
         QElapsedTimer now;
-        now.on_signal_start ();
+        now.start ();
         string file = QDir.clean_path (fn);
 
         // Iterate from the oldest and remove anything older than 15 seconds.
@@ -1257,8 +1257,8 @@ public class SyncEngine : GLib.Object {
             foreach (uint32 transfer_identifier in ids) {
                 if (!transfer_identifier)
                     continue; // Was not a chunked upload
-                GLib.Uri url = Utility.concat_url_path (account ().url (), QLatin1String ("remote.php/dav/uploads/") + account ().dav_user () + '/' + string.number (transfer_identifier));
-                (new DeleteJob (account (), url, this)).on_signal_start ();
+                GLib.Uri url = Utility.concat_url_path (account ().url (), QLatin1String ("remote.php/dav/uploads/") + account ().dav_user () + "/" + string.number (transfer_identifier));
+                (new DeleteJob (account (), url, this)).start ();
             }
         }
     }
@@ -1350,7 +1350,7 @@ public class SyncEngine : GLib.Object {
         this.local_discovery_paths.clear ();
         this.local_discovery_style = DiscoveryPhase.LocalDiscoveryStyle.FILESYSTEM_ONLY;
 
-        this.clear_touched_files_timer.on_signal_start ();
+        this.clear_touched_files_timer.start ();
     }
 
 

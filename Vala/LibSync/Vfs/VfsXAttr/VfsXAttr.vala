@@ -65,7 +65,7 @@ public class VfsXAttr : Vfs {
 
     /***********************************************************
     ***********************************************************/
-    public Result<void, string> update_metadata (string file_path, time_t modtime, int64 size, GLib.ByteArray file_identifier) {
+    public Result<void, string> update_metadata (string file_path, time_t modtime, int64 size, string file_identifier) {
         if (modtime <= 0) {
             return new Result<void, string>.from_error (_("Error updating metadata due to invalid modified time."));
         }
@@ -153,11 +153,11 @@ public class VfsXAttr : Vfs {
             return false;
         }
 
-        var parent_path = static_cast<GLib.ByteArray> (stat_data);
-        GLib.assert (!parent_path.has_suffix ('/'));
-        GLib.assert (!stat.path.starts_with ('/'));
+        var parent_path = static_cast<string> (stat_data);
+        GLib.assert (!parent_path.has_suffix ("/"));
+        GLib.assert (!stat.path.starts_with ("/"));
 
-        var path = new GLib.ByteArray (*parent_path + '/' + stat.path);
+        var path = new string (*parent_path + "/" + stat.path);
         var pin = () => {
             var absolute_path = string.from_utf8 (path);
             GLib.assert (absolute_path.starts_with (parameters ().filesystem_path.to_utf8 ()));

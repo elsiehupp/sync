@@ -44,7 +44,7 @@ public class OcsProfileConnector : GLib.Object {
         const string url = "/ocs/v2.php/hovercard/v1/%1".arg (user_id);
         var job = new JsonApiJob (this.account, url, this);
         JsonApiJob.signal_json_received.connect (job, this, OcsProfileConnector.on_signal_hovercard_fetched);
-        job.on_signal_start ();
+        job.start ();
     }
 
 
@@ -101,7 +101,7 @@ public class OcsProfileConnector : GLib.Object {
     }
 
 
-    private void on_signal_icon_job_finished (size_t hovercard_action_index, GLib.ByteArray icon_data) {
+    private void on_signal_icon_job_finished (size_t hovercard_action_index, string icon_data) {
         load_hovercard_action_icon (hovercard_action_index, icon_data);
     }
 
@@ -123,7 +123,7 @@ public class OcsProfileConnector : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void load_hovercard_action_icon (size_t hovercard_action_index, GLib.ByteArray icon_data) {
+    private void load_hovercard_action_icon (size_t hovercard_action_index, string icon_data) {
         if (hovercard_action_index >= this.current_hovercard.actions.size ()) {
             // Note: Probably could do more checking, like checking if the url is still the same.
             return;
@@ -165,7 +165,7 @@ public class OcsProfileConnector : GLib.Object {
     }
 
 
-    private static Occ.Optional<QPixmap> create_pixmap_from_svg_data (GLib.ByteArray icon_data) {
+    private static Occ.Optional<QPixmap> create_pixmap_from_svg_data (string icon_data) {
         QSvgRenderer svg_renderer;
         if (!svg_renderer.on_signal_load (icon_data)) {
             return {};
@@ -182,7 +182,7 @@ public class OcsProfileConnector : GLib.Object {
     }
 
 
-    private static Occ.Optional<QPixmap> icon_data_to_pixmap (GLib.ByteArray icon_data) {
+    private static Occ.Optional<QPixmap> icon_data_to_pixmap (string icon_data) {
         if (!icon_data.starts_with ("<svg")) {
             return {};
         }

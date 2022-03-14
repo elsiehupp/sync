@@ -113,19 +113,19 @@ public class SyncOptions : GLib.Object {
         this.parallel_network_jobs.
     ***********************************************************/
     public void fill_from_environment_variables () {
-        GLib.ByteArray chunk_size_env = qgetenv ("OWNCLOUD_CHUNK_SIZE");
+        string chunk_size_env = qgetenv ("OWNCLOUD_CHUNK_SIZE");
         if (!chunk_size_env.is_empty ())
             this.initial_chunk_size = chunk_size_env.to_u_int ();
 
-        GLib.ByteArray min_chunk_size_env = qgetenv ("OWNCLOUD_MIN_CHUNK_SIZE");
+        string min_chunk_size_env = qgetenv ("OWNCLOUD_MIN_CHUNK_SIZE");
         if (!min_chunk_size_env.is_empty ())
             this.min_chunk_size = min_chunk_size_env.to_u_int ();
 
-        GLib.ByteArray max_chunk_size_env = qgetenv ("OWNCLOUD_MAX_CHUNK_SIZE");
+        string max_chunk_size_env = qgetenv ("OWNCLOUD_MAX_CHUNK_SIZE");
         if (!max_chunk_size_env.is_empty ())
             this.max_chunk_size = max_chunk_size_env.to_u_int ();
 
-        GLib.ByteArray target_chunk_upload_duration_env = qgetenv ("OWNCLOUD_TARGET_CHUNK_UPLOAD_DURATION");
+        string target_chunk_upload_duration_env = qgetenv ("OWNCLOUD_TARGET_CHUNK_UPLOAD_DURATION");
         if (!target_chunk_upload_duration_env.is_empty ())
             this.target_chunk_upload_duration = std.chrono.milliseconds (target_chunk_upload_duration_env.to_u_int ());
 

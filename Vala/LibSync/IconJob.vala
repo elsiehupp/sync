@@ -17,7 +17,7 @@ namespace LibSync {
 ***********************************************************/
 public class IconJob : GLib.Object {
 
-    signal void signal_job_finished (GLib.ByteArray icon_data);
+    signal void signal_job_finished (string icon_data);
     signal void error (Soup.Reply.NetworkError error_type);
 
 
@@ -29,7 +29,7 @@ public class IconJob : GLib.Object {
     // #if (QT_VERSION >= 0x050600)
         request.attribute (Soup.Request.FollowRedirectsAttribute, true);
     // #endif
-        var reply = account.send_raw_request (GLib.ByteArray ("GET"), url, request);
+        var reply = account.send_raw_request (string ("GET"), url, request);
         connect (reply, Soup.Reply.on_signal_finished, this, IconJob.on_signal_finished);
     }
 

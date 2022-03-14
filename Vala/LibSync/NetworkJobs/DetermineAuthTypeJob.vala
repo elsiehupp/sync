@@ -68,7 +68,7 @@ public class DetermineAuthTypeJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
+    public void start () {
         GLib.info ("Determining auth type for " + this.account.dav_url ());
 
         Soup.Request request;
@@ -114,7 +114,7 @@ public class DetermineAuthTypeJob : GLib.Object {
             this.on_signal_json_received
         );
 
-        old_flow_required.on_signal_start ();
+        old_flow_required.start ();
     }
 
 

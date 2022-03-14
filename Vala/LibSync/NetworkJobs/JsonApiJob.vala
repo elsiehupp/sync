@@ -39,7 +39,7 @@ public class JsonApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    GLib.ByteArray body {
+    string body {
         private get {
             return this.body;
         }
@@ -78,7 +78,7 @@ public class JsonApiJob : AbstractNetworkJob {
     @param value - the ETag response header value
     @param status_code - the OCS status code : 100 (!) for on_signal_success
     ***********************************************************/
-    signal void etag_response_header_received (GLib.ByteArray value, int status_code);
+    signal void etag_response_header_received (string value, int status_code);
 
 
     /***********************************************************
@@ -103,7 +103,7 @@ public class JsonApiJob : AbstractNetworkJob {
     that the format=json para
     need to be set this way.
 
-    This function needs to be called before on_signal_start () obviously.
+    This function needs to be called before start () obviously.
     ***********************************************************/
     public void add_query_params (QUrlQuery parameters) {
         this.additional_params = parameters;
@@ -113,14 +113,14 @@ public class JsonApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void add_raw_header (GLib.ByteArray header_name, GLib.ByteArray value) {
+    public void add_raw_header (string header_name, string value) {
         this.request.raw_header (header_name, value);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
+    public void start () {
         add_raw_header ("OCS-APIREQUEST", "true");
         var query = this.additional_params;
         query.add_query_item (QLatin1String ("format"), QLatin1String ("json"));
@@ -131,7 +131,7 @@ public class JsonApiJob : AbstractNetworkJob {
         } else {
             send_request (http_verb, url, this.request);
         }
-        AbstractNetworkJob.on_signal_start ();
+        AbstractNetworkJob.start ();
     }
 
 
@@ -174,7 +174,7 @@ public class JsonApiJob : AbstractNetworkJob {
         if (reply ().raw_header_list ().contains ("ETag"))
             /* emit */ etag_response_header_received (reply ().raw_header ("ETag"), status_code);
 
-        var desktop_notifications_allowed = reply ().raw_header (GLib.ByteArray ("X-Nextcloud-User-Status"));
+        var desktop_notifications_allowed = reply ().raw_header (string ("X-Nextcloud-User-Status"));
         if (!desktop_notifications_allowed.is_empty ()) {
             /* emit */ allow_desktop_notifications_changed (desktop_notifications_allowed == "online");
         }

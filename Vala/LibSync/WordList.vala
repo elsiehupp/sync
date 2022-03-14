@@ -1710,7 +1710,7 @@ public class WordList : GLib.Object {
             "stairs",
             "stamp",
             "stand",
-            "on_signal_start",
+            "start",
             "state",
             "stay",
             "steak",

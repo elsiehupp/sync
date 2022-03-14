@@ -29,11 +29,11 @@ public class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected GLib.ByteArray folder_token;
+    protected string folder_token;
 
     /***********************************************************
     ***********************************************************/
-    protected GLib.ByteArray folder_identifier;
+    protected string folder_identifier;
 
     /***********************************************************
     ***********************************************************/
@@ -68,7 +68,7 @@ public class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public virtual void on_signal_start ();
+    public virtual void start ();
 
 
 
@@ -98,7 +98,7 @@ public class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
         job.properties ({"resourcetype", "http://owncloud.org/ns:fileid"});
         connect (job, LsColJob.directory_listing_subfolders, this, AbstractPropagateRemoteDeleteEncrypted.on_signal_folder_encrypted_id_received);
         connect (job, LsColJob.finished_with_error, this, AbstractPropagateRemoteDeleteEncrypted.task_failed);
-        job.on_signal_start ();
+        job.start ();
     }
 
 
@@ -114,17 +114,17 @@ public class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_try_lock (GLib.ByteArray folder_identifier) {
+    protected void on_signal_try_lock (string folder_identifier) {
         var lock_job = new LockEncryptFolderApiJob (this.propagator.account (), folder_identifier, this);
         connect (lock_job, LockEncryptFolderApiJob.on_signal_success, this, AbstractPropagateRemoteDeleteEncrypted.on_signal_folder_locked_successfully);
         connect (lock_job, LockEncryptFolderApiJob.error, this, AbstractPropagateRemoteDeleteEncrypted.task_failed);
-        lock_job.on_signal_start ();
+        lock_job.start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_folder_locked_successfully (GLib.ByteArray folder_identifier, GLib.ByteArray token) {
+    protected void on_signal_folder_locked_successfully (string folder_identifier, string token) {
         GLib.debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) + "Folder identifier" + folder_identifier + "Locked Successfully for Upload, Fetching Metadata";
         this.folder_locked = true;
         this.folder_token = token;
@@ -133,13 +133,13 @@ public class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
         var job = new GetMetadataApiJob (this.propagator.account (), this.folder_identifier);
         connect (job, GetMetadataApiJob.signal_json_received, this, AbstractPropagateRemoteDeleteEncrypted.on_signal_folder_encrypted_metadata_received);
         connect (job, GetMetadataApiJob.error, this, AbstractPropagateRemoteDeleteEncrypted.task_failed);
-        job.on_signal_start ();
+        job.start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    protected virtual void on_signal_folder_unlocked_successfully (GLib.ByteArray folder_identifier) {
+    protected virtual void on_signal_folder_unlocked_successfully (string folder_identifier) {
         //  Q_UNUSED (folder_identifier);
         GLib.debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) + "Folder identifier" + folder_identifier + "successfully unlocked";
         this.folder_locked = false;
@@ -212,7 +212,7 @@ public class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
 
         connect (delete_job, DeleteJob.signal_finished, this, AbstractPropagateRemoteDeleteEncrypted.on_signal_delete_remote_item_finished);
 
-        delete_job.on_signal_start ();
+        delete_job.start ();
     }
 
 
@@ -239,7 +239,7 @@ public class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
             this.item.error_string =this.error_string;
             task_failed ();
         });
-        unlock_job.on_signal_start ();
+        unlock_job.start ();
     }
 
 

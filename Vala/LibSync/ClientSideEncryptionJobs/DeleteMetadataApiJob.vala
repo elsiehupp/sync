@@ -11,18 +11,18 @@ public class DeleteMetadataApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.ByteArray file_identifier;
+    private string file_identifier;
 
 
-    signal void success (GLib.ByteArray file_identifier);
-    signal void error (GLib.ByteArray file_identifier, int http_error_code);
+    signal void success (string file_identifier);
+    signal void error (string file_identifier, int http_error_code);
 
 
     /***********************************************************
     ***********************************************************/
     public DeleteMetadataApiJob (
         unowned Account account,
-        GLib.ByteArray file_identifier,
+        string file_identifier,
         GLib.Object parent = new GLib.Object ()) {
 
         base (account, E2EE_BASE_URL + "meta-data/" + file_identifier, parent);
@@ -32,14 +32,14 @@ public class DeleteMetadataApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public new void on_signal_start () {
+    public new void start () {
         Soup.Request request;
         request.raw_header ("OCS-APIREQUEST", "true");
 
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
         send_request ("DELETE", url, request);
 
-        AbstractNetworkJob.on_signal_start ();
+        AbstractNetworkJob.start ();
         GLib.info ("Starting the request to remove the metadata.");
     }
 

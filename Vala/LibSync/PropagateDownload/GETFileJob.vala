@@ -14,7 +14,7 @@ namespace LibSync {
 public class GETFileJob : AbstractNetworkJob {
 
     QIODevice device;
-    GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers;
+    GLib.HashTable<string, string> headers;
     string error_string {
         public get {
             if (!this.error_string.is_empty ()) {
@@ -27,7 +27,7 @@ public class GETFileJob : AbstractNetworkJob {
         }
     }
 
-    GLib.ByteArray expected_etag_for_resume;
+    string expected_etag_for_resume;
     int64 expected_content_length {
         public get {
             return -1;
@@ -50,7 +50,7 @@ public class GETFileJob : AbstractNetworkJob {
     public SyncFileItem.Status error_status;
 
     GLib.Uri direct_download_url;
-    GLib.ByteArray etag { public get; private set; }
+    string etag { public get; private set; }
 
     /***********************************************************
     If this.bandwidth_quota will be used
@@ -83,7 +83,7 @@ public class GETFileJob : AbstractNetworkJob {
     DOES NOT take ownership of the device.
     ***********************************************************/
     public GETFileJob.for_account (unowned Account account, string path, QIODevice device,
-        GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers, GLib.ByteArray expected_etag_for_resume,
+        GLib.HashTable<string, string> headers, string expected_etag_for_resume,
         int64 resume_start, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
         this.device = device;
@@ -107,7 +107,7 @@ public class GETFileJob : AbstractNetworkJob {
     For direct_download_url:
     ***********************************************************/
     public GETFileJob.direct.for_account (unowned Account account, GLib.Uri url, QIODevice device,
-        GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers, GLib.ByteArray expected_etag_for_resume,
+        GLib.HashTable<string, string> headers, string expected_etag_for_resume,
         int64 resume_start, GLib.Object parent = new GLib.Object ()) {
         base (account, url.to_encoded (), parent);
         this.device = device;
@@ -137,9 +137,9 @@ public class GETFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
+    public void start () {
         if (this.resume_start > 0) {
-            this.headers["Range"] = "bytes=" + GLib.ByteArray.number (this.resume_start) + '-';
+            this.headers["Range"] = "bytes=" + string.number (this.resume_start) + '-';
             this.headers["Accept-Ranges"] = "bytes";
             GLib.debug ("Retry with range " + this.headers["Range"]);
         }
@@ -165,7 +165,7 @@ public class GETFileJob : AbstractNetworkJob {
 
         connect (this, AbstractNetworkJob.signal_network_activity, account ().data (), Account.signal_propagator_network_activity);
 
-        AbstractNetworkJob.on_signal_start ();
+        AbstractNetworkJob.start ();
     }
 
 
@@ -287,7 +287,7 @@ public class GETFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    protected int64 write_to_device (GLib.ByteArray data) {
+    protected int64 write_to_device (string data) {
         return this.device.write (data);
     }
 
@@ -298,7 +298,7 @@ public class GETFileJob : AbstractNetworkJob {
         if (!reply ())
             return;
         int buffer_size = q_min (1024 * 8ll, reply ().bytes_available ());
-        GLib.ByteArray buffer = new GLib.ByteArray (buffer_size, Qt.Uninitialized);
+        string buffer = new string (buffer_size, Qt.Uninitialized);
 
         while (reply ().bytes_available () > 0 && this.save_body_to_file) {
             if (this.bandwidth_choked) {
@@ -324,7 +324,7 @@ public class GETFileJob : AbstractNetworkJob {
                 return;
             }
 
-            const int64 written_bytes = write_to_device (GLib.ByteArray.from_raw_data (buffer.const_data (), read_bytes));
+            const int64 written_bytes = write_to_device (string.from_raw_data (buffer.const_data (), read_bytes));
             if (written_bytes != read_bytes) {
                 this.error_string = this.device.error_string ();
                 this.error_status = SyncFileItem.Status.NORMAL_ERROR;
@@ -355,7 +355,7 @@ public class GETFileJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_meta_data_changed () {
-        // For some reason setting the read buffer in GETFileJob.on_signal_start doesn't seem to go
+        // For some reason setting the read buffer in GETFileJob.start doesn't seem to go
         // through the HTTP layer thread (?)
         reply ().read_buffer_size (16 * 1024);
 
@@ -387,7 +387,7 @@ public class GETFileJob : AbstractNetworkJob {
 
         if (!this.direct_download_url.is_empty () && !this.etag.is_empty ()) {
             GLib.info ("Direct download used, ignoring server ETag " + this.etag);
-            this.etag = new GLib.ByteArray (); // reset received ETag
+            this.etag = new string (); // reset received ETag
         } else if (!this.direct_download_url.is_empty ()) {
             // All fine, ETag empty and direct_download_url used
         } else if (this.etag.is_empty ()) {
@@ -416,16 +416,16 @@ public class GETFileJob : AbstractNetworkJob {
             return;
         }
 
-        int64 on_signal_start = 0;
-        GLib.ByteArray ranges = reply ().raw_header ("Content-Range");
+        int64 start = 0;
+        string ranges = reply ().raw_header ("Content-Range");
         if (!ranges.is_empty ()) {
             const QRegularExpression rx = new QRegularExpression ("bytes (\\d+)-");
             var rx_match = rx.match (ranges);
             if (rx_match.has_match ()) {
-                on_signal_start = rx_match.captured (1).to_long_long ();
+                start = rx_match.captured (1).to_long_long ();
             }
         }
-        if (on_signal_start != this.resume_start) {
+        if (start != this.resume_start) {
             GLib.warning ("Wrong content-range: " + ranges + " while expecting start was " + this.resume_start);
             if (ranges.is_empty ()) {
                 // device doesn't support range, just try again from scratch

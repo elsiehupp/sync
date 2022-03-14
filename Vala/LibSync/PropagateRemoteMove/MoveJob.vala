@@ -22,7 +22,7 @@ public class MoveJob : AbstractNetworkJob {
     ***********************************************************/
     const GLib.Uri url;
 
-    GLib.HashTable<GLib.ByteArray, GLib.ByteArray> extra_headers;
+    GLib.HashTable<string, string> extra_headers;
 
     signal void signal_finished ();
 
@@ -36,7 +36,7 @@ public class MoveJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public MoveJob.for_url (unowned Account account, GLib.Uri url, string destination,
-        GLib.HashTable<GLib.ByteArray, GLib.ByteArray> extra_headers, GLib.Object parent) {
+        GLib.HashTable<string, string> extra_headers, GLib.Object parent) {
         base (account, "", parent);
         this.destination = destination;
         this.url = url;
@@ -46,7 +46,7 @@ public class MoveJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
+    public void start () {
         Soup.Request request;
         request.raw_header ("Destination", GLib.Uri.to_percent_encoding (this.destination, "/"));
         for (var it = this.extra_headers.const_begin (); it != this.extra_headers.const_end (); ++it) {
@@ -61,7 +61,7 @@ public class MoveJob : AbstractNetworkJob {
         if (reply ().error () != Soup.Reply.NoError) {
             GLib.warning ("Network error: " + reply ().error_string ());
         }
-        AbstractNetworkJob.on_signal_start ();
+        AbstractNetworkJob.start ();
     }
 
 

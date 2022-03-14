@@ -20,9 +20,9 @@ public class DiscoverySingleDirectoryJob : GLib.Object {
     ***********************************************************/
     private GLib.List<RemoteInfo> results;
     private string sub_path;
-    private GLib.ByteArray first_etag;
-    private GLib.ByteArray file_identifier;
-    private GLib.ByteArray local_file_id;
+    private string first_etag;
+    private string file_identifier;
+    private string local_file_id;
     private unowned Account account;
 
 
@@ -62,14 +62,14 @@ public class DiscoverySingleDirectoryJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private public GLib.ByteArray data_fingerprint;
+    private public string data_fingerprint;
 
 
     /***********************************************************
     This is not actually a network job, it is just a job
     ***********************************************************/
     signal void first_directory_permissions (RemotePermissions);
-    signal void etag (GLib.ByteArray , GLib.DateTime time);
+    signal void etag (string , GLib.DateTime time);
     signal void finished (HttpResult<GLib.List<RemoteInfo>> result);
 
 
@@ -97,11 +97,11 @@ public class DiscoverySingleDirectoryJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
+    public void start () {
         // Start the actual HTTP job
         var ls_col_job = new LsColJob (this.account, this.sub_path, this);
 
-        GLib.List<GLib.ByteArray> props = new GLib.List<GLib.ByteArray> ();
+        GLib.List<string> props = new GLib.List<string> ();
         props.append ("resourcetype");
         props.append ("getlastmodified");
         props.append ("getcontentlength");
@@ -129,7 +129,7 @@ public class DiscoverySingleDirectoryJob : GLib.Object {
             this, DiscoverySingleDirectoryJob.on_signal_directory_listing_iterated_slot);
         GLib.Object.connect (ls_col_job, LsColJob.finished_with_error, this, DiscoverySingleDirectoryJob.on_signal_ls_job_finished_with_error_slot);
         GLib.Object.connect (ls_col_job, LsColJob.finished_without_error, this, DiscoverySingleDirectoryJob.on_signal_ls_job_finished_without_error_slot);
-        ls_col_job.on_signal_start ();
+        ls_col_job.start ();
 
         this.ls_col_job = ls_col_job;
     }
@@ -171,7 +171,7 @@ public class DiscoverySingleDirectoryJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_metadata_error (GLib.ByteArray file_identifier, int http_return_code);
+    private void on_signal_metadata_error (string file_identifier, int http_return_code);
 
 } // class DiscoverySingleDirectoryJob
 

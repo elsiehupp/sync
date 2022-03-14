@@ -66,7 +66,7 @@ public class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.ByteArray private_key;
+    public string private_key;
 
     /***********************************************************
     ***********************************************************/
@@ -154,7 +154,7 @@ public class ClientSideEncryption : GLib.Object {
             GLib.info ("Could not read private key from bio.");
             return;
         }
-        GLib.ByteArray key = BIO2Byte_array (private_key);
+        string key = BIO2Byte_array (private_key);
         //this.private_key = QSslKey (key, QSsl.Rsa, QSsl.Pem, QSsl.PrivateKey);
         this.private_key = key;
 
@@ -213,7 +213,7 @@ public class ClientSideEncryption : GLib.Object {
 
         Biometric bio_out;
         ret = PEM_write_bio_X509_REQ (bio_out, x509_req);
-        GLib.ByteArray output = BIO2Byte_array (bio_out);
+        string output = BIO2Byte_array (bio_out);
 
         GLib.info ("Returning the certificate:");
         GLib.info (output);
@@ -230,7 +230,7 @@ public class ClientSideEncryption : GLib.Object {
             }
             GLib.info ("Return code: " + return_code);
         });
-        sign_public_key_api_job.on_signal_start ();
+        sign_public_key_api_job.start ();
     }
 
 
@@ -268,14 +268,14 @@ public class ClientSideEncryption : GLib.Object {
                     GLib.info ("Store private key failed, return code: " + return_code);
             }
         });
-        store_private_key_api_job.on_signal_start ();
+        store_private_key_api_job.start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void forget_sensitive_data (unowned Account account) {
-        this.private_key = new GLib.ByteArray ();
+        this.private_key = new string ();
         this.certificate = new QSslCertificate ();
         this.public_key = new QSslKey ();
         this.mnemonic = "";
@@ -291,7 +291,7 @@ public class ClientSideEncryption : GLib.Object {
         var delete_password_job = new DeletePasswordJob (Theme.instance ().app_name ());
         delete_password_job.insecure_fallback (false);
         delete_password_job.key (AbstractCredentials.keychain_key (account.url ().to_string (), user, account.identifier ()));
-        delete_password_job.on_signal_start ();
+        delete_password_job.start ();
     }
 
 
@@ -337,7 +337,7 @@ public class ClientSideEncryption : GLib.Object {
         read_password_job.insecure_fallback (false);
         read_password_job.key (kck);
         connect (read_password_job, ReadPasswordJob.on_signal_finished, this, ClientSideEncryption.on_signal_private_key_fetched);
-        read_password_job.on_signal_start ();
+        read_password_job.start ();
     }
 
 
@@ -377,7 +377,7 @@ public class ClientSideEncryption : GLib.Object {
         read_password_job.insecure_fallback (false);
         read_password_job.key (kck);
         connect (read_password_job, ReadPasswordJob.on_signal_finished, this, ClientSideEncryption.on_signal_mnemonic_key_fetched);
-        read_password_job.on_signal_start ();
+        read_password_job.start ();
     }
 
 
@@ -392,7 +392,7 @@ public class ClientSideEncryption : GLib.Object {
         if (read_job.error () != NoError || read_job.text_data ().length () == 0) {
             this.certificate = QSslCertificate ();
             this.public_key = QSslKey ();
-            this.private_key = new GLib.ByteArray ();
+            this.private_key = new string ();
             get_public_key_from_server (account);
             return;
         }
@@ -422,7 +422,7 @@ public class ClientSideEncryption : GLib.Object {
                 GLib.info ("Error while requesting public key: " + return_code);
             }
         });
-        json_api_job.on_signal_start ();
+        json_api_job.start ();
     }
 
 
@@ -445,7 +445,7 @@ public class ClientSideEncryption : GLib.Object {
                     GLib.info ("Error while requesting public key: " + return_code);
                 }
         });
-        json_api_job.on_signal_start ();
+        json_api_job.start ();
     }
 
 
@@ -471,7 +471,7 @@ public class ClientSideEncryption : GLib.Object {
                     GLib.info ("Error invalid server public key.");
                     this.certificate = QSslCertificate ();
                     this.public_key = QSslKey ();
-                    this.private_key = new GLib.ByteArray ();
+                    this.private_key = new string ();
                     get_public_key_from_server (account);
                     return;
                 }
@@ -479,13 +479,13 @@ public class ClientSideEncryption : GLib.Object {
                 GLib.info ("Error while requesting server public key: " + return_code);
             }
         });
-        json_api_job.on_signal_start ();
+        json_api_job.start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void decrypt_private_key.for_account (unowned Account account, GLib.ByteArray key) {
+    private void decrypt_private_key.for_account (unowned Account account, string key) {
         string message = _("Please enter your end to end encryption passphrase:<br>"
                         + "<br>"
                         + "User : %2<br>"
@@ -520,7 +520,7 @@ public class ClientSideEncryption : GLib.Object {
                 var pass = EncryptionHelper.generate_password (mnemonic, salt);
                 GLib.info ("Generated key: " + pass);
 
-                GLib.ByteArray private_key = EncryptionHelper.decrypt_private_key (pass, key);
+                string private_key = EncryptionHelper.decrypt_private_key (pass, key);
                 //this.private_key = QSslKey (private_key, QSsl.Rsa, QSsl.Pem, QSsl.PrivateKey);
                 this.private_key = private_key;
 
@@ -534,7 +534,7 @@ public class ClientSideEncryption : GLib.Object {
                 }
             } else {
                 this.mnemonic = "";
-                this.private_key = new GLib.ByteArray ();
+                this.private_key = new string ();
                 GLib.info ("Cancelled.");
                 break;
             }
@@ -558,28 +558,28 @@ public class ClientSideEncryption : GLib.Object {
         read_password_job.insecure_fallback (false);
         read_password_job.key (kck);
         connect (read_password_job, ReadPasswordJob.on_signal_finished, this, ClientSideEncryption.on_signal_public_key_fetched);
-        read_password_job.on_signal_start ();
+        read_password_job.start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     private bool check_public_key_validity (unowned Account account) {
-        GLib.ByteArray data = EncryptionHelper.generate_random (64);
+        string data = EncryptionHelper.generate_random (64);
 
         Biometric public_key_bio;
-        GLib.ByteArray public_key_pem = account.e2e ().public_key.to_pem ();
+        string public_key_pem = account.e2e ().public_key.to_pem ();
         BIO_write (public_key_bio, public_key_pem.const_data (), public_key_pem.size ());
         var public_key = PrivateKey.read_public_key (public_key_bio);
 
         var encrypted_data = EncryptionHelper.encrypt_string_asymmetric (public_key, data.to_base64 ());
 
         Biometric private_key_bio;
-        GLib.ByteArray private_key_pem = account.e2e ().private_key;
+        string private_key_pem = account.e2e ().private_key;
         BIO_write (private_key_bio, private_key_pem.const_data (), private_key_pem.size ());
         var key = PrivateKey.read_private_key (private_key_bio);
 
-        GLib.ByteArray decrypt_result = new GLib.ByteArray.from_base64 (EncryptionHelper.decrypt_string_asymmetric ( key, GLib.ByteArray.from_base64 (encrypted_data)));
+        string decrypt_result = new string.from_base64 (EncryptionHelper.decrypt_string_asymmetric ( key, string.from_base64 (encrypted_data)));
 
         if (data != decrypt_result) {
             GLib.info ("Invalid private key.");
@@ -592,7 +592,7 @@ public class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private bool check_server_public_key_validity (GLib.ByteArray server_public_key_string) {
+    private bool check_server_public_key_validity (string server_public_key_string) {
         Biometric server_public_key_bio;
         BIO_write (server_public_key_bio, server_public_key_string.const_data (), server_public_key_string.size ());
         var server_public_key = PrivateKey.read_private_key (server_public_key_bio);
@@ -633,7 +633,7 @@ public class ClientSideEncryption : GLib.Object {
             //  Q_UNUSED (incoming);
             GLib.info ("Private key stored in keychain.");
         });
-        write_password_job.on_signal_start ();
+        write_password_job.start ();
     }
 
 
@@ -654,7 +654,7 @@ public class ClientSideEncryption : GLib.Object {
             //  Q_UNUSED (incoming);
             GLib.info ("Certificate stored in keychain.");
         });
-        write_password_job.on_signal_start ();
+        write_password_job.start ();
     }
 
 
@@ -675,12 +675,12 @@ public class ClientSideEncryption : GLib.Object {
             //  Q_UNUSED (incoming);
             GLib.info ("Mnemonic stored in keychain.");
         });
-        write_password_job.on_signal_start ();
+        write_password_job.start ();
     }
 
-    GLib.List<GLib.ByteArray> old_cipher_format_split (GLib.ByteArray cipher) {
-        var separator = new GLib.ByteArray ("f_a=="); // BASE64 encoded '|'
-        var result = GLib.List<GLib.ByteArray> ();
+    GLib.List<string> old_cipher_format_split (string cipher) {
+        var separator = new string ("f_a=="); // BASE64 encoded '|'
+        var result = GLib.List<string> ();
 
         var data = cipher;
         var index = data.index_of (separator);
@@ -694,14 +694,14 @@ public class ClientSideEncryption : GLib.Object {
         return result;
     }
 
-    GLib.List<GLib.ByteArray> split_cipher_parts (GLib.ByteArray data) {
+    GLib.List<string> split_cipher_parts (string data) {
         var is_old_format = !data.contains ("|");
         var parts = is_old_format ? old_cipher_format_split (data) : data.split ("|");
         GLib.info ("Found parts: " + parts + " Is old format? " + is_old_format);
         return parts;
     }
 
-    uchar unsigned_data (GLib.ByteArray array) {
+    uchar unsigned_data (string array) {
         return (uchar)array.data ();
     }
 
@@ -710,14 +710,14 @@ public class ClientSideEncryption : GLib.Object {
     // data structures
     //
 
-    GLib.ByteArray BIO2Byte_array (Biometric b) {
+    string BIO2Byte_array (Biometric b) {
         var pending = (int)BIO_ctrl_pending (b);
-        GLib.ByteArray res = new GLib.ByteArray (pending, '\0');
+        string res = new string (pending, '\0');
         BIO_read (b, unsigned_data (res), pending);
         return res;
     }
 
-    GLib.ByteArray handle_errors () {
+    string handle_errors () {
         Biometric bio_errors;
         ERR_print_errors (bio_errors); // This line is not printing anything.
         return BIO2Byte_array (bio_errors);

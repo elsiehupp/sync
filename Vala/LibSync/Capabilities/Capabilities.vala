@@ -345,8 +345,8 @@ public class Capabilities : GLib.Object {
     Default: []
     Possible entries: "Adler32", "MD5", "SHA1"
     ***********************************************************/
-    public GLib.List<GLib.ByteArray> supported_checksum_types () {
-        GLib.List<GLib.ByteArray> list;
+    public GLib.List<string> supported_checksum_types () {
+        GLib.List<string> list;
         foreach (var t in this.capabilities["checksums"].to_map ()["supported_types"].to_list ()) {
             list.push_back (t.to_byte_array ());
         }
@@ -362,7 +362,7 @@ public class Capabilities : GLib.Object {
     Default: empty, meaning "no preference"
     Possible values : empty or any of the supported_types
     ***********************************************************/
-    public GLib.ByteArray preferred_upload_checksum_type () {
+    public string preferred_upload_checksum_type () {
         return q_environment_variable ("OWNCLOUD_CONTENT_CHECKSUM_TYPE",
             this.capabilities.value ("checksums").to_map ()
             .value ("preferred_upload_type", "SHA1").to_string ()).to_utf8 ();
@@ -372,17 +372,17 @@ public class Capabilities : GLib.Object {
     /***********************************************************
     Helper that returns the preferred_upload_checksum_type () if
     set, or one of the supported_checksum_types () if it isn't.
-    May return an empty GLib.ByteArray if no checksum types are
+    May return an empty string if no checksum types are
     supported.
     ***********************************************************/
-    public GLib.ByteArray upload_checksum_type () {
-        GLib.ByteArray preferred = preferred_upload_checksum_type ();
+    public string upload_checksum_type () {
+        string preferred = preferred_upload_checksum_type ();
         if (!preferred.is_empty ())
             return preferred;
-        GLib.List<GLib.ByteArray> supported = supported_checksum_types ();
+        GLib.List<string> supported = supported_checksum_types ();
         if (!supported.is_empty ())
             return supported.first ();
-        return GLib.ByteArray ();
+        return string ();
     }
 
 

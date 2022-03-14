@@ -38,10 +38,10 @@ public class PropagateDownloadEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
+    public void start () {
         var remote_filename = this.item.encrypted_filename.is_empty () ? this.item.file : this.item.encrypted_filename;
         var remote_path = string (root_path + remote_filename);
-        var remote_parent_path = remote_path.left (remote_path.last_index_of ('/'));
+        var remote_parent_path = remote_path.left (remote_path.last_index_of ("/"));
 
         // Is encrypted Now we need the folder-identifier
         var job = new LsColJob (this.propagator.account (), remote_parent_path, this);
@@ -63,7 +63,7 @@ public class PropagateDownloadEncrypted : GLib.Object {
             this,
             PropagateDownloadEncrypted.on_signal_folder_id_error
         );
-        job.on_signal_start ();
+        job.start ();
     }
 
 
@@ -71,7 +71,7 @@ public class PropagateDownloadEncrypted : GLib.Object {
     ***********************************************************/
     private string root_path () {
         string result = this.propagator.remote_path ();
-        if (result.starts_with ('/')) {
+        if (result.starts_with ("/")) {
             return result.mid (1);
         } else {
             return result;
@@ -133,7 +133,7 @@ public class PropagateDownloadEncrypted : GLib.Object {
         connect (metadata_job, GetMetadataApiJob.error,
                         this, PropagateDownloadEncrypted.on_signal_folder_encrypted_metadata_error);
 
-        metadata_job.on_signal_start ();
+        metadata_job.start ();
     }
 
 
@@ -148,7 +148,7 @@ public class PropagateDownloadEncrypted : GLib.Object {
         var meta = new FolderMetadata (this.propagator.account (), json.to_json (QJsonDocument.Compact));
         const GLib.List<EncryptedFile> files = meta.files ();
 
-        const string encrypted_filename = this.item.encrypted_filename.section ('/', -1);
+        const string encrypted_filename = this.item.encrypted_filename.section ("/", -1);
         foreach (EncryptedFile file in files) {
             if (encrypted_filename == file.encrypted_filename) {
                 this.encrypted_info = file;
@@ -173,7 +173,7 @@ public class PropagateDownloadEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_folder_encrypted_metadata_error (GLib.ByteArray file_identifier, int http_return_code) {
+    public void on_signal_folder_encrypted_metadata_error (string file_identifier, int http_return_code) {
             GLib.critical ("Failed to find encrypted metadata information of remote file " + this.info.filename ());
             /* emit */ failed ();
     }

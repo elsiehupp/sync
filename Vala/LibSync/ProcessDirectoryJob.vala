@@ -30,7 +30,7 @@ This includes:
 
 This job is tightly coupled with the DiscoveryPhase class.
 
-After being on_signal_start ()'ed
+After being start ()'ed
 
 Internally, this job will call DiscoveryPhase.schedule_more_jobs when one of its sub-jobs is
 finished. DiscoveryPhase.schedule_more_jobs will call process_sub_jobs () to continue work until
@@ -83,7 +83,7 @@ public class ProcessDirectoryJob : GLib.Object {
     Structure representing a path during discovery. A same path may have different value locally
     or on the server in case of renames.
 
-    These strings never on_signal_start or ends with slashes. They are all relative to the fo
+    These strings never start or ends with slashes. They are all relative to the fo
     Usually they are all the same and are even shared instance of the s
 
     this.server and this.local path
@@ -118,7 +118,7 @@ public class ProcessDirectoryJob : GLib.Object {
 
 
         static string path_append (string base_record, string name) {
-            return base_record.is_empty () ? name : base_record + '/' + name;
+            return base_record.is_empty () ? name : base_record + "/" + name;
         }
 
 
@@ -269,7 +269,7 @@ public class ProcessDirectoryJob : GLib.Object {
     /***********************************************************
     The root etag of this directory was fetched
     ***********************************************************/
-    signal void etag (GLib.ByteArray array, GLib.DateTime time);
+    signal void etag (string array, GLib.DateTime time);
 
 
     /***********************************************************
@@ -305,7 +305,7 @@ public class ProcessDirectoryJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
+    public void start () {
         GLib.info ("STARTING " + this.current_folder.server + this.query_server + this.current_folder.local + this.query_local);
 
         if (this.query_server == NORMAL_QUERY) {
@@ -374,7 +374,7 @@ public class ProcessDirectoryJob : GLib.Object {
             var f = this.queued_jobs.front ();
             this.queued_jobs.pop_front ();
             this.running_jobs.push_back (f);
-            f.on_signal_start ();
+            f.start ();
             started++;
         }
         return started;
@@ -432,7 +432,7 @@ public class ProcessDirectoryJob : GLib.Object {
 
     Called once this.server_entries and this.local_entries are filled
     Calls process_file () for each non-excluded one.
-    Will on_signal_start scheduling subdir jobs when done.
+    Will start scheduling subdir jobs when done.
     ***********************************************************/
     private void process () {
         //  ASSERT (this.local_query_done && this.server_query_done);
@@ -528,8 +528,8 @@ public class ProcessDirectoryJob : GLib.Object {
 
             // On the server the path is mangled in case of E2EE
             if (!e.server_entry.e2e_mangled_name.is_empty ()) {
-                GLib.assert (this.discovery_data.remote_folder.starts_with ('/'));
-                GLib.assert (this.discovery_data.remote_folder.has_suffix ('/'));
+                GLib.assert (this.discovery_data.remote_folder.starts_with ("/"));
+                GLib.assert (this.discovery_data.remote_folder.has_suffix ("/"));
 
                 var root_path = this.discovery_data.remote_folder.mid (1);
                 GLib.assert (e.server_entry.e2e_mangled_name.starts_with (root_path));
@@ -630,7 +630,7 @@ public class ProcessDirectoryJob : GLib.Object {
                     item.error_string = _("File names ending with a period are not supported on this file system.");
                 } else {
                     char invalid = '\0';
-                    foreach (char x in GLib.ByteArray ("\\:?*\"<>|")) {
+                    foreach (char x in string ("\\:?*\"<>|")) {
                         if (item.file.contains (x)) {
                             invalid = x;
                             break;
@@ -801,8 +801,8 @@ public class ProcessDirectoryJob : GLib.Object {
                 return "";
             }
 
-            GLib.assert (this.discovery_data.remote_folder.starts_with ('/'));
-            GLib.assert (this.discovery_data.remote_folder.has_suffix ('/'));
+            GLib.assert (this.discovery_data.remote_folder.starts_with ("/"));
+            GLib.assert (this.discovery_data.remote_folder.has_suffix ("/"));
 
             var root_path = this.discovery_data.remote_folder.mid (1);
             GLib.assert (server_entry.e2e_mangled_name.starts_with (root_path));
@@ -1020,7 +1020,7 @@ public class ProcessDirectoryJob : GLib.Object {
     }
 
 
-    private void on_signal_request_etag_job_finished_with_result (HttpResult<GLib.ByteArray> etag) /*mutable*/ {
+    private void on_signal_request_etag_job_finished_with_result (HttpResult<string> etag) /*mutable*/ {
         this.pending_async_jobs--;
         QTimer.single_shot (0, this.discovery_data, DiscoveryPhase.schedule_more_jobs);
         if (etag || etag.error ().code != 404 ||
@@ -1136,7 +1136,7 @@ public class ProcessDirectoryJob : GLib.Object {
                 this,
                 this.on_signal_request_etag_job_finished_with_result
             );
-            job.on_signal_start ();
+            job.start ();
             done = true; // Ideally, if the origin still exist on the server, we should continue searching...  but that'd be difficult
             async = true;
         }
@@ -1405,7 +1405,7 @@ public class ProcessDirectoryJob : GLib.Object {
             } else {
                 // Signal to future check_permissions () to forbid the REMOVE and set to restore instead
                 GLib.info ("Preventing future remove on source " + original_path);
-                this.discovery_data.forbidden_deletes[original_path + '/'] = true;
+                this.discovery_data.forbidden_deletes[original_path + "/"] = true;
             }
             return;
         }
@@ -1426,8 +1426,8 @@ public class ProcessDirectoryJob : GLib.Object {
                 job,
                 RequestEtagJob.finished_with_result,
                 this,
-                this.on_signal_request_etag_job_finished_with_result (Occ.LibSync.HttpResult<GLib.ByteArray> etag));
-            job.on_signal_start ();
+                this.on_signal_request_etag_job_finished_with_result (Occ.LibSync.HttpResult<string> etag));
+            job.start ();
             return;
         }
 
@@ -1451,7 +1451,7 @@ public class ProcessDirectoryJob : GLib.Object {
     }
     
     
-    private void on_signal_request_etag_job_finished_with_result (HttpResult<GLib.ByteArray> etag) /*mutable*/ {
+    private void on_signal_request_etag_job_finished_with_result (HttpResult<string> etag) /*mutable*/ {
         if (!etag || (etag != base_record.etag && !item.is_directory ()) || this.discovery_data.is_renamed (original_path)) {
             GLib.info ("Can't rename because the etag has changed or the directory is gone " + original_path);
             // Can't be a rename, leave it as a new.
@@ -1835,7 +1835,7 @@ public class ProcessDirectoryJob : GLib.Object {
             break;
         }
         case CSYNC_INSTRUCTION_REMOVE: {
-            string file_slash = item.file + '/';
+            string file_slash = item.file + "/";
             var forbidden_it = this.discovery_data.forbidden_deletes.upper_bound (file_slash);
             if (forbidden_it != this.discovery_data.forbidden_deletes.begin ())
                 forbidden_it -= 1;
@@ -1882,7 +1882,7 @@ public class ProcessDirectoryJob : GLib.Object {
         var file_perms = src_perm;
         //true when it is just a rename in the same directory. (not a move)
         bool is_rename = src_path.starts_with (this.current_folder.original)
-            && src_path.last_index_of ('/') == this.current_folder.original.size ();
+            && src_path.last_index_of ("/") == this.current_folder.original.size ();
         // Check if we are allowed to move to the destination.
         bool destination_ok = true;
         bool destination_new_ok = true;
@@ -2039,7 +2039,7 @@ public class ProcessDirectoryJob : GLib.Object {
             this,
             this.on_signal_discovery_single_directory_job_first_directory_permissions
         );
-        server_job.on_signal_start ();
+        server_job.start ();
         return server_job;
     }
 
@@ -2131,7 +2131,7 @@ public class ProcessDirectoryJob : GLib.Object {
         );
 
         QThreadPool pool = QThreadPool.global_instance ();
-        pool.on_signal_start (local_job); // QThreadPool takes ownership
+        pool.start (local_job); // QThreadPool takes ownership
     }
 
 
@@ -2231,11 +2231,11 @@ public class ProcessDirectoryJob : GLib.Object {
     in item.checksum_header. Returns true if the checksum was
     successfully computed.
     ***********************************************************/
-    private static bool compute_local_checksum (GLib.ByteArray header, string path, unowned SyncFileItem item) {
+    private static bool compute_local_checksum (string header, string path, unowned SyncFileItem item) {
         var type = parse_checksum_header_type (header);
         if (!type.is_empty ()) {
             // TODO: compute async?
-            GLib.ByteArray checksum = ComputeChecksum.compute_now_on_signal_file (path, type);
+            string checksum = ComputeChecksum.compute_now_on_signal_file (path, type);
             if (!checksum.is_empty ()) {
                 item.checksum_header = make_checksum_header (type, checksum);
                 return true;

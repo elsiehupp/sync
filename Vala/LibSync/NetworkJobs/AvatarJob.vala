@@ -45,10 +45,10 @@ public class AvatarJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
+    public void start () {
         Soup.Request request;
         send_request ("GET", this.avatar_url, request);
-        AbstractNetworkJob.on_signal_start ();
+        AbstractNetworkJob.start ();
     }
 
 
@@ -88,7 +88,7 @@ public class AvatarJob : AbstractNetworkJob {
         Gtk.Image av_image;
 
         if (http_result_code == 200) {
-            GLib.ByteArray png_data = reply ().read_all ();
+            string png_data = reply ().read_all ();
             if (png_data.size ()) {
                 if (av_image.load_from_data (png_data)) {
                     GLib.debug ("Retrieved Avatar pixmap!");

@@ -72,13 +72,13 @@ public class PropagateItemJob : PropagatorJob {
         }
 
         var path = this.item.file;
-        var slash_position = path.last_index_of ('/');
+        var slash_position = path.last_index_of ("/");
         var parent_path = slash_position >= 0 ? path.left (slash_position): "";
 
-        var path_components = parent_path.split ('/');
+        var path_components = parent_path.split ("/");
         while (!path_components.is_empty ()) {
             SyncJournalFileRecord record;
-            propagator ().journal.get_file_record (path_components.join ('/'), record);
+            propagator ().journal.get_file_record (path_components.join ("/"), record);
             if (record.is_valid () && record.is_e2e_encrypted) {
                 return true;
             }
@@ -116,7 +116,7 @@ public class PropagateItemJob : PropagatorJob {
         GLib.info ("Starting " + this.item.instruction + " propagation of " + this.item.destination () + " by " + this);
 
         this.state = Running;
-        QMetaObject.invoke_method (this, "on_signal_start"); // We could be in a different thread (neon jobs)
+        QMetaObject.invoke_method (this, "start"); // We could be in a different thread (neon jobs)
         return true;
     }
 
@@ -126,7 +126,7 @@ public class PropagateItemJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public virtual void on_signal_start ();
+    public virtual void start ();
 
 
 

@@ -19,7 +19,7 @@ public class MkColJob : AbstractNetworkJob {
     ***********************************************************/
     GLib.Uri url;
 
-    GLib.HashTable<GLib.ByteArray, GLib.ByteArray> extra_headers;
+    GLib.HashTable<string, string> extra_headers;
 
 
     signal void finished_with_error (Soup.Reply reply);
@@ -36,7 +36,7 @@ public class MkColJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public MkColJob.for_url (unowned Account account, GLib.Uri url,
-        GLib.HashTable<GLib.ByteArray, GLib.ByteArray> extra_headers, GLib.Object parent) {
+        GLib.HashTable<string, string> extra_headers, GLib.Object parent) {
         base (account, "", parent);
         this.url = url;
         this.extra_headers = extra_headers;
@@ -46,7 +46,7 @@ public class MkColJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public MkColJob.for_path (unowned Account account, string path,
-        GLib.HashTable<GLib.ByteArray, GLib.ByteArray> extra_headers, GLib.Object parent = new GLib.Object ()) {
+        GLib.HashTable<string, string> extra_headers, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
         this.extra_headers = extra_headers;
     }
@@ -54,7 +54,7 @@ public class MkColJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
+    public void start () {
         // add 'Content-Length : 0' header (see https://github.com/owncloud/client/issues/3256)
         Soup.Request request;
         request.raw_header ("Content-Length", "0");
@@ -68,7 +68,7 @@ public class MkColJob : AbstractNetworkJob {
         } else {
             send_request ("MKCOL", make_dav_url (path ()), request);
         }
-        AbstractNetworkJob.on_signal_start ();
+        AbstractNetworkJob.start ();
     }
 
 

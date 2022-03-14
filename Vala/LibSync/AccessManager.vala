@@ -36,7 +36,7 @@ public class AccessManager : QNetworkAccessManager {
 
     /***********************************************************
     ***********************************************************/
-    public static GLib.ByteArray generate_request_id () {
+    public static string generate_request_id () {
         return QUuid.create_uuid ().to_byte_array (QUuid.WithoutBraces);
     }
 
@@ -52,9 +52,9 @@ public class AccessManager : QNetworkAccessManager {
         }
 
         // Some firewalls reject requests that have a "User-Agent" but no "Accept" header
-        new_request.raw_header (GLib.ByteArray ("Accept"), "*/*");
+        new_request.raw_header (string ("Accept"), "*/*");
 
-        GLib.ByteArray verb = new_request.attribute (Soup.Request.CustomVerbAttribute).to_byte_array ();
+        string verb = new_request.attribute (Soup.Request.CustomVerbAttribute).to_byte_array ();
         // For PROPFIND (assumed to be a WebDAV operation), set xml/utf8 as content type/encoding
         // This needs extension
         if (verb == "PROPFIND") {
@@ -62,7 +62,7 @@ public class AccessManager : QNetworkAccessManager {
         }
 
         // Generate a new request identifier
-        GLib.ByteArray request_id = generate_request_id ();
+        string request_id = generate_request_id ();
         GLib.info (operation + verb + new_request.url ().to_string () + "has X-Request-ID " + request_id);
         new_request.raw_header ("X-Request-ID", request_id);
 

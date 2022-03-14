@@ -51,7 +51,7 @@ public class BulkPropagatorJob : PropagatorJob {
         string remote_path;
         string local_path;
         int64 file_size;
-        GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers;
+        GLib.HashTable<string, string> headers;
     }
 
 
@@ -135,14 +135,14 @@ public class BulkPropagatorJob : PropagatorJob {
         if (upload_checksum_enabled ()) {
             compute_checksum.checksum_type ("MD5" /*propagator ().account ().capabilities ().upload_checksum_type ()*/);
         } else {
-            compute_checksum.checksum_type (GLib.ByteArray ());
+            compute_checksum.checksum_type (string ());
         }
 
         ComputeChecksum.signal_done.connect ((compute_checksum, content_checksum_type, content_checksum) => {
             on_signal_start_upload (item, file_to_upload, content_checksum_type, content_checksum);
         });
         ComputeChecksum.signal_done.connect (compute_checksum, GLib.Object.delete_later);
-        compute_checksum.release ().on_signal_start (file_to_upload.path);
+        compute_checksum.release ().start (file_to_upload.path);
     }
 
 
@@ -153,8 +153,8 @@ public class BulkPropagatorJob : PropagatorJob {
     private void on_signal_start_upload (
         unowned SyncFileItem item,
         UploadFileInfo file_to_upload,
-        GLib.ByteArray transmission_checksum_type,
-        GLib.ByteArray transmission_checksum) {
+        string transmission_checksum_type,
+        string transmission_checksum) {
         var transmission_checksum_header = make_checksum_header (transmission_checksum_type, transmission_checksum);
 
         item.checksum_header = transmission_checksum_header;
@@ -164,11 +164,11 @@ public class BulkPropagatorJob : PropagatorJob {
 
         if (!FileSystem.file_exists (full_file_path)) {
             this.pending_checksum_files.remove (item.file);
-            on_signal_error_start_folder_unlock (item, SyncFileItem.Status.SOFT_ERROR, _("File Removed (on_signal_start upload) %1").arg (full_file_path));
+            on_signal_error_start_folder_unlock (item, SyncFileItem.Status.SOFT_ERROR, _("File Removed (start upload) %1").arg (full_file_path));
             check_propagation_is_done ();
             return;
         }
-        const time_t prev_modtime = item.modtime; // the this.item value was set in PropagateUploadFile.on_signal_start ()
+        const time_t prev_modtime = item.modtime; // the this.item value was set in PropagateUploadFile.start ()
         // but a potential checksum calculation could have taken some time during which the file could
         // have been changed again, so better check again here.
 
@@ -283,7 +283,7 @@ public class BulkPropagatorJob : PropagatorJob {
         // even if their parent folder is online-only.
         if (one_file.item.instruction == CSYNC_INSTRUCTION_NEW
             || one_file.item.instruction == CSYNC_INSTRUCTION_TYPE_CHANGE) {
-            var vfs = propagator ().sync_options ().vfs;
+            var vfs = propagator ().sync_options.vfs;
             var pin = vfs.pin_state (one_file.item.file);
             if (pin && *pin == PinState.VfsItemAvailability.ONLINE_ONLY && !vfs.pin_state (one_file.item.file, PinState.PinState.UNSPECIFIED)) {
                 GLib.warning ("Could not set pin state of " + one_file.item.file + " to unspecified.");
@@ -292,7 +292,7 @@ public class BulkPropagatorJob : PropagatorJob {
 
         // Remove from the progress database:
         propagator ().journal.upload_info (one_file.item.file, SyncJournalDb.UploadInfo ());
-        propagator ().journal.commit ("upload file on_signal_start");
+        propagator ().journal.commit ("upload file start");
     }
 
 
@@ -322,7 +322,7 @@ public class BulkPropagatorJob : PropagatorJob {
     private void do_start_upload (
         unowned SyncFileItem item,
         UploadFileInfo file_to_upload,
-        GLib.ByteArray transmission_checksum_header) {
+        string transmission_checksum_header) {
         if (propagator ().abort_requested) {
             return;
         }
@@ -342,7 +342,7 @@ public class BulkPropagatorJob : PropagatorJob {
         propagator ().journal.commit ("Upload info");
 
         var current_headers = headers (item);
-        current_headers[GLib.ByteArray ("Content-Length")] = new GLib.ByteArray.number (file_to_upload.size);
+        current_headers[string ("Content-Length")] = new string.number (file_to_upload.size);
 
         if (!item.rename_target.is_empty () && item.file != item.rename_target) {
             // Try to rename the file
@@ -427,7 +427,7 @@ public class BulkPropagatorJob : PropagatorJob {
 
         adjust_last_job_timeout (job, timeout);
         this.jobs.append (job);
-        job.release ().on_signal_start ();
+        job.release ().start ();
         if (parallelism () == PropagatorJob.JobParallelism.JobParallelism.FULL_PARALLELISM && this.jobs.size () < PARALLEL_JOBS_MAXIMUM_COUNT) {
             on_signal_schedule_self_or_child ();
         }
@@ -532,11 +532,11 @@ public class BulkPropagatorJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    private static GLib.ByteArray get_etag_from_json_reply (QJsonObject reply) {
+    private static string get_etag_from_json_reply (QJsonObject reply) {
         var oc_etag = Occ.parse_etag (reply.value ("OC-ETag").to_string ().to_latin1 ());
         var ETag = Occ.parse_etag (reply.value ("ETag").to_string ().to_latin1 ());
         var  etag = Occ.parse_etag (reply.value ("etag").to_string ().to_latin1 ());
-        GLib.ByteArray ret = oc_etag;
+        string ret = oc_etag;
         if (ret.is_empty ()) {
             ret = ETag;
         }
@@ -552,7 +552,7 @@ public class BulkPropagatorJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    private static GLib.ByteArray get_header_from_json_reply (QJsonObject reply, GLib.ByteArray header_name) {
+    private static string get_header_from_json_reply (QJsonObject reply, string header_name) {
         return reply.value (header_name).to_string ().to_latin1 ();
     }
 
@@ -591,12 +591,12 @@ public class BulkPropagatorJob : PropagatorJob {
     /***********************************************************
     Bases headers that need to be sent on the PUT, or in the MOVE for chunking-ng
     ***********************************************************/
-    private GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers (unowned SyncFileItem item) {
-        GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers;
-        headers[GLib.ByteArray ("Content-Type")] = GLib.ByteArray ("application/octet-stream");
-        headers[GLib.ByteArray ("X-File-Mtime")] = new GLib.ByteArray.number (int64 (item.modtime));
+    private GLib.HashTable<string, string> headers (unowned SyncFileItem item) {
+        GLib.HashTable<string, string> headers;
+        headers[string ("Content-Type")] = string ("application/octet-stream");
+        headers[string ("X-File-Mtime")] = new string.number (int64 (item.modtime));
         if (q_environment_variable_int_value ("OWNCLOUD_LAZYOPS")) {
-            headers[GLib.ByteArray ("OC-LazyOps")] = GLib.ByteArray ("true");
+            headers[string ("OC-LazyOps")] = string ("true");
         }
 
         if (item.file.contains (QLatin1String (".sys.admin#recall#"))) {
@@ -615,24 +615,24 @@ public class BulkPropagatorJob : PropagatorJob {
             && item.instruction != CSYNC_INSTRUCTION_TYPE_CHANGE) {
             // We add quotes because the owncloud server always adds quotes around the etag, and
             //  csync_owncloud.c's owncloud_file_id always strips the quotes.
-            headers[GLib.ByteArray ("If-Match")] = '"' + item.etag + '"';
+            headers[string ("If-Match")] = '"' + item.etag + '"';
         }
 
         // Set up a conflict file header pointing to the original file
         var conflict_record = propagator ().journal.conflict_record (item.file.to_utf8 ());
         if (conflict_record.is_valid ()) {
-            headers[GLib.ByteArray ("OC-Conflict")] = "1";
+            headers[string ("OC-Conflict")] = "1";
             if (!conflict_record.initial_base_path.is_empty ()) {
-                headers[GLib.ByteArray ("OC-ConflictInitialBasePath")] = conflict_record.initial_base_path;
+                headers[string ("OC-ConflictInitialBasePath")] = conflict_record.initial_base_path;
             }
             if (!conflict_record.base_file_id.is_empty ()) {
-                headers[GLib.ByteArray ("OC-ConflictBaseFileId")] = conflict_record.base_file_id;
+                headers[string ("OC-ConflictBaseFileId")] = conflict_record.base_file_id;
             }
             if (conflict_record.base_modtime != -1) {
-                headers[GLib.ByteArray ("OC-ConflictBaseMtime")] = new GLib.ByteArray.number (conflict_record.base_modtime);
+                headers[string ("OC-ConflictBaseMtime")] = new string.number (conflict_record.base_modtime);
             }
             if (!conflict_record.base_etag.is_empty ()) {
-                headers[GLib.ByteArray ("OC-ConflictBaseEtag")] = conflict_record.base_etag;
+                headers[string ("OC-ConflictBaseEtag")] = conflict_record.base_etag;
             }
         }
 

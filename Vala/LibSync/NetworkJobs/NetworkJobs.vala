@@ -38,10 +38,10 @@ namespace LibSync {
 /***********************************************************
 Strips quotes and gzip annotations
 ***********************************************************/
-GLib.ByteArray parse_etag (char header) {
+string parse_etag (char header) {
     if (!header)
-        return GLib.ByteArray ();
-    GLib.ByteArray arr = header;
+        return string ();
+    string arr = header;
 
     // Weak E-Tags can appear when gzip compression is on, see #3946
     if (arr.starts_with ("W/"))
@@ -66,7 +66,7 @@ struct HttpResult : Result<T, HttpError> { }
 
 
 struct ExtraFolderInfo {
-    GLib.ByteArray file_identifier;
+    string file_identifier;
     int64 size = -1;
 }
 

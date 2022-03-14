@@ -107,11 +107,11 @@ public class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    protected GLib.ByteArray client_cert_bundle;
+    protected string client_cert_bundle;
 
     /***********************************************************
     ***********************************************************/
-    protected GLib.ByteArray client_cert_password;
+    protected string client_cert_password;
 
     /***********************************************************
     ***********************************************************/
@@ -143,7 +143,7 @@ public class HttpCredentials : AbstractCredentials {
     /***********************************************************
     From wizard
     ***********************************************************/
-    public HttpCredentials (string user, string password, GLib.ByteArray client_cert_bundle = new GLib.ByteArray (), GLib.ByteArray client_cert_password = new GLib.ByteArray ()) {
+    public HttpCredentials (string user, string password, string client_cert_bundle = new string (), string client_cert_password = new string ()) {
         this.user = user;
         this.password = password;
         this.ready = true;
@@ -240,7 +240,7 @@ public class HttpCredentials : AbstractCredentials {
             connect (job, QKeychain.Job.on_signal_finished, this, HttpCredentials.on_signal_write_client_cert_password_job_done);
             job.key (keychain_key (this.account.url ().to_string (), this.user + CLIENT_CERT_PASSWORD_C, this.account.identifier ()));
             job.binary_data (this.client_cert_password);
-            job.on_signal_start ();
+            job.start ();
             this.client_cert_bundle.clear ();
             this.client_cert_password.clear ();
         } else if (this.account.credential_setting (QLatin1String (CLIENT_CERT_BUNDLE_C)).is_null () && !this.client_ssl_certificate.is_null ()) {
@@ -253,7 +253,7 @@ public class HttpCredentials : AbstractCredentials {
             connect (job, QKeychain.Job.on_signal_finished, this, HttpCredentials.on_signal_write_client_cert_pem_job_done);
             job.key (keychain_key (this.account.url ().to_string (), this.user + CLIENT_CERTIFICATE_PEM_C, this.account.identifier ()));
             job.binary_data (this.client_ssl_certificate.to_pem ());
-            job.on_signal_start ();
+            job.start ();
         } else {
             // Option 3 : no client certificate at all (or doesn't need to be written)
             on_signal_write_password_to_keychain ();
@@ -292,7 +292,7 @@ public class HttpCredentials : AbstractCredentials {
         add_settings_to_job (this.account, job);
         job.insecure_fallback (true);
         job.key (kck);
-        job.on_signal_start ();
+        job.start ();
 
         // let QNAM forget about the password
         // This needs to be done later in the event loop because we might be called (directly or
@@ -489,7 +489,7 @@ public class HttpCredentials : AbstractCredentials {
         job.insecure_fallback (false);
         job.key (kck);
         connect (job, QKeychain.ReadPasswordJob.on_signal_finished, this, HttpCredentials.on_signal_read_client_key_pem_job_done);
-        job.on_signal_start ();
+        job.start ();
     }
 
 
@@ -500,7 +500,7 @@ public class HttpCredentials : AbstractCredentials {
         // Store key in memory
 
         if (read_job.error () == QKeychain.NoError && read_job.binary_data ().length () > 0) {
-            GLib.ByteArray client_key_pem = read_job.binary_data ();
+            string client_key_pem = read_job.binary_data ();
             // FIXME Unfortunately Qt has a bug and we can't just use QSsl.Opaque to let it
             // load whatever we have. So we try until it works.
             this.client_ssl_key = QSslKey (client_key_pem, QSsl.Rsa);
@@ -532,7 +532,7 @@ public class HttpCredentials : AbstractCredentials {
         job.insecure_fallback (false);
         job.key (kck);
         connect (job, QKeychain.ReadPasswordJob.on_signal_finished, this, HttpCredentials.on_signal_read_job_done);
-        job.on_signal_start ();
+        job.start ();
     }
 
 
@@ -566,7 +566,7 @@ public class HttpCredentials : AbstractCredentials {
             connect (job, QKeychain.Job.on_signal_finished, this, HttpCredentials.on_signal_write_client_key_pem_job_done);
             job.key (keychain_key (this.account.url ().to_string (), this.user + CLIENT_KEY_PEM_C, this.account.identifier ()));
             job.binary_data (this.client_ssl_key.to_pem ());
-            job.on_signal_start ();
+            job.start ();
         } else {
             on_signal_write_client_key_pem_job_done (null);
         }
@@ -650,7 +650,7 @@ public class HttpCredentials : AbstractCredentials {
         connect (job, QKeychain.Job.on_signal_finished, this, HttpCredentials.on_signal_write_job_done);
         job.key (keychain_key (this.account.url ().to_string (), this.user, this.account.identifier ()));
         job.text_data (is_using_oauth () ? this.refresh_token : this.password);
-        job.on_signal_start ();
+        job.start ();
     }
 
 
@@ -683,7 +683,7 @@ public class HttpCredentials : AbstractCredentials {
             job.insecure_fallback (false);
             job.key (keychain_key (this.account.url ().to_string (), this.user + CLIENT_CERT_PASSWORD_C, this.account.identifier ()));
             connect (job, QKeychain.Job.on_signal_finished, this, HttpCredentials.on_signal_read_client_cert_password_job_done);
-            job.on_signal_start ();
+            job.start ();
             return;
         }
 
@@ -698,7 +698,7 @@ public class HttpCredentials : AbstractCredentials {
         job.insecure_fallback (false);
         job.key (kck);
         connect (job, QKeychain.Job.on_signal_finished, this, HttpCredentials.on_signal_read_client_cert_pem_job_done);
-        job.on_signal_start ();
+        job.start ();
     }
 
 
@@ -718,7 +718,7 @@ public class HttpCredentials : AbstractCredentials {
         add_settings_to_job (this.account, job);
         job.insecure_fallback (true);
         job.key (keychain_key (this.account.url ().to_string (), user, ""));
-        job.on_signal_start ();
+        job.start ();
     }
 
 

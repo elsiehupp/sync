@@ -55,18 +55,18 @@ public class HttpLogger {
     /***********************************************************
     Helper to construct the HTTP verb used in the request
     ***********************************************************/
-    public static GLib.ByteArray request_verb (QNetworkAccessManager.Operation operation, Soup.Request request) {
+    public static string request_verb (QNetworkAccessManager.Operation operation, Soup.Request request) {
         switch (operation) {
         case QNetworkAccessManager.HeadOperation:
-            return GLib.ByteArray ("HEAD");
+            return string ("HEAD");
         case QNetworkAccessManager.GetOperation:
-            return GLib.ByteArray ("GET");
+            return string ("GET");
         case QNetworkAccessManager.PutOperation:
-            return GLib.ByteArray ("PUT");
+            return string ("PUT");
         case QNetworkAccessManager.PostOperation:
-            return GLib.ByteArray ("POST");
+            return string ("POST");
         case QNetworkAccessManager.DeleteOperation:
-            return GLib.ByteArray ("DELETE");
+            return string ("DELETE");
         case QNetworkAccessManager.CustomOperation:
             return request.attribute (Soup.Request.CustomVerbAttribute).to_byte_array ();
         case QNetworkAccessManager.UnknownOperation:
@@ -82,7 +82,7 @@ public class HttpLogger {
     }
 
 
-    public static void log_http (GLib.ByteArray verb, string url, GLib.ByteArray identifier, string content_type, GLib.List<Soup.Reply.RawHeaderPair> header, QIODevice device) {
+    public static void log_http (string verb, string url, string identifier, string content_type, GLib.List<Soup.Reply.RawHeaderPair> header, QIODevice device) {
         var reply = (Soup.Reply) device;
         var content_length = device ? device.size () : 0;
         string message;

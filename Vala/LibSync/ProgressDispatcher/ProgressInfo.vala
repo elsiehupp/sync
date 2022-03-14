@@ -20,7 +20,7 @@ public class ProgressInfo : GLib.Object {
     public enum Status {
 
         /***********************************************************
-        Emitted once at on_signal_start
+        Emitted once at start
         ***********************************************************/
         STARTING,
 
@@ -336,7 +336,7 @@ public class ProgressInfo : GLib.Object {
     is_updating_estimates () will return true afterwards.
     ***********************************************************/
     public void start_estimate_updates () {
-        this.update_estimates_timer.on_signal_start (1000);
+        this.update_estimates_timer.start (1000);
     }
 
 
@@ -344,7 +344,7 @@ public class ProgressInfo : GLib.Object {
     Returns true when start_estimate_updates () was called.
 
     This is used when the SyncEngine wants to indicate a new sync
-    is about to on_signal_start via the transmission_progress () signal. The
+    is about to start via the transmission_progress () signal. The
     first ProgressInfo will have is_updating_estimates () == false.
     ***********************************************************/
     public bool is_updating_estimates () {

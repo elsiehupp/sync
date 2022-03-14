@@ -11,20 +11,20 @@ public class StoreMetaDataApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.ByteArray file_identifier;
-    private GLib.ByteArray b64_metadata;
+    private string file_identifier;
+    private string b64_metadata;
 
 
-    signal void success (GLib.ByteArray file_identifier);
-    signal void error (GLib.ByteArray file_identifier, int http_return_code);
+    signal void success (string file_identifier);
+    signal void error (string file_identifier, int http_return_code);
 
 
     /***********************************************************
     ***********************************************************/
     public StoreMetaDataApiJob (
         unowned Account account,
-        GLib.ByteArray file_identifier,
-        GLib.ByteArray b64_metadata,
+        string file_identifier,
+        string b64_metadata,
         GLib.Object parent = new GLib.Object ()) {
 
         base (account, E2EE_BASE_URL + "meta-data/" + file_identifier, parent);
@@ -35,7 +35,7 @@ public class StoreMetaDataApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public new void on_signal_start () {
+    public new void start () {
         Soup.Request request;
         request.raw_header ("OCS-APIREQUEST", "true");
         request.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
@@ -44,13 +44,13 @@ public class StoreMetaDataApiJob : AbstractNetworkJob {
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
         url.query (query);
 
-        GLib.ByteArray data = new GLib.ByteArray ("meta_data=") + GLib.Uri.to_percent_encoding (this.b64_metadata);
+        string data = new string ("meta_data=") + GLib.Uri.to_percent_encoding (this.b64_metadata);
         var buffer = new Soup.Buffer (this);
         buffer.data (data);
 
         GLib.info ("Sending the metadata for the file_identifier " + this.file_identifier + " as encrypted.");
         send_request ("POST", url, request, buffer);
-        AbstractNetworkJob.on_signal_start ();
+        AbstractNetworkJob.start ();
     }
 
 

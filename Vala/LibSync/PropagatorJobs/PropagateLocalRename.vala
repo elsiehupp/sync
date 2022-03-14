@@ -23,7 +23,7 @@ public class PropagateLocalRename : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
+    public void start () {
         if (propagator ().abort_requested)
             return;
 
@@ -63,7 +63,7 @@ public class PropagateLocalRename : PropagateItemJob {
         propagator ().journal.get_file_record (this.item.original_file, old_record);
         propagator ().journal.delete_file_record (this.item.original_file);
 
-        var vfs = propagator ().sync_options ().vfs;
+        var vfs = propagator ().sync_options.vfs;
         var pin_state = vfs.pin_state (this.item.original_file);
         if (!vfs.pin_state (this.item.original_file, PinState.PinState.INHERITED)) {
             GLib.warning ("Could not set pin state of " + this.item.original_file + " to inherited.");

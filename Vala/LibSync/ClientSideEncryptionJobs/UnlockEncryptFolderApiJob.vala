@@ -11,21 +11,21 @@ public class UnlockEncryptFolderApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.ByteArray file_identifier;
-    private GLib.ByteArray token;
+    private string file_identifier;
+    private string token;
     private Soup.Buffer token_buf;
 
 
-    internal signal void signal_success (GLib.ByteArray file_identifier);
-    internal signal void signal_error (GLib.ByteArray file_identifier, int http_return_code);
+    internal signal void signal_success (string file_identifier);
+    internal signal void signal_error (string file_identifier, int http_return_code);
 
 
     /***********************************************************
     ***********************************************************/
     public UnlockEncryptFolderApiJob (
         unowned Account account,
-        GLib.ByteArray file_identifier,
-        GLib.ByteArray token,
+        string file_identifier,
+        string token,
         GLib.Object parent = new GLib.Object ()) {
         
         base (account, E2EE_BASE_URL + "lock/" + file_identifier, parent);
@@ -36,7 +36,7 @@ public class UnlockEncryptFolderApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public new void on_signal_start () {
+    public new void start () {
         Soup.Request request;
         request.raw_header ("OCS-APIREQUEST", "true");
         request.raw_header ("e2e-token", this.token);
@@ -44,7 +44,7 @@ public class UnlockEncryptFolderApiJob : AbstractNetworkJob {
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
         send_request ("DELETE", url, request);
 
-        AbstractNetworkJob.on_signal_start ();
+        AbstractNetworkJob.start ();
         GLib.info ("Starting the request to unlock.");
     }
 

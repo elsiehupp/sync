@@ -22,7 +22,7 @@ Propagation job, impementing the old chunking agorithm
 public class PropagateUploadFileV1 : PropagateUploadFileCommon {
 
     /***********************************************************
-    That's the on_signal_start chunk that was stored in the database for resuming.
+    That's the start chunk that was stored in the database for resuming.
     In the non-resuming case it is 0.
     If we are resuming, this is the first chunk we need to send
     ***********************************************************/
@@ -56,7 +56,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
     ***********************************************************/
     int64 chunk_size {
         private get {
-            return propagator ().sync_options ().initial_chunk_size;
+            return propagator ().sync_options.initial_chunk_size;
         }
     }
 
@@ -157,8 +157,8 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
         }
         int64 file_size = this.file_to_upload.size;
         var headers = PropagateUploadFileCommon.headers ();
-        headers[GLib.ByteArray ("OC-Total-Length")] = new GLib.ByteArray.number (file_size);
-        headers[GLib.ByteArray ("OC-Chunk-Size")] = new GLib.ByteArray.number (chunk_size ());
+        headers[string ("OC-Total-Length")] = new string.number (file_size);
+        headers[string ("OC-Chunk-Size")] = new string.number (chunk_size ());
 
         string path = this.file_to_upload.file;
 
@@ -172,7 +172,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
             GLib.info ("Upload chunk" + sending_chunk + "of" + this.chunk_count + "transferid (remote)=" + transid);
             path += "-chunking-%1-%2-%3".arg (transid).arg (this.chunk_count).arg (sending_chunk);
 
-            headers[GLib.ByteArray ("OC-Chunked")] = GLib.ByteArray ("1");
+            headers[string ("OC-Chunked")] = string ("1");
 
             chunk_start = chunk_size () * sending_chunk;
             current_chunk_size = chunk_size ();
@@ -236,7 +236,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
         if (is_final_chunk) {
             adjust_last_job_timeout (job, file_size);
         }
-        job.on_signal_start ();
+        job.start ();
         propagator ().active_job_list.append (this);
         this.current_chunk++;
 
@@ -246,7 +246,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
             // Server may also disable parallel chunked upload for any higher version
             parallel_chunk_upload = false;
         } else {
-            GLib.ByteArray env = qgetenv ("OWNCLOUD_PARALLEL_CHUNK");
+            string env = qgetenv ("OWNCLOUD_PARALLEL_CHUNK");
             if (!env.is_empty ()) {
                 parallel_chunk_upload = env != "false" && env != "0";
             } else {
@@ -320,7 +320,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
         // But if the upload is ongoing, because not all chunks were uploaded
         // yet, the upload can be stopped and an error can be displayed, because
         // the server hasn't registered the new file yet.
-        GLib.ByteArray etag = get_etag_from_reply (job.reply ());
+        string etag = get_etag_from_reply (job.reply ());
         this.finished = etag.length () > 0;
 
         // Check if the file still exists
@@ -376,7 +376,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
                     current_chunk = q_min (current_chunk, put_job.chunk - 1);
                 }
             }
-            pi.chunk = (current_chunk + this.start_chunk + 1) % this.chunk_count; // next chunk to on_signal_start with
+            pi.chunk = (current_chunk + this.start_chunk + 1) % this.chunk_count; // next chunk to start with
             pi.transferid = this.transfer_identifier;
             GLib.assert (this.item.modtime > 0);
             if (this.item.modtime <= 0) {
@@ -394,7 +394,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
         // the following code only happens after all chunks were uploaded.
 
         // the file identifier should only be empty for new files up- or downloaded
-        GLib.ByteArray fid = job.reply ().raw_header ("OC-FileID");
+        string fid = job.reply ().raw_header ("OC-FileID");
         if (!fid.is_empty ()) {
             if (!this.item.file_id.is_empty () && this.item.file_id != fid) {
                 GLib.warning ("File ID changed! " + this.item.file_id.to_string () + fid.to_string ());

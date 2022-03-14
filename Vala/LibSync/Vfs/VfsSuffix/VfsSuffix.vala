@@ -62,7 +62,7 @@ public class VfsSuffix : Vfs {
 
     /***********************************************************
     ***********************************************************/
-    public Result<void, string> update_metadata (string file_path, time_t modtime, int64 size, GLib.ByteArray file_identifier) {
+    public Result<void, string> update_metadata (string file_path, time_t modtime, int64 size, string file_identifier) {
         if (modtime <= 0) {
             return new Result<void, string>.from_error(_("Error updating metadata due to invalid modified time"));
         }
@@ -189,7 +189,7 @@ public class VfsSuffix : Vfs {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_file_status_changed ((string system_filename, SyncFileStatus file_status) {
+    public void on_signal_file_status_changed (string system_filename, SyncFileStatus file_status) {
         return;
     }
 
@@ -201,12 +201,20 @@ public class VfsSuffix : Vfs {
         // that are not marked as a virtual file. These could be real .owncloud
         // files that were synced before vfs was enabled.
         QByteArrayList to_wipe;
-        parameters.journal.get_files_below_path ("", /*[&to_wipe]*/ (SyncJournalFileRecord record) => {
-            if (!record.is_virtual_file () && record.path.has_suffix (APPLICATION_DOTVIRTUALFILE_SUFFIX))
-                to_wipe.append (record.path);
-        });
-        foreach (var path in to_wipe)
+        parameters.journal.get_files_below_path (
+            "",
+            VfsSuffix.record_filter
+        );
+        foreach (var path in to_wipe) {
             parameters.journal.delete_file_record (path);
+        }
+    }
+
+
+    private static void record_filter (QByteArrayList to_wipe, SyncJournalFileRecord record) {
+        if (!record.is_virtual_file () && record.path.has_suffix (APPLICATION_DOTVIRTUALFILE_SUFFIX)) {
+            to_wipe.append (record.path);
+        }
     }
 
 } // class VfsSuffix

@@ -13,8 +13,8 @@ namespace LibSync {
 ***********************************************************/
 public class RequestEtagJob : AbstractNetworkJob {
 
-    signal void on_signal_etag_retrieved (GLib.ByteArray etag, GLib.DateTime time);
-    signal void finished_with_result (HttpResult<GLib.ByteArray> etag);
+    signal void on_signal_etag_retrieved (string etag, GLib.DateTime time);
+    signal void finished_with_result (HttpResult<string> etag);
 
     /***********************************************************
     ***********************************************************/
@@ -25,11 +25,11 @@ public class RequestEtagJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public new void on_signal_start () {
+    public new void start () {
         Soup.Request request;
         request.raw_header ("Depth", "0");
 
-        GLib.ByteArray xml = "<?xml version=\"1.0\" ?>\n"
+        string xml = "<?xml version=\"1.0\" ?>\n"
                            + "<d:propfind xmlns:d=\"DAV:\">\n"
                            + "  <d:prop>\n"
                            + "    <d:getetag/>\n"
@@ -44,7 +44,7 @@ public class RequestEtagJob : AbstractNetworkJob {
         if (reply ().error () != Soup.Reply.NoError) {
             GLib.warning ("Request network error: " + reply ().error_string ());
         }
-        AbstractNetworkJob.on_signal_start ();
+        AbstractNetworkJob.start ();
     }
 
 
@@ -59,7 +59,7 @@ public class RequestEtagJob : AbstractNetworkJob {
             // Parse DAV response
             QXmlStreamReader reader = new QXmlStreamReader (reply ());
             reader.add_extra_namespace_declaration (QXmlStreamNamespaceDeclaration ("d", "DAV:"));
-            GLib.ByteArray etag;
+            string etag;
             while (!reader.at_end ()) {
                 QXmlStreamReader.TokenType type = reader.read_next ();
                 if (type == QXmlStreamReader.StartElement && reader.namespace_uri () == "DAV:") {

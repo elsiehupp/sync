@@ -16,7 +16,7 @@ public class PUTFileJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     QIODevice device { public get; private set; }
-    private GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers;
+    private GLib.HashTable<string, string> headers;
     string error_string {
         public get {
             this.error_string == "" ? AbstractNetworkJob.error_string () : this.error_string;
@@ -41,7 +41,7 @@ public class PUTFileJob : AbstractNetworkJob {
     Takes ownership of the device
     ***********************************************************/
     public PUTFileJob.for_path (unowned Account account, string path, std.unique_ptr<QIODevice> device,
-        GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers, int chunk, GLib.Object parent = new GLib.Object ()) {
+        GLib.HashTable<string, string> headers, int chunk, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
         this.device = device.release ();
         this.headers = headers;
@@ -53,7 +53,7 @@ public class PUTFileJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public PUTFileJob.for_url (unowned Account account, GLib.Uri url, std.unique_ptr<QIODevice> device,
-        GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers, int chunk, GLib.Object parent = new GLib.Object ()) {
+        GLib.HashTable<string, string> headers, int chunk, GLib.Object parent = new GLib.Object ()) {
         base (account, "", parent);
         this.device = device.release ();
         this.headers = headers;
@@ -70,7 +70,7 @@ public class PUTFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
+    public void start () {
         Soup.Request request;
         foreach (var header in this.headers) {
             request.raw_header (header.key (), header.value ());
@@ -90,8 +90,8 @@ public class PUTFileJob : AbstractNetworkJob {
 
         connect (reply (), Soup.Reply.signal_upload_progress, this, PUTFileJob.signal_upload_progress);
         connect (this, AbstractNetworkJob.signal_network_activity, account ().data (), Account.signal_propagator_network_activity);
-        this.request_timer.on_signal_start ();
-        AbstractNetworkJob.on_signal_start ();
+        this.request_timer.start ();
+        AbstractNetworkJob.start ();
     }
 
 

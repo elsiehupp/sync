@@ -78,12 +78,12 @@ public class CheckServerJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
+    public void start () {
         this.server_url = account ().url ();
         send_request ("GET", Utility.concat_url_path (this.server_url, path ()));
         connect (reply (), Soup.Reply.meta_data_changed, this, CheckServerJob.on_signal_metadata_changed);
         connect (reply (), Soup.Reply.encrypted, this, CheckServerJob.on_signal_encrypted);
-        AbstractNetworkJob.on_signal_start ();
+        AbstractNetworkJob.start ();
     }
 
 
@@ -137,12 +137,12 @@ public class CheckServerJob : AbstractNetworkJob {
         if ((reply ().error () == Soup.Reply.ContentNotFoundError) && (!this.subdir_fallback)) {
             this.subdir_fallback = true;
             path (NEXTCLOUD_DIR_C + STATUS_PHP_C);
-            on_signal_start ();
+            start ();
             GLib.info ("Retrying with " + reply ().url ());
             return false;
         }
 
-        GLib.ByteArray body = reply ().peek (4 * 1024);
+        string body = reply ().peek (4 * 1024);
         int http_status = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (body.is_empty () || http_status != 200) {
             GLib.warning ("Error: status.php replied " + http_status + body);
@@ -185,7 +185,7 @@ public class CheckServerJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_redirected (Soup.Reply reply, GLib.Uri target_url, int redirect_count) {
-        GLib.ByteArray slash_status_php = new GLib.ByteArray ("/");
+        string slash_status_php = new string ("/");
         slash_status_php.append (STATUS_PHP_C);
 
         int http_code = reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();

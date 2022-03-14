@@ -184,8 +184,8 @@ public class ConfigFile : GLib.Object {
         }
         string directory = this.conf_dir;
 
-        if (!directory.has_suffix ('/'))
-            directory.append ('/');
+        if (!directory.has_suffix ("/"))
+            directory.append ("/");
         return directory;
     }
 
@@ -304,7 +304,7 @@ public class ConfigFile : GLib.Object {
     /***********************************************************
     The certificates do not depend on a connection.
     ***********************************************************/
-    GLib.ByteArray ca_certificates { public get; public set; }
+    string ca_certificates { public get; public set; }
 
 
     /***********************************************************
@@ -618,8 +618,8 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     public string proxy_password ();
     string ConfigFile.proxy_password () {
-        GLib.ByteArray pass_encoded = get_value (PROXY_PASS_C).to_byte_array ();
-        var pass = string.from_utf8 (GLib.ByteArray.from_base64 (pass_encoded));
+        string pass_encoded = get_value (PROXY_PASS_C).to_byte_array ();
+        var pass = string.from_utf8 (string.from_base64 (pass_encoded));
         pass_encoded.clear ();
 
         var key = KEYCHAIN_PROXY_PASSWORD_KEY ();

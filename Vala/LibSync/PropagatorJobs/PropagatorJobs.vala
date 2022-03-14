@@ -26,7 +26,7 @@ public class PropagatorJobs : GLib.Object {
     const string CHECK_SUM_HEADER_C = "OC-Checksum";
     const string CONTENT_MD5_HEADER_C = "Content-MD5";
 
-    public static GLib.ByteArray local_file_id_from_full_id (GLib.ByteArray identifier) {
+    public static string local_file_id_from_full_id (string identifier) {
         return identifier.left (8);
     }
 

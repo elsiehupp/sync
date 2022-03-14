@@ -21,7 +21,7 @@ public class PropagateRemoteCeleteEncrypted : AbstractPropagateRemoteDeleteEncry
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
+    public void start () {
         GLib.assert (!this.item.encrypted_filename.is_empty ());
 
         const GLib.FileInfo info = new GLib.FileInfo (this.item.encrypted_filename);
@@ -31,7 +31,7 @@ public class PropagateRemoteCeleteEncrypted : AbstractPropagateRemoteDeleteEncry
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_folder_unlocked_successfully (GLib.ByteArray folder_identifier) {
+    private void on_signal_folder_unlocked_successfully (string folder_identifier) {
         AbstractPropagateRemoteDeleteEncrypted.on_signal_folder_unlocked_successfully (folder_identifier);
         /* emit */ finished (!this.is_task_failed);
     }
@@ -85,11 +85,11 @@ public class PropagateRemoteCeleteEncrypted : AbstractPropagateRemoteDeleteEncry
             this,
             PropagateRemoteCeleteEncrypted.task_failed
         );
-        job.on_signal_start ();
+        job.start ();
     }
 
 
-    private void on_signal_update_metadata_api_job_success (GLib.ByteArray file_identifier) {
+    private void on_signal_update_metadata_api_job_success (string file_identifier) {
         //  Q_UNUSED (file_identifier);
         delete_remote_item (this.item.encrypted_filename);
     }

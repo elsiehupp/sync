@@ -3,13 +3,13 @@ namespace LibSync {
 
 public class EncryptionHelper : GLib.Object {
 
-    public static GLib.ByteArray generate_random_filename () {
+    public static string generate_random_filename () {
         return QUuid.create_uuid ().to_rfc4122 ().to_hex ();
     }
 
 
-    public static GLib.ByteArray generate_random (int size) {
-        GLib.ByteArray result = new GLib.ByteArray (size, '\0');
+    public static string generate_random (int size) {
+        string result = new string (size, '\0');
 
         int ret = RAND_bytes (unsigned_data (result), size);
         if (ret != 1) {
@@ -21,14 +21,14 @@ public class EncryptionHelper : GLib.Object {
     }
 
 
-    public static GLib.ByteArray generate_password (string wordlist, GLib.ByteArray salt) {
+    public static string generate_password (string wordlist, string salt) {
         GLib.info ("Start encryption key generation!");
 
         const int iteration_count = 1024;
         const int key_strength = 256;
         const int key_length = key_strength/8;
 
-        GLib.ByteArray secret_key = new GLib.ByteArray (key_length, '\0');
+        string secret_key = new string (key_length, '\0');
 
         int ret = PKCS5_PBKDF2_HMAC_SHA1 (
             wordlist.to_local8Bit ().const_data (),     // const char password,
@@ -51,12 +51,12 @@ public class EncryptionHelper : GLib.Object {
     }
 
 
-    public static GLib.ByteArray encrypt_private_key (
-        GLib.ByteArray key,
-        GLib.ByteArray private_key,
-        GLib.ByteArray salt) {
+    public static string encrypt_private_key (
+        string key,
+        string private_key,
+        string salt) {
 
-        GLib.ByteArray initialization_vector = generate_random (12);
+        string initialization_vector = generate_random (12);
 
         CipherContext context;
 
@@ -88,10 +88,10 @@ public class EncryptionHelper : GLib.Object {
         }
 
         // We write the base64 encoded private key
-        GLib.ByteArray private_key_b64 = private_key.to_base64 ();
+        string private_key_b64 = private_key.to_base64 ();
 
         // Make sure we have enough room in the cipher text
-        GLib.ByteArray cipher_text = new GLib.ByteArray (private_key_b64.size () + 32, '\0');
+        string cipher_text = new string (private_key_b64.size () + 32, '\0');
 
         // Do the actual encryption
         int len = 0;
@@ -114,18 +114,18 @@ public class EncryptionHelper : GLib.Object {
         clen += len;
 
         // Get the e2Ee_tag
-        GLib.ByteArray e2Ee_tag = new GLib.ByteArray (Occ.Constants.E2EE_TAG_SIZE, '\0');
+        string e2Ee_tag = new string (Occ.Constants.E2EE_TAG_SIZE, '\0');
         if (1 != EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_GET_TAG, Occ.Constants.E2EE_TAG_SIZE, unsigned_data (e2Ee_tag))) {
             GLib.info ("Error getting the e2Ee_tag.");
             handle_errors ();
         }
 
-        GLib.ByteArray cipher_text2;
+        string cipher_text2;
         cipher_text2.reserve (clen + Occ.Constants.E2EE_TAG_SIZE);
         cipher_text2.append (cipher_text, clen);
         cipher_text2.append (e2Ee_tag);
 
-        GLib.ByteArray result = cipher_text2.to_base64 ();
+        string result = cipher_text2.to_base64 ();
         result += '|';
         result += initialization_vector.to_base64 ();
         result += '|';
@@ -135,28 +135,28 @@ public class EncryptionHelper : GLib.Object {
     }
 
 
-    public static GLib.ByteArray decrypt_private_key (
-        GLib.ByteArray key,
-        GLib.ByteArray data) {
+    public static string decrypt_private_key (
+        string key,
+        string data) {
         GLib.info ("decrypt_string_symmetric key: " + key);
         GLib.info ("decrypt_string_symmetric data: " + data);
 
         var parts = split_cipher_parts (data);
         if (parts.size () < 2) {
             GLib.info ("Not enough parts found.");
-            return new GLib.ByteArray ();
+            return new string ();
         }
 
-        GLib.ByteArray cipher_t_xT64 = parts.at (0);
-        GLib.ByteArray iv_b64 = parts.at (1);
+        string cipher_t_xT64 = parts.at (0);
+        string iv_b64 = parts.at (1);
 
         GLib.info ("decrypt_string_symmetric cipher text: " + cipher_t_xT64);
         GLib.info ("decrypt_string_symmetric initialization vector: " + iv_b64);
 
-        GLib.ByteArray cipher_text2 = new GLib.ByteArray.from_base64 (cipher_t_xT64);
-        GLib.ByteArray initialization_vector = new GLib.ByteArray.from_base64 (iv_b64);
+        string cipher_text2 = new string.from_base64 (cipher_t_xT64);
+        string initialization_vector = new string.from_base64 (iv_b64);
 
-        const GLib.ByteArray e2Ee_tag = cipher_text2.right (Occ.Constants.E2EE_TAG_SIZE);
+        const string e2Ee_tag = cipher_text2.right (Occ.Constants.E2EE_TAG_SIZE);
         cipher_text2.chop (Occ.Constants.E2EE_TAG_SIZE);
 
         // Init
@@ -165,28 +165,28 @@ public class EncryptionHelper : GLib.Object {
         // Create and initialise the context
         if (!context) {
             GLib.info ("Error creating cipher.");
-            return new GLib.ByteArray ();
+            return new string ();
         }
 
         // Initialise the decryption operation.
         if (!EVP_Decrypt_init_ex (context, EVP_aes_256_gcm (), null, null, null)) {
             GLib.info ("Error initialising context with aes 256");
-            return new GLib.ByteArray ();
+            return new string ();
         }
 
         // Set Initialization Vector length. Not necessary if this is 12 bytes (96 bits)
         if (!EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_SET_IVLEN, initialization_vector.size (), null)) {
             GLib.info ("Error setting Initialization Vector size");
-            return new GLib.ByteArray ();
+            return new string ();
         }
 
         // Initialise key and Initialization Vector
         if (!EVP_Decrypt_init_ex (context, null, null, (uchar *)key.const_data (), (uchar *)initialization_vector.const_data ())) {
             GLib.info ("Error initialising key and initialization_vector");
-            return new GLib.ByteArray ();
+            return new string ();
         }
 
-        GLib.ByteArray ptext = new GLib.ByteArray (cipher_text2.size () + Occ.Constants.E2EE_TAG_SIZE, '\0');
+        string ptext = new string (cipher_text2.size () + Occ.Constants.E2EE_TAG_SIZE, '\0');
         int plen = 0;
 
 
@@ -196,13 +196,13 @@ public class EncryptionHelper : GLib.Object {
         ***********************************************************/
         if (!EVP_Decrypt_update (context, unsigned_data (ptext), plen, (uchar *)cipher_text2.const_data (), cipher_text2.size ())) {
             GLib.info ("Could not decrypt");
-            return new GLib.ByteArray ();
+            return new string ();
         }
 
         // Set expected e2Ee_tag value. Works in OpenSSL 1.0.1d and later
         if (!EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_SET_TAG, e2Ee_tag.size (), (uchar *)e2Ee_tag.const_data ())) {
             GLib.info ("Could not set e2Ee_tag");
-            return new GLib.ByteArray ();
+            return new string ();
         }
 
 
@@ -213,29 +213,29 @@ public class EncryptionHelper : GLib.Object {
         int len = plen;
         if (EVP_Decrypt_final_ex (context, unsigned_data (ptext) + plen, len) == 0) {
             GLib.info ("Tag did not match!");
-            return new GLib.ByteArray ();
+            return new string ();
         }
 
-        GLib.ByteArray result = new GLib.ByteArray (ptext, plen);
-        return GLib.ByteArray.from_base64 (result);
+        string result = new string (ptext, plen);
+        return string.from_base64 (result);
     }
 
 
-    public static GLib.ByteArray extract_private_key_salt (GLib.ByteArray data) {
+    public static string extract_private_key_salt (string data) {
         var parts = split_cipher_parts (data);
         if (parts.size () < 3) {
             GLib.info ("Not enough parts found.");
-            return new GLib.ByteArray ();
+            return new string ();
         }
 
-        return GLib.ByteArray.from_base64 (parts.at (2));
+        return string.from_base64 (parts.at (2));
     }
 
 
-    public static GLib.ByteArray encrypt_string_symmetric (
-        GLib.ByteArray key,
-        GLib.ByteArray data) {
-        GLib.ByteArray initialization_vector = generate_random (16);
+    public static string encrypt_string_symmetric (
+        string key,
+        string data) {
+        string initialization_vector = generate_random (16);
 
         CipherContext context;
 
@@ -271,10 +271,10 @@ public class EncryptionHelper : GLib.Object {
         }
 
         // We write the data base64 encoded
-        GLib.ByteArray data_b64 = data.to_base64 ();
+        string data_b64 = data.to_base64 ();
 
         // Make sure we have enough room in the cipher text
-        GLib.ByteArray cipher_text = new GLib.ByteArray (data_b64.size () + 16, '\0');
+        string cipher_text = new string (data_b64.size () + 16, '\0');
 
         // Do the actual encryption
         int len = 0;
@@ -299,19 +299,19 @@ public class EncryptionHelper : GLib.Object {
         clen += len;
 
         // Get the e2Ee_tag
-        GLib.ByteArray e2Ee_tag = new GLib.ByteArray (Occ.Constants.E2EE_TAG_SIZE, '\0');
+        string e2Ee_tag = new string (Occ.Constants.E2EE_TAG_SIZE, '\0');
         if (1 != EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_GET_TAG, Occ.Constants.E2EE_TAG_SIZE, unsigned_data (e2Ee_tag))) {
             GLib.info ("Error getting the e2Ee_tag");
             handle_errors ();
             return {};
         }
 
-        GLib.ByteArray cipher_text2;
+        string cipher_text2;
         cipher_text2.reserve (clen + Occ.Constants.E2EE_TAG_SIZE);
         cipher_text2.append (cipher_text, clen);
         cipher_text2.append (e2Ee_tag);
 
-        GLib.ByteArray result = cipher_text2.to_base64 ();
+        string result = cipher_text2.to_base64 ();
         result += '|';
         result += initialization_vector.to_base64 ();
 
@@ -319,28 +319,28 @@ public class EncryptionHelper : GLib.Object {
     }
 
 
-    public static GLib.ByteArray decrypt_string_symmetric (
-        GLib.ByteArray key,
-        GLib.ByteArray data) {
+    public static string decrypt_string_symmetric (
+        string key,
+        string data) {
         GLib.info ("decrypt_string_symmetric key: " + key);
         GLib.info ("decrypt_string_symmetric data: " + data);
 
         var parts = split_cipher_parts (data);
         if (parts.size () < 2) {
             GLib.info ("Not enough parts found.");
-            return new GLib.ByteArray ();
+            return new string ();
         }
 
-        GLib.ByteArray cipher_t_xT64 = parts.at (0);
-        GLib.ByteArray iv_b64 = parts.at (1);
+        string cipher_t_xT64 = parts.at (0);
+        string iv_b64 = parts.at (1);
 
         GLib.info ("decrypt_string_symmetric cipher_text2: " + cipher_t_xT64);
         GLib.info ("decrypt_string_symmetric Initialization Vector: " + iv_b64);
 
-        GLib.ByteArray cipher_text2 = new GLib.ByteArray.from_base64 (cipher_t_xT64);
-        GLib.ByteArray initialization_vector = new GLib.ByteArray.from_base64 (iv_b64);
+        string cipher_text2 = new string.from_base64 (cipher_t_xT64);
+        string initialization_vector = new string.from_base64 (iv_b64);
 
-        const GLib.ByteArray e2Ee_tag = cipher_text2.right (Occ.Constants.E2EE_TAG_SIZE);
+        const string e2Ee_tag = cipher_text2.right (Occ.Constants.E2EE_TAG_SIZE);
         cipher_text2.chop (Occ.Constants.E2EE_TAG_SIZE);
 
         // Init
@@ -349,28 +349,28 @@ public class EncryptionHelper : GLib.Object {
         // Create and initialise the context
         if (!context) {
             GLib.info ("Error creating cipher.");
-            return new GLib.ByteArray ();
+            return new string ();
         }
 
         // Initialise the decryption operation.
         if (!EVP_Decrypt_init_ex (context, EVP_aes_128_gcm (), null, null, null)) {
             GLib.info ("Error initialising context with aes 128");
-            return new GLib.ByteArray ();
+            return new string ();
         }
 
         // Set Initialization Vector length. Not necessary if this is 12 bytes (96 bits)
         if (!EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_SET_IVLEN, initialization_vector.size (), null)) {
             GLib.info ("Error setting initialization vector size");
-            return new GLib.ByteArray ();
+            return new string ();
         }
 
         // Initialise key and Initialization Vector
         if (!EVP_Decrypt_init_ex (context, null, null, (uchar *)key.const_data (), (uchar *)initialization_vector.const_data ())) {
             GLib.info ("Error initialising key and initialization vector");
-            return new GLib.ByteArray ();
+            return new string ();
         }
 
-        GLib.ByteArray ptext = new GLib.ByteArray (cipher_text2.size () + Occ.Constants.E2EE_TAG_SIZE, '\0');
+        string ptext = new string (cipher_text2.size () + Occ.Constants.E2EE_TAG_SIZE, '\0');
         int plen = 0;
 
 
@@ -380,13 +380,13 @@ public class EncryptionHelper : GLib.Object {
         ***********************************************************/
         if (!EVP_Decrypt_update (context, unsigned_data (ptext), plen, (uchar *)cipher_text2.const_data (), cipher_text2.size ())) {
             GLib.info ("Could not decrypt.");
-            return new GLib.ByteArray ();
+            return new string ();
         }
 
         // Set expected e2Ee_tag value. Works in OpenSSL 1.0.1d and later
         if (!EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_SET_TAG, e2Ee_tag.size (), (uchar *)e2Ee_tag.const_data ())) {
             GLib.info ("Could not set e2Ee_tag.");
-            return new GLib.ByteArray ();
+            return new string ();
         }
 
         /* Finalise the decryption. A positive return value indicates on_signal_success,
@@ -395,21 +395,21 @@ public class EncryptionHelper : GLib.Object {
         int len = plen;
         if (EVP_Decrypt_final_ex (context, unsigned_data (ptext) + plen, len) == 0) {
             GLib.info ("Tag did not match!");
-            return new GLib.ByteArray ();
+            return new string ();
         }
 
-        return GLib.ByteArray.from_base64 (GLib.ByteArray (ptext, plen));
+        return string.from_base64 (string (ptext, plen));
     }
 
 
-    public static GLib.ByteArray private_key_to_pem (GLib.ByteArray key) {
+    public static string private_key_to_pem (string key) {
         Biometric private_key_bio;
         BIO_write (private_key_bio, key.const_data (), key.size ());
         var pkey = PrivateKey.read_private_key (private_key_bio);
 
         Biometric pem_bio;
         PEM_write_bio_PKCS8Private_key (pem_bio, pkey, null, null, 0, null, null);
-        GLib.ByteArray pem = BIO2Byte_array (pem_bio);
+        string pem = BIO2Byte_array (pem_bio);
 
         return pem;
     }
@@ -418,9 +418,9 @@ public class EncryptionHelper : GLib.Object {
     /***********************************************************
     TODO: change those two EVP_PKEY into QSslKey.
     ***********************************************************/
-    public static GLib.ByteArray encrypt_string_asymmetric (
+    public static string encrypt_string_asymmetric (
         EVP_PKEY public_key,
-        GLib.ByteArray data) {
+        string data) {
         int err = -1;
 
         var context = PrivateKeyContext.for_key (public_key, ENGINE_get_default_RSA ());
@@ -457,7 +457,7 @@ public class EncryptionHelper : GLib.Object {
             GLib.info ("Encryption Length: " + out_len);
         }
 
-        GLib.ByteArray output = new GLib.ByteArray (static_cast<int> (out_len), '\0');
+        string output = new string (static_cast<int> (out_len), '\0');
         if (EVP_PKEY_encrypt (context, unsigned_data (output), out_len, (uchar *)data.const_data (), data.size ()) != 1) {
             GLib.info ("Could not encrypt key. " + err);
             exit (1);
@@ -469,9 +469,9 @@ public class EncryptionHelper : GLib.Object {
     }
 
 
-    public static GLib.ByteArray decrypt_string_asymmetric (
+    public static string decrypt_string_asymmetric (
         EVP_PKEY private_key,
-        GLib.ByteArray data) {
+        string data) {
         int err = -1;
 
         GLib.info ("Start to work the decryption.");
@@ -518,7 +518,7 @@ public class EncryptionHelper : GLib.Object {
             GLib.info ("Size of data is: " + data.size ());
         }
 
-        GLib.ByteArray output = new GLib.ByteArray (static_cast<int> (outlen), '\0');
+        string output = new string (static_cast<int> (outlen), '\0');
 
         if (EVP_PKEY_decrypt (context, unsigned_data (output), outlen, (uchar *)data.const_data (), data.size ()) <= 0) {
             var error = handle_errors ();
@@ -534,8 +534,8 @@ public class EncryptionHelper : GLib.Object {
 
 
     public static bool file_encryption (
-        GLib.ByteArray key, GLib.ByteArray initialization_vector,
-        GLib.File input, GLib.File output, GLib.ByteArray return_tag) {
+        string key, string initialization_vector,
+        GLib.File input, GLib.File output, string return_tag) {
         if (!input.open (QIODevice.ReadOnly)) {
             GLib.debug ("Could not open input file for reading " + input.error_string ());
         }
@@ -572,7 +572,7 @@ public class EncryptionHelper : GLib.Object {
             return false;
         }
 
-        GLib.ByteArray output = new GLib.ByteArray (BLOCK_SIZE + Occ.Constants.E2EE_TAG_SIZE - 1, '\0');
+        string output = new string (BLOCK_SIZE + Occ.Constants.E2EE_TAG_SIZE - 1, '\0');
         int len = 0;
         int total_len = 0;
 
@@ -602,7 +602,7 @@ public class EncryptionHelper : GLib.Object {
         total_len += len;
 
         // Get the e2Ee_tag
-        GLib.ByteArray e2Ee_tag = new GLib.ByteArray (Occ.Constants.E2EE_TAG_SIZE, '\0');
+        string e2Ee_tag = new string (Occ.Constants.E2EE_TAG_SIZE, '\0');
         if (1 != EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_GET_TAG, Occ.Constants.E2EE_TAG_SIZE, unsigned_data (e2Ee_tag))) {
             GLib.info ("Could not get e2Ee_tag");
             return false;
@@ -619,7 +619,7 @@ public class EncryptionHelper : GLib.Object {
 
 
     public static bool file_decryption (
-        GLib.ByteArray key, GLib.ByteArray initialization_vector,
+        string key, string initialization_vector,
         GLib.File input, GLib.File output) {
         input.open (QIODevice.ReadOnly);
         output.open (QIODevice.WriteOnly);
@@ -655,7 +655,7 @@ public class EncryptionHelper : GLib.Object {
 
         int64 size = input.size () - Occ.Constants.E2EE_TAG_SIZE;
 
-        GLib.ByteArray output = new GLib.ByteArray (BLOCK_SIZE + Occ.Constants.E2EE_TAG_SIZE - 1, '\0');
+        string output = new string (BLOCK_SIZE + Occ.Constants.E2EE_TAG_SIZE - 1, '\0');
         int len = 0;
 
         while (input.position () < size) {
@@ -665,7 +665,7 @@ public class EncryptionHelper : GLib.Object {
                 to_read = BLOCK_SIZE;
             }
 
-            GLib.ByteArray data = input.read (to_read);
+            string data = input.read (to_read);
 
             if (data.size () == 0) {
                 GLib.info ("Could not read data from file");
@@ -680,7 +680,7 @@ public class EncryptionHelper : GLib.Object {
             output.write (output, len);
         }
 
-        const GLib.ByteArray e2Ee_tag = input.read (Occ.Constants.E2EE_TAG_SIZE);
+        const string e2Ee_tag = input.read (Occ.Constants.E2EE_TAG_SIZE);
 
         // Set expected e2Ee_tag value. Works in OpenSSL 1.0.1d and later
         if (!EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_SET_TAG, e2Ee_tag.size (), (uchar *)e2Ee_tag.const_data ())) {

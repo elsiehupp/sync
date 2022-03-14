@@ -40,7 +40,7 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
 
     /***********************************************************
     ***********************************************************/
-    public new void on_signal_start () {
+    public new void start () {
         GLib.assert (this.item.is_encrypted);
 
         const bool list_files_result = this.propagator.journal.list_files_in_path (
@@ -61,7 +61,7 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_folder_unlocked_successfully (GLib.ByteArray folder_identifier) {
+    private void on_signal_folder_unlocked_successfully (string folder_identifier) {
         AbstractPropagateRemoteDeleteEncrypted.on_signal_folder_unlocked_successfully (folder_identifier);
         decrypt_and_remote_delete ();
     }
@@ -95,7 +95,7 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
             this.on_signal_update_metadata_api_job_success
         );
         connect (job, UpdateMetadataApiJob.error, this, PropagateRemoteDeleteEncryptedRootFolder.task_failed);
-        job.on_signal_start ();
+        job.start ();
     }
 
 
@@ -167,7 +167,7 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_update_metadata_api_job_success (GLib.ByteArray file_identifier) {
+    private void on_signal_update_metadata_api_job_success (string file_identifier) {
         //  Q_UNUSED (file_identifier);
         for (var it = this.nested_items.const_begin (); it != this.nested_items.const_end (); ++it) {
             delete_nested_remote_item (it.key ());
@@ -191,13 +191,13 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
             this,
             this.on_signal_set_encryption_flag_api_job_error
         );
-        job.on_signal_start ();
+        job.start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_set_encryption_flag_api_job_success (GLib.ByteArray file_identifier) {
+    private void on_signal_set_encryption_flag_api_job_success (string file_identifier) {
         //  Q_UNUSED (file_identifier);
         delete_remote_item (this.item.file);
     }
@@ -205,7 +205,7 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_set_encryption_flag_api_job_error (GLib.ByteArray file_identifier, int http_return_code) {
+    private void on_signal_set_encryption_flag_api_job_error (string file_identifier, int http_return_code) {
         //  Q_UNUSED (file_identifier);
         this.item.http_error_code = http_return_code;
         task_failed ();
@@ -223,7 +223,7 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
 
         connect (delete_job, DeleteJob.signal_finished, this, PropagateRemoteDeleteEncryptedRootFolder.on_signal_delete_nested_remote_item_finished);
 
-        delete_job.on_signal_start ();
+        delete_job.start ();
     }
 
 } // class PropagateRemoteDeleteEncryptedRootFolder

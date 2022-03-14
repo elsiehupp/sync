@@ -235,14 +235,14 @@ public class SyncFileItem : GLib.Object {
     /***********************************************************
     Variable useful to report to the user
     ***********************************************************/
-    public GLib.ByteArray response_time_stamp;
+    public string response_time_stamp;
 
     /***********************************************************
     X-Request-Id of the failed request
 
     Variable useful to report to the user
     ***********************************************************/
-    public GLib.ByteArray request_id;
+    public string request_id;
 
     /***********************************************************
     The number of affected items by the operation on this item.
@@ -267,7 +267,7 @@ public class SyncFileItem : GLib.Object {
     /***********************************************************
     Variable used by the propagator
     ***********************************************************/
-    public GLib.ByteArray etag;
+    public string etag;
 
     /***********************************************************
     Variable used by the propagator
@@ -282,7 +282,7 @@ public class SyncFileItem : GLib.Object {
     /***********************************************************
     Variable used by the propagator
     ***********************************************************/
-    public GLib.ByteArray file_identifier;
+    public string file_identifier;
 
 
     /***********************************************************
@@ -296,7 +296,7 @@ public class SyncFileItem : GLib.Object {
 
     Variable used by the propagator
     ***********************************************************/
-    public GLib.ByteArray checksum_header;
+    public string checksum_header;
 
 
     /***********************************************************
@@ -369,7 +369,7 @@ public class SyncFileItem : GLib.Object {
     to go through a a SyncFileItem, like PollJob.
     ***********************************************************/
     public static unowned SyncFileItem from_sync_journal_file_record (SyncJournalFileRecord record) {
-        var item = unowned SyncFileItem.create ();
+        var item = SyncFileItem.create ();
         item.file = record.path ();
         item.inode = record.inode;
         item.modtime = record.modtime;
@@ -495,9 +495,9 @@ public class SyncFileItem : GLib.Object {
     //      if (prefix_l == d1.size ())
     //          return true;
 
-    //      if (data1[prefix_l] == '/')
+    //      if (data1[prefix_l] == "/")
     //          return true;
-    //      if (data2[prefix_l] == '/')
+    //      if (data2[prefix_l] == "/")
     //          return false;
 
     //      return data1[prefix_l] < data2[prefix_l];

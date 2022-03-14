@@ -15,7 +15,7 @@ To be
 this.job = new SignPubli
 this.job.csr ( csr
 connect (this.job.
-this.job.on_signal_start
+this.job.start
 \encode
 
 @ingroup libsync
@@ -24,14 +24,14 @@ public class SignPublicKeyApiJob : AbstractNetworkJob {
 
     /***********************************************************
     @brief csr - the CSR with the public key.
-    This function needs to be called before on_signal_start () obviously.
+    This function needs to be called before start () obviously.
     ***********************************************************/
     Soup.Buffer csr {
         private get {
             return this.csr;
         }
         public set {
-            GLib.ByteArray data = new GLib.ByteArray ("csr=");
+            string data = new string ("csr=");
             data += GLib.Uri.to_percent_encoding (value);
             this.csr.data (data);
         }
@@ -55,7 +55,7 @@ public class SignPublicKeyApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public new void on_signal_start () {
+    public new void start () {
         Soup.Request request;
         request.raw_header ("OCS-APIREQUEST", "true");
         request.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
@@ -66,7 +66,7 @@ public class SignPublicKeyApiJob : AbstractNetworkJob {
 
         GLib.info ("Sending the CSR " + this.csr.data ());
         send_request ("POST", url, request, this.csr);
-        AbstractNetworkJob.on_signal_start ();
+        AbstractNetworkJob.start ();
     }
 
 

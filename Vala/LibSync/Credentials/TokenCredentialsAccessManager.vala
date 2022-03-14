@@ -21,11 +21,11 @@ public class TokenCredentialsAccessManager : AccessManager {
 
         Soup.Request request (request);
 
-        GLib.ByteArray cred_hash = new GLib.ByteArray (this.credentials.user ().to_utf8 () + ":" + this.credentials.password ().to_utf8 ()).to_base64 ();
-        request.raw_header (GLib.ByteArray ("Authorization"), GLib.ByteArray ("Basic ") + cred_hash);
+        string cred_hash = new string (this.credentials.user ().to_utf8 () + ":" + this.credentials.password ().to_utf8 ()).to_base64 ();
+        request.raw_header (string ("Authorization"), string ("Basic ") + cred_hash);
 
         // A pre-authenticated cookie
-        GLib.ByteArray token = this.credentials.token.to_utf8 ();
+        string token = this.credentials.token.to_utf8 ();
         if (token.length () > 0) {
             raw_cookie (token, request.url ());
         }

@@ -32,7 +32,7 @@ public class PropagateLocalMkdir : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
+    public void start () {
         if (propagator ().abort_requested)
             return;
 

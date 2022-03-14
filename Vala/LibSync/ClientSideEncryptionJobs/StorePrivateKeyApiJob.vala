@@ -15,7 +15,7 @@ To be
 this.job = new StorePrivateKeyApiJob
 this.job.private_key
 connect (this.job.
-this.job.on_signal_start
+this.job.start
 \encode
 
 @ingroup libsync
@@ -24,14 +24,14 @@ public class StorePrivateKeyApiJob : AbstractNetworkJob {
 
     /***********************************************************
     @brief csr - the CSR with the public key.
-    This function needs to be called before on_signal_start () obviously.
+    This function needs to be called before start () obviously.
     ***********************************************************/
     Soup.Buffer private_key {
         private get {
             return this.private_key;
         }
         public set {
-            GLib.ByteArray data = new GLib.ByteArray ("private_key=");
+            string data = new string ("private_key=");
             data += GLib.Uri.to_percent_encoding (value);
             this.private_key.data (data);
         }
@@ -55,7 +55,7 @@ public class StorePrivateKeyApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public new void on_signal_start () {
+    public new void start () {
         Soup.Request request;
         request.raw_header ("OCS-APIREQUEST", "true");
         QUrlQuery query;
@@ -65,7 +65,7 @@ public class StorePrivateKeyApiJob : AbstractNetworkJob {
 
         GLib.info ("Sending the private key" + this.private_key.data ());
         send_request ("POST", url, request, this.private_key);
-        AbstractNetworkJob.on_signal_start ();
+        AbstractNetworkJob.start ();
     }
 
 

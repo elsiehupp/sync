@@ -19,11 +19,11 @@ public class StreamingDecryptor : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    //  public StreamingDecryptor (GLib.ByteArray key, GLib.ByteArray iv, uint64 total_size) {
+    //  public StreamingDecryptor (string key, string iv, uint64 total_size) {
     //      this.is_finished = false;
     //  }
 
-    public StreamingDecryptor (GLib.ByteArray key, GLib.ByteArray initialization_vector, uint64 total_size) {
+    public StreamingDecryptor (string key, string initialization_vector, uint64 total_size) {
         this.is_initialized = false;
         this.total_size = total_size;
         if (this.context && !key.is_empty () && !initialization_vector.is_empty () && total_size > 0) {
@@ -51,33 +51,33 @@ public class StreamingDecryptor : GLib.Object {
         }
     }
 
-    public GLib.ByteArray chunk_decryption (char input, uint64 chunk_size) {
-        GLib.ByteArray byte_array;
+    public string chunk_decryption (char input, uint64 chunk_size) {
+        string byte_array;
         Soup.Buffer buffer = new Soup.Buffer (&byte_array);
         buffer.open (QIODevice.WriteOnly);
 
         GLib.assert (is_initialized ());
         if (!is_initialized ()) {
             GLib.critical ("Decryption failed. Decryptor is not initialized!");
-            return new GLib.ByteArray ();
+            return new string ();
         }
 
         GLib.assert (buffer.is_open () && buffer.is_writable ());
         if (!buffer.is_open () || !buffer.is_writable ()) {
             GLib.critical ("Decryption failed. Incorrect output device!");
-            return new GLib.ByteArray ();
+            return new string ();
         }
 
         GLib.assert (input);
         if (!input) {
             GLib.critical ("Decryption failed. Incorrect input!");
-            return new GLib.ByteArray ();
+            return new string ();
         }
 
         GLib.assert (chunk_size > 0);
         if (chunk_size <= 0) {
             GLib.critical ("Decryption failed. Incorrect chunk_size!");
-            return new GLib.ByteArray ();
+            return new string ();
         }
 
         if (this.decrypted_so_far == 0) {
@@ -87,13 +87,13 @@ public class StreamingDecryptor : GLib.Object {
         GLib.assert (this.decrypted_so_far + chunk_size <= this.total_size);
         if (this.decrypted_so_far + chunk_size > this.total_size) {
             GLib.critical ("Decryption failed. Chunk is output of range!");
-            return new GLib.ByteArray ();
+            return new string ();
         }
 
         GLib.assert (this.decrypted_so_far + chunk_size < Occ.Constants.E2EE_TAG_SIZE || this.total_size - Occ.Constants.E2EE_TAG_SIZE >= this.decrypted_so_far + chunk_size - Occ.Constants.E2EE_TAG_SIZE);
         if (this.decrypted_so_far + chunk_size > Occ.Constants.E2EE_TAG_SIZE && this.total_size - Occ.Constants.E2EE_TAG_SIZE < this.decrypted_so_far + chunk_size - Occ.Constants.E2EE_TAG_SIZE) {
             GLib.critical ("Decryption failed. Incorrect chunk!");
-            return new GLib.ByteArray ();
+            return new string ();
         }
 
         const bool is_last_chunk = this.decrypted_so_far + chunk_size == this.total_size;
@@ -105,28 +105,28 @@ public class StreamingDecryptor : GLib.Object {
         GLib.assert (size > 0 || chunk_size == Occ.Constants.E2EE_TAG_SIZE);
         if (size <= 0 && chunk_size != Occ.Constants.E2EE_TAG_SIZE) {
             GLib.critical ("Decryption failed. Invalid input size: " + size + " !");
-            return new GLib.ByteArray ();
+            return new string ();
         }
 
         int64 bytes_written = 0;
         int64 input_pos = 0;
 
-        GLib.ByteArray decrypted_block = new GLib.ByteArray (BLOCK_SIZE + Occ.Constants.E2EE_TAG_SIZE - 1, '\0');
+        string decrypted_block = new string (BLOCK_SIZE + Occ.Constants.E2EE_TAG_SIZE - 1, '\0');
 
         while (input_pos < size) {
             // read BLOCK_SIZE or less bytes
-            GLib.ByteArray encrypted_block = new GLib.ByteArray (input + input_pos, q_min (size - input_pos, BLOCK_SIZE));
+            string encrypted_block = new string (input + input_pos, q_min (size - input_pos, BLOCK_SIZE));
 
             if (encrypted_block.size () == 0) {
                 GLib.critical ("Could not read data from the input buffer.");
-                return new GLib.ByteArray ();
+                return new string ();
             }
 
             int out_len = 0;
 
             if (!EVP_Decrypt_update (this.context, unsigned_data (decrypted_block), out_len, (uchar) (encrypted_block.data ()), encrypted_block.size ())) {
                 GLib.critical ("Could not decrypt");
-                return new GLib.ByteArray ();
+                return new string ();
             }
 
             var written_to_output = buffer.write (decrypted_block, out_len);
@@ -134,7 +134,7 @@ public class StreamingDecryptor : GLib.Object {
             GLib.assert (written_to_output == out_len);
             if (written_to_output != out_len) {
                 GLib.critical ("Failed to write decrypted data to device.");
-                return new GLib.ByteArray ();
+                return new string ();
             }
 
             bytes_written += written_to_output;
@@ -151,22 +151,22 @@ public class StreamingDecryptor : GLib.Object {
             GLib.assert (chunk_size - input_pos == Occ.Constants.E2EE_TAG_SIZE);
             if (chunk_size - input_pos != Occ.Constants.E2EE_TAG_SIZE) {
                 GLib.critical ("Decryption failed. e2Ee_tag is missing!");
-                return new GLib.ByteArray ();
+                return new string ();
             }
 
             int out_len = 0;
 
-            GLib.ByteArray e2Ee_tag = new GLib.ByteArray (input + input_pos, Occ.Constants.E2EE_TAG_SIZE);
+            string e2Ee_tag = new string (input + input_pos, Occ.Constants.E2EE_TAG_SIZE);
 
             // Set expected e2Ee_tag value. Works in OpenSSL 1.0.1d and later
             if (!EVP_CIPHER_CTX_ctrl (this.context, EVP_CTRL_GCM_SET_TAG, e2Ee_tag.size (), reinterpret_cast<uchar> (e2Ee_tag.data ()))) {
                 GLib.critical ("Could not set expected e2Ee_tag.");
-                return new GLib.ByteArray ();
+                return new string ();
             }
 
             if (1 != EVP_Decrypt_final_ex (this.context, unsigned_data (decrypted_block), out_len)) {
                 GLib.critical ("Could finalize decryption.");
-                return new GLib.ByteArray ();
+                return new string ();
             }
 
             var written_to_output = buffer.write (decrypted_block, out_len);
@@ -174,7 +174,7 @@ public class StreamingDecryptor : GLib.Object {
             GLib.assert (written_to_output == out_len);
             if (written_to_output != out_len) {
                 GLib.critical ("Failed to write decrypted data to device.");
-                return new GLib.ByteArray ();
+                return new string ();
             }
 
             bytes_written += written_to_output;

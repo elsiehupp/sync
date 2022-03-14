@@ -47,7 +47,7 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, QRunnable*/ {
     ***********************************************************/
     public void run () {
         string local_path = this.local_path;
-        if (local_path.has_suffix ('/')) // Happens if this.current_folder.local.is_empty ()
+        if (local_path.has_suffix ("/")) // Happens if this.current_folder.local.is_empty ()
             local_path.chop (1);
 
         var dh = csync_vio_local_opendir (local_path);

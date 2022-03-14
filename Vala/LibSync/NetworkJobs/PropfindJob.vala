@@ -28,7 +28,7 @@ public class PropfindJob : AbstractNetworkJob {
      - contain a colon : and thus specify an explicit namespace,
        e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
     ***********************************************************/
-    public GLib.List<GLib.ByteArray> properties;
+    public GLib.List<string> properties;
 
     signal void signal_result (GLib.HashTable<string, GLib.Variant> values);
     signal void finished_with_error (Soup.Reply reply = null);
@@ -42,8 +42,8 @@ public class PropfindJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
-        GLib.List<GLib.ByteArray> properties = this.properties;
+    public void start () {
+        GLib.List<string> properties = this.properties;
 
         if (properties.is_empty ()) {
             GLib.warning ("Propfind with no properties!");
@@ -54,8 +54,8 @@ public class PropfindJob : AbstractNetworkJob {
         // Also possibly useful for avoiding false timeouts.
         request.priority (Soup.Request.HighPriority);
         request.raw_header ("Depth", "0");
-        GLib.ByteArray prop_str;
-        foreach (GLib.ByteArray prop in properties) {
+        string prop_str;
+        foreach (string prop in properties) {
             if (prop.contains (':')) {
                 int col_index = prop.last_index_of (":");
                 prop_str += "    <" + prop.mid (col_index + 1) + " xmlns=\"" + prop.left (col_index) + "\" />\n";
@@ -63,7 +63,7 @@ public class PropfindJob : AbstractNetworkJob {
                 prop_str += "    <d:" + prop + " />\n";
             }
         }
-        GLib.ByteArray xml = "<?xml version=\"1.0\" ?>\n"
+        string xml = "<?xml version=\"1.0\" ?>\n"
                         + "<d:propfind xmlns:d=\"DAV:\">\n"
                         + "  <d:prop>\n"
                         + prop_str + "  </d:prop>\n"
@@ -74,7 +74,7 @@ public class PropfindJob : AbstractNetworkJob {
         buf.open (QIODevice.ReadOnly);
         send_request ("PROPFIND", make_dav_url (path ()), request, buf);
 
-        AbstractNetworkJob.on_signal_start ();
+        AbstractNetworkJob.start ();
     }
 
 

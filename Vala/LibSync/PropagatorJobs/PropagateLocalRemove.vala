@@ -19,17 +19,17 @@ public class PropagateLocalRemove : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public PropagateLocalRemove (OwncloudPropagator propagator, unowned SyncFileItem item) {
+    public PropagateLocalRemove (OwncloudPropagator propagator, SyncFileItem item) {
         base (propagator, item);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
+    public new void start () {
         GLib.info ("Start propagate local remove job");
 
-        this.move_to_trash = propagator ().sync_options ().move_files_to_trash;
+        this.move_to_trash = propagator ().sync_options.move_files_to_trash;
 
         if (propagator ().abort_requested)
             return;
@@ -71,27 +71,22 @@ public class PropagateLocalRemove : PropagateItemJob {
 
 
     /***********************************************************
-    ***********************************************************/
-    private bool remove_recursively (string path);
-    /***********************************************************
     The code will update the database in case of error.
     If everything goes well (no error, returns true), the caller is responsible for removing the entries
     in the database.  But in case of error, we need to remove the entries from the database of the files
     that were deleted.
 
-    \a path is relative to propagator ().local_dir + this.item.file and should on_signal_start with a slash
+    \a path is relative to propagator ().local_dir + this.item.file and should start with a slash
     ***********************************************************/
-    bool PropagateLocalRemove.remove_recursively (string path) {
+    private bool remove_recursively (string path) {
         string absolute = propagator ().full_local_path (this.item.file + path);
         string[] errors;
         GLib.List<QPair<string, bool>> deleted;
         bool on_signal_success = FileSystem.remove_recursively (
             absolute,
-            [&deleted] (string path, bool is_dir) {
-                // by prepending, a folder deletion may be followed by content deletions
-                deleted.prepend (q_make_pair (path, is_dir));
-            },
-            errors);
+            PropagateLocalRemove.recursive_remove_filter,
+            errors
+        );
 
         if (!on_signal_success) {
             // We need to delete the entries from the database now from the deleted vector.
@@ -111,6 +106,12 @@ public class PropagateLocalRemove : PropagateItemJob {
             this.error = errors.join (", ");
         }
         return on_signal_success;
+    }
+
+
+    private static void recursive_remove_filter (GLib.List<QPair<string, bool>> deleted, string path, bool is_dir) {
+        // by prepending, a folder deletion may be followed by content deletions
+        deleted.prepend (q_make_pair (path, is_dir));
     }
 
 } // class PropagateLocalRemove

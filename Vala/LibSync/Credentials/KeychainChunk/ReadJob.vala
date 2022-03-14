@@ -43,12 +43,12 @@ public class ReadJob : KeychainChunk.Job {
 
 
     /***********************************************************
-    Call this method to on_signal_start the job (async).
+    Call this method to start the job (async).
     You should connect some slot to the signal_finished () signal first.
 
-    @see QKeychain.Job.on_signal_start ()
+    @see QKeychain.Job.start ()
     ***********************************************************/
-    public void on_signal_start () {
+    public void start () {
         this.chunk_count = 0;
         this.chunk_buffer.clear ();
         this.error = QKeychain.NoError;
@@ -66,18 +66,18 @@ public class ReadJob : KeychainChunk.Job {
         job.insecure_fallback (this.insecure_fallback);
         job.key (kck);
         connect (job, QKeychain.Job.on_signal_finished, this, KeychainChunk.ReadJob.on_signal_read_job_done);
-        job.on_signal_start ();
+        job.start ();
     }
 
 
     /***********************************************************
-    Call this method to on_signal_start the job synchronously.
+    Call this method to start the job synchronously.
     Awaits completion with no need to connect some slot to the signal_finished () signal first.
 
     @return Returns true on succeess (QKeychain.NoError).
     ***********************************************************/
     public bool exec () {
-        on_signal_start ();
+        start ();
 
         QEventLoop wait_loop;
         connect (this, ReadJob.on_signal_finished, wait_loop, QEventLoop.quit);
@@ -114,7 +114,7 @@ public class ReadJob : KeychainChunk.Job {
                     // (Issues #4274 and #6522)
                     // (For kwallet, the error is OtherError instead of NoBackendAvailable, maybe a bug in QtKeychain)
                     GLib.info ("Backend unavailable (yet?) Retrying in a few seconds. " + read_job.error_string ());
-                    QTimer.single_shot (10000, this, ReadJob.on_signal_start);
+                    QTimer.single_shot (10000, this, ReadJob.start);
                     this.retry_on_signal_key_chain_error = false;
                     read_job.delete_later ();
                     return;

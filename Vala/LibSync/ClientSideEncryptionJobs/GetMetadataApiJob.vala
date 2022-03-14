@@ -11,18 +11,18 @@ public class GetMetadataApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.ByteArray file_identifier;
+    private string file_identifier;
 
 
     internal signal void signal_json_received (QJsonDocument json, int return_code);
-    signal void singal_error (GLib.ByteArray file_identifier, int http_return_code);
+    signal void singal_error (string file_identifier, int http_return_code);
 
 
     /***********************************************************
     ***********************************************************/
     public GetMetadataApiJob (
         unowned Account account,
-        GLib.ByteArray file_identifier,
+        string file_identifier,
         GLib.Object parent = new GLib.Object ()) {
 
         base (account, E2EE_BASE_URL + "meta-data/" + file_identifier, parent);
@@ -32,7 +32,7 @@ public class GetMetadataApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
+    public void start () {
         Soup.Request request;
         request.raw_header ("OCS-APIREQUEST", "true");
         QUrlQuery query;
@@ -42,7 +42,7 @@ public class GetMetadataApiJob : AbstractNetworkJob {
 
         GLib.info ("Requesting the metadata for the file_identifier " + this.file_identifier + " as encrypted.");
         send_request ("GET", url, request);
-        AbstractNetworkJob.on_signal_start ();
+        AbstractNetworkJob.start ();
     }
 
 

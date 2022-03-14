@@ -110,7 +110,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
         this.clear_message_job = new JsonApiJob (this.account, USER_STATUS_BASE_URL + QStringLiteral ("/message"));
         this.clear_message_job.verb (JsonApiJob.Verb.DELETE);
         connect (this.clear_message_job, JsonApiJob.signal_json_received, this, OcsUserStatusConnector.on_signal_message_cleared);
-        this.clear_message_job.on_signal_start ();
+        this.clear_message_job.start ();
     }
 
 
@@ -213,7 +213,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
 
         this.get_user_status_job = new JsonApiJob (this.account, USER_STATUS_BASE_URL, this);
         connect (this.get_user_status_job, JsonApiJob.signal_json_received, this, OcsUserStatusConnector.on_signal_user_status_fetched);
-        this.get_user_status_job.on_signal_start ();
+        this.get_user_status_job.start ();
     }
 
 
@@ -236,7 +236,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
             this,
             OcsUserStatusConnector.on_signal_predefined_statuses_fetched
         );
-        this.get_predefined_stauses_job.on_signal_start ();
+        this.get_predefined_stauses_job.start ();
     }
 
 
@@ -256,7 +256,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
         body.object (data_object);
         this.online_status_job.body (body);
         connect (this.online_status_job, JsonApiJob.signal_json_received, this, OcsUserStatusConnector.on_signal_user_status_online_status_set);
-        this.online_status_job.on_signal_start ();
+        this.online_status_job.start ();
     }
 
 
@@ -293,7 +293,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
         body.object (data_object);
         this.message_job.body (body);
         connect (this.message_job, JsonApiJob.signal_json_received, this, OcsUserStatusConnector.on_signal_user_status_message_set);
-        this.message_job.on_signal_start ();
+        this.message_job.start ();
     }
 
 
@@ -325,7 +325,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
         body.object (data_object);
         this.message_job.body (body);
         connect (this.message_job, JsonApiJob.signal_json_received, this, OcsUserStatusConnector.on_signal_user_status_message_set);
-        this.message_job.on_signal_start ();
+        this.message_job.start ();
     }
 
 

@@ -52,7 +52,7 @@ public class Job : GLib.Object {
     string error_string { public get; protected set; }
 
     protected int chunk_count = 0;
-    protected GLib.ByteArray chunk_buffer;
+    protected string chunk_buffer;
 
     /***********************************************************
     ***********************************************************/
@@ -71,7 +71,7 @@ public class Job : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.ByteArray binary_data () {
+    public string binary_data () {
         return this.chunk_buffer;
     }
 

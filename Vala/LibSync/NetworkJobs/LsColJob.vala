@@ -25,7 +25,7 @@ public class LsColJob : AbstractNetworkJob {
      - contain a colon : and thus specify an explicit namespace,
        e.g. "ns:with:colons:bar", which is "bar" in the "ns:with:colons" namespace
     ***********************************************************/
-    public GLib.List<GLib.ByteArray> properties;
+    public GLib.List<string> properties;
 
 
     signal void directory_listing_subfolders (string[] items);
@@ -51,14 +51,14 @@ public class LsColJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
-        GLib.List<GLib.ByteArray> properties = this.properties;
+    public void start () {
+        GLib.List<string> properties = this.properties;
 
         if (properties.is_empty ()) {
             GLib.warning ("Propfind with no properties!");
         }
-        GLib.ByteArray prop_str;
-        foreach (GLib.ByteArray prop in properties) {
+        string prop_str;
+        foreach (string prop in properties) {
             if (prop.contains (':')) {
                 int col_index = prop.last_index_of (":");
                 var ns = prop.left (col_index);
@@ -74,7 +74,7 @@ public class LsColJob : AbstractNetworkJob {
 
         Soup.Request request;
         request.raw_header ("Depth", "1");
-        GLib.ByteArray xml = "<?xml version=\"1.0\" ?>\n"
+        string xml = "<?xml version=\"1.0\" ?>\n"
                            + "<d:propfind xmlns:d=\"DAV:\" xmlns:oc=\"http://owncloud.org/ns\">\n"
                            + "  <d:prop>\n"
                            + prop_str.bytes () + "  </d:prop>\n"
@@ -87,7 +87,7 @@ public class LsColJob : AbstractNetworkJob {
         } else {
             send_request ("PROPFIND", make_dav_url (path ()), request, buf);
         }
-        AbstractNetworkJob.on_signal_start ();
+        AbstractNetworkJob.start ();
     }
 
 

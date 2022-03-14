@@ -18,9 +18,9 @@ public class RemoteInfo : Glib.Object {
     or path, just the plain name).
     ***********************************************************/
     string name;
-    GLib.ByteArray etag;
-    GLib.ByteArray file_identifier;
-    GLib.ByteArray checksum_header;
+    string etag;
+    string file_identifier;
+    string checksum_header;
     Occ.RemotePermissions remote_perm;
     time_t modtime = 0;
     int64 size = 0;

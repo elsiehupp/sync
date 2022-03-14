@@ -13,7 +13,7 @@ namespace LibSync {
 
 State Machine:
 
-  +--. on_signal_start ()  -. (delete job) -------+
+  +--. start ()  -. (delete job) -------+
   |
   +-. on_signal_compute_co
                   |
@@ -89,7 +89,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
     protected bool aborting = BITFIELD (1);
 
     protected UploadFileInfo file_to_upload;
-    protected GLib.ByteArray transmission_checksum_header;
+    protected string transmission_checksum_header;
 
 
     /***********************************************************
@@ -108,7 +108,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         this.upload_encrypted_helper = null;
         this.uploading_encrypted = false;
         var path = this.item.file;
-        var slash_position = path.last_index_of ('/');
+        var slash_position = path.last_index_of ("/");
         var parent_path = slash_position >= 0 ? path.left (slash_position): "";
 
         SyncJournalFileRecord parent_rec;
@@ -120,11 +120,11 @@ public class PropagateUploadFileCommon : PropagateItemJob {
 
 
     /***********************************************************
-    on_signal_start should set up the file, path and size that will be send to the server
+    start should set up the file, path and size that will be send to the server
     ***********************************************************/
-    public void on_signal_start () {
+    public void start () {
         var path = this.item.file;
-        var slash_position = path.last_index_of ('/');
+        var slash_position = path.last_index_of ("/");
         var parent_path = slash_position >= 0 ? path.left (slash_position): "";
 
         if (!this.item.rename_target.is_empty () && this.item.file != this.item.rename_target) {
@@ -175,7 +175,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
             PropagateUploadEncrypted.error,
             this.on_signal_propagate_upload_encrypted_error
         );
-        this.upload_encrypted_helper.on_signal_start ();
+        this.upload_encrypted_helper.start ();
     }
 
 
@@ -247,7 +247,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         this.jobs.append (job);
         connect (job, DeleteJob.signal_finished, this, PropagateUploadFileCommon.on_signal_compute_content_checksum);
         connect (job, GLib.Object.destroyed, this, PropagateUploadFileCommon.on_signal_job_destroyed);
-        job.on_signal_start ();
+        job.start ();
     }
 
     /***********************************************************
@@ -287,13 +287,13 @@ public class PropagateUploadFileCommon : PropagateItemJob {
             return;
         }
 
-        const GLib.ByteArray checksum_type = propagator ().account ().capabilities ().preferred_upload_checksum_type ();
+        const string checksum_type = propagator ().account ().capabilities ().preferred_upload_checksum_type ();
 
         // Maybe the discovery already computed the checksum?
         // Should I compute the checksum of the original (this.item.file)
         // or the maybe-modified? (this.file_to_upload.file) ?
 
-        GLib.ByteArray existing_checksum_type, existing_checksum;
+        string existing_checksum_type, existing_checksum;
         parse_checksum_header (this.item.checksum_header, existing_checksum_type, existing_checksum);
         if (existing_checksum_type == checksum_type) {
             on_signal_compute_transmission_checksum (checksum_type, existing_checksum);
@@ -308,14 +308,14 @@ public class PropagateUploadFileCommon : PropagateItemJob {
             this, PropagateUploadFileCommon.on_signal_compute_transmission_checksum);
         connect (compute_checksum, ComputeChecksum.done,
             compute_checksum, GLib.Object.delete_later);
-        compute_checksum.on_signal_start (this.file_to_upload.path);
+        compute_checksum.start (this.file_to_upload.path);
     }
 
 
     /***********************************************************
     Content checksum computed, compute the transmission checksum
     ***********************************************************/
-    private void on_signal_compute_transmission_checksum (GLib.ByteArray content_checksum_type, GLib.ByteArray content_checksum) {
+    private void on_signal_compute_transmission_checksum (string content_checksum_type, string content_checksum) {
         this.item.checksum_header = make_checksum_header (content_checksum_type, content_checksum);
 
         // Reuse the content checksum as the transmission checksum if possible
@@ -331,23 +331,23 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         if (upload_checksum_enabled ()) {
             compute_checksum.checksum_type (propagator ().account ().capabilities ().upload_checksum_type ());
         } else {
-            compute_checksum.checksum_type (GLib.ByteArray ());
+            compute_checksum.checksum_type (string ());
         }
 
         connect (compute_checksum, ComputeChecksum.done,
             this, PropagateUploadFileCommon.on_signal_start_upload);
         connect (compute_checksum, ComputeChecksum.done,
             compute_checksum, GLib.Object.delete_later);
-        compute_checksum.on_signal_start (this.file_to_upload.path);
+        compute_checksum.start (this.file_to_upload.path);
     }
 
 
     /***********************************************************
     Transmission checksum computed, prepare the upload
     ***********************************************************/
-    private void on_signal_start_upload (GLib.ByteArray transmission_checksum_type, GLib.ByteArray transmission_checksum) {
+    private void on_signal_start_upload (string transmission_checksum_type, string transmission_checksum) {
         // Remove ourselfs from the list of active job, before any posible call to on_signal_done ()
-        // When we on_signal_start chunks, we will add it again, once for every chunks.
+        // When we start chunks, we will add it again, once for every chunks.
         propagator ().active_job_list.remove_one (this);
 
         this.transmission_checksum_header = make_checksum_header (transmission_checksum_type, transmission_checksum);
@@ -361,7 +361,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         const string original_file_path = propagator ().full_local_path (this.item.file);
 
         if (!FileSystem.file_exists (full_file_path)) {
-            return on_signal_error_start_folder_unlock (SyncFileItem.Status.SOFT_ERROR, _("File Removed (on_signal_start upload) %1").arg (full_file_path));
+            return on_signal_error_start_folder_unlock (SyncFileItem.Status.SOFT_ERROR, _("File Removed (start upload) %1").arg (full_file_path));
         }
         if (this.item.modtime <= 0) {
             on_signal_error_start_folder_unlock (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (this.item.file)));
@@ -371,7 +371,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         if (this.item.modtime <= 0) {
             GLib.warning ("Invalid modified time " + this.item.file + this.item.modtime);
         }
-        time_t prev_modtime = this.item.modtime; // the this.item value was set in PropagateUploadFile.on_signal_start ()
+        time_t prev_modtime = this.item.modtime; // the this.item value was set in PropagateUploadFile.start ()
         // but a potential checksum calculation could have taken some time during which the file could
         // have been changed again, so better check again here.
 
@@ -408,7 +408,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
     /***********************************************************
     Invoked when encrypted folder lock has been released
     ***********************************************************/
-    private void on_signal_folder_unlocked (GLib.ByteArray folder_identifier, int http_return_code) {
+    private void on_signal_folder_unlocked (string folder_identifier, int http_return_code) {
         GLib.debug ("Failed to unlock encrypted folder " + folder_identifier);
         if (this.upload_status.status == SyncFileItem.Status.NO_STATUS && http_return_code != 200) {
             on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Failed to unlock encrypted folder."));
@@ -462,7 +462,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         propagator ().journal.poll_info (info);
         propagator ().journal.commit ("add poll info");
         propagator ().active_job_list.append (this);
-        job.on_signal_start ();
+        job.start ();
     }
 
 
@@ -524,7 +524,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         // even if their parent folder is online-only.
         if (this.item.instruction == CSYNC_INSTRUCTION_NEW
             || this.item.instruction == CSYNC_INSTRUCTION_TYPE_CHANGE) {
-            var vfs = propagator ().sync_options ().vfs;
+            var vfs = propagator ().sync_options.vfs;
             var pin = vfs.pin_state (this.item.file);
             if (pin && *pin == PinState.VfsItemAvailability.ONLINE_ONLY) {
                 if (!vfs.pin_state (this.item.file, PinState.PinState.UNSPECIFIED)) {
@@ -535,7 +535,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
 
         // Remove from the progress database:
         propagator ().journal.upload_info (this.item.file, SyncJournalDb.UploadInfo ());
-        propagator ().journal.commit ("upload file on_signal_start");
+        propagator ().journal.commit ("upload file start");
 
         if (this.uploading_encrypted) {
             this.upload_status = new UploadStatus (
@@ -651,7 +651,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
     Error handling functionality that is shared between jobs.
     ***********************************************************/
     protected void common_error_handling (AbstractNetworkJob job) {
-        GLib.ByteArray reply_content;
+        string reply_content;
         string error_string = job.error_string_parsing_body (reply_content);
         GLib.debug (reply_content.to_string ()); // display the XML error in the debug
 
@@ -718,16 +718,16 @@ public class PropagateUploadFileCommon : PropagateItemJob {
     /***********************************************************
     Bases headers that need to be sent on the PUT, or in the MOVE for chunking-ng
     ***********************************************************/
-    protected GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers () {
-        GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers;
-        headers[GLib.ByteArray ("Content-Type")] = new GLib.ByteArray ("application/octet-stream");
+    protected GLib.HashTable<string, string> headers () {
+        GLib.HashTable<string, string> headers;
+        headers[string ("Content-Type")] = new string ("application/octet-stream");
         GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
             GLib.warning ("Invalid modified time " + this.item.file + this.item.modtime);
         }
-        headers[GLib.ByteArray ("X-OC-Mtime")] = new GLib.ByteArray.number (int64 (this.item.modtime));
+        headers[string ("X-OC-Mtime")] = new string.number (int64 (this.item.modtime));
         if (q_environment_variable_int_value ("OWNCLOUD_LAZYOPS"))
-            headers[GLib.ByteArray ("OC-LazyOps")] = GLib.ByteArray ("true");
+            headers[string ("OC-LazyOps")] = string ("true");
 
         if (this.item.file.contains (QLatin1String (".sys.admin#recall#"))) {
             // This is a file recall triggered by the admin.  Note: the
@@ -746,21 +746,21 @@ public class PropagateUploadFileCommon : PropagateItemJob {
             && !this.delete_existing) {
             // We add quotes because the owncloud server always adds quotes around the etag, and
             //  csync_owncloud.c's owncloud_file_id always strips the quotes.
-            headers[GLib.ByteArray ("If-Match")] = '"' + this.item.etag + '"';
+            headers[string ("If-Match")] = '"' + this.item.etag + '"';
         }
 
         // Set up a conflict file header pointing to the original file
         var conflict_record = propagator ().journal.conflict_record (this.item.file.to_utf8 ());
         if (conflict_record.is_valid ()) {
-            headers[GLib.ByteArray ("OC-Conflict")] = "1";
+            headers[string ("OC-Conflict")] = "1";
             if (!conflict_record.initial_base_path.is_empty ())
-                headers[GLib.ByteArray ("OC-ConflictInitialBasePath")] = conflict_record.initial_base_path;
+                headers[string ("OC-ConflictInitialBasePath")] = conflict_record.initial_base_path;
             if (!conflict_record.base_file_id.is_empty ())
-                headers[GLib.ByteArray ("OC-ConflictBaseFileId")] = conflict_record.base_file_id;
+                headers[string ("OC-ConflictBaseFileId")] = conflict_record.base_file_id;
             if (conflict_record.base_modtime != -1)
-                headers[GLib.ByteArray ("OC-ConflictBaseMtime")] = new GLib.ByteArray.number (conflict_record.base_modtime);
+                headers[string ("OC-ConflictBaseMtime")] = new string.number (conflict_record.base_modtime);
             if (!conflict_record.base_etag.is_empty ())
-                headers[GLib.ByteArray ("OC-ConflictBaseEtag")] = conflict_record.base_etag;
+                headers[string ("OC-ConflictBaseEtag")] = conflict_record.base_etag;
         }
 
         if (this.upload_encrypted_helper && !this.upload_encrypted_helper.folder_token ().is_empty ()) {

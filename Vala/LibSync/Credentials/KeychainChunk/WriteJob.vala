@@ -19,7 +19,7 @@ public class WriteJob : KeychainChunk.Job {
     /***********************************************************
     WriteJob
     ***********************************************************/
-    public WriteJob.for_account (Account account, string key, GLib.ByteArray data, GLib.Object parent = new GLib.Object ()) {
+    public WriteJob.for_account (Account account, string key, string data, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.account = account;
         this.key = key;
@@ -32,18 +32,18 @@ public class WriteJob : KeychainChunk.Job {
 
     /***********************************************************
     ***********************************************************/
-    public WriteJob (string key, GLib.ByteArray data, GLib.Object parent = new GLib.Object ()) {
+    public WriteJob (string key, string data, GLib.Object parent = new GLib.Object ()) {
         base (null, key, data, parent);
     }
 
 
     /***********************************************************
-    Call this method to on_signal_start the job (async).
+    Call this method to start the job (async).
     You should connect some slot to the signal_finished () signal first.
 
-    @see QKeychain.Job.on_signal_start ()
+    @see QKeychain.Job.start ()
     ***********************************************************/
-    public void on_signal_start () {
+    public void start () {
         this.error = QKeychain.NoError;
 
         on_signal_write_job_done (null);
@@ -51,13 +51,13 @@ public class WriteJob : KeychainChunk.Job {
 
 
     /***********************************************************
-    Call this method to on_signal_start the job synchronously.
+    Call this method to start the job synchronously.
     Awaits completion with no need to connect some slot to the signal_finished () signal first.
 
     @return Returns true on succeess (QKeychain.NoError).
     ***********************************************************/
     public bool exec () {
-        signal_start ();
+        start ();
 
         QEventLoop wait_loop;
         connect (this, WriteJob.on_signal_finished, wait_loop, QEventLoop.quit);
@@ -77,7 +77,7 @@ public class WriteJob : KeychainChunk.Job {
     private void on_signal_write_job_done (QKeychain.Job incoming_job) {
         var write_job = (QKeychain.WritePasswordJob)incoming_job;
 
-        // Errors? (write_job can be null here, see : WriteJob.on_signal_start)
+        // Errors? (write_job can be null here, see : WriteJob.start)
         if (write_job) {
             this.error = write_job.error ();
             this.error_string = write_job.error_string ();
@@ -129,7 +129,7 @@ public class WriteJob : KeychainChunk.Job {
             // only add the key's (sub)"index" after the first element, to stay compatible with older versions and non-Windows
             job.key (kck);
             job.binary_data (chunk);
-            job.on_signal_start ();
+            job.start ();
 
             chunk.clear ();
         } else {

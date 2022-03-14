@@ -23,7 +23,7 @@ public class PropagateIgnoreJob : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
+    public void start () {
         SyncFileItem.Status status = this.item.status;
         if (status == SyncFileItem.Status.NO_STATUS) {
             if (this.item.instruction == CSYNC_INSTRUCTION_ERROR) {

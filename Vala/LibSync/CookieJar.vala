@@ -137,7 +137,7 @@ public class CookieJar : QNetworkCookieJar {
     //      uint32 count = 0;
     //      stream >> count;
     //      for (uint32 i = 0; i < count; ++i) {
-    //          GLib.ByteArray value;
+    //          string value;
     //          stream >> value;
     //          GLib.List<QNetworkCookie> new_cookies = QNetworkCookie.parse_cookies (value);
     //          if (new_cookies.count () == 0 && value.length () != 0) {

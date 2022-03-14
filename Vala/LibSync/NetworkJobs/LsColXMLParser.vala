@@ -20,7 +20,7 @@ public class LsColXMLParser : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public bool parse (GLib.ByteArray xml,
+    public bool parse (string xml,
         GLib.HashTable<string, ExtraFolderInfo> *sizes,
         string expected_path);
 
@@ -35,7 +35,7 @@ public class LsColXMLParser : GLib.Object {
 
     //  LsColXMLParser.LsColXMLParser () = default;
 
-    bool LsColXMLParser.parse (GLib.ByteArray xml, GLib.HashTable<string, ExtraFolderInfo> *file_info, string expected_path) {
+    bool LsColXMLParser.parse (string xml, GLib.HashTable<string, ExtraFolderInfo> *file_info, string expected_path) {
         // Parse DAV response
         QXmlStreamReader reader = new QXmlStreamReader (xml);
         reader.add_extra_namespace_declaration (QXmlStreamNamespaceDeclaration ("d", "DAV:"));
@@ -105,7 +105,7 @@ public class LsColXMLParser : GLib.Object {
             if (type == QXmlStreamReader.EndElement) {
                 if (reader.namespace_uri () == QLatin1String ("DAV:")) {
                     if (reader.name () == "response") {
-                        if (current_href.has_suffix ('/')) {
+                        if (current_href.has_suffix ("/")) {
                             current_href.chop (1);
                         }
                         /* emit */ directory_listing_iterated (current_href, current_http200Properties);

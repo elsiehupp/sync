@@ -25,9 +25,9 @@ public class EntityExistsJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
+    public void start () {
         send_request ("HEAD", make_account_url (path ()));
-        AbstractNetworkJob.on_signal_start ();
+        AbstractNetworkJob.start ();
     }
 
 

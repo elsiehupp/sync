@@ -58,7 +58,6 @@ public class OwncloudPropagator : GLib.Object {
     ***********************************************************/
     public bool abort_requested = false;
 
-
     /***********************************************************
     The list of currently active jobs.
         This list contains the jobs that are currently using ressources and is used purely to
@@ -85,7 +84,7 @@ public class OwncloudPropagator : GLib.Object {
 
     This allows skipping of uploads that have a very high likelihood of failure.
     ***********************************************************/
-    public GLib.HashTable<string, int64> folder_quota;
+    public GLib.HashTable<string, int64?> folder_quota;
 
 
     /***********************************************************
@@ -106,11 +105,21 @@ public class OwncloudPropagator : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private QScopedPointer<PropagateRootDirectory> root_job;
-    private SyncOptions sync_options;
+
+    SyncOptions sync_options {
+        public get {
+            return this.sync_options;
+        }
+        public set {
+            this.sync_options = sync_options;
+            this.chunk_size = sync_options.initial_chunk_size;
+        }
+    }
+
     private bool job_scheduled = false;
 
     /***********************************************************
-    Absolute path to the local directory. ends with '/'
+    Absolute path to the local directory. ends with "/"
     ***********************************************************/
     private const string local_dir;
 
@@ -120,7 +129,7 @@ public class OwncloudPropagator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private bool schedule_delayed_tasks = false;
+    bool schedule_delayed_tasks { private get; public set; }
 
     /***********************************************************
     ***********************************************************/
@@ -169,13 +178,14 @@ public class OwncloudPropagator : GLib.Object {
         this.local_dir = local_dir.has_suffix ("/") ? local_dir : local_dir + "/";
         this.remote_folder = remote_folder.has_suffix ("/") ? remote_folder : remote_folder + "/";
         this.bulk_upload_block_list = bulk_upload_block_list;
+        this.schedule_delayed_tasks = false;
         q_register_meta_type<PropagatorJob.AbortType> ("PropagatorJob.AbortType");
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start (SyncFileItemVector synced_items) {
+    public void start (SyncFileItemVector synced_items) {
         GLib.assert (std.is_sorted (synced_items.begin (), synced_items.end ()));
 
         // This builds all the jobs needed for the propagation.
@@ -183,7 +193,7 @@ public class OwncloudPropagator : GLib.Object {
         // In order to do that we loop over the items. (which are sorted by destination)
         // When we enter a directory, we can create the directory job and push it on the stack.
 
-        var regex = sync_options ().file_regex ();
+        var regex = sync_options.file_regex ();
         if (regex.is_valid ()) {
             GLib.List<QStringRef> names;
             foreach (var i in synced_items) {
@@ -193,18 +203,15 @@ public class OwncloudPropagator : GLib.Object {
                     do {
                         string_ref = i.file.mid_ref (0, index);
                         names.insert (string_ref);
-                        index = string_ref.last_index_of ('/');
+                        index = string_ref.last_index_of ("/");
                     } while (index > 0);
                 }
             }
             synced_items.erase (
                 std.remove_if (synced_items.begin (),
                 synced_items.end (),
-                [&names] (var i) {
-                return !names.contains (QStringRef {
-                    i.file
-                });
-            }),
+                OwncloudPropagator.erase_filter
+            ),
             synced_items.end ());
         }
 
@@ -295,6 +302,15 @@ public class OwncloudPropagator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
+    private static erase_filter (GLib.List<QStringRef> names, SyncFileItem item) {
+        return !names.contains (new QStringRef (
+            item.file
+        ));
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
     public void start_directory_propagation (
         SyncFileItem item,
         GLib.List<QPair<string, PropagateDirectory>> directories, // should be a LIFO stack
@@ -365,22 +381,6 @@ public class OwncloudPropagator : GLib.Object {
             // directory we want to skip processing items inside it.
             maybe_conflict_directory = item.file + "/";
         }
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public SyncOptions sync_options () {
-        return this.sync_options;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-    void OwncloudPropagator.sync_options (SyncOptions sync_options) {
-        this.sync_options = sync_options;
-        this.chunk_size = sync_options.initial_chunk_size;
     }
 
     
@@ -727,7 +727,7 @@ public class OwncloudPropagator : GLib.Object {
     ***********************************************************/
     public Result<Vfs.ConvertToPlaceholderResult, string> update_metadata (SyncFileItem item);
     Result<Vfs.ConvertToPlaceholderResult, string> OwncloudPropagator.update_metadata (SyncFileItem item) {
-        return OwncloudPropagator.static_update_metadata (item, this.local_dir, sync_options ().vfs.data (), this.journal);
+        return OwncloudPropagator.static_update_metadata (item, this.local_dir, sync_options.vfs.data (), this.journal);
     }
 
 
@@ -772,13 +772,6 @@ public class OwncloudPropagator : GLib.Object {
     ***********************************************************/
     public GLib.Deque<unowned SyncFileItem> delayed_tasks () {
         return this.delayed_tasks;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void schedule_delayed_tasks (bool active) {
-        this.schedule_delayed_tasks = active;
     }
 
 
@@ -872,7 +865,7 @@ public class OwncloudPropagator : GLib.Object {
     private PropagateUploadFileCommon create_upload_job (SyncFileItem item, bool delete_existing) {
         var job = new PropagateUploadFileCommon ();
 
-        if (item.size > sync_options ().initial_chunk_size && account ().capabilities ().chunking_ng ()) {
+        if (item.size > sync_options.initial_chunk_size && account ().capabilities ().chunking_ng ()) {
             // Item is above this.initial_chunk_size, thus will be classified as to be chunked
             job = std.make_unique<PropagateUploadFileNG> (this, item);
         } else {
@@ -1080,10 +1073,10 @@ public class OwncloudPropagator : GLib.Object {
 
 
 
-    private GLib.ByteArray get_etag_from_reply (Soup.Reply reply) {
-        GLib.ByteArray oc_etag = parse_etag (reply.raw_header ("OC-ETag"));
-        GLib.ByteArray etag = parse_etag (reply.raw_header ("ETag"));
-        GLib.ByteArray ret = oc_etag;
+    private string get_etag_from_reply (Soup.Reply reply) {
+        string oc_etag = parse_etag (reply.raw_header ("OC-ETag"));
+        string etag = parse_etag (reply.raw_header ("ETag"));
+        string ret = oc_etag;
         if (ret.is_empty ()) {
             ret = etag;
         }
@@ -1098,7 +1091,7 @@ public class OwncloudPropagator : GLib.Object {
     Given an error from the network, map to a SyncFileItem.Status error
     ***********************************************************/
     private SyncFileItem.Status classify_error (Soup.Reply.NetworkError nerror,
-        int http_code, bool another_sync_needed = null, GLib.ByteArray error_body = new GLib.ByteArray ()) {
+        int http_code, bool another_sync_needed = null, string error_body = new string ()) {
         GLib.assert (nerror != Soup.Reply.NoError); // we should only be called when there is an error
 
         if (nerror == Soup.Reply.RemoteHostClosedError) {

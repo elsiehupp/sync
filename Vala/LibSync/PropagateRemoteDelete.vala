@@ -27,7 +27,7 @@ public class PropagateRemoteDelete : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
+    public void start () {
         GLib.info ("Start propagate remote delete job for" + this.item.file);
 
         if (propagator ().abort_requested)
@@ -45,7 +45,7 @@ public class PropagateRemoteDelete : PropagateItemJob {
                 this,
                 this.on_signal_abstract_propagate_remote_delete_encrypted_finished
             );
-            this.delete_encrypted_helper.on_signal_start ();
+            this.delete_encrypted_helper.start ();
         } else {
             create_delete_job (this.item.file);
         }
@@ -76,7 +76,7 @@ public class PropagateRemoteDelete : PropagateItemJob {
 
         connect (this.job.data (), DeleteJob.signal_finished, this, PropagateRemoteDelete.on_signal_delete_job_finished);
         propagator ().active_job_list.append (this);
-        this.job.on_signal_start ();
+        this.job.start ();
     }
 
 

@@ -22,7 +22,7 @@ public class DeleteJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.ByteArray folder_token;
+    public string folder_token;
 
 
     signal void signal_finished ();
@@ -45,7 +45,7 @@ public class DeleteJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public new void on_signal_start () {
+    public new void start () {
         Soup.Request request;
         if (!this.folder_token.is_empty ()) {
             request.raw_header ("e2e-token", this.folder_token);
@@ -60,7 +60,7 @@ public class DeleteJob : AbstractNetworkJob {
         if (reply ().error () != Soup.Reply.NoError) {
             GLib.warning ("Network error: " + reply ().error_string ());
         }
-        AbstractNetworkJob.on_signal_start ();
+        AbstractNetworkJob.start ();
     }
 
 

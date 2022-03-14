@@ -94,13 +94,13 @@ public class DiscoveryPhase : GLib.Object {
 
     /***********************************************************
     Input
-    Absolute path to the local directory. ends with '/'
+    Absolute path to the local directory. ends with "/"
     ***********************************************************/
     public string local_dir;
 
     /***********************************************************
     Input
-    Remote folder, ends with '/'
+    Remote folder, ends with "/"
     ***********************************************************/
     public string remote_folder;
 
@@ -161,7 +161,7 @@ public class DiscoveryPhase : GLib.Object {
     /***********************************************************
     Output
     ***********************************************************/
-    public GLib.ByteArray data_fingerprint;
+    public string data_fingerprint;
 
 
     /***********************************************************
@@ -253,7 +253,7 @@ public class DiscoveryPhase : GLib.Object {
 
             // Only allow it if the allow list contains exactly this path (not parents)
             // We want to ask confirmation for external storage even if the parents where selected
-            if (this.selective_sync_allow_list.contains (path + '/')) {
+            if (this.selective_sync_allow_list.contains (path + "/")) {
                 return callback (false);
             }
 
@@ -275,7 +275,7 @@ public class DiscoveryPhase : GLib.Object {
         // do a PROPFIND to know the size of this folder
         var propfind_job = new PropfindJob (this.account, this.remote_folder + path, this);
         propfind_job.properties (
-            new GLib.List<GLib.ByteArray> (
+            new GLib.List<string> (
                 "resourcetype"
                 + "http://owncloud.org/ns:size"));
         GLib.Object.connect (
@@ -290,7 +290,7 @@ public class DiscoveryPhase : GLib.Object {
             this,
             this.on_signal_prop_find_job_result
         );
-        propfind_job.on_signal_start ();
+        propfind_job.start ();
     }
 
 
@@ -304,8 +304,8 @@ public class DiscoveryPhase : GLib.Object {
             // it is not too big, put it in the allow list (so we will not do more query for the children)
             // and and do not block.
             var p = path;
-            if (!p.has_suffix ('/'))
-                p += '/';
+            if (!p.has_suffix ("/"))
+                p += "/";
             this.selective_sync_allow_list.insert (
                 std.upper_bound (this.selective_sync_allow_list.begin (), this.selective_sync_allow_list.end (), p),
                 p);
@@ -332,7 +332,7 @@ public class DiscoveryPhase : GLib.Object {
     ***********************************************************/
     string adjust_renamed_path (GLib.HashTable<string, string> renamed_items, string original) {
         int slash_pos = original.size ();
-        while ( (slash_pos = original.last_index_of ('/', slash_pos - 1)) > 0) {
+        while ( (slash_pos = original.last_index_of ("/", slash_pos - 1)) > 0) {
             var it = renamed_items.const_find (original.left (slash_pos));
             if (it != renamed_items.const_end ()) {
                 return it + original.mid (slash_pos);
@@ -346,7 +346,7 @@ public class DiscoveryPhase : GLib.Object {
     If the database-path is scheduled for deletion, on_signal_abort it.
 
     Check if there is already a job to delete that item:
-    If that's not the case, return { false, GLib.ByteArray () }.
+    If that's not the case, return { false, string () }.
     If there is such a job, cancel that job and return true and
     the old etag.
 
@@ -355,9 +355,9 @@ public class DiscoveryPhase : GLib.Object {
 
     See this.deleted_item and this.queued_deleted_directories.
     ***********************************************************/
-    public QPair<bool, GLib.ByteArray> find_and_cancel_deleted_job (string original_path) {
+    public QPair<bool, string> find_and_cancel_deleted_job (string original_path) {
         bool result = false;
-        GLib.ByteArray old_etag;
+        string old_etag;
         var it = this.deleted_item.find (original_path);
         if (it != this.deleted_item.end ()) {
             const SyncInstructions instruction = (*it).instruction;
@@ -398,7 +398,7 @@ public class DiscoveryPhase : GLib.Object {
             delete other_job;
             result = true;
         }
-        return new QPair<bool, GLib.ByteArray> (
+        return new QPair<bool, string> (
             result, old_etag
         );
     }
@@ -415,7 +415,7 @@ public class DiscoveryPhase : GLib.Object {
             this.on_signal_process_directory_job_finished
         );
         this.current_root_job = job;
-        job.on_signal_start ();
+        job.start ();
     }
 
 
@@ -454,7 +454,7 @@ public class DiscoveryPhase : GLib.Object {
 
 
     /***********************************************************
-    Given a sorted list of paths ending with '/', return whether
+    Given a sorted list of paths ending with "/", return whether
     or not the given path is within one of the paths of the list
     ***********************************************************/
     private static bool find_path_in_list (string[] list, string path) {
@@ -465,7 +465,7 @@ public class DiscoveryPhase : GLib.Object {
             return true;
         }
 
-        string path_slash = path + '/';
+        string path_slash = path + "/";
 
         // Since the list is sorted, we can do a binary search.
         // If the path is a prefix of another item or right after in the lexical order.
@@ -479,7 +479,7 @@ public class DiscoveryPhase : GLib.Object {
             return false;
         }
         --it;
-        GLib.assert (it.has_suffix ('/')); // Folder.selective_sync_block_list makes sure of that
+        GLib.assert (it.has_suffix ("/")); // Folder.selective_sync_block_list makes sure of that
         return path_slash.starts_with (*it);
     }
 

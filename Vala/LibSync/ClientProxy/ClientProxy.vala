@@ -46,7 +46,7 @@ public class ClientProxy : GLib.Object {
     public void lookup_system_proxy_async (GLib.Uri url, GLib.Object dst, char slot) {
         var runnable = new SystemProxyRunnable (url);
         GLib.Object.connect (runnable, SIGNAL (system_proxy_looked_up (QNetworkProxy)), dst, slot);
-        QThreadPool.global_instance ().on_signal_start (runnable); // takes ownership and deletes
+        QThreadPool.global_instance ().start (runnable); // takes ownership and deletes
     }
 
 

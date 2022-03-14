@@ -36,7 +36,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
         this.delete_existing = false;
         this.upload_encrypted_helper = null;
         var path = this.item.file;
-        var slash_position = path.last_index_of ('/');
+        var slash_position = path.last_index_of ("/");
         var parent_path = slash_position >= 0 ? path.left (slash_position): "";
 
         SyncJournalFileRecord parent_rec;
@@ -49,7 +49,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public new void on_signal_start () {
+    public new void start () {
         if (propagator ().abort_requested) {
             return;
         }
@@ -67,7 +67,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
             propagator ().full_remote_path (this.item.file),
             this);
         connect (qobject_cast<DeleteJob> (this.job), DeleteJob.signal_finished, this, PropagateRemoteMkdir.on_signal_mkdir);
-        this.job.on_signal_start ();
+        this.job.start ();
     }
 
 
@@ -95,7 +95,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
     ***********************************************************/
     private void on_signal_mkdir () {
         var path = this.item.file;
-        var slash_position = path.last_index_of ('/');
+        var slash_position = path.last_index_of ("/");
         var parent_path = slash_position >= 0 ? path.left (slash_position): "";
 
         SyncJournalFileRecord parent_rec;
@@ -124,7 +124,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
             PropagateUploadEncrypted.error,
             this.on_signal_propagate_upload_encrypted_error
         );
-        this.upload_encrypted_helper.on_signal_start ();
+        this.upload_encrypted_helper.start ();
     }
 
 
@@ -159,7 +159,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
             this,
             PropagateRemoteMkdir.on_signal_mkcol_job_finished
         );
-        this.job.on_signal_start ();
+        this.job.start ();
     }
 
 
@@ -199,7 +199,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
             PropagateRemoteMkdir.on_signal_mkcol_job_finished
         );
         this.job = job;
-        this.job.on_signal_start ();
+        this.job.start ();
     }
 
 
@@ -315,7 +315,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
             this,
             this.on_signal_prop_find_job_finished_with_error
         );
-        propfind_job.on_signal_start ();
+        propfind_job.start ();
     }
 
 
@@ -331,11 +331,11 @@ public class PropagateRemoteMkdir : PropagateItemJob {
             propagator ().active_job_list.append (this);
 
             // We're expecting directory path in /Foo/Bar convention...
-            GLib.assert (job_path.starts_with ('/') && !job_path.has_suffix ('/'));
+            GLib.assert (job_path.starts_with ("/") && !job_path.has_suffix ("/"));
             // But encryption job expect it in Foo/Bar/ convention
             var job = new Occ.EncryptFolderJob (propagator ().account (), propagator ().journal, job_path.mid (1), this.item.file_id, this);
             connect (job, Occ.EncryptFolderJob.on_signal_finished, this, PropagateRemoteMkdir.on_signal_encrypt_folder_finished);
-            job.on_signal_start ();
+            job.start ();
         }
     }
 

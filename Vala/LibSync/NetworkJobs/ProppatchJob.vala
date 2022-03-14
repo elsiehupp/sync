@@ -21,7 +21,7 @@ public class ProppatchJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    GLib.HashTable<GLib.ByteArray, GLib.ByteArray> properties {
+    GLib.HashTable<string, string> properties {
         public get {
             return this.properties;
         }
@@ -50,18 +50,18 @@ public class ProppatchJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public new void on_signal_start () {
+    public new void start () {
         if (this.properties.is_empty ()) {
             GLib.warning ("Proppatch with no properties!");
         }
         Soup.Request request;
 
-        GLib.ByteArray prop_str;
-        QMapIterator<GLib.ByteArray, GLib.ByteArray> it = new QMapIterator<GLib.ByteArray, GLib.ByteArray> (this.properties);
+        string prop_str;
+        QMapIterator<string, string> it = new QMapIterator<string, string> (this.properties);
         while (it.has_next ()) {
             it.next ();
-            GLib.ByteArray key_name = it.key ();
-            GLib.ByteArray key_ns;
+            string key_name = it.key ();
+            string key_ns;
             if (key_name.contains (':')) {
                 int col_index = key_name.last_index_of (":");
                 key_ns = key_name.left (col_index);
@@ -76,7 +76,7 @@ public class ProppatchJob : AbstractNetworkJob {
             prop_str += it.value ();
             prop_str += "</" + key_name + ">\n";
         }
-        GLib.ByteArray xml = "<?xml version=\"1.0\" ?>\n"
+        string xml = "<?xml version=\"1.0\" ?>\n"
                            + "<d:propertyupdate xmlns:d=\"DAV:\">\n"
                            + "  <d:set><d:prop>\n"
                            + prop_str.bytes () + "  </d:prop></d:set>\n"
@@ -86,7 +86,7 @@ public class ProppatchJob : AbstractNetworkJob {
         buf.data (xml);
         buf.open (QIODevice.ReadOnly);
         send_request ("PROPPATCH", make_dav_url (path ()), request, buf);
-        AbstractNetworkJob.on_signal_start ();
+        AbstractNetworkJob.start ();
     }
 
 

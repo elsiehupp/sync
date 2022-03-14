@@ -44,8 +44,8 @@ public class FileSystem : GLib.Object {
         }
 
         const int BUFFER_SIZE = 16 * 1024;
-        GLib.ByteArray buffer1 = new GLib.ByteArray (BUFFER_SIZE, 0);
-        GLib.ByteArray buffer2 = new GLib.ByteArray (BUFFER_SIZE, 0);
+        string buffer1 = new string (BUFFER_SIZE, 0);
+        string buffer2 = new string (BUFFER_SIZE, 0);
         // the files have the same size, compare all of it
         while (!file_1.at_end ()) {
             file_1.read (buffer1.data (), BUFFER_SIZE);
@@ -176,7 +176,7 @@ public class FileSystem : GLib.Object {
             // we never want to go into this branch for .lnk files
             bool is_dir = file_info.is_dir () && !file_info.is_sym_link ();
             if (is_dir) {
-                remove_ok = remove_recursively (path + '/' + dir_iterator.filename (), signal_delegate, errors); // recursive
+                remove_ok = remove_recursively (path + "/" + dir_iterator.filename (), signal_delegate, errors); // recursive
             } else {
                 string remove_error;
                 remove_ok = FileSystem.remove (dir_iterator.file_path (), remove_error);

@@ -198,7 +198,7 @@ public class PushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_web_socket_pong_received (uint64 /*elapsed_time*/, GLib.ByteArray  /*payload*/) {
+    private void on_signal_web_socket_pong_received (uint64 /*elapsed_time*/, string  /*payload*/) {
         GLib.debug ("Pong received in time";
         // We are fine with every kind of pong and don't care about the
         // payload. As long as we receive pongs the server is still alive.
@@ -295,7 +295,7 @@ public class PushNotifications : GLib.Object {
         connect (this.reconnect_timer, QTimer.timeout, () {
             reconnect_to_web_socket ();
         });
-        this.reconnect_timer.on_signal_start ();
+        this.reconnect_timer.start ();
 
         return true;
     }
@@ -322,14 +322,14 @@ public class PushNotifications : GLib.Object {
     ***********************************************************/
     private void start_ping_timer () {
         this.ping_timed_out_timer.stop ();
-        this.ping_timer.on_signal_start ();
+        this.ping_timer.start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void start_ping_timed_out_timer () {
-        this.ping_timed_out_timer.on_signal_start ();
+        this.ping_timed_out_timer.start ();
     }
 
 

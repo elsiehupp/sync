@@ -23,7 +23,7 @@ public class PutMultiFileJob : AbstractNetworkJob {
 
     struct SingleUploadFileData {
         std.unique_ptr<UploadDevice> device;
-        GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers;
+        GLib.HashTable<string, string> headers;
     }
 
 
@@ -66,7 +66,7 @@ public class PutMultiFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
+    public void start () {
         Soup.Request request;
 
         foreach (var one_device in this.devices) {
@@ -91,8 +91,8 @@ public class PutMultiFileJob : AbstractNetworkJob {
 
         connect (reply (), Soup.Reply.signal_upload_progress, this, PutMultiFileJob.signal_upload_progress);
         connect (this, AbstractNetworkJob.signal_network_activity, account ().data (), Account.signal_propagator_network_activity);
-        this.request_timer.on_signal_start ();
-        AbstractNetworkJob.on_signal_start ();
+        this.request_timer.start ();
+        AbstractNetworkJob.start ();
     }
 
 

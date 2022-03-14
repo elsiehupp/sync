@@ -14,7 +14,7 @@ To be
 \code
 this.job = new Set
  connect (
-this.job.on_signal_start ();
+this.job.start ();
 \encode
 
 @ingroup libsync
@@ -30,17 +30,17 @@ public class SetEncryptionFlagApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.ByteArray file_identifier;
+    private string file_identifier;
     private FlagAction flag_action = Set;
 
 
-    signal void success (GLib.ByteArray file_identifier);
-    signal void error (GLib.ByteArray file_identifier, int http_return_code);
+    signal void success (string file_identifier);
+    signal void error (string file_identifier, int http_return_code);
 
     
     /***********************************************************
     ***********************************************************/
-    public SetEncryptionFlagApiJob (unowned Account account, GLib.ByteArray file_identifier, FlagAction flag_action = Set, GLib.Object parent = new GLib.Object ()) {
+    public SetEncryptionFlagApiJob (unowned Account account, string file_identifier, FlagAction flag_action = Set, GLib.Object parent = new GLib.Object ()) {
         base (account, E2EE_BASE_URL + "encrypted/" + file_identifier, parent);
         this.file_identifier = file_identifier;
         this.flag_action = flag_action;
@@ -49,7 +49,7 @@ public class SetEncryptionFlagApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public new void on_signal_start () {
+    public new void start () {
         Soup.Request request;
         request.raw_header ("OCS-APIREQUEST", "true");
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
@@ -58,7 +58,7 @@ public class SetEncryptionFlagApiJob : AbstractNetworkJob {
 
         send_request (this.flag_action == Set ? "PUT": "DELETE", url, request);
 
-        AbstractNetworkJob.on_signal_start ();
+        AbstractNetworkJob.start ();
     }
 
 

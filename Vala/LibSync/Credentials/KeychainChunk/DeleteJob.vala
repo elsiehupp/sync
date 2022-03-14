@@ -34,12 +34,12 @@ public class DeleteJob : KeychainChunk.Job {
 
 
     /***********************************************************
-    Call this method to on_signal_start the job (async).
+    Call this method to start the job (async).
     You should connect some slot to the signal_finished () signal first.
 
-    @see QKeychain.Job.on_signal_start ()
+    @see QKeychain.Job.start ()
     ***********************************************************/
-    public void on_signal_start () {
+    public void start () {
         this.chunk_count = 0;
         this.error = QKeychain.NoError;
 
@@ -56,18 +56,18 @@ public class DeleteJob : KeychainChunk.Job {
         job.insecure_fallback (this.insecure_fallback);
         job.key (kck);
         connect (job, QKeychain.Job.on_signal_finished, this, KeychainChunk.DeleteJob.on_signal_delete_job_done);
-        job.on_signal_start ();
+        job.start ();
     }
 
 
     /***********************************************************
-    Call this method to on_signal_start the job synchronously.
+    Call this method to start the job synchronously.
     Awaits completion with no need to connect some slot to the signal_finished () signal first.
 
     @return Returns true on succeess (QKeychain.NoError).
     ***********************************************************/
     public bool exec () {
-        on_signal_start ();
+        start ();
 
         QEventLoop wait_loop;
         connect (this, DeleteJob.on_signal_finished, wait_loop, QEventLoop.quit);

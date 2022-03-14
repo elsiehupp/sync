@@ -44,7 +44,7 @@ public class CleanupPollsJob : GLib.Object {
     Start the job.  After the job is completed, it will emit either on_signal_finished or aborted, and it
     will destroy itself.
     ***********************************************************/
-    public void on_signal_start () {
+    public void start () {
         if (this.poll_infos.empty ()) {
             /* emit */ finished ();
             delete_later ();
@@ -59,7 +59,7 @@ public class CleanupPollsJob : GLib.Object {
         item.size = info.file_size;
         var job = new PollJob (this.account, info.url, item, this.journal, this.local_path, this);
         connect (job, PollJob.signal_finished, this, CleanupPollsJob.on_signal_poll_finished);
-        job.on_signal_start ();
+        job.start ();
     }
 
 
@@ -86,7 +86,7 @@ public class CleanupPollsJob : GLib.Object {
             this.journal.upload_info (job.item.file, SyncJournalDb.UploadInfo ());
         }
         // Continue with the next entry, or finish
-        on_signal_start ();
+        start ();
     }
 
 } // namespace Occ

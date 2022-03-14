@@ -76,7 +76,7 @@ public class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.ByteArray session_ticket;
+    public string session_ticket;
 
 
     /***********************************************************
@@ -473,7 +473,7 @@ public class Account : GLib.Object {
     @returns the (themeable) dav path for the account.
     ***********************************************************/
     public string dav_path () {
-        return dav_path_base () + '/' + dav_user () + '/';
+        return dav_path_base () + "/" + dav_user () + "/";
     }
 
 
@@ -497,7 +497,7 @@ public class Account : GLib.Object {
     code should use the "privatelink" property accessible via
     PROPFIND.
     ***********************************************************/
-    public GLib.Uri deprecated_private_link_url (GLib.ByteArray numeric_file_id) {
+    public GLib.Uri deprecated_private_link_url (string numeric_file_id) {
         return Utility.concat_url_path (this.user_visible_url,
             QLatin1String ("/index.php/f/") + GLib.Uri.to_percent_encoding (string.from_latin1 (numeric_file_id)));
     }
@@ -510,7 +510,7 @@ public class Account : GLib.Object {
     this function. Other places should prefer to use jobs or
     send_request ().
     ***********************************************************/
-    public Soup.Reply send_raw_request_for_device (GLib.ByteArray verb,
+    public Soup.Reply send_raw_request_for_device (string verb,
         GLib.Uri url, Soup.Request request = Soup.Request (),
         QIODevice data = null) {
         request.url (url);
@@ -532,9 +532,9 @@ public class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public Soup.Reply send_raw_request_for_data (GLib.ByteArray verb,
+    public Soup.Reply send_raw_request_for_data (string verb,
         GLib.Uri url, Soup.Request request = Soup.Request (),
-        GLib.ByteArray data)  {
+        string data)  {
         request.url (url);
         request.ssl_configuration (this.get_or_create_ssl_config ());
         if (verb == "HEAD" && data.is_empty ()) {
@@ -554,7 +554,7 @@ public class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public Soup.Reply send_raw_request_for_multipart (GLib.ByteArray verb,
+    public Soup.Reply send_raw_request_for_multipart (string verb,
         GLib.Uri url, Soup.Request request = Soup.Request (),
         QHttpMultiPart data) {
         request.url (url);
@@ -574,7 +574,7 @@ public class Account : GLib.Object {
     More complicated requests typically create their own job
     types.
     ***********************************************************/
-    public SimpleNetworkJob send_request (GLib.ByteArray verb,
+    public SimpleNetworkJob send_request (string verb,
         GLib.Uri url, Soup.Request request = Soup.Request (),
         QIODevice data = null) {
         var simple_network_job = new SimpleNetworkJob (shared_from_this ());
@@ -654,7 +654,7 @@ public class Account : GLib.Object {
     /***********************************************************
     Assign a client certificate
     ***********************************************************/
-    public void certificate (GLib.ByteArray certficate = new GLib.ByteArray (), string private_key = "");
+    public void certificate (string certficate = new string (), string private_key = "");
 
 
     /***********************************************************
@@ -768,7 +768,7 @@ public class Account : GLib.Object {
             /* emit */ signal_push_notifications_disabled (this);
         }
         if (!this.push_notifications_reconnect_timer.is_active ()) {
-            this.push_notifications_reconnect_timer.on_signal_start ();
+            this.push_notifications_reconnect_timer.start ();
         }
     }
 
@@ -795,7 +795,7 @@ public class Account : GLib.Object {
             DeletePasswordJob.signal_finished,
             this.on_signal_delete_password_job_finished
         );
-        delete_password_job.on_signal_start ();
+        delete_password_job.start ();
     }
 
 
@@ -891,7 +891,7 @@ public class Account : GLib.Object {
             read_password_job,
             ReadPasswordJob.signal_finished,
             this.on_signal_read_password_job_finished);
-        read_password_job.on_signal_start ();
+        read_password_job.start ();
     }
 
 
@@ -937,7 +937,7 @@ public class Account : GLib.Object {
             WritePasswordJob.signal_finished,
             this.on_signal_write_password_job_finished
         );
-        write_password_job.on_signal_start ();
+        write_password_job.start ();
     }
 
 
@@ -964,7 +964,7 @@ public class Account : GLib.Object {
             this,
             this.on_signal_delete_job_finished
         );
-        delete_app_token_job.on_signal_start ();
+        delete_app_token_job.start ();
     }
 
 
@@ -998,7 +998,7 @@ public class Account : GLib.Object {
                 // Fetch the available editors and their mime types
                 var json_api_job = new JsonApiJob (shared_from_this (), QLatin1String ("ocs/v2.php/apps/files/api/v1/direct_editing"));
                 GLib.Object.JsonApiJob.signal_json_received.connect (json_api_job, this, Account.on_signal_direct_editing_recieved);
-                json_api_job.on_signal_start ();
+                json_api_job.start ();
         }
     }
 
@@ -1136,7 +1136,7 @@ public class Account : GLib.Object {
                 this,
                 this.on_signal_json_api_job_user_name_fetched
             );
-            fetch_user_name_job.on_signal_start ();
+            fetch_user_name_job.start ();
         } else {
             GLib.debug ("User identifier already fetched.");
             /* emit */ signal_credentials_fetched (this.credentials.data ());

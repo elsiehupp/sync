@@ -29,7 +29,7 @@ namespace LibSync {
 This is the flow:
 
 \code{.unparsed}
-  on_signal_start ()
+  start ()
     |
     | delete_existing_folder () if enabled
     |
@@ -106,7 +106,7 @@ public class PropagateDownloadFile : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
+    public void start () {
         if (propagator ().abort_requested)
             return;
         this.is_encrypted = false;
@@ -114,7 +114,7 @@ public class PropagateDownloadFile : PropagateItemJob {
         GLib.debug (this.item.file + propagator ().active_job_list.count ());
 
         var path = this.item.file;
-        var slash_position = path.last_index_of ('/');
+        var slash_position = path.last_index_of ("/");
         var parent_path = slash_position >= 0 ? path.left (slash_position): "";
 
         SyncJournalFileRecord parent_rec;
@@ -146,7 +146,7 @@ public class PropagateDownloadFile : PropagateItemJob {
                     );
                 }
             );
-            this.download_encrypted_helper.on_signal_start ();
+            this.download_encrypted_helper.start ();
         }
     }
 
@@ -198,7 +198,7 @@ public class PropagateDownloadFile : PropagateItemJob {
     Called when ComputeChecksum on the local file finishes,
     maybe the local and remote checksums are identical?
     ***********************************************************/
-    private void on_signal_conflict_checksum_computed (GLib.ByteArray checksum_type, GLib.ByteArray checksum) {
+    private void on_signal_conflict_checksum_computed (string checksum_type, string checksum) {
         propagator ().active_job_list.remove_one (this);
         if (make_checksum_header (checksum_type, checksum) == this.item.checksum_header) {
             // No download necessary, just update fs and journal metadata
@@ -231,7 +231,7 @@ public class PropagateDownloadFile : PropagateItemJob {
 
 
     /***********************************************************
-    Called to on_signal_start downloading the remote file
+    Called to start downloading the remote file
     ***********************************************************/
     private void on_signal_start_download () {
         if (propagator ().abort_requested)
@@ -246,7 +246,7 @@ public class PropagateDownloadFile : PropagateItemJob {
         propagator ().report_progress (*this.item, 0);
 
         string tmp_filename;
-        GLib.ByteArray expected_etag_for_resume;
+        string expected_etag_for_resume;
         const SyncJournalDb.DownloadInfo progress_info = propagator ().journal.get_download_info (this.item.file);
         if (progress_info.valid) {
             // if the etag has changed meanwhile, remove the already downloaded part.
@@ -311,10 +311,10 @@ public class PropagateDownloadFile : PropagateItemJob {
             pi.tmpfile = tmp_filename;
             pi.valid = true;
             propagator ().journal.download_info (this.item.file, pi);
-            propagator ().journal.commit ("download file on_signal_start");
+            propagator ().journal.commit ("download file start");
         }
 
-        GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers;
+        GLib.HashTable<string, string> headers;
 
         if (this.item.direct_download_url.is_empty ()) {
             // Normal job, download from o_c instance
@@ -338,7 +338,7 @@ public class PropagateDownloadFile : PropagateItemJob {
         connect (this.job.data (), GETFileJob.signal_finished, this, PropagateDownloadFile.on_signal_get_finished);
         connect (this.job.data (), GETFileJob.download_progress, this, PropagateDownloadFile.on_signal_download_progress);
         propagator ().active_job_list.append (this);
-        this.job.on_signal_start ();
+        this.job.start ();
     }
 
 
@@ -388,7 +388,7 @@ public class PropagateDownloadFile : PropagateItemJob {
                 // If this was with a direct download, retry without direct download
                 GLib.warning ("Direct download of" + this.item.direct_download_url + " failed. Retrying through owncloud.");
                 this.item.direct_download_url.clear ();
-                on_signal_start ();
+                start ();
                 return;
             }
 
@@ -413,7 +413,7 @@ public class PropagateDownloadFile : PropagateItemJob {
                 propagator ().journal.schedule_path_for_remote_discovery (this.item.file);
             }
 
-            GLib.ByteArray error_body;
+            string error_body;
             string error_string = this.item.http_error_code >= 400 ? job.error_string_parsing_body (&error_body)
                                                             : job.error_string ();
             SyncFileItem.Status status = job.error_status ();
@@ -450,7 +450,7 @@ public class PropagateDownloadFile : PropagateItemJob {
         reported that if a server breaks behind a proxy, the GET is still a 200 but is
         truncated, as described here : https://github.com/owncloud/mirall/issues/2528
         ***********************************************************/
-        GLib.ByteArray size_header = new GLib.ByteArray ("Content-Length");
+        string size_header = new string ("Content-Length");
         int64 body_size = job.reply ().raw_header (size_header).to_long_long ();
         bool has_size_header = !job.reply ().raw_header (size_header).is_empty ();
 
@@ -522,15 +522,15 @@ public class PropagateDownloadFile : PropagateItemJob {
         var content_md5Header = job.reply ().raw_header (CONTENT_MD5_HEADER_C);
         if (checksum_header.is_empty () && !content_md5Header.is_empty ())
             checksum_header = "MD5:" + content_md5Header;
-        validator.on_signal_start (this.tmp_file.filename (), checksum_header);
+        validator.start (this.tmp_file.filename (), checksum_header);
     }
 
 
     /***********************************************************
     Called when the download's checksum header was validated
     ***********************************************************/
-    private void on_signal_transmission_checksum_validated (GLib.ByteArray checksum_type, GLib.ByteArray checksum) {
-        const GLib.ByteArray the_content_checksum_type = propagator ().account ().capabilities ().preferred_upload_checksum_type ();
+    private void on_signal_transmission_checksum_validated (string checksum_type, string checksum) {
+        const string the_content_checksum_type = propagator ().account ().capabilities ().preferred_upload_checksum_type ();
 
         // Reuse transmission checksum as content checksum.
         //
@@ -546,14 +546,14 @@ public class PropagateDownloadFile : PropagateItemJob {
 
         connect (compute_checksum, ComputeChecksum.done,
             this, PropagateDownloadFile.on_signal_content_checksum_computed);
-        compute_checksum.on_signal_start (this.tmp_file.filename ());
+        compute_checksum.start (this.tmp_file.filename ());
     }
 
 
     /***********************************************************
     Called when the download's checksum computation is done
     ***********************************************************/
-    private void on_signal_content_checksum_computed (GLib.ByteArray checksum_type, GLib.ByteArray checksum) {
+    private void on_signal_content_checksum_computed (string checksum_type, string checksum) {
         this.item.checksum_header = make_checksum_header (checksum_type, checksum);
 
         if (this.is_encrypted) {
@@ -615,7 +615,7 @@ public class PropagateDownloadFile : PropagateItemJob {
             preserve_group_ownership (this.tmp_file.filename (), existing_file);
 
             // Make the file a hydrated placeholder if possible
-            var result = propagator ().sync_options ().vfs.convert_to_placeholder (this.tmp_file.filename (), this.item, fn);
+            var result = propagator ().sync_options.vfs.convert_to_placeholder (this.tmp_file.filename (), this.item, fn);
             if (!result) {
                 on_signal_done (SyncFileItem.Status.NORMAL_ERROR, result.error ());
                 return;
@@ -636,7 +636,7 @@ public class PropagateDownloadFile : PropagateItemJob {
             previous_file_exists = false;
         }
 
-        var vfs = propagator ().sync_options ().vfs;
+        var vfs = propagator ().sync_options.vfs;
 
         // In the case of an hydration, this size is likely to change for placeholders
         // (except with the cfapi backend)
@@ -790,9 +790,9 @@ public class PropagateDownloadFile : PropagateItemJob {
     /***********************************************************
     ***********************************************************/
     private void start_after_is_encrypted_is_checked () {
-        this.stopwatch.on_signal_start ();
+        this.stopwatch.start ();
 
-        var sync_options = propagator ().sync_options ();
+        var sync_options = propagator ().sync_options;
         var vfs = sync_options.vfs;
 
         // For virtual files just dehydrate or create the file and be done
@@ -875,7 +875,7 @@ public class PropagateDownloadFile : PropagateItemJob {
             connect (compute_checksum, ComputeChecksum.done,
                 this, PropagateDownloadFile.on_signal_conflict_checksum_computed);
             propagator ().active_job_list.append (this);
-            compute_checksum.on_signal_start (propagator ().full_local_path (this.item.file));
+            compute_checksum.start (propagator ().full_local_path (this.item.file));
             return;
         }
 
@@ -891,7 +891,7 @@ public class PropagateDownloadFile : PropagateItemJob {
     too. For weak checksums, we only do that if the mtimes are
     also identical.
     ***********************************************************/
-    private void csync_is_collision_safe_hash (GLib.ByteArray checksum_header) {
+    private void csync_is_collision_safe_hash (string checksum_header) {
         return checksum_header.starts_with ("SHA")
             || checksum_header.starts_with ("MD5:");
     }
@@ -905,7 +905,7 @@ public class PropagateDownloadFile : PropagateItemJob {
     static string create_download_tmp_filename (string previous) {
         string tmp_filename;
         string tmp_path;
-        int slash_pos = previous.last_index_of ('/');
+        int slash_pos = previous.last_index_of ("/");
         // work with both pathed filenames and only filenames
         if (slash_pos == -1) {
             tmp_filename = previous;
@@ -917,7 +917,7 @@ public class PropagateDownloadFile : PropagateItemJob {
         int overhead = 1 + 1 + 2 + 8; // slash dot dot-tilde ffffffff"
         int space_for_filename = q_min (254, tmp_filename.length () + overhead) - overhead;
         if (tmp_path.length () > 0) {
-            return tmp_path + '/' + '.' + tmp_filename.left (space_for_filename) + ".~" + (string.number (uint32 (Utility.rand () % 0x_f_f_f_f_f_f_f_f), 16));
+            return tmp_path + "/" + '.' + tmp_filename.left (space_for_filename) + ".~" + (string.number (uint32 (Utility.rand () % 0x_f_f_f_f_f_f_f_f), 16));
         } else {
             return '.' + tmp_filename.left (space_for_filename) + ".~" + (string.number (uint32 (Utility.rand () % 0x_f_f_f_f_f_f_f_f), 16));
         }
@@ -932,7 +932,7 @@ public class PropagateDownloadFile : PropagateItemJob {
         // Add this.recall-XXXX  before the extension.
         int dot_location = recall_filename.last_index_of ('.');
         // If no extension, add it at the end  (take care of cases like foo/.hidden or foo.bar/file)
-        if (dot_location <= recall_filename.last_index_of ('/') + 1) {
+        if (dot_location <= recall_filename.last_index_of ("/") + 1) {
             dot_location = recall_filename.size ();
         }
 
@@ -960,7 +960,7 @@ public class PropagateDownloadFile : PropagateItemJob {
         QDir base_dir = existing_file.directory ();
 
         while (!file.at_end ()) {
-            GLib.ByteArray line = file.read_line ();
+            string line = file.read_line ();
             line.chop (1); // remove trailing \n
 
             string recalled_file = QDir.clean_path (base_dir.file_path (line));

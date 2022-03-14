@@ -361,7 +361,7 @@ public class Theme : GLib.Object {
         case SyncResult.Status.UNDEFINED:
             return _("theme", "Status undefined");
         case SyncResult.Status.NOT_YET_STARTED:
-            return _("theme", "Waiting to on_signal_start sync");
+            return _("theme", "Waiting to start sync");
         case SyncResult.Status.SYNC_RUNNING:
             return _("theme", "Sync is running");
         case SyncResult.Status.SUCCESS:
@@ -438,8 +438,8 @@ public class Theme : GLib.Object {
         var base_url = help_url ();
         if (base_url.is_empty ())
             return "";
-        if (!base_url.has_suffix ('/'))
-            base_url.append ('/');
+        if (!base_url.has_suffix ("/"))
+            base_url.append ("/");
         return base_url + "conflicts.html";
     }
 
@@ -557,13 +557,13 @@ public class Theme : GLib.Object {
             key = "CustomMediaType.OC_SETUP_BOTTOM";
             break;
         case CustomMediaType.OC_SETUP_RESULT_BOTTOM:
-            key = "CustomMediaType.OC_SETUP_RESULT_BOTTOM"\;
+            key = "CustomMediaType.OC_SETUP_RESULT_BOTTOM";
             break;
         }
 
-        string img_path = string (Theme.theme_prefix) + string.from_latin1 ("colored/%1.png").arg (key);
+        string img_path = Theme.theme_prefix + "colored/%1.png".arg (key);
         if (GLib.File.exists (img_path)) {
-            QPixmap pix (img_path);
+            QPixmap pix = new QPixmap (img_path);
             if (pix.is_null ()) {
                 // pixmap loading hasn't succeeded. We take the text instead.
                 re.value (key);
@@ -610,7 +610,7 @@ public class Theme : GLib.Object {
             return QPixmap (hidpi_filename (logo_base_path + ".png"));
         }
     // #else
-        var size = Theme.is_hidpi () ? : 200 : 100;
+        var size = Theme.is_hidpi () ? 200 : 100;
         return application_icon ().pixmap (size);
     // #endif
     }
@@ -647,18 +647,21 @@ public class Theme : GLib.Object {
     ***********************************************************/
     public QPixmap wizard_header_banner () {
         Gtk.Color c = wizard_header_background_color ();
-        if (!c.is_valid ())
+        if (!c.is_valid ()) {
             return QPixmap ();
+        }
 
-        QSize size (750, 78);
-        if (var screen = Gtk.Application.primary_screen ()) {
+        QSize size = new QSize (750, 78);
+        var screen = Gtk.Application.primary_screen ();
+        if (screen) {
             // Adjust the the size if there is a different DPI. (Issue #6156)
             // Indeed, this size need to be big enough to for the banner height, and the wizard's width
-            var ratio = screen.logical_dots_per_inch () / 96.;
-            if (ratio > 1.)
+            var ratio = screen.logical_dots_per_inch () / 96.0;
+            if (ratio > 1.0) {
                 size *= ratio;
+            }
         }
-        QPixmap pix (size);
+        QPixmap pix = new QPixmap (size);
         pix.fill (wizard_header_background_color ());
         return pix;
     }
@@ -673,9 +676,9 @@ public class Theme : GLib.Object {
         const string github_prefix =
             "https://github.com/nextcloud/desktop/commit/";
         const string git_sha1 = GIT_SHA1;
-        dev_string = _("nextcloud_theme.about ()",
-            "<p><small>Built from Git revision <a href=\"%1\">%2</a>"
-            " on %3, %4 using Qt %5, %6</small></p>")
+        dev_string = _("nextcloud_theme.about ()"
+                     + "<p><small>Built from Git revision <a href=\"%1\">%2</a>"
+                     + " on %3, %4 using Qt %5, %6</small></p>")
                         .arg (github_prefix + git_sha1)
                         .arg (git_sha1.left (6))
                         .arg (__DATE__)
@@ -946,7 +949,7 @@ public class Theme : GLib.Object {
             stream += "Using Qt platform plugin '" + QGuiApplication.platform_name () + "'" + Qt.endl;
 
         stream += "Using '" + QSslSocket.ssl_library_version_string () + "'" + Qt.endl;
-        stream += "Running on " + Utility.platform_name (", " + QSysInfo.current_cpu_architecture () + Qt.endl;
+        stream += "Running on " + Utility.platform_name () + ", " + QSysInfo.current_cpu_architecture () + Qt.endl;
         return help_text;
     }
 	
@@ -999,7 +1002,7 @@ public class Theme : GLib.Object {
     the app palette can not account for that (Qt 5.12.5).
     ***********************************************************/
     public static Gtk.Color get_background_aware_link_color (Gtk.Color background_color = QGuiApplication.palette ().base ().color ()) {
-        return is_dark_color (background_color) ? Gtk.Color ("#6193dc") : QGuiApplication.palette ().color (QPalette.Link)
+        return is_dark_color (background_color) ? new Gtk.Color ("#6193dc") : QGuiApplication.palette ().color (QPalette.Link);
     }
 
 
@@ -1049,7 +1052,7 @@ public class Theme : GLib.Object {
         QPainter img_painter = new QPainter  (&img);
         Gtk.Image inverted = new Gtk.Image (64, 64, Gtk.Image.FormatARGB32);
         inverted.fill (Qt.GlobalColor.transparent);
-        QPainter inv_painter (&inverted);
+        QPainter inv_painter = new QPainter (inverted);
 
         renderer.render (&img_painter);
         renderer.render (&inv_painter);
@@ -1167,26 +1170,12 @@ public class Theme : GLib.Object {
             }
 
             const string svg_name = string (Theme.theme_prefix) + string.from_latin1 ("%1/%2.svg").arg (flavor).arg (name);
-            QSvgRenderer renderer (svg_name);
-            var create_pixmap_from_svg = [&renderer] (int size) {
-                Gtk.Image img (size, size, Gtk.Image.FormatARGB32);
-                img.fill (Qt.GlobalColor.transparent);
-                QPainter img_painter (&img);
-                renderer.render (&img_painter);
-                return QPixmap.from_image (img);
-            }
-
-            var load_pixmap = [flavor, name] (int size) {
-                const string pixmap_name = string (Theme.theme_prefix) + string.from_latin1 ("%1/%2-%3.png").arg (flavor).arg (name).arg (size);
-                return QPixmap (pixmap_name);
-            }
+            QSvgRenderer renderer = new QSvgRenderer (svg_name);
 
             var use_svg = should_prefer_svg ();
-            var sizes = use_svg
-                ? GLib.List<int> {
-                    16, 32, 64, 128, 256 }
-                : GLib.List<int> {
-                    16, 22, 32, 48, 64, 128, 256, 512, 1024 };
+            GLib.List<int> sizes = use_svg
+                ? { 16, 32, 64, 128, 256 }
+                : { 16, 22, 32, 48, 64, 128, 256, 512, 1024 };
             foreach (int size in sizes) {
                 var px = use_svg ? create_pixmap_from_svg (size) : load_pixmap (size);
                 if (px.is_null ()) {
@@ -1195,7 +1184,7 @@ public class Theme : GLib.Object {
                 // HACK, get rid of it by supporting FDO icon themes, this is really just emulating ubuntu-mono
                 if (qgetenv ("DESKTOP_SESSION") == "ubuntu") {
                     QBitmap mask = px.create_mask_from_color (Qt.white, Qt.MaskOutColor);
-                    QPainter p (&px);
+                    QPainter p = new QPainter (px);
                     p.pen (Gtk.Color ("#dfdbd2"));
                     p.draw_pixmap (px.rect (), mask, mask.rect ());
                 }
@@ -1204,6 +1193,21 @@ public class Theme : GLib.Object {
         }
 
         return cached;
+    }
+
+
+    private static QPixmap create_pixmap_from_svg (QSvgRenderer renderer, int size) {
+        Gtk.Image img = new Gtk.Image (size, size, Gtk.Image.FormatARGB32);
+        img.fill (Qt.GlobalColor.transparent);
+        QPainter img_painter = new QPainter (img);
+        renderer.render (img_painter);
+        return QPixmap.from_image (img);
+    }
+
+
+    private static QPixmap load_pixmap (string flavor, string name, int size) {
+        const string pixmap_name = Theme.theme_prefix + "%1/%2-%3.png".arg (flavor).arg (name).arg (size);
+        return QPixmap (pixmap_name);
     }
 //  #endif
     /***********************************************************
@@ -1250,7 +1254,7 @@ public class Theme : GLib.Object {
     }
 
     private static bool should_prefer_svg () {
-        return GLib.ByteArray (APPLICATION_ICON_SET).to_upper () == GLib.ByteArray ("SVG");
+        return string (APPLICATION_ICON_SET).to_upper () == string ("SVG");
     }
 
 } // class Theme
