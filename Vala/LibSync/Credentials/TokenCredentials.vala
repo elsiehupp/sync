@@ -56,7 +56,7 @@ public class TokenCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public string auth_type () {
+    public string signal_auth_type () {
         return "token";
     }
 

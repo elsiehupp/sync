@@ -14,7 +14,7 @@ public class PropagateRemoteCeleteEncrypted : AbstractPropagateRemoteDeleteEncry
 
     /***********************************************************
     ***********************************************************/
-    public PropagateRemoteCeleteEncrypted (OwncloudPropagator propagator, SyncFileItemPtr item, GLib.Object parent) {
+    public PropagateRemoteCeleteEncrypted (OwncloudPropagator propagator, unowned SyncFileItem item, GLib.Object parent) {
         base (propagator, item, parent);
 
     }
@@ -22,7 +22,7 @@ public class PropagateRemoteCeleteEncrypted : AbstractPropagateRemoteDeleteEncry
     /***********************************************************
     ***********************************************************/
     public void on_signal_start () {
-        //  Q_ASSERT (!this.item.encrypted_filename.is_empty ());
+        GLib.assert (!this.item.encrypted_filename.is_empty ());
 
         const GLib.FileInfo info = new GLib.FileInfo (this.item.encrypted_filename);
         start_ls_col_job (info.path ());
@@ -73,12 +73,25 @@ public class PropagateRemoteCeleteEncrypted : AbstractPropagateRemoteDeleteEncry
         GLib.debug (PROPAGATE_REMOVE_ENCRYPTED + "Metadata updated, sending to the server.");
 
         var job = new UpdateMetadataApiJob (this.propagator.account (), this.folder_identifier, metadata.encrypted_metadata (), this.folder_token);
-        connect (job, UpdateMetadataApiJob.on_signal_success, this, (GLib.ByteArray file_identifier) {
-            //  Q_UNUSED (file_identifier);
-            delete_remote_item (this.item.encrypted_filename);
-        });
-        connect (job, UpdateMetadataApiJob.error, this, PropagateRemoteCeleteEncrypted.task_failed);
+        connect (
+            job,
+            UpdateMetadataApiJob.on_signal_success,
+            this,
+            this.on_signal_update_metadata_api_job_success
+        );
+        connect (
+            job,
+            UpdateMetadataApiJob.error,
+            this,
+            PropagateRemoteCeleteEncrypted.task_failed
+        );
         job.on_signal_start ();
+    }
+
+
+    private void on_signal_update_metadata_api_job_success (GLib.ByteArray file_identifier) {
+        //  Q_UNUSED (file_identifier);
+        delete_remote_item (this.item.encrypted_filename);
     }
 
 } // class PropagateRemoteCeleteEncrypted

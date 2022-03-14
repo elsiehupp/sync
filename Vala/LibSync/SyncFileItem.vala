@@ -19,8 +19,7 @@ namespace LibSync {
 ***********************************************************/
 public class SyncFileItem : GLib.Object {
 
-    private class SyncFileItemPtr : unowned SyncFileItem { }
-    private class SyncFileItemVector : GLib.List<SyncFileItemPtr> { }
+    private class SyncFileItemVector : GLib.List<unowned SyncFileItem> { }
 
 
     /***********************************************************
@@ -369,8 +368,8 @@ public class SyncFileItem : GLib.Object {
     This is intended in particular for read-update-write cycles that need
     to go through a a SyncFileItem, like PollJob.
     ***********************************************************/
-    public static SyncFileItemPtr from_sync_journal_file_record (SyncJournalFileRecord record) {
-        var item = SyncFileItemPtr.create ();
+    public static unowned SyncFileItem from_sync_journal_file_record (SyncJournalFileRecord record) {
+        var item = unowned SyncFileItem.create ();
         item.file = record.path ();
         item.inode = record.inode;
         item.modtime = record.modtime;
@@ -457,7 +456,7 @@ public class SyncFileItem : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    //  inline bool operator< (SyncFileItemPtr item1, SyncFileItemPtr item2) {
+    //  inline bool operator< (unowned SyncFileItem item1, unowned SyncFileItem item2) {
     //      return item1 < *item2;
     //  }
 

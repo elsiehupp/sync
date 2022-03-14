@@ -75,8 +75,8 @@ public class EncryptFolderJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_encryption_flag_error (GLib.ByteArray file_identifier, int http_error_code) {
-        GLib.debug ("Error on the encryption flag of" + file_identifier + "HTTP code:" + http_error_code;
-        /* emit */ finished (Error);
+        GLib.debug ("Error on the encryption flag of " + file_identifier + " HTTP code: " + http_error_code);
+        /* emit */ signal_finished (Error);
     }
 
 
@@ -85,13 +85,13 @@ public class EncryptFolderJob : GLib.Object {
     private void on_signal_lock_for_encryption_success (GLib.ByteArray file_identifier, GLib.ByteArray token) {
         this.folder_token = token;
 
-        FolderMetadata empty_metadata (this.account);
+        FolderMetadata empty_metadata = new FolderMetadata (this.account);
         var encrypted_metadata = empty_metadata.encrypted_metadata ();
         if (encrypted_metadata.is_empty ()) {
-            //TODO : Mark the folder as unencrypted as the metadata generation failed.
+            // TODO: Mark the folder as unencrypted as the metadata generation failed.
             this.error_string = _("Could not generate the metadata for encryption, Unlocking the folder.\n"
-                              "This can be an issue with your OpenSSL libraries.");
-            /* emit */ finished (Error);
+                                + "This can be an issue with your OpenSSL libraries.");
+            /* emit */ signal_finished (Error);
             return;
         }
 
@@ -107,24 +107,24 @@ public class EncryptFolderJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_lock_for_encryption_error (GLib.ByteArray file_identifier, int http_error_code) {
-        GLib.info ("Locking error for" + file_identifier + "HTTP code:" + http_error_code;
-        /* emit */ finished (Error);
+        GLib.info ("Locking error for " + file_identifier + " HTTP code: " + http_error_code);
+        /* emit */ signal_finished (Error);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_signal_unlock_folder_success (GLib.ByteArray file_identifier) {
-        GLib.info ("Unlocking on_signal_success for" + file_identifier;
-        /* emit */ finished (Success);
+        GLib.info ("Unlocking on_signal_success for " + file_identifier);
+        /* emit */ signal_finished (Success);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_signal_unlock_folder_error (GLib.ByteArray file_identifier, int http_error_code) {
-        GLib.info ("Unlocking error for" + file_identifier + "HTTP code:" + http_error_code;
-        /* emit */ finished (Error);
+        GLib.info ("Unlocking error for " + file_identifier + " HTTP code: " + http_error_code);
+        /* emit */ signal_finished (Error);
     }
 
 
@@ -132,10 +132,18 @@ public class EncryptFolderJob : GLib.Object {
     ***********************************************************/
     private void on_signal_upload_metadata_success (GLib.ByteArray folder_identifier) {
         var unlock_job = new UnlockEncryptFolderApiJob (this.account, folder_identifier, this.folder_token, this);
-        connect (unlock_job, UnlockEncryptFolderApiJob.on_signal_success,
-                        this, EncryptFolderJob.on_signal_unlock_folder_success);
-        connect (unlock_job, UnlockEncryptFolderApiJob.error,
-                        this, EncryptFolderJob.on_signal_unlock_folder_error);
+        connect (
+            unlock_job,
+            UnlockEncryptFolderApiJob.on_signal_success,
+            this,
+            EncryptFolderJob.on_signal_unlock_folder_success
+        );
+        connect (
+            unlock_job,
+            UnlockEncryptFolderApiJob.error,
+            this,
+            EncryptFolderJob.on_signal_unlock_folder_error
+        );
         unlock_job.on_signal_start ();
     }
 

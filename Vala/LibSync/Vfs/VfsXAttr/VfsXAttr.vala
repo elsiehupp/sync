@@ -154,13 +154,13 @@ public class VfsXAttr : Vfs {
         }
 
         var parent_path = static_cast<GLib.ByteArray> (stat_data);
-        //  Q_ASSERT (!parent_path.has_suffix ('/'));
-        //  Q_ASSERT (!stat.path.starts_with ('/'));
+        GLib.assert (!parent_path.has_suffix ('/'));
+        GLib.assert (!stat.path.starts_with ('/'));
 
         var path = new GLib.ByteArray (*parent_path + '/' + stat.path);
         var pin = () => {
             var absolute_path = string.from_utf8 (path);
-            //  Q_ASSERT (absolute_path.starts_with (parameters ().filesystem_path.to_utf8 ()));
+            GLib.assert (absolute_path.starts_with (parameters ().filesystem_path.to_utf8 ()));
             var folder_path = absolute_path.mid (parameters ().filesystem_path.length ());
             return pin_state (folder_path);
         };

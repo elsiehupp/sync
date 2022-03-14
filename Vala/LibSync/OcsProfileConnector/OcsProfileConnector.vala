@@ -26,20 +26,18 @@ public class OcsProfileConnector : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public OcsProfileConnector.for_account (unowned Account account, GLib.Object parent = new GLib.Object ());
-    OcsProfileConnector.OcsProfileConnector.for_account (unowned Account account, GLib.Object parent)
-        : GLib.Object (parent)
-        this.account (account) {
+    public OcsProfileConnector.for_account (Account account, GLib.Object parent = new GLib.Object ()) {
+        base (parent);
+        this.account = account;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void fetch_hovercard (string user_id);
-    void OcsProfileConnector.fetch_hovercard (string user_id) {
+    public void fetch_hovercard (string user_id) {
         if (this.account.server_version_int () < Account.make_server_version (23, 0, 0)) {
-            GLib.info ("Server version" + this.account.server_version ()
-                                         + "does not support profile page";
+            GLib.info ("Server version " + this.account.server_version ()
+                + " does not support profile page.");
             /* emit */ error ();
             return;
         }
@@ -52,7 +50,7 @@ public class OcsProfileConnector : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public const Hovercard hovercard () {
+    public Hovercard hovercard () {
         return this.current_hovercard;
     }
 
@@ -60,14 +58,14 @@ public class OcsProfileConnector : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_hovercard_fetched (QJsonDocument json, int status_code) {
-        GLib.debug ("Hovercard fetched:" + json;
+        GLib.debug ("Hovercard fetched: " + json);
 
         if (status_code != 200) {
-            GLib.info ("Fetching of hovercard on_signal_finished with status code" + status_code;
+            GLib.info ("Fetching of hovercard finished with status code " + status_code);
             return;
         }
         var json_data = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("actions");
-        //  Q_ASSERT (json_data.is_array ());
+        GLib.assert (json_data.is_array ());
         this.current_hovercard = json_to_hovercard (json_data.to_array ());
         fetch_icons ();
         /* emit */ hovercard_fetched ();
@@ -88,14 +86,28 @@ public class OcsProfileConnector : GLib.Object {
     ***********************************************************/
     private void start_fetch_icon_job (size_t hovercard_action_index) {
         var hovercard_action = this.current_hovercard.actions[hovercard_action_index];
-        var icon_job = new IconJob{this.account, hovercard_action.icon_url, this};
-        connect (icon_job, IconJob.signal_job_finished,
-            [this, hovercard_action_index] (GLib.ByteArray icon_data) {
-                load_hovercard_action_icon (hovercard_action_index, icon_data);
-            });
-        connect (icon_job, IconJob.error, this, [] (Soup.Reply.NetworkError error_type) {
-            GLib.warning ("Could not fetch icon:" + error_type;
-        });
+        var icon_job = new IconJob (this.account, hovercard_action.icon_url, this);
+        connect (
+            icon_job,
+            IconJob.signal_job_finished,
+            this.on_signal_icon_job_finished
+        );
+        connect (
+            icon_job,
+            IconJob.error,
+            this,
+            this.on_signal_icon_job_error
+        );
+    }
+
+
+    private void on_signal_icon_job_finished (size_t hovercard_action_index, GLib.ByteArray icon_data) {
+        load_hovercard_action_icon (hovercard_action_index, icon_data);
+    }
+
+
+    private void on_signal_icon_job_error (Soup.Reply.NetworkError error_type) {
+        GLib.warning ("Could not fetch icon: " + error_type);
     }
 
 
@@ -121,16 +133,17 @@ public class OcsProfileConnector : GLib.Object {
             hovercard_action_icon (hovercard_action_index, icon);
             return;
         }
-        GLib.warning ("Could not load Svg icon from data" + icon_data;
+        GLib.warning ("Could not load Svg icon from data " + icon_data);
     }
 
 
     private static Occ.HovercardAction json_to_action (QJsonObject json_action_object) {
         var icon_url = json_action_object.value ("icon").to_string ("no-icon");
         QPixmap icon_pixmap;
-        Occ.HovercardAction hovercard_action{
+        Occ.HovercardAction hovercard_action = new Occ.HovercardAction (
             json_action_object.value ("title").to_string ("No title"), icon_url,
-            json_action_object.value ("hyperlink").to_string ("no-link")};
+            json_action_object.value ("hyperlink").to_string ("no-link")
+        );
         if (QPixmapCache.find (icon_url, icon_pixmap)) {
             hovercard_action.icon = icon_pixmap;
         }
@@ -142,7 +155,7 @@ public class OcsProfileConnector : GLib.Object {
         Occ.Hovercard hovercard;
         hovercard.actions.reserve (json_data_array.size ());
         foreach (var json_entry in json_data_array) {
-            //  Q_ASSERT (json_entry.is_object ());
+            GLib.assert (json_entry.is_object ());
             if (!json_entry.is_object ()) {
                 continue;
             }
@@ -157,13 +170,13 @@ public class OcsProfileConnector : GLib.Object {
         if (!svg_renderer.on_signal_load (icon_data)) {
             return {};
         }
-        QSize image_size{16, 16};
+        QSize image_size = new QSize (16, 16);
         if (Occ.Theme.is_hidpi ()) {
-            image_size = QSize{32, 32};
+            image_size = new QSize (32, 32);
         }
-        Gtk.Image scaled_svg (image_size, Gtk.Image.FormatARGB32);
+        Gtk.Image scaled_svg = new Gtk.Image (image_size, Gtk.Image.FormatARGB32);
         scaled_svg.fill ("transparent");
-        QPainter svg_painter{&scaled_svg};
+        QPainter svg_painter = new QPainter (scaled_svg);
         svg_renderer.render (&svg_painter);
         return QPixmap.from_image (scaled_svg);
     }

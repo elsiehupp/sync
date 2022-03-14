@@ -81,7 +81,7 @@ public class CheckServerJob : AbstractNetworkJob {
     public void on_signal_start () {
         this.server_url = account ().url ();
         send_request ("GET", Utility.concat_url_path (this.server_url, path ()));
-        connect (reply (), Soup.Reply.meta_data_changed, this, CheckServerJob.meta_data_changed_slot);
+        connect (reply (), Soup.Reply.meta_data_changed, this, CheckServerJob.on_signal_metadata_changed);
         connect (reply (), Soup.Reply.encrypted, this, CheckServerJob.on_signal_encrypted);
         AbstractNetworkJob.on_signal_start ();
     }
@@ -90,11 +90,11 @@ public class CheckServerJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public void on_signal_timed_out () {
-        GLib.warning ("TIMEOUT";
+        GLib.warning ("TIMEOUT");
         if (reply () && reply ().is_running ()) {
             /* emit */ timeout (reply ().url ());
         } else if (!reply ()) {
-            GLib.warning ("Timeout even there was no reply?";
+            GLib.warning ("Timeout even there was no reply?");
         }
         delete_later ();
     }
@@ -127,39 +127,39 @@ public class CheckServerJob : AbstractNetworkJob {
         if (reply ().request ().url ().scheme () == QLatin1String ("https")
             && reply ().ssl_configuration ().session_ticket ().is_empty ()
             && reply ().error () == Soup.Reply.NoError) {
-            GLib.warning ("No SSL session identifier / session ticket is used, this might impact sync performance negatively.";
+            GLib.warning ("No SSL session identifier / session ticket is used, this might impact sync performance negatively.");
         }
 
         merge_ssl_configuration_for_ssl_button (reply ().ssl_configuration (), account ());
 
         // The server installs to /owncloud. Let's try that if the file wasn't found
         // at the original location
-        if ( (reply ().error () == Soup.Reply.ContentNotFoundError) && (!this.subdir_fallback)) {
+        if ((reply ().error () == Soup.Reply.ContentNotFoundError) && (!this.subdir_fallback)) {
             this.subdir_fallback = true;
-            path (QLatin1String (NEXTCLOUD_DIR_C) + QLatin1String (STATUS_PHP_C));
+            path (NEXTCLOUD_DIR_C + STATUS_PHP_C);
             on_signal_start ();
-            GLib.info ("Retrying with" + reply ().url ();
+            GLib.info ("Retrying with " + reply ().url ());
             return false;
         }
 
         GLib.ByteArray body = reply ().peek (4 * 1024);
         int http_status = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (body.is_empty () || http_status != 200) {
-            GLib.warning ("error : status.php replied " + http_status + body;
+            GLib.warning ("Error: status.php replied " + http_status + body);
             /* emit */ instance_not_found (reply ());
         } else {
             QJsonParseError error;
             var status = QJsonDocument.from_json (body, error);
             // empty or invalid response
             if (error.error != QJsonParseError.NoError || status.is_null ()) {
-                GLib.warning ("status.php from server is not valid JSON!" + body + reply ().request ().url () + error.error_string ();
+                GLib.warning ("status.php from server is not valid JSON!" + body + reply ().request ().url () + error.error_string ());
             }
 
-            GLib.info ("status.php returns: " + status + " " + reply ().error (" Reply: " + reply ();
+            GLib.info ("status.php returns: " + status + " " + reply ().error () + " Reply: " + reply ());
             if (status.object ().contains ("installed")) {
                 /* emit */ instance_found (this.server_url, status.object ());
             } else {
-                GLib.warning ("No proper answer on " + reply ().url ();
+                GLib.warning ("No proper answer on " + reply ().url ());
                 /* emit */ instance_not_found (reply ());
             }
         }
@@ -169,7 +169,7 @@ public class CheckServerJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private on_ void meta_data_changed_slot () {
+    private void on_signal_metadata_changed () {
         account ().ssl_configuration (reply ().ssl_configuration ());
         merge_ssl_configuration_for_ssl_button (reply ().ssl_configuration (), account ());
     }
@@ -185,7 +185,7 @@ public class CheckServerJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_redirected (Soup.Reply reply, GLib.Uri target_url, int redirect_count) {
-        GLib.ByteArray slash_status_php ("/");
+        GLib.ByteArray slash_status_php = new GLib.ByteArray ("/");
         slash_status_php.append (STATUS_PHP_C);
 
         int http_code = reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
@@ -195,8 +195,9 @@ public class CheckServerJob : AbstractNetworkJob {
             && path.has_suffix (slash_status_php)) {
             this.server_url = target_url;
             this.server_url.path (path.left (path.size () - slash_status_php.size ()));
-            GLib.info ("status.php was permanently redirected to"
-                                    + target_url + "new server url is" + this.server_url;
+            GLib.info (
+                "status.php was permanently redirected to "
+                + target_url + " new server url is " + this.server_url);
             ++this.permanent_redirects;
         }
     }

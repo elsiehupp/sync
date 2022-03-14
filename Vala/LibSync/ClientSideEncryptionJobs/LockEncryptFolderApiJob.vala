@@ -52,7 +52,7 @@ public class LockEncryptFolderApiJob : AbstractNetworkJob {
         var token = object["ocs"].to_map ()["data"].to_map ()["e2e-token"].to_byte_array ();
         GLib.info ("Got json: " + token);
 
-        //TODO : Parse the token and submit.
+        // TODO: Parse the token and submit.
         /* emit */ success (this.file_identifier, token);
         return true;
     }

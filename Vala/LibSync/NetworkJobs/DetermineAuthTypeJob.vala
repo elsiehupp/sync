@@ -24,7 +24,7 @@ public class DetermineAuthTypeJob : GLib.Object {
     
         /***********************************************************
         ***********************************************************/
-#ifdef WITH_WEBENGINE
+//  #ifdef WITH_WEBENGINE
         WEB_VIEW_FLOW,
 //  #endif // WITH_WEBENGINE
 
@@ -55,12 +55,12 @@ public class DetermineAuthTypeJob : GLib.Object {
     private bool old_flow_done = false;
 
 
-    signal void auth_type (AuthType);
+    signal void signal_auth_type (AuthType type);
 
 
     /***********************************************************
     ***********************************************************/
-    public DetermineAuthTypeJob.for_account (unowned Account account, GLib.Object parent = new GLib.Object ()) {
+    public DetermineAuthTypeJob.for_account (Account account, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.account = account;
     }
@@ -69,7 +69,7 @@ public class DetermineAuthTypeJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_start () {
-        GLib.info ("Determining auth type for" + this.account.dav_url ();
+        GLib.info ("Determining auth type for " + this.account.dav_url ());
 
         Soup.Request request;
         // Prevent HttpCredentialsAccessManager from setting an Authorization header.
@@ -80,7 +80,7 @@ public class DetermineAuthTypeJob : GLib.Object {
         // Start three parallel requests
 
         // 1. determines whether it's a basic auth server
-        var get = this.account.send_request ("GET", this.account.url (), request);
+        var get_request = this.account.send_request ("GET", this.account.url (), request);
 
         // 2. checks the HTTP auth method.
         var propfind = this.account.send_request ("PROPFIND", this.account.dav_url (), request);
@@ -88,66 +88,90 @@ public class DetermineAuthTypeJob : GLib.Object {
         // 3. Determines if the old flow has to be used (GS for now)
         var old_flow_required = new JsonApiJob (this.account, "/ocs/v2.php/cloud/capabilities", this);
 
-        get.on_signal_timeout (30 * 1000);
+        get_request.on_signal_timeout (30 * 1000);
         propfind.on_signal_timeout (30 * 1000);
         old_flow_required.on_signal_timeout (30 * 1000);
-        get.ignore_credential_failure (true);
+        get_request.ignore_credential_failure (true);
         propfind.ignore_credential_failure (true);
         old_flow_required.ignore_credential_failure (true);
 
-        connect (get, SimpleNetworkJob.signal_finished, this, [this, get] () {
-            var reply = get.reply ();
-            var www_authenticate_header = reply.raw_header ("WWW-Authenticate");
-            if (reply.error () == Soup.Reply.AuthenticationRequiredError
-                && (www_authenticate_header.starts_with ("Basic") || www_authenticate_header.starts_with ("Bearer"))) {
-                this.result_get = Basic;
-            } else {
-                this.result_get = LoginFlowV2;
-            }
-            this.get_done = true;
-            check_all_done ();
-        });
-        connect (propfind, SimpleNetworkJob.signal_finished, this, (Soup.Reply reply) {
-            var auth_challenge = reply.raw_header ("WWW-Authenticate").down ();
-            if (auth_challenge.contains ("bearer ")) {
-                this.result_propfind = OAuth;
-            } else {
-                if (auth_challenge.is_empty ()) {
-                    GLib.warning ("Did not receive WWW-Authenticate reply to auth-test PROPFIND";
-                } else {
-                    GLib.warning ("Unknown WWW-Authenticate reply to auth-test PROPFIND:" + auth_challenge;
-                }
-                this.result_propfind = Basic;
-            }
-            this.propfind_done = true;
-            check_all_done ();
-        });
-        connect (old_flow_required, JsonApiJob.signal_json_received, this, (QJsonDocument json, int status_code) {
-            if (status_code == 200) {
-                this.result_old_flow = LoginFlowV2;
-
-                var data = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("capabilities").to_object ();
-                var gs = data.value ("globalscale");
-                if (gs != QJsonValue.Undefined) {
-                    var flow = gs.to_object ().value ("desktoplogin");
-                    if (flow != QJsonValue.Undefined) {
-                        if (flow.to_int () == 1) {
-    // #ifdef WITH_WEBENGINE
-                            this.result_old_flow = WEB_VIEW_FLOW;
-    // #else // WITH_WEBENGINE
-                            GLib.warning ("Server does only support flow1, but this client was compiled without support for flow1";
-    // #endif // WITH_WEBENGINE
-                        }
-                    }
-                }
-            } else {
-                this.result_old_flow = Basic;
-            }
-            this.old_flow_done = true;
-            check_all_done ();
-        });
+        connect (
+            get_request,
+            SimpleNetworkJob.signal_finished,
+            this,
+            this.on_signal_get_request_finished
+        );
+        connect (
+            propfind,
+            SimpleNetworkJob.signal_finished,
+            this,
+            this.on_signal_propfind_finished
+        );
+        connect (
+            old_flow_required,
+            JsonApiJob.signal_json_received,
+            this,
+            this.on_signal_json_received
+        );
 
         old_flow_required.on_signal_start ();
+    }
+
+
+    private void on_signal_get_request_finished (Soup.Request get_request) {
+        var reply = get_request.reply ();
+        var www_authenticate_header = reply.raw_header ("WWW-Authenticate");
+        if (reply.error () == Soup.Reply.AuthenticationRequiredError
+            && (www_authenticate_header.starts_with ("Basic") || www_authenticate_header.starts_with ("Bearer"))) {
+            this.result_get = Basic;
+        } else {
+            this.result_get = LoginFlowV2;
+        }
+        this.get_done = true;
+        check_all_done ();
+    }
+
+
+    private void on_signal_propfind_finished (Soup.Reply reply) {
+        var auth_challenge = reply.raw_header ("WWW-Authenticate").down ();
+        if (auth_challenge.contains ("bearer ")) {
+            this.result_propfind = OAuth;
+        } else {
+            if (auth_challenge.is_empty ()) {
+                GLib.warning ("Did not receive WWW-Authenticate reply to auth-test PROPFIND");
+            } else {
+                GLib.warning ("Unknown WWW-Authenticate reply to auth-test PROPFIND: " + auth_challenge);
+            }
+            this.result_propfind = Basic;
+        }
+        this.propfind_done = true;
+        check_all_done ();
+    }
+
+
+    private void on_signal_json_received (QJsonDocument json, int status_code) {
+        if (status_code == 200) {
+            this.result_old_flow = LoginFlowV2;
+
+            var data = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("capabilities").to_object ();
+            var gs = data.value ("globalscale");
+            if (gs != QJsonValue.Undefined) {
+                var flow = gs.to_object ().value ("desktoplogin");
+                if (flow != QJsonValue.Undefined) {
+                    if (flow.to_int () == 1) {
+// #ifdef WITH_WEBENGINE
+                        this.result_old_flow = WEB_VIEW_FLOW;
+// #else // WITH_WEBENGINE
+                        GLib.warning ("Server does only support flow1; but this client was compiled without support for flow1.");
+// #endif // WITH_WEBENGINE
+                    }
+                }
+            }
+        } else {
+            this.result_old_flow = Basic;
+        }
+        this.old_flow_done = true;
+        check_all_done ();
     }
 
 
@@ -159,9 +183,9 @@ public class DetermineAuthTypeJob : GLib.Object {
             return;
         }
 
-        //  Q_ASSERT (this.result_get != NO_AUTH_TYPE);
-        //  Q_ASSERT (this.result_propfind != NO_AUTH_TYPE);
-        //  Q_ASSERT (this.result_old_flow != NO_AUTH_TYPE);
+        GLib.assert (this.result_get != NO_AUTH_TYPE);
+        GLib.assert (this.result_propfind != NO_AUTH_TYPE);
+        GLib.assert (this.result_old_flow != NO_AUTH_TYPE);
 
         var result = this.result_propfind;
 
@@ -184,14 +208,14 @@ public class DetermineAuthTypeJob : GLib.Object {
         }
     // #endif // WITH_WEBENGINE
 
-        // If we determined that a simple get gave us an authentication required error
+        // If we determined that a simple get_request gave us an authentication required error
         // then the server enforces basic auth and we got no choice but to use this
         if (this.result_get == Basic) {
             result = Basic;
         }
 
-        GLib.info ("Auth type for" + this.account.dav_url ("is" + result;
-        /* emit */ auth_type (result);
+        GLib.info ("Auth type for " + this.account.dav_url () + " is " + result);
+        /* emit */ signal_auth_type (result);
         delete_later ();
     }
 

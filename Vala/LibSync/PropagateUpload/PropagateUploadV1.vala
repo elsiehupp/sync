@@ -63,7 +63,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
 
     /***********************************************************
     ***********************************************************/
-    public PropagateUploadFileV1 (OwncloudPropagator propagator, SyncFileItemPtr item) {
+    public PropagateUploadFileV1 (OwncloudPropagator propagator, unowned SyncFileItem item) {
         base (propagator, item);
     }
 
@@ -73,23 +73,23 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
     public void do_start_upload () {
         this.chunk_count = int (std.ceil (this.file_to_upload.size / double (chunk_size ())));
         this.start_chunk = 0;
-        //  Q_ASSERT (this.item.modtime > 0);
+        GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
+            GLib.warning ("Invalid modified time " + this.item.file + this.item.modtime);
         }
         this.transfer_identifier = uint32 (Utility.rand ()) ^ uint32 (this.item.modtime) ^ (uint32 (this.file_to_upload.size) << 16);
 
         const SyncJournalDb.UploadInfo progress_info = propagator ().journal.get_upload_info (this.item.file);
 
-        //  Q_ASSERT (this.item.modtime > 0);
+        GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
+            GLib.warning ("Invalid modified time " + this.item.file.to_string () + this.item.modtime.to_string ());
         }
         if (progress_info.valid && progress_info.is_chunked () && progress_info.modtime == this.item.modtime && progress_info.size == this.item.size
             && (progress_info.content_checksum == this.item.checksum_header || progress_info.content_checksum.is_empty () || this.item.checksum_header.is_empty ())) {
             this.start_chunk = progress_info.chunk;
             this.transfer_identifier = progress_info.transferid;
-            GLib.info (this.item.file + " : Resuming from chunk " + this.start_chunk;
+            GLib.info (this.item.file + ": Resuming from chunk " + this.start_chunk);
         } else if (this.chunk_count <= 1 && !this.item.checksum_header.is_empty ()) {
             // If there is only one chunk, write the checksum in the database, so if the PUT is sent
             // to the server, but the connection drops before we get the etag, we can check the checksum
@@ -98,9 +98,9 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
             pi.valid = true;
             pi.chunk = 0;
             pi.transferid = 0; // We set a null transfer identifier because it is not chunked.
-            //  Q_ASSERT (this.item.modtime > 0);
+            GLib.assert (this.item.modtime > 0);
             if (this.item.modtime <= 0) {
-                GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
+                GLib.warning ("Invalid modified time " + this.item.file.to_string () + this.item.modtime.to_string ());
             }
             pi.modtime = this.item.modtime;
             pi.error_count = 0;
@@ -119,20 +119,25 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_abort (PropagatorJob.AbortType abort_type) {
+    public new void on_signal_abort (PropagatorJob.AbortType abort_type) {
         abort_network_jobs (
             abort_type,
-            [this, abort_type] (AbstractNetworkJob job) {
-                if (var put_job = qobject_cast<PUTFileJob> (job)) {
-                    if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS
-                        && this.chunk_count > 0
-                        && ( ( (this.current_chunk + this.start_chunk) % this.chunk_count) == 0)
-                        && put_job.device ().at_end ()) {
-                        return false;
-                    }
-                }
-                return true;
-            });
+            PropagateUploadFileV1.abort_filter
+        );
+    }
+
+
+    private static bool abort_filter (PropagatorJob.AbortType abort_type, AbstractNetworkJob job) {
+        var put_job = (PUTFileJob) job;
+        if (put_job != null) {
+            if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS
+                && this.chunk_count > 0
+                && ( ( (this.current_chunk + this.start_chunk) % this.chunk_count) == 0)
+                && put_job.device ().at_end ()) {
+                return false;
+            }
+        }
+        return true;
     }
 
 
@@ -164,8 +169,8 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
             int sending_chunk = (this.current_chunk + this.start_chunk) % this.chunk_count;
             // XOR with chunk size to make sure everything goes well if chunk size changes between runs
             uint32 transid = this.transfer_identifier ^ uint32 (chunk_size ());
-            GLib.info ("Upload chunk" + sending_chunk + "of" + this.chunk_count + "transferid (remote)=" + transid;
-            path += string ("-chunking-%1-%2-%3").arg (transid).arg (this.chunk_count).arg (sending_chunk);
+            GLib.info ("Upload chunk" + sending_chunk + "of" + this.chunk_count + "transferid (remote)=" + transid);
+            path += "-chunking-%1-%2-%3".arg (transid).arg (this.chunk_count).arg (sending_chunk);
 
             headers[GLib.ByteArray ("OC-Chunked")] = GLib.ByteArray ("1");
 
@@ -182,10 +187,10 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
             // if there's only one chunk, it's the final one
             is_final_chunk = true;
         }
-        GLib.debug (this.chunk_count + is_final_chunk + chunk_start + current_chunk_size;
+        GLib.debug (this.chunk_count.to_string () + is_final_chunk.to_string () + chunk_start.to_string () + current_chunk_size.to_string ());
 
         if (is_final_chunk && !this.transmission_checksum_header.is_empty ()) {
-            GLib.info (propagator ().full_remote_path (path) + this.transmission_checksum_header;
+            GLib.info (propagator ().full_remote_path (path) + this.transmission_checksum_header);
             headers[CHECK_SUM_HEADER_C] = this.transmission_checksum_header;
         }
 
@@ -193,7 +198,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
         var device = std.make_unique<UploadDevice> (
                 filename, chunk_start, current_chunk_size, propagator ().bandwidth_manager);
         if (!device.open (QIODevice.ReadOnly)) {
-            GLib.warning ("Could not prepare upload device: " + device.error_string ();
+            GLib.warning ("Could not prepare upload device: " + device.error_string ());
 
             // Soft error because this is likely caused by the user modifying his files while syncing
             abort_with_error (SyncFileItem.Status.SOFT_ERROR, device.error_string ());
@@ -204,12 +209,33 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
         var device_ptr = device; // for connections later
         var job = new PUTFileJob (propagator ().account (), propagator ().full_remote_path (path), std.move (device), headers, this.current_chunk, this);
         this.jobs.append (job);
-        connect (job, PUTFileJob.signal_finished, this, PropagateUploadFileV1.on_signal_put_finished);
-        connect (job, PUTFileJob.signal_upload_progress, this, PropagateUploadFileV1.on_signal_upload_progress);
-        connect (job, PUTFileJob.signal_upload_progress, device_ptr, UploadDevice.on_signal_job_upload_progress);
-        connect (job, GLib.Object.destroyed, this, PropagateUploadFileCommon.on_signal_job_destroyed);
-        if (is_final_chunk)
+        connect (
+            job,
+            PUTFileJob.signal_finished,
+            this,
+            PropagateUploadFileV1.on_signal_put_finished
+        );
+        connect (
+            job,
+            PUTFileJob.signal_upload_progress,
+            this,
+            PropagateUploadFileV1.on_signal_upload_progress
+        );
+        connect (
+            job,
+            PUTFileJob.signal_upload_progress,
+            device_ptr,
+            UploadDevice.on_signal_job_upload_progress
+        );
+        connect (
+            job,
+            GLib.Object.destroyed,
+            this,
+            PropagateUploadFileCommon.on_signal_job_destroyed
+        );
+        if (is_final_chunk) {
             adjust_last_job_timeout (job, file_size);
+        }
         job.on_signal_start ();
         propagator ().active_job_list.append (this);
         this.current_chunk++;
@@ -298,7 +324,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
         this.finished = etag.length () > 0;
 
         // Check if the file still exists
-        const string full_file_path (propagator ().full_local_path (this.item.file));
+        const string full_file_path = propagator ().full_local_path (this.item.file);
         if (!FileSystem.file_exists (full_file_path)) {
             if (!this.finished) {
                 abort_with_error (SyncFileItem.Status.SOFT_ERROR, _("The local file was removed during sync."));
@@ -309,9 +335,9 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
         }
 
         // Check whether the file changed since discovery. the file check here is the original and not the temprary.
-        //  Q_ASSERT (this.item.modtime > 0);
+        GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
+            GLib.warning ("Invalid modified time " + this.item.file.to_string () + this.item.modtime.to_string ());
         }
         if (!FileSystem.verify_file_unchanged (full_file_path, this.item.size, this.item.modtime)) {
             propagator ().another_sync_needed = true;
@@ -345,15 +371,16 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
             var current_chunk = job.chunk;
             foreach (var job in this.jobs) {
                 // Take the minimum on_signal_finished one
-                if (var put_job = qobject_cast<PUTFileJob> (job)) {
+                var put_job = (PUTFileJob) job;
+                if (put_job != null) {
                     current_chunk = q_min (current_chunk, put_job.chunk - 1);
                 }
             }
             pi.chunk = (current_chunk + this.start_chunk + 1) % this.chunk_count; // next chunk to on_signal_start with
             pi.transferid = this.transfer_identifier;
-            //  Q_ASSERT (this.item.modtime > 0);
+            GLib.assert (this.item.modtime > 0);
             if (this.item.modtime <= 0) {
-                GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
+                GLib.warning ("Invalid modified time " + this.item.file.to_string () + this.item.modtime.to_string ());
             }
             pi.modtime = this.item.modtime;
             pi.error_count = 0; // successful chunk upload resets
@@ -370,7 +397,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
         GLib.ByteArray fid = job.reply ().raw_header ("OC-FileID");
         if (!fid.is_empty ()) {
             if (!this.item.file_id.is_empty () && this.item.file_id != fid) {
-                GLib.warning ("File ID changed!" + this.item.file_id + fid;
+                GLib.warning ("File ID changed! " + this.item.file_id.to_string () + fid.to_string ());
             }
             this.item.file_id = fid;
         }
@@ -380,7 +407,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
         if (job.reply ().raw_header ("X-OC-MTime") != "accepted") {
             // X-OC-MTime is supported since owncloud 5.0.   But not when chunking.
             // Normally Owncloud 6 always puts X-OC-MTime
-            GLib.warning ("Server does not support X-OC-MTime" + job.reply ().raw_header ("X-OC-MTime");
+            GLib.warning ("Server does not support X-OC-MTime " + job.reply ().raw_header ("X-OC-MTime"));
             // Well, the mtime was not set
         }
 

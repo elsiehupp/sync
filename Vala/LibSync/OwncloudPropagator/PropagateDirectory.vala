@@ -16,7 +16,7 @@ public class PropagateDirectory : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public SyncFileItemPtr item;
+    public unowned SyncFileItem item;
 
     /***********************************************************
     e.g : create the directory
@@ -29,7 +29,7 @@ public class PropagateDirectory : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public PropagateDirectory (OwncloudPropagator propagator, SyncFileItemPtr item) {
+    public PropagateDirectory (OwncloudPropagator propagator, unowned SyncFileItem item) {
         base (propagator);
         this.item = item;
         this.first_job = propagator.create_job (item);
@@ -51,7 +51,7 @@ public class PropagateDirectory : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public void append_task (SyncFileItemPtr item) {
+    public void append_task (unowned SyncFileItem item) {
         this.sub_jobs.append_task (item);
     }
 
@@ -103,7 +103,7 @@ public class PropagateDirectory : PropagatorJob {
             this.first_job.on_signal_abort (PropagatorJob.AbortType.SYNCHRONOUS);
 
         if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
-            connect (&this.sub_jobs, PropagatorCompositeJob.abort_finished, this, PropagateDirectory.abort_finished);
+            connect (&this.sub_jobs, PropagatorCompositeJob.signal_abort_finished, this, PropagateDirectory.signal_abort_finished);
         }
         this.sub_jobs.on_signal_abort (abort_type);
     }

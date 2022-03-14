@@ -31,7 +31,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public PropagateRemoteMkdir (OwncloudPropagator propagator, SyncFileItemPtr item) {
+    public PropagateRemoteMkdir (OwncloudPropagator propagator, unowned SyncFileItem item) {
         base (propagator, item);
         this.delete_existing = false;
         this.upload_encrypted_helper = null;
@@ -49,11 +49,12 @@ public class PropagateRemoteMkdir : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
-        if (propagator ().abort_requested)
+    public new void on_signal_start () {
+        if (propagator ().abort_requested) {
             return;
+        }
 
-        GLib.debug (this.item.file;
+        GLib.debug (this.item.file);
 
         propagator ().active_job_list.append (this);
 
@@ -77,7 +78,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
             this.job.reply ().on_signal_abort ();
 
         if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
-            /* emit */ abort_finished ();
+            /* emit */ signal_abort_finished ();
         }
     }
 
@@ -112,29 +113,52 @@ public class PropagateRemoteMkdir : PropagateItemJob {
         // We should be encrypted as well since our parent is
         var remote_parent_path = parent_rec.e2e_mangled_name.is_empty () ? parent_path : parent_rec.e2e_mangled_name;
         this.upload_encrypted_helper = new PropagateUploadEncrypted (propagator (), remote_parent_path, this.item, this);
-        connect (this.upload_encrypted_helper, PropagateUploadEncrypted.finalized,
-            this, PropagateRemoteMkdir.on_signal_start_encrypted_mkcol_job);
-        connect (this.upload_encrypted_helper, PropagateUploadEncrypted.error,
-            [] {
-                GLib.debug ("Error setting up encryption.";
-            });
+        connect (
+            this.upload_encrypted_helper,
+            PropagateUploadEncrypted.finalized,
+            this,
+            PropagateRemoteMkdir.on_signal_start_encrypted_mkcol_job
+        );
+        connect (
+            this.upload_encrypted_helper,
+            PropagateUploadEncrypted.error,
+            this.on_signal_propagate_upload_encrypted_error
+        );
         this.upload_encrypted_helper.on_signal_start ();
+    }
+
+
+    private void on_signal_propagate_upload_encrypted_error () {
+        GLib.debug ("Error setting up encryption.");
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_signal_start_mkcol_job () {
-        if (propagator ().abort_requested)
+        if (propagator ().abort_requested) {
             return;
+        }
 
-        GLib.debug (this.item.file;
+        GLib.debug (this.item.file);
 
-        this.job = new MkColJob (propagator ().account (),
+        this.job = new MkColJob (
+            propagator ().account (),
             propagator ().full_remote_path (this.item.file),
-            this);
-        connect (qobject_cast<MkColJob> (this.job), MkColJob.finished_with_error, this, PropagateRemoteMkdir.on_signal_mkcol_job_finished);
-        connect (qobject_cast<MkColJob> (this.job), MkColJob.finished_without_error, this, PropagateRemoteMkdir.on_signal_mkcol_job_finished);
+            this
+        );
+        connect (
+            (MkColJob) this.job,
+            MkColJob.finished_with_error,
+            this,
+            PropagateRemoteMkdir.on_signal_mkcol_job_finished
+        );
+        connect (
+            (MkColJob) this.job,
+            MkColJob.finished_without_error,
+            this,
+            PropagateRemoteMkdir.on_signal_mkcol_job_finished
+        );
         this.job.on_signal_start ();
     }
 
@@ -145,17 +169,35 @@ public class PropagateRemoteMkdir : PropagateItemJob {
         //  Q_UNUSED (path)
         //  Q_UNUSED (size)
 
-        if (propagator ().abort_requested)
+        if (propagator ().abort_requested) {
             return;
+        }
 
-        GLib.debug (filename;
-        GLib.debug (filename;
+        GLib.debug (filename);
 
-        var job = new MkColJob (propagator ().account (),
-                                propagator ().full_remote_path (filename), {{"e2e-token", this.upload_encrypted_helper.folder_token () }},
-                                this);
-        connect (job, MkColJob.finished_with_error, this, PropagateRemoteMkdir.on_signal_mkcol_job_finished);
-        connect (job, MkColJob.finished_without_error, this, PropagateRemoteMkdir.on_signal_mkcol_job_finished);
+        var job = new MkColJob (
+            propagator ().account (),
+            propagator ().full_remote_path (filename),
+            {
+                {
+                    "e2e-token",
+                    this.upload_encrypted_helper.folder_token ()
+                }
+            },
+            this
+        );
+        connect (
+            job,
+            MkColJob.finished_with_error,
+            this,
+            PropagateRemoteMkdir.on_signal_mkcol_job_finished
+        );
+        connect (
+            job,
+            MkColJob.finished_without_error,
+            this,
+            PropagateRemoteMkdir.on_signal_mkcol_job_finished
+        );
         this.job = job;
         this.job.on_signal_start ();
     }
@@ -183,9 +225,12 @@ public class PropagateRemoteMkdir : PropagateItemJob {
 
         if (this.upload_encrypted_helper && this.upload_encrypted_helper.is_folder_locked () && !this.upload_encrypted_helper.is_unlock_running ()) {
             // since we are done, we need to unlock a folder in case it was locked
-            connect (this.upload_encrypted_helper, PropagateUploadEncrypted.folder_unlocked, this, [this, err, job_http_reason_phrase_string, job_path] () {
-                finalize_mkcol_job (err, job_http_reason_phrase_string, job_path);
-            });
+            connect (
+                this.upload_encrypted_helper,
+                PropagateUploadEncrypted.folder_unlocked,
+                this,
+                this.on_signal_propagate_upload_encrypted_folder_unlocked
+            );
             this.upload_encrypted_helper.unlock_folder ();
         } else {
             finalize_mkcol_job (err, job_http_reason_phrase_string, job_path);
@@ -193,10 +238,15 @@ public class PropagateRemoteMkdir : PropagateItemJob {
     }
 
 
+    protected void on_signal_propagate_upload_encrypted_folder_unlocked (Soup.Reply.NetworkError err, string job_http_reason_phrase_string, string job_path) {
+        finalize_mkcol_job (err, job_http_reason_phrase_string, job_path);
+    }
+
+
     /***********************************************************
     ***********************************************************/
     private void on_signal_encrypt_folder_finished () {
-        GLib.debug ("Success making the new folder encrypted";
+        GLib.debug ("Success making the new folder encrypted.");
         propagator ().active_job_list.remove_one (this);
         this.item.is_encrypted = true;
         on_signal_success ();
@@ -230,10 +280,13 @@ public class PropagateRemoteMkdir : PropagateItemJob {
     private void finalize_mkcol_job (Soup.Reply.NetworkError err, string job_http_reason_phrase_string, string job_path) {
         if (this.item.http_error_code == 405) {
             // This happens when the directory already exists. Nothing to do.
-            GLib.debug ("Folder" + job_path + "already exists.";
+            GLib.debug ("Folder " + job_path + " already exists.");
         } else if (err != Soup.Reply.NoError) {
-            SyncFileItem.Status status = classify_error (err, this.item.http_error_code,
-                propagator ().another_sync_needed);
+            SyncFileItem.Status status = classify_error (
+                err,
+                this.item.http_error_code,
+                propagator ().another_sync_needed
+            );
             on_signal_done (status, this.item.error_string);
             return;
         } else if (this.item.http_error_code != 201) {
@@ -250,31 +303,47 @@ public class PropagateRemoteMkdir : PropagateItemJob {
         propagator ().active_job_list.append (this);
         var propfind_job = new PropfindJob (propagator ().account (), job_path, this);
         propfind_job.properties ({"http://owncloud.org/ns:permissions"});
-        connect (propfind_job, PropfindJob.result, this, [this, job_path] (GLib.HashTable<string, GLib.Variant> result) {
-            propagator ().active_job_list.remove_one (this);
-            this.item.remote_perm = RemotePermissions.from_server_string (result.value ("permissions").to_string ());
-
-            if (!this.upload_encrypted_helper && !this.item.is_encrypted) {
-                on_signal_success ();
-            } else {
-                // We still need to mark that folder encrypted in case we were uploading it as encrypted one
-                // Another scenario, is we are creating a new folder because of move operation on an encrypted folder that works via remove + re-upload
-                propagator ().active_job_list.append (this);
-
-                // We're expecting directory path in /Foo/Bar convention...
-                //  Q_ASSERT (job_path.starts_with ('/') && !job_path.has_suffix ('/'));
-                // But encryption job expect it in Foo/Bar/ convention
-                var job = new Occ.EncryptFolderJob (propagator ().account (), propagator ().journal, job_path.mid (1), this.item.file_id, this);
-                connect (job, Occ.EncryptFolderJob.on_signal_finished, this, PropagateRemoteMkdir.on_signal_encrypt_folder_finished);
-                job.on_signal_start ();
-            }
-        });
-        connect (propfind_job, PropfindJob.finished_with_error, this, [this]{
-            // ignore the PROPFIND error
-            propagator ().active_job_list.remove_one (this);
-            on_signal_done (SyncFileItem.Status.NORMAL_ERROR);
-        });
+        connect (
+            propfind_job,
+            PropfindJob.result,
+            this,
+            this.on_signal_prop_find_job_result
+        );
+        connect (
+            propfind_job,
+            PropfindJob.finished_with_error,
+            this,
+            this.on_signal_prop_find_job_finished_with_error
+        );
         propfind_job.on_signal_start ();
+    }
+
+
+    private void on_signal_prop_find_job_result (string job_path, GLib.HashTable<string, GLib.Variant> result) {
+        propagator ().active_job_list.remove_one (this);
+        this.item.remote_perm = RemotePermissions.from_server_string (result.value ("permissions").to_string ());
+
+        if (!this.upload_encrypted_helper && !this.item.is_encrypted) {
+            on_signal_success ();
+        } else {
+            // We still need to mark that folder encrypted in case we were uploading it as encrypted one
+            // Another scenario, is we are creating a new folder because of move operation on an encrypted folder that works via remove + re-upload
+            propagator ().active_job_list.append (this);
+
+            // We're expecting directory path in /Foo/Bar convention...
+            GLib.assert (job_path.starts_with ('/') && !job_path.has_suffix ('/'));
+            // But encryption job expect it in Foo/Bar/ convention
+            var job = new Occ.EncryptFolderJob (propagator ().account (), propagator ().journal, job_path.mid (1), this.item.file_id, this);
+            connect (job, Occ.EncryptFolderJob.on_signal_finished, this, PropagateRemoteMkdir.on_signal_encrypt_folder_finished);
+            job.on_signal_start ();
+        }
+    }
+
+
+    private void on_signal_prop_find_job_finished_with_error () {
+        // ignore the PROPFIND error
+        propagator ().active_job_list.remove_one (this);
+        on_signal_done (SyncFileItem.Status.NORMAL_ERROR);
     }
 
 } // class PropagateRemoteMkdir

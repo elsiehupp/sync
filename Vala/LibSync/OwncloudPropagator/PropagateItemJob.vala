@@ -20,7 +20,7 @@ public class PropagateItemJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public SyncFileItemPtr item;
+    public unowned SyncFileItem item;
 
     /***********************************************************
     set a custom restore job message that is used if the restore job succeeded.
@@ -39,12 +39,12 @@ public class PropagateItemJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public PropagateItemJob (OwncloudPropagator propagator, SyncFileItemPtr item) {
+    public PropagateItemJob (OwncloudPropagator propagator, unowned SyncFileItem item) {
         base (propagator);
         this.parallelism = JobParallelism.FULL_PARALLELISM;
         this.item = item;
         // we should always execute jobs that process the E2EE API calls as sequential jobs
-        // TODO : In fact, we must make sure Lock/Unlock are not colliding and always wait for each other to complete. So, we could refactor this "this.parallelism" later
+        // TODO: In fact, we must make sure Lock/Unlock are not colliding and always wait for each other to complete. So, we could refactor this "this.parallelism" later
         // so every "PropagateItemJob" that will potentially execute Lock job on E2EE folder will get executed sequentially.
         // As an alternative, we could optimize Lock/Unlock calls, so we do a batch-write on one folder and only lock and unlock a folder once per batch.
         this.parallelism = (this.item.is_encrypted || has_encrypted_ancestor ()) ? JobParallelism.WAIT_FOR_FINISHED : JobParallelism.FULL_PARALLELISM;
@@ -54,7 +54,8 @@ public class PropagateItemJob : PropagatorJob {
 
 
     ~PropagateItemJob () {
-        if (var p = propagator ()) {
+        var p = propagator ();
+        if (p) {
             // Normally, every job should clean itself from the this.active_job_list. So this should not be
             // needed. But if a job has a bug or is deleted before the network jobs signal get received,
             // we might risk end up with dangling pointer in the list which may cause crashes.
@@ -112,7 +113,7 @@ public class PropagateItemJob : PropagatorJob {
         if (this.state != NotYetStarted) {
             return false;
         }
-        GLib.info ("Starting" + this.item.instruction + "propagation of" + this.item.destination ("by" + this;
+        GLib.info ("Starting " + this.item.instruction + " propagation of " + this.item.destination () + " by " + this);
 
         this.state = Running;
         QMetaObject.invoke_method (this, "on_signal_start"); // We could be in a different thread (neon jobs)
@@ -188,10 +189,10 @@ public class PropagateItemJob : PropagatorJob {
         }
 
         if (this.item.has_error_status ())
-            GLib.warning ("Could not complete propagation of" + this.item.destination ("by" + this + "with status" + this.item.status + "and error:" + this.item.error_string;
+            GLib.warning ("Could not complete propagation of " + this.item.destination () + " by " + this + " with status " + this.item.status + " and error: " + this.item.error_string);
         else
-            GLib.info ("Completed propagation of" + this.item.destination ("by" + this + "with status" + this.item.status;
-        /* emit */ propagator ().item_completed (this.item);
+            GLib.info ("Completed propagation of " + this.item.destination () + " by " + this + " with status " + this.item.status);
+        /* emit */ propagator ().signal_item_completed (this.item);
         /* emit */ finished (this.item.status);
 
         if (this.item.status == SyncFileItem.Status.FATAL_ERROR) {

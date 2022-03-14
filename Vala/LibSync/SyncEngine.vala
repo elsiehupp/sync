@@ -76,7 +76,7 @@ public class SyncEngine : GLib.Object {
     /***********************************************************
     Must only be acessed during update and reconcile
     ***********************************************************/
-    private GLib.List<SyncFileItemPtr> sync_items;
+    private GLib.List<unowned SyncFileItem> sync_items;
 
 
     /***********************************************************
@@ -214,7 +214,7 @@ public class SyncEngine : GLib.Object {
     /***********************************************************
     After each item completed by a job (successful or not)
     ***********************************************************/
-    signal void item_completed (SyncFileItemPtr value);
+    signal void signal_item_completed (unowned SyncFileItem value);
 
 
     /***********************************************************
@@ -286,7 +286,7 @@ public class SyncEngine : GLib.Object {
         this.another_sync_needed = AnotherSyncNeeded.NO_FOLLOW_UP_SYNC;
         this.last_local_discovery_style = DiscoveryPhase.LocalDiscoveryStyle.FILESYSTEM_ONLY;
         q_register_meta_type<SyncFileItem> ("SyncFileItem");
-        q_register_meta_type<SyncFileItemPtr> ("SyncFileItemPtr");
+        q_register_meta_type<unowned SyncFileItem> ("unowned SyncFileItem");
         q_register_meta_type<SyncFileItem.Status> ("SyncFileItem.Status");
         q_register_meta_type<SyncFileStatus> ("SyncFileStatus");
         q_register_meta_type<SyncFileItemVector> ("SyncFileItemVector");
@@ -611,7 +611,7 @@ public class SyncEngine : GLib.Object {
 
     Example: If path is 'foo/bar' and style is
     DATABASE_AND_FILESYSTEM and dirs contains
-    'foo/bar/touched_file', then the result will be true.
+    'foo/bar/signal_touched_file', then the result will be true.
     ***********************************************************/
     public bool should_discover_locally (string path) {
         if (this.local_discovery_style == DiscoveryPhase.LocalDiscoveryStyle.FILESYSTEM_ONLY)
@@ -750,7 +750,7 @@ public class SyncEngine : GLib.Object {
     /***********************************************************
     When the discovery phase discovers an item
     ***********************************************************/
-    private void on_signal_item_discovered (SyncFileItemPtr item) {
+    private void on_signal_item_discovered (unowned SyncFileItem item) {
         if (Utility.is_conflict_file (item.file))
             this.seen_conflict_files.insert (item.file);
         if (item.instruction == CSYNC_INSTRUCTION_UPDATE_METADATA && !item.is_directory ()) {
@@ -810,7 +810,7 @@ public class SyncEngine : GLib.Object {
                 this.journal.file_record (record);
 
                 // This might have changed the shared flag, so we must notify SyncFileStatusTracker for example
-                /* emit */ item_completed (item);
+                /* emit */ signal_item_completed (item);
             } else {
                 // Update only outdated data from the disk.
                 this.journal.update_local_metadata (item.file, item.modtime, item.size, item.inode);
@@ -865,18 +865,18 @@ public class SyncEngine : GLib.Object {
     can also be called via the propagator for items that are
     created during propagation.
     ***********************************************************/
-    private void on_signal_new_item (SyncFileItemPtr item) {
+    private void on_signal_new_item (unowned SyncFileItem item) {
         this.progress_info.adjust_totals_for_file (*item);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_item_completed (SyncFileItemPtr item) {
+    private void on_signal_item_completed (unowned SyncFileItem item) {
         this.progress_info.progress_complete (*item);
 
         /* emit */ transmission_progress (*this.progress_info);
-        /* emit */ item_completed (item);
+        /* emit */ signal_item_completed (item);
     }
 
 
@@ -921,7 +921,7 @@ public class SyncEngine : GLib.Object {
                 this.another_sync_needed = AnotherSyncNeeded.IMMEDIATE_FOLLOW_UP;
             }
 
-            //  Q_ASSERT (std.is_sorted (this.sync_items.begin (), this.sync_items.end ()));
+            GLib.assert (std.is_sorted (this.sync_items.begin (), this.sync_items.end ()));
 
             GLib.info ("#### Reconcile (about_to_propagate) #################################################### " + this.stop_watch.add_lap_time ("Reconcile (about_to_propagate)") + "ms");
 
@@ -959,16 +959,16 @@ public class SyncEngine : GLib.Object {
             this.propagator = new unowned OwncloudPropagator (
                 this.account, this.local_path, this.remote_path, this.journal, this.bulk_upload_block_list);
             this.propagator.sync_options (this.sync_options);
-            connect (this.propagator.data (), OwncloudPropagator.item_completed,
+            connect (this.propagator.data (), OwncloudPropagator.signal_item_completed,
                 this, SyncEngine.on_signal_item_completed);
             connect (this.propagator.data (), OwncloudPropagator.progress,
                 this, SyncEngine.on_signal_progress);
             connect (this.propagator.data (), OwncloudPropagator.on_signal_finished, this, SyncEngine.on_signal_propagation_finished, Qt.QueuedConnection);
             connect (this.propagator.data (), OwncloudPropagator.seen_locked_file, this, SyncEngine.seen_locked_file);
-            connect (this.propagator.data (), OwncloudPropagator.touched_file, this, SyncEngine.on_signal_add_touched_file);
-            connect (this.propagator.data (), OwncloudPropagator.insufficient_local_storage, this, SyncEngine.on_signal_insufficient_local_storage);
-            connect (this.propagator.data (), OwncloudPropagator.insufficient_remote_storage, this, SyncEngine.on_signal_insufficient_remote_storage);
-            connect (this.propagator.data (), OwncloudPropagator.new_item, this, SyncEngine.on_signal_new_item);
+            connect (this.propagator.data (), OwncloudPropagator.signal_touched_file, this, SyncEngine.on_signal_add_touched_file);
+            connect (this.propagator.data (), OwncloudPropagator.signal_insufficient_local_storage, this, SyncEngine.on_signal_insufficient_local_storage);
+            connect (this.propagator.data (), OwncloudPropagator.signal_insufficient_remote_storage, this, SyncEngine.on_signal_insufficient_remote_storage);
+            connect (this.propagator.data (), OwncloudPropagator.signal_new_item, this, SyncEngine.on_signal_new_item);
 
             // apply the network limits to the propagator
             network_limits (this.upload_limit, this.download_limit);
@@ -1216,7 +1216,7 @@ public class SyncEngine : GLib.Object {
     private void delete_stale_download_infos (SyncFileItemVector sync_items) {
         // Find all downloadinfo paths that we want to preserve.
         GLib.List<string> download_file_paths;
-        foreach (SyncFileItemPtr it in sync_items) {
+        foreach (unowned SyncFileItem it in sync_items) {
             if (it.direction == SyncFileItem.Direction.DOWN
                 && it.type == ItemTypeFile
                 && is_file_transfer_instruction (it.instruction)) {
@@ -1241,7 +1241,7 @@ public class SyncEngine : GLib.Object {
     private void delete_stale_upload_infos (SyncFileItemVector sync_items) {
         // Find all blocklisted paths that we want to preserve.
         GLib.List<string> upload_file_paths;
-        foreach (SyncFileItemPtr it in sync_items) {
+        foreach (unowned SyncFileItem it in sync_items) {
             if (it.direction == SyncFileItem.Direction.UP
                 && it.type == ItemTypeFile
                 && is_file_transfer_instruction (it.instruction)) {
@@ -1270,7 +1270,7 @@ public class SyncEngine : GLib.Object {
     private void delete_stale_error_blocklist_entries (SyncFileItemVector sync_items) {
         // Find all blocklisted paths that we want to preserve.
         GLib.List<string> blocklist_file_paths;
-        foreach (SyncFileItemPtr it in sync_items) {
+        foreach (unowned SyncFileItem it in sync_items) {
             if (it.has_blocklist_entry)
                 blocklist_file_paths.insert (it.file);
         }

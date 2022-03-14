@@ -24,8 +24,13 @@ public class CleanupPollsJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public CleanupPollsJob (GLib.List<SyncJournalDb.PollInfo> poll_infos, unowned Account account, SyncJournalDb journal, string local_path,
-        unowned Vfs vfs, GLib.Object parent = new GLib.Object ()) {
+    public CleanupPollsJob (
+        GLib.List<SyncJournalDb.PollInfo> poll_infos,
+        Account account,
+        SyncJournalDb journal,
+        string local_path,
+        Vfs vfs,
+        GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.poll_infos = poll_infos;
         this.account = account;
@@ -33,8 +38,6 @@ public class CleanupPollsJob : GLib.Object {
         this.local_path = local_path;
         this.vfs = vfs;
     }
-
-    ~CleanupPollsJob () = default;
 
 
     /***********************************************************
@@ -50,7 +53,7 @@ public class CleanupPollsJob : GLib.Object {
 
         var info = this.poll_infos.first ();
         this.poll_infos.pop_front ();
-        SyncFileItemPtr item (new SyncFileItem);
+        SyncFileItem item = new SyncFileItem ();
         item.file = info.file;
         item.modtime = info.modtime;
         item.size = info.file_size;
@@ -70,10 +73,10 @@ public class CleanupPollsJob : GLib.Object {
             delete_later ();
             return;
         } else if (job.item.status != SyncFileItem.Status.SUCCESS) {
-            GLib.warning ("There was an error with file " + job.item.file + job.item.error_string;
+            GLib.warning ("There was an error with file " + job.item.file + job.item.error_string);
         } else {
             if (!OwncloudPropagator.static_update_metadata (*job.item, this.local_path, this.vfs.data (), this.journal)) {
-                GLib.warning ("database error";
+                GLib.warning ("Database error");
                 job.item.status = SyncFileItem.Status.FATAL_ERROR;
                 job.item.error_string = _("Error writing metadata to the database");
                 /* emit */ aborted (job.item.error_string);

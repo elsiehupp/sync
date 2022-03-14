@@ -30,7 +30,7 @@ abstract class UserStatusConnector : GLib.Object {
     signal void user_status_fetched (UserStatus user_status);
     signal void predefined_statuses_fetched (GLib.List<UserStatus> statuses);
     signal void user_status_set ();
-    signal void message_cleared ();
+    signal void signal_message_cleared ();
     signal void error (Error error);
 
     /***********************************************************

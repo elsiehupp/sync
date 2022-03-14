@@ -46,7 +46,7 @@ public class BulkPropagatorJob : PropagatorJob {
 
     struct BulkUploadItem {
         unowned Account account;
-        SyncFileItemPtr item;
+        unowned SyncFileItem item;
         UploadFileInfo file_to_upload;
         string remote_path;
         string local_path;
@@ -59,7 +59,7 @@ public class BulkPropagatorJob : PropagatorJob {
     ***********************************************************/
     public BulkPropagatorJob (
         OwncloudPropagator propagator,
-        GLib.Deque<SyncFileItemPtr> items) {
+        GLib.Deque<unowned SyncFileItem> items) {
         base (propagator);
         this.items = items;
         this.files_to_upload.reserve (BATCH_SIZE);
@@ -104,7 +104,7 @@ public class BulkPropagatorJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_start_upload_file (SyncFileItemPtr item, UploadFileInfo file_to_upload) {
+    private void on_signal_start_upload_file (unowned SyncFileItem item, UploadFileInfo file_to_upload) {
         if (propagator ().abort_requested) {
             return;
         }
@@ -124,7 +124,7 @@ public class BulkPropagatorJob : PropagatorJob {
     Content checksum computed, compute the transmission checksum
     ***********************************************************/
     private void on_signal_compute_transmission_checksum (
-        SyncFileItemPtr item,
+        unowned SyncFileItem item,
         UploadFileInfo file_to_upload) {
         // Reuse the content checksum as the transmission checksum if possible
         var supported_transmission_checksums =
@@ -151,7 +151,7 @@ public class BulkPropagatorJob : PropagatorJob {
     Transmission checksum computed, prepare the upload
     ***********************************************************/
     private void on_signal_start_upload (
-        SyncFileItemPtr item,
+        unowned SyncFileItem item,
         UploadFileInfo file_to_upload,
         GLib.ByteArray transmission_checksum_type,
         GLib.ByteArray transmission_checksum) {
@@ -211,7 +211,7 @@ public class BulkPropagatorJob : PropagatorJob {
     Invoked on internal error to unlock a folder and faile
     ***********************************************************/
     private void on_signal_error_start_folder_unlock (
-        SyncFileItemPtr item,
+        unowned SyncFileItem item,
         SyncFileItem.Status status,
         string error_string) {
         GLib.info (status + error_string);
@@ -223,7 +223,7 @@ public class BulkPropagatorJob : PropagatorJob {
     ***********************************************************/
     private void on_signal_put_finished () {
         var job = qobject_cast<PutMultiFileJob> (sender ());
-        //  Q_ASSERT (job);
+        GLib.assert (job);
 
         on_signal_job_destroyed (job); // remove it from the this.jobs list
 
@@ -298,7 +298,7 @@ public class BulkPropagatorJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_upload_progress (SyncFileItemPtr item, int64 sent, int64 total) {
+    private void on_signal_upload_progress (unowned SyncFileItem item, int64 sent, int64 total) {
         // Completion is signaled with sent=0, total=0; avoid accidentally
         // resetting progress due to the sent being zero by ignoring it.
         // signal_finished () is bound to be emitted soon anyway.
@@ -320,7 +320,7 @@ public class BulkPropagatorJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     private void do_start_upload (
-        SyncFileItemPtr item,
+        unowned SyncFileItem item,
         UploadFileInfo file_to_upload,
         GLib.ByteArray transmission_checksum_header) {
         if (propagator ().abort_requested) {
@@ -560,7 +560,7 @@ public class BulkPropagatorJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_done (
-        SyncFileItemPtr item,
+        unowned SyncFileItem item,
         SyncFileItem.Status status,
         string error_string) {
         item.status = status;
@@ -584,14 +584,14 @@ public class BulkPropagatorJob : PropagatorJob {
 
         handle_job_done_errors (item, status);
 
-        /* emit */ propagator ().item_completed (item);
+        /* emit */ propagator ().signal_item_completed (item);
     }
 
 
     /***********************************************************
     Bases headers that need to be sent on the PUT, or in the MOVE for chunking-ng
     ***********************************************************/
-    private GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers (SyncFileItemPtr item) {
+    private GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers (unowned SyncFileItem item) {
         GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers;
         headers[GLib.ByteArray ("Content-Type")] = GLib.ByteArray ("application/octet-stream");
         headers[GLib.ByteArray ("X-File-Mtime")] = new GLib.ByteArray.number (int64 (item.modtime));
@@ -643,7 +643,7 @@ public class BulkPropagatorJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     private void abort_with_error (
-        SyncFileItemPtr item,
+        unowned SyncFileItem item,
         SyncFileItem.Status status,
         string error) {
         on_signal_abort (PropagatorJob.AbortType.SYNCHRONOUS);
@@ -656,7 +656,7 @@ public class BulkPropagatorJob : PropagatorJob {
     the whole transfer if it happens too often. If so: Bump
     UploadInfo.error_count and maybe perform the reset.
     ***********************************************************/
-    private void check_resetting_errors (SyncFileItemPtr item) {
+    private void check_resetting_errors (unowned SyncFileItem item) {
         if (item.http_error_code == 412
             || propagator ().account ().capabilities ().http_error_codes_that_reset_failing_chunked_uploads ().contains (item.http_error_code)) {
             var upload_info = propagator ().journal.get_upload_info (item.file);
@@ -680,7 +680,7 @@ public class BulkPropagatorJob : PropagatorJob {
     Error handling functionality that is shared between jobs.
     ***********************************************************/
     private void common_error_handling (
-        SyncFileItemPtr item,
+        unowned SyncFileItem item,
         string error_message) {
         // Ensure errors that should eventually reset the chunked upload are tracked.
         check_resetting_errors (item);
@@ -692,7 +692,7 @@ public class BulkPropagatorJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     private bool check_file_still_exists (
-        SyncFileItemPtr item,
+        unowned SyncFileItem item,
         bool finished,
         string full_file_path) {
         if (!FileSystem.file_exists (full_file_path)) {
@@ -711,7 +711,7 @@ public class BulkPropagatorJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     private bool check_file_changed (
-        SyncFileItemPtr item,
+        unowned SyncFileItem item,
         bool finished,
         string full_file_path) {
         if (!FileSystem.verify_file_unchanged (full_file_path, item.size, item.modtime)) {
@@ -731,7 +731,7 @@ public class BulkPropagatorJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     private void compute_file_id (
-        SyncFileItemPtr item,
+        unowned SyncFileItem item,
         QJsonObject file_reply) {
         var fid = get_header_from_json_reply (file_reply, "OC-FileID");
         if (!fid.is_empty ()) {
@@ -746,7 +746,7 @@ public class BulkPropagatorJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     private void handle_file_restoration (
-        SyncFileItemPtr item,
+        unowned SyncFileItem item,
         string error_string) {
         if (item.is_restoration) {
             if (item.status == SyncFileItem.Status.SUCCESS
@@ -768,7 +768,7 @@ public class BulkPropagatorJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    private void handle_bulk_upload_block_list (SyncFileItemPtr item) {
+    private void handle_bulk_upload_block_list (unowned SyncFileItem item) {
         propagator ().add_to_bulk_upload_block_list (item.file);
     }
 
@@ -776,7 +776,7 @@ public class BulkPropagatorJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     private void handle_job_done_errors (
-        SyncFileItemPtr item,
+        unowned SyncFileItem item,
         SyncFileItem.Status status) {
         if (item.has_error_status ()) {
             GLib.warning ("Could not complete propagation of " + item.destination () + " by " + this + " with status " + item.status + " and error: " + item.error_string);

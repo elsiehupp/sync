@@ -157,7 +157,7 @@ public class AbstractNetworkJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public AbstractNetworkJob.for_account (unowned Account account, string path, GLib.Object parent = new GLib.Object ()) {
+    public AbstractNetworkJob.for_account (Account account, string path, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.timedout = false;
         this.follow_redirects = true;
@@ -197,7 +197,7 @@ public class AbstractNetworkJob : GLib.Object {
         const string display_url = string ("%1://%2%3").arg (url.scheme ()).arg (url.host ()).arg (url.path ());
 
         string parent_meta_object_name = parent () ? parent ().meta_object ().class_name (): "";
-        GLib.info (meta_object ().class_name ("created for" + display_url + "+" + path () + parent_meta_object_name;
+        GLib.info (meta_object ().class_name () + " created for " + display_url + " + " + path () + parent_meta_object_name);
     }
 
 
@@ -281,7 +281,7 @@ public class AbstractNetworkJob : GLib.Object {
         var request = this.reply.request ();
         GLib.Uri requested_url = request.url ();
         GLib.ByteArray verb = HttpLogger.request_verb (*this.reply);
-        GLib.info ("Restarting" + verb + requested_url;
+        GLib.info ("Restarting " + verb + requested_url);
         on_signal_reset_timeout ();
         if (this.request_body) {
             this.request_body.seek (0);
@@ -397,7 +397,7 @@ public class AbstractNetworkJob : GLib.Object {
     reply () changes. For things like setting up additional
     signal connections on the new reply.
     ***********************************************************/
-    protected virtual void new_reply_hook (Soup.Reply *) {}
+    protected virtual void new_reply_hook (Soup.Reply reply) {}
 
 
     /***********************************************************
@@ -439,7 +439,7 @@ public class AbstractNetworkJob : GLib.Object {
 
 
     protected string reply_status_string () {
-        //  Q_ASSERT (reply ());
+        GLib.assert (reply ());
         if (reply ().error () == Soup.Reply.NoError) {
             return QLatin1String ("OK");
         } else {
@@ -466,7 +466,7 @@ public class AbstractNetworkJob : GLib.Object {
         this.timer.stop ();
 
         if (this.reply.error () == Soup.Reply.SslHandshakeFailedError) {
-            GLib.warning ("SslHandshakeFailedError: " + error_string (" : can be caused by a webserver wanting SSL client certificates";
+            GLib.warning ("SslHandshakeFailedError: " + error_string () + ": can be caused by a webserver wanting SSL client certificates.");
         }
         // Qt doesn't yet transparently resend HTTP2 requests, do so here
         var max_http2Resends = 3;
@@ -475,19 +475,24 @@ public class AbstractNetworkJob : GLib.Object {
             && this.reply.attribute (Soup.Request.HTTP2WasUsedAttribute).to_bool ()) {
 
             if ( (this.request_body && !this.request_body.is_sequential ()) || verb.is_empty ()) {
-                GLib.warning ("Can't resend HTTP2 request, verb or body not suitable"
-                                        + this.reply.request ().url () + verb + this.request_body;
+                GLib.warning (
+                    "Can't resend HTTP2 request; verb or body not suitable "
+                    + this.reply.request ().url () + verb + this.request_body
+                );
             } else if (this.http2_resend_count >= max_http2Resends) {
-                GLib.warning ("Not resending HTTP2 request, number of resends exhausted"
-                                        + this.reply.request ().url () + this.http2_resend_count;
+                GLib.warning (
+                    "Not resending HTTP2 request; number of resends exhausted "
+                    + this.reply.request ().url () + this.http2_resend_count
+                );
             } else {
-                GLib.info ("HTTP2 resending" + this.reply.request ().url ();
+                GLib.info ("HTTP2 resending " + this.reply.request ().url ());
                 this.http2_resend_count++;
 
                 on_signal_reset_timeout ();
                 if (this.request_body) {
-                    if (!this.request_body.is_open ())
-                    this.request_body.open (QIODevice.ReadOnly);
+                    if (!this.request_body.is_open ()) {
+                        this.request_body.open (QIODevice.ReadOnly);
+                    }
                     this.request_body.seek (0);
                 }
                 send_request (
@@ -532,19 +537,19 @@ public class AbstractNetworkJob : GLib.Object {
                 && requested_url.has_query ()
                 && !redirect_url.has_query ()
                 && !this.request_body) {
-                GLib.warning ("Redirecting a POST request with an implicit body loses that body";
+                GLib.warning ("Redirecting a POST request with an implicit body loses that body.");
             }
 
             // ### some of the q_warnings here should be exported via display_errors () so they
             // ### can be presented to the user if the job executor has a GUI
-            if (requested_url.scheme () == QLatin1String ("https") && redirect_url.scheme () == QLatin1String ("http")) {
-                GLib.warning () + this + "HTTPS.HTTP downgrade detected!";
+            if (requested_url.scheme () == "https" && redirect_url.scheme () == "http") {
+                GLib.warning (this + " HTTPS.HTTP downgrade detected!");
             } else if (requested_url == redirect_url || this.redirect_count + 1 >= max_redirects ()) {
-                GLib.warning () + this + "Redirect loop detected!";
+                GLib.warning (this + " Redirect loop detected!");
             } else if (this.request_body && this.request_body.is_sequential ()) {
-                GLib.warning () + this + "cannot redirect request with sequential body";
+                GLib.warning (this + " cannot redirect request with sequential body.");
             } else if (verb.is_empty ()) {
-                GLib.warning () + this + "cannot redirect request : could not detect original verb";
+                GLib.warning (this + " cannot redirect request: could not detect original verb.");
             } else {
                 /* emit */ redirected (this.reply, redirect_url, this.redirect_count);
 
@@ -553,7 +558,7 @@ public class AbstractNetworkJob : GLib.Object {
                     this.redirect_count++;
 
                     // Create the redirected request and send it
-                    GLib.info ("Redirecting" + verb + requested_url + redirect_url;
+                    GLib.info ("Redirecting " + verb + requested_url + redirect_url);
                     on_signal_reset_timeout ();
                     if (this.request_body) {
                         if (!this.request_body.is_open ()) {
@@ -579,7 +584,7 @@ public class AbstractNetworkJob : GLib.Object {
 
         bool discard = on_signal_finished ();
         if (discard) {
-            GLib.debug ("Network job" + meta_object ().class_name ("on_signal_finished for" + path ();
+            GLib.debug ("Network job " + meta_object ().class_name () + " finished for " + path ());
             delete_later ();
         }
     }
@@ -643,16 +648,16 @@ public class AbstractNetworkJob : GLib.Object {
     This function produces clearer error messages for HTTP errors.
     ***********************************************************/
     string network_reply_error_string (Soup.Reply reply) {
-        string base = reply.error_string ();
+        string base_string = reply.error_string ();
         int http_status = reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         string http_reason = reply.attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ();
 
         // Only adjust HTTP error messages of the expected format.
-        if (http_reason.is_empty () || http_status == 0 || !base.contains (http_reason)) {
-            return base;
+        if (http_reason.is_empty () || http_status == 0 || !base_string.contains (http_reason)) {
+            return base_string;
         }
 
-        return AbstractNetworkJob._(R" (Server replied \"%1 %2\" to \"%3 %4\")").arg (string.number (http_status), http_reason, HttpLogger.request_verb (reply), reply.request ().url ().to_display_"");
+        return _(" (Server replied \"%1 %2\" to \"%3 %4\")").arg (string.number (http_status), http_reason, HttpLogger.request_verb (reply), reply.request ().url ().to_display_string ());
     }
 
 } // class AbstractNetworkJob

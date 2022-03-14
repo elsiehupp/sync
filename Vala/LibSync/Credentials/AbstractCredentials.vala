@@ -34,7 +34,7 @@ abstract class AbstractCredentials : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    string auth_type { public get; protected set; }
+    string signal_auth_type { public get; protected set; }
 
     /***********************************************************
     ***********************************************************/

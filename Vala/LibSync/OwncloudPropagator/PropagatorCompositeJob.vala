@@ -52,7 +52,7 @@ public class PropagatorCompositeJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public void append_task (SyncFileItemPtr item) {
+    public void append_task (unowned SyncFileItem item) {
         this.tasks_to_do.append (item);
     }
 
@@ -88,7 +88,7 @@ public class PropagatorCompositeJob : PropagatorJob {
         // Now it's our turn, check if we have something left to do.
         // First, convert a task to a job if necessary
         while (this.jobs_to_do.is_empty () && !this.tasks_to_do.is_empty ()) {
-            SyncFileItemPtr next_task = this.tasks_to_do.first ();
+            unowned SyncFileItem next_task = this.tasks_to_do.first ();
             this.tasks_to_do.remove (0);
             PropagatorJob job = propagator ().create_job (next_task);
             if (!job) {
@@ -140,13 +140,13 @@ public class PropagatorCompositeJob : PropagatorJob {
             this.aborts_count = this.running_jobs.size ();
             foreach (PropagatorJob j in this.running_jobs) {
                 if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
-                    connect (j, PropagatorJob.abort_finished,
+                    connect (j, PropagatorJob.signal_abort_finished,
                             this, PropagatorCompositeJob.on_signal_sub_job_abort_finished);
                 }
                 j.on_signal_abort (abort_type);
             }
         } else if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
-            /* emit */ abort_finished ();
+            /* emit */ signal_abort_finished ();
         }
     }
 
@@ -170,7 +170,7 @@ public class PropagatorCompositeJob : PropagatorJob {
 
         // Emit on_signal_abort if last job has been aborted
         if (this.aborts_count == 0) {
-            /* emit */ abort_finished ();
+            /* emit */ signal_abort_finished ();
         }
     }
 

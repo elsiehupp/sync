@@ -19,7 +19,7 @@ public class PropagateLocalRemove : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public PropagateLocalRemove (OwncloudPropagator propagator, SyncFileItemPtr item) {
+    public PropagateLocalRemove (OwncloudPropagator propagator, unowned SyncFileItem item) {
         base (propagator, item);
     }
 

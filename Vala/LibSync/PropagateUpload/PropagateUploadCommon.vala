@@ -100,7 +100,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public PropagateUploadFileCommon (OwncloudPropagator propagator, SyncFileItemPtr item) {
+    public PropagateUploadFileCommon (OwncloudPropagator propagator, unowned SyncFileItem item) {
         base (propagator, item);
         this.finished = false;
         this.delete_existing = false;
@@ -138,9 +138,9 @@ public class PropagateUploadFileCommon : PropagateItemJob {
             }
             this.item.file = this.item.rename_target;
             this.item.modtime = FileSystem.get_mod_time (new_file_path_absolute);
-            //  Q_ASSERT (this.item.modtime > 0);
+            GLib.assert (this.item.modtime > 0);
             if (this.item.modtime <= 0) {
-                GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
+                GLib.warning ("Invalid modified time " + this.item.file + this.item.modtime);
                 on_signal_error_start_folder_unlock (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (this.item.file)));
                 return;
             }
@@ -164,20 +164,31 @@ public class PropagateUploadFileCommon : PropagateItemJob {
 
         var remote_parent_path = parent_rec.e2e_mangled_name.is_empty () ? parent_path : parent_rec.e2e_mangled_name;
         this.upload_encrypted_helper = new PropagateUploadEncrypted (propagator (), remote_parent_path, this.item, this);
-        connect (this.upload_encrypted_helper, PropagateUploadEncrypted.finalized,
-                this, PropagateUploadFileCommon.setup_encrypted_file);
-        connect (this.upload_encrypted_helper, PropagateUploadEncrypted.error, {
-            GLib.debug ("Error setting up encryption.";
-            on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Failed to upload encrypted file."));
-        });
+        connect (
+            this.upload_encrypted_helper,
+            PropagateUploadEncrypted.finalized,
+            this,
+            PropagateUploadFileCommon.setup_encrypted_file
+        );
+        connect (
+            this.upload_encrypted_helper,
+            PropagateUploadEncrypted.error,
+            this.on_signal_propagate_upload_encrypted_error
+        );
         this.upload_encrypted_helper.on_signal_start ();
+    }
+
+
+    private void on_signal_propagate_upload_encrypted_error () {
+        GLib.debug ("Error setting up encryption.");
+        on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Failed to upload encrypted file."));
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void setup_encrypted_file (string path, string filename, uint64 size) {
-        GLib.debug ("Starting to upload encrypted file" + path + filename + size;
+        GLib.debug ("Starting to upload encrypted file " + path + filename + size);
         this.uploading_encrypted = true;
         this.file_to_upload.path = path;
         this.file_to_upload.file = filename;
@@ -215,7 +226,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         if (this.file_to_upload.size > quota_guess) {
             // Necessary for blocklisting logic
             this.item.http_error_code = 507;
-            /* emit */ propagator ().insufficient_remote_storage ();
+            /* emit */ propagator ().signal_insufficient_remote_storage ();
             on_signal_done (SyncFileItem.Status.DETAIL_ERROR, _("Upload of %1 exceeds the quota for the folder").arg (Utility.octets_to_string (this.file_to_upload.size)));
             return;
         }
@@ -223,14 +234,16 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         propagator ().active_job_list.append (this);
 
         if (!this.delete_existing) {
-            GLib.debug ("Running the compute checksum";
+            GLib.debug ("Running the compute checksum.");
             return on_signal_compute_content_checksum ();
         }
 
-        GLib.debug ("Deleting the current";
-        var job = new DeleteJob (propagator ().account (),
+        GLib.debug ("Deleting the current.");
+        var job = new DeleteJob (
+            propagator ().account (),
             propagator ().full_remote_path (this.file_to_upload.file),
-            this);
+            this
+        );
         this.jobs.append (job);
         connect (job, DeleteJob.signal_finished, this, PropagateUploadFileCommon.on_signal_compute_content_checksum);
         connect (job, GLib.Object.destroyed, this, PropagateUploadFileCommon.on_signal_job_destroyed);
@@ -256,8 +269,8 @@ public class PropagateUploadFileCommon : PropagateItemJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_compute_content_checksum () {
-        GLib.debug ("Trying to compute the checksum of the file";
-        GLib.debug ("Still trying to understand if this is the local file or the uploaded one";
+        GLib.debug ("Trying to compute the checksum of the file.");
+        GLib.debug ("Still trying to understand if this is the local file or the uploaded one.");
         if (propagator ().abort_requested) {
             return;
         }
@@ -354,9 +367,9 @@ public class PropagateUploadFileCommon : PropagateItemJob {
             on_signal_error_start_folder_unlock (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (this.item.file)));
             return;
         }
-        //  Q_ASSERT (this.item.modtime > 0);
+        GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
+            GLib.warning ("Invalid modified time " + this.item.file + this.item.modtime);
         }
         time_t prev_modtime = this.item.modtime; // the this.item value was set in PropagateUploadFile.on_signal_start ()
         // but a potential checksum calculation could have taken some time during which the file could
@@ -367,13 +380,13 @@ public class PropagateUploadFileCommon : PropagateItemJob {
             on_signal_error_start_folder_unlock (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").arg (QDir.to_native_separators (this.item.file)));
             return;
         }
-        //  Q_ASSERT (this.item.modtime > 0);
+        GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
+            GLib.warning ("Invalid modified time " + this.item.file.to_string () + this.item.modtime.to_string ());
         }
         if (prev_modtime != this.item.modtime) {
             propagator ().another_sync_needed = true;
-            GLib.debug ("prev_modtime" + prev_modtime + "Curr" + this.item.modtime;
+            GLib.debug ("Previous modtime: " + prev_modtime.to_string () + " current modtime: " + this.item.modtime.to_string ());
             return on_signal_error_start_folder_unlock (SyncFileItem.Status.SOFT_ERROR, _("Local file changed during syncing. It will be resumed."));
         }
 
@@ -396,7 +409,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
     Invoked when encrypted folder lock has been released
     ***********************************************************/
     private void on_signal_folder_unlocked (GLib.ByteArray folder_identifier, int http_return_code) {
-        GLib.debug ("Failed to unlock encrypted folder" + folder_identifier;
+        GLib.debug ("Failed to unlock encrypted folder " + folder_identifier);
         if (this.upload_status.status == SyncFileItem.Status.NO_STATUS && http_return_code != 200) {
             on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Failed to unlock encrypted folder."));
         } else {
@@ -410,10 +423,15 @@ public class PropagateUploadFileCommon : PropagateItemJob {
     ***********************************************************/
     private void on_signal_error_start_folder_unlock (SyncFileItem.Status status, string error_string) {
         if (this.uploading_encrypted) {
-            this.upload_status = {
+            this.upload_status = new UploadStatus (
                 status, error_string
-            }
-            connect (this.upload_encrypted_helper, PropagateUploadEncrypted.folder_unlocked, this, PropagateUploadFileCommon.on_signal_folder_unlocked);
+            );
+            connect (
+                this.upload_encrypted_helper,
+                PropagateUploadEncrypted.folder_unlocked,
+                this,
+                PropagateUploadFileCommon.on_signal_folder_unlocked
+            );
             this.upload_encrypted_helper.unlock_folder ();
         } else {
             on_signal_done (status, error_string);
@@ -436,9 +454,9 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         info.file = this.item.file;
         info.url = path;
         info.modtime = this.item.modtime;
-        //  Q_ASSERT (this.item.modtime > 0);
+        GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
+            GLib.warning ("Invalid modified time " + this.item.file.to_string () + this.item.modtime.to_string ());
         }
         info.file_size = this.item.size;
         propagator ().journal.poll_info (info);
@@ -447,21 +465,15 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         job.on_signal_start ();
     }
 
-    /***********************************************************
-    ***********************************************************/
-    public 
 
     /***********************************************************
+    This function is used whenever there is an error occuring
+    and jobs might be in progress
     ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public void abort_with_error (SyncFileItem.Status status, string error);
-    // This function is used whenever there is an error occuring and jobs might be in progress
-    void PropagateUploadFileCommon.abort_with_error (SyncFileItem.Status status, string error) {
-        if (this.aborting)
+    public void abort_with_error (SyncFileItem.Status status, string error) {
+        if (this.aborting) {
             return;
+        }
         on_signal_abort (PropagatorJob.AbortType.SYNCHRONOUS);
         on_signal_done (status, error);
     }
@@ -516,7 +528,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
             var pin = vfs.pin_state (this.item.file);
             if (pin && *pin == PinState.VfsItemAvailability.ONLINE_ONLY) {
                 if (!vfs.pin_state (this.item.file, PinState.PinState.UNSPECIFIED)) {
-                    GLib.warning ("Could not set pin state of" + this.item.file + "to unspecified";
+                    GLib.warning ("Could not set pin state of " + this.item.file + " to unspecified");
                 }
             }
         }
@@ -526,10 +538,16 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         propagator ().journal.commit ("upload file on_signal_start");
 
         if (this.uploading_encrypted) {
-            this.upload_status = {
-                SyncFileItem.Status.SUCCESS, ""
-            }
-            connect (this.upload_encrypted_helper, PropagateUploadEncrypted.folder_unlocked, this, PropagateUploadFileCommon.on_signal_folder_unlocked);
+            this.upload_status = new UploadStatus (
+                SyncFileItem.Status.SUCCESS,
+                ""
+            );
+            connect (
+                this.upload_encrypted_helper,
+                PropagateUploadEncrypted.folder_unlocked,
+                this,
+                PropagateUploadFileCommon.on_signal_folder_unlocked
+            );
             this.upload_encrypted_helper.unlock_folder ();
         } else {
             on_signal_done (SyncFileItem.Status.SUCCESS);
@@ -545,26 +563,23 @@ public class PropagateUploadFileCommon : PropagateItemJob {
     }
 
 
+    private delegate bool MayAbortJob (AbstractNetworkJob job);
+
     /***********************************************************
     Aborts all running network jobs, except for the ones that may_abort_job
-    returns false on and, for async aborts, emits abort_finished when done.
+    returns false on and, for async aborts, emits signal_abort_finished when done.
     ***********************************************************/
     protected void abort_network_jobs (
         PropagatorJob.AbortType abort_type,
-        std.function<bool (AbstractNetworkJob job)> may_abort_job) {
-        if (this.aborting)
+        MayAbortJob may_abort_job) {
+        if (this.aborting) {
             return;
+        }
         this.aborting = true;
 
         // Count the number of jobs that need aborting, and emit the overall
         // on_signal_abort signal when they're all done.
         unowned int running_count = 0;
-        var one_abort_finished = [this, running_count] () {
-            (*running_count)--;
-            if (*running_count == 0) {
-                /* emit */ this.abort_finished ();
-            }
-        }
 
         // Abort all running jobs, except for explicitly excluded ones
         foreach (AbstractNetworkJob job in this.jobs) {
@@ -591,7 +606,16 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         }
 
         if (*running_count == 0 && abort_type == PropagatorJob.AbortType.ASYNCHRONOUS)
-            /* emit */ abort_finished ();
+            /* emit */ signal_abort_finished ();
+    }
+
+
+    private int one_abort_finished (int running_count) {
+        int count_copy = running_count - 1;
+        if (count_copy == 0) {
+            /* emit */ this.signal_abort_finished ();
+        }
+        return count_copy;
     }
 
 
@@ -606,13 +630,16 @@ public class PropagateUploadFileCommon : PropagateItemJob {
             var upload_info = propagator ().journal.get_upload_info (this.item.file);
             upload_info.error_count += 1;
             if (upload_info.error_count > 3) {
-                GLib.info ("Reset transfer of" + this.item.file
-                                          + "due to repeated error" + this.item.http_error_code;
+                GLib.info (
+                    "Reset transfer of " + this.item.file
+                    + " due to repeated error " + this.item.http_error_code);
                 upload_info = SyncJournalDb.UploadInfo ();
             } else {
-                GLib.info ("Error count for maybe-reset error" + this.item.http_error_code
-                                          + "on file" + this.item.file
-                                          + "is" + upload_info.error_count;
+                GLib.info (
+                    "Error count for maybe-reset error " + this.item.http_error_code
+                    + " on file " + this.item.file
+                    + " is " + upload_info.error_count
+                );
             }
             propagator ().journal.upload_info (this.item.file, upload_info);
             propagator ().journal.commit ("Upload info");
@@ -625,8 +652,8 @@ public class PropagateUploadFileCommon : PropagateItemJob {
     ***********************************************************/
     protected void common_error_handling (AbstractNetworkJob job) {
         GLib.ByteArray reply_content;
-        string error_string = job.error_string_parsing_body (&reply_content);
-        GLib.debug (reply_content; // display the XML error in the debug
+        string error_string = job.error_string_parsing_body (reply_content);
+        GLib.debug (reply_content.to_string ()); // display the XML error in the debug
 
         if (this.item.http_error_code == 412) {
             // Precondition Failed : Either an etag or a checksum mismatch.
@@ -660,7 +687,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
             // Set up the error
             status = SyncFileItem.Status.DETAIL_ERROR;
             error_string = _("Upload of %1 exceeds the quota for the folder").arg (Utility.octets_to_string (this.file_to_upload.size));
-            /* emit */ propagator ().insufficient_remote_storage ();
+            /* emit */ propagator ().signal_insufficient_remote_storage ();
         }
 
         abort_with_error (status, error_string);
@@ -693,10 +720,10 @@ public class PropagateUploadFileCommon : PropagateItemJob {
     ***********************************************************/
     protected GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers () {
         GLib.HashTable<GLib.ByteArray, GLib.ByteArray> headers;
-        headers[GLib.ByteArray ("Content-Type")] = GLib.ByteArray ("application/octet-stream");
-        //  Q_ASSERT (this.item.modtime > 0);
+        headers[GLib.ByteArray ("Content-Type")] = new GLib.ByteArray ("application/octet-stream");
+        GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
+            GLib.warning ("Invalid modified time " + this.item.file + this.item.modtime);
         }
         headers[GLib.ByteArray ("X-OC-Mtime")] = new GLib.ByteArray.number (int64 (this.item.modtime));
         if (q_environment_variable_int_value ("OWNCLOUD_LAZYOPS"))

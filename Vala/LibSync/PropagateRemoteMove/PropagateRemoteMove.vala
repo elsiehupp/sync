@@ -19,21 +19,22 @@ public class PropagateRemoteMove : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public PropagateRemoteMove (OwncloudPropagator propagator, SyncFileItemPtr item) {
+    public PropagateRemoteMove (OwncloudPropagator propagator, unowned SyncFileItem item) {
         base (propagator, item);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
-        if (propagator ().abort_requested)
+    public new void on_signal_start () {
+        if (propagator ().abort_requested) {
             return;
+        }
 
         string origin = propagator ().adjust_renamed_path (this.item.file);
-        GLib.debug (origin + this.item.rename_target;
+        GLib.debug (origin + this.item.rename_target);
 
-        string target_file (propagator ().full_local_path (this.item.rename_target));
+        string target_file = propagator ().full_local_path (this.item.rename_target);
 
         if (origin == this.item.rename_target) {
             // The parent has been renamed already so there is nothing more to do.
@@ -123,14 +124,21 @@ public class PropagateRemoteMove : PropagateItemJob {
                          .arg (folder_target_alt, folder_target, error));
                     return;
                 }
-                GLib.info ("Suffix vfs required local rename of"
-                                              + folder_target_alt + "to" + folder_target;
+                GLib.info (
+                    "Suffix vfs required local rename of "
+                    + folder_target_alt + " to " + folder_target
+                );
             }
         }
-        GLib.debug (remote_source + remote_destination;
+        GLib.debug (remote_source + remote_destination);
 
         this.job = new MoveJob (propagator ().account (), remote_source, remote_destination, this);
-        connect (this.job.data (), MoveJob.signal_finished, this, PropagateRemoteMove.on_signal_move_job_finished);
+        connect (
+            this.job.data (),
+            MoveJob.signal_finished,
+            this,
+            PropagateRemoteMove.on_signal_move_job_finished
+        );
         propagator ().active_job_list.append (this);
         this.job.on_signal_start ();
     }
@@ -143,7 +151,7 @@ public class PropagateRemoteMove : PropagateItemJob {
             this.job.reply ().on_signal_abort ();
 
         if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
-            /* emit */ abort_finished ();
+            /* emit */ signal_abort_finished ();
         }
     }
 
@@ -236,30 +244,30 @@ public class PropagateRemoteMove : PropagateItemJob {
         // Delete old database data.
         propagator ().journal.delete_file_record (this.item.original_file);
         if (!vfs.pin_state (this.item.original_file, PinState.PinState.INHERITED)) {
-            GLib.warning ("Could not set pin state of" + this.item.original_file + "to inherited";
+            GLib.warning ("Could not set pin state of " + this.item.original_file + " to inherited.");
         }
 
-        SyncFileItem new_item (*this.item);
-        new_item.type = this.item.type;
+        SyncFileItem signal_new_item = new SyncFileItem (this.item);
+        signal_new_item.type = this.item.type;
         if (old_record.is_valid ()) {
-            new_item.checksum_header = old_record.checksum_header;
-            if (new_item.size != old_record.file_size) {
-                GLib.warning ("File sizes differ on server vs sync journal: " + new_item.size + old_record.file_size;
+            signal_new_item.checksum_header = old_record.checksum_header;
+            if (signal_new_item.size != old_record.file_size) {
+                GLib.warning ("File sizes differ on server vs sync journal: " + signal_new_item.size + old_record.file_size);
 
                 // the server might have claimed a different size, we take the old one from the DB
-                new_item.size = old_record.file_size;
+                signal_new_item.size = old_record.file_size;
             }
         }
-        var result = propagator ().update_metadata (new_item);
+        var result = propagator ().update_metadata (signal_new_item);
         if (!result) {
             on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").arg (result.error ()));
             return;
         } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
-            on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").arg (new_item.file));
+            on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").arg (signal_new_item.file));
             return;
         }
         if (pin_state && *pin_state != PinState.PinState.INHERITED
-            && !vfs.pin_state (new_item.rename_target, *pin_state)) {
+            && !vfs.pin_state (signal_new_item.rename_target, *pin_state)) {
             on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Error setting pin state"));
             return;
         }

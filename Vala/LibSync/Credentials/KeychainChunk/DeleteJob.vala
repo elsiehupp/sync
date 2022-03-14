@@ -90,7 +90,7 @@ public class DeleteJob : KeychainChunk.Job {
     private void on_signal_delete_job_done (QKeychain.Job incoming_job) {
         // Errors or next chunk?
         var delete_job = qobject_cast<QKeychain.DeletePasswordJob> (incoming_job);
-        //  Q_ASSERT (delete_job);
+        GLib.assert (delete_job);
 
         if (delete_job.error () == NoError) {
             this.chunk_count++;

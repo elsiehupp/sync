@@ -53,7 +53,7 @@ public class DiscoveryPhase : GLib.Object {
     can be changed. See find_and_cancel_deleted_job (). Note that
     item_discovered () will already have been emitted for the item.
     ***********************************************************/
-    GLib.HashTable<string, SyncFileItemPtr> deleted_item;
+    GLib.HashTable<string, unowned SyncFileItem> deleted_item;
 
 
     /***********************************************************
@@ -171,7 +171,7 @@ public class DiscoveryPhase : GLib.Object {
 
 
     signal void fatal_error (string error_string);
-    signal void item_discovered (SyncFileItemPtr item);
+    signal void item_discovered (unowned SyncFileItem item);
     signal void signal_finished ();
 
 
@@ -382,7 +382,7 @@ public class DiscoveryPhase : GLib.Object {
                     GLib.warning ("instruction" + instruction);
                     GLib.warning (" (*it).type" + (*it).type);
                     GLib.warning (" (*it).is_restoration " + (*it).is_restoration);
-                    //  Q_ASSERT (false);
+                    GLib.assert (false);
                     add_error_to_gui (SyncFileItem.Status.FatalError, _("Error while canceling delete of a file"), original_path);
                     /* emit */ fatal_error (_("Error while canceling delete of %1").arg (original_path));
                 }
@@ -458,7 +458,7 @@ public class DiscoveryPhase : GLib.Object {
     or not the given path is within one of the paths of the list
     ***********************************************************/
     private static bool find_path_in_list (string[] list, string path) {
-        //  Q_ASSERT (std.is_sorted (list.begin (), list.end ()));
+        GLib.assert (std.is_sorted (list.begin (), list.end ()));
 
         if (list.size () == 1 && list.first () == QLatin1String ("/")) {
             // Special case for the case "/" is there, it matches everything
@@ -479,7 +479,7 @@ public class DiscoveryPhase : GLib.Object {
             return false;
         }
         --it;
-        //  Q_ASSERT (it.has_suffix ('/')); // Folder.selective_sync_block_list makes sure of that
+        GLib.assert (it.has_suffix ('/')); // Folder.selective_sync_block_list makes sure of that
         return path_slash.starts_with (*it);
     }
 
@@ -494,7 +494,7 @@ public class DiscoveryPhase : GLib.Object {
                 result.is_directory = value.contains (QLatin1String ("collection"));
             } else if (property == QLatin1String ("getlastmodified")) {
                 var date = GLib.DateTime.from_string (value, Qt.RFC2822Date);
-                //  Q_ASSERT (date.is_valid ());
+                GLib.assert (date.is_valid ());
                 result.modtime = date.to_time_t ();
             } else if (property == QLatin1String ("getcontentlength")) {
                 // See #4573, sometimes negative size values are returned

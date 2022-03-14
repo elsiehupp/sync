@@ -16,7 +16,7 @@ public class PropagateIgnoreJob : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public PropagateIgnoreJob (OwncloudPropagator propagator, SyncFileItemPtr item) {
+    public PropagateIgnoreJob (OwncloudPropagator propagator, unowned SyncFileItem item) {
         base (propagator, item);
     }
 

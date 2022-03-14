@@ -16,7 +16,7 @@ public class PropagateLocalRename : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public PropagateLocalRename (OwncloudPropagator propagator, SyncFileItemPtr item) {
+    public PropagateLocalRename (OwncloudPropagator propagator, unowned SyncFileItem item) {
         base (propagator, item);
     }
 
@@ -50,8 +50,8 @@ public class PropagateLocalRename : PropagateItemJob {
                 return;
             }
 
-            /* emit */ propagator ().touched_file (existing_file);
-            /* emit */ propagator ().touched_file (target_file);
+            /* emit */ propagator ().signal_touched_file (existing_file);
+            /* emit */ propagator ().signal_touched_file (target_file);
             string rename_error;
             if (!FileSystem.rename (existing_file, target_file, rename_error)) {
                 on_signal_done (SyncFileItem.Status.NORMAL_ERROR, rename_error);
@@ -72,16 +72,16 @@ public class PropagateLocalRename : PropagateItemJob {
         var old_file = this.item.file;
 
         if (!this.item.is_directory ()) { // Directories are saved at the end
-            SyncFileItem new_item = new SyncFileItem (*this.item);
+            SyncFileItem signal_new_item = new SyncFileItem (*this.item);
             if (old_record.is_valid ()) {
-                new_item.checksum_header = old_record.checksum_header;
+                signal_new_item.checksum_header = old_record.checksum_header;
             }
-            var result = propagator ().update_metadata (new_item);
+            var result = propagator ().update_metadata (signal_new_item);
             if (!result) {
                 on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").arg (result.error ()));
                 return;
             } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
-                on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").arg (new_item.file));
+                on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").arg (signal_new_item.file));
                 return;
             }
         } else {

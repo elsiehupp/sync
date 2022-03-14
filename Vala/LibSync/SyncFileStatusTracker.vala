@@ -86,7 +86,7 @@ public class SyncFileStatusTracker : GLib.Object {
         this.sync_engine = sync_engine;
         connect (sync_engine, SyncEngine.about_to_propagate,
             this, SyncFileStatusTracker.on_signal_about_to_propagate);
-        connect (sync_engine, SyncEngine.item_completed,
+        connect (sync_engine, SyncEngine.signal_item_completed,
             this, SyncFileStatusTracker.on_signal_item_completed);
         connect (sync_engine, SyncEngine.on_signal_finished, this, SyncFileStatusTracker.on_signal_sync_finished);
         connect (sync_engine, SyncEngine.started, this, SyncFileStatusTracker.on_signal_sync_engine_running_changed);
@@ -124,7 +124,7 @@ public class SyncFileStatusTracker : GLib.Object {
         ProblemsMap old_problems;
         std.swap (this.sync_problems, old_problems);
 
-        foreach (SyncFileItemPtr item in items) {
+        foreach (unowned SyncFileItem item in items) {
             GLib.debug ("Investigating " + item.destination () + item.status + item.instruction);
             this.dirty_paths.remove (item.destination ());
 
@@ -171,7 +171,7 @@ public class SyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_item_completed (SyncFileItemPtr item) {
+    private void on_signal_item_completed (unowned SyncFileItem item) {
         GLib.debug ("Item completed " + item.destination () + item.status + item.instruction);
 
         if (has_error_status (*item)) {

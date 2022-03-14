@@ -105,7 +105,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
     /***********************************************************
     ***********************************************************/
-    public PropagateUploadFileNG (OwncloudPropagator propagator, SyncFileItemPtr item) {
+    public PropagateUploadFileNG (OwncloudPropagator propagator, unowned SyncFileItem item) {
         base (propagator, item);
     }
 
@@ -116,9 +116,9 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         propagator ().active_job_list.append (this);
 
         const SyncJournalDb.UploadInfo progress_info = propagator ().journal.get_upload_info (this.item.file);
-        //  Q_ASSERT (this.item.modtime > 0);
+        GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
+            GLib.warning ("Invalid modified time " + this.item.file + this.item.modtime);
         }
         if (progress_info.valid && progress_info.is_chunked () && progress_info.modtime == this.item.modtime
                 && progress_info.size == this.item.size) {
@@ -127,13 +127,31 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
             var job = new LsColJob (propagator ().account (), url, this);
             this.jobs.append (job);
             job.properties (GLib.List<GLib.ByteArray> ("resourcetype"
-                                                + "getcontentlength");
-            connect (job, LsColJob.finished_without_error, this, PropagateUploadFileNG.on_signal_propfind_finished);
-            connect (job, LsColJob.finished_with_error,
-                this, PropagateUploadFileNG.on_signal_propfind_finished_with_error);
-            connect (job, GLib.Object.destroyed, this, PropagateUploadFileCommon.on_signal_job_destroyed);
-            connect (job, LsColJob.directory_listing_iterated,
-                this, PropagateUploadFileNG.on_signal_propfind_iterate);
+                                                + "getcontentlength"));
+            connect (
+                job,
+                LsColJob.finished_without_error,
+                this,
+                PropagateUploadFileNG.on_signal_propfind_finished
+            );
+            connect (
+                job,
+                LsColJob.finished_with_error,
+                this,
+                PropagateUploadFileNG.on_signal_propfind_finished_with_error
+            );
+            connect (
+                job,
+                GLib.Object.destroyed,
+                this,
+                PropagateUploadFileCommon.on_signal_job_destroyed
+            );
+            connect (
+                job,
+                LsColJob.directory_listing_iterated,
+                this,
+                PropagateUploadFileNG.on_signal_propfind_iterate
+            );
             job.on_signal_start ();
             return;
         } else if (progress_info.valid && progress_info.is_chunked ()) {
@@ -152,9 +170,9 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
     ***********************************************************/
     private void start_new_upload () {
         //  ASSERT (propagator ().active_job_list.count (this) == 1);
-        //  Q_ASSERT (this.item.modtime > 0);
+        GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
+            GLib.warning ("Invalid modified time" + this.item.file + this.item.modtime);
         }
         this.transfer_identifier = uint32 (Utility.rand () ^ uint32 (this.item.modtime) ^ (uint32 (this.file_to_upload.size) << 16) ^ q_hash (this.file_to_upload.file));
         this.sent = 0;
@@ -165,9 +183,9 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         SyncJournalDb.UploadInfo pi;
         pi.valid = true;
         pi.transferid = this.transfer_identifier;
-        //  Q_ASSERT (this.item.modtime > 0);
+        GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
+            GLib.warning ("Invalid modified time " + this.item.file + this.item.modtime);
         }
         pi.modtime = this.item.modtime;
         pi.content_checksum = this.item.checksum_header;
@@ -201,7 +219,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         this.current_chunk_size = q_min (propagator ().chunk_size, file_size - this.sent);
 
         if (this.current_chunk_size == 0) {
-            //  Q_ASSERT (this.jobs.is_empty ()); // There should be no running job anymore
+            GLib.assert (this.jobs.is_empty ()); // There should be no running job anymore
             this.finished = true;
 
             // Finish with a MOVE
@@ -216,7 +234,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
                 headers[GLib.ByteArray ("If")] = "<" + GLib.Uri.to_percent_encoding (destination, "/") + "> ([" + if_match + "])";
             }
             if (!this.transmission_checksum_header.is_empty ()) {
-                GLib.info (destination + this.transmission_checksum_header;
+                GLib.info (destination + this.transmission_checksum_header);
                 headers[CHECK_SUM_HEADER_C] = this.transmission_checksum_header;
             }
             headers[GLib.ByteArray ("OC-Total-Length")] = new GLib.ByteArray.number (file_size);
@@ -236,7 +254,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         var device = std.make_unique<UploadDevice> (
                 filename, this.sent, this.current_chunk_size, propagator ().bandwidth_manager);
         if (!device.open (QIODevice.ReadOnly)) {
-            GLib.warning ("Could not prepare upload device: " + device.error_string ();
+            GLib.warning ("Could not prepare upload device: " + device.error_string ());
 
             // Soft error because this is likely caused by the user modifying his files while syncing
             abort_with_error (SyncFileItem.Status.SOFT_ERROR, device.error_string ());
@@ -266,12 +284,18 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_abort (PropagatorJob.AbortType abort_type) {
+    public new void on_signal_abort (PropagatorJob.AbortType abort_type) {
         abort_network_jobs (
             abort_type,
-            [abort_type] (AbstractNetworkJob job) {
-                return abort_type != PropagatorJob.AbortType.ASYNCHRONOUS || !qobject_cast<MoveJob> (job);
-            });
+            PropagateUploadNg.abort_filter
+        );
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private static bool abort_filter (PropagatorJob.AbortType abort_type, AbstractNetworkJob job) {
+        return abort_type != PropagatorJob.AbortType.ASYNCHRONOUS || !(MoveJob) job;
     }
 
     /***********************************************************
@@ -292,23 +316,25 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         if (this.sent > this.file_to_upload.size) {
             // Normally this can't happen because the size is xor'ed with the transfer identifier, and it is
             // therefore impossible that there is more data on the server than on the file.
-            GLib.critical ("Inconsistency while resuming " + this.item.file
-                                        + " : the size on the server (" + this.sent + ") is bigger than the size of the file ("
-                                        + this.file_to_upload.size + ")";
+            GLib.critical (
+                "Inconsistency while resuming " + this.item.file
+                + " : the size on the server (" + this.sent + ") is bigger than the size of the file ("
+                + this.file_to_upload.size + ")"
+            );
 
             // Wipe the old chunking data.
             // Fire and forget. Any error will be ignored.
-            (new DeleteJob (propagator ().account (), chunk_url (), this)).on_signal_start ();
+            new DeleteJob (propagator ().account (), chunk_url (), this).on_signal_start ();
 
             propagator ().active_job_list.append (this);
             start_new_upload ();
             return;
         }
 
-        GLib.info ("Resuming " + this.item.file + " from chunk " + this.current_chunk + "; sent =" + this.sent;
+        GLib.info ("Resuming " + this.item.file + " from chunk " + this.current_chunk + "; sent =" + this.sent);
 
         if (!this.server_chunks.is_empty ()) {
-            GLib.info ("To Delete" + this.server_chunks.keys ());
+            GLib.info ("To Delete " + this.server_chunks.keys ());
             propagator ().active_job_list.append (this);
             this.remove_job_error = false;
 
@@ -355,11 +381,10 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         string chunk_name = name.mid (name.last_index_of ('/') + 1);
         var chunk_id = chunk_name.to_long_long (&ok);
         if (ok) {
-            ServerChunkInfo chunkinfo = {
+            this.server_chunks[chunk_id] = ServerChunkInfo (
                 properties["getcontentlength"].to_long_long (),
                 chunk_name
-            }
-            this.server_chunks[chunk_id] = chunkinfo;
+            );
         }
     }
 
@@ -380,7 +405,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
                 abort_with_error (status, job.error_string ());
                 return;
             } else {
-                GLib.warning ("DeleteJob errored out" + job.error_string () + job.reply ().url ();
+                GLib.warning ("DeleteJob errored out " + job.error_string () + job.reply ().url ());
                 this.remove_job_error = true;
                 // Let the other jobs finish
             }
@@ -465,16 +490,18 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
                 target_size,
                 propagator ().sync_options ().max_chunk_size);
 
-            GLib.info ("Chunked upload of" + this.current_chunk_size + "bytes took" + upload_time.count ()
-                                    + "ms, desired is" + target_duration.count ("ms, expected good chunk size is"
-                                    + predicted_good_size + "bytes and nudged next chunk size to "
-                                    + propagator ().chunk_size + "bytes";
+            GLib.info (
+                "Chunked upload of " + this.current_chunk_size.to_string () + " bytes took " + upload_time.count ()
+                + "ms, desired is " + target_duration.count () + "ms, expected good chunk size is "
+                + predicted_good_size + " bytes and nudged next chunk size to "
+                + propagator ().chunk_size + " bytes."
+            );
         }
 
         this.finished = this.sent == this.item.size;
 
         // Check if the file still exists
-        const string full_file_path (propagator ().full_local_path (this.item.file));
+        const string full_file_path = propagator ().full_local_path (this.item.file);
         if (!FileSystem.file_exists (full_file_path)) {
             if (!this.finished) {
                 abort_with_error (SyncFileItem.Status.SOFT_ERROR, _("The local file was removed during sync."));
@@ -485,9 +512,9 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         }
 
         // Check whether the file changed since discovery - this acts on the original file.
-        //  Q_ASSERT (this.item.modtime > 0);
+        GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
+            GLib.warning ("Invalid modified time " + this.item.file + this.item.modtime);
         }
         if (!FileSystem.verify_file_unchanged (full_file_path, this.item.size, this.item.modtime)) {
             propagator ().another_sync_needed = true;
@@ -547,13 +574,13 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
         GLib.ByteArray fid = job.reply ().raw_header ("OC-FileID");
         if (fid.is_empty ()) {
-            GLib.warning ("Server did not return a OC-FileID" + this.item.file;
+            GLib.warning ("Server did not return a OC-FileID " + this.item.file);
             abort_with_error (SyncFileItem.Status.NORMAL_ERROR, _("Missing File ID from server"));
             return;
         } else {
             // the old file identifier should only be empty for new files uploaded
             if (!this.item.file_id.is_empty () && this.item.file_id != fid) {
-                GLib.warning ("File ID changed!" + this.item.file_id + fid;
+                GLib.warning ("File ID changed! " + this.item.file_id.to_string () + fid);
             }
             this.item.file_id = fid;
         }
@@ -561,7 +588,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         this.item.etag = get_etag_from_reply (job.reply ());
         ;
         if (this.item.etag.is_empty ()) {
-            GLib.warning ("Server did not return an ETAG" + this.item.file;
+            GLib.warning ("Server did not return an ETAG " + this.item.file);
             abort_with_error (SyncFileItem.Status.NORMAL_ERROR, _("Missing ETag from server"));
             return;
         }

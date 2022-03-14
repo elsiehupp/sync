@@ -79,7 +79,7 @@ public class PropagatorJob : GLib.Object {
     /***********************************************************
     Emitted when the on_signal_abort is fully on_signal_finished
     ***********************************************************/
-    signal void abort_finished (SyncFileItem.Status status = SyncFileItem.Status.NORMAL_ERROR);
+    signal void signal_abort_finished (SyncFileItem.Status status = SyncFileItem.Status.NORMAL_ERROR);
 
     /***********************************************************
     ***********************************************************/
@@ -119,12 +119,12 @@ public class PropagatorJob : GLib.Object {
 
 
     /***********************************************************
-    Asynchronous on_signal_abort requires emit of abort_finished () signal,
+    Asynchronous on_signal_abort requires emit of signal_abort_finished () signal,
     while synchronous is expected to on_signal_abort immedietaly.
     ***********************************************************/
     public void on_signal_abort (PropagatorJob.AbortType abort_type) {
         if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS)
-            /* emit */ abort_finished ();
+            /* emit */ signal_abort_finished ();
     }
 
 

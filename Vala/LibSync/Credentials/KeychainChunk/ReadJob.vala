@@ -101,7 +101,7 @@ public class ReadJob : KeychainChunk.Job {
     private void on_signal_read_job_done (QKeychain.Job incoming_job) {
         // Errors or next chunk?
         var read_job = qobject_cast<QKeychain.ReadPasswordJob> (incoming_job);
-        //  Q_ASSERT (read_job);
+        GLib.assert (read_job);
 
         if (read_job.error () == NoError && !read_job.binary_data ().is_empty ()) {
             this.chunk_buffer.append (read_job.binary_data ());

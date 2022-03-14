@@ -33,17 +33,19 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
 
     /***********************************************************
     ***********************************************************/
-    public PropagateRemoteDeleteEncryptedRootFolder (OwncloudPropagator propagator, SyncFileItemPtr item, GLib.Object parent) {
+    public PropagateRemoteDeleteEncryptedRootFolder (OwncloudPropagator propagator, unowned SyncFileItem item, GLib.Object parent) {
         base (propagator, item, parent);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_start () {
-        //  Q_ASSERT (this.item.is_encrypted);
+    public new void on_signal_start () {
+        GLib.assert (this.item.is_encrypted);
 
-        const bool list_files_result = this.propagator.journal.list_files_in_path (this.item.file.to_utf8 (), (Occ.SyncJournalFileRecord record) {
+        const bool list_files_result = this.propagator.journal.list_files_in_path (
+            this.item.file.to_utf8 (),
+            (Occ.SyncJournalFileRecord record) => {
             this.nested_items[record.e2e_mangled_name] = record;
         });
 
@@ -77,7 +79,7 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
             return;
         }
 
-        FolderMetadata metadata (this.propagator.account (), json.to_json (QJsonDocument.Compact), status_code);
+        FolderMetadata metadata = new FolderMetadata (this.propagator.account (), json.to_json (QJsonDocument.Compact), status_code);
 
         GLib.debug (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) + "It's a root encrypted folder. Let's remove nested items first.";
 
@@ -86,12 +88,12 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
         GLib.debug (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) + "Metadata updated, sending to the server.";
 
         var job = new UpdateMetadataApiJob (this.propagator.account (), this.folder_identifier, metadata.encrypted_metadata (), this.folder_token);
-        connect (job, UpdateMetadataApiJob.on_signal_success, this, (GLib.ByteArray file_identifier) {
-            //  Q_UNUSED (file_identifier);
-            for (var it = this.nested_items.const_begin (); it != this.nested_items.const_end (); ++it) {
-                delete_nested_remote_item (it.key ());
-            }
-        });
+        connect (
+            job,
+            UpdateMetadataApiJob.signal_success,
+            this,
+            this.on_signal_update_metadata_api_job_success
+        );
         connect (job, UpdateMetadataApiJob.error, this, PropagateRemoteDeleteEncryptedRootFolder.task_failed);
         job.on_signal_start ();
     }
@@ -102,7 +104,7 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
     private void on_signal_delete_nested_remote_item_finished () {
         var delete_job = qobject_cast<DeleteJob> (GLib.Object.sender ());
 
-        //  Q_ASSERT (delete_job);
+        GLib.assert (delete_job);
 
         if (!delete_job) {
             return;
@@ -138,9 +140,11 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
             // Normally we expect "204 No Content"
             // If it is not the case, it might be because of a proxy or gateway intercepting the request, so we must
             // throw an error.
-            store_first_error_string (_("Wrong HTTP code returned by server. Expected 204, but received \"%1 %2\".")
-                            .arg (http_error_code)
-                            .arg (delete_job.reply ().attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ()));
+            store_first_error_string (
+                _("Wrong HTTP code returned by server. Expected 204, but received \"%1 %2\".")
+                    .arg (http_error_code)
+                    .arg (delete_job.reply ().attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ())
+            );
             if (this.item.http_error_code == 0) {
                 this.item.http_error_code = http_error_code;
             }
@@ -163,18 +167,48 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
 
     /***********************************************************
     ***********************************************************/
+    private void on_signal_update_metadata_api_job_success (GLib.ByteArray file_identifier) {
+        //  Q_UNUSED (file_identifier);
+        for (var it = this.nested_items.const_begin (); it != this.nested_items.const_end (); ++it) {
+            delete_nested_remote_item (it.key ());
+        }
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
     private void decrypt_and_remote_delete () {
         var job = new Occ.SetEncryptionFlagApiJob (this.propagator.account (), this.item.file_id, Occ.SetEncryptionFlagApiJob.Clear, this);
-        connect (job, Occ.SetEncryptionFlagApiJob.on_signal_success, this, (GLib.ByteArray file_identifier) {
-            //  Q_UNUSED (file_identifier);
-            delete_remote_item (this.item.file);
-        });
-        connect (job, Occ.SetEncryptionFlagApiJob.error, this, (GLib.ByteArray file_identifier, int http_return_code) {
-            //  Q_UNUSED (file_identifier);
-            this.item.http_error_code = http_return_code;
-            task_failed ();
-        });
+        connect (
+            job,
+            Occ.SetEncryptionFlagApiJob.on_signal_success,
+            this,
+            this.on_signal_set_encryption_flag_api_job_success
+        );
+        connect (
+            job,
+            Occ.SetEncryptionFlagApiJob.error,
+            this,
+            this.on_signal_set_encryption_flag_api_job_error
+        );
         job.on_signal_start ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_set_encryption_flag_api_job_success (GLib.ByteArray file_identifier) {
+        //  Q_UNUSED (file_identifier);
+        delete_remote_item (this.item.file);
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void on_signal_set_encryption_flag_api_job_error (GLib.ByteArray file_identifier, int http_return_code) {
+        //  Q_UNUSED (file_identifier);
+        this.item.http_error_code = http_return_code;
+        task_failed ();
     }
 
 

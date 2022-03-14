@@ -106,7 +106,7 @@ public class ClientSideEncryption : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void initialize (unowned Account account) {
-        //  Q_ASSERT (account);
+        GLib.assert (account);
 
         GLib.info ("Initializing");
         if (!account.capabilities ().client_side_encryption_available ()) {
@@ -307,7 +307,7 @@ public class ClientSideEncryption : GLib.Object {
     private void on_signal_public_key_fetched (Job incoming) {
         var read_job = static_cast<ReadPasswordJob> (incoming);
         var account = read_job.property (ACCOUNT_PROPERTY).value<unowned Account> ();
-        //  Q_ASSERT (account);
+        GLib.assert (account);
 
         // Error or no valid public key error out
         if (read_job.error () != NoError || read_job.binary_data ().length () == 0) {
@@ -346,7 +346,7 @@ public class ClientSideEncryption : GLib.Object {
     private void on_signal_private_key_fetched (QKeychain.Job incoming) {
         var read_job = static_cast<ReadPasswordJob> (incoming);
         var account = read_job.property (ACCOUNT_PROPERTY).value<unowned Account> ();
-        //  Q_ASSERT (account);
+        GLib.assert (account);
 
         // Error or no valid public key error out
         if (read_job.error () != NoError || read_job.binary_data ().length () == 0) {
@@ -386,7 +386,7 @@ public class ClientSideEncryption : GLib.Object {
     private void on_signal_mnemonic_key_fetched (QKeychain.Job incoming) {
         var read_job = static_cast<ReadPasswordJob> (incoming);
         var account = read_job.property (ACCOUNT_PROPERTY).value<unowned Account> ();
-        //  Q_ASSERT (account);
+        GLib.assert (account);
 
         // Error or no valid public key error out
         if (read_job.error () != NoError || read_job.text_data ().length () == 0) {

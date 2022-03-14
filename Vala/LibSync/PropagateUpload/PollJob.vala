@@ -21,14 +21,14 @@ public class PollJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public SyncFileItemPtr item;
+    public unowned SyncFileItem item;
 
     signal void signal_finished ();
 
     /***********************************************************
     Takes ownership of the device
     ***********************************************************/
-    public PollJob.for_account (unowned Account account, string path, SyncFileItemPtr item,
+    public PollJob.for_account (unowned Account account, string path, unowned SyncFileItem item,
         SyncJournalDb journal, string local_path, GLib.Object parent) {
         base (account, path, parent);
         this.journal = journal;

@@ -20,7 +20,7 @@ public class PropagateRemoteDelete : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public PropagateRemoteDelete (OwncloudPropagator propagator, SyncFileItemPtr item) {
+    public PropagateRemoteDelete (OwncloudPropagator propagator, unowned SyncFileItem item) {
         base (propagator, item);
     }
 
@@ -39,20 +39,28 @@ public class PropagateRemoteDelete : PropagateItemJob {
             } else {
                 this.delete_encrypted_helper = new PropagateRemoteDeleteEncryptedRootFolder (propagator (), this.item, this);
             }
-            connect (this.delete_encrypted_helper, AbstractPropagateRemoteDeleteEncrypted.on_signal_finished, this, (bool on_signal_success) {
-                if (!on_signal_success) {
-                    SyncFileItem.Status status = SyncFileItem.Status.NORMAL_ERROR;
-                    if (this.delete_encrypted_helper.signal_network_error () != Soup.Reply.NoError && this.delete_encrypted_helper.signal_network_error () != Soup.Reply.ContentNotFoundError) {
-                        status = classify_error (this.delete_encrypted_helper.signal_network_error (), this.item.http_error_code, propagator ().another_sync_needed);
-                    }
-                    on_signal_done (status, this.delete_encrypted_helper.error_string ());
-                } else {
-                    on_signal_done (SyncFileItem.Status.SUCCESS);
-                }
-            });
+            connect (
+                this.delete_encrypted_helper,
+                AbstractPropagateRemoteDeleteEncrypted.on_signal_finished,
+                this,
+                this.on_signal_abstract_propagate_remote_delete_encrypted_finished
+            );
             this.delete_encrypted_helper.on_signal_start ();
         } else {
             create_delete_job (this.item.file);
+        }
+    }
+
+
+    private void on_signal_abstract_propagate_remote_delete_encrypted_finished (bool on_signal_success) {
+        if (!on_signal_success) {
+            SyncFileItem.Status status = SyncFileItem.Status.NORMAL_ERROR;
+            if (this.delete_encrypted_helper.signal_network_error () != Soup.Reply.NoError && this.delete_encrypted_helper.signal_network_error () != Soup.Reply.ContentNotFoundError) {
+                status = classify_error (this.delete_encrypted_helper.signal_network_error (), this.item.http_error_code, propagator ().another_sync_needed);
+            }
+            on_signal_done (status, this.delete_encrypted_helper.error_string ());
+        } else {
+            on_signal_done (SyncFileItem.Status.SUCCESS);
         }
     }
 
@@ -79,7 +87,7 @@ public class PropagateRemoteDelete : PropagateItemJob {
             this.job.reply ().on_signal_abort ();
 
         if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
-            /* emit */ abort_finished ();
+            /* emit */ signal_abort_finished ();
         }
     }
 

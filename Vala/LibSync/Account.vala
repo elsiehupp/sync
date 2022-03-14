@@ -630,7 +630,7 @@ public class Account : GLib.Object {
     ***********************************************************/
     public GLib.Variant credential_setting_key (string key) {
         if (this.credentials) {
-            string prefix = this.credentials.auth_type ();
+            string prefix = this.credentials.signal_auth_type ();
             GLib.Variant value = this.settings_map.value (prefix + "this." + key);
             if (value.is_null ()) {
                 value = this.settings_map.value (key);
@@ -645,7 +645,7 @@ public class Account : GLib.Object {
     ***********************************************************/
     public void credential_setting_key_value (string key, GLib.Variant value) {
         if (this.credentials) {
-            string prefix = this.credentials.auth_type ();
+            string prefix = this.credentials.signal_auth_type ();
             this.settings_map.insert (prefix + "this." + key, value);
         }
     }
@@ -978,7 +978,7 @@ public class Account : GLib.Object {
                 GLib.info ("AppToken for user: " + display_name () + " has been removed.");
             }
         } else {
-            //  Q_ASSERT (false);
+            GLib.assert (false);
             GLib.warning ("The sender is not a DeleteJob instance.");
         }
     }
@@ -1015,7 +1015,7 @@ public class Account : GLib.Object {
         );
         connect (
             this.user_status_connector,
-            UserStatusConnector.message_cleared,
+            UserStatusConnector.signal_message_cleared,
             this,
             this.on_signal_user_status_connector_message_cleared
         );

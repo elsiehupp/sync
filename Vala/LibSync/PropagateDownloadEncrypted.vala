@@ -10,7 +10,7 @@ public class PropagateDownloadEncrypted : GLib.Object {
     ***********************************************************/
     private OwncloudPropagator propagator;
     private string local_parent_path;
-    private SyncFileItemPtr item;
+    private unowned SyncFileItem item;
     private GLib.FileInfo info;
     private EncryptedFile encrypted_info;
 
@@ -27,7 +27,7 @@ public class PropagateDownloadEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public PropagateDownloadEncrypted (OwncloudPropagator propagator, string local_parent_path, SyncFileItemPtr item, GLib.Object parent = new GLib.Object ())
+    public PropagateDownloadEncrypted (OwncloudPropagator propagator, string local_parent_path, unowned SyncFileItem item, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.propagator = propagator;
         this.local_parent_path = local_parent_path;
@@ -39,26 +39,43 @@ public class PropagateDownloadEncrypted : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_start () {
-            var root_path = [=] () {
-                    var result = this.propagator.remote_path ();
-                    if (result.starts_with ('/')) {
-                            return result.mid (1);
-                    } else {
-                            return result;
-                    }
-            } ();
-            var remote_filename = this.item.encrypted_filename.is_empty () ? this.item.file : this.item.encrypted_filename;
-            var remote_path = string (root_path + remote_filename);
-            var remote_parent_path = remote_path.left (remote_path.last_index_of ('/'));
+        var remote_filename = this.item.encrypted_filename.is_empty () ? this.item.file : this.item.encrypted_filename;
+        var remote_path = string (root_path + remote_filename);
+        var remote_parent_path = remote_path.left (remote_path.last_index_of ('/'));
 
-            // Is encrypted Now we need the folder-identifier
-            var job = new LsColJob (this.propagator.account (), remote_parent_path, this);
-            job.properties ({"resourcetype", "http://owncloud.org/ns:fileid"});
-            connect (job, LsColJob.directory_listing_subfolders,
-                            this, PropagateDownloadEncrypted.on_signal_check_folder_id);
-            connect (job, LsColJob.finished_with_error,
-                            this, PropagateDownloadEncrypted.on_signal_folder_id_error);
-            job.on_signal_start ();
+        // Is encrypted Now we need the folder-identifier
+        var job = new LsColJob (this.propagator.account (), remote_parent_path, this);
+        job.properties (
+            {
+                "resourcetype",
+                "http://owncloud.org/ns:fileid"
+            }
+        );
+        connect (
+            job,
+            LsColJob.directory_listing_subfolders,
+            this,
+            PropagateDownloadEncrypted.on_signal_check_folder_id
+        );
+        connect (
+            job,
+            LsColJob.finished_with_error,
+            this,
+            PropagateDownloadEncrypted.on_signal_folder_id_error
+        );
+        job.on_signal_start ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private string root_path () {
+        string result = this.propagator.remote_path ();
+        if (result.starts_with ('/')) {
+            return result.mid (1);
+        } else {
+            return result;
+        }
     }
 
 

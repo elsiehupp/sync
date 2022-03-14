@@ -30,26 +30,26 @@ public class FileSystem : GLib.Object {
     /***********************************************************
     @brief compare two files with given filename and return true if they have the same content
     ***********************************************************/
-    public static bool file_equals (string fn1, string fn2) {
+    public static bool file_equals (string filename_1, string filename_2) {
         // compare two files with given filename and return true if they have the same content
-        GLib.File f1 (fn1);
-        GLib.File f2 (fn2);
-        if (!f1.open (QIODevice.ReadOnly) || !f2.open (QIODevice.ReadOnly)) {
-            GLib.warning ("file_equals : Failed to open " + fn1 + "or" + fn2;
+        GLib.File file_1 = new GLib.File (filename_1);
+        GLib.File file_2 = new GLib.File (filename_2);
+        if (!file_1.open (QIODevice.ReadOnly) || !file_2.open (QIODevice.ReadOnly)) {
+            GLib.warning ("file_equals: Failed to open " + filename_1 + " or " + filename_2);
             return false;
         }
 
-        if (get_size (fn1) != get_size (fn2)) {
+        if (get_size (filename_1) != get_size (filename_2)) {
             return false;
         }
 
-        const int BufferSize = 16 * 1024;
-        GLib.ByteArray buffer1 (BufferSize, 0);
-        GLib.ByteArray buffer2 (BufferSize, 0);
+        const int BUFFER_SIZE = 16 * 1024;
+        GLib.ByteArray buffer1 = new GLib.ByteArray (BUFFER_SIZE, 0);
+        GLib.ByteArray buffer2 = new GLib.ByteArray (BUFFER_SIZE, 0);
         // the files have the same size, compare all of it
-        while (!f1.at_end ()) {
-            f1.read (buffer1.data (), BufferSize);
-            f2.read (buffer2.data (), BufferSize);
+        while (!file_1.at_end ()) {
+            file_1.read (buffer1.data (), BUFFER_SIZE);
+            file_2.read (buffer2.data (), BUFFER_SIZE);
             if (buffer1 != buffer2) {
                 return false;
             }
@@ -72,21 +72,21 @@ public class FileSystem : GLib.Object {
             result = stat.modtime;
         } else {
             result = Utility.q_date_time_to_time_t (GLib.FileInfo (filename).last_modified ());
-            GLib.warning ("Could not get modification time for" + filename
-                                    + "with csync, using GLib.FileInfo:" + result;
+            GLib.warning ("Could not get modification time for " + filename
+                        + "with csync, using GLib.FileInfo: " + result);
         }
         return result;
     }
 
 
     public static bool mod_time (string filename, time_t mod_time) {
-        struct timeval times[2];
+        timeval times[2];
         times[0].tv_sec = times[1].tv_sec = mod_time;
         times[0].tv_usec = times[1].tv_usec = 0;
         int rc = c_utimes (filename, times);
         if (rc != 0) {
-            GLib.warning ("Error setting mtime for" + filename
-                                    + "failed : rc" + rc + ", errno:" + errno;
+            GLib.warning ("Error setting mtime for " + filename
+                        + "failed: rc " + rc + ", errno: " + errno);
             return false;
         }
         return true;
@@ -141,67 +141,71 @@ public class FileSystem : GLib.Object {
         const int64 actual_size = get_size (filename);
         const time_t actual_mtime = get_mod_time (filename);
         if ( (actual_size != previous_size && actual_mtime > 0) || (actual_mtime != previous_mtime && previous_mtime > 0 && actual_mtime > 0)) {
-            GLib.info ("File" + filename + "has changed:"
-                                    + "size: " + previous_size + "<." + actual_size
-                                    + ", mtime: " + previous_mtime + "<." + actual_mtime;
+            GLib.info ("File " + filename + " has changed: "
+                     + "size: " + previous_size + " <-> " + actual_size
+                     + ", mtime: " + previous_mtime + " <-> " + actual_mtime);
             return false;
         }
         return true;
     }
 
 
+    private delegate void SignalDelegate (string path, bool is_dir);
+
+
     /***********************************************************
     Removes a directory and its contents recursively
 
     Returns true if all removes succeeded.
-    on_signal_deleted () is called for each deleted file or directory, including the root.
+    signal_delegate () is called for each deleted file or directory, including the root.
     errors are collected in errors.
 
     Code inspired from Qt5's QDir.remove_recursively
     ***********************************************************/
     public static bool remove_recursively (string path,
-        const std.function<void (string path, bool is_dir)> on_signal_deleted = null,
+        SignalDelegate signal_delegate = null,
         string[] errors = null) {
         bool all_removed = true;
-        QDirIterator di (path, QDir.AllEntries | QDir.Hidden | QDir.System | QDir.NoDotAndDotDot);
+        QDirIterator dir_iterator = new QDirIterator (path, QDir.AllEntries | QDir.Hidden | QDir.System | QDir.NoDotAndDotDot);
 
-        while (di.has_next ()) {
-            di.next ();
-            const GLib.FileInfo file_info = di.file_info ();
+        while (dir_iterator.has_next ()) {
+            dir_iterator.next ();
+            const GLib.FileInfo file_info = dir_iterator.file_info ();
             bool remove_ok = false;
             // The use of is_sym_link here is okay:
             // we never want to go into this branch for .lnk files
             bool is_dir = file_info.is_dir () && !file_info.is_sym_link ();
             if (is_dir) {
-                remove_ok = remove_recursively (path + '/' + di.filename (), on_signal_deleted, errors); // recursive
+                remove_ok = remove_recursively (path + '/' + dir_iterator.filename (), signal_delegate, errors); // recursive
             } else {
                 string remove_error;
-                remove_ok = FileSystem.remove (di.file_path (), remove_error);
+                remove_ok = FileSystem.remove (dir_iterator.file_path (), remove_error);
                 if (remove_ok) {
-                    if (on_signal_deleted)
-                        on_signal_deleted (di.file_path (), false);
+                    if (signal_delegate)
+                        signal_delegate (dir_iterator.file_path (), false);
                 } else {
                     if (errors) {
                         errors.append (_("FileSystem", "Error removing \"%1\" : %2")
-                                            .arg (QDir.to_native_separators (di.file_path ()), remove_error));
+                                            .arg (QDir.to_native_separators (dir_iterator.file_path ()), remove_error));
                     }
-                    GLib.warning ("Error removing " + di.file_path () + ':' + remove_error;
+                    GLib.warning ("Error removing " + dir_iterator.file_path () + " : " + remove_error);
                 }
             }
-            if (!remove_ok)
+            if (!remove_ok) {
                 all_removed = false;
+            }
         }
         if (all_removed) {
-            all_removed = QDir ().rmdir (path);
+            all_removed = new QDir ().rmdir (path);
             if (all_removed) {
-                if (on_signal_deleted)
-                    on_signal_deleted (path, true);
+                if (signal_delegate)
+                    signal_delegate (path, true);
             } else {
                 if (errors) {
                     errors.append (_("FileSystem", "Could not remove folder \"%1\"")
                                         .arg (QDir.to_native_separators (path)));
                 }
-                GLib.warning ("Error removing folder" + path;
+                GLib.warning ("Error removing folder " + path);
             }
         }
         return all_removed;

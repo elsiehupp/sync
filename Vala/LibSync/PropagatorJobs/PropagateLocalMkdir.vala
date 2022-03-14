@@ -24,7 +24,7 @@ public class PropagateLocalMkdir : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public PropagateLocalMkdir (OwncloudPropagator propagator, SyncFileItemPtr item) {
+    public PropagateLocalMkdir (OwncloudPropagator propagator, unowned SyncFileItem item) {
         base (propagator, item);
         this.delete_existing_file = false;
     }
@@ -72,7 +72,7 @@ public class PropagateLocalMkdir : PropagateItemJob {
             on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Attention, possible case sensitivity clash with %1").arg (new_dir_str));
             return;
         }
-        /* emit */ propagator ().touched_file (new_dir_str);
+        /* emit */ propagator ().signal_touched_file (new_dir_str);
         QDir local_dir = new QDir (propagator ().local_path ());
         if (!local_dir.mkpath (this.item.file)) {
             on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Could not create folder %1").arg (new_dir_str));
@@ -84,14 +84,14 @@ public class PropagateLocalMkdir : PropagateItemJob {
         // Adding an entry with a dummy etag to the database still makes sense here
         // so the database is aware that this folder exists even if the sync is aborted
         // before the correct etag is stored.
-        SyncFileItem new_item = new SyncFileItem (this.item);
-        new_item.etag = "this.invalid_";
-        var result = propagator ().update_metadata (new_item);
+        SyncFileItem signal_new_item = new SyncFileItem (this.item);
+        signal_new_item.etag = "this.invalid_";
+        var result = propagator ().update_metadata (signal_new_item);
         if (!result) {
             on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").arg (result.error ()));
             return;
         } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
-            on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").arg (new_item.file));
+            on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").arg (signal_new_item.file));
             return;
         }
         propagator ().journal.commit ("local_mkdir");

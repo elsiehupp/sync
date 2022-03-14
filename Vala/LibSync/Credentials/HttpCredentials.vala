@@ -158,7 +158,7 @@ public class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public string auth_type () {
+    public string signal_auth_type () {
         return string.from_latin1 ("http");
     }
 
@@ -732,7 +732,7 @@ public class HttpCredentials : AbstractCredentials {
     another try and return true.
     ***********************************************************/
     protected bool keychain_unavailable_retry_later (QKeychain.ReadPasswordJob incoming) {
-        //  Q_ASSERT (!incoming.insecure_fallback ()); // If insecure_fallback is set, the next test would be pointless
+        GLib.assert (!incoming.insecure_fallback ()); // If insecure_fallback is set, the next test would be pointless
         if (this.retry_on_signal_key_chain_error && (incoming.error () == QKeychain.NoBackendAvailable
                 || incoming.error () == QKeychain.OtherError)) {
             // Could be that the backend was not yet available. Wait some extra seconds.

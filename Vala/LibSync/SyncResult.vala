@@ -115,37 +115,37 @@ public class SyncResult : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    SyncFileItemPtr first_item_new { public get; private set; }
+    unowned SyncFileItem first_item_new { public get; private set; }
 
 
     /***********************************************************
     ***********************************************************/
-    SyncFileItemPtr first_item_deleted { public get; private set; }
+    unowned SyncFileItem first_item_deleted { public get; private set; }
 
 
     /***********************************************************
     ***********************************************************/
-    SyncFileItemPtr first_item_updated { public get; private set; }
+    unowned SyncFileItem first_item_updated { public get; private set; }
 
 
     /***********************************************************
     ***********************************************************/
-    SyncFileItemPtr first_item_renamed { public get; private set; }
+    unowned SyncFileItem first_item_renamed { public get; private set; }
 
 
     /***********************************************************
     ***********************************************************/
-    SyncFileItemPtr first_new_conflict_item { public get; private set; }
+    unowned SyncFileItem first_new_conflict_item { public get; private set; }
 
 
     /***********************************************************
     ***********************************************************/
-    SyncFileItemPtr first_item_error { public get; private set; }
+    unowned SyncFileItem first_item_error { public get; private set; }
 
 
     /***********************************************************
     ***********************************************************/
-    SyncFileItemPtr first_item_locked { public get; private set; }
+    unowned SyncFileItem first_item_locked { public get; private set; }
 
 
     /***********************************************************
@@ -261,7 +261,7 @@ public class SyncResult : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void process_completed_item (SyncFileItemPtr item) {
+    public void process_completed_item (unowned SyncFileItem item) {
         if (Progress.is_warning_kind (item.status)) {
             // Count any error conditions, error strings will have priority anyway.
             this.found_files_not_synced = true;

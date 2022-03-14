@@ -28,7 +28,7 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, QRunnable*/ {
     signal void finished_fatal_error (string error_string);
     signal void finished_non_fatal_error (string error_string);
 
-    signal void item_discovered (SyncFileItemPtr item);
+    signal void item_discovered (unowned SyncFileItem item);
     signal void child_ignored (bool b);
 
     /***********************************************************
@@ -84,7 +84,7 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, QRunnable*/ {
             i.name = codec.to_unicode (dirent.path, dirent.path.size (), state);
             if (state.invalid_chars > 0 || state.remaining_chars > 0) {
                 /* emit */ child_ignored (true);
-                var item = SyncFileItemPtr.create ();
+                var item = unowned SyncFileItem.create ();
                 //item.file = this.current_folder.target + i.name;
                 // FIXME ^^ do we really need to use this.target or is local fine?
                 item.file = this.local_path + i.name;

@@ -25,7 +25,7 @@ public class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected SyncFileItemPtr item;
+    protected unowned SyncFileItem item;
 
     /***********************************************************
     ***********************************************************/
@@ -58,7 +58,7 @@ public class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public AbstractPropagateRemoteDeleteEncrypted (OwncloudPropagator propagator, SyncFileItemPtr item, GLib.Object parent) {
+    public AbstractPropagateRemoteDeleteEncrypted (OwncloudPropagator propagator, unowned SyncFileItem item, GLib.Object parent) {
         base (parent);
         this.signal_network_error = Soup.Reply.NoError;
         this.propagator = propagator;
@@ -157,7 +157,7 @@ public class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
     protected void on_signal_delete_remote_item_finished () {
         var delete_job = qobject_cast<DeleteJob> (GLib.Object.sender ());
 
-        //  Q_ASSERT (delete_job);
+        GLib.assert (delete_job);
 
         if (!delete_job) {
             GLib.critical (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) + "Sender is not a DeleteJob instance.";

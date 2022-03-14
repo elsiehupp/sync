@@ -87,7 +87,7 @@ public class Logger : GLib.Object {
     }
 
     private QScopedPointer<QTextStream> logstream;
-    private mutable QMutex mutex;
+    private /*mutable*/ QMutex mutex;
     public string log_directory;
     private bool temporary_folder_log_dir = false;
 
@@ -98,9 +98,9 @@ public class Logger : GLib.Object {
         public set {
             this.log_rules = value;
             string tmp;
-            QTextStream output (&tmp);
+            QTextStream output = new QTextStream (tmp);
             foreach (var p in value) {
-                output + p + '\n';
+                output += p + '\n';
             }
             GLib.debug (tmp);
             QLoggingCategory.filter_rules (tmp);
@@ -126,10 +126,13 @@ public class Logger : GLib.Object {
                             + "]%{if-debug}\t[ %{function} ]%{endif}:\t%{message}");
         this.crash_log.resize (CRASH_LOG_SIZE);
     // #ifndef NO_MSG_HANDLER
-        q_install_message_handler ((QtMsgType type, QMessageLogContext context, string message) => {
-            Logger.instance ().do_log (type, context, message);
-        });
+        q_install_message_handler (message_handler);
     // #endif
+    }
+
+
+    private void message_handler (QtMsgType type, QMessageLogContext context, string message) {
+        Logger.instance ().do_log (type, context, message);
     }
 
 
@@ -139,19 +142,19 @@ public class Logger : GLib.Object {
     // #endif
     }
 
+    static Logger log;
 
     /***********************************************************
     ***********************************************************/
     public static Logger instance () {
-        static Logger log;
-        return log;
+        return Logger.log;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool is_logging_to_file () {
-        QMutexLocker lock (&this.mutex);
+        QMutexLocker lock = new QMutexLocker (this.mutex);
         return this.logstream;
     }
 
@@ -161,13 +164,14 @@ public class Logger : GLib.Object {
     public void do_log (QtMsgType type, QMessageLogContext context, string message) {
         const string message = q_format_log_message (type, context, message);
         {
-            QMutexLocker lock (&this.mutex);
+            QMutexLocker lock = new QMutexLocker (this.mutex);
             this.crash_log_index = (this.crash_log_index + 1) % CRASH_LOG_SIZE;
             this.crash_log[this.crash_log_index] = message;
             if (this.logstream) {
                 (*this.logstream) + message + Qt.endl;
-                if (this.do_file_flush)
+                if (this.do_file_flush) {
                     this.logstream.flush ();
+                }
             }
             if (type == QtFatalMsg) {
                 close ();
@@ -290,7 +294,7 @@ public class Logger : GLib.Object {
             // Expire old log files and deal with conflicts
             GLib.List<string> files = directory.entry_list (GLib.List<string> ("*owncloud.log.*"),
                 QDir.Files, QDir.Name);
-            const QRegularExpression regex = new QRegularExpression (QRegularExpression.anchored_pattern (R" (.*owncloud\.log\. (\d+).*)"));
+            const QRegularExpression regex = new QRegularExpression (QRegularExpression.anchored_pattern (" (.*owncloud\.log\. (\d+).*)"));
             int max_number = -1;
             foreach (string s in files) {
                 if (this.log_expire > 0) {
@@ -361,7 +365,7 @@ public class Logger : GLib.Object {
         if (log_file_object.open (GLib.File.WriteOnly)) {
             QTextStream output = new QTextStream (&log_file);
             for (int i = 1; i <= CRASH_LOG_SIZE; ++i) {
-                output + this.crash_log[ (this.crash_log_index + i) % CRASH_LOG_SIZE] + '\n';
+                output += this.crash_log[ (this.crash_log_index + i) % CRASH_LOG_SIZE] + '\n';
             }
         }
     }

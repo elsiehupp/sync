@@ -96,7 +96,7 @@ public class PropagateDownloadFile : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public PropagateDownloadFile (OwncloudPropagator propagator, SyncFileItemPtr item) {
+    public PropagateDownloadFile (OwncloudPropagator propagator, unowned SyncFileItem item) {
         base (propagator, item);
         this.resume_start = 0;
         this.download_progress = 0;
@@ -127,14 +127,25 @@ public class PropagateDownloadFile : PropagateItemJob {
             start_after_is_encrypted_is_checked ();
         } else {
             this.download_encrypted_helper = new PropagateDownloadEncrypted (propagator (), parent_path, this.item, this);
-            connect (this.download_encrypted_helper, PropagateDownloadEncrypted.file_metadata_found, {
-                this.is_encrypted = true;
-                start_after_is_encrypted_is_checked ();
-            });
-            connect (this.download_encrypted_helper, PropagateDownloadEncrypted.failed, {
-                on_signal_done (SyncFileItem.Status.NORMAL_ERROR,
-                    _("File %1 cannot be downloaded because encryption information is missing.").arg (QDir.to_native_separators (this.item.file)));
-            });
+            connect (
+                this.download_encrypted_helper,
+                PropagateDownloadEncrypted.file_metadata_found,
+                () => {
+                    this.is_encrypted = true;
+                    start_after_is_encrypted_is_checked ();
+                }
+            );
+            connect (
+                this.download_encrypted_helper,
+                PropagateDownloadEncrypted.failed,
+                () => {
+                    on_signal_done (
+                        SyncFileItem.Status.NORMAL_ERROR,
+                        _("File %1 cannot be downloaded because encryption information is missing.")
+                            .arg (QDir.to_native_separators (this.item.file))
+                    );
+                }
+            );
             this.download_encrypted_helper.on_signal_start ();
         }
     }
@@ -142,7 +153,7 @@ public class PropagateDownloadFile : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public int64 committed_disk_space () {
+    public new int64 committed_disk_space () {
         if (this.state == Running) {
             return q_bound (0LL, this.item.size - this.resume_start - this.download_progress, this.item.size);
         }
@@ -153,7 +164,7 @@ public class PropagateDownloadFile : PropagateItemJob {
     /***********************************************************
     We think it might finish quickly because it is a small file.
     ***********************************************************/
-    public bool is_likely_finished_quickly () {
+    public new bool is_likely_finished_quickly () {
         return this.item.size < propagator ().small_file_size ();
     }
 
@@ -196,20 +207,20 @@ public class PropagateDownloadFile : PropagateItemJob {
             // Apply the server mtime locally if necessary, ensuring the journal
             // and local mtimes end up identical
             var fn = propagator ().full_local_path (this.item.file);
-            //  Q_ASSERT (this.item.modtime > 0);
+            GLib.assert (this.item.modtime > 0);
             if (this.item.modtime <= 0) {
                 GLib.warning ("invalid modified time" + this.item.file + this.item.modtime);
                 return;
             }
             if (this.item.modtime != this.item.previous_modtime) {
-                //  Q_ASSERT (this.item.modtime > 0);
+                GLib.assert (this.item.modtime > 0);
                 FileSystem.mod_time (fn, this.item.modtime);
-                /* emit */ propagator ().touched_file (fn);
+                /* emit */ propagator ().signal_touched_file (fn);
             }
             this.item.modtime = FileSystem.get_mod_time (fn);
-            //  Q_ASSERT (this.item.modtime > 0);
+            GLib.assert (this.item.modtime > 0);
             if (this.item.modtime <= 0) {
-                GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
+                GLib.warning ("Invalid modified time " + this.item.file + this.item.modtime);
                 return;
             }
             update_metadata (/*is_conflict=*/false);
@@ -281,7 +292,7 @@ public class PropagateDownloadFile : PropagateItemJob {
                 // these detail errors only in the error view.
                 on_signal_done (SyncFileItem.Status.DETAIL_ERROR,
                     _("The download would reduce free local disk space below the limit"));
-                /* emit */ propagator ().insufficient_local_storage ();
+                /* emit */ propagator ().signal_insufficient_local_storage ();
             } else if (disk_space_result == OwncloudPropagator.DiskSpaceCritical) {
                 on_signal_done (SyncFileItem.Status.FATAL_ERROR,
                     _("Free space on disk is less than %1").arg (Utility.octets_to_string (critical_free_space_limit ())));
@@ -426,7 +437,7 @@ public class PropagateDownloadFile : PropagateItemJob {
             // It is possible that the file was modified on the server since we did the discovery phase
             // so make sure we have the up-to-date time
             this.item.modtime = job.last_modified ();
-            //  Q_ASSERT (this.item.modtime > 0);
+            GLib.assert (this.item.modtime > 0);
             if (this.item.modtime <= 0) {
                 GLib.warning ("Invalid modified time: " + this.item.file + this.item.modtime);
             }
@@ -439,7 +450,7 @@ public class PropagateDownloadFile : PropagateItemJob {
         reported that if a server breaks behind a proxy, the GET is still a 200 but is
         truncated, as described here : https://github.com/owncloud/mirall/issues/2528
         ***********************************************************/
-        const GLib.ByteArray size_header ("Content-Length");
+        GLib.ByteArray size_header = new GLib.ByteArray ("Content-Length");
         int64 body_size = job.reply ().raw_header (size_header).to_long_long ();
         bool has_size_header = !job.reply ().raw_header (size_header).is_empty ();
 
@@ -464,7 +475,7 @@ public class PropagateDownloadFile : PropagateItemJob {
         }
 
         if (body_size > 0 && body_size != this.tmp_file.size () - job.resume_start ()) {
-            GLib.debug (body_size + this.tmp_file.size () + job.resume_start ();
+            GLib.debug (body_size + this.tmp_file.size () + job.resume_start ());
             propagator ().another_sync_needed = true;
             on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file could not be downloaded completely."));
             return;
@@ -576,7 +587,7 @@ public class PropagateDownloadFile : PropagateItemJob {
             on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time reported by server. Do not save it.").arg (QDir.to_native_separators (this.item.file)));
             return;
         }
-        //  Q_ASSERT (this.item.modtime > 0);
+        GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
             GLib.warning ("Invalid modified time: " + this.item.file + this.item.modtime);
         }
@@ -589,7 +600,7 @@ public class PropagateDownloadFile : PropagateItemJob {
             on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time reported by server. Do not save it.").arg (QDir.to_native_separators (this.item.file)));
             return;
         }
-        //  Q_ASSERT (this.item.modtime > 0);
+        GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
             GLib.warning ("Invalid modified time: " + this.item.file + this.item.modtime);
         }
@@ -646,7 +657,7 @@ public class PropagateDownloadFile : PropagateItemJob {
         }
 
         string error;
-        /* emit */ propagator ().touched_file (fn);
+        /* emit */ propagator ().signal_touched_file (fn);
         // The file_changed () check is done above to generate better error messages.
         if (!FileSystem.unchecked_rename_replace (this.tmp_file.filename (), fn, error)) {
             GLib.warning () + string ("Rename failed : %1 => %2").arg (this.tmp_file.filename ()).arg (fn);
@@ -752,7 +763,7 @@ public class PropagateDownloadFile : PropagateItemJob {
             this.job.reply ().on_signal_abort ();
 
         if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
-            /* emit */ abort_finished ();
+            /* emit */ signal_abort_finished ();
         }
     }
 
@@ -849,26 +860,16 @@ public class PropagateDownloadFile : PropagateItemJob {
             }
         }
 
-        // If we have a conflict where size of the file is unchanged,
-        // compare the remote checksum to the local one.
-        // Maybe it's not a real conflict and no download is necessary!
-        // If the hashes are collision safe and identical, we assume the content is too.
-        // For weak checksums, we only do that if the mtimes are also identical.
-
-        var csync_is_collision_safe_hash = [] (GLib.ByteArray checksum_header) {
-            return checksum_header.starts_with ("SHA")
-                || checksum_header.starts_with ("MD5:");
-        }
-        //  Q_ASSERT (this.item.modtime > 0);
+        GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warning ("invalid modified time" + this.item.file + this.item.modtime;
+            GLib.warning ("Invalid modified time " + this.item.file.to_string () + this.item.modtime.to_string ());
         }
         if (this.item.instruction == CSYNC_INSTRUCTION_CONFLICT
             && this.item.size == this.item.previous_size
             && !this.item.checksum_header.is_empty ()
             && (csync_is_collision_safe_hash (this.item.checksum_header)
                 || this.item.modtime == this.item.previous_modtime)) {
-            GLib.debug (this.item.file + "may not need download, computing checksum";
+            GLib.debug (this.item.file + " may not need download; computing checksum.");
             var compute_checksum = new ComputeChecksum (this);
             compute_checksum.checksum_type (parse_checksum_header_type (this.item.checksum_header));
             connect (compute_checksum, ComputeChecksum.done,
@@ -879,6 +880,20 @@ public class PropagateDownloadFile : PropagateItemJob {
         }
 
         on_signal_start_download ();
+    }
+
+
+    /***********************************************************
+    If we have a conflict where size of the file is unchanged,
+    compare the remote checksum to the local one. Maybe it's not
+    a real conflict and no download is necessary! If the hashes
+    are collision safe and identical, we assume the content is
+    too. For weak checksums, we only do that if the mtimes are
+    also identical.
+    ***********************************************************/
+    private void csync_is_collision_safe_hash (GLib.ByteArray checksum_header) {
+        return checksum_header.starts_with ("SHA")
+            || checksum_header.starts_with ("MD5:");
     }
 
 
@@ -921,7 +936,7 @@ public class PropagateDownloadFile : PropagateItemJob {
             dot_location = recall_filename.size ();
         }
 
-        string time_string = GLib.DateTime.current_date_time_utc ().to_string () + "yyyy_mMdd-hhmmss");
+        string time_string = GLib.DateTime.current_date_time_utc ().to_string () + " yyyy_mMdd-hhmmss";
         recall_filename.insert (dot_location, "this..sys.admin#recall#-" + time_string);
 
         return recall_filename;
@@ -982,7 +997,7 @@ public class PropagateDownloadFile : PropagateItemJob {
 //  #ifdef Q_OS_UNIX
         int chown_err = chown (filename.to_local8Bit ().const_data (), -1, file_info.group_id ());
         if (chown_err) {
-            // TODO : Consider further error handling!
+            // TODO: Consider further error handling!
             GLib.warning () + string ("preserve_group_ownership : chown error %1 : setting group %2 failed on file %3").arg (chown_err).arg (file_info.group_id ()).arg (filename);
         }
 //  #else

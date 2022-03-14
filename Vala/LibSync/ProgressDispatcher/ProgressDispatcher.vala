@@ -59,7 +59,7 @@ public class ProgressDispatcher : GLib.Object {
     /***********************************************************
     @brief : the item was completed by a job
     ***********************************************************/
-    signal void item_completed (string folder, SyncFileItemPtr item);
+    signal void signal_item_completed (string folder, unowned SyncFileItem item);
 
 
     /***********************************************************
