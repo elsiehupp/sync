@@ -33,7 +33,7 @@ public class AuthenticationDialog : Gtk.Dialog {
         this.password = new QLineEdit ();
         window_title (_("Authentication Required"));
         var lay = new QVBoxLayout (this);
-        var label = new Gtk.Label (_("Enter username and password for \"%1\" at %2.").arg (realm, domain));
+        var label = new Gtk.Label (_("Enter username and password for \"%1\" at %2.").printf (realm, domain));
         label.text_format (Qt.UpdateStatusStringFormat.PLAIN_TEXT);
         lay.add_widget (label);
 

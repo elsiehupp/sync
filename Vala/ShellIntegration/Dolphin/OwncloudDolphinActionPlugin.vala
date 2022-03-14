@@ -95,7 +95,7 @@ public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
         }
 
         menu.setTitle (helper.contextMenuTitle ());
-        menu.setIcon (QIcon.fromTheme (helper.contextMenuIconName ()));
+        menu.setIcon (Gtk.Icon.fromTheme (helper.contextMenuIconName ()));
         return { menu.menuAction ());
     }
 

@@ -45,7 +45,7 @@ public class WebEnginePage : QWebEnginePage {
         ***********************************************************/
         QMessageBox message_box;
         message_box.on_signal_text (_("Invalid certificate detected"));
-        message_box.informative_text (_("The host \"%1\" provided an invalid certificate. Continue?").arg (certificate_error.url ().host ()));
+        message_box.informative_text (_("The host \"%1\" provided an invalid certificate. Continue?").printf (certificate_error.url ().host ()));
         message_box.icon (QMessageBox.Warning);
         message_box.standard_buttons (QMessageBox.Yes|QMessageBox.No);
         message_box.default_button (QMessageBox.No);

@@ -42,8 +42,8 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
 
         WizardCommon.init_error_label (this.ui.error_label);
 
-        title (WizardCommon.title_template ().arg (_("Connect to %1").arg (Theme.instance ().app_name_gui ())));
-        sub_title (WizardCommon.sub_title_template ().arg (_("Login in your browser")));
+        title (WizardCommon.title_template ().printf (_("Connect to %1").printf (Theme.instance ().app_name_gui ())));
+        sub_title (WizardCommon.sub_title_template ().printf (_("Login in your browser")));
 
         connect (this.ui.open_link_button, QCommand_link_button.clicked, this, OwncloudOAuthCredsPage.on_signal_open_browser);
         connect (this.ui.copy_link_button, QCommand_link_button.clicked, this, OwncloudOAuthCredsPage.on_signal_copy_link_to_clipboard);

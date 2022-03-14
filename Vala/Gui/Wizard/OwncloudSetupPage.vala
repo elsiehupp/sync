@@ -421,7 +421,7 @@ public class OwncloudSetupPage : QWizardPage {
     ***********************************************************/
     private void setup_server_address_description_label () {
         const var app_name = Theme.instance ().app_name_gui ();
-        this.ui.server_address_description_label.on_signal_text (_("The link to your %1 web interface when you open it in the browser.", "%1 will be replaced with the application name").arg (app_name));
+        this.ui.server_address_description_label.on_signal_text (_("The link to your %1 web interface when you open it in the browser.", "%1 will be replaced with the application name").printf (app_name));
     }
 
 

@@ -641,7 +641,7 @@ public class FolderMan : GLib.Object {
                 _("An old sync journal \"%1\" was found, "
                 + "but could not be removed. Please make sure "
                 + "that no application is currently using it.")
-                    .arg (QDir.from_native_separators (QDir.clean_path (journal_database_file))),
+                    .printf (QDir.from_native_separators (QDir.clean_path (journal_database_file))),
                 QMessageBox.Retry | QMessageBox.Abort);
             if (ret == QMessageBox.Abort) {
                 return false;
@@ -747,7 +747,7 @@ public class FolderMan : GLib.Object {
         }
         if (paused) {
             // sync is disabled.
-            folder_message = _("%1 (Sync is paused)").arg (folder_message);
+            folder_message = _("%1 (Sync is paused)").printf (folder_message);
         }
         return folder_message;
     }
@@ -936,13 +936,13 @@ public class FolderMan : GLib.Object {
             if (different_paths && folder_dir.starts_with (user_dir, cs)) {
                 return _("The local folder %1 already contains a folder used in a folder sync connection. "
                        + "Please pick another one!")
-                            .arg (QDir.to_native_separators (path));
+                            .printf (QDir.to_native_separators (path));
             }
     
             if (different_paths && user_dir.starts_with (folder_dir, cs)) {
                 return _("The local folder %1 is already contained in a folder used in a folder sync connection. "
                        + "Please pick another one!")
-                            .arg (QDir.to_native_separators (path));
+                            .printf (QDir.to_native_separators (path));
             }
     
             // if both pathes are equal, the server url needs to be different
@@ -1843,7 +1843,7 @@ public class FolderMan : GLib.Object {
         int count = 2;
         do {
             if (file_info.exists ()) {
-                new_name = full_path_name + _(" (backup %1)").arg (count++);
+                new_name = full_path_name + _(" (backup %1)").printf (count++);
                 file_info.file (new_name);
             }
         } while (file_info.exists ());

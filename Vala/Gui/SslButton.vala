@@ -56,11 +56,11 @@ public class SslButton : QToolButton {
 
         unowned Account account = this.account_state.account ();
         if (account.url ().scheme () == "https") {
-            icon (QIcon (":/client/theme/lock-https.svg"));
+            icon (Gtk.Icon (":/client/theme/lock-https.svg"));
             QSslCipher cipher = account.session_cipher;
-            tool_tip (_("This connection is encrypted using %1 bit %2.\n").arg (cipher.used_bits ()).arg (cipher.name ()));
+            tool_tip (_("This connection is encrypted using %1 bit %2.\n").printf (cipher.used_bits ()).printf (cipher.name ()));
         } else {
-            icon (QIcon (":/client/theme/lock-http.svg"));
+            icon (Gtk.Icon (":/client/theme/lock-http.svg"));
             tool_tip (_("This connection is NOT secure as it is not encrypted.\n"));
         }
     }
@@ -77,7 +77,7 @@ public class SslButton : QToolButton {
 
         unowned Account account = this.account_state.account ();
 
-        this.menu.add_action (_("Server version : %1").arg (account.server_version ())).enabled (false);
+        this.menu.add_action (_("Server version : %1").printf (account.server_version ())).enabled (false);
 
         if (account.is_http2Supported ()) {
             this.menu.add_action ("HTTP/2").enabled (false);
@@ -220,9 +220,9 @@ public class SslButton : QToolButton {
             txt += cert_id;
         } else {
             if (is_self_signed (cert)) {
-                txt += _("%1 (self-signed)").arg (cert_id);
+                txt += _("%1 (self-signed)").printf (cert_id);
             } else {
-                txt += _("%1").arg (cert_id);
+                txt += _("%1").printf (cert_id);
             }
         }
 

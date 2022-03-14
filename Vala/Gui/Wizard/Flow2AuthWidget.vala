@@ -138,7 +138,7 @@ public class Flow2AuthWidget : Gtk.Widget {
                 this.status_update_skip_count--;
                 break;
             }
-            this.ui.status_label.setext (_("Waiting for authorization") + string ("… (%1)").arg (secondsLeft));
+            this.ui.status_label.setext (_("Waiting for authorization") + string ("… (%1)").printf (secondsLeft));
             stop_spinner (true);
             break;
         case Flow2Auth.statusPollNow:

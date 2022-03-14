@@ -131,7 +131,7 @@ public class IgnoreListTableWidget : Gtk.Widget {
             }
         } else {
             QMessageBox.warning (this, _("Could not open file"),
-                _("Cannot write changes to \"%1\".").arg (file));
+                _("Cannot write changes to \"%1\".").printf (file));
         }
         ignores.close (); //close the file before reloading stuff.
 

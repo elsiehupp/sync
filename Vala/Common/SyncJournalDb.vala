@@ -314,7 +314,7 @@ public class SyncJournalDb : GLib.Object {
     ***********************************************************/
     private QRecursiveMutex mutex;
 
-    private GLib.HashMap<GLib.ByteArray, int> checksym_type_cache;
+    private GLib.HashTable<GLib.ByteArray, int> checksym_type_cache;
     private int transaction;
     private bool metadata_table_is_empty;
 
@@ -389,7 +389,7 @@ public class SyncJournalDb : GLib.Object {
         string user) {
         string journal_path = ".sync_";
 
-        string key = "%1@%2:%3".arg (user, remote_url.to_string (), remote_path);
+        string key = "%1@%2:%3".printf (user, remote_url.to_string (), remote_path);
 
         GLib.ByteArray ba = QCryptographicHash.hash (key.to_utf8 (), QCryptographicHash.Md5);
         journal_path += string.from_latin1 (ba.left (6).to_hex ()) + ".db";

@@ -23,7 +23,7 @@ public class User : GLib.Object {
     ***********************************************************/
     private QTimer expired_activities_check_timer;
     private QTimer notification_check_timer;
-    private GLib.HashMap<AccountState, QElapsedTimer> time_since_last_check;
+    private GLib.HashTable<AccountState, QElapsedTimer> time_since_last_check;
 
     /***********************************************************
     ***********************************************************/
@@ -394,15 +394,15 @@ public class User : GLib.Object {
             GLib.warning ("Item " + item.file + " retrieved successfully.");
 
             if (item.direction != SyncFileItem.Direction.UP) {
-                activity.message = _("Synced %1").arg (item.original_file);
+                activity.message = _("Synced %1").printf (item.original_file);
             } else if (activity.file_action == "file_renamed") {
-                activity.message = _("You renamed %1").arg (item.original_file);
+                activity.message = _("You renamed %1").printf (item.original_file);
             } else if (activity.file_action == "file_deleted") {
-                activity.message = _("You deleted %1").arg (item.original_file);
+                activity.message = _("You deleted %1").printf (item.original_file);
             } else if (activity.file_action == "file_created") {
-                activity.message = _("You created %1").arg (item.original_file);
+                activity.message = _("You created %1").printf (item.original_file);
             } else {
-                activity.message = _("You changed %1").arg (item.original_file);
+                activity.message = _("You changed %1").printf (item.original_file);
             }
 
             this.activity_model.add_sync_file_item_to_activity_list (activity);

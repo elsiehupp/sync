@@ -58,7 +58,7 @@ public class OwncloudGui : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.HashMap<string, QPointer<ShareDialog>> share_dialogs;
+    private GLib.HashTable<string, QPointer<ShareDialog>> share_dialogs;
 
     /***********************************************************
     ***********************************************************/
@@ -286,7 +286,7 @@ public class OwncloudGui : GLib.Object {
             string[] messages;
             messages.append (_("Disconnected from accounts:"));
             foreach (unowned AccountState account in problem_accounts) {
-                string message = _("Account %1 : %2").arg (account.account ().display_name (), account.state_string (account.state ()));
+                string message = _("Account %1 : %2").printf (account.account ().display_name (), account.state_string (account.state ()));
                 if (!account.connection_errors ().empty ()) {
                     message += "\n";
                     message += account.connection_errors ().join ("\n");
@@ -331,7 +331,7 @@ public class OwncloudGui : GLib.Object {
             icon_status = SyncResult.Status.PROBLEM;
         }
 
-        QIcon status_icon = Theme.instance ().sync_state_icon (icon_status, true);
+        Gtk.Icon status_icon = Theme.instance ().sync_state_icon (icon_status, true);
         this.tray.icon (status_icon);
 
         // create the tray blob message, check if we have an defined state
@@ -342,7 +342,7 @@ public class OwncloudGui : GLib.Object {
                     folder.sync_result ().status (),
                     folder.sync_result ().has_unresolved_conflicts (),
                     folder.sync_paused ());
-                all_status_strings += _("Folder %1: %2").arg (folder.short_gui_local_path (), folder_message);
+                all_status_strings += _("Folder %1: %2").printf (folder.short_gui_local_path (), folder_message);
             }
             tray_message = all_status_strings.join ("\n");
     //  #endif
@@ -419,10 +419,10 @@ public class OwncloudGui : GLib.Object {
     //  #if 0
             if (!progress.current_discovered_remote_folder.is_empty ()) {
                 this.action_status.on_signal_text (_("Checking for changes in remote \"%1\"")
-                                        .arg (progress.current_discovered_remote_folder));
+                                        .printf (progress.current_discovered_remote_folder));
             } else if (!progress.current_discovered_local_folder.is_empty ()) {
                 this.action_status.on_signal_text (_("Checking for changes in local \"%1\"")
-                                        .arg (progress.current_discovered_local_folder));
+                                        .printf (progress.current_discovered_local_folder));
             }
     //  #endif
         } else if (progress.status () == ProgressInfo.Status.DONE) {
@@ -438,13 +438,13 @@ public class OwncloudGui : GLib.Object {
             string message;
             if (progress.trust_eta ()) {
                 message = _("Syncing %1 of %2 (%3 left)")
-                        .arg (current_file)
-                        .arg (total_file_count)
-                        .arg (Utility.duration_to_descriptive_string2 (progress.total_progress ().estimated_eta));
+                        .printf (current_file)
+                        .printf (total_file_count)
+                        .printf (Utility.duration_to_descriptive_string2 (progress.total_progress ().estimated_eta));
             } else {
                 message = _("Syncing %1 of %2")
-                        .arg (current_file)
-                        .arg (total_file_count);
+                        .printf (current_file)
+                        .printf (total_file_count);
             }
             //this.action_status.on_signal_text (message);
         } else {
@@ -452,10 +452,10 @@ public class OwncloudGui : GLib.Object {
             string message;
             if (progress.trust_eta ()) {
                 message = _("Syncing %1 (%2 left)")
-                        .arg (total_size_str, Utility.duration_to_descriptive_string2 (progress.total_progress ().estimated_eta));
+                        .printf (total_size_str, Utility.duration_to_descriptive_string2 (progress.total_progress ().estimated_eta));
             } else {
                 message = _("Syncing %1")
-                        .arg (total_size_str);
+                        .printf (total_size_str);
             }
             //this.action_status.on_signal_text (message);
         }
@@ -464,7 +464,7 @@ public class OwncloudGui : GLib.Object {
 
             string kind_str = Progress.as_result_string (progress.last_completed_item);
             string time_str = QTime.current_time ().to_string ("hh:mm");
-            string action_text = _("%1 (%2, %3)").arg (progress.last_completed_item.file, kind_str, time_str);
+            string action_text = _("%1 (%2, %3)").printf (progress.last_completed_item.file, kind_str, time_str);
             var action = new QAction (action_text, this);
             Folder folder = FolderMan.instance ().folder_by_alias (folder);
             if (folder) {
@@ -690,7 +690,7 @@ public class OwncloudGui : GLib.Object {
                 _("The server on account %1 runs an unsupported version %2. "
                 + "Using this client with unsupported server versions is untested and "
                 + "potentially dangerous. Proceed at your own risk.")
-                    .arg (account.display_name (), account.server_version ()));
+                    .printf (account.display_name (), account.server_version ()));
         }
     }
 

@@ -144,7 +144,7 @@ public class SocketUploadJob : GLib.Object {
     ***********************************************************/
     private void on_signal_mkcol_job_finished_with_error (Soup.Reply reply) {
         if (reply.error () == 202) {
-            this.api_job.failure ("Destination %1 already exists".arg (this.remote_path));
+            this.api_job.failure ("Destination %1 already exists".printf (this.remote_path));
         } else {
             this.api_job.failure (reply.error_string ());
         }

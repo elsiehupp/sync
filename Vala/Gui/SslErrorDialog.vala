@@ -99,7 +99,7 @@ public class SslErrorDialog : Gtk.Dialog {
         message += QL ("</head><body>");
 
         var host = this.account.url ().host ();
-        message += QL ("<h3>") + _("Cannot connect securely to <i>%1</i>:").arg (host) + QL ("</h3>");
+        message += QL ("<h3>") + _("Cannot connect securely to <i>%1</i>:").printf (host) + QL ("</h3>");
         // loop over the unknown certificates and line up their errors.
         message += QL ("<div identifier=\"ca_errors\">");
         foreach (QSslCertificate cert in this.unknown_certificates) {
@@ -171,7 +171,7 @@ public class SslErrorDialog : Gtk.Dialog {
     private string cert_div (QSslCertificate cert) {
         string message;
         message += QL ("<div identifier=\"cert\">");
-        message += QL ("<h3>") + _("with Certificate %1").arg (Utility.escape (cert.subject_info (QSslCertificate.Common_name))) + QL ("</h3>");
+        message += QL ("<h3>") + _("with Certificate %1").printf (Utility.escape (cert.subject_info (QSslCertificate.Common_name))) + QL ("</h3>");
 
         message += QL ("<div identifier=\"ccert\">");
         string[] li;
@@ -185,34 +185,34 @@ public class SslErrorDialog : Gtk.Dialog {
             org = _("&lt;not specified&gt;");
         if (country.is_empty ())
             country = _("&lt;not specified&gt;");
-        li += _("Organization : %1").arg (org);
-        li += _("Unit : %1").arg (unit);
-        li += _("Country : %1").arg (country);
+        li += _("Organization : %1").printf (org);
+        li += _("Unit : %1").printf (unit);
+        li += _("Country : %1").printf (country);
         message += QL ("<p>") + li.join (QL ("<br/>")) + QL ("</p>");
 
         message += QL ("<p>");
 
         if (cert.effective_date () < GLib.DateTime (QDate (2016, 1, 1), QTime (), Qt.UTC)) {
         string sha1sum = Utility.format_fingerprint (cert.digest (QCryptographicHash.Sha1).to_hex ());
-            message += _("Fingerprint (SHA1) : <tt>%1</tt>").arg (sha1sum) + QL ("<br/>");
+            message += _("Fingerprint (SHA1) : <tt>%1</tt>").printf (sha1sum) + QL ("<br/>");
         }
 
         string sha256sum = Utility.format_fingerprint (cert.digest (QCryptographicHash.Sha256).to_hex ());
         string sha512sum = Utility.format_fingerprint (cert.digest (QCryptographicHash.Sha512).to_hex ());
-        message += _("Fingerprint (SHA-256) : <tt>%1</tt>").arg (sha256sum) + QL ("<br/>");
-        message += _("Fingerprint (SHA-512) : <tt>%1</tt>").arg (sha512sum) + QL ("<br/>");
+        message += _("Fingerprint (SHA-256) : <tt>%1</tt>").printf (sha256sum) + QL ("<br/>");
+        message += _("Fingerprint (SHA-512) : <tt>%1</tt>").printf (sha512sum) + QL ("<br/>");
         message += QL ("<br/>");
-        message += _("Effective Date : %1").arg (cert.effective_date ().to_string ()) + QL ("<br/>");
-        message += _("Expiration Date : %1").arg (cert.expiry_date ().to_string ()) + QL ("</p>");
+        message += _("Effective Date : %1").printf (cert.effective_date ().to_string ()) + QL ("<br/>");
+        message += _("Expiration Date : %1").printf (cert.expiry_date ().to_string ()) + QL ("</p>");
 
         message += QL ("</div>");
 
-        message += QL ("<h3>") + _("Issuer : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Common_name))) + QL ("</h3>");
+        message += QL ("<h3>") + _("Issuer : %1").printf (Utility.escape (cert.issuer_info (QSslCertificate.Common_name))) + QL ("</h3>");
         message += QL ("<div identifier=\"issuer\">");
         li.clear ();
-        li += _("Organization : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Organization)));
-        li += _("Unit : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Organizational_unit_name)));
-        li += _("Country : %1").arg (Utility.escape (cert.issuer_info (QSslCertificate.Country_name)));
+        li += _("Organization : %1").printf (Utility.escape (cert.issuer_info (QSslCertificate.Organization)));
+        li += _("Unit : %1").printf (Utility.escape (cert.issuer_info (QSslCertificate.Organizational_unit_name)));
+        li += _("Country : %1").printf (Utility.escape (cert.issuer_info (QSslCertificate.Country_name)));
         message += QL ("<p>") + li.join (QL ("<br/>")) + QL ("</p>");
         message += QL ("</div>");
         message += QL ("</div>");

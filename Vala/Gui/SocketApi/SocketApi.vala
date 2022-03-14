@@ -56,7 +56,7 @@ public class SocketApi : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private GLib.List<string> registered_aliases;
-    private GLib.HashMap<QIODevice *, SocketListener> listeners;
+    private GLib.HashTable<QIODevice *, SocketListener> listeners;
     private SocketApiServer local_server;
 
     /***********************************************************
@@ -382,7 +382,7 @@ public class SocketApi : GLib.Object {
         //  Q_ASSERT (static_qt_meta_object.normalized_signature (function_with_arguments) == function_with_arguments);
         const var output = static_meta_object.index_of_method (function_with_arguments);
         if (output == -1) {
-            listener.send_error ("Function %1 not found".arg (string.from_utf8 (function_with_arguments)));
+            listener.send_error ("Function %1 not found".printf (string.from_utf8 (function_with_arguments)));
         }
         //  ASSERT (output != -1)
         return output;
@@ -682,7 +682,7 @@ public class SocketApi : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void command_SHARE_MENU_TITLE (string argument, SocketListener listener) {
-        //listener.on_signal_send_message ("SHARE_MENU_TITLE: " + _("Share with %1", "parameter is Nextcloud").arg (Theme.instance ().app_name_gui ()));
+        //listener.on_signal_send_message ("SHARE_MENU_TITLE: " + _("Share with %1", "parameter is Nextcloud").printf (Theme.instance ().app_name_gui ()));
         listener.on_signal_send_message ("SHARE_MENU_TITLE:"  + Theme.instance ().app_name_gui ());
     }
 
@@ -975,7 +975,7 @@ public class SocketApi : GLib.Object {
     integration
     ***********************************************************/
     private void command_GET_STRINGS (string argument, SocketListener listener) {
-        GLib.HashMap<string, string> strings = {
+        GLib.HashTable<string, string> strings = {
             {
                 "SHARE_MENU_TITLE", _("Share options")
             },
@@ -998,7 +998,7 @@ public class SocketApi : GLib.Object {
         listener.on_signal_send_message ("GET_STRINGS:BEGIN");
         foreach (var key_value in strings) {
             if (argument.is_empty () || argument == key_value.first) {
-                listener.on_signal_send_message ("STRING:%1:%2".arg (key_value.first, key_value.second));
+                listener.on_signal_send_message ("STRING:%1:%2".printf (key_value.first, key_value.second));
             }
         }
         listener.on_signal_send_message ("GET_STRINGS:END");
@@ -1310,7 +1310,7 @@ public class SocketApi : GLib.Object {
     private void command_ASYNC_ASSERT_ICON_IS_EQUAL (unowned SocketApiJob socket_api_job) {
         var widget = find_widget (socket_api_job.arguments ()[QLatin1String ("query_string")].to_string ());
         if (!widget) {
-            string message = string (QLatin1String ("Object not found : 6 : %1")).arg (socket_api_job.arguments ()["query_string"].to_string ());
+            string message = string (QLatin1String ("Object not found : 6 : %1")).printf (socket_api_job.arguments ()["query_string"].to_string ());
             socket_api_job.reject (message);
             return;
         }
@@ -1320,14 +1320,14 @@ public class SocketApi : GLib.Object {
         var segments = property_name.split ('.');
 
         GLib.Object current_object = widget;
-        QIcon value;
+        Gtk.Icon value;
         for (int i = 0; i < segments.count (); i++) {
             var segment = segments.at (i);
             var variable = current_object.property (segment.to_utf8 ().const_data ());
 
-            if (variable.can_convert<QIcon> ()) {
-                variable.convert (QMetaType.QIcon);
-                value = variable.value<QIcon> ();
+            if (variable.can_convert<Gtk.Icon> ()) {
+                variable.convert (QMetaType.Gtk.Icon);
+                value = variable.value<Gtk.Icon> ();
                 break;
             }
 
@@ -1335,7 +1335,7 @@ public class SocketApi : GLib.Object {
             if (tmp_object) {
                 current_object = tmp_object;
             } else {
-                socket_api_job.reject ("Icon not found : %1").arg (property_name);
+                socket_api_job.reject ("Icon not found : %1").printf (property_name);
             }
         }
 
@@ -1387,7 +1387,7 @@ public class SocketApi : GLib.Object {
         string widget_name = socket_api_job.arguments ()[QLatin1String ("object_name")].to_string ();
         var widget = find_widget (widget_name);
         if (!widget) {
-            string message = string (QLatin1String ("Widget not found : 2 : %1")).arg (widget_name);
+            string message = string (QLatin1String ("Widget not found : 2 : %1")).printf (widget_name);
             socket_api_job.reject (message);
             return;
         }
@@ -1412,7 +1412,7 @@ public class SocketApi : GLib.Object {
             if (tmp_object) {
                 current_object = tmp_object;
             } else {
-                string message = string (QLatin1String ("Widget not found : 3 : %1")).arg (widget_name);
+                string message = string (QLatin1String ("Widget not found : 3 : %1")).printf (widget_name);
                 socket_api_job.reject (message);
                 return;
             }
@@ -1430,7 +1430,7 @@ public class SocketApi : GLib.Object {
         string widget_name = arguments["object_name"].to_string ();
         var widget = find_widget (widget_name);
         if (!widget) {
-            string message = string (QLatin1String ("Widget not found : 4 : %1")).arg (widget_name);
+            string message = string (QLatin1String ("Widget not found : 4 : %1")).printf (widget_name);
             socket_api_job.reject (message);
             return;
         }
@@ -1449,7 +1449,7 @@ public class SocketApi : GLib.Object {
         string widget_name = arguments["object_name"].to_string ();
         var widget = find_widget (arguments["object_name"].to_string ());
         if (!widget) {
-            string message = string (QLatin1String ("Widget not found : 5 : %1")).arg (widget_name);
+            string message = string (QLatin1String ("Widget not found : 5 : %1")).printf (widget_name);
             socket_api_job.reject (message);
             return;
         }
@@ -1484,7 +1484,7 @@ public class SocketApi : GLib.Object {
         var object_name = arguments["object_name"].to_string ();
         var widget = find_widget (object_name);
         if (!widget) {
-            string message = string (QLatin1String ("Object not found : 1 : %1")).arg (object_name);
+            string message = string (QLatin1String ("Object not found : 1 : %1")).printf (object_name);
             socket_api_job.reject (message);
             return;
         }
@@ -1503,7 +1503,7 @@ public class SocketApi : GLib.Object {
             }
         }
 
-        string message = "Action not found : 1 : %1".arg (arguments["action_name"].to_string ());
+        string message = "Action not found : 1 : %1".printf (arguments["action_name"].to_string ());
         socket_api_job.reject (message);
     }
 

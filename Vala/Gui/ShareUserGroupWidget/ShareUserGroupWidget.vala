@@ -11,7 +11,7 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 //  #include <QAbstract_proxy_model>
 //  #include <QCompleter>
 //  #include <QBox_layout>
-//  #include <QIcon>
+//  #include <Gtk.Icon>
 //  #include <QLayout>
 //  #include <QPropertyAnimation>
 //  #include <QMenu>
@@ -119,7 +119,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         this.ui.sharee_line_edit.completer (this.completer);
 
         var search_globally_action = new QAction (this.ui.sharee_line_edit);
-        search_globally_action.icon (QIcon (":/client/theme/magnifying-glass.svg"));
+        search_globally_action.icon (Gtk.Icon (":/client/theme/magnifying-glass.svg"));
         search_globally_action.tool_tip (_("Search globally"));
 
         connect (
@@ -279,7 +279,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
             }
         }
 
-        scroll_area.frame_shape (x > 6 ? QFrame.Styled_panel : QFrame.No_frame);
+        scroll_area.frame_shape (x > 6 ? Gdk.Frame.Styled_panel : Gdk.Frame.No_frame);
         scroll_area.visible (!shares.is_empty ());
         scroll_area.fixed_height (height);
         scroll_area.widget (new_view_port);
@@ -438,7 +438,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
 
         this.pi_sharee.on_signal_stop_animation ();
         if (this.completer_model.row_count () == 0) {
-            on_signal_display_error (0, _("No results for \"%1\"").arg (this.completer_model.current_search ()));
+            on_signal_display_error (0, _("No results for \"%1\"").printf (this.completer_model.current_search ()));
         }
 
         // if no rows are present in the model - complete () will hide the completer
@@ -462,7 +462,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         if (share_user_line_childs_count > 0 && share_user_line_childs_count <= 3) {
             scroll_area.fixed_height (scroll_area.widget ().size_hint ().height ());
         }
-        scroll_area.frame_shape (share_user_line_childs_count > 3 ? QFrame.Styled_panel : QFrame.No_frame);
+        scroll_area.frame_shape (share_user_line_childs_count > 3 ? Gdk.Frame.Styled_panel : Gdk.Frame.No_frame);
     }
 
 

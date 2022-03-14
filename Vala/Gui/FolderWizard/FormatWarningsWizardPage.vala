@@ -18,11 +18,11 @@ public class FormatWarningsWizardPage : QWizardPage {
     protected static string format_warnings (string[] warnings) {
         string ret;
         if (warnings.count () == 1) {
-            ret = _("<b>Warning:</b> %1").arg (warnings.first ());
+            ret = _("<b>Warning:</b> %1").printf (warnings.first ());
         } else if (warnings.count () > 1) {
             ret = _("<b>Warning:</b>") + " <ul>";
             foreach (string warning in warnings) {
-                ret += "<li>%1</li>".arg (warning);
+                ret += "<li>%1</li>".printf (warning);
             }
             ret += "</ul>";
         }

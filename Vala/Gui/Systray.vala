@@ -162,7 +162,7 @@ public class Systray : QSystemTrayIcon {
         var pause_action = context_menu.add_action (_("Pause sync"), this, Systray.on_signal_pause_all_folders);
         var resume_action = context_menu.add_action (_("Resume sync"), this, Systray.on_signal_unpause_all_folders);
         context_menu.add_action (_("Settings"), this, Systray.signal_open_settings);
-        context_menu.add_action (_("Exit %1").arg (Theme.instance ().app_name_gui ()), this, Systray.signal_shutdown);
+        context_menu.add_action (_("Exit %1").printf (Theme.instance ().app_name_gui ()), this, Systray.signal_shutdown);
         context_menu (context_menu);
 
         connect (
@@ -304,7 +304,7 @@ public class Systray : QSystemTrayIcon {
     /***********************************************************
     ***********************************************************/
     public void tool_tip (string tip) {
-        QSystemTrayIcon.tool_tip (_("%1 : %2").arg (Theme.instance ().app_name_gui (), tip));
+        QSystemTrayIcon.tool_tip (_("%1 : %2").printf (Theme.instance ().app_name_gui (), tip));
     }
 
 

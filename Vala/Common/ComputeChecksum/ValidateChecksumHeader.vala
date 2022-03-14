@@ -61,11 +61,11 @@ public class ValidateChecksumHeader : ComputeChecksumBase {
     ***********************************************************/
     private void on_signal_checksum_calculated (GLib.ByteArray checksum_type, GLib.ByteArray checksum) {
         if (checksum_type != this.expected_checksum_type) {
-            /* emit */ validation_failed (_("The checksum header contained an unknown checksum type \"%1\"").arg (string.from_latin1 (this.expected_checksum_type)));
+            /* emit */ validation_failed (_("The checksum header contained an unknown checksum type \"%1\"").printf (string.from_latin1 (this.expected_checksum_type)));
             return;
         }
         if (checksum != this.expected_checksum) {
-            /* emit */ validation_failed (_(R" (The downloaded file does not match the checksum, it will be resumed. "%1" != "%2")").arg (string.from_utf8 (this.expected_checksum), string.from_utf8 (checksum)));
+            /* emit */ validation_failed (_(R" (The downloaded file does not match the checksum, it will be resumed. "%1" != "%2")").printf (string.from_utf8 (this.expected_checksum), string.from_utf8 (checksum)));
             return;
         }
         /* emit */ validated (checksum_type, checksum);

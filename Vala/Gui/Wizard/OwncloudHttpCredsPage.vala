@@ -56,8 +56,8 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
         }
         this.ui.le_username.placeholder_text (theme.user_id_hint ());
 
-        title (WizardCommon.title_template ().arg (_("Connect to %1").arg (Theme.instance ().app_name_gui ())));
-        sub_title (WizardCommon.sub_title_template ().arg (_("Enter user credentials")));
+        title (WizardCommon.title_template ().printf (_("Connect to %1").printf (Theme.instance ().app_name_gui ())));
+        sub_title (WizardCommon.sub_title_template ().printf (_("Enter user credentials")));
 
         this.ui.result_layout.add_widget (this.progress_indicator);
         on_signal_stop_spinner ();

@@ -329,14 +329,14 @@ public class ProxyAuthHandler : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private string keychain_username_key () {
-        return "%1/username".arg (this.proxy);
+        return "%1/username".printf (this.proxy);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private string keychain_password_key () {
-        return "%1/password".arg (this.proxy);
+        return "%1/password".printf (this.proxy);
     }
 
 } // class ProxyAuthHandler

@@ -61,7 +61,7 @@ public class AsyncImageResponse : QQuickImageResponse {
         }
 
         if (this.image_paths.at (this.index).starts_with (":/client")) {
-            image_and_emit_finished (QIcon (this.image_paths.at (this.index)).pixmap (this.requested_image_size).to_image ());
+            image_and_emit_finished (Gtk.Icon (this.image_paths.at (this.index)).pixmap (this.requested_image_size).to_image ());
             return;
         }
 

@@ -161,13 +161,13 @@ public class Flow2Auth : GLib.Object {
             string error_from_json = json["error"].to_string ();
             if (!error_from_json.is_empty ()) {
                 error_reason = _("Error returned from the server : <em>%1</em>")
-                                  .arg (error_from_json.to_html_escaped ());
+                                  .printf (error_from_json.to_html_escaped ());
             } else if (reply.error () != Soup.Reply.NoError) {
                 error_reason = _("There was an error accessing the \"token\" endpoint : <br><em>%1</em>")
-                                  .arg (reply.error_string ().to_html_escaped ());
+                                  .printf (reply.error_string ().to_html_escaped ());
             } else if (json_parse_error.error != QJsonParseError.NoError) {
                 error_reason = _("Could not parse the JSON returned from the server : <br><em>%1</em>")
-                                  .arg (json_parse_error.error_string ());
+                                  .printf (json_parse_error.error_string ());
             } else {
                 error_reason = _("The reply from the server did not contain all expected fields");
             }
@@ -278,7 +278,7 @@ public class Flow2Auth : GLib.Object {
         req.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
 
         var request_body = new QBuffer ();
-        QUrlQuery arguments = new QUrlQuery ("token=%1".arg (this.poll_token));
+        QUrlQuery arguments = new QUrlQuery ("token=%1".printf (this.poll_token));
         request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
 
         var job = this.account.send_request ("POST", this.poll_endpoint, req, request_body);
@@ -320,13 +320,13 @@ public class Flow2Auth : GLib.Object {
             string error_from_json = json["error"].to_string ();
             if (!error_from_json.is_empty ()) {
                 error_reason = _("Error returned from the server : <em>%1</em>")
-                                  .arg (error_from_json.to_html_escaped ());
+                                  .printf (error_from_json.to_html_escaped ());
             } else if (reply.error () != Soup.Reply.NoError) {
                 error_reason = _("There was an error accessing the \"token\" endpoint : <br><em>%1</em>")
-                                  .arg (reply.error_string ().to_html_escaped ());
+                                  .printf (reply.error_string ().to_html_escaped ());
             } else if (json_parse_error.error != QJsonParseError.NoError) {
                 error_reason = _("Could not parse the JSON returned from the server : <br><em>%1</em>")
-                                  .arg (json_parse_error.error_string ());
+                                  .printf (json_parse_error.error_string ());
             } else {
                 error_reason = _("The reply from the server did not contain all expected fields");
             }

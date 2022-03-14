@@ -15,7 +15,7 @@ public class CloudProviderManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.HashMap<string, CloudProviderWrapper> map;
+    private GLib.HashTable<string, CloudProviderWrapper> map;
     private uint32 folder_index;
 
     /***********************************************************

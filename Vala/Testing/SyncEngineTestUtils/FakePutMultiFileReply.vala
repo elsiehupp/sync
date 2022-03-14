@@ -44,7 +44,7 @@ public class FakePutMultiFileReply : FakeReply {
             var one_part_header_part = one_part.left (header_end_position);
             var one_part_body = one_part.mid (header_end_position + 4, one_part.size () - header_end_position - 6);
             var one_part_header = one_part_header_part.split ("\r\n");
-            GLib.HashMap<string, string> all_headers;
+            GLib.HashTable<string, string> all_headers;
             for (var one_header : one_part_header) {
                 var header_parts = one_header.split (":");
                 all_headers[header_parts.at (0)] = header_parts.at (1);

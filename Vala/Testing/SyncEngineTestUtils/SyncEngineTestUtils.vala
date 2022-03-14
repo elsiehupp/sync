@@ -64,12 +64,12 @@ public class SyncEngineTestUtils {
 
     inline void add_files (string[] dest, FileInfo file_info) {
         if (file_info.is_directory) {
-            dest += "%1 - directory".arg (file_info.path ());
+            dest += "%1 - directory".printf (file_info.path ());
             foreach (FileInfo file_info in file_info.children) {
                 add_files (dest, file_info);
             }
         } else {
-            dest += "%1 - %2 %3-bytes".arg (file_info.path ()).arg (file_info.size).arg (file_info.content_char);
+            dest += "%1 - %2 %3-bytes".printf (file_info.path ()).printf (file_info.size).printf (file_info.content_char);
         }
     }
 
@@ -79,13 +79,13 @@ public class SyncEngineTestUtils {
             add_files (files, file_info);
         }
         files.sort ();
-        return "FileInfo with %1 files (\n\t%2\n)".arg (files.size ()).arg (files.join ("\n\t"));
+        return "FileInfo with %1 files (\n\t%2\n)".printf (files.size ()).printf (files.join ("\n\t"));
     }
 
     inline void add_files_database_data (string[] dest, FileInfo file_info) {
         // could include etag, permissions etc, but would need extra work
         if (file_info.is_directory) {
-            dest += "%1 - %2 %3 %4".arg (
+            dest += "%1 - %2 %3 %4".printf (
                 file_info.name,
                 file_info.is_directory ? "directory": "file",
                 string.number (file_info.last_modified.to_seconds_since_epoch ()),
@@ -94,7 +94,7 @@ public class SyncEngineTestUtils {
                 add_files_database_data (dest, file_info);
             }
         } else {
-            dest += "%1 - %2 %3 %4 %5".arg (
+            dest += "%1 - %2 %3 %4 %5".printf (
                 file_info.name,
                 file_info.is_directory ? "directory": "file",
                 string.number (file_info.size),
@@ -108,7 +108,7 @@ public class SyncEngineTestUtils {
         foreach (FileInfo file_info in file_info.children) {
             add_files_database_data (files, file_info);
         }
-        return QTest.to_string ("FileInfo with %1 files (%2)".arg (files.size ()).arg (files.join (", ")));
+        return QTest.to_string ("FileInfo with %1 files (%2)".printf (files.size ()).printf (files.join (", ")));
     }
 
 } // class SyncEngineTestUtils

@@ -123,7 +123,7 @@ public class CloudProviderWrapper : GLib.Object {
         this.folder = folder;
         GMenuModel model;
         GActionGroup action_group;
-        string account_name = string ("Folder/%1").arg (folder_identifier);
+        string account_name = string ("Folder/%1").printf (folder_identifier);
 
         this.cloud_provider = CLOUD_PROVIDERS_PROVIDER_EXPORTER (cloudprovider);
         this.cloud_provider_account = cloud_providers_account_exporter_new (this.cloud_provider, account_name.to_utf8 ().data ());
@@ -245,7 +245,7 @@ public class CloudProviderWrapper : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void update_status_text (string status_text) {
-        string status = string ("%1 - %2").arg (this.folder.account_state ().state_string (this.folder.account_state ().state ()), status_text);
+        string status = string ("%1 - %2").printf (this.folder.account_state ().state_string (this.folder.account_state ().state ()), status_text);
         cloud_providers_account_exporter_status_details (this.cloud_provider_account, status.to_utf8 ().data ());
     }
 
@@ -295,7 +295,7 @@ public class CloudProviderWrapper : GLib.Object {
         if (!progress.last_completed_item.is_empty () && should_show_in_recents_menu (progress.last_completed_item)) {
             string kind_str = Progress.as_result_string (progress.last_completed_item);
             string time_str = QTime.current_time ().to_string ("hh:mm");
-            string action_text = _("%1 (%2, %3)").arg (progress.last_completed_item.file, kind_str, time_str);
+            string action_text = _("%1 (%2, %3)").printf (progress.last_completed_item.file, kind_str, time_str);
             if (f) {
                 string full_path = f.path () + '/' + progress.last_completed_item.file;
                 if (GLib.File (full_path).exists ()) {
@@ -312,28 +312,28 @@ public class CloudProviderWrapper : GLib.Object {
         // Build status details text
         string message;
         if (!progress.current_discovered_remote_folder.is_empty ()) {
-            message =  _("Checking for changes in \"%1\"").arg (progress.current_discovered_remote_folder);
+            message =  _("Checking for changes in \"%1\"").printf (progress.current_discovered_remote_folder);
         } else if (progress.total_size () == 0) {
             int64 current_file = progress.current_file ();
             int64 total_file_count = q_max (progress.total_files (), current_file);
             if (progress.trust_eta ()) {
                 message = _("Syncing %1 of %2  (%3 left)")
-                        .arg (current_file)
-                        .arg (total_file_count)
-                        .arg (Utility.duration_to_descriptive_string2 (progress.total_progress ().estimated_eta));
+                        .printf (current_file)
+                        .printf (total_file_count)
+                        .printf (Utility.duration_to_descriptive_string2 (progress.total_progress ().estimated_eta));
             } else {
                 message = _("Syncing %1 of %2")
-                        .arg (current_file)
-                        .arg (total_file_count);
+                        .printf (current_file)
+                        .printf (total_file_count);
             }
         } else {
             string total_size_str = Utility.octets_to_string (progress.total_size ());
             if (progress.trust_eta ()) {
                 message = _("Syncing %1 (%2 left)")
-                        .arg (total_size_str, Utility.duration_to_descriptive_string2 (progress.total_progress ().estimated_eta));
+                        .printf (total_size_str, Utility.duration_to_descriptive_string2 (progress.total_progress ().estimated_eta));
             } else {
                 message = _("Syncing %1")
-                        .arg (total_size_str);
+                        .printf (total_size_str);
             }
         }
         update_status_text (message);

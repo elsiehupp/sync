@@ -64,7 +64,7 @@ public class FakePropfindReply : FakeReply {
             var string_date = QLocale.c ().to_string (gmt_date, "ddd, dd MMM yyyy HH:mm:ss 'GMT'");
             xml.write_text_element (dav_uri, "getlastmodified", string_date);
             xml.write_text_element (dav_uri, "getcontentlength", file_info.size.to_string ());
-            xml.write_text_element (dav_uri, "getetag", "\"%1\"".arg (file_info.etag));
+            xml.write_text_element (dav_uri, "getetag", "\"%1\"".printf (file_info.etag));
             xml.write_text_element (oc_uri, "permissions", !file_info.permissions.is_null () ? string (file_info.permissions.to_string ()) : file_info.is_shared ? "SRDNVCKW": "RDNVCKW");
             xml.write_text_element (oc_uri, "identifier", file_info.file_identifier);
             xml.write_text_element (oc_uri, "checksums", file_info.checksums);

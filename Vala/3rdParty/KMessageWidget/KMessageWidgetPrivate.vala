@@ -13,28 +13,27 @@ Copyright (c) 2014 Dominik Haumann <dhaumann@kde.org>
 //  #include <QEvent>
 //  #include <QGridLayout>
 //  #include <QHBoxLayout>
-//  #include <QLabel>
+//  #include <Gtk.Label>
 //  #include <QPainter>
 //  #include <QShowEvent>
 //  #include <QTimeLine>
 //  #include <QToolButton>
 //  #include <QStyle>
 
-//---------------------------------------------------------------------
-// KMessageWidgetPrivate
-//---------------------------------------------------------------------
+/***********************************************************
+KMessageWidgetPrivate
+***********************************************************/
 public class KMessageWidgetPrivate {
-    public void on_init (KMessageWidget *);
 
     /***********************************************************
     ***********************************************************/
     public KMessageWidget q;
-    public QFrame content = null;
-    public QLabel icon_label = null;
-    public QLabel text_label = null;
+    public Gdk.Frame content = null;
+    public Gtk.Label icon_label = null;
+    public Gtk.Label text_label = null;
     public QToolButton close_button = null;
     public QTimeLine time_line = null;
-    public QIcon icon;
+    public Gtk.Icon icon;
     public bool ignore_show_event_doing_animated_show = false;
 
     /***********************************************************
@@ -42,83 +41,54 @@ public class KMessageWidgetPrivate {
     public KMessageWidget.MessageType message_type;
     public bool word_wrap;
     public GLib.List<QToolButton> buttons;
-    public QPixmap content_snap_shot;
+    public Gdk.Pixbuf content_snap_shot;
 
     /***********************************************************
     ***********************************************************/
-    public void create_layout ();
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public void update_snap_shot (
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public void on_time_line_changed (qreal);
-
-
-    public void on_time_line_finished ();
-
-    public int best_content_height ();
-}
-
-    void KMessageWidgetPrivate.on_init (KMessageWidget q_ptr) {
-        q = q_ptr;
+    public void on_init (KMessageWidget widget) {
+        q = widget;
 
         q.set_size_policy (QSizePolicy.Minimum, QSizePolicy.Fixed);
 
         // Note: when changing the value 500, also update KMessageWidgetTest
         time_line = new QTimeLine (500, q);
-        GLib.Object.connect (time_line, SIGNAL (value_changed (qreal)), q, SLOT (on_time_line_changed (qreal)));
+        GLib.Object.connect (time_line, SIGNAL (value_changed (double)), q, SLOT (on_time_line_changed (double)));
         GLib.Object.connect (time_line, SIGNAL (on_finished ()), q, SLOT (on_time_line_finished ()));
 
-        content = new QFrame (q);
+        content = new Gdk.Frame (q);
         content.set_object_name ("content_widget");
         content.set_size_policy (QSizePolicy.Expanding, QSizePolicy.Fixed);
 
         word_wrap = false;
 
-        icon_label = new QLabel (content);
+        icon_label = new Gtk.Label (content);
         icon_label.set_size_policy (QSizePolicy.Fixed, QSizePolicy.Fixed);
         icon_label.hide ();
 
-        text_label = new QLabel (content);
+        text_label = new Gtk.Label (content);
         text_label.set_size_policy (QSizePolicy.Expanding, QSizePolicy.Fixed);
         text_label.set_text_interaction_flags (Qt.TextBrowserInteraction);
-        GLib.Object.connect (text_label, &QLabel.link_activated, q, &KMessageWidget.link_activated);
-        GLib.Object.connect (text_label, &QLabel.link_hovered, q, &KMessageWidget.link_hovered);
+        GLib.Object.connect (text_label, &Gtk.Label.link_activated, q, &KMessageWidget.link_activated);
+        GLib.Object.connect (text_label, &Gtk.Label.link_hovered, q, &KMessageWidget.link_hovered);
 
         var close_action = new QAction (q);
         close_action.on_set_text (KMessageWidget._("&Close"));
         close_action.set_tool_tip (KMessageWidget._("Close message"));
-        close_action.set_icon (QIcon (":/client/theme/close.svg")); // ivan : NC customization
+        close_action.on_signal_set_icon (Gtk.Icon (":/client/theme/close.svg")); // ivan : NC customization
 
-        GLib.Object.connect (close_action, &QAction.triggered, q, &KMessageWidget.animated_hide);
+        GLib.Object.connect (close_action, &QAction.triggered, q, &KMessageWidget.on_signal_animated_hide);
 
         close_button = new QToolButton (content);
         close_button.set_auto_raise (true);
         close_button.set_default_action (close_action);
 
-        q.set_message_type (KMessageWidget.Information);
+        q.on_signal_set_message_type (KMessageWidget.Information);
     }
 
-    void KMessageWidgetPrivate.create_layout () {
+
+    /***********************************************************
+    ***********************************************************/
+    public void create_layout () {
         delete content.layout ();
 
         content.resize (q.size ());
@@ -126,7 +96,7 @@ public class KMessageWidgetPrivate {
         q_delete_all (buttons);
         buttons.clear ();
 
-        Q_FOREACH (QAction action, q.actions ()) {
+        foreach (var QAction action in q.actions ()) {
             var button = new QToolButton (content);
             button.set_default_action (action);
             button.set_tool_button_style (Qt.ToolButtonTextBesideIcon);
@@ -149,9 +119,9 @@ public class KMessageWidgetPrivate {
                 layout.add_widget (close_button, 0, 2, 1, 1, Qt.AlignHCenter | Qt.AlignTop);
             } else {
                 // Use an additional layout in row 1 for the buttons.
-                var button_layout = new QHBoxLayout;
+                var button_layout = new QHBoxLayout ();
                 button_layout.add_stretch ();
-                Q_FOREACH (QToolButton button, buttons) {
+                foreach (var QToolButton button, buttons) {
                     // For some reason, calling show () is necessary if wordwrap is true,
                     // otherwise the buttons do not show up. It is not needed if
                     // wordwrap is false.
@@ -179,7 +149,10 @@ public class KMessageWidgetPrivate {
         q.update_geometry ();
     }
 
-    void KMessageWidgetPrivate.apply_style_sheet () {
+
+    /***********************************************************
+    ***********************************************************/
+    public void apply_style_sheet () {
         Gtk.Color bg_base_color;
 
         // We have to hardcode colors here because KWidgetsAddons is a tier 1 framework
@@ -199,7 +172,7 @@ public class KMessageWidgetPrivate {
             bg_base_color.set_rgb (218, 68, 83); // Window : ForegroundNegative
             break;
         }
-        const qreal bg_base_color_alpha = 0.2;
+        const double bg_base_color_alpha = 0.2;
         bg_base_color.set_alpha_f (bg_base_color_alpha);
 
         const QPalette palette = QGuiApplication.palette ();
@@ -215,45 +188,52 @@ public class KMessageWidgetPrivate {
         const Gtk.Color bg_final_color = Gtk.Color (new_red, new_green, new_blue);
 
         content.set_style_sheet (
-            string.from_latin1 (".QFrame {"
-                                  "background-color : %1;"
-                                  "border-radius : 4px;"
-                                  "border : 2px solid %2;"
-                                  "margin : %3px;"
-                                  "}"
-                                  ".QLabel { color : %4; }"
-                                 )
-            .arg (bg_final_color.name ())
-            .arg (border.name ())
+            ".Gdk.Frame {"
+            + "background-color : %1;".printf (bg_final_color.name ())
+            + "border-radius : 4px;"
+            + "border: 2px solid %2;".printf (border.name ())
             // DefaultFrameWidth returns the size of the external margin + border width. We know our border is 1px, so we subtract this from the frame normal QStyle FrameWidth to get our margin
-            .arg (q.style ().pixel_metric (QStyle.PM_DefaultFrameWidth, null, q) - 1)
-            .arg (text_color.name ())
+            + "margin: %3px;".printf (q.style ().pixel_metric (QStyle.PM_DefaultFrameWidth, null, q) - 1)
+            + "}"
+            + ".Gtk.Label { color : %4; }".printf (text_color.name ())
         );
     }
 
-    void KMessageWidgetPrivate.update_layout () {
+
+    /***********************************************************
+    ***********************************************************/
+    public void update_layout () {
         if (content.layout ()) {
             create_layout ();
         }
     }
 
-    void KMessageWidgetPrivate.update_snap_shot () {
+
+    /***********************************************************
+    ***********************************************************/
+    public void update_snap_shot () {
         // Attention : update_snap_shot calls Gtk.Widget.render (), which causes the whole
         // window layouts to be activated. Calling this method from resize_event ()
         // can lead to infinite recursion, see:
         // https://bugs.kde.org/show_bug.cgi?id=311336
-        content_snap_shot = QPixmap (content.size () * q.device_pixel_ratio ());
+        content_snap_shot = Gdk.Pixbuf (content.size () * q.device_pixel_ratio ());
         content_snap_shot.set_device_pixel_ratio (q.device_pixel_ratio ());
         content_snap_shot.fill (Qt.transparent);
         content.render (&content_snap_shot, QPoint (), QRegion (), Gtk.Widget.DrawChildren);
     }
 
-    void KMessageWidgetPrivate.on_time_line_changed (qreal value) {
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_time_line_changed (double value) {
         q.set_fixed_height (q_min (q_round (value * 2.0), 1) * content.height ());
         q.update ();
     }
 
-    void KMessageWidgetPrivate.on_time_line_finished () {
+
+    /***********************************************************
+    ***********************************************************/
+    public void on_time_line_finished () {
         if (time_line.direction () == QTimeLine.Forward) {
             // Show
             // We set the whole geometry here, because it may be wrong if a
@@ -269,10 +249,15 @@ public class KMessageWidgetPrivate {
         }
     }
 
-    int KMessageWidgetPrivate.best_content_height () {
+
+    /***********************************************************
+    ***********************************************************/
+    public int best_content_height () {
         int height = content.height_for_width (q.width ());
         if (height == -1) {
             height = content.size_hint ().height ();
         }
         return height;
     }
+
+}

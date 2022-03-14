@@ -88,7 +88,7 @@ public class TestSyncConflict : GLib.Object {
         fake_folder.sync_engine ().account ().set_capabilities ({ { "upload_conflict_files", true } });
         GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
-        GLib.HashMap<GLib.ByteArray, string> conflict_map;
+        GLib.HashTable<GLib.ByteArray, string> conflict_map;
         fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice *) . Soup.Reply * {
             if (operation == Soup.PutOperation) {
                 if (request.raw_header ("OC-Conflict") == "1") {
@@ -123,7 +123,7 @@ public class TestSyncConflict : GLib.Object {
         GLib.assert_cmp (Utility.conflict_file_base_name_from_pattern (conflict_map[a1FileId]), GLib.ByteArray ("A/a1"));
 
         // Check that the conflict file contains the username
-        GLib.assert_true (conflict_map[a1FileId].contains (string (" (conflicted copy %1 ").arg (fake_folder.sync_engine ().account ().dav_display_name ())));
+        GLib.assert_true (conflict_map[a1FileId].contains (string (" (conflicted copy %1 ").printf (fake_folder.sync_engine ().account ().dav_display_name ())));
 
         GLib.assert_cmp (remote.find (conflict_map[a1FileId]).content_char, 'L');
         GLib.assert_cmp (remote.find ("A/a1").content_char, 'R');
@@ -140,7 +140,7 @@ public class TestSyncConflict : GLib.Object {
         fake_folder.sync_engine ().account ().set_capabilities ({ { "upload_conflict_files", true } });
         GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
-        GLib.HashMap<GLib.ByteArray, string> conflict_map;
+        GLib.HashTable<GLib.ByteArray, string> conflict_map;
         fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice *) . Soup.Reply * {
             if (operation == Soup.PutOperation) {
                 if (request.raw_header ("OC-Conflict") == "1") {

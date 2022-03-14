@@ -51,7 +51,7 @@ public class FolderStatusDelegate : QStyledItemDelegate {
 
     /***********************************************************
     ***********************************************************/
-    private QIcon icon_more;
+    private Gtk.Icon icon_more;
 
 
     /***********************************************************
@@ -108,7 +108,7 @@ public class FolderStatusDelegate : QStyledItemDelegate {
         }
         painter.save ();
 
-        var status_icon = qvariant_cast<QIcon> (index.data (Folder_status_icon_role));
+        var status_icon = qvariant_cast<Gtk.Icon> (index.data (Folder_status_icon_role));
         var alias_text = qvariant_cast<string> (index.data (Header_role));
         var path_text = qvariant_cast<string> (index.data (FolderPathRole));
         var remote_path = qvariant_cast<string> (index.data (Folder_second_path_role));
@@ -157,7 +157,7 @@ public class FolderStatusDelegate : QStyledItemDelegate {
 
         var options_button_visual_rect = options_button_rect (option.rect, option.direction);
 
-        QPixmap pm = status_icon.pixmap (icon_size, icon_size, sync_enabled ? QIcon.Normal : QIcon.Disabled);
+        Gdk.Pixbuf pm = status_icon.pixmap (icon_size, icon_size, sync_enabled ? Gtk.Icon.Normal : Gtk.Icon.Disabled);
         painter.draw_pixmap (QStyle.visual_rect (option.direction, option.rect, icon_rect).left (),
             icon_rect.top (), pm);
 
@@ -170,8 +170,8 @@ public class FolderStatusDelegate : QStyledItemDelegate {
             warn_rect.width (16);
             warn_rect.height (16);
 
-            QIcon warn_icon = new QIcon (":/client/theme/warning");
-            QPixmap pm = warn_icon.pixmap (16, 16, sync_enabled ? QIcon.Normal : QIcon.Disabled);
+            Gtk.Icon warn_icon = new Gtk.Icon (":/client/theme/warning");
+            Gdk.Pixbuf pm = warn_icon.pixmap (16, 16, sync_enabled ? Gtk.Icon.Normal : Gtk.Icon.Disabled);
             warn_rect = QStyle.visual_rect (option.direction, option.rect, warn_rect);
             painter.draw_pixmap (QPoint (warn_rect.left (), warn_rect.top ()), pm);
         }

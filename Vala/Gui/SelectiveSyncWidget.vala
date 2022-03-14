@@ -371,7 +371,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_gather_encrypted_paths (string path, GLib.HashMap<string, string> properties) {
+    private void on_signal_gather_encrypted_paths (string path, GLib.HashTable<string, string> properties) {
         const var it = properties.find ("is-encrypted");
         if (it == properties.cend () || *it != "1") {
             return;
@@ -426,7 +426,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
     ***********************************************************/
     private static void SelectiveSyncWidget.recursive_insert (QTreeWidgetItem parent, string[] path_trail, string path, int64 size) {
         QFileIconProvider prov;
-        QIcon folder_icon = prov.icon (QFileIconProvider.Folder);
+        Gtk.Icon folder_icon = prov.icon (QFileIconProvider.Folder);
         if (path_trail.size () == 0) {
             if (path.ends_with ('/')) {
                 path.chop (1);

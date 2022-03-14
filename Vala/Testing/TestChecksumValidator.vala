@@ -224,7 +224,7 @@ public class TestChecksumValidator : GLib.Object {
 
         QTRY_VERIFY (this.success_down);
 
-        this.expected_error = "The downloaded file does not match the checksum, it will be resumed. \"543345\" != \"%1\"".arg (this.expected);
+        this.expected_error = "The downloaded file does not match the checksum, it will be resumed. \"543345\" != \"%1\"".printf (this.expected);
         this.error_seen = false;
         file.seek (0);
         vali.on_signal_start (this.testfile, "Adler32:543345");

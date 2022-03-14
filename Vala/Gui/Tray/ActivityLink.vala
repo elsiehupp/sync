@@ -6,7 +6,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 //  #include <QtCore>
 //  #include <QtCore>
-//  #include <QIcon>
+//  #include <Gtk.Icon>
 
 namespace Occ {
 namespace Ui {

@@ -136,7 +136,7 @@ public class GetOrCreatePublicLinkShare : GLib.Object {
         QMessageBox.warning (
             null,
             _("Sharing error"),
-            _("Could not retrieve or create the public link share. Error:\n\n%1").arg (message),
+            _("Could not retrieve or create the public link share. Error:\n\n%1").printf (message),
             QMessageBox.Ok,
             QMessageBox.NoButton);
         /* emit */ error (message);

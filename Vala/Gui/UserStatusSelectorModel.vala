@@ -519,21 +519,21 @@ public class UserStatusSelectorModel : GLib.Object {
             if (minutes_left == 1) {
                 return _("1 minute");
             } else {
-                return _("%1 minutes").arg (minutes_left);
+                return _("%1 minutes").printf (minutes_left);
             }
         } else if (difference_secs < 60 * 60 * 24) {
             const var hours_left = std.ceil (difference_secs / 60.0 / 60.0);
             if (hours_left == 1) {
                 return _("1 hour");
             } else {
-                return _("%1 hours").arg (hours_left);
+                return _("%1 hours").printf (hours_left);
             }
         } else {
             const var days_left = std.ceil (difference_secs / 60.0 / 60.0 / 24.0);
             if (days_left == 1) {
                 return _("1 day");
             } else {
-                return _("%1 days").arg (days_left);
+                return _("%1 days").printf (days_left);
             }
         }
     }

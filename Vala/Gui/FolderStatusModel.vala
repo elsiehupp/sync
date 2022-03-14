@@ -269,7 +269,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
     See on_signal_show_pending_fetch_progress ()
     ***********************************************************/
-    private GLib.HashMap<QPersistentModelIndex, QElapsedTimer> fetching_items;
+    private GLib.HashTable<QPersistentModelIndex, QElapsedTimer> fetching_items;
 
 
     signal void dirty_changed ();
@@ -357,9 +357,9 @@ public class FolderStatusModel : QAbstractItemModel {
             switch (role) {
             case Qt.Display_role:
                 // : Example text: "File.txt (23KB)"
-                return x.size < 0 ? x.name : _("%1 (%2)").arg (x.name, Utility.octets_to_string (x.size));
+                return x.size < 0 ? x.name : _("%1 (%2)").printf (x.name, Utility.octets_to_string (x.size));
             case Qt.ToolTipRole:
-                return string ("<qt>" + Utility.escape (x.size < 0 ? x.name : _("%1 (%2)").arg (x.name, Utility.octets_to_string (x.size))) + "</qt>");
+                return string ("<qt>" + Utility.escape (x.size < 0 ? x.name : _("%1 (%2)").printf (x.name, Utility.octets_to_string (x.size))) + "</qt>");
             case Qt.CheckStateRole:
                 if (supports_selective_sync) {
                     return x.checked;
@@ -1093,11 +1093,11 @@ public class FolderStatusModel : QAbstractItemModel {
 
         if (progress.status () == ProgressInfo.Status.DISCOVERY) {
             if (!progress.current_discovered_remote_folder.is_empty ()) {
-                pi.overall_sync_string = _("Checking for changes in remote \"%1\"").arg (progress.current_discovered_remote_folder);
+                pi.overall_sync_string = _("Checking for changes in remote \"%1\"").printf (progress.current_discovered_remote_folder);
                 /* emit */ data_changed (index (folder_index), index (folder_index), roles);
                 return;
             } else if (!progress.current_discovered_local_folder.is_empty ()) {
-                pi.overall_sync_string = _("Checking for changes in local \"%1\"").arg (progress.current_discovered_local_folder);
+                pi.overall_sync_string = _("Checking for changes in local \"%1\"").printf (progress.current_discovered_local_folder);
                 /* emit */ data_changed (index (folder_index), index (folder_index), roles);
                 return;
             }
@@ -1139,10 +1139,10 @@ public class FolderStatusModel : QAbstractItemModel {
             var filename = GLib.FileInfo (current_item.item.file).filename ();
             if (all_filenames.length () > 0) {
                 // : Build a list of file names
-                all_filenames.append (", \"%1\"".arg (filename));
+                all_filenames.append (", \"%1\"".printf (filename));
             } else {
                 // : Argument is a file name
-                all_filenames.append ("\"%1\"".arg (filename));
+                all_filenames.append ("\"%1\"".printf (filename));
             }
         }
         if (cur_item_progress == -1) {
@@ -1161,30 +1161,30 @@ public class FolderStatusModel : QAbstractItemModel {
                 /***********************************************************
                 // : Example text: "uploading foobar.png (1MB of 2MB) time left 2 minutes at a rate of 24Kb/s"
                 file_progress_string = _("%1 %2 (%3 of %4) %5 left at a rate of %6/s")
-                    .arg (kind_string, item_filename, s1, s2,
+                    .printf (kind_string, item_filename, s1, s2,
                         Utility.duration_to_descriptive_string (progress.file_progress (cur_item).estimated_eta),
                         Utility.octets_to_string (estimated_bw) );
                 */
                 // : Example text: "Syncing 'foo.txt', 'bar.txt'"
-                file_progress_string = _("Syncing %1").arg (all_filenames);
+                file_progress_string = _("Syncing %1").printf (all_filenames);
                 if (estimated_down_bandwidth > 0) {
                     file_progress_string.append (_(", "));
                     // ifdefs : https://github.com/owncloud/client/issues/3095#issuecomment-128409294
                     file_progress_string.append (_("\u2193 %1/s")
-                                                .arg (Utility.octets_to_string (estimated_down_bandwidth)));
+                                                .printf (Utility.octets_to_string (estimated_down_bandwidth)));
                 }
                 if (estimated_up_bandwidth > 0) {
                     file_progress_string.append (_(", "));
                     file_progress_string.append (_("\u2191 %1/s")
-                                                .arg (Utility.octets_to_string (estimated_up_bandwidth)));
+                                                .printf (Utility.octets_to_string (estimated_up_bandwidth)));
                 }
             } else {
                 // : Example text: "uploading foobar.png (2MB of 2MB)"
-                file_progress_string = _("%1 %2 (%3 of %4)").arg (kind_string, item_filename, s1, s2);
+                file_progress_string = _("%1 %2 (%3 of %4)").printf (kind_string, item_filename, s1, s2);
             }
         } else if (!kind_string.is_empty ()) {
             // : Example text: "uploading foobar.png"
-            file_progress_string = _("%1 %2").arg (kind_string, item_filename);
+            file_progress_string = _("%1 %2").printf (kind_string, item_filename);
         }
         pi.progress_string = file_progress_string;
 
@@ -1202,21 +1202,21 @@ public class FolderStatusModel : QAbstractItemModel {
             if (progress.trust_eta ()) {
                 // : Example text: "5 minutes left, 12 MB of 345 MB, file 6 of 7"
                 overall_sync_string = _("%5 left, %1 of %2, file %3 of %4")
-                                        .arg (s1, s2)
-                                        .arg (current_file)
-                                        .arg (total_file_count)
-                                        .arg (Utility.duration_to_descriptive_string1 (progress.total_progress ().estimated_eta));
+                                        .printf (s1, s2)
+                                        .printf (current_file)
+                                        .printf (total_file_count)
+                                        .printf (Utility.duration_to_descriptive_string1 (progress.total_progress ().estimated_eta));
 
             } else {
                 // : Example text: "12 MB of 345 MB, file 6 of 7"
                 overall_sync_string = _("%1 of %2, file %3 of %4")
-                                        .arg (s1, s2)
-                                        .arg (current_file)
-                                        .arg (total_file_count);
+                                        .printf (s1, s2)
+                                        .printf (current_file)
+                                        .printf (total_file_count);
             }
         } else if (total_file_count > 0) {
             // Don't attempt to estimate the time left if there is no kb to transfer.
-            overall_sync_string = _("file %1 of %2").arg (current_file).arg (total_file_count);
+            overall_sync_string = _("file %1 of %2").printf (current_file).printf (total_file_count);
         }
 
         pi.overall_sync_string = overall_sync_string;
@@ -1391,7 +1391,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_gather_permissions (string href, GLib.HashMap<string, string> map) {
+    private void on_signal_gather_permissions (string href, GLib.HashTable<string, string> map) {
         var it = map.find ("permissions");
         if (it == map.end ())
             return;
@@ -1407,7 +1407,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_gather_encryption_status (string href, GLib.HashMap<string, string> properties) {
+    private void on_signal_gather_encryption_status (string href, GLib.HashTable<string, string> properties) {
         var it = properties.find ("is-encrypted");
         if (it == properties.end ())
             return;

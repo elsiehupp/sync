@@ -5,7 +5,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 //  #ifndef TOKEN_AUTH_ONLY
-//  #include <QIcon>
+//  #include <Gtk.Icon>
 //  #include <QCoreApplication>
 
 namespace Occ {

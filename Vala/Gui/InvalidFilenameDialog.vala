@@ -60,7 +60,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
         this.ui.button_box.button (QDialogButtonBox.Ok).enabled (false);
         this.ui.button_box.button (QDialogButtonBox.Ok).on_signal_text (_("Rename file"));
 
-        this.ui.description_label.on_signal_text (_("The file %1 could not be synced because the name contains characters which are not allowed on this system.").arg (this.original_filename));
+        this.ui.description_label.on_signal_text (_("The file %1 could not be synced because the name contains characters which are not allowed on this system.").printf (this.original_filename));
         this.ui.explanation_label.on_signal_text (_("The following characters are not allowed on the system : * \" | & ? , ; : \\ / ~ < >"));
         this.ui.filename_line_edit.on_signal_text (file_path_file_info.filename ());
 
@@ -120,7 +120,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
             this.ui.error_label.on_signal_text ("");
         } else {
             this.ui.error_label.on_signal_text (_("Filename contains illegal characters : %1")
-                                         .arg (illegal_character_list_to_string (illegal_contained_characters)));
+                                         .printf (illegal_character_list_to_string (illegal_contained_characters)));
         }
 
         this.ui.button_box.button (QDialogButtonBox.Ok)

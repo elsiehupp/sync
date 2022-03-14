@@ -904,7 +904,7 @@ public class TestSyncEngine : GLib.Object {
             if (operation == Soup.PostOperation) {
                 ++number_of_post;
                 if (content_type.starts_with ("multipart/related; boundary=")) {
-                    var json_reply_object = fake_folder.for_each_reply_part (outgoing_data, content_type, [] (GLib.HashMap<string, GLib.ByteArray> all_headers) . QJsonObject {
+                    var json_reply_object = fake_folder.for_each_reply_part (outgoing_data, content_type, [] (GLib.HashTable<string, GLib.ByteArray> all_headers) . QJsonObject {
                         var reply = QJsonObject{};
                         var filename = all_headers["X-File-Path"];
                         if (filename.ends_with ("A/big2") ||

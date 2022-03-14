@@ -74,9 +74,9 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
             if (QDir.clean_path (directory) == QDir.clean_path (cur_dir)) {
                 warn_strings.append (_("This folder is already being synced."));
             } else if (directory.starts_with (cur_dir)) {
-                warn_strings.append (_("You are already syncing <i>%1</i>, which is a parent folder of <i>%2</i>.").arg (Utility.escape (cur_dir), Utility.escape (directory)));
+                warn_strings.append (_("You are already syncing <i>%1</i>, which is a parent folder of <i>%2</i>.").printf (Utility.escape (cur_dir), Utility.escape (directory)));
             } else if (cur_dir.starts_with (directory)) {
-                warn_strings.append (_("You are already syncing <i>%1</i>, which is a subfolder of <i>%2</i>.").arg (Utility.escape (cur_dir), Utility.escape (directory)));
+                warn_strings.append (_("You are already syncing <i>%1</i>, which is a subfolder of <i>%2</i>.").printf (Utility.escape (cur_dir), Utility.escape (directory)));
             }
         }
 
@@ -126,7 +126,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
 
         dialog.window_title (_("Create Remote Folder"));
         dialog.label_text (_("Enter the name of the new folder to be created below \"%1\":")
-                              .arg (parent));
+                              .printf (parent));
         dialog.open (this, SLOT (on_signal_create_remote_folder (string)));
         dialog.attribute (Qt.WA_DeleteOnClose);
     }
@@ -158,7 +158,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     ***********************************************************/
     protected void on_signal_create_remote_folder_finished () {
         GLib.debug ("webdav mkdir request on_signal_finished");
-        on_signal_show_warning (_("Folder was successfully created on %1.").arg (Theme.instance ().app_name_gui ()));
+        on_signal_show_warning (_("Folder was successfully created on %1.").printf (Theme.instance ().app_name_gui ()));
         on_signal_refresh_folders ();
         this.ui.folder_entry.on_signal_text (static_cast<MkColJob> (sender ()).path ());
         on_signal_ls_col_folder_entry ();
@@ -170,10 +170,10 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     protected void on_signal_handle_mkdir_network_error (Soup.Reply reply) {
         GLib.warning ("webdav mkdir request failed: " + reply.error ());
         if (!this.account.credentials ().still_valid (reply)) {
-            on_signal_show_warning (_("Authentication failed accessing %1").arg (Theme.instance ().app_name_gui ()));
+            on_signal_show_warning (_("Authentication failed accessing %1").printf (Theme.instance ().app_name_gui ()));
         } else {
             on_signal_show_warning (_("Failed to create the folder on %1. Please check manually.")
-                         .arg (Theme.instance ().app_name_gui ()));
+                         .printf (Theme.instance ().app_name_gui ()));
         }
     }
 
@@ -193,7 +193,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
         var job = qobject_cast<LsColJob> (sender ());
         //  ASSERT (job);
         on_signal_show_warning (_("Failed to list a folder. Error : %1")
-                     .arg (job.error_string_parsing_body ()));
+                     .printf (job.error_string_parsing_body ()));
     }
 
 
@@ -236,7 +236,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_gather_encrypted_paths (string path, GLib.HashMap<string, string> properties) {
+    protected void on_signal_gather_encrypted_paths (string path, GLib.HashTable<string, string> properties) {
         const var it = properties.find ("is-encrypted");
         if (it == properties.cend () || *it != "1") {
             return;
@@ -364,7 +364,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
         if (!item) {
             item = new QTreeWidgetItem (parent);
             QFileIconProvider prov;
-            QIcon folder_icon = prov.icon (QFileIconProvider.Folder);
+            Gtk.Icon folder_icon = prov.icon (QFileIconProvider.Folder);
             item.icon (0, folder_icon);
             item.on_signal_text (0, folder_name);
             item.data (0, Qt.USER_ROLE, folder_path);

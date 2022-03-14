@@ -12,7 +12,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QToolButton>
 //  #include <QLayout>
 //  #include <QVBoxLayout>
-//  #include <QPixmap>
+//  #include <Gdk.Pixbuf>
 //  #include <Gtk.Image>
 //  #include <QWidgetAction>
 //  #include <QPainter>
@@ -33,7 +33,7 @@ public class SettingsDialog : Gtk.Dialog {
 
         /***********************************************************
         ***********************************************************/
-        public ToolButtonAction (QIcon icon, string text, GLib.Object parent) {
+        public ToolButtonAction (Gtk.Icon icon, string text, GLib.Object parent) {
             base (parent);
             on_signal_text (text);
             icon (icon);
@@ -82,13 +82,13 @@ public class SettingsDialog : Gtk.Dialog {
     Maps the actions from the action group to the corresponding
     widgets
     ***********************************************************/
-    private GLib.HashMap<QAction *, Gtk.Widget> action_group_widgets;
+    private GLib.HashTable<QAction *, Gtk.Widget> action_group_widgets;
 
     /***********************************************************
     Maps the action in the dialog to their according account.
     Needed in case the account avatar changes.
     ***********************************************************/
-    private GLib.HashMap<Account *, QAction> action_for_account;
+    private GLib.HashTable<Account *, QAction> action_for_account;
 
     /***********************************************************
     ***********************************************************/
@@ -124,7 +124,7 @@ public class SettingsDialog : Gtk.Dialog {
         object_name ("Settings"); // required as group for save_geometry call
 
         // : This name refers to the application name e.g Nextcloud
-        window_title (_("%1 Settings").arg (Theme.instance ().app_name_gui ()));
+        window_title (_("%1 Settings").printf (Theme.instance ().app_name_gui ()));
 
         connect (AccountManager.instance (), AccountManager.on_signal_account_added,
             this, SettingsDialog.on_signal_account_added);
@@ -232,7 +232,7 @@ public class SettingsDialog : Gtk.Dialog {
             if (action) {
                 Gtk.Image pix = account.avatar ();
                 if (!pix.is_null ()) {
-                    action.icon (QPixmap.from_image (AvatarJob.make_circular_avatar (pix)));
+                    action.icon (Gdk.Pixbuf.from_image (AvatarJob.make_circular_avatar (pix)));
                 }
             }
         }
@@ -311,7 +311,7 @@ public class SettingsDialog : Gtk.Dialog {
             account_action = create_color_aware_action (":/client/theme/account.svg",
                 action_text);
         } else {
-            QIcon icon = new QIcon (QPixmap.from_image (AvatarJob.make_circular_avatar (avatar)));
+            Gtk.Icon icon = new Gtk.Icon (Gdk.Pixbuf.from_image (AvatarJob.make_circular_avatar (avatar)));
             account_action = create_action_with_icon (icon, action_text);
         }
 
@@ -386,10 +386,10 @@ public class SettingsDialog : Gtk.Dialog {
         string highlight_text_color = palette ().highlighted_text ().color ().name ();
         string dark = palette ().dark ().color ().name ();
         string background = palette ().base ().color ().name ();
-        this.tool_bar.style_sheet (TOOLBAR_CSS ().arg (background, dark, highlight_color, highlight_text_color));
+        this.tool_bar.style_sheet (TOOLBAR_CSS ().printf (background, dark, highlight_color, highlight_text_color));
 
         foreach (QAction a in this.action_group.actions ()) {
-            QIcon icon = Theme.create_color_aware_icon (a.property ("icon_path").to_string (), palette ());
+            Gtk.Icon icon = Theme.create_color_aware_icon (a.property ("icon_path").to_string (), palette ());
             a.icon (icon);
             var btn = qobject_cast<QToolButton> (this.tool_bar.widget_for_action (a));
             if (btn) {
@@ -403,14 +403,14 @@ public class SettingsDialog : Gtk.Dialog {
     ***********************************************************/
     private QAction create_color_aware_action (string icon_name, string filename) {
         // all buttons must have the same size in order to keep a good layout
-        QIcon colored_icon = Theme.create_color_aware_icon (icon_path, palette ());
+        Gtk.Icon colored_icon = Theme.create_color_aware_icon (icon_path, palette ());
         return create_action_with_icon (colored_icon, filename, icon_path);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private QAction create_action_with_icon (QIcon icon, string text, string icon_path) {
+    private QAction create_action_with_icon (Gtk.Icon icon, string text, string icon_path) {
         QAction action = new ToolButtonAction (icon, text, this);
         action.checkable (true);
         if (!icon_path.is_empty ()) {
@@ -442,7 +442,7 @@ public class SettingsDialog : Gtk.Dialog {
             host = font_metrics.elided_text (host, Qt.Elide_middle, width);
             user = font_metrics.elided_text (user, Qt.Elide_right, width);
         }
-        return "%1\n%2".arg (user, host);
+        return "%1\n%2".printf (user, host);
     }
 
 } // class SettingsDialog

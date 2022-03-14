@@ -253,13 +253,13 @@ namespace FileSystem {
             }
             if (!file.rename (file_info.absolute_file_path (), path + string.number (suffix_number))) { // rename (file old path, file trash path)
                 *error_string = _("FileSystem", R" (Could not move "%1" to "%2")")
-                                   .arg (file_info.absolute_file_path (), path + string.number (suffix_number));
+                                   .printf (file_info.absolute_file_path (), path + string.number (suffix_number));
                 return false;
             }
         } else {
             if (!file.rename (file_info.absolute_file_path (), trash_file_path + file_info.filename ())) { // rename (file old path, file trash path)
                 *error_string = _("FileSystem", R" (Could not move "%1" to "%2")")
-                                   .arg (file_info.absolute_file_path (), trash_file_path + file_info.filename ());
+                                   .printf (file_info.absolute_file_path (), trash_file_path + file_info.filename ());
                 return false;
             }
         }

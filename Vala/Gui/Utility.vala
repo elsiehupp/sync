@@ -43,7 +43,7 @@ public class Utility {
                     _("utility",
                     + "There was an error when launching the browser to go to "
                     + "URL %1. Maybe no default browser is configured?")
-                        .arg (url.to_string ()));
+                        .printf (url.to_string ()));
             }
             GLib.warning ("QDesktopServices.open_url failed for " + url);
             return false;

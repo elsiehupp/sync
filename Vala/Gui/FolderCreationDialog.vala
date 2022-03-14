@@ -41,7 +41,7 @@ public class FolderCreationDialog : Gtk.Dialog {
             ui.new_folder_name_edit.on_signal_text (suggested_folder_name_prefix);
         } else {
             for (uint32 i = 2; i < std.numeric_limits<uint32>.max (); ++i) {
-                const string suggested_postfix = string (" (%1)").arg (i);
+                const string suggested_postfix = string (" (%1)").printf (i);
 
                 if (!QDir (new_folder_full_path + suggested_postfix).exists ()) {
                     ui.new_folder_name_edit.on_signal_text (suggested_folder_name_prefix + suggested_postfix);

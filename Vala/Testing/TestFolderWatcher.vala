@@ -90,7 +90,7 @@ public class TestFolderWatcher : GLib.Object {
     ***********************************************************/
     private void test_a_create () { // create a new file
         string file = this.root_path + "/foo.txt";
-        string command = "echo \"xyz\" > %1".arg (file);
+        string command = "echo \"xyz\" > %1".printf (file);
         GLib.debug ("Command: " + command);
         system (command.to_local_8_bit ());
 
@@ -239,35 +239,35 @@ public class TestFolderWatcher : GLib.Object {
 
     static void touch (string file) {
         string command;
-        command = "touch %1".arg (file);
+        command = "touch %1".printf (file);
         GLib.debug ("Command: " + command);
         system (command.to_local_8_bit ());
     }
 
 
     static void mkdir (string file) {
-        string command = "mkdir %1".arg (file);
+        string command = "mkdir %1".printf (file);
         GLib.debug ("Command: " + command);
         system (command.to_local_8_bit ());
     }
 
 
     static void rmdir (string file) {
-        string command = "rmdir %1".arg (file);
+        string command = "rmdir %1".printf (file);
         GLib.debug ("Command: " + command);
         system (command.to_local_8_bit ());
     }
 
 
     static void rm (string file) {
-        string command = "rm %1".arg (file);
+        string command = "rm %1".printf (file);
         GLib.debug ("Command: " + command);
         system (command.to_local_8_bit ());
     }
 
 
     static void mv (string file1, string file2) {
-        string command = "mv %1 %2".arg (file1, file2);
+        string command = "mv %1 %2".printf (file1, file2);
         GLib.debug ("Command: " + command);
         system (command.to_local_8_bit ());
     }

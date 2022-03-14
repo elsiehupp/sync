@@ -177,7 +177,7 @@ public class ShareUserLine : Gtk.Widget {
         menu.add_separator ();
 
         // Adds action to delete share widget
-        QIcon delete_icon = QIcon.from_theme (QLatin1String ("user-trash"),QIcon (QLatin1String (":/client/theme/delete.svg")));
+        Gtk.Icon delete_icon = Gtk.Icon.from_theme (QLatin1String ("user-trash"),Gtk.Icon (QLatin1String (":/client/theme/delete.svg")));
         this.delete_share_button= new QAction (delete_icon,_("Unshare"), this);
 
         menu.add_action (this.delete_share_button);
@@ -543,7 +543,7 @@ public class ShareUserLine : Gtk.Widget {
         }
 
         avatar = AvatarJob.make_circular_avatar (avatar);
-        this.ui.avatar.pixmap (QPixmap.from_image (avatar));
+        this.ui.avatar.pixmap (Gdk.Pixbuf.from_image (avatar));
 
         // Remove the stylesheet for the fallback avatar
         this.ui.avatar.style_sheet ("");
@@ -689,7 +689,7 @@ public class ShareUserLine : Gtk.Widget {
             text-align : center;
             line-height : %2px;
             font-size : %2px;
-        })""".arg (background_color.name (), string.number (avatar_size / 2));
+        })""".printf (background_color.name (), string.number (avatar_size / 2));
         this.ui.avatar.style_sheet (style);
 
         const var pixmap = pixmap_for_sharee_type (this.share.share_with ().type (), background_color);
@@ -710,7 +710,7 @@ public class ShareUserLine : Gtk.Widget {
     private void customize_style () {
         this.ui.permission_tool_button.icon (Theme.create_color_aware_icon (":/client/theme/more.svg"));
 
-        QIcon delete_icon = QIcon.from_theme (
+        Gtk.Icon delete_icon = Gtk.Icon.from_theme (
             "user-trash",
             Theme.create_color_aware_icon (":/client/theme/delete.svg")
         );
@@ -727,7 +727,7 @@ public class ShareUserLine : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private QPixmap pixmap_for_sharee_type (Sharee.Type type, Gtk.Color background_color) {
+    private Gdk.Pixbuf pixmap_for_sharee_type (Sharee.Type type, Gtk.Color background_color) {
         switch (type) {
         case Sharee.Type.ROOM:
             return Ui.IconUtils.pixmap_for_background ("talk-app.svg", background_color);
@@ -740,7 +740,7 @@ public class ShareUserLine : Gtk.Widget {
             break;
         }
 
-        return new QPixmap ();
+        return new Gdk.Pixbuf ();
     }
 
 

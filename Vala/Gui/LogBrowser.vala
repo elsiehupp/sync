@@ -51,7 +51,7 @@ public class LogBrowser : Gtk.Dialog {
             + "run and compress older ones. It will also delete log files after a couple "
             + "of hours to avoid consuming too much disk space.\n"
             + "If enabled, logs will be written to %1")
-            .arg (Logger.instance ().temporary_folder_log_dir_path ()));
+            .printf (Logger.instance ().temporary_folder_log_dir_path ()));
         label.word_wrap (true);
         label.text_interaction_flags (Qt.Text_selectable_by_mouse);
         label.size_policy (QSizePolicy.Expanding, QSizePolicy.Minimum_expanding);

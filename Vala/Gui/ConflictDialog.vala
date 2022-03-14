@@ -109,7 +109,7 @@ public class ConflictDialog : Gtk.Dialog {
         }
 
         this.base_filename = base_filename;
-        this.ui.conflict_message.on_signal_text (_("Conflicting versions of %1.").arg (this.base_filename));
+        this.ui.conflict_message.on_signal_text (_("Conflicting versions of %1.").printf (this.base_filename));
     }
 
 
@@ -181,17 +181,17 @@ public class ConflictDialog : Gtk.Dialog {
     ***********************************************************/
     private void update_group (QMimeDatabase mime_database, string filename, Gtk.Label link_label, string link_text, Gtk.Label mtime_label, Gtk.Label size_label, QToolButton button) {
         const string file_url = GLib.Uri.from_local_file (filename).to_string ();
-        link_label.on_signal_text ("<a href='%1'>%2</a>".arg (file_url).arg (link_text));
+        link_label.on_signal_text ("<a href='%1'>%2</a>".printf (file_url).printf (link_text));
 
         const GLib.FileInfo info = new GLib.FileInfo (filename);
         mtime_label.on_signal_text (info.last_modified ().to_string ());
         size_label.on_signal_text (locale ().formatted_data_size (info.size ()));
 
         const string mime = mime_database.mime_type_for_file (filename);
-        if (QIcon.has_theme_icon (mime.icon_name ())) {
-            button.icon (QIcon.from_theme (mime.icon_name ()));
+        if (Gtk.Icon.has_theme_icon (mime.icon_name ())) {
+            button.icon (Gtk.Icon.from_theme (mime.icon_name ()));
         } else {
-            button.icon (QIcon (":/qt-project.org/styles/commonstyle/images/file-128.png"));
+            button.icon (Gtk.Icon (":/qt-project.org/styles/commonstyle/images/file-128.png"));
         }
     }
 

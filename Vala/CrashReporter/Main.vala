@@ -23,7 +23,7 @@ int main (int argc, char argv[]) {
     CrashReporter reporter (GLib.Uri (CRASHREPORTER_SUBMIT_URL), app.arguments ());
 
 //  #ifdef CRASHREPORTER_ICON
-    reporter.logo (QPixmap (CRASHREPORTER_ICON));
+    reporter.logo (Gdk.Pixbuf (CRASHREPORTER_ICON));
 //  #endif
     reporter.window_title (CRASHREPORTER_PRODUCT_NAME);
     reporter.on_signal_text ("<html><head/><body><p><span style=\" font-weight:600;\">Sorry!</span> " CRASHREPORTER_PRODUCT_NAME " crashed. Please tell us about it! " CRASHREPORTER_PRODUCT_NAME " has created an error report for you that can help improve the stability in the future. You can now send this report directly to the " CRASHREPORTER_PRODUCT_NAME " developers.</p></body></html>");

@@ -56,7 +56,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
         /***********************************************************
         ***********************************************************/
-        public static GLib.HashMap<int, GLib.ByteArray> role_names () {
+        public static GLib.HashTable<int, GLib.ByteArray> role_names () {
             var roles = QAbstractListModel.role_names ();
             roles[DataRole.PROVIDER_NAME] = "provider_name";
             roles[DataRole.PROVIDER_IDENTIFIER] = "provider_id";
@@ -84,7 +84,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.HashMap<string, UnifiedSearchProvider> providers;
+    private GLib.HashTable<string, UnifiedSearchProvider> providers;
 
     /***********************************************************
     ***********************************************************/
@@ -96,7 +96,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.HashMap<string, QMetaObject.Connection> search_job_connections;
+    private GLib.HashTable<string, QMetaObject.Connection> search_job_connections;
 
     /***********************************************************
     ***********************************************************/
@@ -254,7 +254,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
         }
 
         var job = new JsonApiJob (this.account_state.account (),
-            QLatin1String ("ocs/v2.php/search/providers/%1/search").arg (provider_id));
+            QLatin1String ("ocs/v2.php/search/providers/%1/search").printf (provider_id));
 
         QUrlQuery parameters;
         parameters.add_query_item (QStringLiteral ("term"), this.search_term);
@@ -569,7 +569,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
         const var job = qobject_cast<JsonApiJob> (sender ());
 
         if (!job) {
-            GLib.critical () + string ("Failed to fetch providers.").arg (this.search_term);
+            GLib.critical () + string ("Failed to fetch providers.").printf (this.search_term);
             this.error_string += _("Failed to fetch providers.") + '\n';
             /* emit */ signal_error_string_changed ();
             return;
@@ -577,11 +577,11 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
         if (status_code != 200) {
             GLib.critical () + string ("%1 : Failed to fetch search providers for '%2'. Error : %3")
-                                               .arg (status_code)
-                                               .arg (this.search_term)
-                                               .arg (job.error_string ());
+                                               .printf (status_code)
+                                               .printf (this.search_term)
+                                               .printf (job.error_string ());
             this.error_string +=
-                _("Failed to fetch search providers for '%1'. Error : %2").arg (this.search_term).arg (job.error_string ())
+                _("Failed to fetch search providers for '%1'. Error : %2").printf (this.search_term).printf (job.error_string ())
                 + '\n';
             /* emit */ signal_error_string_changed ();
             return;
@@ -614,8 +614,8 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
         const var job = qobject_cast<JsonApiJob> (sender ());
 
         if (!job) {
-            GLib.critical () + string ("Search has failed for '%2'.").arg (this.search_term);
-            this.error_string += _("Search has failed for '%2'.").arg (this.search_term) + '\n';
+            GLib.critical () + string ("Search has failed for '%2'.").printf (this.search_term);
+            this.error_string += _("Search has failed for '%2'.").printf (this.search_term) + '\n';
             /* emit */ signal_error_string_changed ();
             return;
         }
@@ -640,11 +640,11 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
         if (status_code != 200) {
             GLib.critical () + string ("%1 : Search has failed for '%2'. Error : %3")
-                                               .arg (status_code)
-                                               .arg (this.search_term)
-                                               .arg (job.error_string ());
+                                               .printf (status_code)
+                                               .printf (this.search_term)
+                                               .printf (job.error_string ());
             this.error_string +=
-                _("Search has failed for '%1'. Error : %2").arg (this.search_term).arg (job.error_string ()) + '\n';
+                _("Search has failed for '%1'. Error : %2").printf (this.search_term).printf (job.error_string ()) + '\n';
             /* emit */ signal_error_string_changed ();
             return;
         }

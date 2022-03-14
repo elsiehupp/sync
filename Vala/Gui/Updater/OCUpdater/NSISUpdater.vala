@@ -132,7 +132,7 @@ public class NSISUpdater : OCUpdater {
         message_box.attribute (Qt.WA_DeleteOnClose);
         message_box.window_flags (message_box.window_flags () & ~Qt.WindowContextHelpButtonHint);
 
-        QIcon info_icon = message_box.style ().standard_icon (QStyle.SP_Message_box_information);
+        Gtk.Icon info_icon = message_box.style ().standard_icon (QStyle.SP_Message_box_information);
         int icon_size = message_box.style ().pixel_metric (QStyle.PM_Message_box_icon_size);
 
         message_box.window_icon (info_icon);
@@ -149,7 +149,7 @@ public class NSISUpdater : OCUpdater {
         var lbl = new Gtk.Label ();
         string txt = _("<p>A new version of the %1 Client is available.</p>"
                      + "<p><b>%2</b> is available for download. The installed version is %3.</p>")
-                        .arg (
+                        .printf (
                             Utility.escape (Theme.instance ().app_name_gui ()),
                             Utility.escape (info.version_string ()), Utility.escape (client_version ())
                         );
@@ -186,7 +186,7 @@ public class NSISUpdater : OCUpdater {
         message_box.attribute (Qt.WA_DeleteOnClose);
         message_box.window_flags (message_box.window_flags () & ~Qt.WindowContextHelpButtonHint);
 
-        QIcon info_icon = message_box.style ().standard_icon (QStyle.SP_Message_box_information);
+        Gtk.Icon info_icon = message_box.style ().standard_icon (QStyle.SP_Message_box_information);
         int icon_size = message_box.style ().pixel_metric (QStyle.PM_Message_box_icon_size);
 
         message_box.window_icon (info_icon);
@@ -203,7 +203,7 @@ public class NSISUpdater : OCUpdater {
         var lbl = new Gtk.Label ();
         string txt = _("<p>A new version of the %1 Client is available but the updating process failed.</p>"
                      + "<p><b>%2</b> has been downloaded. The installed version is %3. If you confirm restart and update, your computer may reboot to complete the installation.</p>")
-                        .arg (
+                        .printf (
                             Utility.escape (Theme.instance ().app_name_gui ()),
                             Utility.escape (target_version), Utility.escape (client_version ())
                         );

@@ -41,7 +41,7 @@ public class NetrcParser {
     /***********************************************************
     ***********************************************************/
     private void try_add_entry_and_clear (string machine, LoginPair pair, bool is_default);
-    private GLib.HashMap<string, LoginPair> this.entries;
+    private GLib.HashTable<string, LoginPair> this.entries;
     private LoginPair this.default;
     private string this.netrc_location;
 }
@@ -119,7 +119,7 @@ public class NetrcParser {
     }
 
     NetrcParser.LoginPair NetrcParser.find (string machine) {
-        GLib.HashMap<string, LoginPair>.ConstIterator it = this.entries.find (machine);
+        GLib.HashTable<string, LoginPair>.ConstIterator it = this.entries.find (machine);
         if (it != this.entries.end ()) {
             return it;
         } else {

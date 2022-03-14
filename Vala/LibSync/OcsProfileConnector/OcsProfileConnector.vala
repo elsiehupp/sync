@@ -4,7 +4,7 @@
 //  #include <QJsonDocument>
 //  #include <QJsonArray>
 //  #include <QLoggingCategory>
-//  #include <QIcon>
+//  #include <Gtk.Icon>
 //  #include <QPainter>
 //  #include <Gtk.Image>
 //  #include <QSvgRenderer>

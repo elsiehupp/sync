@@ -241,21 +241,21 @@ public class ExcludedFiles : GLib.Object {
     private string this.local_path;
 
     /// Files to load excludes from
-    private GLib.HashMap<BasePathString, string[]> this.exclude_files;
+    private GLib.HashTable<BasePathString, string[]> this.exclude_files;
 
     /// Exclude patterns added with add_manual_exclude ()
-    private GLib.HashMap<BasePathString, string[]> this.manual_excludes;
+    private GLib.HashTable<BasePathString, string[]> this.manual_excludes;
 
     /// List of all active exclude patterns
-    private GLib.HashMap<BasePathString, string[]> this.all_excludes;
+    private GLib.HashTable<BasePathString, string[]> this.all_excludes;
 
     /// see prepare ()
-    private GLib.HashMap<BasePathString, QRegularExpression> this.bname_traversal_regex_file;
-    private GLib.HashMap<BasePathString, QRegularExpression> this.bname_traversal_regex_dir;
-    private GLib.HashMap<BasePathString, QRegularExpression> this.full_traversal_regex_file;
-    private GLib.HashMap<BasePathString, QRegularExpression> this.full_traversal_regex_dir;
-    private GLib.HashMap<BasePathString, QRegularExpression> this.full_regex_file;
-    private GLib.HashMap<BasePathString, QRegularExpression> this.full_regex_dir;
+    private GLib.HashTable<BasePathString, QRegularExpression> this.bname_traversal_regex_file;
+    private GLib.HashTable<BasePathString, QRegularExpression> this.bname_traversal_regex_dir;
+    private GLib.HashTable<BasePathString, QRegularExpression> this.full_traversal_regex_file;
+    private GLib.HashTable<BasePathString, QRegularExpression> this.full_traversal_regex_dir;
+    private GLib.HashTable<BasePathString, QRegularExpression> this.full_regex_file;
+    private GLib.HashTable<BasePathString, QRegularExpression> this.full_regex_dir;
 
     /***********************************************************
     ***********************************************************/
@@ -1087,12 +1087,12 @@ void ExcludedFiles.prepare (BasePathString & base_path) {
         QStringLiteral ("^ (?P<exclude>%1)$|"
                        "^ (?P<excluderemove>%2)$|"
                        "^ (?P<trigger>%3)$")
-            .arg (bname_file_dir_keep, bname_file_dir_remove, bname_trigger_file_dir));
+            .printf (bname_file_dir_keep, bname_file_dir_remove, bname_trigger_file_dir));
     this.bname_traversal_regex_dir[base_path].pattern (
         QStringLiteral ("^ (?P<exclude>%1|%2)$|"
                        "^ (?P<excluderemove>%3|%4)$|"
                        "^ (?P<trigger>%5|%6)$")
-            .arg (bname_file_dir_keep, bname_dir_keep, bname_file_dir_remove, bname_dir_remove, bname_trigger_file_dir, bname_trigger_dir));
+            .printf (bname_file_dir_keep, bname_dir_keep, bname_file_dir_remove, bname_dir_remove, bname_trigger_file_dir, bname_trigger_dir));
 
     // The full traveral regex is applied to the full path if the trigger capture of
     // the bname regex matches. Its basic form is (exclude)| (excluderemove)".
@@ -1103,12 +1103,12 @@ void ExcludedFiles.prepare (BasePathString & base_path) {
         QStringLiteral ("^ (?P<exclude>%1) (?:$|/)"
                        "|"
                        "^ (?P<excluderemove>%2) (?:$|/)")
-            .arg (full_file_dir_keep, full_file_dir_remove));
+            .printf (full_file_dir_keep, full_file_dir_remove));
     this.full_traversal_regex_dir[base_path].pattern (
         QStringLiteral ("^ (?P<exclude>%1|%2) (?:$|/)"
                        "|"
                        "^ (?P<excluderemove>%3|%4) (?:$|/)")
-            .arg (full_file_dir_keep, full_dir_keep, full_file_dir_remove, full_dir_remove));
+            .printf (full_file_dir_keep, full_dir_keep, full_file_dir_remove, full_dir_remove));
 
     // The full regex is applied to the full path and incorporates both bname and
     // full-path patterns. It has the form " (exclude)| (excluderemove)".
@@ -1126,7 +1126,7 @@ void ExcludedFiles.prepare (BasePathString & base_path) {
                        "^ (?:%4) (?:$|/)|"
                        " (?:^|/) (?:%5) (?:$|/)|"
                        " (?:^|/) (?:%6)/)")
-            .arg (full_file_dir_keep, bname_file_dir_keep, bname_dir_keep, full_file_dir_remove, bname_file_dir_remove, bname_dir_remove));
+            .printf (full_file_dir_keep, bname_file_dir_keep, bname_dir_keep, full_file_dir_remove, bname_file_dir_remove, bname_dir_remove));
     this.full_regex_dir[base_path].pattern (
         QStringLiteral (" (?P<exclude>"
                        "^ (?:%1|%2) (?:$|/)|"
@@ -1135,7 +1135,7 @@ void ExcludedFiles.prepare (BasePathString & base_path) {
                        " (?P<excluderemove>"
                        "^ (?:%5|%6) (?:$|/)|"
                        " (?:^|/) (?:%7|%8) (?:$|/))")
-            .arg (full_file_dir_keep, full_dir_keep, bname_file_dir_keep, bname_dir_keep, full_file_dir_remove, full_dir_remove, bname_file_dir_remove, bname_dir_remove));
+            .printf (full_file_dir_keep, full_dir_keep, bname_file_dir_keep, bname_dir_keep, full_file_dir_remove, full_dir_remove, bname_file_dir_remove, bname_dir_remove));
 
     QRegularExpression.PatternOptions pattern_options = QRegularExpression.NoPatternOption;
     if (Occ.Utility.fs_case_preserving ())

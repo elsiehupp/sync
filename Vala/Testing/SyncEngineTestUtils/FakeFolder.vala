@@ -145,7 +145,7 @@ public class FakeFolder {
         this.fake_qnam.set_override(qnam_override);
     }
 
-    delegate QJsonObject ReplyFunction (GLib.HashMap<string, GLib.ByteArray> map);
+    delegate QJsonObject ReplyFunction (GLib.HashTable<string, GLib.ByteArray> map);
 
     /***********************************************************
     ***********************************************************/

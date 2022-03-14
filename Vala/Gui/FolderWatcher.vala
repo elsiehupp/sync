@@ -33,7 +33,7 @@ through the signal_path_changed () signal.
 ***********************************************************/
 public class FolderWatcher : GLib.Object {
 
-    protected GLib.HashMap<string, int> pending_pathes;
+    protected GLib.HashTable<string, int> pending_pathes;
 
     /***********************************************************
     ***********************************************************/

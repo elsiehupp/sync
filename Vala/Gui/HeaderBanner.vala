@@ -121,7 +121,7 @@ public class HeaderBanner : Gtk.Widget {
     private Gtk.Label title_label;
     private Gtk.Label logo_label;
     private QGridLayout layout;
-    private QPixmap banner_pixmap;
+    private Gdk.Pixbuf banner_pixmap;
 
     /***********************************************************
     ***********************************************************/
@@ -151,7 +151,7 @@ public class HeaderBanner : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public void setup (
-        string title, QPixmap logo, QPixmap banner,
+        string title, Gdk.Pixbuf logo, Gdk.Pixbuf banner,
         Qt.Text_format title_format, string style_sheet) {
         QStyle style = parent_widget ().style ();
         //const int layout_horizontal_spacing = style.pixel_metric (QStyle.PM_Layout_horizontal_spacing);

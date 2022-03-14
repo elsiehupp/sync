@@ -19,7 +19,7 @@ public abstract class PluginFactory {
     ***********************************************************/
     public static string plugin_filename (string type, string name) {
         return "%1sync_%2_%3"
-            .arg (APPLICATION_EXECUTABLE, type, name);
+            .printf (APPLICATION_EXECUTABLE, type, name);
     }
 
 }

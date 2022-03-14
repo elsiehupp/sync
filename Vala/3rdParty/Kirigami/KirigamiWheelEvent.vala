@@ -10,18 +10,29 @@ Describes the mouse wheel event
 public class KirigamiWheelEvent : GLib.Object {
 
     /***********************************************************
-    x : real
+    ***********************************************************/
+    private double m_x = 0;
+    private double m_y = 0;
+    private QPointF m_angle_delta;
+    private QPointF m_pixel_delta;
+    private Qt.MouseButtons m_buttons = Qt.NoButton;
+    private Qt.KeyboardModifiers m_modifiers = Qt.NoModifier;
+    private bool m_inverted = false;
+    private bool m_accepted = false;
+
+    /***********************************************************
+    x : double
 
     X coordinate of the mouse pointer
     ***********************************************************/
-    //  Q_PROPERTY (qreal x READ x CONSTANT)
+    //  Q_PROPERTY (double x READ x CONSTANT)
 
     /***********************************************************
-    y : real
+    y : double
 
     Y coordinate of the mouse pointer
     ***********************************************************/
-    //  Q_PROPERTY (qreal y READ y CONSTANT)
+    //  Q_PROPERTY (double y READ y CONSTANT)
 
     /***********************************************************
     angle_delta : point
@@ -95,82 +106,14 @@ public class KirigamiWheelEvent : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public KirigamiWheelEvent (GLib.Object parent = new GLib.Object ());
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public qreal y ();
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public QPointF pixel_del
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public int modifiers ();
-
-
-    public bool inverted ();
-
-
-    public bool is_accepted ();
-
-
-    public void set_accepted (bool accepted);
+    public KirigamiWheelEvent (GLib.Object parent = new GLib.Object ()) {
+        base (parent);
+    }
 
 
     /***********************************************************
     ***********************************************************/
-    private qreal m_x = 0;
-    private qreal m_y = 0;
-    private QPointF m_angle_delta;
-    private QPointF m_pixel_delta;
-    private Qt.MouseButtons m_buttons = Qt.NoButton;
-    private Qt.KeyboardModifiers m_modifiers = Qt.NoModifier;
-    private bool m_inverted = false;
-    private bool m_accepted = false;
-}
-
-
-
-
-
-
-
-    KirigamiWheelEvent.KirigamiWheelEvent (GLib.Object parent) {
-        base (parent);}
-
-    KirigamiWheelEvent.~KirigamiWheelEvent () = default;
-
-    void KirigamiWheelEvent.initialize_from_event (QWheelEvent event) {
+    public void initialize_from_event (QWheelEvent event) {
         m_x = event.position ().x ();
         m_y = event.position ().y ();
         m_angle_delta = event.angle_delta ();
@@ -181,38 +124,67 @@ public class KirigamiWheelEvent : GLib.Object {
         m_inverted = event.inverted ();
     }
 
-    qreal KirigamiWheelEvent.x () {
+
+    /***********************************************************
+    ***********************************************************/
+    public double x () {
         return m_x;
     }
 
-    qreal KirigamiWheelEvent.y () {
+
+    /***********************************************************
+    ***********************************************************/
+    public double y () {
         return m_y;
     }
 
-    QPointF KirigamiWheelEvent.angle_delta () {
+
+    /***********************************************************
+    ***********************************************************/
+    public QPointF angle_delta () {
         return m_angle_delta;
     }
 
-    QPointF KirigamiWheelEvent.pixel_delta () {
+
+    /***********************************************************
+    ***********************************************************/
+    public QPointF pixel_delta () {
         return m_pixel_delta;
     }
 
-    int KirigamiWheelEvent.buttons () {
+
+    /***********************************************************
+    ***********************************************************/
+    public int buttons () {
         return m_buttons;
     }
 
-    int KirigamiWheelEvent.modifiers () {
+
+    /***********************************************************
+    ***********************************************************/
+    public int modifiers () {
         return m_modifiers;
     }
 
-    bool KirigamiWheelEvent.inverted () {
+
+    /***********************************************************
+    ***********************************************************/
+    public bool inverted () {
         return m_inverted;
     }
 
-    bool KirigamiWheelEvent.is_accepted () {
+
+    /***********************************************************
+    ***********************************************************/
+    public bool is_accepted () {
         return m_accepted;
     }
 
-    void KirigamiWheelEvent.set_accepted (bool accepted) {
+
+    /***********************************************************
+    ***********************************************************/
+    public void set_accepted (bool accepted) {
         m_accepted = accepted;
     }
+
+}

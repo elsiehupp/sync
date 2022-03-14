@@ -10,7 +10,7 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 //  #include <QPixmapCache>
 //  #include <QSvgRender
 //  #include <Gtk.Color>
-//  #include <QPixmap>
+//  #include <Gdk.Pixbuf>
 
 namespace Occ {
 namespace Ui {
@@ -40,7 +40,7 @@ public class IconUtils {
 
     /***********************************************************
     ***********************************************************/
-    public static QPixmap pixmap_for_background (string filename, Gtk.Color background_color) {
+    public static Gdk.Pixbuf pixmap_for_background (string filename, Gtk.Color background_color) {
         //  Q_ASSERT (!filename.is_empty ());
 
         const var pixmap_color = background_color.is_valid () && !Theme.is_dark_color (background_color)
@@ -120,14 +120,14 @@ public class IconUtils {
 
     /***********************************************************
     ***********************************************************/
-    public static QPixmap create_svg_pixmap_with_custom_color_cached (string filename, Gtk.Color custom_color, QSize original_size = null, QSize requested_size = {}) {
-        QPixmap cached_pixmap;
+    public static Gdk.Pixbuf create_svg_pixmap_with_custom_color_cached (string filename, Gtk.Color custom_color, QSize original_size = null, QSize requested_size = {}) {
+        Gdk.Pixbuf cached_pixmap;
 
         const var custom_color_name = custom_color.name ();
 
         const string cache_key = filename + "," + custom_color_name;
 
-        // check for existing QPixmap in cache
+        // check for existing Gdk.Pixbuf in cache
         if (QPixmapCache.find (cache_key, cached_pixmap)) {
             if (original_size) {
                 *original_size = {};
@@ -135,7 +135,7 @@ public class IconUtils {
             return cached_pixmap;
         }
 
-        cached_pixmap = QPixmap.from_image (create_svg_image_with_custom_color (filename, custom_color, original_size, requested_size));
+        cached_pixmap = Gdk.Pixbuf.from_image (create_svg_image_with_custom_color (filename, custom_color, original_size, requested_size));
 
         if (!cached_pixmap.is_null ()) {
             QPixmapCache.insert (cache_key, cached_pixmap);

@@ -170,7 +170,7 @@ public class Utility {
         const int64 GB = THE_FACTOR * MB;
 
         string s;
-        qreal value = octets;
+        double value = octets;
 
         // Whether we care about decimals : only for GB/MB and only
         // if it's less than 10 units.
@@ -199,9 +199,9 @@ public class Utility {
             round = true;
 
         if (round)
-            return s.arg (q_round (value));
+            return s.printf (q_round (value));
 
-        return s.arg (value, 0, 'g', 2);
+        return s.printf (value, 0, 'g', 2);
     }
 
     /***********************************************************
@@ -209,7 +209,7 @@ public class Utility {
     ***********************************************************/
     public static GLib.ByteArray user_agent_string () {
         return "Mozilla/5.0 (%1) mirall/%2 (%3, %4-%5 ClientArchitecture : %6 OsArchitecture : %7)"
-            .arg (platform (),
+            .printf (platform (),
                 MIRALL_VERSION_STRING,
                 Gtk.Application.application_name (),
                 QSysInfo.product_type (),
@@ -225,7 +225,7 @@ public class Utility {
     ***********************************************************/
     public static GLib.ByteArray friendly_user_agent_string () {
         const var pattern = "%1 (Desktop Client - %2)";
-        const var user_agent = pattern.arg (QSysInfo.machine_host_name (), platform ());
+        const var user_agent = pattern.printf (QSysInfo.machine_host_name (), platform ());
         return user_agent.to_utf8 ();
     }
 
@@ -479,7 +479,7 @@ public class Utility {
             return first_part;
         }
 
-        return _("Utility", "%1 %2").arg (first_part, periods[p + 1].description (second_part_num));
+        return _("Utility", "%1 %2").printf (first_part, periods[p + 1].description (second_part_num));
     }
 
 
@@ -746,7 +746,7 @@ public class Utility {
 
         const string STOPWATCH_END_TAG = "_STOPWATCH_END";
 
-        private GLib.HashMap<string, uint64> lap_times;
+        private GLib.HashTable<string, uint64> lap_times;
         GLib.DateTime start_time { public get; private set; }
         private QElapsedTimer timer;
 

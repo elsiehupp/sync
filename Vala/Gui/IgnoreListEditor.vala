@@ -35,7 +35,7 @@ public class IgnoreListEditor : Gtk.Dialog {
         //FIXME This is not true. The entries are hardcoded below in setup_table_read_only_items
         read_only_tooltip = _("This entry is provided by the system at \"%1\" "
                             + "and cannot be modified in this view.")
-                              .arg (QDir.to_native_separators (config_file.exclude_file (ConfigFile.SYSTEM_SCOPE)));
+                              .printf (QDir.to_native_separators (config_file.exclude_file (ConfigFile.SYSTEM_SCOPE)));
 
         setup_table_read_only_items ();
         const var user_config = config_file.exclude_file (ConfigFile.Scope.USER_SCOPE);

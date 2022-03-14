@@ -203,7 +203,7 @@ public class OwncloudWizard : QWizard {
         );
 
         Theme theme = Theme.instance ();
-        window_title (_("Add %1 account").arg (theme.app_name_gui ()));
+        window_title (_("Add %1 account").printf (theme.app_name_gui ()));
         wizard_style (QWizard.ModernStyle);
         option (QWizard.NoBackButtonOnStartPage);
         option (QWizard.NoBackButtonOnLastPage);
@@ -371,7 +371,7 @@ public class OwncloudWizard : QWizard {
                 + "\n\n"
                 + "This is a new, experimental mode. If you decide to use it, please report any "
                 + "issues that come up.")
-                    .arg (APPLICATION_DOTVIRTUALFILE_SUFFIX),
+                    .printf (APPLICATION_DOTVIRTUALFILE_SUFFIX),
                 QMessageBox.NoButton, receiver);
             accept_button = message_box.add_button (_("Enable experimental placeholder mode"), QMessageBox.AcceptRole);
             message_box.add_button (_("Stay safe"), QMessageBox.RejectRole);

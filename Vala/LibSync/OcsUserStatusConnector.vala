@@ -331,7 +331,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
 
     private static Occ.UserStatus.OnlineStatus string_to_user_online_status (string status) {
         // it needs to match the Status enum
-        const GLib.HashMap<string, Occ.UserStatus.OnlineStatus> pre_defined_status = {
+        const GLib.HashTable<string, Occ.UserStatus.OnlineStatus> pre_defined_status = {
             {
                 "online", Occ.UserStatus.OnlineStatus.Online
             },

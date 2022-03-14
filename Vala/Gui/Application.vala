@@ -294,8 +294,8 @@ public class Application : Gtk.Application {
                     _("Error accessing the configuration file"),
                     _("There was an error while accessing the configuration "
                     + "file at %1. Please make sure the file can be accessed by your user.")
-                        .arg (ConfigFile ().config_file ()),
-                    _("Quit %1").arg (Theme.instance ().app_name_gui ()));
+                        .printf (ConfigFile ().config_file ()),
+                    _("Quit %1").printf (Theme.instance ().app_name_gui ()));
                 QTimer.single_shot (0, Gtk.Application, SLOT (quit ()));
                 return;
             }
@@ -892,7 +892,7 @@ public class Application : Gtk.Application {
                 + "%1<br>"
                 + "<br>"
                 + "The current configuration file was already backed up to <i>%2</i>.")
-                    .arg (bold_message, backup_file));
+                    .printf (bold_message, backup_file));
             box.add_button (_("Quit"), QMessageBox.AcceptRole);
             var continue_btn = box.add_button (_("Continue"), QMessageBox.DestructiveRole);
 

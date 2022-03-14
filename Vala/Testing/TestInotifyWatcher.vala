@@ -63,7 +63,7 @@ public class TestInotifyWatcher : FolderWatcherPrivate {
     ***********************************************************/
     private void on_signal_cleanup_test_case () {
         if (this.root.starts_with (QDir.temporary_path ())) {
-           system ("rm -rf %1".arg (this.root).to_local_8_bit ());
+           system ("rm -rf %1".printf (this.root).to_local_8_bit ());
         }
     }
 

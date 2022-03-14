@@ -84,7 +84,7 @@ signals:
     protected private GLib.Vector<string> this.paths;
     protected private QBasicTimer this.connectTimer;
 
-    protected private GLib.HashMap<string, string> this.strings;
+    protected private GLib.HashTable<string, string> this.strings;
     protected private GLib.ByteArray this.version;
 }
 

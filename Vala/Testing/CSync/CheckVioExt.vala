@@ -104,7 +104,7 @@ public class CheckVioExt {
     ***********************************************************/
     static void create_dirs (string path) {
         int rc = -1;
-        var mypath = "%1/%2".arg (csync_test_dir (), path);
+        var mypath = "%1/%2".printf (csync_test_dir (), path);
         char mypath = mypath.data ();
 
         char p = mypath + csync_test_dir ().size () + 1; /* on_signal_start behind the offset */
@@ -191,7 +191,7 @@ public class CheckVioExt {
     }
 
     static void create_file (string path, string name, string content) {
-        GLib.File file = GLib.File.new_for_path ("%1/%2%3".arg (csync_test_dir (), path, name));
+        GLib.File file = GLib.File.new_for_path ("%1/%2%3".printf (csync_test_dir (), path, name));
         GLib.assert_true (1 == file.open (QIODevice.WriteOnly | QIODevice.NewOnly));
         file.write (content);
     }
@@ -211,7 +211,7 @@ public class CheckVioExt {
             + "<DIR> %1/alibaba/und/die"
             + "<DIR> %1/alibaba/und/die/vierzig"
             + "<DIR> %1/alibaba/und/die/vierzig/räuber"
-            .arg (csync_test_dir ())
+            .printf (csync_test_dir ())
             .const_data ());
         GLib.assert_true (file_count == 0);
     }
@@ -233,7 +233,7 @@ public class CheckVioExt {
             + "<DIR> %1/warum/nur"
             + "<DIR> %1/warum/nur/40"
             + "<DIR> %1/warum/nur/40/Räuber"
-                .arg (csync_test_dir ())
+                .printf (csync_test_dir ())
                 .const_data ());
         /*                   "      %1/warum/nur/40/Räuber/Räuber Max.txt"
                             "      %1/warum/nur/40/Räuber/пя́тница.txt"; */
@@ -264,7 +264,7 @@ public class CheckVioExt {
             + "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne"
             + "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle"
             + "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll"
-            + "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum").arg (csync_test_dir ());
+            + "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum").printf (csync_test_dir ());
 
         const string r2 =
             ( "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und"
@@ -278,7 +278,7 @@ public class CheckVioExt {
             + "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN"
             + "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS"
             + "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE"
-            + "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH").arg (csync_test_dir ());
+            + "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH").printf (csync_test_dir ());
 
         const string r3 =
             ( "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH/AND"
@@ -295,7 +295,7 @@ public class CheckVioExt {
             + "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH/AND/NE/BOTTLE/VOLL/RUM/undnochmalallezusammen/VierZig/MannaufDesTotenManns/KISTE/ooooooooooooooooooooooooooohhhhhh/und/BESSER"
             + "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH/AND/NE/BOTTLE/VOLL/RUM/undnochmalallezusammen/VierZig/MannaufDesTotenManns/KISTE/ooooooooooooooooooooooooooohhhhhh/und/BESSER/ZWEI"
             + "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH/AND/NE/BOTTLE/VOLL/RUM/undnochmalallezusammen/VierZig/MannaufDesTotenManns/KISTE/ooooooooooooooooooooooooooohhhhhh/und/BESSER/ZWEI/Butteln"
-            + "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH/AND/NE/BOTTLE/VOLL/RUM/undnochmalallezusammen/VierZig/MannaufDesTotenManns/KISTE/ooooooooooooooooooooooooooohhhhhh/und/BESSER/ZWEI/Butteln/VOLL RUM").arg (csync_test_dir ());
+            + "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH/AND/NE/BOTTLE/VOLL/RUM/undnochmalallezusammen/VierZig/MannaufDesTotenManns/KISTE/ooooooooooooooooooooooooooohhhhhh/und/BESSER/ZWEI/Butteln/VOLL RUM").printf (csync_test_dir ());
 
         /* assemble the result string ... */
         const string result = r1 + r2 + r3;
@@ -314,11 +314,11 @@ public class CheckVioExt {
     //    3 : ? ASCII : 191 - BF
     //    4 : ASCII : 32    - 20
 
-        string p = "%1/%2".arg (csync_test_dir (), "goodone/");
+        string p = "%1/%2".printf (csync_test_dir (), "goodone/");
         int rc = oc_mkdir (p);
         GLib.assert_true (rc == 0);
 
-        p = "%1/goodone/ugly\xEF\xBB\xBF\x32.txt".arg (csync_test_dir ()); // file with encoding error
+        p = "%1/goodone/ugly\xEF\xBB\xBF\x32.txt".printf (csync_test_dir ()); // file with encoding error
 
         rc = oc_mkdir (p);
 
@@ -328,7 +328,7 @@ public class CheckVioExt {
         traverse_dir (state, csync_test_dir (), file_count);
         var expected_result = "<DIR> %1/goodone"
                                 + "<DIR> %1/goodone/ugly\xEF\xBB\xBF\x32.txt"
-                                .arg (csync_test_dir ());
+                                .printf (csync_test_dir ());
         GLib.assert_string_equal (sv.result.const_data (), expected_result.const_data ());
 
         GLib.assert_true (file_count == 0);

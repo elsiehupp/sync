@@ -73,7 +73,7 @@ public class OpenFileManager {
         }
 
         if (OpenFileManager.name.is_empty ()) {
-            OpenFileManager.name = desktop_file.value (string.from_latin1 ("Desktop Entry/Name[%1]").arg (Gtk.Application.property ("ui_lang").to_string ())).to_string ();
+            OpenFileManager.name = desktop_file.value (string.from_latin1 ("Desktop Entry/Name[%1]").printf (Gtk.Application.property ("ui_lang").to_string ())).to_string ();
             if (OpenFileManager.name.is_empty ()) {
                 OpenFileManager.name = desktop_file.value (string.from_latin1 ("Desktop Entry/Name")).to_string ();
             }

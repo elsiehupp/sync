@@ -92,7 +92,7 @@ public class HttpCredentialsGui : HttpCredentials {
         }
 
         return _("<a href=\"%1\">Click here</a> to request an app password from the web interface.")
-            .arg (url);
+            .printf (url);
     }
 
 
@@ -132,7 +132,7 @@ public class HttpCredentialsGui : HttpCredentials {
                          + "<br>"
                          + "User: %2<br>"
                          + "Account: %3<br>")
-                        .arg (Utility.escape (Theme.instance ().app_name_gui ()),
+                        .printf (Utility.escape (Theme.instance ().app_name_gui ()),
                             Utility.escape (this.user),
                             Utility.escape (this.account.display_name ()));
 
@@ -143,7 +143,7 @@ public class HttpCredentialsGui : HttpCredentials {
         if (!this.fetch_error_string.is_empty ()) {
             message += "<br>"
                 + _("Reading from keychain failed with error : \"%1\"")
-                    .arg (Utility.escape (this.fetch_error_string))
+                    .printf (Utility.escape (this.fetch_error_string))
                 + "<br>";
         }
 

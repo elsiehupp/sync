@@ -116,7 +116,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
             this.ui.conf_trailling_size_label.hide ();
         }
 
-        this.ui.r_virtual_file_sync.on_signal_text (_("Use virtual files instead of downloading content immediately %1").arg (best_available_vfs_mode () == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
+        this.ui.r_virtual_file_sync.on_signal_text (_("Use virtual files instead of downloading content immediately %1").printf (best_available_vfs_mode () == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
     }
 
 
@@ -387,7 +387,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
                 this.ui.r_selective_sync.block_signals (false);
                 var s = dialog.estimated_size ();
                 if (s > 0) {
-                    this.ui.l_selective_sync_size_label.on_signal_text (_(" (%1)").arg (Utility.octets_to_string (s)));
+                    this.ui.l_selective_sync_size_label.on_signal_text (_(" (%1)").printf (Utility.octets_to_string (s)));
                 } else {
                     this.ui.l_selective_sync_size_label.on_signal_text ("");
                 }
@@ -428,7 +428,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     ***********************************************************/
     private void on_signal_quota_retrieved (QVariantMap result) {
         this.r_size = result["size"].to_double ();
-        this.ui.l_sync_everything_size_label.on_signal_text (_(" (%1)").arg (Utility.octets_to_string (this.r_size)));
+        this.ui.l_sync_everything_size_label.on_signal_text (_(" (%1)").printf (Utility.octets_to_string (this.r_size)));
 
         update_status ();
     }
@@ -495,13 +495,13 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
                 t = "";
             } else {
                 t = Utility.escape (_(" (%1 folder \"%2\" is synced to local folder \"%3\")")
-                                        .arg (
+                                        .printf (
                                             Theme.instance ().app_name (),
                                             this.remote_folder,
                                             QDir.to_native_separators (loc_folder)
                                         )
                                     );
-                this.ui.r_sync_everything.on_signal_text (_("Sync the folder \"%1\"").arg (this.remote_folder));
+                this.ui.r_sync_everything.on_signal_text (_("Sync the folder \"%1\"").printf (this.remote_folder));
             }
 
             const bool dir_not_empty = new QDir (loc_folder).entry_list (QDir.AllEntries | QDir.NoDotAndDotDot).count () > 0;
@@ -514,7 +514,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         }
 
         string lfree_space_str = Utility.octets_to_string (available_local_space ());
-        this.ui.l_free_space.on_signal_text (string (_("%1 free space", "%1 gets replaced with the size and a matching unit. Example: 3 MB or 5 GB")).arg (lfree_space_str));
+        this.ui.l_free_space.on_signal_text (string (_("%1 free space", "%1 gets replaced with the size and a matching unit. Example: 3 MB or 5 GB")).printf (lfree_space_str));
 
         this.ui.sync_mode_label.on_signal_text (t);
         this.ui.sync_mode_label.fixed_height (this.ui.sync_mode_label.size_hint ().height ());
@@ -707,7 +707,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         if (avatar_image.is_null ()) {
             return;
         }
-        const var avatar_pixmap = QPixmap.from_image (AvatarJob.make_circular_avatar (avatar_image));
+        const var avatar_pixmap = Gdk.Pixbuf.from_image (AvatarJob.make_circular_avatar (avatar_image));
         this.ui.l_server_icon.pixmap (avatar_pixmap);
     }
 
@@ -737,7 +737,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
             radio_checked (this.ui.r_sync_everything);
             this.ui.r_virtual_file_sync.enabled (false);
         } else {
-            this.ui.r_virtual_file_sync.on_signal_text (_("Use virtual files instead of downloading content immediately %1").arg (best_available_vfs_mode () == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
+            this.ui.r_virtual_file_sync.on_signal_text (_("Use virtual files instead of downloading content immediately %1").printf (best_available_vfs_mode () == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
             this.ui.r_virtual_file_sync.enabled (true);
         }
         //

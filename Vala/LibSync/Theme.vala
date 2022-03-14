@@ -20,7 +20,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #undef Mirall
 //  #endif
 
-//  #include <QIcon>
+//  #include <Gtk.Icon>
 
 namespace Occ {
 namespace LibSync {
@@ -80,7 +80,7 @@ public class Theme : GLib.Object {
 
 //  #ifndef TOKEN_AUTH_ONLY
     // mutable
-    private GLib.HashTable<string, QIcon> icon_cache;
+    private GLib.HashTable<string, Gtk.Icon> icon_cache;
 //  #endif
 
 
@@ -296,7 +296,7 @@ public class Theme : GLib.Object {
     /***********************************************************
     Get an sync state icon
     ***********************************************************/
-    public QIcon sync_state_icon (SyncResult.Status status, bool sys_tray = false) {
+    public Gtk.Icon sync_state_icon (SyncResult.Status status, bool sys_tray = false) {
         // FIXME: Mind the size!
         string status_icon;
 
@@ -333,21 +333,21 @@ public class Theme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public QIcon folder_disabled_icon () {
+    public Gtk.Icon folder_disabled_icon () {
         return theme_icon ("state-pause");
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public QIcon folder_offline_icon (bool sys_tray) {
+    public Gtk.Icon folder_offline_icon (bool sys_tray) {
         return theme_icon ("state-offline", sys_tray);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public QIcon application_icon () {
+    public Gtk.Icon application_icon () {
         return theme_icon (APPLICATION_ICON_NAME + "-icon");
     }
 
@@ -954,14 +954,14 @@ public class Theme : GLib.Object {
     }
 	
 	/***********************************************************
-    @brief Request suitable QIcon resource depending on the
+    @brief Request suitable Gtk.Icon resource depending on the
     background colour of the parent widget.
 
     This should be replaced (TODO) by a real theming
     implementation for the client UI
     (actually 2019/09/13 only systray theming).
     ***********************************************************/
-	public QIcon ui_theme_icon (string icon_name, bool ui_has_dark_background) {
+	public Gtk.Icon ui_theme_icon (string icon_name, bool ui_has_dark_background) {
         string icon_path = Theme.theme_prefix + (ui_has_dark_background ? "white/": "black/") + icon_name;
         string icn_path = icon_path.to_utf8 ().const_data ();
         return new Gtk.Icon (Gdk.Pixbuf (icon_path));
@@ -1041,11 +1041,11 @@ public class Theme : GLib.Object {
     @brief Creates a colour-aware icon based on the specified
     palette's base colour (Dark-/Light-Mode switching).
 
-    @return QIcon, colour-aware (inverted on dark backgrounds).
+    @return Gtk.Icon, colour-aware (inverted on dark backgrounds).
 
     2019/12/09: Moved here from SettingsDialog.
     ***********************************************************/
-    public static QIcon create_color_aware_icon (string name, QPalette palette = QGuiApplication.palette ()) {
+    public static Gtk.Icon create_color_aware_icon (string name, QPalette palette = QGuiApplication.palette ()) {
         QSvgRenderer renderer = new QSvgRenderer (name);
         Gtk.Image img = new Gtk.Image (64, 64, Gtk.Image.FormatARGB32);
         img.fill (Qt.GlobalColor.transparent);
@@ -1059,16 +1059,16 @@ public class Theme : GLib.Object {
 
         inverted.invert_pixels (Gtk.Image.InvertRgb);
 
-        QIcon icon;
+        Gtk.Icon icon;
         if (Theme.is_dark_color (palette.color (QPalette.Base))) {
             icon.add_pixmap (Gdk.Pixbuf.from_image (inverted));
         } else {
             icon.add_pixmap (Gdk.Pixbuf.from_image (img));
         }
         if (Theme.is_dark_color (palette.color (QPalette.HighlightedText))) {
-            icon.add_pixmap (Gdk.Pixbuf.from_image (img), QIcon.Normal, QIcon.On);
+            icon.add_pixmap (Gdk.Pixbuf.from_image (img), Gtk.Icon.Normal, Gtk.Icon.On);
         } else {
-            icon.add_pixmap (Gdk.Pixbuf.from_image (inverted), QIcon.Normal, QIcon.On);
+            icon.add_pixmap (Gdk.Pixbuf.from_image (inverted), Gtk.Icon.Normal, Gtk.Icon.On);
         }
         return icon;
     }
@@ -1153,7 +1153,7 @@ public class Theme : GLib.Object {
     provides or from the apps Qt resources.
     ***********************************************************/
 //  #ifndef TOKEN_AUTH_ONLY
-    protected QIcon theme_icon (string name, bool sys_tray = false) {
+    protected Gtk.Icon theme_icon (string name, bool sys_tray = false) {
         string flavor;
         if (sys_tray) {
             flavor = systray_icon_flavor (this.mono);
@@ -1162,11 +1162,11 @@ public class Theme : GLib.Object {
         }
 
         string key = name + "," + flavor;
-        QIcon cached = this.icon_cache[key];
+        Gtk.Icon cached = this.icon_cache[key];
         if (cached.is_null ()) {
-            if (QIcon.has_theme_icon (name)) {
+            if (Gtk.Icon.has_theme_icon (name)) {
                 // use from theme
-                return cached = QIcon.from_theme (name);
+                return cached = Gtk.Icon.from_theme (name);
             }
 
             const string svg_name = Theme.theme_prefix + "%1/%2.svg".printf (flavor).printf (name);

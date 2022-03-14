@@ -14,7 +14,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QVBoxLayou
 //  #include <QTreeView>
 //  #include <QKeySe
-//  #include <QIcon>
+//  #include <Gtk.Icon>
 //  #include <QJsonDocum
 //  #include <QToolTip>
 //  #include <Gtk.Widget>
@@ -183,7 +183,7 @@ public class AccountSettings : Gtk.Widget {
 
         // quota_progress_bar style now set in customize_style ()
         /*Gtk.Color color = palette ().highlight ().color ();
-         this.ui.quota_progress_bar.style_sheet (string.from_latin1 (PROGRESS_BAR_STYLE_C).arg (color.name ()));*/
+         this.ui.quota_progress_bar.style_sheet (string.from_latin1 (PROGRESS_BAR_STYLE_C).printf (color.name ()));*/
 
         // Connect E2E stuff
         connect (this, AccountSettings.signal_request_mnemonic, this.account_state.account ().e2e (), ClientSideEncryption.on_signal_request_mnemonic);
@@ -272,8 +272,8 @@ public class AccountSettings : Gtk.Widget {
             string used_str = Utility.octets_to_string (used);
             string total_str = Utility.octets_to_string (total);
             string percent_str = Utility.compact_format_double (percent, 1);
-            string tool_tip = _("%1 (%3%) of %2 in use. Some folders, including network mounted or shared folders, might have different limits.").arg (used_str, total_str, percent_str);
-            this.ui.quota_info_label.on_signal_text (_("%1 of %2 in use").arg (used_str, total_str));
+            string tool_tip = _("%1 (%3%) of %2 in use. Some folders, including network mounted or shared folders, might have different limits.").printf (used_str, total_str, percent_str);
+            this.ui.quota_info_label.on_signal_text (_("%1 of %2 in use").printf (used_str, total_str));
             this.ui.quota_info_label.tool_tip (tool_tip);
             this.ui.quota_progress_bar.tool_tip (tool_tip);
         } else {
@@ -285,7 +285,7 @@ public class AccountSettings : Gtk.Widget {
                 this.ui.quota_info_label.on_signal_text (_("Currently there is no storage usage information available."));
             } else {
                 string used_str = Utility.octets_to_string (used);
-                this.ui.quota_info_label.on_signal_text (_("%1 in use").arg (used_str));
+                this.ui.quota_info_label.on_signal_text (_("%1 in use").printf (used_str));
             }
         }
     }
@@ -305,7 +305,7 @@ public class AccountSettings : Gtk.Widget {
             }
 
             const string server = "<a href=\"%1\">%2</a>"
-                                .arg (
+                                .printf (
                                     Utility.escape (account.url ().to_string ()),
                                     Utility.escape (safe_url.to_string ())
                                 );
@@ -315,26 +315,26 @@ public class AccountSettings : Gtk.Widget {
                 if (user.is_empty ()) {
                     user = account.credentials ().user ();
                 }
-                server_with_user = _("%1 as %2").arg (server, Utility.escape (user));
+                server_with_user = _("%1 as %2").printf (server, Utility.escape (user));
             }
 
             switch (state) {
             case AccountState.State.CONNECTED: {
                 string[] errors;
                 if (account.server_version_unsupported ()) {
-                    errors += _("The server version %1 is unsupported! Proceed at your own risk.").arg (account.server_version ());
+                    errors += _("The server version %1 is unsupported! Proceed at your own risk.").printf (account.server_version ());
                 }
-                show_connection_label (_("Connected to %1.").arg (server_with_user), errors);
+                show_connection_label (_("Connected to %1.").printf (server_with_user), errors);
                 break;
             }
             case AccountState.State.SERVICE_UNAVAILABLE:
-                show_connection_label (_("Server %1 is temporarily unavailable.").arg (server));
+                show_connection_label (_("Server %1 is temporarily unavailable.").printf (server));
                 break;
             case AccountState.State.MAINTENANCE_MODE:
-                show_connection_label (_("Server %1 is currently in maintenance mode.").arg (server));
+                show_connection_label (_("Server %1 is currently in maintenance mode.").printf (server));
                 break;
             case AccountState.State.SIGNED_OUT:
-                show_connection_label (_("Signed out from %1.").arg (server_with_user));
+                show_connection_label (_("Signed out from %1.").printf (server_with_user));
                 break;
             case AccountState.State.ASKING_CREDENTIALS: {
                 GLib.Uri url;
@@ -352,20 +352,20 @@ public class AccountSettings : Gtk.Widget {
                 if (url.is_valid ()) {
                     show_connection_label (_("Obtaining authorization from the browser. "
                                            + "<a href='%1'>Click here</a> to re-open the browser.")
-                                            .arg (url.to_string (GLib.Uri.FullyEncoded)));
+                                            .printf (url.to_string (GLib.Uri.FullyEncoded)));
                 } else {
-                    show_connection_label (_("Connecting to %1 …").arg (server_with_user));
+                    show_connection_label (_("Connecting to %1 …").printf (server_with_user));
                 }
                 break;
             }
             case AccountState.State.NETWORK_ERROR:
                 show_connection_label (_("No connection to %1 at %2.")
-                                        .arg (Utility.escape (Theme.instance ().app_name_gui ()), server),
+                                        .printf (Utility.escape (Theme.instance ().app_name_gui ()), server),
                     this.account_state.connection_errors ());
                 break;
             case AccountState.State.CONFIGURATION_ERROR:
                 show_connection_label (_("Server configuration error : %1 at %2.")
-                                        .arg (Utility.escape (Theme.instance ().app_name_gui ()), server),
+                                        .printf (Utility.escape (Theme.instance ().app_name_gui ()), server),
                     this.account_state.connection_errors ());
                 break;
             case AccountState.State.DISCONNECTED:
@@ -376,7 +376,7 @@ public class AccountSettings : Gtk.Widget {
         } else {
             // own_cloud is not yet configured.
             show_connection_label (_("No %1 connection configured.")
-                                    .arg (Utility.escape (Theme.instance ().app_name_gui ())));
+                                    .printf (Utility.escape (Theme.instance ().app_name_gui ())));
         }
 
         /* Allow to expand the item if the account is connected. */
@@ -562,7 +562,7 @@ public class AccountSettings : Gtk.Widget {
                 _("Confirm Folder Sync Connection Removal"),
                 _("<p>Do you really want to stop syncing the folder <i>%1</i>?</p>"
                 + "<p><b>Note:</b> This will <b>not</b> delete any files.</p>")
-                    .arg (short_gui_local_path),
+                    .printf (short_gui_local_path),
                 QMessageBox.NoButton,
                 this);
             message_box.attribute (Qt.WA_DeleteOnClose);
@@ -890,7 +890,7 @@ public class AccountSettings : Gtk.Widget {
                 if (!directory.mkpath (".")) {
                     QMessageBox.warning (this, _("Folder creation failed"),
                         _("<p>Could not create local folder <i>%1</i>.</p>")
-                            .arg (QDir.to_native_separators (definition.local_path)));
+                            .printf (QDir.to_native_separators (definition.local_path)));
                     return;
                 }
             }
@@ -944,7 +944,7 @@ public class AccountSettings : Gtk.Widget {
             _("Confirm Account Removal"),
             _("<p>Do you really want to remove the connection to the account <i>%1</i>?</p>"
             + "<p><b>Note:</b> This will <b>not</b> delete any files.</p>")
-                .arg (this.account_state.account ().display_name ()),
+                .printf (this.account_state.account ().display_name ()),
             QMessageBox.NoButton,
             this);
         var yes_button = message_box.add_button (_("Remove connection"), QMessageBox.YesRole);
@@ -1006,7 +1006,7 @@ public class AccountSettings : Gtk.Widget {
                 }
                 if (this.model.index_for_path (folder, my_folder).is_valid ()) {
                     message += "<a href=\"%1?folder=%2\">%1</a>"
-                               .arg (
+                               .printf (
                                    Utility.escape (my_folder),
                                    Utility.escape (folder.alias ())
                                 );
@@ -1227,7 +1227,7 @@ public class AccountSettings : Gtk.Widget {
             && !FolderMan.instance ().folder_by_alias (alias).virtual_files_enabled () && Vfs.check_availability (FolderMan.instance ().folder_by_alias (alias).path ())) {
             var mode = best_available_vfs_mode ();
             if (mode == Vfs.WindowsCfApi || ConfigFile ().show_experimental_options ()) {
-                action = menu.add_action (_("Enable virtual file support %1 …").arg (mode == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
+                action = menu.add_action (_("Enable virtual file support %1 …").printf (mode == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
                 // TODO: remove when UX decision is made
                 action.enabled (!Utility.is_path_windows_drive_partition_root (FolderMan.instance ().folder_by_alias (alias).path ()));
                 //
@@ -1537,7 +1537,7 @@ public class AccountSettings : Gtk.Widget {
         this.ui.connect_label.on_signal_text (message);
 
         Gtk.Color color = palette ().highlight ().color ();
-        this.ui.quota_progress_bar.style_sheet (string.from_latin1 (PROGRESS_BAR_STYLE_C).arg (color.name ()));
+        this.ui.quota_progress_bar.style_sheet (string.from_latin1 (PROGRESS_BAR_STYLE_C).printf (color.name ()));
     }
 
 

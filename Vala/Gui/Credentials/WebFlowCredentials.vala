@@ -270,7 +270,7 @@ public class WebFlowCredentials : AbstractCredentials {
         }
 
         string message = _("You have been logged out of %1 as user %2. Please log in again.")
-                        .arg (this.account.display_name (), this.user);
+                        .printf (this.account.display_name (), this.user);
         this.ask_dialog.info (message);
 
         this.ask_dialog.show ();
@@ -660,7 +660,7 @@ public class WebFlowCredentials : AbstractCredentials {
             GLib.info ("Authed with the wrong user!");
 
             string message = _("Please log in with the user: %1")
-                    .arg (this.user);
+                    .printf (this.user);
             this.ask_dialog.error (message);
 
             if (!this.ask_dialog.is_using_flow2 ()) {

@@ -212,15 +212,15 @@ public class SyncStatusSummary : GLib.Object {
             if (progress.trust_eta ()) {
                 sync_status_detail_string (
                     _("%1 of %2 · %3 left")
-                        .arg (completed_size_string, total_size_string)
-                        .arg (Utility.duration_to_descriptive_string1 (progress.total_progress ().estimated_eta)));
+                        .printf (completed_size_string, total_size_string)
+                        .printf (Utility.duration_to_descriptive_string1 (progress.total_progress ().estimated_eta)));
             } else {
-                sync_status_detail_string (_("%1 of %2").arg (completed_size_string, total_size_string));
+                sync_status_detail_string (_("%1 of %2").printf (completed_size_string, total_size_string));
             }
         }
 
         if (total_file_count > 0) {
-            sync_status_string (_("Syncing file %1 of %2").arg (current_file).arg (total_file_count));
+            sync_status_string (_("Syncing file %1 of %2").printf (current_file).printf (total_file_count));
         }
     }
 

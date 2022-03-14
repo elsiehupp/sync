@@ -64,7 +64,7 @@ public class TestUtility : GLib.Object {
     private void on_signal_test_launch_on_signal_startup () {
         string postfix = Occ.Utility.rand ().to_string ();
 
-        const string app_name = "on_signal_test_launch_on_signal_startup.%1".arg (postfix);
+        const string app_name = "on_signal_test_launch_on_signal_startup.%1".printf (postfix);
         const string gui_name = "LaunchOnStartup GUI Name";
 
         GLib.assert_true (has_launch_on_startup (app_name) == false);

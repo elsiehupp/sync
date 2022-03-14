@@ -104,7 +104,7 @@ public class RemoteWipe : GLib.Object {
         request.url (request_url);
         request.ssl_configuration (this.account.or_create_ssl_config ());
         var request_body = new QBuffer ();
-        QUrlQuery arguments = new QUrlQuery ("token=%1".arg (this.app_password));
+        QUrlQuery arguments = new QUrlQuery ("token=%1".printf (this.app_password));
         request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
         this.network_reply_check = this.network_manager.post (request, request_body);
         connect (
@@ -139,16 +139,16 @@ public class RemoteWipe : GLib.Object {
             string error_from_json = json["error"].to_string ();
             if (!error_from_json.is_empty ()) {
                 GLib.warning ("Error returned from the server : <em>%1<em>"
-                    .arg (error_from_json.to_html_escaped ()));
+                    .printf (error_from_json.to_html_escaped ()));
             } else if (this.network_reply_check.error () != Soup.Reply.NoError) {
                 GLib.warning (
                     "There was an error accessing the 'token' endpoint: <br><em>%1</em>"
-                        .arg (this.network_reply_check.error_string ().to_html_escaped ())
+                        .printf (this.network_reply_check.error_string ().to_html_escaped ())
                     );
             } else if (json_parse_error.error != QJsonParseError.NoError) {
                 GLib.warning (
                     "Could not parse the JSON returned from the server: <br><em>%1</em>"
-                        .arg (json_parse_error.error_string ())
+                        .printf (json_parse_error.error_string ())
                     );
             } else {
                 GLib.warning ("The reply from the server did not contain all expected fields");
@@ -207,7 +207,7 @@ public class RemoteWipe : GLib.Object {
             request.url (request_url);
             request.ssl_configuration (this.account.or_create_ssl_config ());
             var request_body = new QBuffer ();
-            QUrlQuery arguments = new QUrlQuery ("token=%1".arg (this.app_password));
+            QUrlQuery arguments = new QUrlQuery ("token=%1".printf (this.app_password));
             request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
             this.network_reply_success = this.network_manager.post (request, request_body);
             connect (
@@ -229,13 +229,13 @@ public class RemoteWipe : GLib.Object {
             string error_from_json = json["error"].to_string ();
             if (!error_from_json.is_empty ()) {
                 GLib.warning ("Error returned from the server: <em>%1</em>"
-                    .arg (error_from_json.to_html_escaped ()));
+                    .printf (error_from_json.to_html_escaped ()));
             } else if (this.network_reply_success.error () != Soup.Reply.NoError) {
                 GLib.warning ("There was an error accessing the 'on_signal_success' endpoint: <br><em>%1</em>"
-                    .arg (this.network_reply_success.error_string ().to_html_escaped ()));
+                    .printf (this.network_reply_success.error_string ().to_html_escaped ()));
             } else if (json_parse_error.error != QJsonParseError.NoError) {
                 GLib.warning ("Could not parse the JSON returned from the server: <br><em>%1</em>"
-                    .arg (json_parse_error.error_string ()));
+                    .printf (json_parse_error.error_string ()));
             } else {
                 GLib.warning ("The reply from the server did not contain all expected fields.");
             }

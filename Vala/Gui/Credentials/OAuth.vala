@@ -129,7 +129,7 @@ public class OAuth : GLib.Object {
         Soup.Request req;
         req.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
 
-        string basic_auth = string ("%1:%2").arg (
+        string basic_auth = string ("%1:%2").printf (
             Theme.instance ().oauth_client_id (), Theme.instance ().oauth_client_secret ());
         req.raw_header ("Authorization", "Basic " + basic_auth.to_utf8 ().to_base64 ());
         // We just added the Authorization header, don't let HttpCredentialsAccessManager tamper with it
@@ -138,7 +138,7 @@ public class OAuth : GLib.Object {
         var request_body = new QBuffer ();
         QUrlQuery arguments = new QUrlQuery (
             "grant_type=authorization_code&code=%1&redirect_uri=http://localhost:%2"
-                .arg (code, string.number (this.server.server_port ())));
+                .printf (code, string.number (this.server.server_port ())));
         request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
 
         var job = this.account.send_request ("POST", request_token, req, request_body);
@@ -170,10 +170,10 @@ public class OAuth : GLib.Object {
             string error_from_json = json["error"].to_string ();
             if (!error_from_json.is_empty ()) {
                 error_reason = _("Error returned from the server : <em>%1</em>")
-                                  .arg (error_from_json.to_html_escaped ());
+                                  .printf (error_from_json.to_html_escaped ());
             } else if (reply.error () != Soup.Reply.NoError) {
                 error_reason = _("There was an error accessing the \"token\" endpoint : <br><em>%1</em>")
-                                  .arg (reply.error_string ().to_html_escaped ());
+                                  .printf (reply.error_string ().to_html_escaped ());
             } else if (json_data.is_empty ()) {
                 // Can happen if a funky load balancer strips away POST data, e.g. BigIP APM my.policy
                 error_reason = _("Empty JSON from OAuth2 redirect");
@@ -182,13 +182,13 @@ public class OAuth : GLib.Object {
                 // soon as you access json["whatever"] the debug output json will claim to have "whatever":null
             } else if (json_parse_error.error != QJsonParseError.NoError) {
                 error_reason = _("Could not parse the JSON returned from the server : <br><em>%1</em>")
-                                  .arg (json_parse_error.error_string ());
+                                  .printf (json_parse_error.error_string ());
             } else {
                 error_reason = _("The reply from the server did not contain all expected fields");
             }
             GLib.warning ("Error when getting the access_token " + json + error_reason);
             http_reply_and_close (socket, "500 Internal Server Error",
-                _("<h1>Login Error</h1><p>%1</p>").arg (error_reason).to_utf8 ().const_data ());
+                _("<h1>Login Error</h1><p>%1</p>").printf (error_reason).to_utf8 ().const_data ());
             /* emit */ signal_result (Error);
             return;
         }
@@ -198,7 +198,7 @@ public class OAuth : GLib.Object {
                              + "<p>You logged-in with user <em>%1</em>, but must log in with user <em>%2</em>.<br>"
                              + "Please log out of %3 in another tab, then <a href='%4'>click here</a> "
                              + "and log in as user %2</p>")
-                                  .arg (user, this.expected_user, Theme.instance ().app_name_gui (),
+                                  .printf (user, this.expected_user, Theme.instance ().app_name_gui (),
                                       authorisation_link ().to_string (GLib.Uri.FullyEncoded));
             http_reply_and_close (socket, "200 OK", message.to_utf8 ().const_data ());
             // We are still listening on the socket so we will get the new connection

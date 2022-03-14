@@ -37,7 +37,7 @@ public class TestAsyncOp : GLib.Object {
         fake_folder.sync_engine ().set_sync_options (options);
         int n_get = 0;
 
-        GLib.HashMap<string, TestCase> test_cases;
+        GLib.HashTable<string, TestCase> test_cases;
 
         fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice outgoing_data) . Soup.Reply * {
             var path = request.url ().path ();

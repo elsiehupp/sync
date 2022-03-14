@@ -5,7 +5,7 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <QPixmap>
+//  #include <Gdk.Pixbuf>
 //  #include <QRadioButton>
 //  #include <QAbstractButton>
 //  #include <QCheckBox>
@@ -46,7 +46,7 @@ public class WizardCommon {
         if (!label)
             return;
 
-        QPixmap pix = variant.value<QPixmap> ();
+        Gdk.Pixbuf pix = variant.value<Gdk.Pixbuf> ();
         if (!pix.is_null ()) {
             label.pixmap (pix);
             label.alignment (Qt.AlignTop | Qt.Align_right);
@@ -66,14 +66,14 @@ public class WizardCommon {
     /***********************************************************
     ***********************************************************/
     public static string title_template () {
-        return " (<font color=\"%1\" size=\"5\">)".arg (Theme.instance ().wizard_header_title_color ().name ()) + "%1</font>";
+        return " (<font color=\"%1\" size=\"5\">)".printf (Theme.instance ().wizard_header_title_color ().name ()) + "%1</font>";
     }
 
 
     /***********************************************************
     ***********************************************************/
     public static string sub_title_template () {
-        return "<font color=\"%1\">".arg (Theme.instance ().wizard_header_title_color ().name ()) + "%1</font>";
+        return "<font color=\"%1\">".printf (Theme.instance ().wizard_header_title_color ().name ()) + "%1</font>";
     }
 
 

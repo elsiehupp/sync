@@ -9,7 +9,7 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 //  #include <QInputDialog>
 //  #include <QPointer>
 //  #include <QPushButton>
-//  #include <QFrame>
+//  #include <Gdk.Frame>
 
 //  #include <QPointer>
 //  #include <Gtk.Dialog>
@@ -84,7 +84,7 @@ public class ShareDialog : Gtk.Dialog {
         // Set icon
         GLib.FileInfo file_info = new GLib.FileInfo (this.local_path);
         QFileIconProvider icon_provider;
-        QIcon icon = icon_provider.icon (file_info);
+        Gtk.Icon icon = icon_provider.icon (file_info);
         var pixmap = icon.pixmap (THUMBNAIL_SIZE, THUMBNAIL_SIZE);
         if (pixmap.width () > 0) {
             this.ui.label_icon.pixmap (pixmap);
@@ -92,7 +92,7 @@ public class ShareDialog : Gtk.Dialog {
 
         // Set filename
         string filename = GLib.FileInfo (this.share_path).filename ();
-        this.ui.label_name.on_signal_text (_("%1").arg (filename));
+        this.ui.label_name.on_signal_text (_("%1").printf (filename));
         QFont font = new QFont (this.ui.label_name.font ());
         font.point_size (q_round (font.point_size () * 1.4));
         this.ui.label_name.font (font);
@@ -113,10 +113,10 @@ public class ShareDialog : Gtk.Dialog {
         } else {
             this.ui.grid_layout.add_widget (this.ui.label_name, 0, 1, 1, 1);
             this.ui.grid_layout.add_widget (this.ui.label_share_path, 1, 1, 1, 1);
-            this.ui.label_share_path.on_signal_text (_("Folder : %2").arg (oc_dir));
+            this.ui.label_share_path.on_signal_text (_("Folder : %2").printf (oc_dir));
         }
 
-        this.window_title (_("%1 Sharing").arg (Theme.instance ().app_name_gui ()));
+        this.window_title (_("%1 Sharing").printf (Theme.instance ().app_name_gui ()));
 
         if (!account_state.account ().capabilities ().share_api ()) {
             return;
@@ -214,7 +214,7 @@ public class ShareDialog : Gtk.Dialog {
             return;
         }
 
-        QPixmap p;
+        Gdk.Pixbuf p;
         p.load_from_data (reply, "PNG");
         p = p.scaled_to_height (THUMBNAIL_SIZE, Qt.Smooth_transformation);
         this.ui.label_icon.pixmap (p);
@@ -357,7 +357,7 @@ public class ShareDialog : Gtk.Dialog {
         if (count > 0 && count <= 3) {
             this.ui.scroll_area.fixed_height (this.ui.scroll_area.widget ().size_hint ().height ());
         }
-        this.ui.scroll_area.frame_shape (count > 3 ? QFrame.Styled_panel : QFrame.No_frame);
+        this.ui.scroll_area.frame_shape (count > 3 ? Gdk.Frame.Styled_panel : Gdk.Frame.No_frame);
     }
 
 

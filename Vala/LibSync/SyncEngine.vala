@@ -150,7 +150,7 @@ public class SyncEngine : GLib.Object {
     /***********************************************************
     Stores the time since a job touched a file.
     ***********************************************************/
-    private GLib.HashMap<QElapsedTimer, string> touched_files;
+    private GLib.HashTable<QElapsedTimer, string> touched_files;
 
 
     /***********************************************************

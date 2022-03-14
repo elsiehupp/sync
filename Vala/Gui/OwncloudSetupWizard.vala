@@ -260,7 +260,7 @@ public class OwncloudSetupWizard : GLib.Object {
         var server_version = CheckServerJob.version (info);
 
         this.oc_wizard.on_signal_append_to_configuration_log (_("<font color=\"green\">Successfully connected to %1 : %2 version %3 (%4)</font><br/><br/>")
-                                                .arg (Utility.escape (url.to_string ()),
+                                                .printf (Utility.escape (url.to_string ()),
                                                     Utility.escape (Theme.instance ().app_name_gui ()),
                                                     Utility.escape (CheckServerJob.version_string (info)),
                                                     Utility.escape (server_version)));
@@ -290,7 +290,7 @@ public class OwncloudSetupWizard : GLib.Object {
             message = _("Invalid URL");
         } else {
             message = _("Failed to connect to %1 at %2:<br/>%3")
-                      .arg (Utility.escape (Theme.instance ().app_name_gui ()),
+                      .printf (Utility.escape (Theme.instance ().app_name_gui ()),
                           Utility.escape (this.oc_wizard.account ().url ().to_string ()),
                           Utility.escape (job.error_string ()));
         }
@@ -310,7 +310,7 @@ public class OwncloudSetupWizard : GLib.Object {
     private void on_signal_no_server_found_timeout (GLib.Uri url) {
         this.oc_wizard.on_signal_display_error (
             _("Timeout while trying to connect to %1 at %2.")
-                .arg (Utility.escape (Theme.instance ().app_name_gui ()), Utility.escape (url.to_string ())),
+                .printf (Utility.escape (Theme.instance ().app_name_gui ()), Utility.escape (url.to_string ())),
                     false);
     }
 
@@ -361,8 +361,8 @@ public class OwncloudSetupWizard : GLib.Object {
         this.oc_wizard.field ("OCUrl", url);
         this.oc_wizard.on_signal_append_to_configuration_log (
             _("Trying to connect to %1 at %2 …")
-                .arg (Theme.instance ().app_name_gui ())
-                .arg (url)
+                .printf (Theme.instance ().app_name_gui ())
+                .printf (url)
             );
 
         test_owncloud_connect ();
@@ -383,9 +383,9 @@ public class OwncloudSetupWizard : GLib.Object {
             // own_cloud is newly created.
             this.oc_wizard.on_signal_append_to_configuration_log (
                 _("Local sync folder %1 already exists, setting it up for sync.<br/><br/>")
-                    .arg (Utility.escape (local_folder)));
+                    .printf (Utility.escape (local_folder)));
         } else {
-            string res = _("Creating local sync folder %1 …").arg (local_folder);
+            string res = _("Creating local sync folder %1 …").printf (local_folder);
             if (file_info.mkpath (local_folder)) {
                 FileSystem.folder_minimum_permissions (local_folder);
                 Utility.setup_fav_link (local_folder);
@@ -393,7 +393,7 @@ public class OwncloudSetupWizard : GLib.Object {
             } else {
                 res += _("failed.");
                 GLib.warning ("Failed to create " + file_info.path ());
-                this.oc_wizard.on_signal_display_error (_("Could not create local folder %1").arg (Utility.escape (local_folder)), false);
+                this.oc_wizard.on_signal_display_error (_("Could not create local folder %1").printf (Utility.escape (local_folder)), false);
                 next_step = false;
             }
             this.oc_wizard.on_signal_append_to_configuration_log (res);
@@ -462,7 +462,7 @@ public class OwncloudSetupWizard : GLib.Object {
                 create_remote_folder ();
             }
         } else {
-            error = _("Error: %1").arg (job.error_string ());
+            error = _("Error: %1").printf (job.error_string ());
             ok = false;
         }
 
@@ -484,11 +484,11 @@ public class OwncloudSetupWizard : GLib.Object {
 
         bool on_signal_success = true;
         if (error == 202) {
-            this.oc_wizard.on_signal_append_to_configuration_log (_("The remote folder %1 already exists. Connecting it for syncing.").arg (this.remote_folder));
+            this.oc_wizard.on_signal_append_to_configuration_log (_("The remote folder %1 already exists. Connecting it for syncing.").printf (this.remote_folder));
         } else if (error > 202 && error < 300) {
-            this.oc_wizard.on_signal_display_error (_("The folder creation resulted in HTTP error code %1").arg (static_cast<int> (error)), false);
+            this.oc_wizard.on_signal_display_error (_("The folder creation resulted in HTTP error code %1").printf (static_cast<int> (error)), false);
 
-            this.oc_wizard.on_signal_append_to_configuration_log (_("The folder creation resulted in HTTP error code %1").arg (static_cast<int> (error)));
+            this.oc_wizard.on_signal_append_to_configuration_log (_("The folder creation resulted in HTTP error code %1").printf (static_cast<int> (error)));
         } else if (error == Soup.Reply.OperationCanceledError) {
             this.oc_wizard.on_signal_display_error (
                 _("The remote folder creation failed because the provided credentials "
@@ -504,8 +504,8 @@ public class OwncloudSetupWizard : GLib.Object {
             this.remote_folder.clear ();
             on_signal_success = false;
         } else {
-            this.oc_wizard.on_signal_append_to_configuration_log (_("Remote folder %1 creation failed with error <tt>%2</tt>.").arg (Utility.escape (this.remote_folder)).arg (error));
-            this.oc_wizard.on_signal_display_error (_("Remote folder %1 creation failed with error <tt>%2</tt>.").arg (Utility.escape (this.remote_folder)).arg (error), false);
+            this.oc_wizard.on_signal_append_to_configuration_log (_("Remote folder %1 creation failed with error <tt>%2</tt>.").printf (Utility.escape (this.remote_folder)).printf (error));
+            this.oc_wizard.on_signal_display_error (_("Remote folder %1 creation failed with error <tt>%2</tt>.").printf (Utility.escape (this.remote_folder)).printf (error), false);
             this.remote_folder.clear ();
             on_signal_success = false;
         }
@@ -559,7 +559,7 @@ public class OwncloudSetupWizard : GLib.Object {
                     }
                 }
                 this.oc_wizard.on_signal_append_to_configuration_log (
-                    _("<font color=\"green\"><b>Local sync folder %1 successfully created!</b></font>").arg (local_folder)
+                    _("<font color=\"green\"><b>Local sync folder %1 successfully created!</b></font>").printf (local_folder)
                 );
             }
         }
@@ -629,7 +629,7 @@ public class OwncloudSetupWizard : GLib.Object {
             }
             error_msg = _("The authenticated request to the server was redirected to "
                         + "\"%1\". The URL is bad, the server is misconfigured.")
-                           .arg (Utility.escape (redirect_url.to_string ()));
+                           .printf (Utility.escape (redirect_url.to_string ()));
 
             // A 404 is actually a on_signal_success : we were authorized to know that the folder does
             // not exist. It will be created later...
@@ -642,7 +642,7 @@ public class OwncloudSetupWizard : GLib.Object {
             if (!this.oc_wizard.account ().credentials ().still_valid (reply)) {
                 error_msg = _("Access forbidden by server. To verify that you have proper access, "
                             + "<a href=\"%1\">click here</a> to access the service with your browser.")
-                               .arg (Utility.escape (this.oc_wizard.account ().url ().to_string ()));
+                               .printf (Utility.escape (this.oc_wizard.account ().url ().to_string ()));
             } else {
                 error_msg = job.error_string_parsing_body ();
             }
@@ -738,7 +738,7 @@ public class OwncloudSetupWizard : GLib.Object {
     private void create_remote_folder () {
         this.oc_wizard.on_signal_append_to_configuration_log (
             _("creating folder on Nextcloud : %1")
-                .arg (this.remote_folder)
+                .printf (this.remote_folder)
         );
 
         var job = new MkColJob (this.oc_wizard.account (), this.remote_folder, this);
@@ -761,7 +761,7 @@ public class OwncloudSetupWizard : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_mkcol_job_finished_without_error () {
-        this.oc_wizard.on_signal_append_to_configuration_log (_("Remote folder %1 created successfully.").arg (this.remote_folder));
+        this.oc_wizard.on_signal_append_to_configuration_log (_("Remote folder %1 created successfully.").printf (this.remote_folder));
         finalize_setup (true);
     }
 
@@ -774,13 +774,13 @@ public class OwncloudSetupWizard : GLib.Object {
             if (! (local_folder.is_empty () || this.remote_folder.is_empty ())) {
                 this.oc_wizard.on_signal_append_to_configuration_log (
                     _("A sync connection from %1 to remote directory %2 was set up.")
-                        .arg (local_folder, this.remote_folder));
+                        .printf (local_folder, this.remote_folder));
             }
             this.oc_wizard.on_signal_append_to_configuration_log (" ");
             this.oc_wizard.on_signal_append_to_configuration_log (
                 "<p><font color=\"green\"><b>"
                 + _("Successfully connected to %1!")
-                    .arg (Theme.instance ().app_name_gui ())
+                    .printf (Theme.instance ().app_name_gui ())
                 + "</b></font></p>");
             this.oc_wizard.on_signal_successful_step ();
         } else {
@@ -788,7 +788,7 @@ public class OwncloudSetupWizard : GLib.Object {
             this.oc_wizard.on_signal_append_to_configuration_log (
                 "<p><font color=\"red\">"
                 + _("Connection to %1 could not be established. Please check again.")
-                    .arg (Theme.instance ().app_name_gui ())
+                    .printf (Theme.instance ().app_name_gui ())
                 + "</font></p>");
         }
     }

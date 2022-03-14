@@ -31,8 +31,8 @@ public class FolderWatcherPrivate : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private string folder;
-    private GLib.HashMap<int, string> watch_to_path;
-    private GLib.HashMap<string, int> path_to_watch;
+    private GLib.HashTable<int, string> watch_to_path;
+    private GLib.HashTable<string, int> path_to_watch;
     private QScopedPointer<QSocket_notifier> socket;
     private int fd;
 

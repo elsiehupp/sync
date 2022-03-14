@@ -28,7 +28,7 @@ public class FolderWizardSelectiveSync : QWizardPage {
         layout.add_widget (this.selective_sync);
 
         if (Theme.instance ().show_virtual_files_option () && best_available_vfs_mode () != Vfs.Off) {
-            this.virtual_files_check_box = new QCheckBox (_("Use virtual files instead of downloading content immediately %1").arg (best_available_vfs_mode () == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
+            this.virtual_files_check_box = new QCheckBox (_("Use virtual files instead of downloading content immediately %1").printf (best_available_vfs_mode () == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
             connect (
                 this.virtual_files_check_box,
                 QCheckBox.clicked,
@@ -98,7 +98,7 @@ public class FolderWizardSelectiveSync : QWizardPage {
             } else {
                 this.virtual_files_check_box.checked (best_available_vfs_mode () == Vfs.WindowsCfApi);
                 this.virtual_files_check_box.enabled (true);
-                this.virtual_files_check_box.on_signal_text (_("Use virtual files instead of downloading content immediately %1").arg (best_available_vfs_mode () == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
+                this.virtual_files_check_box.on_signal_text (_("Use virtual files instead of downloading content immediately %1").printf (best_available_vfs_mode () == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
 
                 if (Theme.instance ().enforce_virtual_files_sync_folder ()) {
                     this.virtual_files_check_box.checked (true);

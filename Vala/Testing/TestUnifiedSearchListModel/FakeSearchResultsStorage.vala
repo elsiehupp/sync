@@ -22,7 +22,7 @@ public class FakeSearchResultsStorage {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.HashMap<string, Provider> search_results_data;
+    private GLib.HashTable<string, Provider> search_results_data;
 
     /***********************************************************
     ***********************************************************/

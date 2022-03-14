@@ -23,7 +23,7 @@ public class FileInfo : FileModifier {
     public char content_char = 'W';
 
     // Sorted by name to be able to compare trees
-    public GLib.HashMap<string, FileInfo> children;
+    public GLib.HashTable<string, FileInfo> children;
     public string parent_path;
 
     /***********************************************************

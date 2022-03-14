@@ -322,7 +322,7 @@ public class GeneralSettings : Gtk.Widget {
         }
 
         create_debug_archive (filename);
-        QMessageBox.information (this, _("Debug Archive Created"), _("Debug archive is created at %1").arg (filename));
+        QMessageBox.information (this, _("Debug Archive Created"), _("Debug archive is created at %1").printf (filename));
     }
 
 

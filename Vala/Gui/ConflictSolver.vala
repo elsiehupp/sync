@@ -106,8 +106,8 @@ public class ConflictSolver : GLib.Object {
             return false;
         }
 
-        const string message = info.is_dir () ? _("Do you want to delete the directory <i>%1</i> and all its contents permanently?").arg (info.directory ().dir_name ())
-                                          : _("Do you want to delete the file <i>%1</i> permanently?").arg (info.filename ());
+        const string message = info.is_dir () ? _("Do you want to delete the directory <i>%1</i> and all its contents permanently?").printf (info.directory ().dir_name ())
+                                          : _("Do you want to delete the file <i>%1</i> permanently?").printf (info.filename ());
         if (QMessageBox.question (this.parent_widget, _("Confirm deletion"), message, QMessageBox.Yes, QMessageBox.No) != QMessageBox.Yes) {
             return false;
         }
@@ -137,7 +137,7 @@ public class ConflictSolver : GLib.Object {
             return true;
         } else {
             GLib.warning ("Rename error: " + error);
-            QMessageBox.warning (this.parent_widget, _("Error"), _("Moving file failed:\n\n%1").arg (error));
+            QMessageBox.warning (this.parent_widget, _("Error"), _("Moving file failed:\n\n%1").printf (error));
             return false;
         }
     }
@@ -156,11 +156,11 @@ public class ConflictSolver : GLib.Object {
     ***********************************************************/
     private string target_filename () {
         uint32 i = 1;
-        var result = rename_pattern ().arg (i);
+        var result = rename_pattern ().printf (i);
         while (GLib.FileInfo.exists (result)) {
             //  Q_ASSERT (i > 0);
             i++;
-            result = rename_pattern ().arg (i);
+            result = rename_pattern ().printf (i);
         }
         return result;
     }
@@ -187,7 +187,7 @@ public class ConflictSolver : GLib.Object {
             return true;
         } else {
             GLib.warning ("Rename error: " + error);
-            QMessageBox.warning (this.parent_widget, _("Error"), _("Moving file failed:\n\n%1").arg (error));
+            QMessageBox.warning (this.parent_widget, _("Error"), _("Moving file failed:\n\n%1").printf (error));
             return false;
         }
     }

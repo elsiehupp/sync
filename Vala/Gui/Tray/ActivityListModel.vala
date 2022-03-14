@@ -402,7 +402,7 @@ public class ActivityListModel : QAbstractListModel {
         case DataRole.ACCOUNT:
             return a.acc_name;
         case DataRole.POINT_IN_TIME:
-            //return a.id == -1 ? "" : string ("%1 - %2").arg (Utility.time_ago_in_words (a.date_time.to_local_time ()), a.date_time.to_local_time ().to_string (Qt.Default_locale_short_date));
+            //return a.id == -1 ? "" : string ("%1 - %2").printf (Utility.time_ago_in_words (a.date_time.to_local_time ()), a.date_time.to_local_time ().to_string (Qt.Default_locale_short_date));
             return a.id == -1 ? "" : Utility.time_ago_in_words (a.date_time.to_local_time ());
         case DataRole.ACCOUNT_CONNECTED:
             return (ast && ast.is_connected ());
@@ -620,8 +620,8 @@ public class ActivityListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    protected GLib.HashMap<int, GLib.ByteArray> role_names () {
-        GLib.HashMap<int, GLib.ByteArray> roles;
+    protected GLib.HashTable<int, GLib.ByteArray> role_names () {
+        GLib.HashTable<int, GLib.ByteArray> roles;
         roles[DataRole.DISPLAY_PATH] = "display_path";
         roles[DataRole.PATH] = "path";
         roles[DataRole.ABSOLUTE_PATH] = "absolute_path";

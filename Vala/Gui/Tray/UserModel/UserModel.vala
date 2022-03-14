@@ -5,7 +5,7 @@
 //  #include <chrono>
 //  #include <pushnotifications
 //  #include <QDesktopServ
-//  #include <QIcon>
+//  #include <Gtk.Icon>
 //  #include <QMessageB
 //  #include <QSvgRenderer>
 //  #include <QPainter>
@@ -29,8 +29,8 @@ public class UserModel : QAbstractListModel {
         IS_CONNECTED,
         IDENTIFIER;
 
-        public static GLib.HashMap<int, GLib.ByteArray> role_names () {
-            GLib.HashMap<int, GLib.ByteArray> roles;
+        public static GLib.HashTable<int, GLib.ByteArray> role_names () {
+            GLib.HashTable<int, GLib.ByteArray> roles;
             roles[UserRoles.NAME] = "name";
             roles[UserRoles.SERVER] = "server";
             roles[UserRoles.SERVER_HAS_USER_STATUS] = "server_has_user_status";
@@ -444,7 +444,7 @@ public class UserModel : QAbstractListModel {
             _("Confirm Account Removal"),
             _("<p>Do you really want to remove the connection to the account <i>%1</i>?</p>"
             + "<p><b>Note:</b> This will <b>not</b> delete any files.</p>")
-                .arg (this.users[identifier].name ()),
+                .printf (this.users[identifier].name ()),
             QMessageBox.NoButton);
         QPushButton yes_button =
             message_box.add_button (_("Remove connection"), QMessageBox.YesRole);

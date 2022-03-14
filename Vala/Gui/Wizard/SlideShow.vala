@@ -58,10 +58,10 @@ public class SlideShow : Gtk.Widget {
                 this.animation = new QVariantAnimation (this);
                 this.animation.duration (SLIDE_DURATION);
                 this.animation.easing_curve (QEasing_curve.Out_cubic);
-                this.animation.start_value (static_cast<qreal> (this.current_slide));
+                this.animation.start_value (static_cast<double> (this.current_slide));
                 connect (this.animation.data (), SIGNAL (value_changed (GLib.Variant)), this, SLOT (update ()));
             }
-            this.animation.end_value (static_cast<qreal> (value));
+            this.animation.end_value (static_cast<double> (value));
             this.animation.on_signal_start (QAbstractAnimation.DeleteWhenStopped);
     
             this.reverse = value < this.current_slide;
@@ -76,7 +76,7 @@ public class SlideShow : Gtk.Widget {
     private QPoint press_point;
     private QBasic_timer timer;
     private string[] labels;
-    private GLib.Vector<QPixmap> pixmaps;
+    private GLib.Vector<Gdk.Pixbuf> pixmaps;
     private QPointer<QVariantAnimation> animation = null;
 
     signal void signal_clicked ();
@@ -94,7 +94,7 @@ public class SlideShow : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public void add_slide (QPixmap pixmap, string label) {
+    public void add_slide (Gdk.Pixbuf pixmap, string label) {
         this.labels += label;
         this.pixmaps += pixmap;
         update_geometry ();
@@ -115,7 +115,7 @@ public class SlideShow : Gtk.Widget {
         QRect label_rect = style ().item_text_rect (font_metrics (), rect (), Qt.Align_bottom | Qt.AlignHCenter, is_enabled (), label);
         style ().draw_item_text (painter, label_rect, Qt.AlignCenter, palette (), is_enabled (), label, QPalette.Window_text);
 
-        QPixmap pixmap = this.pixmaps.value (index);
+        Gdk.Pixbuf pixmap = this.pixmaps.value (index);
         QRect pixmap_rect = style ().item_pixmap_rect (QRect (0, 0, width (), label_rect.top () - SPACING), Qt.AlignCenter, pixmap);
         style ().draw_item_pixmap (painter, pixmap_rect, Qt.AlignCenter, pixmap);
     }
@@ -130,7 +130,7 @@ public class SlideShow : Gtk.Widget {
             label_size.width (std.max (font_metrics.horizontal_advance (label), label_size.width ()));
         }
         QSize pixmap_size;
-        foreach (QPixmap pixmap in this.pixmaps) {
+        foreach (Gdk.Pixbuf pixmap in this.pixmaps) {
             pixmap_size.width (std.max (pixmap.width (), pixmap_size.width ()));
             pixmap_size.height (std.max (pixmap.height (), pixmap_size.height ()));
         }
@@ -207,7 +207,7 @@ public class SlideShow : Gtk.Widget {
         if (this.animation) {
             int from = this.animation.start_value ().to_int ();
             int to = this.animation.end_value ().to_int ();
-            qreal progress = this.animation.easing_curve ().value_for_progress (this.animation.current_time () / static_cast<qreal> (this.animation.duration ()));
+            double progress = this.animation.easing_curve ().value_for_progress (this.animation.current_time () / static_cast<double> (this.animation.duration ()));
 
             painter.save ();
             painter.opacity (1.0 - progress);

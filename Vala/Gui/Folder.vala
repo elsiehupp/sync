@@ -27,7 +27,7 @@ namespace Ui {
 ***********************************************************/
 public class Folder : GLib.Object {
 
-    class Map : GLib.HashMap<string, Folder> { }
+    class Map : GLib.HashTable<string, Folder> { }
     class MapIterator : QMapIterator<string, Folder> { }
 
 
@@ -960,7 +960,7 @@ public class Folder : GLib.Object {
               + "If this was an accident and you decide to keep your files, they will be re-synced from the server.");
         var message_box = new QMessageBox (
             QMessageBox.Warning, _("Remove All Files?"),
-            message.arg (short_gui_local_path ()),
+            message.printf (short_gui_local_path ()),
             QMessageBox.NoButton
         );
         message_box.attribute (Qt.WA_DeleteOnClose);
@@ -1505,8 +1505,8 @@ public class Folder : GLib.Object {
                 /* emit */ signal_new_big_folder_discovered (new_folder);
             }
             string message = !is_external ? (_("A new folder larger than %1 MB has been added : %2.\n")
-                                                    .arg (ConfigFile ().new_big_folder_size_limit ().second)
-                                                    .arg (new_folder))
+                                                    .printf (ConfigFile ().new_big_folder_size_limit ().second)
+                                                    .printf (new_folder))
                                           : (_("A folder from an external storage has been added.\n"));
             message += _("Please go in the settings to select it if you wish to download it.");
     
@@ -1580,10 +1580,10 @@ public class Folder : GLib.Object {
         const string message = file_info.is_dir ()
             ? _("The folder %1 was created but was excluded from synchronization previously. "
                 + "Data inside it will not be synchronized.")
-                  .arg (file_info.file_path ())
+                  .printf (file_info.file_path ())
             : _("The file %1 was created but was excluded from synchronization previously. "
                 + "It will not be synchronized.")
-                  .arg (file_info.file_path ());
+                  .printf (file_info.file_path ());
     
         Logger.instance ().post_optional_gui_log (Theme.instance ().app_name_gui (), message);
     }
@@ -1602,7 +1602,7 @@ public class Folder : GLib.Object {
             + "occasionally (every two hours by default).\n"
             + "\n"
             + "%1"
-            ).arg (message);
+            ).printf (message);
         Logger.instance ().post_gui_log (Theme.instance ().app_name_gui (), full_message);
     }
 
@@ -1711,13 +1711,13 @@ public class Folder : GLib.Object {
         } else {
             // Check directory again
             if (!FileSystem.file_exists (this.definition.local_path, file_info)) {
-                this.sync_result.append_error_string (_("Local folder %1 does not exist.").arg (this.definition.local_path));
+                this.sync_result.append_error_string (_("Local folder %1 does not exist.").printf (this.definition.local_path));
                 this.sync_result.status (SyncResult.Status.SETUP_ERROR);
             } else if (!file_info.is_dir ()) {
-                this.sync_result.append_error_string (_("%1 should be a folder but is not.").arg (this.definition.local_path));
+                this.sync_result.append_error_string (_("%1 should be a folder but is not.").printf (this.definition.local_path));
                 this.sync_result.status (SyncResult.Status.SETUP_ERROR);
             } else if (!file_info.is_readable ()) {
-                this.sync_result.append_error_string (_("%1 is not readable.").arg (this.definition.local_path));
+                this.sync_result.append_error_string (_("%1 is not readable.").printf (this.definition.local_path));
                 this.sync_result.status (SyncResult.Status.SETUP_ERROR);
             }
         }
@@ -1763,58 +1763,58 @@ public class Folder : GLib.Object {
             switch (status) {
             case LogStatus.REMOVE:
                 if (count > 1) {
-                    text = _("%1 and %n other file (s) have been removed.", "", count - 1).arg (file);
+                    text = _("%1 and %n other file (s) have been removed.", "", count - 1).printf (file);
                 } else {
-                    text = _("%1 has been removed.", "%1 names a file.").arg (file);
+                    text = _("%1 has been removed.", "%1 names a file.").printf (file);
                 }
                 break;
             case LogStatus.NEW:
                 if (count > 1) {
-                    text = _("%1 and %n other file (s) have been added.", "", count - 1).arg (file);
+                    text = _("%1 and %n other file (s) have been added.", "", count - 1).printf (file);
                 } else {
-                    text = _("%1 has been added.", "%1 names a file.").arg (file);
+                    text = _("%1 has been added.", "%1 names a file.").printf (file);
                 }
                 break;
             case LogStatus.UPDATED:
                 if (count > 1) {
-                    text = _("%1 and %n other file (s) have been updated.", "", count - 1).arg (file);
+                    text = _("%1 and %n other file (s) have been updated.", "", count - 1).printf (file);
                 } else {
-                    text = _("%1 has been updated.", "%1 names a file.").arg (file);
+                    text = _("%1 has been updated.", "%1 names a file.").printf (file);
                 }
                 break;
             case LogStatus.RENAME:
                 if (count > 1) {
-                    text = _("%1 has been renamed to %2 and %n other file (s) have been renamed.", "", count - 1).arg (file, rename_target);
+                    text = _("%1 has been renamed to %2 and %n other file (s) have been renamed.", "", count - 1).printf (file, rename_target);
                 } else {
-                    text = _("%1 has been renamed to %2.", "%1 and %2 name files.").arg (file, rename_target);
+                    text = _("%1 has been renamed to %2.", "%1 and %2 name files.").printf (file, rename_target);
                 }
                 break;
             case LogStatus.MOVE:
                 if (count > 1) {
-                    text = _("%1 has been moved to %2 and %n other file (s) have been moved.", "", count - 1).arg (file, rename_target);
+                    text = _("%1 has been moved to %2 and %n other file (s) have been moved.", "", count - 1).printf (file, rename_target);
                 } else {
-                    text = _("%1 has been moved to %2.").arg (file, rename_target);
+                    text = _("%1 has been moved to %2.").printf (file, rename_target);
                 }
                 break;
             case LogStatus.CONFLICT:
                 if (count > 1) {
-                    text = _("%1 has and %n other file (s) have sync conflicts.", "", count - 1).arg (file);
+                    text = _("%1 has and %n other file (s) have sync conflicts.", "", count - 1).printf (file);
                 } else {
-                    text = _("%1 has a sync conflict. Please check the conflict file!").arg (file);
+                    text = _("%1 has a sync conflict. Please check the conflict file!").printf (file);
                 }
                 break;
             case LogStatus.ERROR:
                 if (count > 1) {
-                    text = _("%1 and %n other file (s) could not be synced due to errors. See the log for details.", "", count - 1).arg (file);
+                    text = _("%1 and %n other file (s) could not be synced due to errors. See the log for details.", "", count - 1).printf (file);
                 } else {
-                    text = _("%1 could not be synced due to an error. See the log for details.").arg (file);
+                    text = _("%1 could not be synced due to an error. See the log for details.").printf (file);
                 }
                 break;
             case LogStatus.FILE_LOCKED:
                 if (count > 1) {
-                    text = _("%1 and %n other file (s) are currently locked.", "", count -1).arg (file);
+                    text = _("%1 and %n other file (s) are currently locked.", "", count -1).printf (file);
                 } else {
-                    text = _("%1 is currently locked.").arg (file);
+                    text = _("%1 is currently locked.").printf (file);
                 }
                 break;
             }

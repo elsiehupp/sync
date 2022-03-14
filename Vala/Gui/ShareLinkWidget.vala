@@ -223,7 +223,7 @@ public class ShareLinkWidget : Gtk.Widget {
 
         this.share_link_button = new QToolButton (this);
         connect (this.share_link_button, QToolButton.clicked, this, ShareLinkWidget.on_signal_create_label);
-        this.share_link_button.icon (QIcon (":/client/theme/confirm.svg"));
+        this.share_link_button.icon (Gtk.Icon (":/client/theme/confirm.svg"));
         this.share_link_button.tool_button_style (Qt.Tool_button_icon_only);
         this.share_link_layout.add_widget (this.share_link_button);
 
@@ -298,15 +298,15 @@ public class ShareLinkWidget : Gtk.Widget {
         }
 
         // Adds action to unshare widget (check box)
-        this.unshare_link_action = this.link_context_menu.add_action (QIcon (":/client/theme/delete.svg"),
+        this.unshare_link_action = this.link_context_menu.add_action (Gtk.Icon (":/client/theme/delete.svg"),
             _("Delete link"));
 
         this.link_context_menu.add_separator ();
 
-        this.add_another_link_action = this.link_context_menu.add_action (QIcon (":/client/theme/add.svg"),
+        this.add_another_link_action = this.link_context_menu.add_action (Gtk.Icon (":/client/theme/add.svg"),
             _("Add another link"));
 
-        this.ui.enable_share_link.icon (QIcon (":/client/theme/copy.svg"));
+        this.ui.enable_share_link.icon (Gtk.Icon (":/client/theme/copy.svg"));
         disconnect (this.ui.enable_share_link, QPushButton.clicked, this, ShareLinkWidget.on_signal_create_share_link);
         connect (this.ui.enable_share_link, QPushButton.clicked, this, ShareLinkWidget.on_signal_copy_link_share);
 
@@ -680,7 +680,7 @@ public class ShareLinkWidget : Gtk.Widget {
             _("Confirm Link Share Deletion"),
             _("<p>Do you really want to delete the public link share <i>%1</i>?</p>"
             + "<p>Note: This action cannot be undone.</p>")
-                .arg (share_name ()),
+                .printf (share_name ()),
             QMessageBox.NoButton,
             this);
         QPushButton yes_button =
@@ -765,7 +765,7 @@ public class ShareLinkWidget : Gtk.Widget {
     private void display_share_link_label () {
         this.share_link_elided_label.clear ();
         if (!this.link_share.label ().is_empty ()) {
-            this.share_link_elided_label.on_signal_text (string (" (%1)").arg (this.link_share.label ()));
+            this.share_link_elided_label.on_signal_text (string (" (%1)").printf (this.link_share.label ()));
         }
     }
 

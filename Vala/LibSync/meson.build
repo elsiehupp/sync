@@ -1,4 +1,4 @@
-project('com.elsiehupp.NextcloudVala', 'c', 'vala', version: '1.0.0')
+# project('com.elsiehupp.NextcloudVala', 'c', 'vala', version: '1.0.0')
 
 srcs = files([
     'AbstractPropagateRemoteDeleteEncrypted.vala',
@@ -148,7 +148,6 @@ srcs = files([
 
     'WordList.vala'
 ])
-
 
 # Dependences
 deps = [

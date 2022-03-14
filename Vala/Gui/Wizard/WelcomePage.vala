@@ -113,7 +113,7 @@ public class WelcomePage : QWizardPage {
     private void set_up_login_button () {
         const string app_name = Theme.instance ().app_name_gui ();
 
-        this.ui.login_button.on_signal_text (_("Log in to your %1").arg (app_name));
+        this.ui.login_button.on_signal_text (_("Log in to your %1").printf (app_name));
         connect (
             this.ui.login_button,
             QPushButton.clicked,
