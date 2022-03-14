@@ -316,8 +316,8 @@ public class ProcessDirectoryJob : GLib.Object {
 
         // Check whether a normal local query is even necessary
         if (this.query_local == NORMAL_QUERY) {
-            if (!this.discovery_data.should_discover_localy (this.current_folder.local)
-                && (this.current_folder.local == this.current_folder.original || !this.discovery_data.should_discover_localy (this.current_folder.original))) {
+            if (!this.discovery_data.local_discovery_delegate (this.current_folder.local)
+                && (this.current_folder.local == this.current_folder.original || !this.discovery_data.local_discovery_delegate (this.current_folder.original))) {
                 this.query_local = PARENT_NOT_CHANGED;
             }
         }
@@ -960,13 +960,8 @@ public class ProcessDirectoryJob : GLib.Object {
             this.discovery_data.check_selective_sync_new_folder (
                 path.server,
                 server_entry.remote_perm,
-                [=] (bool result) {
-                    --this.pending_async_jobs;
-                    if (!result) {
-                        process_file_analyze_local_info (item, path, local_entry, server_entry, database_entry, this.query_server);
-                    }
-                    QTimer.single_shot (0, this.discovery_data, DiscoveryPhase.schedule_more_jobs);
-                });
+                this.selective_sync_filter
+            );
             return;
         }
         // Turn new remote files into virtual files if the option is enabled.
@@ -993,7 +988,16 @@ public class ProcessDirectoryJob : GLib.Object {
     }
 
 
-    private list_files_callback (int64 local_folder_size, Occ.SyncJournalFileRecord record) {
+    private void selective_sync_filter (bool result) {
+        --this.pending_async_jobs;
+        if (!result) {
+            process_file_analyze_local_info (item, path, local_entry, server_entry, database_entry, this.query_server);
+        }
+        QTimer.single_shot (0, this.discovery_data, DiscoveryPhase.schedule_more_jobs);
+    }
+
+
+    private void list_files_callback (int64 local_folder_size, Occ.SyncJournalFileRecord record) {
         if (record.is_file ()) {
             // add Constants.E2EE_TAG_SIZE so we will know the size of E2EE file on the server
             local_folder_size += record.file_size + Constants.E2EE_TAG_SIZE;
@@ -2187,7 +2191,7 @@ public class ProcessDirectoryJob : GLib.Object {
     private void compute_pin_state (PinState parent_state) {
         this.pin_state = parent_state;
         if (this.query_local != PARENT_DOES_NOT_EXIST) {
-            var state = this.discovery_data.sync_options.vfs.pin_state (this.current_folder.local);k
+            var state = this.discovery_data.sync_options.vfs.pin_state (this.current_folder.local);
             if (state) { // ouch! pin local or original?
                 this.pin_state = state;
             }

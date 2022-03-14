@@ -145,7 +145,7 @@ public class DiscoveryPhase : GLib.Object {
     Input
     ***********************************************************/
     public delegate bool ShouldDiscoverLocally (string value);
-    public ShouldDiscoverLocally should_discover_localy;
+    public ShouldDiscoverLocally local_discovery_delegate;
 
     /***********************************************************
     ***********************************************************/

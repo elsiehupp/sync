@@ -65,7 +65,7 @@ public class ProgressDispatcher : GLib.Object {
     /***********************************************************
     @brief A new folder-wide sync error was seen.
     ***********************************************************/
-    signal void sync_error (string folder, string message, ErrorCategory category);
+    signal void signal_sync_error (string folder, string message, ErrorCategory category);
 
 
     /***********************************************************

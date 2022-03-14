@@ -11,7 +11,7 @@ namespace Progress {
 /***********************************************************
 Type of error
 
-Used for ProgressDispatcher.sync_error. May trigger error interactivity
+Used for ProgressDispatcher.signal_sync_error. May trigger error interactivity
 in IssuesWidget.
 ***********************************************************/
 enum ErrorCategory {

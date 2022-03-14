@@ -45,9 +45,8 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
 
         const bool list_files_result = this.propagator.journal.list_files_in_path (
             this.item.file.to_utf8 (),
-            (Occ.SyncJournalFileRecord record) => {
-            this.nested_items[record.e2e_mangled_name] = record;
-        });
+            this.result_list_filter
+        );
 
         if (!list_files_result || this.nested_items.is_empty ()) {
             // if the folder is empty, just decrypt and delete it
@@ -56,6 +55,11 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
         }
 
         start_ls_col_job (this.item.file);
+    }
+
+
+    private void result_list_filter (Occ.SyncJournalFileRecord record) {
+        this.nested_items[record.e2e_mangled_name] = record;
     }
 
 
