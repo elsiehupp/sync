@@ -52,7 +52,7 @@ public class AccessManager : QNetworkAccessManager {
         }
 
         // Some firewalls reject requests that have a "User-Agent" but no "Accept" header
-        new_request.raw_header (string ("Accept"), "*/*");
+        new_request.raw_header ("Accept", "*/*");
 
         string verb = new_request.attribute (Soup.Request.CustomVerbAttribute).to_byte_array ();
         // For PROPFIND (assumed to be a WebDAV operation), set xml/utf8 as content type/encoding

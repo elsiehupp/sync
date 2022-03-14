@@ -48,7 +48,7 @@ public class Logger : GLib.Object {
             }
     
             bool open_succeeded = false;
-            if (value == QLatin1String ("-")) {
+            if (value == "-") {
                 open_succeeded = this.log_file_object.open (stdout, QIODevice.WriteOnly);
             } else {
                 this.log_file_object.filename (value);

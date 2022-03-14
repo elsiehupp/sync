@@ -14,7 +14,7 @@ public class FolderMetadata : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public FolderMetadata.for_account (unowned Account account, string metadata = new string (), int status_code = -1) {
+    public FolderMetadata.for_account (unowned Account account, string metadata = "", int status_code = -1) {
         this.account = account;
         if (metadata.is_empty () || status_code == 404) {
             GLib.info ("Setting up empty metadata.");
@@ -73,7 +73,7 @@ public class FolderMetadata : GLib.Object {
             Now we should be compatible with Android and IOS. Maybe we can fix it later.
             ***********************************************************/
             const string encrypted_key = encrypt_metadata_key (it.value ().to_base64 ());
-            metadata_keys.insert (string.number (key.key ()), string (encrypted_key));
+            metadata_keys.insert (key.key ().to_string (), encrypted_key);
         }
 
 
@@ -268,8 +268,8 @@ public class FolderMetadata : GLib.Object {
             file.file_version = decrypted_file_obj["version"].to_int ();
 
             // In case we wrongly stored "inode/directory" we try to recover from it
-            if (file.mimetype == string ("inode/directory")) {
-                file.mimetype = string ("httpd/unix-directory");
+            if (file.mimetype == "inode/directory") {
+                file.mimetype = "httpd/unix-directory";
             }
 
             this.files.push_back (file);

@@ -144,7 +144,7 @@ public class EncryptionHelper : GLib.Object {
         var parts = split_cipher_parts (data);
         if (parts.size () < 2) {
             GLib.info ("Not enough parts found.");
-            return new string ();
+            return "";
         }
 
         string cipher_t_xT64 = parts.at (0);
@@ -165,25 +165,25 @@ public class EncryptionHelper : GLib.Object {
         // Create and initialise the context
         if (!context) {
             GLib.info ("Error creating cipher.");
-            return new string ();
+            return "";
         }
 
         // Initialise the decryption operation.
         if (!EVP_Decrypt_init_ex (context, EVP_aes_256_gcm (), null, null, null)) {
             GLib.info ("Error initialising context with aes 256");
-            return new string ();
+            return "";
         }
 
         // Set Initialization Vector length. Not necessary if this is 12 bytes (96 bits)
         if (!EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_SET_IVLEN, initialization_vector.size (), null)) {
             GLib.info ("Error setting Initialization Vector size");
-            return new string ();
+            return "";
         }
 
         // Initialise key and Initialization Vector
         if (!EVP_Decrypt_init_ex (context, null, null, (uchar *)key.const_data (), (uchar *)initialization_vector.const_data ())) {
             GLib.info ("Error initialising key and initialization_vector");
-            return new string ();
+            return "";
         }
 
         string ptext = new string (cipher_text2.size () + Occ.Constants.E2EE_TAG_SIZE, '\0');
@@ -196,13 +196,13 @@ public class EncryptionHelper : GLib.Object {
         ***********************************************************/
         if (!EVP_Decrypt_update (context, unsigned_data (ptext), plen, (uchar *)cipher_text2.const_data (), cipher_text2.size ())) {
             GLib.info ("Could not decrypt");
-            return new string ();
+            return "";
         }
 
         // Set expected e2Ee_tag value. Works in OpenSSL 1.0.1d and later
         if (!EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_SET_TAG, e2Ee_tag.size (), (uchar *)e2Ee_tag.const_data ())) {
             GLib.info ("Could not set e2Ee_tag");
-            return new string ();
+            return "";
         }
 
 
@@ -213,7 +213,7 @@ public class EncryptionHelper : GLib.Object {
         int len = plen;
         if (EVP_Decrypt_final_ex (context, unsigned_data (ptext) + plen, len) == 0) {
             GLib.info ("Tag did not match!");
-            return new string ();
+            return "";
         }
 
         string result = new string (ptext, plen);
@@ -225,7 +225,7 @@ public class EncryptionHelper : GLib.Object {
         var parts = split_cipher_parts (data);
         if (parts.size () < 3) {
             GLib.info ("Not enough parts found.");
-            return new string ();
+            return "";
         }
 
         return string.from_base64 (parts.at (2));
@@ -328,7 +328,7 @@ public class EncryptionHelper : GLib.Object {
         var parts = split_cipher_parts (data);
         if (parts.size () < 2) {
             GLib.info ("Not enough parts found.");
-            return new string ();
+            return "";
         }
 
         string cipher_t_xT64 = parts.at (0);
@@ -349,25 +349,25 @@ public class EncryptionHelper : GLib.Object {
         // Create and initialise the context
         if (!context) {
             GLib.info ("Error creating cipher.");
-            return new string ();
+            return "";
         }
 
         // Initialise the decryption operation.
         if (!EVP_Decrypt_init_ex (context, EVP_aes_128_gcm (), null, null, null)) {
             GLib.info ("Error initialising context with aes 128");
-            return new string ();
+            return "";
         }
 
         // Set Initialization Vector length. Not necessary if this is 12 bytes (96 bits)
         if (!EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_SET_IVLEN, initialization_vector.size (), null)) {
             GLib.info ("Error setting initialization vector size");
-            return new string ();
+            return "";
         }
 
         // Initialise key and Initialization Vector
         if (!EVP_Decrypt_init_ex (context, null, null, (uchar *)key.const_data (), (uchar *)initialization_vector.const_data ())) {
             GLib.info ("Error initialising key and initialization vector");
-            return new string ();
+            return "";
         }
 
         string ptext = new string (cipher_text2.size () + Occ.Constants.E2EE_TAG_SIZE, '\0');
@@ -380,13 +380,13 @@ public class EncryptionHelper : GLib.Object {
         ***********************************************************/
         if (!EVP_Decrypt_update (context, unsigned_data (ptext), plen, (uchar *)cipher_text2.const_data (), cipher_text2.size ())) {
             GLib.info ("Could not decrypt.");
-            return new string ();
+            return "";
         }
 
         // Set expected e2Ee_tag value. Works in OpenSSL 1.0.1d and later
         if (!EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_SET_TAG, e2Ee_tag.size (), (uchar *)e2Ee_tag.const_data ())) {
             GLib.info ("Could not set e2Ee_tag.");
-            return new string ();
+            return "";
         }
 
         /* Finalise the decryption. A positive return value indicates on_signal_success,
@@ -395,7 +395,7 @@ public class EncryptionHelper : GLib.Object {
         int len = plen;
         if (EVP_Decrypt_final_ex (context, unsigned_data (ptext) + plen, len) == 0) {
             GLib.info ("Tag did not match!");
-            return new string ();
+            return "";
         }
 
         return string.from_base64 (string (ptext, plen));

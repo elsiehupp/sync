@@ -387,7 +387,7 @@ public class GETFileJob : AbstractNetworkJob {
 
         if (!this.direct_download_url.is_empty () && !this.etag.is_empty ()) {
             GLib.info ("Direct download used, ignoring server ETag " + this.etag);
-            this.etag = new string (); // reset received ETag
+            this.etag = ""; // reset received ETag
         } else if (!this.direct_download_url.is_empty ()) {
             // All fine, ETag empty and direct_download_url used
         } else if (this.etag.is_empty ()) {

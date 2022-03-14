@@ -107,7 +107,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
     /***********************************************************
     ***********************************************************/
     public void clear_message () {
-        this.clear_message_job = new JsonApiJob (this.account, USER_STATUS_BASE_URL + QStringLiteral ("/message"));
+        this.clear_message_job = new JsonApiJob (this.account, USER_STATUS_BASE_URL + "/message");
         this.clear_message_job.verb (JsonApiJob.Verb.DELETE);
         connect (this.clear_message_job, JsonApiJob.signal_json_received, this, OcsUserStatusConnector.on_signal_message_cleared);
         this.clear_message_job.start ();
@@ -279,7 +279,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
             return;
         }
 
-        this.message_job = new JsonApiJob (this.account, USER_STATUS_BASE_URL + QStringLiteral ("/message/predefined"), this);
+        this.message_job = new JsonApiJob (this.account, USER_STATUS_BASE_URL + "/message/predefined", this);
         this.message_job.verb (JsonApiJob.Verb.PUT);
         // Set body
         QJsonObject data_object;
@@ -309,7 +309,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
             /* emit */ signal_error (Error.EmojisNotSupported);
             return;
         }
-        this.message_job = new JsonApiJob (this.account, USER_STATUS_BASE_URL + QStringLiteral ("/message/custom"), this);
+        this.message_job = new JsonApiJob (this.account, USER_STATUS_BASE_URL + "/message/custom", this);
         this.message_job.verb (JsonApiJob.Verb.PUT);
         // Set body
         QJsonObject data_object;
@@ -358,17 +358,17 @@ public class OcsUserStatusConnector : UserStatusConnector {
     private static string online_status_to_string (Occ.UserStatus.OnlineStatus status) {
         switch (status) {
         case Occ.UserStatus.OnlineStatus.Online:
-            return QStringLiteral ("online");
+            return "online";
         case Occ.UserStatus.OnlineStatus.DoNotDisturb:
-            return QStringLiteral ("dnd");
+            return "dnd";
         case Occ.UserStatus.OnlineStatus.Away:
-            return QStringLiteral ("offline");
+            return "offline";
         case Occ.UserStatus.OnlineStatus.Offline:
-            return QStringLiteral ("offline");
+            return "offline";
         case Occ.UserStatus.OnlineStatus.Invisible:
-            return QStringLiteral ("invisible");
+            return "invisible";
         }
-        return QStringLiteral ("online");
+        return "online";
     }
 
 

@@ -40,11 +40,11 @@ public class StoreMetaDataApiJob : AbstractNetworkJob {
         request.raw_header ("OCS-APIREQUEST", "true");
         request.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
         QUrlQuery query;
-        query.add_query_item (QLatin1String ("format"), QLatin1String ("json"));
+        query.add_query_item ("format", "json");
         GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
         url.query (query);
 
-        string data = new string ("meta_data=") + GLib.Uri.to_percent_encoding (this.b64_metadata);
+        string data = "meta_data=" + GLib.Uri.to_percent_encoding (this.b64_metadata);
         var buffer = new Soup.Buffer (this);
         buffer.data (data);
 

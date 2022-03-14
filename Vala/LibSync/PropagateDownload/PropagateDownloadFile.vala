@@ -450,7 +450,7 @@ public class PropagateDownloadFile : PropagateItemJob {
         reported that if a server breaks behind a proxy, the GET is still a 200 but is
         truncated, as described here : https://github.com/owncloud/mirall/issues/2528
         ***********************************************************/
-        string size_header = new string ("Content-Length");
+        string size_header = "Content-Length";
         int64 body_size = job.reply ().raw_header (size_header).to_long_long ();
         bool has_size_header = !job.reply ().raw_header (size_header).is_empty ();
 
@@ -660,7 +660,7 @@ public class PropagateDownloadFile : PropagateItemJob {
         /* emit */ propagator ().signal_touched_file (fn);
         // The file_changed () check is done above to generate better error messages.
         if (!FileSystem.unchecked_rename_replace (this.tmp_file.filename (), fn, error)) {
-            GLib.warning () + string ("Rename failed : %1 => %2").arg (this.tmp_file.filename ()).arg (fn);
+            GLib.warning ("Rename failed: %1 => %2".arg (this.tmp_file.filename ()).arg (fn));
             // If the file is locked, we want to retry this sync when it
             // becomes available again, otherwise try again directly
             if (FileSystem.is_file_locked (fn)) {
@@ -744,8 +744,8 @@ public class PropagateDownloadFile : PropagateItemJob {
 
         // handle the special recall file
         if (!this.item.remote_perm.has_permission (RemotePermissions.Permissions.IS_SHARED)
-            && (this.item.file == QLatin1String (".sys.admin#recall#")
-                || this.item.file.has_suffix (QLatin1String ("/.sys.admin#recall#")))) {
+            && (this.item.file == ".sys.admin#recall#"
+                || this.item.file.has_suffix ("/.sys.admin#recall#"))) {
             handle_recall_file (fn, propagator ().local_path (), *propagator ().journal);
         }
 
@@ -998,7 +998,7 @@ public class PropagateDownloadFile : PropagateItemJob {
         int chown_err = chown (filename.to_local8Bit ().const_data (), -1, file_info.group_id ());
         if (chown_err) {
             // TODO: Consider further error handling!
-            GLib.warning () + string ("preserve_group_ownership : chown error %1 : setting group %2 failed on file %3").arg (chown_err).arg (file_info.group_id ()).arg (filename);
+            GLib.warning ("preserve_group_ownership : chown error %1 : setting group %2 failed on file %3".arg (chown_err).arg (file_info.group_id ()).arg (filename));
         }
 //  #else
         //  Q_UNUSED (filename);

@@ -194,7 +194,7 @@ public class AbstractNetworkJob : GLib.Object {
         this.timer.start ();
 
         const GLib.Uri url = account ().url ();
-        const string display_url = string ("%1://%2%3").arg (url.scheme ()).arg (url.host ()).arg (url.path ());
+        const string display_url = "%1://%2%3".arg (url.scheme ()).arg (url.host ()).arg (url.path ());
 
         string parent_meta_object_name = parent () ? parent ().meta_object ().class_name (): "";
         GLib.info (meta_object ().class_name () + " created for " + display_url + " + " + path () + parent_meta_object_name);
@@ -206,7 +206,7 @@ public class AbstractNetworkJob : GLib.Object {
     request is sent)
     ***********************************************************/
     public string request_id () {
-        return  this.reply ? this.reply.request ().raw_header ("X-Request-ID") : string ();
+        return this.reply ? this.reply.request ().raw_header ("X-Request-ID") : "";
     }
 
 
@@ -287,7 +287,7 @@ public class AbstractNetworkJob : GLib.Object {
             this.request_body.seek (0);
         }
         // The cookie will be added automatically, we don't want AccessManager.create_request to duplicate them
-        request.raw_header ("cookie", string ());
+        request.raw_header ("cookie", "");
         send_request (verb, requested_url, request, this.request_body);
     }
 
@@ -441,7 +441,7 @@ public class AbstractNetworkJob : GLib.Object {
     protected string reply_status_string () {
         GLib.assert (reply ());
         if (reply ().error () == Soup.Reply.NoError) {
-            return QLatin1String ("OK");
+            return "OK";
         } else {
             string enum_str = QMetaEnum.from_type<Soup.Reply.NetworkError> ().value_to_key (static_cast<int> (reply ().error ()));
             return "%1 %2".arg (enum_str, error_string ());
@@ -610,12 +610,12 @@ public class AbstractNetworkJob : GLib.Object {
         string exception;
         while (!reader.at_end () && !reader.has_error ()) {
             reader.read_next_start_element ();
-            if (reader.name () == QLatin1String ("message")) {
+            if (reader.name () == "message") {
                 string message = reader.read_element_text ();
                 if (!message.is_empty ()) {
                     return message;
                 }
-            } else if (reader.name () == QLatin1String ("exception")) {
+            } else if (reader.name () == "exception") {
                 exception = reader.read_element_text ();
             }
         }

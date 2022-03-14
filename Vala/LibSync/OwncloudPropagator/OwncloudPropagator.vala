@@ -1091,7 +1091,7 @@ public class OwncloudPropagator : GLib.Object {
     Given an error from the network, map to a SyncFileItem.Status error
     ***********************************************************/
     private SyncFileItem.Status classify_error (Soup.Reply.NetworkError nerror,
-        int http_code, bool another_sync_needed = null, string error_body = new string ()) {
+        int http_code, bool another_sync_needed = null, string error_body = "") {
         GLib.assert (nerror != Soup.Reply.NoError); // we should only be called when there is an error
 
         if (nerror == Soup.Reply.RemoteHostClosedError) {

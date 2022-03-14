@@ -1364,7 +1364,7 @@ public class SyncEngine : GLib.Object {
             foreach (uint32 transfer_identifier in ids) {
                 if (!transfer_identifier)
                     continue; // Was not a chunked upload
-                GLib.Uri url = Utility.concat_url_path (account ().url (), QLatin1String ("remote.php/dav/uploads/") + account ().dav_user () + "/" + string.number (transfer_identifier));
+                GLib.Uri url = Utility.concat_url_path (account ().url (), "remote.php/dav/uploads/" + account ().dav_user () + "/" + string.number (transfer_identifier));
                 (new DeleteJob (account (), url, this)).start ();
             }
         }

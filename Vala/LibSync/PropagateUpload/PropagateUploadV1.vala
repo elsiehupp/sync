@@ -157,8 +157,8 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
         }
         int64 file_size = this.file_to_upload.size;
         var headers = PropagateUploadFileCommon.headers ();
-        headers[string ("OC-Total-Length")] = new string.number (file_size);
-        headers[string ("OC-Chunk-Size")] = new string.number (chunk_size ());
+        headers["OC-Total-Length"] = new string.number (file_size);
+        headers["OC-Chunk-Size"] = new string.number (chunk_size ());
 
         string path = this.file_to_upload.file;
 
@@ -172,7 +172,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
             GLib.info ("Upload chunk" + sending_chunk + "of" + this.chunk_count + "transferid (remote)=" + transid);
             path += "-chunking-%1-%2-%3".arg (transid).arg (this.chunk_count).arg (sending_chunk);
 
-            headers[string ("OC-Chunked")] = string ("1");
+            headers["OC-Chunked"] = "1";
 
             chunk_start = chunk_size () * sending_chunk;
             current_chunk_size = chunk_size ();

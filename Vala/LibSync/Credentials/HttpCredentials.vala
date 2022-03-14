@@ -143,7 +143,7 @@ public class HttpCredentials : AbstractCredentials {
     /***********************************************************
     From wizard
     ***********************************************************/
-    public HttpCredentials (string user, string password, string client_cert_bundle = new string (), string client_cert_password = new string ()) {
+    public HttpCredentials (string user, string password, string client_cert_bundle = "", string client_cert_password = "") {
         this.user = user;
         this.password = password;
         this.ready = true;
@@ -219,12 +219,12 @@ public class HttpCredentials : AbstractCredentials {
             return;
         }
 
-        this.account.credential_setting (QLatin1String (USER_C), this.user);
-        this.account.credential_setting (QLatin1String (IS_OAUTH_C), is_using_oauth ());
+        this.account.credential_setting (USER_C, this.user);
+        this.account.credential_setting (IS_OAUTH_C, is_using_oauth ());
         if (!this.client_cert_bundle.is_empty ()) {
             // Note that the this.client_cert_bundle will often be cleared after usage,
             // it's just written if it gets passed into the constructor.
-            this.account.credential_setting (QLatin1String (CLIENT_CERT_BUNDLE_C), this.client_cert_bundle);
+            this.account.credential_setting (CLIENT_CERT_BUNDLE_C, this.client_cert_bundle);
         }
         this.account.signal_wants_account_saved (this.account);
 
@@ -243,8 +243,8 @@ public class HttpCredentials : AbstractCredentials {
             job.start ();
             this.client_cert_bundle.clear ();
             this.client_cert_password.clear ();
-        } else if (this.account.credential_setting (QLatin1String (CLIENT_CERT_BUNDLE_C)).is_null () && !this.client_ssl_certificate.is_null ()) {
-            // Option 2, pre 2.6 configs : We used to store the raw cert/key in the keychain and
+        } else if (this.account.credential_setting (CLIENT_CERT_BUNDLE_C).is_null () && !this.client_ssl_certificate.is_null ()) {
+            // Option 2, pre 2.6 configs: We used to store the raw cert/key in the keychain and
             // still do so if no bundle is available. We can't currently migrate to Option 1
             // because we have no functions for creating an encrypted pkcs12 bundle.
             var job = new QKeychain.WritePasswordJob (Theme.instance ().app_name ());
@@ -317,7 +317,7 @@ public class HttpCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     public string fetch_user () {
-        this.user = this.account.credential_setting (QLatin1String (USER_C)).to_string ();
+        this.user = this.account.credential_setting (USER_C).to_string ();
         return this.user;
     }
 
@@ -337,11 +337,11 @@ public class HttpCredentials : AbstractCredentials {
         if (this.refresh_token.is_empty ())
             return false;
 
-        GLib.Uri request_token = Utility.concat_url_path (this.account.url (), QLatin1String ("/index.php/apps/oauth2/api/v1/token"));
+        GLib.Uri request_token = Utility.concat_url_path (this.account.url (), "/index.php/apps/oauth2/api/v1/token");
         Soup.Request request;
         request.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
 
-        string basic_auth = string ("%1:%2").arg (
+        string basic_auth = "%1:%2".arg (
             Theme.instance ().oauth_client_id (), Theme.instance ().oauth_client_secret ());
         request.raw_header ("Authorization", "Basic " + basic_auth.to_utf8 ().to_base64 ());
         request.attribute (HttpCredentials.DontAddCredentialsAttribute, true);
@@ -602,7 +602,7 @@ public class HttpCredentials : AbstractCredentials {
             return;
         }
 
-        bool is_oauth = this.account.credential_setting (QLatin1String (IS_OAUTH_C)).to_bool ();
+        bool is_oauth = this.account.credential_setting (IS_OAUTH_C).to_bool ();
         if (is_oauth) {
             this.refresh_token = job.text_data ();
         } else {
@@ -674,7 +674,7 @@ public class HttpCredentials : AbstractCredentials {
       on_signal_read_job_done
     ***********************************************************/
     protected void fetch_from_keychain_helper () {
-        this.client_cert_bundle = this.account.credential_setting (QLatin1String (CLIENT_CERT_BUNDLE_C)).to_byte_array ();
+        this.client_cert_bundle = this.account.credential_setting (CLIENT_CERT_BUNDLE_C).to_byte_array ();
         if (!this.client_cert_bundle.is_empty ()) {
             // New case (>=2.6) : We have a bundle in the settings and read the password from
             // the keychain

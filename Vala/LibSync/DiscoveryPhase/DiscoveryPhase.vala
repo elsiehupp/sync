@@ -295,7 +295,7 @@ public class DiscoveryPhase : GLib.Object {
 
 
     private void on_signal_prop_find_job_result (GLib.HashTable<string, GLib.Variant> values) {
-        var result = values.value (QLatin1String ("size")).to_long_long ();
+        var result = values.value ("size").to_long_long ();
         if (result >= limit) {
             // we tell the UI there is a new folder
             /* emit */ new_big_folder (path, false);
@@ -346,7 +346,7 @@ public class DiscoveryPhase : GLib.Object {
     If the database-path is scheduled for deletion, on_signal_abort it.
 
     Check if there is already a job to delete that item:
-    If that's not the case, return { false, string () }.
+    If that's not the case, return { false, "" }.
     If there is such a job, cancel that job and return true and
     the old etag.
 
@@ -460,7 +460,7 @@ public class DiscoveryPhase : GLib.Object {
     private static bool find_path_in_list (string[] list, string path) {
         GLib.assert (std.is_sorted (list.begin (), list.end ()));
 
-        if (list.size () == 1 && list.first () == QLatin1String ("/")) {
+        if (list.size () == 1 && list.first () == "/") {
             // Special case for the case "/" is there, it matches everything
             return true;
         }
@@ -490,13 +490,13 @@ public class DiscoveryPhase : GLib.Object {
         for (var it = map.const_begin (); it != map.const_end (); ++it) {
             string property = it.key ();
             string value = it.value ();
-            if (property == QLatin1String ("resourcetype")) {
-                result.is_directory = value.contains (QLatin1String ("collection"));
-            } else if (property == QLatin1String ("getlastmodified")) {
+            if (property == "resourcetype") {
+                result.is_directory = value.contains ("collection");
+            } else if (property == "getlastmodified") {
                 var date = GLib.DateTime.from_string (value, Qt.RFC2822Date);
                 GLib.assert (date.is_valid ());
                 result.modtime = date.to_time_t ();
-            } else if (property == QLatin1String ("getcontentlength")) {
+            } else if (property == "getcontentlength") {
                 // See #4573, sometimes negative size values are returned
                 bool ok = false;
                 int64 ll = value.to_long_long (&ok);

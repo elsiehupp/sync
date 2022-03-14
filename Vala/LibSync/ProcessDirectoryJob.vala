@@ -541,7 +541,7 @@ public class ProcessDirectoryJob : GLib.Object {
             // For windows, the hidden state is also discovered within the vio
             // local stat function.
             // Recall file shall not be ignored (#4420)
-            bool is_hidden = e.local_entry.is_hidden || (!f.first.is_empty () && f.first[0] == '.' && f.first != QLatin1String (".sys.admin#recall#"));
+            bool is_hidden = e.local_entry.is_hidden || (!f.first.is_empty () && f.first[0] == '.' && f.first != ".sys.admin#recall#");
             const bool is_server_entry_windows_shortcut = false;
             if (handle_excluded (path.target, e.local_entry.name,
                     e.local_entry.is_directory || e.server_entry.is_directory, is_hidden,
@@ -630,7 +630,7 @@ public class ProcessDirectoryJob : GLib.Object {
                     item.error_string = _("File names ending with a period are not supported on this file system.");
                 } else {
                     char invalid = '\0';
-                    foreach (char x in string ("\\:?*\"<>|")) {
+                    foreach (char x in "\\:?*\"<>|") {
                         if (item.file.contains (x)) {
                             invalid = x;
                             break;
@@ -822,7 +822,7 @@ public class ProcessDirectoryJob : GLib.Object {
         if (!missing_data.is_empty ()) {
             item.instruction = CSYNC_INSTRUCTION_ERROR;
             this.child_ignored = true;
-            item.error_string = _("Server reported no %1").arg (missing_data.join (QLatin1String (", ")));
+            item.error_string = _("Server reported no %1").arg (missing_data.join (", "));
             /* emit */ this.discovery_data.item_discovered (item);
             return;
         }
@@ -1318,7 +1318,7 @@ public class ProcessDirectoryJob : GLib.Object {
 
                 // Checksum comparison at this stage is only enabled for .eml files,
                 // check #4754 #4755
-                bool is_eml_file = path.original.has_suffix (QLatin1String (".eml"), Qt.CaseInsensitive);
+                bool is_eml_file = path.original.has_suffix (".eml", Qt.CaseInsensitive);
                 if (is_eml_file && database_entry.file_size == local_entry.size && !database_entry.checksum_header.is_empty ()) {
                     if (compute_local_checksum (database_entry.checksum_header, this.discovery_data.local_dir + path.local, item)
                             && item.checksum_header == database_entry.checksum_header) {

@@ -331,7 +331,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         if (upload_checksum_enabled ()) {
             compute_checksum.checksum_type (propagator ().account ().capabilities ().upload_checksum_type ());
         } else {
-            compute_checksum.checksum_type (string ());
+            compute_checksum.checksum_type ("");
         }
 
         connect (compute_checksum, ComputeChecksum.done,
@@ -720,16 +720,16 @@ public class PropagateUploadFileCommon : PropagateItemJob {
     ***********************************************************/
     protected GLib.HashTable<string, string> headers () {
         GLib.HashTable<string, string> headers;
-        headers[string ("Content-Type")] = new string ("application/octet-stream");
+        headers["Content-Type"] = "application/octet-stream";
         GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
             GLib.warning ("Invalid modified time " + this.item.file + this.item.modtime);
         }
-        headers[string ("X-OC-Mtime")] = new string.number (int64 (this.item.modtime));
+        headers["X-OC-Mtime"] = ((int64) (this.item.modtime)).to_string ();
         if (q_environment_variable_int_value ("OWNCLOUD_LAZYOPS"))
-            headers[string ("OC-LazyOps")] = string ("true");
+            headers["OC-LazyOps"] = "true";
 
-        if (this.item.file.contains (QLatin1String (".sys.admin#recall#"))) {
+        if (this.item.file.contains (".sys.admin#recall#")) {
             // This is a file recall triggered by the admin.  Note: the
             // recall list file created by the admin and downloaded by the
             // client (.sys.admin#recall#) also falls into this category
@@ -746,21 +746,21 @@ public class PropagateUploadFileCommon : PropagateItemJob {
             && !this.delete_existing) {
             // We add quotes because the owncloud server always adds quotes around the etag, and
             //  csync_owncloud.c's owncloud_file_id always strips the quotes.
-            headers[string ("If-Match")] = '"' + this.item.etag + '"';
+            headers["If-Match"] = "\"" + this.item.etag + "\"";
         }
 
         // Set up a conflict file header pointing to the original file
         var conflict_record = propagator ().journal.conflict_record (this.item.file.to_utf8 ());
         if (conflict_record.is_valid ()) {
-            headers[string ("OC-Conflict")] = "1";
+            headers["OC-Conflict"] = "1";
             if (!conflict_record.initial_base_path.is_empty ())
-                headers[string ("OC-ConflictInitialBasePath")] = conflict_record.initial_base_path;
+                headers["OC-ConflictInitialBasePath"] = conflict_record.initial_base_path;
             if (!conflict_record.base_file_id.is_empty ())
-                headers[string ("OC-ConflictBaseFileId")] = conflict_record.base_file_id;
+                headers["OC-ConflictBaseFileId"] = conflict_record.base_file_id;
             if (conflict_record.base_modtime != -1)
-                headers[string ("OC-ConflictBaseMtime")] = new string.number (conflict_record.base_modtime);
+                headers["OC-ConflictBaseMtime"] = new string.number (conflict_record.base_modtime);
             if (!conflict_record.base_etag.is_empty ())
-                headers[string ("OC-ConflictBaseEtag")] = conflict_record.base_etag;
+                headers["OC-ConflictBaseEtag"] = conflict_record.base_etag;
         }
 
         if (this.upload_encrypted_helper && !this.upload_encrypted_helper.folder_token ().is_empty ()) {

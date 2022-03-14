@@ -135,7 +135,7 @@ public class BulkPropagatorJob : PropagatorJob {
         if (upload_checksum_enabled ()) {
             compute_checksum.checksum_type ("MD5" /*propagator ().account ().capabilities ().upload_checksum_type ()*/);
         } else {
-            compute_checksum.checksum_type (string ());
+            compute_checksum.checksum_type ("");
         }
 
         ComputeChecksum.signal_done.connect ((compute_checksum, content_checksum_type, content_checksum) => {
@@ -342,7 +342,7 @@ public class BulkPropagatorJob : PropagatorJob {
         propagator ().journal.commit ("Upload info");
 
         var current_headers = headers (item);
-        current_headers[string ("Content-Length")] = new string.number (file_to_upload.size);
+        current_headers["Content-Length"] = new string.number (file_to_upload.size);
 
         if (!item.rename_target.is_empty () && item.file != item.rename_target) {
             // Try to rename the file
@@ -593,13 +593,13 @@ public class BulkPropagatorJob : PropagatorJob {
     ***********************************************************/
     private GLib.HashTable<string, string> headers (unowned SyncFileItem item) {
         GLib.HashTable<string, string> headers;
-        headers[string ("Content-Type")] = string ("application/octet-stream");
-        headers[string ("X-File-Mtime")] = new string.number (int64 (item.modtime));
+        headers["Content-Type"] = "application/octet-stream";
+        headers["X-File-Mtime"] = new string.number (int64 (item.modtime));
         if (q_environment_variable_int_value ("OWNCLOUD_LAZYOPS")) {
-            headers[string ("OC-LazyOps")] = string ("true");
+            headers["OC-LazyOps"] = "true";
         }
 
-        if (item.file.contains (QLatin1String (".sys.admin#recall#"))) {
+        if (item.file.contains (".sys.admin#recall#")) {
             // This is a file recall triggered by the admin.  Note: the
             // recall list file created by the admin and downloaded by the
             // client (.sys.admin#recall#) also falls into this category
@@ -615,24 +615,24 @@ public class BulkPropagatorJob : PropagatorJob {
             && item.instruction != CSYNC_INSTRUCTION_TYPE_CHANGE) {
             // We add quotes because the owncloud server always adds quotes around the etag, and
             //  csync_owncloud.c's owncloud_file_id always strips the quotes.
-            headers[string ("If-Match")] = '"' + item.etag + '"';
+            headers["If-Match"] = '"' + item.etag + '"';
         }
 
         // Set up a conflict file header pointing to the original file
         var conflict_record = propagator ().journal.conflict_record (item.file.to_utf8 ());
         if (conflict_record.is_valid ()) {
-            headers[string ("OC-Conflict")] = "1";
+            headers["OC-Conflict"] = "1";
             if (!conflict_record.initial_base_path.is_empty ()) {
-                headers[string ("OC-ConflictInitialBasePath")] = conflict_record.initial_base_path;
+                headers["OC-ConflictInitialBasePath"] = conflict_record.initial_base_path;
             }
             if (!conflict_record.base_file_id.is_empty ()) {
-                headers[string ("OC-ConflictBaseFileId")] = conflict_record.base_file_id;
+                headers["OC-ConflictBaseFileId"] = conflict_record.base_file_id;
             }
             if (conflict_record.base_modtime != -1) {
-                headers[string ("OC-ConflictBaseMtime")] = new string.number (conflict_record.base_modtime);
+                headers["OC-ConflictBaseMtime"] = new string.number (conflict_record.base_modtime);
             }
             if (!conflict_record.base_etag.is_empty ()) {
-                headers[string ("OC-ConflictBaseEtag")] = conflict_record.base_etag;
+                headers["OC-ConflictBaseEtag"] = conflict_record.base_etag;
             }
         }
 

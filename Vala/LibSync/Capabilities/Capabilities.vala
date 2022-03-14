@@ -377,12 +377,14 @@ public class Capabilities : GLib.Object {
     ***********************************************************/
     public string upload_checksum_type () {
         string preferred = preferred_upload_checksum_type ();
-        if (!preferred.is_empty ())
+        if (!preferred.is_empty ()) {
             return preferred;
+        }
         GLib.List<string> supported = supported_checksum_types ();
-        if (!supported.is_empty ())
+        if (!supported.is_empty ()) {
             return supported.first ();
-        return string ();
+        }
+        return "";
     }
 
 

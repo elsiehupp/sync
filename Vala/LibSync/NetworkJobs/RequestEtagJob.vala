@@ -64,7 +64,7 @@ public class RequestEtagJob : AbstractNetworkJob {
                 QXmlStreamReader.TokenType type = reader.read_next ();
                 if (type == QXmlStreamReader.StartElement && reader.namespace_uri () == "DAV:") {
                     string name = reader.name ().to_string ();
-                    if (name == QLatin1String ("getetag")) {
+                    if (name == "getetag") {
                         var etag_text = reader.read_element_text ();
                         var parsed_tag = parse_etag (etag_text.to_utf8 ());
                         if (!parsed_tag.is_empty ()) {

@@ -40,7 +40,7 @@ public class PropagateDownloadEncrypted : GLib.Object {
     ***********************************************************/
     public void start () {
         var remote_filename = this.item.encrypted_filename.is_empty () ? this.item.file : this.item.encrypted_filename;
-        var remote_path = string (root_path + remote_filename);
+        var remote_path = root_path + remote_filename;
         var remote_parent_path = remote_path.left (remote_path.last_index_of ("/"));
 
         // Is encrypted Now we need the folder-identifier

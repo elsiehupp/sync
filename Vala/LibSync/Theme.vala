@@ -595,11 +595,11 @@ public class Theme : GLib.Object {
     ***********************************************************/
     public QPixmap wizard_application_logo () {
         if (!Theme.is_branded ()) {
-            return QPixmap (Theme.hidpi_filename (string (Theme.theme_prefix) + "colored/wizard-nextcloud.png"));
+            return new QPixmap (Theme.hidpi_filename (Theme.theme_prefix + "colored/wizard-nextcloud.png"));
         }
     // #ifdef APPLICATION_WIZARD_USE_CUSTOM_LOGO
         var use_svg = should_prefer_svg ();
-        const string logo_base_path = string (Theme.theme_prefix) + "colored/wizard_logo";
+        const string logo_base_path = Theme.theme_prefix + "colored/wizard_logo";
         if (use_svg) {
             var max_height = Theme.is_hidpi () ? 200 : 100;
             var max_width = 2 * max_height;
@@ -622,7 +622,7 @@ public class Theme : GLib.Object {
     public QPixmap wizard_header_logo () {
     // #ifdef APPLICATION_WIZARD_USE_CUSTOM_LOGO
         var use_svg = should_prefer_svg ();
-        const string logo_base_path = string (Theme.theme_prefix) + "colored/wizard_logo";
+        const string logo_base_path = Theme.theme_prefix + "colored/wizard_logo";
         if (use_svg) {
             var max_height = 64;
             var max_width = 2 * max_height;
@@ -705,7 +705,7 @@ public class Theme : GLib.Object {
                 .arg (APPLICATION_NAME);
 
         dev_string += _("<p>Version %1. For more information please click <a href='%2'>here</a>.</p>")
-                .arg (string.from_latin1 (MIRALL_STRINGIFY (MIRALL_VERSION)) + string (" (%1)").arg (os_name))
+                .arg (string.from_latin1 (MIRALL_STRINGIFY (MIRALL_VERSION)) + " (%1)".arg (os_name))
                 .arg (help_url ());
 
         dev_string += _("<p><small>Using files plugin : %1</small></p>")
@@ -741,7 +741,7 @@ public class Theme : GLib.Object {
     Check if mono icons are available
     ***********************************************************/
     public bool mono_icons_available () {
-        string theme_dir = string (Theme.theme_prefix) + string.from_latin1 ("%1/").arg (Theme.instance ().systray_icon_flavor (true));
+        string theme_dir = Theme.theme_prefix + "%1/".arg (Theme.instance ().systray_icon_flavor (true));
         return QDir (theme_dir).exists ();
     }
 
@@ -962,7 +962,7 @@ public class Theme : GLib.Object {
     (actually 2019/09/13 only systray theming).
     ***********************************************************/
 	public QIcon ui_theme_icon (string icon_name, bool ui_has_dark_background) {
-        string icon_path = string (Theme.theme_prefix) + (ui_has_dark_background ? "white/": "black/") + icon_name;
+        string icon_path = Theme.theme_prefix + (ui_has_dark_background ? "white/": "black/") + icon_name;
         string icn_path = icon_path.to_utf8 ().const_data ();
         return new Gtk.Icon (QPixmap (icon_path));
     }
@@ -1169,7 +1169,7 @@ public class Theme : GLib.Object {
                 return cached = QIcon.from_theme (name);
             }
 
-            const string svg_name = string (Theme.theme_prefix) + string.from_latin1 ("%1/%2.svg").arg (flavor).arg (name);
+            const string svg_name = Theme.theme_prefix + "%1/%2.svg".arg (flavor).arg (name);
             QSvgRenderer renderer = new QSvgRenderer (svg_name);
 
             var use_svg = should_prefer_svg ();
@@ -1224,20 +1224,16 @@ public class Theme : GLib.Object {
 
         // branded client may have several sizes of the same icon
         const string file_path = (use_svg || size <= 0)
-                ? string (Theme.theme_prefix) + string.from_latin1 ("%1/%2").arg (flavor).arg (name)
-                : string (Theme.theme_prefix) + string.from_latin1 ("%1/%2-%3").arg (flavor).arg (name).arg (size);
+                ? Theme.theme_prefix + "%1/%2".arg (flavor).arg (name)
+                : Theme.theme_prefix + "%1/%2-%3".arg (flavor).arg (name).arg (size);
 
-        const string svg_path = file_path + ".svg";
-        if (use_svg) {
-            return svg_path;
-        }
-
-        const string png_path = file_path + ".png";
         // Use the SVG as fallback if a PNG is missing so that we get a chance to display something
-        if (GLib.File.exists (png_path)) {
-            return png_path;
+        if (use_svg) {
+            return file_path + ".svg";
+        } else if (GLib.File.exists (png_path)) {
+            return file_path + ".png";
         } else {
-            return svg_path;
+            return file_path + ".svg";
         }
     }
 
@@ -1254,7 +1250,7 @@ public class Theme : GLib.Object {
     }
 
     private static bool should_prefer_svg () {
-        return string (APPLICATION_ICON_SET).to_upper () == string ("SVG");
+        return APPLICATION_ICON_SET.to_upper () == "SVG";
     }
 
 } // class Theme

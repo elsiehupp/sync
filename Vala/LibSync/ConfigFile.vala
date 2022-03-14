@@ -210,7 +210,7 @@ public class ConfigFile : GLib.Object {
             file_info.file (config_path (), EXCL_FILE);
 
             if (!file_info.is_readable ()) {
-                file_info.file (config_path (), QLatin1String ("exclude.lst"));
+                file_info.file (config_path (), "exclude.lst");
             }
             if (!file_info.is_readable ()) {
                 file_info.file (config_path (), EXCL_FILE);
@@ -350,7 +350,7 @@ public class ConfigFile : GLib.Object {
         }
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
         settings.begin_group (connection_string);
-        settings.value (QLatin1String (REMOTE_POLL_INTERVAL_C), int64 (interval.count ()));
+        settings.value (REMOTE_POLL_INTERVAL_C, int64 (interval.count ()));
         settings.sync ();
     }
 
@@ -414,11 +414,11 @@ public class ConfigFile : GLib.Object {
         public get {
             GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
             bool mono_default = false; // On Mac we want bw by default
-            return settings.value (QLatin1String (MONO_ICONS_C), mono_default).to_bool ();
+            return settings.value (MONO_ICONS_C, mono_default).to_bool ();
         }
         public set {
             GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-            settings.value (QLatin1String (MONO_ICONS_C), use_mono_icons);
+            settings.value (MONO_ICONS_C, use_mono_icons);
         }
     }
 
@@ -426,12 +426,12 @@ public class ConfigFile : GLib.Object {
     bool crash_reporter {
         public get {
             GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-            var fallback = settings.value (QLatin1String (CRASH_REPORTER_C), true);
-            return get_policy_setting (QLatin1String (CRASH_REPORTER_C), fallback).to_bool ();
+            var fallback = settings.value (CRASH_REPORTER_C, true);
+            return get_policy_setting (CRASH_REPORTER_C, fallback).to_bool ();
         }
         public set {
             GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-            settings.value (QLatin1String (CRASH_REPORTER_C), value);
+            settings.value (CRASH_REPORTER_C, value);
         }
     }
 
@@ -439,40 +439,35 @@ public class ConfigFile : GLib.Object {
     bool prompt_delete_files {
         public get {
             GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-            return settings.value (QLatin1String (PROMPT_DELETE_C), false).to_bool ();
+            return settings.value (PROMPT_DELETE_C, false).to_bool ();
         }
         public set {
             GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-            settings.value (QLatin1String (PROMPT_DELETE_C), value);
+            settings.value (PROMPT_DELETE_C, value);
         }
     }
 
 
-    /***********************************************************
-    ***********************************************************/
-    public bool automatic_log_dir () {
-        GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-        return settings.value (QLatin1String (AUTOMATIC_LOG_DIR_C), false).to_bool ();
+    bool automatic_log_dir {
+        public get {
+            GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
+            return settings.value (AUTOMATIC_LOG_DIR_C, false).to_bool ();
+        }
+        public set {
+            GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
+            settings.value (AUTOMATIC_LOG_DIR_C, value);
+        }
     }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void automatic_log_dir (bool enabled) {
-        GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-        settings.value (QLatin1String (AUTOMATIC_LOG_DIR_C), enabled);
-    }
-
 
     string log_directory {
         public get {
             string default_log_dir = config_path () + "/logs";
             GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-            return settings.value (QLatin1String (LOG_DIR_C), default_log_dir).to_string ();
+            return settings.value (LOG_DIR_C, default_log_dir).to_string ();
         }
         public set {
             GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-            settings.value (QLatin1String (LOG_DIR_C), value);
+            settings.value (LOG_DIR_C, value);
         }
     }
 
@@ -486,11 +481,11 @@ public class ConfigFile : GLib.Object {
     bool log_debug {
         public get {
             GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-            return settings.value (QLatin1String (LOG_DEBUG_C), true).to_bool ();
+            return settings.value (LOG_DEBUG_C, true).to_bool ();
         }
         public set {
             GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-            settings.value (QLatin1String (LOG_DEBUG_C), enabled);
+            settings.value (LOG_DEBUG_C, value);
         }
     }
 
@@ -500,11 +495,11 @@ public class ConfigFile : GLib.Object {
     int log_expire {
         public get {
             GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-            return settings.value (QLatin1String (LOG_EXPIRE_C), 24).to_int ();
+            return settings.value (LOG_EXPIRE_C, 24).to_int ();
         }
         public set {
             GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-            settings.value (QLatin1String (LOG_EXPIRE_C), hours);
+            settings.value (LOG_EXPIRE_C, value);
         }
     }
 
@@ -514,11 +509,11 @@ public class ConfigFile : GLib.Object {
     bool log_flush {
         public get {
             GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-            return settings.value (QLatin1String (LOG_FLUSH_C), false).to_bool ();
+            return settings.value (LOG_FLUSH_C, false).to_bool ();
         }
         public set {
             GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-            settings.value (QLatin1String (LOG_FLUSH_C), value);
+            settings.value (LOG_FLUSH_C, value);
         }
     }
 
@@ -528,7 +523,7 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     public bool show_experimental_options () {
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-        return settings.value (QLatin1String (SHOW_EXPERIMENTAL_OPTIONS_C), false).to_bool ();
+        return settings.value (SHOW_EXPERIMENTAL_OPTIONS_C, false).to_bool ();
     }
 
 
@@ -544,17 +539,17 @@ public class ConfigFile : GLib.Object {
         string pass = "") {
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
 
-        settings.value (QLatin1String (PROXY_TYPE_C), proxy_type);
+        settings.value (PROXY_TYPE_C, proxy_type);
 
         if (proxy_type == QNetworkProxy.HttpProxy || proxy_type == QNetworkProxy.Socks5Proxy) {
-            settings.value (QLatin1String (PROXY_HOST_C), host);
-            settings.value (QLatin1String (PROXY_PORT_C), port);
-            settings.value (QLatin1String (PROXY_NEEDS_AUTH_C), needs_auth);
-            settings.value (QLatin1String (PROXY_USER_C), user);
+            settings.value (PROXY_HOST_C, host);
+            settings.value (PROXY_PORT_C, port);
+            settings.value (PROXY_NEEDS_AUTH_C, needs_auth);
+            settings.value (PROXY_USER_C, user);
 
             if (pass.is_empty ()) {
-                // Security : Don't keep password in config file
-                settings.remove (QLatin1String (PROXY_PASS_C));
+                // Security: Don't keep password in config file
+                settings.remove (PROXY_PASS_C);
 
                 // Delete password from keychain
                 var job = new KeychainChunk.DeleteJob (KEYCHAIN_PROXY_PASSWORD_KEY ());
@@ -563,8 +558,8 @@ public class ConfigFile : GLib.Object {
                 // Write password to keychain
                 var job = new KeychainChunk.WriteJob (KEYCHAIN_PROXY_PASSWORD_KEY (), pass.to_utf8 ());
                 if (job.exec ()) {
-                    // Security : Don't keep password in config file
-                    settings.remove (QLatin1String (PROXY_PASS_C));
+                    // Security: Don't keep password in config file
+                    settings.remove (PROXY_PASS_C);
                 }
             }
         }
@@ -580,7 +575,7 @@ public class ConfigFile : GLib.Object {
         if (Theme.instance ().force_system_network_proxy ()) {
             return QNetworkProxy.DefaultProxy;
         }
-        return get_value (QLatin1String (PROXY_TYPE_C)).to_int ();
+        return get_value (PROXY_TYPE_C).to_int ();
     }
 
 
@@ -629,7 +624,7 @@ public class ConfigFile : GLib.Object {
             var job = new KeychainChunk.WriteJob (key, pass.to_utf8 ());
             if (job.exec ()) {
                 GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-                settings.remove (QLatin1String (PROXY_PASS_C));
+                settings.remove (PROXY_PASS_C);
                 GLib.info ("Migrated proxy password to keychain.");
             }
         } else {
@@ -723,7 +718,7 @@ public class ConfigFile : GLib.Object {
         public get {
             var default_value = Theme.instance ().new_big_folder_size_limit ();
             var fallback = get_value (NEW_BIG_FOLDER_SIZE_LIMIT_C, "", default_value).to_long_long ();
-            var value = get_policy_setting (QLatin1String (NEW_BIG_FOLDER_SIZE_LIMIT_C), fallback).to_long_long ();
+            var value = get_policy_setting (NEW_BIG_FOLDER_SIZE_LIMIT_C, fallback).to_long_long ();
             const bool use = value >= 0 && use_new_big_folder_size_limit ();
             return q_make_pair (use, q_max<int64> (0, value));
         }
@@ -739,7 +734,7 @@ public class ConfigFile : GLib.Object {
     bool confirm_external_storage {
         public get {
             var fallback = get_value (CONFIRM_EXTERNAL_STORAGE_C, "", true);
-            return get_policy_setting (QLatin1String (CONFIRM_EXTERNAL_STORAGE_C), fallback).to_bool ();
+            return get_policy_setting (CONFIRM_EXTERNAL_STORAGE_C, fallback).to_bool ();
         }
         public set {
             value (CONFIRM_EXTERNAL_STORAGE_C, value);
@@ -751,7 +746,7 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     public bool use_new_big_folder_size_limit () {
         var fallback = get_value (USE_NEW_BIG_FOLDER_SIZE_LIMIT_C, "", true);
-        return get_policy_setting (QLatin1String (USE_NEW_BIG_FOLDER_SIZE_LIMIT_C), fallback).to_bool ();
+        return get_policy_setting (USE_NEW_BIG_FOLDER_SIZE_LIMIT_C, fallback).to_bool ();
     }
 
 
@@ -798,7 +793,7 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     private static chrono.milliseconds milliseconds_value (GLib.Settings setting, char key,
         chrono.milliseconds default_value) {
-        return chrono.milliseconds (setting.value (QLatin1String (key), int64 (default_value.count ())).to_long_long ());
+        return chrono.milliseconds (setting.value (key, int64 (default_value.count ())).to_long_long ());
     }
 
 
@@ -855,11 +850,11 @@ public class ConfigFile : GLib.Object {
     bool optional_server_notifications {
         public get {
             GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-            return settings.value (QLatin1String (OPTIONAL_SERVER_NOTIFICATIONS_C), true).to_bool ();
+            return settings.value (OPTIONAL_SERVER_NOTIFICATIONS_C, true).to_bool ();
         }
         public set {
             GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-            settings.value (QLatin1String (OPTIONAL_SERVER_NOTIFICATIONS_C), value);
+            settings.value (OPTIONAL_SERVER_NOTIFICATIONS_C, value);
             settings.sync ();
         }
     }
@@ -871,11 +866,11 @@ public class ConfigFile : GLib.Object {
         public get {
             const bool default_value = false;
             GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-            return settings.value (QLatin1String (SHOW_IN_EXPLORER_NAVIGATION_PANE_C), default_value).to_bool ();
+            return settings.value (SHOW_IN_EXPLORER_NAVIGATION_PANE_C, default_value).to_bool ();
         }
         public set {
             GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-            settings.value (QLatin1String (SHOW_IN_EXPLORER_NAVIGATION_PANE_C), value);
+            settings.value (SHOW_IN_EXPLORER_NAVIGATION_PANE_C, value);
             settings.sync ();
         }
     }
@@ -885,7 +880,7 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     public int timeout () {
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-        return settings.value (QLatin1String (TIMEOUT_C), 300).to_int (); // default to 5 min
+        return settings.value (TIMEOUT_C, 300).to_int (); // default to 5 min
     }
 
 
@@ -893,7 +888,7 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     public int64 chunk_size () {
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-        return settings.value (QLatin1String (CHUNK_SIZE_C), 10 * 1000 * 1000).to_long_long (); // default to 10 MB
+        return settings.value (CHUNK_SIZE_C, 10 * 1000 * 1000).to_long_long (); // default to 10 MB
     }
 
 
@@ -901,7 +896,7 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     public int64 max_chunk_size () {
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-        return settings.value (QLatin1String (MAX_CHUNK_SIZE_C), 1000 * 1000 * 1000).to_long_long (); // default to 1000 MB
+        return settings.value (MAX_CHUNK_SIZE_C, 1000 * 1000 * 1000).to_long_long (); // default to 1000 MB
     }
 
 
@@ -909,7 +904,7 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     public int64 min_chunk_size () {
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-        return settings.value (QLatin1String (MIN_CHUNK_SIZE_C), 1000 * 1000).to_long_long (); // default to 1 MB
+        return settings.value (MIN_CHUNK_SIZE_C, 1000 * 1000).to_long_long (); // default to 1 MB
     }
 
 
@@ -930,7 +925,7 @@ public class ConfigFile : GLib.Object {
         //  ASSERT (!w.object_name ().is_null ());
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
         settings.begin_group (w.object_name ());
-        settings.value (QLatin1String (GEOMETRY_C), w.save_geometry ());
+        settings.value (GEOMETRY_C, w.save_geometry ());
         settings.sync ();
     // #endif
     }
@@ -956,7 +951,7 @@ public class ConfigFile : GLib.Object {
 
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
         settings.begin_group (header.object_name ());
-        settings.value (QLatin1String (GEOMETRY_C), header.save_state ());
+        settings.value (GEOMETRY_C, header.save_state ());
         settings.sync ();
     // #endif
     }
@@ -1010,10 +1005,10 @@ public class ConfigFile : GLib.Object {
         if (connection.is_empty ())
             connection_string = default_connection ();
 
-        GLib.Variant fallback = get_value (QLatin1String (SKIP_UPDATE_CHECK_C), connection_string, false);
-        fallback = get_value (QLatin1String (SKIP_UPDATE_CHECK_C), "", fallback);
+        GLib.Variant fallback = get_value (SKIP_UPDATE_CHECK_C, connection_string, false);
+        fallback = get_value (SKIP_UPDATE_CHECK_C, "", fallback);
 
-        GLib.Variant value = get_policy_setting (QLatin1String (SKIP_UPDATE_CHECK_C), fallback);
+        GLib.Variant value = get_policy_setting (SKIP_UPDATE_CHECK_C, fallback);
         return value.to_bool ();
     }
     public void set_skip_update_check (bool skip, string connection) {
@@ -1024,7 +1019,7 @@ public class ConfigFile : GLib.Object {
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
         settings.begin_group (connection_string);
 
-        settings.value (QLatin1String (SKIP_UPDATE_CHECK_C), GLib.Variant (skip));
+        settings.value (SKIP_UPDATE_CHECK_C, GLib.Variant (skip));
         settings.sync ();
     }
 
@@ -1034,13 +1029,14 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     public bool auto_update_check (string connection = "") {
         string connection_string = connection;
-        if (connection.is_empty ())
+        if (connection.is_empty ()) {
             connection_string = default_connection ();
+        }
 
-        GLib.Variant fallback = get_value (QLatin1String (AUTO_UPDATE_CHECK_C), connection_string, true);
-        fallback = get_value (QLatin1String (AUTO_UPDATE_CHECK_C), "", fallback);
+        GLib.Variant fallback = get_value (AUTO_UPDATE_CHECK_C, connection_string, true);
+        fallback = get_value (AUTO_UPDATE_CHECK_C, "", fallback);
 
-        GLib.Variant value = get_policy_setting (QLatin1String (AUTO_UPDATE_CHECK_C), fallback);
+        GLib.Variant value = get_policy_setting (AUTO_UPDATE_CHECK_C, fallback);
         return value.to_bool ();
     }
 
@@ -1055,7 +1051,7 @@ public class ConfigFile : GLib.Object {
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
         settings.begin_group (connection_string);
 
-        settings.value (QLatin1String (AUTO_UPDATE_CHECK_C), GLib.Variant (auto_check));
+        settings.value (AUTO_UPDATE_CHECK_C, GLib.Variant (auto_check));
         settings.sync ();
     }
 
@@ -1068,13 +1064,13 @@ public class ConfigFile : GLib.Object {
     public int update_segment ();
     int ConfigFile.update_segment () {
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-        int segment = settings.value (QLatin1String (UPDATE_SEGMENT_C), -1).to_int ();
+        int segment = settings.value (UPDATE_SEGMENT_C, -1).to_int ();
 
         // Invalid? (Unset at the very first launch)
         if (segment < 0 || segment > 99) {
             // Save valid segment value, normally has to be done only once.
             segment = Utility.rand () % 99;
-            settings.value (QLatin1String (UPDATE_SEGMENT_C), segment);
+            settings.value (UPDATE_SEGMENT_C, segment);
         }
 
         return segment;
@@ -1096,7 +1092,7 @@ public class ConfigFile : GLib.Object {
         }
 
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-        return settings.value (QLatin1String (UPDATE_CHANNEL_C), default_update_channel).to_string ();
+        return settings.value (UPDATE_CHANNEL_C, default_update_channel).to_string ();
     }
 
 
@@ -1104,7 +1100,7 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     public void update_channel (string channel) {
         GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-        settings.value (QLatin1String (UPDATE_CHANNEL_C), channel);
+        settings.value (UPDATE_CHANNEL_C, channel);
     }
 
     /***********************************************************
@@ -1132,11 +1128,11 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     string certificate_password {
         public get {
-            return retrieve_data ("", QLatin1String (CERT_PASSWORD)).to_string ();
+            return retrieve_data ("", CERT_PASSWORD).to_string ();
         }
         public set {
             GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-            settings.value (QLatin1String (CERT_PASSWORD), value);
+            settings.value (CERT_PASSWORD, value);
             settings.sync ();
         }
     }
@@ -1149,11 +1145,11 @@ public class ConfigFile : GLib.Object {
     string client_version_string {
         public get {
             GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-            return settings.value (QLatin1String (CLIENT_VERSION_C), "").to_string ();
+            return settings.value (CLIENT_VERSION_C, "").to_string ();
         }
         public set {
             GLib.Settings settings = new GLib.Settings (config_file (), GLib.Settings.IniFormat);
-            settings.value (QLatin1String (CLIENT_VERSION_C), value);
+            settings.value (CLIENT_VERSION_C, value);
         }
     }
 

@@ -31,7 +31,7 @@ public class StorePrivateKeyApiJob : AbstractNetworkJob {
             return this.private_key;
         }
         public set {
-            string data = new string ("private_key=");
+            string data = "private_key=";
             data += GLib.Uri.to_percent_encoding (value);
             this.private_key.data (data);
         }

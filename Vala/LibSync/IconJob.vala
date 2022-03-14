@@ -23,14 +23,17 @@ public class IconJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public IconJob.for_account (unowned Account account, GLib.Uri url, GLib.Object parent = new GLib.Object ()) {
+    public IconJob.for_account (Account account, GLib.Uri url, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         Soup.Request request = new Soup.Request (url);
-    // #if (QT_VERSION >= 0x050600)
         request.attribute (Soup.Request.FollowRedirectsAttribute, true);
-    // #endif
-        var reply = account.send_raw_request (string ("GET"), url, request);
-        connect (reply, Soup.Reply.on_signal_finished, this, IconJob.on_signal_finished);
+        var reply = account.send_raw_request ("GET", url, request);
+        connect (
+            reply,
+            Soup.Reply.on_signal_finished,
+            this,
+            IconJob.on_signal_finished
+        );
     }
 
 

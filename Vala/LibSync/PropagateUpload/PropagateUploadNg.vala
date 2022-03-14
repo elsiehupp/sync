@@ -92,9 +92,9 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
     If chunk == -1, returns the URL of the parent folder containing the chunks
     ***********************************************************/
     private GLib.Uri chunk_url (int chunk = -1) {
-        string path = QLatin1String ("remote.php/dav/uploads/")
+        string path = "remote.php/dav/uploads/"
             + propagator ().account ().dav_user ()
-            + "/" + string.number (this.transfer_identifier);
+            + "/" + this.transfer_identifier.to_string ();
         if (chunk >= 0) {
             // We need to do add leading 0 because the server orders the chunk alphabetically
             path += "/" + string.number (chunk).right_justified (16, '0'); // 1e16 is 10 petabyte
@@ -229,15 +229,15 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
             var headers = PropagateUploadFileCommon.headers ();
 
             // "If-Match applies to the source, but we are interested in comparing the etag of the destination
-            var if_match = headers.take (string ("If-Match"));
+            var if_match = headers.take ("If-Match");
             if (!if_match.is_empty ()) {
-                headers[string ("If")] = "<" + GLib.Uri.to_percent_encoding (destination, "/") + "> ([" + if_match + "])";
+                headers["If"] = "<" + GLib.Uri.to_percent_encoding (destination, "/") + "> ([" + if_match + "])";
             }
             if (!this.transmission_checksum_header.is_empty ()) {
                 GLib.info (destination + this.transmission_checksum_header);
                 headers[CHECK_SUM_HEADER_C] = this.transmission_checksum_header;
             }
-            headers[string ("OC-Total-Length")] = new string.number (file_size);
+            headers["OC-Total-Length"] = new string.number (file_size);
 
             var job = new MoveJob (propagator ().account (), Utility.concat_url_path (chunk_url (), "/.file"),
                 destination, headers, this);

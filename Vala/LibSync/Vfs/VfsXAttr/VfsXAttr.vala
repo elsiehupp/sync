@@ -82,7 +82,7 @@ public class VfsXAttr : Vfs {
             return new Result<void, string>.from_error (_("Error updating metadata due to invalid modified time."));
         }
 
-        var path = string (this.setup_params.filesystem_path + item.file);
+        string path = this.setup_params.filesystem_path + item.file;
         GLib.File file = GLib.File.new_for_path (path);
         if (file.exists () && file.size () > 1
             && !FileSystem.verify_file_unchanged (path, item.size, item.modtime)) {
@@ -103,7 +103,7 @@ public class VfsXAttr : Vfs {
     /***********************************************************
     ***********************************************************/
     public Result<void, string> dehydrate_placeholder (SyncFileItem item) {
-        var path = string (this.setup_params.filesystem_path + item.file);
+        string path = this.setup_params.filesystem_path + item.file;
         GLib.File file = GLib.File.new_for_path (path);
         if (!file.remove ()) {
             return new Result<void, string>.from_error (_("Couldn't remove the original file to dehydrate."));
@@ -157,7 +157,7 @@ public class VfsXAttr : Vfs {
         GLib.assert (!parent_path.has_suffix ("/"));
         GLib.assert (!stat.path.starts_with ("/"));
 
-        var path = new string (*parent_path + "/" + stat.path);
+        string path = parent_path + "/" + stat.path;
         var pin = () => {
             var absolute_path = string.from_utf8 (path);
             GLib.assert (absolute_path.starts_with (parameters ().filesystem_path.to_utf8 ()));

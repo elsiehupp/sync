@@ -53,7 +53,7 @@ public class ClientProxy : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private string print_q_network_proxy (QNetworkProxy proxy) {
-        return string ("%1://%2:%3").arg (proxy_type_to_c_str (proxy.type ())).arg (proxy.host_name ()).arg (proxy.port ());
+        return "%1://%2:%3".arg (proxy_type_to_c_str (proxy.type ())).arg (proxy.host_name ()).arg (proxy.port ());
     }
 
 

@@ -58,15 +58,15 @@ public class HttpLogger {
     public static string request_verb (QNetworkAccessManager.Operation operation, Soup.Request request) {
         switch (operation) {
         case QNetworkAccessManager.HeadOperation:
-            return string ("HEAD");
+            return "HEAD";
         case QNetworkAccessManager.GetOperation:
-            return string ("GET");
+            return "GET";
         case QNetworkAccessManager.PutOperation:
-            return string ("PUT");
+            return "PUT";
         case QNetworkAccessManager.PostOperation:
-            return string ("POST");
+            return "POST";
         case QNetworkAccessManager.DeleteOperation:
-            return string ("DELETE");
+            return "DELETE";
         case QNetworkAccessManager.CustomOperation:
             return request.attribute (Soup.Request.CustomVerbAttribute).to_byte_array ();
         case QNetworkAccessManager.UnknownOperation:

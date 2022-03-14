@@ -275,7 +275,7 @@ public class ClientSideEncryption : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void forget_sensitive_data (unowned Account account) {
-        this.private_key = new string ();
+        this.private_key = "";
         this.certificate = new QSslCertificate ();
         this.public_key = new QSslKey ();
         this.mnemonic = "";
@@ -392,7 +392,7 @@ public class ClientSideEncryption : GLib.Object {
         if (read_job.error () != NoError || read_job.text_data ().length () == 0) {
             this.certificate = QSslCertificate ();
             this.public_key = QSslKey ();
-            this.private_key = new string ();
+            this.private_key = "";
             get_public_key_from_server (account);
             return;
         }
@@ -471,7 +471,7 @@ public class ClientSideEncryption : GLib.Object {
                     GLib.info ("Error invalid server public key.");
                     this.certificate = QSslCertificate ();
                     this.public_key = QSslKey ();
-                    this.private_key = new string ();
+                    this.private_key = "";
                     get_public_key_from_server (account);
                     return;
                 }
@@ -534,7 +534,7 @@ public class ClientSideEncryption : GLib.Object {
                 }
             } else {
                 this.mnemonic = "";
-                this.private_key = new string ();
+                this.private_key = "";
                 GLib.info ("Cancelled.");
                 break;
             }
@@ -679,7 +679,7 @@ public class ClientSideEncryption : GLib.Object {
     }
 
     GLib.List<string> old_cipher_format_split (string cipher) {
-        var separator = new string ("f_a=="); // BASE64 encoded '|'
+        var separator = "f_a=="; // BASE64 encoded '|'
         var result = GLib.List<string> ();
 
         var data = cipher;

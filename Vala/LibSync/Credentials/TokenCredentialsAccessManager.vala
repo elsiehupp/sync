@@ -15,14 +15,14 @@ public class TokenCredentialsAccessManager : AccessManager {
 
 
     protected Soup.Reply create_request (Operation operation, Soup.Request request, QIODevice outgoing_data) {
-        if (this.credentials.user ().is_empty () || this.credentials.password ().is_empty ()) {
-            GLib.warning ("Empty user/password provided!";
+        if (this.credentials.user () == "" || this.credentials.password () == "") {
+            GLib.warning ("Empty user/password provided!");
         }
 
-        Soup.Request request (request);
+        Soup.Request request = new Soup.Request (request);
 
-        string cred_hash = new string (this.credentials.user ().to_utf8 () + ":" + this.credentials.password ().to_utf8 ()).to_base64 ();
-        request.raw_header (string ("Authorization"), string ("Basic ") + cred_hash);
+        string cred_hash = (this.credentials.user ().to_utf8 () + ":" + this.credentials.password ().to_utf8 ()).to_base64 ();
+        request.raw_header ("Authorization", "Basic " + cred_hash);
 
         // A pre-authenticated cookie
         string token = this.credentials.token.to_utf8 ();

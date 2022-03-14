@@ -499,7 +499,7 @@ public class Account : GLib.Object {
     ***********************************************************/
     public GLib.Uri deprecated_private_link_url (string numeric_file_id) {
         return Utility.concat_url_path (this.user_visible_url,
-            QLatin1String ("/index.php/f/") + GLib.Uri.to_percent_encoding (string.from_latin1 (numeric_file_id)));
+            "/index.php/f/" + GLib.Uri.to_percent_encoding (string.from_latin1 (numeric_file_id)));
     }
 
 
@@ -654,7 +654,7 @@ public class Account : GLib.Object {
     /***********************************************************
     Assign a client certificate
     ***********************************************************/
-    public void certificate (string certficate = new string (), string private_key = "");
+    public void certificate (string certficate = "", string private_key = "");
 
 
     /***********************************************************
@@ -996,7 +996,7 @@ public class Account : GLib.Object {
         if (!direct_editing_url.is_empty () &&
             (direct_editing_e_tag.is_empty () || direct_editing_e_tag != this.last_direct_editing_e_tag)) {
                 // Fetch the available editors and their mime types
-                var json_api_job = new JsonApiJob (shared_from_this (), QLatin1String ("ocs/v2.php/apps/files/api/v1/direct_editing"));
+                var json_api_job = new JsonApiJob (shared_from_this (), "ocs/v2.php/apps/files/api/v1/direct_editing");
                 GLib.Object.JsonApiJob.signal_json_received.connect (json_api_job, this, Account.on_signal_direct_editing_recieved);
                 json_api_job.start ();
         }

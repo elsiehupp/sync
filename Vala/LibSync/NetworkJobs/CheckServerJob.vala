@@ -67,7 +67,7 @@ public class CheckServerJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public CheckServerJob.for_account (unowned Account account, GLib.Object parent = new GLib.Object ()) {
-        base (account, QLatin1String (STATUS_PHP_C), parent);
+        base (account, STATUS_PHP_C, parent);
         this.subdir_fallback = false;
         this.permanent_redirects = 0;
         ignore_credential_failure (true);
@@ -124,7 +124,7 @@ public class CheckServerJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private bool on_signal_finished () {
-        if (reply ().request ().url ().scheme () == QLatin1String ("https")
+        if (reply ().request ().url ().scheme () == "https"
             && reply ().ssl_configuration ().session_ticket ().is_empty ()
             && reply ().error () == Soup.Reply.NoError) {
             GLib.warning ("No SSL session identifier / session ticket is used, this might impact sync performance negatively.");
@@ -185,7 +185,7 @@ public class CheckServerJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_redirected (Soup.Reply reply, GLib.Uri target_url, int redirect_count) {
-        string slash_status_php = new string ("/");
+        string slash_status_php = "/";
         slash_status_php.append (STATUS_PHP_C);
 
         int http_code = reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();

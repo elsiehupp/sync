@@ -73,7 +73,7 @@ public class PropagateUploadEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public PropagateUploadEncrypted (OwncloudPropagator propagator, string remote_parent_path, unowned SyncFileItem item, GLib.Object parent = new GLib.Object ()) {
+    public PropagateUploadEncrypted (OwncloudPropagator propagator, string remote_parent_path, SyncFileItem item, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.propagator = propagator;
         this.remote_parent_path = remote_parent_path;
@@ -85,40 +85,44 @@ public class PropagateUploadEncrypted : GLib.Object {
 
 
     /***********************************************************
+    If the file is in a encrypted folder, which we know, we
+    wouldn't be here otherwise, we need to do the long road:
+
+    - find the ID of the folder.
+    - lock the folder using its identifier.
+    - download the metadata
+    - update the metadata
+    - upload the file
+    - upload the metadata
+    - unlock the folder.
     ***********************************************************/
     public void start () {
-        var root_path = () => {
-            var result = this.propagator.remote_path ();
-            if (result.starts_with ("/")) {
-                return result.mid (1);
-            } else {
-                return result;
-            }
-        };
-        var absolute_remote_parent_path = () => {
-            var path = string (root_path + this.remote_parent_path);
-            if (path.has_suffix ("/")) {
-                path.chop (1);
-            }
-            return path;
-        };
 
-        /* If the file is in a encrypted folder, which we know, we wouldn't be here otherwise,
-        we need to do the long road:
-        find the ID of the folder.
-        lock the folder using it's identifier.
-        download the metadata
-        update the metadata
-        upload the file
-        upload the metadata
-        unlock the folder.
-        */
         GLib.debug ("Folder is encrypted; let's get the Id from it.");
         var job = new LsColJob (this.propagator.account (), absolute_remote_parent_path, this);
         job.properties ({"resourcetype", "http://owncloud.org/ns:fileid"});
         connect (job, LsColJob.directory_listing_subfolders, this, PropagateUploadEncrypted.on_signal_folder_encrypted_id_received);
         connect (job, LsColJob.finished_with_error, this, PropagateUploadEncrypted.on_signal_folder_encrypted_id_error);
         job.start ();
+    }
+
+
+    private void root_path () {
+        var result = this.propagator.remote_path ();
+        if (result.starts_with ("/")) {
+            return result.mid (1);
+        } else {
+            return result;
+        }
+    }
+
+
+    private void absolute_remote_parent_path () {
+        var path = root_path + this.remote_parent_path;
+        if (path.has_suffix ("/")) {
+            path.chop (1);
+        }
+        return path;
     }
 
 
@@ -309,8 +313,8 @@ public class PropagateUploadEncrypted : GLib.Object {
 
             // Other clients expect "httpd/unix-directory" instead of "inode/directory"
             // Doesn't matter much for us since we don't do much about that mimetype anyway
-            if (encrypted_file.mimetype == string ("inode/directory")) {
-                encrypted_file.mimetype = string ("httpd/unix-directory");
+            if (encrypted_file.mimetype == "inode/directory") {
+                encrypted_file.mimetype = "httpd/unix-directory";
             }
         }
 

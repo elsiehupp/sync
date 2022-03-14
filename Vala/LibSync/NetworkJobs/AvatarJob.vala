@@ -36,9 +36,9 @@ public class AvatarJob : AbstractNetworkJob {
     public AvatarJob.for_account (unowned Account account, string user_id, int size, GLib.Object parent = new GLib.Object ()) {
         base (account, "", parent);
         if (account.server_version_int () >= Account.make_server_version (10, 0, 0)) {
-            this.avatar_url = Utility.concat_url_path (account.url (), string ("remote.php/dav/avatars/%1/%2.png").arg (user_id, string.number (size)));
+            this.avatar_url = Utility.concat_url_path (account.url (), "remote.php/dav/avatars/%1/%2.png".arg (user_id, string.number (size)));
         } else {
-            this.avatar_url = Utility.concat_url_path (account.url (), string ("index.php/avatar/%1/%2").arg (user_id, string.number (size)));
+            this.avatar_url = Utility.concat_url_path (account.url (), "index.php/avatar/%1/%2".arg (user_id, string.number (size)));
         }
     }
 

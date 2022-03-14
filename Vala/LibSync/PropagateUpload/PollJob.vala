@@ -42,8 +42,8 @@ public class PollJob : AbstractNetworkJob {
     public void start () {
         on_signal_timeout (120 * 1000);
         GLib.Uri account_url = account ().url ();
-        GLib.Uri final_url = GLib.Uri.from_user_input (account_url.scheme () + QLatin1String ("://") + account_url.authority ()
-            + (path ().starts_with ("/") ? QLatin1String ("") : QLatin1String ("/")) + path ());
+        GLib.Uri final_url = GLib.Uri.from_user_input (account_url.scheme () + "://" + account_url.authority ()
+            + (path ().starts_with ("/") ? "" : "/") + path ());
         send_request ("GET", final_url);
         connect (reply (), Soup.Reply.download_progress, this, AbstractNetworkJob.on_signal_reset_timeout, Qt.UniqueConnection);
         AbstractNetworkJob.start ();
@@ -88,7 +88,7 @@ public class PollJob : AbstractNetworkJob {
         }
 
         var status = json["status"].to_string ();
-        if (status == QLatin1String ("on_signal_init") || status == QLatin1String ("started")) {
+        if (status == "on_signal_init" || status == "started") {
             QTimer.single_shot (5 * 1000, this, PollJob.start);
             return false;
         }
@@ -96,7 +96,7 @@ public class PollJob : AbstractNetworkJob {
         this.item.response_time_stamp = response_timestamp ();
         this.item.http_error_code = json["error_code"].to_int ();
 
-        if (status == QLatin1String ("on_signal_finished")) {
+        if (status == "on_signal_finished") {
             this.item.status = SyncFileItem.Status.SUCCESS;
             this.item.file_id = json["file_identifier"].to_string ().to_utf8 ();
             this.item.etag = parse_etag (json["ETag"].to_string ().to_utf8 ());

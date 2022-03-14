@@ -58,7 +58,7 @@ public class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public AbstractPropagateRemoteDeleteEncrypted (OwncloudPropagator propagator, unowned SyncFileItem item, GLib.Object parent) {
+    public AbstractPropagateRemoteDeleteEncrypted (OwncloudPropagator propagator, SyncFileItem item, GLib.Object parent) {
         base (parent);
         this.signal_network_error = Soup.Reply.NoError;
         this.propagator = propagator;

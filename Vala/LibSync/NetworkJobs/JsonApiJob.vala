@@ -16,7 +16,7 @@ https://github.com/ow
 
 To be used like this:
 \code
-this.job = new JsonApiJob (account, QLatin1String ("o
+this.job = new JsonApiJob (account, "o
 connect (j
 The received GLib.HashTable<string, GLib.Variant> is null in case of error
 \encode
@@ -123,7 +123,7 @@ public class JsonApiJob : AbstractNetworkJob {
     public void start () {
         add_raw_header ("OCS-APIREQUEST", "true");
         var query = this.additional_params;
-        query.add_query_item (QLatin1String ("format"), QLatin1String ("json"));
+        query.add_query_item ("format", "json");
         GLib.Uri url = Utility.concat_url_path (account ().url (), path (), query);
         const string http_verb = this.verb.to_string ();
         if (!this.body.is_empty ()) {
@@ -174,7 +174,7 @@ public class JsonApiJob : AbstractNetworkJob {
         if (reply ().raw_header_list ().contains ("ETag"))
             /* emit */ etag_response_header_received (reply ().raw_header ("ETag"), status_code);
 
-        var desktop_notifications_allowed = reply ().raw_header (string ("X-Nextcloud-User-Status"));
+        var desktop_notifications_allowed = reply ().raw_header ("X-Nextcloud-User-Status");
         if (!desktop_notifications_allowed.is_empty ()) {
             /* emit */ allow_desktop_notifications_changed (desktop_notifications_allowed == "online");
         }

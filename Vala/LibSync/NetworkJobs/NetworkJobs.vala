@@ -39,8 +39,9 @@ namespace LibSync {
 Strips quotes and gzip annotations
 ***********************************************************/
 string parse_etag (char header) {
-    if (!header)
-        return string ();
+    if (!header) {
+        return "";
+    }
     string arr = header;
 
     // Weak E-Tags can appear when gzip compression is on, see #3946

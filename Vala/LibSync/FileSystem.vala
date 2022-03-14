@@ -44,8 +44,8 @@ public class FileSystem : GLib.Object {
         }
 
         const int BUFFER_SIZE = 16 * 1024;
-        string buffer1 = new string (BUFFER_SIZE, 0);
-        string buffer2 = new string (BUFFER_SIZE, 0);
+        string buffer1;
+        string buffer2;
         // the files have the same size, compare all of it
         while (!file_1.at_end ()) {
             file_1.read (buffer1.data (), BUFFER_SIZE);

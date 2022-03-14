@@ -53,8 +53,8 @@ public class LsColXMLParser : GLib.Object {
             QXmlStreamReader.TokenType type = reader.read_next ();
             string name = reader.name ().to_string ();
             // Start elements with DAV:
-            if (type == QXmlStreamReader.StartElement && reader.namespace_uri () == QLatin1String ("DAV:")) {
-                if (name == QLatin1String ("href")) {
+            if (type == QXmlStreamReader.StartElement && reader.namespace_uri () == "DAV:") {
+                if (name == "href") {
                     // We don't use URL encoding in our request URL (which is the expected path) (QNAM will do it for us)
                     // but the result will have URL encoding..
                     string href_string = GLib.Uri.from_local_file (GLib.Uri.from_percent_encoding (reader.read_element_text ().to_utf8 ()))
@@ -87,15 +87,15 @@ public class LsColXMLParser : GLib.Object {
             if (type == QXmlStreamReader.StartElement && inside_propstat && inside_prop) {
                 // All those elements are properties
                 string property_content = read_contents_as_string (reader);
-                if (name == QLatin1String ("resourcetype") && property_content.contains ("collection")) {
+                if (name == "resourcetype" && property_content.contains ("collection")) {
                     folders.append (current_href);
-                } else if (name == QLatin1String ("size")) {
+                } else if (name == "size") {
                     bool ok = false;
                     var s = property_content.to_long_long (&ok);
                     if (ok && file_info) {
                         (*file_info)[current_href].size = s;
                     }
-                } else if (name == QLatin1String ("fileid")) {
+                } else if (name == "fileid") {
                     (*file_info)[current_href].file_identifier = property_content.to_utf8 ();
                 }
                 current_tmp_properties.insert (reader.name ().to_string (), property_content);
@@ -103,7 +103,7 @@ public class LsColXMLParser : GLib.Object {
 
             // End elements with DAV:
             if (type == QXmlStreamReader.EndElement) {
-                if (reader.namespace_uri () == QLatin1String ("DAV:")) {
+                if (reader.namespace_uri () == "DAV:") {
                     if (reader.name () == "response") {
                         if (current_href.has_suffix ("/")) {
                             current_href.chop (1);

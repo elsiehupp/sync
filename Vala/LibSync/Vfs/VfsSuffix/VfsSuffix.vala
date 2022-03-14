@@ -83,13 +83,13 @@ public class VfsSuffix : Vfs {
         string fn = this.setup_params.filesystem_path + item.file;
         if (!fn.has_suffix (file_suffix ())) {
             //  ASSERT (false, "vfs file isn't ending with suffix");
-            return string ("vfs file isn't ending with suffix");
+            return "vfs file isn't ending with suffix";
         }
 
         GLib.File file = GLib.File.new_for_path (fn);
         if (file.exists () && file.size () > 1
             && !FileSystem.verify_file_unchanged (fn, item.size, item.modtime)) {
-            return string ("Cannot create a placeholder because a file with the placeholder name already exist");
+            return "Cannot create a placeholder because a file with the placeholder name already exist";
         }
 
         if (!file.open (GLib.File.ReadWrite | GLib.File.Truncate))

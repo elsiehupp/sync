@@ -93,20 +93,20 @@ public class PropfindJob : AbstractNetworkJob {
 
             GLib.HashTable<string, GLib.Variant> items;
             // introduced to nesting is ignored
-            GLib.List<string> cur_element; // should be a LIFO stack
+            GLib.List<string> current_element; // should be a LIFO stack
 
             while (!reader.at_end ()) {
                 QXmlStreamReader.TokenType type = reader.read_next ();
                 if (type == QXmlStreamReader.StartElement) {
-                    if (!cur_element.is_empty () && cur_element.top () == QLatin1String ("prop")) {
+                    if (!current_element.is_empty () && current_element.top () == "prop") {
                         items.insert (reader.name ().to_string (), reader.read_element_text (QXmlStreamReader.SkipChildElements));
                     } else {
-                        cur_element.push (reader.name ().to_string ());
+                        current_element.push (reader.name ().to_string ());
                     }
                 }
                 if (type == QXmlStreamReader.EndElement) {
-                    if (cur_element.top () == reader.name ()) {
-                        cur_element.pop ();
+                    if (current_element.top () == reader.name ()) {
+                        current_element.pop ();
                     }
                 }
             }
