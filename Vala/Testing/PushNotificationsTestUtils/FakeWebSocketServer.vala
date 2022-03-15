@@ -60,7 +60,7 @@ public class FakeWebSocketServer : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public QWebSocket authenticate_account (Occ.unowned Account account, BeforeAuthentication before_authentication, AfterAuthentication after_authentication) {
+    public QWebSocket authenticate_account (Occ.Account account, BeforeAuthentication before_authentication, AfterAuthentication after_authentication) {
         var push_notifications = account.push_notifications ();
         GLib.assert_true (push_notifications);
         QSignalSpy ready_spy = new QSignalSpy (push_notifications, &Occ.PushNotifications.ready);
@@ -146,7 +146,7 @@ public class FakeWebSocketServer : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static Occ.unowned Account create_account (string username = "user", string password = "password") {
+    public static unowned Occ.Account create_account (string username = "user", string password = "password") {
         var account = Occ.Account.create ();
 
         string[] type_list;

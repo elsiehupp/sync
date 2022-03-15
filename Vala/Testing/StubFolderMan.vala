@@ -19,12 +19,12 @@ public class StubFolderMan : Occ.AccountManager {
 
     void account_removed (Occ.AccountState state) { }
 
-    GLib.List<Occ.unowned AccountState> accounts () {
-        return GLib.List<Occ.unowned AccountState> ();
+    GLib.List<unowned Occ.AccountState> accounts () {
+        return GLib.List<unowned Occ.AccountState> ();
     }
 
-    Occ.unowned AccountState account (string value) {
-        return unowned AccountState ();
+    Occ.AccountState account (string value) {
+        return AccountState ();
     }
 
     void remove_account_folders (Occ.AccountState state) { }

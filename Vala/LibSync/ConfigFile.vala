@@ -561,17 +561,14 @@ public class ConfigFile : GLib.Object {
     }
 
 
-
-
     /***********************************************************
     ***********************************************************/
-    public int proxy_type_from_instance {
+    public int proxy_type_from_instance () {
         if (Theme.instance.force_system_network_proxy ()) {
             return Soup.ProxyResolverDefault.DefaultProxy;
         }
         return get_value (PROXY_TYPE_C).to_int ();
     }
-
 
 
     /***********************************************************

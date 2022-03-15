@@ -140,7 +140,7 @@ public class CheckVioExt {
 
     ***********************************************************/
     static void traverse_dir (void **state, string directory, int count) {
-        csync_vio_handle_t dh = null;
+        CSyncVioHandleT dh = null;
         std.unique_ptr<CSyncFileStatT> dirent;
         var sv = (StateVar*) *state;
         string subdir;

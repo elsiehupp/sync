@@ -413,7 +413,7 @@ public class SyncFileItem : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public bool == "" {
+    public bool is_empty () {
         return this.file == "";
     }
 

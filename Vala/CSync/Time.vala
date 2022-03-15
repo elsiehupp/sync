@@ -19,12 +19,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ***********************************************************/
 
 
-#ifdef this.WIN32
+//  #ifdef this.WIN32
 //  #include <time.h>
 //  #include <sys/time.h>
 //  #endif
 
-OCSYNC_EXPORT int c_utimes (string uri, struct timeval times);
+//  OCSYNC_EXPORT int c_utimes (string uri, struct timeval times);
 
 
 
@@ -63,34 +63,34 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ***********************************************************/
 
 
-#ifdef HAVE_UTIMES
-int c_utimes (string uri, struct timeval times) {
+//  #ifdef HAVE_UTIMES
+int c_utimes (string uri, timeval times) {
     int ret = utimes (GLib.File.encode_name (uri).const_data (), times);
     return ret;
 }
-#else // HAVE_UTIMES
+//  #else // HAVE_UTIMES
 
-#ifdef this.WIN32
+//  #ifdef this.WIN32
 // implementation for utimes taken from KDE mingw headers
 
 //  #include <errno.h>
 //  #include <wtypes.h>
-const int CSYNC_SECONDS_SINCE_1601 11644473600LL
-const int CSYNC_USEC_IN_SEC            1000000LL
+const int CSYNC_SECONDS_SINCE_1601 = 11644473600LL;
+const int CSYNC_USEC_IN_SEC        = 1000000LL;
 //after Microsoft KB167296
-static void Unix_timeval_to_file_time (struct timeval t, LPFILETIME pft) {
+static void Unix_timeval_to_file_time (timeval t, LPFILETIME pft) {
     LONGLONG ll;
     ll = Int32x32To64 (t.tv_sec, CSYNC_USEC_IN_SEC*10) + t.tv_usec*10 + CSYNC_SECONDS_SINCE_1601*CSYNC_USEC_IN_SEC*10;
     pft.dw_low_date_time = (DWORD)ll;
     pft.dw_high_date_time = ll >> 32;
 }
 
-int c_utimes (string uri, struct timeval times) {
+int c_utimes (string uri, timeval times) {
     FILETIME Last_access_time;
     FILETIME Last_modification_time;
     HANDLE h_file;
 
-    var wuri = uri.to_std_w_"";
+    var wuri = uri.to_std_w_string ();
 
     if (times) {
         Unix_timeval_to_file_time (times[0], &Last_access_time);

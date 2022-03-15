@@ -146,7 +146,7 @@ public class Logger : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static Logger instance {
+    public static Logger instance () {
         return Logger.log;
     }
 

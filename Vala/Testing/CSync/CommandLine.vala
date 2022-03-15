@@ -23,75 +23,77 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 namespace Testing {
 
-const string ARGP_PROGRAM_VERSION = "csync test 0.2";
-const string ARGP_PROGRAM_BUG_ADDRESS = "<csync-devel@csync.org>";
+class TestCommandLine {
 
-static string command_line;
+    const string ARGP_PROGRAM_VERSION = "csync test 0.2";
+    const string ARGP_PROGRAM_BUG_ADDRESS = "<csync-devel@csync.org>";
 
-/***********************************************************
-Program documentation.
-***********************************************************/
-static char doc = "csync test";
+    static string command_line;
 
-/***********************************************************
-The options we understand.
-static
-***********************************************************/
-struct argp_option options[] = { {
-        .name    = "verbose",
-        .key     = 'v',
-        .arg     = NULL,
-        .flags = 0,
-        .doc     = "Make csync test more verbose",
-        .group = 0
-    }, {NULL, 0, NULL, 0, NULL, 0}
-}
+    /***********************************************************
+    Program documentation.
+    ***********************************************************/
+    static string doc = "csync test";
 
-/***********************************************************
-Parse a single option.
-***********************************************************/
-static Error parse_opt (int key, char arg, struct argp_state state) {
-    /* Get the input argument from argp_parse, which we
-     * know is a pointer to our arguments structure.
-     */
-    struct Arguments arguments = state.input;
+    /***********************************************************
+    The options we understand.
+    ***********************************************************/
+    //  static ArgpOption[] options = { ArgpOption (
+    //          .name    = "verbose",
+    //          .key     = 'v',
+    //          .arg     = NULL,
+    //          .flags = 0,
+    //          .doc     = "Make csync test more verbose",
+    //          .group = 0
+    //      ), {NULL, 0, NULL, 0, NULL, 0}
+    //  }
 
-    /* arg is currently not used */
-    (void) arg;
+    /***********************************************************
+    Parse a single option.
+    ***********************************************************/
+    static Error parse_opt (int key, char arg, ArgpState state) {
+        /* Get the input argument from argp_parse, which we
+        * know is a pointer to our arguments structure.
+        */
+        Arguments arguments = state.input;
 
-    switch (key) {
-        case 'v':
-            arguments.verbose++;
-            break;
-        case ARGP_KEY_ARG:
-            /* End processing here. */
-            command_line = state.argv [state.next - 1];
-            state.next = state.argc;
-            break;
-        default:
-            return ARGP_ERR_UNKNOWN;
+        /* arg is currently not used */
+        (void) arg;
+
+        switch (key) {
+            case 'v':
+                arguments.verbose++;
+                break;
+            case ARGP_KEY_ARG:
+                /* End processing here. */
+                command_line = state.argv [state.next - 1];
+                state.next = state.argc;
+                break;
+            default:
+                return ARGP_ERR_UNKNOWN;
+        }
+
+        return 0;
     }
 
-    return 0;
-}
-
-/***********************************************************
-Our argp parser. */
-/***********************************************************
-static struct argp argp = {options, parse_opt, args_doc, doc, NULL, NULL, NULL}; */
-static struct argp argp = {options, parse_opt, NULL, doc, NULL, NULL, NULL};
-//    #endif /* HAVE_ARGP_H */
-
-void torture_cmdline_parse (int argc, char **argv, struct Arguments arguments) {
     /***********************************************************
-     * Parse our arguments; every option seen by parse_opt will
-     * be reflected in arguments.
-     */
-#ifdef HAVE_ARGP_H
-    argp_parse (&argp, argc, argv, 0, 0, arguments);
-#else
-    (void) argc;
-    (void) argv;
-    (void) arguments;
-//    #endif /* HAVE_ARGP_H */
+    Our argp parser. */
+    /***********************************************************
+    static struct argp argp = {options, parse_opt, args_doc, doc, NULL, NULL, NULL}; */
+    static argp ArgP = {options, parse_opt, NULL, doc, NULL, NULL, NULL};
+    //    #endif /* HAVE_ARGP_H */
+
+    void torture_cmdline_parse (int argc, char **argv, Arguments arguments) {
+        /***********************************************************
+        * Parse our arguments; every option seen by parse_opt will
+        * be reflected in arguments.
+        */
+    //  #ifdef HAVE_ARGP_H
+        argp_parse (&argp, argc, argv, 0, 0, arguments);
+    //  #else
+        (void) argc;
+        (void) argv;
+        (void) arguments;
+    //    #endif /* HAVE_ARGP_H */
+    }
 }

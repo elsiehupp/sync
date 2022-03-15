@@ -21,12 +21,12 @@ public class StubRemoteWipe : Occ.AccountManager {
 
     void account_removed (Occ.AccountState state) { }
 
-    GLib.List<Occ.unowned AccountState> accounts () {
-        return new GLib.List<Occ.unowned AccountState> ();
+    GLib.List<unowned Occ.AccountState> accounts () {
+        return new GLib.List<unowned Occ.AccountState> ();
     }
 
-    Occ.unowned AccountState account (string value) {
-        return unowned AccountState ();
+    Occ.AccountState account (string value) {
+        return new AccountState ();
     }
 
 } // class StubRemoteWipe

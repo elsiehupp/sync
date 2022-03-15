@@ -20,7 +20,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public FakeQNAM fake_qnam;
-    public Occ.unowned Account account;
+    public unowned Occ.Account account;
     public Occ.AccountState account_state;
     public Occ.UnifiedSearchResultsListModel model;
     public QAbstractItemModelTester model_tester;

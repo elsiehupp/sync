@@ -1,21 +1,8 @@
-/*************************************************************
-  Copyright (C) 2014 by Olivier Goffart <ogoffart@woboq.com                *
-                                                                           *
-  This program is free software; you can redistribute it and/or modify     *
-  it under the terms of the GNU General Public License as published by     *
-  the Free Software Foundation; either version 2 of the License, or        *
-  (at your option) any later version.                                      *
-                                                                           *
-  This program is distributed in the hope that it will be useful,          *
-  but WITHOUT ANY WARRANTY; without even the implied warranty of           *
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            *
-  GNU General Public License for more details.                             *
-                                                                           *
-  You should have received a copy of the GNU General Public License        *
-  along with this program; if not, write to the                            *
-  Free Software Foundation, Inc.,                                          *
-  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA               *
- ******************************************************************************/
+/***********************************************************
+Copyright (C) 2014 by Olivier Goffart <ogoffart@woboq.com
+
+<GPLv2-or-later-Boilerplate>
+***********************************************************/
 
 //  #include <KOverlayIconPlugin>
 //  #include <KPluginFactory>
@@ -25,7 +12,8 @@
 //  #include <QTimer>
 
 public class OwncloudDolphinPlugin : KOverlayIconPlugin {
-    Q_PLUGIN_METADATA (IID "com.owncloud.ovarlayiconplugin" FILE "ownclouddolphinoverlayplugin.json")
+
+    //  Q_PLUGIN_METADATA (IID "com.owncloud.ovarlayiconplugin" FILE "ownclouddolphinoverlayplugin.json")
 
     using StatusMap = GLib.HashTable<string, string>;
     StatusMap m_status;
@@ -34,29 +22,31 @@ public class OwncloudDolphinPlugin : KOverlayIconPlugin {
     ***********************************************************/
     public OwncloudDolphinPlugin () {
         var helper = OwncloudDolphinPluginHelper.instance ();
-        GLib.Object.connect (helper, &OwncloudDolphinPluginHelper.commandRecieved,
+        GLib.Object.connect (helper, &OwncloudDolphinPluginHelper.signal_command_received,
                          this, &OwncloudDolphinPlugin.slotCommandRecieved);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public string[] getOverlays (GLib.Uri& url) override {
+    public override string[] getOverlays (GLib.Uri url) {
         var helper = OwncloudDolphinPluginHelper.instance ();
-        if (!helper.isConnected ())
-            return string[] ();
-        if (!url.isLocalFile ())
-            return string[] ();
-        QDir local_path (url.toLocalFile ());
-        const string localFile = local_path.canonicalPath ().toUtf8 ();
+        if (!helper.is_connected ()) {
+            return { };
+        }
+        if (!url.isLocalFile ()) {
+            return { };
+        }
+        QDir local_path = new QDir (url.to_local_file ());
+        const string local_file = local_path.canonical_path ().toUtf8 ();
 
-        helper.sendCommand (string ("RETRIEVE_FILE_STATUS:" + localFile + "\n"));
+        helper.send_command ("RETRIEVE_FILE_STATUS:" + local_file + "\n");
 
-        StatusMap.iterator it = m_status.find (localFile);
-        if (it != m_status.constEnd ()) {
+        StatusMap.iterator it = m_status.find (local_file);
+        if (it != m_status.const_end ()) {
             return  overlaysForString (*it);
         }
-        return string[] ();
+        return { };
     }
 
 
@@ -68,16 +58,16 @@ public class OwncloudDolphinPlugin : KOverlayIconPlugin {
             return r;
 
         if (status.startsWith ("OK"))
-            r + "vcs-normal";
+            r += "vcs-normal";
         if (status.startsWith ("SYNC") || status.startsWith ("NEW"))
-            r + "vcs-update-required";
+            r += "vcs-update-required";
         if (status.startsWith ("IGNORE") || status.startsWith ("WARN"))
-            r + "vcs-locally-modified-unstaged";
+            r += "vcs-locally-modified-unstaged";
         if (status.startsWith ("ERROR"))
-            r + "vcs-conflicting";
+            r += "vcs-conflicting";
 
         if (status.contains ("+SWM"))
-            r + "document-share";
+            r += "document-share";
 
         return r;
     }

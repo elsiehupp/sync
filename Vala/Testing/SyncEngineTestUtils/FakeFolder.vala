@@ -6,7 +6,7 @@ implied, as to its usefulness for any purpose.
 
 namespace Testing {
 
-public class FakeFolder {
+public class FakeFolder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
@@ -28,7 +28,7 @@ public class FakeFolder {
 
     // FIXME: Clarify ownership, double delete
     FakeQNAM fake_qnam;
-    Occ.unowned Account account;
+    unowned Occ.Account account;
     std.unique_ptr<Occ.SyncJournalDb> journal_database;
     std.unique_ptr<Occ.SyncEngine> sync_engine;
 
@@ -84,7 +84,7 @@ public class FakeFolder {
 
     /***********************************************************
     ***********************************************************/
-    public Occ.unowned Account account () {
+    public unowned Occ.Account account () {
         return this.account;
     }
 
