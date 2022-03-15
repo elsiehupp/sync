@@ -85,14 +85,14 @@ struct csync_vio_handle_t {
   string path;
 }
 
-static int this.csync_vio_local_stat_mb (mbchar_t wuri, CSyncFileStatT buf);
+static int this.csync_vio_local_stat_mb (char wuri, CSyncFileStatT buf);
 
 csync_vio_handle_t csync_vio_local_opendir (string name) {
     QScopedPointer<csync_vio_handle_t> handle (new csync_vio_handle_t{});
 
     var dirname = GLib.File.encode_name (name);
 
-    handle.dh = this.topendir (dirname.const_data ());
+    handle.dh = opendir (dirname.const_data ());
     if (!handle.dh) {
         return null;
     }
@@ -103,18 +103,18 @@ csync_vio_handle_t csync_vio_local_opendir (string name) {
 
 int csync_vio_local_closedir (csync_vio_handle_t dhandle) {
     //  Q_ASSERT (dhandle);
-    var rc = this.tclosedir (dhandle.dh);
+    var rc = closedir (dhandle.dh);
     delete dhandle;
     return rc;
 }
 
 std.unique_ptr<CSyncFileStatT> csync_vio_local_readdir (csync_vio_handle_t handle, Occ.Vfs vfs) {
 
-  struct this.tdirent dirent = null;
+  struct dirent dirent = null;
   std.unique_ptr<CSyncFileStatT> file_stat;
 
   do {
-      dirent = this.treaddir (handle.dh);
+      dirent = readdir (handle.dh);
       if (!dirent)
           return {};
   } while (qstrcmp (dirent.d_name, ".") == 0 || qstrcmp (dirent.d_name, "..") == 0);
@@ -171,10 +171,10 @@ int csync_vio_local_stat (string uri, CSyncFileStatT buf) {
     return this.csync_vio_local_stat_mb (GLib.File.encode_name (uri).const_data (), buf);
 }
 
-static int this.csync_vio_local_stat_mb (mbchar_t wuri, CSyncFileStatT buf) {
-    csync_stat_t sb;
+static int this.csync_vio_local_stat_mb (char wuri, CSyncFileStatT buf) {
+    stat sb;
 
-    if (this.tstat (wuri, sb) < 0) {
+    if (stat (wuri, sb) < 0) {
         return -1;
     }
 

@@ -354,9 +354,9 @@ public class SyncFileStatusTracker : GLib.Object {
             return resolve_sync_and_error_status ("", SharedFlag.NOT_SHARED);
         }
 
-        // The SyncEngine won't notify us at all for CSYNC_FILE_SILENTLY_EXCLUDED
-        // and CSYNC_FILE_EXCLUDE_AND_REMOVE excludes. Even though it's possible
-        // that the status of CSYNC_FILE_EXCLUDE_LIST excludes will change if the user
+        // The SyncEngine won't notify us at all for CSync.ExcludedFiles.Type.EXCLUDE_SILENT
+        // and CSync.ExcludedFiles.Type.EXCLUDE_AND_REMOVE excludes. Even though it's possible
+        // that the status of CSync.ExcludedFiles.Type.LIST excludes will change if the user
         // update the exclude list at runtime and doing it statically here removes
         // our ability to notify changes through the file_status_changed signal,
         // it's an acceptable compromize to treat all exclude types the same.

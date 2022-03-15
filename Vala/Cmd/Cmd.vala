@@ -151,12 +151,12 @@ public class Cmd : GLib.Object {
         if (!options.source_dir.ends_with ('/')) {
             options.source_dir.append ('/');
         }
-        GLib.FileInfo fi = new GLib.FileInfo (options.source_dir);
-        if (!fi.exists ()) {
+        GLib.FileInfo file_info = new GLib.FileInfo (options.source_dir);
+        if (!file_info.exists ()) {
             GLib.error ("Source directory '" + options.source_dir + "' does not exist.");
             exit (1);
         }
-        options.source_dir = fi.absolute_file_path ();
+        options.source_dir = file_info.absolute_file_path ();
 
         QStringListIterator it = new QStringListIterator (args);
         // skip file name;

@@ -1,0 +1,12 @@
+/***********************************************************
+libcsync -- a library to sync a directory with another
+
+Copyright (c) 2006-2012 by Andreas Schneider <asn@cryptomilk.org>
+
+<LGPL-2.1-or-Later-Boilerplate>
+***********************************************************/
+
+#define CSYNC_STRINGIFY(s) CSYNC_TOSTRING(s)
+#define CSYNC_TOSTRING(s) #s
+
+#define MIRALL_VERSION @MIRALL_VERSION@

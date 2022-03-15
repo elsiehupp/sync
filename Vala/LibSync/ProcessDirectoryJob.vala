@@ -572,18 +572,18 @@ public class ProcessDirectoryJob : GLib.Object {
 
         // FIXME: move to ExcludedFiles 's regex ?
         bool is_invalid_pattern = false;
-        if (excluded == CSYNC_NOT_EXCLUDED && !this.discovery_data.invalid_filename_rx.pattern () == "") {
+        if (excluded == CSync.ExcludedFiles.Type.NOT_EXCLUDED && !this.discovery_data.invalid_filename_rx.pattern () == "") {
             if (path.contains (this.discovery_data.invalid_filename_rx)) {
-                excluded = CSYNC_FILE_EXCLUDE_INVALID_CHAR;
+                excluded = CSync.ExcludedFiles.Type.INVALID_CHAR;
                 is_invalid_pattern = true;
             }
         }
-        if (excluded == CSYNC_NOT_EXCLUDED && this.discovery_data.ignore_hidden_files && is_hidden) {
-            excluded = CSYNC_FILE_EXCLUDE_HIDDEN;
+        if (excluded == CSync.ExcludedFiles.Type.NOT_EXCLUDED && this.discovery_data.ignore_hidden_files && is_hidden) {
+            excluded = CSync.ExcludedFiles.Type.HIDDEN;
         }
-        if (excluded == CSYNC_NOT_EXCLUDED && !local_name == ""
+        if (excluded == CSync.ExcludedFiles.Type.NOT_EXCLUDED && !local_name == ""
                 && this.discovery_data.server_blocklisted_files.contains (local_name)) {
-            excluded = CSYNC_FILE_EXCLUDE_SERVER_BLOCKLISTED;
+            excluded = CSync.ExcludedFiles.Type.SERVER_BLOCKLISTED;
             is_invalid_pattern = true;
         }
 
@@ -597,13 +597,13 @@ public class ProcessDirectoryJob : GLib.Object {
             QTextEncoder encoder = new QTextEncoder (local_codec, QTextCodec.Convert_invalid_to_null);
             if (encoder.from_unicode (path).contains ('\0')) {
                 GLib.warning ("Cannot encode " + path + " to local encoding " + local_codec.name ());
-                excluded = CSYNC_FILE_EXCLUDE_CANNOT_ENCODE;
+                excluded = CSync.ExcludedFiles.Type.CANNOT_ENCODE;
             }
         }
 
-        if (excluded == CSYNC_NOT_EXCLUDED && !is_symlink) {
+        if (excluded == CSync.ExcludedFiles.Type.NOT_EXCLUDED && !is_symlink) {
             return false;
-        } else if (excluded == CSYNC_FILE_SILENTLY_EXCLUDED || excluded == CSYNC_FILE_EXCLUDE_AND_REMOVE) {
+        } else if (excluded == CSync.ExcludedFiles.Type.EXCLUDE_SILENT || excluded == CSync.ExcludedFiles.Type.EXCLUDE_AND_REMOVE) {
             /* emit */ this.discovery_data.silently_excluded (path);
             return true;
         }
@@ -618,14 +618,14 @@ public class ProcessDirectoryJob : GLib.Object {
             item.error_string = _("Symbolic links are not supported in syncing.");
         } else {
             switch (excluded) {
-            case CSYNC_NOT_EXCLUDED:
-            case CSYNC_FILE_SILENTLY_EXCLUDED:
-            case CSYNC_FILE_EXCLUDE_AND_REMOVE:
+            case CSync.ExcludedFiles.Type.NOT_EXCLUDED:
+            case CSync.ExcludedFiles.Type.EXCLUDE_SILENT:
+            case CSync.ExcludedFiles.Type.EXCLUDE_AND_REMOVE:
                 q_fatal ("These were handled earlier");
-            case CSYNC_FILE_EXCLUDE_LIST:
+            case CSync.ExcludedFiles.Type.LIST:
                 item.error_string = _("File is listed on the ignore list.");
                 break;
-            case CSYNC_FILE_EXCLUDE_INVALID_CHAR:
+            case CSync.ExcludedFiles.Type.INVALID_CHAR:
                 if (item.file.has_suffix ('.')) {
                     item.error_string = _("File names ending with a period are not supported on this file system.");
                 } else {
@@ -646,28 +646,28 @@ public class ProcessDirectoryJob : GLib.Object {
                 }
                 item.status = SyncFileItem.Status.FILENAME_INVALID;
                 break;
-            case CSYNC_FILE_EXCLUDE_TRAILING_SPACE:
+            case CSync.ExcludedFiles.Type.TRAILING_SPACE:
                 item.error_string = _("Filename contains trailing spaces.");
                 item.status = SyncFileItem.Status.FILENAME_INVALID;
                 break;
-            case CSYNC_FILE_EXCLUDE_LONG_FILENAME:
+            case CSync.ExcludedFiles.Type.LONG_FILENAME:
                 item.error_string = _("Filename is too long.");
                 item.status = SyncFileItem.Status.FILENAME_INVALID;
                 break;
-            case CSYNC_FILE_EXCLUDE_HIDDEN:
+            case CSync.ExcludedFiles.Type.HIDDEN:
                 item.error_string = _("File/Folder is ignored because it's hidden.");
                 break;
-            case CSYNC_FILE_EXCLUDE_STAT_FAILED:
+            case CSync.ExcludedFiles.Type.STAT_FAILED:
                 item.error_string = _("Stat failed.");
                 break;
-            case CSYNC_FILE_EXCLUDE_CONFLICT:
+            case CSync.ExcludedFiles.Type.CONFLICT:
                 item.error_string = _("Conflict : Server version downloaded, local copy renamed and not uploaded.");
                 item.status = SyncFileItem.Status.CONFLICT;
             break;
-            case CSYNC_FILE_EXCLUDE_CANNOT_ENCODE:
+            case CSync.ExcludedFiles.Type.CANNOT_ENCODE:
                 item.error_string = _("The filename cannot be encoded on your file system.");
                 break;
-            case CSYNC_FILE_EXCLUDE_SERVER_BLOCKLISTED:
+            case CSync.ExcludedFiles.Type.SERVER_BLOCKLISTED:
                 item.error_string = _("The filename is blocklisted on the server.");
                 break;
             }

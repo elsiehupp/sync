@@ -40,7 +40,7 @@ public class CheckVioExt {
         return QDir (path).mkpath (path) ? 0 : -1;
     }
 
-    static mbchar_t wd_buffer[WD_BUFFER_SIZE];
+    static char wd_buffer[WD_BUFFER_SIZE];
 
     struct StateVar {
         string result;
@@ -67,9 +67,9 @@ public class CheckVioExt {
         rc = oc_mkdir (directory);
         GLib.assert_true (rc == 0);
 
-        assert_non_null (this.tgetcwd (wd_buffer, WD_BUFFER_SIZE));
+        assert_non_null (getcwd (wd_buffer, WD_BUFFER_SIZE));
 
-        rc = this.tchdir (directory.to_local_8_bit ().const_data ());
+        rc = chdir (directory.to_local_8_bit ().const_data ());
 
         GLib.assert_true (rc == 0);
 
@@ -88,7 +88,7 @@ public class CheckVioExt {
 
         output ("================== Tearing down!\n");
 
-        rc = this.tchdir (wd_buffer);
+        rc = chdir (wd_buffer);
         GLib.assert_true (rc == 0);
 
         rc = wipe_testdir ();

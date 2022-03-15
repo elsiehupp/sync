@@ -5,19 +5,18 @@
 #	version: '1.0.0')
 
 srcs = files([
-#    'ConfigCSync.vala.cmake',
-    'CsyncExclude.vala',
+#    'Config.vala.cmake',
+    'Exclude.vala',
     'Csync.vala',
-#    'CsyncVersion.vala.in',
-    'Std/CLib.vala',
-    'Std/CPrivate.vala',
-    'Std/CTime.vala',
-    'Vio/CSyncVioLocal.vala'
+#    'Version.vala.in',
+    'Private.vala',
+    'Time.vala',
+    'VioLocal.vala'
 ])
 
 executable(
     meson.project_name(),
     srcs,
-#     dependencies: deps,
+#    dependencies: deps,
     install: false
 )
