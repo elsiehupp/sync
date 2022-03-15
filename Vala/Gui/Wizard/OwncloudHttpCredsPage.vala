@@ -82,7 +82,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
         var http_creds = qobject_cast<HttpCredentials> (credentials);
         if (http_creds) {
             const string user = http_creds.fetch_user ();
-            if (!user.is_empty ()) {
+            if (!user == "") {
                 this.ui.le_username.on_signal_text (user);
             }
         } else {
@@ -91,22 +91,22 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
             // If the final url does not have a username, check the
             // user specified url too. Sometimes redirects can lose
             // the user:pw information.
-            if (url.user_name ().is_empty ()) {
+            if (url.user_name () == "") {
                 url = oc_wizard.oc_url ();
             }
 
             const string user = url.user_name ();
             const string password = url.password ();
 
-            if (!user.is_empty ()) {
+            if (!user == "") {
                 this.ui.le_username.on_signal_text (user);
             }
-            if (!password.is_empty ()) {
+            if (!password == "") {
                 this.ui.le_password.on_signal_text (password);
             }
         }
         this.ui.token_label.on_signal_text (HttpCredentialsGui.request_app_password_text (oc_wizard.account ().data ()));
-        this.ui.token_label.visible (!this.ui.token_label.text ().is_empty ());
+        this.ui.token_label.visible (!this.ui.token_label.text () == "");
         this.ui.le_username.focus ();
     }
 
@@ -122,7 +122,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
     /***********************************************************
     ***********************************************************/
     public bool validate_page () {
-        if (this.ui.le_username.text ().is_empty () || this.ui.le_password.text ().is_empty ()) {
+        if (this.ui.le_username.text () == "" || this.ui.le_password.text () == "") {
             return false;
         }
 

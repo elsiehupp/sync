@@ -9,7 +9,7 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 //  #include <account.h>
 //  #include <QFile_ico
 //  #include <QPainter>
-//  #include <QApplication>
+//  #include <Gtk.Application>
 //  #include <QMouseEvent>
 //  #include <QStyled_item_delegate>
 
@@ -98,7 +98,7 @@ public class FolderStatusDelegate : QStyledItemDelegate {
             opt.rect = add_button_rect (option.rect, option.direction);
             painter.save ();
             painter.font (Gtk.Application.font ("QPushButton"));
-            QApplication.style ().draw_control (QStyle.CE_Push_button, opt, painter, option.widget);
+            Gtk.Application.style ().draw_control (QStyle.CE_Push_button, opt, painter, option.widget);
             painter.restore ();
             return;
         }
@@ -201,7 +201,7 @@ public class FolderStatusDelegate : QStyledItemDelegate {
         painter.font (alias_font);
         painter.draw_text (QStyle.visual_rect (option.direction, option.rect, alias_rect), text_align, elided_alias);
 
-        const bool show_progess = !overall_string.is_empty () || !item_string.is_empty ();
+        const bool show_progess = !overall_string == "" || !item_string == "";
         if (!show_progess) {
             painter.font (sub_font);
             string elided_remote_path_text = sub_font_metrics.elided_text (
@@ -217,11 +217,11 @@ public class FolderStatusDelegate : QStyledItemDelegate {
 
         int h = icon_rect.bottom () + margin;
 
-        if (!conflict_texts.is_empty ())
+        if (!conflict_texts == "")
             draw_text_box (conflict_texts, Gtk.Color (0xba, 0xba, 0x4d));
-        if (!error_texts.is_empty ())
+        if (!error_texts == "")
             draw_text_box (error_texts, Gtk.Color (0xbb, 0x4d, 0x4d));
-        if (!info_texts.is_empty ())
+        if (!info_texts == "")
             draw_text_box (info_texts, Gtk.Color (0x4d, 0x4d, 0xba));
 
         // Sync File Progress Bar: Show it if sync_file is not empty.
@@ -247,7 +247,7 @@ public class FolderStatusDelegate : QStyledItemDelegate {
             p_bar_opt.progress = overall_percent;
             p_bar_opt.orientation = Qt.Horizontal;
             p_bar_opt.rect = QStyle.visual_rect (option.direction, option.rect, p_bRect);
-            QApplication.style ().draw_control (QStyle.CE_Progress_bar, p_bar_opt, painter, option.widget);
+            Gtk.Application.style ().draw_control (QStyle.CE_Progress_bar, p_bar_opt, painter, option.widget);
 
             // Overall Progress Text
             QRect overall_progress_rect;
@@ -274,9 +274,9 @@ public class FolderStatusDelegate : QStyledItemDelegate {
             btn_opt.sub_controls = QStyle.SC_Tool_button;
             btn_opt.rect = options_button_visual_rect;
             btn_opt.icon = this.icon_more;
-            int e = QApplication.style ().pixel_metric (QStyle.PM_Button_icon_size);
+            int e = Gtk.Application.style ().pixel_metric (QStyle.PM_Button_icon_size);
             btn_opt.icon_size = QSize (e,e);
-            QApplication.style ().draw_complex_control (QStyle.CC_Tool_button, btn_opt, painter);
+            Gtk.Application.style ().draw_complex_control (QStyle.CC_Tool_button, btn_opt, painter);
         }
     }
 
@@ -336,9 +336,9 @@ public class FolderStatusDelegate : QStyledItemDelegate {
             QFontMetrics font_metrics = new QFontMetrics (Gtk.Application.font ("QPushButton"));
             QStyleOptionButton opt = (QStyleOption) option;
             opt.text = add_folder_text ();
-            return QApplication.style ().size_from_contents (
+            return Gtk.Application.style ().size_from_contents (
                 QStyle.CT_Push_button, opt, font_metrics.size (Qt.Text_single_line, opt.text))
-                    .expanded_to (QApplication.global_strut ())
+                    .expanded_to (Gtk.Application.global_strut ())
                 + QSize (0, margins);
         }
 
@@ -354,7 +354,7 @@ public class FolderStatusDelegate : QStyledItemDelegate {
         int margin = font_metrics.height () / 4;
         foreach (var role in {Folder_conflict_msg, Folder_error_msg, Folder_info_msg}) {
             var msgs = qvariant_cast<string[]> (index.data (role));
-            if (!msgs.is_empty ()) {
+            if (!msgs == "") {
                 h += margin + 2 * margin + msgs.count () * font_metrics.height ();
             }
         }
@@ -404,11 +404,11 @@ public class FolderStatusDelegate : QStyledItemDelegate {
         within.height (FolderStatusDelegate.root_folder_height_without_errors (font_metrics, alias_font_metrics));
 
         QStyle_option_tool_button opt;
-        int e = QApplication.style ().pixel_metric (QStyle.PM_Button_icon_size);
+        int e = Gtk.Application.style ().pixel_metric (QStyle.PM_Button_icon_size);
         opt.rect.size (QSize (e,e));
-        QSize size = QApplication.style ().size_from_contents (QStyle.CT_Tool_button, opt, opt.rect.size ()).expanded_to (QApplication.global_strut ());
+        QSize size = Gtk.Application.style ().size_from_contents (QStyle.CT_Tool_button, opt, opt.rect.size ()).expanded_to (Gtk.Application.global_strut ());
 
-        int margin = QApplication.style ().pixel_metric (QStyle.PM_Default_layout_spacing);
+        int margin = Gtk.Application.style ().pixel_metric (QStyle.PM_Default_layout_spacing);
         QRect rectangle = new QRect (
             QPoint (within.right () - size.width () - margin,
             within.top () + within.height () / 2 - size.height () / 2),
@@ -424,7 +424,7 @@ public class FolderStatusDelegate : QStyledItemDelegate {
         QFontMetrics font_metrics = new QFontMetrics (Gtk.Application.font ("QPushButton"));
         QStyleOptionButton opt;
         opt.text = add_folder_text ();
-        QSize size = QApplication.style ().size_from_contents (QStyle.CT_Push_button, opt, font_metrics.size (Qt.Text_single_line, opt.text)).expanded_to (QApplication.global_strut ());
+        QSize size = Gtk.Application.style ().size_from_contents (QStyle.CT_Push_button, opt, font_metrics.size (Qt.Text_single_line, opt.text)).expanded_to (Gtk.Application.global_strut ());
         QRect rectangle = new QRect (
             QPoint (within.left (),
             within.top () + within.height () / 2 - size.height () / 2),

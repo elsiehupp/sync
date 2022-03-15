@@ -17,7 +17,7 @@ public class LinkLabel : Gtk.Label {
 
     /***********************************************************
     ***********************************************************/
-    public LinkLabel (Gtk.Widget parent = null) {
+    public LinkLabel (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
     }
 

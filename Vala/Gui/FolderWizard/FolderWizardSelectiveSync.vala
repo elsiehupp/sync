@@ -81,7 +81,7 @@ public class FolderWizardSelectiveSync : QWizardPage {
             target_path = target_path.mid (1);
         }
         string alias = GLib.FileInfo (target_path).filename ();
-        if (alias.is_empty ())
+        if (alias == "")
             alias = Theme.instance ().app_name ();
         string[] initial_blocklist;
         if (Theme.instance ().wizard_selective_sync_default_nothing ()) {
@@ -117,7 +117,7 @@ public class FolderWizardSelectiveSync : QWizardPage {
     public override void clean_up_page () {
         string target_path = wizard ().property ("target_path").to_string ();
         string alias = GLib.FileInfo (target_path).filename ();
-        if (alias.is_empty ())
+        if (alias == "")
             alias = Theme.instance ().app_name ();
         this.selective_sync.folder_info (target_path, alias);
         QWizardPage.clean_up_page ();

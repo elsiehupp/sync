@@ -151,11 +151,11 @@ public class UserInfo : GLib.Object {
 
         // User Info
         string user = obj_data.value ("identifier").to_string ();
-        if (!user.is_empty ()) {
+        if (!user == "") {
             account.dav_user (user);
         }
         string display_name = obj_data.value ("display-name").to_string ();
-        if (!display_name.is_empty ()) {
+        if (!display_name == "") {
             account.dav_display_name (display_name);
         }
 

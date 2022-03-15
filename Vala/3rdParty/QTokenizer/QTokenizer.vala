@@ -37,42 +37,58 @@ met : http://www.gnu.org/copyleft/gpl.html.
 $QT_END_LICENSE$
 ****************************************************************************/
 
+//  using QByte_array_tokenizer = QTokenizer<string>;
+//  using String_tokenizer = QTokenizer<std.string_value>;
+//  using WString_tokenizer = QTokenizer<std.wstring>;
 
+//  template <class T, class ConstIterator>
 
-QT_BEGIN_NAMESPACE
+class QTokenizerPrivate<T> : GLib.Object {
+    //  using CharType = typename T.value_type;
 
-template <class T, class ConstIterator>
-struct QTokenizerPrivate {
-    using CharType = typename T.value_type;
+    T string_value;
+    // ### copies begin and end for performance, premature optimization?
+    ConstIterator begin;
+    ConstIterator end;
+    ConstIterator token_begin;
+    ConstIterator token_end;
+    T delimiters;
+    T quotes;
+    bool is_delim;
+    bool return_delimiters;
+    bool return_quotes;
 
-    struct State {
-        bool in_quote = false;
-        bool in_escape = false;
-        CharType quote_char = '\0';
+    class State : GLib.Object {
+        public bool in_quote = false;
+        public bool in_escape = false;
+        public CharType quote_char = '\0';
     }
 
-    QTokenizerPrivate (T& this.string, T& this.delims) :
-        string (this.string)
-      , begin (string.begin ())
-      , end (string.end ())
-      , token_begin (end)
-      , token_end (begin)
-      , delimiters (this.delims)
-      , is_delim (false)
-      , return_delimiters (false)
-      , return_quotes (false) {
+    public QTokenizerPrivate (T string_value, T delimiters) {
+        this.string_value = string_value;
+        this.begin = string_value.begin ();
+        this.end = string_value.end ();
+        this.token_begin = end;
+        this.token_end = begin;
+        this.delimiters = delimiters;
+        this.is_delim = false;
+        this.return_delimiters = false;
+        this.return_quotes = false;
     }
 
-    bool is_delimiter (CharType c) {
+
+    public bool is_delimiter (CharType c) {
         return delimiters.contains (c);
     }
 
-    bool is_quote (CharType c) {
+
+    public bool is_quote (CharType c) {
         return quotes.contains (c);
     }
 
+
     // Returns true if a delimiter was not hit
-    bool next_char (State* state, CharType c) {
+    public bool next_char (State* state, CharType c) {
         if (state.in_quote) {
             if (state.in_escape) {
                 state.in_escape = false;
@@ -89,54 +105,49 @@ struct QTokenizerPrivate {
         return true;
     }
 
-    T string;
-    // ### copies begin and end for performance, premature optimization?
-    ConstIterator begin;
-    ConstIterator end;
-    ConstIterator token_begin;
-    ConstIterator token_end;
-    T delimiters;
-    T quotes;
-    bool is_delim;
-    bool return_delimiters;
-    bool return_quotes;
 }
 
-template <class T, class ConstIterator = typename T.ConstIterator>
-public class QTokenizer {
+//  template <class T, class ConstIterator = typename T.ConstIterator>
+public class QTokenizer<T> : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public CharType : typename T.value_type;
+    //  public CharType : typename T.value_type;
+
+    /***********************************************************
+    ***********************************************************/
+    //  private friend class QStringTokenizer;
+    private unowned QTokenizerPrivate<T, ConstIterator> d;
 
 
     /***********************************************************
     \class QTokenizer
     \inmodule QtNetwork
-    \brief QTokenizer tokenizes Strings on string, GLib.ByteArray,
-            std.string or std.wstring
+    \brief QTokenizer tokenizes Strings on string_value, string,
+            std.string_value or std.wstring
 
     Example Usage:
 
     \code
-        string string_value = ...;
+        string_value string_value = ...;
         QByte_array_tokenizer tokenizer (string_value, "; ");
         tokenizer.set_quote_characters ("\"'");
         tokenizer.set_return_delimiters (true);
         while (tokenizer.has_next ()) {
-        GLib.ByteArray token = tokenizer.next ();
+        string token = tokenizer.next ();
         bool is_delimiter = tokenizer.is_delimiter ();
         ...
         }
     \endcode
 
-    \param string The string to tokenize
-    \param delimiters A string containing delimiters
+    \param string_value The string_value to tokenize
+    \param delimiters A string_value containing delimiters
 
     \sa QStringTokenizer, QByte_array_tokenizer, String_tokenizer, WString_tokenizer
     ***********************************************************/
-    public QTokenizer (T& string, T& delimiters)
-        : d (new QTokenizerPrivate<T, ConstIterator> (string, delimiters)) {}
+    public QTokenizer (T string_value, T delimiters) {
+        this.d = new QTokenizerPrivate<T, ConstIterator> (string_value, delimiters);
+    }
 
 
     /***********************************************************
@@ -159,7 +170,7 @@ public class QTokenizer {
 
     \param quotes Characters that delimit quotes.
     ***********************************************************/
-    public void set_quote_characters (T& quotes) {
+    public void set_quote_characters (T quotes) {
         d.quotes = quotes;
     }
 
@@ -181,7 +192,7 @@ public class QTokenizer {
     \sa next ()
     ***********************************************************/
     public bool has_next () {
-        typename QTokenizerPrivate<T, ConstIterator>.State state;
+        //  typename QTokenizerPrivate<T, ConstIterator>.State state;
         d.is_delim = false;
         for (;;) {
             d.token_begin = d.token_end;
@@ -234,17 +245,4 @@ public class QTokenizer {
         return T (tmp_start, len);
     }
 
-
-    /***********************************************************
-    ***********************************************************/
-    private friend class QStringTokenizer;
-    private unowned<QTokenizerPrivate<T, ConstIterator> > d;
 }
-
-
-using QByte_array_tokenizer = QTokenizer<GLib.ByteArray>;
-using String_tokenizer = QTokenizer<std.string>;
-using WString_tokenizer = QTokenizer<std.wstring>;
-
-QT_END_NAMESPACE
-

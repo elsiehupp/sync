@@ -10,7 +10,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QSettings>
 //  #include <QDir>
 //  #include <QDesktopServices>
-//  #include <QApplication>
+//  #include <Gtk.Application>
 
 //  const int QTLEGACY (QT_VERSION < QT_VERSION_CHECK (5,9,0))
 
@@ -72,9 +72,9 @@ public class OpenFileManager {
             can_handle_file = true;
         }
 
-        if (OpenFileManager.name.is_empty ()) {
+        if (OpenFileManager.name == "") {
             OpenFileManager.name = desktop_file.value (string.from_latin1 ("Desktop Entry/Name[%1]").printf (Gtk.Application.property ("ui_lang").to_string ())).to_string ();
-            if (OpenFileManager.name.is_empty ()) {
+            if (OpenFileManager.name == "") {
                 OpenFileManager.name = desktop_file.value (string.from_latin1 ("Desktop Entry/Name")).to_string ();
             }
         }
@@ -96,7 +96,7 @@ public class OpenFileManager {
             args += file_to_open;
         }
 
-        if (app.is_empty () || args.is_empty () || !can_handle_file) {
+        if (app == "" || args == "" || !can_handle_file) {
             // fallback: open the default file manager, without ever selecting the file
             QDesktopServices.open_url (GLib.Uri.from_local_file (path_to_open));
         } else {
@@ -112,7 +112,7 @@ public class OpenFileManager {
         string[] dirs;
         // http://standards.freedesktop.org/basedir-spec/latest/
         string xdg_data_dirs_env = GLib.File.decode_name (qgetenv ("XDG_DATA_DIRS"));
-        if (xdg_data_dirs_env.is_empty ()) {
+        if (xdg_data_dirs_env == "") {
             dirs.append (string.from_latin1 ("/usr/local/share"));
             dirs.append (string.from_latin1 ("/usr/share"));
         } else {
@@ -120,7 +120,7 @@ public class OpenFileManager {
         }
         // local location
         string xdg_data_home = GLib.File.decode_name (qgetenv ("XDG_DATA_HOME"));
-        if (xdg_data_home.is_empty ()) {
+        if (xdg_data_home == "") {
             xdg_data_home = QDir.home_path () + "/.local/share";
         }
         dirs.prepend (xdg_data_home);
@@ -145,7 +145,7 @@ public class OpenFileManager {
         );
         p.wait_for_finished ();
         string filename = p.read_all ().trimmed ();
-        if (filename.is_empty ()) {
+        if (filename == "") {
             return "";
         }
 

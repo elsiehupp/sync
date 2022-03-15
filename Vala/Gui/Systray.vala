@@ -153,7 +153,7 @@ public class Systray : QSystemTrayIcon {
         qml_register_type<WheelHandler> ("com.nextcloud.desktopclient", 1, 0, "WheelHandler");
 
         var context_menu = new QMenu ();
-        if (AccountManager.instance ().accounts ().is_empty ()) {
+        if (AccountManager.instance ().accounts () == "") {
             context_menu.add_action (_("Add account"), this, Systray.signal_open_account_wizard);
         } else {
             context_menu.add_action (_("Open main dialog"), this, Systray.signal_open_main_dialog);
@@ -236,7 +236,7 @@ public class Systray : QSystemTrayIcon {
     ***********************************************************/
     public void create () {
         if (this.tray_engine) {
-            if (!AccountManager.instance ().accounts ().is_empty ()) {
+            if (!AccountManager.instance ().accounts () == "") {
                 this.tray_engine.root_context ().context_property ("activity_model", UserModel.instance ().current_activity_model ());
             }
             this.tray_engine.on_signal_load ("qrc:/qml/src/gui/tray/Window.qml");

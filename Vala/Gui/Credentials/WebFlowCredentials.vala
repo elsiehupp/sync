@@ -136,7 +136,7 @@ public class WebFlowCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     public override void persist () {
-        if (this.user.is_empty ()) {
+        if (this.user == "") {
             // We don't even have a user nothing to see here move along
             return;
         }
@@ -185,7 +185,7 @@ public class WebFlowCredentials : AbstractCredentials {
         this.account.delete_app_password ();
 
         const string kck = keychain_key (this.account.url ().to_string (), this.user, this.account.identifier ());
-        if (kck.is_empty ()) {
+        if (kck == "") {
             GLib.debug ("InvalidateToken: User is empty, bailing out!");
             return;
         }
@@ -206,7 +206,7 @@ public class WebFlowCredentials : AbstractCredentials {
     ***********************************************************/
     public override void account (Account account) {
         AbstractCredentials.account (account);
-        if (this.user.is_empty ()) {
+        if (this.user == "") {
             fetch_user ();
         }
     }
@@ -319,7 +319,7 @@ public class WebFlowCredentials : AbstractCredentials {
     private void on_signal_read_client_key_pem_job_done (KeychainChunk.ReadJob read_job) {
         // Store key in memory
         if (read_job.error () == NoError && read_job.binary_data ().length () > 0) {
-            GLib.ByteArray client_key_pem = read_job.binary_data ();
+            string client_key_pem = read_job.binary_data ();
             // FIXME Unfortunately Qt has a bug and we can't just use QSsl.Opaque to let it
             // load whatever we have. So we try until it works.
             this.client_ssl_key = QSslKey (client_key_pem, QSsl.Rsa);
@@ -397,7 +397,7 @@ public class WebFlowCredentials : AbstractCredentials {
             return;
         }
 
-        if (this.user.is_empty ()) {
+        if (this.user == "") {
             GLib.warning ("Strange: User is empty!");
         }
 
@@ -446,7 +446,7 @@ public class WebFlowCredentials : AbstractCredentials {
         this.client_ssl_ca_certificates_write_queue.clear ();
 
         // write ca certificates if there are any
-        if (!this.client_ssl_ca_certificates.is_empty ()) {
+        if (!this.client_ssl_ca_certificates == "") {
             // queue the certificates to avoid trouble on Windows (Workaround for CredWriteW used by QtKeychain)
             this.client_ssl_ca_certificates_write_queue.append (this.client_ssl_ca_certificates);
 
@@ -462,12 +462,12 @@ public class WebFlowCredentials : AbstractCredentials {
     ***********************************************************/
     private void on_signal_write_client_ca_certificates_pem_job_done (KeychainChunk.WriteJob write_job) {
         // errors / next ca cert?
-        if (write_job && !this.client_ssl_ca_certificates.is_empty ()) {
+        if (write_job && !this.client_ssl_ca_certificates == "") {
             if (write_job.error () != NoError) {
                 GLib.warning ("Error while writing client CA cert " + write_job.error_string ());
             }
 
-            if (!this.client_ssl_ca_certificates_write_queue.is_empty ()) {
+            if (!this.client_ssl_ca_certificates_write_queue == "") {
                 // next ca cert
                 write_single_client_ca_cert_pem ();
                 return;
@@ -534,7 +534,7 @@ public class WebFlowCredentials : AbstractCredentials {
     ***********************************************************/
     private void write_single_client_ca_cert_pem () {
         // write a ca cert if there is any in the queue
-        if (!this.client_ssl_ca_certificates_write_queue.is_empty ()) {
+        if (!this.client_ssl_ca_certificates_write_queue == "") {
             // grab and remove the first cert from the queue
             var cert = this.client_ssl_ca_certificates_write_queue.dequeue ();
 

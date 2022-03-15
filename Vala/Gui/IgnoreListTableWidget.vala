@@ -21,7 +21,7 @@ public class IgnoreListTableWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public IgnoreListTableWidget (Gtk.Widget parent = null) {
+    public IgnoreListTableWidget (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.ui = new Ui.IgnoreListTableWidget ();
         window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
@@ -62,7 +62,7 @@ public class IgnoreListTableWidget : Gtk.Widget {
             while (!ignores.at_end ()) {
                 string line = string.from_utf8 (ignores.read_line ());
                 line.chop (1);
-                if (!line.is_empty () && !line.starts_with ("#")) {
+                if (!line == "" && !line.starts_with ("#")) {
                     bool deletable = false;
                     if (line.starts_with (']')) {
                         deletable = true;
@@ -120,7 +120,7 @@ public class IgnoreListTableWidget : Gtk.Widget {
                 QTableWidgetItem pattern_item = ui.table_widget.item (row, pattern_col);
                 QTableWidgetItem deletable_item = ui.table_widget.item (row, deletable_col);
                 if (pattern_item.flags () & Qt.ItemIsEnabled) {
-                    GLib.ByteArray prepend;
+                    string prepend;
                     if (deletable_item.check_state () == Qt.Checked) {
                         prepend = "]";
                     } else if (pattern_item.text ().starts_with ('#')) {
@@ -178,7 +178,7 @@ public class IgnoreListTableWidget : Gtk.Widget {
             _("Add a new ignore pattern:"),
             QLineEdit.Normal, "", ok_clicked);
 
-        if (!ok_clicked || pattern.is_empty ())
+        if (!ok_clicked || pattern == "")
             return;
 
         add_pattern (pattern, false, false);

@@ -40,19 +40,19 @@ public class TestExcludedFiles : GLib.Object {
     }
 
     static ExcludedFiles check_file_full (char path) {
-        return excluded_files.full_pattern_match (path, ItemTypeFile);
+        return excluded_files.full_pattern_match (path, ItemType.FILE);
     }
 
     static ExcludedFiles check_dir_full (char path) {
-        return excluded_files.full_pattern_match (path, ItemTypeDirectory);
+        return excluded_files.full_pattern_match (path, ItemType.DIRECTORY);
     }
 
     static ExcludedFiles check_file_traversal (char path) {
-        return excluded_files.traversal_pattern_match (path, ItemTypeFile);
+        return excluded_files.traversal_pattern_match (path, ItemType.FILE);
     }
 
     static ExcludedFiles check_dir_traversal (char path) {
-        return excluded_files.traversal_pattern_match (path, ItemTypeDirectory);
+        return excluded_files.traversal_pattern_match (path, ItemType.DIRECTORY);
     }
 
     private void test_fun () {
@@ -243,8 +243,8 @@ public class TestExcludedFiles : GLib.Object {
 
         excluded_files.add_exclude_file_path (foo_exclude_list);
         excluded_files.reload_exclude_files ();
-        GLib.assert_cmp (check_file_full (GLib.ByteArray (foo_directory + "/bar")), CSYNC_FILE_EXCLUDE_LIST);
-        GLib.assert_cmp (check_file_full (GLib.ByteArray (foo_directory + "/baz")), CSYNC_NOT_EXCLUDED);
+        GLib.assert_cmp (check_file_full (string (foo_directory + "/bar")), CSYNC_FILE_EXCLUDE_LIST);
+        GLib.assert_cmp (check_file_full (string (foo_directory + "/baz")), CSYNC_NOT_EXCLUDED);
     }
 
     private void check_csync_excluded_traversal_per_dir () {
@@ -497,7 +497,7 @@ public class TestExcludedFiles : GLib.Object {
 
     private void check_csync_regex_translation () {
         up ();
-        GLib.ByteArray storage;
+        string storage;
         var translate = [&storage] (char pattern) {
             storage = ExcludedFiles.convert_to_regexp_syntax (pattern, false);
             return storage.const_data ();
@@ -518,7 +518,7 @@ public class TestExcludedFiles : GLib.Object {
     private void check_csync_bname_trigger () {
         up ();
         bool wildcards_match_slash = false;
-        GLib.ByteArray storage;
+        string storage;
         var translate = [&storage, wildcards_match_slash] (char pattern) => {
             storage = ExcludedFiles.extract_bname_trigger (pattern, wildcards_match_slash);
             return storage.const_data ();
@@ -622,9 +622,9 @@ public class TestExcludedFiles : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void check_csync_exclude_expand_escapes () {
-        extern void csync_exclude_expand_escapes (GLib.ByteArray input);
+        extern void csync_exclude_expand_escapes (string input);
 
-        GLib.ByteArray line = R" (keep \' \" \? \\ \a \b \f \n \r \t \v \z \#)";
+        string line = R" (keep \' \" \? \\ \a \b \f \n \r \t \v \z \#)";
         csync_exclude_expand_escapes (line);
         GLib.assert_true (0 == strcmp (line.const_data (), "keep ' \" ? \\\\ \a \b \f \n \r \t \v \\z #"));
 

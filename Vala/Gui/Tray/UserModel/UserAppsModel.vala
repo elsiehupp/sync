@@ -11,8 +11,8 @@ public class UserAppsModel : QAbstractListModel {
         URL,
         ICON_URL;
 
-        internal GLib.HashTable<int, GLib.ByteArray> role_names () {
-            GLib.HashTable<int, GLib.ByteArray> roles;
+        internal GLib.HashTable<int, string> role_names () {
+            GLib.HashTable<int, string> roles;
             roles[UserAppsRoles.NAME] = "app_name";
             roles[UserAppsRoles.URL] = "app_url";
             roles[UserAppsRoles.ICON_URL] = "app_icon_url";

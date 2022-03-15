@@ -61,15 +61,15 @@ public class TestUnifiedSearchListmodel : GLib.Object {
             }
 
             // handle fetch of providers list
-            if (path.starts_with ("/ocs/v2.php/search/providers") && search_term.is_empty ()) {
+            if (path.starts_with ("/ocs/v2.php/search/providers") && search_term == "") {
                 reply = new FakePayloadReply (operation, request,
                     FakeSearchResultsStorage.instance ().fake_providers_response_json (), fake_qnam.data ());
             // handle search for provider
-            } else if (path.starts_with ("/ocs/v2.php/search/providers") && !search_term.is_empty ()) {
+            } else if (path.starts_with ("/ocs/v2.php/search/providers") && !search_term == "") {
                 var path_split = path.mid ("/ocs/v2.php/search/providers".size ())
                                            .split ('/', Qt.SkipEmptyParts);
 
-                if (!path_split.is_empty () && path.contains (path_split.first ())) {
+                if (!path_split == "" && path.contains (path_split.first ())) {
                     reply = new FakePayloadReply (operation, request,
                         FakeSearchResultsStorage.instance ().query_provider (path_split.first (), search_term, cursor),
                         SEARCH_RESULTS_REPLY_DELAY, fake_qnam.data ());
@@ -77,7 +77,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
             }
 
             if (!reply) {
-                return qobject_cast<Soup.Reply> (new FakeErrorReply (operation, request, this, 404, new GLib.ByteArray ("{error : \"Not found!\"}")));
+                return qobject_cast<Soup.Reply> (new FakeErrorReply (operation, request, this, 404, new string ("{error : \"Not found!\"}")));
             }
 
             return reply;
@@ -228,11 +228,11 @@ public class TestUnifiedSearchListmodel : GLib.Object {
 
         var provider_id_fetch_more_triggered = model.current_fetch_more_in_progress_provider_id ();
 
-        GLib.assert_true (!provider_id_fetch_more_triggered.is_empty ());
+        GLib.assert_true (!provider_id_fetch_more_triggered == "");
 
         GLib.assert_true (current_fetch_more_in_progress_provider_id_changed.wait ());
 
-        GLib.assert_true (model.current_fetch_more_in_progress_provider_id ().is_empty ());
+        GLib.assert_true (model.current_fetch_more_in_progress_provider_id () == "");
 
         GLib.assert_cmp (rows_inserted.count (), 1);
 
@@ -248,7 +248,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
         GLib.assert_cmp (model.row_count () - number_of_rows_in_mmodel_previous, nuiber_of_inserted_expected);
 
         // make sure the FetchMoreTrigger gets removed when no more results available
-        if (!provider_id_fetch_more_triggered.is_empty ()) {
+        if (!provider_id_fetch_more_triggered == "") {
             current_fetch_more_in_progress_provider_id_changed.clear ();
             rows_inserted.clear ();
 
@@ -327,7 +327,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
                         .to_string ();
                 url_for_clicked_result = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.ResourceUrlRole).to_string ();
 
-                if (!provider_id.is_empty () && !url_for_clicked_result.is_empty ()) {
+                if (!provider_id == "" && !url_for_clicked_result == "") {
                     model.signal_result_clicked (provider_id, GLib.Uri (url_for_clicked_result));
                     break;
                 }
@@ -372,7 +372,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
 
         GLib.assert_true (error_string_changed.count () > 0);
 
-        GLib.assert_true (!model.error_string ().is_empty ());
+        GLib.assert_true (!model.error_string () == "");
     }
 
 

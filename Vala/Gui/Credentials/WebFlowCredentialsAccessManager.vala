@@ -28,8 +28,8 @@ public class WebFlowCredentialsAccessManager : AccessManager {
     protected override Soup.Reply create_request (Operation operation, Soup.Request request, QIODevice outgoing_data) {
         Soup.Request req (request);
         if (!req.attribute (WebFlowCredentials.DontAddCredentialsAttribute).to_bool ()) {
-            if (this.credentials && !this.credentials.password ().is_empty ()) {
-                GLib.ByteArray cred_hash = GLib.ByteArray (this.credentials.user ().to_utf8 () + ":" + this.credentials.password ().to_utf8 ()).to_base64 ();
+            if (this.credentials && !this.credentials.password () == "") {
+                string cred_hash = string (this.credentials.user ().to_utf8 () + ":" + this.credentials.password ().to_utf8 ()).to_base64 ();
                 req.raw_header ("Authorization", "Basic " + cred_hash);
             }
         }

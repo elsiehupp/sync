@@ -30,7 +30,7 @@
 //  #include <common/utility.h>
 //  #include <common/constants.h>
 
-//  QDebug operator<< (QDebug out, std.string string_value) {
+//  QDebug operator<< (QDebug out, string string_value) {
 //      out + string.from_std_string (string_value);
 //      return out;
 //  }

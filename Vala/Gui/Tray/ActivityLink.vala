@@ -22,7 +22,7 @@ public class ActivityLink {
     ***********************************************************/
     public string label;
     public string link;
-    public GLib.ByteArray verb;
+    public string verb;
     public bool primary;
 
 } // class ActivityLink

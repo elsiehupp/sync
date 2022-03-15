@@ -23,13 +23,13 @@ public class ConflictRecord {
 
     The path is sync-folder relative.
     ***********************************************************/
-    public GLib.ByteArray path;
+    public string path;
 
 
     /***********************************************************
     File identifier of the base file
     ***********************************************************/
-    public GLib.ByteArray base_file_id;
+    public string base_file_id;
 
 
     /***********************************************************
@@ -45,7 +45,7 @@ public class ConflictRecord {
 
     may not be available and empty
     ***********************************************************/
-    public GLib.ByteArray base_etag;
+    public string base_etag;
 
 
     /***********************************************************
@@ -56,12 +56,12 @@ public class ConflictRecord {
 
     maybe be empty if not available
     ***********************************************************/
-    public GLib.ByteArray initial_base_path;
+    public string initial_base_path;
 
     /***********************************************************
     ***********************************************************/
     public bool is_valid () {
-        return !path.is_empty ();
+        return !path == "";
     }
 
 } // class ConflictRecord

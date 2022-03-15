@@ -12,25 +12,25 @@ Copyright (C) by Dominik Schmidt <domme@tomahawk-player.org>
 
 int main (int argc, char argv[]) {
     QCoreApplication.attribute (Qt.AAUseHighDpiPixmaps, true);
-    QApplication app (argc, argv);
+    Gtk.Application app = new Gtk.Application (argc, argv);
 
     if (app.arguments ().size () != 2) {
-        GLib.debug ("You need to pass the .dmp file path as only argument";
+        GLib.debug ("You need to pass the .dmp file path as only argument.");
         return 1;
     }
 
-    // TODO : install socorro ....
-    CrashReporter reporter (GLib.Uri (CRASHREPORTER_SUBMIT_URL), app.arguments ());
+    // TODO: install socorro ....
+    CrashReporter reporter = new CrashReporter (GLib.Uri (CRASHREPORTER_SUBMIT_URL), app.arguments ());
 
 //  #ifdef CRASHREPORTER_ICON
     reporter.logo (Gdk.Pixbuf (CRASHREPORTER_ICON));
 //  #endif
     reporter.window_title (CRASHREPORTER_PRODUCT_NAME);
-    reporter.on_signal_text ("<html><head/><body><p><span style=\" font-weight:600;\">Sorry!</span> " CRASHREPORTER_PRODUCT_NAME " crashed. Please tell us about it! " CRASHREPORTER_PRODUCT_NAME " has created an error report for you that can help improve the stability in the future. You can now send this report directly to the " CRASHREPORTER_PRODUCT_NAME " developers.</p></body></html>");
+    reporter.on_signal_text ("<html><head/><body><p><span style=\" font-weight:600;\">Sorry!</span> " + CRASHREPORTER_PRODUCT_NAME + " crashed. Please tell us about it! " + CRASHREPORTER_PRODUCT_NAME + " has created an error report for you that can help improve the stability in the future. You can now send this report directly to the " + CRASHREPORTER_PRODUCT_NAME + " developers.</p></body></html>");
 
     const GLib.FileInfo crash_log = new GLib.FileInfo (QDir.temp_path () + "/" + CRASHREPORTER_PRODUCT_NAME + "-crash.log");
     if (crash_log.exists ()) {
-        GLib.File in_file (crash_log.file_path ());
+        GLib.File in_file = new GLib.File (crash_log.file_path ());
         if (in_file.open (GLib.File.ReadOnly)) {
             reporter.comment (in_file.read_all ());
         }
@@ -41,7 +41,7 @@ int main (int argc, char argv[]) {
     reporter.report_data ("Version", CRASHREPORTER_VERSION_STRING);
     reporter.report_data ("ReleaseChannel", CRASHREPORTER_RELEASE_CHANNEL);
 
-    //reporter.report_data ( "timestamp", GLib.ByteArray.number ( GLib.DateTime.current_date_time ().to_time_t () ) );
+    //reporter.report_data ( "timestamp", string.number ( GLib.DateTime.current_date_time ().to_time_t () ) );
 
     // add parameters
 

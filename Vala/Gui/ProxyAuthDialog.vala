@@ -22,7 +22,7 @@ public class ProxyAuthDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public ProxyAuthDialog (Gtk.Widget parent = null) {
+    public ProxyAuthDialog (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.ui = new Ui.ProxyAuthDialog ();
         ui.up_ui (this);

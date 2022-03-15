@@ -13,7 +13,7 @@ public class FakeDeleteReply : FakeReply {
         open (QIODevice.ReadOnly);
     
         string filename = get_file_path_from_url (request.url ());
-        GLib.assert_true (!filename.is_empty ());
+        GLib.assert_true (!filename == "");
         remote_root_file_info.remove (filename);
         QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
     }

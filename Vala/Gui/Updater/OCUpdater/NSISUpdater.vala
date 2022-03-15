@@ -31,7 +31,7 @@ public class NSISUpdater : OCUpdater {
         QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
         string update_filename = settings.value (update_available_c).to_string ();
         // has the previous run downloaded an update?
-        if (!update_filename.is_empty () && GLib.File (update_filename).exists ()) {
+        if (!update_filename == "" && GLib.File (update_filename).exists ()) {
             GLib.info ("An updater file is available.");
             // did it try to execute the update?
             if (settings.value (auto_update_attempted_c, false).to_bool ()) {
@@ -115,7 +115,7 @@ public class NSISUpdater : OCUpdater {
         ConfigFile config;
         QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
         string update_filename = settings.value (update_available_c).to_string ();
-        if (!update_filename.is_empty ())
+        if (!update_filename == "")
             GLib.File.remove (update_filename);
         settings.remove (update_available_c);
         settings.remove (update_target_version_c);
@@ -290,7 +290,7 @@ public class NSISUpdater : OCUpdater {
                 + "Available version string:" + info.version_string ()
                 + "Web url:" + info.web ()
                 + "Download url:" + info.download_url ());
-        if (info.version ().is_empty ()) {
+        if (info.version () == "") {
             GLib.info ("No version information available at the moment.");
             download_state (DownloadState.UP_TO_DATE);
         } else if (info_version <= curr_version
@@ -299,7 +299,7 @@ public class NSISUpdater : OCUpdater {
             download_state (DownloadState.UP_TO_DATE);
         } else {
             string url = info.download_url ();
-            if (url.is_empty ()) {
+            if (url == "") {
                 show_no_url_dialog (info);
             } else {
                 this.target_file = config.config_path () + url.mid (url.last_index_of ('/')+1);

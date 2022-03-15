@@ -113,7 +113,7 @@ public class OAuth : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_ready_read (QTcpSocket socket) {
-        GLib.ByteArray peek = socket.peek (q_min (socket.bytes_available (), 4000LL)); //The code should always be within the first 4K
+        string peek = socket.peek (q_min (socket.bytes_available (), 4000LL)); //The code should always be within the first 4K
         if (peek.index_of ('\n') < 0)
             return; // wait until we find a \n
         const QRegularExpression rx = new QRegularExpression ("^GET /\\?code= ([a-z_a-Z0-9]+)[& ]"); // Match a  /?code=...  URL
@@ -164,17 +164,17 @@ public class OAuth : GLib.Object {
         GLib.Uri message_url = json["message_url"].to_string ();
 
         if (reply.error () != Soup.Reply.NoError || json_parse_error.error != QJsonParseError.NoError
-            || json_data.is_empty () || json.is_empty () || refresh_token.is_empty () || access_token.is_empty ()
+            || json_data == "" || json == "" || refresh_token == "" || access_token == ""
             || json["token_type"].to_string () != QLatin1String ("Bearer")) {
             string error_reason;
             string error_from_json = json["error"].to_string ();
-            if (!error_from_json.is_empty ()) {
+            if (!error_from_json == "") {
                 error_reason = _("Error returned from the server : <em>%1</em>")
                                   .printf (error_from_json.to_html_escaped ());
             } else if (reply.error () != Soup.Reply.NoError) {
                 error_reason = _("There was an error accessing the \"token\" endpoint : <br><em>%1</em>")
                                   .printf (reply.error_string ().to_html_escaped ());
-            } else if (json_data.is_empty ()) {
+            } else if (json_data == "") {
                 // Can happen if a funky load balancer strips away POST data, e.g. BigIP APM my.policy
                 error_reason = _("Empty JSON from OAuth2 redirect");
                 // We explicitly have this as error case since the json qc_warning output below is misleading,
@@ -207,7 +207,7 @@ public class OAuth : GLib.Object {
         const string login_successfull_html = "<h1>Login Successful</h1><p>You can close this window.</p>";
         if (message_url.is_valid ()) {
             http_reply_and_close (socket, "303 See Other", login_successfull_html,
-                GLib.ByteArray ("Location: " + message_url.to_encoded ()).const_data ());
+                string ("Location: " + message_url.to_encoded ()).const_data ());
         } else {
             http_reply_and_close (socket, "200 OK", login_successfull_html);
         }
@@ -236,7 +236,7 @@ public class OAuth : GLib.Object {
         socket.write ("HTTP/1.1 ");
         socket.write (code);
         socket.write ("\r\n_content-Type : text/html\r\n_connection : close\r\n_content-Length: ");
-        socket.write (GLib.ByteArray.number (qstrlen (html)));
+        socket.write (string.number (qstrlen (html)));
         if (more_headers) {
             socket.write ("\r\n");
             socket.write (more_headers);

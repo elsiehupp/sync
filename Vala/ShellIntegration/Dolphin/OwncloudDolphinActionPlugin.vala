@@ -47,7 +47,7 @@ public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
         // If any of the url is outside of a sync folder, return an empty menu.
         const GLib.List<GLib.Uri> urls = fileItemInfos.urlList ();
         const var paths = helper.paths ();
-        GLib.ByteArray files;
+        string files;
         for (var url : urls) {
             QDir local_path (url.toLocalFile ());
             var localFile = local_path.canonicalPath ();
@@ -67,7 +67,7 @@ public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
 
         var menu = new QMenu (parentWidget);
         QEventLoop loop;
-        var con = connect (helper, &OwncloudDolphinPluginHelper.commandRecieved, this, [&] (GLib.ByteArray cmd) {
+        var con = connect (helper, &OwncloudDolphinPluginHelper.commandRecieved, this, [&] (string cmd) {
             if (cmd.startsWith ("GET_MENU_ITEMS:END")) {
                 loop.quit ();
             } else if (cmd.startsWith ("MENU_ITEM:")) {
@@ -81,12 +81,12 @@ public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
                 }
                 var call = args.value (1).toLatin1 ();
                 connect (action, &QAction.triggered, [helper, call, files] {
-                    helper.sendCommand (GLib.ByteArray (call + ":" + files + "\n"));
+                    helper.sendCommand (string (call + ":" + files + "\n"));
                 });
             }
         });
         QTimer.singleShot (100, loop, SLOT (quit ())); // add a timeout to be sure we don't freeze dolphin
-        helper.sendCommand (GLib.ByteArray ("GET_MENU_ITEMS:" + files + "\n"));
+        helper.sendCommand (string ("GET_MENU_ITEMS:" + files + "\n"));
         loop.exec (QEventLoop.ExcludeUserInputEvents);
         disconnect (con);
         if (menu.actions ().isEmpty ()) {
@@ -116,20 +116,20 @@ public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
 
         var shareAction = menu.addAction (helper.shareActionTitle ());
         connect (shareAction, &QAction.triggered, this, [localFile, helper] {
-            helper.sendCommand (GLib.ByteArray ("SHARE:" + localFile.toUtf8 () + "\n"));
+            helper.sendCommand (string ("SHARE:" + localFile.toUtf8 () + "\n"));
         });
 
         if (!helper.copyPrivateLinkTitle ().isEmpty ()) {
             var copyPrivateLinkAction = menu.addAction (helper.copyPrivateLinkTitle ());
             connect (copyPrivateLinkAction, &QAction.triggered, this, [localFile, helper] {
-                helper.sendCommand (GLib.ByteArray ("COPY_PRIVATE_LINK:" + localFile.toUtf8 () + "\n"));
+                helper.sendCommand (string ("COPY_PRIVATE_LINK:" + localFile.toUtf8 () + "\n"));
             });
         }
 
         if (!helper.emailPrivateLinkTitle ().isEmpty ()) {
             var emailPrivateLinkAction = menu.addAction (helper.emailPrivateLinkTitle ());
             connect (emailPrivateLinkAction, &QAction.triggered, this, [localFile, helper] {
-                helper.sendCommand (GLib.ByteArray ("EMAIL_PRIVATE_LINK:" + localFile.toUtf8 () + "\n"));
+                helper.sendCommand (string ("EMAIL_PRIVATE_LINK:" + localFile.toUtf8 () + "\n"));
             });
         }
         return { menuaction };

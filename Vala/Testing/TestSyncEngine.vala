@@ -14,7 +14,7 @@ namespace Testing {
 bool item_did_complete (ItemCompletedSpy spy, string path) {
     var item = spy.find_item (path);
     if (item) {
-        return item.instruction != CSYNC_INSTRUCTION_NONE && item.instruction != CSYNC_INSTRUCTION_UPDATE_METADATA;
+        return item.instruction != SyncInstructions.NONE && item.instruction != SyncInstructions.UPDATE_METADATA;
     }
     return false;
 }
@@ -196,7 +196,7 @@ public class TestSyncEngine : GLib.Object {
         }
 
         // printf 'A%.0s' {1..64} | sha1sum -
-        GLib.ByteArray reference_checksum = new GLib.ByteArray ("SHA1:30b86e44e6001403827a62c58b08893e77cf121f");
+        string reference_checksum = new string ("SHA1:30b86e44e6001403827a62c58b08893e77cf121f");
         GLib.assert_cmp (get_database_checksum ("a1.eml"), reference_checksum);
         GLib.assert_cmp (get_database_checksum ("a2.eml"), reference_checksum);
         GLib.assert_cmp (get_database_checksum ("a3.eml"), reference_checksum);
@@ -212,8 +212,8 @@ public class TestSyncEngine : GLib.Object {
         fake_folder.sync_once ();
 
         GLib.assert_cmp (get_database_checksum ("a1.eml"), reference_checksum);
-        GLib.assert_cmp (get_database_checksum ("a2.eml"), GLib.ByteArray ("SHA1:84951fc23a4dafd10020ac349da1f5530fa65949"));
-        GLib.assert_cmp (get_database_checksum ("a3.eml"), GLib.ByteArray ("SHA1:826b7e7a7af8a529ae1c7443c23bf185c0ad440c"));
+        GLib.assert_cmp (get_database_checksum ("a2.eml"), string ("SHA1:84951fc23a4dafd10020ac349da1f5530fa65949"));
+        GLib.assert_cmp (get_database_checksum ("a3.eml"), string ("SHA1:826b7e7a7af8a529ae1c7443c23bf185c0ad440c"));
         GLib.assert_cmp (get_database_checksum ("b3.eml"), get_database_checksum ("a3.txt"));
 
         GLib.assert_true (!item_did_complete (complete_spy, "a1.eml"));
@@ -284,8 +284,8 @@ public class TestSyncEngine : GLib.Object {
 
         // Remove sub_folder_a with selective_sync:
         fake_folder.sync_engine ().journal ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, {"parent_folder/sub_folder_a/"});
-        fake_folder.sync_engine ().journal ().schedule_path_for_remote_discovery (new GLib.ByteArray ("parent_folder/sub_folder_a/"));
-        var get_etag = (GLib.ByteArray file) => {
+        fake_folder.sync_engine ().journal ().schedule_path_for_remote_discovery (new string ("parent_folder/sub_folder_a/"));
+        var get_etag = (string file) => {
             SyncJournalFileRecord record;
             fake_folder.sync_journal ().get_file_record (file, record);
             return record.etag;
@@ -359,10 +359,10 @@ public class TestSyncEngine : GLib.Object {
         GLib.assert_true (!fake_folder.sync_once ());
 
         SyncJournalFileRecord record;
-        fake_folder.sync_journal ().get_file_record (new GLib.ByteArray ("NewFolder"), record);
+        fake_folder.sync_journal ().get_file_record (new string ("NewFolder"), record);
         GLib.assert_true (record.is_valid ());
-        GLib.assert_cmp (record.etag, new GLib.ByteArray ("this.invalid_"));
-        GLib.assert_true (!record.file_identifier.is_empty ());
+        GLib.assert_cmp (record.etag, new string ("this.invalid_"));
+        GLib.assert_true (!record.file_identifier == "");
     }
 
 
@@ -409,40 +409,40 @@ public class TestSyncEngine : GLib.Object {
     ***********************************************************/
     private void test_fake_conflict_data () {
         QTest.add_column<bool> ("same_mtime");
-        QTest.add_column<GLib.ByteArray> ("checksums");
+        QTest.add_column<string> ("checksums");
 
         QTest.add_column<int> ("expected_get");
 
         QTest.new_row ("Same mtime, but no server checksum . ignored in reconcile")
-            + true + GLib.ByteArray ()
+            + true + ""
             << 0;
 
         QTest.new_row ("Same mtime, weak server checksum differ . downloaded")
-            + true + GLib.ByteArray ("Adler32:bad")
+            + true + string ("Adler32:bad")
             << 1;
 
         QTest.new_row ("Same mtime, matching weak checksum . skipped")
-            + true + GLib.ByteArray ("Adler32:2a2010d")
+            + true + string ("Adler32:2a2010d")
             << 0;
 
         QTest.new_row ("Same mtime, strong server checksum differ . downloaded")
-            + true + GLib.ByteArray ("SHA1:bad")
+            + true + string ("SHA1:bad")
             << 1;
 
         QTest.new_row ("Same mtime, matching strong checksum . skipped")
-            + true + GLib.ByteArray ("SHA1:56900fb1d337cf7237ff766276b9c1e8ce507427")
+            + true + string ("SHA1:56900fb1d337cf7237ff766276b9c1e8ce507427")
             << 0;
 
         QTest.new_row ("mtime changed, but no server checksum . download")
-            + false + GLib.ByteArray ()
+            + false + ""
             << 1;
 
         QTest.new_row ("mtime changed, weak checksum match . download anyway")
-            + false + GLib.ByteArray ("Adler32:2a2010d")
+            + false + string ("Adler32:2a2010d")
             << 1;
 
         QTest.new_row ("mtime changed, strong checksum match . skip")
-            + false + GLib.ByteArray ("SHA1:56900fb1d337cf7237ff766276b9c1e8ce507427")
+            + false + string ("SHA1:56900fb1d337cf7237ff766276b9c1e8ce507427")
             << 0;
     }
 
@@ -451,7 +451,7 @@ public class TestSyncEngine : GLib.Object {
     ***********************************************************/
     private void test_fake_conflict () {
         QFETCH (bool, same_mtime);
-        QFETCH (GLib.ByteArray, checksums);
+        QFETCH (string, checksums);
         QFETCH (int, expected_get);
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
@@ -483,7 +483,7 @@ public class TestSyncEngine : GLib.Object {
         // check that mtime in journal and filesystem agree
         string a1path = fake_folder.local_path () + "A/a1";
         SyncJournalFileRecord a1record;
-        fake_folder.sync_journal ().get_file_record (GLib.ByteArray ("A/a1"), a1record);
+        fake_folder.sync_journal ().get_file_record (string ("A/a1"), a1record);
         GLib.assert_cmp (a1record.modtime, (int64)FileSystem.get_mod_time (a1path));
 
         // Extra sync reads from database, no difference
@@ -540,7 +540,7 @@ public class TestSyncEngine : GLib.Object {
 
             // a1 : should have local size and modtime
             GLib.assert_true (a1);
-            GLib.assert_cmp (a1.instruction, CSYNC_INSTRUCTION_SYNC);
+            GLib.assert_cmp (a1.instruction, SyncInstructions.SYNC);
             GLib.assert_cmp (a1.direction, SyncFileItem.Direction.UP);
             GLib.assert_cmp (a1.size, int64 (5));
 
@@ -550,7 +550,7 @@ public class TestSyncEngine : GLib.Object {
 
             // b2 : should have remote size and modtime
             GLib.assert_true (b1);
-            GLib.assert_cmp (b1.instruction, CSYNC_INSTRUCTION_SYNC);
+            GLib.assert_cmp (b1.instruction, SyncInstructions.SYNC);
             GLib.assert_cmp (b1.direction, SyncFileItem.Direction.DOWN);
             GLib.assert_cmp (b1.size, int64 (17));
             GLib.assert_cmp (Utility.date_time_from_time_t (b1.modtime), changed_mtime);
@@ -559,7 +559,7 @@ public class TestSyncEngine : GLib.Object {
 
             // c1 : conflicts are downloads, so remote size and modtime
             GLib.assert_true (c1);
-            GLib.assert_cmp (c1.instruction, CSYNC_INSTRUCTION_CONFLICT);
+            GLib.assert_cmp (c1.instruction, SyncInstructions.CONFLICT);
             GLib.assert_cmp (c1.direction, SyncFileItem.Direction.NONE);
             GLib.assert_cmp (c1.size, int64 (25));
             GLib.assert_cmp (Utility.date_time_from_time_t (c1.modtime), changed_mtime2);
@@ -628,8 +628,8 @@ public class TestSyncEngine : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         GLib.Object parent;
 
-        GLib.ByteArray checksum_value;
-        GLib.ByteArray content_md5_value;
+        string checksum_value;
+        string content_md5_value;
 
         fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice *) . Soup.Reply * {
             if (operation == Soup.GetOperation) {
@@ -657,7 +657,7 @@ public class TestSyncEngine : GLib.Object {
         checksum_value = "SHA1:19b1928d58a2030d08023f3d7054516dbc186f20"; // printf 'A%.0s' {1..16} | sha1sum -
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        checksum_value = GLib.ByteArray ();
+        checksum_value = "";
 
         // Bad Content-MD5
         content_md5_value = "bad";
@@ -904,7 +904,7 @@ public class TestSyncEngine : GLib.Object {
             if (operation == Soup.PostOperation) {
                 ++number_of_post;
                 if (content_type.starts_with ("multipart/related; boundary=")) {
-                    var json_reply_object = fake_folder.for_each_reply_part (outgoing_data, content_type, [] (GLib.HashTable<string, GLib.ByteArray> all_headers) . QJsonObject {
+                    var json_reply_object = fake_folder.for_each_reply_part (outgoing_data, content_type, [] (GLib.HashTable<string, string> all_headers) . QJsonObject {
                         var reply = QJsonObject{};
                         var filename = all_headers["X-File-Path"];
                         if (filename.ends_with ("A/big2") ||

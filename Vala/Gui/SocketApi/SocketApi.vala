@@ -23,7 +23,7 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 //  #include <QMetaObject>
 //  #include <QScopedPointer>
 //  #include <QDir>
-//  #include <QApplication>
+//  #include <Gtk.Application>
 //  #include <QLocalSocket>
 //  #include <QString_builder>
 //  #include <QMessageBox>
@@ -142,7 +142,7 @@ public class SocketApi : GLib.Object {
         GLib.debug ("dtor");
         this.local_server.close ();
         // All remaining sockets will be destroyed with this.local_server, their parent
-        //  ASSERT (this.listeners.is_empty () || this.listeners.first ().socket.parent () == this.local_server)
+        //  ASSERT (this.listeners == "" || this.listeners.first ().socket.parent () == this.local_server)
         this.listeners.clear ();
     }
 
@@ -150,7 +150,7 @@ public class SocketApi : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_update_folder_view (Folder folder) {
-        if (this.listeners.is_empty ()) {
+        if (this.listeners == "") {
             return;
         }
 
@@ -233,7 +233,7 @@ public class SocketApi : GLib.Object {
             local_message.append ('\n');
         }
 
-        GLib.ByteArray bytes_to_send = local_message.to_utf8 ();
+        string bytes_to_send = local_message.to_utf8 ();
         int64 sent = socket.write (bytes_to_send);
         if (do_wait) {
             socket.wait_for_bytes_written (1000);
@@ -258,7 +258,7 @@ public class SocketApi : GLib.Object {
         connect (socket, QIODevice.ready_read, this, SocketApi.on_signal_read_socket);
         connect (socket, SIGNAL (disconnected ()), this, SLOT (on_signal_lost_connection ()));
         connect (socket, GLib.Object.destroyed, this, SocketApi.on_signal_socket_destroyed);
-        //  ASSERT (socket.read_all ().is_empty ());
+        //  ASSERT (socket.read_all () == "");
 
         unowned var listener = SocketListener.create (socket);
         this.listeners.insert (socket, listener);
@@ -312,7 +312,7 @@ public class SocketApi : GLib.Object {
             const string line = string.from_utf8 (socket.read_line ().trimmed ()).normalized (string.Normalization_form_C);
             GLib.info ("Received SocketApi message <-- " + line + " from " + socket);
             const int arg_pos = line.index_of (':');
-            const GLib.ByteArray command = line.mid_ref (0, arg_pos).to_utf8 ().to_upper ();
+            const string command = line.mid_ref (0, arg_pos).to_utf8 ().to_upper ();
 
             const var argument = arg_pos != -1 ? line.mid_ref (arg_pos + 1) : QStringRef ();
             if (command.starts_with ("ASYNC_")) {
@@ -371,7 +371,7 @@ public class SocketApi : GLib.Object {
 
 
     private static int index_of_method () {
-        GLib.ByteArray function_with_arguments = "command_";
+        string function_with_arguments = "command_";
         if (command.starts_with ("ASYNC_")) {
             function_with_arguments += command + QByteArrayLiteral (" (unowned SocketApiJob)");
         } else if (command.starts_with ("V2/")) {
@@ -392,7 +392,7 @@ public class SocketApi : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private static void copy_url_to_clipboard (string link) {
-        QApplication.clipboard ().on_signal_text (link);
+        Gtk.Application.clipboard ().on_signal_text (link);
     }
 
 
@@ -432,20 +432,20 @@ public class SocketApi : GLib.Object {
     private static void fetch_private_link_url (
         unowned Account account,
         string remote_path,
-        GLib.ByteArray numeric_file_id,
+        string numeric_file_id,
         GLib.Object target,
         TargetFunction target_function) {
 
         SocketApi.target_function = target_function;;
         string old_url;
-        if (!numeric_file_id.is_empty ()) {
+        if (!numeric_file_id == "") {
             old_url = account.deprecated_private_link_url (numeric_file_id).to_string (GLib.Uri.FullyEncoded);
         }
 
         // Retrieve the new link by PROPFIND
         var prop_find_job = new PropfindJob (account, remote_path, target);
         prop_find_job.properties (
-            new GLib.List<GLib.ByteArray> ()
+            new GLib.List<string> ()
             + "http://owncloud.org/ns:fileid" // numeric file identifier for fallback private link generation
             + "http://owncloud.org/ns:privatelink");
         prop_find_job.on_signal_timeout (10 * 1000);
@@ -470,9 +470,9 @@ public class SocketApi : GLib.Object {
     private static void on_signal_prop_find_job_result (QVariantMap result) {
         var private_link_url = result["privatelink"].to_string ();
         var numeric_file_id = result["fileid"].to_byte_array ();
-        if (!private_link_url.is_empty ()) {
+        if (!private_link_url == "") {
             SocketApi.target_function (private_link_url);
-        } else if (!numeric_file_id.is_empty ()) {
+        } else if (!numeric_file_id == "") {
             SocketApi.target_function (account.deprecated_private_link_url (numeric_file_id).to_string (GLib.Uri.FullyEncoded));
         } else {
             SocketApi.target_function (old_url);
@@ -892,7 +892,7 @@ public class SocketApi : GLib.Object {
             _("Select new location …"),
             default_dir_and_name,
             "", null, QFileDialog.Hide_name_filter_details);
-        if (target.is_empty ()) {
+        if (target == "") {
             return;
         }
 
@@ -997,7 +997,7 @@ public class SocketApi : GLib.Object {
         };
         listener.on_signal_send_message ("GET_STRINGS:BEGIN");
         foreach (var key_value in strings) {
-            if (argument.is_empty () || argument == key_value.first) {
+            if (argument == "" || argument == key_value.first) {
                 listener.on_signal_send_message ("STRING:%1:%2".printf (key_value.first, key_value.second));
             }
         }
@@ -1087,7 +1087,7 @@ public class SocketApi : GLib.Object {
             FileData file_data = FileData.file_data (argument);
             const var record = file_data.journal_record ();
             const bool is_on_signal_the_server = record.is_valid ();
-            const var is_e2e_encrypted_path = file_data.journal_record ().is_e2e_encrypted || !file_data.journal_record ().e2e_mangled_name.is_empty ();
+            const var is_e2e_encrypted_path = file_data.journal_record ().is_e2e_encrypted || !file_data.journal_record ().e2e_mangled_name == "";
             var flag_string = is_on_signal_the_server && !is_e2e_encrypted_path ? QLatin1String (".") : QLatin1String (":d:");
 
             const GLib.FileInfo file_info = new GLib.FileInfo (file_data.local_path);
@@ -1148,7 +1148,7 @@ public class SocketApi : GLib.Object {
         if (sync_folder
             && sync_folder.virtual_files_enabled ()
             && sync_folder.vfs ().socket_api_pin_state_actions_shown ()) {
-            ENFORCE (!files.is_empty ());
+            //  ENFORCE (!files == "");
 
             // Determine the combined availability status of the files
             var combined = new Optional<VfsItemAvailability> ();
@@ -1273,7 +1273,7 @@ public class SocketApi : GLib.Object {
         var data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
         var url = GLib.Uri (data.value ("url").to_string ());
 
-        if (!url.is_empty ()) {
+        if (!url == "") {
             Utility.open_browser (url);
         }
     }
@@ -1353,9 +1353,9 @@ public class SocketApi : GLib.Object {
     ***********************************************************/
     private void command_ASYNC_LIST_WIDGETS (SocketApiJob socket_api_job) {
         string response;
-        foreach (var widget in all_objects (QApplication.all_widgets ())) {
+        foreach (var widget in all_objects (Gtk.Application.all_widgets ())) {
             var object_name = widget.object_name ();
-            if (!object_name.is_empty ()) {
+            if (!object_name == "") {
                 response += object_name + ":" + widget.property ("text").to_string () + ", ";
             }
         }
@@ -1541,7 +1541,7 @@ public class SocketApi : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static GLib.Object find_widget (string query_string, GLib.List<Gtk.Widget> widgets = QApplication.all_widgets ()) {
+    private static GLib.Object find_widget (string query_string, GLib.List<Gtk.Widget> widgets = Gtk.Application.all_widgets ()) {
         if (query_string.contains (">")) {
             GLib.debug ("query_string contains >");
 
@@ -1613,11 +1613,11 @@ public class SocketApi : GLib.Object {
     private static string build_message (string verb, string path, string status = "") {
         string message = verb;
 
-        if (!status.is_empty ()) {
+        if (!status == "") {
             message.append (':');
             message.append (status);
         }
-        if (!path.is_empty ()) {
+        if (!path == "") {
             message.append (':');
             GLib.FileInfo file_info = new GLib.FileInfo (path);
             message.append (QDir.to_native_separators (file_info.absolute_file_path ()));

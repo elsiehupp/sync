@@ -169,7 +169,7 @@ public class ExcludedFiles : GLib.Object {
 
     Would enable the "myexclude" pattern only for versions before 2.5.0.
     ***********************************************************/
-    private bool version_directive_keep_next_line (GLib.ByteArray directive);
+    private bool version_directive_keep_next_line (string directive);
 
 
     /***********************************************************
@@ -326,7 +326,7 @@ const int this.GNU_SOURCE
 /***********************************************************
 Expands C-like escape sequences (in place)
 ***********************************************************/
-OCSYNC_EXPORT void csync_exclude_expand_escapes (GLib.ByteArray input) {
+OCSYNC_EXPORT void csync_exclude_expand_escapes (string input) {
     size_t o = 0;
     char line = input.data ();
     var len = input.size ();
@@ -533,7 +533,7 @@ ExcludedFiles.ExcludedFiles (string local_path)
     this.wildcards_match_slash = Utility.is_windows ();
 
     // We're in a detached exclude probably coming from a partial sync or test
-    if (this.local_path.is_empty ())
+    if (this.local_path == "")
         return;
 }
 
@@ -585,12 +585,12 @@ void ExcludedFiles.client_version (ExcludedFiles.Version version) {
 void ExcludedFiles.on_signal_load_exclude_file_patterns (string base_path, GLib.File file) {
     string[] patterns;
     while (!file.at_end ()) {
-        GLib.ByteArray line = file.read_line ().trimmed ();
+        string line = file.read_line ().trimmed ();
         if (line.starts_with ("#!version")) {
             if (!version_directive_keep_next_line (line))
                 file.read_line ();
         }
-        if (line.is_empty () || line.starts_with ('#'))
+        if (line == "" || line.starts_with ('#'))
             continue;
         csync_exclude_expand_escapes (line);
         patterns.append (string.from_utf8 (line));
@@ -598,7 +598,7 @@ void ExcludedFiles.on_signal_load_exclude_file_patterns (string base_path, GLib.
     this.all_excludes[base_path].append (patterns);
 
     // nothing to prepare if the user decided to not exclude anything
-    if (!this.all_excludes.value (base_path).is_empty ()) {
+    if (!this.all_excludes.value (base_path) == "") {
         prepare (base_path);
     }
 }
@@ -636,13 +636,13 @@ bool ExcludedFiles.on_signal_reload_exclude_files () {
     return on_signal_success;
 }
 
-bool ExcludedFiles.version_directive_keep_next_line (GLib.ByteArray directive) {
+bool ExcludedFiles.version_directive_keep_next_line (string directive) {
     if (!directive.starts_with ("#!version"))
         return true;
     QByteArrayList args = directive.split (' ');
     if (args.size () != 3)
         return true;
-    GLib.ByteArray operation = args[1];
+    string operation = args[1];
     QByteArrayList arg_versions = args[2].split ('.');
     if (arg_versions.size () != 3)
         return true;
@@ -688,9 +688,9 @@ bool ExcludedFiles.is_excluded (
     }
 
     GLib.FileInfo fi (file_path);
-    ItemType type = ItemTypeFile;
+    ItemType type = ItemType.FILE;
     if (fi.is_dir ()) {
-        type = ItemTypeDirectory;
+        type = ItemType.DIRECTORY;
     }
 
     string relative_path = file_path.mid (base_path.size ());
@@ -705,11 +705,11 @@ CSYNC_EXCLUDE_TYPE ExcludedFiles.traversal_pattern_match (string path, ItemType 
     var match = this.csync_excluded_common (path, this.exclude_conflict_files);
     if (match != CSYNC_NOT_EXCLUDED)
         return match;
-    if (this.all_excludes.is_empty ())
+    if (this.all_excludes == "")
         return CSYNC_NOT_EXCLUDED;
 
     // Directories are guaranteed to be visited before their files
-    if (filetype == ItemTypeDirectory) {
+    if (filetype == ItemType.DIRECTORY) {
         const var base_path = string (this.local_path + path + '/');
         const string absolute_path = base_path + QStringLiteral (".sync-exclude.lst");
         GLib.FileInfo exclude_file_info (absolute_path);
@@ -734,10 +734,10 @@ CSYNC_EXCLUDE_TYPE ExcludedFiles.traversal_pattern_match (string path, ItemType 
     while (base_path.size () > this.local_path.size ()) {
         base_path = left_include_last (base_path, '/');
         QRegularExpressionMatch m;
-        if (filetype == ItemTypeDirectory
+        if (filetype == ItemType.DIRECTORY
             && this.bname_traversal_regex_dir.contains (base_path)) {
             m = this.bname_traversal_regex_dir[base_path].match (bname_str);
-        } else if (filetype == ItemTypeFile
+        } else if (filetype == ItemType.FILE
             && this.bname_traversal_regex_file.contains (base_path)) {
             m = this.bname_traversal_regex_file[base_path].match (bname_str);
         } else {
@@ -758,10 +758,10 @@ CSYNC_EXCLUDE_TYPE ExcludedFiles.traversal_pattern_match (string path, ItemType 
     while (base_path.size () > this.local_path.size ()) {
         base_path = left_include_last (base_path, '/');
         QRegularExpressionMatch m;
-        if (filetype == ItemTypeDirectory
+        if (filetype == ItemType.DIRECTORY
             && this.full_traversal_regex_dir.contains (base_path)) {
             m = this.full_traversal_regex_dir[base_path].match (path);
-        } else if (filetype == ItemTypeFile
+        } else if (filetype == ItemType.FILE
             && this.full_traversal_regex_file.contains (base_path)) {
             m = this.full_traversal_regex_file[base_path].match (path);
         } else {
@@ -783,7 +783,7 @@ CSYNC_EXCLUDE_TYPE ExcludedFiles.full_pattern_match (string p, ItemType filetype
     var match = this.csync_excluded_common (p, this.exclude_conflict_files);
     if (match != CSYNC_NOT_EXCLUDED)
         return match;
-    if (this.all_excludes.is_empty ())
+    if (this.all_excludes == "")
         return CSYNC_NOT_EXCLUDED;
 
     // `path` seems to always be relative to `this.local_path`, the tests however have not been
@@ -796,10 +796,10 @@ CSYNC_EXCLUDE_TYPE ExcludedFiles.full_pattern_match (string p, ItemType filetype
     while (base_path.size () > this.local_path.size ()) {
         base_path = left_include_last (base_path, '/');
         QRegularExpressionMatch m;
-        if (filetype == ItemTypeDirectory
+        if (filetype == ItemType.DIRECTORY
             && this.full_regex_dir.contains (base_path)) {
             m = this.full_regex_dir[base_path].match (p);
-        } else if (filetype == ItemTypeFile
+        } else if (filetype == ItemType.FILE
             && this.full_regex_file.contains (base_path)) {
             m = this.full_regex_file[base_path].match (p);
         } else {
@@ -1006,7 +1006,7 @@ void ExcludedFiles.prepare (BasePathString & base_path) {
 
     var regex_append = [] (string file_dir_pattern, string dir_pattern, string append_me, bool dir_only) {
         string pattern = dir_only ? dir_pattern : file_dir_pattern;
-        if (!pattern.is_empty ()) {
+        if (!pattern == "") {
             pattern.append ('|');
         }
         pattern.append (append_me);
@@ -1062,7 +1062,7 @@ void ExcludedFiles.prepare (BasePathString & base_path) {
 
     // The empty pattern would match everything - change it to match-nothing
     var empty_match_nothing = [] (string pattern) {
-        if (pattern.is_empty ())
+        if (pattern == "")
             pattern = QStringLiteral ("a^");
     }
     empty_match_nothing (full_file_dir_keep);

@@ -65,7 +65,7 @@ public class FileSystem : GLib.Object {
     owncloud/core#9781 for details.
     ***********************************************************/
     public static time_t get_mod_time (string filename) {
-        csync_file_stat_t stat;
+        CSyncFileStatT stat;
         int64 result = -1;
         if (csync_vio_local_stat (filename, stat) != -1
             && (stat.modtime != 0)) {
@@ -108,7 +108,7 @@ public class FileSystem : GLib.Object {
     @brief Retrieve a file inode with csync
     ***********************************************************/
     public static bool get_inode (string filename, uint64 inode) {
-        csync_file_stat_t fs;
+        CSyncFileStatT fs;
         if (csync_vio_local_stat (filename, fs) == 0) {
             *inode = fs.inode;
             return true;

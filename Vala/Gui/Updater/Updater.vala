@@ -33,9 +33,9 @@ public class Updater : GLib.Object {
     ***********************************************************/
     public struct Helper {
         static int64 string_version_to_int (string version) {
-            if (version.is_empty ())
+            if (version == "")
                 return 0;
-            GLib.ByteArray ba_version = version.to_latin1 ();
+            string ba_version = version.to_latin1 ();
             int major = 0, minor = 0, patch = 0, build = 0;
             sscanf (ba_version, "%d.%d.%d.%d", major, minor, patch, build);
             return version_to_int (major, minor, patch, build);
@@ -64,7 +64,7 @@ public class Updater : GLib.Object {
     ***********************************************************/
     public static GLib.Uri update_url () {
         GLib.Uri update_base_url = GLib.Uri (qgetenv ("OCC_UPDATE_URL").to_string ());
-        if (update_base_url.is_empty ()) {
+        if (update_base_url == "") {
             update_base_url = GLib.Uri (APPLICATION_UPDATE_URL);
         }
         if (!update_base_url.is_valid () || update_base_url.host () == ".") {
@@ -109,7 +109,7 @@ public class Updater : GLib.Object {
             "-a"
         });
         process.wait_for_finished ();
-        GLib.ByteArray output = process.read_all_standard_output ();
+        string output = process.read_all_standard_output ();
         GLib.debug ("Sys Info size: " + output.length ());
         if (output.length () > 1024)
             output.clear (); // don't send too much.
@@ -135,7 +135,7 @@ public class Updater : GLib.Object {
         }
 
         string sys_info = system_info ();
-        if (!sys_info.is_empty ()) {
+        if (!sys_info == "") {
             query.add_query_item ("client", sys_info);
         }
         query.add_query_item ("version", client_version ());
@@ -170,7 +170,7 @@ public class Updater : GLib.Object {
     private static Updater create () {
         var url = update_url ();
         GLib.debug () + url;
-        if (url.is_empty ()) {
+        if (url == "") {
             GLib.warning ("Not a valid updater URL; will not do update check.");
             return null;
         }

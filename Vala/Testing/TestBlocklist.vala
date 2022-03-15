@@ -34,8 +34,8 @@ public class TestBlocklist : GLib.Object {
         var modifier = remote ? fake_folder.remote_modifier () : fake_folder.local_modifier ();
 
         int counter = 0;
-        const GLib.ByteArray test_filename = "A/new";
-        GLib.ByteArray request_identifier;
+        const string test_filename = "A/new";
+        string request_identifier;
         fake_folder.set_server_override ((Soup.Operation operation, Soup.Request request, QIODevice device) => { // Soup.Reply
             if (request.url ().path ().ends_with (test_filename)) {
                 request_identifier = request.raw_header ("X-Request-ID");
@@ -54,7 +54,7 @@ public class TestBlocklist : GLib.Object {
         }
 
         var initial_etag = journal_record (fake_folder, "A").etag;
-        GLib.assert_true (!initial_etag.is_empty ());
+        GLib.assert_true (!initial_etag == "");
 
         // The first sync and the download will fail - the item will be blocklisted
         modifier.insert (test_filename);
@@ -63,7 +63,7 @@ public class TestBlocklist : GLib.Object {
             var it = complete_spy.find_item (test_filename);
             GLib.assert_true (it);
             GLib.assert_cmp (it.status, SyncFileItem.Status.NORMAL_ERROR); // initial error visible
-            GLib.assert_cmp (it.instruction, CSYNC_INSTRUCTION_NEW);
+            GLib.assert_cmp (it.instruction, SyncInstructions.NEW);
 
             var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
             GLib.assert_true (entry.is_valid ());
@@ -83,7 +83,7 @@ public class TestBlocklist : GLib.Object {
             var it = complete_spy.find_item (test_filename);
             GLib.assert_true (it);
             GLib.assert_cmp (it.status, SyncFileItem.Status.BLOCKLISTED_ERROR);
-            GLib.assert_cmp (it.instruction, CSYNC_INSTRUCTION_IGNORE); // no retry happened!
+            GLib.assert_cmp (it.instruction, SyncInstructions.IGNORE); // no retry happened!
 
             var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
             GLib.assert_true (entry.is_valid ());
@@ -108,7 +108,7 @@ public class TestBlocklist : GLib.Object {
             var it = complete_spy.find_item (test_filename);
             GLib.assert_true (it);
             GLib.assert_cmp (it.status, SyncFileItem.Status.BLOCKLISTED_ERROR); // blocklisted as it's just a retry
-            GLib.assert_cmp (it.instruction, CSYNC_INSTRUCTION_NEW); // retry!
+            GLib.assert_cmp (it.instruction, SyncInstructions.NEW); // retry!
 
             var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
             GLib.assert_true (entry.is_valid ());
@@ -129,7 +129,7 @@ public class TestBlocklist : GLib.Object {
             var it = complete_spy.find_item (test_filename);
             GLib.assert_true (it);
             GLib.assert_cmp (it.status, SyncFileItem.Status.BLOCKLISTED_ERROR);
-            GLib.assert_cmp (it.instruction, CSYNC_INSTRUCTION_NEW); // retry!
+            GLib.assert_cmp (it.instruction, SyncInstructions.NEW); // retry!
 
             var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
             GLib.assert_true (entry.is_valid ());
@@ -155,7 +155,7 @@ public class TestBlocklist : GLib.Object {
             var it = complete_spy.find_item (test_filename);
             GLib.assert_true (it);
             GLib.assert_cmp (it.status, SyncFileItem.Status.SUCCESS);
-            GLib.assert_cmp (it.instruction, CSYNC_INSTRUCTION_NEW);
+            GLib.assert_cmp (it.instruction, SyncInstructions.NEW);
 
             var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
             GLib.assert_true (!entry.is_valid ());
@@ -169,7 +169,7 @@ public class TestBlocklist : GLib.Object {
         GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
     }
 
-    SyncJournalFileRecord journal_record (FakeFolder folder, GLib.ByteArray path) {
+    SyncJournalFileRecord journal_record (FakeFolder folder, string path) {
         SyncJournalFileRecord record;
         folder.sync_journal ().get_file_record (path, record);
         return record;

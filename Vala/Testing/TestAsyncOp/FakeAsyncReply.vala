@@ -8,11 +8,11 @@ namespace Testing {
 
 public class FakeAsyncReply : FakeReply {
 
-    GLib.ByteArray poll_location;
+    string poll_location;
 
     /***********************************************************
     ***********************************************************/
-    public FakeAsyncReply (GLib.ByteArray poll_location, Soup.Operation operation, Soup.Request request, GLib.Object parent) {
+    public FakeAsyncReply (string poll_location, Soup.Operation operation, Soup.Request request, GLib.Object parent) {
         base (parent);
         this.poll_location = poll_location;
         set_request (request);

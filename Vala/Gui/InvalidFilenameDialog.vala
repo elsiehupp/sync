@@ -40,7 +40,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public InvalidFilenameDialog (unowned Account account, Folder folder, string file_path, Gtk.Widget parent = null) {
+    public InvalidFilenameDialog (unowned Account account, Folder folder, string file_path, Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.ui = new Ui.InvalidFilenameDialog ();
         this.account = account;
@@ -52,7 +52,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
         const GLib.FileInfo file_path_file_info = GLib.FileInfo (this.file_path);
         this.relative_file_path = file_path_file_info.path () + "/";
         this.relative_file_path = this.relative_file_path.replace (folder.path (), "");
-        this.relative_file_path = this.relative_file_path.is_empty () ? "" : this.relative_file_path + "/";
+        this.relative_file_path = this.relative_file_path == "" ? "" : this.relative_file_path + "/";
 
         this.original_filename = this.relative_file_path + file_path_file_info.filename ();
 

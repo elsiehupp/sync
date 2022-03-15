@@ -361,24 +361,24 @@ public class DiscoveryPhase : GLib.Object {
         var it = this.deleted_item.find (original_path);
         if (it != this.deleted_item.end ()) {
             const SyncInstructions instruction = (*it).instruction;
-            if (instruction == CSYNC_INSTRUCTION_IGNORE && (*it).type == ItemTypeVirtualFile) {
+            if (instruction == SyncInstructions.IGNORE && (*it).type == ItemType.VIRTUAL_FILE) {
                 // re-creation of virtual files count as a delete
-                // a file might be in an error state and thus gets marked as CSYNC_INSTRUCTION_IGNORE
-                // after it was initially marked as CSYNC_INSTRUCTION_REMOVE
+                // a file might be in an error state and thus gets marked as SyncInstructions.IGNORE
+                // after it was initially marked as SyncInstructions.REMOVE
                 // return true, to not trigger any additional actions on that file that could elad to dataloss
                 result = true;
                 old_etag = (*it).etag;
             } else {
-                if (! (instruction == CSYNC_INSTRUCTION_REMOVE
+                if (! (instruction == SyncInstructions.REMOVE
                         // re-creation of virtual files count as a delete
-                        || ( (*it).type == ItemTypeVirtualFile && instruction == CSYNC_INSTRUCTION_NEW)
-                        || ( (*it).is_restoration && instruction == CSYNC_INSTRUCTION_NEW))) {
+                        || ( (*it).type == ItemType.VIRTUAL_FILE && instruction == SyncInstructions.NEW)
+                        || ( (*it).is_restoration && instruction == SyncInstructions.NEW))) {
                     GLib.warning ("ENFORCE (FAILING) " + original_path);
-                    GLib.warning ("instruction == CSYNC_INSTRUCTION_REMOVE " + (instruction == CSYNC_INSTRUCTION_REMOVE));
-                    GLib.warning (" ( (*it).type == ItemTypeVirtualFile && instruction == CSYNC_INSTRUCTION_NEW)"
-                                           + ( (*it).type == ItemTypeVirtualFile && instruction == CSYNC_INSTRUCTION_NEW));
-                    GLib.warning (" ( (*it).is_restoration && instruction == CSYNC_INSTRUCTION_NEW))"
-                                           + ( (*it).is_restoration && instruction == CSYNC_INSTRUCTION_NEW));
+                    GLib.warning ("instruction == SyncInstructions.REMOVE " + (instruction == SyncInstructions.REMOVE));
+                    GLib.warning (" ( (*it).type == ItemType.VIRTUAL_FILE && instruction == SyncInstructions.NEW)"
+                                           + ( (*it).type == ItemType.VIRTUAL_FILE && instruction == SyncInstructions.NEW));
+                    GLib.warning (" ( (*it).is_restoration && instruction == SyncInstructions.NEW))"
+                                           + ( (*it).is_restoration && instruction == SyncInstructions.NEW));
                     GLib.warning ("instruction" + instruction);
                     GLib.warning (" (*it).type" + (*it).type);
                     GLib.warning (" (*it).is_restoration " + (*it).is_restoration);
@@ -386,7 +386,7 @@ public class DiscoveryPhase : GLib.Object {
                     add_error_to_gui (SyncFileItem.Status.FatalError, _("Error while canceling delete of a file"), original_path);
                     /* emit */ fatal_error (_("Error while canceling delete of %1").printf (original_path));
                 }
-                (*it).instruction = CSYNC_INSTRUCTION_NONE;
+                (*it).instruction = SyncInstructions.NONE;
                 result = true;
                 old_etag = (*it).etag;
             }

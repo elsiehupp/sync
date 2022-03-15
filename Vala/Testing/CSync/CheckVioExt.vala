@@ -43,8 +43,8 @@ public class CheckVioExt {
     static mbchar_t wd_buffer[WD_BUFFER_SIZE];
 
     struct StateVar {
-        GLib.ByteArray result;
-        GLib.ByteArray ignored_dir;
+        string result;
+        string ignored_dir;
     }
 
     /***********************************************************
@@ -141,10 +141,10 @@ public class CheckVioExt {
     ***********************************************************/
     static void traverse_dir (void **state, string directory, int count) {
         csync_vio_handle_t dh = null;
-        std.unique_ptr<csync_file_stat_t> dirent;
+        std.unique_ptr<CSyncFileStatT> dirent;
         var sv = (StateVar*) *state;
-        GLib.ByteArray subdir;
-        GLib.ByteArray subdir_out;
+        string subdir;
+        string subdir_out;
         int rc = -1;
         int is_dir = 0;
 
@@ -154,18 +154,18 @@ public class CheckVioExt {
         Occ.Vfs vfs = null;
         while ( (dirent = csync_vio_local_readdir (dh, vfs)) ) {
             assert_non_null (dirent.get ());
-            if (!dirent.original_path.is_empty ()) {
+            if (!dirent.original_path == "") {
                 sv.ignored_dir = dirent.original_path;
                 continue;
             }
 
-            assert_false (dirent.path.is_empty ());
+            assert_false (dirent.path == "");
 
             if ( dirent.path == ".." || dirent.path == "." ) {
             continue;
             }
 
-            is_dir = (dirent.type == ItemTypeDirectory) ? 1:0;
+            is_dir = (dirent.type == ItemType.DIRECTORY) ? 1:0;
 
             subdir = directory + "/" + dirent.path;
             subdir_out = (is_dir ? "<DIR> ":"      ") + subdir;

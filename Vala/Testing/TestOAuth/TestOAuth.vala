@@ -57,14 +57,14 @@ public class TestOAuth : GLib.Object {
             QTimer.single_shot (0, this, [this, request] {
                 var port = request.url ().port ();
                 state = CustomState;
-                GLib.Vector<GLib.ByteArray> payloads = {
+                GLib.Vector<string> payloads = {
                     "GET FOFOFO HTTP 1/1\n\n",
                     "GET /?code=invalie HTTP 1/1\n\n",
                     "GET /?code=xxxxx&bar=fff",
-                    GLib.ByteArray ("\0\0\0", 3),
-                    GLib.ByteArray ("GET \0\0\0 \n\n\n\n\n\0", 14),
-                    GLib.ByteArray ("GET /?code=éléphant\xa5 HTTP\n"),
-                    GLib.ByteArray ("\n\n\n\n"),
+                    string ("\0\0\0", 3),
+                    string ("GET \0\0\0 \n\n\n\n\n\0", 14),
+                    string ("GET /?code=éléphant\xa5 HTTP\n"),
+                    string ("\n\n\n\n"),
                 }
                 foreach (var x in payloads) {
                     var socket = new QTcpSocket (this);

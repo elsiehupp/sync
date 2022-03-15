@@ -157,7 +157,7 @@ public class KMessageWidget : Gdk.Frame {
     /***********************************************************
     Constructs a KMessageWidget with the specified @p parent.
     ***********************************************************/
-    public KMessageWidget (Gtk.Widget parent = null) {
+    public KMessageWidget (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         d = new KMessageWidgetPrivate ();
         d.on_init (this);
@@ -168,7 +168,7 @@ public class KMessageWidget : Gdk.Frame {
     Constructs a KMessageWidget with the specified @p parent and
     contents @p text.
     ***********************************************************/
-    public KMessageWidget.for_string (string text, Gtk.Widget parent = null) {
+    public KMessageWidget.for_string (string text, Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         d = new KMessageWidgetPrivate ();
         d.on_init (this);

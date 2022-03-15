@@ -6,7 +6,7 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 ***********************************************************/
 
 //  #include <QDesktopServices>
-//  #include <QApplication>
+//  #include <Gtk.Application>
 //  #include <QClipboard>
 //  #include <QTimer>
 //  #include <QBuffer>
@@ -144,7 +144,7 @@ public class Flow2Auth : GLib.Object {
         string poll_token, poll_endpoint, login_url;
 
         if (reply.error () == Soup.Reply.NoError && json_parse_error.error == QJsonParseError.NoError
-            && !json.is_empty ()) {
+            && !json == "") {
             poll_token = json.value ("poll").to_object ().value ("token").to_string ();
             poll_endpoint = json.value ("poll").to_object ().value ("endpoint").to_string ();
             if (this.enforce_https && GLib.Uri (poll_endpoint).scheme () != "https") {
@@ -156,10 +156,10 @@ public class Flow2Auth : GLib.Object {
         }
 
         if (reply.error () != Soup.Reply.NoError || json_parse_error.error != QJsonParseError.NoError
-            || json.is_empty () || poll_token.is_empty () || poll_endpoint.is_empty () || login_url.is_empty ()) {
+            || json == "" || poll_token == "" || poll_endpoint == "" || login_url == "") {
             string error_reason;
             string error_from_json = json["error"].to_string ();
-            if (!error_from_json.is_empty ()) {
+            if (!error_from_json == "") {
                 error_reason = _("Error returned from the server : <em>%1</em>")
                                   .printf (error_from_json.to_html_escaped ());
             } else if (reply.error () != Soup.Reply.NoError) {
@@ -182,7 +182,7 @@ public class Flow2Auth : GLib.Object {
 
         if (this.account.is_username_prefill_supported ()) {
             const var user_name = Utility.current_user_name ();
-            if (!user_name.is_empty ()) {
+            if (!user_name == "") {
                 var query = QUrlQuery (this.login_url);
                 query.add_query_item ("user", user_name);
                 this.login_url.query (query);
@@ -214,7 +214,7 @@ public class Flow2Auth : GLib.Object {
             }
             break;
         case TokenAction.COPY_LINK_TO_CLIPBOARD:
-            QApplication.clipboard ().on_signal_text (authorisation_link ().to_string (GLib.Uri.FullyEncoded));
+            Gtk.Application.clipboard ().on_signal_text (authorisation_link ().to_string (GLib.Uri.FullyEncoded));
             /* emit */ signal_status_changed (PollStatus.PollStatus.COPY_LINK_TO_CLIPBOARD, 0);
             break;
         }
@@ -303,7 +303,7 @@ public class Flow2Auth : GLib.Object {
         string login_name, app_password;
 
         if (reply.error () == Soup.Reply.NoError && json_parse_error.error == QJsonParseError.NoError
-            && !json.is_empty ()) {
+            && !json == "") {
             server_url = json["server"].to_string ();
             if (this.enforce_https && server_url.scheme () != "https") {
                 GLib.warning ("Returned server url " + server_url + " does not start with https.");
@@ -315,10 +315,10 @@ public class Flow2Auth : GLib.Object {
         }
 
         if (reply.error () != Soup.Reply.NoError || json_parse_error.error != QJsonParseError.NoError
-            || json.is_empty () || server_url.is_empty () || login_name.is_empty () || app_password.is_empty ()) {
+            || json == "" || server_url == "" || login_name == "" || app_password == "") {
             string error_reason;
             string error_from_json = json["error"].to_string ();
-            if (!error_from_json.is_empty ()) {
+            if (!error_from_json == "") {
                 error_reason = _("Error returned from the server : <em>%1</em>")
                                   .printf (error_from_json.to_html_escaped ());
             } else if (reply.error () != Soup.Reply.NoError) {

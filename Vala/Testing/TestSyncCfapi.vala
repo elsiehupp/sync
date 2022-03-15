@@ -17,13 +17,13 @@ const int CFVERIFY_VIRTUAL (folder, path)
     GLib.assert_true (GLib.FileInfo ( (folder).local_path () + (path)).exists ());
     GLib.assert_true (cfapi.is_sparse_file ( (folder).local_path () + (path)));
     GLib.assert_true (database_record ( (folder), (path)).is_valid ());
-    GLib.assert_cmp (database_record ( (folder), (path)).type, ItemTypeVirtualFile);
+    GLib.assert_cmp (database_record ( (folder), (path)).type, ItemType.VIRTUAL_FILE);
 
 const int CFVERIFY_NONVIRTUAL (folder, path)
     GLib.assert_true (GLib.FileInfo ( (folder).local_path () + (path)).exists ());
     GLib.assert_true (!cfapi.is_sparse_file ( (folder).local_path () + (path)));
     GLib.assert_true (database_record ( (folder), (path)).is_valid ());
-    GLib.assert_cmp (database_record ( (folder), (path)).type, ItemTypeFile);
+    GLib.assert_cmp (database_record ( (folder), (path)).type, ItemType.FILE);
 
 const int CFVERIFY_GONE (folder, path)
     GLib.assert_true (!GLib.FileInfo ( (folder).local_path () + (path)).exists ());
@@ -64,24 +64,24 @@ SyncJournalFileRecord database_record (FakeFolder folder, string path) {
     return record;
 }
 
-void trigger_download (FakeFolder folder, GLib.ByteArray path) {
+void trigger_download (FakeFolder folder, string path) {
     var journal = folder.sync_journal ();
     SyncJournalFileRecord record;
     journal.get_file_record (path, record);
     if (!record.is_valid ())
         return;
-    record.type = ItemTypeVirtualFileDownload;
+    record.type = ItemType.VIRTUAL_FILE_DOWNLOAD;
     journal.set_file_record (record);
     journal.schedule_path_for_remote_discovery (record.path);
 }
 
-void mark_for_dehydration (FakeFolder folder, GLib.ByteArray path) {
+void mark_for_dehydration (FakeFolder folder, string path) {
     var journal = folder.sync_journal ();
     SyncJournalFileRecord record;
     journal.get_file_record (path, record);
     if (!record.is_valid ())
         return;
-    record.type = ItemTypeVirtualFileDehydration;
+    record.type = ItemType.VIRTUAL_FILE_DEHYDRATION;
     journal.set_file_record (record);
     journal.schedule_path_for_remote_discovery (record.path);
 }
@@ -139,7 +139,7 @@ public class TestSyncCfApi : GLib.Object {
         GLib.assert_cmp (GLib.FileInfo (fake_folder.local_path () + "A/a1").size (), 64);
         GLib.assert_cmp (GLib.FileInfo (fake_folder.local_path () + "A/a1").last_modified (), some_date);
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a1"));
-        GLib.assert_true (item_instruction (complete_spy, "A/a1", CSYNC_INSTRUCTION_NEW));
+        GLib.assert_true (item_instruction (complete_spy, "A/a1", SyncInstructions.NEW));
         on_signal_cleanup ();
 
         // Another sync doesn't actually lead to changes
@@ -148,7 +148,7 @@ public class TestSyncCfApi : GLib.Object {
         GLib.assert_cmp (GLib.FileInfo (fake_folder.local_path () + "A/a1").size (), 64);
         GLib.assert_cmp (GLib.FileInfo (fake_folder.local_path () + "A/a1").last_modified (), some_date);
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a1"));
-        GLib.assert_true (complete_spy.is_empty ());
+        GLib.assert_true (complete_spy == "");
         on_signal_cleanup ();
 
         // Not even when the remote is rediscovered
@@ -158,7 +158,7 @@ public class TestSyncCfApi : GLib.Object {
         GLib.assert_cmp (GLib.FileInfo (fake_folder.local_path () + "A/a1").size (), 64);
         GLib.assert_cmp (GLib.FileInfo (fake_folder.local_path () + "A/a1").last_modified (), some_date);
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a1"));
-        GLib.assert_true (complete_spy.is_empty ());
+        GLib.assert_true (complete_spy == "");
         on_signal_cleanup ();
 
         // Neither does a remote change
@@ -168,7 +168,7 @@ public class TestSyncCfApi : GLib.Object {
         GLib.assert_cmp (GLib.FileInfo (fake_folder.local_path () + "A/a1").size (), 65);
         GLib.assert_cmp (GLib.FileInfo (fake_folder.local_path () + "A/a1").last_modified (), some_date);
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a1"));
-        GLib.assert_true (item_instruction (complete_spy, "A/a1", CSYNC_INSTRUCTION_UPDATE_METADATA));
+        GLib.assert_true (item_instruction (complete_spy, "A/a1", SyncInstructions.UPDATE_METADATA));
         GLib.assert_cmp (database_record (fake_folder, "A/a1").file_size, 65);
         on_signal_cleanup ();
 
@@ -179,7 +179,7 @@ public class TestSyncCfApi : GLib.Object {
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (!fake_folder.current_local_state ().find ("A/a1"));
         GLib.assert_true (!fake_folder.current_remote_state ().find ("A/a1"));
-        GLib.assert_true (item_instruction (complete_spy, "A/a1", CSYNC_INSTRUCTION_REMOVE));
+        GLib.assert_true (item_instruction (complete_spy, "A/a1", SyncInstructions.REMOVE));
         GLib.assert_true (!database_record (fake_folder, "A/a1").is_valid ());
         on_signal_cleanup ();
 
@@ -191,7 +191,7 @@ public class TestSyncCfApi : GLib.Object {
         GLib.assert_cmp (GLib.FileInfo (fake_folder.local_path () + "A/a1").size (), 65);
         GLib.assert_cmp (GLib.FileInfo (fake_folder.local_path () + "A/a1").last_modified (), some_date);
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a1"));
-        GLib.assert_true (item_instruction (complete_spy, "A/a1", CSYNC_INSTRUCTION_NEW));
+        GLib.assert_true (item_instruction (complete_spy, "A/a1", SyncInstructions.NEW));
         on_signal_cleanup ();
 
         // Remote rename is propagated
@@ -204,9 +204,9 @@ public class TestSyncCfApi : GLib.Object {
         GLib.assert_true (!fake_folder.current_remote_state ().find ("A/a1"));
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a1m"));
         GLib.assert_true (
-            item_instruction (complete_spy, "A/a1m", CSYNC_INSTRUCTION_RENAME)
-            || (item_instruction (complete_spy, "A/a1m", CSYNC_INSTRUCTION_NEW)
-                && item_instruction (complete_spy, "A/a1", CSYNC_INSTRUCTION_REMOVE)));
+            item_instruction (complete_spy, "A/a1m", SyncInstructions.RENAME)
+            || (item_instruction (complete_spy, "A/a1m", SyncInstructions.NEW)
+                && item_instruction (complete_spy, "A/a1", SyncInstructions.REMOVE)));
         GLib.assert_true (!database_record (fake_folder, "A/a1").is_valid ());
         on_signal_cleanup ();
 
@@ -215,7 +215,7 @@ public class TestSyncCfApi : GLib.Object {
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (!GLib.FileInfo (fake_folder.local_path () + "A/a1m").exists ());
         GLib.assert_true (!fake_folder.current_remote_state ().find ("A/a1m"));
-        GLib.assert_true (item_instruction (complete_spy, "A/a1m", CSYNC_INSTRUCTION_REMOVE));
+        GLib.assert_true (item_instruction (complete_spy, "A/a1m", SyncInstructions.REMOVE));
         GLib.assert_true (!database_record (fake_folder, "A/a1").is_valid ());
         GLib.assert_true (!database_record (fake_folder, "A/a1m").is_valid ());
         on_signal_cleanup ();
@@ -237,9 +237,9 @@ public class TestSyncCfApi : GLib.Object {
         GLib.assert_true (fake_folder.sync_once ());
         CFVERIFY_VIRTUAL (fake_folder, "A/a2");
         GLib.assert_cmp (GLib.FileInfo (fake_folder.local_path () + "A/a2").size (), 32);
-        GLib.assert_true (item_instruction (complete_spy, "A/a2", CSYNC_INSTRUCTION_UPDATE_METADATA));
+        GLib.assert_true (item_instruction (complete_spy, "A/a2", SyncInstructions.UPDATE_METADATA));
         GLib.assert_true (!GLib.FileInfo (fake_folder.local_path () + "A/a3").exists ());
-        GLib.assert_true (item_instruction (complete_spy, "A/a3", CSYNC_INSTRUCTION_REMOVE));
+        GLib.assert_true (item_instruction (complete_spy, "A/a3", SyncInstructions.REMOVE));
         GLib.assert_true (!database_record (fake_folder, "A/a3").is_valid ());
         on_signal_cleanup ();
     }
@@ -290,9 +290,9 @@ public class TestSyncCfApi : GLib.Object {
         GLib.assert_true (fake_folder.sync_once ());
 
         // Everything is CONFLICT
-        GLib.assert_true (item_instruction (complete_spy, "A/a1", CSYNC_INSTRUCTION_CONFLICT));
-        GLib.assert_true (item_instruction (complete_spy, "A/a2", CSYNC_INSTRUCTION_CONFLICT));
-        GLib.assert_true (item_instruction (complete_spy, "B/b1", CSYNC_INSTRUCTION_CONFLICT));
+        GLib.assert_true (item_instruction (complete_spy, "A/a1", SyncInstructions.CONFLICT));
+        GLib.assert_true (item_instruction (complete_spy, "A/a2", SyncInstructions.CONFLICT));
+        GLib.assert_true (item_instruction (complete_spy, "B/b1", SyncInstructions.CONFLICT));
 
         // conflict files should exist
         GLib.assert_cmp (fake_folder.sync_journal ().conflict_record_paths ().size (), 2);
@@ -338,7 +338,7 @@ public class TestSyncCfApi : GLib.Object {
         CFVERIFY_VIRTUAL (fake_folder, "A/new");
         GLib.assert_cmp (GLib.FileInfo (fake_folder.local_path () + "A/new").size (), 42);
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/new"));
-        GLib.assert_true (item_instruction (complete_spy, "A/new", CSYNC_INSTRUCTION_NEW));
+        GLib.assert_true (item_instruction (complete_spy, "A/new", SyncInstructions.NEW));
         on_signal_cleanup ();
     }
 
@@ -413,21 +413,21 @@ public class TestSyncCfApi : GLib.Object {
         fake_folder.local_modifier ().insert ("A/a6");
 
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_true (item_instruction (complete_spy, "A/a1", CSYNC_INSTRUCTION_SYNC));
-        GLib.assert_cmp (complete_spy.find_item ("A/a1").type, ItemTypeVirtualFileDownload);
-        GLib.assert_true (item_instruction (complete_spy, "A/a2", CSYNC_INSTRUCTION_SYNC));
-        GLib.assert_cmp (complete_spy.find_item ("A/a2").type, ItemTypeVirtualFileDownload);
-        GLib.assert_true (item_instruction (complete_spy, "A/a3", CSYNC_INSTRUCTION_REMOVE));
-        GLib.assert_true (item_instruction (complete_spy, "A/a4m", CSYNC_INSTRUCTION_NEW));
-        GLib.assert_true (item_instruction (complete_spy, "A/a4", CSYNC_INSTRUCTION_REMOVE));
-        GLib.assert_true (item_instruction (complete_spy, "A/a5", CSYNC_INSTRUCTION_CONFLICT));
-        GLib.assert_true (item_instruction (complete_spy, "A/a6", CSYNC_INSTRUCTION_CONFLICT));
-        GLib.assert_true (item_instruction (complete_spy, "A/a7", CSYNC_INSTRUCTION_SYNC));
-        GLib.assert_true (item_instruction (complete_spy, "A/b1", CSYNC_INSTRUCTION_SYNC));
-        GLib.assert_true (item_instruction (complete_spy, "A/b2", CSYNC_INSTRUCTION_SYNC));
-        GLib.assert_true (item_instruction (complete_spy, "A/b3", CSYNC_INSTRUCTION_REMOVE));
-        GLib.assert_true (item_instruction (complete_spy, "A/b4m", CSYNC_INSTRUCTION_NEW));
-        GLib.assert_true (item_instruction (complete_spy, "A/b4", CSYNC_INSTRUCTION_REMOVE));
+        GLib.assert_true (item_instruction (complete_spy, "A/a1", SyncInstructions.SYNC));
+        GLib.assert_cmp (complete_spy.find_item ("A/a1").type, ItemType.VIRTUAL_FILE_DOWNLOAD);
+        GLib.assert_true (item_instruction (complete_spy, "A/a2", SyncInstructions.SYNC));
+        GLib.assert_cmp (complete_spy.find_item ("A/a2").type, ItemType.VIRTUAL_FILE_DOWNLOAD);
+        GLib.assert_true (item_instruction (complete_spy, "A/a3", SyncInstructions.REMOVE));
+        GLib.assert_true (item_instruction (complete_spy, "A/a4m", SyncInstructions.NEW));
+        GLib.assert_true (item_instruction (complete_spy, "A/a4", SyncInstructions.REMOVE));
+        GLib.assert_true (item_instruction (complete_spy, "A/a5", SyncInstructions.CONFLICT));
+        GLib.assert_true (item_instruction (complete_spy, "A/a6", SyncInstructions.CONFLICT));
+        GLib.assert_true (item_instruction (complete_spy, "A/a7", SyncInstructions.SYNC));
+        GLib.assert_true (item_instruction (complete_spy, "A/b1", SyncInstructions.SYNC));
+        GLib.assert_true (item_instruction (complete_spy, "A/b2", SyncInstructions.SYNC));
+        GLib.assert_true (item_instruction (complete_spy, "A/b3", SyncInstructions.REMOVE));
+        GLib.assert_true (item_instruction (complete_spy, "A/b4m", SyncInstructions.NEW));
+        GLib.assert_true (item_instruction (complete_spy, "A/b4", SyncInstructions.REMOVE));
 
         CFVERIFY_NONVIRTUAL (fake_folder, "A/a1");
         CFVERIFY_NONVIRTUAL (fake_folder, "A/a2");
@@ -472,15 +472,15 @@ public class TestSyncCfApi : GLib.Object {
         trigger_download (fake_folder, "A/a1");
         fake_folder.server_error_paths ().append ("A/a1", 500);
         GLib.assert_true (!fake_folder.sync_once ());
-        GLib.assert_true (item_instruction (complete_spy, "A/a1", CSYNC_INSTRUCTION_SYNC));
+        GLib.assert_true (item_instruction (complete_spy, "A/a1", SyncInstructions.SYNC));
         GLib.assert_true (cfapi.is_sparse_file (fake_folder.local_path () + "A/a1"));
         GLib.assert_true (GLib.FileInfo (fake_folder.local_path () + "A/a1").exists ());
-        GLib.assert_cmp (database_record (fake_folder, "A/a1").type, ItemTypeVirtualFileDownload);
+        GLib.assert_cmp (database_record (fake_folder, "A/a1").type, ItemType.VIRTUAL_FILE_DOWNLOAD);
         on_signal_cleanup ();
 
         fake_folder.server_error_paths ().clear ();
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_true (item_instruction (complete_spy, "A/a1", CSYNC_INSTRUCTION_SYNC));
+        GLib.assert_true (item_instruction (complete_spy, "A/a1", SyncInstructions.SYNC));
         CFVERIFY_NONVIRTUAL (fake_folder, "A/a1");
         GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
     }
@@ -618,7 +618,7 @@ public class TestSyncCfApi : GLib.Object {
         CFVERIFY_VIRTUAL (fake_folder, "renamed1");
 
         GLib.assert_true (fake_folder.current_remote_state ().find ("renamed1"));
-        GLib.assert_true (item_instruction (complete_spy, "renamed1", CSYNC_INSTRUCTION_RENAME));
+        GLib.assert_true (item_instruction (complete_spy, "renamed1", SyncInstructions.RENAME));
 
         // file2 has a conflict between the download request and the rename:
         // the rename wins, the download is ignored
@@ -627,9 +627,9 @@ public class TestSyncCfApi : GLib.Object {
         CFVERIFY_VIRTUAL (fake_folder, "renamed2");
 
         GLib.assert_true (fake_folder.current_remote_state ().find ("renamed2"));
-        GLib.assert_true (item_instruction (complete_spy, "renamed2", CSYNC_INSTRUCTION_RENAME));
+        GLib.assert_true (item_instruction (complete_spy, "renamed2", SyncInstructions.RENAME));
 
-        GLib.assert_true (item_instruction (complete_spy, "file3", CSYNC_INSTRUCTION_SYNC));
+        GLib.assert_true (item_instruction (complete_spy, "file3", SyncInstructions.SYNC));
         CFVERIFY_NONVIRTUAL (fake_folder, "file3");
         on_signal_cleanup ();
     }
@@ -676,14 +676,14 @@ public class TestSyncCfApi : GLib.Object {
         CFVERIFY_VIRTUAL (fake_folder, "case3-rename");
         GLib.assert_true (!fake_folder.current_remote_state ().find ("case3"));
         GLib.assert_true (fake_folder.current_remote_state ().find ("case3-rename"));
-        GLib.assert_true (item_instruction (complete_spy, "case3-rename", CSYNC_INSTRUCTION_RENAME));
+        GLib.assert_true (item_instruction (complete_spy, "case3-rename", SyncInstructions.RENAME));
 
         // Case 4 : the rename went though, dehydration is forgotten
         CFVERIFY_GONE (fake_folder, "case4");
         CFVERIFY_NONVIRTUAL (fake_folder, "case4-rename");
         GLib.assert_true (!fake_folder.current_remote_state ().find ("case4"));
         GLib.assert_true (fake_folder.current_remote_state ().find ("case4-rename"));
-        GLib.assert_true (item_instruction (complete_spy, "case4-rename", CSYNC_INSTRUCTION_RENAME));
+        GLib.assert_true (item_instruction (complete_spy, "case4-rename", SyncInstructions.RENAME));
     }
 
     // Dehydration via sync works
@@ -737,35 +737,35 @@ public class TestSyncCfApi : GLib.Object {
         var has_dehydrated_database_entries = [&] (string path) {
             SyncJournalFileRecord record;
             fake_folder.sync_journal ().get_file_record (path, record);
-            return record.is_valid () && record.type == ItemTypeVirtualFile;
+            return record.is_valid () && record.type == ItemType.VIRTUAL_FILE;
         }
 
         GLib.assert_true (is_dehydrated ("A/a1"));
         GLib.assert_true (has_dehydrated_database_entries ("A/a1"));
-        GLib.assert_true (item_instruction (complete_spy, "A/a1", CSYNC_INSTRUCTION_SYNC));
-        GLib.assert_cmp (complete_spy.find_item ("A/a1").type, ItemTypeVirtualFileDehydration);
+        GLib.assert_true (item_instruction (complete_spy, "A/a1", SyncInstructions.SYNC));
+        GLib.assert_cmp (complete_spy.find_item ("A/a1").type, ItemType.VIRTUAL_FILE_DEHYDRATION);
         GLib.assert_cmp (complete_spy.find_item ("A/a1").file, "A/a1");
         GLib.assert_true (is_dehydrated ("A/a2"));
         GLib.assert_true (has_dehydrated_database_entries ("A/a2"));
-        GLib.assert_true (item_instruction (complete_spy, "A/a2", CSYNC_INSTRUCTION_SYNC));
-        GLib.assert_cmp (complete_spy.find_item ("A/a2").type, ItemTypeVirtualFileDehydration);
+        GLib.assert_true (item_instruction (complete_spy, "A/a2", SyncInstructions.SYNC));
+        GLib.assert_cmp (complete_spy.find_item ("A/a2").type, ItemType.VIRTUAL_FILE_DEHYDRATION);
 
         GLib.assert_true (!GLib.FileInfo (fake_folder.local_path () + "B/b1").exists ());
         GLib.assert_true (!fake_folder.current_remote_state ().find ("B/b1"));
-        GLib.assert_true (item_instruction (complete_spy, "B/b1", CSYNC_INSTRUCTION_REMOVE));
+        GLib.assert_true (item_instruction (complete_spy, "B/b1", SyncInstructions.REMOVE));
 
         GLib.assert_true (!GLib.FileInfo (fake_folder.local_path () + "B/b2").exists ());
         GLib.assert_true (!fake_folder.current_remote_state ().find ("B/b2"));
         GLib.assert_true (is_dehydrated ("B/b3"));
         GLib.assert_true (has_dehydrated_database_entries ("B/b3"));
-        GLib.assert_true (item_instruction (complete_spy, "B/b2", CSYNC_INSTRUCTION_REMOVE));
-        GLib.assert_true (item_instruction (complete_spy, "B/b3", CSYNC_INSTRUCTION_NEW));
+        GLib.assert_true (item_instruction (complete_spy, "B/b2", SyncInstructions.REMOVE));
+        GLib.assert_true (item_instruction (complete_spy, "B/b3", SyncInstructions.NEW));
 
         GLib.assert_cmp (fake_folder.current_remote_state ().find ("C/c1").size, 25);
-        GLib.assert_true (item_instruction (complete_spy, "C/c1", CSYNC_INSTRUCTION_SYNC));
+        GLib.assert_true (item_instruction (complete_spy, "C/c1", SyncInstructions.SYNC));
 
         GLib.assert_cmp (fake_folder.current_remote_state ().find ("C/c2").size, 26);
-        GLib.assert_true (item_instruction (complete_spy, "C/c2", CSYNC_INSTRUCTION_CONFLICT));
+        GLib.assert_true (item_instruction (complete_spy, "C/c2", SyncInstructions.CONFLICT));
         on_signal_cleanup ();
 
         var expected_remote_state = fake_folder.current_remote_state ();
@@ -849,7 +849,7 @@ public class TestSyncCfApi : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state ().find ("f2"));
 
         // a3 has a conflict
-        GLib.assert_true (item_instruction (complete_spy, "A/a3", CSYNC_INSTRUCTION_CONFLICT));
+        GLib.assert_true (item_instruction (complete_spy, "A/a3", SyncInstructions.CONFLICT));
 
         // conflict files should exist
         GLib.assert_cmp (fake_folder.sync_journal ().conflict_record_paths ().size (), 1);
@@ -1210,7 +1210,7 @@ public class TestSyncCfApi : GLib.Object {
         std.thread t ([&] {
             GLib.File file = GLib.File.new_for_path (fake_folder.local_path () + "online/sub/file1");
             open_result = file.open (GLib.File.ReadOnly);
-            read_result = !file.read_all ().is_empty ();
+            read_result = !file.read_all () == "";
             file.close ();
             QMetaObject.invoke_method (&loop, &QEventLoop.quit, Qt.QueuedConnection);
         });
@@ -1226,7 +1226,7 @@ public class TestSyncCfApi : GLib.Object {
         // Nothing should change
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_true (complete_spy.is_empty ());
+        GLib.assert_true (complete_spy == "");
 
         if (error_kind == NoError) {
             CFVERIFY_NONVIRTUAL (fake_folder, "online/sub/file1");

@@ -110,7 +110,7 @@ public class AccountManager : GLib.Object {
         }
 
         // If there are no accounts, check the old format.
-        if (settings.child_groups ().is_empty ()
+        if (settings.child_groups () == ""
             && !settings.contains (VERSION_C)) {
             restore_from_legacy_settings ();
             return true;
@@ -149,7 +149,7 @@ public class AccountManager : GLib.Object {
     ***********************************************************/
     public AccountState add_account (unowned Account new_account) {
         var identifier = new_account.identifier ();
-        if (identifier.is_empty () || !is_account_id_available (identifier)) {
+        if (identifier == "" || !is_account_id_available (identifier)) {
             identifier = generate_free_account_id ();
         }
         new_account.id = identifier;
@@ -280,11 +280,11 @@ public class AccountManager : GLib.Object {
         // Save accepted certificates.
         settings.begin_group ("General");
         GLib.info ("Saving " + acc.approved_certificates ().count () + " unknown certificates.");
-        GLib.ByteArray certificates;
+        string certificates;
         foreach (var cert in acc.approved_certificates ()) {
             certificates += cert.to_pem () + '\n';
         }
-        if (!certificates.is_empty ()) {
+        if (!certificates == "") {
             settings.value (CA_CERTS_KEY_C, certificates);
         }
         settings.end_group ();
@@ -328,7 +328,7 @@ public class AccountManager : GLib.Object {
 
         string override_url = Theme.instance ().override_server_url ();
         string force_auth = Theme.instance ().force_config_auth_type ();
-        if (!force_auth.is_empty () && !override_url.is_empty ()) {
+        if (!force_auth == "" && !override_url == "") {
             // If force_auth is set, this might also mean the override_uRL has changed.
             // See enterprise issues #1126
             acc.url (override_url);
@@ -389,7 +389,7 @@ public class AccountManager : GLib.Object {
 
         // if the settings file could not be opened, the child_keys list is empty
         // then try to load settings from a very old place
-        if (settings.child_keys ().is_empty ()) {
+        if (settings.child_keys () == "") {
             // Now try to open the original own_cloud settings to see if they exist.
             string oc_config_file = QDir.from_native_separators (settings.filename ());
             // replace the last two segments with own_cloud/owncloud.config
@@ -406,7 +406,7 @@ public class AccountManager : GLib.Object {
 
                 // Check the theme url to see if it is the same url that the o_c config was for
                 string override_url = Theme.instance ().override_server_url ();
-                if (!override_url.is_empty ()) {
+                if (!override_url == "") {
                     if (override_url.ends_with ('/')) {
                         override_url.chop (1);
                     }
@@ -427,7 +427,7 @@ public class AccountManager : GLib.Object {
         }
 
         // Try to load the single account.
-        if (!settings.child_keys ().is_empty ()) {
+        if (!settings.child_keys () == "") {
             var acc = load_account_helper (settings);
             if (acc) {
                 add_account (acc);

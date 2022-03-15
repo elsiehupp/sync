@@ -4,7 +4,7 @@ Copyright (C) 2015 by Christian Kamm <kamm@incasoftware.de>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <QApplication>
+//  #include <Gtk.Application>
 //  #include <qt5keychain/keychain.h>
 
 using QKeychain;
@@ -143,7 +143,7 @@ public class ProxyAuthHandler : GLib.Object {
         // isn't reliable, so we also invalidate credentials if we previously
         // gave presumably valid credentials to the same QNAM.
         bool invalidated = false;
-        if (!this.waiting_for_dialog && !this.waiting_for_keychain && (!authenticator.user ().is_empty ()
+        if (!this.waiting_for_dialog && !this.waiting_for_keychain && (!authenticator.user () == ""
                                                             || (sending_qnam && this.gave_credentials_to.contains (sending_qnam)))) {
             GLib.info ("Invalidating old credentials " + key);
             this.username.clear ();
@@ -152,7 +152,7 @@ public class ProxyAuthHandler : GLib.Object {
             this.gave_credentials_to.clear ();
         }
 
-        if (this.username.is_empty () || this.waiting_for_keychain) {
+        if (this.username == "" || this.waiting_for_keychain) {
             if (invalidated || !creds_from_keychain ()) {
                 if (creds_from_dialog ()) {
                     store_creds_in_keychain ();
@@ -238,7 +238,7 @@ public class ProxyAuthHandler : GLib.Object {
 
         if (!this.waiting_for_keychain) {
             this.username = this.settings.value (keychain_username_key ()).to_string ();
-            if (this.username.is_empty ()) {
+            if (this.username == "") {
                 return false;
             }
 

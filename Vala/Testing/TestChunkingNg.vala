@@ -247,7 +247,7 @@ public class TestChunkingNG : GLib.Object {
 
         // Make the MOVE never reply, but trigger a client-on_signal_abort and apply the change remotely
         GLib.Object parent;
-        GLib.ByteArray move_checksum_header;
+        string move_checksum_header;
         int n_get = 0;
         int response_delay = 100000; // bigger than on_signal_abort-wait timeout
         fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice *) . Soup.Reply * {
@@ -271,7 +271,7 @@ public class TestChunkingNG : GLib.Object {
             GLib.assert_cmp (items.size (), 1);
             GLib.assert_cmp (items[0].file, "A");
             SyncJournalFileRecord record;
-            GLib.assert_true (fake_folder.sync_journal ().get_file_record (GLib.ByteArray ("A/a0"), record));
+            GLib.assert_true (fake_folder.sync_journal ().get_file_record (string ("A/a0"), record));
             GLib.assert_cmp (record.etag, fake_folder.remote_modifier ().find ("A/a0").etag);
         }
         var connection = connect (&fake_folder.sync_engine (), &SyncEngine.about_to_propagate, check_etag_updated);
@@ -296,7 +296,7 @@ public class TestChunkingNG : GLib.Object {
         GLib.assert_true (!fake_folder.sync_once ()); // error : on_signal_abort!
 
         // Set the remote checksum -- the test setup doesn't do it automatically
-        GLib.assert_true (!move_checksum_header.is_empty ());
+        GLib.assert_true (!move_checksum_header == "");
         fake_folder.remote_modifier ().find ("A/a0").checksums = move_checksum_header;
 
         GLib.assert_true (fake_folder.sync_once ());
@@ -530,7 +530,7 @@ public class TestChunkingNG : GLib.Object {
         set_chunk_size (fake_folder.sync_engine (), 300 * 1000);
 
         // Make the MOVE never reply, but trigger a client-on_signal_abort and apply the change remotely
-        GLib.ByteArray checksum_header;
+        string checksum_header;
         int n_get = 0;
         QScopedValueRollback<int> set_http_timeout (AbstractNetworkJob.http_timeout, 1);
         int response_delay = AbstractNetworkJob.http_timeout * 1000 * 1000; // much bigger than http timeout (so a timeout will occur)
@@ -556,7 +556,7 @@ public class TestChunkingNG : GLib.Object {
         fake_folder.local_modifier ().insert ("A/a0", size);
         GLib.assert_true (!fake_folder.sync_once ()); // timeout!
         GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ()); // but the upload succeeded
-        GLib.assert_true (!checksum_header.is_empty ());
+        GLib.assert_true (!checksum_header == "");
         fake_folder.remote_modifier ().find ("A/a0").checksums = checksum_header; // The test system don't do that automatically
         // Should be resolved properly
         GLib.assert_true (fake_folder.sync_once ());

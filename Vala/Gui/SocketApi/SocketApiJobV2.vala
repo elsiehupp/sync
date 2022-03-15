@@ -12,18 +12,18 @@ namespace Ui {
 public class SocketApiJobV2 : GLib.Object {
 
     private unowned SocketListener this.socket_listener;
-    private const GLib.ByteArray this.command;
+    private const string this.command;
     private string this.job_id;
     private QJsonObject this.arguments;
 
     signal void signal_finished ();
 
-    public SocketApiJobV2 (unowned SocketListener socket_listener, GLib.ByteArray command, QJsonObject arguments) {
+    public SocketApiJobV2 (unowned SocketListener socket_listener, string command, QJsonObject arguments) {
         this.socket_listener = socket_listener;
         this.command = command;
         this.job_id = arguments["identifier"].to_string ();
         this.arguments = arguments["arguments"].to_object ());
-        //  ASSERT (!this.job_id.is_empty ())
+        //  ASSERT (!this.job_id == "")
     }
 
 
@@ -54,7 +54,7 @@ public class SocketApiJobV2 : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.ByteArray command () {
+    public string command () {
         return this.command;
     }
 

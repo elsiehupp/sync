@@ -120,7 +120,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     private GLib.DateTime time_of_last_e_tag_check;
     private QPointer<ConnectionValidator> connection_validator;
 
-    GLib.ByteArray notifications_etag_response_header {
+    string notifications_etag_response_header {
         /***********************************************************
         Returns the ETag Response header from the last Notifications
         API request with status_code 200.
@@ -133,7 +133,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
         public set;
     }
 
-    GLib.ByteArray navigation_apps_etag_response_header {
+    string navigation_apps_etag_response_header {
         /***********************************************************
         Saves the ETag Response header from the last Navigation Apps
         API request with status_code 200.
@@ -643,7 +643,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
             } else {
                 this.apps.clear ();
 
-                if (!reply.is_empty ()) {
+                if (!reply == "") {
                     var element = reply.object ().value ("ocs").to_object ().value ("data");
                     const var nav_links = element.to_array ();
 
@@ -667,7 +667,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_etag_response_header_received (GLib.ByteArray value, int status_code) {
+    protected void on_signal_etag_response_header_received (string value, int status_code) {
         if (status_code == 200) {
             GLib.debug ("New navigation apps ETag Response Header received " + value);
             navigation_apps_etag_response_header (value);

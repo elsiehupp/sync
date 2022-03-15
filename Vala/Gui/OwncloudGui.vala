@@ -417,10 +417,10 @@ public class OwncloudGui : GLib.Object {
         // FIXME: Lots of messages computed for nothing in this method, needs revisiting
         if (progress.status () == ProgressInfo.Status.DISCOVERY) {
     //  #if 0
-            if (!progress.current_discovered_remote_folder.is_empty ()) {
+            if (!progress.current_discovered_remote_folder == "") {
                 this.action_status.on_signal_text (_("Checking for changes in remote \"%1\"")
                                         .printf (progress.current_discovered_remote_folder));
-            } else if (!progress.current_discovered_local_folder.is_empty ()) {
+            } else if (!progress.current_discovered_local_folder == "") {
                 this.action_status.on_signal_text (_("Checking for changes in local \"%1\"")
                                         .printf (progress.current_discovered_local_folder));
             }
@@ -460,7 +460,7 @@ public class OwncloudGui : GLib.Object {
             //this.action_status.on_signal_text (message);
         }
 
-        if (!progress.last_completed_item.is_empty ()) {
+        if (!progress.last_completed_item == "") {
 
             string kind_str = Progress.as_result_string (progress.last_completed_item);
             string time_str = QTime.current_time ().to_string ("hh:mm");
@@ -523,7 +523,7 @@ public class OwncloudGui : GLib.Object {
             } else if (this.tray.is_open ()) {
                 this.tray.hide_window ();
             } else {
-                if (AccountManager.instance ().accounts ().is_empty ()) {
+                if (AccountManager.instance ().accounts () == "") {
                     this.on_signal_open_settings_dialog ();
                 } else {
                     this.tray.show_window ();
@@ -631,8 +631,8 @@ public class OwncloudGui : GLib.Object {
     ***********************************************************/
     public void on_signal_open_settings_dialog () {
         // if account is set up, on_signal_start the configuration wizard.
-        if (!AccountManager.instance ().accounts ().is_empty ()) {
-            if (this.settings_dialog.is_null () || QApplication.active_window () != this.settings_dialog) {
+        if (!AccountManager.instance ().accounts () == "") {
+            if (this.settings_dialog.is_null () || Gtk.Application.active_window () != this.settings_dialog) {
                 on_signal_show_settings ();
             } else {
                 this.settings_dialog.close ();

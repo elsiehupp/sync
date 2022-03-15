@@ -40,7 +40,7 @@ public class QtLocalPeer : GLib.Object {
     public QtLocalPeer (GLib.Object parent = new GLib.Object (), string app_id = "") {
         base (parent);
         this.identifier = app_id;
-        if (identifier.is_empty ()) {
+        if (identifier == "") {
             identifier = QCoreApplication.application_file_path ();  //### On win, check if this returns .../argv[0] without casefolding; .\MYAPP == .\myapp on Win
         }
 
@@ -89,7 +89,7 @@ public class QtLocalPeer : GLib.Object {
             return false;
         }
 
-        GLib.ByteArray u_msg = new GLib.ByteArray (message.to_utf8 ());
+        string u_msg = new string (message.to_utf8 ());
         QDataStream ds = new QDataStream (socket);
         ds.write_bytes (u_msg.const_data (), u_msg.size ());
         bool res = socket.wait_for_bytes_written (timeout);
@@ -111,7 +111,7 @@ public class QtLocalPeer : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static string app_session_id (string app_id) {
-        GLib.ByteArray idc = app_id.to_utf8 ();
+        string idc = app_id.to_utf8 ();
         uint16 id_num = q_checksum (idc.const_data (), idc.size ());
         //### could do : two 16bit checksums over separate halves of identifier, for a 32bit result - improved uniqeness probability. Every-other-char split would be best.
 
@@ -136,7 +136,7 @@ public class QtLocalPeer : GLib.Object {
             socket.wait_for_ready_read (1000);
         }
         QDataStream ds = new QDataStream (socket);
-        GLib.ByteArray u_msg;
+        string u_msg;
         uint32 remaining = 0;
         ds >> remaining;
         u_msg.resize (remaining);

@@ -46,7 +46,7 @@ public class ShareUserLine : Gtk.Widget {
         UserGroupShare Share,
         SharePermissions max_sharing_permissions,
         bool is_file,
-        Gtk.Widget parent = null) {
+        Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.ui = new Ui.ShareUserLine ();
         this.account = account;
@@ -146,7 +146,7 @@ public class ShareUserLine : Gtk.Widget {
                 this,
                 ShareUserLine.toggle_note_options
             );
-            if (!this.share.note ().is_empty ()) {
+            if (!this.share.note () == "") {
                 this.note_link_action.checked (true);
                 show_note_options (true);
             }
@@ -552,7 +552,7 @@ public class ShareUserLine : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_password_confirmed () {
-        if (this.ui.line_edit_password.text ().is_empty ()) {
+        if (this.ui.line_edit_password.text () == "") {
             return;
         }
 

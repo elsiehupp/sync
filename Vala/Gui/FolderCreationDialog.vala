@@ -22,7 +22,7 @@ public class FolderCreationDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public FolderCreationDialog (string destination, Gtk.Widget parent = null) {
+    public FolderCreationDialog (string destination, Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         ui = new Ui.FolderCreationDialog ();
         this.destination = destination;
@@ -81,7 +81,7 @@ public class FolderCreationDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void on_signal_new_folder_name_edit_text_edited () {
-        if (!ui.new_folder_name_edit.text ().is_empty () && QDir (this.destination + "/" + ui.new_folder_name_edit.text ()).exists ()) {
+        if (!ui.new_folder_name_edit.text () == "" && QDir (this.destination + "/" + ui.new_folder_name_edit.text ()).exists ()) {
             ui.label_error_message.visible (true);
         } else {
             ui.label_error_message.visible (false);

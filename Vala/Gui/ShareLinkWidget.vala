@@ -80,7 +80,7 @@ public class ShareLinkWidget : Gtk.Widget {
         string share_path,
         string local_path,
         SharePermissions max_sharing_permissions,
-        Gtk.Widget parent = null) {
+        Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.ui = new Ui.ShareLinkWidget ();
         this.account = account;
@@ -144,7 +144,7 @@ public class ShareLinkWidget : Gtk.Widget {
         this.ui.sharelink_progress_indicator.visible (false);
 
         // check if the file is already inside of a synced folder
-        if (share_path.is_empty ()) {
+        if (share_path == "") {
             GLib.warning ("Unable to share files not in a sync folder.");
             return;
         }
@@ -252,7 +252,7 @@ public class ShareLinkWidget : Gtk.Widget {
         this.note_link_action = this.link_context_menu.add_action (_("Note to recipient"));
         this.note_link_action.checkable (true);
 
-        if (this.link_share.note ().is_simple_text () && !this.link_share.note ().is_empty ()) {
+        if (this.link_share.note ().is_simple_text () && !this.link_share.note () == "") {
             this.ui.text_edit_note.on_signal_text (this.link_share.note ());
             this.note_link_action.checked (true);
             toggle_note_options ();
@@ -425,9 +425,9 @@ public class ShareLinkWidget : Gtk.Widget {
     ***********************************************************/
     public void on_signal_create_share_requires_password (string message);
     void ShareLinkWidget.on_signal_create_share_requires_password (string message) {
-        on_signal_toggle_share_link_animation (message.is_empty ());
+        on_signal_toggle_share_link_animation (message == "");
 
-        if (!message.is_empty ()) {
+        if (!message == "") {
             this.ui.error_label.on_signal_text (message);
             this.ui.error_label.show ();
         }
@@ -460,7 +460,7 @@ public class ShareLinkWidget : Gtk.Widget {
     ***********************************************************/
     private void on_signal_create_password ();
     void ShareLinkWidget.on_signal_create_password () {
-        if (!this.link_share || this.ui.line_edit_password.text ().is_empty ()) {
+        if (!this.link_share || this.ui.line_edit_password.text () == "") {
             return;
         }
 
@@ -507,7 +507,7 @@ public class ShareLinkWidget : Gtk.Widget {
     private void on_signal_create_note ();
     void ShareLinkWidget.on_signal_create_note () {
         const var note = this.ui.text_edit_note.to_plain_text ();
-        if (!this.link_share || this.link_share.note () == note || note.is_empty ()) {
+        if (!this.link_share || this.link_share.note () == note || note == "") {
             return;
         }
 
@@ -522,7 +522,7 @@ public class ShareLinkWidget : Gtk.Widget {
     private void on_signal_copy_link_share (bool clicked) {
         //  Q_UNUSED (clicked);
 
-        QApplication.clipboard ().on_signal_text (this.link_share.share_link ().to_string ());
+        Gtk.Application.clipboard ().on_signal_text (this.link_share.share_link ().to_string ());
     }
 
 
@@ -580,7 +580,7 @@ public class ShareLinkWidget : Gtk.Widget {
     ***********************************************************/
     private void on_signal_create_label () {
         const var label_text = this.share_link_edit.text ();
-        if (!this.link_share || this.link_share.label () == label_text || label_text.is_empty ()) {
+        if (!this.link_share || this.link_share.label () == label_text || label_text == "") {
             return;
         }
         this.share_link_widget_action.checked (true);
@@ -628,7 +628,7 @@ public class ShareLinkWidget : Gtk.Widget {
         this.ui.confirm_note.visible (enable);
         this.ui.text_edit_note.on_signal_text (enable && this.link_share ? this.link_share.note (): "");
 
-        if (!enable && this.link_share && !this.link_share.note ().is_empty ()) {
+        if (!enable && this.link_share && !this.link_share.note () == "") {
             this.link_share.note ({});
         }
     }
@@ -711,7 +711,7 @@ public class ShareLinkWidget : Gtk.Widget {
     ***********************************************************/
     private static string share_name () {
         string name = this.link_share.name ();
-        if (!name.is_empty ()) {
+        if (!name == "") {
             return name;
         }
         if (!this.names_supported) {
@@ -764,7 +764,7 @@ public class ShareLinkWidget : Gtk.Widget {
     ***********************************************************/
     private void display_share_link_label () {
         this.share_link_elided_label.clear ();
-        if (!this.link_share.label ().is_empty ()) {
+        if (!this.link_share.label () == "") {
             this.share_link_elided_label.on_signal_text (string (" (%1)").printf (this.link_share.label ()));
         }
     }

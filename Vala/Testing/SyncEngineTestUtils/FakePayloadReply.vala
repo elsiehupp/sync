@@ -10,7 +10,7 @@ public class FakePayloadReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.ByteArray body;
+    public string body;
 
     /***********************************************************
     ***********************************************************/
@@ -18,14 +18,14 @@ public class FakePayloadReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public FakePayloadReply (Soup.Operation operation, Soup.Request request, GLib.ByteArray body, GLib.Object parent) {
+    public FakePayloadReply (Soup.Operation operation, Soup.Request request, string body, GLib.Object parent) {
         FakePayloadReply (operation, request, body, FakePayloadReply.DEFAULT_DELAY, parent);
     }
 
     /***********************************************************
     ***********************************************************/
     public FakePayloadReply (
-        Soup.Operation operation, Soup.Request request, GLib.ByteArray body, int delay, GLib.Object parent) {
+        Soup.Operation operation, Soup.Request request, string body, int delay, GLib.Object parent) {
         base (parent);
         this.body = body;
         set_request (request);

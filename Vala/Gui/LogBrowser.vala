@@ -35,7 +35,7 @@ public class LogBrowser : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public LogBrowser (Gtk.Widget parent = null) {
+    public LogBrowser (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
         object_name ("LogBrowser"); // for save/restore_geometry ()

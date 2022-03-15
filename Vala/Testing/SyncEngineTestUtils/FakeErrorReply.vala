@@ -10,12 +10,12 @@ public class FakeErrorReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.ByteArray body;
+    public string body;
 
     /***********************************************************
     ***********************************************************/
     public FakeErrorReply (Soup.Operation operation, Soup.Request request,
-        GLib.Object parent, int http_error_code, GLib.ByteArray body = GLib.ByteArray ()) {
+        GLib.Object parent, int http_error_code, string body = "") {
             base (parent);
             this.body = body;
             set_request (request);

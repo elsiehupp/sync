@@ -102,8 +102,8 @@ public class EmojiCategoriesModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public override GLib.HashTable<int, GLib.ByteArray> role_names () {
-        GLib.HashTable<int, GLib.ByteArray> roles;
+    public override GLib.HashTable<int, string> role_names () {
+        GLib.HashTable<int, string> roles;
         roles[Roles.EMOJI_ROLE] = "emoji";
         roles[Roles.LABEL_ROLE] = "label";
         return roles;

@@ -136,10 +136,10 @@ public class SyncFileStatusTracker : GLib.Object {
             }
 
             SharedFlag shared_flag = item.remote_perm.has_permission (RemotePermissions.Permissions.IS_SHARED) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED;
-            if (item.instruction != CSYNC_INSTRUCTION_NONE
-                && item.instruction != CSYNC_INSTRUCTION_UPDATE_METADATA
-                && item.instruction != CSYNC_INSTRUCTION_IGNORE
-                && item.instruction != CSYNC_INSTRUCTION_ERROR) {
+            if (item.instruction != SyncInstructions.NONE
+                && item.instruction != SyncInstructions.UPDATE_METADATA
+                && item.instruction != SyncInstructions.IGNORE
+                && item.instruction != SyncInstructions.ERROR) {
                 // Mark this path as syncing for instructions that will result in propagation.
                 inc_sync_count_and_emit_status_changed (item.destination (), shared_flag);
             } else {
@@ -184,10 +184,10 @@ public class SyncFileStatusTracker : GLib.Object {
         }
 
         SharedFlag shared_flag = item.remote_perm.has_permission (RemotePermissions.Permissions.IS_SHARED) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED;
-        if (item.instruction != CSYNC_INSTRUCTION_NONE
-            && item.instruction != CSYNC_INSTRUCTION_UPDATE_METADATA
-            && item.instruction != CSYNC_INSTRUCTION_IGNORE
-            && item.instruction != CSYNC_INSTRUCTION_ERROR) {
+        if (item.instruction != SyncInstructions.NONE
+            && item.instruction != SyncInstructions.UPDATE_METADATA
+            && item.instruction != SyncInstructions.IGNORE
+            && item.instruction != SyncInstructions.ERROR) {
             // dec_sync_count calls must* be symetric with inc_sync_count calls in on_signal_about_to_propagate
             dec_sync_count_and_emit_status_changed (item.destination (), shared_flag);
         } else {
@@ -408,7 +408,7 @@ public class SyncFileStatusTracker : GLib.Object {
     ***********************************************************/
     private static bool has_error_status (SyncFileItem item) {
         var status = item.status;
-        return item.instruction == CSYNC_INSTRUCTION_ERROR
+        return item.instruction == SyncInstructions.ERROR
             || status == SyncFileItem.Status.NORMAL_ERROR
             || status == SyncFileItem.Status.FATAL_ERROR
             || status == SyncFileItem.Status.DETAIL_ERROR
@@ -421,7 +421,7 @@ public class SyncFileStatusTracker : GLib.Object {
     ***********************************************************/
     private static bool has_excluded_status (SyncFileItem item) {
         var status = item.status;
-        return item.instruction == CSYNC_INSTRUCTION_IGNORE
+        return item.instruction == SyncInstructions.IGNORE
             || status == SyncFileItem.Status.FILE_IGNORED
             || status == SyncFileItem.Status.CONFLICT
             || status == SyncFileItem.Status.RESTORATION

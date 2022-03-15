@@ -27,7 +27,7 @@ public class FakeChunkMoveReply : FakeReply {
     ***********************************************************/
     public static FileInfo perform (FileInfo uploads_file_info, FileInfo remote_root_file_info, Soup.Request request) {
         string source = get_file_path_from_url (request.url ());
-        GLib.assert_true (!source.is_empty ());
+        GLib.assert_true (!source == "");
         GLib.assert_true (source.ends_with ("/.file"));
         source = source.left (source.length () - (int) (qstrlen ("/.file")));
 
@@ -39,7 +39,7 @@ public class FakeChunkMoveReply : FakeReply {
         char payload = '\0';
 
         string filename = get_file_path_from_url (GLib.Uri.from_encoded (request.raw_header ("Destination")));
-        GLib.assert_true (!filename.is_empty ());
+        GLib.assert_true (!filename == "");
 
         // Compute the size and content from the chunks if possible
         foreach (var chunk_name in source_folder.children.keys ()) {
@@ -60,7 +60,7 @@ public class FakeChunkMoveReply : FakeReply {
             GLib.assert_true (request.has_raw_header ("If"));
 
             // And it should condition on the destination file
-            var on_signal_start = GLib.ByteArray ("<" + request.raw_header ("Destination") + ">");
+            var on_signal_start = string ("<" + request.raw_header ("Destination") + ">");
             GLib.assert_true (request.raw_header ("If").starts_with (on_signal_start));
 
             if (request.raw_header ("If") != on_signal_start + " ([\"" + file_info.etag + "\"])") {

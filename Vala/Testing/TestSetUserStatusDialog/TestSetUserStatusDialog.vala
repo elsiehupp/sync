@@ -628,10 +628,10 @@ public class TestSetUserStatusDialog : GLib.Object {
 
         fake_user_status_job.set_error_could_not_set_user_status_message (true);
         model.set_user_status ();
-        GLib.assert_true (!model.error_message ().is_empty ());
+        GLib.assert_true (!model.error_message () == "");
         fake_user_status_job.set_error_could_not_set_user_status_message (false);
         model.set_user_status ();
-        GLib.assert_true (model.error_message ().is_empty ());
+        GLib.assert_true (model.error_message () == "");
     }
 
 
@@ -643,10 +643,10 @@ public class TestSetUserStatusDialog : GLib.Object {
 
         fake_user_status_job.set_error_could_not_set_user_status_message (true);
         model.set_user_status ();
-        GLib.assert_true (!model.error_message ().is_empty ());
+        GLib.assert_true (!model.error_message () == "");
         fake_user_status_job.set_error_could_not_set_user_status_message (false);
         model.clear_user_status ();
-        GLib.assert_true (model.error_message ().is_empty ());
+        GLib.assert_true (model.error_message () == "");
     }
 
 }

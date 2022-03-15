@@ -100,8 +100,8 @@ public class ServerNotificationHandler : GLib.Object {
             a.icon = json.value ("icon").to_string ();
 
             GLib.Uri link = new GLib.Uri (json.value ("link").to_string ());
-            if (!link.is_empty ()) {
-                if (link.host ().is_empty ()) {
+            if (!link == "") {
+                if (link.host () == "") {
                     link.scheme (ai.account ().url ().scheme ());
                     link.host (ai.account ().url ().host ());
                 }
@@ -143,7 +143,7 @@ public class ServerNotificationHandler : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_etag_response_header_received (GLib.ByteArray value, int status_code) {
+    private void on_signal_etag_response_header_received (string value, int status_code) {
         if (status_code == SUCCESS_STATUS_CODE) {
             GLib.warning ("New Notification ETag Response Header received " + value.to_string ());
             var account = ((AccountState) sender ()).property (PROPERTY_ACCOUNT_STATE);

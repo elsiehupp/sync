@@ -166,7 +166,7 @@ public class FolderMetadata : GLib.Object {
 
 
     /***********************************************************
-    Use std.string and GLib.List internally on this class
+    Use string and GLib.List internally on this class
     to ease the port to Nlohmann Json API
     ***********************************************************/
     private void up_empty_metadata () {

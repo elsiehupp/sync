@@ -63,7 +63,7 @@ public class GeneralSettings : Gtk.Widget {
 
             const var logger = Occ.Logger.instance ();
 
-            if (!logger.log_dir ().is_empty ()) {
+            if (!logger.log_dir () == "") {
                 list.append ({"", "logs"});
 
                 QDir directory = new QDir (logger.log_dir ());
@@ -71,7 +71,7 @@ public class GeneralSettings : Gtk.Widget {
                 std.transform (std.cbegin (info_list), std.cend (info_list),
                             std.back_inserter (list),
                             file_info_to_log_zip_entry);
-            } else if (!logger.log_file ().is_empty ()) {
+            } else if (!logger.log_file () == "") {
                 list.append (file_info_to_zip_entry (GLib.FileInfo (logger.log_file ())));
             }
 
@@ -88,7 +88,7 @@ public class GeneralSettings : Gtk.Widget {
 
             QZipWriter zip = new QZipWriter (filename);
             foreach (var entry in entries) {
-                if (entry.local_filename.is_empty ()) {
+                if (entry.local_filename == "") {
                     zip.add_directory (entry.zip_filename);
                 } else {
                     GLib.File file = GLib.File.new_for_path (entry.local_filename);
@@ -114,7 +114,7 @@ public class GeneralSettings : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public GeneralSettings (Gtk.Widget parent = null) {
+    public GeneralSettings (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.ui = new Ui.GeneralSettings ();
         this.ui.up_ui (this);
@@ -317,7 +317,7 @@ public class GeneralSettings : Gtk.Widget {
     ***********************************************************/
     private void on_signal_create_debug_archive () {
         const var filename = QFileDialog.save_filename (this, _("Create Debug Archive"), "", _("Zip Archives") + " (*.zip)");
-        if (filename.is_empty ()) {
+        if (filename == "") {
             return;
         }
 
@@ -382,7 +382,7 @@ public class GeneralSettings : Gtk.Widget {
                 this.ui.restart_button,
                 QAbstractButton.clicked,
                 Gtk.Application,
-                QApplication.quit,
+                Gtk.Application.quit,
                 Qt.UniqueConnection
             );
             connect (

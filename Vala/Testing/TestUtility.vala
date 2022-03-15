@@ -129,12 +129,12 @@ public class TestUtility : GLib.Object {
             // and command works without X in CI
             string version = version_of_installed_binary (OWNCLOUD_BIN_PATH + "/" + APPLICATION_EXECUTABLE + "command");
             GLib.debug ("Version of installed Nextcloud: " + version);
-            GLib.assert_true (!version.is_empty ());
+            GLib.assert_true (!version == "");
 
             const QRegularExpression rx = new QRegularExpression (QRegularExpression.anchored_pattern (APPLICATION_SHORTNAME + " ( version \d+\.\d+\.\d+.*)"));
             GLib.assert_true (rx.match (version).has_match ());
         } else {
-            GLib.assert_true (version_of_installed_binary ().is_empty ());
+            GLib.assert_true (version_of_installed_binary () == "");
         }
     }
 
@@ -235,7 +235,7 @@ public class TestUtility : GLib.Object {
     }
 
     void test_normalize_etag () {
-        GLib.ByteArray string_value;
+        string string_value;
     }
 
     int CHECK_NORMALIZE_ETAG (string TEST, string EXPECT) {

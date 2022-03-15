@@ -105,7 +105,7 @@ public class SyncRunFileLog : GLib.Object {
     public void log_item (SyncFileItem item) {
         // don't log the directory items that are in the list
         if (item.direction == SyncFileItem.Direction.NONE
-            || item.instruction == CSYNC_INSTRUCTION_IGNORE) {
+            || item.instruction == SyncInstructions.IGNORE) {
             return;
         }
         string ts = string.from_latin1 (item.response_time_stamp);
@@ -120,7 +120,7 @@ public class SyncRunFileLog : GLib.Object {
         const char L = '|';
         this.out + ts + L;
         this.out + L;
-        if (item.instruction != CSYNC_INSTRUCTION_RENAME) {
+        if (item.instruction != SyncInstructions.RENAME) {
             this.out + item.destination () + L;
         } else {
             this.out + item.file + " . " + item.rename_target + L;

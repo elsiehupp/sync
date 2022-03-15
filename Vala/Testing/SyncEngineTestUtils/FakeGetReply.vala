@@ -25,7 +25,7 @@ public class FakeGetReply : FakeReply {
         open (QIODevice.ReadOnly);
     
         string filename = get_file_path_from_url (request.url ());
-        GLib.assert_true (!filename.is_empty ());
+        GLib.assert_true (!filename == "");
         file_info = remote_root_file_info.find (filename);
         if (!file_info) {
             GLib.debug ("meh;");

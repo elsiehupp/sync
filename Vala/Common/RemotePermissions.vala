@@ -76,8 +76,8 @@ public class RemotePermissions {
     /***********************************************************
     array with one character per permission, "" is null, " " is non-null but empty
     ***********************************************************/
-    public GLib.ByteArray to_database_value () {
-        GLib.ByteArray result;
+    public string to_database_value () {
+        string result;
         if (is_null ())
             return result;
         result.reserve (Permissions.PERMISSIONS_COUNT);
@@ -85,7 +85,7 @@ public class RemotePermissions {
             if (this.value & (1 << i))
                 result.append (LETTERS[i]);
         }
-        if (result.is_empty ()) {
+        if (result == "") {
             // Make sure it is not empty so we can differentiate null and empty permissions
             result.append (' ');
         }
@@ -104,8 +104,8 @@ public class RemotePermissions {
     /***********************************************************
     read value that was written with to_database_value ()
     ***********************************************************/
-    public static RemotePermissions from_database_value (GLib.ByteArray value) {
-        if (value.is_empty ())
+    public static RemotePermissions from_database_value (string value) {
+        if (value == "")
             return {};
         RemotePermissions perm;
         perm.from_array (value.const_data ());

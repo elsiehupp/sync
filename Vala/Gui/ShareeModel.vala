@@ -165,7 +165,7 @@ public class ShareeModel : QAbstractListModel {
         const string share_with = data.value ("value").to_object ().value ("share_with").to_string ();
         Sharee.Type type = (Sharee.Type)data.value ("value").to_object ().value ("share_type").to_int ();
         const string additional_info = data.value ("value").to_object ().value ("share_with_additional_info").to_string ();
-        if (!additional_info.is_empty ()) {
+        if (!additional_info == "") {
             display_name = _("%1 (%2)", "sharee (share_with_additional_info)").printf (display_name, additional_info);
         }
 

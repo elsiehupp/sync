@@ -281,8 +281,8 @@ public class BulkPropagatorJob : PropagatorJob {
 
         // Files that were new on the remote shouldn't have online-only pin state
         // even if their parent folder is online-only.
-        if (one_file.item.instruction == CSYNC_INSTRUCTION_NEW
-            || one_file.item.instruction == CSYNC_INSTRUCTION_TYPE_CHANGE) {
+        if (one_file.item.instruction == SyncInstructions.NEW
+            || one_file.item.instruction == SyncInstructions.TYPE_CHANGE) {
             var vfs = propagator ().sync_options.vfs;
             var pin = vfs.pin_state (one_file.item.file);
             if (pin && *pin == PinState.VfsItemAvailability.ONLINE_ONLY && !vfs.pin_state (one_file.item.file, PinState.PinState.UNSPECIFIED)) {
@@ -611,8 +611,8 @@ public class BulkPropagatorJob : PropagatorJob {
         }
 
         if (!item.etag == "" && item.etag != "empty_etag"
-            && item.instruction != CSYNC_INSTRUCTION_NEW // On new files never send a If-Match
-            && item.instruction != CSYNC_INSTRUCTION_TYPE_CHANGE) {
+            && item.instruction != SyncInstructions.NEW // On new files never send a If-Match
+            && item.instruction != SyncInstructions.TYPE_CHANGE) {
             // We add quotes because the owncloud server always adds quotes around the etag, and
             //  csync_owncloud.c's owncloud_file_id always strips the quotes.
             headers["If-Match"] = '"' + item.etag + '"';

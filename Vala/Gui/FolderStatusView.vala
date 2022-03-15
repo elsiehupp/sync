@@ -17,7 +17,7 @@ public class FolderStatusView : QTreeView {
 
     /***********************************************************
     ***********************************************************/
-    public FolderStatusView (Gtk.Widget parent = null) {
+    public FolderStatusView (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
     }
 

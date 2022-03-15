@@ -23,7 +23,7 @@ public class NotificationConfirmJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.ByteArray verb;
+    private string verb;
     private GLib.Uri link;
 
     /***********************************************************
@@ -46,7 +46,7 @@ public class NotificationConfirmJob : AbstractNetworkJob {
 
     @param verb currently supported GET PUT POST DELETE
     ***********************************************************/
-    public void link_and_verb (GLib.Uri link, GLib.ByteArray verb) {
+    public void link_and_verb (GLib.Uri link, string verb) {
         this.link = link;
         this.verb = verb;
     }

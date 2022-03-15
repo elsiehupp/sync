@@ -87,7 +87,7 @@ public class RemoteWipe : GLib.Object {
     fetch to <server>/index.php/core/wipe/check
     ***********************************************************/
     public void on_signal_start_check_job_with_app_password (string password) {
-        if (password.is_empty ()) {
+        if (password == "") {
             return;
         }
 
@@ -137,7 +137,7 @@ public class RemoteWipe : GLib.Object {
                 json_parse_error.error != QJsonParseError.NoError) {
             string error_reason;
             string error_from_json = json["error"].to_string ();
-            if (!error_from_json.is_empty ()) {
+            if (!error_from_json == "") {
                 GLib.warning ("Error returned from the server : <em>%1<em>"
                     .printf (error_from_json.to_html_escaped ()));
             } else if (this.network_reply_check.error () != Soup.Reply.NoError) {
@@ -227,7 +227,7 @@ public class RemoteWipe : GLib.Object {
                 json_parse_error.error != QJsonParseError.NoError) {
             string error_reason;
             string error_from_json = json["error"].to_string ();
-            if (!error_from_json.is_empty ()) {
+            if (!error_from_json == "") {
                 GLib.warning ("Error returned from the server: <em>%1</em>"
                     .printf (error_from_json.to_html_escaped ()));
             } else if (this.network_reply_success.error () != Soup.Reply.NoError) {

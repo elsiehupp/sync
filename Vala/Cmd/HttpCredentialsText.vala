@@ -13,17 +13,21 @@ public class HttpCredentialsText : HttpCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public HttpCredentialsText (string user, string password)
-        : HttpCredentials (user, password)
-        , // FIXME: not working with client certificates yet (qknight)
-        this.ssl_trusted (false) {
+    private bool ssl_trusted;
+
+    /***********************************************************
+    ***********************************************************/
+    public HttpCredentialsText (string user, string password) {
+        base (user, password);
+        // FIXME: not working with client certificates yet (qknight)
+        this.ssl_trusted = false;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void ask_from_user () override {
-        this.password = .query_password (user ());
+    public override void ask_from_user () {
+        this.password = query_password (user ());
         this.ready = true;
         persist ();
         /* emit */ asked ();
@@ -39,13 +43,9 @@ public class HttpCredentialsText : HttpCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public bool ssl_is_trusted () override {
+    public override bool ssl_is_trusted () {
         return this.ssl_trusted;
     }
 
-
-    /***********************************************************
-    ***********************************************************/
-    private bool this.ssl_trusted;
 }
 //  #endif /* TOKEN_AUTH_ONLY */

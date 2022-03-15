@@ -84,7 +84,7 @@ public class SlideShow : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public SlideShow (Gtk.Widget parent = null) {
+    public SlideShow (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.current_slide = 0;
         this.interval = 3500;

@@ -27,7 +27,7 @@ public class Flow2AuthWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public Flow2AuthWidget (Gtk.Widget parent = null) {
+    public Flow2AuthWidget (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.progress_indicator = new QProgressIndicator (this);
         this.ui.setupUi (this);
@@ -87,7 +87,7 @@ public class Flow2AuthWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public void error (string error) {
-        if (error.is_empty ()) {
+        if (error == "") {
             this.ui.error_label.hide ();
         } else {
             this.ui.error_label.text (error);

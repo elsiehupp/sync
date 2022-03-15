@@ -170,7 +170,7 @@ public class Share : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_password_set (QJsonDocument reply, GLib.Variant value) {
-        this.is_password_set = !value.to_string ().is_empty ();
+        this.is_password_set = !value.to_string () == "";
         /* emit */ signal_password_set ();
     }
 

@@ -15,6 +15,11 @@ public class PreparedSqlQueryManager {
 
     /***********************************************************
     ***********************************************************/
+    private SqlQuery queries[Key.PREPARED_QUERY_COUNT];
+    //  private Q_DISABLE_COPY (PreparedSqlQueryManager)
+
+    /***********************************************************
+    ***********************************************************/
     public enum Key {
         GET_FILE_RECORD_QUERY,
         GET_FILE_RECORD_QUERY_BY_MANGLED_NAME,
@@ -61,47 +66,37 @@ public class PreparedSqlQueryManager {
 
 
     /***********************************************************
-    ***********************************************************/
-    public PreparedSqlQueryManager () = default;
-
-
-    /***********************************************************
     The queries are reset in the destructor to prevent wal locks
     ***********************************************************/
-    public const PreparedSqlQuery get (Key key) {
+    public PreparedSqlQuery get_for_key (Key key) {
         var query = this.queries[key];
-        ENFORCE (query.stmt)
+        //  ENFORCE (query.stmt)
         //  Q_ASSERT (!Sqlite3StmtBusy (query.stmt));
-        return {
+        return new PreparedSqlQuery (
             query
-        }
+        );
     }
 
 
     /***********************************************************
     Prepare the SqlQuery if it was not prepared yet.
     ***********************************************************/
-    public const PreparedSqlQuery get (Key key, GLib.ByteArray sql, SqlDatabase database) {
+    public PreparedSqlQuery get_for_key_sql_and_database (Key key, string sql, SqlDatabase database) {
         var query = this.queries[key];
         //  Q_ASSERT (!Sqlite3StmtBusy (query.stmt));
-        ENFORCE (!query.sqldb || database == query.sqldb)
+        //  ENFORCE (!query.sqldb || database == query.sqldb)
         if (!query.stmt) {
             query.sqldb = database;
             query.db = database.sqlite_db ();
-            return {
+            return new PreparedSqlQuery (
                 query, query.prepare (sql) == 0
-            }
+            );
         }
-        return {
+        return new PreparedSqlQuery (
             query
-        }
+        );
     }
 
-
-    /***********************************************************
-    ***********************************************************/
-    private SqlQuery this.queries[Key.PREPARED_QUERY_COUNT];
-    private Q_DISABLE_COPY (PreparedSqlQueryManager)
 }
 
 }

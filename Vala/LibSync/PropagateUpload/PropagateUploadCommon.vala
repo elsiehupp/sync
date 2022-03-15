@@ -522,8 +522,8 @@ public class PropagateUploadFileCommon : PropagateItemJob {
 
         // Files that were new on the remote shouldn't have online-only pin state
         // even if their parent folder is online-only.
-        if (this.item.instruction == CSYNC_INSTRUCTION_NEW
-            || this.item.instruction == CSYNC_INSTRUCTION_TYPE_CHANGE) {
+        if (this.item.instruction == SyncInstructions.NEW
+            || this.item.instruction == SyncInstructions.TYPE_CHANGE) {
             var vfs = propagator ().sync_options.vfs;
             var pin = vfs.pin_state (this.item.file);
             if (pin && *pin == PinState.VfsItemAvailability.ONLINE_ONLY) {
@@ -741,8 +741,8 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         }
 
         if (!this.item.etag == "" && this.item.etag != "empty_etag"
-            && this.item.instruction != CSYNC_INSTRUCTION_NEW // On new files never send a If-Match
-            && this.item.instruction != CSYNC_INSTRUCTION_TYPE_CHANGE
+            && this.item.instruction != SyncInstructions.NEW // On new files never send a If-Match
+            && this.item.instruction != SyncInstructions.TYPE_CHANGE
             && !this.delete_existing) {
             // We add quotes because the owncloud server always adds quotes around the etag, and
             //  csync_owncloud.c's owncloud_file_id always strips the quotes.

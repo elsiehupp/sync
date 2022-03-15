@@ -103,7 +103,7 @@ public class FolderWatcherPrivate : GLib.Object {
             if (event.len == 0 || event.wd <= -1) {
                 continue;
             }
-            GLib.ByteArray filename = new GLib.ByteArray (event.name);
+            string filename = new string (event.name);
             // Filter out journal changes - redundant with filtering in
             // FolderWatcher.path_is_ignored.
             if (filename.starts_with (".sync_")
@@ -195,7 +195,7 @@ public class FolderWatcherPrivate : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected void inotify_register_path (string path) {
-        if (path.is_empty ())
+        if (path == "")
             return;
 
         int wd = inotify_add_watch (this.fd, path.to_utf8 ().const_data (),

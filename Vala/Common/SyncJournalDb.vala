@@ -45,7 +45,7 @@ public class SyncJournalDb : GLib.Object {
     ***********************************************************/
     public class DownloadInfo {
         string tmpfile;
-        GLib.ByteArray etag;
+        string etag;
         int error_count = 0;
         bool valid = false;
     }
@@ -60,7 +60,7 @@ public class SyncJournalDb : GLib.Object {
         int64 modtime = 0;
         int error_count = 0;
         bool valid = false;
-        GLib.ByteArray content_checksum;
+        string content_checksum;
         /***********************************************************
         Returns true if this entry refers to a chunked upload that can be continued.
         (As opposed to a small file transfer which is stored in the database so we can detect the case
@@ -106,7 +106,7 @@ public class SyncJournalDb : GLib.Object {
 
         Returns none on database error.
         ***********************************************************/
-        Optional<PinState> raw_for_path (GLib.ByteArray path) {
+        Optional<PinState> raw_for_path (string path) {
             QMutexLocker lock = new QMutexLocker (this.database.mutex);
             if (!this.database.check_connect ())
                 return {};
@@ -144,7 +144,7 @@ public class SyncJournalDb : GLib.Object {
 
         Returns none on database error.
         ***********************************************************/
-        Optional<PinState> effective_for_path (GLib.ByteArray path) {
+        Optional<PinState> effective_for_path (string path) {
             QMutexLocker lock = new QMutexLocker (this.database.mutex);
             if (!this.database.check_connect ())
                 return {};
@@ -186,7 +186,7 @@ public class SyncJournalDb : GLib.Object {
         It's valid to use the root path "".
         Returns none on database error.
         ***********************************************************/
-        Optional<PinState> effective_for_path_recursive (GLib.ByteArray path) {
+        Optional<PinState> effective_for_path_recursive (string path) {
             // Get the item's effective pin state. We'll compare subitem's pin states
             // against this.
             PreparedSqlQuery base_pin = effective_for_path (path);
@@ -230,7 +230,7 @@ public class SyncJournalDb : GLib.Object {
         The path should not have a trailing slash.
         It's valid to use the root path "".
         ***********************************************************/
-        void for_path (GLib.ByteArray path, PinState state) {
+        void for_path (string path, PinState state) {
             QMutexLocker lock = new QMutexLocker (this.database.mutex);
             if (!this.database.check_connect ())
                 return;
@@ -258,7 +258,7 @@ public class SyncJournalDb : GLib.Object {
         The path should not have a trailing slash.
         The path "" wipes every entry.
         ***********************************************************/
-        void wipe_for_path_and_below (GLib.ByteArray path) {
+        void wipe_for_path_and_below (string path) {
             QMutexLocker lock = new QMutexLocker (this.database.mutex);
             if (!this.database.check_connect ())
                 return;
@@ -280,7 +280,7 @@ public class SyncJournalDb : GLib.Object {
         Returns nothing on database error.
         Note that this will have an entry for "".
         ***********************************************************/
-        Optional<GLib.Vector<QPair<GLib.ByteArray, PinState>>> raw_list () {
+        Optional<GLib.Vector<QPair<string, PinState>>> raw_list () {
             QMutexLocker lock = new QMutexLocker (this.database.mutex);
             if (!this.database.check_connect ())
                 return {};
@@ -288,7 +288,7 @@ public class SyncJournalDb : GLib.Object {
             SqlQuery query = new SqlQuery ("SELECT path, pin_state FROM flags;", this.database.database);
             query.exec ();
     
-            GLib.Vector<QPair<GLib.ByteArray, PinState>> result;
+            GLib.Vector<QPair<string, PinState>> result;
             while (true) {
                 var next = query.next ();
                 if (!next.ok)
@@ -314,7 +314,7 @@ public class SyncJournalDb : GLib.Object {
     ***********************************************************/
     private QRecursiveMutex mutex;
 
-    private GLib.HashTable<GLib.ByteArray, int> checksym_type_cache;
+    private GLib.HashTable<string, int> checksym_type_cache;
     private int transaction;
     private bool metadata_table_is_empty;
 
@@ -334,7 +334,7 @@ public class SyncJournalDb : GLib.Object {
 
     The contained paths have a trailing /.
     ***********************************************************/
-    private GLib.List<GLib.ByteArray> etag_storage_filter;
+    private GLib.List<string> etag_storage_filter;
 
 
     /***********************************************************
@@ -343,7 +343,7 @@ public class SyncJournalDb : GLib.Object {
     Typically WAL initially, but may be set to other modes via environment
     variable, for specific filesystems, or when WAL fails in a particular way.
     ***********************************************************/
-    private GLib.ByteArray journal_mode;
+    private string journal_mode;
 
 
     /***********************************************************
@@ -367,9 +367,9 @@ public class SyncJournalDb : GLib.Object {
         this.transaction = 0;
         this.metadata_table_is_empty = false;
         // Allow forcing the journal mode for debugging
-        /*static*/ GLib.ByteArray env_journal_mode = qgetenv ("OWNCLOUD_SQLITE_JOURNAL_MODE");
+        /*static*/ string env_journal_mode = qgetenv ("OWNCLOUD_SQLITE_JOURNAL_MODE");
         this.journal_mode = env_journal_mode;
-        if (this.journal_mode.is_empty ()) {
+        if (this.journal_mode == "") {
             this.journal_mode = default_journal_mode (this.database_file);
         }
     }
@@ -391,7 +391,7 @@ public class SyncJournalDb : GLib.Object {
 
         string key = "%1@%2:%3".printf (user, remote_url.to_string (), remote_path);
 
-        GLib.ByteArray ba = QCryptographicHash.hash (key.to_utf8 (), QCryptographicHash.Md5);
+        string ba = QCryptographicHash.hash (key.to_utf8 (), QCryptographicHash.Md5);
         journal_path += string.from_latin1 (ba.left (6).to_hex ()) + ".db";
 
         // If it exists already, the path is clearly usable
@@ -416,7 +416,7 @@ public class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    static GLib.ByteArray default_journal_mode (string db_path) {
+    static string default_journal_mode (string db_path) {
         //  Q_UNUSED (db_path)
         return "WAL";
     }
@@ -498,7 +498,7 @@ public class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public bool get_file_record (GLib.ByteArray filename, SyncJournalFileRecord record) {
+    public bool get_file_record (string filename, SyncJournalFileRecord record) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
 
         // Reset the output var in case the caller is reusing it.
@@ -512,7 +512,7 @@ public class SyncJournalDb : GLib.Object {
         if (!check_connect ())
             return false;
 
-        if (!filename.is_empty ()) {
+        if (!filename == "") {
             PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_FILE_RECORD_QUERY, GET_FILE_RECORD_QUERY + " WHERE phash=?1", this.database);
             if (!query) {
                 return false;
@@ -558,7 +558,7 @@ public class SyncJournalDb : GLib.Object {
             return false;
         }
 
-        if (!mangled_name.is_empty ()) {
+        if (!mangled_name == "") {
             PreparedSqlQuery query = this.query_manager.get (
                 PreparedSqlQueryManager.Key.GET_FILE_RECORD_QUERY_BY_MANGLED_NAME,
                 GET_FILE_RECORD_QUERY + " WHERE e2e_mangled_name=?1",
@@ -630,10 +630,10 @@ public class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public bool get_file_records_by_file_id (GLib.ByteArray file_id, RowCallback row_callback) {
+    public bool get_file_records_by_file_id (string file_id, RowCallback row_callback) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
 
-        if (file_id.is_empty () || this.metadata_table_is_empty)
+        if (file_id == "" || this.metadata_table_is_empty)
             return true; // no error, yet nothing found (record.is_valid () == false)
 
         if (!check_connect ())
@@ -670,7 +670,7 @@ public class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public bool get_files_below_path (GLib.ByteArray path, RowCallback row_callback) {
+    public bool get_files_below_path (string path, RowCallback row_callback) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
 
         if (this.metadata_table_is_empty) {
@@ -700,7 +700,7 @@ public class SyncJournalDb : GLib.Object {
         //      return true;
         //  }
 
-        if (path.is_empty ()) {
+        if (path == "") {
             // Since the path column doesn't store the starting /, the get_files_below_path_query
             // can't be used for the root path "". It would scan for (path > '/' and path < '0')
             // and find nothing. So, unfortunately, we have to use a different query for
@@ -739,7 +739,7 @@ public class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public bool list_files_in_path (GLib.ByteArray path, RowCallback row_callback) {
+    public bool list_files_in_path (string path, RowCallback row_callback) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
 
         if (this.metadata_table_is_empty)
@@ -786,10 +786,10 @@ public class SyncJournalDb : GLib.Object {
         SyncJournalFileRecord record = this.record;
         QMutexLocker locker = new QMutexLocker (this.mutex);
 
-        if (!this.etag_storage_filter.is_empty ()) {
+        if (!this.etag_storage_filter == "") {
             // If we are a directory that should not be read from database next time, don't write the etag
-            GLib.ByteArray prefix = record.path + "/";
-            foreach (GLib.ByteArray it in this.etag_storage_filter) {
+            string prefix = record.path + "/";
+            foreach (string it in this.etag_storage_filter) {
                 if (it.starts_with (prefix)) {
                     GLib.info ("Filtered writing the etag of" + prefix + "because it is a prefix of" + it);
                     record.etag = "this.invalid_";
@@ -809,15 +809,15 @@ public class SyncJournalDb : GLib.Object {
         if (check_connect ()) {
             int plen = record.path.length ();
 
-            GLib.ByteArray etag = new GLib.ByteArray (record.etag);
-            if (etag.is_empty ())
+            string etag = new string (record.etag);
+            if (etag == "")
                 etag = "";
-            GLib.ByteArray file_id = new GLib.ByteArray (record.file_id);
-            if (file_id.is_empty ())
+            string file_id = new string (record.file_id);
+            if (file_id == "")
                 file_id = "";
-            GLib.ByteArray remote_perm = record.remote_perm.to_database_value ();
-            GLib.ByteArray checksum_type;
-            GLib.ByteArray checksum;
+            string remote_perm = record.remote_perm.to_database_value ();
+            string checksum_type;
+            string checksum;
             parse_checksum_header (record.checksum_header, checksum_type, checksum);
             int content_checksum_type_id = map_checksum_type (checksum_type);
 
@@ -971,8 +971,8 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool update_file_record_checksum (string filename,
-        GLib.ByteArray content_checksum,
-        GLib.ByteArray content_checksum_type) {
+        string content_checksum,
+        string content_checksum_type) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
 
         GLib.info ("Updating file checksum" + filename + content_checksum + content_checksum_type);
@@ -1036,7 +1036,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     Returns whether the item or any subitems are dehydrated
     ***********************************************************/
-    public Optional<HasHydratedDehydrated> has_hydrated_or_dehydrated_files (GLib.ByteArray filename) {
+    public Optional<HasHydratedDehydrated> has_hydrated_or_dehydrated_files (string filename) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
         if (!check_connect ())
             return {};
@@ -1062,9 +1062,9 @@ public class SyncJournalDb : GLib.Object {
             if (!next.has_data)
                 break;
             var type = static_cast<ItemType> (query.int_value (0));
-            if (type == ItemTypeFile || type == ItemTypeVirtualFileDehydration)
+            if (type == ItemType.FILE || type == ItemType.VIRTUAL_FILE_DEHYDRATION)
                 result.has_hydrated = true;
-            if (type == ItemTypeVirtualFile || type == ItemTypeVirtualFileDownload)
+            if (type == ItemType.VIRTUAL_FILE || type == ItemType.VIRTUAL_FILE_DOWNLOAD)
                 result.has_dehydrated = true;
         }
 
@@ -1076,7 +1076,7 @@ public class SyncJournalDb : GLib.Object {
     ***********************************************************/
     public bool exists () {
         QMutexLocker locker = new QMutexLocker (this.mutex);
-        return (!this.database_file.is_empty () && GLib.File.exists (this.database_file));
+        return (!this.database_file == "" && GLib.File.exists (this.database_file));
     }
 
 
@@ -1106,11 +1106,11 @@ public class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static int64 get_pHash (GLib.ByteArray file) {
+    public static int64 get_pHash (string file) {
         int64 h = 0;
         int len = file.length ();
 
-        h = c_jhash64 ( (uint8_t *)file.data (), len, 0);
+        h = c_jhash64 ( (uint8 *)file.data (), len, 0);
         return h;
     }
 
@@ -1156,7 +1156,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void wipe_error_blocklist_entry (string file) {
-        if (file.is_empty ()) {
+        if (file == "") {
             return;
         }
 
@@ -1478,7 +1478,7 @@ public class SyncJournalDb : GLib.Object {
         QMutexLocker locker = new QMutexLocker (this.mutex);
         SyncJournalErrorBlocklistRecord entry;
 
-        if (file.is_empty ())
+        if (file == "")
             return entry;
 
         if (check_connect ()) {
@@ -1556,7 +1556,7 @@ public class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void avoid_renames_on_signal_next_sync (GLib.ByteArray path) {
+    public void avoid_renames_on_signal_next_sync (string path) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
 
         if (!check_connect ()) {
@@ -1582,7 +1582,7 @@ public class SyncJournalDb : GLib.Object {
             return;
         }
 
-        if (info.url.is_empty ()) {
+        if (info.url == "") {
             GLib.debug ("Deleting Poll job" + info.file);
             SqlQuery query = new SqlQuery ("DELETE FROM async_poll WHERE path=?", this.database);
             query.bind_value (1, info.file);
@@ -1749,7 +1749,7 @@ public class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void schedule_path_for_remote_discovery (GLib.ByteArray filename) {
+    public void schedule_path_for_remote_discovery (string filename) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
 
         if (!check_connect ()) {
@@ -1864,10 +1864,10 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     Returns the checksum type for an identifier.
     ***********************************************************/
-    public GLib.ByteArray get_checksum_type (int checksum_type_id) {
+    public string get_checksum_type (int checksum_type_id) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
         if (!check_connect ()) {
-            return GLib.ByteArray ();
+            return "";
         }
 
         // Retrieve the identifier
@@ -1877,12 +1877,12 @@ public class SyncJournalDb : GLib.Object {
         }
         query.bind_value (1, checksum_type_id);
         if (!query.exec ()) {
-            return GLib.ByteArray ();
+            return "";
         }
 
         if (!query.next ().has_data) {
             GLib.warning ("No checksum type mapping found for" + checksum_type_id);
-            return GLib.ByteArray ();
+            return "";
         }
         return query.byte_array_value (0);
     }
@@ -1891,7 +1891,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     The data-fingerprint used to detect backup
     ***********************************************************/
-    GLib.ByteArray data_fingerprint {
+    string data_fingerprint {
         set {
             QMutexLocker locker = new QMutexLocker (this.mutex);
             if (!check_connect ()) {
@@ -1912,20 +1912,20 @@ public class SyncJournalDb : GLib.Object {
         get {
             QMutexLocker locker = new QMutexLocker (this.mutex);
             if (!check_connect ()) {
-                return GLib.ByteArray ();
+                return "";
             }
 
             PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_DATA_FINGERPRINT_QUERY, QByteArrayLiteral ("SELECT fingerprint FROM datafingerprint"), this.database);
             if (!query) {
-                return GLib.ByteArray ();
+                return "";
             }
 
             if (!query.exec ()) {
-                return GLib.ByteArray ();
+                return "";
             }
 
             if (!query.next ().has_data) {
-                return GLib.ByteArray ();
+                return "";
             }
             return query.byte_array_value (0);
         }
@@ -1963,7 +1963,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     Retrieve a conflict record by path of the file with the conflict tag
     ***********************************************************/
-    public ConflictRecord conflict_record_for_path (GLib.ByteArray path) {
+    public ConflictRecord conflict_record_for_path (string path) {
         ConflictRecord entry;
 
         QMutexLocker locker = new QMutexLocker (this.mutex);
@@ -1990,7 +1990,7 @@ public class SyncJournalDb : GLib.Object {
     Delete a conflict record by path of the file with the
     conflict tag
     ***********************************************************/
-    public void delete_conflict_record (GLib.ByteArray path) {
+    public void delete_conflict_record (string path) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
         if (!check_connect ())
             return;
@@ -2029,18 +2029,18 @@ public class SyncJournalDb : GLib.Object {
 
     Will return an empty string if it's not even a conflict file by pattern.
     ***********************************************************/
-    public GLib.ByteArray conflict_file_base_name (GLib.ByteArray conflict_name) {
+    public string conflict_file_base_name (string conflict_name) {
         var conflict = conflict_record (conflict_name);
-        GLib.ByteArray result;
+        string result;
         //  if (conflict.is_valid ()) {
         //      get_file_records_by_file_id (conflict.base_file_id, [&result] (SyncJournalFileRecord record) => {
-        //          if (!record.path.is_empty ()) {
+        //          if (!record.path == "") {
         //              result = record.path;
         //          }
         //      });
         //  }
 
-        if (result.is_empty ()) {
+        if (result == "") {
             result = Utility.conflict_file_base_name_from_pattern (conflict_name);
         }
         return result;
@@ -2061,17 +2061,17 @@ public class SyncJournalDb : GLib.Object {
 
 
     /***********************************************************
-    Set the 'ItemTypeVirtualFileDownload' to all the files that have the ItemTypeVirtualFile flag
+    Set the 'ItemType.VIRTUAL_FILE_DOWNLOAD' to all the files that have the ItemType.VIRTUAL_FILE flag
     within the directory specified path path
 
     The path "" marks everything.
     ***********************************************************/
-    public void mark_virtual_file_for_download_recursively (GLib.ByteArray path) {
+    public void mark_virtual_file_for_download_recursively (string path) {
         QMutexLocker lock = new QMutexLocker (this.mutex);
         if (!check_connect ())
             return;
 
-        static_assert (ItemTypeVirtualFile == 4 && ItemTypeVirtualFileDownload == 5, "");
+        static_assert (ItemType.VIRTUAL_FILE == 4 && ItemType.VIRTUAL_FILE_DOWNLOAD == 5, "");
         SqlQuery query = new SqlQuery (
             "UPDATE metadata SET type=5 WHERE "
             + " (" + is_prefix_path_of ("?1", "path") + " OR ?1 == '') "
@@ -2082,7 +2082,7 @@ public class SyncJournalDb : GLib.Object {
 
         // We also must make sure we do not read the files from the database (same logic as in schedule_path_for_remote_discovery)
         // This includes all the parents up to the root, but also all the directory within the selected directory.
-        static_assert (ItemTypeDirectory == 2, "");
+        static_assert (ItemType.DIRECTORY == 2, "");
         query.prepare (
             "UPDATE metadata SET md5='this.invalid_' WHERE "
             + " (" + is_prefix_path_of ("?1", "path") + " OR ?1 == '' OR " + is_prefix_path_or_equal ("path", "?1") + ") AND type == 2;");
@@ -2151,8 +2151,8 @@ public class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Vector<GLib.ByteArray> table_columns (GLib.ByteArray table) {
-        GLib.Vector<GLib.ByteArray> columns;
+    private GLib.Vector<string> table_columns (string table) {
+        GLib.Vector<string> columns;
         if (!check_connect ()) {
             return columns;
         }
@@ -2176,7 +2176,7 @@ public class SyncJournalDb : GLib.Object {
         bool re = true;
 
         // check if the file_id column is there and create it if not
-        if (columns.is_empty ()) {
+        if (columns == "") {
             return false;
         }
 
@@ -2294,7 +2294,7 @@ public class SyncJournalDb : GLib.Object {
         }
 
         var upload_info_columns = table_columns ("uploadinfo");
-        if (upload_info_columns.is_empty ())
+        if (upload_info_columns == "")
             return false;
         if (!upload_info_columns.contains ("content_checksum")) {
             SqlQuery query = new SqlQuery (this.database);
@@ -2307,7 +2307,7 @@ public class SyncJournalDb : GLib.Object {
         }
 
         var conflicts_columns = table_columns ("conflicts");
-        if (conflicts_columns.is_empty ())
+        if (conflicts_columns == "")
             return false;
         if (!conflicts_columns.contains ("base_path")) {
             SqlQuery query = new SqlQuery (this.database);
@@ -2338,7 +2338,7 @@ public class SyncJournalDb : GLib.Object {
         var columns = table_columns ("blocklist");
         bool re = true;
 
-        if (columns.is_empty ()) {
+        if (columns == "") {
             return false;
         }
 
@@ -2458,7 +2458,7 @@ public class SyncJournalDb : GLib.Object {
             return true;
         }
 
-        if (this.database_file.is_empty ()) {
+        if (this.database_file == "") {
             GLib.warning ("Database filename" + this.database_file + "is empty");
             return false;
         }
@@ -2485,8 +2485,8 @@ public class SyncJournalDb : GLib.Object {
         }
 
         // Set locking mode to avoid issues with WAL on Windows
-        GLib.ByteArray locking_mode_env = qgetenv ("OWNCLOUD_SQLITE_LOCKING_MODE");
-        if (locking_mode_env.is_empty ())
+        string locking_mode_env = qgetenv ("OWNCLOUD_SQLITE_LOCKING_MODE");
+        if (locking_mode_env == "")
             locking_mode_env = "EXCLUSIVE";
         pragma1.prepare ("PRAGMA locking_mode=" + locking_mode_env + ";");
         if (!pragma1.exec ()) {
@@ -2505,8 +2505,8 @@ public class SyncJournalDb : GLib.Object {
         }
 
         // For debugging purposes, allow temp_store to be set
-        GLib.ByteArray env_temp_store = qgetenv ("OWNCLOUD_SQLITE_TEMP_STORE");
-        if (!env_temp_store.is_empty ()) {
+        string env_temp_store = qgetenv ("OWNCLOUD_SQLITE_TEMP_STORE");
+        if (!env_temp_store == "") {
             pragma1.prepare ("PRAGMA temp_store = " + env_temp_store + ";");
             if (!pragma1.exec ()) {
                 return sql_fail ("Set PRAGMA temp_store", pragma1);
@@ -2516,7 +2516,7 @@ public class SyncJournalDb : GLib.Object {
 
         // With WAL journal the NORMAL sync mode is safe from corruption,
         // otherwise use the standard FULL mode.
-        GLib.ByteArray synchronous_mode = "FULL";
+        string synchronous_mode = "FULL";
         if (string.from_utf8 (this.journal_mode).compare ("wal", Qt.CaseInsensitive) == 0)
             synchronous_mode = "NORMAL";
         pragma1.prepare ("PRAGMA synchronous = " + synchronous_mode + ";");
@@ -2793,7 +2793,7 @@ public class SyncJournalDb : GLib.Object {
             return sql_fail ("prepare this.delete_upload_info_query", *delete_upload_info_query);
         }
 
-        GLib.ByteArray sql = new GLib.ByteArray (
+        string sql = new string (
             "SELECT last_try_etag, last_try_modtime, retrycount, errorstring, last_try_time, ignore_duration, rename_target, error_category, request_id "
             + "FROM blocklist WHERE path=?1");
         if (Utility.fs_case_preserving ()) {
@@ -2840,8 +2840,8 @@ public class SyncJournalDb : GLib.Object {
 
     Returns 0 on failure and for empty checksum types.
     ***********************************************************/
-    private int map_checksum_type (GLib.ByteArray checksum_type) {
-        if (checksum_type.is_empty ()) {
+    private int map_checksum_type (string checksum_type) {
+        if (checksum_type == "") {
             return 0;
         }
 
@@ -2919,7 +2919,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     static bool delete_batch (SqlQuery query, string[] entries, string name) {
-        if (entries.is_empty ())
+        if (entries == "")
             return true;
 
         GLib.debug ("Removing stale" + name + "entries:" + entries.join (", "));

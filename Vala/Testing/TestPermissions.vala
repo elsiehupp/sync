@@ -362,51 +362,51 @@ public class TestPermissions : GLib.Object {
         GLib.assert_true (!fake_folder.sync_once ());
 
         // if renaming doesn't work, just delete+create
-        GLib.assert_true (item_instruction (complete_spy, "norename/file", CSYNC_INSTRUCTION_REMOVE));
-        GLib.assert_true (item_instruction (complete_spy, "norename/sub", CSYNC_INSTRUCTION_NONE));
-        GLib.assert_true (discovery_instruction (discovery, "norename/sub", CSYNC_INSTRUCTION_REMOVE));
-        GLib.assert_true (item_instruction (complete_spy, "norename/file_renamed", CSYNC_INSTRUCTION_NEW));
-        GLib.assert_true (item_instruction (complete_spy, "norename/sub_renamed", CSYNC_INSTRUCTION_NEW));
+        GLib.assert_true (item_instruction (complete_spy, "norename/file", SyncInstructions.REMOVE));
+        GLib.assert_true (item_instruction (complete_spy, "norename/sub", SyncInstructions.NONE));
+        GLib.assert_true (discovery_instruction (discovery, "norename/sub", SyncInstructions.REMOVE));
+        GLib.assert_true (item_instruction (complete_spy, "norename/file_renamed", SyncInstructions.NEW));
+        GLib.assert_true (item_instruction (complete_spy, "norename/sub_renamed", SyncInstructions.NEW));
         // the contents can this.move_
-        GLib.assert_true (item_instruction (complete_spy, "norename/sub_renamed/file", CSYNC_INSTRUCTION_RENAME));
+        GLib.assert_true (item_instruction (complete_spy, "norename/sub_renamed/file", SyncInstructions.RENAME));
 
         // simiilarly forbidding moves becomes delete+create
-        GLib.assert_true (item_instruction (complete_spy, "nomove/file", CSYNC_INSTRUCTION_REMOVE));
-        GLib.assert_true (item_instruction (complete_spy, "nomove/sub", CSYNC_INSTRUCTION_NONE));
-        GLib.assert_true (discovery_instruction (discovery, "nomove/sub", CSYNC_INSTRUCTION_REMOVE));
+        GLib.assert_true (item_instruction (complete_spy, "nomove/file", SyncInstructions.REMOVE));
+        GLib.assert_true (item_instruction (complete_spy, "nomove/sub", SyncInstructions.NONE));
+        GLib.assert_true (discovery_instruction (discovery, "nomove/sub", SyncInstructions.REMOVE));
         // nomove/sub/file is removed as part of the directory
-        GLib.assert_true (item_instruction (complete_spy, "allowed/file_moved", CSYNC_INSTRUCTION_NEW));
-        GLib.assert_true (item_instruction (complete_spy, "allowed/sub_moved", CSYNC_INSTRUCTION_NEW));
-        GLib.assert_true (item_instruction (complete_spy, "allowed/sub_moved/file", CSYNC_INSTRUCTION_NEW));
+        GLib.assert_true (item_instruction (complete_spy, "allowed/file_moved", SyncInstructions.NEW));
+        GLib.assert_true (item_instruction (complete_spy, "allowed/sub_moved", SyncInstructions.NEW));
+        GLib.assert_true (item_instruction (complete_spy, "allowed/sub_moved/file", SyncInstructions.NEW));
 
         // when moving to an invalid target, the targets should be an error
-        GLib.assert_true (item_instruction (complete_spy, "nocreatefile/file", CSYNC_INSTRUCTION_ERROR));
-        GLib.assert_true (item_instruction (complete_spy, "nocreatefile/zfile", CSYNC_INSTRUCTION_ERROR));
-        GLib.assert_true (item_instruction (complete_spy, "nocreatefile/sub", CSYNC_INSTRUCTION_RENAME)); // TODO : What does a real server say?
-        GLib.assert_true (item_instruction (complete_spy, "nocreatedir/sub2", CSYNC_INSTRUCTION_ERROR));
-        GLib.assert_true (item_instruction (complete_spy, "nocreatedir/zsub2", CSYNC_INSTRUCTION_ERROR));
+        GLib.assert_true (item_instruction (complete_spy, "nocreatefile/file", SyncInstructions.ERROR));
+        GLib.assert_true (item_instruction (complete_spy, "nocreatefile/zfile", SyncInstructions.ERROR));
+        GLib.assert_true (item_instruction (complete_spy, "nocreatefile/sub", SyncInstructions.RENAME)); // TODO : What does a real server say?
+        GLib.assert_true (item_instruction (complete_spy, "nocreatedir/sub2", SyncInstructions.ERROR));
+        GLib.assert_true (item_instruction (complete_spy, "nocreatedir/zsub2", SyncInstructions.ERROR));
 
         // and the sources of the invalid moves should be restored, not deleted
         // (depending on the order of discovery a follow-up sync is needed)
-        GLib.assert_true (item_instruction (complete_spy, "allowed/file", CSYNC_INSTRUCTION_NONE));
-        GLib.assert_true (item_instruction (complete_spy, "allowed/sub2", CSYNC_INSTRUCTION_NONE));
-        GLib.assert_true (item_instruction (complete_spy, "zallowed/file", CSYNC_INSTRUCTION_NEW));
-        GLib.assert_true (item_instruction (complete_spy, "zallowed/sub2", CSYNC_INSTRUCTION_NEW));
-        GLib.assert_true (item_instruction (complete_spy, "zallowed/sub2/file", CSYNC_INSTRUCTION_NEW));
+        GLib.assert_true (item_instruction (complete_spy, "allowed/file", SyncInstructions.NONE));
+        GLib.assert_true (item_instruction (complete_spy, "allowed/sub2", SyncInstructions.NONE));
+        GLib.assert_true (item_instruction (complete_spy, "zallowed/file", SyncInstructions.NEW));
+        GLib.assert_true (item_instruction (complete_spy, "zallowed/sub2", SyncInstructions.NEW));
+        GLib.assert_true (item_instruction (complete_spy, "zallowed/sub2/file", SyncInstructions.NEW));
         GLib.assert_cmp (fake_folder.sync_engine ().is_another_sync_needed (), ImmediateFollowUp);
 
         // A follow-up sync will restore allowed/file and allowed/sub2 and maintain the nocreatedir/file errors
         complete_spy.clear ();
         GLib.assert_true (!fake_folder.sync_once ());
 
-        GLib.assert_true (item_instruction (complete_spy, "nocreatefile/file", CSYNC_INSTRUCTION_ERROR));
-        GLib.assert_true (item_instruction (complete_spy, "nocreatefile/zfile", CSYNC_INSTRUCTION_ERROR));
-        GLib.assert_true (item_instruction (complete_spy, "nocreatedir/sub2", CSYNC_INSTRUCTION_ERROR));
-        GLib.assert_true (item_instruction (complete_spy, "nocreatedir/zsub2", CSYNC_INSTRUCTION_ERROR));
+        GLib.assert_true (item_instruction (complete_spy, "nocreatefile/file", SyncInstructions.ERROR));
+        GLib.assert_true (item_instruction (complete_spy, "nocreatefile/zfile", SyncInstructions.ERROR));
+        GLib.assert_true (item_instruction (complete_spy, "nocreatedir/sub2", SyncInstructions.ERROR));
+        GLib.assert_true (item_instruction (complete_spy, "nocreatedir/zsub2", SyncInstructions.ERROR));
 
-        GLib.assert_true (item_instruction (complete_spy, "allowed/file", CSYNC_INSTRUCTION_NEW));
-        GLib.assert_true (item_instruction (complete_spy, "allowed/sub2", CSYNC_INSTRUCTION_NEW));
-        GLib.assert_true (item_instruction (complete_spy, "allowed/sub2/file", CSYNC_INSTRUCTION_NEW));
+        GLib.assert_true (item_instruction (complete_spy, "allowed/file", SyncInstructions.NEW));
+        GLib.assert_true (item_instruction (complete_spy, "allowed/sub2", SyncInstructions.NEW));
+        GLib.assert_true (item_instruction (complete_spy, "allowed/sub2/file", SyncInstructions.NEW));
 
         var cls = fake_folder.current_local_state ();
         GLib.assert_true (cls.find ("allowed/file"));

@@ -27,7 +27,7 @@
 public class OwncloudDolphinPlugin : KOverlayIconPlugin {
     Q_PLUGIN_METADATA (IID "com.owncloud.ovarlayiconplugin" FILE "ownclouddolphinoverlayplugin.json")
 
-    using StatusMap = GLib.HashTable<GLib.ByteArray, GLib.ByteArray>;
+    using StatusMap = GLib.HashTable<string, string>;
     StatusMap m_status;
 
     /***********************************************************
@@ -48,9 +48,9 @@ public class OwncloudDolphinPlugin : KOverlayIconPlugin {
         if (!url.isLocalFile ())
             return string[] ();
         QDir local_path (url.toLocalFile ());
-        const GLib.ByteArray localFile = local_path.canonicalPath ().toUtf8 ();
+        const string localFile = local_path.canonicalPath ().toUtf8 ();
 
-        helper.sendCommand (GLib.ByteArray ("RETRIEVE_FILE_STATUS:" + localFile + "\n"));
+        helper.sendCommand (string ("RETRIEVE_FILE_STATUS:" + localFile + "\n"));
 
         StatusMap.iterator it = m_status.find (localFile);
         if (it != m_status.constEnd ()) {
@@ -62,7 +62,7 @@ public class OwncloudDolphinPlugin : KOverlayIconPlugin {
 
     /***********************************************************
     ***********************************************************/
-    private string[] overlaysForString (GLib.ByteArray status) {
+    private string[] overlaysForString (string status) {
         string[] r;
         if (status.startsWith ("NOP"))
             return r;
@@ -85,9 +85,9 @@ public class OwncloudDolphinPlugin : KOverlayIconPlugin {
 
     /***********************************************************
     ***********************************************************/
-    private void slotCommandRecieved (GLib.ByteArray line) {
+    private void slotCommandRecieved (string line) {
 
-        GLib.List<GLib.ByteArray> tokens = line.split (':');
+        GLib.List<string> tokens = line.split (':');
         if (tokens.count () < 3)
             return;
         if (tokens[0] != "STATUS" && tokens[0] != "BROADCAST")
@@ -97,8 +97,8 @@ public class OwncloudDolphinPlugin : KOverlayIconPlugin {
 
         // We can't use tokens[2] because the filename might contain ':'
         int secondColon = line.indexOf (":", line.indexOf (":") + 1);
-        const GLib.ByteArray name = line.mid (secondColon + 1);
-        GLib.ByteArray status = m_status[name]; // reference to the item in the hash
+        const string name = line.mid (secondColon + 1);
+        string status = m_status[name]; // reference to the item in the hash
         if (status == tokens[1])
             return;
         status = tokens[1];

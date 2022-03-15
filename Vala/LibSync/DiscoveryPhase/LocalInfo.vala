@@ -19,7 +19,7 @@ public class LocalInfo : GLib.Object {
     time_t modtime = 0;
     int64 size = 0;
     uint64 inode = 0;
-    ItemType type = ItemTypeSkip;
+    ItemType type = ItemType.SKIP;
     bool is_directory = false;
     bool is_hidden = false;
     bool is_virtual_file = false;

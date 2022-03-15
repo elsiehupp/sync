@@ -14,11 +14,11 @@ public class FakePutMultiFileReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.ByteArray payload;
+    private string payload;
 
     /***********************************************************
     ***********************************************************/
-    public FakePutMultiFileReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, string content_type, GLib.ByteArray put_payload, GLib.Object parent) {
+    public FakePutMultiFileReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, string content_type, string put_payload, GLib.Object parent) {
         base (parent);
         set_request (request);
         set_url (request.url ());
@@ -30,8 +30,8 @@ public class FakePutMultiFileReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public static GLib.Vector<FileInfo> perform_multi_part (FileInfo remote_root_file_info, Soup.Request request, GLib.ByteArray put_payload, string content_type);
-    GLib.Vector<FileInfo> FakePutMultiFileReply.perform_multi_part (FileInfo remote_root_file_info, Soup.Request request, GLib.ByteArray put_payload, string content_type) {
+    public static GLib.Vector<FileInfo> perform_multi_part (FileInfo remote_root_file_info, Soup.Request request, string put_payload, string content_type);
+    GLib.Vector<FileInfo> FakePutMultiFileReply.perform_multi_part (FileInfo remote_root_file_info, Soup.Request request, string put_payload, string content_type) {
         GLib.Vector<FileInfo> result;
 
         var string_put_payload = put_payload;
@@ -50,7 +50,7 @@ public class FakePutMultiFileReply : FakeReply {
                 all_headers[header_parts.at (0)] = header_parts.at (1);
             }
             var filename = all_headers["X-File-Path"];
-            GLib.assert_true (!filename.is_empty ());
+            GLib.assert_true (!filename == "");
             FileInfo file_info = remote_root_file_info.find (filename);
             if (file_info) {
                 file_info.size = one_part_body.size ();

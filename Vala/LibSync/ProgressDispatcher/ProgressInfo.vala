@@ -51,28 +51,28 @@ public class ProgressInfo : GLib.Object {
     
         static string as_action_string (SyncFileItem item) {
             switch (item.instruction) {
-            case CSYNC_INSTRUCTION_CONFLICT:
-            case CSYNC_INSTRUCTION_SYNC:
-            case CSYNC_INSTRUCTION_NEW:
-            case CSYNC_INSTRUCTION_TYPE_CHANGE:
+            case SyncInstructions.CONFLICT:
+            case SyncInstructions.SYNC:
+            case SyncInstructions.NEW:
+            case SyncInstructions.TYPE_CHANGE:
                 if (item.direction != SyncFileItem.Direction.UP)
                     return _("progress", "downloading");
                 else
                     return _("progress", "uploading");
-            case CSYNC_INSTRUCTION_REMOVE:
+            case SyncInstructions.REMOVE:
                 return _("progress", "deleting");
-            case CSYNC_INSTRUCTION_EVAL_RENAME:
-            case CSYNC_INSTRUCTION_RENAME:
+            case SyncInstructions.EVAL_RENAME:
+            case SyncInstructions.RENAME:
                 return _("progress", "moving");
-            case CSYNC_INSTRUCTION_IGNORE:
+            case SyncInstructions.IGNORE:
                 return _("progress", "ignoring");
-            case CSYNC_INSTRUCTION_STAT_ERROR:
-            case CSYNC_INSTRUCTION_ERROR:
+            case SyncInstructions.STAT_ERROR:
+            case SyncInstructions.ERROR:
                 return _("progress", "error");
-            case CSYNC_INSTRUCTION_UPDATE_METADATA:
+            case SyncInstructions.UPDATE_METADATA:
                 return _("progress", "updating local metadata");
-            case CSYNC_INSTRUCTION_NONE:
-            case CSYNC_INSTRUCTION_EVAL:
+            case SyncInstructions.NONE:
+            case SyncInstructions.EVAL:
                 break;
             }
             return "";
@@ -81,13 +81,13 @@ public class ProgressInfo : GLib.Object {
 
         static string as_result_string (SyncFileItem item) {
             switch (item.instruction) {
-            case CSYNC_INSTRUCTION_SYNC:
-            case CSYNC_INSTRUCTION_NEW:
-            case CSYNC_INSTRUCTION_TYPE_CHANGE:
+            case SyncInstructions.SYNC:
+            case SyncInstructions.NEW:
+            case SyncInstructions.TYPE_CHANGE:
                 if (item.direction != SyncFileItem.Direction.UP) {
-                    if (item.type == ItemTypeVirtualFile) {
+                    if (item.type == ItemType.VIRTUAL_FILE) {
                         return _("progress", "Virtual file created");
-                    } else if (item.type == ItemTypeVirtualFileDehydration) {
+                    } else if (item.type == ItemType.VIRTUAL_FILE_DEHYDRATION) {
                         return _("progress", "Replaced by virtual file");
                     } else {
                         return _("progress", "Downloaded");
@@ -95,23 +95,23 @@ public class ProgressInfo : GLib.Object {
                 } else {
                     return _("progress", "Uploaded");
                 }
-            case CSYNC_INSTRUCTION_CONFLICT:
+            case SyncInstructions.CONFLICT:
                 return _("progress", "Server version downloaded, copied changed local file into conflict file");
-            case CSYNC_INSTRUCTION_REMOVE:
+            case SyncInstructions.REMOVE:
                 return _("progress", "Deleted");
-            case CSYNC_INSTRUCTION_EVAL_RENAME:
-            case CSYNC_INSTRUCTION_RENAME:
+            case SyncInstructions.EVAL_RENAME:
+            case SyncInstructions.RENAME:
                 return _("progress", "Moved to %1").printf (item.rename_target);
-            case CSYNC_INSTRUCTION_IGNORE:
+            case SyncInstructions.IGNORE:
                 return _("progress", "Ignored");
-            case CSYNC_INSTRUCTION_STAT_ERROR:
+            case SyncInstructions.STAT_ERROR:
                 return _("progress", "Filesystem access error");
-            case CSYNC_INSTRUCTION_ERROR:
+            case SyncInstructions.ERROR:
                 return _("progress", "Error");
-            case CSYNC_INSTRUCTION_UPDATE_METADATA:
+            case SyncInstructions.UPDATE_METADATA:
                 return _("progress", "Updated local metadata");
-            case CSYNC_INSTRUCTION_NONE:
-            case CSYNC_INSTRUCTION_EVAL:
+            case SyncInstructions.NONE:
+            case SyncInstructions.EVAL:
                 return _("progress", "Unknown");
             }
             return _("progress", "Unknown");
@@ -410,12 +410,12 @@ public class ProgressInfo : GLib.Object {
     ***********************************************************/
     public static inline bool is_size_dependent (SyncFileItem item) {
         return !item.is_directory ()
-            && (item.instruction == CSYNC_INSTRUCTION_CONFLICT
-                || item.instruction == CSYNC_INSTRUCTION_SYNC
-                || item.instruction == CSYNC_INSTRUCTION_NEW
-                || item.instruction == CSYNC_INSTRUCTION_TYPE_CHANGE)
-            && ! (item.type == ItemTypeVirtualFile
-                 || item.type == ItemTypeVirtualFileDehydration);
+            && (item.instruction == SyncInstructions.CONFLICT
+                || item.instruction == SyncInstructions.SYNC
+                || item.instruction == SyncInstructions.NEW
+                || item.instruction == SyncInstructions.TYPE_CHANGE)
+            && ! (item.type == ItemType.VIRTUAL_FILE
+                 || item.type == ItemType.VIRTUAL_FILE_DEHYDRATION);
     }
 
 

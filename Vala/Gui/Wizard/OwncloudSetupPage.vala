@@ -50,7 +50,7 @@ public class OwncloudSetupPage : QWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public OwncloudSetupPage (Gtk.Widget parent = null) {
+    public OwncloudSetupPage (Gtk.Widget parent = new Gtk.Widget ()) {
         base ();
         this.progress_indicator = new QProgressIndicator (this);
         this.oc_wizard = (OwncloudWizard)parent;
@@ -59,7 +59,7 @@ public class OwncloudSetupPage : QWizardPage {
         setup_server_address_description_label ();
 
         Theme theme = Theme.instance ();
-        if (theme.override_server_url ().is_empty ()) {
+        if (theme.override_server_url () == "") {
             this.ui.le_url.postfix (theme.wizard_url_postfix ());
             this.ui.le_url.placeholder_text (theme.WIZARD_URL_HINT);
         } else if (Theme.instance ().force_override_server_url ()) {
@@ -89,7 +89,7 @@ public class OwncloudSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     public bool is_complete () {
-        return !this.ui.le_url.text ().is_empty () && !this.checking;
+        return !this.ui.le_url.text () == "" && !this.checking;
     }
 
 
@@ -111,7 +111,7 @@ public class OwncloudSetupPage : QWizardPage {
 
         this.ui.le_url.focus ();
 
-        const var is_server_url_overridden = !Theme.instance ().override_server_url ().is_empty ();
+        const var is_server_url_overridden = !Theme.instance ().override_server_url () == "";
         if (is_server_url_overridden && !Theme.instance ().force_override_server_url ()) {
             // If the url is overwritten but we don't force to use that url
             // Just focus the next button to let the user navigate quicker
@@ -138,7 +138,7 @@ public class OwncloudSetupPage : QWizardPage {
             on_signal_url_edit_finished ();
             string u = url ();
             GLib.Uri qurl = new GLib.Uri (u);
-            if (!qurl.is_valid () || qurl.host ().is_empty ()) {
+            if (!qurl.is_valid () || qurl.host () == "") {
                 on_signal_error_string (_("Server address does not seem to be valid"), false);
                 return false;
             }
@@ -186,7 +186,7 @@ public class OwncloudSetupPage : QWizardPage {
     public void server_url (string new_url) {
         this.oc_wizard.registration (false);
         this.oc_url = new_url;
-        if (this.oc_url.is_empty ()) {
+        if (this.oc_url == "") {
             this.ui.le_url.clear ();
             return;
         }
@@ -225,7 +225,7 @@ public class OwncloudSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     public void on_signal_error_string (string err, bool retry_http_only) {
-        if (err.is_empty ()) {
+        if (err == "") {
             this.ui.error_label.visible (false);
         } else {
             if (retry_http_only) {
@@ -292,8 +292,8 @@ public class OwncloudSetupPage : QWizardPage {
     public void on_signal_certificate_accepted () {
         GLib.File cert_file = new GLib.File (add_cert_dial.certificate_path ());
         cert_file.open (GLib.File.ReadOnly);
-        GLib.ByteArray cert_data = cert_file.read_all ();
-        GLib.ByteArray cert_password = add_cert_dial.certificate_password ().to_local8Bit ();
+        string cert_data = cert_file.read_all ();
+        string cert_password = add_cert_dial.certificate_password ().to_local8Bit ();
 
         QBuffer cert_data_buffer = new QBuffer (cert_data);
         cert_data_buffer.open (QIODevice.ReadOnly);
@@ -361,7 +361,7 @@ public class OwncloudSetupPage : QWizardPage {
     ***********************************************************/
     protected void on_signal_url_edit_finished () {
         string url = this.ui.le_url.full_text ();
-        if (GLib.Uri (url).is_relative () && !url.is_empty ()) {
+        if (GLib.Uri (url).is_relative () && !url == "") {
             // no scheme defined, set one
             url.prepend ("https://");
             this.ui.le_url.full_text (url);
@@ -427,7 +427,7 @@ public class OwncloudSetupPage : QWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    private static string subject_info_helper (QSslCertificate cert, GLib.ByteArray qa) {
+    private static string subject_info_helper (QSslCertificate cert, string qa) {
         return cert.subject_info (qa).join ('/');
     }
 

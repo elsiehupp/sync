@@ -141,7 +141,7 @@ int main (int argc, char **argv) {
             Utility.sleep (1);
 
             var desktop_session = qgetenv ("XDG_CURRENT_DESKTOP").to_lower ();
-            if (desktop_session.is_empty ()) {
+            if (desktop_session == "") {
                 desktop_session = qgetenv ("DESKTOP_SESSION").to_lower ();
             }
             if (desktop_session == "xfce") {
@@ -159,7 +159,7 @@ int main (int argc, char **argv) {
 
             if (QSystemTrayIcon.is_system_tray_available ()) {
                 app.on_signal_try_tray_again ();
-            } else if (!app.background_mode () && !AccountManager.instance ().accounts ().is_empty ()) {
+            } else if (!app.background_mode () && !AccountManager.instance ().accounts () == "") {
                 if (desktop_session != "ubuntu") {
                     GLib.info ("System tray still not available; showing window and trying again later.");
                     app.show_main_dialog ();

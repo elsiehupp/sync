@@ -25,7 +25,7 @@ public class AddCertificateDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public AddCertificateDialog (Gtk.Widget parent = null) {
+    public AddCertificateDialog (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.ui = new Ui.AddCertificateDialog ();
         ui.up_ui (this);

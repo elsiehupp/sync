@@ -40,7 +40,7 @@ public class WebView : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public WebView (Gtk.Widget parent = null) {
+    public WebView (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.ui ();
         this.ui.up_ui (this);

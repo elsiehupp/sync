@@ -17,14 +17,14 @@ public class TestChecksumValidator : GLib.Object {
     private QTemporaryDir root;
     private string testfile;
     private string expected_error;
-    private GLib.ByteArray expected;
-    private GLib.ByteArray expected_type;
+    private string expected;
+    private string expected_type;
     private bool success_down;
     private bool error_seen;
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_up_validated (GLib.ByteArray type, GLib.ByteArray checksum) {
+    public void on_signal_up_validated (string type, string checksum) {
         GLib.debug ("Checksum: " + checksum.to_string ());
         GLib.assert_true (this.expected == checksum );
         GLib.assert_true (this.expected_type == type );
@@ -48,12 +48,12 @@ public class TestChecksumValidator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    static GLib.ByteArray shell_sum (GLib.ByteArray command, string file) {
+    static string shell_sum (string command, string file) {
         QProcess md5;
         string[] args;
         args.append (file);
         md5.on_signal_start (command, args);
-        GLib.ByteArray sum_shell;
+        string sum_shell;
         GLib.debug ("File: " + file);
 
         if (md5.wait_for_finished ()) {
@@ -79,15 +79,15 @@ public class TestChecksumValidator : GLib.Object {
 
         GLib.File file_device = new GLib.File (file);
         file_device.open (QIODevice.ReadOnly);
-        GLib.ByteArray sum = calc_md5 (&file_device);
+        string sum = calc_md5 (&file_device);
         file_device.close ();
 
-        GLib.ByteArray s_sum = shell_sum ("md5sum", file);
-        if (s_sum.is_empty ()) {
+        string s_sum = shell_sum ("md5sum", file);
+        if (s_sum == "") {
             QSKIP ("Couldn't execute md5sum to calculate checksum, executable missing?", SkipSingle);
         }
 
-        GLib.assert_true (!sum.is_empty ());
+        GLib.assert_true (!sum == "");
         GLib.assert_cmp (s_sum, sum);
     }
 
@@ -99,27 +99,27 @@ public class TestChecksumValidator : GLib.Object {
 
         GLib.File file_device = new GLib.File (file);
         file_device.open (QIODevice.ReadOnly);
-        GLib.ByteArray sum = calc_sha1 (file_device);
+        string sum = calc_sha1 (file_device);
         file_device.close ();
 
-        GLib.ByteArray s_sum = shell_sum ("sha1sum", file);
-        if (s_sum.is_empty ()) {
+        string s_sum = shell_sum ("sha1sum", file);
+        if (s_sum == "") {
             QSKIP ("Couldn't execute sha1sum to calculate checksum, executable missing?", SkipSingle);
         }
 
-        GLib.assert_true (!sum.is_empty ());
+        GLib.assert_true (!sum == "");
         GLib.assert_cmp (s_sum, sum);
     }
 
     private void test_upload_checksumming_adler () {
         var vali = new ComputeChecksum (this);
-        this.expected_type = new GLib.ByteArray ("Adler32");
+        this.expected_type = new string ("Adler32");
         vali.set_checksum_type (this.expected_type);
 
         connect (
             vali,
-            signal_done (GLib.ByteArray,GLib.ByteArray),
-            on_signal_up_validated (GLib.ByteArray,GLib.ByteArray)
+            signal_done (string,string),
+            on_signal_up_validated (string,string)
         );
 
         var file = GLib.File.new_for_path (this.testfile, vali);
@@ -131,7 +131,7 @@ public class TestChecksumValidator : GLib.Object {
         QEventLoop loop;
         connect (
             vali,
-            signal_done (GLib.ByteArray,GLib.ByteArray),
+            signal_done (string,string),
             loop,
             quit (),
             Qt.QueuedConnection
@@ -149,9 +149,9 @@ public class TestChecksumValidator : GLib.Object {
         vali.set_checksum_type (this.expected_type);
         connect (
             vali,
-            signal_done (GLib.ByteArray, GLib.ByteArray),
+            signal_done (string, string),
             this,
-            on_signal_up_validated (GLib.ByteArray, GLib.ByteArray));
+            on_signal_up_validated (string, string));
 
         var file = GLib.File.new_for_path (this.testfile, vali);
         file.open (QIODevice.ReadOnly);
@@ -159,7 +159,7 @@ public class TestChecksumValidator : GLib.Object {
         vali.on_signal_start (this.testfile);
 
         QEventLoop loop;
-        connect (vali, SIGNAL (signal_done (GLib.ByteArray,GLib.ByteArray)), loop, SLOT (quit ()), Qt.QueuedConnection);
+        connect (vali, SIGNAL (signal_done (string,string)), loop, SLOT (quit ()), Qt.QueuedConnection);
         loop.exec ();
 
         delete vali;
@@ -171,9 +171,9 @@ public class TestChecksumValidator : GLib.Object {
         vali.set_checksum_type (this.expected_type);
         connect (
             vali,
-            signal_done (GLib.ByteArray,GLib.ByteArray),
+            signal_done (string,string),
             this,
-            on_signal_up_validated (GLib.ByteArray,GLib.ByteArray)
+            on_signal_up_validated (string,string)
         );
 
         var file = GLib.File.new_for_path (this.testfile, vali);
@@ -185,7 +185,7 @@ public class TestChecksumValidator : GLib.Object {
         QEventLoop loop;
         connect (
             vali,
-            signal_done (GLib.ByteArray,GLib.ByteArray),
+            signal_done (string,string),
             loop,
             quit (),
             Qt.QueuedConnection
@@ -199,13 +199,13 @@ public class TestChecksumValidator : GLib.Object {
         var vali = new ValidateChecksumHeader (this);
         connect (
             vali,
-            ValidateChecksumHeader.validated,
+            ValidateChecksumHeader.signal_validated,
             this,
             TestChecksumValidator.on_signal_down_validated
         );
         connect (
             vali,
-            ValidateChecksumHeader.validation_failed,
+            ValidateChecksumHeader.signal_validation_failed,
             this,
             TestChecksumValidator.on_signal_down_error
         );
@@ -214,7 +214,7 @@ public class TestChecksumValidator : GLib.Object {
         file.open (QIODevice.ReadOnly);
         this.expected = calc_adler32 (file);
 
-        GLib.ByteArray adler = check_sum_adler_c;
+        string adler = check_sum_adler_c;
         adler.append (":");
         adler.append (this.expected);
 

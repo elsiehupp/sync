@@ -212,10 +212,10 @@ public class OcsShareJob : OcsJob {
         add_param (string.from_latin1 ("path"), path);
         add_param (string.from_latin1 ("share_type"), string.number (Share.Type.LINK));
 
-        if (!name.is_empty ()) {
+        if (!name == "") {
             add_param (string.from_latin1 ("name"), name);
         }
-        if (!password.is_empty ()) {
+        if (!password == "") {
             add_param (string.from_latin1 ("password"), password);
         }
 
@@ -247,7 +247,7 @@ public class OcsShareJob : OcsJob {
         add_param ("share_type", share_type.to_int ());
         add_param ("share_with", share_with);
 
-        if (!password.is_empty ()) {
+        if (!password == "") {
             add_param ("password", password);
         }
 

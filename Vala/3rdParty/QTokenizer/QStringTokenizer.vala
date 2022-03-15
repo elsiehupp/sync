@@ -3,8 +3,11 @@ public class QStringTokenizer : QTokenizer<string> {
 
     /***********************************************************
     ***********************************************************/
-    public QStringTokenizer (string string, string delim) :
-        QTokenizer<string, string.ConstIterator> (string, delim) {}
+    public QStringTokenizer (string string, string delim) {
+        base (string, delim);
+    }
+
+
     /***********************************************************
     @brief Like \see next (), but returns a lightweight string reference
     @return A reference to the token within the string
@@ -19,4 +22,4 @@ public class QStringTokenizer : QTokenizer<string> {
         }
         return QStringRef (&d.string, begin, end);
     }
-};
+}

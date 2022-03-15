@@ -34,7 +34,7 @@ public class WebFlowCredentialsDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public WebFlowCredentialsDialog (Account account, bool use_flow2, Gtk.Widget parent = null) {
+    public WebFlowCredentialsDialog (Account account, bool use_flow2, Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.use_flow2 = use_flow2;
         this.flow_2_auth_widget = null;
@@ -125,7 +125,7 @@ public class WebFlowCredentialsDialog : Gtk.Dialog {
             return;
         }
 
-        if (error.is_empty ()) {
+        if (error == "") {
             this.error_label.hide ();
         } else {
             this.error_label.on_signal_text (error);

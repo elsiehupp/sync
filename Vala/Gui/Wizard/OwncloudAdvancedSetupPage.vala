@@ -164,7 +164,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
 
         var acc = static_cast<OwncloudWizard> (wizard ()).account ();
         var quota_job = new PropfindJob (acc, this.remote_folder, this);
-        quota_job.properties (new GLib.List<GLib.ByteArray> ("http://owncloud.org/ns:size"));
+        quota_job.properties (new GLib.List<string> ("http://owncloud.org/ns:size"));
 
         connect (
             quota_job,
@@ -271,7 +271,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     public void on_signal_remote_folder (string remote_folder) {
-        if (!remote_folder.is_empty ()) {
+        if (!remote_folder == "") {
             this.remote_folder = remote_folder;
         }
     }
@@ -295,7 +295,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     public void on_signal_error_string (string error_string) {
-        if (error_string.is_empty ()) {
+        if (error_string == "") {
             this.ui.error_label.visible (false);
         } else {
             this.ui.error_label.visible (true);
@@ -317,7 +317,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     ***********************************************************/
     private void on_signal_select_folder () {
         string directory = QFileDialog.existing_directory (null, _("Local Sync Folder"), QDir.home_path ());
-        if (!directory.is_empty ()) {
+        if (!directory == "") {
             // TODO: remove when UX decision is made
             refresh_virtual_files_availibility (directory);
 
@@ -381,7 +381,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         }
 
         if (update_blocklist) {
-            if (!this.selective_sync_blocklist.is_empty ()) {
+            if (!this.selective_sync_blocklist == "") {
                 this.ui.r_selective_sync.block_signals (true);
                 radio_checked (this.ui.r_selective_sync);
                 this.ui.r_selective_sync.block_signals (false);
@@ -484,14 +484,14 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
 
         // check if the local folder exists. If so, and if its not empty, show a warning.
         string error_str = FolderMan.instance ().check_path_validity_for_new_folder (loc_folder, server_url ());
-        this.local_folder_valid = error_str.is_empty ();
+        this.local_folder_valid = error_str == "";
 
         string t;
 
         local_folder_push_button_path (loc_folder);
 
         if (on_signal_data_changed ()) {
-            if (this.remote_folder.is_empty () || this.remote_folder == QLatin1String ("/")) {
+            if (this.remote_folder == "" || this.remote_folder == QLatin1String ("/")) {
                 t = "";
             } else {
                 t = Utility.escape (_(" (%1 folder \"%2\" is synced to local folder \"%3\")")
@@ -522,7 +522,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         int64 r_space = this.ui.r_sync_everything.is_checked () ? this.r_size : this.r_selected_size;
 
         string space_error = check_local_space (r_space);
-        if (!space_error.is_empty ()) {
+        if (!space_error == "") {
             error_str = space_error;
         }
         on_signal_error_string (error_str);

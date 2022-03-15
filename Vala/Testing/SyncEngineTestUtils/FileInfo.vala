@@ -17,8 +17,8 @@ public class FileInfo : FileModifier {
     public Occ.RemotePermissions permissions; // When uset, defaults to everything
     public GLib.DateTime last_modified = GLib.DateTime.current_date_time_utc ().add_days (-7);
 
-    public GLib.ByteArray checksums;
-    public GLib.ByteArray extra_dav_properties;
+    public string checksums;
+    public string extra_dav_properties;
     public int64 size = 0;
     public char content_char = 'W';
 
@@ -28,7 +28,7 @@ public class FileInfo : FileModifier {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.ByteArray etag = generate_etag ();
+    public string etag = generate_etag ();
 
     /***********************************************************
     ***********************************************************/
@@ -180,7 +180,7 @@ public class FileInfo : FileModifier {
     /***********************************************************
     ***********************************************************/
     public FileInfo find (PathComponents path_components, bool invalidate_etags = false) {
-        if (path_components.is_empty ()) {
+        if (path_components == "") {
             if (invalidate_etags) {
                 etag = generate_etag ();
             }
@@ -230,7 +230,7 @@ public class FileInfo : FileModifier {
     /***********************************************************
     ***********************************************************/
     public string path () {
-        return (parent_path.is_empty () ? "" : (parent_path + '/')) + name;
+        return (parent_path == "" ? "" : (parent_path + '/')) + name;
     }
 
 

@@ -148,8 +148,8 @@ public class VfsXAttr : Vfs {
 
     /***********************************************************
     ***********************************************************/
-    public bool stat_type_virtual_file (csync_file_stat_t stat, void stat_data) {
-        if (stat.type == ItemTypeDirectory) {
+    public bool stat_type_virtual_file (CSyncFileStatT stat, void stat_data) {
+        if (stat.type == ItemType.DIRECTORY) {
             return false;
         }
 
@@ -167,12 +167,12 @@ public class VfsXAttr : Vfs {
 
         if (xattr.has_nextcloud_placeholder_attributes (path)) {
             var should_download = pin && (*pin == PinState.PinState.ALWAYS_LOCAL);
-            stat.type = should_download ? ItemTypeVirtualFileDownload : ItemTypeVirtualFile;
+            stat.type = should_download ? ItemType.VIRTUAL_FILE_DOWNLOAD : ItemType.VIRTUAL_FILE;
             return true;
         } else {
             var should_dehydrate = pin && (*pin == PinState.VfsItemAvailability.ONLINE_ONLY);
             if (should_dehydrate) {
-                stat.type = ItemTypeVirtualFileDehydration;
+                stat.type = ItemType.VIRTUAL_FILE_DEHYDRATION;
                 return true;
             }
         }

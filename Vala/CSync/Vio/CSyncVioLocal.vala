@@ -25,9 +25,9 @@ namespace Occ {
 
 csync_vio_handle_t OCSYNC_EXPORT *csync_vio_local_opendir (string name);
 int OCSYNC_EXPORT csync_vio_local_closedir (csync_vio_handle_t dhandle);
-std.unique_ptr<csync_file_stat_t> OCSYNC_EXPORT csync_vio_local_readdir (csync_vio_handle_t dhandle, Occ.Vfs vfs);
+std.unique_ptr<CSyncFileStatT> OCSYNC_EXPORT csync_vio_local_readdir (csync_vio_handle_t dhandle, Occ.Vfs vfs);
 
-int OCSYNC_EXPORT csync_vio_local_stat (string uri, csync_file_stat_t buf);
+int OCSYNC_EXPORT csync_vio_local_stat (string uri, CSyncFileStatT buf);
 
 
 
@@ -82,10 +82,10 @@ directory functions
 
 struct csync_vio_handle_t {
   DIR *dh;
-  GLib.ByteArray path;
+  string path;
 }
 
-static int this.csync_vio_local_stat_mb (mbchar_t wuri, csync_file_stat_t buf);
+static int this.csync_vio_local_stat_mb (mbchar_t wuri, CSyncFileStatT buf);
 
 csync_vio_handle_t csync_vio_local_opendir (string name) {
     QScopedPointer<csync_vio_handle_t> handle (new csync_vio_handle_t{});
@@ -108,10 +108,10 @@ int csync_vio_local_closedir (csync_vio_handle_t dhandle) {
     return rc;
 }
 
-std.unique_ptr<csync_file_stat_t> csync_vio_local_readdir (csync_vio_handle_t handle, Occ.Vfs vfs) {
+std.unique_ptr<CSyncFileStatT> csync_vio_local_readdir (csync_vio_handle_t handle, Occ.Vfs vfs) {
 
   struct this.tdirent dirent = null;
-  std.unique_ptr<csync_file_stat_t> file_stat;
+  std.unique_ptr<CSyncFileStatT> file_stat;
 
   do {
       dirent = this.treaddir (handle.dh);
@@ -119,9 +119,9 @@ std.unique_ptr<csync_file_stat_t> csync_vio_local_readdir (csync_vio_handle_t ha
           return {};
   } while (qstrcmp (dirent.d_name, ".") == 0 || qstrcmp (dirent.d_name, "..") == 0);
 
-  file_stat = std.make_unique<csync_file_stat_t> ();
+  file_stat = std.make_unique<CSyncFileStatT> ();
   file_stat.path = GLib.File.decode_name (dirent.d_name).to_utf8 ();
-  GLib.ByteArray full_path = handle.path % '/' % GLib.ByteArray () % const_cast<const char> (dirent.d_name);
+  string full_path = handle.path % '/' % "" % const_cast<const char> (dirent.d_name);
   if (file_stat.path.is_null ()) {
       file_stat.original_path = full_path;
       GLib.warning ("Invalid characters in file/directory name, please rename:" + dirent.d_name + handle.path;
@@ -138,9 +138,9 @@ std.unique_ptr<csync_file_stat_t> csync_vio_local_readdir (csync_vio_handle_t ha
     case DT_DIR:
     case DT_REG:
       if (dirent.d_type == DT_DIR) {
-        file_stat.type = ItemTypeDirectory;
+        file_stat.type = ItemType.DIRECTORY;
       } else {
-        file_stat.type = ItemTypeFile;
+        file_stat.type = ItemType.FILE;
       }
       break;
     default:
@@ -153,7 +153,7 @@ std.unique_ptr<csync_file_stat_t> csync_vio_local_readdir (csync_vio_handle_t ha
 
   if (this.csync_vio_local_stat_mb (full_path.const_data (), file_stat.get ()) < 0) {
       // Will get excluded by this.csync_detect_update.
-      file_stat.type = ItemTypeSkip;
+      file_stat.type = ItemType.SKIP;
   }
 
   // Override type for virtual files if desired
@@ -167,11 +167,11 @@ std.unique_ptr<csync_file_stat_t> csync_vio_local_readdir (csync_vio_handle_t ha
   return file_stat;
 }
 
-int csync_vio_local_stat (string uri, csync_file_stat_t buf) {
+int csync_vio_local_stat (string uri, CSyncFileStatT buf) {
     return this.csync_vio_local_stat_mb (GLib.File.encode_name (uri).const_data (), buf);
 }
 
-static int this.csync_vio_local_stat_mb (mbchar_t wuri, csync_file_stat_t buf) {
+static int this.csync_vio_local_stat_mb (mbchar_t wuri, CSyncFileStatT buf) {
     csync_stat_t sb;
 
     if (this.tstat (wuri, sb) < 0) {
@@ -180,17 +180,17 @@ static int this.csync_vio_local_stat_mb (mbchar_t wuri, csync_file_stat_t buf) {
 
     switch (sb.st_mode & S_IFMT) {
     case S_IFDIR:
-      buf.type = ItemTypeDirectory;
+      buf.type = ItemType.DIRECTORY;
       break;
     case S_IFREG:
-      buf.type = ItemTypeFile;
+      buf.type = ItemType.FILE;
       break;
     case S_IFLNK:
     case S_IFSOCK:
-      buf.type = ItemTypeSoftLink;
+      buf.type = ItemType.SOFT_LINK;
       break;
     default:
-      buf.type = ItemTypeSkip;
+      buf.type = ItemType.SKIP;
       break;
   }
 

@@ -79,18 +79,18 @@ public class TestAsyncOp : GLib.Object {
         var success_callback = [] (TestCase tc, Soup.Request request) {
             tc.poll_request = [] (TestCase *, Soup.Request &) . Soup.Reply * { std.on_signal_abort (); }; // shall no longer be called
             FileInfo info = tc.perform ();
-            GLib.ByteArray body = R" ({ "status":"on_signal_finished", "ETag":"\")" + info.etag + R" (\"", "file_identifier":")" + info.file_identifier + "\"}\n";
+            string body = R" ({ "status":"on_signal_finished", "ETag":"\")" + info.etag + R" (\"", "file_identifier":")" + info.file_identifier + "\"}\n";
             return new FakePayloadReply (Soup.GetOperation, request, body, null);
         }
         // Callback that never finishes
         var wait_forever_callback = [] (TestCase *, Soup.Request request) {
-            GLib.ByteArray body = "{\"status\":\"started\"}\n";
+            string body = "{\"status\":\"started\"}\n";
             return new FakePayloadReply (Soup.GetOperation, request, body, null);
         }
         // Callback that simulate an error.
         var error_callback = [] (TestCase tc, Soup.Request request) {
             tc.poll_request = [] (TestCase *, Soup.Request &) . Soup.Reply * { std.on_signal_abort (); }; // shall no longer be called;
-            GLib.ByteArray body = "{\"status\":\"error\",\"errorCode\":500,\"error_message\":\"TestingErrors\"}\n";
+            string body = "{\"status\":\"error\",\"errorCode\":500,\"error_message\":\"TestingErrors\"}\n";
             return new FakePayloadReply (Soup.GetOperation, request, body, null);
         }
         // This lambda takes another functor as a parameter, and returns a callback that will
@@ -99,7 +99,7 @@ public class TestAsyncOp : GLib.Object {
         var wait_and_chain = [] (TestCase.PollRequest_t chain) {
             return [chain] (TestCase tc, Soup.Request request) {
                 tc.poll_request = chain;
-                GLib.ByteArray body = "{\"status\":\"started\"}\n";
+                string body = "{\"status\":\"started\"}\n";
                 return new FakePayloadReply (Soup.GetOperation, request, body, null);
             }
         }

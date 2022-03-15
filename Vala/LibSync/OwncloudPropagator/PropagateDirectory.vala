@@ -151,12 +151,12 @@ public class PropagateDirectory : PropagatorJob {
         if (!this.item == "" && status == SyncFileItem.Status.SUCCESS) {
             // If a directory is renamed, recursively delete any stale items
             // that may still exist below the old path.
-            if (this.item.instruction == CSYNC_INSTRUCTION_RENAME
+            if (this.item.instruction == SyncInstructions.RENAME
                 && this.item.original_file != this.item.rename_target) {
                 propagator ().journal.delete_file_record (this.item.original_file, true);
             }
 
-            if (this.item.instruction == CSYNC_INSTRUCTION_NEW && this.item.direction == SyncFileItem.Direction.DOWN) {
+            if (this.item.instruction == SyncInstructions.NEW && this.item.direction == SyncFileItem.Direction.DOWN) {
                 // special case for local MKDIR, set local directory mtime
                 // (it's not synced later at all, but can be nice to have it set initially)
 
@@ -172,9 +172,9 @@ public class PropagateDirectory : PropagatorJob {
             // For new directories we always want to update the etag once
             // the directory has been propagated. Otherwise the directory
             // could appear locally without being added to the database.
-            if (this.item.instruction == CSYNC_INSTRUCTION_RENAME
-                || this.item.instruction == CSYNC_INSTRUCTION_NEW
-                || this.item.instruction == CSYNC_INSTRUCTION_UPDATE_METADATA) {
+            if (this.item.instruction == SyncInstructions.RENAME
+                || this.item.instruction == SyncInstructions.NEW
+                || this.item.instruction == SyncInstructions.UPDATE_METADATA) {
                 var result = propagator ().update_metadata (*this.item);
                 if (!result) {
                     status = this.item.status = SyncFileItem.Status.FATAL_ERROR;

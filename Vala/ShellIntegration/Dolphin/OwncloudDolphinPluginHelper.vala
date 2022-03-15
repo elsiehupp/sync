@@ -68,10 +68,10 @@ public class OWNCLOUDDOLPHINPLUGINHELPER_EXPORT OwncloudDolphinPluginHelper : GL
 
 
     public
-    public GLib.ByteArray version () { return this.version; }
+    public string version () { return this.version; }
 
 signals:
-    void commandRecieved (GLib.ByteArray cmd);
+    void commandRecieved (string cmd);
 
     protected void timerEvent (QTimerEvent*) override;
 
@@ -80,12 +80,12 @@ signals:
     protected private void slotReadyRead ();
     protected private void tryConnect ();
     protected private QLocalSocket this.socket;
-    protected private GLib.ByteArray this.line;
+    protected private string this.line;
     protected private GLib.Vector<string> this.paths;
     protected private QBasicTimer this.connectTimer;
 
     protected private GLib.HashTable<string, string> this.strings;
-    protected private GLib.ByteArray this.version;
+    protected private string this.version;
 }
 
 
@@ -175,7 +175,7 @@ void OwncloudDolphinPluginHelper.slotReadyRead () {
         this.line += this.socket.readLine ();
         if (!this.line.endsWith ("\n"))
             continue;
-        GLib.ByteArray line;
+        string line;
         qSwap (line, this.line);
         line.chop (1);
         if (line.isEmpty ())

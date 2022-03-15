@@ -11,7 +11,7 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 //  #include <QProcess>
 //  #include <QMessageBox>
 //  #include <QDesktopServices>
-//  #include <QApplication>
+//  #include <Gtk.Application>
 //  #include <Gtk.Widget>
 //  #include <QProcess>
 //  #include <QPointer>
@@ -99,7 +99,7 @@ public class OwncloudSetupWizard : GLib.Object {
     /***********************************************************
     Run the wizard
     ***********************************************************/
-    public static void run_wizard (GLib.Object object, char amember, Gtk.Widget parent = null) {
+    public static void run_wizard (GLib.Object object, char amember, Gtk.Widget parent = new Gtk.Widget ()) {
         if (!wiz.is_null ()) {
             bring_wizard_to_front_if_visible ();
             return;
@@ -455,7 +455,7 @@ public class OwncloudSetupWizard : GLib.Object {
         if (err_id == Soup.Reply.NoError) {
             GLib.info ("Remote folder found, all cool!");
         } else if (err_id == Soup.Reply.ContentNotFoundError) {
-            if (this.remote_folder.is_empty ()) {
+            if (this.remote_folder == "") {
                 error = _("No remote folder specified!");
                 ok = false;
             } else {
@@ -612,7 +612,7 @@ public class OwncloudSetupWizard : GLib.Object {
         // If there were redirects on the authed* requests, also store
         // the updated server URL, similar to redirects on status.php.
         GLib.Uri redirect_url = reply.attribute (Soup.Request.RedirectionTargetAttribute).to_url ();
-        if (!redirect_url.is_empty ()) {
+        if (!redirect_url == "") {
             GLib.info ("Authed request was redirected to " + redirect_url.to_string ());
 
             // strip the expected path
@@ -716,7 +716,7 @@ public class OwncloudSetupWizard : GLib.Object {
         // There is custom redirect handling in the error handler,
         // so don't automatically follow redirects.
         job.follow_redirects (false);
-        job.properties (new GLib.List<GLib.ByteArray> ("getlastmodified"));
+        job.properties (new GLib.List<string> ("getlastmodified"));
         connect (
             job,
             PropfindJob.result,
@@ -771,7 +771,7 @@ public class OwncloudSetupWizard : GLib.Object {
     private void finalize_setup (bool on_signal_success) {
         const string local_folder = this.oc_wizard.property ("local_folder").to_string ();
         if (on_signal_success) {
-            if (! (local_folder.is_empty () || this.remote_folder.is_empty ())) {
+            if (! (local_folder == "" || this.remote_folder == "")) {
                 this.oc_wizard.on_signal_append_to_configuration_log (
                     _("A sync connection from %1 to remote directory %2 was set up.")
                         .printf (local_folder, this.remote_folder));

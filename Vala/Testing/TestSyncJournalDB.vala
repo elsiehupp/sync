@@ -46,7 +46,7 @@ public class TestSyncJournalDB : GLib.Object {
     ***********************************************************/
     private void test_file_record () {
         SyncJournalFileRecord record;
-        GLib.assert_true (this.database.get_file_record (new GLib.ByteArray ("nonexistant"), record));
+        GLib.assert_true (this.database.get_file_record (new string ("nonexistant"), record));
         GLib.assert_true (!record.is_valid ());
 
         record.path = "foo";
@@ -54,7 +54,7 @@ public class TestSyncJournalDB : GLib.Object {
         // signed int being cast to uint64 either (like uint64.max would be)
         record.inode = std.numeric_limits<uint32>.max () + 12ull;
         record.modtime = drop_msecs (GLib.DateTime.current_date_time ());
-        record.type = ItemTypeDirectory;
+        record.type = ItemType.DIRECTORY;
         record.etag = "789789";
         record.file_identifier = "abcd";
         record.remote_perm = RemotePermissions.from_database_value ("RW");
@@ -63,30 +63,30 @@ public class TestSyncJournalDB : GLib.Object {
         GLib.assert_true (this.database.set_file_record (record));
 
         SyncJournalFileRecord stored_record;
-        GLib.assert_true (this.database.get_file_record (new GLib.ByteArray ("foo"), stored_record));
+        GLib.assert_true (this.database.get_file_record (new string ("foo"), stored_record));
         GLib.assert_true (stored_record == record);
 
         // Update checksum
         record.checksum_header = "Adler32:newchecksum";
         this.database.update_file_record_checksum ("foo", "newchecksum", "Adler32");
-        GLib.assert_true (this.database.get_file_record (new GLib.ByteArray ("foo"), stored_record));
+        GLib.assert_true (this.database.get_file_record (new string ("foo"), stored_record));
         GLib.assert_true (stored_record == record);
 
         // Update metadata
         record.modtime = drop_msecs (GLib.DateTime.current_date_time ().add_days (1));
         // try a value that only fits uint64, not int64
         record.inode = std.numeric_limits<uint64>.max () - std.numeric_limits<uint32>.max () - 1;
-        record.type = ItemTypeFile;
+        record.type = ItemType.FILE;
         record.etag = "789FFF";
         record.file_identifier = "efg";
         record.remote_perm = RemotePermissions.from_database_value ("NV");
         record.file_size = 289055;
         this.database.set_file_record (record);
-        GLib.assert_true (this.database.get_file_record (new GLib.ByteArray ("foo"), stored_record));
+        GLib.assert_true (this.database.get_file_record (new string ("foo"), stored_record));
         GLib.assert_true (stored_record == record);
 
         GLib.assert_true (this.database.delete_file_record ("foo"));
-        GLib.assert_true (this.database.get_file_record (new GLib.ByteArray ("foo"), record));
+        GLib.assert_true (this.database.get_file_record (new string ("foo"), record));
         GLib.assert_true (!record.is_valid ());
     }
 
@@ -103,7 +103,7 @@ public class TestSyncJournalDB : GLib.Object {
             GLib.assert_true (this.database.set_file_record (record));
 
             SyncJournalFileRecord stored_record;
-            GLib.assert_true (this.database.get_file_record (new GLib.ByteArray ("foo-checksum"), stored_record));
+            GLib.assert_true (this.database.get_file_record (new string ("foo-checksum"), stored_record));
             GLib.assert_true (stored_record.path == record.path);
             GLib.assert_true (stored_record.remote_perm == record.remote_perm);
             GLib.assert_true (stored_record.checksum_header == record.checksum_header);
@@ -123,7 +123,7 @@ public class TestSyncJournalDB : GLib.Object {
             GLib.assert_true (this.database.set_file_record (record));
 
             SyncJournalFileRecord stored_record;
-            GLib.assert_true (this.database.get_file_record (new GLib.ByteArray ("foo-nochecksum"), stored_record));
+            GLib.assert_true (this.database.get_file_record (new string ("foo-nochecksum"), stored_record));
             GLib.assert_true (stored_record == record);
         }
     }
@@ -182,11 +182,11 @@ public class TestSyncJournalDB : GLib.Object {
 
         // Typical 8-digit padded identifier
         record.file_identifier = "00000001abcd";
-        GLib.assert_cmp (record.numeric_file_id (), GLib.ByteArray ("00000001"));
+        GLib.assert_cmp (record.numeric_file_id (), string ("00000001"));
 
         // When the numeric identifier overflows the 8-digit boundary
         record.file_identifier = "123456789ocidblaabcd";
-        GLib.assert_cmp (record.numeric_file_id (), GLib.ByteArray ("123456789"));
+        GLib.assert_cmp (record.numeric_file_id (), string ("123456789"));
     }
 
 
@@ -217,9 +217,9 @@ public class TestSyncJournalDB : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void test_avoid_read_from_database_on_next_sync () {
-        var invalid_etag = GLib.ByteArray ("this.invalid_");
-        var initial_etag = GLib.ByteArray ("etag");
-        var make_entry = [&] (GLib.ByteArray path, ItemType type) {
+        var invalid_etag = string ("this.invalid_");
+        var initial_etag = string ("etag");
+        var make_entry = [&] (string path, ItemType type) {
             SyncJournalFileRecord record;
             record.path = path;
             record.type = type;
@@ -227,27 +227,27 @@ public class TestSyncJournalDB : GLib.Object {
             record.remote_perm = RemotePermissions.from_database_value ("RW");
             this.database.set_file_record (record);
         }
-        var get_etag = [&] (GLib.ByteArray path) {
+        var get_etag = [&] (string path) {
             SyncJournalFileRecord record;
             this.database.get_file_record (path, record);
             return record.etag;
         }
 
-        make_entry ("foodir", ItemTypeDirectory);
-        make_entry ("otherdir", ItemTypeDirectory);
-        make_entry ("foo%", ItemTypeDirectory); // wildcards don't apply
-        make_entry ("foodi_", ItemTypeDirectory); // wildcards don't apply
-        make_entry ("foodir/file", ItemTypeFile);
-        make_entry ("foodir/subdir", ItemTypeDirectory);
-        make_entry ("foodir/subdir/file", ItemTypeFile);
-        make_entry ("foodir/otherdir", ItemTypeDirectory);
-        make_entry ("fo", ItemTypeDirectory); // prefix, but does not match
-        make_entry ("foodir/sub", ItemTypeDirectory); // prefix, but does not match
-        make_entry ("foodir/subdir/subsubdir", ItemTypeDirectory);
-        make_entry ("foodir/subdir/subsubdir/file", ItemTypeFile);
-        make_entry ("foodir/subdir/otherdir", ItemTypeDirectory);
+        make_entry ("foodir", ItemType.DIRECTORY);
+        make_entry ("otherdir", ItemType.DIRECTORY);
+        make_entry ("foo%", ItemType.DIRECTORY); // wildcards don't apply
+        make_entry ("foodi_", ItemType.DIRECTORY); // wildcards don't apply
+        make_entry ("foodir/file", ItemType.FILE);
+        make_entry ("foodir/subdir", ItemType.DIRECTORY);
+        make_entry ("foodir/subdir/file", ItemType.FILE);
+        make_entry ("foodir/otherdir", ItemType.DIRECTORY);
+        make_entry ("fo", ItemType.DIRECTORY); // prefix, but does not match
+        make_entry ("foodir/sub", ItemType.DIRECTORY); // prefix, but does not match
+        make_entry ("foodir/subdir/subsubdir", ItemType.DIRECTORY);
+        make_entry ("foodir/subdir/subsubdir/file", ItemType.FILE);
+        make_entry ("foodir/subdir/otherdir", ItemType.DIRECTORY);
 
-        this.database.schedule_path_for_remote_discovery (GLib.ByteArray ("foodir/subdir"));
+        this.database.schedule_path_for_remote_discovery (string ("foodir/subdir"));
 
         // Direct effects of parent directories being set to this.invalid_
         GLib.assert_cmp (get_etag ("foodir"), invalid_etag);
@@ -269,15 +269,15 @@ public class TestSyncJournalDB : GLib.Object {
         // Indirect effects : set_file_record () calls filter etags
         initial_etag = "etag2";
 
-        make_entry ("foodir", ItemTypeDirectory);
+        make_entry ("foodir", ItemType.DIRECTORY);
         GLib.assert_cmp (get_etag ("foodir"), invalid_etag);
-        make_entry ("foodir/subdir", ItemTypeDirectory);
+        make_entry ("foodir/subdir", ItemType.DIRECTORY);
         GLib.assert_cmp (get_etag ("foodir/subdir"), invalid_etag);
-        make_entry ("foodir/subdir/subsubdir", ItemTypeDirectory);
+        make_entry ("foodir/subdir/subsubdir", ItemType.DIRECTORY);
         GLib.assert_cmp (get_etag ("foodir/subdir/subsubdir"), initial_etag);
-        make_entry ("fo", ItemTypeDirectory);
+        make_entry ("fo", ItemType.DIRECTORY);
         GLib.assert_cmp (get_etag ("fo"), initial_etag);
-        make_entry ("foodir/sub", ItemTypeDirectory);
+        make_entry ("foodir/sub", ItemType.DIRECTORY);
         GLib.assert_cmp (get_etag ("foodir/sub"), initial_etag);
     }
 
@@ -285,7 +285,7 @@ public class TestSyncJournalDB : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void test_recursive_delete () {
-        var make_entry = [&] (GLib.ByteArray path) {
+        var make_entry = [&] (string path) {
             SyncJournalFileRecord record;
             record.path = path;
             record.remote_perm = RemotePermissions.from_database_value ("RW");
@@ -338,13 +338,13 @@ public class TestSyncJournalDB : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void test_pin_state () {
-        var make = [&] (GLib.ByteArray path, PinState state) {
+        var make = [&] (string path, PinState state) {
             this.database.internal_pin_states ().set_for_path (path, state);
             var pin_state = this.database.internal_pin_states ().raw_for_path (path);
             GLib.assert_true (pin_state);
             GLib.assert_cmp (*pin_state, state);
         }
-        var get = [&] (GLib.ByteArray path) . PinState {
+        var get = [&] (string path) . PinState {
             var state = this.database.internal_pin_states ().effective_for_path (path);
             if (!state) {
                 GLib.assert_fail ("couldn't read pin state", __FILE__, __LINE__);
@@ -352,7 +352,7 @@ public class TestSyncJournalDB : GLib.Object {
             }
             return state;
         }
-        var get_recursive = [&] (GLib.ByteArray path) . PinState {
+        var get_recursive = [&] (string path) . PinState {
             var state = this.database.internal_pin_states ().effective_for_path_recursive (path);
             if (!state) {
                 GLib.assert_fail ("couldn't read pin state", __FILE__, __LINE__);
@@ -360,7 +360,7 @@ public class TestSyncJournalDB : GLib.Object {
             }
             return state;
         }
-        var get_raw = [&] (GLib.ByteArray path) . PinState {
+        var get_raw = [&] (string path) . PinState {
             var state = this.database.internal_pin_states ().raw_for_path (path);
             if (!state) {
                 GLib.assert_fail ("couldn't read pin state", __FILE__, __LINE__);
@@ -379,14 +379,14 @@ public class TestSyncJournalDB : GLib.Object {
         make ("online", PinState.VfsItemAvailability.ONLINE_ONLY);
         make ("inherit", PinState.PinState.INHERITED);
         for (var base: {"local/", "online/", "inherit/"}) {
-            make (GLib.ByteArray (base) + "inherit", PinState.PinState.INHERITED);
-            make (GLib.ByteArray (base) + "local", PinState.PinState.ALWAYS_LOCAL);
-            make (GLib.ByteArray (base) + "online", PinState.VfsItemAvailability.ONLINE_ONLY);
+            make (string (base) + "inherit", PinState.PinState.INHERITED);
+            make (string (base) + "local", PinState.PinState.ALWAYS_LOCAL);
+            make (string (base) + "online", PinState.VfsItemAvailability.ONLINE_ONLY);
 
             for (var base2: {"local/", "online/", "inherit/"}) {
-                make (GLib.ByteArray (base) + base2 + "inherit", PinState.PinState.INHERITED);
-                make (GLib.ByteArray (base) + base2 + "local", PinState.PinState.ALWAYS_LOCAL);
-                make (GLib.ByteArray (base) + base2 + "online", PinState.VfsItemAvailability.ONLINE_ONLY);
+                make (string (base) + base2 + "inherit", PinState.PinState.INHERITED);
+                make (string (base) + base2 + "local", PinState.PinState.ALWAYS_LOCAL);
+                make (string (base) + base2 + "online", PinState.VfsItemAvailability.ONLINE_ONLY);
             }
         }
 

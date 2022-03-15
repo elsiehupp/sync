@@ -40,7 +40,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public SelectiveSyncWidget (unowned Account account, Gtk.Widget parent = null) {
+    public SelectiveSyncWidget (unowned Account account, Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.account = account;
         this.inserting = false;
@@ -196,7 +196,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
             path_to_remove.append ('/');
         }
         path_to_remove.append (this.folder_path);
-        if (!this.folder_path.is_empty ())
+        if (!this.folder_path == "")
             path_to_remove.append ('/');
 
         // Check for excludes.
@@ -213,7 +213,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
             this.old_block_list.clear ();
             foreach (string path, list) {
                 path.remove (path_to_remove);
-                if (path.is_empty ()) {
+                if (path == "") {
                     continue;
                 }
                 this.old_block_list.append (path);
@@ -255,9 +255,9 @@ public class SelectiveSyncWidget : Gtk.Widget {
             }
 
             string[] paths = path.split ('/');
-            if (paths.last ().is_empty ())
+            if (paths.last () == "")
                 paths.remove_last ();
-            if (paths.is_empty ())
+            if (paths == "")
                 continue;
             if (!path.ends_with ('/')) {
                 path.append ('/');
@@ -282,14 +282,14 @@ public class SelectiveSyncWidget : Gtk.Widget {
     ***********************************************************/
     private void on_signal_item_expanded (QTreeWidgetItem item) {
         string directory = item.data (0, Qt.USER_ROLE).to_string ();
-        if (directory.is_empty ())
+        if (directory == "")
             return;
         string prefix;
-        if (!this.folder_path.is_empty ()) {
+        if (!this.folder_path == "") {
             prefix = this.folder_path + '/';
         }
         var job = new LsColJob (this.account, prefix + directory, this);
-        job.properties (GLib.List<GLib.ByteArray> ("resourcetype"
+        job.properties (GLib.List<string> ("resourcetype"
                                                + "http://owncloud.org/ns:size");
         connect (job, LsColJob.directory_listing_subfolders,
             this, SelectiveSyncWidget.on_signal_update_directories);
@@ -390,7 +390,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
         this.encrypted_paths.clear ();
 
         var job = new LsColJob (this.account, this.folder_path, this);
-        var props = GLib.List<GLib.ByteArray> ("resourcetype"
+        var props = GLib.List<string> ("resourcetype"
                                          + "http://owncloud.org/ns:size";
         if (this.account.capabilities ().client_side_encryption_available ()) {
             props + "http://nextcloud.org/ns:is-encrypted";

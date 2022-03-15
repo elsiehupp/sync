@@ -59,7 +59,7 @@ public class VfsOff : Vfs {
 
     /***********************************************************
     ***********************************************************/
-    public Result<void, string> update_metadata (string , time_t, int64, GLib.ByteArray ) override {
+    public Result<void, string> update_metadata (string , time_t, int64, string ) override {
         return {};
     }
 
@@ -101,7 +101,7 @@ public class VfsOff : Vfs {
 
     /***********************************************************
     ***********************************************************/
-    public bool stat_type_virtual_file (csync_file_stat_t *, void *) override {
+    public bool stat_type_virtual_file (CSyncFileStatT *, void *) override {
         return false;
     }
 
@@ -147,14 +147,14 @@ public class VfsOff : Vfs {
         }
 
         var name = Mode.to_plugin_name (mode);
-        if (name.is_empty ()) {
+        if (name == "") {
             return false;
         }
 
         QPluginLoader loader (plugin_filename ("vfs", name));
 
         const var base_meta_data = loader.meta_data ();
-        if (base_meta_data.is_empty () || !base_meta_data.contains ("IID")) {
+        if (base_meta_data == "" || !base_meta_data.contains ("IID")) {
             GLib.debug ("Plugin doesn't exist" + loader.filename ();
             return false;
         }
@@ -230,7 +230,7 @@ public class VfsOff : Vfs {
             return std.unique_ptr<Vfs> (new VfsOff);
 
         var name = Mode.to_plugin_name (mode);
-        if (name.is_empty ()) {
+        if (name == "") {
             return null;
         }
 

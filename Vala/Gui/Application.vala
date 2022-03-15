@@ -243,7 +243,7 @@ public class Application : Gtk.Application {
             return;
 
         if (this.quit_instance) {
-            QTimer.single_shot (0, Gtk.Application, QApplication.quit);
+            QTimer.single_shot (0, Gtk.Application, Gtk.Application.quit);
             return;
         }
 
@@ -280,7 +280,7 @@ public class Application : Gtk.Application {
 
         this.folder_manager.on_signal_reset (new FolderMan ());
 
-        connect (this, SharedTools.QtSingleApplication.signal_message_received, this, Application.on_signal_parse_message);
+        connect (this, SharedTools.SingleApplication.signal_message_received, this, Application.on_signal_parse_message);
 
         if (!AccountManager.instance ().restore ()) {
             // If there is an error reading the account settings, try again
@@ -617,7 +617,7 @@ public class Application : Gtk.Application {
         ui_languages = QLocale.system ().ui_languages ();
 
         string enforced_locale = Theme.instance ().enforced_locale ();
-        if (!enforced_locale.is_empty ())
+        if (!enforced_locale == "")
             ui_languages.prepend (enforced_locale);
 
         var translator = new QTranslator (this);
@@ -651,11 +651,11 @@ public class Application : Gtk.Application {
                 if (!qtkeychain_translator.on_signal_load (qtkeychain_tr_file, qt_tr_path)) {
                     qtkeychain_translator.on_signal_load (qtkeychain_tr_file, tr_path);
                 }
-                if (!translator.is_empty ())
+                if (!translator == "")
                     install_translator (translator);
-                if (!qt_translator.is_empty ())
+                if (!qt_translator == "")
                     install_translator (qt_translator);
-                if (!qtkeychain_translator.is_empty ())
+                if (!qtkeychain_translator == "")
                     install_translator (qtkeychain_translator);
                 break;
             }
@@ -671,8 +671,8 @@ public class Application : Gtk.Application {
         // might be called from second instance
         var logger = Logger.instance ();
         logger.log_file (this.log_file);
-        if (this.log_file.is_empty ()) {
-            logger.log_dir (this.log_dir.is_empty () ? ConfigFile ().log_dir () : this.log_dir);
+        if (this.log_file == "") {
+            logger.log_dir (this.log_dir == "" ? ConfigFile ().log_dir () : this.log_dir);
         }
         logger.log_expire (this.log_expire > 0 ? this.log_expire : ConfigFile ().log_expire ());
         logger.log_flush (this.log_flush || ConfigFile ().log_flush ());
@@ -697,7 +697,7 @@ public class Application : Gtk.Application {
     /***********************************************************
     ***********************************************************/
     protected override bool event (QEvent event) {
-        return SharedTools.QtSingleApplication.event (event);
+        return SharedTools.SingleApplication.event (event);
     }
 
 
@@ -726,7 +726,7 @@ public class Application : Gtk.Application {
             }
 
             // Show the main dialog only if there is at least one account configured
-            if (!AccountManager.instance ().accounts ().is_empty ()) {
+            if (!AccountManager.instance ().accounts () == "") {
                 show_main_dialog ();
             } else {
                 this.gui.on_signal_new_account_wizard ();
@@ -753,7 +753,7 @@ public class Application : Gtk.Application {
             }
         }
 
-        if (AccountManager.instance ().accounts ().is_empty ()) {
+        if (AccountManager.instance ().accounts () == "") {
             // let gui open the setup wizard
             this.gui.on_signal_open_settings_dialog ();
 
@@ -813,7 +813,7 @@ public class Application : Gtk.Application {
         }
 
         // if there is no more account, show the wizard.
-        if (this.gui && AccountManager.instance ().accounts ().is_empty ()) {
+        if (this.gui && AccountManager.instance ().accounts () == "") {
             // allow to add a new account if there is non any more. Always think
             // about single account theming!
             OwncloudSetupWizard.run_wizard (this, SLOT (on_signal_owncloud_wizard_done (int)));
@@ -868,7 +868,7 @@ public class Application : Gtk.Application {
 
         // We want to message the user either for destructive changes,
         // or if we're ignoring something and the client version changed.
-        bool warning_message = !delete_keys.is_empty () || (!ignore_keys.is_empty () && version_changed);
+        bool warning_message = !delete_keys == "" || (!ignore_keys == "" && version_changed);
 
         if (!version_changed && !warning_message)
             return true;
@@ -877,7 +877,7 @@ public class Application : Gtk.Application {
 
         if (warning_message) {
             string bold_message;
-            if (!delete_keys.is_empty ()) {
+            if (!delete_keys == "") {
                 bold_message = _("Continuing will mean <b>deleting these settings</b>.");
             } else {
                 bold_message = _("Continuing will mean <b>ignoring these settings</b>.");

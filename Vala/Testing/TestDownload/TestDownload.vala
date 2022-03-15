@@ -39,7 +39,7 @@ public class TestDownload : GLib.Object {
         GLib.assert_true (fake_folder.sync_engine ().is_another_sync_needed ());
 
         // Now, we need to restart, this time, it should resume.
-        GLib.ByteArray ranges;
+        string ranges;
         fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice *) . Soup.Reply * {
             if (operation == Soup.GetOperation && request.url ().path ().ends_with ("A/a0")) {
                 ranges = request.raw_header ("Range");
@@ -47,7 +47,7 @@ public class TestDownload : GLib.Object {
             return null;
         });
         GLib.assert_true (fake_folder.sync_once ()); // now this succeeds
-        GLib.assert_cmp (ranges, GLib.ByteArray ("bytes=" + GLib.ByteArray.number (STOP_AFTER) + "-"));
+        GLib.assert_cmp (ranges, string ("bytes=" + string.number (STOP_AFTER) + "-"));
         GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
     }
 
@@ -66,7 +66,7 @@ public class TestDownload : GLib.Object {
         var size = 3500000;
         fake_folder.remote_modifier ().insert ("A/broken", size);
 
-        GLib.ByteArray server_message = new GLib.ByteArray ("The file was not downloaded because the tests wants so!");
+        string server_message = new string ("The file was not downloaded because the tests wants so!");
 
         // First, download only the first 3 MB of the file
         fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice *) Soup.Reply * => {
@@ -153,7 +153,7 @@ public class TestDownload : GLib.Object {
                         conflict_file = s;
                         return;
                     }
-                    if (!conflict_file.is_empty ()) {
+                    if (!conflict_file == "") {
                         // Check that the temporary file is still there
                         GLib.assert_cmp (QDir (fake_folder.local_path () + "A/").entry_list ({"*.~*"}, QDir.Files | QDir.Hidden).count (), 1);
                         // Set the permission to read only on the folder, so the rename of the temporary file will fail
@@ -164,7 +164,7 @@ public class TestDownload : GLib.Object {
         );
 
         GLib.assert_true (!fake_folder.sync_once ()); // The sync must fail because the rename failed
-        GLib.assert_true (!conflict_file.is_empty ());
+        GLib.assert_true (!conflict_file == "");
 
         // restore permissions
         GLib.File (fake_folder.local_path () + "A/").set_permissions (GLib.File.Permissions (0x7777));
@@ -193,7 +193,7 @@ public class TestDownload : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.remote_modifier ().insert ("A/resendme", 300);
 
-        GLib.ByteArray server_message = new GLib.ByteArray ("Needs to be resend on a new connection!");
+        string server_message = new string ("Needs to be resend on a new connection!");
         int resend_actual = 0;
         int resend_expected = 2;
 

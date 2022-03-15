@@ -267,10 +267,10 @@ public class SyncResult : GLib.Object {
             this.found_files_not_synced = true;
         }
 
-        if (item.is_directory () && (item.instruction == CSYNC_INSTRUCTION_NEW
-                                      || item.instruction == CSYNC_INSTRUCTION_TYPE_CHANGE
-                                      || item.instruction == CSYNC_INSTRUCTION_REMOVE
-                                      || item.instruction == CSYNC_INSTRUCTION_RENAME)) {
+        if (item.is_directory () && (item.instruction == SyncInstructions.NEW
+                                      || item.instruction == SyncInstructions.TYPE_CHANGE
+                                      || item.instruction == SyncInstructions.REMOVE
+                                      || item.instruction == SyncInstructions.RENAME)) {
             this.folder_structure_was_changed = true;
         }
 
@@ -290,7 +290,7 @@ public class SyncResult : GLib.Object {
                 this.first_item_error = item;
             }
         } else if (item.status == SyncFileItem.Status.CONFLICT) {
-            if (item.instruction == CSYNC_INSTRUCTION_CONFLICT) {
+            if (item.instruction == SyncInstructions.CONFLICT) {
                 this.num_new_conflict_items++;
                 if (!this.first_new_conflict_item) {
                     this.first_new_conflict_item = item;
@@ -301,23 +301,23 @@ public class SyncResult : GLib.Object {
         } else {
             if (!item.has_error_status () && item.status != SyncFileItem.Status.FILE_IGNORED && item.direction == SyncFileItem.Direction.DOWN) {
                 switch (item.instruction) {
-                case CSYNC_INSTRUCTION_NEW:
-                case CSYNC_INSTRUCTION_TYPE_CHANGE:
+                case SyncInstructions.NEW:
+                case SyncInstructions.TYPE_CHANGE:
                     this.num_new_items++;
                     if (!this.first_item_new)
                         this.first_item_new = item;
                     break;
-                case CSYNC_INSTRUCTION_REMOVE:
+                case SyncInstructions.REMOVE:
                     this.num_removed_items++;
                     if (!this.first_item_deleted)
                         this.first_item_deleted = item;
                     break;
-                case CSYNC_INSTRUCTION_SYNC:
+                case SyncInstructions.SYNC:
                     this.num_updated_items++;
                     if (!this.first_item_updated)
                         this.first_item_updated = item;
                     break;
-                case CSYNC_INSTRUCTION_RENAME:
+                case SyncInstructions.RENAME:
                     if (!this.first_item_renamed) {
                         this.first_item_renamed = item;
                     }
@@ -327,7 +327,7 @@ public class SyncResult : GLib.Object {
                     // nothing.
                     break;
                 }
-            } else if (item.instruction == CSYNC_INSTRUCTION_IGNORE) {
+            } else if (item.instruction == SyncInstructions.IGNORE) {
                 this.found_files_not_synced = true;
             }
         }

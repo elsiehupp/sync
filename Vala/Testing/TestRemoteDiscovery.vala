@@ -119,13 +119,13 @@ public class TestRemoteDiscovery : GLib.Object {
             GLib.assert_cmp (error_spy.size (), 1);
             GLib.assert_cmp (error_spy[0][0].to_string (), string (fatal_error_prefix + expected_error_string));
         } else {
-            GLib.assert_cmp (complete_spy.find_item ("B").instruction, CSYNC_INSTRUCTION_IGNORE);
+            GLib.assert_cmp (complete_spy.find_item ("B").instruction, SyncInstructions.IGNORE);
             GLib.assert_true (complete_spy.find_item ("B").error_string.contains (expected_error_string));
 
             // The other folder should have been sync'ed as the sync just ignored the faulty directory
             GLib.assert_cmp (fake_folder.current_remote_state ().children["A"], fake_folder.current_local_state ().children["A"]);
             GLib.assert_cmp (fake_folder.current_remote_state ().children["C"], fake_folder.current_local_state ().children["C"]);
-            GLib.assert_cmp (complete_spy.find_item ("A/z1").instruction, CSYNC_INSTRUCTION_NEW);
+            GLib.assert_cmp (complete_spy.find_item ("A/z1").instruction, SyncInstructions.NEW);
         }
 
         //
@@ -162,11 +162,11 @@ public class TestRemoteDiscovery : GLib.Object {
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
         GLib.assert_true (!fake_folder.sync_once ());
 
-        GLib.assert_cmp (complete_spy.find_item ("good").instruction, CSYNC_INSTRUCTION_NEW);
-        GLib.assert_cmp (complete_spy.find_item ("noetag").instruction, CSYNC_INSTRUCTION_ERROR);
-        GLib.assert_cmp (complete_spy.find_item ("nofileid").instruction, CSYNC_INSTRUCTION_ERROR);
-        GLib.assert_cmp (complete_spy.find_item ("nopermissions").instruction, CSYNC_INSTRUCTION_NEW);
-        GLib.assert_cmp (complete_spy.find_item ("nopermissions/A").instruction, CSYNC_INSTRUCTION_ERROR);
+        GLib.assert_cmp (complete_spy.find_item ("good").instruction, SyncInstructions.NEW);
+        GLib.assert_cmp (complete_spy.find_item ("noetag").instruction, SyncInstructions.ERROR);
+        GLib.assert_cmp (complete_spy.find_item ("nofileid").instruction, SyncInstructions.ERROR);
+        GLib.assert_cmp (complete_spy.find_item ("nopermissions").instruction, SyncInstructions.NEW);
+        GLib.assert_cmp (complete_spy.find_item ("nopermissions/A").instruction, SyncInstructions.ERROR);
         GLib.assert_true (complete_spy.find_item ("noetag").error_string.contains ("ETag"));
         GLib.assert_true (complete_spy.find_item ("nofileid").error_string.contains ("file identifier"));
         GLib.assert_true (complete_spy.find_item ("nopermissions/A").error_string.contains ("permission"));

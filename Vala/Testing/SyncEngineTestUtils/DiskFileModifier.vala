@@ -33,7 +33,7 @@ public class DiskFileModifier : FileModifier {
         GLib.File file = new GLib.File (this.root_directory.file_path (relative_path));
         GLib.assert_true (!file.exists ());
         file.open (GLib.File.WriteOnly);
-        GLib.ByteArray buffer = new GLib.ByteArray (1024, content_char);
+        string buffer = new string (1024, content_char);
         for (int x = 0; x < size / buffer.size (); ++x) {
             file.write (buffer);
         }
@@ -51,7 +51,7 @@ public class DiskFileModifier : FileModifier {
         GLib.assert_true (file.exists ());
         int64 size = file.size ();
         file.open (GLib.File.WriteOnly);
-        file.write (GLib.ByteArray ().fill (content_char, size));
+        file.write ("".fill (content_char, size));
     }
 
     /***********************************************************
@@ -60,7 +60,7 @@ public class DiskFileModifier : FileModifier {
         GLib.File file = new GLib.File (this.root_directory.file_path (relative_path));
         GLib.assert_true (file.exists ());
         file.open (GLib.File.ReadWrite);
-        GLib.ByteArray contents = file.read (1);
+        string contents = file.read (1);
         file.seek (file.size ());
         file.write (contents);
     }

@@ -77,12 +77,12 @@ public class OwncloudWizard : QWizard {
     /***********************************************************
     Raw, potentially encrypted pkcs12 bundle provided by the user
     ***********************************************************/
-    public GLib.ByteArray client_cert_bundle;
+    public string client_cert_bundle;
 
     /***********************************************************
     Password for the pkcs12
     ***********************************************************/
-    public GLib.ByteArray client_cert_password;
+    public string client_cert_password;
 
     /***********************************************************
     Key extracted from pkcs12
@@ -115,7 +115,7 @@ public class OwncloudWizard : QWizard {
 
     /***********************************************************
     ***********************************************************/
-    public OwncloudWizard (Gtk.Widget parent = null) {
+    public OwncloudWizard (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.account = null;
         this.registration = false;

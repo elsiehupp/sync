@@ -22,8 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ***********************************************************/
 
-//  #include <Gtk.Widget>
-//  #include <Gtk.Color>
+//  #include <QPainter>
 
 /***********************************************************
     \class QProgressIndicator
@@ -33,13 +32,26 @@ SOFTWARE.
     \sa QProgressBar
 ***********************************************************/
 public class QProgressIndicator : Gtk.Widget {
+
     //  Q_PROPERTY (int delay READ animation_delay WRITE on_set_animation_delay)
     //  Q_PROPERTY (bool displayed_when_stopped READ is_displayed_when_stopped WRITE on_set_displayed_when_stopped)
     //  Q_PROPERTY (Gtk.Color color READ color WRITE on_set_color)
 
     /***********************************************************
     ***********************************************************/
-    public QProgressIndicator (Gtk.Widget* parent = null);
+    private int m_angle = 0;
+    private int m_timer_id = -1;
+    private int m_delay = 40;
+    private bool m_displayed_when_stopped = false;
+    private Gtk.Color m_color = Qt.black;
+
+    /***********************************************************
+    ***********************************************************/
+    public QProgressIndicator (Gtk.Widget parent = new Gtk.Widget ()) {
+        base (parent);
+        set_size_policy (QSizePolicy.Fixed, QSizePolicy.Fixed);
+        set_focus_policy (Qt.NoFocus);
+    }
 
 
     /***********************************************************
@@ -57,7 +69,9 @@ public class QProgressIndicator : Gtk.Widget {
     \return Animation state.
     \sa on_start_animation on_stop_animation
     ***********************************************************/
-    public bool is_animated ();
+    public bool is_animated () {
+        return m_timer_id != -1;
+    }
 
 
     /***********************************************************
@@ -65,36 +79,58 @@ public class QProgressIndicator : Gtk.Widget {
     \return Return true if the progress indicator shows itself even when it is not animating. By default, it returns false.
     \sa on_set_displayed_when_stopped
     ***********************************************************/
-    public bool is_displayed_when_stopped ();
+    public bool is_displayed_when_stopped () {
+        return m_displayed_when_stopped;
+    }
 
 
     /***********************************************************
     Returns the color of the component.
     \sa on_set_color
     ***********************************************************/
-      public const Gtk.Color & color () {
+    public Gtk.Color color () {
         return m_color;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public QSize size_hint () override;
-    public int height_for_width (int w) override;
+    public override QSize size_hint () {
+        return new QSize (20, 20);
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public override int height_for_width (int pixel_width) {
+        return pixel_width;
+    }
 
 
     /***********************************************************
     Starts the spin animation.
     \sa on_stop_animation is_animated
     ***********************************************************/
-    public void on_start_animation ();
+    public void on_start_animation () {
+        m_angle = 0;
+
+        if (m_timer_id == -1)
+            m_timer_id = start_timer (m_delay);
+    }
 
 
     /***********************************************************
     Stops the spin animation.
     \sa on_start_animation is_animated
     ***********************************************************/
-    public void on_stop_animation ();
+    public void on_stop_animation () {
+        if (m_timer_id != -1)
+            kill_timer (m_timer_id);
+
+        m_timer_id = -1;
+
+        update ();
+    }
 
 
     /***********************************************************
@@ -103,7 +139,15 @@ public class QProgressIndicator : Gtk.Widget {
     \param delay The delay, in milliseconds.
     \sa animation_delay
     ***********************************************************/
-    public void on_set_animation_delay (int delay);
+    public void on_set_animation_delay (int delay) {
+        if (m_timer_id != -1)
+            kill_timer (m_timer_id);
+
+        m_delay = delay;
+
+        if (m_timer_id != -1)
+            m_timer_id = start_timer (m_delay);
+    }
 
 
     /***********************************************************
@@ -111,153 +155,86 @@ public class QProgressIndicator : Gtk.Widget {
     \param state The animation state. Set false to hide the progress indicator when it is not animating; otherwise true.
     \sa is_displayed_when_stopped
     ***********************************************************/
-    public void on_set_displayed_when_stopped (bool state);
+    public void on_set_displayed_when_stopped (bool state) {
+        m_displayed_when_stopped = state;
+
+        update ();
+    }
 
 
     /***********************************************************
     Sets the color of the components to the given color.
     \sa color
     ***********************************************************/
-    public void on_set_color (Gtk.Color & color);
+    public void on_set_color (Gtk.Color color) {
+        m_color = color;
 
-    protected void timer_event (QTimerEvent * event) override;
-    protected void paint_event (QPaintEvent * event) override;
+        update ();
+    }
+
 
     /***********************************************************
     ***********************************************************/
-    private int m_angle = 0;
-    private int m_timer_id = -1;
-    private int m_delay = 40;
-    private bool m_displayed_when_stopped = false;
-    private Gtk.Color m_color = Qt.black;
-}
+    protected override void timer_event (QTimerEvent event) {
+        m_angle = (m_angle+30)%360;
 
-
-
-
-
-
-
-
-
-
-/***********************************************************
-The MIT License (MIT)
-
-Copyright (c) 2011 Morgan Leborgne
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to
-in the Software without restriction, including without limitation the
-to use, copy, modify, merge, publish, distribute, sublicens
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following condi
-
-The above copyright notice and this permission notice shall be included
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-***********************************************************/
-
-//  #include <QPainter>
-
-QProgressIndicator.QProgressIndicator (Gtk.Widget* parent)
-    : Gtk.Widget (parent) {
-    set_size_policy (QSizePolicy.Fixed, QSizePolicy.Fixed);
-    set_focus_policy (Qt.NoFocus);
-}
-
-bool QProgressIndicator.is_animated () {
-    return (m_timer_id != -1);
-}
-
-void QProgressIndicator.on_set_displayed_when_stopped (bool state) {
-    m_displayed_when_stopped = state;
-
-    update ();
-}
-
-bool QProgressIndicator.is_displayed_when_stopped () {
-    return m_displayed_when_stopped;
-}
-
-void QProgressIndicator.on_start_animation () {
-    m_angle = 0;
-
-    if (m_timer_id == -1)
-        m_timer_id = start_timer (m_delay);
-}
-
-void QProgressIndicator.on_stop_animation () {
-    if (m_timer_id != -1)
-        kill_timer (m_timer_id);
-
-    m_timer_id = -1;
-
-    update ();
-}
-
-void QProgressIndicator.on_set_animation_delay (int delay) {
-    if (m_timer_id != -1)
-        kill_timer (m_timer_id);
-
-    m_delay = delay;
-
-    if (m_timer_id != -1)
-        m_timer_id = start_timer (m_delay);
-}
-
-void QProgressIndicator.on_set_color (Gtk.Color & color) {
-    m_color = color;
-
-    update ();
-}
-
-QSize QProgressIndicator.size_hint () {
-    return {20, 20};
-}
-
-int QProgressIndicator.height_for_width (int w) {
-    return w;
-}
-
-void QProgressIndicator.timer_event (QTimerEvent * /*event*/) {
-    m_angle = (m_angle+30)%360;
-
-    update ();
-}
-
-void QProgressIndicator.paint_event (QPaintEvent * /*event*/) {
-    if (!m_displayed_when_stopped && !is_animated ())
-        return;
-
-    int width = q_min (this.width (), this.height ());
-
-    QPainter p (this);
-    p.set_render_hint (QPainter.Antialiasing);
-
-    int outer_radius = q_round ( (width - 1) * 0.5);
-    int inner_radius = q_round ( (width - 1) * 0.5 * 0.38);
-
-    int capsule_height = outer_radius - inner_radius;
-    int capsule_width  = q_round ( (width > 32 ) ? capsule_height * 0.23 : capsule_height * 0.35);
-    int capsule_radius = capsule_width/2;
-
-    for (int i=0; i<12; i++) {
-        Gtk.Color color = m_color;
-        color.set_alpha_f (1.0f - (static_cast<float> (i) / 12.0f));
-        p.set_pen (Qt.NoPen);
-        p.set_brush (color);
-        p.save ();
-        p.translate (rect ().center ());
-        p.rotate (m_angle - i * 30);
-        p.draw_rounded_rect (q_round (-capsule_width * 0.5), - (inner_radius + capsule_height), capsule_width, capsule_height, capsule_radius, capsule_radius);
-        p.restore ();
+        update ();
     }
+
+
+    /***********************************************************
+    ***********************************************************/
+    protected override void paint_event (QPaintEvent event) {
+        if (!m_displayed_when_stopped && !is_animated ()) {
+            return;
+        }
+
+        int width = q_min (this.width (), this.height ());
+
+        QPainter p = new QPainter (this);
+        p.set_render_hint (QPainter.Antialiasing);
+
+        int outer_radius = q_round ( (width - 1) * 0.5);
+        int inner_radius = q_round ( (width - 1) * 0.5 * 0.38);
+
+        int capsule_height = outer_radius - inner_radius;
+        int capsule_width  = q_round ( (width > 32 ) ? capsule_height * 0.23 : capsule_height * 0.35);
+        int capsule_radius = capsule_width/2;
+
+        for (int i=0; i<12; i++) {
+            Gtk.Color color = m_color;
+            color.set_alpha_f (1.0f - (static_cast<float> (i) / 12.0f));
+            p.set_pen (Qt.NoPen);
+            p.set_brush (color);
+            p.save ();
+            p.translate (rect ().center ());
+            p.rotate (m_angle - i * 30);
+            p.draw_rounded_rect (q_round (-capsule_width * 0.5), - (inner_radius + capsule_height), capsule_width, capsule_height, capsule_radius, capsule_radius);
+            p.restore ();
+        }
+    }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

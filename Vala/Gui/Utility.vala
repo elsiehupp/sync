@@ -5,7 +5,7 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 ***********************************************************/
 
 //  #include <QClipboard>
-//  #include <QApplication>
+//  #include <Gtk.Application>
 //  #include <QDesktopServices>
 //  #include <QLoggingCategory>
 //  #include <QMessageBox>

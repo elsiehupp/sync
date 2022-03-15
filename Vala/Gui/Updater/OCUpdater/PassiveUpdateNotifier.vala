@@ -16,7 +16,7 @@ The implementation does not show popups
 ***********************************************************/
 public class PassiveUpdateNotifier : OCUpdater {
 
-    private GLib.ByteArray running_app_version;
+    private string running_app_version;
 
     /***********************************************************
     ***********************************************************/
@@ -42,8 +42,8 @@ public class PassiveUpdateNotifier : OCUpdater {
         if (Utility.is_linux ()) {
             // on linux, check if the installed binary is still the same version
             // as the one that is running. If not, restart if possible.
-            const GLib.ByteArray fs_version = Utility.version_of_installed_binary ();
-            if (! (fs_version.is_empty () || this.running_app_version.is_empty ()) && fs_version != this.running_app_version) {
+            const string fs_version = Utility.version_of_installed_binary ();
+            if (! (fs_version == "" || this.running_app_version == "") && fs_version != this.running_app_version) {
                 /* emit */ signal_request_restart ();
             }
         }
@@ -58,7 +58,7 @@ public class PassiveUpdateNotifier : OCUpdater {
         int64 current_ver = Helper.current_version_to_int ();
         int64 remote_ver = Helper.string_version_to_int (info.version ());
 
-        if (info.version ().is_empty () || current_ver >= remote_ver) {
+        if (info.version () == "" || current_ver >= remote_ver) {
             GLib.info ("Client is on latest version!");
             download_state (DownloadState.UP_TO_DATE);
         } else {

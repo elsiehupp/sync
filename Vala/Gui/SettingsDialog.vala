@@ -103,7 +103,7 @@ public class SettingsDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public SettingsDialog (OwncloudGui gui, Gtk.Widget parent = null) {
+    public SettingsDialog (OwncloudGui gui, Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.ui = new Ui.SettingsDialog ();
         this.gui = gui;
@@ -373,7 +373,7 @@ public class SettingsDialog : Gtk.Dialog {
         // Hide when the last account is deleted. We want to enter the same
         // state we'd be in the client was started up without an account
         // configured.
-        if (AccountManager.instance ().accounts ().is_empty ()) {
+        if (AccountManager.instance ().accounts () == "") {
             hide ();
         }
     }
@@ -413,7 +413,7 @@ public class SettingsDialog : Gtk.Dialog {
     private QAction create_action_with_icon (Gtk.Icon icon, string text, string icon_path) {
         QAction action = new ToolButtonAction (icon, text, this);
         action.checkable (true);
-        if (!icon_path.is_empty ()) {
+        if (!icon_path == "") {
             action.property ("icon_path", icon_path);
         }
         return action;
@@ -427,7 +427,7 @@ public class SettingsDialog : Gtk.Dialog {
     ***********************************************************/
     private static string short_display_name_for_settings (Occ.Account account, int width) {
         string user = account.dav_display_name ();
-        if (user.is_empty ()) {
+        if (user == "") {
             user = account.credentials ().user ();
         }
         string host = account.url ().host ();

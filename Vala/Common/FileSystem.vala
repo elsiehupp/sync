@@ -26,14 +26,16 @@ namespace Occ {
 /***********************************************************
 @brief This file contains file system helper
 ***********************************************************/
-namespace FileSystem {
+public class FileSystem {
+
+    static GLib.File.Permissions default_write_permissions;
 
     /***********************************************************
     @brief Mark the file as hidden  (only has effects on windows)
 
     OCSYNC_EXPORT
     ***********************************************************/
-    void file_hidden (string filename, bool hidden) {
+    public static void file_hidden (string filename, bool hidden) {
         //  Q_UNUSED (filename);
         //  Q_UNUSED (hidden);
     }
@@ -47,13 +49,13 @@ namespace FileSystem {
 
     OCSYNC_EXPORT
     ***********************************************************/
-    void file_read_only (string filename, bool read_only) {
+    public static void file_read_only (string filename, bool read_only) {
         GLib.File file = GLib.File.new_for_path (filename);
         GLib.File.Permissions permissions = file.permissions ();
 
         GLib.File.Permissions all_write_permissions =
             GLib.File.WriteUser | GLib.File.WriteGroup | GLib.File.WriteOther | GLib.File.WriteOwner;
-        static GLib.File.Permissions default_write_permissions = get_default_write_permissions ();
+        FileSystem.default_write_permissions = get_default_write_permissions ();
 
         permissions &= ~all_write_permissions;
         if (!read_only) {
@@ -74,7 +76,7 @@ namespace FileSystem {
 
     OCSYNC_EXPORT
     ***********************************************************/
-    void file_read_only_weak (string filename, bool read_only) {
+    public static void file_read_only_weak (string filename, bool read_only) {
         GLib.File file = GLib.File.new_for_path (filename);
         GLib.File.Permissions permissions = file.permissions ();
 
@@ -92,7 +94,7 @@ namespace FileSystem {
 
     OCSYNC_EXPORT
     ***********************************************************/
-    void folder_minimum_permissions (string filename) {
+    public static void folder_minimum_permissions (string filename) {
         //  Q_UNUSED (filename);
     }
 
@@ -102,7 +104,7 @@ namespace FileSystem {
 
     OCSYNC_EXPORT
     ***********************************************************/
-    string long_win_path (string inpath) {
+    public static string long_win_path (string inpath) {
         return inpath;
     }
 
@@ -115,7 +117,7 @@ namespace FileSystem {
 
     OCSYNC_EXPORT
     ***********************************************************/
-    bool file_exists (string filename, GLib.FileInfo file_info = new GLib.FileInfo ()) {
+    public static bool file_exists (string filename, GLib.FileInfo file_info = new GLib.FileInfo ()) {
         bool re = file_info.exists ();
         // if the filename is different from the filename in file_info, the file_info is
         // not valid. There needs to be one initialised here. Otherwise the incoming
@@ -137,7 +139,7 @@ namespace FileSystem {
 
     OCSYNC_EXPORT
     ***********************************************************/
-    bool rename (string origin_filename,
+    public static bool rename (string origin_filename,
         string destination_filename,
         string error_string = "") {
         bool success = false;
@@ -151,9 +153,9 @@ namespace FileSystem {
 
         if (!success) {
             GLib.warning (
-                "Error renaming file" + origin_filename
-                + "to" + destination_filename
-                + "failed: " + error;
+                "Error renaming file " + origin_filename
+                + " to " + destination_filename
+                + " failed: " + error);
             if (error_string) {
                 *error_string = error;
             }
@@ -169,12 +171,13 @@ namespace FileSystem {
 
     OCSYNC_EXPORT
     ***********************************************************/
-    bool unchecked_rename_replace (string origin_filename,
-        const string destination_filename,
+    public static bool unchecked_rename_replace (
+        string origin_filename,
+        string destination_filename,
         string error_string) {
 
         bool success = false;
-        GLib.File orig (origin_filename);
+        GLib.File orig = new GLib.File (origin_filename);
         // We want a rename that also overwites.  GLib.File.rename does not overwite.
         // Qt 5.1 has QSaveFile.rename_overwrite we could use.
         // ### FIXME
@@ -182,7 +185,7 @@ namespace FileSystem {
         bool dest_exists = file_exists (destination_filename);
         if (dest_exists && !GLib.File.remove (destination_filename)) {
             *error_string = orig.error_string ();
-            GLib.warning ("Target file could not be removed.";
+            GLib.warning ("Target file could not be removed.");
             success = false;
         }
         if (success) {
@@ -190,7 +193,7 @@ namespace FileSystem {
         }
         if (!success) {
             *error_string = orig.error_string ();
-            GLib.warning ("Renaming temp file to final failed: " + *error_string;
+            GLib.warning ("Renaming temp file to final failed: " + *error_string);
             return false;
         }
 
@@ -206,7 +209,7 @@ namespace FileSystem {
 
     OCSYNC_EXPORT
     ***********************************************************/
-    bool remove (string filename, string error_string = "") {
+    public static bool remove (string filename, string error_string = "") {
         GLib.File file = GLib.File.new_for_path (filename);
         if (!file.remove ()) {
             if (error_string) {
@@ -224,11 +227,11 @@ namespace FileSystem {
 
     OCSYNC_EXPORT
     ***********************************************************/
-    bool move_to_trash (string filename, string error_string) {
+    public static bool move_to_trash (string filename, string error_string) {
         // TODO : Qt 5.15 bool GLib.File.move_to_trash ()
         string trash_path, trash_file_path, trash_info_path;
         string xdg_data_home = GLib.File.decode_name (qgetenv ("XDG_DATA_HOME"));
-        if (xdg_data_home.is_empty ()) {
+        if (xdg_data_home == "") {
             trash_path = QDir.home_path () + "/.local/share/Trash/"; // trash path that should exist
         } else {
             trash_path = xdg_data_home + "/Trash/";
@@ -242,7 +245,7 @@ namespace FileSystem {
             return false; //mkpath will return true if path exists
         }
 
-        GLib.FileInfo file_info (filename);
+        GLib.FileInfo file_info = new GLib.FileInfo (filename);
 
         QDir file;
         int suffix_number = 1;
@@ -252,13 +255,13 @@ namespace FileSystem {
                 suffix_number++;
             }
             if (!file.rename (file_info.absolute_file_path (), path + string.number (suffix_number))) { // rename (file old path, file trash path)
-                *error_string = _("FileSystem", R" (Could not move "%1" to "%2")")
+                *error_string = _("FileSystem", " (Could not move \"%1\" to \"%2\")")
                                    .printf (file_info.absolute_file_path (), path + string.number (suffix_number));
                 return false;
             }
         } else {
             if (!file.rename (file_info.absolute_file_path (), trash_file_path + file_info.filename ())) { // rename (file old path, file trash path)
-                *error_string = _("FileSystem", R" (Could not move "%1" to "%2")")
+                *error_string = _("FileSystem", " (Could not move \"%1\" to \"%2\")")
                                    .printf (file_info.absolute_file_path (), trash_file_path + file_info.filename ());
                 return false;
             }
@@ -276,9 +279,9 @@ namespace FileSystem {
 
         info_file.open (QIODevice.ReadWrite);
 
-        QTextStream stream (&info_file); // for write data on open file
+        QTextStream stream = new QTextStream (info_file); // for write data on open file
 
-        stream + "[Trash Info]\n"
+        stream += "[Trash Info]\n"
                + "Path="
                + GLib.Uri.to_percent_encoding (file_info.absolute_file_path (), "~this.-./")
                + "\n"
@@ -302,7 +305,7 @@ namespace FileSystem {
 
     OCSYNC_EXPORT
     ***********************************************************/
-    bool open_and_seek_file_shared_read (GLib.File file, string error_or_null, int64 seek) {
+    public static bool open_and_seek_file_shared_read (GLib.File file, string error_or_null, int64 seek) {
         string error_dummy;
         // avoid many if (error_or_null) later.
         string error = error_or_null ? *error_or_null : error_dummy;
@@ -325,7 +328,7 @@ namespace FileSystem {
 
     OCSYNC_EXPORT
     ***********************************************************/
-    bool is_lnk_file (string filename) {
+    public static bool is_lnk_file (string filename) {
         return filename.ends_with (".lnk");
     }
 
@@ -335,7 +338,7 @@ namespace FileSystem {
 
     OCSYNC_EXPORT
     ***********************************************************/
-    bool is_exclude_file (string filename) {
+    public static bool is_exclude_file (string filename) {
         return filename.down () == ".sync-exclude.lst"
             || filename.down () == "exclude.lst"
             || filename.down ().has_suffix ("/.sync-exclude.lst")

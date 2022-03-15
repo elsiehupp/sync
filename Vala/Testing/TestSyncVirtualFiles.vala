@@ -24,24 +24,24 @@ SyncJournalFileRecord database_record (FakeFolder folder, string path) {
     return record;
 }
 
-void trigger_download (FakeFolder folder, GLib.ByteArray path) {
+void trigger_download (FakeFolder folder, string path) {
     var journal = folder.sync_journal ();
     SyncJournalFileRecord record;
     journal.get_file_record (path + DVSUFFIX, record);
     if (!record.is_valid ())
         return;
-    record.type = ItemTypeVirtualFileDownload;
+    record.type = ItemType.VIRTUAL_FILE_DOWNLOAD;
     journal.set_file_record (record);
     journal.schedule_path_for_remote_discovery (record.path);
 }
 
-void mark_for_dehydration (FakeFolder folder, GLib.ByteArray path) {
+void mark_for_dehydration (FakeFolder folder, string path) {
     var journal = folder.sync_journal ();
     SyncJournalFileRecord record;
     journal.get_file_record (path, record);
     if (!record.is_valid ())
         return;
-    record.type = ItemTypeVirtualFileDehydration;
+    record.type = ItemType.VIRTUAL_FILE_DEHYDRATION;
     journal.set_file_record (record);
     journal.schedule_path_for_remote_discovery (record.path);
 }
@@ -96,8 +96,8 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state ().find ("A/a1" DVSUFFIX));
         GLib.assert_cmp (GLib.FileInfo (fake_folder.local_path () + "A/a1" DVSUFFIX).last_modified (), some_date);
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a1"));
-        GLib.assert_true (item_instruction (complete_spy, "A/a1" DVSUFFIX, CSYNC_INSTRUCTION_NEW));
-        GLib.assert_cmp (database_record (fake_folder, "A/a1" DVSUFFIX).type, ItemTypeVirtualFile);
+        GLib.assert_true (item_instruction (complete_spy, "A/a1" DVSUFFIX, SyncInstructions.NEW));
+        GLib.assert_cmp (database_record (fake_folder, "A/a1" DVSUFFIX).type, ItemType.VIRTUAL_FILE);
         on_signal_cleanup ();
 
         // Another sync doesn't actually lead to changes
@@ -106,8 +106,8 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state ().find ("A/a1" DVSUFFIX));
         GLib.assert_cmp (GLib.FileInfo (fake_folder.local_path () + "A/a1" DVSUFFIX).last_modified (), some_date);
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a1"));
-        GLib.assert_cmp (database_record (fake_folder, "A/a1" DVSUFFIX).type, ItemTypeVirtualFile);
-        GLib.assert_true (complete_spy.is_empty ());
+        GLib.assert_cmp (database_record (fake_folder, "A/a1" DVSUFFIX).type, ItemType.VIRTUAL_FILE);
+        GLib.assert_true (complete_spy == "");
         on_signal_cleanup ();
 
         // Not even when the remote is rediscovered
@@ -117,8 +117,8 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state ().find ("A/a1" DVSUFFIX));
         GLib.assert_cmp (GLib.FileInfo (fake_folder.local_path () + "A/a1" DVSUFFIX).last_modified (), some_date);
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a1"));
-        GLib.assert_cmp (database_record (fake_folder, "A/a1" DVSUFFIX).type, ItemTypeVirtualFile);
-        GLib.assert_true (complete_spy.is_empty ());
+        GLib.assert_cmp (database_record (fake_folder, "A/a1" DVSUFFIX).type, ItemType.VIRTUAL_FILE);
+        GLib.assert_true (complete_spy == "");
         on_signal_cleanup ();
 
         // Neither does a remote change
@@ -127,8 +127,8 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (!fake_folder.current_local_state ().find ("A/a1"));
         GLib.assert_true (fake_folder.current_local_state ().find ("A/a1" DVSUFFIX));
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a1"));
-        GLib.assert_true (item_instruction (complete_spy, "A/a1" DVSUFFIX, CSYNC_INSTRUCTION_UPDATE_METADATA));
-        GLib.assert_cmp (database_record (fake_folder, "A/a1" DVSUFFIX).type, ItemTypeVirtualFile);
+        GLib.assert_true (item_instruction (complete_spy, "A/a1" DVSUFFIX, SyncInstructions.UPDATE_METADATA));
+        GLib.assert_cmp (database_record (fake_folder, "A/a1" DVSUFFIX).type, ItemType.VIRTUAL_FILE);
         GLib.assert_cmp (database_record (fake_folder, "A/a1" DVSUFFIX).file_size, 65);
         on_signal_cleanup ();
 
@@ -140,8 +140,8 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (!fake_folder.current_local_state ().find ("A/a1"));
         GLib.assert_true (fake_folder.current_local_state ().find ("A/a1" DVSUFFIX));
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a1"));
-        GLib.assert_true (item_instruction (complete_spy, "A/a1" DVSUFFIX, CSYNC_INSTRUCTION_NEW));
-        GLib.assert_cmp (database_record (fake_folder, "A/a1" DVSUFFIX).type, ItemTypeVirtualFile);
+        GLib.assert_true (item_instruction (complete_spy, "A/a1" DVSUFFIX, SyncInstructions.NEW));
+        GLib.assert_cmp (database_record (fake_folder, "A/a1" DVSUFFIX).type, ItemType.VIRTUAL_FILE);
         GLib.assert_cmp (database_record (fake_folder, "A/a1" DVSUFFIX).file_size, 65);
         on_signal_cleanup ();
 
@@ -155,10 +155,10 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (!fake_folder.current_remote_state ().find ("A/a1"));
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a1m"));
         GLib.assert_true (
-            item_instruction (complete_spy, "A/a1m" DVSUFFIX, CSYNC_INSTRUCTION_RENAME)
-            || (item_instruction (complete_spy, "A/a1m" DVSUFFIX, CSYNC_INSTRUCTION_NEW)
-                && item_instruction (complete_spy, "A/a1" DVSUFFIX, CSYNC_INSTRUCTION_REMOVE)));
-        GLib.assert_cmp (database_record (fake_folder, "A/a1m" DVSUFFIX).type, ItemTypeVirtualFile);
+            item_instruction (complete_spy, "A/a1m" DVSUFFIX, SyncInstructions.RENAME)
+            || (item_instruction (complete_spy, "A/a1m" DVSUFFIX, SyncInstructions.NEW)
+                && item_instruction (complete_spy, "A/a1" DVSUFFIX, SyncInstructions.REMOVE)));
+        GLib.assert_cmp (database_record (fake_folder, "A/a1m" DVSUFFIX).type, ItemType.VIRTUAL_FILE);
         on_signal_cleanup ();
 
         // Remote remove is propagated
@@ -166,7 +166,7 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (!fake_folder.current_local_state ().find ("A/a1m" DVSUFFIX));
         GLib.assert_true (!fake_folder.current_remote_state ().find ("A/a1m"));
-        GLib.assert_true (item_instruction (complete_spy, "A/a1m" DVSUFFIX, CSYNC_INSTRUCTION_REMOVE));
+        GLib.assert_true (item_instruction (complete_spy, "A/a1m" DVSUFFIX, SyncInstructions.REMOVE));
         GLib.assert_true (!database_record (fake_folder, "A/a1" DVSUFFIX).is_valid ());
         GLib.assert_true (!database_record (fake_folder, "A/a1m" DVSUFFIX).is_valid ());
         on_signal_cleanup ();
@@ -185,10 +185,10 @@ public class TestSyncVirtualFiles : GLib.Object {
         fake_folder.sync_engine ().set_local_discovery_options (LocalDiscoveryStyle.FILESYSTEM_ONLY);
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state ().find ("A/a2" DVSUFFIX));
-        GLib.assert_true (item_instruction (complete_spy, "A/a2" DVSUFFIX, CSYNC_INSTRUCTION_UPDATE_METADATA));
+        GLib.assert_true (item_instruction (complete_spy, "A/a2" DVSUFFIX, SyncInstructions.UPDATE_METADATA));
         GLib.assert_true (database_record (fake_folder, "A/a2" DVSUFFIX).is_valid ());
         GLib.assert_true (!fake_folder.current_local_state ().find ("A/a3" DVSUFFIX));
-        GLib.assert_true (item_instruction (complete_spy, "A/a3" DVSUFFIX, CSYNC_INSTRUCTION_REMOVE));
+        GLib.assert_true (item_instruction (complete_spy, "A/a3" DVSUFFIX, SyncInstructions.REMOVE));
         GLib.assert_true (!database_record (fake_folder, "A/a3" DVSUFFIX).is_valid ());
         on_signal_cleanup ();
     }
@@ -235,11 +235,11 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (fake_folder.sync_once ());
 
         // Everything is CONFLICT since mtimes are different even for a1/b1
-        GLib.assert_true (item_instruction (complete_spy, "A/a1", CSYNC_INSTRUCTION_CONFLICT));
-        GLib.assert_true (item_instruction (complete_spy, "A/a2", CSYNC_INSTRUCTION_CONFLICT));
-        GLib.assert_true (item_instruction (complete_spy, "B/b1", CSYNC_INSTRUCTION_CONFLICT));
-        GLib.assert_true (item_instruction (complete_spy, "B/b2", CSYNC_INSTRUCTION_CONFLICT));
-        GLib.assert_true (item_instruction (complete_spy, "C/c1", CSYNC_INSTRUCTION_CONFLICT));
+        GLib.assert_true (item_instruction (complete_spy, "A/a1", SyncInstructions.CONFLICT));
+        GLib.assert_true (item_instruction (complete_spy, "A/a2", SyncInstructions.CONFLICT));
+        GLib.assert_true (item_instruction (complete_spy, "B/b1", SyncInstructions.CONFLICT));
+        GLib.assert_true (item_instruction (complete_spy, "B/b2", SyncInstructions.CONFLICT));
+        GLib.assert_true (item_instruction (complete_spy, "C/c1", SyncInstructions.CONFLICT));
 
         // no virtual file files should remain
         GLib.assert_true (!fake_folder.current_local_state ().find ("A/a1" DVSUFFIX));
@@ -252,11 +252,11 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_cmp (fake_folder.sync_journal ().conflict_record_paths ().size (), 3);
 
         // nothing should have the virtual file tag
-        GLib.assert_cmp (database_record (fake_folder, "A/a1").type, ItemTypeFile);
-        GLib.assert_cmp (database_record (fake_folder, "A/a2").type, ItemTypeFile);
-        GLib.assert_cmp (database_record (fake_folder, "B/b1").type, ItemTypeFile);
-        GLib.assert_cmp (database_record (fake_folder, "B/b2").type, ItemTypeFile);
-        GLib.assert_cmp (database_record (fake_folder, "C/c1").type, ItemTypeFile);
+        GLib.assert_cmp (database_record (fake_folder, "A/a1").type, ItemType.FILE);
+        GLib.assert_cmp (database_record (fake_folder, "A/a2").type, ItemType.FILE);
+        GLib.assert_cmp (database_record (fake_folder, "B/b1").type, ItemType.FILE);
+        GLib.assert_cmp (database_record (fake_folder, "B/b2").type, ItemType.FILE);
+        GLib.assert_cmp (database_record (fake_folder, "C/c1").type, ItemType.FILE);
         GLib.assert_true (!database_record (fake_folder, "A/a1" DVSUFFIX).is_valid ());
         GLib.assert_true (!database_record (fake_folder, "A/a2" DVSUFFIX).is_valid ());
         GLib.assert_true (!database_record (fake_folder, "B/b1" DVSUFFIX).is_valid ());
@@ -299,8 +299,8 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (!fake_folder.current_local_state ().find ("A/new"));
         GLib.assert_true (fake_folder.current_local_state ().find ("A/new" DVSUFFIX));
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/new"));
-        GLib.assert_true (item_instruction (complete_spy, "A/new" DVSUFFIX, CSYNC_INSTRUCTION_NEW));
-        GLib.assert_cmp (database_record (fake_folder, "A/new" DVSUFFIX).type, ItemTypeVirtualFile);
+        GLib.assert_true (item_instruction (complete_spy, "A/new" DVSUFFIX, SyncInstructions.NEW));
+        GLib.assert_cmp (database_record (fake_folder, "A/new" DVSUFFIX).type, ItemType.VIRTUAL_FILE);
         on_signal_cleanup ();
     }
 
@@ -372,37 +372,37 @@ public class TestSyncVirtualFiles : GLib.Object {
         fake_folder.local_modifier ().rename ("A/a7" DVSUFFIX, "A/a7");
 
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_true (item_instruction (complete_spy, "A/a1", CSYNC_INSTRUCTION_SYNC));
-        GLib.assert_cmp (complete_spy.find_item ("A/a1").type, ItemTypeVirtualFileDownload);
-        GLib.assert_true (item_instruction (complete_spy, "A/a1" DVSUFFIX, CSYNC_INSTRUCTION_NONE));
-        GLib.assert_true (item_instruction (complete_spy, "A/a2", CSYNC_INSTRUCTION_SYNC));
-        GLib.assert_cmp (complete_spy.find_item ("A/a2").type, ItemTypeVirtualFileDownload);
-        GLib.assert_true (item_instruction (complete_spy, "A/a2" DVSUFFIX, CSYNC_INSTRUCTION_NONE));
-        GLib.assert_true (item_instruction (complete_spy, "A/a3" DVSUFFIX, CSYNC_INSTRUCTION_REMOVE));
-        GLib.assert_true (item_instruction (complete_spy, "A/a4m", CSYNC_INSTRUCTION_NEW));
-        GLib.assert_true (item_instruction (complete_spy, "A/a4" DVSUFFIX, CSYNC_INSTRUCTION_REMOVE));
-        GLib.assert_true (item_instruction (complete_spy, "A/a5", CSYNC_INSTRUCTION_CONFLICT));
-        GLib.assert_true (item_instruction (complete_spy, "A/a5" DVSUFFIX, CSYNC_INSTRUCTION_REMOVE));
-        GLib.assert_true (item_instruction (complete_spy, "A/a6", CSYNC_INSTRUCTION_CONFLICT));
-        GLib.assert_true (item_instruction (complete_spy, "A/a7", CSYNC_INSTRUCTION_SYNC));
-        GLib.assert_true (item_instruction (complete_spy, "A/b1", CSYNC_INSTRUCTION_SYNC));
-        GLib.assert_true (item_instruction (complete_spy, "A/b2", CSYNC_INSTRUCTION_SYNC));
-        GLib.assert_true (item_instruction (complete_spy, "A/b3", CSYNC_INSTRUCTION_REMOVE));
-        GLib.assert_true (item_instruction (complete_spy, "A/b4m" DVSUFFIX, CSYNC_INSTRUCTION_NEW));
-        GLib.assert_true (item_instruction (complete_spy, "A/b4", CSYNC_INSTRUCTION_REMOVE));
-        GLib.assert_cmp (database_record (fake_folder, "A/a1").type, ItemTypeFile);
+        GLib.assert_true (item_instruction (complete_spy, "A/a1", SyncInstructions.SYNC));
+        GLib.assert_cmp (complete_spy.find_item ("A/a1").type, ItemType.VIRTUAL_FILE_DOWNLOAD);
+        GLib.assert_true (item_instruction (complete_spy, "A/a1" DVSUFFIX, SyncInstructions.NONE));
+        GLib.assert_true (item_instruction (complete_spy, "A/a2", SyncInstructions.SYNC));
+        GLib.assert_cmp (complete_spy.find_item ("A/a2").type, ItemType.VIRTUAL_FILE_DOWNLOAD);
+        GLib.assert_true (item_instruction (complete_spy, "A/a2" DVSUFFIX, SyncInstructions.NONE));
+        GLib.assert_true (item_instruction (complete_spy, "A/a3" DVSUFFIX, SyncInstructions.REMOVE));
+        GLib.assert_true (item_instruction (complete_spy, "A/a4m", SyncInstructions.NEW));
+        GLib.assert_true (item_instruction (complete_spy, "A/a4" DVSUFFIX, SyncInstructions.REMOVE));
+        GLib.assert_true (item_instruction (complete_spy, "A/a5", SyncInstructions.CONFLICT));
+        GLib.assert_true (item_instruction (complete_spy, "A/a5" DVSUFFIX, SyncInstructions.REMOVE));
+        GLib.assert_true (item_instruction (complete_spy, "A/a6", SyncInstructions.CONFLICT));
+        GLib.assert_true (item_instruction (complete_spy, "A/a7", SyncInstructions.SYNC));
+        GLib.assert_true (item_instruction (complete_spy, "A/b1", SyncInstructions.SYNC));
+        GLib.assert_true (item_instruction (complete_spy, "A/b2", SyncInstructions.SYNC));
+        GLib.assert_true (item_instruction (complete_spy, "A/b3", SyncInstructions.REMOVE));
+        GLib.assert_true (item_instruction (complete_spy, "A/b4m" DVSUFFIX, SyncInstructions.NEW));
+        GLib.assert_true (item_instruction (complete_spy, "A/b4", SyncInstructions.REMOVE));
+        GLib.assert_cmp (database_record (fake_folder, "A/a1").type, ItemType.FILE);
         GLib.assert_true (!database_record (fake_folder, "A/a1" DVSUFFIX).is_valid ());
-        GLib.assert_cmp (database_record (fake_folder, "A/a2").type, ItemTypeFile);
+        GLib.assert_cmp (database_record (fake_folder, "A/a2").type, ItemType.FILE);
         GLib.assert_true (!database_record (fake_folder, "A/a3").is_valid ());
-        GLib.assert_cmp (database_record (fake_folder, "A/a4m").type, ItemTypeFile);
-        GLib.assert_cmp (database_record (fake_folder, "A/a5").type, ItemTypeFile);
-        GLib.assert_cmp (database_record (fake_folder, "A/a6").type, ItemTypeFile);
-        GLib.assert_cmp (database_record (fake_folder, "A/a7").type, ItemTypeFile);
-        GLib.assert_cmp (database_record (fake_folder, "A/b1").type, ItemTypeFile);
+        GLib.assert_cmp (database_record (fake_folder, "A/a4m").type, ItemType.FILE);
+        GLib.assert_cmp (database_record (fake_folder, "A/a5").type, ItemType.FILE);
+        GLib.assert_cmp (database_record (fake_folder, "A/a6").type, ItemType.FILE);
+        GLib.assert_cmp (database_record (fake_folder, "A/a7").type, ItemType.FILE);
+        GLib.assert_cmp (database_record (fake_folder, "A/b1").type, ItemType.FILE);
         GLib.assert_true (!database_record (fake_folder, "A/b1" DVSUFFIX).is_valid ());
-        GLib.assert_cmp (database_record (fake_folder, "A/b2").type, ItemTypeFile);
+        GLib.assert_cmp (database_record (fake_folder, "A/b2").type, ItemType.FILE);
         GLib.assert_true (!database_record (fake_folder, "A/b3").is_valid ());
-        GLib.assert_cmp (database_record (fake_folder, "A/b4m" DVSUFFIX).type, ItemTypeVirtualFile);
+        GLib.assert_cmp (database_record (fake_folder, "A/b4m" DVSUFFIX).type, ItemType.VIRTUAL_FILE);
         GLib.assert_true (!database_record (fake_folder, "A/a1" DVSUFFIX).is_valid ());
         GLib.assert_true (!database_record (fake_folder, "A/a2" DVSUFFIX).is_valid ());
         GLib.assert_true (!database_record (fake_folder, "A/a3" DVSUFFIX).is_valid ());
@@ -447,20 +447,20 @@ public class TestSyncVirtualFiles : GLib.Object {
         trigger_download (fake_folder, "A/a1");
         fake_folder.server_error_paths ().append ("A/a1", 500);
         GLib.assert_true (!fake_folder.sync_once ());
-        GLib.assert_true (item_instruction (complete_spy, "A/a1", CSYNC_INSTRUCTION_SYNC));
-        GLib.assert_true (item_instruction (complete_spy, "A/a1" DVSUFFIX, CSYNC_INSTRUCTION_NONE));
+        GLib.assert_true (item_instruction (complete_spy, "A/a1", SyncInstructions.SYNC));
+        GLib.assert_true (item_instruction (complete_spy, "A/a1" DVSUFFIX, SyncInstructions.NONE));
         GLib.assert_true (fake_folder.current_local_state ().find ("A/a1" DVSUFFIX));
         GLib.assert_true (!fake_folder.current_local_state ().find ("A/a1"));
-        GLib.assert_cmp (database_record (fake_folder, "A/a1" DVSUFFIX).type, ItemTypeVirtualFileDownload);
+        GLib.assert_cmp (database_record (fake_folder, "A/a1" DVSUFFIX).type, ItemType.VIRTUAL_FILE_DOWNLOAD);
         GLib.assert_true (!database_record (fake_folder, "A/a1").is_valid ());
         on_signal_cleanup ();
 
         fake_folder.server_error_paths ().clear ();
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_true (item_instruction (complete_spy, "A/a1", CSYNC_INSTRUCTION_SYNC));
-        GLib.assert_true (item_instruction (complete_spy, "A/a1" DVSUFFIX, CSYNC_INSTRUCTION_NONE));
+        GLib.assert_true (item_instruction (complete_spy, "A/a1", SyncInstructions.SYNC));
+        GLib.assert_true (item_instruction (complete_spy, "A/a1" DVSUFFIX, SyncInstructions.NONE));
         GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        GLib.assert_cmp (database_record (fake_folder, "A/a1").type, ItemTypeFile);
+        GLib.assert_cmp (database_record (fake_folder, "A/a1").type, ItemType.FILE);
         GLib.assert_true (!database_record (fake_folder, "A/a1" DVSUFFIX).is_valid ());
     }
 
@@ -611,8 +611,8 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state ().find ("A/a1" DVSUFFIX));
         GLib.assert_true (fake_folder.current_local_state ().find ("A/a1" DVSUFFIX).size <= 1);
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a1"));
-        GLib.assert_true (item_instruction (complete_spy, "A/a1" DVSUFFIX, CSYNC_INSTRUCTION_SYNC));
-        GLib.assert_cmp (database_record (fake_folder, "A/a1" DVSUFFIX).type, ItemTypeVirtualFile);
+        GLib.assert_true (item_instruction (complete_spy, "A/a1" DVSUFFIX, SyncInstructions.SYNC));
+        GLib.assert_cmp (database_record (fake_folder, "A/a1" DVSUFFIX).type, ItemType.VIRTUAL_FILE);
         GLib.assert_true (!database_record (fake_folder, "A/a1").is_valid ());
 
         GLib.assert_true (!fake_folder.current_local_state ().find ("A/a2"));
@@ -620,8 +620,8 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state ().find ("A/rand"));
         GLib.assert_true (!fake_folder.current_remote_state ().find ("A/a2"));
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/rand"));
-        GLib.assert_true (item_instruction (complete_spy, "A/rand", CSYNC_INSTRUCTION_RENAME));
-        GLib.assert_true (database_record (fake_folder, "A/rand").type == ItemTypeFile);
+        GLib.assert_true (item_instruction (complete_spy, "A/rand", SyncInstructions.RENAME));
+        GLib.assert_true (database_record (fake_folder, "A/rand").type == ItemType.FILE);
 
         GLib.assert_true (!fake_folder.current_local_state ().find ("A/dangling" DVSUFFIX));
         on_signal_cleanup ();
@@ -661,7 +661,7 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state ().find ("renamed1" DVSUFFIX));
         GLib.assert_true (!fake_folder.current_remote_state ().find ("file1"));
         GLib.assert_true (fake_folder.current_remote_state ().find ("renamed1"));
-        GLib.assert_true (item_instruction (complete_spy, "renamed1" DVSUFFIX, CSYNC_INSTRUCTION_RENAME));
+        GLib.assert_true (item_instruction (complete_spy, "renamed1" DVSUFFIX, SyncInstructions.RENAME));
         GLib.assert_true (database_record (fake_folder, "renamed1" DVSUFFIX).is_valid ());
 
         // file2 has a conflict between the download request and the rename:
@@ -670,11 +670,11 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (!fake_folder.current_local_state ().find ("file2" DVSUFFIX));
         GLib.assert_true (fake_folder.current_local_state ().find ("renamed2" DVSUFFIX));
         GLib.assert_true (fake_folder.current_remote_state ().find ("renamed2"));
-        GLib.assert_true (item_instruction (complete_spy, "renamed2" DVSUFFIX, CSYNC_INSTRUCTION_RENAME));
-        GLib.assert_true (database_record (fake_folder, "renamed2" DVSUFFIX).type == ItemTypeVirtualFile);
+        GLib.assert_true (item_instruction (complete_spy, "renamed2" DVSUFFIX, SyncInstructions.RENAME));
+        GLib.assert_true (database_record (fake_folder, "renamed2" DVSUFFIX).type == ItemType.VIRTUAL_FILE);
 
-        GLib.assert_true (item_instruction (complete_spy, "file3", CSYNC_INSTRUCTION_SYNC));
-        GLib.assert_true (database_record (fake_folder, "file3").type == ItemTypeFile);
+        GLib.assert_true (item_instruction (complete_spy, "file3", SyncInstructions.SYNC));
+        GLib.assert_true (database_record (fake_folder, "file3").type == ItemType.FILE);
         on_signal_cleanup ();
 
         // Test rename while adding/removing vfs suffix
@@ -739,8 +739,8 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state ().find ("case3-rename" DVSUFFIX));
         GLib.assert_true (!fake_folder.current_remote_state ().find ("case3"));
         GLib.assert_true (fake_folder.current_remote_state ().find ("case3-rename"));
-        GLib.assert_true (item_instruction (complete_spy, "case3-rename" DVSUFFIX, CSYNC_INSTRUCTION_RENAME));
-        GLib.assert_true (database_record (fake_folder, "case3-rename" DVSUFFIX).type == ItemTypeVirtualFile);
+        GLib.assert_true (item_instruction (complete_spy, "case3-rename" DVSUFFIX, SyncInstructions.RENAME));
+        GLib.assert_true (database_record (fake_folder, "case3-rename" DVSUFFIX).type == ItemType.VIRTUAL_FILE);
 
         // Case 4 : the rename went though, dehydration is forgotten
         GLib.assert_true (!fake_folder.current_local_state ().find ("case4"));
@@ -749,8 +749,8 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (!fake_folder.current_local_state ().find ("case4-rename" DVSUFFIX));
         GLib.assert_true (!fake_folder.current_remote_state ().find ("case4"));
         GLib.assert_true (fake_folder.current_remote_state ().find ("case4-rename"));
-        GLib.assert_true (item_instruction (complete_spy, "case4-rename", CSYNC_INSTRUCTION_RENAME));
-        GLib.assert_true (database_record (fake_folder, "case4-rename").type == ItemTypeFile);
+        GLib.assert_true (item_instruction (complete_spy, "case4-rename", SyncInstructions.RENAME));
+        GLib.assert_true (database_record (fake_folder, "case4-rename").type == ItemType.FILE);
 
         // Case 5 : the rename went though, hydration is forgotten
         GLib.assert_true (!fake_folder.current_local_state ().find ("case5"));
@@ -759,8 +759,8 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state ().find ("case5-rename" DVSUFFIX));
         GLib.assert_true (!fake_folder.current_remote_state ().find ("case5"));
         GLib.assert_true (fake_folder.current_remote_state ().find ("case5-rename"));
-        GLib.assert_true (item_instruction (complete_spy, "case5-rename" DVSUFFIX, CSYNC_INSTRUCTION_RENAME));
-        GLib.assert_true (database_record (fake_folder, "case5-rename" DVSUFFIX).type == ItemTypeVirtualFile);
+        GLib.assert_true (item_instruction (complete_spy, "case5-rename" DVSUFFIX, SyncInstructions.RENAME));
+        GLib.assert_true (database_record (fake_folder, "case5-rename" DVSUFFIX).type == ItemType.VIRTUAL_FILE);
 
         // Case 6 : the rename went though, dehydration is forgotten
         GLib.assert_true (!fake_folder.current_local_state ().find ("case6"));
@@ -769,8 +769,8 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (!fake_folder.current_local_state ().find ("case6-rename" DVSUFFIX));
         GLib.assert_true (!fake_folder.current_remote_state ().find ("case6"));
         GLib.assert_true (fake_folder.current_remote_state ().find ("case6-rename"));
-        GLib.assert_true (item_instruction (complete_spy, "case6-rename", CSYNC_INSTRUCTION_RENAME));
-        GLib.assert_true (database_record (fake_folder, "case6-rename").type == ItemTypeFile);
+        GLib.assert_true (item_instruction (complete_spy, "case6-rename", SyncInstructions.RENAME));
+        GLib.assert_true (database_record (fake_folder, "case6-rename").type == ItemType.FILE);
     }
 
     // Dehydration via sync works
@@ -826,36 +826,36 @@ public class TestSyncVirtualFiles : GLib.Object {
             SyncJournalFileRecord normal, suffix;
             fake_folder.sync_journal ().get_file_record (path, normal);
             fake_folder.sync_journal ().get_file_record (path + DVSUFFIX, suffix);
-            return !normal.is_valid () && suffix.is_valid () && suffix.type == ItemTypeVirtualFile;
+            return !normal.is_valid () && suffix.is_valid () && suffix.type == ItemType.VIRTUAL_FILE;
         }
 
         GLib.assert_true (is_dehydrated ("A/a1"));
         GLib.assert_true (has_dehydrated_database_entries ("A/a1"));
-        GLib.assert_true (item_instruction (complete_spy, "A/a1" DVSUFFIX, CSYNC_INSTRUCTION_SYNC));
-        GLib.assert_cmp (complete_spy.find_item ("A/a1" DVSUFFIX).type, ItemTypeVirtualFileDehydration);
+        GLib.assert_true (item_instruction (complete_spy, "A/a1" DVSUFFIX, SyncInstructions.SYNC));
+        GLib.assert_cmp (complete_spy.find_item ("A/a1" DVSUFFIX).type, ItemType.VIRTUAL_FILE_DEHYDRATION);
         GLib.assert_cmp (complete_spy.find_item ("A/a1" DVSUFFIX).file, "A/a1");
         GLib.assert_cmp (complete_spy.find_item ("A/a1" DVSUFFIX).rename_target, "A/a1" + DVSUFFIX);
         GLib.assert_true (is_dehydrated ("A/a2"));
         GLib.assert_true (has_dehydrated_database_entries ("A/a2"));
-        GLib.assert_true (item_instruction (complete_spy, "A/a2" DVSUFFIX, CSYNC_INSTRUCTION_SYNC));
-        GLib.assert_cmp (complete_spy.find_item ("A/a2" DVSUFFIX).type, ItemTypeVirtualFileDehydration);
+        GLib.assert_true (item_instruction (complete_spy, "A/a2" DVSUFFIX, SyncInstructions.SYNC));
+        GLib.assert_cmp (complete_spy.find_item ("A/a2" DVSUFFIX).type, ItemType.VIRTUAL_FILE_DEHYDRATION);
 
         GLib.assert_true (!fake_folder.current_local_state ().find ("B/b1"));
         GLib.assert_true (!fake_folder.current_remote_state ().find ("B/b1"));
-        GLib.assert_true (item_instruction (complete_spy, "B/b1", CSYNC_INSTRUCTION_REMOVE));
+        GLib.assert_true (item_instruction (complete_spy, "B/b1", SyncInstructions.REMOVE));
 
         GLib.assert_true (!fake_folder.current_local_state ().find ("B/b2"));
         GLib.assert_true (!fake_folder.current_remote_state ().find ("B/b2"));
         GLib.assert_true (is_dehydrated ("B/b3"));
         GLib.assert_true (has_dehydrated_database_entries ("B/b3"));
-        GLib.assert_true (item_instruction (complete_spy, "B/b2", CSYNC_INSTRUCTION_REMOVE));
-        GLib.assert_true (item_instruction (complete_spy, "B/b3" DVSUFFIX, CSYNC_INSTRUCTION_NEW));
+        GLib.assert_true (item_instruction (complete_spy, "B/b2", SyncInstructions.REMOVE));
+        GLib.assert_true (item_instruction (complete_spy, "B/b3" DVSUFFIX, SyncInstructions.NEW));
 
         GLib.assert_cmp (fake_folder.current_remote_state ().find ("C/c1").size, 25);
-        GLib.assert_true (item_instruction (complete_spy, "C/c1", CSYNC_INSTRUCTION_SYNC));
+        GLib.assert_true (item_instruction (complete_spy, "C/c1", SyncInstructions.SYNC));
 
         GLib.assert_cmp (fake_folder.current_remote_state ().find ("C/c2").size, 26);
-        GLib.assert_true (item_instruction (complete_spy, "C/c2", CSYNC_INSTRUCTION_CONFLICT));
+        GLib.assert_true (item_instruction (complete_spy, "C/c2", SyncInstructions.CONFLICT));
         on_signal_cleanup ();
 
         var expected_local_state = fake_folder.current_local_state ();
@@ -920,7 +920,7 @@ public class TestSyncVirtualFiles : GLib.Object {
         set_up_vfs (fake_folder);
         GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
-        var set_pin = [&] (GLib.ByteArray path, PinState state) {
+        var set_pin = [&] (string path, PinState state) {
             fake_folder.sync_journal ().internal_pin_states ().set_for_path (path, state);
         }
 
@@ -1027,21 +1027,21 @@ public class TestSyncVirtualFiles : GLib.Object {
 
         // A simple sync removes the files that are now ignored (?)
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_true (item_instruction (complete_spy, "A/file1" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
-        GLib.assert_true (item_instruction (complete_spy, "A/file2" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
-        GLib.assert_true (item_instruction (complete_spy, "A/file3" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
-        GLib.assert_true (item_instruction (complete_spy, "A/file3" DVSUFFIX DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/file1" DVSUFFIX, SyncInstructions.IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/file2" DVSUFFIX, SyncInstructions.IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/file3" DVSUFFIX, SyncInstructions.IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/file3" DVSUFFIX DVSUFFIX, SyncInstructions.IGNORE));
         on_signal_cleanup ();
 
         // Add a real file where the suffixed file exists
         fake_folder.local_modifier ().insert ("A/test1", 11, 'A');
         fake_folder.remote_modifier ().insert ("A/test2", 21, 'A');
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_true (item_instruction (complete_spy, "A/test1", CSYNC_INSTRUCTION_NEW));
+        GLib.assert_true (item_instruction (complete_spy, "A/test1", SyncInstructions.NEW));
         // this isn't fully good since some code requires size == 1 for placeholders
         // (when renaming placeholder to real file). But the alternative would mean
         // special casing this to allow CONFLICT at virtual file creation level. Ew.
-        GLib.assert_true (item_instruction (complete_spy, "A/test2" DVSUFFIX, CSYNC_INSTRUCTION_UPDATE_METADATA));
+        GLib.assert_true (item_instruction (complete_spy, "A/test2" DVSUFFIX, SyncInstructions.UPDATE_METADATA));
         on_signal_cleanup ();
 
         // Local changes of suffixed file do nothing
@@ -1050,10 +1050,10 @@ public class TestSyncVirtualFiles : GLib.Object {
         fake_folder.local_modifier ().set_contents ("A/file3" DVSUFFIX, 'B');
         fake_folder.local_modifier ().set_contents ("A/file3" DVSUFFIX DVSUFFIX, 'B');
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_true (item_instruction (complete_spy, "A/file1" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
-        GLib.assert_true (item_instruction (complete_spy, "A/file2" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
-        GLib.assert_true (item_instruction (complete_spy, "A/file3" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
-        GLib.assert_true (item_instruction (complete_spy, "A/file3" DVSUFFIX DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/file1" DVSUFFIX, SyncInstructions.IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/file2" DVSUFFIX, SyncInstructions.IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/file3" DVSUFFIX, SyncInstructions.IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/file3" DVSUFFIX DVSUFFIX, SyncInstructions.IGNORE));
         on_signal_cleanup ();
 
         // Remote changes don't do anything either
@@ -1062,10 +1062,10 @@ public class TestSyncVirtualFiles : GLib.Object {
         fake_folder.remote_modifier ().set_contents ("A/file3" DVSUFFIX, 'C');
         fake_folder.remote_modifier ().set_contents ("A/file3" DVSUFFIX DVSUFFIX, 'C');
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_true (item_instruction (complete_spy, "A/file1" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
-        GLib.assert_true (item_instruction (complete_spy, "A/file2" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
-        GLib.assert_true (item_instruction (complete_spy, "A/file3" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
-        GLib.assert_true (item_instruction (complete_spy, "A/file3" DVSUFFIX DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/file1" DVSUFFIX, SyncInstructions.IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/file2" DVSUFFIX, SyncInstructions.IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/file3" DVSUFFIX, SyncInstructions.IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/file3" DVSUFFIX DVSUFFIX, SyncInstructions.IGNORE));
         on_signal_cleanup ();
 
         // Local removal : when not querying server
@@ -1074,19 +1074,19 @@ public class TestSyncVirtualFiles : GLib.Object {
         fake_folder.local_modifier ().remove ("A/file3" DVSUFFIX);
         fake_folder.local_modifier ().remove ("A/file3" DVSUFFIX DVSUFFIX);
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_true (complete_spy.find_item ("A/file1" DVSUFFIX).is_empty ());
-        GLib.assert_true (complete_spy.find_item ("A/file2" DVSUFFIX).is_empty ());
-        GLib.assert_true (complete_spy.find_item ("A/file3" DVSUFFIX).is_empty ());
-        GLib.assert_true (complete_spy.find_item ("A/file3" DVSUFFIX DVSUFFIX).is_empty ());
+        GLib.assert_true (complete_spy.find_item ("A/file1" DVSUFFIX) == "");
+        GLib.assert_true (complete_spy.find_item ("A/file2" DVSUFFIX) == "");
+        GLib.assert_true (complete_spy.find_item ("A/file3" DVSUFFIX) == "");
+        GLib.assert_true (complete_spy.find_item ("A/file3" DVSUFFIX DVSUFFIX) == "");
         on_signal_cleanup ();
 
         // Local removal : when querying server
         fake_folder.remote_modifier ().set_contents ("A/file1" DVSUFFIX, 'D');
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_true (item_instruction (complete_spy, "A/file1" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
-        GLib.assert_true (item_instruction (complete_spy, "A/file2" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
-        GLib.assert_true (item_instruction (complete_spy, "A/file3" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
-        GLib.assert_true (item_instruction (complete_spy, "A/file3" DVSUFFIX DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/file1" DVSUFFIX, SyncInstructions.IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/file2" DVSUFFIX, SyncInstructions.IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/file3" DVSUFFIX, SyncInstructions.IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/file3" DVSUFFIX DVSUFFIX, SyncInstructions.IGNORE));
         on_signal_cleanup ();
 
         // Remote removal
@@ -1095,16 +1095,16 @@ public class TestSyncVirtualFiles : GLib.Object {
         fake_folder.remote_modifier ().remove ("A/remote3" DVSUFFIX);
         fake_folder.remote_modifier ().remove ("A/remote3" DVSUFFIX DVSUFFIX);
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_true (item_instruction (complete_spy, "A/remote1" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
-        GLib.assert_true (item_instruction (complete_spy, "A/remote2" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
-        GLib.assert_true (item_instruction (complete_spy, "A/remote3" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
-        GLib.assert_true (item_instruction (complete_spy, "A/remote3" DVSUFFIX DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/remote1" DVSUFFIX, SyncInstructions.IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/remote2" DVSUFFIX, SyncInstructions.IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/remote3" DVSUFFIX, SyncInstructions.IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/remote3" DVSUFFIX DVSUFFIX, SyncInstructions.IGNORE));
         on_signal_cleanup ();
 
         // New files with a suffix aren't propagated downwards in the first place
         fake_folder.remote_modifier ().insert ("A/new1" DVSUFFIX);
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_true (item_instruction (complete_spy, "A/new1" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/new1" DVSUFFIX, SyncInstructions.IGNORE));
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/new1" DVSUFFIX));
         GLib.assert_true (!fake_folder.current_local_state ().find ("A/new1"));
         GLib.assert_true (!fake_folder.current_local_state ().find ("A/new1" DVSUFFIX));
@@ -1145,11 +1145,11 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (!fake_folder.current_local_state ().find ("A/file4"));
         GLib.assert_true (fake_folder.current_local_state ().find ("A/file4" DVSUFFIX));
         GLib.assert_true (!fake_folder.current_local_state ().find ("A/file4" DVSUFFIX DVSUFFIX));
-        GLib.assert_true (item_instruction (complete_spy, "A/file1" DVSUFFIX, CSYNC_INSTRUCTION_NEW));
-        GLib.assert_true (item_instruction (complete_spy, "A/file2" DVSUFFIX, CSYNC_INSTRUCTION_NEW));
-        GLib.assert_true (item_instruction (complete_spy, "A/file3" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
-        GLib.assert_true (item_instruction (complete_spy, "A/file4" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
-        GLib.assert_true (item_instruction (complete_spy, "A/file4" DVSUFFIX DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/file1" DVSUFFIX, SyncInstructions.NEW));
+        GLib.assert_true (item_instruction (complete_spy, "A/file2" DVSUFFIX, SyncInstructions.NEW));
+        GLib.assert_true (item_instruction (complete_spy, "A/file3" DVSUFFIX, SyncInstructions.IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/file4" DVSUFFIX, SyncInstructions.IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/file4" DVSUFFIX DVSUFFIX, SyncInstructions.IGNORE));
         on_signal_cleanup ();
 
         // Create odd extra files locally and remotely
@@ -1159,12 +1159,12 @@ public class TestSyncVirtualFiles : GLib.Object {
         fake_folder.local_modifier ().insert ("A/file6", 10, 'A');
         fake_folder.remote_modifier ().insert ("A/file6" DVSUFFIX, 10, 'A');
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_true (item_instruction (complete_spy, "A/file1", CSYNC_INSTRUCTION_CONFLICT));
-        GLib.assert_true (item_instruction (complete_spy, "A/file1" DVSUFFIX, CSYNC_INSTRUCTION_REMOVE)); // it's now a pointless real virtual file
-        GLib.assert_true (item_instruction (complete_spy, "A/file2" DVSUFFIX DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
-        GLib.assert_true (item_instruction (complete_spy, "A/file5" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
-        GLib.assert_true (item_instruction (complete_spy, "A/file6", CSYNC_INSTRUCTION_CONFLICT));
-        GLib.assert_true (item_instruction (complete_spy, "A/file6" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/file1", SyncInstructions.CONFLICT));
+        GLib.assert_true (item_instruction (complete_spy, "A/file1" DVSUFFIX, SyncInstructions.REMOVE)); // it's now a pointless real virtual file
+        GLib.assert_true (item_instruction (complete_spy, "A/file2" DVSUFFIX DVSUFFIX, SyncInstructions.IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/file5" DVSUFFIX, SyncInstructions.IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/file6", SyncInstructions.CONFLICT));
+        GLib.assert_true (item_instruction (complete_spy, "A/file6" DVSUFFIX, SyncInstructions.IGNORE));
         on_signal_cleanup ();
     }
 
@@ -1176,7 +1176,7 @@ public class TestSyncVirtualFiles : GLib.Object {
         var vfs = set_up_vfs (fake_folder);
         GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
-        var set_pin = [&] (GLib.ByteArray path, PinState state) {
+        var set_pin = [&] (string path, PinState state) {
             fake_folder.sync_journal ().internal_pin_states ().set_for_path (path, state);
         }
 
@@ -1244,7 +1244,7 @@ public class TestSyncVirtualFiles : GLib.Object {
         var vfs = set_up_vfs (fake_folder);
         GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
-        var set_pin = [&] (GLib.ByteArray path, PinState state) {
+        var set_pin = [&] (string path, PinState state) {
             fake_folder.sync_journal ().internal_pin_states ().set_for_path (path, state);
         }
 
@@ -1328,7 +1328,7 @@ public class TestSyncVirtualFiles : GLib.Object {
         var vfs = set_up_vfs (fake_folder);
         GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
 
-        var set_pin = [&] (GLib.ByteArray path, PinState state) {
+        var set_pin = [&] (string path, PinState state) {
             fake_folder.sync_journal ().internal_pin_states ().set_for_path (path, state);
         }
 
@@ -1377,16 +1377,16 @@ public class TestSyncVirtualFiles : GLib.Object {
 
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        GLib.assert_true (item_instruction (complete_spy, "A/a1" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
-        GLib.assert_true (item_instruction (complete_spy, "A/hello" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/a1" DVSUFFIX, SyncInstructions.IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/hello" DVSUFFIX, SyncInstructions.IGNORE));
 
         fake_folder.remote_modifier ().insert ("A/a2" DVSUFFIX);
         fake_folder.remote_modifier ().insert ("A/hello", 12);
         fake_folder.local_modifier ().insert ("A/igno" DVSUFFIX, 123);
         on_signal_cleanup ();
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_true (item_instruction (complete_spy, "A/a1" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
-        GLib.assert_true (item_instruction (complete_spy, "A/igno" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/a1" DVSUFFIX, SyncInstructions.IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/igno" DVSUFFIX, SyncInstructions.IGNORE));
 
         // verify that the files are still present
         GLib.assert_cmp (fake_folder.current_local_state ().find ("A/hello" DVSUFFIX).size, 222);
@@ -1399,7 +1399,7 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (vfs.set_pin_state ("", PinState.VfsItemAvailability.ONLINE_ONLY));
         GLib.assert_true (!fake_folder.sync_once ());
 
-        GLib.assert_true (item_instruction (complete_spy, "A/igno" DVSUFFIX, CSYNC_INSTRUCTION_IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/igno" DVSUFFIX, SyncInstructions.IGNORE));
         // verify that the files are still present
         GLib.assert_cmp (fake_folder.current_local_state ().find ("A/a1" DVSUFFIX).size, 111);
         GLib.assert_cmp (fake_folder.current_local_state ().find ("A/hello" DVSUFFIX).size, 222);

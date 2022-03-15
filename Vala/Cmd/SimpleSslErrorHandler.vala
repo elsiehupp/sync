@@ -14,23 +14,21 @@ public class SimpleSslErrorHandler : Occ.AbstractSslErrorHandler {
 
     /***********************************************************
     ***********************************************************/
-    public bool handle_errors (GLib.List<QSslError> errors, QSslConfiguration conf, GLib.List<QSslCertificate> *certificates, Occ.unowned Account) override;
-}
-
-
-    bool SimpleSslErrorHandler.handle_errors (GLib.List<QSslError> errors, QSslConfiguration conf, GLib.List<QSslCertificate> *certificates, Occ.unowned Account account) {
+    public override bool handle_errors (GLib.List<QSslError> errors, QSslConfiguration conf, GLib.List<QSslCertificate> certificates, Occ.Account account) {
         (void)account;
         (void)conf;
 
         if (!certificates) {
-            GLib.debug ("Certs parameter required but is NULL!";
+            GLib.debug ("Certs parameter required but is NULL!");
             return false;
         }
 
-        for (var error : q_as_const (errors)) {
+        foreach (var error in errors) {
             certificates.append (error.certificate ());
         }
         return true;
     }
-    }
-    
+
+}
+
+}

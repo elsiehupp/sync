@@ -257,7 +257,7 @@ public class SyncFileItem : GLib.Object {
     /***********************************************************
     Variable used by the propagator
     ***********************************************************/
-    public SyncInstructions instruction = CSYNC_INSTRUCTION_NONE;
+    public SyncInstructions instruction = SyncInstructions.NONE;
 
     /***********************************************************
     Variable used by the propagator
@@ -333,10 +333,10 @@ public class SyncFileItem : GLib.Object {
 
         // Some types should never be written to the database when propagation completes
         record.type = this.type;
-        if (record.type == ItemTypeVirtualFileDownload)
-            record.type = ItemTypeFile;
-        if (record.type == ItemTypeVirtualFileDehydration)
-            record.type = ItemTypeVirtualFile;
+        if (record.type == ItemType.VIRTUAL_FILE_DOWNLOAD)
+            record.type = ItemType.FILE;
+        if (record.type == ItemType.VIRTUAL_FILE_DEHYDRATION)
+            record.type = ItemType.VIRTUAL_FILE;
 
         record.etag = this.etag;
         record.file_id = this.file_identifier;
@@ -389,7 +389,7 @@ public class SyncFileItem : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public SyncFileItem () {
-        this.type = ItemTypeSkip;
+        this.type = ItemType.SKIP;
         this.direction = Direction.NONE;
         this.server_has_ignored_files = false;
         this.has_blocklist_entry = false;
@@ -421,7 +421,7 @@ public class SyncFileItem : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool is_directory () {
-        return this.type == ItemTypeDirectory;
+        return this.type == ItemType.DIRECTORY;
     }
 
 
@@ -450,7 +450,7 @@ public class SyncFileItem : GLib.Object {
     public bool show_in_protocol_tab () {
         return (!show_in_issues_tab () || this.status == Status.RESTORATION)
             // Don't show conflicts that were resolved as "not a conflict after all"
-            && ! (this.instruction == CSYNC_INSTRUCTION_CONFLICT && this.status == Status.SUCCESS);
+            && ! (this.instruction == SyncInstructions.CONFLICT && this.status == Status.SUCCESS);
     }
 
 

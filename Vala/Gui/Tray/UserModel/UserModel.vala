@@ -29,8 +29,8 @@ public class UserModel : QAbstractListModel {
         IS_CONNECTED,
         IDENTIFIER;
 
-        public static GLib.HashTable<int, GLib.ByteArray> role_names () {
-            GLib.HashTable<int, GLib.ByteArray> roles;
+        public static GLib.HashTable<int, string> role_names () {
+            GLib.HashTable<int, string> roles;
             roles[UserRoles.NAME] = "name";
             roles[UserRoles.SERVER] = "server";
             roles[UserRoles.SERVER_HAS_USER_STATUS] = "server_has_user_status";

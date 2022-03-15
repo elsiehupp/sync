@@ -9,7 +9,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QCryptographicHash>
 
 
-//  #include <QFuture_watcher>
+//  #include <QFutureWatcher>
 //  #include <memory>
 
 using ZLib;
@@ -81,33 +81,17 @@ public class ComputeChecksum : ComputeChecksumBase {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.ByteArray this.checksum_type;
+    public string checksum_type;
 
-    // watcher for the checksum calculation thread
-    private QFuture_watcher<GLib.ByteArray> this.watcher;
+    /***********************************************************
+    Watcher for the checksum calculation thread
+    ***********************************************************/
+    private QFutureWatcher<string> watcher;
 
     /***********************************************************
     ***********************************************************/
     public ComputeChecksum (GLib.Object parent = new GLib.Object ()) {
-        GLib.Object (parent);
-    }
-
-
-    ~ComputeChecksum () = default;
-
-
-    /***********************************************************
-    Sets the checksum type to be used. The default is empty.
-    ***********************************************************/
-    public void checksum_type (GLib.ByteArray type) {
-        this.checksum_type = type;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public GLib.ByteArray checksum_type () {
-        return this.checksum_type;
+        base (parent);
     }
 
 
@@ -116,8 +100,8 @@ public class ComputeChecksum : ComputeChecksumBase {
 
     on_signal_done () is emitted when the calculation finishes.
     ***********************************************************/
-    public void on_signal_start (string file_path) {
-        GLib.info ("Computing" + checksum_type ("checksum of" + file_path + "in a thread";
+    public void start_for_path (string file_path) {
+        GLib.info ("Computing " + this.checksum_type + " checksum of " + file_path + " in a thread.");
         start_impl (std.make_unique<GLib.File> (file_path));
     }
 
@@ -130,9 +114,9 @@ public class ComputeChecksum : ComputeChecksumBase {
     The device ownership transfers into the thread that
     will compute the checksum. It must not have a parent.
     ***********************************************************/
-    public void on_signal_start (std.unique_ptr<QIODevice> device) {
-        ENFORCE (device);
-        GLib.info ("Computing" + checksum_type ("checksum of device" + device.get ("in a thread";
+    public void start_for_device (std.unique_ptr<QIODevice> device) {
+        //  ENFORCE (device);
+        GLib.info ("Computing " + this.checksum_type + " checksum of device " + device.get () + " in a thread.");
         //  ASSERT (!device.parent ());
 
         start_impl (std.move (device));
@@ -142,10 +126,10 @@ public class ComputeChecksum : ComputeChecksumBase {
     /***********************************************************
     Computes the checksum synchronously.
     ***********************************************************/
-    public static GLib.ByteArray compute_now (QIODevice device, GLib.ByteArray checksum_type) {
+    public static string compute_now (QIODevice device, string checksum_type) {
         if (!checksum_computation_enabled ()) {
-            GLib.warning ("Checksum computation disabled by environment variable";
-            return GLib.ByteArray ();
+            GLib.warning ("Checksum computation disabled by environment variable.");
+            return "";
         }
 
         if (checksum_type == CHECKSUM_MD5C) {
@@ -155,49 +139,49 @@ public class ComputeChecksum : ComputeChecksumBase {
         } else if (checksum_type == CHECKSUM_SHA2C) {
             return calc_crypto_hash (device, QCryptographicHash.Sha256);
         }
-    #if QT_VERSION >= QT_VERSION_CHECK (5, 9, 0)
+    //  #if QT_VERSION >= QT_VERSION_CHECK (5, 9, 0)
         else if (checksum_type == CHECKSUM_SHA3C) {
             return calc_crypto_hash (device, QCryptographicHash.Sha3_256);
         }
-    #endif
-    #ifdef ZLIB_FOUND
+    //  #endif
+    //  #ifdef ZLIB_FOUND
         else if (checksum_type == CHECKSUM_ADLER_C) {
             return calc_adler32 (device);
         }
-    #endif
+    //  #endif
         // for an unknown checksum or no checksum, we're done right now
-        if (!checksum_type.is_empty ()) {
-            GLib.warning ("Unknown checksum type:" + checksum_type;
+        if (!checksum_type == "") {
+            GLib.warning ("Unknown checksum type: " + checksum_type);
         }
-        return GLib.ByteArray ();
+        return "";
     }
 
 
     /***********************************************************
     Computes the checksum synchronously on file. Convenience wrapper for compute_now ().
     ***********************************************************/
-    public static GLib.ByteArray compute_now_on_signal_file (string file_path, GLib.ByteArray checksum_type) {
+    public static string compute_now_on_signal_file (string file_path, string checksum_type) {
         GLib.File file = GLib.File.new_for_path (file_path);
         if (!file.open (QIODevice.ReadOnly)) {
-            GLib.warning ("Could not open file" + file_path + "for reading and computing checksum" + file.error_string ();
-            return GLib.ByteArray ();
+            GLib.warning ("Could not open file " + file_path + " for reading and computing checksum " + file.error_string ());
+            return "";
         }
 
         return compute_now (&file, checksum_type);
     }
 
 
-    signal void done (GLib.ByteArray checksum_type, GLib.ByteArray checksum);
+    signal void done (string checksum_type, string checksum);
 
 
     /***********************************************************
     ***********************************************************/
     private void on_signal_calculation_done () {
-        GLib.ByteArray checksum = this.watcher.future ().result ();
+        string checksum = this.watcher.future ().result ();
         if (!checksum.is_null ()) {
             /* emit */ done (this.checksum_type, checksum);
         } else {
-            /* emit */ done (GLib.ByteArray (), GLib.ByteArray ());
+            /* emit */ done ("", "");
         }
     }
 
@@ -213,23 +197,29 @@ public class ComputeChecksum : ComputeChecksumBase {
         // awkward with the C++ standard we're on
         var shared_device = unowned<QIODevice> (device.release ());
 
-        // Bug : The thread will keep running even if ComputeChecksum is deleted.
-        var type = checksum_type ();
-        this.watcher.future (Qt_concurrent.run ([shared_device, type] () {
-            if (!shared_device.open (QIODevice.ReadOnly)) {
-                if (var file = qobject_cast<GLib.File> (shared_device.data ())) {
-                    GLib.warning ("Could not open file" + file.filename ()
-                            + "for reading to compute a checksum" + file.error_string ();
-                } else {
-                    GLib.warning ("Could not open device" + shared_device.data ()
-                            + "for reading to compute a checksum" + shared_device.error_string ();
-                }
-                return GLib.ByteArray ();
+        // Bug: The thread will keep running even if ComputeChecksum is deleted.
+        string type = this.checksum_type;
+        this.watcher.future (QtConcurrent.run (
+            ComputeChecksum.on_watcher_run
+        ));
+    }
+
+
+    private static void on_watcher_run (QIODevice shared_device, string type) {
+        if (!shared_device.open (QIODevice.ReadOnly)) {
+            var file = qobject_cast<GLib.File> (shared_device.data ());
+            if (file) {
+                GLib.warning ("Could not open file " + file.filename ()
+                        + " for reading to compute a checksum " + file.error_string ());
+            } else {
+                GLib.warning ("Could not open device " + shared_device.data ()
+                        + " for reading to compute a checksum " + shared_device.error_string ());
             }
-            var result = ComputeChecksum.compute_now (shared_device.data (), type);
-            shared_device.close ();
-            return result;
-        }));
+            return "";
+        }
+        var result = ComputeChecksum.compute_now (shared_device.data (), type);
+        shared_device.close ();
+        return result;
     }
 }
 

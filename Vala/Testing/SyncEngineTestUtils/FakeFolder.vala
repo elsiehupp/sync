@@ -75,7 +75,7 @@ public class FakeFolder {
         // A new folder will update the local file state database on first sync.
         // To have a state matching what users will encounter, we have to a sync
         // using an identical local/remote file tree first.
-        ENFORCE (sync_once ());
+        //  ENFORCE (sync_once ());
     }
 
     /***********************************************************
@@ -145,7 +145,7 @@ public class FakeFolder {
         this.fake_qnam.set_override(qnam_override);
     }
 
-    delegate QJsonObject ReplyFunction (GLib.HashTable<string, GLib.ByteArray> map);
+    delegate QJsonObject ReplyFunction (GLib.HashTable<string, string> map);
 
     /***********************************************************
     ***********************************************************/
@@ -293,7 +293,7 @@ void FakeFolder.to_disk (QDir directory, FileInfo template_file_info) {
         } else {
             GLib.File file = new GLib.File (directory.file_path (child.name));
             file.open (GLib.File.WriteOnly);
-            file.write (GLib.ByteArray {}.fill (child.content_char, child.size));
+            file.write (string {}.fill (child.content_char, child.size));
             file.close ();
             Occ.FileSystem.set_modification_time (file.filename (), Occ.Utility.date_time_to_time_t (child.last_modified));
         }
@@ -322,7 +322,7 @@ void FakeFolder.from_disk (QDir directory, FileInfo template_file_info) {
 }
 
 static FileInfo find_or_create_directories (FileInfo base, PathComponents components) {
-    if (components.is_empty ())
+    if (components == "")
         return base;
     var child_name = components.path_root ();
     var it = base.children.find (child_name);
@@ -344,7 +344,7 @@ FileInfo FakeFolder.database_state () {
         item.name = name;
         item.parent_path = parent_directory.path ();
         item.size = record.file_size;
-        item.is_directory = record.type == ItemTypeDirectory;
+        item.is_directory = record.type == ItemType.DIRECTORY;
         item.permissions = record.remote_perm;
         item.etag = record.etag;
         item.last_modified = Occ.Utility.date_time_from_time_t (record.modtime);

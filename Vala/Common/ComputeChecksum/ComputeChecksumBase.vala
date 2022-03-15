@@ -22,6 +22,7 @@ abstract class ComputeChecksumBase : GLib.Object {
 
     const int64 BUFSIZE = 500 * 1024; // 500 KiB
 
+    private static bool enabled;
 
     /***********************************************************
     Returns the highest-quality checksum in a 'checksums'
@@ -33,11 +34,10 @@ abstract class ComputeChecksumBase : GLib.Object {
 
     OCSYNC_EXPORT
     ***********************************************************/
-    GLib.ByteArray find_best_checksum (GLib.ByteArray this.checksums) {
-        if (this.checksums.is_empty ()) {
-            return {};
+    string find_best_checksum (string checksums) {
+        if (checksums == "") {
+            return "";
         }
-        const var checksums = string.from_utf8 (this.checksums);
         int i = 0;
         // The order of the searches here defines the preference ordering.
         if (-1 != (i = checksums.index_of ("SHA3-256:", 0, Qt.CaseInsensitive))
@@ -47,15 +47,15 @@ abstract class ComputeChecksumBase : GLib.Object {
             || -1 != (i = checksums.index_of ("ADLER32:", 0, Qt.CaseInsensitive))) {
             // Now i is the on_signal_start of the best checksum
             // Grab it until the next space or end of xml or end of string.
-            int end = this.checksums.index_of (' ', i);
+            int end = checksums.index_of (' ', i);
             // workaround for https://github.com/owncloud/core/pull/38304
             if (end == -1) {
-                end = this.checksums.index_of ('<', i);
+                end = checksums.index_of ('<', i);
             }
-            return this.checksums.mid (i, end - i);
+            return checksums.mid (i, end - i);
         }
-        GLib.warning ("Failed to parse" + this.checksums;
-        return {};
+        GLib.warning ("Failed to parse " + checksums);
+        return "";
     }
 
 
@@ -63,12 +63,13 @@ abstract class ComputeChecksumBase : GLib.Object {
     Creates a checksum header from type and value.
     OCSYNC_EXPORT
     ***********************************************************/
-    GLib.ByteArray make_checksum_header (GLib.ByteArray checksum_type, GLib.ByteArray checksum) {
-        if (checksum_type.is_empty () || checksum.is_empty ())
-            return GLib.ByteArray ();
-        GLib.ByteArray header = checksum_type;
-        header.append (':');
-        header.append (checksum);
+    string make_checksum_header (string checksum_type, string checksum) {
+        if (checksum_type == "" || checksum == "") {
+            return "";
+        }
+        string header = checksum_type;
+        header += ":";
+        header += checksum;
         return header;
     }
 
@@ -77,8 +78,8 @@ abstract class ComputeChecksumBase : GLib.Object {
     Parses a checksum header
     OCSYNC_EXPORT
     ***********************************************************/
-    bool parse_checksum_header (GLib.ByteArray header, GLib.ByteArray type, GLib.ByteArray checksum) {
-        if (header.is_empty ()) {
+    bool parse_checksum_header (string header, string type, string checksum) {
+        if (header == "") {
             type.clear ();
             checksum.clear ();
             return true;
@@ -99,10 +100,10 @@ abstract class ComputeChecksumBase : GLib.Object {
     Convenience for getting the type from a checksum header, null if none
     OCSYNC_EXPORT
     ***********************************************************/
-    GLib.ByteArray parse_checksum_header_type (GLib.ByteArray header) {
+    string parse_checksum_header_type (string header) {
         const var index = header.index_of (':');
         if (index < 0) {
-            return GLib.ByteArray ();
+            return "";
         }
         return header.left (index);
     }
@@ -113,8 +114,8 @@ abstract class ComputeChecksumBase : GLib.Object {
     OCSYNC_EXPORT
     ***********************************************************/
     bool upload_checksum_enabled () {
-        static bool enabled = q_environment_variable_is_empty ("OWNCLOUD_DISABLE_CHECKSUM_UPLOAD");
-        return enabled;
+        ComputeChecksumBase.enabled = q_environment_variable_is_empty ("OWNCLOUD_DISABLE_CHECKSUM_UPLOAD");
+        return ComputeChecksumBase.enabled;
     }
 
 
@@ -127,7 +128,7 @@ abstract class ComputeChecksumBase : GLib.Object {
     /***********************************************************
     OCSYNC_EXPORT
     ***********************************************************/
-    GLib.ByteArray calc_md5 (QIODevice device) {
+    string calc_md5 (QIODevice device) {
         return calc_crypto_hash (device, QCryptographicHash.Md5);
     }
 
@@ -135,7 +136,7 @@ abstract class ComputeChecksumBase : GLib.Object {
     /***********************************************************
     OCSYNC_EXPORT
     ***********************************************************/
-    GLib.ByteArray calc_sha1 (QIODevice device) {
+    string calc_sha1 (QIODevice device) {
         return calc_crypto_hash (device, QCryptographicHash.Sha1);
     }
 
@@ -143,11 +144,11 @@ abstract class ComputeChecksumBase : GLib.Object {
     /***********************************************************
     OCSYNC_EXPORT
     ***********************************************************/
-    GLib.ByteArray calc_adler32 (QIODevice device) {
+    string calc_adler32 (QIODevice device) {
         if (device.size () == 0) {
-            return GLib.ByteArray ();
+            return "";
         }
-        GLib.ByteArray buf (BUFSIZE, Qt.Uninitialized);
+        string buf = string (BUFSIZE, Qt.Uninitialized);
 
         uint32 adler = adler32 (0L, Z_NULL, 0);
         int64 size = 0;
@@ -157,15 +158,15 @@ abstract class ComputeChecksumBase : GLib.Object {
                 adler = adler32 (adler, (Bytef *)buf.data (), size);
         }
 
-        return GLib.ByteArray.number (adler, 16);
+        return string.number (adler, 16);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    static GLib.ByteArray calc_crypto_hash (QIODevice device, QCryptographicHash.Algorithm algo) {
-        GLib.ByteArray arr;
-        QCryptographicHash crypto ( algo );
+    static string calc_crypto_hash (QIODevice device, QCryptographicHash.Algorithm algo) {
+        string arr;
+        QCryptographicHash crypto = new QCryptographicHash (algo);
 
         if (crypto.add_data (device)) {
             arr = crypto.result ().to_hex ();
@@ -177,7 +178,7 @@ abstract class ComputeChecksumBase : GLib.Object {
     /***********************************************************
     ***********************************************************/
     static bool checksum_computation_enabled () {
-        static bool enabled = q_environment_variable_is_empty ("OWNCLOUD_DISABLE_CHECKSUM_COMPUTATIONS");
-        return enabled;
+        ComputeChecksumBase.enabled = q_environment_variable_is_empty ("OWNCLOUD_DISABLE_CHECKSUM_COMPUTATIONS");
+        return ComputeChecksumBase.enabled;
     }
 }

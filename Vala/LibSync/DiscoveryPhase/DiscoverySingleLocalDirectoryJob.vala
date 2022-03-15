@@ -75,7 +75,7 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, QRunnable*/ {
             var dirent = csync_vio_local_readdir (dh, this.vfs);
             if (!dirent)
                 break;
-            if (dirent.type == ItemTypeSkip)
+            if (dirent.type == ItemType.SKIP)
                 continue;
             LocalInfo i;
             static QTextCodec codec = QTextCodec.codec_for_name ("UTF-8");
@@ -88,7 +88,7 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, QRunnable*/ {
                 //item.file = this.current_folder.target + i.name;
                 // FIXME ^^ do we really need to use this.target or is local fine?
                 item.file = this.local_path + i.name;
-                item.instruction = CSYNC_INSTRUCTION_IGNORE;
+                item.instruction = SyncInstructions.IGNORE;
                 item.status = SyncFileItem.Status.NORMAL_ERROR;
                 item.error_string = _("Filename encoding is not valid");
                 /* emit */ item_discovered (item);
@@ -97,10 +97,10 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, QRunnable*/ {
             i.modtime = dirent.modtime;
             i.size = dirent.size;
             i.inode = dirent.inode;
-            i.is_directory = dirent.type == ItemTypeDirectory;
+            i.is_directory = dirent.type == ItemType.DIRECTORY;
             i.is_hidden = dirent.is_hidden;
-            i.is_sym_link = dirent.type == ItemTypeSoftLink;
-            i.is_virtual_file = dirent.type == ItemTypeVirtualFile || dirent.type == ItemTypeVirtualFileDownload;
+            i.is_sym_link = dirent.type == ItemType.SOFT_LINK;
+            i.is_virtual_file = dirent.type == ItemType.VIRTUAL_FILE || dirent.type == ItemType.VIRTUAL_FILE_DOWNLOAD;
             i.type = dirent.type;
             results.push_back (i);
         }

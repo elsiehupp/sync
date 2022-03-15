@@ -25,7 +25,7 @@ public class ItemCompletedSpy : QSignalSpy {
 
     Occ.SyncFileItemPtr find_item_with_expected_rank (string path, int rank) {
         GLib.assert_true (size () > rank);
-        GLib.assert_true (! (*this)[rank].is_empty ());
+        GLib.assert_true (! (*this)[rank] == "");
 
         var item = (*this)[rank][0].value<Occ.SyncFileItemPtr> ();
         if (item.destination () == path) {

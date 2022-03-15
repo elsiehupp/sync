@@ -25,7 +25,7 @@ public class TestIconUtils : GLib.Object {
         const QDir black_svg_dir = new QDir (black_svg_dir_path);
         const string[] black_images = black_svg_dir.entry_list ("*.svg");
 
-        GLib.assert_true (!black_images.is_empty ());
+        GLib.assert_true (!black_images == "");
 
         GLib.assert_true (!Occ.Ui.IconUtils.draw_svg_with_custom_fill_color (black_svg_dir_path + "/" + black_images.at (0), QColorConstants.Svg.red).is_null ());
 
@@ -35,7 +35,7 @@ public class TestIconUtils : GLib.Object {
         const QDir white_svg_dir = new QDir (white_svg_dir_path);
         const string[] white_images = white_svg_dir.entry_list ("*.svg");
 
-        GLib.assert_true (!white_images.is_empty ());
+        GLib.assert_true (!white_images == "");
 
         GLib.assert_true (!Occ.Ui.IconUtils.draw_svg_with_custom_fill_color (white_svg_dir_path + "/" + white_images.at (0), QColorConstants.Svg.blue).is_null ());
     }
@@ -47,7 +47,7 @@ public class TestIconUtils : GLib.Object {
         const QDir black_svg_dir = new QDir (Occ.Theme.theme_prefix + "black");
         const string[] black_images = black_svg_dir.entry_list ("*.svg");
 
-        GLib.assert_true (!black_images.is_empty ());
+        GLib.assert_true (!black_images == "");
 
         GLib.assert_true (!Occ.Ui.IconUtils.create_svg_image_with_custom_color (black_images.at (0), QColorConstants.Svg.red).is_null ());
 
@@ -56,7 +56,7 @@ public class TestIconUtils : GLib.Object {
         const QDir white_svg_dir = new QDir (Occ.Theme.theme_prefix + "white");
         const string[] white_images = white_svg_dir.entry_list ("*.svg");
 
-        GLib.assert_true (!white_images.is_empty ());
+        GLib.assert_true (!white_images == "");
 
         GLib.assert_true (!Occ.Ui.IconUtils.create_svg_image_with_custom_color (white_images.at (0), QColorConstants.Svg.blue).is_null ());
     }
@@ -71,11 +71,11 @@ public class TestIconUtils : GLib.Object {
         const QDir white_svg_dir = new QDir (Occ.Theme.theme_prefix + "white");
         const string[] white_images = white_svg_dir.entry_list ("*.svg");
 
-        GLib.assert_true (!black_images.is_empty ());
+        GLib.assert_true (!black_images == "");
 
         GLib.assert_true (!Occ.Ui.IconUtils.pixmap_for_background (white_images.at (0), Gtk.Color ("blue")).is_null ());
 
-        GLib.assert_true (!white_images.is_empty ());
+        GLib.assert_true (!white_images == "");
 
         GLib.assert_true (!Occ.Ui.IconUtils.pixmap_for_background (black_images.at (0), Gtk.Color ("yellow")).is_null ());
     }

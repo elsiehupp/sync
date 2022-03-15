@@ -40,7 +40,7 @@ public class OcsJob : AbstractNetworkJob {
 
     @param verb currently supported PUT POST DELETE
     ***********************************************************/
-    GLib.ByteArray verb { private get; protected set; }
+    string verb { private get; protected set; }
 
     private GLib.List<QPair<string, string>> params;
     private GLib.Vector<int> pass_status_codes;
@@ -133,7 +133,7 @@ public class OcsJob : AbstractNetworkJob {
     @param header_name a string with the header name
     @param value a string with the value
     ***********************************************************/
-    public void add_raw_header (GLib.ByteArray header_name, GLib.ByteArray value) {
+    public void add_raw_header (string header_name, string value) {
         this.request.raw_header (header_name, value);
     }
 
@@ -152,9 +152,9 @@ public class OcsJob : AbstractNetworkJob {
             query_items = percent_encode_query_items (this.params);
         } else if (this.verb == "POST" || this.verb == "PUT") {
             // Url encode the this.post_params and put them in a buffer.
-            GLib.ByteArray post_data;
+            string post_data;
             foreach (var tmp in this.params) {
-                if (!post_data.is_empty ()) {
+                if (!post_data == "") {
                     post_data.append ("&");
                 }
                 post_data.append (GLib.Uri.to_percent_encoding (tmp.first));
@@ -186,13 +186,13 @@ public class OcsJob : AbstractNetworkJob {
     @param value - the ETag response header value
     @param status_code - the OCS status code : 100 (!) for on_signal_success
     ***********************************************************/
-    private void etag_response_header_received (GLib.ByteArray value, int status_code);
+    private void etag_response_header_received (string value, int status_code);
 
 
     /***********************************************************
     ***********************************************************/
     private override bool on_signal_finished () {
-        const GLib.ByteArray reply_data = reply ().read_all ();
+        const string reply_data = reply ().read_all ();
 
         QJsonParseError error;
         string message;

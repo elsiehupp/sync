@@ -157,9 +157,9 @@ public class VfsSuffix : Vfs {
 
     /***********************************************************
     ***********************************************************/
-    public bool stat_type_virtual_file (csync_file_stat_t stat, void stat_data) {
+    public bool stat_type_virtual_file (CSyncFileStatT stat, void stat_data) {
         if (stat.path.has_suffix (file_suffix ().to_utf8 ())) {
-            stat.type = ItemTypeVirtualFile;
+            stat.type = ItemType.VIRTUAL_FILE;
             return true;
         }
         return false;

@@ -75,8 +75,8 @@ public class Utility {
     /***********************************************************
     OCSYNC_EXPORT
     ***********************************************************/
-    public static string format_fingerprint (GLib.ByteArray fmhash, bool colon_separated = true) {
-        GLib.ByteArray hash;
+    public static string format_fingerprint (string fmhash, bool colon_separated = true) {
+        string hash;
         int steps = fmhash.length () / 2;
         for (int i = 0; i < steps; i++) {
             hash.append (fmhash[i * 2]);
@@ -106,9 +106,9 @@ public class Utility {
     static void setup_fav_link_private (string folder) {
         // Nautilus : add to ~/.gtk-bookmarks
         GLib.File gtk_bookmarks = GLib.File.new_for_path (QDir.home_path () + "/.config/gtk-3.0/bookmarks");
-        GLib.ByteArray folder_url = "file://" + folder.to_utf8 ();
+        string folder_url = "file://" + folder.to_utf8 ();
         if (gtk_bookmarks.open (GLib.File.ReadWrite)) {
-            GLib.ByteArray places = gtk_bookmarks.read_all ();
+            string places = gtk_bookmarks.read_all ();
             if (!places.contains (folder_url)) {
                 places += folder_url;
                 gtk_bookmarks.on_signal_reset ();
@@ -207,7 +207,7 @@ public class Utility {
     /***********************************************************
     OCSYNC_EXPORT
     ***********************************************************/
-    public static GLib.ByteArray user_agent_string () {
+    public static string user_agent_string () {
         return "Mozilla/5.0 (%1) mirall/%2 (%3, %4-%5 ClientArchitecture : %6 OsArchitecture : %7)"
             .printf (platform (),
                 MIRALL_VERSION_STRING,
@@ -223,7 +223,7 @@ public class Utility {
     /***********************************************************
     OCSYNC_EXPORT
     ***********************************************************/
-    public static GLib.ByteArray friendly_user_agent_string () {
+    public static string friendly_user_agent_string () {
         const var pattern = "%1 (Desktop Client - %2)";
         const var user_agent = pattern.printf (QSysInfo.machine_host_name (), platform ());
         return user_agent.to_utf8 ();
@@ -398,7 +398,7 @@ public class Utility {
             }
             string_value.chop (1);
         }
-        if (!unit.is_empty ())
+        if (!unit == "")
             string_value += (' ' + unit);
         return string_value;
     }
@@ -574,8 +574,8 @@ public class Utility {
     OCSYNC_EXPORT
     ***********************************************************/
     public static bool fs_case_preserving_override () {
-        GLib.ByteArray env = qgetenv ("OWNCLOUD_TEST_CASE_PRESERVING");
-        if (!env.is_empty ())
+        string env = qgetenv ("OWNCLOUD_TEST_CASE_PRESERVING");
+        if (!env == "")
             return env.to_int ();
         return Utility.is_windows () || Utility.is_mac ();
     }
@@ -609,7 +609,7 @@ public class Utility {
         // ONLY use this function with existing pathes.
         const string a = fd1.canonical_path ();
         const string b = fd2.canonical_path ();
-        bool re = !a.is_empty () && string.compare (a, b, fs_case_preserving () ? Qt.CaseInsensitive : Qt.CaseSensitive) == 0;
+        bool re = !a == "" && string.compare (a, b, fs_case_preserving () ? Qt.CaseInsensitive : Qt.CaseSensitive) == 0;
         return re;
     }
 
@@ -631,11 +631,11 @@ public class Utility {
 
     OCSYNC_EXPORT
     ***********************************************************/
-    public static GLib.ByteArray version_of_installed_binary (string command = "") {
-        GLib.ByteArray re;
+    public static string version_of_installed_binary (string command = "") {
+        string re;
         if (is_linux ()) {
             string binary = command;
-            if (binary.is_empty ()) {
+            if (binary == "") {
                 binary = Gtk.Application.arguments ()[0];
             }
             string[] parameters;
@@ -668,7 +668,7 @@ public class Utility {
     /***********************************************************
     OCSYNC_EXPORT
     ***********************************************************/
-    public static GLib.ByteArray normalize_etag (GLib.ByteArray etag) {
+    public static string normalize_etag (string etag) {
         // strip "XXXX-gzip"
         if (etag.starts_with ('"') && etag.ends_with ("-gzip\"")) {
             etag.chop (6);
@@ -823,7 +823,7 @@ public class Utility {
         GLib.Uri url, string concat_path,
         QUrlQuery query_items = {}) {
         string path = url.path ();
-        if (!concat_path.is_empty ()) {
+        if (!concat_path == "") {
             // avoid '//'
             if (path.ends_with ('/') && concat_path.starts_with ('/')) {
                 path.chop (1);
@@ -897,7 +897,7 @@ public class Utility {
         }
 
         string conflict_marker = " (conflicted copy ";
-        if (!user.is_empty ()) {
+        if (!user == "") {
             // Don't allow parens in the user name, to ensure
             // we can find the beginning and end of the conflict tag.
             const var user_name = sanitize_for_filename (user).replace ('(', '_').replace (')', '_');
@@ -965,7 +965,7 @@ public class Utility {
 
     OCSYNC_EXPORT
     ***********************************************************/
-    public static GLib.ByteArray conflict_file_base_name_from_pattern (GLib.ByteArray conflict_name) {
+    public static string conflict_file_base_name_from_pattern (string conflict_name) {
         // This function must be able to deal with conflict files for conflict files.
         // To do this, we scan backwards, for the outermost conflict marker and
         // strip only that to generate the conflict file base name.

@@ -57,7 +57,7 @@ public class FakeQNAM : Soup {
         return this.error_paths;
     }
 
-    delegate QJsonObject ReplyFunction (GLib.HashTable<string, GLib.ByteArray> map);
+    delegate QJsonObject ReplyFunction (GLib.HashTable<string, string> map);
 
     /***********************************************************
     ***********************************************************/
@@ -77,7 +77,7 @@ public class FakeQNAM : Soup {
             var header_end_position = one_part.index_of ("\r\n\r\n");
             var one_part_header_part = one_part.left (header_end_position);
             var one_part_header = one_part_header_part.split ("\r\n");
-            GLib.HashTable<string, GLib.ByteArray> all_headers;
+            GLib.HashTable<string, string> all_headers;
             foreach (var one_header in one_part_header) {
                 var header_parts = one_header.split (":");
                 all_headers[header_parts.at (0)] = header_parts.at (1);

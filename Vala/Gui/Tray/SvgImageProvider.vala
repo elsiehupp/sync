@@ -22,11 +22,11 @@ public class SvgImageProvider : QQuickImageProvider {
     /***********************************************************
     ***********************************************************/
     public Gtk.Image request_image (string identifier, QSize size, QSize requested_size) {
-        //  Q_ASSERT (!identifier.is_empty ());
+        //  Q_ASSERT (!identifier == "");
 
         const var id_split = identifier.split ("/", Qt.SkipEmptyParts);
 
-        if (id_split.is_empty ()) {
+        if (id_split == "") {
             GLib.warning ("Image identifier is incorrect!");
             return {};
         }
@@ -34,7 +34,7 @@ public class SvgImageProvider : QQuickImageProvider {
         const var pixmap_name = id_split.at (0);
         const var pixmap_color = id_split.size () > 1 ? Gtk.Color (id_split.at (1)) : QColor_constants.Svg.black;
 
-        if (pixmap_name.is_empty () || !pixmap_color.is_valid ()) {
+        if (pixmap_name == "" || !pixmap_color.is_valid ()) {
             GLib.warning ("Image identifier is incorrect!");
             return {};
         }

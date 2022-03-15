@@ -292,7 +292,7 @@ public class CloudProviderWrapper : GLib.Object {
             return;
 
         // Build recently changed files list
-        if (!progress.last_completed_item.is_empty () && should_show_in_recents_menu (progress.last_completed_item)) {
+        if (!progress.last_completed_item == "" && should_show_in_recents_menu (progress.last_completed_item)) {
             string kind_str = Progress.as_result_string (progress.last_completed_item);
             string time_str = QTime.current_time ().to_string ("hh:mm");
             string action_text = _("%1 (%2, %3)").printf (progress.last_completed_item.file, kind_str, time_str);
@@ -311,7 +311,7 @@ public class CloudProviderWrapper : GLib.Object {
 
         // Build status details text
         string message;
-        if (!progress.current_discovered_remote_folder.is_empty ()) {
+        if (!progress.current_discovered_remote_folder == "") {
             message =  _("Checking for changes in \"%1\"").printf (progress.current_discovered_remote_folder);
         } else if (progress.total_size () == 0) {
             int64 current_file = progress.current_file ();
@@ -338,11 +338,11 @@ public class CloudProviderWrapper : GLib.Object {
         }
         update_status_text (message);
 
-        if (!progress.last_completed_item.is_empty ()
+        if (!progress.last_completed_item == ""
                 && should_show_in_recents_menu (progress.last_completed_item)) {
             GMenuItem* item;
             g_menu_remove_all (G_MENU (this.recent_menu));
-            if (!this.recently_changed.is_empty ()) {
+            if (!this.recently_changed == "") {
                 foreach (var item in this.recently_changed) {
                     string label = item.first;
                     string full_path = item.second;
@@ -395,8 +395,8 @@ public class CloudProviderWrapper : GLib.Object {
     ***********************************************************/
     private static bool should_show_in_recents_menu (SyncFileItem item) {
         return !Progress.is_ignored_kind (item.status)
-                && item.instruction != CSYNC_INSTRUCTION_EVAL
-                && item.instruction != CSYNC_INSTRUCTION_NONE;
+                && item.instruction != SyncInstructions.EVAL
+                && item.instruction != SyncInstructions.NONE;
     }
 
 

@@ -9,7 +9,7 @@ Copyright (c) 2014 Dominik Haumann <dhaumann@kde.org>
 ***********************************************************/
 
 //  #include <QAction>
-//  #include <QApplication>
+//  #include <Gtk.Application>
 //  #include <QEvent>
 //  #include <QGridLayout>
 //  #include <QHBoxLayout>
@@ -96,7 +96,7 @@ public class KMessageWidgetPrivate {
         q_delete_all (buttons);
         buttons.clear ();
 
-        foreach (var QAction action in q.actions ()) {
+        foreach (QAction action in q.actions ()) {
             var button = new QToolButton (content);
             button.set_default_action (action);
             button.set_tool_button_style (Qt.ToolButtonTextBesideIcon);
@@ -106,7 +106,7 @@ public class KMessageWidgetPrivate {
         // AutoRaise reduces visual clutter, but we don't want to turn it on if
         // there are other buttons, otherwise the close button will look different
         // from the others.
-        close_button.set_auto_raise (buttons.is_empty ());
+        close_button.set_auto_raise (buttons == "");
 
         if (word_wrap) {
             var layout = new QGridLayout (content);
@@ -114,14 +114,14 @@ public class KMessageWidgetPrivate {
             layout.add_widget (icon_label, 0, 0, 1, 1, Qt.AlignHCenter | Qt.AlignTop);
             layout.add_widget (text_label, 0, 1);
 
-            if (buttons.is_empty ()) {
+            if (buttons == "") {
                 // Use top-vertical alignment like the icon does.
                 layout.add_widget (close_button, 0, 2, 1, 1, Qt.AlignHCenter | Qt.AlignTop);
             } else {
                 // Use an additional layout in row 1 for the buttons.
                 var button_layout = new QHBoxLayout ();
                 button_layout.add_stretch ();
-                foreach (var QToolButton button, buttons) {
+                foreach (QToolButton button in buttons) {
                     // For some reason, calling show () is necessary if wordwrap is true,
                     // otherwise the buttons do not show up. It is not needed if
                     // wordwrap is false.
@@ -136,7 +136,7 @@ public class KMessageWidgetPrivate {
             layout.add_widget (icon_label);
             layout.add_widget (text_label);
 
-            for (QToolButton button : q_as_const (buttons)) {
+            foreach (QToolButton button in buttons) {
                 layout.add_widget (button);
             }
 

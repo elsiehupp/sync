@@ -54,7 +54,7 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
         string error_str = FolderMan.instance ().check_path_validity_for_new_folder (
             QDir.from_native_separators (this.ui.local_folder_line_edit.text ()), server_url);
 
-        bool is_ok = error_str.is_empty ();
+        bool is_ok = error_str == "";
         string[] warn_strings;
         if (!is_ok) {
             warn_strings += error_str;
@@ -104,7 +104,7 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
         string directory = QFileDialog.existing_directory (this,
             _("Select the source folder"),
             sf);
-        if (!directory.is_empty ()) {
+        if (!directory == "") {
             // set the last directory component name as alias
             this.ui.local_folder_line_edit.on_signal_text (QDir.to_native_separators (directory));
         }

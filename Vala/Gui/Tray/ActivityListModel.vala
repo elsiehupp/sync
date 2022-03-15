@@ -80,7 +80,7 @@ public class ActivityListModel : QAbstractListModel {
 
 
     signal void activity_job_status_code (int status_code);
-    signal void send_notification_request (string account_name, string link, GLib.ByteArray verb, int row);
+    signal void send_notification_request (string account_name, string link, string verb, int row);
 
 
     /***********************************************************
@@ -261,7 +261,7 @@ public class ActivityListModel : QAbstractListModel {
 
         switch (role) {
         case DataRole.DISPLAY_PATH:
-            if (!a.file.is_empty ()) {
+            if (!a.file == "") {
                 var folder = FolderMan.instance ().folder_by_alias (a.folder);
                 string relative_path = a.file;
                 if (folder) {
@@ -278,7 +278,7 @@ public class ActivityListModel : QAbstractListModel {
             }
             return "";
         case DataRole.PATH:
-            if (!a.file.is_empty ()) {
+            if (!a.file == "") {
                 const var folder = FolderMan.instance ().folder_by_alias (a.folder);
 
                 string relative_path = a.file;
@@ -289,7 +289,7 @@ public class ActivityListModel : QAbstractListModel {
                 // get relative path to the file so we can open it in the file manager
                 const var local_files = FolderMan.instance ().find_file_in_local_folders (GLib.FileInfo (relative_path).path (), ast.account ());
 
-                if (local_files.is_empty ()) {
+                if (local_files == "") {
                     return "";
                 }
 
@@ -298,7 +298,7 @@ public class ActivityListModel : QAbstractListModel {
                 if (folder) {
                     SyncJournalFileRecord record;
                     folder.journal_database ().file_record (a.file.mid (1), record);
-                    if (record.is_valid () && (record.is_e2e_encrypted || !record.e2e_mangled_name.is_empty ())) {
+                    if (record.is_valid () && (record.is_e2e_encrypted || !record.e2e_mangled_name == "")) {
                         return "";
                     }
                 }
@@ -309,7 +309,7 @@ public class ActivityListModel : QAbstractListModel {
         case DataRole.ABSOLUTE_PATH: {
             const var folder = FolderMan.instance ().folder_by_alias (a.folder);
             string relative_path = a.file;
-            if (!a.file.is_empty ()) {
+            if (!a.file == "") {
                 if (folder) {
                     relative_path.prepend (folder.remote_path ());
                 }
@@ -363,7 +363,7 @@ public class ActivityListModel : QAbstractListModel {
                 }
             } else {
                 // We have an activity
-                if (a.icon.is_empty ()) {
+                if (a.icon == "") {
                     return "qrc:///client/theme/black/activity.svg";
                 }
 
@@ -393,7 +393,7 @@ public class ActivityListModel : QAbstractListModel {
         case DataRole.MESSAGE:
             return a.message;
         case DataRole.LINK: {
-            if (a.link.is_empty ()) {
+            if (a.link == "") {
                 return "";
             } else {
                 return a.link;
@@ -409,7 +409,7 @@ public class ActivityListModel : QAbstractListModel {
         case DataRole.DISPLAY_ACTIONS:
             return this.display_actions;
         case DataRole.SHAREABLE:
-            return !data (index, DataRole.PATH).to_string ().is_empty () && this.display_actions && a.file_action != "file_deleted" && a.status != SyncFileItem.Status.FILE_IGNORED;
+            return !data (index, DataRole.PATH).to_string () == "" && this.display_actions && a.file_action != "file_deleted" && a.status != SyncFileItem.Status.FILE_IGNORED;
         default:
             return GLib.Variant ();
         }
@@ -430,8 +430,8 @@ public class ActivityListModel : QAbstractListModel {
 
         const var activity = this.final_list.at (activity_index);
         if (activity.status == SyncFileItem.Status.CONFLICT) {
-            //  Q_ASSERT (!activity.file.is_empty ());
-            //  Q_ASSERT (!activity.folder.is_empty ());
+            //  Q_ASSERT (!activity.file == "");
+            //  Q_ASSERT (!activity.folder == "");
             //  Q_ASSERT (Utility.is_conflict_file (activity.file));
 
             const var folder = FolderMan.instance ().folder_by_alias (activity.folder);
@@ -620,8 +620,8 @@ public class ActivityListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    protected GLib.HashTable<int, GLib.ByteArray> role_names () {
-        GLib.HashTable<int, GLib.ByteArray> roles;
+    protected GLib.HashTable<int, string> role_names () {
+        GLib.HashTable<int, string> roles;
         roles[DataRole.DISPLAY_PATH] = "display_path";
         roles[DataRole.PATH] = "path";
         roles[DataRole.ABSOLUTE_PATH] = "absolute_path";

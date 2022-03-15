@@ -142,7 +142,7 @@ public class OCUpdater : Updater {
         ConfigFile config;
         QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
         string update_file = settings.value (update_available_c).to_string ();
-        if (!update_file.is_empty () && GLib.File (update_file).exists ()
+        if (!update_file == "" && GLib.File (update_file).exists ()
             && !update_succeeded () /* Someone might have run the updater manually between restarts */) {
             const var message_box_start_installer = new QMessageBox (QMessageBox.Information,
                 _("New %1 update ready").printf (Theme.instance ().app_name_gui ()),

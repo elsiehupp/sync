@@ -53,7 +53,7 @@ public class WizardCommon {
             label.visible (true);
         } else {
             string string_value = variant.to_string ();
-            if (!string_value.is_empty ()) {
+            if (!string_value == "") {
                 label.on_signal_text (string_value);
                 label.text_format (Qt.RichText);
                 label.visible (true);

@@ -97,7 +97,7 @@ public class ConflictSolver : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private bool delete_local_version () {
-        if (this.local_version_filename.is_empty ()) {
+        if (this.local_version_filename == "") {
             return false;
         }
 
@@ -123,7 +123,7 @@ public class ConflictSolver : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private bool rename_local_version () {
-        if (this.local_version_filename.is_empty ()) {
+        if (this.local_version_filename == "") {
             return false;
         }
 
@@ -169,11 +169,11 @@ public class ConflictSolver : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private bool overwrite_remote_version () {
-        if (this.local_version_filename.is_empty ()) {
+        if (this.local_version_filename == "") {
             return false;
         }
 
-        if (this.remote_version_filename.is_empty ()) {
+        if (this.remote_version_filename == "") {
             return false;
         }
 

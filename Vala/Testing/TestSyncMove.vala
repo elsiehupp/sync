@@ -41,11 +41,11 @@ bool item_successful (ItemCompletedSpy spy, string path, SyncInstructions instr)
 
 bool item_conflict (ItemCompletedSpy spy, string path) {
     var item = spy.find_item (path);
-    return item.status == SyncFileItem.Status.CONFLICT && item.instruction == CSYNC_INSTRUCTION_CONFLICT;
+    return item.status == SyncFileItem.Status.CONFLICT && item.instruction == SyncInstructions.CONFLICT;
 }
 
 bool item_successful_ move (ItemCompletedSpy spy, string path) {
-    return item_successful (spy, path, CSYNC_INSTRUCTION_RENAME);
+    return item_successful (spy, path, SyncInstructions.RENAME);
 }
 
 string[] find_conflicts (FileInfo directory) {
@@ -116,7 +116,7 @@ public class TestSyncMove : GLib.Object {
         GLib.assert_cmp (counter.number_of_move, 1);
         GLib.assert_cmp (counter.number_of_delete, 0);
 
-        GLib.assert_true (item_successful (complete_spy, "f1", CSYNC_INSTRUCTION_RENAME));
+        GLib.assert_true (item_successful (complete_spy, "f1", SyncInstructions.RENAME));
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/f1"));
         GLib.assert_true (!fake_folder.current_remote_state ().find ("A/AS/f1"));
     }
@@ -193,7 +193,7 @@ public class TestSyncMove : GLib.Object {
 
         // Remove sub_folder_a with selective_sync:
         fake_folder.sync_engine ().journal ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, { "parent_folder/sub_folder_a/" });
-        fake_folder.sync_engine ().journal ().schedule_path_for_remote_discovery (new GLib.ByteArray ("parent_folder/sub_folder_a/"));
+        fake_folder.sync_engine ().journal ().schedule_path_for_remote_discovery (new string ("parent_folder/sub_folder_a/"));
 
         fake_folder.sync_once ();
  {
@@ -492,8 +492,8 @@ public class TestSyncMove : GLib.Object {
             GLib.assert_cmp (counter.number_of_put, 1);
             GLib.assert_cmp (counter.number_of_move, 0);
             GLib.assert_cmp (counter.number_of_delete, 0);
-            GLib.assert_true (item_successful (complete_spy, "A/a1m", CSYNC_INSTRUCTION_NEW));
-            GLib.assert_true (item_successful (complete_spy, "B/b1m", CSYNC_INSTRUCTION_NEW));
+            GLib.assert_true (item_successful (complete_spy, "A/a1m", SyncInstructions.NEW));
+            GLib.assert_true (item_successful (complete_spy, "B/b1m", SyncInstructions.NEW));
             GLib.assert_true (item_conflict (complete_spy, "A/a1mt"));
             GLib.assert_true (item_conflict (complete_spy, "B/b1mt"));
         }
@@ -514,8 +514,8 @@ public class TestSyncMove : GLib.Object {
             GLib.assert_cmp (counter.number_of_put, 0);
             GLib.assert_cmp (counter.number_of_move, 0);
             GLib.assert_cmp (counter.number_of_delete, 1);
-            GLib.assert_true (item_successful (complete_spy, "A/a1mt", CSYNC_INSTRUCTION_REMOVE));
-            GLib.assert_true (item_successful (complete_spy, "B/b1mt", CSYNC_INSTRUCTION_REMOVE));
+            GLib.assert_true (item_successful (complete_spy, "A/a1mt", SyncInstructions.REMOVE));
+            GLib.assert_true (item_successful (complete_spy, "B/b1mt", SyncInstructions.REMOVE));
             GLib.assert_true (item_conflict (complete_spy, "A/a1N"));
             GLib.assert_true (item_conflict (complete_spy, "B/b1N"));
         }

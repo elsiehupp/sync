@@ -56,7 +56,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
         /***********************************************************
         ***********************************************************/
-        public static GLib.HashTable<int, GLib.ByteArray> role_names () {
+        public static GLib.HashTable<int, string> role_names () {
             var roles = QAbstractListModel.role_names ();
             roles[DataRole.PROVIDER_NAME] = "provider_name";
             roles[DataRole.PROVIDER_IDENTIFIER] = "provider_id";
@@ -172,7 +172,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     public bool is_search_in_progress () {
-        return !this.search_job_connections.is_empty ();
+        return !this.search_job_connections == "";
     }
 
 
@@ -184,7 +184,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
         const var filename =
             url_query.query_item_value ("scrollto", GLib.Uri.Component_formatting_option.Fully_decoded);
 
-        if (provider_id.contains ("file", Qt.CaseInsensitive) && !directory.is_empty () && !filename.is_empty ()) {
+        if (provider_id.contains ("file", Qt.CaseInsensitive) && !directory == "" && !filename == "") {
             if (!this.account_state || !this.account_state.account ()) {
                 return;
             }
@@ -193,7 +193,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
             const var local_files =
                 FolderMan.instance ().find_file_in_local_folders (GLib.FileInfo (relative_path).path (), this.account_state.account ());
 
-            if (!local_files.is_empty ()) {
+            if (!local_files == "") {
                 GLib.info ("Opening file: " + local_files.const_first ());
                 QDesktopServices.open_url (GLib.Uri.from_local_file (local_files.const_first ()));
                 return;
@@ -206,13 +206,13 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     public void fetch_more_trigger_clicked (string provider_id) {
-        if (is_search_in_progress () || !this.current_fetch_more_in_progress_provider_id.is_empty ()) {
+        if (is_search_in_progress () || !this.current_fetch_more_in_progress_provider_id == "") {
             return;
         }
 
         const var provider_info = this.providers.value (provider_id, {});
 
-        if (!provider_info.id.is_empty () && provider_info.id == provider_id && provider_info.is_paginated) {
+        if (!provider_info.id == "" && provider_info.id == provider_id && provider_info.is_paginated) {
             // Load more items
             this.current_fetch_more_in_progress_provider_id = provider_id;
             /* emit */ signal_current_fetch_more_in_progress_provider_id_changed ();
@@ -232,7 +232,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
             return;
         }
 
-        if (!this.results.is_empty ()) {
+        if (!this.results == "") {
             begin_reset_model ();
             this.results.clear ();
             end_reset_model ();
@@ -283,12 +283,12 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
         var provider = this.providers[provider_id];
 
-        if (provider.id.is_empty () && fetched_more) {
+        if (provider.id == "" && fetched_more) {
             this.providers.remove (provider_id);
             return;
         }
 
-        if (entries.is_empty ()) {
+        if (entries == "") {
             // we may have received false pagination information from the server, such as, we expect more
             // results available via pagination, but, there are no more left, so, we need to stop paginating for
             // this provider
@@ -319,7 +319,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
         foreach (var entry in entries) {
             const var entry_map = entry.to_map ();
-            if (entry_map.is_empty ()) {
+            if (entry_map == "") {
                 continue;
             }
             UnifiedSearchResult result;
@@ -350,7 +350,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
     private static GLib.Uri make_resource_url (string resource_url, GLib.Uri account_url) {
         GLib.Uri final_resurce_url = new GLib.Uri  (resource_url);
-        if (final_resurce_url.scheme ().is_empty () && account_url.scheme ().is_empty ()) {
+        if (final_resurce_url.scheme () == "" && account_url.scheme () == "") {
             final_resurce_url = account_url;
             final_resurce_url.path (resource_url);
         }
@@ -371,7 +371,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
             results.push_back (fetch_more_trigger);
         }
 
-        if (this.results.is_empty ()) {
+        if (this.results == "") {
             begin_insert_rows ({}, 0, results.size () - 1);
             this.results = results;
             end_insert_rows ();
@@ -412,7 +412,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
     initial search
     ***********************************************************/
     private void append_results_to_provider (GLib.Vector<UnifiedSearchResult> results, UnifiedSearchProvider provider) {
-        if (results.is_empty ()) {
+        if (results == "") {
             return;
         }
 
@@ -484,7 +484,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
             }
         }
 
-        if (!this.search_job_connections.is_empty ()) {
+        if (!this.search_job_connections == "") {
             this.search_job_connections.clear ();
             /* emit */ signal_is_search_in_progress_changed ();
         }
@@ -494,7 +494,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     private void clear_current_fetch_more_in_progress_provider_id () {
-        if (!this.current_fetch_more_in_progress_provider_id.is_empty ()) {
+        if (!this.current_fetch_more_in_progress_provider_id == "") {
             this.current_fetch_more_in_progress_provider_id.clear ();
             /* emit */ signal_current_fetch_more_in_progress_provider_id_changed ();
         }
@@ -511,7 +511,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
         this.search_term = term;
         /* emit */ signal_search_term_changed ();
 
-        if (!this.error_string.is_empty ()) {
+        if (!this.error_string == "") {
             this.error_string.clear ();
             /* emit */ signal_error_string_changed ();
         }
@@ -527,14 +527,14 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
             this.unified_search_text_editing_finished_timer.stop ();
         }
 
-        if (!this.search_term.is_empty ()) {
+        if (!this.search_term == "") {
             this.unified_search_text_editing_finished_timer.interval (SEARCH_TERM_EDITING_FINISHED_SEARCH_START_DELAY);
             connect (this.unified_search_text_editing_finished_timer, QTimer.timeout, this,
                 &UnifiedSearchResultsListModel.on_signal_search_term_editing_finished);
             this.unified_search_text_editing_finished_timer.on_signal_start ();
         }
 
-        if (!this.results.is_empty ()) {
+        if (!this.results == "") {
             begin_reset_model ();
             this.results.clear ();
             end_reset_model ();
@@ -553,7 +553,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
             return;
         }
 
-        if (this.providers.is_empty ()) {
+        if (this.providers == "") {
             var job = new JsonApiJob (this.account_state.account (), QLatin1String ("ocs/v2.php/search/providers"));
             connect (job, JsonApiJob.json_received, this, UnifiedSearchResultsListModel.on_signal_fetch_providers_finished);
             job.on_signal_start ();
@@ -591,7 +591,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
             const var provider_map = provider.to_map ();
             const var identifier = provider_map[QStringLiteral ("identifier")].to_string ();
             const var name = provider_map[QStringLiteral ("name")].to_string ();
-            if (!name.is_empty () && identifier != QStringLiteral ("talk-message-current")) {
+            if (!name == "" && identifier != QStringLiteral ("talk-message-current")) {
                 UnifiedSearchProvider new_provider;
                 new_provider.name = name;
                 new_provider.id = identifier;
@@ -622,14 +622,14 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
         const var provider_id = job.property ("provider_id").to_string ();
 
-        if (provider_id.is_empty ()) {
+        if (provider_id == "") {
             return;
         }
 
-        if (!this.search_job_connections.is_empty ()) {
+        if (!this.search_job_connections == "") {
             this.search_job_connections.remove (provider_id);
 
-            if (this.search_job_connections.is_empty ()) {
+            if (this.search_job_connections == "") {
                 /* emit */ signal_is_search_in_progress_changed ();
             }
         }
@@ -650,7 +650,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
         }
 
         const var data = json.object ().value (QStringLiteral ("ocs")).to_object ().value (QStringLiteral ("data")).to_object ();
-        if (!data.is_empty ()) {
+        if (!data == "") {
             parse_results_for_provider (data, provider_id, job.property ("append_results").to_bool ());
         }
     }
@@ -705,7 +705,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
     private static string icon_url_for_default_icon_name (string default_icon_name) {
         const GLib.Uri url_for_icon = new GLib.Uri (default_icon_name);
 
-        if (url_for_icon.is_valid () && !url_for_icon.scheme ().is_empty ()) {
+        if (url_for_icon.is_valid () && !url_for_icon.scheme () == "") {
             return default_icon_name;
         }
 
@@ -728,7 +728,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
             const var icon_name_from_icon_prefix = local_icon_path_from_icon_prefix (default_icon_name);
 
-            if (!icon_name_from_icon_prefix.is_empty ()) {
+            if (!icon_name_from_icon_prefix == "") {
                 return icon_name_from_icon_prefix;
             }
         }
@@ -749,7 +749,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
             const string[] thumbnail_url_copy_splitted = thumbnail_url_copy.contains ('?')
                 ? thumbnail_url_copy.split ('?', Qt.SkipEmptyParts)
                 : { thumbnail_url_copy };
-            //  Q_ASSERT (!thumbnail_url_copy_splitted.is_empty ());
+            //  Q_ASSERT (!thumbnail_url_copy_splitted == "");
             server_url_copy.path (thumbnail_url_copy_splitted[0]);
             thumbnail_url_copy = server_url_copy.to_string ();
             if (thumbnail_url_copy_splitted.size () > 1) {
@@ -773,16 +773,16 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
             // some icons may contain parameters after (?)
             const string[] fallack_icon_path_splitted =
                 fallack_icon_copy.contains ('?') ? fallack_icon_copy.split ('?') : { fallack_icon_copy };
-            //  Q_ASSERT (!fallack_icon_path_splitted.is_empty ());
+            //  Q_ASSERT (!fallack_icon_path_splitted == "");
             server_url_copy.path (fallack_icon_path_splitted[0]);
             fallack_icon_copy = server_url_copy.to_string ();
             if (fallack_icon_path_splitted.size () > 1) {
                 fallack_icon_copy += '?' + fallack_icon_path_splitted[1];
             }
-        } else if (!fallack_icon_copy.is_empty ()) {
+        } else if (!fallack_icon_copy == "") {
             // could be one of names for standard icons (e.g. icon-mail)
             const var default_icon_url = icon_url_for_default_icon_name (fallack_icon_copy);
-            if (!default_icon_url.is_empty ()) {
+            if (!default_icon_url == "") {
                 fallack_icon_copy = default_icon_url;
             }
         }
@@ -794,11 +794,11 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     private static string icons_from_thumbnail_and_fallback_icon (string thumbnail_url, string fallack_icon, GLib.Uri server_url) {
-        if (thumbnail_url.is_empty () && fallack_icon.is_empty ()) {
+        if (thumbnail_url == "" && fallack_icon == "") {
             return {};
         }
 
-        if (server_url.is_empty ()) {
+        if (server_url == "") {
             const string[] list_images = {thumbnail_url, fallack_icon};
             return list_images.join (';');
         }
@@ -806,11 +806,11 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
         const var url_for_thumbnail = generate_url_for_thumbnail (thumbnail_url, server_url);
         const var url_for_fallack_icon = generate_url_for_icon (fallack_icon, server_url);
 
-        if (url_for_thumbnail.is_empty () && !url_for_fallack_icon.is_empty ()) {
+        if (url_for_thumbnail == "" && !url_for_fallack_icon == "") {
             return url_for_fallack_icon;
         }
 
-        if (!url_for_thumbnail.is_empty () && url_for_fallack_icon.is_empty ()) {
+        if (!url_for_thumbnail == "" && url_for_fallack_icon == "") {
             return url_for_thumbnail;
         }
 

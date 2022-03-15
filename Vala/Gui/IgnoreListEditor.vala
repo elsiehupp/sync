@@ -25,7 +25,7 @@ public class IgnoreListEditor : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public IgnoreListEditor (Gtk.Widget parent = null) {
+    public IgnoreListEditor (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.ui = new Ui.IgnoreListEditor ();
         window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);

@@ -10,7 +10,7 @@ public class FakePropfindReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.ByteArray payload;
+    public string payload;
 
     /***********************************************************
     ***********************************************************/
@@ -89,7 +89,7 @@ public class FakePropfindReply : FakeReply {
     ***********************************************************/
     public void respond () {
         set_header (Soup.Request.ContentLengthHeader, payload.size ());
-        set_header (Soup.Request.ContentTypeHeader, new GLib.ByteArray ("application/xml; charset=utf-8"));
+        set_header (Soup.Request.ContentTypeHeader, new string ("application/xml; charset=utf-8"));
         set_attribute (Soup.Request.HttpStatusCodeAttribute, 207);
         set_finished (true);
         /* emit */ signal_meta_data_changed ();

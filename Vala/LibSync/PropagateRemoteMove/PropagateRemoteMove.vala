@@ -75,8 +75,8 @@ public class PropagateRemoteMove : PropagateItemJob {
 
         var vfs = propagator ().sync_options.vfs;
         var itype = this.item.type;
-        //  ASSERT (itype != ItemTypeVirtualFileDownload && itype != ItemTypeVirtualFileDehydration);
-        if (vfs.mode () == Vfs.WithSuffix && itype != ItemTypeDirectory) {
+        //  ASSERT (itype != ItemType.VIRTUAL_FILE_DOWNLOAD && itype != ItemType.VIRTUAL_FILE_DEHYDRATION);
+        if (vfs.mode () == Vfs.WithSuffix && itype != ItemType.DIRECTORY) {
             var suffix = vfs.file_suffix ();
             bool source_had_suffix = remote_source.has_suffix (suffix);
             bool destination_had_suffix = remote_destination.has_suffix (suffix);
@@ -98,13 +98,13 @@ public class PropagateRemoteMove : PropagateItemJob {
             // file may have a different name. folder_target_alt will contain this potential
             // name.
             string folder_target_alt = folder_target;
-            if (itype == ItemTypeFile) {
+            if (itype == ItemType.FILE) {
                 //  ASSERT (!source_had_suffix && !destination_had_suffix);
 
                 // If foo . bar.owncloud, the rename target will be "bar"
                 folder_target_alt = folder_target + suffix;
 
-            } else if (itype == ItemTypeVirtualFile) {
+            } else if (itype == ItemType.VIRTUAL_FILE) {
                 //  ASSERT (source_had_suffix && destination_had_suffix);
 
                 // If foo.owncloud . bar, the rename target will be "bar.owncloud"

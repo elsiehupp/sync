@@ -730,13 +730,13 @@ public class SyncEngine : GLib.Object {
 
         journal.force_remote_discovery_next_sync ();
 
-        // Postcondition : No ItemTypeVirtualFile / ItemTypeVirtualFileDownload left in the database.
+        // Postcondition : No ItemType.VIRTUAL_FILE / ItemType.VIRTUAL_FILE_DOWNLOAD left in the database.
         // But hydrated placeholders may still be around.
     }
 
 
     private static void files_below_path_wipe_filter (SyncJournalFileRecord record) {
-        if (record.type != ItemTypeVirtualFile && record.type != ItemTypeVirtualFileDownload) {
+        if (record.type != ItemType.VIRTUAL_FILE && record.type != ItemType.VIRTUAL_FILE_DOWNLOAD) {
             return;
         }
 
@@ -826,7 +826,7 @@ public class SyncEngine : GLib.Object {
         if (Utility.is_conflict_file (item.file)) {
             this.seen_conflict_files.insert (item.file);
         }
-        if (item.instruction == CSYNC_INSTRUCTION_UPDATE_METADATA && !item.is_directory ()) {
+        if (item.instruction == SyncInstructions.UPDATE_METADATA && !item.is_directory ()) {
             // For directories, metadata-only updates will be done after all their files are propagated.
 
             // Update the database now already :  New remote fileid or Etag or Remote_perm
@@ -860,20 +860,20 @@ public class SyncEngine : GLib.Object {
                 record.server_has_ignored_files |= prev.server_has_ignored_files;
 
                 // Ensure it's a placeholder file on disk
-                if (item.type == ItemTypeFile) {
+                if (item.type == ItemType.FILE) {
                     var result = this.sync_options.vfs.convert_to_placeholder (file_path, *item);
                     if (!result) {
-                        item.instruction = CSYNC_INSTRUCTION_ERROR;
+                        item.instruction = SyncInstructions.ERROR;
                         item.error_string = _("Could not update file : %1").printf (result.error ());
                         return;
                     }
                 }
 
                 // Update on-disk virtual file metadata
-                if (item.type == ItemTypeVirtualFile) {
+                if (item.type == ItemType.VIRTUAL_FILE) {
                     var r = this.sync_options.vfs.update_metadata (file_path, item.modtime, item.size, item.file_id);
                     if (!r) {
-                        item.instruction = CSYNC_INSTRUCTION_ERROR;
+                        item.instruction = SyncInstructions.ERROR;
                         item.error_string = _("Could not update virtual file metadata : %1").printf (r.error ());
                         return;
                     }
@@ -890,23 +890,23 @@ public class SyncEngine : GLib.Object {
             }
             this.has_none_files = true;
             return;
-        } else if (item.instruction == CSYNC_INSTRUCTION_NONE) {
+        } else if (item.instruction == SyncInstructions.NONE) {
             this.has_none_files = true;
             if (this.account.capabilities ().upload_conflict_files () && Utility.is_conflict_file (item.file)) {
                 // For uploaded conflict files, files with no action performed on them should
                 // be displayed : but we mustn't overwrite the instruction if something happens
                 // to the file!
                 item.error_string = _("Unresolved conflict.");
-                item.instruction = CSYNC_INSTRUCTION_IGNORE;
+                item.instruction = SyncInstructions.IGNORE;
                 item.status = SyncFileItem.Status.CONFLICT;
             }
             return;
-        } else if (item.instruction == CSYNC_INSTRUCTION_REMOVE && !item.is_selective_sync) {
+        } else if (item.instruction == SyncInstructions.REMOVE && !item.is_selective_sync) {
             this.has_remove_file = true;
-        } else if (item.instruction == CSYNC_INSTRUCTION_RENAME) {
+        } else if (item.instruction == SyncInstructions.RENAME) {
             this.has_none_files = true; // If a file (or every file) has been renamed, it means not al files where deleted
-        } else if (item.instruction == CSYNC_INSTRUCTION_TYPE_CHANGE
-            || item.instruction == CSYNC_INSTRUCTION_SYNC) {
+        } else if (item.instruction == SyncInstructions.TYPE_CHANGE
+            || item.instruction == SyncInstructions.SYNC) {
             if (item.direction == SyncFileItem.Direction.UP) {
                 // An upload of an existing file means that the file was left unchanged on the server
                 // This counts as a NONE for detecting if all the files on the server were changed
@@ -985,7 +985,7 @@ public class SyncEngine : GLib.Object {
             GLib.info ("All the files are going to be changed, asking the user");
             int side = 0; // > 0 means more deleted on the server.  < 0 means more deleted on the client
             foreach (var it in this.sync_items) {
-                if (it.instruction == CSYNC_INSTRUCTION_REMOVE) {
+                if (it.instruction == SyncInstructions.REMOVE) {
                     side += it.direction == SyncFileItem.Direction.DOWN ? 1 : -1;
                 }
             }
@@ -1312,7 +1312,7 @@ public class SyncEngine : GLib.Object {
         // for reporting and for making sure we don't update the blocklist
         // entry yet.
         // Classification is this this.instruction and this.status
-        item.instruction = CSYNC_INSTRUCTION_IGNORE;
+        item.instruction = SyncInstructions.IGNORE;
         item.status = SyncFileItem.Status.BLOCKLISTED_ERROR;
 
         var wait_seconds_str = Utility.duration_to_descriptive_string1 (1000 * wait_seconds);
@@ -1335,7 +1335,7 @@ public class SyncEngine : GLib.Object {
         GLib.List<string> download_file_paths;
         foreach (unowned SyncFileItem it in sync_items) {
             if (it.direction == SyncFileItem.Direction.DOWN
-                && it.type == ItemTypeFile
+                && it.type == ItemType.FILE
                 && is_file_transfer_instruction (it.instruction)) {
                 download_file_paths.insert (it.file);
             }
@@ -1360,7 +1360,7 @@ public class SyncEngine : GLib.Object {
         GLib.List<string> upload_file_paths;
         foreach (unowned SyncFileItem it in sync_items) {
             if (it.direction == SyncFileItem.Direction.UP
-                && it.type == ItemTypeFile
+                && it.type == ItemType.FILE
                 && is_file_transfer_instruction (it.instruction)) {
                 upload_file_paths.insert (it.file);
             }
@@ -1500,17 +1500,17 @@ public class SyncEngine : GLib.Object {
                 continue;
 
             switch (sync_item.instruction) {
-            case CSYNC_INSTRUCTION_SYNC:
+            case SyncInstructions.SYNC:
                 GLib.warning ("restore_old_files: RESTORING " + sync_item.file);
-                sync_item.instruction = CSYNC_INSTRUCTION_CONFLICT;
+                sync_item.instruction = SyncInstructions.CONFLICT;
                 break;
-            case CSYNC_INSTRUCTION_REMOVE:
+            case SyncInstructions.REMOVE:
                 GLib.warning ("restore_old_files: RESTORING " + sync_item.file);
-                sync_item.instruction = CSYNC_INSTRUCTION_NEW;
+                sync_item.instruction = SyncInstructions.NEW;
                 sync_item.direction = SyncFileItem.Direction.UP;
                 break;
-            case CSYNC_INSTRUCTION_RENAME:
-            case CSYNC_INSTRUCTION_NEW:
+            case SyncInstructions.RENAME:
+            case SyncInstructions.NEW:
                 // Ideally we should try to revert the rename or remove, but this would be dangerous
                 // without re-doing the reconcile phase.  So just let it happen.
             default:
@@ -1523,10 +1523,10 @@ public class SyncEngine : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private static bool is_file_transfer_instruction (SyncInstructions instruction) {
-        return instruction == CSYNC_INSTRUCTION_CONFLICT
-            || instruction == CSYNC_INSTRUCTION_NEW
-            || instruction == CSYNC_INSTRUCTION_SYNC
-            || instruction == CSYNC_INSTRUCTION_TYPE_CHANGE;
+        return instruction == SyncInstructions.CONFLICT
+            || instruction == SyncInstructions.NEW
+            || instruction == SyncInstructions.SYNC
+            || instruction == SyncInstructions.TYPE_CHANGE;
     }
 
 } // class SyncEngine

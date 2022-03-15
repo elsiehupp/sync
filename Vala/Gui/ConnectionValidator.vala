@@ -205,7 +205,7 @@ public class ConnectionValidator : GLib.Object {
         GLib.debug ("# Check whether authenticated propfind works.");
         var job = new PropfindJob (this.account, "/", this);
         job.on_signal_timeout (TIMEOUT_TO_USE_MILLISECONDS);
-        job.properties (GLib.List<GLib.ByteArray> ("getlastmodified"));
+        job.properties (GLib.List<string> ("getlastmodified"));
         connect (job, PropfindJob.result, this, ConnectionValidator.on_signal_auth_success);
         connect (job, PropfindJob.finished_with_error, this, ConnectionValidator.on_signal_auth_failed);
         job.on_signal_start ();
@@ -249,7 +249,7 @@ public class ConnectionValidator : GLib.Object {
             this.account.wants_account_saved (this.account.data ());
         }
 
-        if (!server_version.is_empty () && !and_check_server_version (server_version)) {
+        if (!server_version == "" && !and_check_server_version (server_version)) {
             return;
         }
 
@@ -352,7 +352,7 @@ public class ConnectionValidator : GLib.Object {
 
         // New servers also report the version in the capabilities
         string server_version = capabilities["core"].to_object ()["status"].to_object ()["version"].to_string ();
-        if (!server_version.is_empty () && !and_check_server_version (server_version)) {
+        if (!server_version == "" && !and_check_server_version (server_version)) {
             return;
         }
 

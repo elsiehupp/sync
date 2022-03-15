@@ -27,7 +27,7 @@ public class AuthenticationDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public AuthenticationDialog (string realm, string domain, Gtk.Widget parent = null) {
+    public AuthenticationDialog (string realm, string domain, Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.user = new QLineEdit ();
         this.password = new QLineEdit ();

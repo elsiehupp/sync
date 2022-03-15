@@ -28,7 +28,7 @@ public class SslButton : QToolButton {
 
     /***********************************************************
     ***********************************************************/
-    public SslButton (Gtk.Widget parent = null) {
+    public SslButton (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         popup_mode (QToolButton.Instant_popup);
         auto_raise (true);
@@ -90,13 +90,13 @@ public class SslButton : QToolButton {
                 + ", " + account.session_cipher.encryption_method ();
             this.menu.add_action (ssl_version).enabled (false);
 
-            if (account.session_ticket.is_empty ()) {
+            if (account.session_ticket == "") {
                 this.menu.add_action (_("No support for SSL session tickets/identifiers")).enabled (false);
             }
 
             GLib.List<QSslCertificate> chain = account.peer_certificate_chain;
 
-            if (chain.is_empty ()) {
+            if (chain == "") {
                 GLib.warning ("Empty certificate chain.");
                 return;
             }
@@ -152,11 +152,11 @@ public class SslButton : QToolButton {
         string country = cert.subject_info (QSslCertificate.Country_name).join (char (';'));
         string state = cert.subject_info (QSslCertificate.State_or_province_name).join (char (';'));
         string issuer = cert.issuer_info (QSslCertificate.Common_name).join (char (';'));
-        if (issuer.is_empty ()) {
+        if (issuer == "") {
             issuer = cert.issuer_info (QSslCertificate.Organizational_unit_name).join (char (';'));
         }
         string sha1 = Utility.format_fingerprint (cert.digest (QCryptographicHash.Sha1).to_hex (), false);
-        GLib.ByteArray sha265hash = cert.digest (QCryptographicHash.Sha256).to_hex ();
+        string sha265hash = cert.digest (QCryptographicHash.Sha256).to_hex ();
         string sha256escaped =
             Utility.escape (Utility.format_fingerprint (sha265hash.left (sha265hash.length () / 2), false))
             + "<br/>"
@@ -214,7 +214,7 @@ public class SslButton : QToolButton {
             }
         }
 
-        string cert_id = cn.is_empty () ? ou : cn;
+        string cert_id = cn == "" ? ou : cn;
 
         if (system_ca_certificates.contains (cert)) {
             txt += cert_id;
@@ -247,7 +247,7 @@ public class SslButton : QToolButton {
     /***********************************************************
     ***********************************************************/
     private static string add_cert_details_field (string key, string value) {
-        if (value.is_empty ()) {
+        if (value == "") {
             return "";
         }
 

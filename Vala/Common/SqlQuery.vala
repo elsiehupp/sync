@@ -43,7 +43,7 @@ public class SqlQuery {
     private Sqlite3Stmt this.stmt = null;
     private string this.error;
     private int this.err_id;
-    private GLib.ByteArray this.sql;
+    private string this.sql;
 
     /***********************************************************
     ***********************************************************/
@@ -64,7 +64,7 @@ public class SqlQuery {
 
     /***********************************************************
     ***********************************************************/
-    public SqlQuery (GLib.ByteArray sql, SqlDatabase database)
+    public SqlQuery (string sql, SqlDatabase database)
         : this.sqldatabase (&database)
         this.database (database.sqlite_database ()) {
         prepare (sql);
@@ -85,12 +85,12 @@ public class SqlQuery {
     finish (), and re-prepare it. This function must only be
     used if the constructor was setting a SqlDatabase
     ***********************************************************/
-    public int prepare (GLib.ByteArray sql, bool allow_failure = false) {
+    public int prepare (string sql, bool allow_failure = false) {
         this.sql = sql.trimmed ();
         if (this.stmt) {
             finish ();
         }
-        if (!this.sql.is_empty ()) {
+        if (!this.sql == "") {
             int n = 0;
             int rc = 0;
             do {
@@ -105,7 +105,7 @@ public class SqlQuery {
             if (this.err_id != SQLITE_OK) {
                 this.error = string.from_utf8 (sqlite3_errmsg (this.database));
                 GLib.warning ("Sqlite prepare statement error:" + this.error + "in" + this.sql;
-                ENFORCE (allow_failure, "SQLITE Prepare error");
+                //  ENFORCE (allow_failure, "SQLITE Prepare error");
             } else {
                 //  ASSERT (this.stmt);
                 this.sqldatabase.queries.insert (this);
@@ -160,8 +160,8 @@ public class SqlQuery {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.ByteArray byte_array_value (int index) {
-        return GLib.ByteArray (static_cast<const char> (sqlite3_column_blob (this.stmt, index)),
+    public string byte_array_value (int index) {
+        return string (static_cast<const char> (sqlite3_column_blob (this.stmt, index)),
             sqlite3_column_bytes (this.stmt, index));
     }
 
@@ -181,10 +181,10 @@ public class SqlQuery {
 
 
     /***********************************************************
-    There is no overloads to GLib.ByteArray.start_with that takes Qt.CaseInsensitive.
+    There is no overloads to string.start_with that takes Qt.CaseInsensitive.
     Returns true if 'a' starts with 'b' in a case insensitive way
     ***********************************************************/
-    private static bool starts_with_insensitive (GLib.ByteArray a, GLib.ByteArray b) {
+    private static bool starts_with_insensitive (string a, string b) {
         return a.size () >= b.size () && qstrnicmp (a.const_data (), b.const_data (), static_cast<uint32> (b.size ())) == 0;
     }
 
@@ -291,7 +291,7 @@ public class SqlQuery {
 
     /***********************************************************
     ***********************************************************/
-    public void bind_value (int pos, GLib.ByteArray value) {
+    public void bind_value (int pos, string value) {
         GLib.debug ("SQL bind" + pos + string.from_utf8 (value);
         bind_value_internal (pos, value);
     }
@@ -299,7 +299,7 @@ public class SqlQuery {
 
     /***********************************************************
     ***********************************************************/
-    public const GLib.ByteArray last_query () {
+    public const string last_query () {
         return this.sql;
     }
 

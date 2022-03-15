@@ -12,7 +12,7 @@ public class FakePutReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public FakePutReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, GLib.ByteArray put_payload, GLib.Object parent) {
+    public FakePutReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, string put_payload, GLib.Object parent) {
         base (parent);
         set_request (request);
         set_url (request.url ());
@@ -24,9 +24,9 @@ public class FakePutReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public static FileInfo perform (FileInfo remote_root_file_info, Soup.Request request, GLib.ByteArray put_payload) {
+    public static FileInfo perform (FileInfo remote_root_file_info, Soup.Request request, string put_payload) {
         string filename = get_file_path_from_url (request.url ());
-        GLib.assert_true (!filename.is_empty ());
+        GLib.assert_true (!filename == "");
         FileInfo file_info = remote_root_file_info.find (filename);
         if (file_info) {
             file_info.size = put_payload.size ();

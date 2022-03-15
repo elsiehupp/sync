@@ -31,7 +31,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
             bool is_null ()
             {
-                return this.progress_string.is_empty () && this.warning_count == 0 && this.overall_sync_string.is_empty ();
+                return this.progress_string == "" && this.warning_count == 0 && this.overall_sync_string == "";
             }
         }
 
@@ -123,7 +123,7 @@ public class FolderStatusModel : QAbstractItemModel {
         /***********************************************************
         The file identifier for this folder on the server
         ***********************************************************/
-        GLib.ByteArray file_id;
+        string file_id;
 
 
         /***********************************************************
@@ -154,7 +154,7 @@ public class FolderStatusModel : QAbstractItemModel {
                 this.fetching_label = false;
                 this.has_error = false;
                 model.end_remove_rows ();
-            } else if (!this.subs.is_empty ()) {
+            } else if (!this.subs == "") {
                 model.begin_remove_rows (index, 0, this.subs.count () - 1);
                 this.subs.clear ();
                 model.end_remove_rows ();
@@ -689,7 +689,7 @@ public class FolderStatusModel : QAbstractItemModel {
         string path = info.folder.remote_path_trailing_slash ();
 
         // info.path always contains non-mangled name, so we need to use mangled when requesting nested folders for encrypted subfolders as required by LsColJob
-        const string info_path = (info.is_encrypted && !info.e2e_mangled_name.is_empty ()) ? info.e2e_mangled_name : info.path;
+        const string info_path = (info.is_encrypted && !info.e2e_mangled_name == "") ? info.e2e_mangled_name : info.path;
 
         if (info_path != "/") {
             path += info_path;
@@ -697,7 +697,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
         var job = new LsColJob (this.account_state.account (), path, this);
         info.fetching_job = job;
-        var props = GLib.List<GLib.ByteArray> ("resourcetype"
+        var props = GLib.List<string> ("resourcetype"
                                               + "http://owncloud.org/ns:size"
                                               + "http://owncloud.org/ns:permissions"
                                               + "http://owncloud.org/ns:fileid");
@@ -749,7 +749,7 @@ public class FolderStatusModel : QAbstractItemModel {
         if (!info.fetched)
             return true;
 
-        if (info.subs.is_empty ())
+        if (info.subs == "")
             return false;
 
         return true;
@@ -839,7 +839,7 @@ public class FolderStatusModel : QAbstractItemModel {
             for (int i = 0; i < this.folders.size (); ++i) {
                 var info = this.folders.at (i);
                 if (info.folder == folder_i) {
-                    if (path.is_empty ()) { // the folder object
+                    if (path == "") { // the folder object
                         return index (i, 0);
                     }
                     for (int j = 0; j < info.subs.size (); ++j) {
@@ -918,7 +918,7 @@ public class FolderStatusModel : QAbstractItemModel {
             // The user confirmed them already just now.
             string[] to_add_to_allow_list = ( (old_block_list_set + folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok).to_set ()) - block_list_set).values ();
 
-            if (!to_add_to_allow_list.is_empty ()) {
+            if (!to_add_to_allow_list == "") {
                 var allow_list = folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, ok);
                 if (ok) {
                     allow_list += to_add_to_allow_list;
@@ -936,7 +936,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
             // do the sync if there were changes
             var changes = (old_block_list_set - block_list_set) + (block_list_set - old_block_list_set);
-            if (!changes.is_empty ()) {
+            if (!changes == "") {
                 if (folder.is_busy ()) {
                     folder.on_signal_terminate_sync ();
                 }
@@ -985,7 +985,7 @@ public class FolderStatusModel : QAbstractItemModel {
             }
 
             // If this folder had no undecided entries, skip it.
-            if (undecided_list.is_empty ()) {
+            if (undecided_list == "") {
                 continue;
             }
 
@@ -1092,11 +1092,11 @@ public class FolderStatusModel : QAbstractItemModel {
                + Qt.ToolTipRole;
 
         if (progress.status () == ProgressInfo.Status.DISCOVERY) {
-            if (!progress.current_discovered_remote_folder.is_empty ()) {
+            if (!progress.current_discovered_remote_folder == "") {
                 pi.overall_sync_string = _("Checking for changes in remote \"%1\"").printf (progress.current_discovered_remote_folder);
                 /* emit */ data_changed (index (folder_index), index (folder_index), roles);
                 return;
-            } else if (!progress.current_discovered_local_folder.is_empty ()) {
+            } else if (!progress.current_discovered_local_folder == "") {
                 pi.overall_sync_string = _("Checking for changes in local \"%1\"").printf (progress.current_discovered_local_folder);
                 /* emit */ data_changed (index (folder_index), index (folder_index), roles);
                 return;
@@ -1111,7 +1111,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
         // Status is Starting, Propagation or Done
 
-        if (!progress.last_completed_item.is_empty ()
+        if (!progress.last_completed_item == ""
             && Progress.is_warning_kind (progress.last_completed_item.status)) {
             pi.warning_count++;
         }
@@ -1182,7 +1182,7 @@ public class FolderStatusModel : QAbstractItemModel {
                 // : Example text: "uploading foobar.png (2MB of 2MB)"
                 file_progress_string = _("%1 %2 (%3 of %4)").printf (kind_string, item_filename, s1, s2);
             }
-        } else if (!kind_string.is_empty ()) {
+        } else if (!kind_string == "") {
             // : Example text: "uploading foobar.png"
             file_progress_string = _("%1 %2").printf (kind_string, item_filename);
         }
@@ -1242,7 +1242,7 @@ public class FolderStatusModel : QAbstractItemModel {
             return;
         }
         //  ASSERT (parent_info.fetching_job == job);
-        //  ASSERT (parent_info.subs.is_empty ());
+        //  ASSERT (parent_info.subs == "");
 
         if (parent_info.has_label ()) {
             begin_remove_rows (index, 0, 0);
@@ -1283,7 +1283,7 @@ public class FolderStatusModel : QAbstractItemModel {
         const var encryption_map = job.property (PROPERTY_ENCRYPTION_MAP).to_map ();
 
         string[] sorted_subfolders = list;
-        if (!sorted_subfolders.is_empty ())
+        if (!sorted_subfolders == "")
             sorted_subfolders.remove_first (); // skip the parent item (first in the list)
         Utility.sort_filenames (sorted_subfolders);
 
@@ -1309,7 +1309,7 @@ public class FolderStatusModel : QAbstractItemModel {
             parent_info.folder.journal_database ().file_record_by_e2e_mangled_name (remove_trailing_slash (relative_path), record);
             if (record.is_valid ()) {
                 new_info.name = remove_trailing_slash (record.path).split ('/').last ();
-                if (record.is_e2e_encrypted && !record.e2e_mangled_name.is_empty ()) {
+                if (record.is_e2e_encrypted && !record.e2e_mangled_name == "") {
                     // we must use local path for Settings Dialog's filesystem tree, otherwise open and create new folder actions won't work
                     // hence, we are storing this.e2e_mangled_name separately so it can be use later for LsColJob
                     new_info.e2e_mangled_name = relative_path;
@@ -1325,7 +1325,7 @@ public class FolderStatusModel : QAbstractItemModel {
             const var folder_info = job.folder_infos.value (path);
             new_info.size = folder_info.size;
             new_info.file_id = folder_info.file_id;
-            if (relative_path.is_empty ())
+            if (relative_path == "")
                 continue;
 
             if (parent_info.checked == Qt.Unchecked) {
@@ -1361,7 +1361,7 @@ public class FolderStatusModel : QAbstractItemModel {
             new_subs.append (new_info);
         }
 
-        if (!new_subs.is_empty ()) {
+        if (!new_subs == "") {
             begin_insert_rows (index, 0, new_subs.size () - 1);
             parent_info.subs = std.move (new_subs);
             end_insert_rows ();

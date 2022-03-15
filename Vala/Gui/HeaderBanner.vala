@@ -125,7 +125,7 @@ public class HeaderBanner : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public HeaderBanner (Gtk.Widget parent = null) {
+    public HeaderBanner (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         size_policy (QSizePolicy.Expanding, QSizePolicy.Fixed);
         background_role (QPalette.Base);
@@ -169,7 +169,7 @@ public class HeaderBanner : Gtk.Widget {
         layout.column_minimum_width (1, min_column_width1);
         title_label.text_format (title_format);
         title_label.on_signal_text (title);
-        if (!style_sheet.is_empty ())
+        if (!style_sheet == "")
             title_label.style_sheet (style_sheet);
         logo_label.pixmap (logo);
         banner_pixmap = banner;

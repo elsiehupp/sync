@@ -152,7 +152,7 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
     ***********************************************************/
     protected void on_signal_copy_link_to_clipboard () {
         if (this.async_auth)
-            QApplication.clipboard ().on_signal_text (this.async_auth.authorisation_link ().to_string (GLib.Uri.FullyEncoded));
+            Gtk.Application.clipboard ().on_signal_text (this.async_auth.authorisation_link ().to_string (GLib.Uri.FullyEncoded));
     }
 
 } // class OwncloudOAuthCredsPage

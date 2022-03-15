@@ -89,7 +89,7 @@ public class SslErrorDialog : Gtk.Dialog {
         }
 
         // if there are no errors left, all Certs were known.
-        if (error_strings.is_empty ()) {
+        if (error_strings == "") {
             this.all_trusted = true;
             return true;
         }
@@ -117,7 +117,7 @@ public class SslErrorDialog : Gtk.Dialog {
             }
         }
 
-        if (!additional_error_strings.is_empty ()) {
+        if (!additional_error_strings == "") {
             message += QL ("<h4>") + _("Additional errors:") + QL ("</h4>");
 
             foreach (var error_string in additional_error_strings) {
@@ -179,11 +179,11 @@ public class SslErrorDialog : Gtk.Dialog {
         string org = Utility.escape (cert.subject_info (QSslCertificate.Organization));
         string unit = Utility.escape (cert.subject_info (QSslCertificate.Organizational_unit_name));
         string country = Utility.escape (cert.subject_info (QSslCertificate.Country_name));
-        if (unit.is_empty ())
+        if (unit == "")
             unit = _("&lt;not specified&gt;");
-        if (org.is_empty ())
+        if (org == "")
             org = _("&lt;not specified&gt;");
-        if (country.is_empty ())
+        if (country == "")
             country = _("&lt;not specified&gt;");
         li += _("Organization : %1").printf (org);
         li += _("Unit : %1").printf (unit);

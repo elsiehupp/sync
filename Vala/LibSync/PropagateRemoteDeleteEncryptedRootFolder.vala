@@ -120,7 +120,7 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
             var nested_item = this.nested_items.take (encrypted_filename);
 
             if (nested_item.is_valid ()) {
-                this.propagator.journal.delete_file_record (nested_item.path, nested_item.type == ItemTypeDirectory);
+                this.propagator.journal.delete_file_record (nested_item.path, nested_item.type == ItemType.DIRECTORY);
                 this.propagator.journal.commit ("Remote Remove");
             }
         }

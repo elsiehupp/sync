@@ -45,7 +45,7 @@ public class TestRemoteWipe : GLib.Object {
 
 //        // check if account exists
 //        GLib.debug ("Does account exists?!";
-//        GLib.assert_true (!account.identifier ().is_empty ());
+//        GLib.assert_true (!account.identifier () == "");
 
 //        manager.delete_account (new_account_state);
 //        manager.save ();

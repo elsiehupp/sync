@@ -74,7 +74,7 @@ public class TestNextcloudPropagator : GLib.Object {
         tests.append (Test ("W/\"foo\"", "foo"));
 
         foreach (var test in tests) {
-            GLib.assert_cmp (parse_etag (test.first), GLib.ByteArray (test.second));
+            GLib.assert_cmp (parse_etag (test.first), string (test.second));
         }
     }
 

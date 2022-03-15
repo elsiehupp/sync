@@ -380,7 +380,7 @@ public class UserStatusSelectorModel : GLib.Object {
         this.user_status.id (user_status.identifier ());
         this.user_status.clear_at (user_status.clear_at ());
 
-        if (!user_status.icon ().is_empty ()) {
+        if (!user_status.icon () == "") {
             this.user_status.icon (user_status.icon ());
         }
 

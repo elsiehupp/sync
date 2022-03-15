@@ -26,11 +26,11 @@ public class PropagateIgnoreJob : PropagateItemJob {
     public new void start () {
         SyncFileItem.Status status = this.item.status;
         if (status == SyncFileItem.Status.NO_STATUS) {
-            if (this.item.instruction == CSYNC_INSTRUCTION_ERROR) {
+            if (this.item.instruction == SyncInstructions.ERROR) {
                 status = SyncFileItem.Status.NORMAL_ERROR;
             } else {
                 status = SyncFileItem.Status.FILE_IGNORED;
-                //  ASSERT (this.item.instruction == CSYNC_INSTRUCTION_IGNORE);
+                //  ASSERT (this.item.instruction == SyncInstructions.IGNORE);
             }
         }
         on_signal_done (status, this.item.error_string);

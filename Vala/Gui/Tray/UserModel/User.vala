@@ -380,11 +380,11 @@ public class User : GLib.Object {
         activity.folder = folder.alias ();
         activity.file_action = "";
 
-        if (item.instruction == CSYNC_INSTRUCTION_REMOVE) {
+        if (item.instruction == SyncInstructions.REMOVE) {
             activity.file_action = "file_deleted";
-        } else if (item.instruction == CSYNC_INSTRUCTION_NEW) {
+        } else if (item.instruction == SyncInstructions.NEW) {
             activity.file_action = "file_created";
-        } else if (item.instruction == CSYNC_INSTRUCTION_RENAME) {
+        } else if (item.instruction == SyncInstructions.RENAME) {
             activity.file_action = "file_renamed";
         } else {
             activity.file_action = "file_changed";
@@ -489,7 +489,7 @@ public class User : GLib.Object {
             const var current_date_time = GLib.DateTime.current_date_time ();
             activity.date_time = GLib.DateTime.from_string (current_date_time.to_string (), Qt.ISODate);
             activity.expire_at_msecs = current_date_time.add_m_secs (ACTIVITY_DEFAULT_EXPIRATION_TIME_MSECS).to_m_secs_since_epoch ();
-            activity.subject = !subject.is_empty () ? subject : folder_instance.short_gui_local_path ();
+            activity.subject = !subject == "" ? subject : folder_instance.short_gui_local_path ();
             activity.message = error_message;
             activity.link = folder_instance.short_gui_local_path ();
             activity.acc_name = folder_instance.account_state ().account ().display_name ();
@@ -618,7 +618,7 @@ public class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_send_notification_request (string account_name, string link, GLib.ByteArray verb, int row) {
+    public void on_signal_send_notification_request (string account_name, string link, string verb, int row) {
         GLib.info ("Server Notification Request " + verb + link + " on account " + account_name);
 
         const string[] valid_verbs = {

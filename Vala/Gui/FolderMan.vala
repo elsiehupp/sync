@@ -87,7 +87,7 @@ public class FolderMan : GLib.Object {
     ***********************************************************/
     bool sync_enabled {
         public set {
-            if (!this.sync_enabled && value && !this.scheduled_folders.is_empty ()) {
+            if (!this.sync_enabled && value && !this.scheduled_folders == "") {
                 // We have things in our queue that were waiting for the connection to come back on.
                 start_scheduled_sync_soon ();
             }
@@ -259,7 +259,7 @@ public class FolderMan : GLib.Object {
     
         var settings = ConfigFile.settings_with_group ("Accounts");
         const var accounts_with_settings = settings.child_groups ();
-        if (accounts_with_settings.is_empty ()) {
+        if (accounts_with_settings == "") {
             int r = setup_folders_migration ();
             if (r > 0) {
                 AccountManager.instance ().save (false); // don't save credentials, they had not been loaded from keychain
@@ -527,7 +527,7 @@ public class FolderMan : GLib.Object {
     Returns the folder by alias or \c null if no folder with the alias exists.
     ***********************************************************/
     public Folder folder_by_alias (string alias) {
-        if (!alias.is_empty ()) {
+        if (!alias == "") {
             if (this.folder_map.contains (alias)) {
                 return this.folder_map[alias];
             }
@@ -587,7 +587,7 @@ public class FolderMan : GLib.Object {
         // string connection = settings.value ("connection").to_string ();
         string alias = unescape_alias (escaped_alias);
     
-        if (backend.is_empty () || backend != "owncloud") {
+        if (backend == "" || backend != "owncloud") {
             GLib.warning ("obsolete configuration of type" + backend);
             return null;
         }
@@ -655,7 +655,7 @@ public class FolderMan : GLib.Object {
     Creates a new and empty local directory.
     ***********************************************************/
     public bool start_from_scratch (string local_folder) {
-        if (local_folder.is_empty ()) {
+        if (local_folder == "") {
             return false;
         }
     
@@ -916,7 +916,7 @@ public class FolderMan : GLib.Object {
     ***********************************************************/
     public string check_path_validity_for_new_folder (string path, GLib.Uri server_url = GLib.Uri ()) {
         string recursive_validity = check_path_validity_recursive (path);
-        if (!recursive_validity.is_empty ()) {
+        if (!recursive_validity == "") {
             GLib.debug () + path + recursive_validity;
             return recursive_validity;
         }
@@ -991,7 +991,7 @@ public class FolderMan : GLib.Object {
         while (true) {
             const bool is_good =
                 !GLib.FileInfo (folder).exists ()
-                && FolderMan.instance ().check_path_validity_for_new_folder (folder, server_url).is_empty ();
+                && FolderMan.instance ().check_path_validity_for_new_folder (folder, server_url) == "";
             if (is_good) {
                 break;
             }
@@ -1049,7 +1049,7 @@ public class FolderMan : GLib.Object {
             delete folder;
             count++;
         }
-        //  ASSERT (this.folder_map.is_empty ());
+        //  ASSERT (this.folder_map == "");
     
         this.last_sync_folder = null;
         this.current_sync_folder = null;
@@ -1429,13 +1429,13 @@ public class FolderMan : GLib.Object {
         }
     
         GLib.debug ("folder_queue size: " + this.scheduled_folders.count ());
-        if (this.scheduled_folders.is_empty ()) {
+        if (this.scheduled_folders == "") {
             return;
         }
     
         // Find the first folder in the queue that can be synced.
         Folder folder = null;
-        while (!this.scheduled_folders.is_empty ()) {
+        while (!this.scheduled_folders == "") {
             Folder g = this.scheduled_folders.dequeue ();
             if (g.can_sync ()) {
                 folder = g;
@@ -1662,7 +1662,7 @@ public class FolderMan : GLib.Object {
         AccountState account_state, std.unique_ptr<Vfs> vfs) {
         var alias = folder_definition.alias;
         int count = 0;
-        while (folder_definition.alias.is_empty ()
+        while (folder_definition.alias == ""
             || this.folder_map.contains (folder_definition.alias)
             || this.additional_blocked_folder_aliases.contains (folder_definition.alias)) {
             // There is already a folder configured with this name and folder names need to be unique
@@ -1834,7 +1834,7 @@ public class FolderMan : GLib.Object {
             full_path_name.chop (1);
         }
     
-        if (full_path_name.is_empty ()) {
+        if (full_path_name == "") {
             return "";
         }
     
@@ -1905,7 +1905,7 @@ public class FolderMan : GLib.Object {
                 var default_journal_path = folder_definition.default_journal_path (account.account ());
     
                 // Migration : Old settings don't have journal_path
-                if (folder_definition.journal_path.is_empty ()) {
+                if (folder_definition.journal_path == "") {
                     folder_definition.journal_path = default_journal_path;
                 }
     
@@ -2074,7 +2074,7 @@ public class FolderMan : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private static string check_path_validity_recursive (string path) {
-        if (path.is_empty ()) {
+        if (path == "") {
             return FolderMan._("No valid folder selected!");
         }
     

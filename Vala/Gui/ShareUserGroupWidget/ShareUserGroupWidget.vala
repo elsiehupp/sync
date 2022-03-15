@@ -89,7 +89,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         string local_path,
         SharePermissions max_sharing_permissions,
         string private_link_url,
-        Gtk.Widget parent = null) {
+        Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.ui = new Ui.ShareUserGroupWidget ();
         this.account = account;
@@ -230,7 +230,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         foreach (var share in shares) {
             // We don't handle link shares, only Share.Type.USER or Share.Type.GROUP
             if (share.share_type () == Share.Type.LINK) {
-                if (!share.owner_uid ().is_empty () &&
+                if (!share.owner_uid () == "" &&
                         share.owner_uid () != share.account ().dav_user ()) {
                     link_owners.append (share.owner_display_name ());
                  }
@@ -239,7 +239,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
 
             // the owner of the file that shared it first
             // leave out if it's the current user
-            if (x == 0 && !share.owner_uid ().is_empty () && ! (share.owner_uid () == this.account.credentials ().user ())) {
+            if (x == 0 && !share.owner_uid () == "" && ! (share.owner_uid () == this.account.credentials ().user ())) {
                 this.ui.main_owner_label.on_signal_text (string ("SharedFlag.SHARED with you by ").append (share.owner_display_name ()));
             }
 
@@ -255,7 +255,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
 
             layout.add_widget (s);
 
-            if (!this.last_created_share_id.is_empty () && share.identifier () == this.last_created_share_id) {
+            if (!this.last_created_share_id == "" && share.identifier () == this.last_created_share_id) {
                 this.last_created_share_id = "";
                 if (this.account.capabilities ().share_email_password_enabled () && !this.account.capabilities ().share_email_password_enforced ()) {
                     just_created_share_that_needs_password = s;
@@ -280,7 +280,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         }
 
         scroll_area.frame_shape (x > 6 ? Gdk.Frame.Styled_panel : Gdk.Frame.No_frame);
-        scroll_area.visible (!shares.is_empty ());
+        scroll_area.visible (!shares == "");
         scroll_area.fixed_height (height);
         scroll_area.widget (new_view_port);
 
@@ -305,7 +305,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_search_for_sharees (ShareeModel.LookupMode lookup_mode) {
-        if (this.ui.sharee_line_edit.text ().is_empty ()) {
+        if (this.ui.sharee_line_edit.text () == "") {
             return;
         }
 
@@ -332,7 +332,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         this.disable_completer_activated = false;
         // First text_changed is called first and we stopped the timer when the text is changed, programatically or not
         // Then we restart the timer here if the user touched a key
-        if (!text.is_empty ()) {
+        if (!text == "") {
             this.completion_timer.on_signal_start ();
             /* emit */ signal_toggle_public_link_share (true);
         }
@@ -407,7 +407,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
                     QLineEdit.Password,
                     "",
                     ok);
-            } while (password.is_empty () && ok);
+            } while (password == "" && ok);
 
             if (!ok) {
                 return;
@@ -511,7 +511,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_private_link_copy () {
-        QApplication.clipboard ().on_signal_text (this.private_link_url);
+        Gtk.Application.clipboard ().on_signal_text (this.private_link_url);
     }
 
 

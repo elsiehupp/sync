@@ -19,62 +19,30 @@ namespace Occ {
 ***********************************************************/
 public class NetrcParser {
 
-    /***********************************************************
-    ***********************************************************/
-    public LoginPair : QPair<string, string> { }
+    const string DEFAULT_KEYWORD = "default";
+    const string MACHINE_KEYWORD = "machine";
+    const string LOGIN_KEYWORD = "login";
+    const string PASSWORD_KEYWORD = "password";
 
-    /***********************************************************
-    ***********************************************************/
-    public NetrcParser (string file = "");
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    /***********************************************************
-    ***********************************************************/
-    public 
-
-    public LoginPair find (string machine);
+    private GLib.HashTable<string, QPair<string, string>> entries;
+    private QPair<string, string> default_pair;
+    private string netrc_location;
 
 
     /***********************************************************
     ***********************************************************/
-    private void try_add_entry_and_clear (string machine, LoginPair pair, bool is_default);
-    private GLib.HashTable<string, LoginPair> this.entries;
-    private LoginPair this.default;
-    private string this.netrc_location;
-}
-
-
-
-    namespace {
-        string default_keyword = "default";
-        string machine_keyword = "machine";
-        string login_keyword = "login";
-        string password_keyword = "password";
-    }
-
-    NetrcParser.NetrcParser (string file) {
+    public NetrcParser (string file = "") {
         this.netrc_location = file;
-        if (this.netrc_location.is_empty ()) {
+        if (this.netrc_location == "") {
             this.netrc_location = QDir.home_path () + "/.netrc";
         }
     }
 
-    void NetrcParser.try_add_entry_and_clear (string machine, LoginPair pair, bool is_default) {
-        if (is_default) {
-            this.default = pair;
-        } else if (!machine.is_empty () && !pair.first.is_empty ()) {
-            this.entries.insert (machine, pair);
-        }
-        pair = q_make_pair ("", "");
-        machine.clear ();
-        is_default = false;
-    }
 
-    bool NetrcParser.parse () {
-        GLib.File netrc (this.netrc_location);
+    /***********************************************************
+    ***********************************************************/
+    public bool parse () {
+        GLib.File netrc = new GLib.File (this.netrc_location);
         if (!netrc.open (QIODevice.ReadOnly)) {
             return false;
         }
@@ -83,49 +51,73 @@ public class NetrcParser {
         QStringTokenizer tokenizer = new QStringTokenizer (content, " \n\t");
         tokenizer.quote_characters ("\"'");
 
-        LoginPair pair;
+        QPair<string, string> pair;
         string machine;
         bool is_default = false;
         while (tokenizer.has_next ()) {
             string key = tokenizer.next ();
-            if (key == default_keyword) {
+            if (key == DEFAULT_KEYWORD) {
                 try_add_entry_and_clear (machine, pair, is_default);
                 is_default = true;
                 continue; // don't read a value
             }
 
             if (!tokenizer.has_next ()) {
-                GLib.debug ("error fetching value for" + key;
+                GLib.debug ("Error fetching value for " + key);
                 return false;
             }
             string value = tokenizer.next ();
 
-            if (key == machine_keyword) {
+            if (key == MACHINE_KEYWORD) {
                 try_add_entry_and_clear (machine, pair, is_default);
                 machine = value;
-            } else if (key == login_keyword) {
+            } else if (key == LOGIN_KEYWORD) {
                 pair.first = value;
-            } else if (key == password_keyword) {
+            } else if (key == PASSWORD_KEYWORD) {
                 pair.second = value;
             } // ignore unsupported tokens
         }
         try_add_entry_and_clear (machine, pair, is_default);
 
-        if (!this.entries.is_empty () || this.default != q_make_pair ("", "")) {
+        if (!this.entries == "" || this.default_pair != q_make_pair ("", "")) {
             return true;
         } else {
             return false;
         }
     }
 
-    NetrcParser.LoginPair NetrcParser.find (string machine) {
-        GLib.HashTable<string, LoginPair>.ConstIterator it = this.entries.find (machine);
-        if (it != this.entries.end ()) {
-            return it;
+
+    /***********************************************************
+    ***********************************************************/
+    public QPair<string, string> find (string machine) {
+        if (this.entries.contains (machine)) {
+            return this.entries.get (machine);
         } else {
-            return this.default;
+            return this.default_pair;
         }
     }
+
+
+    /***********************************************************
+    ***********************************************************/
+    private void try_add_entry_and_clear (string machine, QPair<string, string> pair, bool is_default) {
+        if (is_default) {
+            this.default_pair = pair;
+        } else if (!machine == "" && !pair.first == "") {
+            this.entries.insert (machine, pair);
+        }
+        pair = q_make_pair ("", "");
+        machine.clear ();
+        is_default = false;
+    }
+}
+
+
+
+
+
+
+
 
     } // namespace Occ
     

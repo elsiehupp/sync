@@ -22,7 +22,7 @@ public class NetworkSettings : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public NetworkSettings (Gtk.Widget parent = null) {
+    public NetworkSettings (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.ui = new Ui.NetworkSettings ();
         this.ui.up_ui (this);
@@ -140,7 +140,7 @@ public class NetworkSettings : Gtk.Widget {
         } else if (this.ui.manual_proxy_radio_button.is_checked ()) {
             int type = this.ui.type_combo_box.item_data (this.ui.type_combo_box.current_index ()).to_int ();
             string host = this.ui.host_line_edit.text ();
-            if (host.is_empty ())
+            if (host == "")
                 type = QNetworkProxy.NoProxy;
             bool needs_auth = this.ui.auth_requiredcheck_box.is_checked ();
             string user = this.ui.user_line_edit.text ();
@@ -194,7 +194,7 @@ public class NetworkSettings : Gtk.Widget {
     Red marking of host field if empty and enabled
     ***********************************************************/
     private void on_signal_check_empty_proxy_host () {
-        if (this.ui.host_line_edit.is_enabled () && this.ui.host_line_edit.text ().is_empty ()) {
+        if (this.ui.host_line_edit.is_enabled () && this.ui.host_line_edit.text () == "") {
             this.ui.host_line_edit.style_sheet ("border : 1px solid red");
         } else {
             this.ui.host_line_edit.style_sheet ("");
@@ -226,7 +226,7 @@ public class NetworkSettings : Gtk.Widget {
     protected override void show_event (QShowEvent event) {
         if (!event.spontaneous ()
             && this.ui.manual_proxy_radio_button.is_checked ()
-            && this.ui.host_line_edit.text ().is_empty ()) {
+            && this.ui.host_line_edit.text () == "") {
             this.ui.no_proxy_radio_button.checked (true);
             on_signal_check_empty_proxy_host ();
             on_signal_save_proxy_settings ();

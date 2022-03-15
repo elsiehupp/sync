@@ -43,7 +43,7 @@ public class HttpCredentialsGui : HttpCredentials {
     public HttpCredentialsGui.with_username_and_password (
         string user, string password,
         string refresh_token = "",
-        GLib.ByteArray client_cert_bundle, GLib.ByteArray client_cert_password) {
+        string client_cert_bundle, string client_cert_password) {
         base (user, password, client_cert_bundle, client_cert_password);
         if (refresh_token != "") {
             this.refresh_token = refresh_token;
@@ -137,10 +137,10 @@ public class HttpCredentialsGui : HttpCredentials {
                             Utility.escape (this.account.display_name ()));
 
         string req_txt = request_app_password_text (this.account);
-        if (!req_txt.is_empty ()) {
+        if (!req_txt == "") {
             message += "<br>" + req_txt + "<br>";
         }
-        if (!this.fetch_error_string.is_empty ()) {
+        if (!this.fetch_error_string == "") {
             message += "<br>"
                 + _("Reading from keychain failed with error : \"%1\"")
                     .printf (Utility.escape (this.fetch_error_string))

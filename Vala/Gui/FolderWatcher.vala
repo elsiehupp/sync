@@ -105,7 +105,7 @@ public class FolderWatcher : GLib.Object {
     Check if the path is ignored.
     ***********************************************************/
     public bool path_is_ignored (string path) {
-        if (path.is_empty ())
+        if (path == "")
             return true;
         if (!this.folder)
             return false;
@@ -127,7 +127,7 @@ public class FolderWatcher : GLib.Object {
     The path must be ignored by the watcher.
     ***********************************************************/
     public void start_notificaton_test (string path) {
-        //  Q_ASSERT (this.test_notification_path.is_empty ());
+        //  Q_ASSERT (this.test_notification_path == "");
         this.test_notification_path = path;
 
         // Don't do the local file modification immediately:
@@ -181,7 +181,7 @@ public class FolderWatcher : GLib.Object {
         // ------- handle ignores:
         for (int i = 0; i < paths.size (); ++i) {
             string path = paths[i];
-            if (!this.test_notification_path.is_empty ()
+            if (!this.test_notification_path == ""
                 && Utility.filenames_equal (path, this.test_notification_path)) {
                 this.test_notification_path.clear ();
             }
@@ -191,7 +191,7 @@ public class FolderWatcher : GLib.Object {
 
             changed_paths.insert (path);
         }
-        if (changed_paths.is_empty ()) {
+        if (changed_paths == "") {
             return;
         }
 
@@ -226,7 +226,7 @@ public class FolderWatcher : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_timer () {
-        if (!this.test_notification_path.is_empty ())
+        if (!this.test_notification_path == "")
             /* emit */ signal_became_unreliable (_("The watcher did not receive a test notification."));
         this.test_notification_path.clear ();
     }

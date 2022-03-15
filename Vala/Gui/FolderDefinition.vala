@@ -103,7 +103,7 @@ public class FolderDefinition {
 
         folder.virtual_files_mode = Vfs.Off;
         string vfs_mode_string = settings.value ("virtual_files_mode").to_string ();
-        if (!vfs_mode_string.is_empty ()) {
+        if (!vfs_mode_string == "") {
             if (var mode = Vfs.Mode.from_string (vfs_mode_string)) {
                 folder.virtual_files_mode = *mode;
             } else {

@@ -17,14 +17,14 @@ int number_of_files = 0;
 void add_a_bunch_of_files (int depth, string path, FileModifier file_info) {
     for (int file_number = 1; file_number <= files_per_directory; ++file_number) {
         string name = "file" + file_number.to_string ();
-        file_info.insert (path.is_empty () ? name : path + "/" + name);
+        file_info.insert (path == "" ? name : path + "/" + name);
         number_of_files++;
     }
     if (depth >= max_depth)
         return;
     for (int directory_number = 1; directory_number <= directories_per_directory; ++directory_number) {
         string name = "directory" + directory_number.to_string ();
-        string sub_path = path.is_empty () ? name : path + "/" + name;
+        string sub_path = path == "" ? name : path + "/" + name;
         file_info.mkdir (sub_path);
         number_of_directories++;
         add_a_bunch_of_files<files_per_directory, directories_per_directory, max_depth> (depth + 1, sub_path, file_info);

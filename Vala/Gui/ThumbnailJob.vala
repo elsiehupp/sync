@@ -41,7 +41,7 @@ public class ThumbnailJob : AbstractNetworkJob {
     will contain the image data in PNG. If the status code is different the content
     of reply is undefined.
     ***********************************************************/
-    void signal_job_finished (int status_code, GLib.ByteArray reply);
+    void signal_job_finished (int status_code, string reply);
 
     /***********************************************************
     ***********************************************************/

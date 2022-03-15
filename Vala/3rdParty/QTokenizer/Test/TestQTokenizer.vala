@@ -140,5 +140,5 @@ public class TestTokenizer : GLib.Object {
         }
     }
 
-    // ### GLib.ByteArray, other types
+    // ### string, other types
 }

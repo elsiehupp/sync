@@ -102,7 +102,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_show_warning (string message = "") {
-        if (message.is_empty ()) {
+        if (message == "") {
             this.ui.warn_frame.hide ();
 
         } else {
@@ -135,7 +135,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_create_remote_folder (string folder) {
-        if (folder.is_empty ())
+        if (folder == "")
             return;
 
         QTreeWidgetItem current = this.ui.folder_tree_widget.current_item ();
@@ -226,7 +226,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
             }
 
             string[] paths = path.split ('/');
-            if (paths.last ().is_empty ())
+            if (paths.last () == "")
                 paths.remove_last ();
             recursive_insert (root, paths, path);
         }
@@ -329,7 +329,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     ***********************************************************/
     private LsColJob run_ls_col_job (string path) {
         var job = new LsColJob (this.account, path, this);
-        var props = new GLib.List<GLib.ByteArray> ({ "resourcetype" });
+        var props = new GLib.List<string> ({ "resourcetype" });
         if (this.account.capabilities ().client_side_encryption_available ()) {
             props += "http://nextcloud.org/ns:is-encrypted";
         }
@@ -349,7 +349,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     /***********************************************************
     ***********************************************************/
     private void recursive_insert (QTreeWidgetItem parent, string[] path_trail, string path) {
-        if (path_trail.is_empty ())
+        if (path_trail == "")
             return;
 
         const string parent_path = parent.data (0, Qt.USER_ROLE).to_string ();
@@ -388,7 +388,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
         }
 
         QTreeWidgetItem it = this.ui.folder_tree_widget.top_level_item (0);
-        if (!path.is_empty ()) {
+        if (!path == "") {
             const string[] path_trail = path.split ('/');
             foreach (string path in path_trail) {
                 if (!it) {

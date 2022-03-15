@@ -60,7 +60,7 @@ public class TestXmlParse : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_test_parser1 () {
-        const GLib.ByteArray test_xml = "<?xml version='1.0' encoding='utf-8'?>"
+        const string test_xml = "<?xml version='1.0' encoding='utf-8'?>"
             + "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             + "<d:response>"
             + "<d:href>/oc/remote.php/dav/sharefolder/</d:href>"
@@ -148,7 +148,7 @@ public class TestXmlParse : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_test_parser_broken_xml () {
-        const GLib.ByteArray test_xml = "X<?xml version='1.0' encoding='utf-8'?>"
+        const string test_xml = "X<?xml version='1.0' encoding='utf-8'?>"
             + "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             + "<d:response>"
             + "<d:href>/oc/remote.php/dav/sharefolder/</d:href>"
@@ -221,7 +221,7 @@ public class TestXmlParse : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_test_parser_empty_xml_no_dav () {
-        const GLib.ByteArray test_xml = "<html><body>I am under construction</body></html>";
+        const string test_xml = "<html><body>I am under construction</body></html>";
 
         LsColXMLParser parser;
 
@@ -246,7 +246,7 @@ public class TestXmlParse : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_test_parser_empty_xml () {
-        const GLib.ByteArray test_xml = "";
+        const string test_xml = "";
 
         LsColXMLParser parser;
 
@@ -271,7 +271,7 @@ public class TestXmlParse : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_test_parser_truncated_xml () {
-        const GLib.ByteArray test_xml = "<?xml version='1.0' encoding='utf-8'?>"
+        const string test_xml = "<?xml version='1.0' encoding='utf-8'?>"
             + "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             + "<d:response>"
             + "<d:href>/oc/remote.php/dav/sharefolder/</d:href>"
@@ -307,7 +307,7 @@ public class TestXmlParse : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_test_parser_bogus_href1 () {
-        const GLib.ByteArray test_xml = "<?xml version='1.0' encoding='utf-8'?>"
+        const string test_xml = "<?xml version='1.0' encoding='utf-8'?>"
             + "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             + "<d:response>"
             + "<d:href>http://127.0.0.1:81/oc/remote.php/dav/sharefolder/</d:href>"
@@ -374,7 +374,7 @@ public class TestXmlParse : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_test_parser_bogus_href2 () {
-        const GLib.ByteArray test_xml = "<?xml version='1.0' encoding='utf-8'?>"
+        const string test_xml = "<?xml version='1.0' encoding='utf-8'?>"
             + "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             + "<d:response>"
             + "<d:href>/sharefolder</d:href>"
@@ -441,7 +441,7 @@ public class TestXmlParse : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_test_parser_denormalized_path () {
-        const GLib.ByteArray test_xml = "<?xml version='1.0' encoding='utf-8'?>"
+        const string test_xml = "<?xml version='1.0' encoding='utf-8'?>"
             + "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             + "<d:response>"
             + "<d:href>/oc/remote.php/dav/sharefolder/</d:href>"
@@ -517,7 +517,7 @@ public class TestXmlParse : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_test_parser_denormalized_path_outside_namespace () {
-        const GLib.ByteArray test_xml = "<?xml version='1.0' encoding='utf-8'?>"
+        const string test_xml = "<?xml version='1.0' encoding='utf-8'?>"
             + "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             + "<d:response>"
             + "<d:href>/oc/remote.php/dav/sharefolder/</d:href>"
@@ -585,7 +585,7 @@ public class TestXmlParse : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_test_href_url_encoding () {
-        const GLib.ByteArray test_xml = "<?xml version='1.0' encoding='utf-8'?>"
+        const string test_xml = "<?xml version='1.0' encoding='utf-8'?>"
             + "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             + "<d:response>"
             + "<d:href>/%C3%A4</d:href>" // a-umlaut utf8

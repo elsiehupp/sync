@@ -120,7 +120,7 @@ public class OAuthTestCase : GLib.Object {
         GLib.assert_cmp (sender (), browser_reply.data ());
         GLib.assert_cmp (state, TokenAsked);
         browser_reply.delete_later ();
-        GLib.assert_cmp (browser_reply.raw_header ("Location"), GLib.ByteArray ("owncloud://on_signal_success"));
+        GLib.assert_cmp (browser_reply.raw_header ("Location"), string ("owncloud://on_signal_success"));
         reply_to_browser_ok = true;
     }
 
@@ -140,7 +140,7 @@ public class OAuthTestCase : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public virtual GLib.ByteArray token_reply_payload () {
+    public virtual string token_reply_payload () {
         QJsonDocument jsondata = new QJsonObject (
             { "access_token", "123" },
             { "refresh_token" , "456" },

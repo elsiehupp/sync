@@ -47,7 +47,7 @@ public class SyncJournalErrorBlocklistRecord {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.ByteArray last_try_etag;
+    public string last_try_etag;
 
 
     /***********************************************************
@@ -74,7 +74,7 @@ public class SyncJournalErrorBlocklistRecord {
     /***********************************************************
     The last X-Request-ID of the request that failled
     ***********************************************************/
-    public GLib.ByteArray request_id;
+    public string request_id;
 
 
     /***********************************************************

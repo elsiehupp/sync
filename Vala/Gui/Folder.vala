@@ -74,7 +74,7 @@ public class Folder : GLib.Object {
 
     private QScopedPointer<SyncEngine> engine;
     private QPointer<RequestEtagJob> request_etag_job;
-    private GLib.ByteArray last_etag;
+    private string last_etag;
     private QElapsedTimer time_since_last_sync_done;
     private QElapsedTimer time_since_last_sync_start;
     private QElapsedTimer time_since_last_full_local_discovery;
@@ -388,7 +388,7 @@ public class Folder : GLib.Object {
         );
     
         // Potentially upgrade suffix vfs to windows vfs
-        ENFORCE (this.vfs);
+        //  ENFORCE (this.vfs);
         if (this.definition.virtual_files_mode == Vfs.WithSuffix
             && this.definition.upgrade_vfs_mode) {
             if (is_vfs_plugin_available (Vfs.WindowsCfApi)) {
@@ -1067,8 +1067,8 @@ public class Folder : GLib.Object {
     ***********************************************************/
     private static std.chrono.milliseconds full_local_discovery_interval () {
         var interval = ConfigFile ().full_local_discovery_interval ();
-        GLib.ByteArray env = qgetenv ("OWNCLOUD_FULL_LOCAL_DISCOVERY_INTERVAL");
-        if (!env.is_empty ()) {
+        string env = qgetenv ("OWNCLOUD_FULL_LOCAL_DISCOVERY_INTERVAL");
+        if (!env == "") {
             interval = std.chrono.milliseconds (env.to_long_long ());
         }
         return interval;
@@ -1229,7 +1229,7 @@ public class Folder : GLib.Object {
             GLib.info ("The file is not virtual.");
             return;
         }
-        record.type = ItemTypeVirtualFileDownload;
+        record.type = ItemType.VIRTUAL_FILE_DOWNLOAD;
         this.journal.file_record (record);
     
         // Change the file's pin state if it's contradictory to being hydrated
@@ -1285,7 +1285,7 @@ public class Folder : GLib.Object {
             + " SSL " + QSslSocket.ssl_library_version_string ().to_utf8 ().data ()
         );
     
-        bool sync_error = !this.sync_result.error_strings ().is_empty ();
+        bool sync_error = !this.sync_result.error_strings () == "";
         if (sync_error) {
             GLib.warning ("SyncEngine finished with ERROR.");
         } else {
@@ -1393,7 +1393,7 @@ public class Folder : GLib.Object {
     ***********************************************************/
     private 
     void Folder.on_signal_item_completed (SyncFileItemPtr item) {
-        if (item.instruction == CSYNC_INSTRUCTION_NONE || item.instruction == CSYNC_INSTRUCTION_UPDATE_METADATA) {
+        if (item.instruction == SyncInstructions.NONE || item.instruction == SyncInstructions.UPDATE_METADATA) {
             // We only care about the updates that deserve to be shown in the UI
             return;
         }
@@ -1436,7 +1436,7 @@ public class Folder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_etag_retrieved (GLib.ByteArray value1, GLib.DateTime tp) {
+    private void on_signal_etag_retrieved (string value1, GLib.DateTime tp) {
         // re-enable sync if it was disabled because network was down
         FolderMan.instance ().sync_enabled (true);
     
@@ -1452,7 +1452,7 @@ public class Folder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_etag_retrieved_from_sync_engine (GLib.ByteArray etag, GLib.DateTime time) {
+    private void on_signal_etag_retrieved_from_sync_engine (string etag, GLib.DateTime time) {
         GLib.info ("Root etag from during sync: " + etag);
         account_state ().tag_last_successful_etag_request (time);
         this.last_etag = etag;
@@ -1699,7 +1699,7 @@ public class Folder : GLib.Object {
     private void check_local_path () {
         const GLib.FileInfo file_info = new GLib.FileInfo (this.definition.local_path);
         this.canonical_local_path = file_info.canonical_file_path ();
-        if (this.canonical_local_path.is_empty ()) {
+        if (this.canonical_local_path == "") {
             GLib.warning ("Broken symlink: " + this.definition.local_path);
             this.canonical_local_path = this.definition.local_path;
         } else if (!this.canonical_local_path.ends_with ('/')) {
@@ -1819,7 +1819,7 @@ public class Folder : GLib.Object {
                 break;
             }
     
-            if (!text.is_empty ()) {
+            if (!text == "") {
                 // Ignores the settings in case of an error or conflict
                 if (status == LogStatus.ERROR || status == LogStatus.CONFLICT)
                     logger.post_optional_gui_log (_("Sync Activity"), text);

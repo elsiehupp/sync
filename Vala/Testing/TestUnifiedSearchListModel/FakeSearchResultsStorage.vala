@@ -26,7 +26,7 @@ public class FakeSearchResultsStorage {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.ByteArray providers_response = fake_404_response;
+    private string providers_response = fake_404_response;
 
     /***********************************************************
     ***********************************************************/
@@ -80,7 +80,7 @@ public class FakeSearchResultsStorage {
     /***********************************************************
     ***********************************************************/
     public void on_signal_init () {
-        if (!this.search_results_data.is_empty ()) {
+        if (!this.search_results_data == "") {
             return;
         }
 
@@ -174,7 +174,7 @@ public class FakeSearchResultsStorage {
 
         var results = results_for_provider_as_vector (provider_id, cursor);
 
-        if (results.is_empty ()) {
+        if (results == "") {
             return list;
         }
 
@@ -212,7 +212,7 @@ public class FakeSearchResultsStorage {
 
         var provider = this.search_results_data.value (provider_id, Provider ());
 
-        if (provider.id.is_empty () || cursor > provider.results.size ()) {
+        if (provider.id == "" || cursor > provider.results.size ()) {
             return results;
         }
 
@@ -230,7 +230,7 @@ public class FakeSearchResultsStorage {
 
     /***********************************************************
     ***********************************************************/
-    public const GLib.ByteArray query_provider (string provider_id, string search_term, int cursor) {
+    public const string query_provider (string provider_id, string search_term, int cursor) {
         if (!this.search_results_data.contains (provider_id)) {
             return fake_404_response;
         }
@@ -313,7 +313,7 @@ public class FakeSearchResultsStorage {
 
     /***********************************************************
     ***********************************************************/
-    public const GLib.ByteArray fake_providers_response_json () {
+    public const string fake_providers_response_json () {
         return this.providers_response;
     }
 

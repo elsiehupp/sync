@@ -511,12 +511,12 @@ public class PropagateDownloadFile : PropagateItemJob {
         }
 
         // Do checksum validation for the download. If there is no checksum header, the validator
-        // will also emit the validated () signal to continue the flow in slot on_signal_transmission_checksum_validated ()
+        // will also emit the signal_validated () signal to continue the flow in slot on_signal_transmission_checksum_validated ()
         // as this is (still) also correct.
         var validator = new ValidateChecksumHeader (this);
-        connect (validator, ValidateChecksumHeader.validated,
+        connect (validator, ValidateChecksumHeader.signal_validated,
             this, PropagateDownloadFile.on_signal_transmission_checksum_validated);
-        connect (validator, ValidateChecksumHeader.validation_failed,
+        connect (validator, ValidateChecksumHeader.signal_validation_failed,
             this, PropagateDownloadFile.on_signal_checksum_fail);
         var checksum_header = find_best_checksum (job.reply ().raw_header (CHECK_SUM_HEADER_C));
         var content_md5Header = job.reply ().raw_header (CONTENT_MD5_HEADER_C);
@@ -527,7 +527,7 @@ public class PropagateDownloadFile : PropagateItemJob {
 
 
     /***********************************************************
-    Called when the download's checksum header was validated
+    Called when the download's checksum header was signal_validated
     ***********************************************************/
     private void on_signal_transmission_checksum_validated (string checksum_type, string checksum) {
         const string the_content_checksum_type = propagator ().account ().capabilities ().preferred_upload_checksum_type ();
@@ -625,7 +625,7 @@ public class PropagateDownloadFile : PropagateItemJob {
         // Apply the remote permissions
         FileSystem.file_read_only_weak (this.tmp_file.filename (), !this.item.remote_perm.is_null () && !this.item.remote_perm.has_permission (RemotePermissions.Permissions.CAN_WRITE));
 
-        bool is_conflict = this.item.instruction == CSYNC_INSTRUCTION_CONFLICT
+        bool is_conflict = this.item.instruction == SyncInstructions.CONFLICT
             && (GLib.File.new_for_path (fn).query_info ().get_file_type () == FileType.DIRECTORY || !FileSystem.file_equals (fn, this.tmp_file.filename ()));
         if (is_conflict) {
             string error;
@@ -640,7 +640,7 @@ public class PropagateDownloadFile : PropagateItemJob {
 
         // In the case of an hydration, this size is likely to change for placeholders
         // (except with the cfapi backend)
-        var is_virtual_download = this.item.type == ItemTypeVirtualFileDownload;
+        var is_virtual_download = this.item.type == ItemType.VIRTUAL_FILE_DOWNLOAD;
         var is_cf_api_vfs = vfs && vfs.mode () == Vfs.WindowsCfApi;
         if (previous_file_exists && (is_cf_api_vfs || !is_virtual_download)) {
             // Check whether the existing file has changed since the discovery
@@ -687,7 +687,7 @@ public class PropagateDownloadFile : PropagateItemJob {
         if (vfs && vfs.mode () == Vfs.WithSuffix) {
             // If the virtual file used to have a different name and database
             // entry, remove it transfer its old pin state.
-            if (this.item.type == ItemTypeVirtualFileDownload) {
+            if (this.item.type == ItemType.VIRTUAL_FILE_DOWNLOAD) {
                 string virtual_file = this.item.file + vfs.file_suffix ();
                 var fn = propagator ().full_local_path (virtual_file);
                 GLib.debug ("Download of previous virtual file finished: " + fn);
@@ -796,7 +796,7 @@ public class PropagateDownloadFile : PropagateItemJob {
         var vfs = sync_options.vfs;
 
         // For virtual files just dehydrate or create the file and be done
-        if (this.item.type == ItemTypeVirtualFileDehydration) {
+        if (this.item.type == ItemType.VIRTUAL_FILE_DEHYDRATION) {
             string fs_path = propagator ().full_local_path (this.item.file);
             if (!FileSystem.verify_file_unchanged (fs_path, this.item.previous_size, this.item.previous_modtime)) {
                 propagator ().another_sync_needed = true;
@@ -820,11 +820,11 @@ public class PropagateDownloadFile : PropagateItemJob {
 
             return;
         }
-        if (vfs.mode () == Vfs.Off && this.item.type == ItemTypeVirtualFile) {
+        if (vfs.mode () == Vfs.Off && this.item.type == ItemType.VIRTUAL_FILE) {
             GLib.warning ("Ignored virtual file type of " + this.item.file);
-            this.item.type = ItemTypeFile;
+            this.item.type = ItemType.FILE;
         }
-        if (this.item.type == ItemTypeVirtualFile) {
+        if (this.item.type == ItemType.VIRTUAL_FILE) {
             if (propagator ().local_filename_clash (this.item.file)) {
                 on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 cannot be downloaded because of a local file name clash!").printf (QDir.to_native_separators (this.item.file)));
                 return;
@@ -864,7 +864,7 @@ public class PropagateDownloadFile : PropagateItemJob {
         if (this.item.modtime <= 0) {
             GLib.warning ("Invalid modified time " + this.item.file.to_string () + this.item.modtime.to_string ());
         }
-        if (this.item.instruction == CSYNC_INSTRUCTION_CONFLICT
+        if (this.item.instruction == SyncInstructions.CONFLICT
             && this.item.size == this.item.previous_size
             && !this.item.checksum_header == ""
             && (csync_is_collision_safe_hash (this.item.checksum_header)

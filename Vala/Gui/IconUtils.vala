@@ -41,7 +41,7 @@ public class IconUtils {
     /***********************************************************
     ***********************************************************/
     public static Gdk.Pixbuf pixmap_for_background (string filename, Gtk.Color background_color) {
-        //  Q_ASSERT (!filename.is_empty ());
+        //  Q_ASSERT (!filename == "");
 
         const var pixmap_color = background_color.is_valid () && !Theme.is_dark_color (background_color)
             ? QColor_constants.Svg.black
@@ -54,12 +54,12 @@ public class IconUtils {
     /***********************************************************
     ***********************************************************/
     public static Gtk.Image create_svg_image_with_custom_color (string filename, Gtk.Color custom_color, QSize original_size = null, QSize requested_size = {}) {
-        //  Q_ASSERT (!filename.is_empty ());
+        //  Q_ASSERT (!filename == "");
         //  Q_ASSERT (custom_color.is_valid ());
 
         Gtk.Image result = new Gtk.Image ();
 
-        if (filename.is_empty () || !custom_color.is_valid ()) {
+        if (filename == "" || !custom_color.is_valid ()) {
             GLib.warning ("invalid filename or custom_color");
             return result;
         }
@@ -84,8 +84,8 @@ public class IconUtils {
         // find the first matching svg file
         const var source_svg = find_svg_file_path (filename, icon_base_colors);
 
-        //  Q_ASSERT (!source_svg.is_empty ());
-        if (source_svg.is_empty ()) {
+        //  Q_ASSERT (!source_svg == "");
+        if (source_svg == "") {
             GLib.warning ("Failed to find base SVG file for " + filename);
             return result;
         }

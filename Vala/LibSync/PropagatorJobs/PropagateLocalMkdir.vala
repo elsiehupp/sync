@@ -58,7 +58,7 @@ public class PropagateLocalMkdir : PropagateItemJob {
                             .printf (new_dir_str, remove_error));
                     return;
                 }
-            } else if (this.item.instruction == CSYNC_INSTRUCTION_CONFLICT) {
+            } else if (this.item.instruction == SyncInstructions.CONFLICT) {
                 string error;
                 if (!propagator ().create_conflict (this.item, this.associated_composite, error)) {
                     on_signal_done (SyncFileItem.Status.SOFT_ERROR, error);
@@ -96,7 +96,7 @@ public class PropagateLocalMkdir : PropagateItemJob {
         }
         propagator ().journal.commit ("local_mkdir");
 
-        var result_status = this.item.instruction == CSYNC_INSTRUCTION_CONFLICT
+        var result_status = this.item.instruction == SyncInstructions.CONFLICT
             ? SyncFileItem.Status.CONFLICT
             : SyncFileItem.Status.SUCCESS;
         on_signal_done (result_status);

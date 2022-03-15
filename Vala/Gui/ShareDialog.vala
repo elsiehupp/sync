@@ -34,7 +34,7 @@ public class ShareDialog : Gtk.Dialog {
     private string share_path;
     private string local_path;
     private SharePermissions max_sharing_permissions;
-    private GLib.ByteArray numeric_file_id;
+    private string numeric_file_id;
     private string private_link_url;
     private ShareDialogStartPage start_page;
     private ShareManager manager = null;
@@ -56,9 +56,9 @@ public class ShareDialog : Gtk.Dialog {
         string share_path,
         string local_path,
         SharePermissions max_sharing_permissions,
-        GLib.ByteArray numeric_file_id,
+        string numeric_file_id,
         ShareDialogStartPage start_page,
-        Gtk.Widget parent = null) {
+        Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.ui = new Ui.ShareDialog ();
         this.account_state = account_state;
@@ -107,7 +107,7 @@ public class ShareDialog : Gtk.Dialog {
         // may be in use or not.
         this.ui.grid_layout.remove_widget (this.ui.label_share_path);
         this.ui.grid_layout.remove_widget (this.ui.label_name);
-        if (oc_dir.is_empty ()) {
+        if (oc_dir == "") {
             this.ui.grid_layout.add_widget (this.ui.label_name, 0, 1, 2, 1);
             this.ui.label_share_path.on_signal_text ("");
         } else {
@@ -130,7 +130,7 @@ public class ShareDialog : Gtk.Dialog {
 
         var job = new PropfindJob (account_state.account (), this.share_path);
         job.properties (
-            GLib.List<GLib.ByteArray> ()
+            GLib.List<string> ()
             + "http://open-collaboration-services.org/ns:share-permissions"
             + "http://owncloud.org/ns:fileid" // numeric file identifier for fallback private link generation
             + "http://owncloud.org/ns:privatelink");
@@ -177,16 +177,16 @@ public class ShareDialog : Gtk.Dialog {
     ***********************************************************/
     private void on_signal_propfind_received (QVariantMap result) {
         const GLib.Variant received_permissions = result["share-permissions"];
-        if (!received_permissions.to_string ().is_empty ()) {
+        if (!received_permissions.to_string () == "") {
             this.max_sharing_permissions = static_cast<SharePermissions> (received_permissions.to_int ());
             GLib.info ("Received sharing permissions for " + this.share_path + this.max_sharing_permissions);
         }
         var private_link_url = result["privatelink"].to_string ();
         var numeric_file_id = result["fileid"].to_byte_array ();
-        if (!private_link_url.is_empty ()) {
+        if (!private_link_url == "") {
             GLib.info ("Received private link url for " + this.share_path + private_link_url);
             this.private_link_url = private_link_url;
-        } else if (!numeric_file_id.is_empty ()) {
+        } else if (!numeric_file_id == "") {
             GLib.info ("Received numeric file identifier for " + this.share_path + numeric_file_id);
             this.private_link_url = this.account_state.account ().deprecated_private_link_url (numeric_file_id).to_string (GLib.Uri.FullyEncoded);
         }
@@ -208,7 +208,7 @@ public class ShareDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_thumbnail_fetched (int status_code, GLib.ByteArray reply) {
+    private void on_signal_thumbnail_fetched (int status_code, string reply) {
         if (status_code != 200) {
             GLib.warning ("Thumbnail status code: " + status_code);
             return;

@@ -28,7 +28,7 @@ function.
 ***********************************************************/
 public class Vfs : GLib.Object {
 
-    struct csync_file_stat_t : csync_file_stat_s { }
+    struct CSyncFileStatT : CSyncFileStatS { }
     public class AvailabilityResult : Result<VfsItemAvailability, AvailabilityError> { }
 
     /***********************************************************
@@ -200,7 +200,7 @@ public class Vfs : GLib.Object {
     change as well.
     Q_REQUIRED_RESULT
     ***********************************************************/
-    public virtual Result<void, string> update_metadata (string file_path, time_t modtime, int64 size, GLib.ByteArray file_id);
+    public virtual Result<void, string> update_metadata (string file_path, time_t modtime, int64 size, string file_id);
 
 
     /***********************************************************
@@ -267,7 +267,7 @@ public class Vfs : GLib.Object {
     Returning true means that type was fully determined.
     Q_REQUIRED_RESULT
     ***********************************************************/
-    public virtual bool stat_type_virtual_file (csync_file_stat_t stat, void stat_data);
+    public virtual bool stat_type_virtual_file (CSyncFileStatT stat, void stat_data);
 
 
     /***********************************************************

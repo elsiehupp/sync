@@ -109,7 +109,7 @@ public class AccountSettings : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public AccountSettings (AccountState account_state, Gtk.Widget parent = null) {
+    public AccountSettings (AccountState account_state, Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.ui = new Ui.AccountSettings ();
         this.was_disabled_before = false;
@@ -312,7 +312,7 @@ public class AccountSettings : Gtk.Widget {
             string server_with_user = server;
             if (account.credentials ()) {
                 string user = account.dav_display_name ();
-                if (user.is_empty ()) {
+                if (user == "") {
                     user = account.credentials ().user ();
                 }
                 server_with_user = _("%1 as %2").printf (server, Utility.escape (user));
@@ -459,7 +459,7 @@ public class AccountSettings : Gtk.Widget {
     protected void on_signal_enable_current_folder (bool terminate = false) {
         var alias = selected_folder_alias ();
 
-        if (!alias.is_empty ()) {
+        if (!alias == "") {
             GLib.info ("Application: enable folder with alias " + alias);
             bool currently_paused = false;
 
@@ -594,7 +594,7 @@ public class AccountSettings : Gtk.Widget {
     ***********************************************************/
     protected void on_signal_open_current_folder () {
         var alias = selected_folder_alias ();
-        if (!alias.is_empty ()) {
+        if (!alias == "") {
             /* emit */ signal_open_folder_alias (alias);
         }
     }
@@ -639,7 +639,7 @@ public class AccountSettings : Gtk.Widget {
             return;
         }
 
-        if (!this.filename ().is_empty ()) {
+        if (!this.filename () == "") {
             var folder_creation_dialog = new FolderCreationDialog (this.filename (), this);
             folder_creation_dialog.attribute (Qt.WA_DeleteOnClose);
             folder_creation_dialog.open ();
@@ -1016,7 +1016,7 @@ public class AccountSettings : Gtk.Widget {
             }
         }
 
-        if (!message.is_empty ()) {
+        if (!message == "") {
             ConfigFile config;
             string info = !config.confirm_external_storage ()
                     ? _("There are folders that were not synchronized because they are too big: ")
@@ -1365,7 +1365,7 @@ public class AccountSettings : Gtk.Widget {
         GLib.info ("Current folder encryption status code: " + status);
         var job = qobject_cast<EncryptFolderJob> (sender ());
         //  Q_ASSERT (job);
-        if (!job.error_string ().is_empty ()) {
+        if (!job.error_string () == "") {
             QMessageBox.warning (null, _("Warning"), job.error_string ());
         }
 
@@ -1447,7 +1447,7 @@ public class AccountSettings : Gtk.Widget {
         const string err_style = "color: #ffffff; background-color: #bb4d4d; padding: 5px;"
                                + "border-width: 1px; border-style: solid; border-color: #aaaaaa;"
                                + "border-radius: 5px;";
-        if (errors.is_empty ()) {
+        if (errors == "") {
             string message = message;
             Theme.replace_link_color_string_background_aware (message);
             this.ui.connect_label.on_signal_text (message);
@@ -1462,7 +1462,7 @@ public class AccountSettings : Gtk.Widget {
             this.ui.connect_label.tool_tip ("");
             this.ui.connect_label.style_sheet (err_style);
         }
-        this.ui.account_status.visible (!message.is_empty ());
+        this.ui.account_status.visible (!message == "");
     }
 
 
