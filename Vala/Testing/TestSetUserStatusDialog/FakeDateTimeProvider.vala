@@ -42,7 +42,7 @@ public class FakeDateTimeProvider : Occ.DateTimeProvider {
         clear_at.timestamp = current_time.add_secs (60 * 60).to_time_t ();
         user_status_clear_at = clear_at;
 
-        statuses.emplace_back (user_status_id, user_status_message, user_status)icon,
+        statuses.emplace_back (user_status_id, user_status_message, user_status_icon,
             user_status_state, user_status_message_predefined, user_status_clear_at);
 
         return statuses;

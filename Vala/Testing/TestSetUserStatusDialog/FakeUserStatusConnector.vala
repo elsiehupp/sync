@@ -92,7 +92,7 @@ public class FakeUserStatusConnector : Occ.UserStatusConnector {
     /***********************************************************
     ***********************************************************/
     public void set_fake_predefined_statuses (
-        const GLib.Vector<Occ.UserStatus> statuses) {
+        GLib.Vector<Occ.UserStatus> statuses) {
         this.predefined_statuses = statuses;
     }
 

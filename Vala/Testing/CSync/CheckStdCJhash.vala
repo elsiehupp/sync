@@ -15,8 +15,8 @@ const int MAXLEN    = 70;
 static void check_c_jhash_trials (void **state) {
     uint8 qa[MAXLEN+1];
     uint8 qb[MAXLEN+2];
-    uint8 *a = qa[0];
-    uint8 *b = qb[1];
+    uint8 *a = &qa[0];
+    uint8 *b = &qb[1];
     uint32 c[HASHSTATE];
     uint32 d[HASHSTATE];
     uint32 i = 0;

@@ -10,9 +10,7 @@ using Occ;
 
 namespace Testing {
 
-public class TestConcatUrl {
-public class 
-class TestConcatUrl : GLib.Object {
+public class TestConcatUrl : GLib.Object {
 
     class QueryItems : GLib.List<QPair<string, string>> { }
 
