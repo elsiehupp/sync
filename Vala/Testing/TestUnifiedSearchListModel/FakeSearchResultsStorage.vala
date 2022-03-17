@@ -26,7 +26,7 @@ public class FakeSearchResultsStorage {
 
     /***********************************************************
     ***********************************************************/
-    private string providers_response = fake_404_response;
+    private string providers_response = FAKE_404_RESPONSE;
 
     /***********************************************************
     ***********************************************************/
@@ -49,10 +49,8 @@ public class FakeSearchResultsStorage {
         int32 order = std.numeric_limits<int32>.max ();
         int32 cursor = 0;
         bool  is_paginated = false;
-        GLib.Vector<SearchResult> results;
+        GLib.List<SearchResult> results;
     }
-
-    FakeSearchResultsStorage () = default;
 
 
     /***********************************************************
@@ -125,14 +123,14 @@ public class FakeSearchResultsStorage {
             }));
         }
 
-        const QVariantMap ocs_map = {
+        QVariantMap ocs_map = new QVariantMap (
             {
                 "meta", this.meta_success
             },
             {
                 "data", providers_list
             }
-        }
+        );
 
         this.providers_response = QJsonDocument.from_variant (
             new QVariantMap ({
@@ -171,7 +169,7 @@ public class FakeSearchResultsStorage {
 
     /***********************************************************
     ***********************************************************/
-    public const GLib.List<GLib.Variant> results_for_provider (string provider_id, int cursor) {
+    public GLib.List<Variant> results_for_provider (string provider_id, int cursor) {
         GLib.List<GLib.Variant> list;
 
         var results = results_for_provider_as_vector (provider_id, cursor);
@@ -209,8 +207,8 @@ public class FakeSearchResultsStorage {
 
     /***********************************************************
     ***********************************************************/
-    public const GLib.Vector<Provider.SearchResult> results_for_provider_as_vector (string provider_id, int cursor) {
-        GLib.Vector<Provider.SearchResult> results;
+    public GLib.List<Provider.SearchResult> results_for_provider_as_vector (string provider_id, int cursor) {
+        GLib.List<Provider.SearchResult> results;
 
         var provider = this.search_results_data.value (provider_id, Provider ());
 
@@ -232,13 +230,13 @@ public class FakeSearchResultsStorage {
 
     /***********************************************************
     ***********************************************************/
-    public const string query_provider (string provider_id, string search_term, int cursor) {
+    public string query_provider (string provider_id, string search_term, int cursor) {
         if (!this.search_results_data.contains (provider_id)) {
-            return fake_404_response;
+            return FAKE_404_RESPONSE;
         }
 
         if (search_term == "[HTTP500]") {
-            return fake500Response;
+            return FAKE_500_RESPONSE;
         }
 
         if (search_term == "[empty]") {
@@ -306,7 +304,7 @@ public class FakeSearchResultsStorage {
         return new QJsonDocument.from_variant (
             new QVariantMap (
                 {
-                    "ocs"), ocs_map
+                    "ocs", ocs_map
                 }
             )
         ).to_json (QJsonDocument.Compact);
@@ -315,7 +313,7 @@ public class FakeSearchResultsStorage {
 
     /***********************************************************
     ***********************************************************/
-    public const string fake_providers_response_json () {
+    public string fake_providers_response_json () {
         return this.providers_response;
     }
 

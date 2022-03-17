@@ -25,9 +25,9 @@ public class TestClientSideEncryption : GLib.Object {
     ***********************************************************/
     private void should_encrypt_private_keys () {
         // GIVEN
-        var encryption_key = new "foo";
-        var private_key = new "bar";
-        var original_salt = new "baz";
+        var encryption_key = "foo";
+        var private_key = "bar";
+        var original_salt = "baz";
 
         // WHEN
         var cipher = EncryptionHelper.encrypt_private_key (encryption_key, private_key, original_salt);
@@ -54,9 +54,9 @@ public class TestClientSideEncryption : GLib.Object {
     ***********************************************************/
     private void should_decrypt_private_keys () {
         // GIVEN
-        var encryption_key = new "foo";
-        var original_private_key = new "bar";
-        var original_salt = new "baz";
+        var encryption_key = "foo";
+        var original_private_key = "bar";
+        var original_salt = "baz";
         var cipher = EncryptionHelper.encrypt_private_key (encryption_key, original_private_key, original_salt);
 
         // WHEN
@@ -73,9 +73,9 @@ public class TestClientSideEncryption : GLib.Object {
     ***********************************************************/
     private void should_decrypt_private_keys_in_old_storage_format () {
         // GIVEN
-        var encryption_key = new "foo";
-        var original_private_key = new "bar";
-        var original_salt = new "baz";
+        var encryption_key = "foo";
+        var original_private_key = "bar";
+        var original_salt = "baz";
         var cipher = convert_to_old_storage_format (EncryptionHelper.encrypt_private_key (encryption_key, original_private_key, original_salt));
 
         // WHEN
@@ -92,8 +92,8 @@ public class TestClientSideEncryption : GLib.Object {
     ***********************************************************/
     private void should_symmetric_encrypt_strings () {
         // GIVEN
-        var encryption_key = new "foo";
-        var data = new "bar";
+        var encryption_key = "foo";
+        var data = "bar";
 
         // WHEN
         var cipher = EncryptionHelper.encrypt_string_symmetric (encryption_key, data);
@@ -118,8 +118,8 @@ public class TestClientSideEncryption : GLib.Object {
     ***********************************************************/
     private void should_symmetric_decrypt_strings () {
         // GIVEN
-        var encryption_key = new "foo";
-        var original_data = new "bar";
+        var encryption_key = "foo";
+        var original_data = "bar";
         var cipher = EncryptionHelper.encrypt_string_symmetric (encryption_key, original_data);
 
         // WHEN
@@ -134,8 +134,8 @@ public class TestClientSideEncryption : GLib.Object {
     ***********************************************************/
     private void should_symmetric_decrypt_strings_in_old_storage_format () {
         // GIVEN
-        var encryption_key = new "foo";
-        var original_data = new "bar";
+        var encryption_key = "foo";
+        var original_data = "bar";
         var cipher = convert_to_old_storage_format (EncryptionHelper.encrypt_string_symmetric (encryption_key, original_data));
 
         // WHEN
@@ -172,12 +172,6 @@ public class TestClientSideEncryption : GLib.Object {
 
         GLib.assert_true (dummy_input_file.write (dummy_file_random_contents) == dummy_file_random_contents.size ());
 
-        var generate_hash = [] (string data) => {
-            QCryptographicHash hash = new QCryptographicHash (QCryptographicHash.Sha1);
-            hash.add_data (data);
-            return hash.result ();
-        }
-
         const string original_file_hash = generate_hash (dummy_file_random_contents);
 
         GLib.assert_true (original_file_hash != "");
@@ -208,7 +202,7 @@ public class TestClientSideEncryption : GLib.Object {
         GLib.assert_true (dummy_decryption_output_file_hash == original_file_hash);
 
         // test streaming decryptor
-        EncryptionHelper.StreamingDecryptor streaming_decryptor (encryption_key, initialization_vector, dummy_encryption_output_file.size ());
+        EncryptionHelper.StreamingDecryptor streaming_decryptor = new EncryptionHelper.StreamingDecryptor (encryption_key, initialization_vector, dummy_encryption_output_file.size ());
         GLib.assert_true (streaming_decryptor.is_initialized ());
 
         QBuffer chunked_output_decrypted;
@@ -257,6 +251,13 @@ public class TestClientSideEncryption : GLib.Object {
         GLib.assert_true (chunked_output_decrypted.open (QBuffer.ReadOnly));
         GLib.assert_true (generate_hash (chunked_output_decrypted.read_all ()) == original_file_hash);
         chunked_output_decrypted.close ();
+    }
+
+
+    private HashResult generate_hash (string data) {
+        QCryptographicHash hash = new QCryptographicHash (QCryptographicHash.Sha1);
+        hash.add_data (data);
+        return hash.result ();
     }
 
 }

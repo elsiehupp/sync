@@ -17,20 +17,23 @@ public class OperationCounter {
     int number_of_move = 0;
     int number_of_delete = 0;
 
-    void on_signal_reset () { *this = {}; }
+    void on_signal_reset () {
+        this.number_of_get = 0;
+        this.number_of_put = 0;
+        this.number_of_move = 0;
+        this.number_of_delete = 0;
+    }
 
-    var functor () {
-        return [&] (Soup.Operation operation, Soup.Request request, QIODevice *) {
-            if (operation == Soup.GetOperation)
-                ++number_of_get;
-            if (operation == Soup.PutOperation)
-                ++number_of_put;
-            if (operation == Soup.DeleteOperation)
-                ++number_of_delete;
-            if (request.attribute (Soup.Request.CustomVerbAttribute) == "MOVE")
-                ++number_of_move;
-            return null;
-        }
+    public void functor (Soup.Operation operation, Soup.Request request, QIODevice device) {
+        if (operation == Soup.GetOperation)
+            ++number_of_get;
+        if (operation == Soup.PutOperation)
+            ++number_of_put;
+        if (operation == Soup.DeleteOperation)
+            ++number_of_delete;
+        if (request.attribute (Soup.Request.CustomVerbAttribute) == "MOVE")
+            ++number_of_move;
+        return null;
     }
 }
 
@@ -50,7 +53,7 @@ bool item_successful_move (ItemCompletedSpy spy, string path) {
 
 string[] find_conflicts (FileInfo directory) {
     string[] conflicts;
-    for (var item : directory.children) {
+    foreach (var item in directory.children) {
         if (item.name.contains (" (conflicted copy")) {
             conflicts.append (item.path ());
         }
@@ -60,10 +63,10 @@ string[] find_conflicts (FileInfo directory) {
 
 bool expect_and_wipe_conflict (FileModifier local, FileInfo state, string path) {
     PathComponents path_components = new PathComponents (path);
-    var base = state.find (path_components.parent_directory_components ());
-    if (!base)
+    var base_path = state.find (path_components.parent_directory_components ());
+    if (!base_path)
         return false;
-    for (var item : base.children) {
+    foreach (var item in base_path.children) {
         if (item.name.starts_with (path_components.filename ()) && item.name.contains (" (conflicted copy")) {
             local.remove (item.path ());
             return true;
@@ -319,7 +322,7 @@ public class TestSyncMove : GLib.Object {
     }
 
 
-    private Soup.Reply override_delegate_local_move_detection (Soup.Operation operation, Soup.Request &, QIODevice *) {
+    private Soup.Reply override_delegate_local_move_detection (Soup.Operation operation, Soup.Request request, QIODevice device) {
         if (operation == Soup.PutOperation)
             ++number_of_put;
         if (operation == Soup.DeleteOperation)
@@ -434,7 +437,7 @@ public class TestSyncMove : GLib.Object {
             GLib.assert_true (complete_spy.find_item ("A/a1m").rename_target == "A/a1m");
             GLib.assert_true (complete_spy.find_item ("B/b1m").file == "B/b1");
             GLib.assert_true (complete_spy.find_item ("B/b1m").rename_target == "B/b1m");
-        }
+        //  }
 
         // Touch+Move on same side
         counter.on_signal_reset ();
@@ -496,7 +499,7 @@ public class TestSyncMove : GLib.Object {
             GLib.assert_true (item_successful (complete_spy, "B/b1m", SyncInstructions.NEW));
             GLib.assert_true (item_conflict (complete_spy, "A/a1mt"));
             GLib.assert_true (item_conflict (complete_spy, "B/b1mt"));
-        }
+        //  }
 
         // Create new on one side, move to new on the other {
             counter.on_signal_reset ();
@@ -518,7 +521,7 @@ public class TestSyncMove : GLib.Object {
             GLib.assert_true (item_successful (complete_spy, "B/b1mt", SyncInstructions.REMOVE));
             GLib.assert_true (item_conflict (complete_spy, "A/a1N"));
             GLib.assert_true (item_conflict (complete_spy, "B/b1N"));
-        }
+        //  }
 
         // Local move, remote move
         counter.on_signal_reset ();
@@ -564,7 +567,7 @@ public class TestSyncMove : GLib.Object {
             GLib.assert_true (complete_spy.find_item ("AM").rename_target == "AM");
             GLib.assert_true (complete_spy.find_item ("BM").file == "B");
             GLib.assert_true (complete_spy.find_item ("BM").rename_target == "BM");
-        }
+        //  }
 
         // Folder move with contents touched on the same side {
             counter.on_signal_reset ();
@@ -589,7 +592,7 @@ public class TestSyncMove : GLib.Object {
             GLib.assert_true (remote.find ("B2/b2m").content_char == 'C');
             GLib.assert_true (item_successful_move (complete_spy, "A2"));
             GLib.assert_true (item_successful_move (complete_spy, "B2"));
-        }
+        //  }
 
         // Folder rename with contents touched on the other tree
         counter.on_signal_reset ();
@@ -952,12 +955,6 @@ public class TestSyncMove : GLib.Object {
     ***********************************************************/
     private void test_moved_with_error () {
         QFETCH (Vfs.Mode, vfs_mode);
-        var get_name = [vfs_mode] (string s) { {f (vfs_mode == Vfs.WithSuffix)
-            {
-                return s + APPLICATION_DOTVIRTUALFILE_SUFFIX;
-            }
-            return s;
-        }
         const string src = "folder/folder_a/file.txt";
         const string dest = "folder/folder_b/file.txt";
         FakeFolder fake_folder = new FakeFolder (
@@ -1021,6 +1018,13 @@ public class TestSyncMove : GLib.Object {
         GLib.assert_true (!fake_folder.current_remote_state ().find (dest));
     }
 
-}
 
-QTEST_GUILESS_MAIN (TestSyncMove)
+    private static string get_name (Vfs.Mode vfs_mode, string s) {
+        if (vfs_mode == Vfs.WithSuffix) {
+            return s + APPLICATION_DOTVIRTUALFILE_SUFFIX;
+        }
+        return s;
+    }
+
+}
+}

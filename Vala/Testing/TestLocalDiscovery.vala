@@ -97,7 +97,7 @@ public class TestLocalDiscovery : GLib.Object {
         GLib.assert_true (engine.should_discover_locally ("zzzz/hello"));
         GLib.assert_true (!engine.should_discover_locally ("zzza/hello"));
 
-        GLib.assert_fail ("", "There is a possibility of false positives if the set contains a path "
+        GLib.assert_fail ("", "There is a possibility of false positives if the set contains a path " +
             "which is a prefix, and that prefix is followed by a character less than '/'", Continue);
         GLib.assert_true (!engine.should_discover_locally ("A/X o"));
 
@@ -128,9 +128,6 @@ public class TestLocalDiscovery : GLib.Object {
             tracker,
             LocalDiscoveryTracker.slot_sync_finished
         );
-        var tracker_contains = (char path) => {
-            return tracker.local_discovery_paths ().find (path) != tracker.local_discovery_paths ().end ();
-        }
 
         tracker.add_touched_path ("A/spurious");
 
@@ -173,6 +170,11 @@ public class TestLocalDiscovery : GLib.Object {
     }
 
 
+    private bool tracker_contains (char path) {
+        return tracker.local_discovery_paths ().find (path) != tracker.local_discovery_paths ().end ();
+    }
+
+
     /***********************************************************
     ***********************************************************/
     private void test_directory_and_sub_directory () {
@@ -202,8 +204,8 @@ public class TestLocalDiscovery : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
-        fake_folder.sync_engine ().account ().set_capabilities ({ { "files",
-            QVariantMap { { "blocklisted_files", QVariantList { ".foo", "bar" } } } } });
+        fake_folder.sync_engine ().account ().set_capabilities (
+            { { "files", new QVariantMap ( { "blocklisted_files", new QVariantList ( ".foo", "bar" ) } ) } });
         fake_folder.local_modifier ().insert ("C/.foo");
         fake_folder.local_modifier ().insert ("C/bar");
         fake_folder.local_modifier ().insert ("C/moo");
@@ -276,7 +278,7 @@ public class TestLocalDiscovery : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         const string file_with_spaces = " foo";
-        const string file_trimmed "foo";
+        const string file_trimmed = "foo";
 
         fake_folder.local_modifier ().insert (file_trimmed);
         GLib.assert_true (fake_folder.sync_once ());
@@ -295,8 +297,8 @@ public class TestLocalDiscovery : GLib.Object {
     private void test_create_file_with_trailing_spaces_local_trimmed_also_created_dont_rename_and_upload_file () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
-        const string file_with_spaces (" foo");
-        const string file_trimmed ("foo");
+        const string file_with_spaces = " foo";
+        const string file_trimmed = "foo";
 
         fake_folder.local_modifier ().insert (file_trimmed);
         fake_folder.local_modifier ().insert (file_with_spaces);
@@ -307,6 +309,6 @@ public class TestLocalDiscovery : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state ().find (file_with_spaces));
         GLib.assert_true (fake_folder.current_local_state ().find (file_trimmed));
     }
-}
 
-QTEST_GUILESS_MAIN (TestLocalDiscovery)
+}
+}

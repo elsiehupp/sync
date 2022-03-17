@@ -102,7 +102,10 @@ public class TestChunkingNg : GLib.Object {
             GLib.assert_true (fake_folder.upload_state ().children.count () == 1);
             var chunking_identifier = fake_folder.upload_state ().children.first ().name;
             var chunk_map = fake_folder.upload_state ().children.first ().children;
-            int64 uploaded_size = std.accumulate (chunk_map.begin (), chunk_map.end (), 0LL, [] (int64 s, FileInfo f) { return s + f.size; });
+            int64 uploaded_size = 0LL;
+            foreach (FileInfo chunk in chunk_map) {
+                uploaded_size += chunk.size;
+            }
             GLib.assert_true (uploaded_size > 2 * 1000 * 1000); // at least 2 MB
 
             // Add a fake chunk to make sure it gets deleted
@@ -141,7 +144,10 @@ public class TestChunkingNg : GLib.Object {
             GLib.assert_true (fake_folder.upload_state ().children.count () == 1);
             var chunking_identifier = fake_folder.upload_state ().children.first ().name;
             var chunk_map = fake_folder.upload_state ().children.first ().children;
-            int64 uploaded_size = std.accumulate (chunk_map.begin (), chunk_map.end (), 0LL, [] (int64 s, FileInfo f) { return s + f.size; });
+            int64 uploaded_size = 0LL;
+            foreach (FileInfo chunk in chunk_map) {
+                uploaded_size += chunk.size;
+            }
             GLib.assert_true (uploaded_size > 2 * 1000 * 1000); // at least 50 MB
             GLib.assert_true (chunk_map.size () >= 3); // at least three chunks
 
@@ -201,7 +207,10 @@ public class TestChunkingNg : GLib.Object {
             GLib.assert_true (fake_folder.upload_state ().children.count () == 1);
             var chunking_identifier = fake_folder.upload_state ().children.first ().name;
             var chunk_map = fake_folder.upload_state ().children.first ().children;
-            int64 uploaded_size = std.accumulate (chunk_map.begin (), chunk_map.end (), 0LL, [] (int64 s, FileInfo f) { return s + f.size; });
+            int64 uploaded_size = 0LL;
+            foreach (FileInfo chunk in chunk_map) {
+                uploaded_size += chunk.size;
+            }
             GLib.assert_true (uploaded_size > 5 * 1000 * 1000); // at least 5 MB
 
             // Add a chunk that makes the file completely uploaded
@@ -237,7 +246,10 @@ public class TestChunkingNg : GLib.Object {
             GLib.assert_true (fake_folder.upload_state ().children.count () == 1);
             var chunking_identifier = fake_folder.upload_state ().children.first ().name;
             var chunk_map = fake_folder.upload_state ().children.first ().children;
-            int64 uploaded_size = std.accumulate (chunk_map.begin (), chunk_map.end (), 0LL, [] (int64 s, FileInfo f) { return s + f.size; });
+            int64 uploaded_size = 0LL;
+            foreach (FileInfo chunk in chunk_map) {
+                uploaded_size += chunk.size;
+            }
             GLib.assert_true (uploaded_size > 5 * 1000 * 1000); // at least 5 MB
 
             // Add a chunk that makes the file more than completely uploaded
@@ -270,7 +282,7 @@ public class TestChunkingNg : GLib.Object {
         // the final MOVE takes longer than the on_signal_abort-delay
         private void test_late_abort_hard () {
             FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-            fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } }, { "checksums", QVariantMap{ { "supportedTypes", string[] ("SHA1" } } } });
+            fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", new QVariantMap ( { "chunking", "1.0" } ) }, { "checksums", new QVariantMap ( { "supportedTypes", { "SHA1" } } ) } });
             int size = 15 * 1000 * 1000; // 15 MB
             set_chunk_size (fake_folder.sync_engine (), 1 * 1000 * 1000);
 
@@ -345,7 +357,7 @@ public class TestChunkingNg : GLib.Object {
 
         private Soup.Reply override_delegate_abort_hard (Soup.Operation operation, Soup.Request request, QIODevice device) {
             if (request.attribute (Soup.Request.CustomVerbAttribute) == "MOVE") {
-                QTimer.single_shot (50, parent, [&] () { fake_folder.sync_engine ().on_signal_abort (); });
+                QTimer.single_shot (50, parent, () => { fake_folder.sync_engine ().on_signal_abort (); });
                 move_checksum_header = request.raw_header ("OC-Checksum");
                 return new DelayedReply<FakeChunkMoveReply> (response_delay, fake_folder.upload_state (), fake_folder.remote_modifier (), operation, request, parent);
             } else if (operation == Soup.GetOperation) {
@@ -359,7 +371,7 @@ public class TestChunkingNg : GLib.Object {
         // the final MOVE is short enough for the on_signal_abort-delay to help
         private void test_late_abort_recoverable () {
             FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-            fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } }, { "checksums", QVariantMap{ { "supportedTypes", string[] ("SHA1" } } } });
+            fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", new QVariantMap ( { "chunking", "1.0" } ) }, { "checksums", new QVariantMap ( { "supportedTypes", { "SHA1" } } ) } });
             int size = 15 * 1000 * 1000; // 15 MB
             set_chunk_size (fake_folder.sync_engine (), 1 * 1000 * 1000);
 
@@ -382,7 +394,7 @@ public class TestChunkingNg : GLib.Object {
 
         private Soup.Reply override_delegate_abort_recoverable (Soup.Operation operation, Soup.Request request, QIODevice device) {
             if (request.attribute (Soup.Request.CustomVerbAttribute) == "MOVE") {
-                QTimer.single_shot (50, parent, [&] () { fake_folder.sync_engine ().on_signal_abort (); });
+                QTimer.single_shot (50, parent, () => { fake_folder.sync_engine ().on_signal_abort (); });
                 return new DelayedReply<FakeChunkMoveReply> (response_delay, fake_folder.upload_state (), fake_folder.remote_modifier (), operation, request, parent);
             }
             return null;
@@ -452,12 +464,7 @@ public class TestChunkingNg : GLib.Object {
             QMetaObject.Connection con = connect (
                 fake_folder.sync_engine (),
                 SyncEngine.transmission_progress,
-                [&] (ProgressInfo progress) {
-                    if (progress.completed_size () > (progress.total_size () / 2 )) {
-                        fake_folder.remote_modifier ().set_contents ("A/a0", 'C');
-                        GLib.Object.disconnect (con);
-                    }
-                }
+                this.on_signal_sync_engine_transmission_progress_create_conflict_while_syncing
             );
 
             GLib.assert_true (!fake_folder.sync_once ());
@@ -476,12 +483,16 @@ public class TestChunkingNg : GLib.Object {
 
             // There is a conflict file with our version
             var state_a_children = local_state.find ("A").children;
-            var it = std.find_if (state_a_children.cbegin (), state_a_children.cend (), [&] (FileInfo file_info) {
-                return file_info.name.starts_with ("a0 (conflicted copy");
-            });
-            GLib.assert_true (it != state_a_children.cend ());
-            GLib.assert_true (it.content_char == 'B');
-            GLib.assert_true (it.size == size + 1);
+            FileInfo file_info;
+            foreach (FileInfo child in state_a_children) {
+                if (child.name.starts_with ("a0 (conflicted copy")) {
+                    file_info = child;
+                    break;
+                }
+            }
+            GLib.assert_true (file_info != state_a_children.cend ());
+            GLib.assert_true (file_info.content_char == 'B');
+            GLib.assert_true (file_info.size == size + 1);
 
             // Remove the conflict file so the comparison works!
             fake_folder.local_modifier ().remove ("A/" + it.name);
@@ -489,6 +500,14 @@ public class TestChunkingNg : GLib.Object {
             GLib.assert_cassert_truemp (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
             GLib.assert_true (fake_folder.upload_state ().children.count () == 0); // The last sync cleaned the chunks
+        }
+
+
+        private void on_signal_sync_engine_transmission_progress_create_conflict_while_syncing (ProgressInfo progress) {
+            if (progress.completed_size () > (progress.total_size () / 2 )) {
+                fake_folder.remote_modifier ().set_contents ("A/a0", 'C');
+                GLib.Object.disconnect (con);
+            }
         }
 
 
@@ -504,14 +523,11 @@ public class TestChunkingNg : GLib.Object {
             fake_folder.local_modifier ().insert ("A/a0", size);
 
             // middle of the sync, modify the file
-            QMetaObject.Connection con = connect (&fake_folder.sync_engine (), &SyncEngine.transmission_progress,
-                                        [&] (ProgressInfo progress) {
-                    if (progress.completed_size () > (progress.total_size () / 2 )) {
-                        fake_folder.local_modifier ().set_contents ("A/a0", 'B');
-                        fake_folder.local_modifier ().append_byte ("A/a0");
-                        GLib.Object.disconnect (con);
-                    }
-            });
+            QMetaObject.Connection con = connect (
+                fake_folder.sync_engine (),
+                SyncEngine.transmission_progress,
+                this.on_signal_sync_engine_transmission_progress_modify_local_file_while_uploading
+            );
 
             GLib.assert_true (!fake_folder.sync_once ());
 
@@ -530,6 +546,15 @@ public class TestChunkingNg : GLib.Object {
             // A different chunk identifier was used, and the previous one is removed
             GLib.assert_true (fake_folder.upload_state ().children.count () == 1);
             GLib.assert_true (fake_folder.upload_state ().children.first ().name != chunking_identifier);
+        }
+
+
+        private void on_signal_sync_engine_transmission_progress_modify_local_file_while_uploading (ProgressInfo progress) {
+            if (progress.completed_size () > (progress.total_size () / 2 )) {
+                fake_folder.local_modifier ().set_contents ("A/a0", 'B');
+                fake_folder.local_modifier ().append_byte ("A/a0");
+                GLib.Object.disconnect (con);
+            }
         }
 
 
@@ -571,14 +596,14 @@ public class TestChunkingNg : GLib.Object {
         private void connection_dropped_before_etag_recieved () {
             QFETCH (bool, chunking);
             FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-            fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", QVariantMap{ { "chunking", "1.0" } } }, { "checksums", QVariantMap{ { "supportedTypes", string[] ("SHA1" } } } });
+            fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", new QVariantMap ( { "chunking", "1.0" } ) }, { "checksums", new QVariantMap ( { "supportedTypes", { "SHA1" } } ) } });
             int size = chunking ? 1 * 1000 * 1000 : 300;
             set_chunk_size (fake_folder.sync_engine (), 300 * 1000);
 
             // Make the MOVE never reply, but trigger a client-on_signal_abort and apply the change remotely
             string checksum_header;
             int n_get = 0;
-            QScopedValueRollback<int> set_http_timeout (AbstractNetworkJob.http_timeout, 1);
+            QScopedValueRollback<int> set_http_timeout = new QScopedValueRollback<int> (AbstractNetworkJob.http_timeout, 1);
             int response_delay = AbstractNetworkJob.http_timeout * 1000 * 1000; // much bigger than http timeout (so a timeout will occur)
             // This will perform the operation on the server, but the reply will not come to the client
             fake_folder.set_server_override (this.override_delegate_connection_dropped);

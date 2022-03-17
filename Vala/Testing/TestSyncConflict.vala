@@ -11,50 +11,6 @@ using Occ;
 
 namespace Testing {
 
-bool item_successful (ItemCompletedSpy spy, string path, SyncInstructions instr) {
-    var item = spy.find_item (path);
-    return item.status == SyncFileItem.Status.SUCCESS && item.instruction == instr;
-}
-
-bool item_conflict (ItemCompletedSpy spy, string path) {
-    var item = spy.find_item (path);
-    return item.status == SyncFileItem.Status.CONFLICT && item.instruction == SyncInstructions.CONFLICT;
-}
-
-bool item_successful_ move (ItemCompletedSpy spy, string path) {
-    return item_successful (spy, path, SyncInstructions.RENAME);
-}
-
-string[] find_conflicts (FileInfo directory) {
-    string[] conflicts;
-    for (var item : directory.children) {
-        if (item.name.contains (" (conflicted copy")) {
-            conflicts.append (item.path ());
-        }
-    }
-    return conflicts;
-}
-
-bool expect_and_wipe_conflict (FileModifier local, FileInfo state, string path) {
-    PathComponents path_components (path);
-    var base = state.find (path_components.parent_directory_components ());
-    if (!base)
-        return false;
-    for (var item : base.children) {
-        if (item.name.starts_with (path_components.filename ()) && item.name.contains (" (conflicted copy")) {
-            local.remove (item.path ());
-            return true;
-        }
-    }
-    return false;
-}
-
-SyncJournalFileRecord database_record (FakeFolder folder, string path) {
-    SyncJournalFileRecord record;
-    folder.sync_journal ().get_file_record (path, record);
-    return record;
-}
-
 public class TestSyncConflict : GLib.Object {
 
     /***********************************************************
@@ -126,10 +82,8 @@ public class TestSyncConflict : GLib.Object {
                 var components = request.url ().to_string ().split ('/');
                 string conflict_file = components.mid (components.size () - 2).join ('/');
                 conflict_map[base_file_id] = conflict_file;
-                [&] {
-                    GLib.assert_true (!base_file_id == "");
-                    GLib.assert_true (request.raw_header ("OC-ConflictInitialBasePath") == Utility.conflict_file_base_name_from_pattern (conflict_file));
-                } ();
+                GLib.assert_true (!base_file_id == "");
+                GLib.assert_true (request.raw_header ("OC-ConflictInitialBasePath") == Utility.conflict_file_base_name_from_pattern (conflict_file));
             }
         }
         return null;
@@ -201,10 +155,8 @@ public class TestSyncConflict : GLib.Object {
                 var components = request.url ().to_string ().split ('/');
                 string conflict_file = components.mid (components.size () - 2).join ('/');
                 conflict_map[base_file_id] = conflict_file;
-                [&] {
-                    GLib.assert_true (!base_file_id == "");
-                    GLib.assert_true (request.raw_header ("OC-ConflictInitialBasePath") == Utility.conflict_file_base_name_from_pattern (conflict_file));
-                } ();
+                GLib.assert_true (!base_file_id == "");
+                GLib.assert_true (request.raw_header ("OC-ConflictInitialBasePath") == Utility.conflict_file_base_name_from_pattern (conflict_file));
             }
         }
         return null;
@@ -310,11 +262,13 @@ public class TestSyncConflict : GLib.Object {
         var conflicts = find_conflicts (fake_folder.current_local_state ().children["A"]);
         string a1conflict;
         string a2conflict;
-        for (var & conflict : conflicts) {
-            if (conflict.contains ("a1"))
+        foreach (var conflict in conflicts) {
+            if (conflict.contains ("a1")) {
                 a1conflict = conflict;
-            if (conflict.contains ("a2"))
+            }
+            if (conflict.contains ("a2")) {
                 a2conflict = conflict;
+            }
         }
 
         // A nothing-to-sync keeps them alive
@@ -421,10 +375,7 @@ public class TestSyncConflict : GLib.Object {
         fake_folder.sync_engine ().account ().set_capabilities ({ { "upload_conflict_files", true } });
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
 
-        var on_signal_cleanup = [&] () {
-            complete_spy.clear ();
-        }
-        on_signal_cleanup ();
+        clean_up ();
 
         // 1) a NEW/NEW conflict
         fake_folder.local_modifier ().mkdir ("Z");
@@ -481,7 +432,7 @@ public class TestSyncConflict : GLib.Object {
         // The contents of the conflict directories will only be uploaded after
         // another sync.
         GLib.assert_true (fake_folder.sync_engine ().is_another_sync_needed () == ImmediateFollowUp);
-        on_signal_cleanup ();
+        clean_up ();
         GLib.assert_true (fake_folder.sync_once ());
 
         GLib.assert_true (item_successful (complete_spy, conflicts[0], SyncInstructions.NEW));
@@ -491,6 +442,11 @@ public class TestSyncConflict : GLib.Object {
         GLib.assert_true (item_successful (complete_spy, conflicts[2], SyncInstructions.NEW));
         GLib.assert_true (item_successful (complete_spy, conflicts[2] + "/foo", SyncInstructions.NEW));
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+    }
+
+
+    private static void clean_up (ItemCompletedSpy complete_spy) {
+        complete_spy.clear ();
     }
 
 
@@ -575,8 +531,9 @@ public class TestSyncConflict : GLib.Object {
         GLib.assert_true (conflicts.size () == 2);
         GLib.assert_true (conflicts[0].contains ("A (conflicted copy"));
         GLib.assert_true (conflicts[1].contains ("B (conflicted copy"));
-        for (var& conflict : conflicts)
+        foreach (var conflict in conflicts) {
             QDir (fake_folder.local_path () + conflict).remove_recursively ();
+        }
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // Currently a1 and b1 don't get moved, but redownloaded
@@ -615,8 +572,9 @@ public class TestSyncConflict : GLib.Object {
         var conflicts = find_conflicts (fake_folder.current_local_state ());
         GLib.assert_true (conflicts.size () == 1);
         GLib.assert_true (conflicts[0].contains ("A (conflicted copy"));
-        for (var& conflict : conflicts)
+        foreach (var conflict in conflicts) {
             QDir (fake_folder.local_path () + conflict).remove_recursively ();
+        }
 
         GLib.assert_true (fake_folder.sync_engine ().is_another_sync_needed () == ImmediateFollowUp);
         GLib.assert_true (fake_folder.sync_once ());
@@ -649,6 +607,57 @@ public class TestSyncConflict : GLib.Object {
         GLib.assert_true (!database_record (fake_folder, "A/a1").is_valid ());
         GLib.assert_true (!database_record (fake_folder, "A").is_valid ());
     }
-}
 
-QTEST_GUILESS_MAIN (TestSyncConflict)
+
+    private static bool item_successful (ItemCompletedSpy spy, string path, SyncInstructions instr) {
+        var item = spy.find_item (path);
+        return item.status == SyncFileItem.Status.SUCCESS && item.instruction == instr;
+    }
+
+
+    private static bool item_conflict (ItemCompletedSpy spy, string path) {
+        var item = spy.find_item (path);
+        return item.status == SyncFileItem.Status.CONFLICT && item.instruction == SyncInstructions.CONFLICT;
+    }
+
+
+    private static bool item_successful_move (ItemCompletedSpy spy, string path) {
+        return item_successful (spy, path, SyncInstructions.RENAME);
+    }
+
+
+    private static string[] find_conflicts (FileInfo directory) {
+        string[] conflicts;
+        foreach (var item in directory.children) {
+            if (item.name.contains (" (conflicted copy")) {
+                conflicts.append (item.path ());
+            }
+        }
+        return conflicts;
+    }
+
+
+    private static bool expect_and_wipe_conflict (FileModifier local, FileInfo state, string path) {
+        PathComponents path_components = new PathComponents (path);
+        var base_path = state.find (path_components.parent_directory_components ());
+        if (!base_path) {
+            return false;
+        }
+        foreach (var item in base_path.children) {
+            if (item.name.starts_with (path_components.filename ()) && item.name.contains (" (conflicted copy")) {
+                local.remove (item.path ());
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    private static SyncJournalFileRecord database_record (FakeFolder folder, string path) {
+        SyncJournalFileRecord record;
+        folder.sync_journal ().get_file_record (path, record);
+        return record;
+    }
+
+}
+}

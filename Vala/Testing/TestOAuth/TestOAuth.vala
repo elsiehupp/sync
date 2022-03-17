@@ -54,18 +54,18 @@ public class TestOAuth : GLib.Object {
 
     class TestRandomConnections : OAuthTestCase {
         override Soup.Reply create_browser_reply (Soup.Request request) {
-            QTimer.single_shot (0, this, [this, request] {
+            QTimer.single_shot (0, this, () => {
                 var port = request.url ().port ();
                 state = CustomState;
-                GLib.Vector<string> payloads = {
+                GLib.List<string> payloads = {
                     "GET FOFOFO HTTP 1/1\n\n",
                     "GET /?code=invalie HTTP 1/1\n\n",
                     "GET /?code=xxxxx&bar=fff",
-                    string ("\0\0\0", 3),
-                    string ("GET \0\0\0 \n\n\n\n\n\0", 14),
-                    string ("GET /?code=éléphant\xa5 HTTP\n"),
-                    string ("\n\n\n\n"),
-                }
+                    "\0\0\0", // 3 bits!
+                    "GET \0\0\0 \n\n\n\n\n\0", // 14 bits!
+                    "GET /?code=éléphant\xa5 HTTP\n",
+                    "\n\n\n\n",
+                };
                 foreach (var x in payloads) {
                     var socket = new QTcpSocket (this);
                     socket.connect_to_host ("localhost", port);
@@ -77,7 +77,7 @@ public class TestOAuth : GLib.Object {
                 QTimer.single_shot (
                     100,
                     this,
-                    [this, request] () => {
+                    () => {
                         GLib.assert_true (state == CustomState);
                         state = BrowserOpened;
                         this.OAuthTestCase.create_browser_reply (request);

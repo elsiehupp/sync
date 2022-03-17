@@ -10,7 +10,7 @@ public class FakePutMultiFileReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Vector<FileInfo> all_file_info;
+    private GLib.List<FileInfo> all_file_info;
 
     /***********************************************************
     ***********************************************************/
@@ -31,9 +31,9 @@ public class FakePutMultiFileReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public static GLib.Vector<FileInfo> perform_multi_part (FileInfo remote_root_file_info, Soup.Request request, string put_payload, string content_type);
-    GLib.Vector<FileInfo> FakePutMultiFileReply.perform_multi_part (FileInfo remote_root_file_info, Soup.Request request, string put_payload, string content_type) {
-        GLib.Vector<FileInfo> result;
+    public static GLib.List<FileInfo> perform_multi_part (FileInfo remote_root_file_info, Soup.Request request, string put_payload, string content_type);
+    GLib.List<FileInfo> FakePutMultiFileReply.perform_multi_part (FileInfo remote_root_file_info, Soup.Request request, string put_payload, string content_type) {
+        GLib.List<FileInfo> result;
 
         var string_put_payload = put_payload;
         const int boundary_position = "multipart/related; boundary=".size ();

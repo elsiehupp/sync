@@ -13,7 +13,7 @@ namespace Testing {
 
 public class TestExcludedFiles : GLib.Object {
 
-    const string EXCLUDE_LIST_FILE SOURCEDIR = "/../../sync-exclude.lst"
+    const string EXCLUDE_LIST_FILE = SOURCEDIR + "/../../sync-exclude.lst";
     
     // The tests were converted from the old CMocka framework, that's why there is a global
     static ExcludedFiles excluded_files;
@@ -358,7 +358,7 @@ public class TestExcludedFiles : GLib.Object {
         /* Check ending of pattern */
         GLib.assert_true (check_file_traversal ("/exclude") == CSync.ExcludedFiles.Type.LIST);
         GLib.assert_true (check_file_traversal ("/exclude_x") == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
-        GLib.assert_true (check_file_traversal ("exclude") ==assert_true CSync.ExcludedFiles.Type.NOT_EXCLUDED);
+        GLib.assert_true (check_file_traversal ("exclude") == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
 
         excluded_files.add_manual_exclude ("exclude");
         excluded_files.reload_exclude_files ();
@@ -385,7 +385,7 @@ public class TestExcludedFiles : GLib.Object {
         excluded_files.add_manual_exclude ("c \\[d]");
         excluded_files.reload_exclude_files ();
         GLib.assert_true (check_file_traversal ("a \\*") == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
-        GLib.assert_true (check_file_traversal ("a bc"), == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
+        GLib.assert_true (check_file_traversal ("a bc") == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
         GLib.assert_true (check_file_traversal ("a *") == CSync.ExcludedFiles.Type.LIST);
         GLib.assert_true (check_file_traversal ("b \\?") == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
         GLib.assert_true (check_file_traversal ("b f") == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
@@ -500,60 +500,61 @@ public class TestExcludedFiles : GLib.Object {
     private void check_csync_regex_translation () {
         up ();
         string storage;
-        var translate = [&storage] (char pattern) {
-            storage = ExcludedFiles.convert_to_regexp_syntax (pattern, false);
-            return storage.const_data ();
-        }
 
-        GLib.assert_true (translate ("") == "");
-        GLib.assert_true (translate ("abc") == "abc");
-        GLib.assert_true (translate ("a*c") == "a[^/]*c");
-        GLib.assert_true (translate ("a?c") == "a[^/]c");
-        GLib.assert_true (translate ("a[xyz]c") == "a[xyz]c");
-        GLib.assert_true (translate ("a[xyzc") == "a\\[xyzc");
-        GLib.assert_true (translate ("a[!xyz]c") == "a[^xyz]c");
-        GLib.assert_true (translate ("a\\*b\\?c\\[d\\\\e") == "a\\*b\\?c\\[d\\\\e");
-        GLib.assert_true (translate ("a.c") == "a\\.c");
-        GLib.assert_true (translate ("?𠜎?") == "[^/]\\𠜎[^/]"); // 𠜎 is 4-byte utf8
+        GLib.assert_true (translate_to_regexp_syntax ("") == "");
+        GLib.assert_true (translate_to_regexp_syntax ("abc") == "abc");
+        GLib.assert_true (translate_to_regexp_syntax ("a*c") == "a[^/]*c");
+        GLib.assert_true (translate_to_regexp_syntax ("a?c") == "a[^/]c");
+        GLib.assert_true (translate_to_regexp_syntax ("a[xyz]c") == "a[xyz]c");
+        GLib.assert_true (translate_to_regexp_syntax ("a[xyzc") == "a\\[xyzc");
+        GLib.assert_true (translate_to_regexp_syntax ("a[!xyz]c") == "a[^xyz]c");
+        GLib.assert_true (translate_to_regexp_syntax ("a\\*b\\?c\\[d\\\\e") == "a\\*b\\?c\\[d\\\\e");
+        GLib.assert_true (translate_to_regexp_syntax ("a.c") == "a\\.c");
+        GLib.assert_true (translate_to_regexp_syntax ("?𠜎?") == "[^/]\\𠜎[^/]"); // 𠜎 is 4-byte utf8
     }
+
+
+    private string translate_to_regexp_syntax (string pattern) {
+        string storage = ExcludedFiles.convert_to_regexp_syntax (pattern, false);
+        return storage.const_data ();
+    }
+
 
     private void check_csync_bname_trigger () {
         up ();
         bool wildcards_match_slash = false;
         string storage;
-        var translate = [&storage, wildcards_match_slash] (char pattern) => {
-            storage = ExcludedFiles.extract_bname_trigger (pattern, wildcards_match_slash);
-            return storage.const_data ();
-        }
 
-        GLib.assert_true (translate ("") == "");
-        GLib.assert_true (translate ("a/b/") == "");
-        GLib.assert_true (translate ("a/b/c") == "c");
-        GLib.assert_true (translate ("c") == "c");
-        GLib.assert_true (translate ("a/foo*") == "foo*");
-        GLib.assert_true (translate ("a/abc*foo*") == "abc*foo*");
+        GLib.assert_true (translate_to_bname_trigger (wildcards_match_slash, "") == "");
+        GLib.assert_true (translate_to_bname_trigger (wildcards_match_slash, "a/b/") == "");
+        GLib.assert_true (translate_to_bname_trigger (wildcards_match_slash, "a/b/c") == "c");
+        GLib.assert_true (translate_to_bname_trigger (wildcards_match_slash, "c") == "c");
+        GLib.assert_true (translate_to_bname_trigger (wildcards_match_slash, "a/foo*") == "foo*");
+        GLib.assert_true (translate_to_bname_trigger (wildcards_match_slash, "a/abc*foo*") == "abc*foo*");
 
         wildcards_match_slash = true;
 
-        GLib.assert_true (translate ("") == "");
-        GLib.assert_true (translate ("a/b/") == "");
-        GLib.assert_true (translate ("a/b/c") == "c");
-        GLib.assert_true (translate ("c") == "c");
-        GLib.assert_true (translate ("*") == "*");
-        GLib.assert_true (translate ("a/foo*") == "foo*");
-        GLib.assert_true (translate ("a/abc?foo*") == "*foo*");
-        GLib.assert_true (translate ("a/abc*foo*") == "*foo*");
-        GLib.assert_true (translate ("a/abc?foo?") == "*foo?");
-        GLib.assert_true (translate ("a/abc*foo?*") == "*foo?*");
-        GLib.assert_true (translate ("a/abc*/foo*") == "foo*");
+        GLib.assert_true (translate_to_bname_trigger (wildcards_match_slash, "") == "");
+        GLib.assert_true (translate_to_bname_trigger (wildcards_match_slash, "a/b/") == "");
+        GLib.assert_true (translate_to_bname_trigger (wildcards_match_slash, "a/b/c") == "c");
+        GLib.assert_true (translate_to_bname_trigger (wildcards_match_slash, "c") == "c");
+        GLib.assert_true (translate_to_bname_trigger (wildcards_match_slash, "*") == "*");
+        GLib.assert_true (translate_to_bname_trigger (wildcards_match_slash, "a/foo*") == "foo*");
+        GLib.assert_true (translate_to_bname_trigger (wildcards_match_slash, "a/abc?foo*") == "*foo*");
+        GLib.assert_true (translate_to_bname_trigger (wildcards_match_slash, "a/abc*foo*") == "*foo*");
+        GLib.assert_true (translate_to_bname_trigger (wildcards_match_slash, "a/abc?foo?") == "*foo?");
+        GLib.assert_true (translate_to_bname_trigger (wildcards_match_slash, "a/abc*foo?*") == "*foo?*");
+        GLib.assert_true (translate_to_bname_trigger (wildcards_match_slash, "a/abc*/foo*") == "foo*");
     }
 
+
+    private string translate_to_bname_trigger (bool wildcards_match_slash, string pattern) {
+        var storage = ExcludedFiles.extract_bname_trigger (pattern, wildcards_match_slash);
+        return storage.const_data ();
+    }
+
+
     private void check_csync_is_windows_reserved_word () {
-        var csync_is_windows_reserved_word = [] (char fn) {
-            string s = fn;
-            extern bool csync_is_windows_reserved_word (QStringRef filename);
-            return csync_is_windows_reserved_word (&s);
-        }
 
         GLib.assert_true (csync_is_windows_reserved_word ("CON"));
         GLib.assert_true (csync_is_windows_reserved_word ("con"));
@@ -588,20 +589,28 @@ public class TestExcludedFiles : GLib.Object {
         GLib.assert_true (csync_is_windows_reserved_word ("m:"));
     }
 
+
+    private bool csync_is_windows_reserved_word (string fn) {
+        string s = fn;
+        //  extern bool csync_is_windows_reserved_word (QStringRef filename);
+        return csync_is_windows_reserved_word (s);
+    }
+
+
     /* QT_ENABLE_REGEXP_JIT=0 to get slower results :-) */
     private void check_csync_excluded_performance1 () {
         setup_init ();
         const int N = 1000;
         int total_rc = 0;
 
-        QBENCHMARK {
+        //  QBENCHMARK {
 
             for (int i = 0; i < N; ++i) {
                 total_rc += check_dir_full ("/this/is/quite/a/long/path/with/many/components");
                 total_rc += check_file_full ("/1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/29");
             }
             GLib.assert_true (total_rc == 0); // mainly to avoid optimization
-        }
+        //  }
     }
 
 
@@ -611,22 +620,22 @@ public class TestExcludedFiles : GLib.Object {
         const int N = 1000;
         int total_rc = 0;
 
-        QBENCHMARK {
+        //  QBENCHMARK {
             for (int i = 0; i < N; ++i) {
                 total_rc += check_dir_traversal ("/this/is/quite/a/long/path/with/many/components");
                 total_rc += check_file_traversal ("/1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/29");
             }
             GLib.assert_true (total_rc == 0); // mainly to avoid optimization
-        }
+        //  }
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void check_csync_exclude_expand_escapes () {
-        extern void csync_exclude_expand_escapes (string input);
+        //  extern void csync_exclude_expand_escapes (string input);
 
-        string line = R" (keep \' \" \? \\ \a \b \f \n \r \t \v \z \#)";
+        string line = " (keep \' \" ? \\ a \b \f \n \r \t \v z #)";
         csync_exclude_expand_escapes (line);
         GLib.assert_true (0 == strcmp (line.const_data (), "keep ' \" ? \\\\ \a \b \f \n \r \t \v \\z #"));
 
@@ -646,9 +655,23 @@ public class TestExcludedFiles : GLib.Object {
         ExcludedFiles excludes;
         excludes.set_client_version (ExcludedFiles.Version (2, 5, 0));
 
-        GLib.Vector<std.pair<const char *, bool>> tests = { { "#!version == 2.5.0", true }, { "#!version == 2.6.0", false }, { "#!version < 2.6.0", true }, { "#!version <= 2.6.0", true }, { "#!version > 2.6.0", false }, { "#!version >= 2.6.0", false }, { "#!version < 2.4.0", false }, { "#!version <= 2.4.0", false }, { "#!version > 2.4.0", true }, { "#!version >= 2.4.0", true }, { "#!version < 2.5.0", false }, { "#!version <= 2.5.0", true }, { "#!version > 2.5.0", false }, { "#!version >= 2.5.0", true },
-        }
-        for (var test : tests) {
+        GLib.List<Pair<string, bool>> tests = new GLib.List<Pair<string, bool>> (
+            { "#!version == 2.5.0", true },
+            { "#!version == 2.6.0", false },
+            { "#!version < 2.6.0", true },
+            { "#!version <= 2.6.0", true },
+            { "#!version > 2.6.0", false },
+            { "#!version >= 2.6.0", false },
+            { "#!version < 2.4.0", false },
+            { "#!version <= 2.4.0", false },
+            { "#!version > 2.4.0", true },
+            { "#!version >= 2.4.0", true },
+            { "#!version < 2.5.0", false },
+            { "#!version <= 2.5.0", true },
+            { "#!version > 2.5.0", false },
+            { "#!version >= 2.5.0", true }
+        );
+        foreach (var test in tests) {
             GLib.assert_true (excludes.version_directive_keep_next_line (test.first) == test.second);
         }
     }

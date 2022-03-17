@@ -43,51 +43,56 @@ public class TestUnifiedSearchListmodel : GLib.Object {
 
         account_state.on_signal_reset (new Occ.AccountState (account));
 
-        fake_qnam.set_override ([this] (Soup.Operation operation, Soup.Request request, QIODevice device) {
-            Q_UNUSED (device);
-            Soup.Reply reply = null;
-
-            var url_query = QUrlQuery (request.url ());
-            var format = url_query.query_item_value ("format");
-            var cursor = url_query.query_item_value ("cursor").to_int ();
-            var search_term = url_query.query_item_value ("term");
-            var path = request.url ().path ();
-
-            if (!request.url ().to_string ().starts_with (account_state.account ().url ().to_string ())) {
-                reply = new FakeErrorReply (operation, request, this, 404, fake_404_response);
-            }
-            if (format != "json") {
-                reply = new FakeErrorReply (operation, request, this, 400, fake400Response);
-            }
-
-            // handle fetch of providers list
-            if (path.starts_with ("/ocs/v2.php/search/providers") && search_term == "") {
-                reply = new FakePayloadReply (operation, request,
-                    FakeSearchResultsStorage.instance ().fake_providers_response_json (), fake_qnam.data ());
-            // handle search for provider
-            } else if (path.starts_with ("/ocs/v2.php/search/providers") && !search_term == "") {
-                var path_split = path.mid ("/ocs/v2.php/search/providers".size ())
-                                           .split ('/', Qt.SkipEmptyParts);
-
-                if (!path_split == "" && path.contains (path_split.first ())) {
-                    reply = new FakePayloadReply (operation, request,
-                        FakeSearchResultsStorage.instance ().query_provider (path_split.first (), search_term, cursor),
-                        SEARCH_RESULTS_REPLY_DELAY, fake_qnam.data ());
-                }
-            }
-
-            if (!reply) {
-                return (Soup.Reply)new FakeErrorReply (operation, request, this, 404, "{error : \"Not found!\"}");
-            }
-
-            return reply;
-        });
+        fake_qnam.set_override (
+            this.init_test_case_override_delegate
+        );
 
         model.on_signal_reset (new Occ.UnifiedSearchResultsListModel (account_state.data ()));
 
         model_tester.on_signal_reset (new QAbstractItemModelTester (model.data ()));
 
-        fake_desktop_services_url_handler.on_signal_reset (new FakeDesktopServicesUrlHandler);
+        fake_desktop_services_url_handler.on_signal_reset (new FakeDesktopServicesUrlHandler ());
+    }
+
+
+    private Soup.Reply init_test_case_override_delegate (Soup.Operation operation, Soup.Request request, QIODevice device) {
+
+        Soup.Reply reply = null;
+
+        var url_query = QUrlQuery (request.url ());
+        var format = url_query.query_item_value ("format");
+        var cursor = url_query.query_item_value ("cursor").to_int ();
+        var search_term = url_query.query_item_value ("term");
+        var path = request.url ().path ();
+
+        if (!request.url ().to_string ().starts_with (account_state.account ().url ().to_string ())) {
+            reply = new FakeErrorReply (operation, request, this, 404, FAKE_404_RESPONSE);
+        }
+        if (format != "json") {
+            reply = new FakeErrorReply (operation, request, this, 400, FAKE_400_RESPONSE);
+        }
+
+        // handle fetch of providers list
+        if (path.starts_with ("/ocs/v2.php/search/providers") && search_term == "") {
+            reply = new FakePayloadReply (operation, request,
+                FakeSearchResultsStorage.instance ().fake_providers_response_json (), fake_qnam.data ());
+        // handle search for provider
+        } else if (path.starts_with ("/ocs/v2.php/search/providers") && !search_term == "") {
+            var path_split = path.mid ("/ocs/v2.php/search/providers".size ())
+                                       .split ('/', Qt.SkipEmptyParts);
+
+            if (!path_split == "" && path.contains (path_split.first ())) {
+                reply = new FakePayloadReply (operation, request,
+                    FakeSearchResultsStorage.instance ().query_provider (path_split.first (), search_term, cursor),
+                    SEARCH_RESULTS_REPLY_DELAY, fake_qnam.data ());
+            }
+        }
+
+        if (!reply) {
+            return (Soup.Reply)new FakeErrorReply (operation, request, this, 404, "{error : \"Not found!\"}");
+        }
+
+        return reply;
     }
 
 

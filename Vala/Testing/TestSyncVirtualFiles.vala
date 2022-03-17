@@ -982,9 +982,7 @@ public class TestSyncVirtualFiles : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
 
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
-        var TestSyncVirtualFiles.clean_up_test_suffix_files_while_local_hydrated = [&] () {
-            complete_spy.clear ();
-        }
+
         TestSyncVirtualFiles.clean_up_test_suffix_files_while_local_hydrated ();
 
         // suffixed files are happily synced with Vfs.Off
@@ -996,13 +994,13 @@ public class TestSyncVirtualFiles : GLib.Object {
         fake_folder.remote_modifier ().insert ("A/file2" + DVSUFFIX, 50, 'A');
         fake_folder.remote_modifier ().insert ("A/file3", 60, 'A');
         fake_folder.remote_modifier ().insert ("A/file3" + DVSUFFIX, 70, 'A');
-        fake_folder.remote_modifier ().insert ("A/file3" + DVSUFFIX DVSUFFIX, 80, 'A');
+        fake_folder.remote_modifier ().insert ("A/file3" + DVSUFFIX + DVSUFFIX, 80, 'A');
         fake_folder.remote_modifier ().insert ("A/remote1" + DVSUFFIX, 30, 'A');
         fake_folder.remote_modifier ().insert ("A/remote2", 40, 'A');
         fake_folder.remote_modifier ().insert ("A/remote2" + DVSUFFIX, 50, 'A');
         fake_folder.remote_modifier ().insert ("A/remote3", 60, 'A');
         fake_folder.remote_modifier ().insert ("A/remote3" + DVSUFFIX, 70, 'A');
-        fake_folder.remote_modifier ().insert ("A/remote3" + DVSUFFIX DVSUFFIX, 80, 'A');
+        fake_folder.remote_modifier ().insert ("A/remote3" + DVSUFFIX + DVSUFFIX, 80, 'A');
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         TestSyncVirtualFiles.clean_up_test_suffix_files_while_local_hydrated ();
@@ -1015,7 +1013,7 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (item_instruction (complete_spy, "A/file1" + DVSUFFIX, SyncInstructions.IGNORE));
         GLib.assert_true (item_instruction (complete_spy, "A/file2" + DVSUFFIX, SyncInstructions.IGNORE));
         GLib.assert_true (item_instruction (complete_spy, "A/file3" + DVSUFFIX, SyncInstructions.IGNORE));
-        GLib.assert_true (item_instruction (complete_spy, "A/file3" + DVSUFFIX DVSUFFIX, SyncInstructions.IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/file3" + DVSUFFIX + DVSUFFIX, SyncInstructions.IGNORE));
         TestSyncVirtualFiles.clean_up_test_suffix_files_while_local_hydrated ();
 
         // Add a real file where the suffixed file exists
@@ -1033,36 +1031,36 @@ public class TestSyncVirtualFiles : GLib.Object {
         fake_folder.local_modifier ().set_contents ("A/file1" + DVSUFFIX, 'B');
         fake_folder.local_modifier ().set_contents ("A/file2" + DVSUFFIX, 'B');
         fake_folder.local_modifier ().set_contents ("A/file3" + DVSUFFIX, 'B');
-        fake_folder.local_modifier ().set_contents ("A/file3" + DVSUFFIX DVSUFFIX, 'B');
+        fake_folder.local_modifier ().set_contents ("A/file3" + DVSUFFIX + DVSUFFIX, 'B');
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (item_instruction (complete_spy, "A/file1" + DVSUFFIX, SyncInstructions.IGNORE));
         GLib.assert_true (item_instruction (complete_spy, "A/file2" + DVSUFFIX, SyncInstructions.IGNORE));
         GLib.assert_true (item_instruction (complete_spy, "A/file3" + DVSUFFIX, SyncInstructions.IGNORE));
-        GLib.assert_true (item_instruction (complete_spy, "A/file3" + DVSUFFIX DVSUFFIX, SyncInstructions.IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/file3" + DVSUFFIX + DVSUFFIX, SyncInstructions.IGNORE));
         TestSyncVirtualFiles.clean_up_test_suffix_files_while_local_hydrated ();
 
         // Remote changes don't do anything either
         fake_folder.remote_modifier ().set_contents ("A/file1" + DVSUFFIX, 'C');
         fake_folder.remote_modifier ().set_contents ("A/file2" + DVSUFFIX, 'C');
         fake_folder.remote_modifier ().set_contents ("A/file3" + DVSUFFIX, 'C');
-        fake_folder.remote_modifier ().set_contents ("A/file3" + DVSUFFIX DVSUFFIX, 'C');
+        fake_folder.remote_modifier ().set_contents ("A/file3" + DVSUFFIX + DVSUFFIX, 'C');
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (item_instruction (complete_spy, "A/file1" + DVSUFFIX, SyncInstructions.IGNORE));
         GLib.assert_true (item_instruction (complete_spy, "A/file2" + DVSUFFIX, SyncInstructions.IGNORE));
         GLib.assert_true (item_instruction (complete_spy, "A/file3" + DVSUFFIX, SyncInstructions.IGNORE));
-        GLib.assert_true (item_instruction (complete_spy, "A/file3" + DVSUFFIX DVSUFFIX, SyncInstructions.IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/file3" + DVSUFFIX + DVSUFFIX, SyncInstructions.IGNORE));
         TestSyncVirtualFiles.clean_up_test_suffix_files_while_local_hydrated ();
 
         // Local removal : when not querying server
         fake_folder.local_modifier ().remove ("A/file1" + DVSUFFIX);
         fake_folder.local_modifier ().remove ("A/file2" + DVSUFFIX);
         fake_folder.local_modifier ().remove ("A/file3" + DVSUFFIX);
-        fake_folder.local_modifier ().remove ("A/file3" + DVSUFFIX DVSUFFIX);
+        fake_folder.local_modifier ().remove ("A/file3" + DVSUFFIX + DVSUFFIX);
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (complete_spy.find_item ("A/file1" + DVSUFFIX) == "");
         GLib.assert_true (complete_spy.find_item ("A/file2" + DVSUFFIX) == "");
         GLib.assert_true (complete_spy.find_item ("A/file3" + DVSUFFIX) == "");
-        GLib.assert_true (complete_spy.find_item ("A/file3" + DVSUFFIX DVSUFFIX) == "");
+        GLib.assert_true (complete_spy.find_item ("A/file3" + DVSUFFIX + DVSUFFIX) == "");
         TestSyncVirtualFiles.clean_up_test_suffix_files_while_local_hydrated ();
 
         // Local removal : when querying server
@@ -1071,19 +1069,19 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (item_instruction (complete_spy, "A/file1" + DVSUFFIX, SyncInstructions.IGNORE));
         GLib.assert_true (item_instruction (complete_spy, "A/file2" + DVSUFFIX, SyncInstructions.IGNORE));
         GLib.assert_true (item_instruction (complete_spy, "A/file3" + DVSUFFIX, SyncInstructions.IGNORE));
-        GLib.assert_true (item_instruction (complete_spy, "A/file3" + DVSUFFIX DVSUFFIX, SyncInstructions.IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/file3" + DVSUFFIX + DVSUFFIX, SyncInstructions.IGNORE));
         TestSyncVirtualFiles.clean_up_test_suffix_files_while_local_hydrated ();
 
         // Remote removal
         fake_folder.remote_modifier ().remove ("A/remote1" + DVSUFFIX);
         fake_folder.remote_modifier ().remove ("A/remote2" + DVSUFFIX);
         fake_folder.remote_modifier ().remove ("A/remote3" + DVSUFFIX);
-        fake_folder.remote_modifier ().remove ("A/remote3" + DVSUFFIX DVSUFFIX);
+        fake_folder.remote_modifier ().remove ("A/remote3" + DVSUFFIX + DVSUFFIX);
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (item_instruction (complete_spy, "A/remote1" + DVSUFFIX, SyncInstructions.IGNORE));
         GLib.assert_true (item_instruction (complete_spy, "A/remote2" + DVSUFFIX, SyncInstructions.IGNORE));
         GLib.assert_true (item_instruction (complete_spy, "A/remote3" + DVSUFFIX, SyncInstructions.IGNORE));
-        GLib.assert_true (item_instruction (complete_spy, "A/remote3" + DVSUFFIX DVSUFFIX, SyncInstructions.IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/remote3" + DVSUFFIX + DVSUFFIX, SyncInstructions.IGNORE));
         TestSyncVirtualFiles.clean_up_test_suffix_files_while_local_hydrated ();
 
         // New files with a suffix aren't propagated downwards in the first place
@@ -1093,9 +1091,15 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/new1" + DVSUFFIX));
         GLib.assert_true (!fake_folder.current_local_state ().find ("A/new1"));
         GLib.assert_true (!fake_folder.current_local_state ().find ("A/new1" + DVSUFFIX));
-        GLib.assert_true (!fake_folder.current_local_state ().find ("A/new1" + DVSUFFIX DVSUFFIX));
+        GLib.assert_true (!fake_folder.current_local_state ().find ("A/new1" + DVSUFFIX + DVSUFFIX));
         TestSyncVirtualFiles.clean_up_test_suffix_files_while_local_hydrated ();
     }
+
+
+    private static void clean_up_test_suffix_files_while_local_hydrated (ItemCompletedSpy complete_spy) {
+        complete_spy.clear ();
+    }
+
 
     // Check what happens if vfs-suffixed files exist on the server or in the database
     private void on_signal_test_extra_files_local_dehydrated () {
@@ -1103,9 +1107,7 @@ public class TestSyncVirtualFiles : GLib.Object {
         set_up_vfs (fake_folder);
 
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
-        var TestSyncVirtualFiles.clean_up_test_extra_files_local_dehydrated = [&] () {
-            complete_spy.clear ();
-        }
+
         TestSyncVirtualFiles.clean_up_test_extra_files_local_dehydrated ();
 
         // create a bunch of local virtual files, in some instances
@@ -1117,7 +1119,7 @@ public class TestSyncVirtualFiles : GLib.Object {
         fake_folder.remote_modifier ().insert ("A/file3" + DVSUFFIX, 70, 'A');
         fake_folder.remote_modifier ().insert ("A/file4", 80, 'A');
         fake_folder.remote_modifier ().insert ("A/file4" + DVSUFFIX, 90, 'A');
-        fake_folder.remote_modifier ().insert ("A/file4" + DVSUFFIX DVSUFFIX, 100, 'A');
+        fake_folder.remote_modifier ().insert ("A/file4" + DVSUFFIX + DVSUFFIX, 100, 'A');
         fake_folder.remote_modifier ().insert ("A/file5", 110, 'A');
         fake_folder.remote_modifier ().insert ("A/file6", 120, 'A');
         GLib.assert_true (fake_folder.sync_once ());
@@ -1129,28 +1131,33 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state ().find ("A/file3" + DVSUFFIX));
         GLib.assert_true (!fake_folder.current_local_state ().find ("A/file4"));
         GLib.assert_true (fake_folder.current_local_state ().find ("A/file4" + DVSUFFIX));
-        GLib.assert_true (!fake_folder.current_local_state ().find ("A/file4" + DVSUFFIX DVSUFFIX));
+        GLib.assert_true (!fake_folder.current_local_state ().find ("A/file4" + DVSUFFIX + DVSUFFIX));
         GLib.assert_true (item_instruction (complete_spy, "A/file1" + DVSUFFIX, SyncInstructions.NEW));
         GLib.assert_true (item_instruction (complete_spy, "A/file2" + DVSUFFIX, SyncInstructions.NEW));
         GLib.assert_true (item_instruction (complete_spy, "A/file3" + DVSUFFIX, SyncInstructions.IGNORE));
         GLib.assert_true (item_instruction (complete_spy, "A/file4" + DVSUFFIX, SyncInstructions.IGNORE));
-        GLib.assert_true (item_instruction (complete_spy, "A/file4" + DVSUFFIX DVSUFFIX, SyncInstructions.IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/file4" + DVSUFFIX + DVSUFFIX, SyncInstructions.IGNORE));
         TestSyncVirtualFiles.clean_up_test_extra_files_local_dehydrated ();
 
         // Create odd extra files locally and remotely
         fake_folder.local_modifier ().insert ("A/file1", 10, 'A');
-        fake_folder.local_modifier ().insert ("A/file2" + DVSUFFIX DVSUFFIX, 10, 'A');
+        fake_folder.local_modifier ().insert ("A/file2" + DVSUFFIX + DVSUFFIX, 10, 'A');
         fake_folder.remote_modifier ().insert ("A/file5" + DVSUFFIX, 10, 'A');
         fake_folder.local_modifier ().insert ("A/file6", 10, 'A');
         fake_folder.remote_modifier ().insert ("A/file6" + DVSUFFIX, 10, 'A');
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (item_instruction (complete_spy, "A/file1", SyncInstructions.CONFLICT));
         GLib.assert_true (item_instruction (complete_spy, "A/file1" + DVSUFFIX, SyncInstructions.REMOVE)); // it's now a pointless real virtual file
-        GLib.assert_true (item_instruction (complete_spy, "A/file2" + DVSUFFIX DVSUFFIX, SyncInstructions.IGNORE));
+        GLib.assert_true (item_instruction (complete_spy, "A/file2" + DVSUFFIX + DVSUFFIX, SyncInstructions.IGNORE));
         GLib.assert_true (item_instruction (complete_spy, "A/file5" + DVSUFFIX, SyncInstructions.IGNORE));
         GLib.assert_true (item_instruction (complete_spy, "A/file6", SyncInstructions.CONFLICT));
         GLib.assert_true (item_instruction (complete_spy, "A/file6" + DVSUFFIX, SyncInstructions.IGNORE));
         TestSyncVirtualFiles.clean_up_test_extra_files_local_dehydrated ();
+    }
+
+
+    private static void clean_up_test_extra_files_local_dehydrated (ItemCompletedSpy complete_spy) {
+        complete_spy.clear ();
     }
 
 
@@ -1345,7 +1352,7 @@ public class TestSyncVirtualFiles : GLib.Object {
         Vfs vfs = set_up_vfs (fake_folder);
 
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
-        var TestSyncVirtualFiles.clean_up_test_place_holder_exist = [&] () { complete_spy.clear (); };
+
         TestSyncVirtualFiles.clean_up_test_place_holder_exist ();
 
         GLib.assert_true (fake_folder.sync_once ());
@@ -1392,6 +1399,11 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state ().find ("A/hello").size == 12);
         GLib.assert_true (fake_folder.current_local_state ().find ("A/hello" + DVSUFFIX).size == 222);
         GLib.assert_true (fake_folder.current_local_state ().find ("A/igno" + DVSUFFIX).size == 123);
+    }
+
+
+    private static void clean_up_test_place_holder_exist (ItemCompletedSpy complete_spy) {
+        complete_spy.clear ();
     }
 
 

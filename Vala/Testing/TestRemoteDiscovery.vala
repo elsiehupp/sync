@@ -13,9 +13,11 @@ using Occ;
 namespace Testing {
 
 public class FakeBrokenXmlPropfindReply : FakePropfindReply {
-    FakeBrokenXmlPropfindReply (FileInfo remote_root_file_info, Soup.Operation operation,
-                               const Soup.Request request, GLib.Object parent)
-        : FakePropfindReply (remote_root_file_info, operation, request, parent) {
+
+    FakeBrokenXmlPropfindReply (
+        FileInfo remote_root_file_info, Soup.Operation operation,
+        Soup.Request request, GLib.Object parent) {
+        base (remote_root_file_info, operation, request, parent);
         GLib.assert_true (payload.size () > 50);
         // turncate the XML
         payload.chop (20);
@@ -34,7 +36,7 @@ public class MissingPermissionsPropfindReply : FakePropfindReply {
     }
 }
 
-enum ErrorKind : int {
+enum ErrorKind {
     // Lower code are corresponding to HTML error code
     InvalidXML = 1000,
     Timeout,
@@ -90,7 +92,7 @@ public class TestRemoteDiscovery : GLib.Object {
         fake_folder.set_server_override (this.override_delegate_remote_error);
 
         // So the test that test timeout finishes fast
-        QScopedValueRollback<int> set_http_timeout (AbstractNetworkJob.http_timeout, error_kind == Timeout ? 1 : 10000);
+        QScopedValueRollback<int> set_http_timeout = new QScopedValueRollback<int> (AbstractNetworkJob.http_timeout, error_kind == Timeout ? 1 : 10000);
 
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
         QSignalSpy error_spy = new QSignalSpy (

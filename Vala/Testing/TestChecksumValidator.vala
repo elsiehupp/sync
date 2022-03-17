@@ -113,7 +113,7 @@ public class TestChecksumValidator : GLib.Object {
 
     private void test_upload_checksumming_adler () {
         var vali = new ComputeChecksum (this);
-        this.expected_type = new "Adler32";
+        this.expected_type = new Adler32 ();
         vali.set_checksum_type (this.expected_type);
 
         connect (

@@ -28,8 +28,8 @@ public class FakeDateTimeProvider : Occ.DateTimeProvider {
 
     /***********************************************************
     ***********************************************************/
-    static GLib.Vector<Occ.UserStatus> create_fake_predefined_statuses (GLib.DateTime current_time) {
-        GLib.Vector<Occ.UserStatus> statuses;
+    static GLib.List<Occ.UserStatus> create_fake_predefined_statuses (GLib.DateTime current_time) {
+        GLib.List<Occ.UserStatus> statuses;
 
         const string user_status_id = "fake-identifier";
         const string user_status_message = "Predefined status";

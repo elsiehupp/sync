@@ -19,7 +19,7 @@ public class TestSyncJournalDB : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public TestSyncJournalDB () {
-        this.database = this.temporary_directory.path () + "/sync.db");
+        this.database = this.temporary_directory.path () + "/sync.db";
         GLib.assert_true (this.temporary_directory.is_valid ());
     }
 
@@ -291,17 +291,17 @@ public class TestSyncJournalDB : GLib.Object {
     ***********************************************************/
     private void test_recursive_delete () {
 
-        QByteArrayList elements;
-        elements
-            + "foo"
-            + "foo/file"
-            + "bar"
-            + "moo"
-            + "moo/file"
-            + "foo%bar"
-            + "foo bla bar/file"
-            + "fo_"
-            + "fo_/file";
+        string[] elements = {
+            "foo",
+            "foo/file",
+            "bar",
+            "moo",
+            "moo/file",
+            "foo%bar",
+            "foo bla bar/file",
+            "fo_",
+            "fo_/file"
+        };
         foreach (var elem in elements) {
             make_entry (elem);
         }

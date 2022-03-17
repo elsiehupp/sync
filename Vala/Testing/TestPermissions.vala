@@ -29,15 +29,6 @@ public class TestPermissions : GLib.Object {
         const int cannot_be_modified_size = 133;
         const int can_be_modified_size = 144;
 
-        //create some files
-        var insert_in = [&] (string directory) {
-            fake_folder.remote_modifier ().insert (directory + "normal_file_PERM_WVND_.data", 100 );
-            fake_folder.remote_modifier ().insert (directory + "cannot_be_removed_PERM_WVN_.data", 101 );
-            fake_folder.remote_modifier ().insert (directory + "can_be_removed_PERM_D_.data", 102 );
-            fake_folder.remote_modifier ().insert (directory + "cannot_be_modified_PERM_DVN_.data", cannot_be_modified_size , 'A');
-            fake_folder.remote_modifier ().insert (directory + "can_be_modified_PERM_W_.data", can_be_modified_size );
-        }
-
         //put them in some directories
         fake_folder.remote_modifier ().mkdir ("normal_directory_PERM_CKDNV_");
         insert_in ("normal_directory_PERM_CKDNV_/");
@@ -60,21 +51,11 @@ public class TestPermissions : GLib.Object {
 
         //2. remove the file that can be removed
         //  (they should properly be gone)
-        var remove_read_only = [&] (string file)  {
-            GLib.assert_true (!GLib.FileInfo (fake_folder.local_path () + file).permission (GLib.File.WriteOwner));
-            GLib.File (fake_folder.local_path () + file).set_permissions (GLib.File.WriteOwner | GLib.File.ReadOwner);
-            fake_folder.local_modifier ().remove (file);
-        }
         remove_read_only ("normal_directory_PERM_CKDNV_/can_be_removed_PERM_D_.data");
         remove_read_only ("readonly_directory_PERM_M_/can_be_removed_PERM_D_.data");
 
         //3. Edit the files that cannot be modified
         //  (they should be recovered, and a conflict shall be created)
-        var edit_read_only = [&] (string file)  {
-            GLib.assert_true (!GLib.FileInfo (fake_folder.local_path () + file).permission (GLib.File.WriteOwner));
-            GLib.File (fake_folder.local_path () + file).set_permissions (GLib.File.WriteOwner | GLib.File.ReadOwner);
-            fake_folder.local_modifier ().append_byte (file);
-        }
         edit_read_only ("normal_directory_PERM_CKDNV_/cannot_be_modified_PERM_DVN_.data");
         edit_read_only ("readonly_directory_PERM_M_/cannot_be_modified_PERM_DVN_.data");
 
@@ -271,23 +252,50 @@ public class TestPermissions : GLib.Object {
         // there should be two conflict files
         current_local_state = fake_folder.current_local_state ();
         int count = 0;
-        while (var i = find_conflict (current_local_state, "readonly_directory_PERM_M_/cannot_be_modified_PERM_DVN_.data")) {
+        var i = find_conflict (current_local_state, "readonly_directory_PERM_M_/cannot_be_modified_PERM_DVN_.data");
+        while (i) {
             GLib.assert_true ( (i.content_char == 's') || (i.content_char == 'd'));
             fake_folder.local_modifier ().remove (i.path ());
             current_local_state = fake_folder.current_local_state ();
             count++;
+            i = find_conflict (current_local_state, "readonly_directory_PERM_M_/cannot_be_modified_PERM_DVN_.data");
         }
         GLib.assert_true (count == 2);
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
 
+    // Create some files
+    private void insert_in (FakeFolder fake_folder, string directory, int cannot_be_modified_size) {
+        fake_folder.remote_modifier ().insert (directory + "normal_file_PERM_WVND_.data", 100 );
+        fake_folder.remote_modifier ().insert (directory + "cannot_be_removed_PERM_WVN_.data", 101 );
+        fake_folder.remote_modifier ().insert (directory + "can_be_removed_PERM_D_.data", 102 );
+        fake_folder.remote_modifier ().insert (directory + "cannot_be_modified_PERM_DVN_.data", cannot_be_modified_size, 'A');
+        fake_folder.remote_modifier ().insert (directory + "can_be_modified_PERM_W_.data", can_be_modified_size);
+    }
+
+
+    private void remove_read_only (FakeFolder fake_folder, string file) {
+        GLib.assert_true (!GLib.FileInfo (fake_folder.local_path () + file).permission (GLib.File.WriteOwner));
+        GLib.File (fake_folder.local_path () + file).set_permissions (GLib.File.WriteOwner | GLib.File.ReadOwner);
+        fake_folder.local_modifier ().remove (file);
+    }
+
+
+    private void edit_read_only (FakeFolder fake_folder, string file)  {
+        GLib.assert_true (!GLib.FileInfo (fake_folder.local_path () + file).permission (GLib.File.WriteOwner));
+        GLib.File (fake_folder.local_path () + file).set_permissions (GLib.File.WriteOwner | GLib.File.ReadOwner);
+        fake_folder.local_modifier ().append_byte (file);
+    }
+
+
     /***********************************************************
     ***********************************************************/
-    private on_ static void set_all_perm (FileInfo file_info, RemotePermissions perm) {
-        file_info.permissions = perm;
-        foreach (var sub_file_info in file_info.children)
-            set_all_perm (&sub_file_info, perm);
+    private static void on_set_all_perm (FileInfo file_info, RemotePermissions remote_permissions) {
+        file_info.permissions = remote_permissions;
+        foreach (var sub_file_info in file_info.children) {
+            on_set_all_perm (sub_file_info, remote_permissions);
+        }
     }
 
     // What happens if the source can't be moved or the target can't be created?
@@ -327,10 +335,10 @@ public class TestPermissions : GLib.Object {
         rm.insert ("zallowed/sub/file");
         rm.insert ("zallowed/sub2/file");
 
-        set_all_perm (rm.find ("norename"), RemotePermissions.from_server_string ("WDVCK"));
-        set_all_perm (rm.find ("nomove"), RemotePermissions.from_server_string ("WDNCK"));
-        set_all_perm (rm.find ("nocreatefile"), RemotePermissions.from_server_string ("WDNVK"));
-        set_all_perm (rm.find ("nocreatedir"), RemotePermissions.from_server_string ("WDNVC"));
+        on_set_all_perm (rm.find ("norename"), RemotePermissions.from_server_string ("WDVCK"));
+        on_set_all_perm (rm.find ("nomove"), RemotePermissions.from_server_string ("WDNCK"));
+        on_set_all_perm (rm.find ("nocreatefile"), RemotePermissions.from_server_string ("WDNVK"));
+        on_set_all_perm (rm.find ("nocreatedir"), RemotePermissions.from_server_string ("WDNVC"));
 
         GLib.assert_true (fake_folder.sync_once ());
 
@@ -354,9 +362,7 @@ public class TestPermissions : GLib.Object {
             fake_folder.sync_engine (),
             SyncEngine.about_to_propagate,
             this,
-            [discovery] (var v) => {
-                discovery = v;
-            }
+            this.on_signal_sync_engine_about_to_propagate
         );
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
         GLib.assert_true (!fake_folder.sync_once ());
@@ -416,6 +422,12 @@ public class TestPermissions : GLib.Object {
         GLib.assert_true (cls.find ("zallowed/sub2/file"));
     }
 
+
+    private void on_signal_sync_engine_about_to_propagate (SyncFileItemVector *discovery, SyncFileItemVector v) {
+        discovery = *v;
+    }
+
+
     // Test for issue #7293
     private void test_allowed_move_forbidden_delete () {
          FakeFolder fake_folder = new FakeFolder (new FileInfo ());
@@ -439,7 +451,7 @@ public class TestPermissions : GLib.Object {
         rm.insert ("changeonly/sub2/filetorname2a");
         rm.insert ("changeonly/sub2/filetorname2z");
 
-        set_all_perm (rm.find ("changeonly"), RemotePermissions.from_server_string ("NSV"));
+        on_set_all_perm (rm.find ("changeonly"), RemotePermissions.from_server_string ("NSV"));
 
         GLib.assert_true (fake_folder.sync_once ());
 

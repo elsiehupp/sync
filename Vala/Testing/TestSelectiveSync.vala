@@ -65,8 +65,10 @@ public class TestSelectiveSync : GLib.Object {
         size_requests.clear ();
 
         // Simulate that we accept all files by seting a wildcard allow list
-        fake_folder.sync_engine ().journal ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST,
-            string[] () + "/");
+        fake_folder.sync_engine ().journal ().set_selective_sync_list (
+            SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST,
+            { "/" }
+        );
         fake_folder.sync_engine ().journal ().schedule_path_for_remote_discovery ("A/new_big_dir");
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (new_big_folder.count () == 0);

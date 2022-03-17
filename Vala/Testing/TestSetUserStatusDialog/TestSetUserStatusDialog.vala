@@ -21,7 +21,7 @@ public class TestSetUserStatusDialog : GLib.Object {
         const string user_status_message = "Some status";
         const string user_status_icon = "❤";
         const Occ.UserStatus.OnlineStatus user_status_state = Occ.UserStatus.OnlineStatus.DoNotDisturb;
-        const bool user_status_message_[redefined = false;
+        const bool user_status_message_predefined = false;
         Occ.Optional<Occ.ClearAt> user_status_clear_at; {
             Occ.ClearAt clear_at;
             clear_at.type = Occ.ClearAtType.Timestamp;
@@ -118,7 +118,7 @@ public class TestSetUserStatusDialog : GLib.Object {
         );
 
         const string user_status_message = "Some status";
-        const string user_status_icon = "❤");
+        const string user_status_icon = "❤";
         const Occ.UserStatus.OnlineStatus user_status_state = Occ.UserStatus.OnlineStatus.Online;
 
         model.set_online_status (user_status_state);
@@ -375,134 +375,161 @@ public class TestSetUserStatusDialog : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void test_clear_at_clear_at_timestamp () {
-        {
-        const var current_time = create_date_time ();
-        {
-            Occ.UserStatus user_status;
-            Occ.ClearAt clear_at;
-            clear_at.type = Occ.ClearAtType.Timestamp;
-            clear_at.timestamp = current_time.add_secs (30).to_time_t ();
-            user_status.set_clear_at (clear_at);
+        const GLib.DateTime current_time = create_date_time ();
+        clear_at_clear_at_timestamp_test_1 (current_time);
+        clear_at_clear_at_timestamp_test_2 (current_time);
+        clear_at_clear_at_timestamp_test_3 (current_time);
+        clear_at_clear_at_timestamp_test_4 (current_time);
+        clear_at_clear_at_timestamp_test_5 (current_time);
+        clear_at_clear_at_timestamp_test_6 (current_time);
+        clear_at_clear_at_timestamp_test_7 (current_time);
+    }
 
-            var fake_date_time_provider = new FakeDateTimeProvider ();
-            fake_date_time_provider.set_current_date_time (current_time);
 
-            Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status, std.move (fake_date_time_provider));
+    private void clear_at_clear_at_timestamp_test_1 (GLib.DateTime current_time) {
+        Occ.UserStatus user_status;
+        Occ.ClearAt clear_at;
+        clear_at.type = Occ.ClearAtType.Timestamp;
+        clear_at.timestamp = current_time.add_secs (30).to_time_t ();
+        user_status.set_clear_at (clear_at);
 
-            GLib.assert_true (model.clear_at () == _("Less than a minute"));
-        }
-        {
-            Occ.UserStatus user_status;
-            Occ.ClearAt clear_at;
-            clear_at.type = Occ.ClearAtType.Timestamp;
-            clear_at.timestamp = current_time.add_secs (60).to_time_t ();
-            user_status.set_clear_at (clear_at);
+        var fake_date_time_provider = new FakeDateTimeProvider ();
+        fake_date_time_provider.set_current_date_time (current_time);
 
-            var fake_date_time_provider = new FakeDateTimeProvider ();
-            fake_date_time_provider.set_current_date_time (current_time);
+        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status, std.move (fake_date_time_provider));
 
-            Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status, std.move (fake_date_time_provider));
+        GLib.assert_true (model.clear_at () == _("Less than a minute"));
+    }
 
-            GLib.assert_true (model.clear_at () == _("1 minute"));
-        }
- {
-            Occ.UserStatus user_status;
-            Occ.ClearAt clear_at;
-            clear_at.type = Occ.ClearAtType.Timestamp;
-            clear_at.timestamp = current_time.add_secs (60 * 30).to_time_t ();
-            user_status.set_clear_at (clear_at);
 
-            var fake_date_time_provider = new FakeDateTimeProvider ();
-            fake_date_time_provider.set_current_date_time (current_time);
+    private void clear_at_clear_at_timestamp_test_2 (GLib.DateTime current_time) {
+        Occ.UserStatus user_status;
+        Occ.ClearAt clear_at;
+        clear_at.type = Occ.ClearAtType.Timestamp;
+        clear_at.timestamp = current_time.add_secs (60).to_time_t ();
+        user_status.set_clear_at (clear_at);
 
-            Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status, std.move (fake_date_time_provider));
+        var fake_date_time_provider = new FakeDateTimeProvider ();
+        fake_date_time_provider.set_current_date_time (current_time);
 
-            GLib.assert_true (model.clear_at () == _("30 minutes"));
-        }
- {
-            Occ.UserStatus user_status;
-            Occ.ClearAt clear_at;
-            clear_at.type = Occ.ClearAtType.Timestamp;
-            clear_at.timestamp = current_time.add_secs (60 * 60).to_time_t ();
-            user_status.set_clear_at (clear_at);
+        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status, std.move (fake_date_time_provider));
 
-            var fake_date_time_provider = new FakeDateTimeProvider ();
-            fake_date_time_provider.set_current_date_time (current_time);
+        GLib.assert_true (model.clear_at () == _("1 minute"));
+    }
 
-            Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status, std.move (fake_date_time_provider));
 
-            GLib.assert_true (model.clear_at () == _("1 hour"));
-        }
- {
-            Occ.UserStatus user_status;
-            Occ.ClearAt clear_at;
-            clear_at.type = Occ.ClearAtType.Timestamp;
-            clear_at.timestamp = current_time.add_secs (60 * 60 * 4).to_time_t ();
-            user_status.set_clear_at (clear_at);
+    private void clear_at_clear_at_timestamp_test_3 (GLib.DateTime current_time) {
+        Occ.UserStatus user_status;
+        Occ.ClearAt clear_at;
+        clear_at.type = Occ.ClearAtType.Timestamp;
+        clear_at.timestamp = current_time.add_secs (60 * 30).to_time_t ();
+        user_status.set_clear_at (clear_at);
 
-            var fake_date_time_provider = new FakeDateTimeProvider ();
-            fake_date_time_provider.set_current_date_time (current_time);
+        var fake_date_time_provider = new FakeDateTimeProvider ();
+        fake_date_time_provider.set_current_date_time (current_time);
 
-            Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status, std.move (fake_date_time_provider));
+        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status, std.move (fake_date_time_provider));
 
-            GLib.assert_true (model.clear_at () == _("4 hours"));
-        }
- {
-            Occ.UserStatus user_status;
-            Occ.ClearAt clear_at;
-            clear_at.type = Occ.ClearAtType.Timestamp;
-            clear_at.timestamp = current_time.add_days (1).to_time_t ();
-            user_status.set_clear_at (clear_at);
+        GLib.assert_true (model.clear_at () == _("30 minutes"));
+    }
 
-            var fake_date_time_provider = new FakeDateTimeProvider ();
-            fake_date_time_provider.set_current_date_time (current_time);
 
-            Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status, std.move (fake_date_time_provider));
+    private void clear_at_clear_at_timestamp_test_4 (GLib.DateTime current_time) {
+        Occ.UserStatus user_status;
+        Occ.ClearAt clear_at;
+        clear_at.type = Occ.ClearAtType.Timestamp;
+        clear_at.timestamp = current_time.add_secs (60 * 60).to_time_t ();
+        user_status.set_clear_at (clear_at);
 
-            GLib.assert_true (model.clear_at () == _("1 day"));
-        }
- {
-            Occ.UserStatus user_status;
-            Occ.ClearAt clear_at;
-            clear_at.type = Occ.ClearAtType.Timestamp;
-            clear_at.timestamp = current_time.add_days (7).to_time_t ();
-            user_status.set_clear_at (clear_at);
+        var fake_date_time_provider = new FakeDateTimeProvider ();
+        fake_date_time_provider.set_current_date_time (current_time);
 
-            var fake_date_time_provider = new FakeDateTimeProvider ();
-            fake_date_time_provider.set_current_date_time (current_time);
+        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status, std.move (fake_date_time_provider));
 
-            Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status, std.move (fake_date_time_provider));
+        GLib.assert_true (model.clear_at () == _("1 hour"));
+    }
 
-            GLib.assert_true (model.clear_at () == _("7 days"));
-        }
+
+    private void clear_at_clear_at_timestamp_test_5 (GLib.DateTime current_time) {
+        Occ.UserStatus user_status;
+        Occ.ClearAt clear_at;
+        clear_at.type = Occ.ClearAtType.Timestamp;
+        clear_at.timestamp = current_time.add_secs (60 * 60 * 4).to_time_t ();
+        user_status.set_clear_at (clear_at);
+
+        var fake_date_time_provider = new FakeDateTimeProvider ();
+        fake_date_time_provider.set_current_date_time (current_time);
+
+        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status, std.move (fake_date_time_provider));
+
+        GLib.assert_true (model.clear_at () == _("4 hours"));
+    }
+
+
+    private void clear_at_clear_at_timestamp_test_6 (GLib.DateTime current_time) {
+        Occ.UserStatus user_status;
+        Occ.ClearAt clear_at;
+        clear_at.type = Occ.ClearAtType.Timestamp;
+        clear_at.timestamp = current_time.add_days (1).to_time_t ();
+        user_status.set_clear_at (clear_at);
+
+        var fake_date_time_provider = new FakeDateTimeProvider ();
+        fake_date_time_provider.set_current_date_time (current_time);
+
+        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status, std.move (fake_date_time_provider));
+
+        GLib.assert_true (model.clear_at () == _("1 day"));
+    }
+
+
+    private void clear_at_clear_at_timestamp_test_7 (GLib.DateTime current_time) {
+        Occ.UserStatus user_status;
+        Occ.ClearAt clear_at;
+        clear_at.type = Occ.ClearAtType.Timestamp;
+        clear_at.timestamp = current_time.add_days (7).to_time_t ();
+        user_status.set_clear_at (clear_at);
+
+        var fake_date_time_provider = new FakeDateTimeProvider ();
+        fake_date_time_provider.set_current_date_time (current_time);
+
+        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status, std.move (fake_date_time_provider));
+
+        GLib.assert_true (model.clear_at () == _("7 days"));
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void test_clear_at_clear_at_end_of () {
-        {
-            Occ.UserStatus user_status;
-            Occ.ClearAt clear_at;
-            clear_at.type = Occ.ClearAtType.EndOf;
-            clear_at.endof = "day";
-            user_status.set_clear_at (clear_at);
+        clear_at_clear_at_end_of_test_1 ();
+        clear_at_clear_at_end_of_test_2 ();
+    }
 
-            Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status);
 
-            GLib.assert_true (model.clear_at () == _("Today"));
-        }
-        {
-            Occ.UserStatus user_status;
-            Occ.ClearAt clear_at;
-            clear_at.type = Occ.ClearAtType.EndOf;
-            clear_at.endof = "week";
-            user_status.set_clear_at (clear_at);
 
-            Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status);
+    private void clear_at_clear_at_end_of_test_1 () {
+        Occ.UserStatus user_status;
+        Occ.ClearAt clear_at;
+        clear_at.type = Occ.ClearAtType.EndOf;
+        clear_at.endof = "day";
+        user_status.set_clear_at (clear_at);
 
-            GLib.assert_true (model.clear_at () == _("This week"));
-        }
+        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status);
+
+        GLib.assert_true (model.clear_at () == _("Today"));
+    }
+
+
+    private void clear_at_clear_at_end_of_test_2 () {
+        Occ.UserStatus user_status;
+        Occ.ClearAt clear_at;
+        clear_at.type = Occ.ClearAtType.EndOf;
+        clear_at.endof = "week";
+        user_status.set_clear_at (clear_at);
+
+        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status);
+
+        GLib.assert_true (model.clear_at () == _("This week"));
     }
 
 

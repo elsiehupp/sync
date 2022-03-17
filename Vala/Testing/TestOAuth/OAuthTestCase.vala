@@ -59,11 +59,7 @@ public class OAuthTestCase : GLib.Object {
         account.set_url (s_oauth_test_server);
         account.set_credentials (new FakeCredentials (fake_qnam));
         fake_qnam.set_parent (this);
-        fake_qnam.set_override ([this] (Soup.Operation operation, Soup.Request request, QIODevice device) {
-            //  ASSERT (device);
-            //  ASSERT (device.bytes_available ()>0); // OAuth2 always sends around POST data.
-            return this.token_reply (operation, request);
-        });
+        fake_qnam.set_override (this.oauth_test_case_override);
 
         connect (
             desktop_service_hook,
@@ -81,6 +77,13 @@ public class OAuthTestCase : GLib.Object {
         );
         oauth.on_signal_start ();
         QTRY_VERIFY (signal_done ());
+    }
+
+
+    private Soup.Reply oauth_test_case_override (Soup.Operation operation, Soup.Request request, QIODevice device) {
+        //  ASSERT (device);
+        //  ASSERT (device.bytes_available ()>0); // OAuth2 always sends around POST data.
+        return this.token_reply (operation, request);
     }
 
 

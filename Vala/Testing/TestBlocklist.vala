@@ -141,7 +141,7 @@ public class TestBlocklist : GLib.Object {
             var it = complete_spy.find_item (test_filename);
             GLib.assert_true (it);
             GLib.assert_true (it.status == SyncFileItem.Status.SUCCESS);
-            GLib.assert_true (it.instruction ==assert_true SyncInstructions.NEW);
+            GLib.assert_true (it.instruction == SyncInstructions.NEW);
 
             var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
             GLib.assert_true (!entry.is_valid ());

@@ -32,22 +32,47 @@ public class TestPushNotifications : GLib.Object {
     ***********************************************************/
     private void test_setup_correct_credentials_authenticate_and_emit_ready () {
         FakeWebSocketServer fake_server;
-        std.unique_ptr<QSignalSpy> files_changed_spy;
-        std.unique_ptr<QSignalSpy> notifications_changed_spy;
-        std.unique_ptr<QSignalSpy> activities_changed_spy;
+        QSignalSpy files_changed_spy;
+        QSignalSpy notifications_changed_spy;
+        QSignalSpy activities_changed_spy;
         var account = FakeWebSocketServer.create_account ();
 
-        GLib.assert_true (fake_server.authenticate_account (
-        //      account, [&] (Occ.PushNotifications push_notifications) {
-        //          files_changed_spy.on_signal_reset (new QSignalSpy (push_notifications, &Occ.PushNotifications.files_changed));
-        //          notifications_changed_spy.on_signal_reset (new QSignalSpy (push_notifications, &Occ.PushNotifications.notifications_changed));
-        //          activities_changed_spy.on_signal_reset (new QSignalSpy (push_notifications, &Occ.PushNotifications.activities_changed));
-        //      },
-        //      [&] {
-        //          GLib.assert_true (verify_called_once_with_account (*files_changed_spy, account));
-        //          GLib.assert_true (verify_called_once_with_account (*notifications_changed_spy, account));
-        //          GLib.assert_true (verify_called_once_with_account (*activities_changed_spy, account));
-        //      }));
+        GLib.assert_true (
+            fake_server.authenticate_account (
+                account,
+                authentication_delegate_1,
+                authentication_delegate_1
+            )
+        );
+    }
+
+
+    private void authentication_delegate_setup_correct_credentials_authenticate_and_emit_read_1 (Occ.PushNotifications push_notifications) {
+        files_changed_spy.on_signal_reset (
+            new QSignalSpy (
+                push_notifications,
+                Occ.PushNotifications.files_changed
+            )
+        );
+        notifications_changed_spy.on_signal_reset (
+            new QSignalSpy (
+                push_notifications,
+                Occ.PushNotifications.notifications_changed
+            )
+        );
+        activities_changed_spy.on_signal_reset (
+            new QSignalSpy (
+                push_notifications,
+                Occ.PushNotifications.activities_changed
+            )
+        );
+    }
+
+
+    private void authentication_delegate_setup_correct_credentials_authenticate_and_emit_read_2 () {
+        GLib.assert_true (verify_called_once_with_account (*files_changed_spy, account));
+        GLib.assert_true (verify_called_once_with_account (*notifications_changed_spy, account));
+        GLib.assert_true (verify_called_once_with_account (*activities_changed_spy, account));
     }
 
 
@@ -235,33 +260,60 @@ public class TestPushNotifications : GLib.Object {
     ***********************************************************/
     private void test_ping_timeout_ping_timed_out_reconnect () {
         FakeWebSocketServer fake_server;
-        std.unique_ptr<QSignalSpy> files_changed_spy;
-        std.unique_ptr<QSignalSpy> notifications_changed_spy;
-        std.unique_ptr<QSignalSpy> activities_changed_spy;
+        QSignalSpy files_changed_spy;
+        QSignalSpy notifications_changed_spy;
+        QSignalSpy activities_changed_spy;
         var account = FakeWebSocketServer.create_account ();
         GLib.assert_true (fake_server.authenticate_account (account));
 
         // Set the ping timeout interval to zero and check if the server attemps to authenticate again
         fake_server.clear_text_messages ();
         account.push_notifications ().set_ping_interval (0);
-        GLib.assert_true (fake_server.authenticate_account (
-        //      account, [&] (Occ.PushNotifications push_notifications) {
-        //          files_changed_spy.on_signal_reset (new QSignalSpy (push_notifications, &Occ.PushNotifications.files_changed));
-        //          notifications_changed_spy.on_signal_reset (new QSignalSpy (push_notifications, &Occ.PushNotifications.notifications_changed));
-        //          activities_changed_spy.on_signal_reset (new QSignalSpy (push_notifications, &Occ.PushNotifications.activities_changed));
-        //      },
-        //      [&] {
-        //          GLib.assert_true (verify_called_once_with_account (*files_changed_spy, account));
-        //          GLib.assert_true (verify_called_once_with_account (*notifications_changed_spy, account));
-        //          GLib.assert_true (verify_called_once_with_account (*activities_changed_spy, account));
-        //      }));
+        GLib.assert_true (
+            fake_server.authenticate_account (
+                account,
+                this.authentication_delegate_ping_timeout_ping_timed_out_reconnect_1,
+                this.authentication_delegate_ping_timeout_ping_timed_out_reconnect_2
+            )
+        );
     }
+
+
+    private void authentication_delegate_ping_timeout_ping_timed_out_reconnect_1 (Occ.PushNotifications push_notifications) {
+        files_changed_spy.on_signal_reset (
+            new QSignalSpy (
+                push_notifications,
+                Occ.PushNotifications.files_changed
+            )
+        );
+        notifications_changed_spy.on_signal_reset (
+            new QSignalSpy (
+                push_notifications,
+                Occ.PushNotifications.notifications_changed
+            )
+        );
+        activities_changed_spy.on_signal_reset (
+            new QSignalSpy (
+                push_notifications,
+                Occ.PushNotifications.activities_changed
+            )
+        );
+    }
+
+
+    private void authentication_delegate_ping_timeout_ping_timed_out_reconnect_2 () {
+        GLib.assert_true (verify_called_once_with_account (*files_changed_spy, account));
+        GLib.assert_true (verify_called_once_with_account (*notifications_changed_spy, account));
+        GLib.assert_true (verify_called_once_with_account (*activities_changed_spy, account));
+    }
+
 
     static int return_false_on_fail (var expr) {
         if (! (expr)) {
             return false;
         }
     }
+
     
     static bool verify_called_once_with_account (QSignalSpy spy, unowned Occ.Account account) {
         return_false_on_fail (spy.count () == 1);

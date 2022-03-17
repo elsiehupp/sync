@@ -18,7 +18,7 @@ public class SlowFakePostReply : FakePostReply {
         QTimer.single_shot (
             100,
             this,
-            [this] () => {
+            () => {
                 this.FakePostReply.respond ();
             });
     }

@@ -33,13 +33,7 @@ public class TestSyncXAttr : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state (), fake_folder.current_remote_state ());
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
 
-        var on_signal_cleanup = () => {
-            complete_spy.clear ();
-            if (!do_local_discovery) {
-                fake_folder.sync_engine ().set_local_discovery_options (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM);
-            }
-        }
-        on_signal_cleanup ();
+        clean_up_test_virtual_file_lifecycle ();
 
         // Create a virtual file for a new remote file
         fake_folder.remote_modifier ().mkdir ("A");
@@ -52,7 +46,7 @@ public class TestSyncXAttr : GLib.Object {
         GLib.assert_true (new FileInfo (fake_folder.local_path () + "A/a1").last_modified () == some_date);
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a1"));
         GLib.assert_true (item_instruction (complete_spy, "A/a1", SyncInstructions.NEW));
-        on_signal_cleanup ();
+        clean_up_test_virtual_file_lifecycle ();
 
         // Another sync doesn't actually lead to changes
         GLib.assert_true (fake_folder.sync_once ());
@@ -61,7 +55,7 @@ public class TestSyncXAttr : GLib.Object {
         GLib.assert_true (new FileInfo (fake_folder.local_path () + "A/a1").last_modified () == some_date);
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a1"));
         GLib.assert_true (complete_spy == "");
-        on_signal_cleanup ();
+        clean_up_test_virtual_file_lifecycle ();
 
         // Not even when the remote is rediscovered
         fake_folder.sync_journal ().force_remote_discovery_next_sync ();
@@ -71,7 +65,7 @@ public class TestSyncXAttr : GLib.Object {
         GLib.assert_true (new FileInfo (fake_folder.local_path () + "A/a1").last_modified () == some_date);
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a1"));
         GLib.assert_true (complete_spy == "");
-        on_signal_cleanup ();
+        clean_up_test_virtual_file_lifecycle ();
 
         // Neither does a remote change
         fake_folder.remote_modifier ().append_byte ("A/a1");
@@ -82,7 +76,7 @@ public class TestSyncXAttr : GLib.Object {
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a1"));
         GLib.assert_true (item_instruction (complete_spy, "A/a1", SyncInstructions.UPDATE_METADATA));
         GLib.assert_true (database_record (fake_folder, "A/a1").file_size == 65);
-        on_signal_cleanup ();
+        clean_up_test_virtual_file_lifecycle ();
 
         // If the local virtual file is removed, this will be propagated remotely
         if (!do_local_discovery)
@@ -93,7 +87,7 @@ public class TestSyncXAttr : GLib.Object {
         GLib.assert_true (!fake_folder.current_remote_state ().find ("A/a1"));
         GLib.assert_true (item_instruction (complete_spy, "A/a1", SyncInstructions.REMOVE));
         GLib.assert_true (!database_record (fake_folder, "A/a1").is_valid ());
-        on_signal_cleanup ();
+        clean_up_test_virtual_file_lifecycle ();
 
         // Recreate a1 before carrying on with the other tests
         fake_folder.remote_modifier ().insert ("A/a1", 65);
@@ -104,7 +98,7 @@ public class TestSyncXAttr : GLib.Object {
         GLib.assert_true (new FileInfo (fake_folder.local_path () + "A/a1").last_modified () == some_date);
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a1"));
         GLib.assert_true (item_instruction (complete_spy, "A/a1", SyncInstructions.NEW));
-        on_signal_cleanup ();
+        clean_up_test_virtual_file_lifecycle ();
 
         // Remote rename is propagated
         fake_folder.remote_modifier ().rename ("A/a1", "A/a1m");
@@ -120,7 +114,7 @@ public class TestSyncXAttr : GLib.Object {
             || (item_instruction (complete_spy, "A/a1m", SyncInstructions.NEW)
                 && item_instruction (complete_spy, "A/a1", SyncInstructions.REMOVE)));
         GLib.assert_true (!database_record (fake_folder, "A/a1").is_valid ());
-        on_signal_cleanup ();
+        clean_up_test_virtual_file_lifecycle ();
 
         // Remote remove is propagated
         fake_folder.remote_modifier ().remove ("A/a1m");
@@ -130,7 +124,7 @@ public class TestSyncXAttr : GLib.Object {
         GLib.assert_true (item_instruction (complete_spy, "A/a1m", SyncInstructions.REMOVE));
         GLib.assert_true (!database_record (fake_folder, "A/a1").is_valid ());
         GLib.assert_true (!database_record (fake_folder, "A/a1m").is_valid ());
-        on_signal_cleanup ();
+        clean_up_test_virtual_file_lifecycle ();
 
         // Edge case : Local virtual file but no database entry for some reason
         fake_folder.remote_modifier ().insert ("A/a2", 32);
@@ -140,7 +134,7 @@ public class TestSyncXAttr : GLib.Object {
         GLib.assert_true (database_record (fake_folder, "A/a2").file_size == 32);
         xaverify_virtual (fake_folder, "A/a3");
         GLib.assert_true (database_record (fake_folder, "A/a3").file_size == 33);
-        on_signal_cleanup ();
+        clean_up_test_virtual_file_lifecycle ();
 
         fake_folder.sync_engine ().journal ().delete_file_record ("A/a2");
         fake_folder.sync_engine ().journal ().delete_file_record ("A/a3");
@@ -153,7 +147,15 @@ public class TestSyncXAttr : GLib.Object {
         GLib.assert_true (!GLib.FileInfo (fake_folder.local_path () + "A/a3").exists ());
         GLib.assert_true (item_instruction (complete_spy, "A/a3", SyncInstructions.REMOVE));
         GLib.assert_true (!database_record (fake_folder, "A/a3").is_valid ());
-        on_signal_cleanup ();
+        clean_up_test_virtual_file_lifecycle ();
+    }
+
+
+    private static void clean_up_test_virtual_file_lifecycle () {
+        complete_spy.clear ();
+        if (!do_local_discovery) {
+            fake_folder.sync_engine ().set_local_discovery_options (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM);
+        }
     }
 
 
@@ -165,10 +167,7 @@ public class TestSyncXAttr : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
 
-        var on_signal_cleanup = () => {
-            complete_spy.clear ();
-        }
-        on_signal_cleanup ();
+        clean_up_test_virtual_file_conflict ();
 
         // Create a virtual file for a new remote file
         fake_folder.remote_modifier ().mkdir ("A");
@@ -183,7 +182,7 @@ public class TestSyncXAttr : GLib.Object {
         GLib.assert_true (database_record (fake_folder, "A/a1").file_size == 11);
         GLib.assert_true (database_record (fake_folder, "A/a2").file_size == 12);
         GLib.assert_true (database_record (fake_folder, "B/b1").file_size == 21);
-        on_signal_cleanup ();
+        clean_up_test_virtual_file_conflict ();
 
         // All the files are touched on the server
         fake_folder.remote_modifier ().append_byte ("A/a1");
@@ -214,7 +213,12 @@ public class TestSyncXAttr : GLib.Object {
         xaverify_nonvirtual (fake_folder, "A/a2");
         xaverify_nonvirtual (fake_folder, "B/b1");
 
-        on_signal_cleanup ();
+        clean_up_test_virtual_file_conflict ();
+    }
+
+
+    private static void clean_up_test_virtual_file_conflict () {
+        complete_spy.clear ();
     }
 
 
@@ -226,15 +230,12 @@ public class TestSyncXAttr : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
 
-        var on_signal_cleanup = () => {
-            complete_spy.clear ();
-        }
-        on_signal_cleanup ();
+        clean_up_test_with_normal_sync ();
 
         // No effect sync
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
-        on_signal_cleanup ();
+        clean_up_test_with_normal_sync ();
 
         // Existing files are propagated just fine in both directions
         fake_folder.local_modifier ().append_byte ("A/a1");
@@ -242,7 +243,7 @@ public class TestSyncXAttr : GLib.Object {
         fake_folder.remote_modifier ().append_byte ("A/a2");
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
-        on_signal_cleanup ();
+        clean_up_test_with_normal_sync ();
 
         // New files on the remote create virtual files
         fake_folder.remote_modifier ().insert ("A/new", 42);
@@ -251,7 +252,12 @@ public class TestSyncXAttr : GLib.Object {
         GLib.assert_true (database_record (fake_folder, "A/new").file_size == 42);
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/new"));
         GLib.assert_true (item_instruction (complete_spy, "A/new", SyncInstructions.NEW));
-        on_signal_cleanup ();
+        clean_up_test_with_normal_sync ();
+    }
+
+
+    private static clean_up_test_with_normal_sync () {
+        complete_spy.clear ();
     }
 
 
@@ -263,10 +269,7 @@ public class TestSyncXAttr : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
 
-        var on_signal_cleanup = () => {
-            complete_spy.clear ();
-        }
-        on_signal_cleanup ();
+        clean_up_test_virtual_file_download ();
 
         // Create a virtual file for remote files
         fake_folder.remote_modifier ().mkdir ("A");
@@ -295,7 +298,7 @@ public class TestSyncXAttr : GLib.Object {
         xaverify_virtual (fake_folder, "A/b3");
         xaverify_virtual (fake_folder, "A/b4");
 
-        on_signal_cleanup ();
+        clean_up_test_virtual_file_download ();
 
         // Download by changing the database entry
         trigger_download (fake_folder, "A/a1");
@@ -359,6 +362,11 @@ public class TestSyncXAttr : GLib.Object {
     }
 
 
+    private static void clean_up_test_virtual_file_download (ItemCompletedSpy complete_spy) {
+        complete_spy.clear ();
+    }
+
+
     /***********************************************************
     ***********************************************************/
     private void on_signal_test_virtual_file_download_resume () {
@@ -367,18 +375,14 @@ public class TestSyncXAttr : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
 
-        var on_signal_cleanup = () => {
-            complete_spy.clear ();
-            fake_folder.sync_journal ().wipe_error_blocklist ();
-        }
-        on_signal_cleanup ();
+        clean_up_test_virtual_file_download_resume ();
 
         // Create a virtual file for remote files
         fake_folder.remote_modifier ().mkdir ("A");
         fake_folder.remote_modifier ().insert ("A/a1");
         GLib.assert_true (fake_folder.sync_once ());
         xaverify_virtual (fake_folder, "A/a1");
-        on_signal_cleanup ();
+        clean_up_test_virtual_file_download_resume ();
 
         // Download by changing the database entry
         trigger_download (fake_folder, "A/a1");
@@ -388,13 +392,19 @@ public class TestSyncXAttr : GLib.Object {
         GLib.assert_true (xattr.has_nextcloud_placeholder_attributes (fake_folder.local_path () + "A/a1"));
         GLib.assert_true (new FileInfo (fake_folder.local_path () + "A/a1").exists ());
         GLib.assert_true (database_record (fake_folder, "A/a1").type == ItemType.VIRTUAL_FILE_DOWNLOAD);
-        on_signal_cleanup ();
+        clean_up_test_virtual_file_download_resume ();
 
         fake_folder.server_error_paths ().clear ();
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (item_instruction (complete_spy, "A/a1", SyncInstructions.SYNC));
         xaverify_nonvirtual (fake_folder, "A/a1");
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+    }
+
+
+    private static void clean_up_test_virtual_file_download_resume (FakeFolder fake_folder, ItemCompletedSpy complete_spy) {
+        complete_spy.clear ();
+        fake_folder.sync_journal ().wipe_error_blocklist ();
     }
 
 
@@ -504,10 +514,7 @@ public class TestSyncXAttr : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
 
-        var on_signal_cleanup = () => {
-            complete_spy.clear ();
-        }
-        on_signal_cleanup ();
+        clean_up_test_rename_virtual ();
 
         fake_folder.remote_modifier ().insert ("file1", 128, 'C');
         fake_folder.remote_modifier ().insert ("file2", 256, 'C');
@@ -518,7 +525,7 @@ public class TestSyncXAttr : GLib.Object {
         xaverify_virtual (fake_folder, "file2");
         xaverify_virtual (fake_folder, "file3");
 
-        on_signal_cleanup ();
+        clean_up_test_rename_virtual ();
 
         fake_folder.local_modifier ().rename ("file1", "renamed1");
         fake_folder.local_modifier ().rename ("file2", "renamed2");
@@ -543,7 +550,12 @@ public class TestSyncXAttr : GLib.Object {
 
         GLib.assert_true (item_instruction (complete_spy, "file3", SyncInstructions.SYNC));
         xaverify_nonvirtual (fake_folder, "file3");
-        on_signal_cleanup ();
+        clean_up_test_rename_virtual ();
+    }
+
+
+    private static void clean_up_test_rename_virtual (ItemCompletedSpy complete_spy) {
+        complete_spy.clear ();
     }
 
 
@@ -553,10 +565,8 @@ public class TestSyncXAttr : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
         set_up_vfs (fake_folder);
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
-        var on_signal_cleanup = () => {
-            complete_spy.clear ();
-        }
-        on_signal_cleanup ();
+
+        clean_up_test_rename_virtual2 ();
 
         fake_folder.remote_modifier ().insert ("case3", 128, 'C');
         fake_folder.remote_modifier ().insert ("case4", 256, 'C');
@@ -568,7 +578,7 @@ public class TestSyncXAttr : GLib.Object {
         xaverify_virtual (fake_folder, "case3");
         xaverify_nonvirtual (fake_folder, "case4");
 
-        on_signal_cleanup ();
+        clean_up_test_rename_virtual2 ();
 
         // Case 1 : non-virtual, foo . bar (tested elsewhere)
         // Case 2 : virtual, foo . bar (tested elsewhere)
@@ -598,6 +608,12 @@ public class TestSyncXAttr : GLib.Object {
         GLib.assert_true (item_instruction (complete_spy, "case4-rename", SyncInstructions.RENAME));
     }
 
+
+    private static void clean_up_test_rename_virtual2 (ItemCompletedSpy complete_spy) {
+        complete_spy.clear ();
+    }
+
+
     // Dehydration via sync works
     private void on_signal_test_sync_dehydration () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
@@ -607,10 +623,8 @@ public class TestSyncXAttr : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
-        var on_signal_cleanup = () => {
-            complete_spy.clear ();
-        }
-        on_signal_cleanup ();
+
+        clean_up_test_sync_dehydration ();
 
         //
         // Mark for dehydration and check
@@ -642,16 +656,6 @@ public class TestSyncXAttr : GLib.Object {
 
         GLib.assert_true (fake_folder.sync_once ());
 
-        var is_dehydrated = [&] (string path) {
-            return xattr.has_nextcloud_placeholder_attributes (fake_folder.local_path () + path)
-                && GLib.FileInfo (fake_folder.local_path () + path).exists ();
-        }
-        var has_dehydrated_database_entries = [&] (string path) {
-            SyncJournalFileRecord record;
-            fake_folder.sync_journal ().get_file_record (path, record);
-            return record.is_valid () && record.type == ItemType.VIRTUAL_FILE;
-        }
-
         GLib.assert_true (is_dehydrated ("A/a1"));
         GLib.assert_true (has_dehydrated_database_entries ("A/a1"));
         GLib.assert_true (item_instruction (complete_spy, "A/a1", SyncInstructions.SYNC));
@@ -678,7 +682,7 @@ public class TestSyncXAttr : GLib.Object {
 
         GLib.assert_true (fake_folder.current_remote_state ().find ("C/c2").size == 26);
         GLib.assert_true (item_instruction (complete_spy, "C/c2", SyncInstructions.CONFLICT));
-        on_signal_cleanup ();
+        clean_up_test_sync_dehydration ();
 
         var expected_remote_state = fake_folder.current_remote_state ();
         GLib.assert_true (fake_folder.sync_once ());
@@ -703,6 +707,24 @@ public class TestSyncXAttr : GLib.Object {
         GLib.assert_true (database_record (fake_folder, "C/c2").is_valid ());
         GLib.assert_true (!is_dehydrated ("C/c2"));
         GLib.assert_true (!has_dehydrated_database_entries ("C/c2"));
+    }
+
+
+    private static void clean_up_test_sync_dehydration () {
+        complete_spy.clear ();
+    }
+
+
+    private static bool is_dehydrated (FakeFolder fake_folder, string path) {
+        return xattr.has_nextcloud_placeholder_attributes (fake_folder.local_path () + path)
+            && new GLib.FileInfo (fake_folder.local_path () + path).exists ();
+    }
+
+
+    private static bool has_dehydrated_database_entries (FakeFolder fake_folder, string path) {
+        SyncJournalFileRecord record;
+        fake_folder.sync_journal ().get_file_record (path, record);
+        return record.is_valid () && record.type == ItemType.VIRTUAL_FILE;
     }
 
 
@@ -746,7 +768,7 @@ public class TestSyncXAttr : GLib.Object {
         GLib.assert_true (!database_record (fake_folder, "A/a3").is_valid ());
         cfverify_gone (fake_folder, "A/B/b1");
 
-        fake_folder.switch_to_vfs (unowned<Vfs> (new VfsOff));
+        fake_folder.switch_to_vfs (new VfsOff ());
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
         GLib.assert_true (fake_folder.sync_once ());
 
@@ -774,10 +796,6 @@ public class TestSyncXAttr : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
         set_up_vfs (fake_folder);
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
-
-        var set_pin = (string path, PinState state) => {
-            fake_folder.sync_journal ().internal_pin_states ().set_for_path (path, state);
-        }
 
         fake_folder.remote_modifier ().mkdir ("local");
         fake_folder.remote_modifier ().mkdir ("online");
@@ -847,7 +865,7 @@ public class TestSyncXAttr : GLib.Object {
     }
 
 
-    private static void set_pin (string path, PinState state) {
+    private static void set_pin (FakeFolder fake_folder, string path, PinState state) {
         fake_folder.sync_journal ().internal_pin_states ().set_for_path (path, state);
     }
 

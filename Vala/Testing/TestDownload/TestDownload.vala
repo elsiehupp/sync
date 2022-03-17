@@ -21,7 +21,10 @@ public class TestDownload : GLib.Object {
     private void test_resume () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().set_ignore_hidden_files (true);
-        QSignalSpy complete_spy = new QSignalSpy (fake_folder.sync_engine (), SIGNAL (item_completed (SyncFileItemPtr)));
+        QSignalSpy complete_spy = new QSignalSpy (
+            fake_folder.sync_engine (),
+            item_completed (SyncFileItemPtr)
+        );
         var size = 30 * 1000 * 1000;
         fake_folder.remote_modifier ().insert ("A/a0", size);
 
@@ -68,7 +71,7 @@ public class TestDownload : GLib.Object {
         fake_folder.sync_engine ().set_ignore_hidden_files (true);
         QSignalSpy complete_spy = new QSignalSpy (
             fake_folder.sync_engine (),
-            SIGNAL (item_completed (SyncFileItemPtr &))
+            item_completed (SyncFileItemPtr)
         );
         var size = 3500000;
         fake_folder.remote_modifier ().insert ("A/broken", size);
@@ -82,7 +85,7 @@ public class TestDownload : GLib.Object {
         QTimer.single_shot (
             10000,
             fake_folder.sync_engine (),
-            [&] () {
+            () => {
                 timed_out = true;
                 fake_folder.sync_engine ().on_signal_abort ();
             });
@@ -115,7 +118,10 @@ public class TestDownload : GLib.Object {
         fake_folder.remote_modifier ().insert ("A/broken");
         fake_folder.set_server_override (this.override_delegate_server_maintenence);
 
-        QSignalSpy complete_spy (&fake_folder.sync_engine (), &SyncEngine.item_completed);
+        QSignalSpy complete_spy = new QSignalSpy (
+            fake_folder.sync_engine (),
+            SyncEngine.item_completed
+        );
         GLib.assert_true (!fake_folder.sync_once ()); // Fail because A/broken
         // FatalError means the sync was aborted, which is what we want
         GLib.assert_true (get_item (complete_spy, "A/broken").status == SyncFileItem.Status.FATAL_ERROR);
@@ -123,7 +129,7 @@ public class TestDownload : GLib.Object {
     }
 
 
-    private Soup.Reply override_delegate_server_maintenence (Soup.Operation operation, Soup.Request request, QIODevice *) Soup.Reply * => {
+    private Soup.Reply override_delegate_server_maintenence (Soup.Operation operation, Soup.Request request, QIODevice device) {
         if (operation == Soup.GetOperation) {
             return new FakeErrorReply (operation, request, this, 503,
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
@@ -155,28 +161,7 @@ public class TestDownload : GLib.Object {
         var trans_progress = connect (
             fake_folder.sync_engine (),
             SyncEngine.transmission_progress,
-            [] (ProgressInfo progress_info) => {
-                var propagator = fake_folder.sync_engine ().get_propagator ();
-                if (progress_info.status () != ProgressInfo.Status.PROPAGATION || prop_connected || !propagator)
-                    return;
-                prop_connected = true;
-                connect (
-                    propagator.data (),
-                    OwncloudPropagator.touched_file,
-                    [&] (string s) {
-                    if (s.contains ("conflicted copy")) {
-                        GLib.assert_true (conflict_file == "");
-                        conflict_file = s;
-                        return;
-                    }
-                    if (!conflict_file == "") {
-                        // Check that the temporary file is still there
-                        GLib.assert_true (QDir (fake_folder.local_path () + "A/").entry_list ({ "*.~*" }, QDir.Files | QDir.Hidden).count () == 1);
-                        // Set the permission to read only on the folder, so the rename of the temporary file will fail
-                        GLib.File (fake_folder.local_path () + "A/").set_permissions (GLib.File.Permissions (0x5555));
-                    }
-                });
-            }
+            this.on_signal_sync_engine_transmission_progress
         );
 
         GLib.assert_true (!fake_folder.sync_once ()); // The sync must fail because the rename failed
@@ -207,6 +192,34 @@ public class TestDownload : GLib.Object {
     }
 
 
+    private void on_signal_sync_engine_transmission_progress (ProgressInfo progress_info) {
+        var propagator = fake_folder.sync_engine ().get_propagator ();
+        if (progress_info.status () != ProgressInfo.Status.PROPAGATION || prop_connected || !propagator)
+            return;
+        prop_connected = true;
+        connect (
+            propagator.data (),
+            OwncloudPropagator.touched_file,
+            this.on_signal_propagator_touched_file
+        );
+    }
+
+
+    private void on_signal_propagator_touched_file (string string_value) {
+        if (string_value.contains ("conflicted copy")) {
+            GLib.assert_true (conflict_file == "");
+            conflict_file = string_value;
+            return;
+        }
+        if (!conflict_file == "") {
+            // Check that the temporary file is still there
+            GLib.assert_true (QDir (fake_folder.local_path () + "A/").entry_list ({ "*.~*" }, QDir.Files | QDir.Hidden).count () == 1);
+            // Set the permission to read only on the folder, so the rename of the temporary file will fail
+            GLib.File (fake_folder.local_path () + "A/").set_permissions (GLib.File.Permissions (0x5555));
+        }
+    }
+
+
     /***********************************************************
     ***********************************************************/
     private void test_http2_resend () {
@@ -228,7 +241,10 @@ public class TestDownload : GLib.Object {
         resend_actual = 0;
         resend_expected = 10;
 
-        QSignalSpy complete_spy (&fake_folder.sync_engine (), SIGNAL (item_completed (SyncFileItemPtr &)));
+        QSignalSpy complete_spy = new QSignalSpy (
+            fake_folder.sync_engine (),
+            item_completed (SyncFileItemPtr)
+        );
         GLib.assert_true (!fake_folder.sync_once ());
         GLib.assert_true (resend_actual == 4); // the 4th fails because it only resends 3 times
         GLib.assert_true (get_item (complete_spy, "A/resendme").status == SyncFileItem.Status.NORMAL_ERROR);

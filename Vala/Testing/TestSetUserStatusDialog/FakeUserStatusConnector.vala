@@ -13,7 +13,7 @@ public class FakeUserStatusConnector : Occ.UserStatusConnector {
     ***********************************************************/
     private Occ.UserStatus user_status_set_by_caller_of_set_user_status;
     private Occ.UserStatus user_status;
-    private GLib.Vector<Occ.UserStatus> predefined_statuses;
+    private GLib.List<Occ.UserStatus> predefined_statuses;
     private bool is_message_cleared = false;
     private bool could_not_fetch_predefined_user_statuses = false;
     private bool could_not_fetch_user_status = false;
@@ -92,7 +92,7 @@ public class FakeUserStatusConnector : Occ.UserStatusConnector {
     /***********************************************************
     ***********************************************************/
     public void set_fake_predefined_statuses (
-        GLib.Vector<Occ.UserStatus> statuses) {
+        GLib.List<Occ.UserStatus> statuses) {
         this.predefined_statuses = statuses;
     }
 

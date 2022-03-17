@@ -113,21 +113,21 @@ public class TestXmlParse : GLib.Object {
 
         connect (
             parser,
-            directory_listing_subfolders (string[]&),
+            directory_listing_subfolders,
             this,
-            on_signal_directory_listing_sub_folders (string[]&)
+            on_signal_directory_listing_sub_folders
         );
         connect (
             parser,
-            directory_listing_iterated (string&, GLib.HashTable<string,string> map),
+            directory_listing_iterated,
             this,
-            on_signal_directory_listing_iterated (string, GLib.HashTable<string,string> map)
+            on_signal_directory_listing_iterated
         );
         connect (
             parser,
-            finished_without_error (),
+            finished_without_error,
             this,
-            on_signal_finished_successfully ()
+            on_signal_finished_successfully
         );
 
         GLib.HashTable <string, ExtraFolderInfo> sizes;
@@ -199,12 +199,24 @@ public class TestXmlParse : GLib.Object {
 
         LsColXMLParser parser;
 
-        connect (parser, SIGNAL (directory_listing_subfolders (string[]&)),
-                 this, SLOT (on_signal_directory_listing_sub_folders (string[]&)) );
-        connect (parser, SIGNAL (directory_listing_iterated (string&, GLib.HashTable<string,string>&)),
-                 this, SLOT (on_signal_directory_listing_iterated (string&, GLib.HashTable<string,string>&)) );
-        connect (parser, SIGNAL (finished_without_error ()),
-                 this, SLOT (on_signal_finished_successfully ()) );
+        connect (
+            parser,
+            directory_listing_subfolders,
+            this,
+            on_signal_directory_listing_sub_folders
+        );
+        connect (
+            parser,
+            directory_listing_iterated,
+            this,
+            on_signal_directory_listing_iterated
+        );
+        connect (
+            parser,
+            finished_without_error,
+            this,
+            on_signal_finished_successfully
+        );
 
         GLib.HashTable <string, ExtraFolderInfo> sizes;
         GLib.assert_true (false == parser.parse ( test_xml, sizes, "/oc/remote.php/dav/sharefolder" )); // verify false
@@ -225,12 +237,24 @@ public class TestXmlParse : GLib.Object {
 
         LsColXMLParser parser;
 
-        connect (parser, SIGNAL (directory_listing_subfolders (string[]&)),
-                 this, SLOT (on_signal_directory_listing_sub_folders (string[]&)) );
-        connect (parser, SIGNAL (directory_listing_iterated (string&, GLib.HashTable<string,string>&)),
-                 this, SLOT (on_signal_directory_listing_iterated (string&, GLib.HashTable<string,string>&)) );
-        connect (parser, SIGNAL (finished_without_error ()),
-                 this, SLOT (on_signal_finished_successfully ()) );
+        connect (
+            parser,
+            directory_listing_subfolders,
+            this,
+            on_signal_directory_listing_sub_folders
+        );
+        connect (
+            parser,
+            directory_listing_iterated,
+            this,
+            on_signal_directory_listing_iterated
+        );
+        connect (
+            parser,
+            finished_without_error,
+            this,
+            on_signal_finished_successfully
+        );
 
         GLib.HashTable <string, ExtraFolderInfo> sizes;
         GLib.assert_true (false == parser.parse ( test_xml, sizes, "/oc/remote.php/dav/sharefolder" )); // verify false
@@ -250,12 +274,24 @@ public class TestXmlParse : GLib.Object {
 
         LsColXMLParser parser;
 
-        connect (parser, SIGNAL (directory_listing_subfolders (string[]&)),
-                 this, SLOT (on_signal_directory_listing_sub_folders (string[]&)) );
-        connect (parser, SIGNAL (directory_listing_iterated (string&, GLib.HashTable<string,string>&)),
-                 this, SLOT (on_signal_directory_listing_iterated (string&, GLib.HashTable<string,string>&)) );
-        connect (parser, SIGNAL (finished_without_error ()),
-                 this, SLOT (on_signal_finished_successfully ()) );
+        connect (
+            parser,
+            directory_listing_subfolders,
+            this,
+            on_signal_directory_listing_sub_folders
+        );
+        connect (
+            parser,
+            directory_listing_iterated,
+            this,
+            on_signal_directory_listing_iterated
+        );
+        connect (
+            parser,
+            finished_without_error,
+            this,
+            on_signal_finished_successfully
+        );
 
         GLib.HashTable <string, ExtraFolderInfo> sizes;
         GLib.assert_true (false == parser.parse ( test_xml, sizes, "/oc/remote.php/dav/sharefolder" )); // verify false
@@ -291,12 +327,24 @@ public class TestXmlParse : GLib.Object {
 
         LsColXMLParser parser;
 
-        connect (parser, SIGNAL (directory_listing_subfolders (string[]&)),
-                 this, SLOT (on_signal_directory_listing_sub_folders (string[]&)) );
-        connect (parser, SIGNAL (directory_listing_iterated (string&, GLib.HashTable<string,string>&)),
-                 this, SLOT (on_signal_directory_listing_iterated (string&, GLib.HashTable<string,string>&)) );
-        connect (parser, SIGNAL (finished_without_error ()),
-                 this, SLOT (on_signal_finished_successfully ()) );
+        connect (
+            parser,
+            directory_listing_subfolders,
+            this,
+            on_signal_directory_listing_sub_folders
+        );
+        connect (
+            parser,
+            directory_listing_iterated,
+            this,
+            on_signal_directory_listing_iterated
+        );
+        connect (
+            parser,
+            finished_without_error,
+            this,
+            on_signal_finished_successfully
+        );
 
         GLib.HashTable <string, ExtraFolderInfo> sizes;
         GLib.assert_true (!parser.parse ( test_xml, sizes, "/oc/remote.php/dav/sharefolder" ));
@@ -358,12 +406,24 @@ public class TestXmlParse : GLib.Object {
 
         LsColXMLParser parser;
 
-        connect (parser, SIGNAL (directory_listing_subfolders (string[]&)),
-                 this, SLOT (on_signal_directory_listing_sub_folders (string[]&)) );
-        connect (parser, SIGNAL (directory_listing_iterated (string&, GLib.HashTable<string,string>&)),
-                 this, SLOT (on_signal_directory_listing_iterated (string&, GLib.HashTable<string,string>&)) );
-        connect (parser, SIGNAL (finished_without_error ()),
-                 this, SLOT (on_signal_finished_successfully ()) );
+        connect (
+            parser,
+            directory_listing_subfolders,
+            this,
+            on_signal_directory_listing_sub_folders
+        );
+        connect (
+            parser,
+            directory_listing_iterated,
+            this,
+            on_signal_directory_listing_iterated
+        );
+        connect (
+            parser,
+            finished_without_error,
+            this,
+            on_signal_finished_successfully
+        );
 
         GLib.HashTable <string, ExtraFolderInfo> sizes;
         GLib.assert_true (false == parser.parse ( test_xml, sizes, "/oc/remote.php/dav/sharefolder" ));
@@ -425,12 +485,24 @@ public class TestXmlParse : GLib.Object {
 
         LsColXMLParser parser;
 
-        connect (parser, SIGNAL (directory_listing_subfolders (string[]&)),
-                 this, SLOT (on_signal_directory_listing_sub_folders (string[]&)) );
-        connect (parser, SIGNAL (directory_listing_iterated (string&, GLib.HashTable<string,string>&)),
-                 this, SLOT (on_signal_directory_listing_iterated (string&, GLib.HashTable<string,string>&)) );
-        connect (parser, SIGNAL (finished_without_error ()),
-                 this, SLOT (on_signal_finished_successfully ()) );
+        connect (
+            parser,
+            directory_listing_subfolders,
+            this,
+            on_signal_directory_listing_sub_folders
+        );
+        connect (
+            parser,
+            directory_listing_iterated,
+            this,
+            on_signal_directory_listing_iterated
+        );
+        connect (
+            parser,
+            finished_without_error,
+            this,
+            on_signal_finished_successfully
+        );
 
         GLib.HashTable <string, ExtraFolderInfo> sizes;
         GLib.assert_true (false == parser.parse ( test_xml, sizes, "/oc/remote.php/dav/sharefolder" ));
@@ -492,12 +564,24 @@ public class TestXmlParse : GLib.Object {
 
         LsColXMLParser parser;
 
-        connect (parser, SIGNAL (directory_listing_subfolders (string[]&)),
-                 this, SLOT (on_signal_directory_listing_sub_folders (string[]&)) );
-        connect (parser, SIGNAL (directory_listing_iterated (string&, GLib.HashTable<string,string>&)),
-                 this, SLOT (on_signal_directory_listing_iterated (string&, GLib.HashTable<string,string>&)) );
-        connect (parser, SIGNAL (finished_without_error ()),
-                 this, SLOT (on_signal_finished_successfully ()) );
+        connect (
+            parser,
+            directory_listing_subfolders,
+            this,
+            on_signal_directory_listing_sub_folders
+        );
+        connect (
+            parser,
+            directory_listing_iterated,
+            this,
+            on_signal_directory_listing_iterated
+        );
+        connect (
+            parser,
+            finished_without_error,
+            this,
+            on_signal_finished_successfully
+        );
 
         GLib.HashTable <string, ExtraFolderInfo> sizes;
         GLib.assert_true (parser.parse ( test_xml, sizes, "/oc/remote.php/dav/sharefolder" ));
@@ -568,12 +652,24 @@ public class TestXmlParse : GLib.Object {
 
         LsColXMLParser parser;
 
-        connect (parser, SIGNAL (directory_listing_subfolders (string[]&)),
-                 this, SLOT (on_signal_directory_listing_sub_folders (string[]&)) );
-        connect (parser, SIGNAL (directory_listing_iterated (string&, GLib.HashTable<string,string>&)),
-                 this, SLOT (on_signal_directory_listing_iterated (string&, GLib.HashTable<string,string>&)) );
-        connect (parser, SIGNAL (finished_without_error ()),
-                 this, SLOT (on_signal_finished_successfully ()) );
+        connect (
+            parser,
+            directory_listing_subfolders,
+            this,
+            on_signal_directory_listing_sub_folders
+        );
+        connect (
+            parser,
+            directory_listing_iterated,
+            this,
+            on_signal_directory_listing_iterated
+        );
+        connect (
+            parser,
+            finished_without_error,
+            this,
+            on_signal_finished_successfully
+        );
 
         GLib.HashTable <string, ExtraFolderInfo> sizes;
         GLib.assert_true (!parser.parse ( test_xml, sizes, "/oc/remote.php/dav/sharefolder" ));
@@ -636,12 +732,24 @@ public class TestXmlParse : GLib.Object {
 
         LsColXMLParser parser;
 
-        connect (parser, SIGNAL (directory_listing_subfolders (string[]&)),
-                 this, SLOT (on_signal_directory_listing_sub_folders (string[]&)) );
-        connect (parser, SIGNAL (directory_listing_iterated (string&, GLib.HashTable<string,string>&)),
-                 this, SLOT (on_signal_directory_listing_iterated (string&, GLib.HashTable<string,string>&)) );
-        connect (parser, SIGNAL (finished_without_error ()),
-                 this, SLOT (on_signal_finished_successfully ()) );
+        connect (
+            parser,
+            directory_listing_subfolders,
+            this,
+            on_signal_directory_listing_sub_folders
+        );
+        connect (
+            parser,
+            directory_listing_iterated,
+            this,
+            on_signal_directory_listing_iterated
+        );
+        connect (
+            parser,
+            finished_without_error,
+            this,
+            on_signal_finished_successfully
+        );
 
         GLib.HashTable <string, ExtraFolderInfo> sizes;
         GLib.assert_true (

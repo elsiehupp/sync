@@ -189,18 +189,12 @@ public class TestSyncEngine : GLib.Object {
         // fake_folder.sync_once ();
         fake_folder.sync_once ();
 
-        var get_database_checksum = [&] (string path) {
-            SyncJournalFileRecord record;
-            fake_folder.sync_journal ().get_file_record (path, record);
-            return record.checksum_header;
-        }
-
         // printf 'A%.0s' {1..64} | sha1sum -
-        string reference_checksum = new "SHA1:30b86e44e6001403827a62c58b08893e77cf121f";
-        GLib.assert_true (get_database_checksum ("a1.eml") == reference_checksum);
-        GLib.assert_true (get_database_checksum ("a2.eml") == reference_checksum);
-        GLib.assert_true (get_database_checksum ("a3.eml") == reference_checksum);
-        GLib.assert_true (get_database_checksum ("b3.txt") == reference_checksum);
+        string reference_checksum = "SHA1:30b86e44e6001403827a62c58b08893e77cf121f";
+        GLib.assert_true (get_database_checksum (fake_folder, "a1.eml") == reference_checksum);
+        GLib.assert_true (get_database_checksum (fake_folder, "a2.eml") == reference_checksum);
+        GLib.assert_true (get_database_checksum (fake_folder, "a3.eml") == reference_checksum);
+        GLib.assert_true (get_database_checksum (fake_folder, "b3.txt") == reference_checksum);
 
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
         // Touch the file without changing the content, shouldn't upload
@@ -223,6 +217,13 @@ public class TestSyncEngine : GLib.Object {
     }
 
 
+    private static string get_database_checksum (FakeFolder fake_folder, string path) {
+        SyncJournalFileRecord record;
+        fake_folder.sync_journal ().get_file_record (path, record);
+        return record.checksum_header;
+    }
+
+
     /***********************************************************
     ***********************************************************/
     private void on_test_selective_sync_bug () {
@@ -242,7 +243,7 @@ public class TestSyncEngine : GLib.Object {
                                         "file_b.txt", 400, 'o'
                                     },
                                     {
-                                        ???
+                                        "???" // mangled?
                                     }, new FileInfonfo (
                                         "subsub_folder", {
                                             {
@@ -285,11 +286,6 @@ public class TestSyncEngine : GLib.Object {
         // Remove sub_folder_a with selective_sync:
         fake_folder.sync_engine ().journal ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, {"parent_folder/sub_folder_a/"});
         fake_folder.sync_engine ().journal ().schedule_path_for_remote_discovery ("parent_folder/sub_folder_a/");
-        var get_etag = (string file) => {
-            SyncJournalFileRecord record;
-            fake_folder.sync_journal ().get_file_record (file, record);
-            return record.etag;
-        }
         GLib.assert_true (get_etag ("parent_folder") == "this.invalid_");
         GLib.assert_true (get_etag ("parent_folder/sub_folder_a") == "this.invalid_");
         GLib.assert_true (get_etag ("parent_folder/sub_folder_a/subsub_folder") != "this.invalid_");
@@ -322,6 +318,13 @@ public class TestSyncEngine : GLib.Object {
                 GLib.assert_true (local.find ("parent_folder/sub_folder_b"));
             }
         }
+    }
+
+
+    private static string get_etag (FakeFoler fake_folder, string file) {
+        SyncJournalFileRecord record;
+        fake_folder.sync_journal ().get_file_record (file, record);
+        return record.etag;
     }
 
 
@@ -530,47 +533,57 @@ public class TestSyncEngine : GLib.Object {
         fake_folder.remote_modifier ().append_byte ("C/c1");
         fake_folder.remote_modifier ().set_modification_time ("C/c1", changed_mtime2);
 
-        connect (&fake_folder.sync_engine (), &SyncEngine.about_to_propagate, [&] (SyncFileItemVector items) {
-            SyncFileItemPtr a1, b1, c1;
-            for (var item : items) {
-                if (item.file == "A/a1")
-                    a1 = item;
-                if (item.file == "B/b1")
-                    b1 = item;
-                if (item.file == "C/c1")
-                    c1 = item;
-            }
-
-            // a1 : should have local size and modtime
-            GLib.assert_true (a1);
-            GLib.assert_true (a1.instruction == SyncInstructions.SYNC);
-            GLib.assert_true (a1.direction, ==SyncFileItem.Direction.UP);
-            GLib.assert_true (a1.size == int64 (5));
-
-            GLib.assert_true (Utility.date_time_from_time_t (a1.modtime) == changed_mtime);
-            GLib.assert_true (a1.previous_size == int64 (4));
-            GLib.assert_true (Utility.date_time_from_time_t (a1.previous_modtime) == initial_mtime);
-
-            // b2 : should have remote size and modtime
-            GLib.assert_true (b1);
-            GLib.assert_true (b1.instruction == SyncInstructions.SYNC);
-            GLib.assert_true (b1.direction == SyncFileItem.Direction.DOWN);
-            GLib.assert_true (b1.size == int64 (17));
-            GLib.assert_true (Utility.date_time_from_time_t (b1.modtime) == changed_mtime);
-            GLib.assert_true (b1.previous_size == int64 (16));
-            GLib.assert_true (Utility.date_time_from_time_t (b1.previous_modtime) == initial_mtime);
-
-            // c1 : conflicts are downloads, so remote size and modtime
-            GLib.assert_true (c1);
-            GLib.assert_true (c1.instruction == SyncInstructions.CONFLICT);
-            GLib.assert_true (c1.direction == SyncFileItem.Direction.NONE);
-            GLib.assert_true (c1.size == int64 (25));
-            GLib.assert_true (Utility.date_time_from_time_t (c1.modtime) == changed_mtime2);
-            GLib.assert_true (c1.previous_size == int64 (26));
-            GLib.assert_true (Utility.date_time_from_time_t (c1.previous_modtime) == changed_mtime);
-        });
+        connect (
+            fake_folder.sync_engine (),
+            SyncEngine.about_to_propagate,
+            this.on_signal_sync_engine_about_to_propagate
+        );
 
         GLib.assert_true (fake_folder.sync_once ());
+    }
+
+
+    private void on_signal_sync_engine_about_to_propagate (SyncFileItemVector items) {
+        SyncFileItemPtr a1, b1, c1;
+        foreach (var item in items) {
+            if (item.file == "A/a1") {
+                a1 = item;
+            }
+            if (item.file == "B/b1") {
+                b1 = item;
+            }
+            if (item.file == "C/c1") {
+                c1 = item;
+            }
+        }
+
+        // a1 : should have local size and modtime
+        GLib.assert_true (a1);
+        GLib.assert_true (a1.instruction == SyncInstructions.SYNC);
+        GLib.assert_true (a1.direction == SyncFileItem.Direction.UP);
+        GLib.assert_true (a1.size == (int64) 5);
+
+        GLib.assert_true (Utility.date_time_from_time_t (a1.modtime) == changed_mtime);
+        GLib.assert_true (a1.previous_size == (int64) 4);
+        GLib.assert_true (Utility.date_time_from_time_t (a1.previous_modtime) == initial_mtime);
+
+        // b2 : should have remote size and modtime
+        GLib.assert_true (b1);
+        GLib.assert_true (b1.instruction == SyncInstructions.SYNC);
+        GLib.assert_true (b1.direction == SyncFileItem.Direction.DOWN);
+        GLib.assert_true (b1.size == (int64) 17);
+        GLib.assert_true (Utility.date_time_from_time_t (b1.modtime) == changed_mtime);
+        GLib.assert_true (b1.previous_size == (int64) 16);
+        GLib.assert_true (Utility.date_time_from_time_t (b1.previous_modtime) == initial_mtime);
+
+        // c1 : conflicts are downloads, so remote size and modtime
+        GLib.assert_true (c1);
+        GLib.assert_true (c1.instruction == SyncInstructions.CONFLICT);
+        GLib.assert_true (c1.direction == SyncFileItem.Direction.NONE);
+        GLib.assert_true (c1.size == (int64) 25);
+        GLib.assert_true (Utility.date_time_from_time_t (c1.modtime) == changed_mtime2);
+        GLib.assert_true (c1.previous_size == (int64) 26);
+        GLib.assert_true (Utility.date_time_from_time_t (c1.previous_modtime) == changed_mtime);
     }
 
 
@@ -615,7 +628,6 @@ public class TestSyncEngine : GLib.Object {
 
 
     private Soup.Reply override_delegate_insufficient_remote_storage (Soup.Operation operation, Soup.Request request, QIODevice outgoing_data) {
-        Q_UNUSED (outgoing_data)
 
         if (operation == Soup.PutOperation) {
             number_of_put++;
@@ -720,13 +732,13 @@ public class TestSyncEngine : GLib.Object {
         GLib.assert_true (!fake_folder.current_remote_state ().find ("B/\\:?*\"<>|.txt"));
 
         // We can override that by setting the capability
-        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", QVariantMap{ { "invalid_filename_regex", "" } } } });
+        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", new QVariantMap ( { "invalid_filename_regex", "" } ) } });
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // Check that new servers also accept the capability
         fake_folder.sync_engine ().account ().set_server_version ("10.0.0");
-        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", QVariantMap{ { "invalid_filename_regex", "my[fgh]ile" } } } });
+        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", new QVariantMap ( { "invalid_filename_regex", "my[fgh]ile" } ) } });
         fake_folder.local_modifier ().insert ("C/myfile.txt");
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (!fake_folder.current_remote_state ().find ("C/myfile.txt"));
@@ -740,12 +752,6 @@ public class TestSyncEngine : GLib.Object {
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
-        // We can't depend on current_local_state for hidden files since
-        // it should rightfully skip things like download temporaries
-        var local_file_exists = [&] (string name) {
-            return new FileInfo (fake_folder.local_path () + name).exists ();
-        }
-
         fake_folder.sync_engine ().set_ignore_hidden_files (true);
         fake_folder.remote_modifier ().insert ("A/.hidden");
         fake_folder.local_modifier ().insert ("B/.hidden");
@@ -758,6 +764,15 @@ public class TestSyncEngine : GLib.Object {
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (local_file_exists ("A/.hidden"));
         GLib.assert_true (fake_folder.current_remote_state ().find ("B/.hidden"));
+    }
+
+
+    /***********************************************************
+    We can't depend on current_local_state for hidden files since
+    it should rightfully skip things like download temporaries
+    ***********************************************************/
+    private static FileInfo local_file_exists (FakeFolder fake_folder, string name) {
+        return new FileInfo (fake_folder.local_path () + name).exists ();
     }
 
 
@@ -827,19 +842,21 @@ public class TestSyncEngine : GLib.Object {
         GLib.Object parent;
         int number_of_put = 0;
         fake_folder.set_server_override (this.override_delegate);
-        private Soup.Reply override_delegate (Soup.Operation operation, Soup.Request request, QIODevice device) {
-            if (operation == Soup.PutOperation) {
-                ++number_of_put;
-                return new FakeHangingReply (operation, request, parent);
-            }
-            return null;
-        });
 
         fake_folder.local_modifier ().insert ("file", 100, 'W');
-        QTimer.single_shot (100, fake_folder.sync_engine (), [&] () { fake_folder.sync_engine ().on_signal_abort (); });
+        QTimer.single_shot (100, fake_folder.sync_engine (), () => { fake_folder.sync_engine ().on_signal_abort (); });
         GLib.assert_true (!fake_folder.sync_once ());
 
         GLib.assert_true (number_of_put == 3);
+    }
+
+
+    private Soup.Reply override_delegate (Soup.Operation operation, Soup.Request request, QIODevice device) {
+        if (operation == Soup.PutOperation) {
+            ++number_of_put;
+            return new FakeHangingReply (operation, request, parent);
+        }
+        return null;
     }
 
 
@@ -904,7 +921,7 @@ public class TestSyncEngine : GLib.Object {
     ***********************************************************/
     private void test_errors_with_bulk_upload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", QVariantMap{ {"bulkupload", "1.0"} } } });
+        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", new QVariantMap ( { "bulkupload", "1.0" } ) } });
 
         // Disable parallel uploads
         SyncOptions sync_options;
@@ -949,28 +966,12 @@ public class TestSyncEngine : GLib.Object {
         if (operation == Soup.PostOperation) {
             ++number_of_post;
             if (content_type.starts_with ("multipart/related; boundary=")) {
-                var json_reply_object = fake_folder.for_each_reply_part (outgoing_data, content_type, [] (GLib.HashTable<string, string> all_headers) . QJsonObject {
-                    var reply = QJsonObject{};
-                    var filename = all_headers["X-File-Path"];
-                    if (filename.ends_with ("A/big2") ||
-                            filename.ends_with ("A/big3") ||
-                            filename.ends_with ("A/big4") ||
-                            filename.ends_with ("A/big5") ||
-                            filename.ends_with ("A/big7") ||
-                            filename.ends_with ("B/big8")) {
-                        reply.insert ("error", true);
-                        reply.insert ("etag", {});
-                        return reply;
-                    } else {
-                        reply.insert ("error", false);
-                        reply.insert ("etag", {});
-                    }
-                    return reply;
-                });
+                var json_reply_object = fake_folder.for_each_reply_part (outgoing_data, content_type, fake_folder_for_each_reply_part_delegate
+                );
                 if (json_reply_object.size ()) {
-                    var json_reply = QJsonDocument{};
+                    var json_reply = new QJsonDocument ();
                     json_reply.set_object (json_reply_object);
-                    return new FakeJsonErrorReply{operation, request, this, 200, json_reply};
+                    return new FakeJsonErrorReply (operation, request, this, 200, json_reply);
                 }
                 return  null;
             }
@@ -985,9 +986,29 @@ public class TestSyncEngine : GLib.Object {
                     filename.ends_with ("B/big8")) {
                 return new FakeErrorReply (operation, request, this, 412);
             }
-            return  null;
+            return null;
         }
         return null;
+    }
+
+
+    private QJsonObject fake_folder_for_each_reply_part_delegate (GLib.HashTable<string, string> all_headers) {
+        var reply = new QJsonObject ();
+        var filename = all_headers["X-File-Path"];
+        if (filename.ends_with ("A/big2") ||
+                filename.ends_with ("A/big3") ||
+                filename.ends_with ("A/big4") ||
+                filename.ends_with ("A/big5") ||
+                filename.ends_with ("A/big7") ||
+                filename.ends_with ("B/big8")) {
+            reply.insert ("error", true);
+            reply.insert ("etag", {});
+            return reply;
+        } else {
+            reply.insert ("error", false);
+            reply.insert ("etag", {});
+        }
+        return reply;
     }
 
 }
