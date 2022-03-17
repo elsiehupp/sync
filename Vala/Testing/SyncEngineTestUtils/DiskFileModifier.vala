@@ -39,7 +39,7 @@ public class DiskFileModifier : FileModifier {
         for (int x = 0; x < size / buffer.size (); ++x) {
             file.write (buffer);
         }
-        file.write (buffer.data (), size % buffer.size ());
+        file.write (buffer, size % buffer.size ());
         file.close ();
         // Set the mtime 30 seconds in the past, for some tests that need to make sure that the mtime differs.
         Occ.FileSystem.set_modification_time (file.filename (), Occ.Utility.date_time_to_time_t (GLib.DateTime.current_date_time_utc ().add_secs (-30)));

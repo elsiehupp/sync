@@ -57,7 +57,7 @@ public class TestFolderWatcher : GLib.Object {
 
         this.watcher.on_signal_reset (new FolderWatcher ());
         this.watcher.init (this.root_path);
-        this.path_changed_spy.on_signal_reset (new QSignalSpy (this.watcher.data (), SIGNAL (path_changed (string))));
+        this.path_changed_spy.on_signal_reset (new QSignalSpy (this.watcher, SIGNAL (path_changed (string))));
     }
 
 

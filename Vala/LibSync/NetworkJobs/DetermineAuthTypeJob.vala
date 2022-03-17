@@ -55,7 +55,7 @@ public class DetermineAuthTypeJob : GLib.Object {
     private bool old_flow_done = false;
 
 
-    signal void signal_auth_type (AuthType type);
+    internal signal void signal_auth_type (AuthType type);
 
 
     /***********************************************************

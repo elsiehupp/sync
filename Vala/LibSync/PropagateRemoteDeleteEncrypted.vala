@@ -46,7 +46,7 @@ public class PropagateRemoteCeleteEncrypted : AbstractPropagateRemoteDeleteEncry
             return;
         }
 
-        FolderMetadata metadata = new FolderMetadata (this.propagator.account (), json.to_json (QJsonDocument.Compact), status_code);
+        FolderMetadata metadata = new FolderMetadata (this.propagator.account, json.to_json (QJsonDocument.Compact), status_code);
 
         GLib.debug (PROPAGATE_REMOVE_ENCRYPTED + "Metadata Received, preparing it for removal of the file");
 
@@ -72,7 +72,7 @@ public class PropagateRemoteCeleteEncrypted : AbstractPropagateRemoteDeleteEncry
 
         GLib.debug (PROPAGATE_REMOVE_ENCRYPTED + "Metadata updated, sending to the server.");
 
-        var job = new UpdateMetadataApiJob (this.propagator.account (), this.folder_identifier, metadata.encrypted_metadata (), this.folder_token);
+        var job = new UpdateMetadataApiJob (this.propagator.account, this.folder_identifier, metadata.encrypted_metadata (), this.folder_token);
         connect (
             job,
             UpdateMetadataApiJob.on_signal_success,

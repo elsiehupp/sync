@@ -323,13 +323,13 @@ public class Vfs : GLib.Object {
     /***********************************************************
     Emitted when a user-initiated hydration starts
     ***********************************************************/
-    signal void begin_hydrating ();
+    internal signal void begin_hydrating ();
 
 
     /***********************************************************
     Emitted when the hydration ends
     ***********************************************************/
-    signal void done_hydrating ();
+    internal signal void done_hydrating ();
 
 
     /***********************************************************

@@ -242,7 +242,7 @@ public class VfsOff : Vfs {
         }
 
         QPluginLoader loader (plugin_path);
-        var plugin = loader.instance ();
+        var plugin = loader.instance;
         if (!plugin) {
             GLib.critical ("Could not load plugin" + plugin_path + loader.error_string ();
             return null;

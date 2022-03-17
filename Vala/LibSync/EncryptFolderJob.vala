@@ -29,7 +29,7 @@ public class EncryptFolderJob : GLib.Object {
     string error_string { public get; protected set; }
 
 
-    signal void signal_finished (int status);
+    internal signal void signal_finished (int status);
 
 
     /***********************************************************

@@ -42,8 +42,8 @@ public class ConflictSolver : GLib.Object {
     }
 
 
-    signal void signal_local_version_filename_changed ();
-    signal void signal_remote_version_filename_changed ();
+    internal signal void signal_local_version_filename_changed ();
+    internal signal void signal_remote_version_filename_changed ();
 
 
     /***********************************************************

@@ -100,8 +100,8 @@ public class UserInfo : GLib.Object {
     private QPointer<JsonApiJob> job;
 
 
-    signal void quota_updated (int64 total, int64 used);
-    signal void fetched_last_info (UserInfo user_info);
+    internal signal void quota_updated (int64 total, int64 used);
+    internal signal void fetched_last_info (UserInfo user_info);
 
 
     /***********************************************************
@@ -114,7 +114,7 @@ public class UserInfo : GLib.Object {
         this.last_quota_total_bytes = 0;
         this.last_quota_used_bytes = 0;
         this.active = false;
-        connect (account_state, AccountState.state_changed,
+        connect (account_state, AccountState.signal_state_changed,
             this, UserInfo.on_signal_account_state_changed);
         connect (this.job_restart_timer, QTimer.timeout, this, UserInfo.on_signal_fetch_info);
         this.job_restart_timer.single_shot (true);
@@ -133,11 +133,11 @@ public class UserInfo : GLib.Object {
             this.job.delete_later ();
         }
 
-        unowned Account account = this.account_state.account ();
+        unowned Account account = this.account_state.account;
         this.job = new JsonApiJob (account, "ocs/v1.php/cloud/user", this);
         this.job.on_signal_timeout (20 * 1000);
-        connect (this.job.data (), JsonApiJob.json_received, this, UserInfo.on_signal_update_last_info);
-        connect (this.job.data (), AbstractNetworkJob.network_error, this, UserInfo.on_signal_request_failed);
+        connect (this.job, JsonApiJob.json_received, this, UserInfo.on_signal_update_last_info);
+        connect (this.job, AbstractNetworkJob.network_error, this, UserInfo.on_signal_request_failed);
         this.job.on_signal_start ();
     }
 
@@ -147,7 +147,7 @@ public class UserInfo : GLib.Object {
     private void on_signal_update_last_info (QJsonDocument json) {
         var obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
 
-        unowned Account account = this.account_state.account ();
+        unowned Account account = this.account_state.account;
 
         // User Info
         string user = obj_data.value ("identifier").to_string ();
@@ -215,7 +215,7 @@ public class UserInfo : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_avatar_image (Gtk.Image img) {
-        this.account_state.account ().avatar (img);
+        this.account_state.account.avatar (img);
 
         /* emit */ fetched_last_info (this);
     }
@@ -227,7 +227,7 @@ public class UserInfo : GLib.Object {
         if (!this.account_state || !this.active) {
             return false;
         }
-        unowned Account account = this.account_state.account ();
+        unowned Account account = this.account_state.account;
         return (this.account_state.is_connected () || this.allow_disconnected_account_state)
             && account.credentials ()
             && account.credentials ().ready ();

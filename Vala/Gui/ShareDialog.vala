@@ -47,8 +47,8 @@ public class ShareDialog : Gtk.Dialog {
     private QProgressIndicator progress_indicator = null;
 
 
-    signal void signal_toggle_share_link_animation (bool on_signal_start);
-    signal void signal_style_changed ();
+    internal signal void signal_toggle_share_link_animation (bool on_signal_start);
+    internal signal void signal_style_changed ();
 
     /***********************************************************
     ***********************************************************/
@@ -65,7 +65,7 @@ public class ShareDialog : Gtk.Dialog {
         this.share_path = share_path;
         this.local_path = local_path;
         this.max_sharing_permissions = max_sharing_permissions;
-        this.private_link_url = account_state.account ().deprecated_private_link_url (numeric_file_id).to_string (GLib.Uri.FullyEncoded);
+        this.private_link_url = account_state.account.deprecated_private_link_url (numeric_file_id).to_string (GLib.Uri.FullyEncoded);
         this.start_page = start_page;
         window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
         attribute (Qt.WA_DeleteOnClose);
@@ -75,8 +75,8 @@ public class ShareDialog : Gtk.Dialog {
 
         // We want to act on account state changes
         connect (
-            this.account_state.data (),
-            AccountState.state_changed,
+            this.account_state,
+            AccountState.signal_state_changed,
             this,
             ShareDialog.on_signal_account_state_changed
         );
@@ -116,19 +116,19 @@ public class ShareDialog : Gtk.Dialog {
             this.ui.label_share_path.on_signal_text (_("Folder : %2").printf (oc_dir));
         }
 
-        this.window_title (_("%1 Sharing").printf (Theme.instance ().app_name_gui ()));
+        this.window_title (_("%1 Sharing").printf (Theme.instance.app_name_gui ()));
 
-        if (!account_state.account ().capabilities ().share_api ()) {
+        if (!account_state.account.capabilities ().share_api ()) {
             return;
         }
 
         if (GLib.FileInfo (this.local_path).is_file ()) {
-            var job = new ThumbnailJob (this.share_path, this.account_state.account (), this);
+            var job = new ThumbnailJob (this.share_path, this.account_state.account, this);
             connect (job, ThumbnailJob.signal_job_finished, this, ShareDialog.on_signal_thumbnail_fetched);
             job.on_signal_start ();
         }
 
-        var job = new PropfindJob (account_state.account (), this.share_path);
+        var job = new PropfindJob (account_state.account, this.share_path);
         job.properties (
             GLib.List<string> ()
             + "http://open-collaboration-services.org/ns:share-permissions"
@@ -140,7 +140,7 @@ public class ShareDialog : Gtk.Dialog {
         job.on_signal_start ();
 
         bool sharing_possible = true;
-        if (!account_state.account ().capabilities ().share_public_link ()) {
+        if (!account_state.account.capabilities ().share_public_link ()) {
             GLib.warning ("Link shares have been disabled.");
             sharing_possible = false;
         } else if (!(max_sharing_permissions & Share_permission_share)) {
@@ -149,7 +149,7 @@ public class ShareDialog : Gtk.Dialog {
         }
 
         if (sharing_possible) {
-            this.manager = new ShareManager (account_state.account (), this);
+            this.manager = new ShareManager (account_state.account, this);
             connect (this.manager, ShareManager.on_signal_shares_fetched, this, ShareDialog.on_signal_shares_fetched);
             connect (this.manager, ShareManager.on_signal_link_share_created, this, ShareDialog.on_signal_add_link_share_widget);
             connect (this.manager, ShareManager.on_signal_link_share_requires_password, this, ShareDialog.on_signal_link_share_requires_password);
@@ -188,7 +188,7 @@ public class ShareDialog : Gtk.Dialog {
             this.private_link_url = private_link_url;
         } else if (!numeric_file_id == "") {
             GLib.info ("Received numeric file identifier for " + this.share_path + numeric_file_id);
-            this.private_link_url = this.account_state.account ().deprecated_private_link_url (numeric_file_id).to_string (GLib.Uri.FullyEncoded);
+            this.private_link_url = this.account_state.account.deprecated_private_link_url (numeric_file_id).to_string (GLib.Uri.FullyEncoded);
         }
 
         show_sharing_ui ();
@@ -245,10 +245,10 @@ public class ShareDialog : Gtk.Dialog {
     private void on_signal_shares_fetched (GLib.List<unowned Share> shares) {
         /* emit */ signal_toggle_share_link_animation (true);
 
-        const string version_string = this.account_state.account ().server_version ();
+        const string version_string = this.account_state.account.server_version ();
         GLib.info (version_string + "Fetched" + shares.count () + "shares");
         foreach (var share in shares) {
-            if (share.share_type () != Share.Type.LINK || share.owner_uid () != share.account ().dav_user ()) {
+            if (share.share_type () != Share.Type.LINK || share.owner_uid () != share.account.dav_user ()) {
                 continue;
             }
 
@@ -289,7 +289,7 @@ public class ShareDialog : Gtk.Dialog {
     ***********************************************************/
     private void on_signal_create_link_share () {
         if (this.manager) {
-            const var ask_optional_password = this.account_state.account ().capabilities ().share_public_link_ask_optional_password ();
+            const var ask_optional_password = this.account_state.account.capabilities ().share_public_link_ask_optional_password ();
             const var password = ask_optional_password ? create_random_password (): "";
             this.manager.create_link_share (this.share_path, "", password);
         }
@@ -382,7 +382,7 @@ public class ShareDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void show_sharing_ui () {
-        var theme = Theme.instance ();
+        var theme = Theme.instance;
 
         // There's no difference between being unable to reshare and
         // being unable to reshare with reshare permission.
@@ -399,10 +399,10 @@ public class ShareDialog : Gtk.Dialog {
         // We only do user/group sharing from 8.2.0
         bool user_group_sharing =
             theme.user_group_sharing ()
-            && this.account_state.account ().server_version_int () >= Account.make_server_version (8, 2, 0);
+            && this.account_state.account.server_version_int () >= Account.make_server_version (8, 2, 0);
 
         if (user_group_sharing) {
-            this.user_group_widget = new ShareUserGroupWidget (this.account_state.account (), this.share_path, this.local_path, this.max_sharing_permissions, this.private_link_url, this);
+            this.user_group_widget = new ShareUserGroupWidget (this.account_state.account, this.share_path, this.local_path, this.max_sharing_permissions, this.private_link_url, this);
 
             // Connect signal_style_changed events to our widget, so it can adapt (Dark-/Light-Mode switching)
             connect (this, ShareDialog.signal_style_changed, this.user_group_widget, ShareUserGroupWidget.on_signal_style_changed);
@@ -422,13 +422,13 @@ public class ShareDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private ShareLinkWidget add_link_share_widget (unowned LinkShare link_share) {
-        this.link_widget_list.append (new ShareLinkWidget (this.account_state.account (), this.share_path, this.local_path, this.max_sharing_permissions, this));
+        this.link_widget_list.append (new ShareLinkWidget (this.account_state.account, this.share_path, this.local_path, this.max_sharing_permissions, this));
 
         const var link_share_widget = this.link_widget_list.at (this.link_widget_list.size () - 1);
         link_share_widget.link_share (link_share);
 
-        connect (link_share.data (), Share.on_signal_server_error, link_share_widget, ShareLinkWidget.on_signal_server_error);
-        connect (link_share.data (), Share.signal_share_deleted, link_share_widget, ShareLinkWidget.on_signal_delete_share_fetched);
+        connect (link_share, Share.on_signal_server_error, link_share_widget, ShareLinkWidget.on_signal_server_error);
+        connect (link_share, Share.signal_share_deleted, link_share_widget, ShareLinkWidget.on_signal_delete_share_fetched);
 
         if (this.manager) {
             connect (this.manager, ShareManager.on_signal_server_error, link_share_widget, ShareLinkWidget.on_signal_server_error);
@@ -456,7 +456,7 @@ public class ShareDialog : Gtk.Dialog {
     ***********************************************************/
     private void init_link_share_widget () {
         if (this.link_widget_list.size () == 0) {
-            this.empty_share_link_widget = new ShareLinkWidget (this.account_state.account (), this.share_path, this.local_path, this.max_sharing_permissions, this);
+            this.empty_share_link_widget = new ShareLinkWidget (this.account_state.account, this.share_path, this.local_path, this.max_sharing_permissions, this);
             this.link_widget_list.append (this.empty_share_link_widget);
 
             connect (this.empty_share_link_widget, ShareLinkWidget.resize_requested, this, ShareDialog.on_signal_adjust_scroll_widget_size);

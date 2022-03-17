@@ -35,8 +35,8 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
 
         GLib.Uri server_url = this.account.url ();
         server_url.user_name (this.account.credentials ().user ());
-        string default_path = QDir.home_path () + '/' + Theme.instance ().app_name ();
-        default_path = FolderMan.instance ().find_good_path_for_new_sync_folder (default_path, server_url);
+        string default_path = QDir.home_path () + '/' + Theme.instance.app_name ();
+        default_path = FolderMan.instance.find_good_path_for_new_sync_folder (default_path, server_url);
         this.ui.local_folder_line_edit.on_signal_text (QDir.to_native_separators (default_path));
         this.ui.local_folder_line_edit.tool_tip (_("Enter the path to the local folder."));
 
@@ -51,7 +51,7 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
         GLib.Uri server_url = this.account.url ();
         server_url.user_name (this.account.credentials ().user ());
 
-        string error_str = FolderMan.instance ().check_path_validity_for_new_folder (
+        string error_str = FolderMan.instance.check_path_validity_for_new_folder (
             QDir.from_native_separators (this.ui.local_folder_line_edit.text ()), server_url);
 
         bool is_ok = error_str == "";

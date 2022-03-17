@@ -58,7 +58,7 @@ public class OAuth : GLib.Object {
     The state has changed.
     when logged in, token has the value of the token.
     ***********************************************************/
-    signal void signal_result (OAuth.Result result, string user = "", string token = "", string refresh_token = "");
+    internal signal void signal_result (OAuth.Result result, string user = "", string token = "", string refresh_token = "");
 
     /***********************************************************
     ***********************************************************/
@@ -95,13 +95,13 @@ public class OAuth : GLib.Object {
         QPointer<QTcpSocket> socket = this.server.next_pending_connection ();
         while (socket) {
             connect (
-                socket.data (),
+                socket,
                 QTcpSocket.disconnected,
-                socket.data (),
+                socket,
                 QTcpSocket.delete_later
             );
             connect (
-                socket.data (),
+                socket,
                 QIODevice.ready_read,
                 this,
                 on_signal_ready_read
@@ -130,7 +130,7 @@ public class OAuth : GLib.Object {
         req.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
 
         string basic_auth = string ("%1:%2").printf (
-            Theme.instance ().oauth_client_id (), Theme.instance ().oauth_client_secret ());
+            Theme.instance.oauth_client_id (), Theme.instance.oauth_client_secret ());
         req.raw_header ("Authorization", "Basic " + basic_auth.to_utf8 ().to_base64 ());
         // We just added the Authorization header, don't let HttpCredentialsAccessManager tamper with it
         req.attribute (HttpCredentials.DontAddCredentialsAttribute, true);
@@ -198,7 +198,7 @@ public class OAuth : GLib.Object {
                              + "<p>You logged-in with user <em>%1</em>, but must log in with user <em>%2</em>.<br>"
                              + "Please log out of %3 in another tab, then <a href='%4'>click here</a> "
                              + "and log in as user %2</p>")
-                                  .printf (user, this.expected_user, Theme.instance ().app_name_gui (),
+                                  .printf (user, this.expected_user, Theme.instance.app_name_gui (),
                                       authorisation_link ().to_string (GLib.Uri.FullyEncoded));
             http_reply_and_close (socket, "200 OK", message.to_utf8 ().const_data ());
             // We are still listening on the socket so we will get the new connection
@@ -262,7 +262,7 @@ public class OAuth : GLib.Object {
             },
             {
                 QLatin1String ("client_id"),
-                Theme.instance ().oauth_client_id ()
+                Theme.instance.oauth_client_id ()
             },
             {
                 QLatin1String ("redirect_uri"),

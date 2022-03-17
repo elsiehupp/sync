@@ -43,7 +43,7 @@ public class OwncloudSetupWizard : GLib.Object {
     /***********************************************************
     Overall dialog close signal
     ***********************************************************/
-    signal void signal_own_cloud_wizard_done (int value);
+    internal signal void signal_own_cloud_wizard_done (int value);
 
     /***********************************************************
     ***********************************************************/
@@ -107,7 +107,7 @@ public class OwncloudSetupWizard : GLib.Object {
 
         wiz = new OwncloudSetupWizard (parent);
         connect (wiz, SIGNAL (signal_own_cloud_wizard_done (int)), object, amember);
-        FolderMan.instance ().sync_enabled (false);
+        FolderMan.instance.sync_enabled (false);
         wiz.start_wizard ();
     }
 
@@ -135,7 +135,7 @@ public class OwncloudSetupWizard : GLib.Object {
         if (!fixed_url.starts_with ("http://") && !fixed_url.starts_with ("https://")) {
             url.scheme ("https");
         }
-        unowned Account account = this.oc_wizard.account ();
+        unowned Account account = this.oc_wizard.account;
         account.url (url);
 
         // Reset the proxy which might had been determined previously in ConnectionValidator.on_signal_check_server_and_auth ()
@@ -176,7 +176,7 @@ public class OwncloudSetupWizard : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_find_server () {
-        unowned Account account = this.oc_wizard.account ();
+        unowned Account account = this.oc_wizard.account;
 
         // Set fake credentials before we check what credential it actually is.
         account.credentials (CredentialsFactory.create ("dummy"));
@@ -204,7 +204,7 @@ public class OwncloudSetupWizard : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_find_server_behind_redirect () {
-        unowned Account account = this.oc_wizard.account ();
+        unowned Account account = this.oc_wizard.account;
 
         // Step 2: Resolve any permanent redirect chains on the base url
         var redirect_check_job = account.send_request ("GET", account.url ());
@@ -261,17 +261,17 @@ public class OwncloudSetupWizard : GLib.Object {
 
         this.oc_wizard.on_signal_append_to_configuration_log (_("<font color=\"green\">Successfully connected to %1 : %2 version %3 (%4)</font><br/><br/>")
                                                 .printf (Utility.escape (url.to_string ()),
-                                                    Utility.escape (Theme.instance ().app_name_gui ()),
+                                                    Utility.escape (Theme.instance.app_name_gui ()),
                                                     Utility.escape (CheckServerJob.version_string (info)),
                                                     Utility.escape (server_version)));
 
         // Note with newer servers we get the version actually only later in capabilities
         // https://github.com/owncloud/core/pull/27473/files
-        this.oc_wizard.account ().server_version (server_version);
+        this.oc_wizard.account.server_version (server_version);
 
-        if (url != this.oc_wizard.account ().url ()) {
+        if (url != this.oc_wizard.account.url ()) {
             // We might be redirected, update the account
-            this.oc_wizard.account ().url (url);
+            this.oc_wizard.account.url (url);
             GLib.info (" was redirected to" + url.to_string ());
         }
 
@@ -286,12 +286,12 @@ public class OwncloudSetupWizard : GLib.Object {
 
         // Do this early because reply might be deleted in message box event loop
         string message;
-        if (!this.oc_wizard.account ().url ().is_valid ()) {
+        if (!this.oc_wizard.account.url ().is_valid ()) {
             message = _("Invalid URL");
         } else {
             message = _("Failed to connect to %1 at %2:<br/>%3")
-                      .printf (Utility.escape (Theme.instance ().app_name_gui ()),
-                          Utility.escape (this.oc_wizard.account ().url ().to_string ()),
+                      .printf (Utility.escape (Theme.instance.app_name_gui ()),
+                          Utility.escape (this.oc_wizard.account.url ().to_string ()),
                           Utility.escape (job.error_string ()));
         }
         bool is_downgrade_advised = check_downgrade_advised (reply);
@@ -301,7 +301,7 @@ public class OwncloudSetupWizard : GLib.Object {
 
         // Allow the credentials dialog to pop up again for the same URL.
         // Maybe the user just clicked 'Cancel' by accident or changed his mind.
-        this.oc_wizard.account ().reset_rejected_certificates ();
+        this.oc_wizard.account.reset_rejected_certificates ();
     }
 
 
@@ -310,7 +310,7 @@ public class OwncloudSetupWizard : GLib.Object {
     private void on_signal_no_server_found_timeout (GLib.Uri url) {
         this.oc_wizard.on_signal_display_error (
             _("Timeout while trying to connect to %1 at %2.")
-                .printf (Utility.escape (Theme.instance ().app_name_gui ()), Utility.escape (url.to_string ())),
+                .printf (Utility.escape (Theme.instance.app_name_gui ()), Utility.escape (url.to_string ())),
                     false);
     }
 
@@ -318,7 +318,7 @@ public class OwncloudSetupWizard : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_determine_auth_type () {
-        var job = new DetermineAuthTypeJob (this.oc_wizard.account (), this);
+        var job = new DetermineAuthTypeJob (this.oc_wizard.account, this);
         connect (job, DetermineAuthTypeJob.auth_type,
             this.oc_wizard, OwncloudWizard.on_signal_auth_type);
         job.on_signal_start ();
@@ -330,9 +330,9 @@ public class OwncloudSetupWizard : GLib.Object {
     private void on_signal_connect_to_oc_url (string url) {
         GLib.info ("Connect to url: " + url);
         AbstractCredentials creds = this.oc_wizard.credentials ();
-        this.oc_wizard.account ().credentials (creds);
+        this.oc_wizard.account.credentials (creds);
 
-        const var fetch_user_name_job = new JsonApiJob (this.oc_wizard.account ().shared_from_this (), "/ocs/v1.php/cloud/user");
+        const var fetch_user_name_job = new JsonApiJob (this.oc_wizard.account.shared_from_this (), "/ocs/v1.php/cloud/user");
         connect (
             fetch_user_name_job,
             JsonApiJob.json_received,
@@ -355,13 +355,13 @@ public class OwncloudSetupWizard : GLib.Object {
         const var obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
         const var user_id = obj_data.value ("identifier").to_string ("");
         const var display_name = obj_data.value ("display-name").to_string ("");
-        this.oc_wizard.account ().dav_user (user_id);
-        this.oc_wizard.account ().dav_display_name (display_name);
+        this.oc_wizard.account.dav_user (user_id);
+        this.oc_wizard.account.dav_display_name (display_name);
 
         this.oc_wizard.field ("OCUrl", url);
         this.oc_wizard.on_signal_append_to_configuration_log (
             _("Trying to connect to %1 at %2 …")
-                .printf (Theme.instance ().app_name_gui ())
+                .printf (Theme.instance.app_name_gui ())
                 .printf (url)
             );
 
@@ -407,9 +407,9 @@ public class OwncloudSetupWizard : GLib.Object {
                     Example: https://cloud.example.com/remote.php/dav//
 
             ***********************************************************/
-            GLib.info ("Sanitize got URL path:" + this.oc_wizard.account ().url ().to_string () + '/' + this.oc_wizard.account ().dav_path () + remote_folder);
+            GLib.info ("Sanitize got URL path:" + this.oc_wizard.account.url ().to_string () + '/' + this.oc_wizard.account.dav_path () + remote_folder);
 
-            string new_dav_path = this.oc_wizard.account ().dav_path (),
+            string new_dav_path = this.oc_wizard.account.dav_path (),
                     new_remote_folder = remote_folder;
 
             while (new_dav_path.starts_with ('/')) {
@@ -428,12 +428,12 @@ public class OwncloudSetupWizard : GLib.Object {
 
             string new_url_path = new_dav_path + '/' + new_remote_folder;
 
-            GLib.info ("Sanitized to URL path:" + this.oc_wizard.account ().url ().to_string () + '/' + new_url_path);
+            GLib.info ("Sanitized to URL path:" + this.oc_wizard.account.url ().to_string () + '/' + new_url_path);
             /***********************************************************
             END - Sanitize URL paths to eliminate double-slashes
             ***********************************************************/
 
-            var job = new EntityExistsJob (this.oc_wizard.account (), new_url_path, this);
+            var job = new EntityExistsJob (this.oc_wizard.account, new_url_path, this);
             connect (job, EntityExistsJob.exists, this, OwncloudSetupWizard.on_signal_remote_folder_exists);
             job.on_signal_start ();
         } else {
@@ -479,7 +479,7 @@ public class OwncloudSetupWizard : GLib.Object {
     private void on_signal_create_remote_folder_finished (Soup.Reply reply) {
         var error = reply.error ();
         GLib.debug ("** webdav mkdir request finished " + error);
-        //    disconnect (own_cloud_info.instance (), SIGNAL (webdav_col_created (Soup.Reply.NetworkError)),
+        //    disconnect (own_cloud_info.instance, SIGNAL (webdav_col_created (Soup.Reply.NetworkError)),
         //               this, SLOT (on_signal_create_remote_folder_finished (Soup.Reply.NetworkError)));
 
         bool on_signal_success = true;
@@ -519,7 +519,7 @@ public class OwncloudSetupWizard : GLib.Object {
     setup.
     ***********************************************************/
     private void on_signal_assistant_finished (int result) {
-        FolderMan folder_man = FolderMan.instance ();
+        FolderMan folder_man = FolderMan.instance;
 
         if (result == Gtk.Dialog.Rejected) {
             GLib.info ("Rejected the new config, use the old!");
@@ -590,7 +590,7 @@ public class OwncloudSetupWizard : GLib.Object {
         } else {
             GLib.info ("No system proxy set by OS.");
         }
-        unowned Account account = this.oc_wizard.account ();
+        unowned Account account = this.oc_wizard.account;
         account.network_access_manager ().proxy (proxy);
 
         on_signal_find_server ();
@@ -617,13 +617,13 @@ public class OwncloudSetupWizard : GLib.Object {
 
             // strip the expected path
             string path = redirect_url.path ();
-            OwncloudSetupWizard.expected_path = "/" + this.oc_wizard.account ().dav_path ();
+            OwncloudSetupWizard.expected_path = "/" + this.oc_wizard.account.dav_path ();
             if (path.ends_with (OwncloudSetupWizard.expected_path)) {
                 path.chop (OwncloudSetupWizard.expected_path.size ());
                 redirect_url.path (path);
 
                 GLib.info ("Setting account url to " + redirect_url.to_string ());
-                this.oc_wizard.account ().url (redirect_url);
+                this.oc_wizard.account.url (redirect_url);
                 test_owncloud_connect ();
                 return;
             }
@@ -639,10 +639,10 @@ public class OwncloudSetupWizard : GLib.Object {
 
             // Provide messages for other errors, such as invalid credentials.
         } else if (reply.error () != Soup.Reply.NoError) {
-            if (!this.oc_wizard.account ().credentials ().still_valid (reply)) {
+            if (!this.oc_wizard.account.credentials ().still_valid (reply)) {
                 error_msg = _("Access forbidden by server. To verify that you have proper access, "
                             + "<a href=\"%1\">click here</a> to access the service with your browser.")
-                               .printf (Utility.escape (this.oc_wizard.account ().url ().to_string ()));
+                               .printf (Utility.escape (this.oc_wizard.account.url ().to_string ()));
             } else {
                 error_msg = job.error_string_parsing_body ();
             }
@@ -666,13 +666,13 @@ public class OwncloudSetupWizard : GLib.Object {
     private void start_wizard () {
         unowned Account account = AccountManager.create_account ();
         account.credentials (CredentialsFactory.create ("dummy"));
-        account.url (Theme.instance ().override_server_url ());
+        account.url (Theme.instance.override_server_url ());
         this.oc_wizard.account (account);
         this.oc_wizard.oc_url (account.url ().to_string ());
 
-        this.remote_folder = Theme.instance ().default_server_folder ();
+        this.remote_folder = Theme.instance.default_server_folder ();
         // remote_folder may be empty, which means /
-        string local_folder = Theme.instance ().default_client_folder ();
+        string local_folder = Theme.instance.default_client_folder ();
 
         // if its a relative path, prepend with users home directory, otherwise use as absolute path
 
@@ -709,7 +709,7 @@ public class OwncloudSetupWizard : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void test_owncloud_connect () {
-        unowned Account account = this.oc_wizard.account ();
+        unowned Account account = this.oc_wizard.account;
 
         var job = new PropfindJob (account, "/", this);
         job.ignore_credential_failure (true);
@@ -741,7 +741,7 @@ public class OwncloudSetupWizard : GLib.Object {
                 .printf (this.remote_folder)
         );
 
-        var job = new MkColJob (this.oc_wizard.account (), this.remote_folder, this);
+        var job = new MkColJob (this.oc_wizard.account, this.remote_folder, this);
         connect (
             job,
             MkColJob.finished_with_error,
@@ -780,7 +780,7 @@ public class OwncloudSetupWizard : GLib.Object {
             this.oc_wizard.on_signal_append_to_configuration_log (
                 "<p><font color=\"green\"><b>"
                 + _("Successfully connected to %1!")
-                    .printf (Theme.instance ().app_name_gui ())
+                    .printf (Theme.instance.app_name_gui ())
                 + "</b></font></p>");
             this.oc_wizard.on_signal_successful_step ();
         } else {
@@ -788,7 +788,7 @@ public class OwncloudSetupWizard : GLib.Object {
             this.oc_wizard.on_signal_append_to_configuration_log (
                 "<p><font color=\"red\">"
                 + _("Connection to %1 could not be established. Please check again.")
-                    .printf (Theme.instance ().app_name_gui ())
+                    .printf (Theme.instance.app_name_gui ())
                 + "</font></p>");
         }
     }
@@ -800,7 +800,7 @@ public class OwncloudSetupWizard : GLib.Object {
         // first try to rename (backup) the current local directory.
         bool rename_ok = false;
         while (!rename_ok) {
-            rename_ok = FolderMan.instance ().start_from_scratch (local_folder);
+            rename_ok = FolderMan.instance.start_from_scratch (local_folder);
             if (!rename_ok) {
                 QMessageBox.StandardButton but = QMessageBox.question (
                     null,
@@ -820,7 +820,7 @@ public class OwncloudSetupWizard : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private AccountState apply_account_changes () {
-        unowned Account new_account = this.oc_wizard.account ();
+        unowned Account new_account = this.oc_wizard.account;
 
         // Detach the account that is going to be saved from the
         // wizard to ensure it doesn't accidentally get modified
@@ -828,7 +828,7 @@ public class OwncloudSetupWizard : GLib.Object {
         // AbstractCredentialsWizardPage.clean_up_page ())
         this.oc_wizard.account (AccountManager.create_account ());
 
-        var manager = AccountManager.instance ();
+        var manager = AccountManager.instance;
 
         var new_state = manager.add_account (new_account);
         manager.save ();

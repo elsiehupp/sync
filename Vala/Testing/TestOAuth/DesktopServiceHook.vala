@@ -10,7 +10,7 @@ namespace Testing {
 
 public class DesktopServiceHook : GLib.Object {
 
-    signal void signal_hooked (GLib.Uri uri);
+    internal signal void signal_hooked (GLib.Uri uri);
 
     /***********************************************************
     ***********************************************************/

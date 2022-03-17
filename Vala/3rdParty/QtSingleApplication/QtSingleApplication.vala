@@ -32,8 +32,8 @@ public class SingleApplication : Gtk.Application {
     private string app_id;
     private bool block;
 
-    signal void signal_message_received (string message, GLib.Object socket);
-    signal void signal_file_open_request (string file);
+    internal signal void signal_message_received (string message, GLib.Object socket);
+    internal signal void signal_file_open_request (string file);
 
     /***********************************************************
     ***********************************************************/
@@ -62,7 +62,7 @@ public class SingleApplication : Gtk.Application {
             }
         }
 
-        var pids = static_cast<int64> (instances.data ());
+        var pids = static_cast<int64> (instances);
         if (!created) {
             // Find the first instance that it still running
             // The whole list needs to be iterated in order to append to it
@@ -74,9 +74,14 @@ public class SingleApplication : Gtk.Application {
         // Add current pid to list and terminate it
         *pids++ = QCoreApplication.application_pid ();
         *pids = 0;
-        pid_peer = new QtLocalPeer (this, app_id + '-' +
-                                  string.number (QCoreApplication.application_pid ()));
-        connect (pid_peer, &QtLocalPeer.signal_message_received, this, &SingleApplication.signal_message_received);
+        pid_peer = new QtLocalPeer (
+            this,
+            app_id + '-' +
+            QCoreApplication.application_pid ().to_string ()
+        );
+        pid_peer.signal_message_received.connect (
+            this.signal_message_received
+        );
         pid_peer.is_client ();
     }
 
@@ -87,7 +92,7 @@ public class SingleApplication : Gtk.Application {
         }
         const int64 app_pid = QCoreApplication.application_pid ();
         // Rewrite array, removing current pid and previously crashed ones
-        var pids = (int64) instances.data ();
+        var pids = (int64) instances;
         int64 newpids = pids;
         for (; *pids; ++pids) {
             if (*pids != app_pid && is_running (*pids))
@@ -146,10 +151,16 @@ public class SingleApplication : Gtk.Application {
         act_win = aw;
         if (!pid_peer)
             return;
-        if (activate_on_message)
-            connect (pid_peer, &QtLocalPeer.signal_message_received, this, &SingleApplication.on_activate_window);
-        else
-            disconnect (pid_peer, &QtLocalPeer.signal_message_received, this, &SingleApplication.on_activate_window);
+        if (activate_on_message) {
+            pid_peer.signal_message_received.connect (
+                this.on_signal_activate_window
+            );
+        }
+        else {
+            pid_peer.signal_message_received.disconnect (
+                this.on_signal_activate_window
+            );
+        }
     }
 
 
@@ -177,11 +188,11 @@ public class SingleApplication : Gtk.Application {
 
     /***********************************************************
     ***********************************************************/
-    public void on_activate_window () {
+    public void on_signal_activate_window () {
         if (act_win) {
             act_win.set_window_state (act_win.window_state () & ~Qt.Window_minimized);
             act_win.raise ();
-            act_win.on_activate_window ();
+            act_win.on_signal_activate_window ();
         }
     }
 

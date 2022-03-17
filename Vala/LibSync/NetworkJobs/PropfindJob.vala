@@ -30,8 +30,8 @@ public class PropfindJob : AbstractNetworkJob {
     ***********************************************************/
     public GLib.List<string> properties;
 
-    signal void signal_result (GLib.HashTable<string, GLib.Variant> values);
-    signal void finished_with_error (GLib.InputStream reply = null);
+    internal signal void signal_result (GLib.HashTable<string, GLib.Variant> values);
+    internal signal void finished_with_error (GLib.InputStream reply = null);
 
     /***********************************************************
     ***********************************************************/

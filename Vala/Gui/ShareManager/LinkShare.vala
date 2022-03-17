@@ -111,10 +111,10 @@ public class LinkShare : Share {
     }
 
 
-    signal void signal_expire_date_set ();
-    signal void signal_note_set ();
-    signal void signal_name_set ();
-    signal void signal_label_set ();
+    internal signal void signal_expire_date_set ();
+    internal signal void signal_note_set ();
+    internal signal void signal_name_set ();
+    internal signal void signal_label_set ();
 
 
     /***********************************************************

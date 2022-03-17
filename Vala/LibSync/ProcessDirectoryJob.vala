@@ -264,12 +264,12 @@ public class ProcessDirectoryJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    signal void signal_finished ();
+    internal signal void signal_finished ();
 
     /***********************************************************
     The root etag of this directory was fetched
     ***********************************************************/
-    signal void etag (string array, GLib.DateTime time);
+    internal signal void etag (string array, GLib.DateTime time);
 
 
     /***********************************************************
@@ -2094,7 +2094,7 @@ public class ProcessDirectoryJob : GLib.Object {
     ***********************************************************/
     private void start_async_local_query () {
         string local_path = this.discovery_data.local_dir + this.current_folder.local;
-        var local_job = new DiscoverySingleLocalDirectoryJob (this.discovery_data.account, local_path, this.discovery_data.sync_options.vfs.data ());
+        var local_job = new DiscoverySingleLocalDirectoryJob (this.discovery_data.account, local_path, this.discovery_data.sync_options.vfs);
 
         this.discovery_data.currently_active_jobs++;
         this.pending_async_jobs++;

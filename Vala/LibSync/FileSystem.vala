@@ -48,8 +48,8 @@ public class FileSystem : GLib.Object {
         string buffer2;
         // the files have the same size, compare all of it
         while (!file_1.at_end ()) {
-            file_1.read (buffer1.data (), BUFFER_SIZE);
-            file_2.read (buffer2.data (), BUFFER_SIZE);
+            file_1.read (buffer1, BUFFER_SIZE);
+            file_2.read (buffer2, BUFFER_SIZE);
             if (buffer1 != buffer2) {
                 return false;
             }

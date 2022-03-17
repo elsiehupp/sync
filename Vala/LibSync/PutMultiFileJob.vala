@@ -90,7 +90,7 @@ public class PutMultiFileJob : AbstractNetworkJob {
         }
 
         connect (reply (), Soup.Reply.signal_upload_progress, this, PutMultiFileJob.signal_upload_progress);
-        connect (this, AbstractNetworkJob.signal_network_activity, account ().data (), Account.signal_propagator_network_activity);
+        connect (this, AbstractNetworkJob.signal_network_activity, account, Account.signal_propagator_network_activity);
         this.request_timer.start ();
         AbstractNetworkJob.start ();
     }

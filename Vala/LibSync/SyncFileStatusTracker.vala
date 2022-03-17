@@ -77,7 +77,7 @@ public class SyncFileStatusTracker : GLib.Object {
     private GLib.HashTable<string, int> sync_count;
 
 
-    signal void file_status_changed (string system_filename, SyncFileStatus file_status);
+    internal signal void file_status_changed (string system_filename, SyncFileStatus file_status);
 
 
     /***********************************************************

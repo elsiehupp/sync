@@ -203,7 +203,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
         QMutableListIterator<string> it (list);
         while (it.has_next ()) {
             it.next ();
-            if (this.excluded_files.is_excluded (it.value (), path_to_remove, FolderMan.instance ().ignore_hidden_files ()))
+            if (this.excluded_files.is_excluded (it.value (), path_to_remove, FolderMan.instance.ignore_hidden_files ()))
                 it.remove ();
         }
 
@@ -231,7 +231,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
         if (!root) {
             root = new SelectiveSyncTreeViewItem (this.folder_tree);
             root.on_signal_text (0, this.root_name);
-            root.icon (0, Theme.instance ().application_icon ());
+            root.icon (0, Theme.instance.application_icon ());
             root.data (0, Qt.USER_ROLE, "");
             root.check_state (0, Qt.Checked);
             int64 size = job ? job.folder_infos[path_to_remove].size : -1;

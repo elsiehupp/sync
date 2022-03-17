@@ -27,7 +27,6 @@ public class Job : GLib.Object {
     const int ChunkSize = 2048;
     const int MaxChunks = 10;
 
-
     protected string service_name;
     protected Account account;
     protected string key;
@@ -47,7 +46,7 @@ public class Job : GLib.Object {
 
     protected bool keychain_migration = false;
 
-    QKeychain.Error error { public get; protected set; }
+    public QKeychain.Error error { public get; protected set; }
 
     string error_string { public get; protected set; }
 

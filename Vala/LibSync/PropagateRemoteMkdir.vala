@@ -63,7 +63,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
             return;
         }
 
-        this.job = new DeleteJob (propagator ().account (),
+        this.job = new DeleteJob (propagator ().account,
             propagator ().full_remote_path (this.item.file),
             this);
         connect (qobject_cast<DeleteJob> (this.job), DeleteJob.signal_finished, this, PropagateRemoteMkdir.on_signal_mkdir);
@@ -143,7 +143,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
         GLib.debug (this.item.file);
 
         this.job = new MkColJob (
-            propagator ().account (),
+            propagator ().account,
             propagator ().full_remote_path (this.item.file),
             this
         );
@@ -176,7 +176,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
         GLib.debug (filename);
 
         var job = new MkColJob (
-            propagator ().account (),
+            propagator ().account,
             propagator ().full_remote_path (filename),
             {
                 {
@@ -301,7 +301,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
         }
 
         propagator ().active_job_list.append (this);
-        var propfind_job = new PropfindJob (propagator ().account (), job_path, this);
+        var propfind_job = new PropfindJob (propagator ().account, job_path, this);
         propfind_job.properties ({"http://owncloud.org/ns:permissions"});
         connect (
             propfind_job,
@@ -333,7 +333,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
             // We're expecting directory path in /Foo/Bar convention...
             GLib.assert (job_path.starts_with ("/") && !job_path.has_suffix ("/"));
             // But encryption job expect it in Foo/Bar/ convention
-            var job = new Occ.EncryptFolderJob (propagator ().account (), propagator ().journal, job_path.mid (1), this.item.file_id, this);
+            var job = new Occ.EncryptFolderJob (propagator ().account, propagator ().journal, job_path.mid (1), this.item.file_id, this);
             connect (job, Occ.EncryptFolderJob.on_signal_finished, this, PropagateRemoteMkdir.on_signal_encrypt_folder_finished);
             job.start ();
         }

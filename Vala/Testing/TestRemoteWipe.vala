@@ -28,7 +28,7 @@ public class TestRemoteWipe : GLib.Object {
 //        unowned Account account = Account.create ();
 //        GLib.assert_true (account);
 
-//        var manager = AccountManager.instance ();
+//        var manager = AccountManager.instance;
 //        GLib.assert_true (manager);
 
 //        AccountState new_account_state = manager.add_account (account);
@@ -40,7 +40,7 @@ public class TestRemoteWipe : GLib.Object {
 //        account.set_credentials (credentials);
 //        account.set_url ( url );
 
-//        FolderMan folder_manager = FolderMan.instance ();
+//        FolderMan folder_manager = FolderMan.instance;
 //        folder_manager.add_folder (new_account_state, folder_definition (directory_path + "/sub/nextcloud/"));
 
 //        // check if account exists
@@ -58,7 +58,7 @@ public class TestRemoteWipe : GLib.Object {
 //        GLib.assert_true (dir_to_remove.exists ());
 
 //        // remote folders
-//        GLib.debug () +  "Removing folder for account " + new_account_state.account ().url ();
+//        GLib.debug () +  "Removing folder for account " + new_account_state.account.url ();
 
 //        folder_manager.slot_wipe_folder_for_account (new_account_state);
 

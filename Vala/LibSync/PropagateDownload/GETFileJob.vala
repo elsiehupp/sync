@@ -75,8 +75,8 @@ public class GETFileJob : AbstractNetworkJob {
     int64 content_length { public get; protected set; }
 
 
-    signal void signal_finished ();
-    signal void download_progress (int64 value1, int64 value2);
+    internal signal void signal_finished ();
+    internal signal void download_progress (int64 value1, int64 value2);
 
 
     /***********************************************************
@@ -163,7 +163,7 @@ public class GETFileJob : AbstractNetworkJob {
             this.bandwidth_manager.on_signal_register_download_job (this);
         }
 
-        connect (this, AbstractNetworkJob.signal_network_activity, account ().data (), Account.signal_propagator_network_activity);
+        connect (this, AbstractNetworkJob.signal_network_activity, account, Account.signal_propagator_network_activity);
 
         AbstractNetworkJob.start ();
     }
@@ -315,7 +315,7 @@ public class GETFileJob : AbstractNetworkJob {
                 this.bandwidth_quota -= to_read;
             }
 
-            const int64 read_bytes = reply ().read (buffer.data (), to_read);
+            const int64 read_bytes = reply ().read (buffer, to_read);
             if (read_bytes < 0) {
                 this.error_string = network_reply_error_string (*reply ());
                 this.error_status = SyncFileItem.Status.NORMAL_ERROR;

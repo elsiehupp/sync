@@ -129,12 +129,12 @@ public class TestSetUserStatusDialog : GLib.Object {
         model.set_user_status ();
         GLib.assert_true (finished_spy.count () == 1);
 
-        var user_status_set = fake_user_status_job.user_status_set_by_caller_of_set_user_status ();
-        GLib.assert_true (user_status_set.icon () == user_status_icon);
-        GLib.assert_true (user_status_set.message () == user_status_message);
-        GLib.assert_true (user_status_set.state () == user_status_state);
-        GLib.assert_true (user_status_set.message_predefined () == false);
-        var clear_at = user_status_set.clear_at ();
+        var signal_user_status_set = fake_user_status_job.user_status_set_by_caller_of_set_user_status ();
+        GLib.assert_true (signal_user_status_set.icon () == user_status_icon);
+        GLib.assert_true (signal_user_status_set.message () == user_status_message);
+        GLib.assert_true (signal_user_status_set.state () == user_status_state);
+        GLib.assert_true (signal_user_status_set.message_predefined () == false);
+        var clear_at = signal_user_status_set.clear_at ();
         GLib.assert_true (clear_at.is_valid ());
         GLib.assert_true (clear_at.type == Occ.ClearAtType.Period);
         GLib.assert_true (clear_at.period == 60 * 30);
@@ -163,11 +163,11 @@ public class TestSetUserStatusDialog : GLib.Object {
         model.set_user_status ();
         GLib.assert_true (finished_spy.count () == 1);
 
-        var user_status_set = fake_user_status_job.user_status_set_by_caller_of_set_user_status ();
-        GLib.assert_true (user_status_set.message () == user_status_message);
-        GLib.assert_true (user_status_set.state () == user_status_state);
-        GLib.assert_true (user_status_set.message_predefined () == false);
-        var clear_at = user_status_set.clear_at ();
+        var signal_user_status_set = fake_user_status_job.user_status_set_by_caller_of_set_user_status ();
+        GLib.assert_true (signal_user_status_set.message () == user_status_message);
+        GLib.assert_true (signal_user_status_set.state () == user_status_state);
+        GLib.assert_true (signal_user_status_set.message_predefined () == false);
+        var clear_at = signal_user_status_set.clear_at ();
         GLib.assert_true (clear_at.is_valid ());
         GLib.assert_true (clear_at.type == Occ.ClearAtType.Period);
         GLib.assert_true (clear_at.period == 60 * 30);
@@ -196,11 +196,11 @@ public class TestSetUserStatusDialog : GLib.Object {
         model.set_user_status ();
         GLib.assert_true (finished_spy.count () == 1);
 
-        var user_status_set = fake_user_status_job.user_status_set_by_caller_of_set_user_status ();
-        GLib.assert_true (user_status_set.icon () == user_status_icon);
-        GLib.assert_true (user_status_set.state () == user_status_state);
-        GLib.assert_true (user_status_set.message_predefined () == false);
-        var clear_at = user_status_set.clear_at ();
+        var signal_user_status_set = fake_user_status_job.user_status_set_by_caller_of_set_user_status ();
+        GLib.assert_true (signal_user_status_set.icon () == user_status_icon);
+        GLib.assert_true (signal_user_status_set.state () == user_status_state);
+        GLib.assert_true (signal_user_status_set.message_predefined () == false);
+        var clear_at = signal_user_status_set.clear_at ();
         GLib.assert_true (clear_at.is_valid ());
         GLib.assert_true (clear_at.type == Occ.ClearAtType.Period);
         GLib.assert_true (clear_at.period == 60 * 30);

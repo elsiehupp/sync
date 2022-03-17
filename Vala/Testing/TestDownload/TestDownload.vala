@@ -198,7 +198,7 @@ public class TestDownload : GLib.Object {
             return;
         prop_connected = true;
         connect (
-            propagator.data (),
+            propagator,
             OwncloudPropagator.touched_file,
             this.on_signal_propagator_touched_file
         );

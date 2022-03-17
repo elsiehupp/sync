@@ -19,8 +19,8 @@ public class CleanupPollsJob : GLib.Object {
     string local_path;
     unowned Vfs vfs;
 
-    signal void signal_finished ();
-    signal void aborted (string error);
+    internal signal void signal_finished ();
+    internal signal void aborted (string error);
 
     /***********************************************************
     ***********************************************************/
@@ -75,7 +75,7 @@ public class CleanupPollsJob : GLib.Object {
         } else if (job.item.status != SyncFileItem.Status.SUCCESS) {
             GLib.warning ("There was an error with file " + job.item.file + job.item.error_string);
         } else {
-            if (!OwncloudPropagator.static_update_metadata (*job.item, this.local_path, this.vfs.data (), this.journal)) {
+            if (!OwncloudPropagator.static_update_metadata (*job.item, this.local_path, this.vfs, this.journal)) {
                 GLib.warning ("Database error");
                 job.item.status = SyncFileItem.Status.FATAL_ERROR;
                 job.item.error_string = _("Error writing metadata to the database");

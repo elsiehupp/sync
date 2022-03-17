@@ -44,7 +44,7 @@ public class CheckServerJob : AbstractNetworkJob {
     \a url see this.server_status_url (does not include "/status.php")
     \a info The status.php reply information
     ***********************************************************/
-    signal void instance_found (GLib.Uri url, QJsonObject info);
+    internal signal void instance_found (GLib.Uri url, QJsonObject info);
 
 
     /***********************************************************
@@ -52,7 +52,7 @@ public class CheckServerJob : AbstractNetworkJob {
 
     \a reply is never null
     ***********************************************************/
-    signal void instance_not_found (GLib.InputStream reply);
+    internal signal void instance_not_found (GLib.InputStream reply);
 
 
     /***********************************************************
@@ -60,7 +60,7 @@ public class CheckServerJob : AbstractNetworkJob {
 
     \a url The specific url where the timeout happened.
     ***********************************************************/
-    signal void timeout (GLib.Uri url);
+    internal signal void timeout (GLib.Uri url);
 
 
 
@@ -79,7 +79,7 @@ public class CheckServerJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public new void start () {
-        this.server_url = account ().url ();
+        this.server_url = account.url ();
         send_request ("GET", Utility.concat_url_path (this.server_url, path ()));
         connect (reply (), Soup.Reply.meta_data_changed, this, CheckServerJob.on_signal_metadata_changed);
         connect (reply (), Soup.Reply.encrypted, this, CheckServerJob.on_signal_encrypted);
@@ -130,7 +130,7 @@ public class CheckServerJob : AbstractNetworkJob {
             GLib.warning ("No SSL session identifier / session ticket is used, this might impact sync performance negatively.");
         }
 
-        merge_ssl_configuration_for_ssl_button (reply ().ssl_configuration (), account ());
+        merge_ssl_configuration_for_ssl_button (reply ().ssl_configuration (), account);
 
         // The server installs to /owncloud. Let's try that if the file wasn't found
         // at the original location
@@ -170,15 +170,15 @@ public class CheckServerJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_metadata_changed () {
-        account ().ssl_configuration (reply ().ssl_configuration ());
-        merge_ssl_configuration_for_ssl_button (reply ().ssl_configuration (), account ());
+        account.ssl_configuration (reply ().ssl_configuration ());
+        merge_ssl_configuration_for_ssl_button (reply ().ssl_configuration (), account);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_signal_encrypted () {
-        merge_ssl_configuration_for_ssl_button (reply ().ssl_configuration (), account ());
+        merge_ssl_configuration_for_ssl_button (reply ().ssl_configuration (), account);
     }
 
 

@@ -36,7 +36,7 @@ public class WebView : Gtk.Widget {
     private WebViewPageUrlRequestInterceptor interceptor;
     private WebViewPageUrlSchemeHandler scheme_handler;
 
-    signal void signal_url_catched (string user, string pass, string host);
+    internal signal void signal_url_catched (string user, string pass, string host);
 
     /***********************************************************
     ***********************************************************/

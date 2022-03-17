@@ -122,7 +122,7 @@ public class Updater : GLib.Object {
     ***********************************************************/
     private static QUrlQuery query_params () {
         QUrlQuery query;
-        Theme theme = Theme.instance ();
+        Theme theme = Theme.instance;
         string platform = "stranger";
         if (Utility.is_linux ()) {
             platform = "linux";

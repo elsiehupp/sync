@@ -24,7 +24,7 @@ public class QtSingleCoreApplication : QCoreApplication {
     private bool block;
 
 
-    signal void signal_message_received (string message);
+    internal signal void signal_message_received (string message);
 
 
     /***********************************************************
@@ -33,7 +33,8 @@ public class QtSingleCoreApplication : QCoreApplication {
         base (argc, argv);
         peer = new QtLocalPeer (this);
         block = false;
-        connect (peer, &QtLocalPeer.signal_message_received, this, &QtSingleCoreApplication.signal_message_received);
+        peer.signal_message_received.connect (
+            this.signal_message_received);
     }
 
 
@@ -42,7 +43,9 @@ public class QtSingleCoreApplication : QCoreApplication {
     public QtSingleCoreApplication (string app_id, int argc, char **argv) {
         base (argc, argv);
         peer = new QtLocalPeer (this, app_id);
-        connect (peer, &QtLocalPeer.signal_message_received, this, &QtSingleCoreApplication.signal_message_received);
+        peer.signal_message_received.connect (
+            this.signal_message_received
+        );
     }
 
     /***********************************************************

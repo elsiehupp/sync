@@ -50,9 +50,9 @@ public class UserGroupShare : Share {
     }
 
 
-    signal void signal_note_set ();
-    signal void signal_note_error ();
-    signal void signal_expire_date_set ();
+    internal signal void signal_note_set ();
+    internal signal void signal_note_error ();
+    internal signal void signal_expire_date_set ();
 
 
     /***********************************************************

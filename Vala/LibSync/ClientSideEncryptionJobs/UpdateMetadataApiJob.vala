@@ -16,8 +16,8 @@ public class UpdateMetadataApiJob : AbstractNetworkJob {
     private string token;
 
 
-    signal void success (string file_identifier);
-    signal void error (string file_identifier, int http_return_code);
+    internal signal void success (string file_identifier);
+    internal signal void error (string file_identifier, int http_return_code);
 
 
     /***********************************************************
@@ -47,7 +47,7 @@ public class UpdateMetadataApiJob : AbstractNetworkJob {
         url_query.add_query_item ("format", "json");
         url_query.add_query_item ("e2e-token", this.token);
 
-        GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
+        GLib.Uri url = Utility.concat_url_path (account.url (), path ());
         url.query (url_query);
 
         QUrlQuery parameters;

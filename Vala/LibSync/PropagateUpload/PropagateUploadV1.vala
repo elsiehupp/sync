@@ -207,7 +207,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
 
         // job takes ownership of device via a QScopedPointer. Job deletes itself when finishing
         var device_ptr = device; // for connections later
-        var job = new PUTFileJob (propagator ().account (), propagator ().full_remote_path (path), std.move (device), headers, this.current_chunk, this);
+        var job = new PUTFileJob (propagator ().account, propagator ().full_remote_path (path), std.move (device), headers, this.current_chunk, this);
         this.jobs.append (job);
         connect (
             job,
@@ -242,7 +242,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
 
         bool parallel_chunk_upload = true;
 
-        if (propagator ().account ().capabilities ().chunking_parallel_upload_disabled ()) {
+        if (propagator ().account.capabilities ().chunking_parallel_upload_disabled ()) {
             // Server may also disable parallel chunked upload for any higher version
             parallel_chunk_upload = false;
         } else {
@@ -250,7 +250,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
             if (!env == "") {
                 parallel_chunk_upload = env != "false" && env != "0";
             } else {
-                int version_num = propagator ().account ().server_version_int ();
+                int version_num = propagator ().account.server_version_int ();
                 if (version_num < Account.make_server_version (8, 0, 3)) {
                     // Disable parallel chunk upload severs older than 8.0.3 to avoid too many
                     // internal sever errors (#2743, #2938)

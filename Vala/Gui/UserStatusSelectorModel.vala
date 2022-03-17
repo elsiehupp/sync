@@ -59,12 +59,12 @@ public class UserStatusSelectorModel : GLib.Object {
     };
 
 
-    signal void error_message_changed ();
-    signal void user_status_changed ();
-    signal void online_status_changed ();
-    signal void clear_at_changed ();
-    signal void predefined_statuses_changed ();
-    signal void on_signal_finished ();
+    internal signal void error_message_changed ();
+    internal signal void user_status_changed ();
+    internal signal void online_status_changed ();
+    internal signal void clear_at_changed ();
+    internal signal void predefined_statuses_changed ();
+    internal signal void on_signal_finished ();
         
 
     /***********************************************************
@@ -148,14 +148,14 @@ public class UserStatusSelectorModel : GLib.Object {
     Q_REQUIRED_RESULT
     ***********************************************************/
     public GLib.Uri online_icon () {
-        return Theme.instance ().status_online_image_source ();
+        return Theme.instance.status_online_image_source ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public GLib.Uri away_icon () {
-        return Theme.instance ().status_away_image_source ();
+        return Theme.instance.status_away_image_source ();
     }
 
 
@@ -163,14 +163,14 @@ public class UserStatusSelectorModel : GLib.Object {
     Q_REQUIRED_RESULT
     ***********************************************************/
     public GLib.Uri dnd_icon () {
-        return Theme.instance ().status_do_not_disturb_image_source ();
+        return Theme.instance.status_do_not_disturb_image_source ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public GLib.Uri invisible_icon () {
-        return Theme.instance ().status_invisible_image_source ();
+        return Theme.instance.status_invisible_image_source ();
     }
 
 
@@ -307,13 +307,13 @@ public class UserStatusSelectorModel : GLib.Object {
 
         connect (
             this.user_status_connector.get (),
-            UserStatusConnector.user_status_fetched,
+            UserStatusConnector.signal_user_status_fetched,
             this,
             UserStatusSelectorModel.on_signal_user_status_fetched
         );
         connect (
             this.user_status_connector.get (),
-            UserStatusConnector.predefined_statuses_fetched,
+            UserStatusConnector.signal_predefined_statuses_fetched,
             this,
             UserStatusSelectorModel.on_signal_predefined_statuses_fetched
         );
@@ -325,7 +325,7 @@ public class UserStatusSelectorModel : GLib.Object {
         );
         connect (
             this.user_status_connector.get (),
-            UserStatusConnector.user_status_set,
+            UserStatusConnector.signal_user_status_set,
             this,
             UserStatusSelectorModel.on_signal_user_status_set
         );
@@ -345,7 +345,7 @@ public class UserStatusSelectorModel : GLib.Object {
     ***********************************************************/
     private void on_signal_load (int identifier) {
         on_signal_reset ();
-        this.user_status_connector = UserModel.instance ().user_status_connector (identifier);
+        this.user_status_connector = UserModel.instance.user_status_connector (identifier);
         on_signal_init ();
     }
 
@@ -354,13 +354,13 @@ public class UserStatusSelectorModel : GLib.Object {
     ***********************************************************/
     private void on_signal_reset () {
         if (this.user_status_connector) {
-            disconnect (this.user_status_connector.get (), UserStatusConnector.user_status_fetched, this,
+            disconnect (this.user_status_connector.get (), UserStatusConnector.signal_user_status_fetched, this,
                 &UserStatusSelectorModel.on_signal_user_status_fetched);
-            disconnect (this.user_status_connector.get (), UserStatusConnector.predefined_statuses_fetched, this,
+            disconnect (this.user_status_connector.get (), UserStatusConnector.signal_predefined_statuses_fetched, this,
                 &UserStatusSelectorModel.on_signal_predefined_statuses_fetched);
             disconnect (this.user_status_connector.get (), UserStatusConnector.error, this,
                 &UserStatusSelectorModel.on_signal_error);
-            disconnect (this.user_status_connector.get (), UserStatusConnector.user_status_set, this,
+            disconnect (this.user_status_connector.get (), UserStatusConnector.signal_user_status_set, this,
                 &UserStatusSelectorModel.on_signal_user_status_set);
             disconnect (this.user_status_connector.get (), UserStatusConnector.message_cleared, this,
                 &UserStatusSelectorModel.on_signal_message_cleared);

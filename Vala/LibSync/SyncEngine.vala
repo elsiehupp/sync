@@ -202,45 +202,45 @@ public class SyncEngine : GLib.Object {
     /***********************************************************
     During update, before reconcile
     ***********************************************************/
-    signal void root_etag (string value1, GLib.DateTime value2);
+    internal signal void root_etag (string value1, GLib.DateTime value2);
 
 
     /***********************************************************
     After the above signals. with the items that actually need propagating
     ***********************************************************/
-    signal void about_to_propagate (SyncFileItemVector value);
+    internal signal void about_to_propagate (SyncFileItemVector value);
 
 
     /***********************************************************
     After each item completed by a job (successful or not)
     ***********************************************************/
-    signal void signal_item_completed (SyncFileItem value);
+    internal signal void signal_item_completed (SyncFileItem value);
 
 
     /***********************************************************
     ***********************************************************/
-    signal void signal_transmission_progress (ProgressInfo progress);
+    internal signal void signal_transmission_progress (ProgressInfo progress);
 
 
     /***********************************************************
     We've produced a new sync error of a type.
     ***********************************************************/
-    signal void signal_sync_error (string message, ErrorCategory category = ErrorCategory.NORMAL);
+    internal signal void signal_sync_error (string message, ErrorCategory category = ErrorCategory.NORMAL);
 
 
     /***********************************************************
     ***********************************************************/
-    signal void add_error_to_gui (SyncFileItem.Status status, string error_message, string subject);
+    internal signal void add_error_to_gui (SyncFileItem.Status status, string error_message, string subject);
 
 
     /***********************************************************
     ***********************************************************/
-    signal void finished (bool success);
+    internal signal void finished (bool success);
 
 
     /***********************************************************
     ***********************************************************/
-    signal void started ();
+    internal signal void started ();
 
 
     delegate void RemoveDelegate (bool value);
@@ -250,14 +250,14 @@ public class SyncEngine : GLib.Object {
     was reset or something. Set cancel to true in a slot
     connected from this signal to abort the sync.
     ***********************************************************/
-    signal void about_to_remove_all_files (SyncFileItem.Direction direction, RemoveDelegate f);
+    internal signal void about_to_remove_all_files (SyncFileItem.Direction direction, RemoveDelegate f);
 
 
     /***********************************************************
     A new folder was discovered and was not synced because of
     the confirmation feature
     ***********************************************************/
-    signal void new_big_folder (string folder, bool is_external);
+    internal signal void new_big_folder (string folder, bool is_external);
 
 
     /***********************************************************
@@ -265,7 +265,7 @@ public class SyncEngine : GLib.Object {
 
     Forwarded from OwncloudPropagator.seen_locked_file.
     ***********************************************************/
-    signal void seen_locked_file (string filename);
+    internal signal void seen_locked_file (string filename);
 
 
     /***********************************************************
@@ -403,7 +403,7 @@ public class SyncEngine : GLib.Object {
         string version_string = "Using Qt ";
         version_string.append (q_version ());
 
-        version_string.append (" SSL library ").append (QSslSocket.ssl_library_version_string ().to_utf8 ().data ());
+        version_string.append (" SSL library ").append (QSslSocket.ssl_library_version_string ().to_utf8 ());
         version_string.append (" on ").append (Utility.platform_name ());
         GLib.info (version_string);
 
@@ -448,14 +448,14 @@ public class SyncEngine : GLib.Object {
         /* emit */ signal_transmission_progress (*this.progress_info);
 
         GLib.info ("#### Discovery start ####################################################");
-        GLib.info ("Server" + account ().server_version ()
-                         + (account ().is_http2Supported () ? "Using HTTP/2": ""));
+        GLib.info ("Server" + account.server_version ()
+                         + (account.is_http2Supported () ? "Using HTTP/2": ""));
         this.progress_info.status = ProgressInfo.Status.DISCOVERY;
         /* emit */ signal_transmission_progress (*this.progress_info);
 
         this.discovery_phase.reset (new DiscoveryPhase ());
         this.discovery_phase.account = this.account;
-        this.discovery_phase.excludes = this.excluded_files.data ();
+        this.discovery_phase.excludes = this.excluded_files;
         const string exclude_file_path = this.local_path + ".sync-exclude.lst";
         if (GLib.File.exists (exclude_file_path)) {
             this.discovery_phase.excludes.add_exclude_file_path (exclude_file_path);
@@ -496,40 +496,40 @@ public class SyncEngine : GLib.Object {
         this.discovery_phase.ignore_hidden_files = ignore_hidden_files ();
 
         connect (
-            this.discovery_phase.data (),
+            this.discovery_phase,
             DiscoveryPhase.item_discovered,
             this,
             SyncEngine.on_signal_item_discovered
         );
         connect (
-            this.discovery_phase.data (),
+            this.discovery_phase,
             DiscoveryPhase.new_big_folder,
             this,
             SyncEngine.new_big_folder
         );
         connect (
-            this.discovery_phase.data (),
+            this.discovery_phase,
             DiscoveryPhase.fatal_error,
             this,
             this.on_signal_fatal_error
         );
         connect (
-            this.discovery_phase.data (),
+            this.discovery_phase,
             DiscoveryPhase.on_signal_finished,
             this,
             SyncEngine.on_signal_discovery_finished
         );
         connect (
-            this.discovery_phase.data (),
+            this.discovery_phase,
             DiscoveryPhase.silently_excluded,
-            this.sync_file_status_tracker.data (),
+            this.sync_file_status_tracker,
             SyncFileStatusTracker.on_signal_add_silently_excluded
         );
         var discovery_job = new ProcessDirectoryJob (
-            this.discovery_phase.data (),
+            this.discovery_phase,
             PinState.PinState.ALWAYS_LOCAL,
             this.journal.key_value_store_get_int ("last_sync", 0),
-            this.discovery_phase.data ()
+            this.discovery_phase
         );
         this.discovery_phase.start_job (discovery_job);
         connect (
@@ -539,7 +539,7 @@ public class SyncEngine : GLib.Object {
             SyncEngine.on_signal_root_etag_received
         );
         connect (
-            this.discovery_phase.data (),
+            this.discovery_phase,
             DiscoveryPhase.add_error_to_gui,
             this,
             SyncEngine.add_error_to_gui
@@ -587,7 +587,7 @@ public class SyncEngine : GLib.Object {
             // Delete the discovery and all child jobs after ensuring
             // it can't finish_delegate and start the propagator
             disconnect (
-                this.discovery_phase.data (),
+                this.discovery_phase,
                 null,
                 this,
                 null
@@ -1054,48 +1054,48 @@ public class SyncEngine : GLib.Object {
             this.account, this.local_path, this.remote_path, this.journal, this.bulk_upload_block_list);
         this.propagator.sync_options (this.sync_options);
         connect (
-            this.propagator.data (),
+            this.propagator,
             OwncloudPropagator.signal_item_completed,
             this,
             SyncEngine.on_signal_item_completed
         );
         connect (
-            this.propagator.data (),
+            this.propagator,
             OwncloudPropagator.progress,
             this,
             SyncEngine.on_signal_progress
         );
         connect (
-            this.propagator.data (),
+            this.propagator,
             OwncloudPropagator.on_signal_finished,
             this,
             SyncEngine.on_signal_propagation_finished, Qt.QueuedConnection
         );
         connect (
-            this.propagator.data (),
+            this.propagator,
             OwncloudPropagator.seen_locked_file,
             this,
             SyncEngine.seen_locked_file);
         connect (
-            this.propagator.data (),
+            this.propagator,
             OwncloudPropagator.signal_touched_file,
             this,
             SyncEngine.on_signal_add_touched_file
         );
         connect (
-            this.propagator.data (),
+            this.propagator,
             OwncloudPropagator.signal_insufficient_local_storage,
             this,
             SyncEngine.on_signal_insufficient_local_storage
         );
         connect (
-            this.propagator.data (),
+            this.propagator,
             OwncloudPropagator.signal_insufficient_remote_storage,
             this,
             SyncEngine.on_signal_insufficient_remote_storage
         );
         connect (
-            this.propagator.data (),
+            this.propagator,
             OwncloudPropagator.signal_new_item,
             this,
             SyncEngine.on_signal_new_item
@@ -1370,12 +1370,12 @@ public class SyncEngine : GLib.Object {
         var ids = this.journal.delete_stale_upload_infos (upload_file_paths);
 
         // Delete the stales chunk on the server.
-        if (account ().capabilities ().chunking_ng ()) {
+        if (account.capabilities ().chunking_ng ()) {
             foreach (uint32 transfer_identifier in ids) {
                 if (!transfer_identifier)
                     continue; // Was not a chunked upload
-                GLib.Uri url = Utility.concat_url_path (account ().url (), "remote.php/dav/uploads/" + account ().dav_user () + "/" + string.number (transfer_identifier));
-                (new DeleteJob (account (), url, this)).start ();
+                GLib.Uri url = Utility.concat_url_path (account.url (), "remote.php/dav/uploads/" + account.dav_user () + "/" + string.number (transfer_identifier));
+                (new DeleteJob (account, url, this)).start ();
             }
         }
     }

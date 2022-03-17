@@ -100,17 +100,17 @@ public class Systray : QSystemTrayIcon {
     private AccessManagerFactory access_manager_factory;
 
 
-    signal void signal_current_user_changed ();
-    signal void signal_open_account_wizard ();
-    signal void signal_open_main_dialog ();
-    signal void signal_open_settings ();
-    signal void signal_open_help ();
-    signal void signal_shutdown ();
+    internal signal void signal_current_user_changed ();
+    internal signal void signal_open_account_wizard ();
+    internal signal void signal_open_main_dialog ();
+    internal signal void signal_open_settings ();
+    internal signal void signal_open_help ();
+    internal signal void signal_shutdown ();
 
-    signal void hide_window ();
-    signal void show_window ();
-    signal void open_share_dialog (string share_path, string local_path);
-    signal void show_file_activity_dialog (string share_path, string local_path);
+    internal signal void hide_window ();
+    internal signal void show_window ();
+    internal signal void open_share_dialog (string share_path, string local_path);
+    internal signal void show_file_activity_dialog (string share_path, string local_path);
 
 
     private Systray () {
@@ -153,7 +153,7 @@ public class Systray : QSystemTrayIcon {
         qml_register_type<WheelHandler> ("com.nextcloud.desktopclient", 1, 0, "WheelHandler");
 
         var context_menu = new QMenu ();
-        if (AccountManager.instance ().accounts () == "") {
+        if (AccountManager.instance.accounts () == "") {
             context_menu.add_action (_("Add account"), this, Systray.signal_open_account_wizard);
         } else {
             context_menu.add_action (_("Open main dialog"), this, Systray.signal_open_main_dialog);
@@ -162,7 +162,7 @@ public class Systray : QSystemTrayIcon {
         var pause_action = context_menu.add_action (_("Pause sync"), this, Systray.on_signal_pause_all_folders);
         var resume_action = context_menu.add_action (_("Resume sync"), this, Systray.on_signal_unpause_all_folders);
         context_menu.add_action (_("Settings"), this, Systray.signal_open_settings);
-        context_menu.add_action (_("Exit %1").printf (Theme.instance ().app_name_gui ()), this, Systray.signal_shutdown);
+        context_menu.add_action (_("Exit %1").printf (Theme.instance.app_name_gui ()), this, Systray.signal_shutdown);
         context_menu (context_menu);
 
         connect (
@@ -171,38 +171,38 @@ public class Systray : QSystemTrayIcon {
             on_signal_context_menu_about_to_show
         );
 
-        connect (UserModel.instance (), UserModel.signal_new_user_selected,
+        connect (UserModel.instance, UserModel.signal_new_user_selected,
             this, Systray.on_signal_new_user_selected);
-        connect (UserModel.instance (), UserModel.signal_add_account,
+        connect (UserModel.instance, UserModel.signal_add_account,
                 this, Systray.signal_open_account_wizard);
 
-        connect (AccountManager.instance (), AccountManager.on_signal_account_added,
+        connect (AccountManager.instance, AccountManager.signal_account_added,
             this, Systray.show_window);
     }
 
 
     private UserModel on_signal_user_model_instance_for_engineon_signal_instance_for_engine (QQmlEngine qml_engine, QJSEngine qjs_engine) {
-        return UserModel.instance ();
+        return UserModel.instance;
     }
 
 
     private UserAppsModel on_signal_user_apps_model_instance_for_engineon_signal_instance_for_engine (QQmlEngine qml_engine, QJSEngine qjs_engine) {
-        return UserAppsModel.instance ();
+        return UserAppsModel.instance;
     }
 
 
     private Theme on_signal_theme_instance_for_engineon_signal_instance_for_engine (QQmlEngine qml_engine, QJSEngine qjs_engine) {
-        return Theme.instance ();
+        return Theme.instance;
     }
 
 
     private Systray on_signal_systray_instance_for_engineon_signal_instance_for_engine (QQmlEngine qml_engine, QJSEngine qjs_engine) {
-        return Systray.instance ();
+        return Systray.instance;
     }
 
 
     private void on_signal_context_menu_about_to_show () {
-        const var folders = FolderMan.instance ().map ();
+        const var folders = FolderMan.instance.map ();
 
         GLib.List<Folder> all_paused = new GLib.List<Folder> ();
 
@@ -236,15 +236,15 @@ public class Systray : QSystemTrayIcon {
     ***********************************************************/
     public void create () {
         if (this.tray_engine) {
-            if (!AccountManager.instance ().accounts () == "") {
-                this.tray_engine.root_context ().context_property ("activity_model", UserModel.instance ().current_activity_model ());
+            if (!AccountManager.instance.accounts () == "") {
+                this.tray_engine.root_context ().context_property ("activity_model", UserModel.instance.current_activity_model ());
             }
             this.tray_engine.on_signal_load ("qrc:/qml/src/gui/tray/Window.qml");
         }
         hide_window ();
         /* emit */ activated (QSystemTrayIcon.Activation_reason.Unknown);
 
-        const var folder_map = FolderMan.instance ().map ();
+        const var folder_map = FolderMan.instance.map ();
         foreach (var folder in folder_map) {
             if (!folder.sync_paused ()) {
                 this.sync_is_paused = false;
@@ -272,7 +272,7 @@ public class Systray : QSystemTrayIcon {
     /***********************************************************
     ***********************************************************/
     public string window_title () {
-        return Theme.instance ().app_name_gui ();
+        return Theme.instance.app_name_gui ();
     }
 
 
@@ -304,7 +304,7 @@ public class Systray : QSystemTrayIcon {
     /***********************************************************
     ***********************************************************/
     public void tool_tip (string tip) {
-        QSystemTrayIcon.tool_tip (_("%1 : %2").printf (Theme.instance ().app_name_gui (), tip));
+        QSystemTrayIcon.tool_tip (_("%1 : %2").printf (Theme.instance.app_name_gui (), tip));
     }
 
 
@@ -355,11 +355,11 @@ public class Systray : QSystemTrayIcon {
     public void on_signal_new_user_selected () {
         if (this.tray_engine) {
             // Change Activity_model
-            this.tray_engine.root_context ().context_property ("activity_model", UserModel.instance ().current_activity_model ());
+            this.tray_engine.root_context ().context_property ("activity_model", UserModel.instance.current_activity_model ());
         }
 
         // Rebuild App list
-        UserAppsModel.instance ().build_app_list ();
+        UserAppsModel.instance.build_app_list ();
     }
 
 
@@ -380,7 +380,7 @@ public class Systray : QSystemTrayIcon {
     /***********************************************************
     ***********************************************************/
     private void pause_on_signal_all_folders_helper (bool pause) {
-        const var folders = FolderMan.instance ().map ();
+        const var folders = FolderMan.instance.map ();
         foreach (var folder in folders) {
             if (accounts.contains (folder.account_state ())) {
                 folder.sync_paused (pause);
@@ -400,8 +400,8 @@ public class Systray : QSystemTrayIcon {
     ***********************************************************/
     private static AccountState accounts () {
         GLib.List<AccountState> account_state_list = new GLib.List<AccountState> ();
-        foreach (AccountState account in AccountManager.instance ().accounts ()) {
-            account_state_list.append (account.data ());
+        foreach (AccountState account in AccountManager.instance.accounts ()) {
+            account_state_list.append (account);
         }
         return account_state_list;
     }

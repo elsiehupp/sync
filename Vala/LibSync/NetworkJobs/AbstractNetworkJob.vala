@@ -139,8 +139,8 @@ public class AbstractNetworkJob : GLib.Object {
 
     \a reply is never null
     ***********************************************************/
-    signal void signal_network_error (GLib.InputStream reply);
-    signal void signal_network_activity ();
+    internal signal void signal_network_error (GLib.InputStream reply);
+    internal signal void signal_network_activity ();
 
 
     /***********************************************************
@@ -150,7 +150,7 @@ public class AbstractNetworkJob : GLib.Object {
     \a target_url Where to redirect to
     \a redirect_count Counts redirect hops, first is 0.
     ***********************************************************/
-    signal void redirected (GLib.InputStream reply, GLib.Uri target_url, int redirect_count);
+    internal signal void redirected (GLib.InputStream reply, GLib.Uri target_url, int redirect_count);
 
     /***********************************************************
     ***********************************************************/
@@ -175,7 +175,7 @@ public class AbstractNetworkJob : GLib.Object {
         // This is a workaround for OC instances which only support one
         // parallel up and download
         if (this.account) {
-            connect (this.account.data (), Account.signal_propagator_network_activity, this, AbstractNetworkJob.reset_timeout);
+            connect (this.account, Account.signal_propagator_network_activity, this, AbstractNetworkJob.reset_timeout);
         }
     }
 
@@ -190,7 +190,7 @@ public class AbstractNetworkJob : GLib.Object {
     public new void start () {
         this.timer.start ();
 
-        const GLib.Uri url = account ().url ();
+        const GLib.Uri url = account.url ();
         const string display_url = "%1://%2%3".printf (url.scheme ()).printf (url.host ()).printf (url.path ());
 
         string parent_meta_object_name = parent () ? parent ().meta_object ().class_name (): "";

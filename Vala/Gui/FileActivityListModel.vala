@@ -29,7 +29,7 @@ public class FileActivityListModel : ActivityListModel {
         }
         account_state (account_state);
 
-        const var folder = FolderMan.instance ().folder_for_path (local_path);
+        const var folder = FolderMan.instance.folder_for_path (local_path);
         if (!folder) {
             return;
         }
@@ -54,7 +54,7 @@ public class FileActivityListModel : ActivityListModel {
         currently_fetching (true);
 
         const string url = "ocs/v2.php/apps/activity/api/v2/activity/filter";
-        var job = new JsonApiJob (account_state ().account (), url, this);
+        var job = new JsonApiJob (account_state ().account, url, this);
         connect (job, JsonApiJob.json_received,
             this, FileActivityListModel.activities_received);
 

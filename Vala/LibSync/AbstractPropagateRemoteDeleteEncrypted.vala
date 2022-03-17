@@ -53,7 +53,7 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    signal void finished (bool success);
+    internal signal void finished (bool success);
 
 
     /***********************************************************
@@ -93,7 +93,7 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
     ***********************************************************/
     protected void start_ls_col_job (string path) {
         GLib.debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) + "Folder is encrypted, let's get the Id from it.";
-        var job = new LsColJob (this.propagator.account (), this.propagator.full_remote_path (path), this);
+        var job = new LsColJob (this.propagator.account, this.propagator.full_remote_path (path), this);
         job.properties ({"resourcetype", "http://owncloud.org/ns:fileid"});
         connect (job, LsColJob.directory_listing_subfolders, this, AbstractPropagateRemoteDeleteEncrypted.on_signal_folder_encrypted_id_received);
         connect (job, LsColJob.finished_with_error, this, AbstractPropagateRemoteDeleteEncrypted.task_failed);
@@ -114,7 +114,7 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_try_lock (string folder_identifier) {
-        var lock_job = new LockEncryptFolderApiJob (this.propagator.account (), folder_identifier, this);
+        var lock_job = new LockEncryptFolderApiJob (this.propagator.account, folder_identifier, this);
         connect (lock_job, LockEncryptFolderApiJob.on_signal_success, this, AbstractPropagateRemoteDeleteEncrypted.on_signal_folder_locked_successfully);
         connect (lock_job, LockEncryptFolderApiJob.error, this, AbstractPropagateRemoteDeleteEncrypted.task_failed);
         lock_job.start ();
@@ -129,7 +129,7 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
         this.folder_token = token;
         this.folder_identifier = folder_identifier;
 
-        var job = new GetMetadataApiJob (this.propagator.account (), this.folder_identifier);
+        var job = new GetMetadataApiJob (this.propagator.account, this.folder_identifier);
         connect (job, GetMetadataApiJob.signal_json_received, this, AbstractPropagateRemoteDeleteEncrypted.on_signal_folder_encrypted_metadata_received);
         connect (job, GetMetadataApiJob.error, this, AbstractPropagateRemoteDeleteEncrypted.task_failed);
         job.start ();
@@ -206,7 +206,7 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
     protected void delete_remote_item (string filename) {
         GLib.info (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) + "Deleting nested encrypted item" + filename;
 
-        var delete_job = new DeleteJob (this.propagator.account (), this.propagator.full_remote_path (filename), this);
+        var delete_job = new DeleteJob (this.propagator.account, this.propagator.full_remote_path (filename), this);
         delete_job.folder_token (this.folder_token);
 
         connect (delete_job, DeleteJob.signal_finished, this, AbstractPropagateRemoteDeleteEncrypted.on_signal_delete_remote_item_finished);
@@ -224,7 +224,7 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
         }
 
         GLib.debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) + "Unlocking folder" + this.folder_identifier;
-        var unlock_job = new UnlockEncryptFolderApiJob (this.propagator.account (), this.folder_identifier, this.folder_token, this);
+        var unlock_job = new UnlockEncryptFolderApiJob (this.propagator.account, this.folder_identifier, this.folder_token, this);
 
         UnlockEncryptFolderApiJob.signal_success.connect (unlock_job, AbstractPropagateRemoteDeleteEncrypted.on_signal_folder_unlocked_successfully);
         UnlockEncryptFolderApiJob.signal_error.connect ((unlock_job, file_identifier, http_return_code) => {

@@ -78,14 +78,14 @@ public class JsonApiJob : AbstractNetworkJob {
     @param value - the ETag response header value
     @param status_code - the OCS status code : 100 (!) for on_signal_success
     ***********************************************************/
-    signal void etag_response_header_received (string value, int status_code);
+    internal signal void etag_response_header_received (string value, int status_code);
 
 
     /***********************************************************
     @brief desktop_notification_status_received - signal to report if notifications are allowed
     @param status - set desktop notifications allowed status
     ***********************************************************/
-    signal void allow_desktop_notifications_changed (bool is_allowed);
+    internal signal void allow_desktop_notifications_changed (bool is_allowed);
 
 
     /***********************************************************
@@ -124,7 +124,7 @@ public class JsonApiJob : AbstractNetworkJob {
         add_raw_header ("OCS-APIREQUEST", "true");
         var query = this.additional_params;
         query.add_query_item ("format", "json");
-        GLib.Uri url = Utility.concat_url_path (account ().url (), path (), query);
+        GLib.Uri url = Utility.concat_url_path (account.url (), path (), query);
         const string http_verb = this.verb.to_string ();
         if (!this.body == "") {
             send_request (http_verb, url, this.request, this.body);

@@ -35,7 +35,7 @@ public class PropagateDirectory : PropagatorJob {
         this.first_job = propagator.create_job (item);
         this.sub_jobs = propagator;
         if (this.first_job) {
-            connect (this.first_job.data (), PropagatorJob.on_signal_finished, this, PropagateDirectory.on_signal_first_job_finished);
+            connect (this.first_job, PropagatorJob.on_signal_finished, this, PropagateDirectory.on_signal_first_job_finished);
             this.first_job.associated_composite (&this.sub_jobs);
         }
         connect (&this.sub_jobs, PropagatorJob.on_signal_finished, this, PropagateDirectory.on_signal_sub_jobs_finished);

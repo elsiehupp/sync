@@ -59,7 +59,7 @@ public class SlideShow : Gtk.Widget {
                 this.animation.duration (SLIDE_DURATION);
                 this.animation.easing_curve (QEasing_curve.Out_cubic);
                 this.animation.start_value (static_cast<double> (this.current_slide));
-                connect (this.animation.data (), SIGNAL (value_changed (GLib.Variant)), this, SLOT (update ()));
+                connect (this.animation, SIGNAL (value_changed (GLib.Variant)), this, SLOT (update ()));
             }
             this.animation.end_value (static_cast<double> (value));
             this.animation.on_signal_start (QAbstractAnimation.DeleteWhenStopped);
@@ -79,8 +79,8 @@ public class SlideShow : Gtk.Widget {
     private GLib.Vector<Gdk.Pixbuf> pixmaps;
     private QPointer<QVariantAnimation> animation = null;
 
-    signal void signal_clicked ();
-    signal void signal_current_slide_changed (int index);
+    internal signal void signal_clicked ();
+    internal signal void signal_current_slide_changed (int index);
 
     /***********************************************************
     ***********************************************************/

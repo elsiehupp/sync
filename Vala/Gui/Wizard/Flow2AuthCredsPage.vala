@@ -24,9 +24,9 @@ public class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
     private Flow2AuthWidget flow_2_auth_widget = null;
     private QVBoxLayout layout = null;
 
-    signal void connect_to_oc_url (string value);
-    signal void poll_now ();
-    signal void signal_style_changed ();
+    internal signal void connect_to_oc_url (string value);
+    internal signal void poll_now ();
+    internal signal void signal_style_changed ();
 
     /***********************************************************
     ***********************************************************/
@@ -82,10 +82,10 @@ public class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
     public void initialize_page () {
         var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
         //  Q_ASSERT (oc_wizard);
-        oc_wizard.account ().credentials (CredentialsFactory.create ("http"));
+        oc_wizard.account.credentials (CredentialsFactory.create ("http"));
 
         if (this.flow_2_auth_widget)
-            this.flow_2_auth_widget.start_auth (oc_wizard.account ().data ());
+            this.flow_2_auth_widget.start_auth (oc_wizard.account);
 
         // Don't hide the wizard (avoid user confusion)!
         //wizard ().hide ();
@@ -158,7 +158,7 @@ public class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
                 var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
                 //  Q_ASSERT (oc_wizard);
 
-                /* emit */ connect_to_oc_url (oc_wizard.account ().url ().to_string ());
+                /* emit */ connect_to_oc_url (oc_wizard.account.url ().to_string ());
                 break;
             }
         }

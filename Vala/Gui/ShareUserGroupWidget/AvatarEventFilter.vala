@@ -9,8 +9,8 @@ namespace Ui {
 
 public class AvatarEventFilter : GLib.Object {
 
-    signal void signal_clicked ();
-    signal void signal_context_menu (QPoint global_position);
+    internal signal void signal_clicked ();
+    internal signal void signal_context_menu (QPoint global_position);
 
     /***********************************************************
     ***********************************************************/

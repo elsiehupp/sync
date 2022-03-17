@@ -71,7 +71,7 @@ public class PropagateRemoteMove : PropagateItemJob {
         }
 
         string remote_source = propagator ().full_remote_path (origin);
-        string remote_destination = QDir.clean_path (propagator ().account ().dav_url ().path () + propagator ().full_remote_path (this.item.rename_target));
+        string remote_destination = QDir.clean_path (propagator ().account.dav_url ().path () + propagator ().full_remote_path (this.item.rename_target));
 
         var vfs = propagator ().sync_options.vfs;
         var itype = this.item.type;
@@ -132,9 +132,9 @@ public class PropagateRemoteMove : PropagateItemJob {
         }
         GLib.debug (remote_source + remote_destination);
 
-        this.job = new MoveJob (propagator ().account (), remote_source, remote_destination, this);
+        this.job = new MoveJob (propagator ().account, remote_source, remote_destination, this);
         connect (
-            this.job.data (),
+            this.job,
             MoveJob.signal_finished,
             this,
             PropagateRemoteMove.on_signal_move_job_finished

@@ -120,9 +120,9 @@ public class OCUpdater : Updater {
     UpdateInfo update_info { protected get; private set; }
 
 
-    signal void signal_download_state_changed ();
-    signal void signal_new_update_available (string header, string message);
-    signal void signal_request_restart ();
+    internal signal void signal_download_state_changed ();
+    internal signal void signal_new_update_available (string header, string message);
+    internal signal void signal_request_restart ();
 
 
     /***********************************************************
@@ -145,10 +145,10 @@ public class OCUpdater : Updater {
         if (!update_file == "" && GLib.File (update_file).exists ()
             && !update_succeeded () /* Someone might have run the updater manually between restarts */) {
             const var message_box_start_installer = new QMessageBox (QMessageBox.Information,
-                _("New %1 update ready").printf (Theme.instance ().app_name_gui ()),
+                _("New %1 update ready").printf (Theme.instance.app_name_gui ()),
                 _("A new update for %1 is about to be installed. The updater may ask "
                 + "for additional privileges during the process. Your computer may reboot to complete the installation.")
-                    .printf (Theme.instance ().app_name_gui ()),
+                    .printf (Theme.instance.app_name_gui ()),
                 QMessageBox.Ok,
                 null);
 

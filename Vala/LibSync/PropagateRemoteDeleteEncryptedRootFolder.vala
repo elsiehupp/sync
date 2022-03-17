@@ -83,7 +83,7 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
             return;
         }
 
-        FolderMetadata metadata = new FolderMetadata (this.propagator.account (), json.to_json (QJsonDocument.Compact), status_code);
+        FolderMetadata metadata = new FolderMetadata (this.propagator.account, json.to_json (QJsonDocument.Compact), status_code);
 
         GLib.debug (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) + "It's a root encrypted folder. Let's remove nested items first.";
 
@@ -91,7 +91,7 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
 
         GLib.debug (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) + "Metadata updated, sending to the server.";
 
-        var job = new UpdateMetadataApiJob (this.propagator.account (), this.folder_identifier, metadata.encrypted_metadata (), this.folder_token);
+        var job = new UpdateMetadataApiJob (this.propagator.account, this.folder_identifier, metadata.encrypted_metadata (), this.folder_token);
         connect (
             job,
             UpdateMetadataApiJob.signal_success,
@@ -182,7 +182,7 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
     /***********************************************************
     ***********************************************************/
     private void decrypt_and_remote_delete () {
-        var job = new Occ.SetEncryptionFlagApiJob (this.propagator.account (), this.item.file_id, Occ.SetEncryptionFlagApiJob.Clear, this);
+        var job = new Occ.SetEncryptionFlagApiJob (this.propagator.account, this.item.file_id, Occ.SetEncryptionFlagApiJob.Clear, this);
         connect (
             job,
             Occ.SetEncryptionFlagApiJob.on_signal_success,
@@ -221,7 +221,7 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
     private void delete_nested_remote_item (string filename) {
         GLib.info (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) + "Deleting nested encrypted remote item" + filename;
 
-        var delete_job = new DeleteJob (this.propagator.account (), this.propagator.full_remote_path (filename), this);
+        var delete_job = new DeleteJob (this.propagator.account, this.propagator.full_remote_path (filename), this);
         delete_job.folder_token (this.folder_token);
         delete_job.property (ENCRYPTED_FILENAME_PROPERTY_KEY, filename);
 

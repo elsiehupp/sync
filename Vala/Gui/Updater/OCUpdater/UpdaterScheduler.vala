@@ -14,8 +14,8 @@ public class UpdaterScheduler : GLib.Object {
     ***********************************************************/
     private QTimer update_check_timer;
 
-    signal void signal_updater_announcement (string title, string message);
-    signal void signal_request_restart ();
+    internal signal void signal_updater_announcement (string title, string message);
+    internal signal void signal_request_restart ();
 
     /***********************************************************
     ***********************************************************/
@@ -28,7 +28,7 @@ public class UpdaterScheduler : GLib.Object {
             UpdaterScheduler.on_signal_timer_fired
         );
 
-        var updater = (OCUpdater) Updater.instance ();
+        var updater = (OCUpdater) Updater.instance;
         // Note: the sparkle-updater is not an OCUpdater
         if (updater) {
             connect (
@@ -72,7 +72,7 @@ public class UpdaterScheduler : GLib.Object {
             return;
         }
 
-        Updater updater = Updater.instance ();
+        Updater updater = Updater.instance;
         if (updater) {
             updater.on_signal_background_check_for_update ();
         }

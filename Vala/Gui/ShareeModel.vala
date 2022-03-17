@@ -44,8 +44,8 @@ public class ShareeModel : QAbstractListModel {
     private GLib.Vector<unowned Sharee> sharees;
     private GLib.Vector<unowned Sharee> sharee_blocklist;
 
-    signal void signal_sharees_ready ();
-    signal void signal_display_error_message (int code, string value);
+    internal signal void signal_sharees_ready ();
+    internal signal void signal_display_error_message (int code, string value);
 
     /***********************************************************
     ***********************************************************/

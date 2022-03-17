@@ -64,7 +64,7 @@ public class LegalNotice : Gtk.Dialog {
         notice += _("<p>Licensed under the GNU General Public License (GPL) Version 2.0 or any later version.</p>");
 
         notice += "<p>&nbsp;</p>";
-        notice += Theme.instance ().about_details ();
+        notice += Theme.instance.about_details ();
 
         Theme.replace_link_color_string_background_aware (notice);
 

@@ -54,7 +54,7 @@ public class SslButton : QToolButton {
         }
         this.account_state = account_state;
 
-        unowned Account account = this.account_state.account ();
+        unowned Account account = this.account_state.account;
         if (account.url ().scheme () == "https") {
             icon (Gtk.Icon (":/client/theme/lock-https.svg"));
             QSslCipher cipher = account.session_cipher;
@@ -75,7 +75,7 @@ public class SslButton : QToolButton {
             return;
         }
 
-        unowned Account account = this.account_state.account ();
+        unowned Account account = this.account_state.account;
 
         this.menu.add_action (_("Server version : %1").printf (account.server_version ())).enabled (false);
 

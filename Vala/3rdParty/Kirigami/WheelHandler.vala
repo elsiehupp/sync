@@ -30,10 +30,10 @@ public class WheelHandler : GLib.Object {
     ***********************************************************/
     //  private friend class GlobalWheelFilter;
 
-    signal void signal_target_changed ();
-    signal void signal_block_target_wheel_changed ();
-    signal void signal_scroll_flickable_target_changed ();
-    signal void signal_wheel (KirigamiWheelEvent wheel);
+    internal signal void signal_target_changed ();
+    internal signal void signal_block_target_wheel_changed ();
+    internal signal void signal_scroll_flickable_target_changed ();
+    internal signal void signal_wheel (KirigamiWheelEvent wheel);
 
     /***********************************************************
     target : Item

@@ -79,7 +79,7 @@ public class SelectiveSyncDialog : Gtk.Dialog {
             string[] block_list = this.selective_sync.create_block_list ();
             this.folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, block_list);
 
-            FolderMan folder_man = FolderMan.instance ();
+            FolderMan folder_man = FolderMan.instance;
             if (this.folder.is_busy ()) {
                 this.folder.on_signal_terminate_sync ();
             }

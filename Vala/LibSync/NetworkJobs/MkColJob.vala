@@ -22,8 +22,8 @@ public class MkColJob : AbstractNetworkJob {
     GLib.HashTable<string, string> extra_headers;
 
 
-    signal void finished_with_error (GLib.InputStream reply);
-    signal void finished_without_error ();
+    internal signal void finished_with_error (GLib.InputStream reply);
+    internal signal void finished_without_error ();
 
 
     /***********************************************************

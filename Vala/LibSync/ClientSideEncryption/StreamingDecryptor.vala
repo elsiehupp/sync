@@ -124,7 +124,7 @@ public class StreamingDecryptor : GLib.Object {
 
             int out_len = 0;
 
-            if (!EVP_Decrypt_update (this.context, unsigned_data (decrypted_block), out_len, (uchar) (encrypted_block.data ()), encrypted_block.size ())) {
+            if (!EVP_Decrypt_update (this.context, unsigned_data (decrypted_block), out_len, (uchar) (encrypted_block), encrypted_block.size ())) {
                 GLib.critical ("Could not decrypt");
                 return "";
             }
@@ -159,7 +159,7 @@ public class StreamingDecryptor : GLib.Object {
             string e2Ee_tag = new string (input + input_pos, Occ.Constants.E2EE_TAG_SIZE);
 
             // Set expected e2Ee_tag value. Works in OpenSSL 1.0.1d and later
-            if (!EVP_CIPHER_CTX_ctrl (this.context, EVP_CTRL_GCM_SET_TAG, e2Ee_tag.size (), reinterpret_cast<uchar> (e2Ee_tag.data ()))) {
+            if (!EVP_CIPHER_CTX_ctrl (this.context, EVP_CTRL_GCM_SET_TAG, e2Ee_tag.size (), reinterpret_cast<uchar> (e2Ee_tag))) {
                 GLib.critical ("Could not set expected e2Ee_tag.");
                 return "";
             }

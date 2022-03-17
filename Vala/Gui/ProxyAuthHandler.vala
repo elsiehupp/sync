@@ -130,7 +130,7 @@ public class ProxyAuthHandler : GLib.Object {
             // Since we go into an event loop, it's possible for the account's qnam
             // to be destroyed before we get back. We can use this to check for its
             // liveness.
-            sending_qnam = account.shared_network_access_manager ().data ();
+            sending_qnam = account.shared_network_access_manager ();
         }
         if (!sending_qnam) {
             GLib.warning ("Could not get the sending QNAM for " + sender ());
@@ -210,7 +210,7 @@ public class ProxyAuthHandler : GLib.Object {
         // If that's the case, continue processing the dialog until
         // it's done.
         if (this.dialog) {
-            exec_await (this.dialog.data (),
+            exec_await (this.dialog,
                     &Gtk.Dialog.on_signal_finished,
                     this.waiting_for_dialog,
                     QEventLoop.Exclude_socket_notifiers);
@@ -242,8 +242,8 @@ public class ProxyAuthHandler : GLib.Object {
                 return false;
             }
 
-            this.read_password_job.on_signal_reset (new ReadPasswordJob (Theme.instance ().app_name ()));
-            this.read_password_job.settings (this.settings.data ());
+            this.read_password_job.on_signal_reset (new ReadPasswordJob (Theme.instance.app_name ()));
+            this.read_password_job.settings (this.settings);
             this.read_password_job.insecure_fallback (false);
             this.read_password_job.key (keychain_password_key ());
             this.read_password_job.auto_delete (false);
@@ -255,7 +255,7 @@ public class ProxyAuthHandler : GLib.Object {
         // bad behavior when we reenter this code after the flag has been switched
         // but before the while loop has on_signal_finished.
         exec_await (
-            this.read_password_job.data (),
+            this.read_password_job,
             QKeychain.Job.on_signal_finished,
             this.waiting_for_keychain);
 
@@ -285,8 +285,8 @@ public class ProxyAuthHandler : GLib.Object {
 
         this.settings.value (keychain_username_key (), this.username);
 
-        var job = new WritePasswordJob (Theme.instance ().app_name (), this);
-        job.settings (this.settings.data ());
+        var job = new WritePasswordJob (Theme.instance.app_name (), this);
+        job.settings (this.settings);
         job.insecure_fallback (false);
         job.key (keychain_password_key ());
         job.text_data (this.password);

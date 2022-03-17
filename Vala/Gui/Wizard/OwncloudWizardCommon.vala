@@ -66,14 +66,14 @@ public class WizardCommon {
     /***********************************************************
     ***********************************************************/
     public static string title_template () {
-        return " (<font color=\"%1\" size=\"5\">)".printf (Theme.instance ().wizard_header_title_color ().name ()) + "%1</font>";
+        return " (<font color=\"%1\" size=\"5\">)".printf (Theme.instance.wizard_header_title_color ().name ()) + "%1</font>";
     }
 
 
     /***********************************************************
     ***********************************************************/
     public static string sub_title_template () {
-        return "<font color=\"%1\">".printf (Theme.instance ().wizard_header_title_color ().name ()) + "%1</font>";
+        return "<font color=\"%1\">".printf (Theme.instance.wizard_header_title_color ().name ()) + "%1</font>";
     }
 
 

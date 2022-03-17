@@ -201,21 +201,21 @@ public class FolderStatusModel : QAbstractItemModel {
             this.account_state = value;
     
             connect (
-                FolderMan.instance (),
+                FolderMan.instance,
                 FolderMan.signal_folder_sync_state_change,
                 this,
                 FolderStatusModel.on_signal_folder_sync_state_change,
                 Qt.UniqueConnection
             );
             connect (
-                FolderMan.instance (),
+                FolderMan.instance,
                 FolderMan.signal_schedule_queue_changed,
                 this,
                 FolderStatusModel.on_signal_folder_schedule_queue_changed,
                 Qt.UniqueConnection
             );
     
-            var folders = FolderMan.instance ().map ();
+            var folders = FolderMan.instance.map ();
             foreach (var folder_i in folders) {
                 if (!this.account_state) {
                     break;
@@ -272,14 +272,14 @@ public class FolderStatusModel : QAbstractItemModel {
     private GLib.HashTable<QPersistentModelIndex, QElapsedTimer> fetching_items;
 
 
-    signal void dirty_changed ();
+    internal signal void dirty_changed ();
 
 
     /***********************************************************
     Tell the view that this item should be expanded because it
     has an undecided item
     ***********************************************************/
-    signal void suggest_expand (QModelIndex index);
+    internal signal void suggest_expand (QModelIndex index);
 
 
     //  friend struct SubFolderInfo;
@@ -450,7 +450,7 @@ public class FolderStatusModel : QAbstractItemModel {
                 return progress.progress_string;
             }
             if (account_connected)
-                tool_tip = Theme.instance ().status_header_text (folder_i.sync_result ().status ());
+                tool_tip = Theme.instance.status_header_text (folder_i.sync_result ().status ());
             else
                 tool_tip = _("Signed out");
             tool_tip += "\n";
@@ -459,7 +459,7 @@ public class FolderStatusModel : QAbstractItemModel {
         }
         case DataRole.FOLDER_STATUS_ICON_ROLE:
             if (account_connected) {
-                var theme = Theme.instance ();
+                var theme = Theme.instance;
                 var status = folder_i.sync_result ().status ();
                 if (folder_i.sync_paused ()) {
                     return theme.folder_disabled_icon ();
@@ -482,7 +482,7 @@ public class FolderStatusModel : QAbstractItemModel {
                     }
                 }
             } else {
-                return Theme.instance ().folder_offline_icon ();
+                return Theme.instance.folder_offline_icon ();
             }
         case DataRole.SYNC_PROGRESS_ITEM_STRING:
             return progress.progress_string;
@@ -583,7 +583,7 @@ public class FolderStatusModel : QAbstractItemModel {
     ***********************************************************/
     public int row_count (QModelIndex parent = QModelIndex ()) {
         if (!parent.is_valid ()) {
-            if (Theme.instance ().single_sync_folder () && this.folders.count () != 0) {
+            if (Theme.instance.single_sync_folder () && this.folders.count () != 0) {
                 // "Add folder" button not visible in the single_sync_folder configuration.
                 return this.folders.count ();
             }
@@ -695,13 +695,13 @@ public class FolderStatusModel : QAbstractItemModel {
             path += info_path;
         }
 
-        var job = new LsColJob (this.account_state.account (), path, this);
+        var job = new LsColJob (this.account_state.account, path, this);
         info.fetching_job = job;
         var props = GLib.List<string> ("resourcetype"
                                               + "http://owncloud.org/ns:size"
                                               + "http://owncloud.org/ns:permissions"
                                               + "http://owncloud.org/ns:fileid");
-        if (this.account_state.account ().capabilities ().client_side_encryption_available ()) {
+        if (this.account_state.account.capabilities ().client_side_encryption_available ()) {
             props += "http://nextcloud.org/ns:is-encrypted";
         }
         job.properties (props);
@@ -946,7 +946,7 @@ public class FolderStatusModel : QAbstractItemModel {
                     folder.journal_database ().schedule_path_for_remote_discovery (change);
                     folder.on_signal_schedule_path_for_local_discovery (change);
                 }
-                FolderMan.instance ().schedule_folder (folder);
+                FolderMan.instance.schedule_folder (folder);
             }
         }
 
@@ -1034,7 +1034,7 @@ public class FolderStatusModel : QAbstractItemModel {
                 folder.journal_database ().schedule_path_for_remote_discovery (it);
                 folder.on_signal_schedule_path_for_local_discovery (it);
             }
-            FolderMan.instance ().schedule_folder (folder);
+            FolderMan.instance.schedule_folder (folder);
         }
 
         on_signal_reset_folders ();
@@ -1475,7 +1475,7 @@ public class FolderStatusModel : QAbstractItemModel {
             // Reset progress info.
             pi = SubFolderInfo.Progress ();
         } else if (state == SyncResult.Status.NOT_YET_STARTED) {
-            FolderMan folder_man = FolderMan.instance ();
+            FolderMan folder_man = FolderMan.instance;
             int position = folder_man.schedule_queue ().index_of (folder_i);
             foreach (var other in folder_man.map ()) {
                 if (other != folder_i && other.is_sync_running ())
@@ -1509,7 +1509,7 @@ public class FolderStatusModel : QAbstractItemModel {
     Update messages on waiting folders.
     ***********************************************************/
     private void on_signal_folder_schedule_queue_changed () {
-        foreach (Folder folder in FolderMan.instance ().map ()) {
+        foreach (Folder folder in FolderMan.instance.map ()) {
             on_signal_folder_sync_state_change (folder);
         }
     }

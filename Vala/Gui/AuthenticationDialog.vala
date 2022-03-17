@@ -31,22 +31,26 @@ public class AuthenticationDialog : Gtk.Dialog {
         base (parent);
         this.user = new QLineEdit ();
         this.password = new QLineEdit ();
-        window_title (_("Authentication Required"));
-        var lay = new QVBoxLayout (this);
+        this.window_title (_("Authentication Required"));
+        var vertical_box_layout = new QVBoxLayout (this);
         var label = new Gtk.Label (_("Enter username and password for \"%1\" at %2.").printf (realm, domain));
         label.text_format (Qt.UpdateStatusStringFormat.PLAIN_TEXT);
-        lay.add_widget (label);
+        vertical_box_layout.add_widget (label);
 
         var form = new QFormLayout ();
         form.add_row (_("&User:"), this.user);
         form.add_row (_("&Password:"), this.password);
-        lay.add_layout (form);
+        vertical_box_layout.add_layout (form);
         this.password.echo_mode (QLineEdit.Password);
 
-        var box = new QDialogButtonBox (QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal);
-        connect (box, QDialogButtonBox.accepted, this, Gtk.Dialog.accept);
-        connect (box, QDialogButtonBox.rejected, this, Gtk.Dialog.reject);
-        lay.add_widget (box);
+        var dialog_button_box = new QDialogButtonBox (QDialogButtonBox.Ok | QDialogButtonBox.Cancel, Qt.Horizontal);
+        dialog_button_box.accepted.connect (
+            this.accept
+        );
+        dialog_button_box.rejected.connect (
+            this.reject
+        );
+        vertical_box_layout.add_widget (dialog_button_box);
     }
 
 

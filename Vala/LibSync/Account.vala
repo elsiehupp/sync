@@ -96,11 +96,11 @@ public class Account : GLib.Object {
     The user that can be used in dav url.
 
     This can very well be different frome the login user that's
-    stored in credentials ().user ().
+    stored in credentials.user ().
     ***********************************************************/
     string dav_user {
         public get {
-            return this.dav_user == "" && this.credentials ? this.credentials.user () : this.dav_user;
+            return this.dav_user == "" && this.credentials != null ? this.credentials.user : this.dav_user;
         }
         public set {
             if (this.dav_user == value) {
@@ -116,8 +116,8 @@ public class Account : GLib.Object {
     ***********************************************************/
     string display_name {
         public get {
-            string dn = "%1@%2".printf (credentials ().user (), this.url.host ());
-            int port = url ().port ();
+            string dn = "%1@%2".printf (this.credentials.user, this.url.host);
+            int port = this.url.port ();
             if (port > 0 && port != 80 && port != 443) {
                 dn.append (':');
                 dn.append (string.number (port));
@@ -231,12 +231,12 @@ public class Account : GLib.Object {
     /***********************************************************
     Pluggable handler
     ***********************************************************/
-    QScopedPointer<AbstractSslErrorHandler> ssl_error_handler {
+    AbstractSslErrorHandler ssl_error_handler {
         private get {
             return this.ssl_error_handler;
         }
         public set {
-            this.ssl_error_handler.reset (value);
+            this.ssl_error_handler = value;
         }
     }
 
@@ -249,16 +249,16 @@ public class Account : GLib.Object {
     ***********************************************************/
     AbstractCredentials credentials {
         public get {
-            return this.credentials.data ();
+            return this.credentials;
         }
         public set {
             // set active credential manager
             Soup.CookieJar jar = null;
             Soup.ProxyResolverDefault proxy;
 
-            if (this.soup_session) {
+            if (this.soup_session != null) {
                 jar = this.soup_session.add_feature ();
-                jar.parent (null);
+                //  jar.parent (null);
 
                 // Remember proxy (issue #2108)
                 proxy = (Soup.ProxyResolverDefault) this.soup_session.get_feature (typeof (Soup.ProxyResolverDefault));
@@ -268,32 +268,29 @@ public class Account : GLib.Object {
 
             // The order for these two is important! Reading the credential's
             // settings accesses the account as well as account.credentials,
-            this.credentials.reset (value);
-            value.account (this);
+            this.credentials = value;
+            value.account = this;
 
             // Note: This way the QNAM can outlive the Account and Credentials.
             // This is necessary to avoid issues with the QNAM being deleted while
             // processing on_signal_handle_ssl_errors ().
-            this.soup_session = new /*unowned*/ Soup.Session (this.credentials.create_qnam (), GLib.Object.delete_later);
+            //  this.soup_session = new Soup.Session (this.credentials.create_qnam (), GLib.Object.delete_later);
+            this.soup_session = new Soup.Session ();
 
             if (jar != null) {
                 this.soup_session.add_feature (jar);
             }
-            this.signal_ssl_errors.connect (
-                this.soup_session.data (),
+            this.soup_session.signal_ssl_errors.connect (
                 this.on_signal_handle_ssl_errors
             );
-            Soup.Session.signal_proxy_authentication_required.connect (
-                this.soup_session.data (),
-                Account.signal_proxy_authentication_required
+            this.soup_session.signal_proxy_authentication_required.connect (
+                this.signal_proxy_authentication_required
             );
             AbstractCredentials.signal_fetched.connect (
-                this.credentials.data (),
-                Account.on_signal_credentials_fetched
+                this.on_signal_credentials_fetched
             );
             AbstractCredentials.signal_asked.connect (
-                this.credentials.data (),
-                Account.on_signal_credentials_asked
+                this.on_signal_credentials_asked
             );
 
             try_setup_push_notifications ();
@@ -303,7 +300,7 @@ public class Account : GLib.Object {
     /***********************************************************
     True when the server connection is using HTTP2
     ***********************************************************/
-    public bool http2Supported;
+    public bool http2_supported;
 
     /***********************************************************
     Certificates that were explicitly rejected by the user
@@ -361,84 +358,85 @@ public class Account : GLib.Object {
     /***********************************************************
     Emitted whenever there's network activity
     ***********************************************************/
-    signal void signal_propagator_network_activity ();
+    internal signal void signal_propagator_network_activity ();
 
     /***********************************************************
     Triggered by handle_invalid_credentials ()
     ***********************************************************/
-    signal void signal_invalid_credentials ();
+    internal signal void signal_invalid_credentials ();
 
     /***********************************************************
     ***********************************************************/
-    signal void signal_credentials_fetched (AbstractCredentials credentials);
+    internal signal void signal_credentials_fetched (AbstractCredentials credentials);
 
     /***********************************************************
     ***********************************************************/
-    signal void signal_credentials_asked (AbstractCredentials credentials);
+    internal signal void signal_credentials_asked (AbstractCredentials credentials);
 
     /***********************************************************
     Forwards from Soup.Session.signal_proxy_authentication_required ().
     ***********************************************************/
-    signal void signal_proxy_authentication_required (Soup.ProxyResolverDefault proxy, QAuthenticator authenticator);
+    internal signal void signal_proxy_authentication_required (Soup.ProxyResolverDefault proxy, QAuthenticator authenticator);
 
     /***********************************************************
     e.g. when the approved SSL certificates changed
     ***********************************************************/
-    signal void signal_wants_account_saved (Account account);
+    internal signal void signal_wants_account_saved (Account account);
 
     /***********************************************************
     ***********************************************************/
-    signal void signal_server_version_changed (Account account, string new_version, string old_version);
+    internal signal void signal_server_version_changed (Account account, string new_version, string old_version);
 
     /***********************************************************
     ***********************************************************/
-    signal void signal_account_changed_avatar ();
+    internal signal void signal_account_changed_avatar ();
 
     /***********************************************************
     ***********************************************************/
-    signal void signal_account_changed_display_name ();
+    internal signal void signal_account_changed_display_name ();
 
     /***********************************************************
     Used in RemoteWipe
     ***********************************************************/
-    signal void signal_app_password_retrieved (string value);
+    internal signal void signal_app_password_retrieved (string value);
 
     /***********************************************************
     ***********************************************************/
-    signal void signal_push_notifications_ready (Account account);
+    internal signal void signal_push_notifications_ready (Account account);
 
     /***********************************************************
     ***********************************************************/
-    signal void signal_push_notifications_disabled (Account account);
+    internal signal void signal_push_notifications_disabled (Account account);
 
     /***********************************************************
     ***********************************************************/
-    signal void signal_user_status_changed ();
+    internal signal void signal_user_status_changed ();
 
     /***********************************************************
     ***********************************************************/
-    signal void signal_ssl_errors (GLib.InputStream reply, GLib.List<GnuTLS.ErrorCode> error_list);
+    internal signal void signal_ssl_errors (GLib.InputStream reply, GLib.List<GnuTLS.ErrorCode> error_list);
 
     /***********************************************************
     ***********************************************************/
     private Account (GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.capabilities = new GLib.HashTable<string, GLib.Variant> (str_hash, str_equal);
-        this.http2Supported = false;
+        this.http2_supported = false;
         this.push_notifications = null;
         this.is_remote_wipe_requested_HACK = false;
-        q_register_meta_type<unowned Account> ("unowned Account");
-        q_register_meta_type<Account> ("Account*");
+        //  q_register_meta_type<unowned Account> ("unowned Account");
+        //  q_register_meta_type<Account> ("Account*");
 
         this.push_notifications_reconnect_timer.interval (PUSH_NOTIFICATIONS_RECONNECT_INTERVAL);
-        connect (&this.push_notifications_reconnect_timer, QTimer.timeout, this, Account.try_setup_push_notifications);
+        this.push_notifications_reconnect_timer.timeout.connect (
+            this.try_setup_push_notifications);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public static unowned Account create () {
-        unowned Account account = new Account ();
+    public static Account create () {
+        Account account = new Account ();
         account.shared_this (account);
         return account;
     }
@@ -446,8 +444,8 @@ public class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public unowned Account shared_from_this () {
-        return this.shared_this.to_strong_ref ();
+    public Account shared_from_this () {
+        return this.shared_this;
     }
 
 
@@ -465,7 +463,7 @@ public class Account : GLib.Object {
     @returns the (themeable) dav path for the account.
     ***********************************************************/
     public string dav_path () {
-        return dav_path_base () + "/" + dav_user () + "/";
+        return dav_path_base () + "/" + this.dav_user + "/";
     }
 
 
@@ -771,10 +769,10 @@ public class Account : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void delete_app_password () {
-        const string kck = AbstractCredentials.keychain_key (
-            url ().to_string (),
-            credentials ().user () + app_password,
-            identifier ()
+        string kck = AbstractCredentials.keychain_key (
+            this.url.to_string (),
+            this.credentials.user + app_password,
+            this.identifier
         );
 
         if (kck == "") {
@@ -782,12 +780,10 @@ public class Account : GLib.Object {
             return;
         }
 
-        var delete_password_job = new DeletePasswordJob (Theme.instance.app_name ());
+        var delete_password_job = new DeleteJob (Theme.instance.app_name ());
         delete_password_job.insecure_fallback (false);
         delete_password_job.key (kck);
-        connect (
-            delete_password_job,
-            DeletePasswordJob.signal_finished,
+        delete_password_job.signal_finished.connect (
             this.on_signal_delete_password_job_finished
         );
         delete_password_job.start ();
@@ -795,8 +791,8 @@ public class Account : GLib.Object {
 
 
     private void on_signal_delete_password_job_finished (Job incoming) {
-        var delete_job = static_cast<DeletePasswordJob> (incoming);
-        if (delete_job.error () == NoError) {
+        var delete_job = (DeleteJob) incoming;
+        if (delete_job.error == NoError) {
             GLib.info ("app_password deleted from keychain.");
         } else {
             GLib.warning ("Unable to delete app_password from keychain " + delete_job.error_string ());
@@ -810,7 +806,7 @@ public class Account : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public string cookie_jar_path () {
-        return GLib.Environment.get_user_config_dir () + "/cookies" + identifier () + ".db";
+        return GLib.Environment.get_user_config_dir () + "/cookies" + this.identifier + ".db";
     }
 
 
@@ -832,19 +828,17 @@ public class Account : GLib.Object {
         this.soup_session.add_feature (jar); // takes ownership of the old cookie jar
         this.soup_session.add_feature (proxy);   // Remember proxy (issue #2108)
 
-        connect (
-            this.soup_session.data (),
-            signal_ssl_errors (reply, error_list),
-            on_signal_handle_ssl_errors (reply, error_list)
+        this.soup_session.signal_ssl_errors.connect (
+            this.on_signal_handle_ssl_errors
         );
-        Account.signal_proxy_authentication_required.connect (this.soup_session.data (), Soup.Session.signal_proxy_authentication_required);
+        Account.signal_proxy_authentication_required.connect (this.soup_session, Soup.Session.signal_proxy_authentication_required);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public Soup.Session network_access_manager () {
-        return this.soup_session.data ();
+        return this.soup_session;
     }
 
 
@@ -875,17 +869,16 @@ public class Account : GLib.Object {
     public void retrieve_app_password () {
         const string kck = AbstractCredentials.keychain_key (
             url ().to_string (),
-            credentials ().user () + app_password,
-            identifier ()
+            credentials.user () + app_password,
+            this.identifier
         );
 
         var read_password_job = new ReadPasswordJob (Theme.instance.app_name ());
         read_password_job.insecure_fallback (false);
         read_password_job.key (kck);
-        connect (
-            read_password_job,
-            ReadPasswordJob.signal_finished,
-            this.on_signal_read_password_job_finished);
+        read_password_job.signal_finished.connect (
+            this.on_signal_read_password_job_finished
+        );
         read_password_job.start ();
     }
 
@@ -914,22 +907,20 @@ public class Account : GLib.Object {
         // there'll be a zombie keychain slot forever, never used again ;p
         //
         // Also don't write empty passwords (Log out . Relaunch)
-        if (identifier () == "" || app_password == "")
+        if (this.identifier == "" || app_password == "")
             return;
 
         const string kck = AbstractCredentials.keychain_key (
                     url ().to_string (),
-                    dav_user () + app_password,
-                    identifier ()
+                    this.dav_user + app_password,
+                    this.identifier
         );
 
         var write_password_job = new WritePasswordJob (Theme.instance.app_name ());
         write_password_job.insecure_fallback (false);
         write_password_job.key (kck);
         write_password_job.binary_data (app_password.to_latin1 ());
-        connect (
-            write_password_job,
-            WritePasswordJob.signal_finished,
+        write_password_job.signal_finished.connect (
             this.on_signal_write_password_job_finished
         );
         write_password_job.start ();
@@ -953,10 +944,7 @@ public class Account : GLib.Object {
     ***********************************************************/
     public void delete_app_token () {
         var delete_app_token_job = new DeleteJob (shared_from_this (), "/ocs/v2.php/core/apppassword");
-        connect (
-            delete_app_token_job,
-            DeleteJob.signal_finished,
-            this,
+        delete_app_token_job.signal_finished.connect (
             this.on_signal_delete_job_finished
         );
         delete_app_token_job.start ();
@@ -1001,17 +989,11 @@ public class Account : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void set_up_user_status_connector () {
-        this.user_status_connector = std.make_shared<OcsUserStatusConnector> (shared_from_this ());
-        connect (
-            this.user_status_connector,
-            UserStatusConnector.user_status_fetched,
-            this,
+        this.user_status_connector = shared_from_this ();
+        this.user_status_connector.signal_user_status_fetched.connect (
             this.on_signal_user_status_connector_user_status_fetched
         );
-        connect (
-            this.user_status_connector,
-            UserStatusConnector.signal_message_cleared,
-            this,
+        this.user_status_connector.signal_message_cleared.connect (
             this.on_signal_user_status_connector_message_cleared
         );
     }
@@ -1125,16 +1107,13 @@ public class Account : GLib.Object {
         if (this.dav_user == "") {
             GLib.debug ("User identifier not set. Fetch it.");
             var fetch_user_name_job = new JsonApiJob (shared_from_this (), "/ocs/v1.php/cloud/user");
-            connect (
-                fetch_user_name_job,
-                JsonApiJob.signal_json_received,
-                this,
+            fetch_user_name_job.signal_json_received.connect (
                 this.on_signal_json_api_job_user_name_fetched
             );
             fetch_user_name_job.start ();
         } else {
             GLib.debug ("User identifier already fetched.");
-            /* emit */ signal_credentials_fetched (this.credentials.data ());
+            /* emit */ signal_credentials_fetched (this.credentials);
         }
     }
 
@@ -1143,21 +1122,21 @@ public class Account : GLib.Object {
         fetch_user_name_job.delete_later ();
         if (status_code != 100) {
             GLib.warning ("Could not fetch user identifier. Login will probably not work.");
-            /* emit */ signal_credentials_fetched (this.credentials.data ());
+            /* emit */ signal_credentials_fetched (this.credentials);
             return;
         }
 
         var obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
         var user_id = obj_data.value ("identifier").to_string ();
-        dav_user (user_id);
-        /* emit */ signal_credentials_fetched (this.credentials.data ());
+        this.dav_user = user_id;
+        /* emit */ signal_credentials_fetched (this.credentials);
     }
 
 
     /***********************************************************
     ***********************************************************/
     protected void on_signal_credentials_asked () {
-        /* emit */ signal_credentials_asked (this.credentials.data ());
+        /* emit */ signal_credentials_asked (this.credentials);
     }
 
 

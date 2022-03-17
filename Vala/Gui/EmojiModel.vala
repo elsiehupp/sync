@@ -4307,8 +4307,8 @@ public class EmojiModel : GLib.Object {
     }
 
 
-    signal void signal_history_changed ();
-    signal void signal_model_changed ();
+    internal signal void signal_history_changed ();
+    internal signal void signal_model_changed ();
 
 
     /***********************************************************

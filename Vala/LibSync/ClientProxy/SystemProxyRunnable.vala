@@ -23,7 +23,7 @@ public class SystemProxyRunnable : GLib.Object /*, QRunnable*/ {
 
     /***********************************************************
     ***********************************************************/
-    signal void system_proxy_looked_up (Soup.ProxyResolverDefault url);
+    internal signal void system_proxy_looked_up (Soup.ProxyResolverDefault url);
 
     /***********************************************************
     ***********************************************************/

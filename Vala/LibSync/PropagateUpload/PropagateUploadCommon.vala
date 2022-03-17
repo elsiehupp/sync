@@ -153,7 +153,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
             return;
         }
 
-        var account = propagator ().account ();
+        var account = propagator ().account;
 
         if (!account.capabilities ().client_side_encryption_available () ||
             !parent_rec.is_valid () ||
@@ -240,7 +240,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
 
         GLib.debug ("Deleting the current.");
         var job = new DeleteJob (
-            propagator ().account (),
+            propagator ().account,
             propagator ().full_remote_path (this.file_to_upload.file),
             this
         );
@@ -287,7 +287,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
             return;
         }
 
-        const string checksum_type = propagator ().account ().capabilities ().preferred_upload_checksum_type ();
+        const string checksum_type = propagator ().account.capabilities ().preferred_upload_checksum_type ();
 
         // Maybe the discovery already computed the checksum?
         // Should I compute the checksum of the original (this.item.file)
@@ -320,7 +320,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
 
         // Reuse the content checksum as the transmission checksum if possible
         var supported_transmission_checksums =
-            propagator ().account ().capabilities ().supported_checksum_types ();
+            propagator ().account.capabilities ().supported_checksum_types ();
         if (supported_transmission_checksums.contains (content_checksum_type)) {
             on_signal_start_upload (content_checksum_type, content_checksum);
             return;
@@ -329,7 +329,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         // Compute the transmission checksum.
         var compute_checksum = new ComputeChecksum (this);
         if (upload_checksum_enabled ()) {
-            compute_checksum.checksum_type (propagator ().account ().capabilities ().upload_checksum_type ());
+            compute_checksum.checksum_type (propagator ().account.capabilities ().upload_checksum_type ());
         } else {
             compute_checksum.checksum_type ("");
         }
@@ -447,7 +447,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
     /***********************************************************
     ***********************************************************/
     public void start_poll_job (string path) {
-        var job = new PollJob (propagator ().account (), path, this.item,
+        var job = new PollJob (propagator ().account, path, this.item,
             propagator ().journal, propagator ().local_path (), this);
         connect (job, PollJob.signal_finished, this, PropagateUploadFileCommon.on_signal_poll_finished);
         SyncJournalDb.PollInfo info;
@@ -626,7 +626,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
     ***********************************************************/
     protected void check_resetting_errors () {
         if (this.item.http_error_code == 412
-            || propagator ().account ().capabilities ().http_error_codes_that_reset_failing_chunked_uploads ().contains (this.item.http_error_code)) {
+            || propagator ().account.capabilities ().http_error_codes_that_reset_failing_chunked_uploads ().contains (this.item.http_error_code)) {
             var upload_info = propagator ().journal.get_upload_info (this.item.file);
             upload_info.error_count += 1;
             if (upload_info.error_count > 3) {

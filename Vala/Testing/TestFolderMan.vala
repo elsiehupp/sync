@@ -40,10 +40,10 @@ public class TestFolderMan : GLib.Object {
         account.set_url ( url );
 
         AccountState new_account_state = new AccountState (account);
-        FolderMan folder_manager = FolderMan.instance ();
+        FolderMan folder_manager = FolderMan.instance;
         GLib.assert_true (folder_manager == this.folder_manager);
-        GLib.assert_true (folder_manager.add_folder (new_account_state.data (), folder_definition (directory_path + "/sub/own_cloud1")));
-        GLib.assert_true (folder_manager.add_folder (new_account_state.data (), folder_definition (directory_path + "/own_cloud2")));
+        GLib.assert_true (folder_manager.add_folder (new_account_state, folder_definition (directory_path + "/sub/own_cloud1")));
+        GLib.assert_true (folder_manager.add_folder (new_account_state, folder_definition (directory_path + "/own_cloud2")));
 
         var folder_list = folder_manager.map ();
 
@@ -153,10 +153,10 @@ public class TestFolderMan : GLib.Object {
         url.set_user_name (credentials.user ());
 
         AccountState new_account_state = new AccountState (account);
-        FolderMan folder_manager = FolderMan.instance ();
+        FolderMan folder_manager = FolderMan.instance;
         GLib.assert_true (folder_manager == this.folder_manager);
-        GLib.assert_true (folder_manager.add_folder (new_account_state.data (), folder_definition (directory_path + "/sub/own_cloud/")));
-        GLib.assert_true (folder_manager.add_folder (new_account_state.data (), folder_definition (directory_path + "/own_cloud2/")));
+        GLib.assert_true (folder_manager.add_folder (new_account_state, folder_definition (directory_path + "/sub/own_cloud/")));
+        GLib.assert_true (folder_manager.add_folder (new_account_state, folder_definition (directory_path + "/own_cloud2/")));
 
         // TEST
 

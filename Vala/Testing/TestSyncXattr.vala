@@ -1118,7 +1118,7 @@ public class TestSyncXAttr : GLib.Object {
         connect (
             folder.sync_engine ().sync_file_status_tracker (),
             SyncFileStatusTracker.file_status_changed,
-            xattr_vfs.data (),
+            xattr_vfs,
             Vfs.file_status_changed
         );
         folder.switch_to_vfs (xattr_vfs);

@@ -15,7 +15,7 @@ public class GetMetadataApiJob : AbstractNetworkJob {
 
 
     internal signal void signal_json_received (QJsonDocument json, int return_code);
-    signal void singal_error (string file_identifier, int http_return_code);
+    internal signal void singal_error (string file_identifier, int http_return_code);
 
 
     /***********************************************************
@@ -37,7 +37,7 @@ public class GetMetadataApiJob : AbstractNetworkJob {
         request.raw_header ("OCS-APIREQUEST", "true");
         QUrlQuery query;
         query.add_query_item ("format", "json");
-        GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
+        GLib.Uri url = Utility.concat_url_path (account.url (), path ());
         url.query (query);
 
         GLib.info ("Requesting the metadata for the file_identifier " + this.file_identifier + " as encrypted.");

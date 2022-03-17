@@ -27,11 +27,11 @@ abstract class UserStatusConnector : GLib.Object {
 
     UserStatus user_status { public get; public set; }
 
-    signal void user_status_fetched (UserStatus user_status);
-    signal void predefined_statuses_fetched (GLib.List<UserStatus> statuses);
-    signal void user_status_set ();
-    signal void signal_message_cleared ();
-    signal void error (Error error);
+    internal signal void signal_user_status_fetched (UserStatus user_status);
+    internal signal void signal_predefined_statuses_fetched (GLib.List<UserStatus> statuses);
+    internal signal void signal_user_status_set ();
+    internal signal void signal_message_cleared ();
+    internal signal void signal_error (Error error);
 
     /***********************************************************
     ***********************************************************/

@@ -34,7 +34,7 @@ void warn_systray () {
         + "If you are running XFCE, please follow "
         + "<a href=\"http://docs.xfce.org/xfce/xfce4-panel/systray\">these instructions</a>. "
         + "Otherwise, please install a system tray application such as \"trayer\" and try again.")
-            .printf (Theme.instance ().app_name_gui ()));
+            .printf (Theme.instance.app_name_gui ()));
 }
 
 int main (int argc, char **argv) {
@@ -104,7 +104,7 @@ int main (int argc, char **argv) {
     // if handle_startup returns true, main ()
     // needs to terminate here, e.g. because
     // the updater is triggered
-    Updater updater = Updater.instance ();
+    Updater updater = Updater.instance;
     if (updater && updater.handle_startup ()) {
         return 1;
     }
@@ -159,7 +159,7 @@ int main (int argc, char **argv) {
 
             if (QSystemTrayIcon.is_system_tray_available ()) {
                 app.on_signal_try_tray_again ();
-            } else if (!app.background_mode () && !AccountManager.instance ().accounts () == "") {
+            } else if (!app.background_mode () && !AccountManager.instance.accounts () == "") {
                 if (desktop_session != "ubuntu") {
                     GLib.info ("System tray still not available; showing window and trying again later.");
                     app.show_main_dialog ();

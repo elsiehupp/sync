@@ -85,17 +85,17 @@ public class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    signal void initialization_finished ();
+    internal signal void initialization_finished ();
 
 
     /***********************************************************
     ***********************************************************/
-    signal void mnemonic_generated (string mnemonic);
+    internal signal void mnemonic_generated (string mnemonic);
 
 
     /***********************************************************
     ***********************************************************/
-    signal void show_mnemonic (string mnemonic);
+    internal signal void show_mnemonic (string mnemonic);
 
 
     /***********************************************************
@@ -701,7 +701,7 @@ public class ClientSideEncryption : GLib.Object {
     }
 
     uchar unsigned_data (string array) {
-        return (uchar)array.data ();
+        return (uchar)array;
     }
 
     //

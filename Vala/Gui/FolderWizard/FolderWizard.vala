@@ -59,7 +59,7 @@ public class FolderWizard : QWizard {
         window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
         page (Page.SOURCE, this.folder_wizard_source_page);
         this.folder_wizard_source_page.install_event_filter (this);
-        if (!Theme.instance ().single_sync_folder ()) {
+        if (!Theme.instance.single_sync_folder ()) {
             this.folder_wizard_target_page = new FolderWizardRemotePath (account);
             page (Page.TARGET, this.folder_wizard_target_page);
             this.folder_wizard_target_page.install_event_filter (this);

@@ -170,16 +170,16 @@ public class DiscoveryPhase : GLib.Object {
     public bool another_sync_needed = false;
 
 
-    signal void fatal_error (string error_string);
-    signal void item_discovered (SyncFileItem item);
-    signal void signal_finished ();
+    internal signal void fatal_error (string error_string);
+    internal signal void item_discovered (SyncFileItem item);
+    internal signal void signal_finished ();
 
 
     /***********************************************************
     A new folder was discovered and was not synced because of
     the confirmation feature.
     ***********************************************************/
-    signal void new_big_folder (string folder, bool is_external);
+    internal signal void new_big_folder (string folder, bool is_external);
 
 
     /***********************************************************
@@ -187,11 +187,11 @@ public class DiscoveryPhase : GLib.Object {
 
     The path is relative to the sync folder, similar to item.file
     ***********************************************************/
-    signal void silently_excluded (string folder_path);
+    internal signal void silently_excluded (string folder_path);
 
     /***********************************************************
     ***********************************************************/
-    signal void add_error_to_gui (SyncFileItem.Status status, string error_message, string subject);
+    internal signal void add_error_to_gui (SyncFileItem.Status status, string error_message, string subject);
 
 
     /***********************************************************

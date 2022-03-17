@@ -1110,7 +1110,7 @@ public class SyncJournalDb : GLib.Object {
         int64 h = 0;
         int len = file.length ();
 
-        h = c_jhash64 ( (uint8 *)file.data (), len, 0);
+        h = c_jhash64 ( (uint8 *)file, len, 0);
         return h;
     }
 

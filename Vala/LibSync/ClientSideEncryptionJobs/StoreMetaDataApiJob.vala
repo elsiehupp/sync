@@ -15,8 +15,8 @@ public class StoreMetaDataApiJob : AbstractNetworkJob {
     private string b64_metadata;
 
 
-    signal void success (string file_identifier);
-    signal void error (string file_identifier, int http_return_code);
+    internal signal void success (string file_identifier);
+    internal signal void error (string file_identifier, int http_return_code);
 
 
     /***********************************************************
@@ -41,7 +41,7 @@ public class StoreMetaDataApiJob : AbstractNetworkJob {
         request.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
         QUrlQuery query;
         query.add_query_item ("format", "json");
-        GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
+        GLib.Uri url = Utility.concat_url_path (account.url (), path ());
         url.query (query);
 
         string data = "meta_data=" + GLib.Uri.to_percent_encoding (this.b64_metadata);

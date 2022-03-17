@@ -67,8 +67,8 @@ public class SocketApi : GLib.Object {
     ***********************************************************/
     const int MIRALL_SOCKET_API_VERSION = "1.1";
 
-    signal void signal_share_command_received (string share_path, string local_path, ShareDialogStartPage start_page);
-    signal void signal_file_activity_command_received (string share_path, string local_path);
+    internal signal void signal_share_command_received (string share_path, string local_path, ShareDialogStartPage start_page);
+    internal signal void signal_file_activity_command_received (string share_path, string local_path);
 
     /***********************************************************
     ***********************************************************/
@@ -89,7 +89,7 @@ public class SocketApi : GLib.Object {
             // TODO: once the windows extension supports multiple
             // client connections, switch back to the theme name
             // See issue #2388
-            // + Theme.instance ().app_name ();
+            // + Theme.instance.app_name ();
         } else if (Utility.is_mac ()) {
             // This must match the code signing Team setting of the extension
             // Example for developer builds (with ad-hoc signing identity): "" "com.owncloud.desktopclient" ".socket_api"
@@ -98,7 +98,7 @@ public class SocketApi : GLib.Object {
         } else if (Utility.is_linux () || Utility.is_bsd ()) {
             string runtime_dir;
             runtime_dir = QStandardPaths.writable_location (QStandardPaths.Runtime_location);
-            socket_path = runtime_dir + "/" + Theme.instance ().app_name () + "/socket";
+            socket_path = runtime_dir + "/" + Theme.instance.app_name () + "/socket";
         } else {
             GLib.warning ("An unexpected system detected, so this probably won't work.");
         }
@@ -128,7 +128,7 @@ public class SocketApi : GLib.Object {
 
         // folder watcher
         connect (
-            FolderMan.instance (),
+            FolderMan.instance,
             FolderMan.signal_folder_sync_state_change,
             this,
             SocketApi.on_signal_update_folder_view
@@ -179,7 +179,7 @@ public class SocketApi : GLib.Object {
         if (!this.registered_aliases.contains (alias))
             return;
 
-        Folder folder = FolderMan.instance ().folder_by_alias (alias);
+        Folder folder = FolderMan.instance.folder_by_alias (alias);
         if (folder)
             broadcast_message (build_message (QLatin1String ("UNREGISTER_PATH"), remove_trailing_slash (folder.path ()), ""), true);
 
@@ -194,7 +194,7 @@ public class SocketApi : GLib.Object {
         if (this.registered_aliases.contains (alias))
             return;
 
-        Folder folder = FolderMan.instance ().folder_by_alias (alias);
+        Folder folder = FolderMan.instance.folder_by_alias (alias);
         if (folder) {
             const string message = build_register_path_message (remove_trailing_slash (folder.path ()));
             foreach (var listener in this.listeners) {
@@ -262,7 +262,7 @@ public class SocketApi : GLib.Object {
 
         unowned var listener = SocketListener.create (socket);
         this.listeners.insert (socket, listener);
-        foreach (Folder folder in FolderMan.instance ().map ()) {
+        foreach (Folder folder in FolderMan.instance.map ()) {
             if (folder.can_sync ()) {
                 string message = build_register_path_message (remove_trailing_slash (folder.path ()));
                 GLib.info ("Trying to send SocketApi Register Path Message --> " + message + " to " + listener.socket);
@@ -362,7 +362,7 @@ public class SocketApi : GLib.Object {
                     //  ASSERT (thread () == QThread.current_thread ())
                     static_meta_object.method (index_of_method)
                         .invoke (this, Qt.Direct_connection, Q_ARG (string, argument.to_string ()),
-                            Q_ARG (SocketListener, listener.data ()));
+                            Q_ARG (SocketListener, listener));
                 }
             }
         }
@@ -520,7 +520,7 @@ public class SocketApi : GLib.Object {
             if (data.local_path.ends_with ('/'))
                 data.local_path.chop (1);
     
-            data.folder = FolderMan.instance ().folder_for_path (data.local_path);
+            data.folder = FolderMan.instance.folder_for_path (data.local_path);
             if (!data.folder)
                 return data;
     
@@ -590,7 +590,7 @@ public class SocketApi : GLib.Object {
     Opens share dialog, sends reply
     ***********************************************************/
     private void process_share_request (string local_file, SocketListener listener, ShareDialogStartPage start_page) {
-        var theme = Theme.instance ();
+        var theme = Theme.instance;
 
         var file_data = FileData.file_data (local_file);
         var share_folder = file_data.folder;
@@ -602,7 +602,7 @@ public class SocketApi : GLib.Object {
             const string message = QLatin1String ("SHARE:NOTCONNECTED:") + QDir.to_native_separators (local_file);
             // if the folder isn't connected, don't open the share dialog
             listener.on_signal_send_message (message);
-        } else if (!theme.link_sharing () && (!theme.user_group_sharing () || share_folder.account_state ().account ().server_version_int () < Account.make_server_version (8, 2, 0))) {
+        } else if (!theme.link_sharing () && (!theme.user_group_sharing () || share_folder.account_state ().account.server_version_int () < Account.make_server_version (8, 2, 0))) {
             const string message = QLatin1String ("SHARE:NOP:") + QDir.to_native_separators (local_file);
             listener.on_signal_send_message (message);
         } else {
@@ -682,8 +682,8 @@ public class SocketApi : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void command_SHARE_MENU_TITLE (string argument, SocketListener listener) {
-        //listener.on_signal_send_message ("SHARE_MENU_TITLE: " + _("Share with %1", "parameter is Nextcloud").printf (Theme.instance ().app_name_gui ()));
-        listener.on_signal_send_message ("SHARE_MENU_TITLE:"  + Theme.instance ().app_name_gui ());
+        //listener.on_signal_send_message ("SHARE_MENU_TITLE: " + _("Share with %1", "parameter is Nextcloud").printf (Theme.instance.app_name_gui ()));
+        listener.on_signal_send_message ("SHARE_MENU_TITLE:"  + Theme.instance.app_name_gui ());
     }
 
 
@@ -721,7 +721,7 @@ public class SocketApi : GLib.Object {
         if (!file_data.folder)
             return;
 
-        unowned Account account = file_data.folder.account_state ().account ();
+        unowned Account account = file_data.folder.account_state ().account;
         var get_or_create_public_link_share_job = new GetOrCreatePublicLinkShare (account, file_data.server_relative_path, this);
         connect (
             get_or_create_public_link_share_job,
@@ -907,17 +907,17 @@ public class SocketApi : GLib.Object {
     ***********************************************************/
     private void command_V2_LIST_ACCOUNTS (SocketApiJobV2 socket_api_v2_job) {
         QJsonArray output;
-        foreach (var account in AccountManager.instance ().accounts ()) {
+        foreach (var account in AccountManager.instance.accounts ()) {
             // TODO: Use uuid once https://github.com/owncloud/client/pull/8397 is merged
             output += new QJsonObject (
                 {
                     {
                         "name",
-                        account.account ().display_name ()
+                        account.account.display_name ()
                     },
                     {
                         "identifier",
-                        account.account ().identifier ()
+                        account.account.identifier ()
                     }
                 }
             );
@@ -962,7 +962,7 @@ public class SocketApi : GLib.Object {
         }
 
         fetch_private_link_url (
-            file_data.folder.account_state ().account (),
+            file_data.folder.account_state ().account,
             file_data.server_relative_path,
             record.numeric_file_id (),
             this,
@@ -983,7 +983,7 @@ public class SocketApi : GLib.Object {
                 "FILE_ACTIVITY_MENU_TITLE", _("Activity")
             },
             {
-                "CONTEXT_MENU_TITLE", Theme.instance ().app_name_gui ()
+                "CONTEXT_MENU_TITLE", Theme.instance.app_name_gui ()
             },
             {
                 "COPY_PRIVATE_LINK_MENU_TITLE", _("Copy private link to clipboard")
@@ -1013,8 +1013,8 @@ public class SocketApi : GLib.Object {
         bool is_on_signal_the_server = record.is_valid ();
         var flag_string = is_on_signal_the_server && enabled ? QLatin1String (".") : QLatin1String (":d:");
 
-        var capabilities = file_data.folder.account_state ().account ().capabilities ();
-        var theme = Theme.instance ();
+        var capabilities = file_data.folder.account_state ().account.capabilities ();
+        var theme = Theme.instance;
         if (!capabilities.share_api () || ! (theme.user_group_sharing () || (theme.link_sharing () && capabilities.share_public_link ())))
             return;
 
@@ -1066,7 +1066,7 @@ public class SocketApi : GLib.Object {
         // sync_folder will be null if files are in different folders.
         Folder sync_folder = null;
         foreach (var file in files) {
-            var folder = FolderMan.instance ().folder_for_path (file);
+            var folder = FolderMan.instance.folder_for_path (file);
             if (folder != sync_folder) {
                 if (!sync_folder) {
                     sync_folder = folder;
@@ -1217,7 +1217,7 @@ public class SocketApi : GLib.Object {
         listener.on_signal_send_message (
             "MENU_ITEM:CURRENT_PIN:d:"
             + Utility.vfs_current_availability_text (*combined));
-        if (!Theme.instance ().enforce_virtual_files_sync_folder ()) {
+        if (!Theme.instance.enforce_virtual_files_sync_folder ()) {
             listener.on_signal_send_message (
                 "MENU_ITEM:MAKE_AVAILABLE_LOCALLY:"
                 + (make_available_locally ? ":" : "d:")
@@ -1252,7 +1252,7 @@ public class SocketApi : GLib.Object {
             return;
         }
 
-        var json_api_job = new JsonApiJob (file_data.folder.account_state ().account (), QLatin1String ("ocs/v2.php/apps/files/api/v1/direct_editing/open"), this);
+        var json_api_job = new JsonApiJob (file_data.folder.account_state ().account, QLatin1String ("ocs/v2.php/apps/files/api/v1/direct_editing/open"), this);
 
         QUrlQuery parameters;
         parameters.add_query_item ("path", file_data.server_relative_path);
@@ -1284,7 +1284,7 @@ public class SocketApi : GLib.Object {
     ***********************************************************/
     private DirectEditor direct_editor_for_local_file (string local_file) {
         FileData file_data = FileData.file_data (local_file);
-        var capabilities = file_data.folder.account_state ().account ().capabilities ();
+        var capabilities = file_data.folder.account_state ().account.capabilities ();
 
         if (file_data.folder && file_data.folder.account_state ().is_connected ()) {
             const var record = file_data.journal_record ();

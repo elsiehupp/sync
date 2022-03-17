@@ -29,7 +29,7 @@ public class HttpCredentialsGui : HttpCredentials {
     ***********************************************************/
     private QScopedPointer<OAuth, QScopedPointerObjectDeleteLater<OAuth>> async_auth;
 
-    signal void signal_authorisation_link_changed ();
+    internal signal void signal_authorisation_link_changed ();
 
     /***********************************************************
     ***********************************************************/
@@ -132,7 +132,7 @@ public class HttpCredentialsGui : HttpCredentials {
                          + "<br>"
                          + "User: %2<br>"
                          + "Account: %3<br>")
-                        .printf (Utility.escape (Theme.instance ().app_name_gui ()),
+                        .printf (Utility.escape (Theme.instance.app_name_gui ()),
                             Utility.escape (this.user),
                             Utility.escape (this.account.display_name ()));
 
@@ -206,13 +206,13 @@ public class HttpCredentialsGui : HttpCredentials {
             this.async_auth.on_signal_reset (new OAuth (this.account, this));
             this.async_auth.expected_user = this.account.dav_user ();
             connect (
-                this.async_auth.data (),
+                this.async_auth,
                 OAuth.result,
                 this,
                 HttpCredentialsGui.on_signal_async_auth_result
             );
             connect (
-                this.async_auth.data (),
+                this.async_auth,
                 OAuth.destroyed,
                 this,
                 HttpCredentialsGui.signal_authorisation_link_changed

@@ -21,7 +21,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
     private OwncloudWizard oc_wizard;
 
 
-    signal void connect_to_oc_url (string value);
+    internal signal void connect_to_oc_url (string value);
 
 
     /***********************************************************
@@ -40,7 +40,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
         register_field (QLatin1String ("OCUser*"), this.ui.le_username);
         register_field (QLatin1String ("OCPasswd*"), this.ui.le_password);
 
-        Theme theme = Theme.instance ();
+        Theme theme = Theme.instance;
         switch (theme.user_identifier_type ()) {
         case Theme.UserIdentifierType.USER_NAME:
             // default, handled in ui file
@@ -56,7 +56,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
         }
         this.ui.le_username.placeholder_text (theme.user_id_hint ());
 
-        title (WizardCommon.title_template ().printf (_("Connect to %1").printf (Theme.instance ().app_name_gui ())));
+        title (WizardCommon.title_template ().printf (_("Connect to %1").printf (Theme.instance.app_name_gui ())));
         sub_title (WizardCommon.sub_title_template ().printf (_("Enter user credentials")));
 
         this.ui.result_layout.add_widget (this.progress_indicator);
@@ -78,7 +78,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
         WizardCommon.init_error_label (this.ui.error_label);
 
         var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
-        AbstractCredentials credentials = oc_wizard.account ().credentials ();
+        AbstractCredentials credentials = oc_wizard.account.credentials ();
         var http_creds = qobject_cast<HttpCredentials> (credentials);
         if (http_creds) {
             const string user = http_creds.fetch_user ();
@@ -86,7 +86,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
                 this.ui.le_username.on_signal_text (user);
             }
         } else {
-            GLib.Uri url = oc_wizard.account ().url ();
+            GLib.Uri url = oc_wizard.account.url ();
 
             // If the final url does not have a username, check the
             // user specified url too. Sometimes redirects can lose
@@ -105,7 +105,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
                 this.ui.le_password.on_signal_text (password);
             }
         }
-        this.ui.token_label.on_signal_text (HttpCredentialsGui.request_app_password_text (oc_wizard.account ().data ()));
+        this.ui.token_label.on_signal_text (HttpCredentialsGui.request_app_password_text (oc_wizard.account));
         this.ui.token_label.visible (!this.ui.token_label.text () == "");
         this.ui.le_username.focus ();
     }
@@ -132,7 +132,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
 
             // Reset cookies to ensure the username / password is actually used
             var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
-            oc_wizard.account ().clear_cookie_jar ();
+            oc_wizard.account.clear_cookie_jar ();
 
             /* emit */ complete_changed ();
             /* emit */ connect_to_oc_url (field ("OCUrl").to_string ().simplified ());
@@ -211,7 +211,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
         this.ui.top_label.hide ();
         this.ui.bottom_label.hide ();
 
-        Theme theme = Theme.instance ();
+        Theme theme = Theme.instance;
         GLib.Variant variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_TOP);
         if (!variant.is_null ()) {
             WizardCommon.set_up_custom_media (variant, this.ui.top_label);

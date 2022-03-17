@@ -110,10 +110,10 @@ public class Logger : GLib.Object {
     private GLib.Vector<string> crash_log;
     private int crash_log_index = 0;
 
-    signal void log_window_log (string value);
-    signal void signal_gui_log (string value_1, string value_2);
-    signal void gui_message (string value_1, string value_2);
-    signal void optional_gui_log (string value_1, string value_2);
+    internal signal void log_window_log (string value);
+    internal signal void signal_gui_log (string value_1, string value_2);
+    internal signal void gui_message (string value_1, string value_2);
+    internal signal void optional_gui_log (string value_1, string value_2);
 
 
     /***********************************************************
@@ -146,7 +146,7 @@ public class Logger : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static Logger instance () {
+    public static Logger instance {
         return Logger.log;
     }
 
@@ -344,7 +344,7 @@ public class Logger : GLib.Object {
 
         while (!original.at_end ()) {
             var data = original.read (1024 * 1024);
-            var written = gzwrite (compressed, data.data (), data.size ());
+            var written = gzwrite (compressed, data, data.size ());
             if (written != data.size ()) {
                 gzclose (compressed);
                 return false;

@@ -28,7 +28,7 @@ public class WebViewPage : AbstractCredentialsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    signal void connect_to_oc_url (string value);
+    internal signal void connect_to_oc_url (string value);
 
     /***********************************************************
     ***********************************************************/
@@ -125,7 +125,7 @@ public class WebViewPage : AbstractCredentialsWizardPage {
         this.user = user;
         this.pass = pass;
 
-        unowned Account account = this.oc_wizard.account ();
+        unowned Account account = this.oc_wizard.account;
         account.url (host);
 
         GLib.info ("URL: " + field ("OCUrl").to_string ());

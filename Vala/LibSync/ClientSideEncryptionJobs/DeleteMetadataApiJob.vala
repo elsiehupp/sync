@@ -14,8 +14,8 @@ public class DeleteMetadataApiJob : AbstractNetworkJob {
     private string file_identifier;
 
 
-    signal void success (string file_identifier);
-    signal void error (string file_identifier, int http_error_code);
+    internal signal void success (string file_identifier);
+    internal signal void error (string file_identifier, int http_error_code);
 
 
     /***********************************************************
@@ -36,7 +36,7 @@ public class DeleteMetadataApiJob : AbstractNetworkJob {
         Soup.Request request = new Soup.Request ();
         request.raw_header ("OCS-APIREQUEST", "true");
 
-        GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
+        GLib.Uri url = Utility.concat_url_path (account.url (), path ());
         send_request ("DELETE", url, request);
 
         AbstractNetworkJob.start ();

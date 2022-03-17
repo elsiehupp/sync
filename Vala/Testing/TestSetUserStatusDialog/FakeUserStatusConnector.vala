@@ -36,7 +36,7 @@ public class FakeUserStatusConnector : Occ.UserStatusConnector {
             return;
         }
 
-        /* emit */ user_status_fetched (this.user_status);
+        /* emit */ signal_user_status_fetched (this.user_status);
     }
 
 
@@ -47,7 +47,7 @@ public class FakeUserStatusConnector : Occ.UserStatusConnector {
             /* emit */ error (Error.CouldNotFetchPredefinedUserStatuses);
             return;
         }
-        /* emit */ predefined_statuses_fetched (this.predefined_statuses);
+        /* emit */ signal_predefined_statuses_fetched (this.predefined_statuses);
     }
 
 
@@ -60,7 +60,7 @@ public class FakeUserStatusConnector : Occ.UserStatusConnector {
         }
 
         this.user_status_set_by_caller_of_set_user_status = user_status;
-        /* emit */ UserStatusConnector.user_status_set ();
+        /* emit */ UserStatusConnector.signal_user_status_set ();
     }
 
 

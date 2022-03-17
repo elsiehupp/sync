@@ -126,11 +126,11 @@ public class CloudProviderWrapper : GLib.Object {
         string account_name = string ("Folder/%1").printf (folder_identifier);
 
         this.cloud_provider = CLOUD_PROVIDERS_PROVIDER_EXPORTER (cloudprovider);
-        this.cloud_provider_account = cloud_providers_account_exporter_new (this.cloud_provider, account_name.to_utf8 ().data ());
+        this.cloud_provider_account = cloud_providers_account_exporter_new (this.cloud_provider, account_name.to_utf8 ());
 
-        cloud_providers_account_exporter_name (this.cloud_provider_account, folder.short_gui_local_path ().to_utf8 ().data ());
+        cloud_providers_account_exporter_name (this.cloud_provider_account, folder.short_gui_local_path ().to_utf8 ());
         cloud_providers_account_exporter_icon (this.cloud_provider_account, g_icon_new_for_string (APPLICATION_ICON_NAME, null));
-        cloud_providers_account_exporter_path (this.cloud_provider_account, folder.clean_path ().to_utf8 ().data ());
+        cloud_providers_account_exporter_path (this.cloud_provider_account, folder.clean_path ().to_utf8 ());
         cloud_providers_account_exporter_status (this.cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_IDLE);
         model = menu_model ();
         cloud_providers_account_exporter_menu_model (this.cloud_provider_account, model);
@@ -138,7 +138,7 @@ public class CloudProviderWrapper : GLib.Object {
         cloud_providers_account_exporter_action_group (this.cloud_provider_account, action_group);
 
         connect (
-            ProgressDispatcher.instance (),
+            ProgressDispatcher.instance,
             signal_progress_info (string, ProgressInfo),
             this,
             on_signal_update_progress (string, ProgressInfo)
@@ -246,7 +246,7 @@ public class CloudProviderWrapper : GLib.Object {
     ***********************************************************/
     public void update_status_text (string status_text) {
         string status = string ("%1 - %2").printf (this.folder.account_state ().state_string (this.folder.account_state ().state ()), status_text);
-        cloud_providers_account_exporter_status_details (this.cloud_provider_account, status.to_utf8 ().data ());
+        cloud_providers_account_exporter_status_details (this.cloud_provider_account, status.to_utf8 ());
     }
 
 
@@ -287,7 +287,7 @@ public class CloudProviderWrapper : GLib.Object {
     ***********************************************************/
     public void on_signal_update_progress (string folder, ProgressInfo progress) {
         // Only update progress for the current folder
-        Folder f = FolderMan.instance ().folder (folder);
+        Folder f = FolderMan.instance.folder (folder);
         if (f != this.folder)
             return;
 
@@ -347,7 +347,7 @@ public class CloudProviderWrapper : GLib.Object {
                     string label = item.first;
                     string full_path = item.second;
                     menu_item = menu_item_new (label, "cloudprovider.showfile");
-                    g_menu_item_action_and_target_value (menu_item, "cloudprovider.showfile", g_variant_new_string (full_path.to_utf8 ().data ()));
+                    g_menu_item_action_and_target_value (menu_item, "cloudprovider.showfile", g_variant_new_string (full_path.to_utf8 ()));
                     g_menu_append_item (this.recent_menu, menu_item);
                     g_clear_object (menu_item);
                 }
@@ -403,14 +403,14 @@ public class CloudProviderWrapper : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private static GMenuItem menu_item_new (string label, gchar detailed_action) {
-        return g_menu_item_new (label.to_utf8 ().data (), detailed_action);
+        return g_menu_item_new (label.to_utf8 (), detailed_action);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private static GMenuItem menu_item_new_submenu (string label, GMenuModel submenu) {
-        return g_menu_item_new_submenu (label.to_utf8 ().data (), submenu);
+        return g_menu_item_new_submenu (label.to_utf8 (), submenu);
     }
 
 
@@ -431,7 +431,7 @@ public class CloudProviderWrapper : GLib.Object {
         }
 
         if (g_str_equal (name, "openwebsite")) {
-            QDesktopServices.open_url (self.folder ().account_state ().account ().url ());
+            QDesktopServices.open_url (self.folder ().account_state ().account.url ());
         }
 
         if (g_str_equal (name, "openfolder")) {
@@ -460,7 +460,7 @@ public class CloudProviderWrapper : GLib.Object {
         //  Q_UNUSED (action);
         //  Q_UNUSED (parameter);
         var self = static_cast<CloudProviderWrapper> (user_data);
-        QDesktopServices.open_url (self.folder ().account_state ().account ().url ());
+        QDesktopServices.open_url (self.folder ().account_state ().account.url ());
     }
 
 } // class CloudProviderWrapper

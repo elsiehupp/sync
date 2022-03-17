@@ -869,7 +869,7 @@ public class ExcludedFiles : GLib.Object {
     ***********************************************************/
     private static void csync_exclude_expand_escapes (string *input) {
         size_t o = 0;
-        char line = input.data ();
+        char line = input;
         var len = input.size ();
         for (int i = 0; i < len; ++i) {
             if (line[i] == '\\') {

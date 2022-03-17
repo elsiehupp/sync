@@ -162,7 +162,7 @@ public class TestPushNotifications : GLib.Object {
         FakeWebSocketServer fake_server;
         var account = FakeWebSocketServer.create_account ();
         QSignalSpy connection_lost_spy = new QSignalSpy (account.push_notifications (), &Occ.PushNotifications.connection_lost);
-        QSignalSpy push_notifications_disabled_spy = new QSignalSpy (account.data (), &Occ.Account.push_notifications_disabled);
+        QSignalSpy push_notifications_disabled_spy = new QSignalSpy (account, &Occ.Account.push_notifications_disabled);
         GLib.assert_true (connection_lost_spy.is_valid ());
 
         // Wait for authentication and then sent a network error
@@ -182,7 +182,7 @@ public class TestPushNotifications : GLib.Object {
     private void test_setup_max_connection_attempts_reached_disable_push_notifications () {
         FakeWebSocketServer fake_server;
         var account = FakeWebSocketServer.create_account ();
-        QSignalSpy push_notifications_disabled_spy = new QSignalSpy (account.data (), &Occ.Account.push_notifications_disabled);
+        QSignalSpy push_notifications_disabled_spy = new QSignalSpy (account, &Occ.Account.push_notifications_disabled);
 
         GLib.assert_true (fail_three_authentication_attempts (fake_server, account));
         // Account disabled the push notifications
@@ -195,7 +195,7 @@ public class TestPushNotifications : GLib.Object {
     private void test_on_web_socket_ssl_error_ssl_error_disable_push_notifications () {
         FakeWebSocketServer fake_server;
         var account = FakeWebSocketServer.create_account ();
-        QSignalSpy push_notifications_disabled_spy = new QSignalSpy (account.data (), &Occ.Account.push_notifications_disabled);
+        QSignalSpy push_notifications_disabled_spy = new QSignalSpy (account, &Occ.Account.push_notifications_disabled);
 
         GLib.assert_true (fake_server.wait_for_text_messages ());
         // FIXME: This a little bit ugly but I had no better idea how to trigger a error on the websocket client.
@@ -222,7 +222,7 @@ public class TestPushNotifications : GLib.Object {
         QSignalSpy connection_lost_spy = new QSignalSpy (account.push_notifications (), &Occ.PushNotifications.connection_lost);
         GLib.assert_true (connection_lost_spy.is_valid ());
 
-        QSignalSpy push_notifications_disabled_spy = new QSignalSpy (account.data (), &Occ.Account.push_notifications_disabled);
+        QSignalSpy push_notifications_disabled_spy = new QSignalSpy (account, &Occ.Account.push_notifications_disabled);
         GLib.assert_true (push_notifications_disabled_spy.is_valid ());
 
         // Wait for authentication and then sent a network error
@@ -234,7 +234,7 @@ public class TestPushNotifications : GLib.Object {
         GLib.assert_true (connection_lost_spy.count () == 1);
 
         var account_sent = push_notifications_disabled_spy.at (0).at (0).value<Occ.Account> ();
-        GLib.assert_true (account_sent == account.data ());
+        GLib.assert_true (account_sent == account);
     }
 
 
@@ -244,7 +244,7 @@ public class TestPushNotifications : GLib.Object {
         FakeWebSocketServer fake_server;
         var account = FakeWebSocketServer.create_account ();
         account.set_push_notifications_reconnect_interval (0);
-        QSignalSpy push_notifications_disabled_spy = new QSignalSpy (account.data (), &Occ.Account.push_notifications_disabled);
+        QSignalSpy push_notifications_disabled_spy = new QSignalSpy (account, &Occ.Account.push_notifications_disabled);
         GLib.assert_true (push_notifications_disabled_spy.is_valid ());
 
         GLib.assert_true (fail_three_authentication_attempts (fake_server, account));
@@ -252,7 +252,7 @@ public class TestPushNotifications : GLib.Object {
         // Now the push_notifications_disabled Signal should be emitted
         GLib.assert_true (push_notifications_disabled_spy.count () == 1);
         var account_sent = push_notifications_disabled_spy.at (0).at (0).value<Occ.Account> ();
-        GLib.assert_true (account_sent == account.data ());
+        GLib.assert_true (account_sent == account);
     }
 
 
@@ -318,7 +318,7 @@ public class TestPushNotifications : GLib.Object {
     static bool verify_called_once_with_account (QSignalSpy spy, unowned Occ.Account account) {
         return_false_on_fail (spy.count () == 1);
         var account_from_spy = spy.at (0).at (0).value<Occ.Account> ();
-        return_false_on_fail (account_from_spy == account.data ());
+        return_false_on_fail (account_from_spy == account);
     
         return true;
     }

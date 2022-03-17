@@ -23,7 +23,7 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
     public Ui.OwncloudeOAuthCredsPage ui;
 
 
-    signal void connect_to_oc_url (string value);
+    internal signal void connect_to_oc_url (string value);
 
 
     /***********************************************************
@@ -32,7 +32,7 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
         base ();
         this.ui.up_ui (this);
 
-        Theme theme = Theme.instance ();
+        Theme theme = Theme.instance;
         this.ui.top_label.hide ();
         this.ui.bottom_label.hide ();
         GLib.Variant variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_TOP);
@@ -42,7 +42,7 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
 
         WizardCommon.init_error_label (this.ui.error_label);
 
-        title (WizardCommon.title_template ().printf (_("Connect to %1").printf (Theme.instance ().app_name_gui ())));
+        title (WizardCommon.title_template ().printf (_("Connect to %1").printf (Theme.instance.app_name_gui ())));
         sub_title (WizardCommon.sub_title_template ().printf (_("Login in your browser")));
 
         connect (this.ui.open_link_button, QCommand_link_button.clicked, this, OwncloudOAuthCredsPage.on_signal_open_browser);
@@ -65,9 +65,9 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
     public void initialize_page () {
         var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
         //  Q_ASSERT (oc_wizard);
-        oc_wizard.account ().credentials (CredentialsFactory.create ("http"));
-        this.async_auth.on_signal_reset (new OAuth (oc_wizard.account ().data (), this));
-        connect (this.async_auth.data (), OAuth.result, this, OwncloudOAuthCredsPage.on_signal_async_auth_result, Qt.QueuedConnection);
+        oc_wizard.account.credentials (CredentialsFactory.create ("http"));
+        this.async_auth.on_signal_reset (new OAuth (oc_wizard.account, this));
+        connect (this.async_auth, OAuth.result, this, OwncloudOAuthCredsPage.on_signal_async_auth_result, Qt.QueuedConnection);
         this.async_auth.on_signal_start ();
 
         // Don't hide the wizard (avoid user confusion)!
@@ -128,7 +128,7 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
             this.refresh_token = refresh_token;
             var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
             //  Q_ASSERT (oc_wizard);
-            /* emit */ connect_to_oc_url (oc_wizard.account ().url ().to_string ());
+            /* emit */ connect_to_oc_url (oc_wizard.account.url ().to_string ());
             break;
         }
         }
@@ -141,7 +141,7 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
         if (this.ui.error_label)
             this.ui.error_label.hide ();
 
-        qobject_cast<OwncloudWizard> (wizard ()).account ().clear_cookie_jar (); // #6574
+        qobject_cast<OwncloudWizard> (wizard ()).account.clear_cookie_jar (); // #6574
 
         if (this.async_auth)
             this.async_auth.open_browser ();

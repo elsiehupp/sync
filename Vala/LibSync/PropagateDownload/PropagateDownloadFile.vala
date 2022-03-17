@@ -120,7 +120,7 @@ public class PropagateDownloadFile : PropagateItemJob {
         SyncJournalFileRecord parent_rec;
         propagator ().journal.get_file_record (parent_path, parent_rec);
 
-        var account = propagator ().account ();
+        var account = propagator ().account;
         if (!account.capabilities ().client_side_encryption_available () ||
             !parent_rec.is_valid () ||
             !parent_rec.is_e2e_encrypted) {
@@ -318,7 +318,7 @@ public class PropagateDownloadFile : PropagateItemJob {
 
         if (this.item.direct_download_url == "") {
             // Normal job, download from o_c instance
-            this.job = new GETFileJob (propagator ().account (),
+            this.job = new GETFileJob (propagator ().account,
                 propagator ().full_remote_path (this.is_encrypted ? this.item.encrypted_filename : this.item.file),
                 this.tmp_file, headers, expected_etag_for_resume, this.resume_start, this);
         } else {
@@ -330,13 +330,13 @@ public class PropagateDownloadFile : PropagateItemJob {
             }
 
             GLib.Uri url = GLib.Uri.from_user_input (this.item.direct_download_url);
-            this.job = new GETFileJob (propagator ().account (),
+            this.job = new GETFileJob (propagator ().account,
                 url,
                 this.tmp_file, headers, expected_etag_for_resume, this.resume_start, this);
         }
         this.job.bandwidth_manager (&propagator ().bandwidth_manager);
-        connect (this.job.data (), GETFileJob.signal_finished, this, PropagateDownloadFile.on_signal_get_finished);
-        connect (this.job.data (), GETFileJob.download_progress, this, PropagateDownloadFile.on_signal_download_progress);
+        connect (this.job, GETFileJob.signal_finished, this, PropagateDownloadFile.on_signal_get_finished);
+        connect (this.job, GETFileJob.download_progress, this, PropagateDownloadFile.on_signal_download_progress);
         propagator ().active_job_list.append (this);
         this.job.start ();
     }
@@ -530,7 +530,7 @@ public class PropagateDownloadFile : PropagateItemJob {
     Called when the download's checksum header was signal_validated
     ***********************************************************/
     private void on_signal_transmission_checksum_validated (string checksum_type, string checksum) {
-        const string the_content_checksum_type = propagator ().account ().capabilities ().preferred_upload_checksum_type ();
+        const string the_content_checksum_type = propagator ().account.capabilities ().preferred_upload_checksum_type ();
 
         // Reuse transmission checksum as content checksum.
         //

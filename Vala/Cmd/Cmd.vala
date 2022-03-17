@@ -123,7 +123,7 @@ public class Cmd : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void show_version () {
-        GLib.print (Theme.instance ().version_switch_output ());
+        GLib.print (Theme.instance.version_switch_output ());
         exit (0);
     }
 
@@ -194,8 +194,8 @@ public class Cmd : GLib.Object {
             } else if (option == "--downlimit" && !it.peek_next ().starts_with ("-")) {
                 options.downlimit = it.next ().to_int () * 1000;
             } else if (option == "--logdebug") {
-                Logger.instance ().log_file ("-");
-                Logger.instance ().log_debug (true);
+                Logger.instance.log_file ("-");
+                Logger.instance.log_debug (true);
             } else if (option == "--path" && !it.peek_next ().starts_with ("-")) {
                 options.remote_path = it.next ();
             }
@@ -364,9 +364,7 @@ public class Cmd : GLib.Object {
 
         QEventLoop loop;
         var job = new JsonApiJob (account, "ocs/v1.php/cloud/capabilities");
-        connect (
-            job,
-            JsonApiJob.json_received,
+        job.json_received.connect (
             this.on_signal_capabilities_json_received
         );
         job.on_signal_start ();
@@ -378,9 +376,7 @@ public class Cmd : GLib.Object {
         }
 
         job = new JsonApiJob (account, "ocs/v1.php/cloud/user");
-        connect (
-            job,
-            JsonApiJob.json_received,
+        job.json_received.connect (
             this.on_signal_user_json_received
         );
         job.on_signal_start ();

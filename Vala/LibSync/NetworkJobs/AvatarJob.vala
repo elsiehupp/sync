@@ -26,7 +26,7 @@ public class AvatarJob : AbstractNetworkJob {
     /***********************************************************
     @brief avatar_pixmap - returns either a valid pixmap or not.
     ***********************************************************/
-    signal void avatar_pixmap (Gtk.Image image);
+    internal signal void avatar_pixmap (Gtk.Image image);
 
 
     /***********************************************************

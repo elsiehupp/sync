@@ -20,9 +20,9 @@ public class PropagateDownloadEncrypted : GLib.Object {
     string error_string { public get; protected set; }
 
 
-    signal void file_metadata_found ();
-    signal void failed ();
-    signal void decryption_finished ();
+    internal signal void file_metadata_found ();
+    internal signal void failed ();
+    internal signal void decryption_finished ();
 
 
     /***********************************************************
@@ -44,7 +44,7 @@ public class PropagateDownloadEncrypted : GLib.Object {
         var remote_parent_path = remote_path.left (remote_path.last_index_of ("/"));
 
         // Is encrypted Now we need the folder-identifier
-        var job = new LsColJob (this.propagator.account (), remote_parent_path, this);
+        var job = new LsColJob (this.propagator.account, remote_parent_path, this);
         job.properties (
             {
                 "resourcetype",
@@ -127,7 +127,7 @@ public class PropagateDownloadEncrypted : GLib.Object {
         const ExtraFolderInfo folder_info = job.folder_infos.value (folder_identifier);
 
         // Now that we have the folder-identifier we need it's JSON metadata
-        var metadata_job = new GetMetadataApiJob (this.propagator.account (), folder_info.file_identifier);
+        var metadata_job = new GetMetadataApiJob (this.propagator.account, folder_info.file_identifier);
         connect (metadata_job, GetMetadataApiJob.signal_json_received,
                         this, PropagateDownloadEncrypted.on_signal_check_folder_encrypted_metadata);
         connect (metadata_job, GetMetadataApiJob.error,
@@ -145,7 +145,7 @@ public class PropagateDownloadEncrypted : GLib.Object {
                    + this.item.file
                    + this.item.encrypted_filename);
         const string filename = this.info.filename ();
-        var meta = new FolderMetadata (this.propagator.account (), json.to_json (QJsonDocument.Compact));
+        var meta = new FolderMetadata (this.propagator.account, json.to_json (QJsonDocument.Compact));
         const GLib.List<EncryptedFile> files = meta.files ();
 
         const string encrypted_filename = this.item.encrypted_filename.section ("/", -1);

@@ -5,7 +5,7 @@ namespace Ui {
 
 public class WebViewPageUrlSchemeHandler : QWebEngineUrlSchemeHandler {
 
-    signal void on_signal_url_catched (string user, string pass, string host);
+    internal signal void on_signal_url_catched (string user, string pass, string host);
 
     /***********************************************************
     ***********************************************************/

@@ -98,19 +98,19 @@ public class OwncloudWizard : QWizard {
     ***********************************************************/
     public GLib.List<QSslCertificate> client_ssl_ca_certificates;
 
-    signal void clear_pending_requests ();
-    signal void determine_auth_type (string value);
-    signal void connect_to_oc_url (string value);
-    signal void create_local_and_remote_folders (string value1, string value2);
+    internal signal void clear_pending_requests ();
+    internal signal void determine_auth_type (string value);
+    internal signal void connect_to_oc_url (string value);
+    internal signal void create_local_and_remote_folders (string value1, string value2);
 
     /***********************************************************
     Make sure to connect to this, rather than on_signal_finished (int)!!
     ***********************************************************/
-    signal void basic_setup_finished (int value);
-    signal void skip_folder_configuration ();
-    signal void need_certificate ();
-    signal void signal_style_changed ();
-    signal void on_signal_activate ();
+    internal signal void basic_setup_finished (int value);
+    internal signal void skip_folder_configuration ();
+    internal signal void need_certificate ();
+    internal signal void signal_style_changed ();
+    internal signal void on_signal_activate ();
 
 
     /***********************************************************
@@ -202,7 +202,7 @@ public class OwncloudWizard : QWizard {
             OwncloudWizard.skip_folder_configuration
         );
 
-        Theme theme = Theme.instance ();
+        Theme theme = Theme.instance;
         window_title (_("Add %1 account").printf (theme.app_name_gui ()));
         wizard_style (QWizard.ModernStyle);
         option (QWizard.NoBackButtonOnStartPage);

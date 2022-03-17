@@ -79,8 +79,8 @@ public class ActivityListModel : QAbstractListModel {
     bool hide_old_activities { private get; protected set; }
 
 
-    signal void activity_job_status_code (int status_code);
-    signal void send_notification_request (string account_name, string link, string verb, int row);
+    internal signal void activity_job_status_code (int status_code);
+    internal signal void send_notification_request (string account_name, string link, string verb, int row);
 
 
     /***********************************************************
@@ -255,19 +255,19 @@ public class ActivityListModel : QAbstractListModel {
             return GLib.Variant ();
 
         a = this.final_list.at (index.row ());
-        unowned AccountState ast = AccountManager.instance ().account (a.acc_name);
-        if (!ast && this.account_state != ast.data ())
+        unowned AccountState ast = AccountManager.instance.account (a.acc_name);
+        if (!ast && this.account_state != ast)
             return GLib.Variant ();
 
         switch (role) {
         case DataRole.DISPLAY_PATH:
             if (!a.file == "") {
-                var folder = FolderMan.instance ().folder_by_alias (a.folder);
+                var folder = FolderMan.instance.folder_by_alias (a.folder);
                 string relative_path = a.file;
                 if (folder) {
                     relative_path.prepend (folder.remote_path ());
                 }
-                const var local_files = FolderMan.instance ().find_file_in_local_folders (relative_path, ast.account ());
+                const var local_files = FolderMan.instance.find_file_in_local_folders (relative_path, ast.account);
                 if (local_files.count () > 0) {
                     if (relative_path.starts_with ('/') || relative_path.starts_with ('\\')) {
                         return relative_path.remove (0, 1);
@@ -279,7 +279,7 @@ public class ActivityListModel : QAbstractListModel {
             return "";
         case DataRole.PATH:
             if (!a.file == "") {
-                const var folder = FolderMan.instance ().folder_by_alias (a.folder);
+                const var folder = FolderMan.instance.folder_by_alias (a.folder);
 
                 string relative_path = a.file;
                 if (folder) {
@@ -287,7 +287,7 @@ public class ActivityListModel : QAbstractListModel {
                 }
 
                 // get relative path to the file so we can open it in the file manager
-                const var local_files = FolderMan.instance ().find_file_in_local_folders (GLib.FileInfo (relative_path).path (), ast.account ());
+                const var local_files = FolderMan.instance.find_file_in_local_folders (GLib.FileInfo (relative_path).path (), ast.account);
 
                 if (local_files == "") {
                     return "";
@@ -307,13 +307,13 @@ public class ActivityListModel : QAbstractListModel {
             }
             return "";
         case DataRole.ABSOLUTE_PATH: {
-            const var folder = FolderMan.instance ().folder_by_alias (a.folder);
+            const var folder = FolderMan.instance.folder_by_alias (a.folder);
             string relative_path = a.file;
             if (!a.file == "") {
                 if (folder) {
                     relative_path.prepend (folder.remote_path ());
                 }
-                const var local_files = FolderMan.instance ().find_file_in_local_folders (relative_path, ast.account ());
+                const var local_files = FolderMan.instance.find_file_in_local_folders (relative_path, ast.account);
                 if (!local_files.empty ()) {
                     return local_files.const_first ();
                 } else {
@@ -434,7 +434,7 @@ public class ActivityListModel : QAbstractListModel {
             //  Q_ASSERT (!activity.folder == "");
             //  Q_ASSERT (Utility.is_conflict_file (activity.file));
 
-            const var folder = FolderMan.instance ().folder_by_alias (activity.folder);
+            const var folder = FolderMan.instance.folder_by_alias (activity.folder);
 
             const var conflicted_relative_path = activity.file;
             const var base_relative_path = folder.journal_database ().conflict_file_base_name (conflicted_relative_path.to_utf8 ());
@@ -467,9 +467,9 @@ public class ActivityListModel : QAbstractListModel {
                 this.current_invalid_filename_dialog.close ();
             }
 
-            var folder = FolderMan.instance ().folder_by_alias (activity.folder);
+            var folder = FolderMan.instance.folder_by_alias (activity.folder);
             const var folder_dir = QDir (folder.path ());
-            this.current_invalid_filename_dialog = new InvalidFilenameDialog (this.account_state.account (), folder,
+            this.current_invalid_filename_dialog = new InvalidFilenameDialog (this.account_state.account, folder,
                 folder_dir.file_path (activity.file));
             connect (
                 this.current_invalid_filename_dialog,
@@ -588,7 +588,7 @@ public class ActivityListModel : QAbstractListModel {
             Activity a;
             a.type = Activity.Type.ACTIVITY;
             a.object_type = json.value ("object_type").to_string ();
-            a.acc_name = ast.account ().display_name ();
+            a.acc_name = ast.account.display_name ();
             a.id = json.value ("activity_id").to_int ();
             a.file_action = json.value ("type").to_string ();
             a.subject = json.value ("subject").to_string ();
@@ -646,7 +646,7 @@ public class ActivityListModel : QAbstractListModel {
         if (!this.account_state.is_connected ()) {
             return;
         }
-        var job = new JsonApiJob (this.account_state.account (), QLatin1String ("ocs/v2.php/apps/activity/api/v2/activity"), this);
+        var job = new JsonApiJob (this.account_state.account, QLatin1String ("ocs/v2.php/apps/activity/api/v2/activity"), this);
         connect (job, JsonApiJob.json_received,
             this, ActivityListModel.activities_received);
 
@@ -656,7 +656,7 @@ public class ActivityListModel : QAbstractListModel {
         job.add_query_params (parameters);
 
         this.currently_fetching = true;
-        GLib.info ("Start fetching activities for " + this.account_state.account ().display_name ());
+        GLib.info ("Start fetching activities for " + this.account_state.account.display_name ());
         job.on_signal_start ();
     }
 
@@ -690,7 +690,7 @@ public class ActivityListModel : QAbstractListModel {
             if (this.show_more_activities_available_entry) {
                 Activity a;
                 a.type = Activity.Type.ACTIVITY;
-                a.acc_name = this.account_state.account ().display_name ();
+                a.acc_name = this.account_state.account.display_name ();
                 a.id = -1;
                 a.subject = _("For more activities please open the Activity app.");
                 a.date_time = GLib.DateTime.current_date_time ();
@@ -716,7 +716,7 @@ public class ActivityListModel : QAbstractListModel {
     }
 
     private bool can_fetch_activities () {
-        return this.account_state.is_connected () && this.account_state.account ().capabilities ().has_activities ();
+        return this.account_state.is_connected () && this.account_state.account.capabilities ().has_activities ();
     }
 
 } // class ActivityListModel

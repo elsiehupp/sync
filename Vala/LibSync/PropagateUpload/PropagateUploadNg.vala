@@ -93,13 +93,13 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
     ***********************************************************/
     private GLib.Uri chunk_url (int chunk = -1) {
         string path = "remote.php/dav/uploads/"
-            + propagator ().account ().dav_user ()
+            + propagator ().account.dav_user ()
             + "/" + this.transfer_identifier.to_string ();
         if (chunk >= 0) {
             // We need to do add leading 0 because the server orders the chunk alphabetically
             path += "/" + string.number (chunk).right_justified (16, '0'); // 1e16 is 10 petabyte
         }
-        return Utility.concat_url_path (propagator ().account ().url (), path);
+        return Utility.concat_url_path (propagator ().account.url (), path);
     }
 
 
@@ -124,7 +124,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
                 && progress_info.size == this.item.size) {
             this.transfer_identifier = progress_info.transferid;
             var url = chunk_url ();
-            var job = new LsColJob (propagator ().account (), url, this);
+            var job = new LsColJob (propagator ().account, url, this);
             this.jobs.append (job);
             job.properties (GLib.List<string> ("resourcetype"
                                                 + "getcontentlength"));
@@ -158,7 +158,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
             // The upload info is stale. remove the stale chunks on the server
             this.transfer_identifier = progress_info.transferid;
             // Fire and forget. Any error will be ignored.
-            (new DeleteJob (propagator ().account (), chunk_url (), this)).start ();
+            (new DeleteJob (propagator ().account, chunk_url (), this)).start ();
             // start_new_upload will reset the this.transfer_identifier and the UploadInfo in the database.
         }
 
@@ -196,7 +196,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
         // But we should send the temporary (or something) one.
         headers["OC-Total-Length"] = new string.number (this.file_to_upload.size);
-        var job = new MkColJob (propagator ().account (), chunk_url (), headers, this);
+        var job = new MkColJob (propagator ().account, chunk_url (), headers, this);
 
         connect (job, MkColJob.finished_with_error,
             this, PropagateUploadFileNG.on_signal_mkcol_finished);
@@ -224,7 +224,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
             // Finish with a MOVE
             // If we changed the file name, we must store the changed filename in the remote folder, not the original one.
-            string destination = QDir.clean_path (propagator ().account ().dav_url ().path ()
+            string destination = QDir.clean_path (propagator ().account.dav_url ().path ()
                 + propagator ().full_remote_path (this.file_to_upload.file));
             var headers = PropagateUploadFileCommon.headers ();
 
@@ -239,7 +239,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
             }
             headers["OC-Total-Length"] = new string.number (file_size);
 
-            var job = new MoveJob (propagator ().account (), Utility.concat_url_path (chunk_url (), "/.file"),
+            var job = new MoveJob (propagator ().account, Utility.concat_url_path (chunk_url (), "/.file"),
                 destination, headers, this);
             this.jobs.append (job);
             connect (job, MoveJob.signal_finished, this, PropagateUploadFileNG.on_signal_move_job_finished);
@@ -269,7 +269,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
         // job takes ownership of device via a QScopedPointer. Job deletes itself when finishing
         var device_ptr = device; // for connections later
-        var job = new PUTFileJob (propagator ().account (), url, std.move (device), headers, this.current_chunk, this);
+        var job = new PUTFileJob (propagator ().account, url, std.move (device), headers, this.current_chunk, this);
         this.jobs.append (job);
         connect (job, PUTFileJob.signal_finished, this, PropagateUploadFileNG.on_signal_put_finished);
         connect (job, PUTFileJob.signal_upload_progress,
@@ -324,7 +324,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
             // Wipe the old chunking data.
             // Fire and forget. Any error will be ignored.
-            new DeleteJob (propagator ().account (), chunk_url (), this).start ();
+            new DeleteJob (propagator ().account, chunk_url (), this).start ();
 
             propagator ().active_job_list.append (this);
             start_new_upload ();
@@ -342,7 +342,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
             // we should remove the later chunks. Otherwise when we do dynamic chunk sizing, we may end up
             // with corruptions if there are too many chunks, or if we abort and there are still stale chunks.
             foreach (var server_chunk in q_as_const (this.server_chunks)) {
-                var job = new DeleteJob (propagator ().account (), Utility.concat_url_path (chunk_url (), server_chunk.original_name), this);
+                var job = new DeleteJob (propagator ().account, Utility.concat_url_path (chunk_url (), server_chunk.original_name), this);
                 GLib.Object.connect (job, DeleteJob.signal_finished, this, PropagateUploadFileNG.on_signal_delete_job_finished);
                 this.jobs.append (job);
                 job.start ();

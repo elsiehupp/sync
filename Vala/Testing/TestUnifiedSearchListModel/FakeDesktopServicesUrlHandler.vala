@@ -19,7 +19,7 @@ public class FakeDesktopServicesUrlHandler : GLib.Object {
     }
 
 
-    signal void signal_result_clicked (GLib.Uri url);
+    internal signal void signal_result_clicked (GLib.Uri url);
 
 }
 }

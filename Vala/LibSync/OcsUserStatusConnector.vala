@@ -126,7 +126,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
         }
 
         this.user_status = json_to_user_status (json);
-        /* emit */ user_status_fetched (this.user_status);
+        /* emit */ signal_user_status_fetched (this.user_status);
     }
 
 
@@ -146,7 +146,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
             return;
         }
         var statuses = json_to_predefined_statuses (json_data.to_array ());
-        /* emit */ predefined_statuses_fetched (statuses);
+        /* emit */ signal_predefined_statuses_fetched (statuses);
     }
 
 
@@ -177,7 +177,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
         // message
         fetch_user_status ();
 
-        /* emit */ user_status_set ();
+        /* emit */ signal_user_status_set ();
     }
 
 

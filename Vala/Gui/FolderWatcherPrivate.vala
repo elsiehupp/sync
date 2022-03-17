@@ -45,7 +45,7 @@ public class FolderWatcherPrivate : GLib.Object {
         this.fd = inotify_init ();
         if (this.fd != -1) {
             this.socket.on_signal_reset (new QSocket_notifier (this.fd, QSocket_notifier.Read));
-            connect (this.socket.data (), QSocket_notifier.activated, this, FolderWatcherPrivate.on_signal_received_notification);
+            connect (this.socket, QSocket_notifier.activated, this, FolderWatcherPrivate.on_signal_received_notification);
         } else {
             GLib.warning ("notify_init () failed: " + strerror (errno));
         }
@@ -70,7 +70,7 @@ public class FolderWatcherPrivate : GLib.Object {
         int error = 0;
         char[] buffer = char[2048]; // previously QVarLengthArray<char, 2048>
 
-        len = read (fd, buffer.data (), buffer.size ());
+        len = read (fd, buffer, buffer.size ());
         error = errno;
         /***********************************************************
         From inotify documentation:
@@ -85,7 +85,7 @@ public class FolderWatcherPrivate : GLib.Object {
             buffer.resize (buffer.size () * 2);
 
             /* and try again ... */
-            len = read (fd, buffer.data (), buffer.size ());
+            len = read (fd, buffer, buffer.size ());
             error = errno;
         }
 

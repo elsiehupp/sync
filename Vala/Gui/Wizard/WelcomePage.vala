@@ -76,7 +76,7 @@ public class WelcomePage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void style_slide_show () {
-        const var theme = Theme.instance ();
+        const var theme = Theme.instance;
         const var background_color = palette ().window ().color ();
 
         const var wizard_nextcloud_icon_filename = theme.is_branded () ? Theme.hidpi_filename ("wizard-nextcloud.png", background_color)
@@ -111,7 +111,7 @@ public class WelcomePage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void set_up_login_button () {
-        const string app_name = Theme.instance ().app_name_gui ();
+        const string app_name = Theme.instance.app_name_gui ();
 
         this.ui.login_button.on_signal_text (_("Log in to your %1").printf (app_name));
         connect (

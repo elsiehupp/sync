@@ -17,7 +17,7 @@ This does not* delete files, it does a http request.
 ***********************************************************/
 public class DeleteApiJob : AbstractNetworkJob {
 
-    signal void signal_result (int http_code);
+    internal signal void signal_result (int http_code);
 
     /***********************************************************
     ***********************************************************/
@@ -31,7 +31,7 @@ public class DeleteApiJob : AbstractNetworkJob {
     public new void start () {
         Soup.Request request = new Soup.Request ();
         request.raw_header ("OCS-APIREQUEST", "true");
-        GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
+        GLib.Uri url = Utility.concat_url_path (account.url (), path ());
         send_request ("DELETE", url, request);
         AbstractNetworkJob.start ();
     }

@@ -74,7 +74,7 @@ public class Theme : GLib.Object {
         }
         public set {
             this.mono = value;
-            /* emit */ systray_use_mono_icons_changed (mono);
+            /* emit */ signal_systray_use_mono_icons_changed (mono);
         }
     }
 
@@ -86,7 +86,7 @@ public class Theme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    signal void systray_use_mono_icons_changed (bool value);
+    internal signal void signal_systray_use_mono_icons_changed (bool value);
 
 
     /***********************************************************

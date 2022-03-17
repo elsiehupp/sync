@@ -81,7 +81,7 @@ public class SyncRunFileLog : GLib.Object {
         this.file.on_signal_reset (GLib.File.new_for_path (filename));
 
         this.file.open (QIODevice.WriteOnly | QIODevice.Append | QIODevice.Text);
-        this.out.device (this.file.data ());
+        this.out.device (this.file);
 
         if (!exists) {
             this.out + folder_path + endl;

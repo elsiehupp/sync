@@ -204,7 +204,7 @@ public class TestLocalDiscovery : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
-        fake_folder.sync_engine ().account ().set_capabilities (
+        fake_folder.sync_engine ().account.set_capabilities (
             { { "files", new QVariantMap ( { "blocklisted_files", new QVariantList ( ".foo", "bar" ) } ) } });
         fake_folder.local_modifier ().insert ("C/.foo");
         fake_folder.local_modifier ().insert ("C/bar");

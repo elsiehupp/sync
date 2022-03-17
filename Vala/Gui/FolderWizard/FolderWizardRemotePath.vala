@@ -63,11 +63,11 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
         }
         wizard ().property ("target_path", directory);
 
-        Folder.Map map = FolderMan.instance ().map ();
+        Folder.Map map = FolderMan.instance.map ();
         Folder.Map.ConstIterator i = map.const_begin ();
         for (i = map.const_begin (); i != map.const_end (); i++) {
             var f = static_cast<Folder> (i.value ());
-            if (f.account_state ().account () != this.account) {
+            if (f.account_state ().account != this.account) {
                 continue;
             }
             string cur_dir = f.remote_path_trailing_slash ();
@@ -158,7 +158,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     ***********************************************************/
     protected void on_signal_create_remote_folder_finished () {
         GLib.debug ("webdav mkdir request on_signal_finished");
-        on_signal_show_warning (_("Folder was successfully created on %1.").printf (Theme.instance ().app_name_gui ()));
+        on_signal_show_warning (_("Folder was successfully created on %1.").printf (Theme.instance.app_name_gui ()));
         on_signal_refresh_folders ();
         this.ui.folder_entry.on_signal_text (static_cast<MkColJob> (sender ()).path ());
         on_signal_ls_col_folder_entry ();
@@ -170,10 +170,10 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     protected void on_signal_handle_mkdir_network_error (Soup.Reply reply) {
         GLib.warning ("webdav mkdir request failed: " + reply.error ());
         if (!this.account.credentials ().still_valid (reply)) {
-            on_signal_show_warning (_("Authentication failed accessing %1").printf (Theme.instance ().app_name_gui ()));
+            on_signal_show_warning (_("Authentication failed accessing %1").printf (Theme.instance.app_name_gui ()));
         } else {
             on_signal_show_warning (_("Failed to create the folder on %1. Please check manually.")
-                         .printf (Theme.instance ().app_name_gui ()));
+                         .printf (Theme.instance.app_name_gui ()));
         }
     }
 
@@ -205,8 +205,8 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
         QTreeWidgetItem root = this.ui.folder_tree_widget.top_level_item (0);
         if (!root) {
             root = new QTreeWidgetItem (this.ui.folder_tree_widget);
-            root.on_signal_text (0, Theme.instance ().app_name_gui ());
-            root.icon (0, Theme.instance ().application_icon ());
+            root.on_signal_text (0, Theme.instance.app_name_gui ());
+            root.icon (0, Theme.instance.application_icon ());
             root.tool_tip (0, _("Choose this to sync the entire account"));
             root.data (0, Qt.USER_ROLE, "/");
         }

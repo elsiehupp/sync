@@ -153,9 +153,9 @@ abstract class ComputeChecksumBase : GLib.Object {
         uint32 adler = adler32 (0L, Z_NULL, 0);
         int64 size = 0;
         while (!device.at_end ()) {
-            size = device.read (buf.data (), BUFSIZE);
+            size = device.read (buf, BUFSIZE);
             if (size > 0)
-                adler = adler32 (adler, (Bytef *)buf.data (), size);
+                adler = adler32 (adler, (Bytef *)buf, size);
         }
 
         return string.number (adler, 16);

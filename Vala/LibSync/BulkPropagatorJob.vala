@@ -128,12 +128,12 @@ public class BulkPropagatorJob : PropagatorJob {
         UploadFileInfo file_to_upload) {
         // Reuse the content checksum as the transmission checksum if possible
         var supported_transmission_checksums =
-            propagator ().account ().capabilities ().supported_checksum_types ();
+            propagator ().account.capabilities ().supported_checksum_types ();
 
         // Compute the transmission checksum.
         var compute_checksum = std.make_unique<ComputeChecksum> (this);
         if (upload_checksum_enabled ()) {
-            compute_checksum.checksum_type ("MD5" /*propagator ().account ().capabilities ().upload_checksum_type ()*/);
+            compute_checksum.checksum_type ("MD5" /*propagator ().account.capabilities ().upload_checksum_type ()*/);
         } else {
             compute_checksum.checksum_type ("");
         }
@@ -370,7 +370,7 @@ public class BulkPropagatorJob : PropagatorJob {
         current_headers["X-File-MD5"] = transmission_checksum_header;
 
         BulkUploadItem new_upload_file = BulkUploadItem (
-            propagator ().account (), item, file_to_upload,
+            propagator ().account, item, file_to_upload,
             remote_path, file_to_upload.path,
             file_to_upload.size, current_headers
         );
@@ -415,8 +415,8 @@ public class BulkPropagatorJob : PropagatorJob {
             timeout += single_file.file_size;
         }
 
-        var bulk_upload_url = Utility.concat_url_path (propagator ().account ().url (), "/remote.php/dav/bulk");
-        var job = std.make_unique<PutMultiFileJob> (propagator ().account (), bulk_upload_url, std.move (upload_parameters_data), this);
+        var bulk_upload_url = Utility.concat_url_path (propagator ().account.url (), "/remote.php/dav/bulk");
+        var job = std.make_unique<PutMultiFileJob> (propagator ().account, bulk_upload_url, std.move (upload_parameters_data), this);
         PutMultiFileJob.signal_finished.connect (job, BulkPropagatorJob.on_signal_put_finished);
 
         foreach (var single_file in this.files_to_upload) {
@@ -658,7 +658,7 @@ public class BulkPropagatorJob : PropagatorJob {
     ***********************************************************/
     private void check_resetting_errors (SyncFileItem item) {
         if (item.http_error_code == 412
-            || propagator ().account ().capabilities ().http_error_codes_that_reset_failing_chunked_uploads ().contains (item.http_error_code)) {
+            || propagator ().account.capabilities ().http_error_codes_that_reset_failing_chunked_uploads ().contains (item.http_error_code)) {
             var upload_info = propagator ().journal.get_upload_info (item.file);
             upload_info.error_count += 1;
             if (upload_info.error_count > 3) {

@@ -44,7 +44,7 @@ public class SslErrorDialog : Gtk.Dialog {
             this.ui.dialog_button_box.button (QDialogButtonBox.Cancel);
         ok_button.enabled (false);
 
-        this.ui.cb_trust_connect.enabled (!Theme.instance ().forbid_bad_ssl ());
+        this.ui.cb_trust_connect.enabled (!Theme.instance.forbid_bad_ssl ());
         connect (this.ui.cb_trust_connect, QAbstractButton.clicked,
             ok_button, Gtk.Widget.enabled);
 

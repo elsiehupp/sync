@@ -27,11 +27,11 @@ public class OwncloudDolphinPluginHelper : GLib.Object {
     static OwncloudDolphinPluginHelper self;
 
 
-    signal void signal_command_received (string cmd);
+    internal signal void signal_command_received (string cmd);
 
     /***********************************************************
     ***********************************************************/
-    public static OwncloudDolphinPluginHelper instance () {
+    public static OwncloudDolphinPluginHelper instance {
         return OwncloudDolphinPluginHelper.self;
     }
 

@@ -13,7 +13,7 @@ public class LinkLabel : Gtk.Label {
     ***********************************************************/
     GLib.Uri url { private get; public set; }
 
-    signal void clicked ();
+    internal signal void clicked ();
 
     /***********************************************************
     ***********************************************************/

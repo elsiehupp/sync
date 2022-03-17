@@ -190,7 +190,7 @@ public class WebFlowCredentials : AbstractCredentials {
             return;
         }
 
-        var job = new DeletePasswordJob (Theme.instance ().app_name (), this);
+        var job = new DeletePasswordJob (Theme.instance.app_name (), this);
         job.insecure_fallback (false);
         job.key (kck);
         job.on_signal_start ();
@@ -373,7 +373,7 @@ public class WebFlowCredentials : AbstractCredentials {
             this.keychain_migration ? "" : this.account.identifier ()
         );
 
-        var job = new ReadPasswordJob (Theme.instance ().app_name (), this);
+        var job = new ReadPasswordJob (Theme.instance.app_name (), this);
     //  #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
         add_settings_to_job (this.account, job);
     //  #endif
@@ -475,7 +475,7 @@ public class WebFlowCredentials : AbstractCredentials {
         }
 
         // done storing ca certificates, time for the password
-        var job = new WritePasswordJob (Theme.instance ().app_name (), this);
+        var job = new WritePasswordJob (Theme.instance.app_name (), this);
     //  #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
         add_settings_to_job (this.account, job);
     //  #endif

@@ -45,7 +45,7 @@ public class OwncloudSetupPage : QWizardPage {
     private AddCertificateDialog add_cert_dial = null;
 
 
-    signal void determine_auth_type (string value);
+    internal signal void determine_auth_type (string value);
 
 
     /***********************************************************
@@ -58,11 +58,11 @@ public class OwncloudSetupPage : QWizardPage {
 
         setup_server_address_description_label ();
 
-        Theme theme = Theme.instance ();
+        Theme theme = Theme.instance;
         if (theme.override_server_url () == "") {
             this.ui.le_url.postfix (theme.wizard_url_postfix ());
             this.ui.le_url.placeholder_text (theme.WIZARD_URL_HINT);
-        } else if (Theme.instance ().force_override_server_url ()) {
+        } else if (Theme.instance.force_override_server_url ()) {
             this.ui.le_url.enabled (false);
         }
 
@@ -111,8 +111,8 @@ public class OwncloudSetupPage : QWizardPage {
 
         this.ui.le_url.focus ();
 
-        const var is_server_url_overridden = !Theme.instance ().override_server_url () == "";
-        if (is_server_url_overridden && !Theme.instance ().force_override_server_url ()) {
+        const var is_server_url_overridden = !Theme.instance.override_server_url () == "";
+        if (is_server_url_overridden && !Theme.instance.force_override_server_url ()) {
             // If the url is overwritten but we don't force to use that url
             // Just focus the next button to let the user navigate quicker
             if (next_button) {
@@ -339,8 +339,8 @@ public class OwncloudSetupPage : QWizardPage {
         if (url.ends_with ("index.php")) {
             new_url.chop (9);
         }
-        if (this.oc_wizard && this.oc_wizard.account ()) {
-            string web_dav_path = this.oc_wizard.account ().dav_path ();
+        if (this.oc_wizard && this.oc_wizard.account) {
+            string web_dav_path = this.oc_wizard.account.dav_path ();
             if (url.ends_with (web_dav_path)) {
                 new_url.chop (web_dav_path.length ());
             }
@@ -376,7 +376,7 @@ public class OwncloudSetupPage : QWizardPage {
         this.ui.top_label.hide ();
         this.ui.bottom_label.hide ();
 
-        Theme theme = Theme.instance ();
+        Theme theme = Theme.instance;
         GLib.Variant variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_TOP);
         if (!variant.is_null ()) {
             WizardCommon.set_up_custom_media (variant, this.ui.top_label);
@@ -395,7 +395,7 @@ public class OwncloudSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void logo () {
-        this.ui.logo_label.pixmap (Theme.instance ().wizard_application_logo ());
+        this.ui.logo_label.pixmap (Theme.instance.wizard_application_logo ());
     }
 
 
@@ -420,7 +420,7 @@ public class OwncloudSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void setup_server_address_description_label () {
-        const var app_name = Theme.instance ().app_name_gui ();
+        const var app_name = Theme.instance.app_name_gui ();
         this.ui.server_address_description_label.on_signal_text (_("The link to your %1 web interface when you open it in the browser.", "%1 will be replaced with the application name").printf (app_name));
     }
 

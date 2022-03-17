@@ -53,19 +53,19 @@ public class ProgressDispatcher : GLib.Object {
     @param[out]  progress   A struct with all progress info.
 
     ***********************************************************/
-    signal void signal_progress_info (string folder, ProgressInfo progress);
+    internal signal void signal_progress_info (string folder, ProgressInfo progress);
 
 
     /***********************************************************
     @brief the item was completed by a job
     ***********************************************************/
-    signal void signal_item_completed (string folder, SyncFileItem item);
+    internal signal void signal_item_completed (string folder, SyncFileItem item);
 
 
     /***********************************************************
     @brief A new folder-wide sync error was seen.
     ***********************************************************/
-    signal void signal_sync_error (string folder, string message, ErrorCategory category);
+    internal signal void signal_sync_error (string folder, string message, ErrorCategory category);
 
 
     /***********************************************************
@@ -75,13 +75,13 @@ public class ProgressDispatcher : GLib.Object {
     @param[out] full error message
     @param[out] subject (optional)
     ***********************************************************/
-    signal void add_error_to_gui (string folder, SyncFileItem.Status status, string error_message, string subject);
+    internal signal void add_error_to_gui (string folder, SyncFileItem.Status status, string error_message, string subject);
 
 
     /***********************************************************
     @brief Emitted for a folder when a sync is done, listing all pending conflicts
     ***********************************************************/
-    signal void folder_conflicts (string folder, string[] conflict_paths);
+    internal signal void folder_conflicts (string folder, string[] conflict_paths);
 
 
     /***********************************************************

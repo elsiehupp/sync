@@ -7,7 +7,7 @@ public class StubRemoteWipe : Occ.AccountManager {
 
     //  const QMetaObject static_meta_object = GLib.Object.static_meta_object;
 
-    Occ.AccountManager instance () {
+    Occ.AccountManager instance {
         return (AccountManager) new GLib.Object ();
     }
 

@@ -30,7 +30,7 @@ public class TestAsyncOp : GLib.Object {
     ***********************************************************/
     private void async_upload_operations () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", new QVariantMap ( { "chunking", "1.0" } ) } });
+        fake_folder.sync_engine ().account.set_capabilities ({ { "dav", new QVariantMap ( { "chunking", "1.0" } ) } });
         // Reduce max chunk size a bit so we get more chunks
         SyncOptions options;
         options.max_chunk_size = 20 * 1000;

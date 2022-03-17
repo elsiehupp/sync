@@ -16,7 +16,7 @@ public class SocketApiJobV2 : GLib.Object {
     private string this.job_id;
     private QJsonObject this.arguments;
 
-    signal void signal_finished ();
+    internal signal void signal_finished ();
 
     public SocketApiJobV2 (unowned SocketListener socket_listener, string command, QJsonObject arguments) {
         this.socket_listener = socket_listener;

@@ -164,8 +164,8 @@ public class Folder : GLib.Object {
                 this.vfs.stop ();
                 this.vfs.unregister_folder ();
         
-                disconnect (this.vfs.data (), null, this, null);
-                disconnect (this.engine.sync_file_status_tracker (), null, this.vfs.data (), null);
+                disconnect (this.vfs, null, this, null);
+                disconnect (this.engine.sync_file_status_tracker (), null, this.vfs, null);
         
                 this.vfs.on_signal_reset (create_vfs_from_plugin (new_mode).release ());
         
@@ -281,7 +281,7 @@ public class Folder : GLib.Object {
     
         this.sync_result.folder (this.definition.alias);
     
-        this.engine.on_signal_reset (new SyncEngine (this.account_state.account (), path (), remote_path (), this.journal));
+        this.engine.on_signal_reset (new SyncEngine (this.account_state.account, path (), remote_path (), this.journal));
         // pass the setting if hidden files are to be ignored, will be read in csync_update
         this.engine.ignore_hidden_files (this.definition.ignore_hidden_files);
     
@@ -291,66 +291,66 @@ public class Folder : GLib.Object {
         }
     
         connect (
-            this.account_state.data (),
-            AccountState.is_connected_changed,
+            this.account_state,
+            AccountState.signal_is_connected_changed,
             this,
             Folder.signal_can_sync_changed
         );
         connect (
-            this.engine.data (),
+            this.engine,
             SyncEngine.root_etag,
             this,
             Folder.on_signal_etag_retrieved_from_sync_engine
         );
         connect (
-            this.engine.data (),
+            this.engine,
             SyncEngine.started,
             this,
             Folder.on_signal_sync_started,
             Qt.QueuedConnection
         );
         connect (
-            this.engine.data (),
+            this.engine,
             SyncEngine.on_signal_finished,
             this,
             Folder.on_signal_sync_finished,
             Qt.QueuedConnection
         );
         connect (
-            this.engine.data (),
+            this.engine,
             SyncEngine.about_to_remove_all_files,
             this,
             Folder.on_signal_about_to_remove_all_files
         );
         connect (
-            this.engine.data (),
+            this.engine,
             SyncEngine.transmission_progress,
             this,
             Folder.on_signal_transmission_progress
         );
         connect (
-            this.engine.data (),
+            this.engine,
             SyncEngine.item_completed,
             this,
             Folder.on_signal_item_completed);
         connect (
-            this.engine.data (),
+            this.engine,
             SyncEngine.new_big_folder,
             this,
             Folder.on_signal_new_big_folder_discovered);
         connect (
-            this.engine.data (),
+            this.engine,
             SyncEngine.about_to_propagate,
             this,
             Folder.on_signal_log_propagation_start);
         connect (
-            this.engine.data (),
+            this.engine,
             SyncEngine.sync_error,
             this,
             Folder.on_signal_sync_error
         );
         connect (
-            this.engine.data (),
+            this.engine,
             SyncEngine.add_error_to_gui,
             this,
             Folder.on_signal_add_error_to_gui
@@ -366,7 +366,7 @@ public class Folder : GLib.Object {
             Folder.on_signal_schedule_this_folder
         );
         connect (
-            ProgressDispatcher.instance (),
+            ProgressDispatcher.instance,
             ProgressDispatcher.folder_conflicts,
             this,
             Folder.on_signal_folder_conflicts
@@ -375,15 +375,15 @@ public class Folder : GLib.Object {
             new LocalDiscoveryTracker ()
         );
         connect (
-            this.engine.data (),
+            this.engine,
             SyncEngine.on_signal_finished,
-            this.local_discovery_tracker.data (),
+            this.local_discovery_tracker,
             LocalDiscoveryTracker.on_signal_sync_finished
         );
         connect (
-            this.engine.data (),
+            this.engine,
             SyncEngine.item_completed,
-            this.local_discovery_tracker.data (),
+            this.local_discovery_tracker,
             LocalDiscoveryTracker.on_signal_item_completed
         );
     
@@ -432,17 +432,17 @@ public class Folder : GLib.Object {
         vfs_params.display_name = short_gui_remote_path_or_app_name ();
         vfs_params.alias = alias ();
         vfs_params.remote_path = remote_path_trailing_slash ();
-        vfs_params.account = this.account_state.account ();
+        vfs_params.account = this.account_state.account;
         vfs_params.journal = this.journal;
-        vfs_params.provider_name = Theme.instance ().app_name_gui ();
-        vfs_params.provider_version = Theme.instance ().version ();
-        vfs_params.multiple_accounts_registered = AccountManager.instance ().accounts ().size () > 1;
+        vfs_params.provider_name = Theme.instance.app_name_gui ();
+        vfs_params.provider_version = Theme.instance.version ();
+        vfs_params.multiple_accounts_registered = AccountManager.instance.accounts ().size () > 1;
 
-        connect (this.vfs.data (), Vfs.begin_hydrating, this, Folder.on_signal_hydration_starts);
-        connect (this.vfs.data (), Vfs.done_hydrating, this, Folder.on_signal_hydration_done);
+        connect (this.vfs, Vfs.begin_hydrating, this, Folder.on_signal_hydration_starts);
+        connect (this.vfs, Vfs.done_hydrating, this, Folder.on_signal_hydration_done);
 
         connect (this.engine.sync_file_status_tracker (), SyncFileStatusTracker.file_status_changed,
-                this.vfs.data (), Vfs.on_signal_file_status_changed);
+                this.vfs, Vfs.on_signal_file_status_changed);
 
         this.vfs.on_signal_start (vfs_params);
 
@@ -475,7 +475,7 @@ public class Folder : GLib.Object {
             }
             return a;
         } else {
-            return Theme.instance ().app_name_gui ();
+            return Theme.instance.app_name_gui ();
         }
     }
 
@@ -547,7 +547,7 @@ public class Folder : GLib.Object {
     Remote folder path with server url
     ***********************************************************/
     public GLib.Uri remote_url () {
-        return Utility.concat_url_path (this.account_state.account ().dav_url (), remote_path ());
+        return Utility.concat_url_path (this.account_state.account.dav_url (), remote_path ());
     }
 
 
@@ -597,7 +597,7 @@ public class Folder : GLib.Object {
         on_signal_discard_download_progress ();
     
         // Unregister the socket API so it does not keep the .sync_journal file open
-        FolderMan.instance ().socket_api ().on_signal_unregister_path (alias ());
+        FolderMan.instance.socket_api ().on_signal_unregister_path (alias ());
         this.journal.close (); // close the sync journal
     
         // Remove database and temporaries
@@ -720,7 +720,7 @@ public class Folder : GLib.Object {
     
         // True if the folder path appears in only one account
         int accounts = 1;
-        foreach (var Folder in FolderMan.instance ().map ()){
+        foreach (var Folder in FolderMan.instance.map ()){
             if (other != this && other.clean_path () == this.clean_path ()) {
                 accounts++;
             }
@@ -816,18 +816,18 @@ public class Folder : GLib.Object {
     
         this.folder_watcher.on_signal_reset (new FolderWatcher (this));
         connect (
-            this.folder_watcher.data (),
+            this.folder_watcher,
             FolderWatcher.signal_path_changed,
             this,
             this.on_signal_path_changed
         );
         connect (
-            this.folder_watcher.data (),
+            this.folder_watcher,
             FolderWatcher.signal_lost_changes,
             this,
             Folder.on_signal_next_sync_full_local_discovery);
         connect (
-            this.folder_watcher.data (),
+            this.folder_watcher,
             FolderWatcher.signal_became_unreliable,
             this,
             Folder.on_signal_watcher_unreliable
@@ -904,21 +904,21 @@ public class Folder : GLib.Object {
     }
 
 
-    signal void signal_sync_state_change ();
-    signal void signal_sync_started ();
-    signal void signal_sync_finished (SyncResult result);
-    signal void signal_progress_info (ProgressInfo progress);
+    internal signal void signal_sync_state_change ();
+    internal signal void signal_sync_started ();
+    internal signal void signal_sync_finished (SyncResult result);
+    internal signal void signal_progress_info (ProgressInfo progress);
     /***********************************************************
     A new folder bigger than the threshold was discovered
     ***********************************************************/
-    signal void signal_new_big_folder_discovered (string value);
-    signal void signal_sync_paused_changed (Folder folder, bool paused);
-    signal void signal_can_sync_changed ();
+    internal signal void signal_new_big_folder_discovered (string value);
+    internal signal void signal_sync_paused_changed (Folder folder, bool paused);
+    internal signal void signal_can_sync_changed ();
     /***********************************************************
     Fires for each change inside this folder that wasn't caused
     by sync activity.
     ***********************************************************/
-    signal void signal_watched_file_changed_externally (string path);
+    internal signal void signal_watched_file_changed_externally (string path);
 
 
     /***********************************************************
@@ -1020,7 +1020,7 @@ public class Folder : GLib.Object {
         GLib.info (
             "*** Start syncing " + remote_url ().to_string ()
             + " -" + APPLICATION_NAME + "client version"
-            + Theme.instance ().version ().to_string ()
+            + Theme.instance.version ().to_string ()
         );
     
         this.file_log.on_signal_start (path ());
@@ -1056,7 +1056,7 @@ public class Folder : GLib.Object {
     
         correct_placeholder_files ();
     
-        QMetaObject.invoke_method (this.engine.data (), "on_signal_start_sync", Qt.QueuedConnection);
+        QMetaObject.invoke_method (this.engine, "on_signal_start_sync", Qt.QueuedConnection);
     
         /* emit */ signal_sync_started ();
     }
@@ -1280,9 +1280,9 @@ public class Folder : GLib.Object {
     ***********************************************************/
     private void on_signal_sync_finished (bool success) {
         GLib.info (
-            "Client version" + Theme.instance ().version ().to_string ()
+            "Client version" + Theme.instance.version ().to_string ()
             + " Qt " + q_version ()
-            + " SSL " + QSslSocket.ssl_library_version_string ().to_utf8 ().data ()
+            + " SSL " + QSslSocket.ssl_library_version_string ().to_utf8 ()
         );
     
         bool sync_error = !this.sync_result.error_strings () == "";
@@ -1366,14 +1366,14 @@ public class Folder : GLib.Object {
     ***********************************************************/
     private void on_signal_sync_error (string message, ErrorCategory category = ErrorCategory.NORMAL) {
         this.sync_result.append_error_string (message);
-        /* emit */ ProgressDispatcher.instance ().sync_error (alias (), message, category);
+        /* emit */ ProgressDispatcher.instance.sync_error (alias (), message, category);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_signal_add_error_to_gui (SyncFileItem.Status status, string error_message, string subject = "") {
-        /* emit */ ProgressDispatcher.instance ().add_error_to_gui (alias (), status, error_message, subject);
+        /* emit */ ProgressDispatcher.instance.add_error_to_gui (alias (), status, error_message, subject);
     }
 
 
@@ -1383,7 +1383,7 @@ public class Folder : GLib.Object {
     ***********************************************************/
     private void on_signal_transmission_progress (ProgressInfo progress_info) {
         /* emit */ signal_progress_info (progress_info);
-        ProgressDispatcher.instance ().signal_progress_info (alias (), progress_info);
+        ProgressDispatcher.instance.signal_progress_info (alias (), progress_info);
     }
 
 
@@ -1401,7 +1401,7 @@ public class Folder : GLib.Object {
         this.sync_result.process_completed_item (item);
     
         this.file_log.log_item (*item);
-        /* emit */ ProgressDispatcher.instance ().item_completed (alias (), item);
+        /* emit */ ProgressDispatcher.instance.item_completed (alias (), item);
     }
 
 
@@ -1410,7 +1410,7 @@ public class Folder : GLib.Object {
     private void on_signal_run_etag_job () {
         GLib.info ("Trying to check " + remote_url ().to_string () + " for changes via ETag check. (time since last sync: " + (this.time_since_last_sync_done.elapsed () / 1000) + "s)");
     
-        unowned Account account = this.account_state.account ();
+        unowned Account account = this.account_state.account;
     
         if (this.request_etag_job) {
             GLib.info (remote_url ().to_string () + " has ETag job queued, not trying to sync");
@@ -1428,8 +1428,8 @@ public class Folder : GLib.Object {
         this.request_etag_job = new RequestEtagJob (account, remote_path (), this);
         this.request_etag_job.on_signal_timeout (60 * 1000);
         // check if the etag is different when retrieved
-        connect (this.request_etag_job.data (), RequestEtagJob.on_signal_etag_retrieved, this, Folder.on_signal_etag_retrieved);
-        FolderMan.instance ().on_signal_schedule_e_tag_job (alias (), this.request_etag_job);
+        connect (this.request_etag_job, RequestEtagJob.on_signal_etag_retrieved, this, Folder.on_signal_etag_retrieved);
+        FolderMan.instance.on_signal_schedule_e_tag_job (alias (), this.request_etag_job);
         // The this.request_etag_job is var deleting itself on finish. Our guard pointer this.request_etag_job will then be null.
     }
 
@@ -1438,7 +1438,7 @@ public class Folder : GLib.Object {
     ***********************************************************/
     private void on_signal_etag_retrieved (string value1, GLib.DateTime tp) {
         // re-enable sync if it was disabled because network was down
-        FolderMan.instance ().sync_enabled (true);
+        FolderMan.instance.sync_enabled (true);
     
         if (this.last_etag != etag) {
             GLib.info ("Compare etag with previous etag: last: " + this.last_etag + ", received: " + etag + ". CHANGED");
@@ -1510,8 +1510,8 @@ public class Folder : GLib.Object {
                                           : (_("A folder from an external storage has been added.\n"));
             message += _("Please go in the settings to select it if you wish to download it.");
     
-            var logger = Logger.instance ();
-            logger.post_optional_gui_log (Theme.instance ().app_name_gui (), message);
+            var logger = Logger.instance;
+            logger.post_optional_gui_log (Theme.instance.app_name_gui (), message);
         }
     }
 
@@ -1529,7 +1529,7 @@ public class Folder : GLib.Object {
     FolderMan.
     ***********************************************************/
     private void on_signal_schedule_this_folder () {
-        FolderMan.instance ().schedule_folder (this);
+        FolderMan.instance.schedule_folder (this);
     }
 
 
@@ -1585,7 +1585,7 @@ public class Folder : GLib.Object {
                 + "It will not be synchronized.")
                   .printf (file_info.file_path ());
     
-        Logger.instance ().post_optional_gui_log (Theme.instance ().app_name_gui (), message);
+        Logger.instance.post_optional_gui_log (Theme.instance.app_name_gui (), message);
     }
 
 
@@ -1603,7 +1603,7 @@ public class Folder : GLib.Object {
             + "\n"
             + "%1"
             ).printf (message);
-        Logger.instance ().post_gui_log (Theme.instance ().app_name_gui (), full_message);
+        Logger.instance.post_gui_log (Theme.instance.app_name_gui (), full_message);
     }
 
 
@@ -1735,7 +1735,7 @@ public class Folder : GLib.Object {
         opt.confirm_external_storage = config_file.confirm_external_storage ();
         opt.move_files_to_trash = config_file.move_to_trash ();
         opt.vfs = this.vfs;
-        opt.parallel_network_jobs = this.account_state.account ().is_http2Supported () ? 20 : 6;
+        opt.parallel_network_jobs = this.account_state.account.is_http2Supported () ? 20 : 6;
     
         opt.initial_chunk_size = config_file.chunk_size ();
         opt.min_chunk_size = config_file.min_chunk_size ();
@@ -1755,7 +1755,7 @@ public class Folder : GLib.Object {
         string filename, LogStatus status,
         int count, string rename_target) {
         if (count > 0) {
-            Logger logger = Logger.instance ();
+            Logger logger = Logger.instance;
     
             string file = QDir.to_native_separators (filename);
             string text;

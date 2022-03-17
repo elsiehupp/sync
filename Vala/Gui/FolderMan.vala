@@ -160,7 +160,7 @@ public class FolderMan : GLib.Object {
     ***********************************************************/
     SocketApi socket_api {
         public get {
-            return this.socket_api.data ();
+            return this.socket_api;
         }
         private set {
             this.socket_api = value;
@@ -224,10 +224,10 @@ public class FolderMan : GLib.Object {
             this, FolderMan.on_signal_schedule_folder_by_time);
         this.time_scheduler.on_signal_start ();
     
-        connect (AccountManager.instance (), AccountManager.signal_remove_account_folders,
+        connect (AccountManager.instance, AccountManager.signal_remove_account_folders,
             this, FolderMan.on_signal_remove_folders_for_account);
     
-        connect (AccountManager.instance (), AccountManager.account_sync_connection_removed,
+        connect (AccountManager.instance, AccountManager.signal_account_sync_connection_removed,
             this, FolderMan.on_signal_account_removed);
     
         connect (this, FolderMan.signal_folder_list_changed, this, FolderMan.on_signal_setup_push_notifications);
@@ -244,7 +244,7 @@ public class FolderMan : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static FolderMan instance () {
+    public static FolderMan instance {
         return this.instance;
     }
 
@@ -262,15 +262,15 @@ public class FolderMan : GLib.Object {
         if (accounts_with_settings == "") {
             int r = setup_folders_migration ();
             if (r > 0) {
-                AccountManager.instance ().save (false); // don't save credentials, they had not been loaded from keychain
+                AccountManager.instance.save (false); // don't save credentials, they had not been loaded from keychain
             }
             return r;
         }
     
         GLib.info ("Setup folders from settings file.");
     
-        foreach (var account in AccountManager.instance ().accounts ()) {
-            const int identifier = account.account ().identifier ();
+        foreach (var account in AccountManager.instance.accounts ()) {
+            const int identifier = account.account.identifier ();
             if (!accounts_with_settings.contains (identifier)) {
                 continue;
             }
@@ -326,7 +326,7 @@ public class FolderMan : GLib.Object {
         const var list = directory.entry_list ();
     
         // Normally there should be only one account when migrating.
-        AccountState account_state = AccountManager.instance ().accounts ().value (0).data ();
+        AccountState account_state = AccountManager.instance.accounts ().value (0);
         foreach (var alias in list) {
             Folder folder = set_up_folder_from_old_config_file (alias, account_state);
             if (folder) {
@@ -395,7 +395,7 @@ public class FolderMan : GLib.Object {
     public Folder add_folder (AccountState account_state, FolderDefinition folder_definition) {
         // Choose a database filename
         var definition = folder_definition;
-        definition.journal_path = definition.default_journal_path (account_state.account ());
+        definition.journal_path = definition.default_journal_path (account_state.account);
     
         if (!ensure_journal_gone (definition.absolute_journal_path ())) {
             return null;
@@ -411,9 +411,9 @@ public class FolderMan : GLib.Object {
     
         // Migration: The first account that's configured for a local folder shall
         // be saved in a backwards-compatible way.
-        const var folder_list = FolderMan.instance ().map ();
+        const var folder_list = FolderMan.instance.map ();
         int count = 0;
-        foreach (var Folder in FolderMan.instance ().map ()) {
+        foreach (var Folder in FolderMan.instance.map ()) {
             if (other != folder && other.clean_path () == folder.clean_path ()) {
                 count++;
             }
@@ -506,7 +506,7 @@ public class FolderMan : GLib.Object {
         }
     
         foreach (Folder folder in this.map ().values ()) {
-            if (acc && folder.account_state ().account () != acc) {
+            if (acc && folder.account_state ().account != acc) {
                 continue;
             }
             if (!server_path.starts_with (folder.remote_path ())) {
@@ -949,8 +949,8 @@ public class FolderMan : GLib.Object {
             // otherwise it would mean that a new connection from the same local folder
             // to the same account is added which is not wanted. The account must differ.
             if (server_url.is_valid () && !different_paths) {
-                GLib.Uri folder_url = folder.account_state ().account ().url ();
-                string user = folder.account_state ().account ().credentials ().user ();
+                GLib.Uri folder_url = folder.account_state ().account.url ();
+                string user = folder.account_state ().account.credentials ().user ();
                 folder_url.user_name (user);
     
                 if (server_url == folder_url) {
@@ -981,7 +981,7 @@ public class FolderMan : GLib.Object {
         // Example: Someone syncs their home directory. Then ~/foobar is not
         // going to be an acceptable sync folder path for any value of foobar.
         string parent_folder = GLib.FileInfo (folder).directory ().canonical_path ();
-        if (FolderMan.instance ().folder_for_path (parent_folder)) {
+        if (FolderMan.instance.folder_for_path (parent_folder)) {
             // Any path with that parent is going to be unacceptable,
             // so just keep it as-is.
             return base_path;
@@ -991,7 +991,7 @@ public class FolderMan : GLib.Object {
         while (true) {
             const bool is_good =
                 !GLib.FileInfo (folder).exists ()
-                && FolderMan.instance ().check_path_validity_for_new_folder (folder, server_url) == "";
+                && FolderMan.instance.check_path_validity_for_new_folder (folder, server_url) == "";
             if (is_good) {
                 break;
             }
@@ -1136,10 +1136,10 @@ public class FolderMan : GLib.Object {
     public void dirty_proxy () {
         foreach (Folder folder in this.folder_map.values ()) {
             if (folder) {
-                if (folder.account_state () && folder.account_state ().account ()
-                    && folder.account_state ().account ().network_access_manager ()) {
+                if (folder.account_state () && folder.account_state ().account
+                    && folder.account_state ().account.network_access_manager ()) {
                     // Need to do this so we do not use the old determined system proxy
-                    folder.account_state ().account ().network_access_manager ().proxy (
+                    folder.account_state ().account.network_access_manager ().proxy (
                         QNetworkProxy (QNetworkProxy.DefaultProxy));
                 }
             }
@@ -1168,7 +1168,7 @@ public class FolderMan : GLib.Object {
         if (!account_state) {
             return;
         }
-        string account_name = account_state.account ().display_name ();
+        string account_name = account_state.account.display_name ();
     
         if (account_state.is_connected ()) {
             GLib.info ("Account " + account_name + " connected, scheduling its folders.");
@@ -1337,7 +1337,7 @@ public class FolderMan : GLib.Object {
     
         GLib.info (lc_folder_man, ">========== Sync started for folder [%s] of account [%s] with remote [%s]",
             q_printable (folder.short_gui_local_path ()),
-            q_printable (folder.account_state ().account ().display_name ()),
+            q_printable (folder.account_state ().account.display_name ()),
             q_printable (folder.remote_url ().to_string ()));
     }
 
@@ -1356,7 +1356,7 @@ public class FolderMan : GLib.Object {
     
         GLib.info (lc_folder_man, "<========== Sync on_signal_finished for folder [%s] of account [%s] with remote [%s]",
             q_printable (folder.short_gui_local_path ()),
-            q_printable (folder.account_state ().account ().display_name ()),
+            q_printable (folder.account_state ().account.display_name ()),
             q_printable (folder.remote_url ().to_string ()));
     
         if (folder == this.current_sync_folder) {
@@ -1467,7 +1467,7 @@ public class FolderMan : GLib.Object {
     
         // Some folders need not to be checked because they use the push notifications
         foreach (Folder folder in this.folder_map) {
-            if (!push_notifications_files_ready (folder.account_state ().account ().data ())) {
+            if (!push_notifications_files_ready (folder.account_state ().account)) {
                 folders_to_run.append (folder);
             }
         }
@@ -1529,7 +1529,7 @@ public class FolderMan : GLib.Object {
                 + "pausing all folders on the account.");
     
             foreach (Folder folder in this.folder_map) {
-                if (folder.account_state ().account ().data () == account) {
+                if (folder.account_state ().account == account) {
                     folder.sync_paused (true);
                 }
             }
@@ -1608,14 +1608,14 @@ public class FolderMan : GLib.Object {
     ***********************************************************/
     private void on_signal_setup_push_notifications (Folder.Map folder_map) {
         foreach (Folder folder in folder_map) {
-            const var account = folder.account_state ().account ();
+            const var account = folder.account_state ().account;
     
             // See if the account already provides the PushNotifications object and if yes connect to it.
             // If we can't connect at this point, the signals will be connected in on_signal_push_notifications_ready ()
             // after the Push_notification object emitted the ready signal
-            on_signal_connect_to_push_notifications (account.data ());
+            on_signal_connect_to_push_notifications (account);
             connect (
-                account.data (),
+                account,
                 Account.push_notifications_ready,
                 this,
                 FolderMan.on_signal_connect_to_push_notifications,
@@ -1632,7 +1632,7 @@ public class FolderMan : GLib.Object {
     
         foreach (Folder folder in this.folder_map) {
             // Just run on the folders that belong to this account
-            if (folder.account_state ().account () != account) {
+            if (folder.account_state ().account != account) {
                 continue;
             }
     
@@ -1716,7 +1716,7 @@ public class FolderMan : GLib.Object {
         connect (
             folder.sync_engine ().sync_file_status_tracker (),
             SyncFileStatusTracker.file_status_changed,
-            this.socket_api.data (),
+            this.socket_api,
             SocketApi.on_signal_broadcast_status_push_message
         );
         connect (
@@ -1771,7 +1771,7 @@ public class FolderMan : GLib.Object {
         disconnect (
             folder.sync_engine ().sync_file_status_tracker (),
             SyncFileStatusTracker.file_status_changed,
-            this.socket_api.data (),
+            this.socket_api,
             SocketApi.on_signal_broadcast_status_push_message
         );
         disconnect (
@@ -1902,7 +1902,7 @@ public class FolderMan : GLib.Object {
             FolderDefinition folder_definition;
             settings.begin_group (folder_alias);
             if (FolderDefinition.on_signal_load (settings, folder_alias, folder_definition)) {
-                var default_journal_path = folder_definition.default_journal_path (account.account ());
+                var default_journal_path = folder_definition.default_journal_path (account.account);
     
                 // Migration : Old settings don't have journal_path
                 if (folder_definition.journal_path == "") {
@@ -1943,7 +1943,7 @@ public class FolderMan : GLib.Object {
                         GLib.warning ("Could not load plugin for mode " + folder_definition.virtual_files_mode);
                     }
     
-                    Folder folder = add_folder_internal (folder_definition, account.data (), std.move (vfs));
+                    Folder folder = add_folder_internal (folder_definition, account, std.move (vfs));
                     folder.save_to_settings ();
     
                     continue;
@@ -1975,7 +1975,7 @@ public class FolderMan : GLib.Object {
                     q_fatal ("Could not load plugin");
                 }
     
-                Folder folder = add_folder_internal (std.move (folder_definition), account.data (), std.move (vfs));
+                Folder folder = add_folder_internal (std.move (folder_definition), account, std.move (vfs));
                 if (folder) {
                     if (switch_to_vfs) {
                         folder.switch_to_virtual_files ();
@@ -2011,7 +2011,7 @@ public class FolderMan : GLib.Object {
         if (ENFORCE_VIRTUAL_FILES_SYNC_FOLDER &&
                 folder_definition.virtual_files_mode != best_available_vfs_mode () &&
                 folder_definition.virtual_files_mode == Vfs.Off &&
-                Occ.Theme.instance ().show_virtual_files_option ()) {
+                Occ.Theme.instance.show_virtual_files_option ()) {
             result = true;
         }
 
@@ -2056,7 +2056,7 @@ public class FolderMan : GLib.Object {
             return;
         }
         // When not using push notifications, make sure polltime is reached
-        if (!push_notifications_files_ready (folder.account_state ().account ().data ())) {
+        if (!push_notifications_files_ready (folder.account_state ().account)) {
             if (folder.msec_since_last_sync () < polltime) {
                 GLib.info ("Can not run etag job: Polltime not reached.");
                 return;

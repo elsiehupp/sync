@@ -24,7 +24,7 @@ public class CookieJar : Soup.CookieJar {
 
     /***********************************************************
     ***********************************************************/
-    signal void new_cookies_for_url (GLib.List<Soup.Cookie> cookie_list, GLib.Uri url);
+    internal signal void new_cookies_for_url (GLib.List<Soup.Cookie> cookie_list, GLib.Uri url);
 
     /***********************************************************
     ***********************************************************/

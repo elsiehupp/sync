@@ -16,7 +16,7 @@ Primarily adds timeout and redirection handling.
 ***********************************************************/
 public class SimpleNetworkJob : AbstractNetworkJob {
 
-    signal void signal_finished (GLib.InputStream reply);
+    internal signal void signal_finished (GLib.InputStream reply);
 
 
     /***********************************************************

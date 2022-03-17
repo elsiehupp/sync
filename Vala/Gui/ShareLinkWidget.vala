@@ -65,12 +65,12 @@ public class ShareLinkWidget : Gtk.Widget {
     private QWidgetAction share_link_widget_action = new QWidgetAction ();
 
 
-    signal void create_link_share ();
-    signal void delete_link_share ();
-    signal void resize_requested ();
-    signal void visual_deletion_done ();
-    signal void create_password (string password);
-    signal void create_password_processed ();
+    internal signal void create_link_share ();
+    internal signal void delete_link_share ();
+    internal signal void resize_requested ();
+    internal signal void visual_deletion_done ();
+    internal signal void create_password (string password);
+    internal signal void create_password_processed ();
 
 
     /***********************************************************
@@ -163,14 +163,14 @@ public class ShareLinkWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public void setup_ui_options () {
-        connect (this.link_share.data (), LinkShare.signal_note_set, this, ShareLinkWidget.on_signal_note_set);
-        connect (this.link_share.data (), LinkShare.signal_password_set, this, ShareLinkWidget.on_signal_password_set);
-        connect (this.link_share.data (), LinkShare.signal_password_error, this, ShareLinkWidget.on_signal_password_error);
-        connect (this.link_share.data (), LinkShare.signal_label_set, this, ShareLinkWidget.on_signal_label_set);
+        connect (this.link_share, LinkShare.signal_note_set, this, ShareLinkWidget.on_signal_note_set);
+        connect (this.link_share, LinkShare.signal_password_set, this, ShareLinkWidget.on_signal_password_set);
+        connect (this.link_share, LinkShare.signal_password_error, this, ShareLinkWidget.on_signal_password_error);
+        connect (this.link_share, LinkShare.signal_label_set, this, ShareLinkWidget.on_signal_label_set);
 
         // Prepare permissions check and create group action
-        const QDate expire_date = this.link_share.data ().expire_date ().is_valid () ? this.link_share.data ().expire_date () : QDate ();
-        const SharePermissions perm = this.link_share.data ().permissions ();
+        const QDate expire_date = this.link_share.expire_date ().is_valid () ? this.link_share.expire_date () : QDate ();
+        const SharePermissions perm = this.link_share.permissions ();
         var checked = false;
         var permissions_group = new QAction_group (this);
 
@@ -218,7 +218,7 @@ public class ShareLinkWidget : Gtk.Widget {
         this.share_link_edit = new QLineEdit (this);
         connect (this.share_link_edit, QLineEdit.return_pressed, this, ShareLinkWidget.on_signal_create_label);
         this.share_link_edit.placeholder_text (_("Link name"));
-        this.share_link_edit.on_signal_text (this.link_share.data ().label ());
+        this.share_link_edit.on_signal_text (this.link_share.label ());
         this.share_link_layout.add_widget (this.share_link_edit);
 
         this.share_link_button = new QToolButton (this);
@@ -262,7 +262,7 @@ public class ShareLinkWidget : Gtk.Widget {
         this.password_protect_link_action = this.link_context_menu.add_action (_("Password protect"));
         this.password_protect_link_action.checkable (true);
 
-        if (this.link_share.data ().is_password_set ()) {
+        if (this.link_share.is_password_set ()) {
             this.password_protect_link_action.checked (true);
             this.ui.line_edit_password.placeholder_text (string.from_utf8 (PASSWORD_IS_PLACEHOLDER));
             toggle_password_options ();
@@ -270,7 +270,7 @@ public class ShareLinkWidget : Gtk.Widget {
 
         // If password is enforced then don't allow users to disable it
         if (this.account.capabilities ().share_public_link_enforce_password ()) {
-            if (this.link_share.data ().is_password_set ()) {
+            if (this.link_share.is_password_set ()) {
                 this.password_protect_link_action.checked (true);
                 this.password_protect_link_action.enabled (false);
             }
@@ -286,7 +286,7 @@ public class ShareLinkWidget : Gtk.Widget {
             toggle_expire_date_options ();
         }
         connect (this.ui.calendar, QDateTimeEdit.date_changed, this, ShareLinkWidget.on_signal_expire_date);
-        connect (this.link_share.data (), LinkShare.signal_expire_date_set, this, ShareLinkWidget.on_signal_expire_date_set);
+        connect (this.link_share, LinkShare.signal_expire_date_set, this, ShareLinkWidget.on_signal_expire_date_set);
 
         // If expiredate is enforced do not allow disable and set max days
         if (this.account.capabilities ().share_public_link_enforce_expire_date ()) {

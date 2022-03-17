@@ -70,11 +70,11 @@ public class PropagateRemoteDelete : PropagateItemJob {
     public void create_delete_job (string filename) {
         GLib.info ("Deleting file, local" + this.item.file + "remote" + filename);
 
-        this.job = new DeleteJob (propagator ().account (),
+        this.job = new DeleteJob (propagator ().account,
             propagator ().full_remote_path (filename),
             this);
 
-        connect (this.job.data (), DeleteJob.signal_finished, this, PropagateRemoteDelete.on_signal_delete_job_finished);
+        connect (this.job, DeleteJob.signal_finished, this, PropagateRemoteDelete.on_signal_delete_job_finished);
         propagator ().active_job_list.append (this);
         this.job.start ();
     }

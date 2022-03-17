@@ -39,7 +39,7 @@ public class RemoteWipe : GLib.Object {
         this.network_reply_check = null;
         this.network_reply_success = null;
         connect (
-            AccountManager.instance (),
+            AccountManager.instance,
             AccountManager.on_signal_account_removed,
             this,
             this.on_signal_account_removed
@@ -47,17 +47,17 @@ public class RemoteWipe : GLib.Object {
         connect (
             this,
             RemoteWipe.signal_authorized,
-            FolderMan.instance (),
+            FolderMan.instance,
             FolderMan.on_signal_wipe_folder_for_account
         );
         connect (
-            FolderMan.instance (),
+            FolderMan.instance,
             FolderMan.signal_wipe_done,
             this,
             RemoteWipe.on_signal_notify_server_success_job
         );
         connect (
-            this.account.data (),
+            this.account,
             Account.app_password_retrieved,
             this,
             RemoteWipe.on_signal_start_check_job_with_app_password
@@ -73,13 +73,13 @@ public class RemoteWipe : GLib.Object {
     /***********************************************************
     Notify if wipe was requested
     ***********************************************************/
-    signal void signal_authorized (AccountState state);
+    internal signal void signal_authorized (AccountState state);
 
 
     /***********************************************************
     Notify if user only needs to log in again
     ***********************************************************/
-    signal void ask_user_credentials ();
+    internal signal void ask_user_credentials ();
 
 
     /***********************************************************
@@ -110,7 +110,7 @@ public class RemoteWipe : GLib.Object {
         connect (
             this.network_manager,
             ssl_errors, // (Soup.Reply reply, GLib.List<QSslError> error_list),
-            this.account.data (),
+            this.account,
             on_signal_handle_ssl_errors // (Soup.Reply reply, GLib.List<QSslError> error_list)
         );
         connect (
@@ -159,8 +159,8 @@ public class RemoteWipe : GLib.Object {
             wipe = json["wipe"].to_bool ();
         }
 
-        var manager = AccountManager.instance ();
-        var account_state = manager.account (this.account.display_name ()).data ();
+        var manager = AccountManager.instance;
+        var account_state = manager.account (this.account.display_name ());
 
         if (wipe) {
             /* IMPORTANT - remove later - FIXME MS@2019-12-07 -.
@@ -196,7 +196,7 @@ public class RemoteWipe : GLib.Object {
     <server>/index.php/core/wipe/on_signal_success
     ***********************************************************/
     private void on_signal_notify_server_success_job (AccountState account_state, bool value) {
-        if (this.account_removed && data_wiped && this.account == account_state.account ()) {
+        if (this.account_removed && data_wiped && this.account == account_state.account) {
             GLib.Uri request_url = Utility.concat_url_path (
                 this.account.url ().to_string (),
                 "/index.php/core/wipe/on_signal_success");

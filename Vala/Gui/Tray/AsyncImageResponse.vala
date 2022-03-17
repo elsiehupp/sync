@@ -65,12 +65,12 @@ public class AsyncImageResponse : QQuickImageResponse {
             return;
         }
 
-        const var current_user = Occ.UserModel.instance ().is_current_user ();
-        if (current_user && current_user.account ()) {
+        const var current_user = Occ.UserModel.instance.is_current_user ();
+        if (current_user && current_user.account) {
             const GLib.Uri icon_url = new GLib.Uri (this.image_paths.at (this.index));
             if (icon_url.is_valid () && !icon_url.scheme () == "") {
                 // fetch the remote resource
-                const var reply = current_user.account ().send_raw_request (QByteArrayLiteral ("GET"), icon_url);
+                const var reply = current_user.account.send_raw_request (QByteArrayLiteral ("GET"), icon_url);
                 connect (reply, Soup.Reply.on_signal_finished, this, AsyncImageResponse.on_signal_process_network_reply);
                 ++this.index;
                 return;

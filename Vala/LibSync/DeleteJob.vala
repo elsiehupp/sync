@@ -25,7 +25,7 @@ public class DeleteJob : AbstractNetworkJob {
     public string folder_token;
 
 
-    signal void signal_finished ();
+    internal signal void signal_finished ();
 
 
     /***********************************************************

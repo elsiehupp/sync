@@ -22,8 +22,8 @@ public class GetOrCreatePublicLinkShare : GLib.Object {
     private string local_file;
 
 
-    signal void signal_done (string link);
-    signal void signal_error (string message);
+    internal signal void signal_done (string link);
+    internal signal void signal_error (string message);
 
     /***********************************************************
     ***********************************************************/

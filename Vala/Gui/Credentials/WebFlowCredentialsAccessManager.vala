@@ -57,7 +57,7 @@ public class WebFlowCredentialsAccessManager : AccessManager {
     ***********************************************************/
     private static void add_settings_to_job (Account account, QKeychain.Job job) {
         //  Q_UNUSED (account)
-        var settings = ConfigFile.settings_with_group (Theme.instance ().app_name ());
+        var settings = ConfigFile.settings_with_group (Theme.instance.app_name ());
         settings.parent (job); // make the job parent to make setting deleted properly
         job.settings (settings.release ());
     }

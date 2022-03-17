@@ -38,7 +38,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     private OwncloudWizard oc_wizard;
 
 
-    signal void create_local_and_remote_folders (string value1, string value2);
+    internal signal void create_local_and_remote_folders (string value1, string value2);
 
 
     /***********************************************************
@@ -64,7 +64,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         connect (this.ui.pb_select_local_folder, QAbstractButton.clicked, this, OwncloudAdvancedSetupPage.on_signal_select_folder);
         button_text (QWizard.FinishButton, _("Connect"));
 
-        if (Theme.instance ().enforce_virtual_files_sync_folder ()) {
+        if (Theme.instance.enforce_virtual_files_sync_folder ()) {
             this.ui.r_sync_everything.disabled (true);
             this.ui.r_selective_sync.disabled (true);
             this.ui.b_selective_sync.disabled (true);
@@ -101,7 +101,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
             OwncloudAdvancedSetupPage.on_signal_selective_sync_clicked
         );
 
-        const var theme = Theme.instance ();
+        const var theme = Theme.instance;
         const var app_icon = theme.application_icon ();
         const var app_icon_size = Theme.is_hidpi () ? 128 : 64;
 
@@ -140,7 +140,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     public void initialize_page () {
         WizardCommon.init_error_label (this.ui.error_label);
 
-        if (!Theme.instance ().show_virtual_files_option () || best_available_vfs_mode () == Vfs.Off) {
+        if (!Theme.instance.show_virtual_files_option () || best_available_vfs_mode () == Vfs.Off) {
             // If the layout were wrapped in a widget, the var-grouping of the
             // radio buttons no longer works and there are surprising margins.
             // Just manually hide the button and remove the layout.
@@ -153,7 +153,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         this.ui.l_sync_everything_size_label.clear ();
 
         // Update the local folder - this is not guaranteed to find a good one
-        string good_local_folder = FolderMan.instance ().find_good_path_for_new_sync_folder (local_folder (), server_url ());
+        string good_local_folder = FolderMan.instance.find_good_path_for_new_sync_folder (local_folder (), server_url ());
         wizard ().property ("local_folder", good_local_folder);
 
         // call to on_signal_init label
@@ -162,7 +162,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         // ensure "next" gets the focus, not ob_select_local_folder
         QTimer.single_shot (0, wizard ().button (QWizard.FinishButton), Gtk.Widget.focus);
 
-        var acc = static_cast<OwncloudWizard> (wizard ()).account ();
+        var acc = static_cast<OwncloudWizard> (wizard ()).account;
         var quota_job = new PropfindJob (acc, this.remote_folder, this);
         quota_job.properties (new GLib.List<string> ("http://owncloud.org/ns:size"));
 
@@ -174,7 +174,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         );
         quota_job.on_signal_start ();
 
-        if (Theme.instance ().wizard_selective_sync_default_nothing ()) {
+        if (Theme.instance.wizard_selective_sync_default_nothing ()) {
             this.selective_sync_blocklist = {
                 "/"
             };
@@ -347,7 +347,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void on_signal_selective_sync_clicked () {
-        unowned Account acc = ((OwncloudWizard) wizard ()).account ();
+        unowned Account acc = ((OwncloudWizard) wizard ()).account;
         var dialog = new SelectiveSyncDialog (acc, this.remote_folder, this.selective_sync_blocklist, this);
         dialog.attribute (Qt.WA_DeleteOnClose);
 
@@ -459,7 +459,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         this.ui.top_label.hide ();
         this.ui.bottom_label.hide ();
 
-        Theme theme = Theme.instance ();
+        Theme theme = Theme.instance;
         GLib.Variant variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_TOP);
         if (!variant.is_null ()) {
             WizardCommon.set_up_custom_media (variant, this.ui.top_label);
@@ -483,7 +483,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         const string loc_folder = local_folder ();
 
         // check if the local folder exists. If so, and if its not empty, show a warning.
-        string error_str = FolderMan.instance ().check_path_validity_for_new_folder (loc_folder, server_url ());
+        string error_str = FolderMan.instance.check_path_validity_for_new_folder (loc_folder, server_url ());
         this.local_folder_valid = error_str == "";
 
         string t;
@@ -496,7 +496,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
             } else {
                 t = Utility.escape (_(" (%1 folder \"%2\" is synced to local folder \"%3\")")
                                         .printf (
-                                            Theme.instance ().app_name (),
+                                            Theme.instance.app_name (),
                                             this.remote_folder,
                                             QDir.to_native_separators (loc_folder)
                                         )
@@ -646,7 +646,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     ***********************************************************/
     private void style_local_folder_label () {
         const var background_color = palette ().window ().color ();
-        const var folder_icon_filename = Theme.instance ().is_branded () ? Theme.hidpi_filename ("folder.png", background_color)
+        const var folder_icon_filename = Theme.instance.is_branded () ? Theme.hidpi_filename ("folder.png", background_color)
                                                                        : Theme.hidpi_filename (":/client/theme/colored/folder.png");
         this.ui.l_local.pixmap (folder_icon_filename);
     }
@@ -681,10 +681,10 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     ***********************************************************/
     private void fetch_user_avatar () {
         // Reset user avatar
-        const var app_icon = Theme.instance ().application_icon ();
+        const var app_icon = Theme.instance.application_icon ();
         this.ui.l_server_icon.pixmap (app_icon.pixmap (48));
         // Fetch user avatar
-        const var account = this.oc_wizard.account ();
+        const var account = this.oc_wizard.account;
         var avatar_size = 64;
         if (Theme.is_hidpi ()) {
             avatar_size *= 2;
@@ -715,7 +715,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void user_information () {
-        const var account = this.oc_wizard.account ();
+        const var account = this.oc_wizard.account;
         const var server_url = account.url ().to_string ();
         server_address_label_url (server_url);
         const var user_name = account.dav_display_name ();

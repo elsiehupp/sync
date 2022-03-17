@@ -25,7 +25,7 @@ abstract class AbstractCredentials : GLib.Object {
 
     //  ENFORCE (!this.account, "should only set account once");
     ***********************************************************/
-    Account account { protected get; public set; }
+    public Account account { protected get; public set; }
 
     /***********************************************************
     Whether fetch_from_keychain () was called before.
@@ -38,7 +38,7 @@ abstract class AbstractCredentials : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    string user { public get; protected set; }
+    public string user { public get; protected set; }
 
     /***********************************************************
     Emitted when fetch_from_keychain () is done.

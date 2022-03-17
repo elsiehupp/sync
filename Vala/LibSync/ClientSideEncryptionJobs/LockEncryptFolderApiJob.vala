@@ -13,8 +13,8 @@ public class LockEncryptFolderApiJob : AbstractNetworkJob {
     ***********************************************************/
     private string file_identifier;
 
-    signal void success (string file_identifier, string token);
-    signal void error (string file_identifier, int httpd_error_code);
+    internal signal void success (string file_identifier, string token);
+    internal signal void error (string file_identifier, int httpd_error_code);
 
     /***********************************************************
     ***********************************************************/
@@ -30,7 +30,7 @@ public class LockEncryptFolderApiJob : AbstractNetworkJob {
         request.raw_header ("OCS-APIREQUEST", "true");
         QUrlQuery query;
         query.add_query_item ("format", "json");
-        GLib.Uri url = Utility.concat_url_path (account ().url (), path ());
+        GLib.Uri url = Utility.concat_url_path (account.url (), path ());
         url.query (query);
 
         GLib.info ("Locking the folder with identifier " + this.file_identifier.to_string () + " as encrypted.");

@@ -28,10 +28,10 @@ public class LsColJob : AbstractNetworkJob {
     public GLib.List<string> properties;
 
 
-    signal void directory_listing_subfolders (string[] items);
-    signal void directory_listing_iterated (string name, GLib.HashTable<string, string> properties);
-    signal void finished_with_error (GLib.InputStream reply);
-    signal void finished_without_error ();
+    internal signal void directory_listing_subfolders (string[] items);
+    internal signal void directory_listing_iterated (string name, GLib.HashTable<string, string> properties);
+    internal signal void finished_with_error (GLib.InputStream reply);
+    internal signal void finished_without_error ();
 
 
     /***********************************************************

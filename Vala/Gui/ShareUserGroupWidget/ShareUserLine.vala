@@ -37,8 +37,8 @@ public class ShareUserLine : Gtk.Widget {
     private QAction expiration_date_link_action;
     private QAction password_protect_link_action;
 
-    signal void visual_deletion_done ();
-    signal void resize_requested ();
+    internal signal void visual_deletion_done ();
+    internal signal void resize_requested ();
 
     /***********************************************************
     ***********************************************************/
@@ -89,19 +89,19 @@ public class ShareUserLine : Gtk.Widget {
             ShareUserLine.expire_date
         );
         connect (
-            this.share.data (),
+            this.share,
             UserGroupShare.signal_note_set,
             this,
             ShareUserLine.disable_progess_indicator_animation
         );
         connect (
-            this.share.data (),
+            this.share,
             UserGroupShare.signal_note_error,
             this,
             ShareUserLine.disable_progess_indicator_animation
         );
         connect (
-            this.share.data (),
+            this.share,
             UserGroupShare.signal_expire_date_set,
             this,
             ShareUserLine.disable_progess_indicator_animation
@@ -167,7 +167,7 @@ public class ShareUserLine : Gtk.Widget {
                 this,
                 ShareUserLine.toggle_expire_date_options
             );
-            const var expire_date = this.share.expire_date ().is_valid () ? share.data ().expire_date () : QDate ();
+            const var expire_date = this.share.expire_date ().is_valid () ? share.expire_date () : QDate ();
             if (!expire_date.is_null ()) {
                 this.expiration_date_link_action.checked (true);
                 show_expire_date_options (true, expire_date);
@@ -245,13 +245,13 @@ public class ShareUserLine : Gtk.Widget {
             on_signal_refresh_password_line_edit_placeholder ();
 
             connect (
-                this.share.data (),
+                this.share,
                 Share.signal_password_set,
                 this,
                 ShareUserLine.on_signal_password_set
             );
             connect (
-                this.share.data (),
+                this.share,
                 Share.signal_password_error,
                 this,
                 ShareUserLine.on_signal_password_error
@@ -276,25 +276,25 @@ public class ShareUserLine : Gtk.Widget {
         https://github.com/owncloud/client/issues/4996
             */
         if (share.share_type () == Share.Type.REMOTE
-            && share.account ().server_version_int () < Account.make_server_version (9, 1, 0)) {
+            && share.account.server_version_int () < Account.make_server_version (9, 1, 0)) {
             this.permission_reshare.visible (false);
             this.ui.permission_tool_button.visible (false);
         }
 
         connect (
-            share.data (),
+            share,
             Share.signal_permissions_set,
             this,
             ShareUserLine.on_signal_permissions_set
         );
         connect (
-            share.data (),
+            share,
             Share.signal_share_deleted,
             this,
             ShareUserLine.on_signal_share_deleted
         );
 
-        if (!share.account ().capabilities ().share_resharing ()) {
+        if (!share.account.capabilities ().share_resharing ()) {
             this.permission_reshare.visible (false);
         }
 
@@ -666,7 +666,7 @@ public class ShareUserLine : Gtk.Widget {
         Currently only regular users can have avatars.
         ***********************************************************/
         if (this.share.share_with ().type () == Sharee.Type.USER) {
-            var job = new AvatarJob (this.share.account (), this.share.share_with ().share_with (), avatar_size, this);
+            var job = new AvatarJob (this.share.account, this.share.share_with ().share_with (), avatar_size, this);
             connect (job, AvatarJob.avatar_pixmap, this, ShareUserLine.on_signal_avatar_loaded);
             job.on_signal_start ();
         }
@@ -906,9 +906,9 @@ public class ShareUserLine : Gtk.Widget {
     private Gtk.Color background_color_for_sharee_type (Sharee.Type type) {
         switch (type) {
         case Sharee.Type.ROOM:
-            return Theme.instance ().wizard_header_background_color ();
+            return Theme.instance.wizard_header_background_color ();
         case Sharee.Type.EMAIL:
-            return Theme.instance ().wizard_header_title_color ();
+            return Theme.instance.wizard_header_title_color ();
         case Sharee.Type.GROUP:
         case Sharee.Type.FEDERATED:
         case Sharee.Type.CIRCLE:

@@ -29,7 +29,7 @@ public class SocketUploadJob : GLib.Object {
     ***********************************************************/
     public SocketUploadJob (unowned SocketApiJobV2 job) {
         this.api_job = job;
-        connect (job.data (), SocketApiJobV2.on_signal_finished, this, SocketUploadJob.delete_later);
+        connect (job, SocketApiJobV2.on_signal_finished, this, SocketUploadJob.delete_later);
 
         this.local_path = this.api_job.arguments ()[QLatin1String ("local_path")].to_string ();
         this.remote_path = this.api_job.arguments ()[QLatin1String ("remote_path")].to_string ();
@@ -40,7 +40,7 @@ public class SocketUploadJob : GLib.Object {
         this.pattern = job.arguments ()[QLatin1String ("pattern")].to_string ();
         // TODO: use uuid
         const var accname = job.arguments ()[QLatin1String ("account")][QLatin1String ("name")].to_string ();
-        var account = AccountManager.instance ().account (accname);
+        var account = AccountManager.instance.account (accname);
 
         if (!GLib.FileInfo (this.local_path).is_absolute ()) {
             job.failure ("Local path must be a an absolute path");
@@ -52,7 +52,7 @@ public class SocketUploadJob : GLib.Object {
         }
 
         this.database = new SyncJournalDb (this.tmp.filename (), this);
-        this.engine = new SyncEngine (account.account (), this.local_path.ends_with ('/') ? this.local_path : this.local_path + '/', this.remote_path, this.database);
+        this.engine = new SyncEngine (account.account, this.local_path.ends_with ('/') ? this.local_path : this.local_path + '/', this.remote_path, this.database);
         this.engine.parent (this.database);
 
         connect (
@@ -123,7 +123,7 @@ public class SocketUploadJob : GLib.Object {
         this.engine.sync_options (opt);
 
         // create the directory, fail if it already exists
-        var mkcol_job = new Occ.MkColJob (this.engine.account (), this.remote_path);
+        var mkcol_job = new Occ.MkColJob (this.engine.account, this.remote_path);
         connect (
             mkcol_job,
             Occ.MkColJob.finished_without_error,

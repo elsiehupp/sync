@@ -26,7 +26,7 @@ public class ImageProvider : QQuickImageProvider {
         }
 
         const int uid = identifier.to_int ();
-        return UserModel.instance ().avatar_by_identifier (uid);
+        return UserModel.instance.avatar_by_identifier (uid);
     }
 
 

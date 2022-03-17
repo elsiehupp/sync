@@ -144,10 +144,10 @@ public class OwncloudPropagator : GLib.Object {
     private static int64 max_blocklist_time;
 
 
-    signal void signal_new_item (SyncFileItem item);
-    signal void signal_item_completed (SyncFileItem item);
-    signal void signal_progress (SyncFileItem item, int64 bytes);
-    signal void signal_finished (bool success);
+    internal signal void signal_new_item (SyncFileItem item);
+    internal signal void signal_item_completed (SyncFileItem item);
+    internal signal void signal_progress (SyncFileItem item, int64 bytes);
+    internal signal void signal_finished (bool success);
 
 
     /***********************************************************
@@ -156,10 +156,10 @@ public class OwncloudPropagator : GLib.Object {
     Used to track our own file modifications such that notifications
     from the file watcher about these can be ignored.
     ***********************************************************/
-    signal void signal_touched_file (string filename);
+    internal signal void signal_touched_file (string filename);
 
-    signal void signal_insufficient_local_storage ();
-    signal void signal_insufficient_remote_storage ();
+    internal signal void signal_insufficient_local_storage ();
+    internal signal void signal_insufficient_remote_storage ();
 
     /***********************************************************
     ***********************************************************/
@@ -218,7 +218,7 @@ public class OwncloudPropagator : GLib.Object {
         reset_delayed_upload_tasks ();
         this.root_job.reset (new PropagateRootDirectory (this));
         GLib.List<QPair<string /* directory name */, PropagateDirectory /* job */>> directories; // should be a LIFO stack
-        directories.push (q_make_pair ("", this.root_job.data ()));
+        directories.push (q_make_pair ("", this.root_job));
         GLib.List<PropagatorJob> directories_to_remove;
         string removed_directory;
         string maybe_conflict_directory;
@@ -293,7 +293,7 @@ public class OwncloudPropagator : GLib.Object {
             this.root_job.dir_deletion_jobs.append_job (it);
         }
 
-        connect (this.root_job.data (), PropagatorJob.on_signal_finished, this, OwncloudPropagator.on_signal_emit_finished);
+        connect (this.root_job, PropagatorJob.on_signal_finished, this, OwncloudPropagator.on_signal_emit_finished);
 
         this.job_scheduled = false;
         schedule_next_job ();
@@ -581,10 +581,10 @@ public class OwncloudPropagator : GLib.Object {
         }
         if (this.root_job) {
             // Connect to signal_abort_finished  which signals that abort has been asynchronously on_signal_finished
-            connect (this.root_job.data (), PropagateDirectory.signal_abort_finished, this, OwncloudPropagator.on_signal_emit_finished);
+            connect (this.root_job, PropagateDirectory.signal_abort_finished, this, OwncloudPropagator.on_signal_emit_finished);
 
             // Use Queued Connection because we're possibly already in an item's on_signal_finished stack
-            QMetaObject.invoke_method (this.root_job.data (), "abort", Qt.QueuedConnection,
+            QMetaObject.invoke_method (this.root_job, "abort", Qt.QueuedConnection,
                                       Q_ARG (PropagatorJob.AbortType, PropagatorJob.AbortType.ASYNCHRONOUS));
 
             // Give asynchronous abort 5000 msec to finish on its own
@@ -601,8 +601,8 @@ public class OwncloudPropagator : GLib.Object {
     //  private unowned Account account;
     /***********************************************************
     ***********************************************************/
-    public unowned Account account ();
-    unowned Account OwncloudPropagator.account () {
+    public unowned Account account;
+    unowned Account OwncloudPropagator.account {
         return this.account;
     }
 
@@ -652,8 +652,8 @@ public class OwncloudPropagator : GLib.Object {
             return false;
         }
         string conflict_user_name;
-        if (account ().capabilities ().upload_conflict_files ())
-            conflict_user_name = account ().display_name;
+        if (account.capabilities ().upload_conflict_files ())
+            conflict_user_name = account.display_name;
         string conflict_filename = Utility.make_conflict_filename (
             item.file, Utility.q_date_time_from_time_t (conflict_mod_time), conflict_user_name);
         string conflict_file_path = full_local_path (conflict_filename);
@@ -686,7 +686,7 @@ public class OwncloudPropagator : GLib.Object {
         this.journal.conflict_record (conflict_record);
 
         // Create a new upload job if the new conflict file should be uploaded
-        if (account ().capabilities ().upload_conflict_files ()) {
+        if (account.capabilities ().upload_conflict_files ()) {
             if (composite && !GLib.File.new_for_path (conflict_file_path).query_info ().get_file_type () == FileType.DIRECTORY) {
                 SyncFileItem conflict_item = new SyncFileItem ();
                 conflict_item.file = conflict_filename;
@@ -726,7 +726,7 @@ public class OwncloudPropagator : GLib.Object {
     ***********************************************************/
     public Result<Vfs.ConvertToPlaceholderResult, string> update_metadata (SyncFileItem item);
     Result<Vfs.ConvertToPlaceholderResult, string> OwncloudPropagator.update_metadata (SyncFileItem item) {
-        return OwncloudPropagator.static_update_metadata (item, this.local_dir, sync_options.vfs.data (), this.journal);
+        return OwncloudPropagator.static_update_metadata (item, this.local_dir, sync_options.vfs, this.journal);
     }
 
 
@@ -761,7 +761,7 @@ public class OwncloudPropagator : GLib.Object {
     Q_REQUIRED_RESULT
     ***********************************************************/
     public bool is_delayed_upload_item (SyncFileItem item) {
-        return account ().capabilities ().bulk_upload () && !this.schedule_delayed_tasks && !item.is_encrypted && this.sync_options.min_chunk_size > item.size && !is_in_bulk_upload_block_list (item.file);
+        return account.capabilities ().bulk_upload () && !this.schedule_delayed_tasks && !item.is_encrypted && this.sync_options.min_chunk_size > item.size && !is_in_bulk_upload_block_list (item.file);
     }
 
 
@@ -807,7 +807,7 @@ public class OwncloudPropagator : GLib.Object {
     ***********************************************************/
     private void on_signal_abort_timeout () {
         // Abort synchronously and finish
-        this.root_job.data ().abort (PropagatorJob.AbortType.SYNCHRONOUS);
+        this.root_job.abort (PropagatorJob.AbortType.SYNCHRONOUS);
         on_signal_emit_finished (SyncFileItem.Status.NORMAL_ERROR);
     }
 
@@ -863,7 +863,7 @@ public class OwncloudPropagator : GLib.Object {
     private PropagateUploadFileCommon create_upload_job (SyncFileItem item, bool delete_existing) {
         var job = new PropagateUploadFileCommon ();
 
-        if (item.size > sync_options.initial_chunk_size && account ().capabilities ().chunking_ng ()) {
+        if (item.size > sync_options.initial_chunk_size && account.capabilities ().chunking_ng ()) {
             // Item is above this.initial_chunk_size, thus will be classified as to be chunked
             job = std.make_unique<PropagateUploadFileNG> (this, item);
         } else {

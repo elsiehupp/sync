@@ -106,10 +106,10 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
     ***********************************************************/
     private AccountState account_state = null;
 
-    signal void signal_current_fetch_more_in_progress_provider_id_changed ();
-    signal void signal_is_search_in_progress_changed ();
-    signal void signal_error_string_changed ();
-    signal void signal_search_term_changed ();
+    internal signal void signal_current_fetch_more_in_progress_provider_id_changed ();
+    internal signal void signal_is_search_in_progress_changed ();
+    internal signal void signal_error_string_changed ();
+    internal signal void signal_search_term_changed ();
 
     /***********************************************************
     ***********************************************************/
@@ -185,13 +185,13 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
             url_query.query_item_value ("scrollto", GLib.Uri.Component_formatting_option.Fully_decoded);
 
         if (provider_id.contains ("file", Qt.CaseInsensitive) && !directory == "" && !filename == "") {
-            if (!this.account_state || !this.account_state.account ()) {
+            if (!this.account_state || !this.account_state.account) {
                 return;
             }
 
             const string relative_path = directory + '/' + filename;
             const var local_files =
-                FolderMan.instance ().find_file_in_local_folders (GLib.FileInfo (relative_path).path (), this.account_state.account ());
+                FolderMan.instance.find_file_in_local_folders (GLib.FileInfo (relative_path).path (), this.account_state.account);
 
             if (!local_files == "") {
                 GLib.info ("Opening file: " + local_files.const_first ());
@@ -224,11 +224,11 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     private void start_search () {
-        //  Q_ASSERT (this.account_state && this.account_state.account ());
+        //  Q_ASSERT (this.account_state && this.account_state.account);
 
         disconnect_and_clear_search_jobs ();
 
-        if (!this.account_state || !this.account_state.account ()) {
+        if (!this.account_state || !this.account_state.account) {
             return;
         }
 
@@ -247,13 +247,13 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     private void start_search_for_provider (string provider_id, int32 cursor) {
-        //  Q_ASSERT (this.account_state && this.account_state.account ());
+        //  Q_ASSERT (this.account_state && this.account_state.account);
 
-        if (!this.account_state || !this.account_state.account ()) {
+        if (!this.account_state || !this.account_state.account) {
             return;
         }
 
-        var job = new JsonApiJob (this.account_state.account (),
+        var job = new JsonApiJob (this.account_state.account,
             QLatin1String ("ocs/v2.php/search/providers/%1/search").printf (provider_id));
 
         QUrlQuery parameters;
@@ -331,7 +331,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
             result.subline = entry_map.value (QStringLiteral ("subline")).to_string ();
 
             const var resource_url = entry_map.value (QStringLiteral ("resource_url")).to_string ();
-            const var account_url = (this.account_state && this.account_state.account ()) ? this.account_state.account ().url () : GLib.Uri ();
+            const var account_url = (this.account_state && this.account_state.account) ? this.account_state.account.url () : GLib.Uri ();
 
             result.resource_url = make_resource_url (resource_url, account_url);
             result.icons = icons_from_thumbnail_and_fallback_icon (entry_map.value (QStringLiteral ("thumbnail_url")).to_string (),
@@ -548,13 +548,13 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
         disconnect (this.unified_search_text_editing_finished_timer, QTimer.timeout, this,
             &UnifiedSearchResultsListModel.on_signal_search_term_editing_finished);
 
-        if (!this.account_state || !this.account_state.account ()) {
+        if (!this.account_state || !this.account_state.account) {
             GLib.critical () + string ("Account state is invalid. Could not on_signal_start search!");
             return;
         }
 
         if (this.providers == "") {
-            var job = new JsonApiJob (this.account_state.account (), QLatin1String ("ocs/v2.php/search/providers"));
+            var job = new JsonApiJob (this.account_state.account, QLatin1String ("ocs/v2.php/search/providers"));
             connect (job, JsonApiJob.json_received, this, UnifiedSearchResultsListModel.on_signal_fetch_providers_finished);
             job.on_signal_start ();
         } else {
@@ -609,7 +609,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     private void on_signal_search_for_provider_finished (QJsonDocument json, int status_code) {
-        //  Q_ASSERT (this.account_state && this.account_state.account ());
+        //  Q_ASSERT (this.account_state && this.account_state.account);
 
         const var job = qobject_cast<JsonApiJob> (sender ());
 

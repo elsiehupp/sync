@@ -7,7 +7,7 @@ public class StubFolderMan : Occ.AccountManager {
 
     //  const QMetaObject static_meta_object = GLib.Object.static_meta_object;
 
-    Occ.AccountManager instance () {
+    Occ.AccountManager instance {
         return (AccountManager) dummy ();
     }
 
@@ -32,7 +32,7 @@ public class StubFolderMan : Occ.AccountManager {
 
     // From StubRemoteWipe ???
     //
-    //  Occ.FolderMan *Occ.FolderMan.instance () { return static_cast<FolderMan> (new GLib.Object); }
+    //  Occ.FolderMan *Occ.FolderMan.instance { return static_cast<FolderMan> (new GLib.Object); }
     //  void Occ.FolderMan.wipe_done (Occ.AccountState*, bool) { }
     //  Occ.Folder* Occ.FolderMan.add_folder (Occ.AccountState*, Occ.FolderDefinition const &) { return null; }
     //  void Occ.FolderMan.slot_wipe_folder_for_account (Occ.AccountState*) { }

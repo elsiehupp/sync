@@ -31,7 +31,7 @@ public class NotificationConfirmJob : AbstractNetworkJob {
 
     @param reply the reply
     ***********************************************************/
-    signal void signal_job_finished (string reply, int reply_code);
+    internal signal void signal_job_finished (string reply, int reply_code);
 
     /***********************************************************
     ***********************************************************/

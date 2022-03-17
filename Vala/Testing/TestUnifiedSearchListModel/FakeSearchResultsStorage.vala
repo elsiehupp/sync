@@ -55,7 +55,7 @@ public class FakeSearchResultsStorage {
 
     /***********************************************************
     ***********************************************************/
-    public static FakeSearchResultsStorage instance () {
+    public static FakeSearchResultsStorage instance {
         if (!this.instance) {
             this.instance = new FakeSearchResultsStorage ();
             this.instance.on_signal_init ();

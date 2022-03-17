@@ -21,7 +21,7 @@ public class OwncloudDolphinPlugin : KOverlayIconPlugin {
     /***********************************************************
     ***********************************************************/
     public OwncloudDolphinPlugin () {
-        var helper = OwncloudDolphinPluginHelper.instance ();
+        var helper = OwncloudDolphinPluginHelper.instance;
         GLib.Object.connect (helper, &OwncloudDolphinPluginHelper.signal_command_received,
                          this, &OwncloudDolphinPlugin.slotCommandRecieved);
     }
@@ -30,7 +30,7 @@ public class OwncloudDolphinPlugin : KOverlayIconPlugin {
     /***********************************************************
     ***********************************************************/
     public override string[] getOverlays (GLib.Uri url) {
-        var helper = OwncloudDolphinPluginHelper.instance ();
+        var helper = OwncloudDolphinPluginHelper.instance;
         if (!helper.is_connected ()) {
             return { };
         }

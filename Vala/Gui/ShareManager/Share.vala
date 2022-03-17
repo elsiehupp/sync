@@ -71,11 +71,11 @@ public class Share : GLib.Object {
         }
     }
 
-    signal void signal_permissions_set ();
-    signal void signal_share_deleted ();
-    signal void signal_server_error (int code, string message);
-    signal void signal_password_set ();
-    signal void signal_password_error (int status_code, string message);
+    internal signal void signal_permissions_set ();
+    internal signal void signal_share_deleted ();
+    internal signal void signal_server_error (int code, string message);
+    internal signal void signal_password_set ();
+    internal signal void signal_password_error (int status_code, string message);
 
 
     /***********************************************************

@@ -20,8 +20,8 @@ public class ValidateChecksumHeader : ComputeChecksumBase {
     private string expected_checksum;
 
 
-    signal void signal_validated (string checksum_type, string checksum);
-    signal void signal_validation_failed (string error_message);
+    internal signal void signal_validated (string checksum_type, string checksum);
+    internal signal void signal_validation_failed (string error_message);
 
 
     /***********************************************************
@@ -95,11 +95,8 @@ public class ValidateChecksumHeader : ComputeChecksumBase {
 
         var calculator = new ComputeChecksum (this);
         calculator.checksum_type (this.expected_checksum_type);
-        connect (
-            calculator,
-            ComputeChecksum.done,
-            this,
-            ValidateChecksumHeader.on_signal_checksum_calculated
+        calculator.done.connect (
+            this.on_signal_checksum_calculated
         );
         return calculator;
     }

@@ -61,7 +61,7 @@ public class GeneralSettings : Gtk.Widget {
 
             list.append (file_info_to_zip_entry (GLib.FileInfo (config.config_file ())));
 
-            const var logger = Occ.Logger.instance ();
+            const var logger = Occ.Logger.instance;
 
             if (!logger.log_dir () == "") {
                 list.append ({"", "logs"});
@@ -75,7 +75,7 @@ public class GeneralSettings : Gtk.Widget {
                 list.append (file_info_to_zip_entry (GLib.FileInfo (logger.log_file ())));
             }
 
-            const var folders = Occ.FolderMan.instance ().map ().values ();
+            const var folders = Occ.FolderMan.instance.map ().values ();
             std.transform (std.cbegin (folders), std.cend (folders),
                         std.back_inserter (list),
                         sync_folder_to_zip_entry);
@@ -101,7 +101,7 @@ public class GeneralSettings : Gtk.Widget {
 
             zip.add_file ("__nextcloud_client_parameters.txt", QCoreApplication.arguments ().join (' ').to_utf8 ());
 
-            const var build_info = string (Occ.Theme.instance ().about () + "\n\n" + Occ.Theme.instance ().about_details ());
+            const var build_info = string (Occ.Theme.instance.about () + "\n\n" + Occ.Theme.instance.about_details ());
             zip.add_file ("__nextcloud_client_buildinfo.txt", build_info.to_utf8 ());
         }
     }
@@ -127,12 +127,12 @@ public class GeneralSettings : Gtk.Widget {
 
         // Rename 'Explorer' appropriately on non-Windows
 
-        if (Utility.has_system_launch_on_signal_startup (Theme.instance ().app_name ())) {
+        if (Utility.has_system_launch_on_signal_startup (Theme.instance.app_name ())) {
             this.ui.autostart_check_box.checked (true);
             this.ui.autostart_check_box.disabled (true);
             this.ui.autostart_check_box.tool_tip (_("You cannot disable autostart because system-wide autostart is enabled."));
         } else {
-            const bool has_auto_start = Utility.has_launch_on_signal_startup (Theme.instance ().app_name ());
+            const bool has_auto_start = Utility.has_launch_on_signal_startup (Theme.instance.app_name ());
             // make sure the binary location is correctly set
             on_signal_toggle_launch_on_signal_startup (has_auto_start);
             this.ui.autostart_check_box.checked (has_auto_start);
@@ -140,7 +140,7 @@ public class GeneralSettings : Gtk.Widget {
         }
 
         // setup about section
-        string about = Theme.instance ().about ();
+        string about = Theme.instance.about ();
         this.ui.about_label.text_interaction_flags (Qt.Text_selectable_by_mouse | Qt.TextBrowserInteraction);
         this.ui.about_label.on_signal_text (about);
         this.ui.about_label.open_external_links (true);
@@ -203,7 +203,7 @@ public class GeneralSettings : Gtk.Widget {
         // OEM themes are not obliged to ship mono icons, so there
         // is no point in offering an option
         this.ui.mono_icons_check_box.visible (
-            Theme.instance ().mono_icons_available ()
+            Theme.instance.mono_icons_available ()
         );
 
         connect (
@@ -212,19 +212,13 @@ public class GeneralSettings : Gtk.Widget {
             this,
             GeneralSettings.on_signal_ignore_files_editor
         );
-        connect (
-            this.ui.debug_archive_button,
-            QAbstractButton.clicked,
-            this,
-            GeneralSettings.on_signal_create_debug_archive
+        this.ui.debug_archive_button.clicked.connect (
+            this.on_signal_create_debug_archive
         );
 
-        // on_signal_account_added means the wizard was on_signal_finished and the wizard might change some options.
-        connect (
-            AccountManager.instance (),
-            AccountManager.on_signal_account_added,
-            this,
-            GeneralSettings.on_signal_load_misc_settings
+        // signal_account_added means the wizard was finished and the wizard might change some options.
+        AccountManager.instance.signal_account_added.connect (
+            this.on_signal_load_misc_settings
         );
 
         customize_style ();
@@ -264,7 +258,7 @@ public class GeneralSettings : Gtk.Widget {
         ConfigFile config_file;
         bool is_checked = this.ui.mono_icons_check_box.is_checked ();
         config_file.mono_icons (is_checked);
-        Theme.instance ().systray_use_mono_icons (is_checked);
+        Theme.instance.systray_use_mono_icons (is_checked);
         config_file.crash_reporter (this.ui.crashreporter_check_box.is_checked ());
 
         config_file.new_big_folder_size_limit (this.ui.new_folder_limit_check_box.is_checked (),
@@ -276,7 +270,7 @@ public class GeneralSettings : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_toggle_launch_on_signal_startup (bool enable) {
-        Theme theme = Theme.instance ();
+        Theme theme = Theme.instance;
         Utility.launch_on_signal_startup (theme.app_name (), theme.app_name_gui (), enable);
     }
 
@@ -295,7 +289,7 @@ public class GeneralSettings : Gtk.Widget {
         ConfigFile config_file;
         config_file.show_in_explorer_navigation_pane (checked);
         // Now update the registry with the change.
-        FolderMan.instance ().navigation_pane_helper ().show_in_explorer_navigation_pane (checked);
+        FolderMan.instance.navigation_pane_helper ().show_in_explorer_navigation_pane (checked);
     }
 
 
@@ -356,14 +350,14 @@ public class GeneralSettings : Gtk.Widget {
     #if defined (BUILD_UPDATER)
     ***********************************************************/
     private void on_signal_update_info () {
-        if (ConfigFile ().skip_update_check () || !Updater.instance ()) {
+        if (ConfigFile ().skip_update_check () || !Updater.instance) {
             // updater disabled on compile
             this.ui.updates_group_box.visible (false);
             return;
         }
 
         // Note: the sparkle-updater is not an OCUpdater
-        var ocupdater = qobject_cast<OCUpdater> (Updater.instance ());
+        var ocupdater = qobject_cast<OCUpdater> (Updater.instance);
         if (ocupdater) {
             connect (
                 ocupdater,
@@ -493,7 +487,7 @@ public class GeneralSettings : Gtk.Widget {
         message_box.delete_later ();
         if (message_box.clicked_button () == accept_button) {
             ConfigFile ().update_channel (channel);
-            var updater = (OCUpdater) Updater.instance ();
+            var updater = (OCUpdater) Updater.instance;
             if (updater) {
                 updater.update_url (Updater.update_url ());
                 updater.check_for_update ();
@@ -508,7 +502,7 @@ public class GeneralSettings : Gtk.Widget {
     #if defined (BUILD_UPDATER)
     ***********************************************************/
     private void on_signal_update_check_now () {
-        var updater = qobject_cast<OCUpdater> (Updater.instance ());
+        var updater = qobject_cast<OCUpdater> (Updater.instance);
         if (ConfigFile ().skip_update_check ()) {
             updater = null; // don't show update info if updates are disabled
         }
@@ -535,7 +529,7 @@ public class GeneralSettings : Gtk.Widget {
     ***********************************************************/
     private void customize_style () {
         // setup about section
-        string about = Theme.instance ().about ();
+        string about = Theme.instance.about ();
         Theme.replace_link_color_string_background_aware (about);
         this.ui.about_label.on_signal_text (about);
 

@@ -68,9 +68,9 @@ public class DiscoverySingleDirectoryJob : GLib.Object {
     /***********************************************************
     This is not actually a network job, it is just a job
     ***********************************************************/
-    signal void first_directory_permissions (RemotePermissions);
-    signal void etag (string , GLib.DateTime time);
-    signal void finished (HttpResult<GLib.List<RemoteInfo>> result);
+    internal signal void first_directory_permissions (RemotePermissions);
+    internal signal void etag (string , GLib.DateTime time);
+    internal signal void finished (HttpResult<GLib.List<RemoteInfo>> result);
 
 
     /***********************************************************

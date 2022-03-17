@@ -32,17 +32,11 @@ public class GlobalWheelFilter : GLib.Object {
         }
         m_handlers_for_item.insert (item, handler);
 
-        connect (
-            item,
-            GLib.Object.destroyed,
-            this,
+        item.destroyed.connect (
             this.on_signal_item_destroyed
         );
 
-        connect (
-            handler,
-            GLib.Object.destroyed,
-            this,
+        handler.destroyed.connect (
             this.on_signal_handler_destroyed
         );
     }

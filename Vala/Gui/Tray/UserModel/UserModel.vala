@@ -99,8 +99,8 @@ public class UserModel : QAbstractListModel {
     private bool init = true;
 
 
-    signal void signal_add_account ();
-    signal void signal_new_user_selected ();
+    internal signal void signal_add_account ();
+    internal signal void signal_new_user_selected ();
 
 
     /***********************************************************
@@ -108,11 +108,11 @@ public class UserModel : QAbstractListModel {
     private UserModel (GLib.Object parent = new GLib.Object ()) {
         base (parent);
         // TODO: Remember selected user from last quit via settings file
-        if (AccountManager.instance ().accounts ().size () > 0) {
+        if (AccountManager.instance.accounts ().size () > 0) {
             build_user_list ();
         }
 
-        connect (AccountManager.instance (), AccountManager.on_signal_account_added,
+        connect (AccountManager.instance, AccountManager.signal_account_added,
             this, UserModel.build_user_list);
     }
 
@@ -212,7 +212,7 @@ public class UserModel : QAbstractListModel {
         int identifier = 0;
         foreach (var user in this.users) {
             identifer++;
-            if (user.account ().identifier () == account.account ().identifier ()) {
+            if (user.account.identifier () == account.account.identifier ()) {
                 break;
             }
         }
@@ -238,7 +238,7 @@ public class UserModel : QAbstractListModel {
     public void add_user (unowned AccountState user, bool is_current) {
         bool contains_user = false;
         foreach (var u in this.users) {
-            if (u.account () == user.account ()) {
+            if (u.account == user.account) {
                 contains_user = true;
                 continue;
             }
@@ -479,7 +479,7 @@ public class UserModel : QAbstractListModel {
             return null;
         }
 
-        return this.users[identifier].account ().user_status_connector ();
+        return this.users[identifier].account.user_status_connector ();
     }
 
 
@@ -506,8 +506,8 @@ public class UserModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     private void build_user_list () {
-        for (int i = 0; i < AccountManager.instance ().accounts ().size (); i++) {
-            var user = AccountManager.instance ().accounts ().at (i);
+        for (int i = 0; i < AccountManager.instance.accounts ().size (); i++) {
+            var user = AccountManager.instance.accounts ().at (i);
             add_user (user);
         }
         if (this.init) {

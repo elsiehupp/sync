@@ -51,11 +51,11 @@ public class HttpServer : QTcpServer {
                     + GLib.DateTime.current_date_time_utc ().to_string ("\n");
                 socket.close ();
 
-                QtServiceBase.instance ().log_message ("Wrote to client");
+                QtServiceBase.instance.log_message ("Wrote to client");
 
                 if (socket.state () == QTcpSocket.UnconnectedState) {
                     delete socket;
-                    QtServiceBase.instance ().log_message ("Connection closed");
+                    QtServiceBase.instance.log_message ("Connection closed");
                 }
             }
         }
@@ -66,7 +66,7 @@ public class HttpServer : QTcpServer {
         QTcpSocket socket = (QTcpSocket) sender ();
         socket.delete_later ();
 
-        QtServiceBase.instance ().log_message ("Connection closed");
+        QtServiceBase.instance.log_message ("Connection closed");
     }
 
 }

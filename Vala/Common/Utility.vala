@@ -370,7 +370,7 @@ public class Utility {
     public static int64 free_disk_space (string path) {
         struct StatVfs64;
         StatVfs64 stat;
-        if (statvfs64 (path.to_local8Bit ().data (), stat) == 0) {
+        if (statvfs64 (path.to_local8Bit (), stat) == 0) {
             return (int64)stat.f_bavail * stat.f_frsize;
         }
         return -1;

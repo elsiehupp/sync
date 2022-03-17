@@ -27,10 +27,10 @@ public class WebFlowCredentialsDialog : Gtk.Dialog {
     private HeaderBanner header_banner;
 
 
-    signal void signal_url_catched (string user, string pass, string host);
-    signal void signal_style_changed ();
-    signal void signal_activate ();
-    signal void signal_close ();
+    internal signal void signal_url_catched (string user, string pass, string host);
+    internal signal void signal_style_changed ();
+    internal signal void signal_activate ();
+    internal signal void signal_close ();
 
     /***********************************************************
     ***********************************************************/

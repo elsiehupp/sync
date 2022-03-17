@@ -38,7 +38,7 @@ class XAttrWrapper : GLib.Object {
         const int BUFFER_SIZE = 256;
         string result;
         result.resize (BUFFER_SIZE);
-        var count = getxattr (path.const_data (), name.const_data (), result.data (), BUFFER_SIZE);
+        var count = getxattr (path.const_data (), name.const_data (), result, BUFFER_SIZE);
         if (count >= 0) {
             result.resize (static_cast<int> (count) - 1);
             return result;

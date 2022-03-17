@@ -76,7 +76,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
         ASKING_CREDENTIALS
     }
 
-    unowned Account account { public get; private set; }
+    public unowned Account account { public get; private set; }
     State state {
         public get {
             return this.state;
@@ -103,12 +103,12 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
                     on_signal_check_connectivity ();
                 }
                 if (old_state == State.CONNECTED || this.state == State.CONNECTED) {
-                    /* emit */ is_connected_changed ();
+                    /* emit */ signal_is_connected_changed ();
                 }
             }
     
             // might not have changed but the underlying this.connection_errors might have
-            /* emit */ state_changed (this.state);
+            /* emit */ signal_state_changed (this.state);
         }
     }
 
@@ -193,17 +193,17 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     }
 
 
-    signal void state_changed (State state);
-    signal void is_connected_changed ();
-    signal void has_fetched_navigation_apps ();
-    signal void signal_status_changed ();
-    signal void signal_desktop_notifications_allowed_changed ();
+    internal signal void signal_state_changed (State state);
+    internal signal void signal_is_connected_changed ();
+    internal signal void signal_has_fetched_navigation_apps ();
+    internal signal void signal_status_changed ();
+    internal signal void signal_desktop_notifications_allowed_changed ();
 
 
     /***********************************************************
     Use the account as parent
     ***********************************************************/
-    public AccountState (unowned Account account) {
+    public AccountState (Account account) {
         base ();
         this.account = account;
         this.state = AccountState.State.DISCONNECTED;
@@ -214,27 +214,16 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
         this.are_desktop_notifications_allowed = true;
         q_register_meta_type<AccountState> ("AccountState*");
 
-        connect (
-            account.data (),
-            Account.invalid_credentials,
-            this,
-            AccountState.on_signal_handle_remote_wipe_check
+        account.signal_invalid_credentials.connect (
+            this.on_signal_handle_remote_wipe_check
         );
-        connect (
-            account.data (),
-            Account.credentials_fetched,
-            this,
-            AccountState.on_signal_credentials_fetched
+        account.signal_credentials_fetched.connect (
+            this.on_signal_credentials_fetched
         );
-        connect (
-            account.data (),
-            Account.credentials_asked,
-            this,
-            AccountState.on_signal_credentials_asked
+        account.signal_credentials_asked.connect (
+            this.on_signal_credentials_asked
         );
-        connect (
-            this,
-            AccountState.is_connected_changed,
+        this.signal_is_connected_changed.connect (
             this.on_signal_is_connected_changed
         );
     }
@@ -326,8 +315,8 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     for the account and forgets the password.
     ***********************************************************/
     public void sign_out_by_ui () {
-        account ().credentials ().forget_sensitive_data ();
-        account ().clear_cookie_jar ();
+        account.credentials ().forget_sensitive_data ();
+        account.clear_cookie_jar ();
         state (State.SIGNED_OUT);
     }
 
@@ -408,14 +397,14 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
         this.waiting_for_new_credentials = true;
         state (State.ASKING_CREDENTIALS);
 
-        if (account ().credentials ().ready ()) {
-            account ().credentials ().invalidate_token ();
+        if (account.credentials ().ready ()) {
+            account.credentials ().invalidate_token ();
         }
-        var creds = qobject_cast<HttpCredentials> (account ().credentials ());
+        var creds = qobject_cast<HttpCredentials> (account.credentials ());
         if (creds && creds.refresh_access_token ()) {
             return;
         }
-        account ().credentials ().ask_from_user ();
+        account.credentials ().ask_from_user ();
     }
 
 
@@ -431,15 +420,15 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
         }
 
         if (this.connection_validator) {
-            GLib.warning ("ConnectionValidator already running, ignoring " + account ().display_name ());
+            GLib.warning ("ConnectionValidator already running, ignoring " + account.display_name ());
             return;
         }
 
         // If we never fetched credentials, do that now - otherwise connection attempts
         // make little sense, we might be missing client certificates.
-        if (!account ().credentials ().was_fetched ()) {
+        if (!account.credentials ().was_fetched ()) {
             this.waiting_for_new_credentials = true;
-            account ().credentials ().fetch_from_keychain ();
+            account.credentials ().fetch_from_keychain ();
             return;
         }
 
@@ -449,16 +438,13 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
         const var elapsed = this.time_of_last_e_tag_check.secs_to (GLib.DateTime.current_date_time_utc ());
         if (is_connected () && this.time_of_last_e_tag_check.is_valid ()
             && elapsed <= polltime.count ()) {
-            GLib.debug (account ().display_name () + "The last ETag check succeeded within the last " + polltime.count () + "s (" + elapsed + "s). No connection check needed!");
+            GLib.debug (account.display_name () + "The last ETag check succeeded within the last " + polltime.count () + "s (" + elapsed + "s). No connection check needed!");
             return;
         }
 
         this.connection_validator = new ConnectionValidator (new AccountState (this));
-        connect (
-            this.connection_validator,
-            ConnectionValidator.signal_connection_result,
-            this,
-            AccountState.on_signal_connection_validator_result
+        this.connection_validator.signal_connection_result.connect (
+            this.on_signal_connection_validator_result
         );
 
         if (is_connected ()) {
@@ -475,11 +461,11 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
             // and #2973.
             // As an attempted workaround, reset the QNAM regularly if the account is
             // disconnected.
-            account ().reset_network_access_manager ();
+            account.reset_network_access_manager ();
 
             // If we don't reset the ssl config a second CheckServerJob can produce a
             // ssl config that does not have a sensible certificate chain.
-            account ().ssl_configuration (QSslConfiguration ());
+            account.ssl_configuration (QSslConfiguration ());
             //#endif
             this.connection_validator.on_signal_check_server_and_auth ();
         }
@@ -491,12 +477,18 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     /***********************************************************
     ***********************************************************/
     private void fetch_navigation_apps () {
-        var job = new OcsNavigationAppsJob (this.account);
-        job.add_raw_header ("If-None-Match", navigation_apps_etag_response_header ());
-        connect (job, OcsNavigationAppsJob.signal_apps_job_finished, this, AccountState.on_signal_navigation_apps_fetched);
-        connect (job, OcsNavigationAppsJob.etag_response_header_received, this, AccountState.on_signal_etag_response_header_received);
-        connect (job, OcsNavigationAppsJob.ocs_error, this, AccountState.on_signal_ocs_error);
-        job.navigation_apps ();
+        var ocs_navigation_apps_job = new OcsNavigationAppsJob (this.account);
+        ocs_navigation_apps_job.add_raw_header ("If-None-Match", navigation_apps_etag_response_header ());
+        ocs_navigation_apps_job.signal_apps_job_finished.connect (
+            this.on_signal_navigation_apps_fetched
+        );
+        ocs_navigation_apps_job.etag_response_header_received.connect (
+            this.on_signal_etag_response_header_received
+        );
+        ocs_navigation_apps_job.ocs_error.connect (
+            this.on_signal_ocs_error
+        );
+        ocs_navigation_apps_job.navigation_apps ();
     }
 
 
@@ -542,7 +534,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
                 fetch_navigation_apps ();
 
                 // Setup push notifications after a successful connection
-                account ().try_setup_push_notifications ();
+                account.try_setup_push_notifications ();
             }
             break;
         case ConnectionValidator.Status.UNDEFINED:
@@ -659,7 +651,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
                     }
                 }
 
-                /* emit */ has_fetched_navigation_apps ();
+                /* emit */ signal_has_fetched_navigation_apps ();
             }
         }
     }

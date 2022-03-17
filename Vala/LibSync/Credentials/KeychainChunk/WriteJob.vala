@@ -14,7 +14,7 @@ splits too large keychain entry's data into chunks on Windows
 ***********************************************************/
 public class WriteJob : KeychainChunk.Job {
 
-    signal void signal_finished (KeychainChunk.WriteJob incoming_job);
+    internal signal void signal_finished (KeychainChunk.WriteJob incoming_job);
 
     /***********************************************************
     WriteJob

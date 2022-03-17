@@ -107,7 +107,7 @@ public class CheckVioExt {
     static void create_dirs (string path) {
         int rc = -1;
         var mypath = "%1/%2".printf (csync_test_dir (), path);
-        char mypath = mypath.data ();
+        char mypath = mypath;
 
         char p = mypath + csync_test_dir ().size () + 1; /* on_signal_start behind the offset */
         int i = 0;

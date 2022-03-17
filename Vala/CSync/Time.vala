@@ -101,7 +101,7 @@ int c_utimes (string uri, timeval times) {
         Get_system_time_as_file_time (&Last_modification_time);
     }
 
-    h_file=Create_file_w (wuri.data (), FILE_WRITE_ATTRIBUTES, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE,
+    h_file=Create_file_w (wuri, FILE_WRITE_ATTRIBUTES, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE,
                       NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL+FILE_FLAG_BACKUP_SEMANTICS, NULL);
     if (h_file==INVALID_HANDLE_VALUE) {
         switch (Get_last_error ()) {

@@ -14,7 +14,7 @@ namespace LibSync {
 ***********************************************************/
 public class EntityExistsJob : AbstractNetworkJob {
 
-    signal void exists (GLib.InputStream reply);
+    internal signal void exists (GLib.InputStream reply);
 
     /***********************************************************
     ***********************************************************/

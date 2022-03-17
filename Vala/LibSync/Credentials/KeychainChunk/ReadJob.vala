@@ -19,7 +19,7 @@ public class ReadJob : KeychainChunk.Job {
     ***********************************************************/
     private bool retry_on_signal_key_chain_error = true;
 
-    signal void signal_finished (KeychainChunk.ReadJob incoming_job);
+    internal signal void signal_finished (KeychainChunk.ReadJob incoming_job);
 
     /***********************************************************
     ***********************************************************/

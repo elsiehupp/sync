@@ -114,7 +114,7 @@ public class KMessageWidget : Gdk.Frame {
     @see Gtk.Label.link_activated ()
     @since 4.10
     ***********************************************************/
-    signal void link_activated (string contents);
+    internal signal void link_activated (string contents);
 
     /***********************************************************
     This signal is emitted when the user hovers over a link in the text label.
@@ -123,7 +123,7 @@ public class KMessageWidget : Gdk.Frame {
     @see Gtk.Label.link_hovered ()
     @since 4.11
     ***********************************************************/
-    signal void link_hovered (string contents);
+    internal signal void link_hovered (string contents);
 
     /***********************************************************
     This signal is emitted when the hide animation is on_finished, started by
@@ -137,7 +137,7 @@ public class KMessageWidget : Gdk.Frame {
     @see on_signal_animated_hide ()
     @since 5.0
     ***********************************************************/
-    signal void hide_animation_finished ();
+    internal signal void hide_animation_finished ();
 
     /***********************************************************
     This signal is emitted when the show animation is on_finished, started by
@@ -151,7 +151,7 @@ public class KMessageWidget : Gdk.Frame {
     @see on_signal_animated_show ()
     @since 5.0
     ***********************************************************/
-    signal void show_animation_finished ();
+    internal signal void show_animation_finished ();
 
 
     /***********************************************************

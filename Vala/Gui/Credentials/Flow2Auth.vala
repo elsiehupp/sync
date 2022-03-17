@@ -71,14 +71,14 @@ public class Flow2Auth : GLib.Object {
     The state has changed.
     when logged in, app_password has the value of the app password.
     ***********************************************************/
-    signal void signal_result (
+    internal signal void signal_result (
         Flow2Auth.Result result, string error_string = "",
         string user = "", string app_password = "");
 
 
     /***********************************************************
     ***********************************************************/
-    signal void signal_status_changed (PollStatus status, int seconds_left);
+    internal signal void signal_status_changed (PollStatus status, int seconds_left);
 
 
     /***********************************************************

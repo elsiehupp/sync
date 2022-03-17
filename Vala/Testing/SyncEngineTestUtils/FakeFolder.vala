@@ -39,8 +39,8 @@ public class FakeFolder : GLib.Object {
         this.local_modifier = this.temporary_directory.path ();
         // Needs to be done once
         Occ.SyncEngine.minimum_file_age_for_upload = std.chrono.milliseconds (0);
-        Occ.Logger.instance ().set_log_file ("-");
-        Occ.Logger.instance ().add_log_rule ({ "sync.httplogger=true" });
+        Occ.Logger.instance.set_log_file ("-");
+        Occ.Logger.instance.add_log_rule ({ "sync.httplogger=true" });
     
         QDir root_directory = new QDir (this.temporary_directory.path ());
         GLib.debug ("FakeFolder operating on " + root_directory);
@@ -102,7 +102,7 @@ public class FakeFolder : GLib.Object {
         var opts = this.sync_engine.sync_options ();
 
         opts.vfs.stop ();
-        GLib.Object.disconnect (this.sync_engine.get (), null, opts.vfs.data (), null);
+        GLib.Object.disconnect (this.sync_engine.get (), null, opts.vfs, null);
 
         opts.vfs = vfs;
         this.sync_engine.set_sync_options (opts);
@@ -117,7 +117,7 @@ public class FakeFolder : GLib.Object {
         connect (
             this.sync_engine.get (),
             GLib.Object.destroyed,
-            vfs.data (),
+            vfs,
             FakeFolder.on_signal_sync_engine_destroyed
         );
 
@@ -133,7 +133,7 @@ public class FakeFolder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public Occ.Account account () {
+    public Occ.Account account {
         return this.account;
     }
 

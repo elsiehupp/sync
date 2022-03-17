@@ -13,7 +13,7 @@ namespace KeychainChunk {
 ***********************************************************/
 public class DeleteJob : KeychainChunk.Job {
 
-    signal void signal_finished (KeychainChunk.DeleteJob incoming_job);
+    internal signal void signal_finished (KeychainChunk.DeleteJob incoming_job);
 
     /***********************************************************
     ***********************************************************/

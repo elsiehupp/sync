@@ -56,11 +56,10 @@ public class AccountManager : GLib.Object {
     ***********************************************************/
     private GLib.List<string> additional_blocked_account_ids;
 
-
-    signal void on_signal_account_added (AccountState account);
-    signal void on_signal_account_removed (AccountState account);
-    signal void account_sync_connection_removed (AccountState account);
-    signal void signal_remove_account_folders (AccountState account);
+    internal signal void signal_account_added (AccountState account);
+    internal signal void signal_account_removed (AccountState account);
+    internal signal void signal_account_sync_connection_removed (AccountState account);
+    internal signal void signal_remove_account_folders (AccountState account);
 
     /***********************************************************
     Uses default constructor and destructor
@@ -74,8 +73,8 @@ public class AccountManager : GLib.Object {
         var settings = ConfigFile.settings_with_group (ACCOUNTS_C);
         settings.value (VERSION_C, MAX_ACCOUNTS_VERSION);
         foreach (var acc in this.accounts) {
-            settings.begin_group (acc.account ().identifier ());
-            save_account_helper (acc.account ().data (), *settings, save_credentials);
+            settings.begin_group (acc.account.identifier ());
+            save_account_helper (acc.account, *settings, save_credentials);
             acc.write_to_settings (*settings);
             settings.end_group ();
         }
@@ -167,8 +166,8 @@ public class AccountManager : GLib.Object {
         var accounts_copy = this.accounts;
         this.accounts.clear ();
         foreach (var acc in accounts_copy) {
-            /* emit */ account_removed (acc.data ());
-            /* emit */ signal_remove_account_folders (acc.data ());
+            /* emit */ account_removed (acc);
+            /* emit */ signal_remove_account_folders (acc);
         }
     }
 
@@ -179,7 +178,7 @@ public class AccountManager : GLib.Object {
     ***********************************************************/
     public unowned AccountState account (string name) {
         foreach (Account acc in this.accounts) {
-            if (acc.account ().display_name () == name) {
+            if (acc.account.display_name () == name) {
                 return acc;
             }
         }
@@ -199,18 +198,18 @@ public class AccountManager : GLib.Object {
         this.accounts.erase (it);
 
         // Forget account credentials, cookies
-        account.account ().credentials ().forget_sensitive_data ();
-        GLib.File.remove (account.account ().cookie_jar_path ());
+        account.account.credentials ().forget_sensitive_data ();
+        GLib.File.remove (account.account.cookie_jar_path ());
 
         var settings = ConfigFile.settings_with_group (ACCOUNTS_C);
-        settings.remove (account.account ().identifier ());
+        settings.remove (account.account.identifier ());
 
         // Forget E2E keys
-        account.account ().e2e ().forget_sensitive_data (account.account ());
+        account.account.e2e ().forget_sensitive_data (account.account);
 
-        account.account ().delete_app_token ();
+        account.account.delete_app_token ();
 
-        /* emit */ account_sync_connection_removed (account);
+        /* emit */ signal_account_sync_connection_removed (account);
         /* emit */ account_removed (account);
     }
 
@@ -219,11 +218,12 @@ public class AccountManager : GLib.Object {
     Creates an account and sets up some basic handlers.
     Does not* add the account to the account manager just yet.
     ***********************************************************/
-    public static unowned Account create_account () {
-        unowned Account acc = Account.create ();
+    public static Account create_account () {
+        Account acc = Account.create ();
         acc.ssl_error_handler (new SslDialogErrorHandler ());
-        connect (acc.data (), Account.proxy_authentication_required,
-            ProxyAuthHandler.instance (), ProxyAuthHandler.on_signal_handle_proxy_authentication_required);
+        acc.signal_proxy_authentication_required.connect (
+            ProxyAuthHandler.instance.on_signal_handle_proxy_authentication_required
+        );
 
         return acc;
     }
@@ -235,11 +235,11 @@ public class AccountManager : GLib.Object {
     ***********************************************************/
     public static void backward_migration_settings_keys (string[] delete_keys, string[] ignore_keys) {
         var settings = ConfigFile.settings_with_group (ACCOUNTS_C);
-        const int accounts_version = settings.value (VERSION_C).to_int ();
+        int accounts_version = settings.value (VERSION_C).to_int ();
         if (accounts_version <= MAX_ACCOUNTS_VERSION) {
             foreach (var account_id in settings.child_groups ()) {
                 settings.begin_group (account_id);
-                const int account_version = settings.value (VERSION_C, 1).to_int ();
+                int account_version = settings.value (VERSION_C, 1).to_int ();
                 if (account_version > MAX_ACCOUNT_VERSION) {
                     ignore_keys.append (settings.group ());
                 }
@@ -326,8 +326,8 @@ public class AccountManager : GLib.Object {
             }
         }
 
-        string override_url = Theme.instance ().override_server_url ();
-        string force_auth = Theme.instance ().force_config_auth_type ();
+        string override_url = Theme.instance.override_server_url ();
+        string force_auth = Theme.instance.force_config_auth_type ();
         if (!force_auth == "" && !override_url == "") {
             // If force_auth is set, this might also mean the override_uRL has changed.
             // See enterprise issues #1126
@@ -382,10 +382,10 @@ public class AccountManager : GLib.Object {
     ***********************************************************/
     private bool restore_from_legacy_settings () {
         GLib.info ("Migrate: restore_from_legacy_settings, checking settings group "
-                  + Theme.instance ().app_name ());
+                  + Theme.instance.app_name ());
 
         // try to open the correctly themed settings
-        var settings = ConfigFile.settings_with_group (Theme.instance ().app_name ());
+        var settings = ConfigFile.settings_with_group (Theme.instance.app_name ());
 
         // if the settings file could not be opened, the child_keys list is empty
         // then try to load settings from a very old place
@@ -405,7 +405,7 @@ public class AccountManager : GLib.Object {
                 oc_settings.begin_group ("own_cloud");
 
                 // Check the theme url to see if it is the same url that the o_c config was for
-                string override_url = Theme.instance ().override_server_url ();
+                string override_url = Theme.instance.override_server_url ();
                 if (!override_url == "") {
                     if (override_url.ends_with ('/')) {
                         override_url.chop (1);
@@ -446,7 +446,7 @@ public class AccountManager : GLib.Object {
         }
 
         foreach (var account in this.accounts) {
-            if (account.account ().identifier () == identifier) {
+            if (account.account.identifier () == identifier) {
                 return true;
             }
         }
@@ -475,15 +475,13 @@ public class AccountManager : GLib.Object {
     signal_account_added ()
     ***********************************************************/
     private void add_account_state (AccountState account_state) {
-        connect (
-            account_state.account ().data (),
-            &Account.wants_account_saved,
-            this, AccountManager.on_signal_save_account
+        account_state.account.signal_wants_account_saved.connect (
+            this.on_signal_save_account
         );
 
-        unowned AccountState ptr = new AccountState (account_state);
+        AccountState ptr = new AccountState (account_state);
         this.accounts += ptr;
-        /* emit */ account_added (account_state);
+        /* emit */ signal_account_added (account_state);
     }
 
 
@@ -506,9 +504,9 @@ public class AccountManager : GLib.Object {
     Saves account state data, not including the account
     ***********************************************************/
     public void on_signal_save_account_state (AccountState a) {
-        GLib.debug ("Saving account state " + a.account ().url ().to_string ());
+        GLib.debug ("Saving account state " + a.account.url ().to_string ());
         var settings = ConfigFile.settings_with_group (ACCOUNTS_C);
-        settings.begin_group (a.account ().identifier ());
+        settings.begin_group (a.account.identifier ());
         a.write_to_settings (*settings);
         settings.end_group ();
 

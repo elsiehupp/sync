@@ -155,9 +155,9 @@ public class NetworkSettings : Gtk.Widget {
 
         // ...and set the folders dirty, they refresh their proxy next time they
         // on_signal_start the sync.
-        FolderMan.instance ().dirty_proxy ();
+        FolderMan.instance.dirty_proxy ();
 
-        const var accounts = AccountManager.instance ().accounts ();
+        const var accounts = AccountManager.instance.accounts ();
         foreach (var account in accounts) {
             account.fresh_connection_attempt ();
         }
@@ -186,7 +186,7 @@ public class NetworkSettings : Gtk.Widget {
         }
         config_file.upload_limit (this.ui.upload_spin_box.value ());
 
-        FolderMan.instance ().dirty_network_limits ();
+        FolderMan.instance.dirty_network_limits ();
     }
 
 
@@ -209,8 +209,8 @@ public class NetworkSettings : Gtk.Widget {
         if (this.ui.manual_proxy_radio_button.is_checked ()) {
             // Check if at least one account is using localhost, because Qt proxy settings have no
             // effect for localhost (#7169)
-            foreach (var account in AccountManager.instance ().accounts ()) {
-                const var host = account.account ().url ().host ();
+            foreach (var account in AccountManager.instance.accounts ()) {
+                const var host = account.account.url ().host ();
                 // Some typical url for localhost
                 if (host == "localhost" || host.starts_with ("127.") || host == "[.1]") {
                     visible = true;
@@ -240,7 +240,7 @@ public class NetworkSettings : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void load_proxy_settings () {
-        if (Theme.instance ().force_system_network_proxy ()) {
+        if (Theme.instance.force_system_network_proxy ()) {
             this.ui.system_proxy_radio_button.checked (true);
             this.ui.proxy_group_box.enabled (false);
             return;

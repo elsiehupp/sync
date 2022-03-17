@@ -22,7 +22,7 @@ public class OcsShareeJob : OcsJob {
 
     @param reply The reply
     ***********************************************************/
-    signal void signal_sharee_job_finished (QJsonDocument reply);
+    internal signal void signal_sharee_job_finished (QJsonDocument reply);
 
     /***********************************************************
     ***********************************************************/

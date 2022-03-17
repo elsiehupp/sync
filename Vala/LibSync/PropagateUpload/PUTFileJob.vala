@@ -33,8 +33,8 @@ public class PUTFileJob : AbstractNetworkJob {
     public int chunk;
 
 
-    signal void signal_finished ();
-    signal void signal_upload_progress (int64 value1, int64 value2);
+    internal signal void signal_finished ();
+    internal signal void signal_upload_progress (int64 value1, int64 value2);
 
 
     /***********************************************************
@@ -89,7 +89,7 @@ public class PUTFileJob : AbstractNetworkJob {
         }
 
         connect (reply (), Soup.Reply.signal_upload_progress, this, PUTFileJob.signal_upload_progress);
-        connect (this, AbstractNetworkJob.signal_network_activity, account ().data (), Account.signal_propagator_network_activity);
+        connect (this, AbstractNetworkJob.signal_network_activity, account, Account.signal_propagator_network_activity);
         this.request_timer.start ();
         AbstractNetworkJob.start ();
     }

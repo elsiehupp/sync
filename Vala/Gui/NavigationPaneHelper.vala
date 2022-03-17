@@ -88,8 +88,8 @@ public class NavigationPaneHelper : GLib.Object {
 
                     string title = folder.short_gui_remote_path_or_app_name ();
                     // Write the account name in the sidebar only when using more than one account.
-                    if (AccountManager.instance ().accounts ().size () > 1) {
-                        title = title % " - " % folder.account_state ().account ().display_name ();
+                    if (AccountManager.instance.accounts ().size () > 1) {
+                        title = title % " - " % folder.account_state ().account.display_name ();
                     }
                     string icon_path = QDir.to_native_separators (Gtk.Application.application_file_path ());
                     string target_folder_path = QDir.to_native_separators (folder.clean_path ());

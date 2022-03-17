@@ -24,7 +24,7 @@ public class MoveJob : AbstractNetworkJob {
 
     GLib.HashTable<string, string> extra_headers;
 
-    signal void signal_finished ();
+    internal signal void signal_finished ();
 
     /***********************************************************
     ***********************************************************/

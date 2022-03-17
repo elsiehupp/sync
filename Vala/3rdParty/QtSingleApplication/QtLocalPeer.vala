@@ -33,7 +33,7 @@ public class QtLocalPeer : GLib.Object {
     protected string socket_name;
     protected QLocalServer server;
 
-    signal void signal_message_received (string message, GLib.Object socket);
+    internal signal void signal_message_received (string message, GLib.Object socket);
 
     /***********************************************************
     ***********************************************************/
@@ -141,7 +141,7 @@ public class QtLocalPeer : GLib.Object {
         ds >> remaining;
         u_msg.resize (remaining);
         int got = 0;
-        char* u_msg_buf = u_msg.data ();
+        char* u_msg_buf = u_msg;
         //GLib.debug () << "RCV : remaining" << remaining;
         do {
             got = ds.read_raw_data (u_msg_buf, remaining);

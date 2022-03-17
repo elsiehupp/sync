@@ -68,9 +68,9 @@ public class OAuthTestCase : GLib.Object {
             OAuthTestCase.open_browser_hook
         );
 
-        oauth.on_signal_reset (new OAuth (account.data (), null));
+        oauth.on_signal_reset (new OAuth (account, null));
         connect (
-            oauth.data (),
+            oauth,
             OAuth.result,
             this,
             OAuthTestCase.oauth_result
@@ -96,7 +96,7 @@ public class OAuthTestCase : GLib.Object {
         GLib.assert_true (url.to_string ().starts_with (s_oauth_test_server.to_string ()));
         QUrlQuery query = new QUrlQuery (url);
         GLib.assert_true (query.query_item_value ("response_type") == "code");
-        GLib.assert_true (query.query_item_value ("client_id") == Theme.instance ().oauth_client_id ());
+        GLib.assert_true (query.query_item_value ("client_id") == Theme.instance.oauth_client_id ());
         GLib.Uri redirect_uri = new GLib.Uri (query.query_item_value ("redirect_uri"));
         GLib.assert_true (redirect_uri.host () == "localhost");
         redirect_uri.set_query ("code=" + code);
@@ -120,7 +120,7 @@ public class OAuthTestCase : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public virtual void browser_reply_finished () {
-        GLib.assert_true (sender () == browser_reply.data ());
+        GLib.assert_true (sender () == browser_reply);
         GLib.assert_true (state == TokenAsked);
         browser_reply.delete_later ();
         GLib.assert_true (browser_reply.raw_header ("Location") == "owncloud://on_signal_success");

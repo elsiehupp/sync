@@ -131,14 +131,14 @@ public class ConnectionValidator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    signal void signal_connection_result (ConnectionValidator.Status status, string[] errors);
+    internal signal void signal_connection_result (ConnectionValidator.Status status, string[] errors);
 
     /***********************************************************
     ***********************************************************/
     public ConnectionValidator (unowned AccountState account_state, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.account_state = account_state;
-        this.account = account_state.account ();
+        this.account = account_state.account;
         this.is_checking_server_and_auth = false;
     }
 
@@ -246,7 +246,7 @@ public class ConnectionValidator : GLib.Object {
         if (this.account.url () != url) {
             GLib.info ("status.php was redirected to " + url.to_string ());
             this.account.url (url);
-            this.account.wants_account_saved (this.account.data ());
+            this.account.wants_account_saved (this.account);
         }
 
         if (!server_version == "" && !and_check_server_version (server_version)) {
@@ -413,7 +413,7 @@ public class ConnectionValidator : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void fetch_user () {
-        var user_info = new UserInfo (this.account_state.data (), true, true, this);
+        var user_info = new UserInfo (this.account_state, true, true, this);
         connect (user_info, UserInfo.fetched_last_info, this, ConnectionValidator.on_signal_user_fetched);
         user_info.active (true);
     }
@@ -446,7 +446,7 @@ public class ConnectionValidator : GLib.Object {
         var job = (AbstractNetworkJob) sender ();
         if (job) {
             if (job.reply ()) {
-                this.account.http2Supported (
+                this.account.http2_supported (
                     job.reply ().attribute (
                         Soup.Request.HTTP2WasUsedAttribute
                     ).to_bool ()

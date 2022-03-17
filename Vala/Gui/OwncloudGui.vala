@@ -73,15 +73,15 @@ public class OwncloudGui : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    signal void signal_setup_proxy ();
+    internal signal void signal_setup_proxy ();
 
     /***********************************************************
     ***********************************************************/
-    signal void signal_server_error (int code, string message);
+    internal signal void signal_server_error (int code, string message);
 
     /***********************************************************
     ***********************************************************/
-    signal void signal_is_showing_settings_dialog ();
+    internal signal void signal_is_showing_settings_dialog ();
 
     /***********************************************************
     ***********************************************************/
@@ -92,81 +92,81 @@ public class OwncloudGui : GLib.Object {
         this.log_browser = null;
         this.bus = QDBusConnection.session_bus ();
         this.app = parent;
-        this.tray = Systray.instance ();
+        this.tray = Systray.instance;
         this.tray.tray_engine (new QQmlApplicationEngine (this));
         // for the beginning, set the offline icon until the account was verified
-        this.tray.icon (Theme.instance ().folder_offline_icon (/*systray?*/ true));
+        this.tray.icon (Theme.instance.folder_offline_icon (/*systray?*/ true));
 
         this.tray.show ();
 
         connect (
-            this.tray.data (),
+            this.tray,
             QSystemTrayIcon.activated,
             this,
             OwncloudGui.on_signal_tray_clicked
         );
         connect (
-            this.tray.data (),
+            this.tray,
             Systray.signal_open_help,
             this,
             OwncloudGui.on_signal_help
         );
         connect (
-            this.tray.data (),
+            this.tray,
             Systray.signal_open_account_wizard,
             this,
             OwncloudGui.on_signal_new_account_wizard
         );
         connect (
-            this.tray.data (),
+            this.tray,
             Systray.signal_open_main_dialog,
             this,
             OwncloudGui.on_signal_open_main_dialog
         );
         connect (
-            this.tray.data (),
+            this.tray,
             Systray.signal_open_settings,
             this,
             OwncloudGui.on_signal_show_settings
         );
         connect (
-            this.tray.data (),
+            this.tray,
             Systray.signal_shutdown,
             this,
             OwncloudGui.on_signal_shutdown
         );
         connect (
-            this.tray.data (),
+            this.tray,
             Systray.open_share_dialog,
             this,
             this.on_open_share_dialog
         );
         connect (
-            ProgressDispatcher.instance (),
+            ProgressDispatcher.instance,
             ProgressDispatcher.progress_info,
             this,
             OwncloudGui.on_signal_update_progress
         );
         connect (
-            FolderMan.instance (),
+            FolderMan.instance,
             FolderMan.signal_folder_sync_state_change,
             this,
             OwncloudGui.on_signal_sync_state_change
         );
         connect (
-            Logger.instance (),
+            Logger.instance,
             Logger.signal_gui_log,
             this,
             OwncloudGui.on_signal_show_tray_message
         );
         connect (
-            Logger.instance (),
+            Logger.instance,
             Logger.optional_gui_log,
             this,
             OwncloudGui.on_signal_show_optional_tray_message
         );
         connect (
-            Logger.instance (),
+            Logger.instance,
             Logger.gui_message,
             this,
             OwncloudGui.on_signal_show_gui_message
@@ -260,7 +260,7 @@ public class OwncloudGui : GLib.Object {
         bool all_disconnected = true;
         GLib.Vector<unowned AccountState> problem_accounts;
 
-        foreach (var account in AccountManager.instance ().accounts ()) {
+        foreach (var account in AccountManager.instance.accounts ()) {
             if (!account.is_signed_out ()) {
                 all_signed_out = false;
             }
@@ -270,14 +270,14 @@ public class OwncloudGui : GLib.Object {
                 all_disconnected = false;
             }
         }
-        foreach (Folder folder in FolderMan.instance ().map ()) {
+        foreach (Folder folder in FolderMan.instance.map ()) {
             if (!folder.sync_paused ()) {
                 all_paused = false;
             }
         }
 
         if (!problem_accounts.empty ()) {
-            this.tray.icon (Theme.instance ().folder_offline_icon (true));
+            this.tray.icon (Theme.instance.folder_offline_icon (true));
             if (all_disconnected) {
                 status_text (_("Disconnected"));
             } else {
@@ -286,7 +286,7 @@ public class OwncloudGui : GLib.Object {
             string[] messages;
             messages.append (_("Disconnected from accounts:"));
             foreach (unowned AccountState account in problem_accounts) {
-                string message = _("Account %1 : %2").printf (account.account ().display_name (), account.state_string (account.state ()));
+                string message = _("Account %1 : %2").printf (account.account.display_name (), account.state_string (account.state ()));
                 if (!account.connection_errors ().empty ()) {
                     message += "\n";
                     message += account.connection_errors ().join ("\n");
@@ -299,12 +299,12 @@ public class OwncloudGui : GLib.Object {
         }
 
         if (all_signed_out) {
-            this.tray.icon (Theme.instance ().folder_offline_icon (true));
+            this.tray.icon (Theme.instance.folder_offline_icon (true));
             this.tray.tool_tip (_("Please sign in"));
             status_text (_("Signed out"));
             return;
         } else if (all_paused) {
-            this.tray.icon (Theme.instance ().sync_state_icon (SyncResult.Status.PAUSED, true));
+            this.tray.icon (Theme.instance.sync_state_icon (SyncResult.Status.PAUSED, true));
             this.tray.tool_tip (_("Account synchronization is disabled"));
             status_text (_("Synchronization is paused"));
             return;
@@ -312,7 +312,7 @@ public class OwncloudGui : GLib.Object {
 
         // display the info of the least successful sync (eg. do not just display the result of the latest sync)
         string tray_message;
-        FolderMan folder_man = FolderMan.instance ();
+        FolderMan folder_man = FolderMan.instance;
         Folder.Map map = folder_man.map ();
 
         SyncResult.Status overall_status = SyncResult.Status.UNDEFINED;
@@ -331,7 +331,7 @@ public class OwncloudGui : GLib.Object {
             icon_status = SyncResult.Status.PROBLEM;
         }
 
-        Gtk.Icon status_icon = Theme.instance ().sync_state_icon (icon_status, true);
+        Gtk.Icon status_icon = Theme.instance.sync_state_icon (icon_status, true);
         this.tray.icon (status_icon);
 
         // create the tray blob message, check if we have an defined state
@@ -372,7 +372,7 @@ public class OwncloudGui : GLib.Object {
     private void status_text (string text) {
         //  Q_UNUSED (text)
         // Don't overwrite the status if we're currently syncing
-        if (FolderMan.instance ().is_any_sync_running ()) {
+        if (FolderMan.instance.is_any_sync_running ()) {
             return;
         }
         //this.action_status.on_signal_text (text);
@@ -400,7 +400,7 @@ public class OwncloudGui : GLib.Object {
     open the folder with the given Alias
     ***********************************************************/
     private void OwncloudGui.on_signal_folder_open_action (string alias) {
-        Folder folder = FolderMan.instance ().folder_by_alias (alias);
+        Folder folder = FolderMan.instance.folder_by_alias (alias);
         if (folder) {
             GLib.info ("opening local url " + folder.path ());
             GLib.Uri url = GLib.Uri.from_local_file (folder.path ());
@@ -466,7 +466,7 @@ public class OwncloudGui : GLib.Object {
             string time_str = QTime.current_time ().to_string ("hh:mm");
             string action_text = _("%1 (%2, %3)").printf (progress.last_completed_item.file, kind_str, time_str);
             var action = new QAction (action_text, this);
-            Folder folder = FolderMan.instance ().folder_by_alias (folder);
+            Folder folder = FolderMan.instance.folder_by_alias (folder);
             if (folder) {
                 string full_path = folder.path () + '/' + progress.last_completed_item.file;
                 if (GLib.File (full_path).exists ()) {
@@ -517,13 +517,13 @@ public class OwncloudGui : GLib.Object {
             } else if (this.share_dialogs.size () > 0) {
                 // Share dialog (s) be hidden by other apps, bring them back
                 foreach (ShareDialog share_dialog in this.share_dialogs) {
-                    //  Q_ASSERT (share_dialog.data ());
+                    //  Q_ASSERT (share_dialog);
                     raise_dialog (share_dialog);
                 }
             } else if (this.tray.is_open ()) {
                 this.tray.hide_window ();
             } else {
-                if (AccountManager.instance ().accounts () == "") {
+                if (AccountManager.instance.accounts () == "") {
                     this.on_signal_open_settings_dialog ();
                 } else {
                     this.tray.show_window ();
@@ -553,7 +553,7 @@ public class OwncloudGui : GLib.Object {
             || result.status () == SyncResult.Status.PROBLEM
             || result.status () == SyncResult.Status.SYNC_ABORT_REQUESTED
             || result.status () == SyncResult.Status.ERROR) {
-            Logger.instance ().on_signal_enter_next_log_file ();
+            Logger.instance.on_signal_enter_next_log_file ();
         }
     }
         
@@ -622,7 +622,7 @@ public class OwncloudGui : GLib.Object {
             this.settings_dialog.attribute (Qt.WA_DeleteOnClose, true);
             this.settings_dialog.show ();
         }
-        raise_dialog (this.settings_dialog.data ());
+        raise_dialog (this.settings_dialog);
     }
 
 
@@ -631,7 +631,7 @@ public class OwncloudGui : GLib.Object {
     ***********************************************************/
     public void on_signal_open_settings_dialog () {
         // if account is set up, on_signal_start the configuration wizard.
-        if (!AccountManager.instance ().accounts () == "") {
+        if (!AccountManager.instance.accounts () == "") {
             if (this.settings_dialog.is_null () || Gtk.Application.active_window () != this.settings_dialog) {
                 on_signal_show_settings ();
             } else {
@@ -663,7 +663,7 @@ public class OwncloudGui : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_help () {
-        QDesktopServices.open_url (GLib.Uri (Theme.instance ().help_url ()));
+        QDesktopServices.open_url (GLib.Uri (Theme.instance.help_url ()));
     }
 
 
@@ -703,7 +703,7 @@ public class OwncloudGui : GLib.Object {
     to the folder).
     ***********************************************************/
     private void on_signal_show_share_dialog (string share_path, string local_path, ShareDialogStartPage start_page) {
-        const var folder = FolderMan.instance ().folder_for_path (local_path);
+        const var folder = FolderMan.instance.folder_for_path (local_path);
         if (!folder) {
             GLib.warning ("Could not open share dialog for " + local_path +  "no responsible folder found.");
             return;
@@ -722,7 +722,7 @@ public class OwncloudGui : GLib.Object {
             }
         }
 
-        var max_sharing_permissions = resharing_allowed? SharePermissions (account_state.account ().capabilities ().share_default_permissions ()) : SharePermissions ({});
+        var max_sharing_permissions = resharing_allowed? SharePermissions (account_state.account.capabilities ().share_default_permissions ()) : SharePermissions ({});
 
         ShareDialog share_dialog = null;
         if (this.share_dialogs.contains (local_path) && this.share_dialogs[local_path]) {
@@ -771,10 +771,10 @@ public class OwncloudGui : GLib.Object {
     private void on_signal_login () {
         var account = (AccountState) sender ().property (PROPERTY_ACCOUNT_C);
         if (account) {
-            account.account ().reset_rejected_certificates ();
+            account.account.reset_rejected_certificates ();
             account.sign_in ();
         } else {
-            foreach (var account in AccountManager.instance ().accounts ()) {
+            foreach (var account in AccountManager.instance.accounts ()) {
                 account.sign_in ();
             }
         }
@@ -784,7 +784,7 @@ public class OwncloudGui : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_logout () {
-        var list = AccountManager.instance ().accounts ();
+        var list = AccountManager.instance.accounts ();
         var account = (AccountState) sender ().property (PROPERTY_ACCOUNT_C);
         if (account) {
             list.clear ();

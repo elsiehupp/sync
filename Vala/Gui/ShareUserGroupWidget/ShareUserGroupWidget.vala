@@ -78,8 +78,8 @@ public class ShareUserGroupWidget : Gtk.Widget {
     ***********************************************************/
     private string last_created_share_id;
 
-    signal void signal_toggle_public_link_share (bool value);
-    signal void signal_style_changed ();
+    internal signal void signal_toggle_public_link_share (bool value);
+    internal signal void signal_style_changed ();
 
     /***********************************************************
     ***********************************************************/
@@ -231,7 +231,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
             // We don't handle link shares, only Share.Type.USER or Share.Type.GROUP
             if (share.share_type () == Share.Type.LINK) {
                 if (!share.owner_uid () == "" &&
-                        share.owner_uid () != share.account ().dav_user ()) {
+                        share.owner_uid () != share.account.dav_user ()) {
                     link_owners.append (share.owner_display_name ());
                  }
                 continue;

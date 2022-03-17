@@ -135,7 +135,7 @@ public class IgnoreListTableWidget : Gtk.Widget {
         }
         ignores.close (); //close the file before reloading stuff.
 
-        FolderMan folder_man = FolderMan.instance ();
+        FolderMan folder_man = FolderMan.instance;
 
         // We need to force a remote discovery after a change of the ignore list.
         // Otherwise we would not download the files/directories that are no longer

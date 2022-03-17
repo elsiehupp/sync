@@ -53,7 +53,7 @@ public class CloudProviderManager : GLib.Object {
     ***********************************************************/
     public void register_signals () {
         connect (
-            Occ.FolderMan.instance (),
+            Occ.FolderMan.instance,
             signal_folder_list_changed,
             on_signal_folder_list_changed
         );

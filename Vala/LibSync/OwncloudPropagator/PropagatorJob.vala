@@ -74,12 +74,12 @@ public class PropagatorJob : GLib.Object {
     /***********************************************************
     Emitted when the job is fully on_signal_finished
     ***********************************************************/
-    signal void signal_finished (SyncFileItem.Status status);
+    internal signal void signal_finished (SyncFileItem.Status status);
 
     /***********************************************************
     Emitted when the abort is fully on_signal_finished
     ***********************************************************/
-    signal void signal_abort_finished (SyncFileItem.Status status = SyncFileItem.Status.NORMAL_ERROR);
+    internal signal void signal_abort_finished (SyncFileItem.Status status = SyncFileItem.Status.NORMAL_ERROR);
 
     /***********************************************************
     ***********************************************************/

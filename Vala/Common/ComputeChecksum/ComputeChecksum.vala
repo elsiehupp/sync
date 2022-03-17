@@ -171,7 +171,7 @@ public class ComputeChecksum : ComputeChecksumBase {
     }
 
 
-    signal void done (string checksum_type, string checksum);
+    internal signal void done (string checksum_type, string checksum);
 
 
     /***********************************************************
@@ -189,9 +189,9 @@ public class ComputeChecksum : ComputeChecksumBase {
     /***********************************************************
     ***********************************************************/
     private void start_impl (std.unique_ptr<QIODevice> device) {
-        connect (&this.watcher, &QFuture_watcher_base.on_signal_finished,
-            this, &ComputeChecksum.on_signal_calculation_done,
-            Qt.UniqueConnection);
+        this.watcher.signal_finished.connect (
+            this.on_signal_calculation_done
+        ); // Qt.UniqueConnection
 
         // We'd prefer to move the unique_ptr into the lambda, but that's
         // awkward with the C++ standard we're on
@@ -207,17 +207,17 @@ public class ComputeChecksum : ComputeChecksumBase {
 
     private static void on_watcher_run (QIODevice shared_device, string type) {
         if (!shared_device.open (QIODevice.ReadOnly)) {
-            var file = qobject_cast<GLib.File> (shared_device.data ());
+            var file = qobject_cast<GLib.File> (shared_device);
             if (file) {
                 GLib.warning ("Could not open file " + file.filename ()
                         + " for reading to compute a checksum " + file.error_string ());
             } else {
-                GLib.warning ("Could not open device " + shared_device.data ()
+                GLib.warning ("Could not open device " + shared_device
                         + " for reading to compute a checksum " + shared_device.error_string ());
             }
             return "";
         }
-        var result = ComputeChecksum.compute_now (shared_device.data (), type);
+        var result = ComputeChecksum.compute_now (shared_device, type);
         shared_device.close ();
         return result;
     }

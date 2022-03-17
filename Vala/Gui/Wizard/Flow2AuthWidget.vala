@@ -22,8 +22,8 @@ public class Flow2AuthWidget : Gtk.Widget {
     private QProgressIndicator progress_indicator;
     private int status_update_skip_count = 0;
 
-    signal void auth_result (Flow2Auth.Result result, string error_string, string user, string app_password);
-    signal void poll_now ();
+    internal signal void auth_result (Flow2Auth.Result result, string error_string, string user, string app_password);
+    internal signal void poll_now ();
 
     /***********************************************************
     ***********************************************************/
@@ -69,9 +69,9 @@ public class Flow2AuthWidget : Gtk.Widget {
             this.account = account;
 
             this.async_auth.reset (new Flow2Auth (this.account, this));
-            connect (this.async_auth.data (), Flow2Auth.result, this, Flow2AuthWidget.slotAuthResult, Qt.QueuedConnection);
-            connect (this.async_auth.data (), Flow2Auth.status_changed, this, Flow2AuthWidget.slotStatusChanged);
-            connect (this, Flow2AuthWidget.poll_now, this.async_auth.data (), Flow2Auth.slotPollNow);
+            connect (this.async_auth, Flow2Auth.result, this, Flow2AuthWidget.slotAuthResult, Qt.QueuedConnection);
+            connect (this.async_auth, Flow2Auth.status_changed, this, Flow2AuthWidget.slotStatusChanged);
+            connect (this, Flow2AuthWidget.poll_now, this.async_auth, Flow2Auth.slotPollNow);
             this.async_auth.start ();
         }
     }
@@ -247,7 +247,7 @@ public class Flow2AuthWidget : Gtk.Widget {
     ***********************************************************/
     private void logo () {
         const var background_color = palette ().window ().color ();
-        const var logo_icon_filename = Theme.instance ().is_branded ()
+        const var logo_icon_filename = Theme.instance.is_branded ()
             ? Theme.hidpi_filename ("external.png", background_color)
             : Theme.hidpi_filename (":/client/theme/colored/external.png");
         this.ui.logo_label.pixmap (logo_icon_filename);

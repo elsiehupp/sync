@@ -26,10 +26,10 @@ public class ShareManager : GLib.Object {
     ***********************************************************/
     private unowned Account account;
 
-    signal void signal_share_created (Share share);
-    signal void signal_link_share_created (LinkShare share);
-    signal void signal_shares_fetched (GLib.List<unowned Share> shares);
-    signal void signal_server_error (int code, string message);
+    internal signal void signal_share_created (Share share);
+    internal signal void signal_link_share_created (LinkShare share);
+    internal signal void signal_shares_fetched (GLib.List<unowned Share> shares);
+    internal signal void signal_server_error (int code, string message);
 
 
     /***********************************************************
@@ -39,7 +39,7 @@ public class ShareManager : GLib.Object {
 
     See create_link_share ().
     ***********************************************************/
-    signal void signal_link_share_requires_password (string message);
+    internal signal void signal_link_share_requires_password (string message);
 
     /***********************************************************
     ***********************************************************/
@@ -372,8 +372,8 @@ public class ShareManager : GLib.Object {
     When a share is modified, we need to tell the folders so they can adjust overlay icons
     ***********************************************************/
     private static void update_folder (unowned Account account, string path) {
-        foreach (Folder folder in FolderMan.instance ().map ()) {
-            if (folder.account_state ().account () != account) {
+        foreach (Folder folder in FolderMan.instance.map ()) {
+            if (folder.account_state ().account != account) {
                 continue;
             }
             var folder_path = folder.remote_path ();

@@ -113,7 +113,7 @@ public class TestSyncEngine : GLib.Object {
     ***********************************************************/
     private void test_dir_upload_with_delayed_algorithm () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account ().set_capabilities (
+        fake_folder.sync_engine ().account.set_capabilities (
             {
                 {
                     "dav", new QVariantMap (
@@ -720,25 +720,25 @@ public class TestSyncEngine : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         // For current servers, no characters are forbidden
-        fake_folder.sync_engine ().account ().set_server_version ("10.0.0");
+        fake_folder.sync_engine ().account.set_server_version ("10.0.0");
         fake_folder.local_modifier ().insert ("A/\\:?*\"<>|.txt");
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // For legacy servers, some characters were forbidden by the client
-        fake_folder.sync_engine ().account ().set_server_version ("8.0.0");
+        fake_folder.sync_engine ().account.set_server_version ("8.0.0");
         fake_folder.local_modifier ().insert ("B/\\:?*\"<>|.txt");
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (!fake_folder.current_remote_state ().find ("B/\\:?*\"<>|.txt"));
 
         // We can override that by setting the capability
-        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", new QVariantMap ( { "invalid_filename_regex", "" } ) } });
+        fake_folder.sync_engine ().account.set_capabilities ({ { "dav", new QVariantMap ( { "invalid_filename_regex", "" } ) } });
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // Check that new servers also accept the capability
-        fake_folder.sync_engine ().account ().set_server_version ("10.0.0");
-        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", new QVariantMap ( { "invalid_filename_regex", "my[fgh]ile" } ) } });
+        fake_folder.sync_engine ().account.set_server_version ("10.0.0");
+        fake_folder.sync_engine ().account.set_capabilities ({ { "dav", new QVariantMap ( { "invalid_filename_regex", "my[fgh]ile" } ) } });
         fake_folder.local_modifier ().insert ("C/myfile.txt");
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (!fake_folder.current_remote_state ().find ("C/myfile.txt"));
@@ -921,7 +921,7 @@ public class TestSyncEngine : GLib.Object {
     ***********************************************************/
     private void test_errors_with_bulk_upload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", new QVariantMap ( { "bulkupload", "1.0" } ) } });
+        fake_folder.sync_engine ().account.set_capabilities ({ { "dav", new QVariantMap ( { "bulkupload", "1.0" } ) } });
 
         // Disable parallel uploads
         SyncOptions sync_options;

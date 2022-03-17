@@ -19,7 +19,7 @@ public class ServerNotificationHandler : GLib.Object {
     private AccountState account_state;
 
 
-    signal void signal_new_notification_list (ActivityList list);
+    internal signal void signal_new_notification_list (ActivityList list);
 
 
     /***********************************************************
@@ -35,27 +35,27 @@ public class ServerNotificationHandler : GLib.Object {
     ***********************************************************/
     public void on_signal_fetch_notifications () {
         // check connectivity and credentials
-        if (! (this.account_state && this.account_state.is_connected () && this.account_state.account () && this.account_state.account ().credentials () && this.account_state.account ().credentials ().ready ())) {
+        if (! (this.account_state && this.account_state.is_connected () && this.account_state.account && this.account_state.account.credentials () && this.account_state.account.credentials ().ready ())) {
             delete_later ();
             return;
         }
         // check if the account has notifications enabled. If the capabilities are
         // not yet valid, its assumed that notifications are available.
-        if (this.account_state.account ().capabilities ().is_valid ()) {
-            if (!this.account_state.account ().capabilities ().notifications_available ()) {
-                GLib.info ("Account" + this.account_state.account ().display_name () + "does not have notifications enabled.");
+        if (this.account_state.account.capabilities ().is_valid ()) {
+            if (!this.account_state.account.capabilities ().notifications_available ()) {
+                GLib.info ("Account" + this.account_state.account.display_name () + "does not have notifications enabled.");
                 delete_later ();
                 return;
             }
         }
 
         // if the previous notification job has on_signal_finished, on_signal_start next.
-        this.notification_job = new JsonApiJob (this.account_state.account (), NOTIFICATIONS_PATH, this);
-        connect (this.notification_job.data (), JsonApiJob.json_received,
+        this.notification_job = new JsonApiJob (this.account_state.account, NOTIFICATIONS_PATH, this);
+        connect (this.notification_job, JsonApiJob.json_received,
             this, ServerNotificationHandler.on_signal_notifications_received);
-        connect (this.notification_job.data (), JsonApiJob.etag_response_header_received,
+        connect (this.notification_job, JsonApiJob.etag_response_header_received,
             this, ServerNotificationHandler.on_signal_etag_response_header_received);
-        connect (this.notification_job.data (), JsonApiJob.allow_desktop_notifications_changed,
+        connect (this.notification_job, JsonApiJob.allow_desktop_notifications_changed,
                 this, ServerNotificationHandler.on_signal_allow_desktop_notifications_changed);
         this.notification_job.property (PROPERTY_ACCOUNT_STATE, GLib.Variant.from_value<AccountState> (this.account_state));
         this.notification_job.add_raw_header ("If-None-Match", this.account_state.notifications_etag_response_header ());
@@ -88,7 +88,7 @@ public class ServerNotificationHandler : GLib.Object {
             Activity a;
             var json = element.to_object ();
             a.type = Activity.Type.NOTIFICATION;
-            a.acc_name = ai.account ().display_name ();
+            a.acc_name = ai.account.display_name ();
             a.id = json.value ("notification_id").to_int ();
 
             // Need to know, specially for remote_share
@@ -102,11 +102,11 @@ public class ServerNotificationHandler : GLib.Object {
             GLib.Uri link = new GLib.Uri (json.value ("link").to_string ());
             if (!link == "") {
                 if (link.host () == "") {
-                    link.scheme (ai.account ().url ().scheme ());
-                    link.host (ai.account ().url ().host ());
+                    link.scheme (ai.account.url ().scheme ());
+                    link.host (ai.account.url ().host ());
                 }
                 if (link.port () == -1) {
-                    link.port (ai.account ().url ().port ());
+                    link.port (ai.account.url ().port ());
                 }
             }
             a.link = link;
@@ -128,7 +128,7 @@ public class ServerNotificationHandler : GLib.Object {
             // https://github.com/owncloud/notifications/blob/master/docs/ocs-endpoint-v1.md#deleting-a-notification-for-a-user
             ActivityLink activity_link;
             activity_link.label = _("Dismiss");
-            activity_link.link = Utility.concat_url_path (ai.account ().url (), NOTIFICATIONS_PATH + "/" + string.number (a.id)).to_string ();
+            activity_link.link = Utility.concat_url_path (ai.account.url (), NOTIFICATIONS_PATH + "/" + string.number (a.id)).to_string ();
             activity_link.verb = "DELETE";
             activity_link.primary = false;
             a.links.append (activity_link);

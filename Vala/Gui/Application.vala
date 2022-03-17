@@ -158,16 +158,16 @@ public class Application : Gtk.Application {
     private QScopedPointer<FolderMan> folder_manager;
 
 
-    signal void signal_folder_removed ();
-    signal void signal_folder_state_changed (Folder folder);
-    signal void signal_is_showing_settings_dialog ();
+    internal signal void signal_folder_removed ();
+    internal signal void signal_folder_state_changed (Folder folder);
+    internal signal void signal_is_showing_settings_dialog ();
 
     /***********************************************************
     ***********************************************************/
     public Application (int argc, char **argv) {
-        base (Theme.instance ().app_name (), argc, argv);
+        base (Theme.instance.app_name (), argc, argv);
         this.gui = null;
-        this.theme = Theme.instance ();
+        this.theme = Theme.instance;
         this.help_only = false;
         this.version_only = false;
         this.show_log_window = false;
@@ -270,7 +270,7 @@ public class Application : Gtk.Application {
             AbstractNetworkJob.http_timeout = config.timeout ();
 
         // Check vfs plugins
-        if (Theme.instance ().show_virtual_files_option () && best_available_vfs_mode () == Vfs.Off) {
+        if (Theme.instance.show_virtual_files_option () && best_available_vfs_mode () == Vfs.Off) {
             GLib.warning ("Theme wants to show vfs mode, but no vfs plugins are available.");
         }
         if (is_vfs_plugin_available (Vfs.WindowsCfApi))
@@ -280,14 +280,16 @@ public class Application : Gtk.Application {
 
         this.folder_manager.on_signal_reset (new FolderMan ());
 
-        connect (this, SharedTools.SingleApplication.signal_message_received, this, Application.on_signal_parse_message);
+        this.signal_message_received.connect (
+            this.on_signal_parse_message
+        );
 
-        if (!AccountManager.instance ().restore ()) {
+        if (!AccountManager.instance.restore ()) {
             // If there is an error reading the account settings, try again
             // after a couple of seconds, if that fails, give up.
             // (non-existence is not an error)
             Utility.sleep (5);
-            if (!AccountManager.instance ().restore ()) {
+            if (!AccountManager.instance.restore ()) {
                 GLib.critical ("Could not read the account settings; quitting.");
                 QMessageBox.critical (
                     null,
@@ -295,18 +297,20 @@ public class Application : Gtk.Application {
                     _("There was an error while accessing the configuration "
                     + "file at %1. Please make sure the file can be accessed by your user.")
                         .printf (ConfigFile ().config_file ()),
-                    _("Quit %1").printf (Theme.instance ().app_name_gui ()));
+                    _("Quit %1").printf (Theme.instance.app_name_gui ()));
                 QTimer.single_shot (0, Gtk.Application, SLOT (quit ()));
                 return;
             }
         }
 
-        FolderMan.instance ().sync_enabled (true);
+        FolderMan.instance.sync_enabled (true);
 
         quit_on_signal_last_window_closed (false);
 
         this.theme.systray_use_mono_icons (config.mono_icons ());
-        connect (this.theme, Theme.systray_use_mono_icons_changed, this, Application.on_signal_use_mono_icons_changed);
+        this.theme.signal_systray_use_mono_icons_changed.connect (
+            this.on_signal_use_mono_icons_changed
+        );
 
         // Setting up the gui class will allow tray notifications for the
         // setup that follows, like folder setup
@@ -318,48 +322,61 @@ public class Application : Gtk.Application {
         this.gui.setup_cloud_providers ();
     //  #endif
 
-        FolderMan.instance ().set_up_folders ();
+        FolderMan.instance.set_up_folders ();
         this.proxy.on_signal_setup_qt_proxy_from_config (); // folders have to be defined first, than we set up the Qt proxy.
 
-        connect (AccountManager.instance (), AccountManager.on_signal_account_added,
-            this, Application.on_signal_account_state_added);
-        connect (AccountManager.instance (), AccountManager.on_signal_account_removed,
-            this, Application.on_signal_account_state_removed);
-        foreach (var account_instance in AccountManager.instance ().accounts ()) {
-            on_signal_account_state_added (account_instance).data ();
+        AccountManager.instance.signal_account_added.connect (
+            this.on_signal_account_state_added
+        );
+        AccountManager.instance.signal_account_removed.connect (
+            this.on_signal_account_state_removed
+        );
+        foreach (var account_instance in AccountManager.instance.accounts ()) {
+            on_signal_account_state_added (account_instance);
         }
 
-        connect (FolderMan.instance ().socket_api (), SocketApi.signal_share_command_received,
-            this.gui.data (), OwncloudGui.on_signal_show_share_dialog);
+        FolderMan.instance.socket_api.signal_share_command_received.connect (
+            this.gui.on_signal_show_share_dialog
+        );
 
-        connect (FolderMan.instance ().socket_api (), SocketApi.signal_file_activity_command_received,
-            Systray.instance (), Systray.show_file_activity_dialog);
+        FolderMan.instance.socket_api.signal_file_activity_command_received.connect (
+            Systray.instance.show_file_activity_dialog
+        );
 
         // startup procedure.
-        connect (this.check_connection_timer, QTimer.timeout, this, Application.on_signal_check_connection);
+        this.check_connection_timer.timeout.connect (
+            this.on_signal_check_connection
+        );
         this.check_connection_timer.interval (ConnectionValidator.DEFAULT_CALLING_INTERVAL_MILLISECONDS); // check for connection every 32 seconds.
         this.check_connection_timer.on_signal_start ();
         // Also check immediately
         QTimer.single_shot (0, this, Application.on_signal_check_connection);
 
         // Can't use online_state_changed because it is always true on modern systems because of many interfaces
-        connect (this.network_configuration_manager, QNetworkConfigurationManager.configuration_changed,
-            this, Application.on_signal_system_online_configuration_changed);
+        this.network_configuration_manager.configuration_changed.connect (
+            this.on_signal_system_online_configuration_changed
+        );
 
     //  #if defined (BUILD_UPDATER)
         // Update checks
         var updater_scheduler = new UpdaterScheduler (this);
-        connect (updater_scheduler, UpdaterScheduler.signal_updater_announcement,
-            this.gui.data (), OwncloudGui.on_signal_show_tray_message);
-        connect (updater_scheduler, UpdaterScheduler.signal_request_restart,
-            this.folder_manager.data (), FolderMan.on_signal_schedule_app_restart);
+        updater_scheduler.signal_updater_announcement.connect (
+            this.gui.on_signal_show_tray_message
+        );
+        updater_scheduler.signal_request_restart.connect (
+            this.folder_manager.on_signal_schedule_app_restart
+        );
     //  #endif
 
         // Cleanup at Quit.
-        connect (this, QCoreApplication.about_to_quit, this, Application.on_signal_cleanup);
+        this.about_to_quit.connect (
+            this.on_signal_cleanup
+        );
 
         // Allow other classes to hook into signal_is_showing_settings_dialog () signals (re-auth widgets, for example)
-        connect (this.gui.data (), OwncloudGui.signal_is_showing_settings_dialog, this, Application.on_signal_gui_is_showing_settings);
+        this.gui.signal_is_showing_settings_dialog.connect (
+            this.on_signal_gui_is_showing_settings
+        );
 
         this.gui.create_tray ();
     }
@@ -373,9 +390,9 @@ public class Application : Gtk.Application {
         }
 
         // Remove the account from the account manager so it can be deleted.
-        disconnect (AccountManager.instance (), AccountManager.on_signal_account_removed,
+        disconnect (AccountManager.instance, AccountManager.on_signal_account_removed,
             this, Application.on_signal_account_state_removed);
-        AccountManager.instance ().on_signal_shutdown ();
+        AccountManager.instance.on_signal_shutdown ();
     }
 
 
@@ -442,7 +459,7 @@ public class Application : Gtk.Application {
     console on Windows.
     ***********************************************************/
     public void show_version () {
-        display_help_text (Theme.instance ().version_switch_output ());
+        display_help_text (Theme.instance.version_switch_output ());
     }
 
 
@@ -459,7 +476,7 @@ public class Application : Gtk.Application {
     TODO: this should not be public
     ***********************************************************/
     public void on_signal_owncloud_wizard_done (int res) {
-        FolderMan folder_man = FolderMan.instance ();
+        FolderMan folder_man = FolderMan.instance;
 
         // During the wizard, scheduling of new syncs is disabled
         folder_man.sync_enabled (true);
@@ -471,7 +488,7 @@ public class Application : Gtk.Application {
 
             // If one account is configured : enable autostart
     //  #ifndef QT_DEBUG
-            bool should_auto_start = AccountManager.instance ().accounts ().size () == 1;
+            bool should_auto_start = AccountManager.instance.accounts ().size () == 1;
     //  #else
             bool should_auto_start = false;
     //  #endif
@@ -479,7 +496,7 @@ public class Application : Gtk.Application {
                 Utility.launch_on_signal_startup (this.theme.app_name (), this.theme.app_name_gui (), true);
             }
 
-            Systray.instance ().show_window ();
+            Systray.instance.show_window ();
         }
     }
 
@@ -502,7 +519,7 @@ public class Application : Gtk.Application {
             GLib.warning ("Can only handle file ending in .owncloud. Unable to open " + filename);
             return;
         }
-        var folder = FolderMan.instance ().folder_for_path (filename);
+        var folder = FolderMan.instance.folder_for_path (filename);
         if (!folder) {
             GLib.warning ("Can't find sync folder for " + filename);
             // TODO: show a QMessageBox for errors
@@ -616,7 +633,7 @@ public class Application : Gtk.Application {
         string[] ui_languages;
         ui_languages = QLocale.system ().ui_languages ();
 
-        string enforced_locale = Theme.instance ().enforced_locale ();
+        string enforced_locale = Theme.instance.enforced_locale ();
         if (!enforced_locale == "")
             ui_languages.prepend (enforced_locale);
 
@@ -669,7 +686,7 @@ public class Application : Gtk.Application {
     ***********************************************************/
     protected void setup_logging () {
         // might be called from second instance
-        var logger = Logger.instance ();
+        var logger = Logger.instance;
         logger.log_file (this.log_file);
         if (this.log_file == "") {
             logger.log_dir (this.log_dir == "" ? ConfigFile ().log_dir () : this.log_dir);
@@ -726,7 +743,7 @@ public class Application : Gtk.Application {
             }
 
             // Show the main dialog only if there is at least one account configured
-            if (!AccountManager.instance ().accounts () == "") {
+            if (!AccountManager.instance.accounts () == "") {
                 show_main_dialog ();
             } else {
                 this.gui.on_signal_new_account_wizard ();
@@ -738,7 +755,7 @@ public class Application : Gtk.Application {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_check_connection () {
-        foreach (var account_state in AccountManager.instance ().accounts ()) {
+        foreach (var account_state in AccountManager.instance.accounts ()) {
             AccountState.State state = account_state.state ();
 
             // Don't check if we're manually signed out or
@@ -746,14 +763,14 @@ public class Application : Gtk.Application {
             if (state != AccountState.State.SIGNED_OUT && state != AccountState.State.CONFIGURATION_ERROR
                 && state != AccountState.State.ASKING_CREDENTIALS
                 && !(
-                    account_state.account ().push_notifications ()
-                    && account_state.account ().push_notifications ().is_ready ()
+                    account_state.account.push_notifications ()
+                    && account_state.account.push_notifications ().is_ready ()
                 )) {
                 account_state.on_signal_check_connectivity ();
             }
         }
 
-        if (AccountManager.instance ().accounts () == "") {
+        if (AccountManager.instance.accounts () == "") {
             // let gui open the setup wizard
             this.gui.on_signal_open_settings_dialog ();
 
@@ -772,8 +789,8 @@ public class Application : Gtk.Application {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_cleanup () {
-        AccountManager.instance ().save ();
-        FolderMan.instance ().unload_and_delete_all_folders ();
+        AccountManager.instance.save ();
+        FolderMan.instance.unload_and_delete_all_folders ();
 
         this.gui.on_signal_shutdown ();
         this.gui.delete_later ();
@@ -783,16 +800,20 @@ public class Application : Gtk.Application {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_account_state_added (AccountState account_state) {
-        connect (account_state, AccountState.state_changed,
-            this.gui.data (), OwncloudGui.on_signal_account_state_changed);
-        connect (account_state.account ().data (), Account.server_version_changed,
-            this.gui.data (), OwncloudGui.on_signal_tray_message_if_server_unsupported);
-        connect (account_state, AccountState.state_changed,
-            this.folder_manager.data (), FolderMan.on_signal_account_state_changed);
-        connect (account_state.account ().data (), Account.server_version_changed,
-            this.folder_manager.data (), FolderMan.on_signal_server_version_changed);
+        account_state.signal_state_changed.connect (
+            this.gui.on_signal_account_state_changed
+        );
+        account_state.account.server_version_changed.connect (
+            this.gui.on_signal_tray_message_if_server_unsupported
+        );
+        account_state.signal_state_changed.connect (
+            this.folder_manager.on_signal_account_state_changed
+        );
+        account_state.account.server_version_changed.connect (
+            this.folder_manager.on_signal_server_version_changed
+        );
 
-        this.gui.on_signal_tray_message_if_server_unsupported (account_state.account ().data ());
+        this.gui.on_signal_tray_message_if_server_unsupported (account_state.account);
     }
 
 
@@ -800,20 +821,20 @@ public class Application : Gtk.Application {
     ***********************************************************/
     protected void on_signal_account_state_removed (AccountState account_state) {
         if (this.gui) {
-            disconnect (account_state, AccountState.state_changed,
-                this.gui.data (), OwncloudGui.on_signal_account_state_changed);
-            disconnect (account_state.account ().data (), Account.server_version_changed,
-                this.gui.data (), OwncloudGui.on_signal_tray_message_if_server_unsupported);
+            disconnect (account_state, AccountState.signal_state_changed,
+                this.gui, OwncloudGui.on_signal_account_state_changed);
+            disconnect (account_state.account, Account.server_version_changed,
+                this.gui, OwncloudGui.on_signal_tray_message_if_server_unsupported);
         }
         if (this.folder_manager) {
-            disconnect (account_state, AccountState.state_changed,
-                this.folder_manager.data (), FolderMan.on_signal_account_state_changed);
-            disconnect (account_state.account ().data (), Account.server_version_changed,
-                this.folder_manager.data (), FolderMan.on_signal_server_version_changed);
+            disconnect (account_state, AccountState.signal_state_changed,
+                this.folder_manager, FolderMan.on_signal_account_state_changed);
+            disconnect (account_state.account, Account.server_version_changed,
+                this.folder_manager, FolderMan.on_signal_server_version_changed);
         }
 
         // if there is no more account, show the wizard.
-        if (this.gui && AccountManager.instance ().accounts () == "") {
+        if (this.gui && AccountManager.instance.accounts () == "") {
             // allow to add a new account if there is non any more. Always think
             // about single account theming!
             OwncloudSetupWizard.run_wizard (this, SLOT (on_signal_owncloud_wizard_done (int)));

@@ -18,9 +18,9 @@ public class OcsProfileConnector : GLib.Object {
     private unowned Account account;
     private Hovercard current_hovercard;
 
-    signal void error ();
-    signal void hovercard_fetched ();
-    signal void icon_loaded (size_t hovercard_action_index);
+    internal signal void error ();
+    internal signal void hovercard_fetched ();
+    internal signal void icon_loaded (size_t hovercard_action_index);
 
     /***********************************************************
     ***********************************************************/

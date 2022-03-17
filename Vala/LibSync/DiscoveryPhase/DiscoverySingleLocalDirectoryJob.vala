@@ -24,12 +24,12 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, QRunnable*/ {
     private Occ.Vfs vfs;
 
 
-    signal void signal_finished (GLib.List<LocalInfo> result);
-    signal void finished_fatal_error (string error_string);
-    signal void finished_non_fatal_error (string error_string);
+    internal signal void signal_finished (GLib.List<LocalInfo> result);
+    internal signal void finished_fatal_error (string error_string);
+    internal signal void finished_non_fatal_error (string error_string);
 
-    signal void item_discovered (unowned SyncFileItem item);
-    signal void child_ignored (bool b);
+    internal signal void item_discovered (unowned SyncFileItem item);
+    internal signal void child_ignored (bool b);
 
     /***********************************************************
     ***********************************************************/

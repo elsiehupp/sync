@@ -61,15 +61,15 @@ public class PropagateUploadEncrypted : GLib.Object {
     /***********************************************************
     Emmited after the file is encrypted and everything is set up.
     ***********************************************************/
-    signal void finalized (string path, string filename, uint64 size);
+    internal signal void finalized (string path, string filename, uint64 size);
 
     /***********************************************************
     ***********************************************************/
-    signal void error ();
+    internal signal void error ();
 
     /***********************************************************
     ***********************************************************/
-    signal void folder_unlocked (string folder_identifier, int http_status);
+    internal signal void folder_unlocked (string folder_identifier, int http_status);
 
     /***********************************************************
     ***********************************************************/
@@ -99,7 +99,7 @@ public class PropagateUploadEncrypted : GLib.Object {
     public new void start () {
 
         GLib.debug ("Folder is encrypted; let's get the Id from it.");
-        var job = new LsColJob (this.propagator.account (), absolute_remote_parent_path, this);
+        var job = new LsColJob (this.propagator.account, absolute_remote_parent_path, this);
         job.properties ({"resourcetype", "http://owncloud.org/ns:fileid"});
         connect (job, LsColJob.directory_listing_subfolders, this, PropagateUploadEncrypted.on_signal_folder_encrypted_id_received);
         connect (job, LsColJob.finished_with_error, this, PropagateUploadEncrypted.on_signal_folder_encrypted_id_error);
@@ -139,7 +139,7 @@ public class PropagateUploadEncrypted : GLib.Object {
         this.is_unlock_running = true;
 
         GLib.debug ("Calling Unlock");
-        var unlock_job = new UnlockEncryptFolderApiJob (this.propagator.account (),
+        var unlock_job = new UnlockEncryptFolderApiJob (this.propagator.account,
             this.folder_identifier, this.folder_token, this);
 
         connect (
@@ -215,7 +215,7 @@ public class PropagateUploadEncrypted : GLib.Object {
         this.folder_identifier = file_identifier;
         this.is_folder_locked = true;
 
-        var job = new GetMetadataApiJob (this.propagator.account (), this.folder_identifier);
+        var job = new GetMetadataApiJob (this.propagator.account, this.folder_identifier);
         connect (
             job,
             GetMetadataApiJob.signal_json_received,
@@ -269,7 +269,7 @@ public class PropagateUploadEncrypted : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_try_lock (string file_identifier) {
-        var lock_job = new LockEncryptFolderApiJob (this.propagator.account (), file_identifier, this);
+        var lock_job = new LockEncryptFolderApiJob (this.propagator.account, file_identifier, this);
         connect (lock_job, LockEncryptFolderApiJob.on_signal_success, this, PropagateUploadEncrypted.on_signal_folder_locked_successfully);
         connect (lock_job, LockEncryptFolderApiJob.error, this, PropagateUploadEncrypted.on_signal_folder_locked_error);
         lock_job.start ();
@@ -282,7 +282,7 @@ public class PropagateUploadEncrypted : GLib.Object {
         GLib.debug ("Metadata Received; preparing it for the new file. " + json.to_variant ());
 
         // Encrypt File!
-        this.metadata = new FolderMetadata (this.propagator.account (), json.to_json (QJsonDocument.Compact), status_code);
+        this.metadata = new FolderMetadata (this.propagator.account, json.to_json (QJsonDocument.Compact), status_code);
 
         GLib.FileInfo info = GLib.File.new_for_path (this.propagator.full_local_path (this.item.file));
         const string filename = info.filename ();
@@ -359,14 +359,14 @@ public class PropagateUploadEncrypted : GLib.Object {
         GLib.debug ("Metadata created; sending to the server.");
 
         if (status_code == 404) {
-            var job = new StoreMetaDataApiJob (this.propagator.account (),
+            var job = new StoreMetaDataApiJob (this.propagator.account,
                                                 this.folder_identifier,
                                                 this.metadata.encrypted_metadata ());
             connect (job, StoreMetaDataApiJob.on_signal_success, this, PropagateUploadEncrypted.on_signal_update_metadata_success);
             connect (job, StoreMetaDataApiJob.error, this, PropagateUploadEncrypted.on_signal_update_metadata_error);
             job.start ();
         } else {
-            var job = new UpdateMetadataApiJob (this.propagator.account (),
+            var job = new UpdateMetadataApiJob (this.propagator.account,
                                                 this.folder_identifier,
                                                 this.metadata.encrypted_metadata (),
                                                 this.folder_token);
@@ -384,7 +384,7 @@ public class PropagateUploadEncrypted : GLib.Object {
         //  Q_UNUSED (file_identifier);
         //  Q_UNUSED (http_return_code);
         GLib.debug ("Error getting the encrypted metadata. Pretend we got empty metadata.");
-        FolderMetadata empty_metadata = new FolderMetadata (this.propagator.account ());
+        FolderMetadata empty_metadata = new FolderMetadata (this.propagator.account);
         empty_metadata.encrypted_metadata ();
         var json = QJsonDocument.from_json (empty_metadata.encrypted_metadata ());
         on_signal_folder_encrypted_metadata_received (json, http_return_code);

@@ -23,7 +23,7 @@ public class PollJob : AbstractNetworkJob {
     ***********************************************************/
     public unowned SyncFileItem item;
 
-    signal void signal_finished ();
+    internal signal void signal_finished ();
 
     /***********************************************************
     Takes ownership of the device
@@ -41,7 +41,7 @@ public class PollJob : AbstractNetworkJob {
     ***********************************************************/
     public new void start () {
         on_signal_timeout (120 * 1000);
-        GLib.Uri account_url = account ().url ();
+        GLib.Uri account_url = account.url ();
         GLib.Uri final_url = GLib.Uri.from_user_input (account_url.scheme () + "://" + account_url.authority ()
             + (path ().starts_with ("/") ? "" : "/") + path ());
         send_request ("GET", final_url);
