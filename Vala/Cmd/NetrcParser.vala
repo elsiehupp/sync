@@ -5,7 +5,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 //  #include <QPair>
-//  #include <QDir>
+//  #include <GLib.Dir>
 //  #include <QTextStream>
 //  #include <qtokenizer.h>
 
@@ -34,7 +34,7 @@ public class NetrcParser {
     public NetrcParser (string file = "") {
         this.netrc_location = file;
         if (this.netrc_location == "") {
-            this.netrc_location = QDir.home_path () + "/.netrc";
+            this.netrc_location = GLib.Dir.home_path () + "/.netrc";
         }
     }
 

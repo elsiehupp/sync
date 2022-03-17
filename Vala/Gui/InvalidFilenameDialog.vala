@@ -6,7 +6,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 //  #include <folder.h>
 //  #include <QPush
-//  #include <QDir>
+//  #include <GLib.Dir>
 //  #include <qabstractbutton.h
 //  #include <QDialogBut
 //  #include <GLib.FileInfo>
@@ -91,7 +91,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
     ***********************************************************/
     public override void on_signal_accept () {
         this.new_filename = this.relative_file_path + this.ui.filename_line_edit.text ().trimmed ();
-        const var propfind_job = new PropfindJob (this.account, QDir.clean_path (this.folder.remote_path () + this.new_filename));
+        const var propfind_job = new PropfindJob (this.account, GLib.Dir.clean_path (this.folder.remote_path () + this.new_filename));
         connect (
             propfind_job,
             PropfindJob.result,
@@ -100,7 +100,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
         );
         connect (
             propfind_job,
-            PropfindJob.finished_with_error,
+            PropfindJob.signal_finished_with_error,
             this,
             InvalidFilenameDialog.on_signal_remote_file_does_not_exist
         );
@@ -159,8 +159,8 @@ public class InvalidFilenameDialog : Gtk.Dialog {
         //  Q_UNUSED (reply);
 
         // File does not exist. We can rename it.
-        const var remote_source = QDir.clean_path (this.folder.remote_path () + this.original_filename);
-        const var remote_destionation = QDir.clean_path (this.account.dav_url ().path () + this.folder.remote_path () + this.new_filename);
+        const var remote_source = GLib.Dir.clean_path (this.folder.remote_path () + this.original_filename);
+        const var remote_destionation = GLib.Dir.clean_path (this.account.dav_url ().path () + this.folder.remote_path () + this.new_filename);
         const var move_job = new MoveJob (this.account, remote_source, remote_destionation, this);
         connect (move_job, MoveJob.finished_signal, this, InvalidFilenameDialog.on_signal_move_job_finished);
         move_job.on_signal_start ();
@@ -170,7 +170,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void check_if_allowed_to_rename () {
-        const var propfind_job = new PropfindJob (this.account, QDir.clean_path (this.folder.remote_path () + this.original_filename));
+        const var propfind_job = new PropfindJob (this.account, GLib.Dir.clean_path (this.folder.remote_path () + this.original_filename));
         propfind_job.properties ({
             "http://owncloud.org/ns:permissions"
         });
@@ -213,8 +213,8 @@ public class InvalidFilenameDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private static GLib.Vector<char> illegal_chars_from_string (string string) {
-        GLib.Vector<char> result;
+    private static GLib.List<char> illegal_chars_from_string (string string) {
+        GLib.List<char> result;
         foreach (var character in string) {
             if (std.find (illegal_characters.begin (), illegal_characters.end (), character)
                 != illegal_characters.end ()) {
@@ -227,7 +227,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private static string illegal_character_list_to_string (GLib.Vector<char> illegal_characters) {
+    private static string illegal_character_list_to_string (GLib.List<char> illegal_characters) {
         string illegal_characters_string;
         if (illegal_characters.size () > 0) {
             illegal_characters_string += illegal_characters[0];

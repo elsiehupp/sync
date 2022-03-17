@@ -274,12 +274,12 @@ public class ShareManager : GLib.Object {
             url = GLib.Uri (data.value ("url").to_string ());
         } else if (this.account.server_version_int () >= Account.make_server_version (8, 0, 0)) {
             // From own_cloud server version 8 on, a different share link scheme is used.
-            url = GLib.Uri (Utility.concat_url_path (this.account.url (), QLatin1String ("index.php/s/") + data.value ("token").to_string ())).to_string ();
+            url = GLib.Uri (Utility.concat_url_path (this.account.url, QLatin1String ("index.php/s/") + data.value ("token").to_string ())).to_string ();
         } else {
             QUrlQuery query_args;
             query_args.add_query_item (QLatin1String ("service"), QLatin1String ("files"));
             query_args.add_query_item (QLatin1String ("t"), data.value ("token").to_string ());
-            url = GLib.Uri (Utility.concat_url_path (this.account.url (), QLatin1String ("public.php"), query_args).to_string ());
+            url = GLib.Uri (Utility.concat_url_path (this.account.url, QLatin1String ("public.php"), query_args).to_string ());
         }
 
         QDate expire_date;

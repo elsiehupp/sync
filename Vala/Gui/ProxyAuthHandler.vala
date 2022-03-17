@@ -242,7 +242,7 @@ public class ProxyAuthHandler : GLib.Object {
                 return false;
             }
 
-            this.read_password_job.on_signal_reset (new ReadPasswordJob (Theme.instance.app_name ()));
+            this.read_password_job.on_signal_reset (new ReadPasswordJob (Theme.app_name));
             this.read_password_job.settings (this.settings);
             this.read_password_job.insecure_fallback (false);
             this.read_password_job.key (keychain_password_key ());
@@ -285,7 +285,7 @@ public class ProxyAuthHandler : GLib.Object {
 
         this.settings.value (keychain_username_key (), this.username);
 
-        var job = new WritePasswordJob (Theme.instance.app_name (), this);
+        var job = new WritePasswordJob (Theme.app_name, this);
         job.settings (this.settings);
         job.insecure_fallback (false);
         job.key (keychain_password_key ());

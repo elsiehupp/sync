@@ -34,41 +34,23 @@ public class ConflictDialog : Gtk.Dialog {
         this.ui.button_box.button (QDialogButtonBox.Ok).enabled (false);
         this.ui.button_box.button (QDialogButtonBox.Ok).on_signal_text (_("Keep selected version"));
 
-        connect (
-            this.ui.local_version_radio,
-            QCheckBox.toggled,
-            this,
-            ConflictDialog.update_button_states
+        this.ui.local_version_radio.toggled.connect (
+            this.update_button_states
         );
-        connect (
-            this.ui.local_version_button,
-            QToolButton.clicked,
-            this,
+        this.ui.local_version_button.clicked.connect (
             this.on_local_version_button_clicked
         );
-        connect (
-            this.ui.remote_version_radio,
-            QCheckBox.toggled,
-            this,
-            ConflictDialog.update_button_states
+        this.ui.remote_version_radio.toggled.connect (
+            this.update_button_states
         );
-        connect (
-            this.ui.remote_version_button,
-            QToolButton.clicked,
-            this,
+        this.ui.remote_version_button.clicked.connect (
             this.on_remote_version_button_clicked
         );
-        connect (
-            this.solver,
-            ConflictSolver.signal_local_version_filename_changed,
-            this,
-            ConflictDialog.update_widgets
+        this.solver.signal_local_version_filename_changed.connect (
+            this.update_widgets
         );
-        connect (
-            this.solver,
-            ConflictSolver.signal_remote_version_filename_changed,
-            this,
-            ConflictDialog.update_widgets
+        this.solver.signal_remote_version_filename_changed.connect (
+            this.update_widgets
         );
     }
 

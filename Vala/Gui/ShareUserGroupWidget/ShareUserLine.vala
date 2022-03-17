@@ -718,7 +718,7 @@ public class ShareUserLine : Gtk.Widget {
         this.delete_share_button.icon (delete_icon);
 
         this.ui.note_confirm_button.icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
-        this.ui.progress_indicator.on_signal_color (QGuiApplication.palette ().color (QPalette.Window_text));
+        this.ui.progress_indicator.on_signal_color (Gtk.Application.palette ().color (QPalette.Window_text));
 
         // make sure to force Background_role to QPalette.Window_text for a lable, because it's parent always has a different role set that applies to children unless customized
         this.ui.error_label.background_role (QPalette.Window_text);
@@ -906,9 +906,9 @@ public class ShareUserLine : Gtk.Widget {
     private Gtk.Color background_color_for_sharee_type (Sharee.Type type) {
         switch (type) {
         case Sharee.Type.ROOM:
-            return Theme.instance.wizard_header_background_color ();
+            return Theme.wizard_header_background_color;
         case Sharee.Type.EMAIL:
-            return Theme.instance.wizard_header_title_color ();
+            return Theme.wizard_header_title_color;
         case Sharee.Type.GROUP:
         case Sharee.Type.FEDERATED:
         case Sharee.Type.CIRCLE:

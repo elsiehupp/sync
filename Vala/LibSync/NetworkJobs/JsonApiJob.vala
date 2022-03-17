@@ -124,7 +124,7 @@ public class JsonApiJob : AbstractNetworkJob {
         add_raw_header ("OCS-APIREQUEST", "true");
         var query = this.additional_params;
         query.add_query_item ("format", "json");
-        GLib.Uri url = Utility.concat_url_path (account.url (), path (), query);
+        GLib.Uri url = Utility.concat_url_path (account.url, path (), query);
         const string http_verb = this.verb.to_string ();
         if (!this.body == "") {
             send_request (http_verb, url, this.request, this.body);
@@ -138,7 +138,7 @@ public class JsonApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     protected bool on_signal_finished () {
-        GLib.info ("JsonApiJob of" + reply ().request ().url ()
+        GLib.info ("JsonApiJob of" + reply ().request ().url
             + " finished with status " + reply_status_string ());
 
         int status_code = 0;

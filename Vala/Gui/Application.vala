@@ -18,9 +18,9 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 //  #include <QTranslator>
 //  #include <QMenu>
-//  #include <QMessageBox>
+//  #include <Gtk.MessageBox>
 //  #include <QDesktopServices>
-//  #include <QGuiApplication>
+//  #include <Gtk.Application>
 //  #include <QApplicat
 //  #include <QPointe
 //  #include <QQueue>
@@ -165,7 +165,7 @@ public class Application : Gtk.Application {
     /***********************************************************
     ***********************************************************/
     public Application (int argc, char **argv) {
-        base (Theme.instance.app_name (), argc, argv);
+        base (Theme.app_name, argc, argv);
         this.gui = null;
         this.theme = Theme.instance;
         this.help_only = false;
@@ -192,12 +192,12 @@ public class Application : Gtk.Application {
         desktop_filename (desktop_filename);
     //  #endif
 
-        application_name (this.theme.app_name ());
-        window_icon (this.theme.application_icon ());
+        application_name (this.theme.app_name);
+        window_icon (this.theme.application_icon);
 
         if (!ConfigFile ().exists ()) {
             // Migrate from version <= 2.4
-            application_name (this.theme.app_name_gui ());
+            application_name (this.theme.app_name_gui);
     //  #ifndef QT_WARNING_DISABLE_DEPRECATED // Was added in Qt 5.9
         //  const int QT_WARNING_DISABLE_DEPRECATED = QT_WARNING_DISABLE_GCC ("-Wdeprecated-declarations")
     //  #endif
@@ -211,7 +211,7 @@ public class Application : Gtk.Application {
                 old_dir.chop (1);
             }
             //  QT_WARNING_POP
-            application_name (this.theme.app_name ());
+            application_name (this.theme.app_name);
             if (GLib.FileInfo (old_dir).is_dir ()) {
                 var configuration_directory = ConfigFile ().config_path ();
                 if (configuration_directory.ends_with ('/')) {
@@ -224,8 +224,8 @@ public class Application : Gtk.Application {
                     GLib.warning ("Failed to move the old config directory to its new location (" + old_dir + " to " + configuration_directory + ")");
 
                     // Try to move the files one by one
-                    if (GLib.FileInfo (configuration_directory).is_dir () || QDir ().mkdir (configuration_directory)) {
-                        const string[] files_list = QDir (old_dir).entry_list (QDir.Files);
+                    if (GLib.FileInfo (configuration_directory).is_dir () || GLib.Dir ().mkdir (configuration_directory)) {
+                        const string[] files_list = GLib.Dir (old_dir).entry_list (GLib.Dir.Files);
                         GLib.info ("Will move the individual files " + files_list);
                         foreach (var name in files_list) {
                             if (!GLib.File.rename (old_dir + "/" + name, configuration_directory + "/" + name)) {
@@ -253,7 +253,7 @@ public class Application : Gtk.Application {
     //  #if defined (WITH_CRASHREPORTER)
         if (ConfigFile ().crash_reporter ()) {
             var reporter = CRASHREPORTER_EXECUTABLE;
-            this.crash_handler.on_signal_reset (new CrashReporter.Handler (QDir.temp_path (), true, reporter));
+            this.crash_handler.on_signal_reset (new CrashReporter.Handler (GLib.Dir.temp_path (), true, reporter));
         }
     //  #endif
 
@@ -270,7 +270,7 @@ public class Application : Gtk.Application {
             AbstractNetworkJob.http_timeout = config.timeout ();
 
         // Check vfs plugins
-        if (Theme.instance.show_virtual_files_option () && best_available_vfs_mode () == Vfs.Off) {
+        if (Theme.show_virtual_files_option && best_available_vfs_mode () == Vfs.Off) {
             GLib.warning ("Theme wants to show vfs mode, but no vfs plugins are available.");
         }
         if (is_vfs_plugin_available (Vfs.WindowsCfApi))
@@ -291,13 +291,13 @@ public class Application : Gtk.Application {
             Utility.sleep (5);
             if (!AccountManager.instance.restore ()) {
                 GLib.critical ("Could not read the account settings; quitting.");
-                QMessageBox.critical (
+                Gtk.MessageBox.critical (
                     null,
                     _("Error accessing the configuration file"),
                     _("There was an error while accessing the configuration "
                     + "file at %1. Please make sure the file can be accessed by your user.")
                         .printf (ConfigFile ().config_file ()),
-                    _("Quit %1").printf (Theme.instance.app_name_gui ()));
+                    _("Quit %1").printf (Theme.app_name_gui));
                 QTimer.single_shot (0, Gtk.Application, SLOT (quit ()));
                 return;
             }
@@ -404,15 +404,15 @@ public class Application : Gtk.Application {
         help ();
         string help_text;
         QTextStream stream = new QTextStream (help_text);
-        stream +=  this.theme.app_name ()
+        stream +=  this.theme.app_name
             + " version "
-            + this.theme.version () + endl;
+            + this.theme.version + endl;
 
         stream += "File synchronisation desktop utility." + endl
             + endl
             + OPTIONS;
 
-        if (this.theme.app_name () == "own_cloud") {
+        if (this.theme.app_name == "own_cloud") {
             stream += endl
                 + "For more information, see http://www.owncloud.org" + endl
                 + endl;
@@ -428,7 +428,7 @@ public class Application : Gtk.Application {
     ***********************************************************/
     public void show_hint (string error_hint) {
         std.cerr += error_hint + std.endl;
-        std.cerr += "Try '" + Application.GLib.FileInfo (QCoreApplication.application_file_path ()).filename ().to_std_string () + " --help' for more information" + std.endl;
+        std.cerr += "Try '" + Application.GLib.FileInfo (Gtk.Application.application_file_path ()).filename ().to_std_string () + " --help' for more information" + std.endl;
         std.exit (1);
     }
 
@@ -459,7 +459,7 @@ public class Application : Gtk.Application {
     console on Windows.
     ***********************************************************/
     public void show_version () {
-        display_help_text (Theme.instance.version_switch_output ());
+        display_help_text (Theme.version_switch_output);
     }
 
 
@@ -493,7 +493,7 @@ public class Application : Gtk.Application {
             bool should_auto_start = false;
     //  #endif
             if (should_auto_start) {
-                Utility.launch_on_signal_startup (this.theme.app_name (), this.theme.app_name_gui (), true);
+                Utility.launch_on_signal_startup (this.theme.app_name, this.theme.app_name_gui, true);
             }
 
             Systray.instance.show_window ();
@@ -522,10 +522,10 @@ public class Application : Gtk.Application {
         var folder = FolderMan.instance.folder_for_path (filename);
         if (!folder) {
             GLib.warning ("Can't find sync folder for " + filename);
-            // TODO: show a QMessageBox for errors
+            // TODO: show a Gtk.MessageBox for errors
             return;
         }
-        string relative_path = QDir.clean_path (filename).mid (folder.clean_path ().length () + 1);
+        string relative_path = GLib.Dir.clean_path (filename).mid (folder.clean_path ().length () + 1);
         folder.on_signal_implicitly_hydrate_file (relative_path);
         string normal_name = filename.left (filename.size () - virtual_file_ext.size ());
         QMetaObject.Connection.create () = connect (
@@ -633,7 +633,7 @@ public class Application : Gtk.Application {
         string[] ui_languages;
         ui_languages = QLocale.system ().ui_languages ();
 
-        string enforced_locale = Theme.instance.enforced_locale ();
+        string enforced_locale = Theme.enforced_locale;
         if (!enforced_locale == "")
             ui_languages.prepend (enforced_locale);
 
@@ -701,10 +701,10 @@ public class Application : Gtk.Application {
         logger.on_signal_enter_next_log_file ();
 
         GLib.info ("##################"
-            + this.theme.app_name ()
+            + this.theme.app_name
             + "locale:" + QLocale.system ().name ()
             + "ui_lang:" + property ("ui_lang")
-            + "version:" + this.theme.version ()
+            + "version:" + this.theme.version
             + "os:" + Utility.platform_name ()
         );
         GLib.info ("Arguments: " + Gtk.Application.arguments ());
@@ -885,7 +885,7 @@ public class Application : Gtk.Application {
 
         // Did the client version change?
         // (The client version is adjusted further down)
-        bool version_changed = config_file.client_version_string () != MIRALL_VERSION_STRING;
+        bool version_changed = config_file.client_version_string != MIRALL_VERSION_STRING;
 
         // We want to message the user either for destructive changes,
         // or if we're ignoring something and the client version changed.
@@ -894,7 +894,7 @@ public class Application : Gtk.Application {
         if (!version_changed && !warning_message)
             return true;
 
-        const var backup_file = config_file.backup ();
+        const var backup_file = config_file.create_backup ();
 
         if (warning_message) {
             string bold_message;
@@ -904,8 +904,8 @@ public class Application : Gtk.Application {
                 bold_message = _("Continuing will mean <b>ignoring these settings</b>.");
             }
 
-            QMessageBox box = new QMessageBox (
-                QMessageBox.Warning,
+            Gtk.MessageBox box = new Gtk.MessageBox (
+                Gtk.MessageBox.Warning,
                 APPLICATION_SHORTNAME,
                 _("Some settings were configured in newer versions of this client and "
                 + "use features that are not available in this version.<br>"
@@ -914,8 +914,8 @@ public class Application : Gtk.Application {
                 + "<br>"
                 + "The current configuration file was already backed up to <i>%2</i>.")
                     .printf (bold_message, backup_file));
-            box.add_button (_("Quit"), QMessageBox.AcceptRole);
-            var continue_btn = box.add_button (_("Continue"), QMessageBox.DestructiveRole);
+            box.add_button (_("Quit"), Gtk.MessageBox.AcceptRole);
+            var continue_btn = box.add_button (_("Continue"), Gtk.MessageBox.DestructiveRole);
 
             box.exec ();
             if (box.clicked_button () != continue_btn) {
@@ -940,7 +940,7 @@ public class Application : Gtk.Application {
     ***********************************************************/
     private static string application_tr_path () {
         string dev_tr_path = Gtk.Application.application_dir_path () + string.from_latin1 ("/../src/gui/");
-        if (QDir (dev_tr_path).exists ()) {
+        if (GLib.Dir (dev_tr_path).exists ()) {
             // might miss Qt, QtKeyChain, etc.
             GLib.warning ("Running from build location! Translations may be incomplete!");
             return dev_tr_path;

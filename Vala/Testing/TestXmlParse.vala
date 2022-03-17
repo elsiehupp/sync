@@ -113,13 +113,13 @@ public class TestXmlParse : GLib.Object {
 
         connect (
             parser,
-            directory_listing_subfolders,
+            signal_directory_listing_subfolders,
             this,
             on_signal_directory_listing_sub_folders
         );
         connect (
             parser,
-            directory_listing_iterated,
+            signal_directory_listing_iterated,
             this,
             on_signal_directory_listing_iterated
         );
@@ -201,13 +201,13 @@ public class TestXmlParse : GLib.Object {
 
         connect (
             parser,
-            directory_listing_subfolders,
+            signal_directory_listing_subfolders,
             this,
             on_signal_directory_listing_sub_folders
         );
         connect (
             parser,
-            directory_listing_iterated,
+            signal_directory_listing_iterated,
             this,
             on_signal_directory_listing_iterated
         );
@@ -239,13 +239,13 @@ public class TestXmlParse : GLib.Object {
 
         connect (
             parser,
-            directory_listing_subfolders,
+            signal_directory_listing_subfolders,
             this,
             on_signal_directory_listing_sub_folders
         );
         connect (
             parser,
-            directory_listing_iterated,
+            signal_directory_listing_iterated,
             this,
             on_signal_directory_listing_iterated
         );
@@ -276,13 +276,13 @@ public class TestXmlParse : GLib.Object {
 
         connect (
             parser,
-            directory_listing_subfolders,
+            signal_directory_listing_subfolders,
             this,
             on_signal_directory_listing_sub_folders
         );
         connect (
             parser,
-            directory_listing_iterated,
+            signal_directory_listing_iterated,
             this,
             on_signal_directory_listing_iterated
         );
@@ -329,13 +329,13 @@ public class TestXmlParse : GLib.Object {
 
         connect (
             parser,
-            directory_listing_subfolders,
+            signal_directory_listing_subfolders,
             this,
             on_signal_directory_listing_sub_folders
         );
         connect (
             parser,
-            directory_listing_iterated,
+            signal_directory_listing_iterated,
             this,
             on_signal_directory_listing_iterated
         );
@@ -408,13 +408,13 @@ public class TestXmlParse : GLib.Object {
 
         connect (
             parser,
-            directory_listing_subfolders,
+            signal_directory_listing_subfolders,
             this,
             on_signal_directory_listing_sub_folders
         );
         connect (
             parser,
-            directory_listing_iterated,
+            signal_directory_listing_iterated,
             this,
             on_signal_directory_listing_iterated
         );
@@ -487,13 +487,13 @@ public class TestXmlParse : GLib.Object {
 
         connect (
             parser,
-            directory_listing_subfolders,
+            signal_directory_listing_subfolders,
             this,
             on_signal_directory_listing_sub_folders
         );
         connect (
             parser,
-            directory_listing_iterated,
+            signal_directory_listing_iterated,
             this,
             on_signal_directory_listing_iterated
         );
@@ -566,13 +566,13 @@ public class TestXmlParse : GLib.Object {
 
         connect (
             parser,
-            directory_listing_subfolders,
+            signal_directory_listing_subfolders,
             this,
             on_signal_directory_listing_sub_folders
         );
         connect (
             parser,
-            directory_listing_iterated,
+            signal_directory_listing_iterated,
             this,
             on_signal_directory_listing_iterated
         );
@@ -654,13 +654,13 @@ public class TestXmlParse : GLib.Object {
 
         connect (
             parser,
-            directory_listing_subfolders,
+            signal_directory_listing_subfolders,
             this,
             on_signal_directory_listing_sub_folders
         );
         connect (
             parser,
-            directory_listing_iterated,
+            signal_directory_listing_iterated,
             this,
             on_signal_directory_listing_iterated
         );
@@ -734,13 +734,13 @@ public class TestXmlParse : GLib.Object {
 
         connect (
             parser,
-            directory_listing_subfolders,
+            signal_directory_listing_subfolders,
             this,
             on_signal_directory_listing_sub_folders
         );
         connect (
             parser,
-            directory_listing_iterated,
+            signal_directory_listing_iterated,
             this,
             on_signal_directory_listing_iterated
         );

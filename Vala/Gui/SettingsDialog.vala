@@ -124,7 +124,7 @@ public class SettingsDialog : Gtk.Dialog {
         object_name ("Settings"); // required as group for save_geometry call
 
         // : This name refers to the application name e.g Nextcloud
-        window_title (_("%1 Settings").printf (Theme.instance.app_name_gui ()));
+        window_title (_("%1 Settings").printf (Theme.app_name_gui));
 
         connect (AccountManager.instance, AccountManager.signal_account_added,
             this, SettingsDialog.signal_account_added);
@@ -302,7 +302,7 @@ public class SettingsDialog : Gtk.Dialog {
     ***********************************************************/
     private void signal_account_added (AccountState s) {
         var height = this.tool_bar.size_hint ().height ();
-        bool branding_single_account = !Theme.instance.multi_account ();
+        bool branding_single_account = !Theme.multi_account;
 
         QAction account_action = null;
         Gtk.Image avatar = s.account.avatar ();
@@ -430,8 +430,8 @@ public class SettingsDialog : Gtk.Dialog {
         if (user == "") {
             user = account.credentials ().user ();
         }
-        string host = account.url ().host ();
-        int port = account.url ().port ();
+        string host = account.url.host ();
+        int port = account.url.port ();
         if (port > 0 && port != 80 && port != 443) {
             host.append (':');
             host.append (string.number (port));

@@ -158,7 +158,7 @@ public class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
                 var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
                 //  Q_ASSERT (oc_wizard);
 
-                /* emit */ connect_to_oc_url (oc_wizard.account.url ().to_string ());
+                /* emit */ connect_to_oc_url (oc_wizard.account.url.to_string ());
                 break;
             }
         }

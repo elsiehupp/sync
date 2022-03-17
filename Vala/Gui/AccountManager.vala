@@ -9,9 +9,9 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 //  #include <creds/abstractcredentials.h>
 //  #include <cookiejar.h>
 //  #include <QSettings>
-//  #include <QDir>
+//  #include <GLib.Dir>
 //  #include <QNetworkAccessManager>
-//  #include <QMessageBox>
+//  #include <Gtk.MessageBox>
 
 
 namespace Occ {
@@ -205,7 +205,7 @@ public class AccountManager : GLib.Object {
         settings.remove (account.account.identifier ());
 
         // Forget E2E keys
-        account.account.e2e ().forget_sensitive_data (account.account);
+        account.account.e2e.forget_sensitive_data (account.account);
 
         account.account.delete_app_token ();
 
@@ -326,8 +326,8 @@ public class AccountManager : GLib.Object {
             }
         }
 
-        string override_url = Theme.instance.override_server_url ();
-        string force_auth = Theme.instance.force_config_auth_type ();
+        string override_url = Theme.override_server_url;
+        string force_auth = Theme.force_config_auth_type;
         if (!force_auth == "" && !override_url == "") {
             // If force_auth is set, this might also mean the override_uRL has changed.
             // See enterprise issues #1126
@@ -351,7 +351,7 @@ public class AccountManager : GLib.Object {
             }
         }
 
-        GLib.info ("Account for " + acc.url () + " using auth type " + auth_type);
+        GLib.info ("Account for " + acc.url + " using auth type " + auth_type);
 
         acc.server_version = settings.value (SERVER_VERSION_C).to_string ();
         acc.dav_user = settings.value (DAV_USER_C, "").to_string ();
@@ -382,16 +382,16 @@ public class AccountManager : GLib.Object {
     ***********************************************************/
     private bool restore_from_legacy_settings () {
         GLib.info ("Migrate: restore_from_legacy_settings, checking settings group "
-                  + Theme.instance.app_name ());
+                  + Theme.app_name);
 
         // try to open the correctly themed settings
-        var settings = ConfigFile.settings_with_group (Theme.instance.app_name ());
+        var settings = ConfigFile.settings_with_group (Theme.app_name);
 
         // if the settings file could not be opened, the child_keys list is empty
         // then try to load settings from a very old place
         if (settings.child_keys () == "") {
             // Now try to open the original own_cloud settings to see if they exist.
-            string oc_config_file = QDir.from_native_separators (settings.filename ());
+            string oc_config_file = GLib.Dir.from_native_separators (settings.filename ());
             // replace the last two segments with own_cloud/owncloud.config
             oc_config_file = oc_config_file.left (oc_config_file.last_index_of ('/'));
             oc_config_file = oc_config_file.left (oc_config_file.last_index_of ('/'));
@@ -405,7 +405,7 @@ public class AccountManager : GLib.Object {
                 oc_settings.begin_group ("own_cloud");
 
                 // Check the theme url to see if it is the same url that the o_c config was for
-                string override_url = Theme.instance.override_server_url ();
+                string override_url = Theme.override_server_url;
                 if (!override_url == "") {
                     if (override_url.ends_with ('/')) {
                         override_url.chop (1);
@@ -489,7 +489,7 @@ public class AccountManager : GLib.Object {
     Saves account data, not including the credentials
     ***********************************************************/
     public void on_signal_save_account (Account a) {
-        GLib.debug ("Saving account " + a.url ().to_string ());
+        GLib.debug ("Saving account " + a.url.to_string ());
         var settings = ConfigFile.settings_with_group (ACCOUNTS_C);
         settings.begin_group (a.identifier ());
         save_account_helper (a, *settings, false); // don't save credentials they might not have been loaded yet
@@ -504,7 +504,7 @@ public class AccountManager : GLib.Object {
     Saves account state data, not including the account
     ***********************************************************/
     public void on_signal_save_account_state (AccountState a) {
-        GLib.debug ("Saving account state " + a.account.url ().to_string ());
+        GLib.debug ("Saving account state " + a.account.url.to_string ());
         var settings = ConfigFile.settings_with_group (ACCOUNTS_C);
         settings.begin_group (a.account.identifier ());
         a.write_to_settings (*settings);

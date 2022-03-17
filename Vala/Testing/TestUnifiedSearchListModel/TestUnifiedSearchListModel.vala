@@ -59,13 +59,13 @@ public class TestUnifiedSearchListmodel : GLib.Object {
 
         Soup.Reply reply = null;
 
-        var url_query = QUrlQuery (request.url ());
+        var url_query = QUrlQuery (request.url);
         var format = url_query.query_item_value ("format");
         var cursor = url_query.query_item_value ("cursor").to_int ();
         var search_term = url_query.query_item_value ("term");
-        var path = request.url ().path ();
+        var path = request.url.path ();
 
-        if (!request.url ().to_string ().starts_with (account_state.account.url ().to_string ())) {
+        if (!request.url.to_string ().starts_with (account_state.account.url.to_string ())) {
             reply = new FakeErrorReply (operation, request, this, 404, FAKE_404_RESPONSE);
         }
         if (format != "json") {

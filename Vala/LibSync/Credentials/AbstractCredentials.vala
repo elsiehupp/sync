@@ -6,7 +6,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 //  #include <QLoggingCategory>
-//  #include <QCoreApplication>
+//  #include <Gtk.Application>
 
 using CSync;
 

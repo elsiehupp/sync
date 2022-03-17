@@ -103,7 +103,7 @@ public class PutMultiFileJob : AbstractNetworkJob {
             one_device.device.close ();
         }
 
-        GLib.info ("POST of" + reply ().request ().url ().to_string () + path () + " finished with status "
+        GLib.info ("POST of" + reply ().request ().url.to_string () + path () + " finished with status "
                 + reply_status_string ()
                 + reply ().attribute (Soup.Request.HttpStatusCodeAttribute)
                 + reply ().attribute (Soup.Request.HttpReasonPhraseAttribute));

@@ -5,7 +5,7 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 
 //  #include <QtTest>
-//  #include <QDir>
+//  #include <GLib.Dir>
 
 using Occ;
 using Occ.Utility;

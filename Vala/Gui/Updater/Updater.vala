@@ -143,14 +143,14 @@ public class Updater : GLib.Object {
         query.add_query_item ("os_release", QSysInfo.product_type ());
         query.add_query_item ("os_version", QSysInfo.product_version ());
         query.add_query_item ("kernel_version", QSysInfo.kernel_version ());
-        query.add_query_item ("oem", theme.app_name ());
+        query.add_query_item ("oem", theme.app_name);
         query.add_query_item ("build_arch", QSysInfo.build_cpu_architecture ());
         query.add_query_item ("current_arch", QSysInfo.current_cpu_architecture ());
 
         string suffix = MIRALL_STRINGIFY (MIRALL_VERSION_SUFFIX);
         query.add_query_item ("versionsuffix", suffix);
 
-        var channel = ConfigFile ().update_channel ();
+        var channel = ConfigFile ().update_channel;
         if (channel != "stable") {
             query.add_query_item ("channel", channel);
         }

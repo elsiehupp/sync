@@ -7,7 +7,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QCryptographicHash>
 //  #include <QLoggingCategory>
 //  #include <QElapsedTimer>
-//  #include <QDir>
+//  #include <GLib.Dir>
 //  #includee3;
 //  #include <cstring>
 
@@ -280,7 +280,7 @@ public class SyncJournalDb : GLib.Object {
         Returns nothing on database error.
         Note that this will have an entry for "".
         ***********************************************************/
-        Optional<GLib.Vector<QPair<string, PinState>>> raw_list () {
+        Optional<GLib.List<QPair<string, PinState>>> raw_list () {
             QMutexLocker lock = new QMutexLocker (this.database.mutex);
             if (!this.database.check_connect ())
                 return {};
@@ -288,7 +288,7 @@ public class SyncJournalDb : GLib.Object {
             SqlQuery query = new SqlQuery ("SELECT path, pin_state FROM flags;", this.database.database);
             query.exec ();
     
-            GLib.Vector<QPair<string, PinState>> result;
+            GLib.List<QPair<string, PinState>> result;
             while (true) {
                 var next = query.next ();
                 if (!next.ok)
@@ -395,7 +395,7 @@ public class SyncJournalDb : GLib.Object {
         journal_path += string.from_latin1 (ba.left (6).to_hex ()) + ".db";
 
         // If it exists already, the path is clearly usable
-        GLib.File file = GLib.File.new_for_path (QDir (local_path).file_path (journal_path));
+        GLib.File file = GLib.File.new_for_path (GLib.Dir (local_path).file_path (journal_path));
         if (file.exists ()) {
             return journal_path;
         }
@@ -1300,8 +1300,8 @@ public class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.Vector<DownloadInfo> get_and_delete_stale_download_infos (GLib.Set<string> keep) {
-        GLib.Vector<SyncJournalDb.DownloadInfo> empty_result;
+    public GLib.List<DownloadInfo> get_and_delete_stale_download_infos (GLib.Set<string> keep) {
+        GLib.List<SyncJournalDb.DownloadInfo> empty_result;
         QMutexLocker locker = new QMutexLocker (this.mutex);
 
         if (!check_connect ()) {
@@ -1317,7 +1317,7 @@ public class SyncJournalDb : GLib.Object {
         }
 
         string[] superfluous_paths;
-        GLib.Vector<SyncJournalDb.DownloadInfo> deleted_entries;
+        GLib.List<SyncJournalDb.DownloadInfo> deleted_entries;
 
         while (query.next ().has_data) {
             const string file = query.string_value (3); // path
@@ -1441,9 +1441,9 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     Return the list of transfer ids that were removed.
     ***********************************************************/
-    public GLib.Vector<uint32> delete_stale_upload_infos (GLib.Set<string> keep) {
+    public GLib.List<uint32> delete_stale_upload_infos (GLib.Set<string> keep) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
-        GLib.Vector<uint32> ids;
+        GLib.List<uint32> ids;
 
         if (!check_connect ()) {
             return ids;
@@ -1600,10 +1600,10 @@ public class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.Vector<PollInfo> get_poll_infos () {
+    public GLib.List<PollInfo> get_poll_infos () {
         QMutexLocker locker = new QMutexLocker (this.mutex);
 
-        GLib.Vector<SyncJournalDb.PollInfo> res;
+        GLib.List<SyncJournalDb.PollInfo> res;
 
         if (!check_connect ())
             return res;
@@ -2151,8 +2151,8 @@ public class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Vector<string> table_columns (string table) {
-        GLib.Vector<string> columns;
+    private GLib.List<string> table_columns (string table) {
+        GLib.List<string> columns;
         if (!check_connect ()) {
             return columns;
         }

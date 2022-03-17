@@ -8,7 +8,7 @@ Copyright (C) 2014 by Olivier Goffart <ogoffart@woboq.com
 //  #include <KPluginFactory>
 //  #include <QtNetwork/QLocalSocket>
 //  #include <KIOCore/kfileitem.h>
-//  #include <QDir>
+//  #include <GLib.Dir>
 //  #include <QTimer>
 
 public class OwncloudDolphinPlugin : KOverlayIconPlugin {
@@ -37,7 +37,7 @@ public class OwncloudDolphinPlugin : KOverlayIconPlugin {
         if (!url.isLocalFile ()) {
             return { };
         }
-        QDir local_path = new QDir (url.to_local_file ());
+        GLib.Dir local_path = new GLib.Dir (url.to_local_file ());
         const string local_file = local_path.canonical_path ().toUtf8 ();
 
         helper.send_command ("RETRIEVE_FILE_STATUS:" + local_file + "\n");

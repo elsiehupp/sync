@@ -9,8 +9,8 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 //  #include <QQmlApplicationEngine>
 //  #include <QDesktopServices>
-//  #include <QDir>
-//  #include <QMessageBox>
+//  #include <GLib.Dir>
+//  #include <Gtk.MessageBox>
 //  #include <QSignal_mapper>
 //  #include_LIBCLOUDPROVIDERS
 //  #include <Qt_d_bus/QDBusConnection>
@@ -50,15 +50,15 @@ public class OwncloudGui : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private QPointer<Systray> tray;
-    private QPointer<SettingsDialog> settings_dialog;
-    private QPointer<LogBrowser> log_browser;
+    private Systray tray;
+    private SettingsDialog settings_dialog;
+    private LogBrowser log_browser;
 
     private QDBusConnection bus;
 
     /***********************************************************
     ***********************************************************/
-    private GLib.HashTable<string, QPointer<ShareDialog>> share_dialogs;
+    private GLib.HashTable<string, ShareDialog> share_dialogs;
 
     /***********************************************************
     ***********************************************************/
@@ -93,9 +93,9 @@ public class OwncloudGui : GLib.Object {
         this.bus = QDBusConnection.session_bus ();
         this.app = parent;
         this.tray = Systray.instance;
-        this.tray.tray_engine (new QQmlApplicationEngine (this));
+        this.tray.tray_engine = new QQmlApplicationEngine (this);
         // for the beginning, set the offline icon until the account was verified
-        this.tray.icon (Theme.instance.folder_offline_icon (/*systray?*/ true));
+        this.tray.icon = Theme.folder_offline_icon_for_tray;
 
         this.tray.show ();
 
@@ -258,7 +258,7 @@ public class OwncloudGui : GLib.Object {
         bool all_signed_out = true;
         bool all_paused = true;
         bool all_disconnected = true;
-        GLib.Vector<unowned AccountState> problem_accounts;
+        GLib.List<unowned AccountState> problem_accounts;
 
         foreach (var account in AccountManager.instance.accounts ()) {
             if (!account.is_signed_out ()) {
@@ -277,7 +277,7 @@ public class OwncloudGui : GLib.Object {
         }
 
         if (!problem_accounts.empty ()) {
-            this.tray.icon (Theme.instance.folder_offline_icon (true));
+            this.tray.icon (Theme.folder_offline_icon_for_tray);
             if (all_disconnected) {
                 status_text (_("Disconnected"));
             } else {
@@ -299,12 +299,12 @@ public class OwncloudGui : GLib.Object {
         }
 
         if (all_signed_out) {
-            this.tray.icon (Theme.instance.folder_offline_icon (true));
+            this.tray.icon (Theme.folder_offline_icon_for_tray);
             this.tray.tool_tip (_("Please sign in"));
             status_text (_("Signed out"));
             return;
         } else if (all_paused) {
-            this.tray.icon (Theme.instance.sync_state_icon (SyncResult.Status.PAUSED, true));
+            this.tray.icon (Theme.sync_state_icon (SyncResult.Status.PAUSED, true));
             this.tray.tool_tip (_("Account synchronization is disabled"));
             status_text (_("Synchronization is paused"));
             return;
@@ -331,7 +331,7 @@ public class OwncloudGui : GLib.Object {
             icon_status = SyncResult.Status.PROBLEM;
         }
 
-        Gtk.Icon status_icon = Theme.instance.sync_state_icon (icon_status, true);
+        Gtk.Icon status_icon = Theme.sync_state_icon (icon_status, true);
         this.tray.icon (status_icon);
 
         // create the tray blob message, check if we have an defined state
@@ -562,12 +562,12 @@ public class OwncloudGui : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_show_gui_message (string title, string message) {
-        var message_box = new QMessageBox ();
+        var message_box = new Gtk.MessageBox ();
         message_box.window_flags (message_box.window_flags () | Qt.Window_stays_on_signal_top_hint);
         message_box.attribute (Qt.WA_DeleteOnClose);
         message_box.on_signal_text (message);
         message_box.window_title (title);
-        message_box.icon (QMessageBox.Information);
+        message_box.icon (Gtk.MessageBox.Information);
         message_box.open ();
     }
 
@@ -609,7 +609,7 @@ public class OwncloudGui : GLib.Object {
     public void on_signal_open_owncloud () {
         var account = (Account) sender ().property (PROPERTY_ACCOUNT_C);
         if (account) {
-            Utility.open_browser (account.url ());
+            OpenExtrernal.open_browser (account.url);
         }
     }
 
@@ -663,7 +663,7 @@ public class OwncloudGui : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_help () {
-        QDesktopServices.open_url (GLib.Uri (Theme.instance.help_url ()));
+        QDesktopServices.open_url (GLib.Uri (Theme.help_url));
     }
 
 

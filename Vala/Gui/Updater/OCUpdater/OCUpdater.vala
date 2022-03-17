@@ -144,19 +144,19 @@ public class OCUpdater : Updater {
         string update_file = settings.value (update_available_c).to_string ();
         if (!update_file == "" && GLib.File (update_file).exists ()
             && !update_succeeded () /* Someone might have run the updater manually between restarts */) {
-            const var message_box_start_installer = new QMessageBox (QMessageBox.Information,
-                _("New %1 update ready").printf (Theme.instance.app_name_gui ()),
+            const var message_box_start_installer = new Gtk.MessageBox (Gtk.MessageBox.Information,
+                _("New %1 update ready").printf (Theme.app_name_gui),
                 _("A new update for %1 is about to be installed. The updater may ask "
                 + "for additional privileges during the process. Your computer may reboot to complete the installation.")
-                    .printf (Theme.instance.app_name_gui ()),
-                QMessageBox.Ok,
+                    .printf (Theme.app_name_gui),
+                Gtk.MessageBox.Ok,
                 null);
 
             message_box_start_installer.attribute (Qt.WA_DeleteOnClose);
 
             connect (
                 message_box_start_installer,
-                QMessageBox.on_signal_finished,
+                Gtk.MessageBox.on_signal_finished,
                 this,
                 this.on_signal_start_installer
             );
@@ -189,7 +189,7 @@ public class OCUpdater : Updater {
         case DownloadState.DOWNLOAD_COMPLETE:
             return _("%1 available. Restart application to on_signal_start the update.").printf (update_version);
         case DownloadState.DOWNLOAD_FAILED: {
-            if (format == UpdateStatusStringFormat.UpdateStatusStringFormat.HTML) {
+            if (format == UpdateStatusStringFormat.HTML) {
                 return _("Could not download update. Please open <a href='%1'>%1</a> to download the update manually.").printf (this.update_info.web ());
             }
             return _("Could not download update. Please open %1 to download the update manually.").printf (this.update_info.web ());
@@ -197,7 +197,7 @@ public class OCUpdater : Updater {
         case DownloadState.DOWNLOAD_TIMED_OUT:
             return _("Could not check for new updates.");
         case DownloadState.UIPLOAD_ONLY_AVAILABLE_THROUGH_SYSTEM: {
-            if (format == UpdateStatusStringFormat.UpdateStatusStringFormat.HTML) {
+            if (format == UpdateStatusStringFormat.HTML) {
                 return _("New %1 is available. Please open <a href='%2'>%2</a> to download the update.").printf (update_version, this.update_info.web ());
             }
             return _("New %1 is available. Please open %2 to download the update.").printf (update_version, this.update_info.web ());
@@ -245,7 +245,7 @@ public class OCUpdater : Updater {
             string command = string ("&{msiexec /promptrestart /passive /i '%1' /L*V '%2'| Out-Null ; &'%3'}")
                  .printf (prepare_path_for_powershell (update_file))
                  .printf (prepare_path_for_powershell (msi_log_file))
-                 .printf (prepare_path_for_powershell (QCoreApplication.application_file_path ()));
+                 .printf (prepare_path_for_powershell (Gtk.Application.application_file_path ()));
 
             QProcess.start_detached ("powershell.exe", {"-Command", command});
         }
@@ -255,10 +255,10 @@ public class OCUpdater : Updater {
 
     /***********************************************************
     ***********************************************************/
-    private static QDir prepare_path_for_powershell (string path) {
+    private static GLib.Dir prepare_path_for_powershell (string path) {
         path.replace ("'", "''");
 
-        return QDir.to_native_separators (path);
+        return GLib.Dir.to_native_separators (path);
     }
 
 

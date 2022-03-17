@@ -355,17 +355,17 @@ public class TestSyncJournalDB : GLib.Object {
         // Make a thrice-nested setup
         make ("", PinState.PinState.ALWAYS_LOCAL);
         make ("local", PinState.PinState.ALWAYS_LOCAL);
-        make ("online", PinState.VfsItemAvailability.ONLINE_ONLY);
+        make ("online", Vfs.ItemAvailability.ONLINE_ONLY);
         make ("inherit", PinState.PinState.INHERITED);
         foreach (string base_string_1 in {"local/", "online/", "inherit/"}) {
             make (base_string_1 + "inherit", PinState.PinState.INHERITED);
             make (base_string_1 + "local", PinState.PinState.ALWAYS_LOCAL);
-            make (base_string_1 + "online", PinState.VfsItemAvailability.ONLINE_ONLY);
+            make (base_string_1 + "online", Vfs.ItemAvailability.ONLINE_ONLY);
 
             foreach (var base_string_2 in { "local/", "online/", "inherit/" }) {
                 make (base_string_1 + base_string_2 + "inherit", PinState.PinState.INHERITED);
                 make (base_string_1 + base_string_2 + "local", PinState.PinState.ALWAYS_LOCAL);
-                make (base_string_1 + base_string_2 + "online", PinState.VfsItemAvailability.ONLINE_ONLY);
+                make (base_string_1 + base_string_2 + "online", Vfs.ItemAvailability.ONLINE_ONLY);
             }
         }
 
@@ -375,33 +375,33 @@ public class TestSyncJournalDB : GLib.Object {
         // Baseline direct checks (the fallback for unset root pinstate is PinState.ALWAYS_LOCAL)
         GLib.assert_true (get_pin_state ("") == PinState.PinState.ALWAYS_LOCAL);
         GLib.assert_true (get_pin_state ("local") == PinState.PinState.ALWAYS_LOCAL);
-        GLib.assert_true (get_pin_state ("online") == PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (get_pin_state ("online") == Vfs.ItemAvailability.ONLINE_ONLY);
         GLib.assert_true (get_pin_state ("inherit") == PinState.PinState.ALWAYS_LOCAL);
         GLib.assert_true (get_pin_state ("nonexistant") == PinState.PinState.ALWAYS_LOCAL);
         GLib.assert_true (get_pin_state ("online/local") == PinState.PinState.ALWAYS_LOCAL);
-        GLib.assert_true (get_pin_state ("local/online") == PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (get_pin_state ("local/online") == Vfs.ItemAvailability.ONLINE_ONLY);
         GLib.assert_true (get_pin_state ("inherit/local") == PinState.PinState.ALWAYS_LOCAL);
-        GLib.assert_true (get_pin_state ("inherit/online") == PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (get_pin_state ("inherit/online") == Vfs.ItemAvailability.ONLINE_ONLY);
         GLib.assert_true (get_pin_state ("inherit/inherit") == PinState.PinState.ALWAYS_LOCAL);
         GLib.assert_true (get_pin_state ("inherit/nonexistant") == PinState.PinState.ALWAYS_LOCAL);
 
         // Inheriting checks, level 1
         GLib.assert_true (get_pin_state ("local/inherit") == PinState.PinState.ALWAYS_LOCAL);
         GLib.assert_true (get_pin_state ("local/nonexistant") == PinState.PinState.ALWAYS_LOCAL);
-        GLib.assert_true (get_pin_state ("online/inherit") == PinState.VfsItemAvailability.ONLINE_ONLY);
-        GLib.assert_true (get_pin_state ("online/nonexistant") == PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (get_pin_state ("online/inherit") == Vfs.ItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (get_pin_state ("online/nonexistant") == Vfs.ItemAvailability.ONLINE_ONLY);
 
         // Inheriting checks, level 2
         GLib.assert_true (get_pin_state ("local/inherit/inherit") == PinState.PinState.ALWAYS_LOCAL);
         GLib.assert_true (get_pin_state ("local/local/inherit") == PinState.PinState.ALWAYS_LOCAL);
         GLib.assert_true (get_pin_state ("local/local/nonexistant") == PinState.PinState.ALWAYS_LOCAL);
-        GLib.assert_true (get_pin_state ("local/online/inherit") == PinState.VfsItemAvailability.ONLINE_ONLY);
-        GLib.assert_true (get_pin_state ("local/online/nonexistant") == PinState.VfsItemAvailability.ONLINE_ONLY);
-        GLib.assert_true (get_pin_state ("online/inherit/inherit") == PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (get_pin_state ("local/online/inherit") == Vfs.ItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (get_pin_state ("local/online/nonexistant") == Vfs.ItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (get_pin_state ("online/inherit/inherit") == Vfs.ItemAvailability.ONLINE_ONLY);
         GLib.assert_true (get_pin_state ("online/local/inherit") == PinState.PinState.ALWAYS_LOCAL);
         GLib.assert_true (get_pin_state ("online/local/nonexistant") == PinState.PinState.ALWAYS_LOCAL);
-        GLib.assert_true (get_pin_state ("online/online/inherit") == PinState.VfsItemAvailability.ONLINE_ONLY);
-        GLib.assert_true (get_pin_state ("online/online/nonexistant") == PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (get_pin_state ("online/online/inherit") == Vfs.ItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (get_pin_state ("online/online/nonexistant") == Vfs.ItemAvailability.ONLINE_ONLY);
 
         // Spot check the recursive variant
         GLib.assert_true (get_recursive ("") == PinState.PinState.INHERITED);
@@ -411,21 +411,21 @@ public class TestSyncJournalDB : GLib.Object {
         GLib.assert_true (get_recursive ("online/local") == PinState.PinState.INHERITED);
         GLib.assert_true (get_recursive ("online/local/inherit") == PinState.PinState.ALWAYS_LOCAL);
         GLib.assert_true (get_recursive ("inherit/inherit/inherit") == PinState.PinState.ALWAYS_LOCAL);
-        GLib.assert_true (get_recursive ("inherit/online/inherit") == PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (get_recursive ("inherit/online/inherit") == Vfs.ItemAvailability.ONLINE_ONLY);
         GLib.assert_true (get_recursive ("inherit/online/local") == PinState.PinState.ALWAYS_LOCAL);
         make ("local/local/local/local", PinState.PinState.ALWAYS_LOCAL);
         GLib.assert_true (get_recursive ("local/local/local") == PinState.PinState.ALWAYS_LOCAL);
         GLib.assert_true (get_recursive ("local/local/local/local") == PinState.PinState.ALWAYS_LOCAL);
 
         // Check changing the root pin state
-        make ("", PinState.VfsItemAvailability.ONLINE_ONLY);
+        make ("", Vfs.ItemAvailability.ONLINE_ONLY);
         GLib.assert_true (get_pin_state ("local") == PinState.PinState.ALWAYS_LOCAL);
-        GLib.assert_true (get_pin_state ("online") == PinState.VfsItemAvailability.ONLINE_ONLY);
-        GLib.assert_true (get_pin_state ("inherit") == PinState.VfsItemAvailability.ONLINE_ONLY);
-        GLib.assert_true (get_pin_state ("nonexistant") == PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (get_pin_state ("online") == Vfs.ItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (get_pin_state ("inherit") == Vfs.ItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (get_pin_state ("nonexistant") == Vfs.ItemAvailability.ONLINE_ONLY);
         make ("", PinState.PinState.ALWAYS_LOCAL);
         GLib.assert_true (get_pin_state ("local") == PinState.PinState.ALWAYS_LOCAL);
-        GLib.assert_true (get_pin_state ("online") == PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (get_pin_state ("online") == Vfs.ItemAvailability.ONLINE_ONLY);
         GLib.assert_true (get_pin_state ("inherit") == PinState.PinState.ALWAYS_LOCAL);
         GLib.assert_true (get_pin_state ("nonexistant") == PinState.PinState.ALWAYS_LOCAL);
 

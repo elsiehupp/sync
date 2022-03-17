@@ -391,7 +391,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
         if (is_signed_out () || this.waiting_for_new_credentials)
             return;
 
-        GLib.info ("Invalid credentials for " + this.account.url ().to_string ()
+        GLib.info ("Invalid credentials for " + this.account.url.to_string ()
                                + " asking user.");
 
         this.waiting_for_new_credentials = true;
@@ -496,7 +496,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     ***********************************************************/
     protected void on_signal_connection_validator_result (ConnectionValidator.Status status, string[] errors) {
         if (is_signed_out ()) {
-            GLib.warning ("Signed out, ignoring " + status + this.account.url ().to_string ());
+            GLib.warning ("Signed out, ignoring " + status + this.account.url.to_string ());
             return;
         }
 
@@ -580,7 +580,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
         // make sure it changes account state and icons
         sign_out_by_ui ();
 
-        GLib.info ("Invalid credentials for " + this.account.url ().to_string ()
+        GLib.info ("Invalid credentials for " + this.account.url.to_string ()
                                + "; checking for remote wipe request.");
 
         this.waiting_for_new_credentials = false;
@@ -594,7 +594,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
         // Make a connection attempt, no matter whether the credentials are
         // ready or not - we want to check whether we can get an SSL connection
         // going before bothering the user for a password.
-        GLib.info ("Fetched credentials for " + this.account.url ().to_string ()
+        GLib.info ("Fetched credentials for " + this.account.url.to_string ()
                   + "; attempting to connect.");
         this.waiting_for_new_credentials = false;
         on_signal_check_connectivity ();
@@ -604,7 +604,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_credentials_asked (AbstractCredentials credentials) {
-        GLib.info ("Credentials asked for " + this.account.url ().to_string ()
+        GLib.info ("Credentials asked for " + this.account.url.to_string ()
                   + "; are they ready? " + credentials.ready ());
 
         this.waiting_for_new_credentials = false;

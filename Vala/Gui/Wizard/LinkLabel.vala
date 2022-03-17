@@ -42,7 +42,7 @@ public class LinkLabel : Gtk.Label {
     ***********************************************************/
     protected void mouse_release_event (QMouseEvent event) {
         if (url.is_valid ()) {
-            Utility.open_browser (url);
+            OpenExtrernal.open_browser (url);
         }
 
         /* emit */ clicked ();

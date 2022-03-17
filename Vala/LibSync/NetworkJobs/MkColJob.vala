@@ -22,7 +22,7 @@ public class MkColJob : AbstractNetworkJob {
     GLib.HashTable<string, string> extra_headers;
 
 
-    internal signal void finished_with_error (GLib.InputStream reply);
+    internal signal void signal_finished_with_error (GLib.InputStream reply);
     internal signal void finished_without_error ();
 
 
@@ -75,11 +75,11 @@ public class MkColJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private bool on_signal_finished () {
-        GLib.info ("MKCOL of" + reply ().request ().url ()
+        GLib.info ("MKCOL of" + reply ().request ().url
             + " finished with status " + reply_status_string ());
 
         if (reply ().error () != Soup.Reply.NoError) {
-            /* Q_EMIT */ finished_with_error (reply ());
+            /* Q_EMIT */ signal_finished_with_error (reply ());
         } else {
             /* Q_EMIT */ finished_without_error ();
         }

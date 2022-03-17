@@ -125,9 +125,9 @@ public class DiscoverySingleDirectoryJob : GLib.Object {
 
         ls_col_job.properties (props);
 
-        GLib.Object.connect (ls_col_job, LsColJob.directory_listing_iterated,
+        GLib.Object.connect (ls_col_job, LsColJob.signal_directory_listing_iterated,
             this, DiscoverySingleDirectoryJob.on_signal_directory_listing_iterated_slot);
-        GLib.Object.connect (ls_col_job, LsColJob.finished_with_error, this, DiscoverySingleDirectoryJob.on_signal_ls_job_finished_with_error_slot);
+        GLib.Object.connect (ls_col_job, LsColJob.signal_finished_with_error, this, DiscoverySingleDirectoryJob.on_signal_ls_job_finished_with_error_slot);
         GLib.Object.connect (ls_col_job, LsColJob.finished_without_error, this, DiscoverySingleDirectoryJob.on_signal_ls_job_finished_without_error_slot);
         ls_col_job.start ();
 

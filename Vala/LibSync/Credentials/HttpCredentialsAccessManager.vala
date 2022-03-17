@@ -32,10 +32,10 @@ public class HttpCredentialsAccessManager : AccessManager {
                     string cred_hash = (this.credentials.user ().to_utf8 () + ":" + this.credentials.password ().to_utf8 ()).to_base64 ();
                     request.raw_header ("Authorization", "Basic " + cred_hash);
                 }
-            } else if (!request.url ().password () == "") {
+            } else if (!request.url.password () == "") {
                 // Typically the requests to get or refresh the OAuth access token. The client
                 // credentials are put in the URL from the code making the request.
-                string cred_hash = request.url ().user_info ().to_utf8 ().to_base64 ();
+                string cred_hash = request.url.user_info ().to_utf8 ().to_base64 ();
                 request.raw_header ("Authorization", "Basic " + cred_hash);
             }
         }

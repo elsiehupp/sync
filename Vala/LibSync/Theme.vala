@@ -54,7 +54,7 @@ public class Theme : GLib.Object {
             if (Theme.instance == null) {
                 Theme.instance = new THEME_CLASS ();
                 // some themes may not call the base ctor
-                Theme.instance.mono = false;
+                Theme.mono = false;
             }
             return Theme.instance;
         }
@@ -68,7 +68,7 @@ public class Theme : GLib.Object {
     Define if the systray icons should be using mono design
     Retrieve wether to use mono icons for systray
     ***********************************************************/
-    bool systray_use_mono_icons {
+    public static bool systray_use_mono_icons {
         public get {
             return this.mono;
         }
@@ -105,8 +105,10 @@ public class Theme : GLib.Object {
 
     @return true if branded, false otherwise
     ***********************************************************/
-    public bool is_branded () {
-        return app_name_gui () != "Nextcloud";
+    public static bool is_branded {
+        public get {
+            return app_name_gui != "Nextcloud";
+        }
     }
 
 
@@ -121,8 +123,10 @@ public class Theme : GLib.Object {
 
     @return string with human readable app name.
     ***********************************************************/
-    public string app_name_gui () {
-        return APPLICATION_NAME;
+    public static string app_name_gui {
+        public get {
+            return APPLICATION_NAME;
+        }
     }
 
 
@@ -139,12 +143,14 @@ public class Theme : GLib.Object {
 
     Warning: Do not modify this value, as many things, e.g.
     settings depend on it! You most likely want to modify
-    \ref app_name_gui ().
+    \ref app_name_gui.
 
     @return string with app name.
     ***********************************************************/
-    public string app_name () {
-        return APPLICATION_SHORTNAME;
+    public static string app_name {
+        public get {
+            return APPLICATION_SHORTNAME;
+        }
     }
 
 
@@ -152,8 +158,10 @@ public class Theme : GLib.Object {
     @brief Returns full path to an online state icon
     @return GLib.Uri full path to an icon
     ***********************************************************/
-    public GLib.Uri state_online_image_source () {
-        return image_path_to_url (theme_image_path ("state-ok"));
+    public static GLib.Uri state_online_image_source {
+        public get {
+            return image_path_to_url (theme_image_path ("state-ok"));
+        }
     }
 
 
@@ -161,8 +169,10 @@ public class Theme : GLib.Object {
     @brief Returns full path to an offline state icon
     @return GLib.Uri full path to an icon
     ***********************************************************/
-    public GLib.Uri state_offline_image_source () {
-        return image_path_to_url (theme_image_path ("state-offline", 16));
+    public static GLib.Uri state_offline_image_source {
+        public get {
+            return image_path_to_url (theme_image_path ("state-offline", 16));
+        }
     }
 
 
@@ -170,8 +180,10 @@ public class Theme : GLib.Object {
     @brief Returns full path to an online user status icon
     @return GLib.Uri full path to an icon
     ***********************************************************/
-    public GLib.Uri status_online_image_source () {
-        return image_path_to_url (theme_image_path ("user-status-online", 16));
+    public static GLib.Uri status_online_image_source {
+        public get {
+            return image_path_to_url (theme_image_path ("user-status-online", 16));
+        }
     }
 
 
@@ -179,8 +191,10 @@ public class Theme : GLib.Object {
     @brief Returns full path to an do not disturb user status icon
     @return GLib.Uri full path to an icon
     ***********************************************************/
-    public GLib.Uri status_do_not_disturb_image_source () {
-        return image_path_to_url (theme_image_path ("user-status-dnd", 16));
+    public static GLib.Uri status_do_not_disturb_image_source {
+        public get {
+            return image_path_to_url (theme_image_path ("user-status-dnd", 16));
+        }
     }
 
 
@@ -188,8 +202,10 @@ public class Theme : GLib.Object {
     @brief Returns full path to an away user status icon
     @return GLib.Uri full path to an icon
     ***********************************************************/
-    public GLib.Uri status_away_image_source () {
-        return image_path_to_url (theme_image_path ("user-status-away", 16));
+    public static GLib.Uri status_away_image_source {
+        public get {
+            return image_path_to_url (theme_image_path ("user-status-away", 16));
+        }
     }
 
 
@@ -197,50 +213,64 @@ public class Theme : GLib.Object {
     @brief Returns full path to an invisible user status icon
     @return GLib.Uri full path to an icon
     ***********************************************************/
-    public GLib.Uri status_invisible_image_source () {
-        return image_path_to_url (theme_image_path ("user-status-invisible", 64));
+    public static GLib.Uri status_invisible_image_source {
+        public get {
+            return image_path_to_url (theme_image_path ("user-status-invisible", 64));
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public GLib.Uri sync_status_ok () {
-        return image_path_to_url (theme_image_path ("state-ok", 16));
+    public static GLib.Uri sync_status_ok {
+        public get {
+            return image_path_to_url (theme_image_path ("state-ok", 16));
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public GLib.Uri sync_status_error () {
-        return image_path_to_url (theme_image_path ("state-error", 16));
+    public static GLib.Uri sync_status_error {
+        public get {
+            return image_path_to_url (theme_image_path ("state-error", 16));
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public GLib.Uri sync_status_running () {
-        return image_path_to_url (theme_image_path ("state-sync", 16));
+    public static GLib.Uri sync_status_running {
+        public get {
+            return image_path_to_url (theme_image_path ("state-sync", 16));
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public GLib.Uri sync_status_pause () {
-        return image_path_to_url (theme_image_path ("state-pause", 16));
+    public static GLib.Uri sync_status_pause {
+        public get {
+            return image_path_to_url (theme_image_path ("state-pause", 16));
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public GLib.Uri sync_status_warning () {
-        return image_path_to_url (theme_image_path ("state-warning", 16));
+    public static GLib.Uri sync_status_warning {
+        public get {
+            return image_path_to_url (theme_image_path ("state-warning", 16));
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public GLib.Uri folder_offline () {
-        return image_path_to_url (theme_image_path ("state-offline"));
+    public static GLib.Uri folder_offline {
+        public get {
+            return image_path_to_url (theme_image_path ("state-offline"));
+        }
     }
 
 
@@ -248,8 +278,10 @@ public class Theme : GLib.Object {
     @brief config_filename
     @return the name of the config file.
     ***********************************************************/
-    public string config_filename () {
-        return APPLICATION_EXECUTABLE + ".config";
+    public static string config_filename {
+        public get {
+            return APPLICATION_EXECUTABLE + ".config";
+        }
     }
 
 
@@ -279,7 +311,7 @@ public class Theme : GLib.Object {
     public static string hidpi_filename_for_color (string icon_name, Gtk.Color background_color, QPaintDevice dev = null) {
         var is_dark_background = Theme.is_dark_color (background_color);
 
-        const string icon_path = Theme.theme_prefix + (is_dark_background ? "white/": "black/") + icon_name;
+        const string icon_path = Theme.THEME_PREFIX + (is_dark_background ? "white/": "black/") + icon_name;
 
         return Theme.hidpi_filename (icon_path, dev);
     }
@@ -296,7 +328,7 @@ public class Theme : GLib.Object {
     /***********************************************************
     Get an sync state icon
     ***********************************************************/
-    public Gtk.Icon sync_state_icon (SyncResult.Status status, bool sys_tray = false) {
+    public static Gtk.Icon sync_state_icon (SyncResult.Status status, bool sys_tray = false) {
         // FIXME: Mind the size!
         string status_icon;
 
@@ -333,28 +365,43 @@ public class Theme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public Gtk.Icon folder_disabled_icon () {
-        return theme_icon ("state-pause");
+    public static Gtk.Icon folder_disabled_icon {
+        public get {
+            return theme_icon ("state-pause");
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public Gtk.Icon folder_offline_icon (bool sys_tray) {
-        return theme_icon ("state-offline", sys_tray);
+    public static Gtk.Icon folder_offline_icon {
+        public get {
+            return theme_icon ("state-offline", false);
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public Gtk.Icon application_icon () {
-        return theme_icon (APPLICATION_ICON_NAME + "-icon");
+    public static Gtk.Icon folder_offline_icon_for_tray {
+        public get {
+            return theme_icon ("state-offline", true);
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public string status_header_text (SyncResult.Status status) {
+    public static Gtk.Icon application_icon {
+        public get {
+            return theme_icon (APPLICATION_ICON_NAME + "-icon");
+        }
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public static string status_header_text (SyncResult.Status status) {
         string result_str;
 
         switch (status) {
@@ -385,7 +432,7 @@ public class Theme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public string version ();
+    public static string version;
 
 
     /***********************************************************
@@ -395,16 +442,20 @@ public class Theme : GLib.Object {
     folder to sync.
     The Add-Button is removed accordingly.
     ***********************************************************/
-    public bool single_sync_folder () {
-        return false;
+    public static bool single_sync_folder {
+        public get {
+            return false;
+        }
     }
 
 
     /***********************************************************
     When true, client works with multiple accounts.
     ***********************************************************/
-    public bool multi_account () {
-        return true;
+    public static bool multi_account {
+        public get {
+            return true;
+        }
     }
 
 
@@ -419,8 +470,10 @@ public class Theme : GLib.Object {
 
     Defaults to Nextclouds client documentation website.
     ***********************************************************/
-    public string help_url () {
-        return APPLICATION_HELP_URL;
+    public static string help_url {
+        public get {
+            return APPLICATION_HELP_URL;
+        }
     }
 
 
@@ -430,17 +483,21 @@ public class Theme : GLib.Object {
     If the function is overridden to return an empty string no
     help link will be sh
 
-    Defaults to help_url () + "conflicts.html", which is a page
-    in ownCloud's client documentation website. If help_url ()
+    Defaults to help_url + "conflicts.html", which is a page
+    in ownCloud's client documentation website. If help_url
     is empty, this function will also return the empty string.
     ***********************************************************/
-    public string conflict_help_url () {
-        var base_url = help_url ();
-        if (base_url == "")
-            return "";
-        if (!base_url.has_suffix ("/"))
-            base_url.append ("/");
-        return base_url + "conflicts.html";
+    public static string conflict_help_url {
+        public get {
+            var base_url = help_url;
+            if (base_url == "") {
+                return "";
+            }
+            if (!base_url.has_suffix ("/")) {
+                base_url.append ("/");
+            }
+            return base_url + "conflicts.html";
+        }
     }
 
 
@@ -448,10 +505,12 @@ public class Theme : GLib.Object {
     Setting a value here will pre-define the server url.
 
     The respective UI controls will be disabled only if
-    force_override_server_url () is true
+    force_override_server_url is true
     ***********************************************************/
-    public string override_server_url () {
-        return APPLICATION_SERVER_URL;
+    public static string override_server_url {
+        public get {
+            return APPLICATION_SERVER_URL;
+        }
     }
 
 
@@ -460,8 +519,10 @@ public class Theme : GLib.Object {
 
     When true, the respective UI controls will be disabled
     ***********************************************************/
-    public bool force_override_server_url () {
-        return APPLICATION_SERVER_URL_ENFORCE;
+    public static bool force_override_server_url {
+        public get {
+            return APPLICATION_SERVER_URL_ENFORCE;
+        }
     }
 
 
@@ -471,8 +532,10 @@ public class Theme : GLib.Object {
     When true, peer will be requested for Online Certificate
     Status Protocol response
     ***********************************************************/
-    public bool enable_stapling_ocsp () {
-        return APPLICATION_OCSP_STAPLING_ENABLED;
+    public static bool enable_stapling_ocsp {
+        public get {
+            return APPLICATION_OCSP_STAPLING_ENABLED;
+        }
     }
 
 
@@ -481,8 +544,10 @@ public class Theme : GLib.Object {
 
     When true, trusting the untrusted certificate is not allowed
     ***********************************************************/
-    public bool forbid_bad_ssl () {
-        return APPLICATION_FORBID_BAD_SSL;
+    public static bool forbid_bad_ssl {
+        public get {
+            return APPLICATION_FORBID_BAD_SSL;
+        }
     }
 
 
@@ -492,8 +557,10 @@ public class Theme : GLib.Object {
     you should then specify "http" or "shibboleth". Normally
     this should be left empty.
     ***********************************************************/
-    public string force_config_auth_type () {
-        return "";
+    public static string force_config_auth_type {
+        public get {
+            return "";
+        }
     }
 
 
@@ -501,8 +568,10 @@ public class Theme : GLib.Object {
     The default folder name without path on the server at setup
     time.
     ***********************************************************/
-    public string default_server_folder () {
-        return "/";
+    public static string default_server_folder {
+        public get {
+            return "/";
+        }
     }
 
 
@@ -510,23 +579,27 @@ public class Theme : GLib.Object {
     The default folder name without path on the client side at
     setup time.
     ***********************************************************/
-    public string default_client_folder () {
-        return app_name ();
+    public static string default_client_folder {
+        public get {
+            return app_name;
+        }
     }
 
 
     /***********************************************************
     Override to encforce a particular locale, i.e. "de" or "pt_BR"
     ***********************************************************/
-    public string enforced_locale () {
-        return "";
+    public static string enforced_locale {
+        public get {
+            return "";
+        }
     }
 
 
     /***********************************************************
     colored, white or black
     ***********************************************************/
-    public string systray_icon_flavor (bool mono) {
+    public static string systray_icon_flavor (bool mono) {
         string flavor;
         if (mono) {
             flavor = Utility.has_dark_systray () ? "white": "black";
@@ -542,7 +615,7 @@ public class Theme : GLib.Object {
     The default implementation will try to look up
     :/client/theme/<type>.png
     ***********************************************************/
-    public GLib.Variant custom_media (CustomMediaType type) {
+    public static GLib.Variant custom_media (CustomMediaType type) {
         GLib.Variant re;
         string key;
 
@@ -561,7 +634,7 @@ public class Theme : GLib.Object {
             break;
         }
 
-        string img_path = Theme.theme_prefix + "colored/%1.png".printf (key);
+        string img_path = Theme.THEME_PREFIX + "colored/%1.png".printf (key);
         if (GLib.File.exists (img_path)) {
             Gdk.Pixbuf pix = new Gdk.Pixbuf (img_path);
             if (pix.is_null ()) {
@@ -578,160 +651,176 @@ public class Theme : GLib.Object {
     /***********************************************************
     @return color for the setup wizard
     ***********************************************************/
-    public Gtk.Color wizard_header_title_color () {
-        return {APPLICATION_WIZARD_HEADER_TITLE_COLOR};
+    public static Gtk.Color wizard_header_title_color {
+        public get {
+            return new Gtk.Color (APPLICATION_WIZARD_HEADER_TITLE_COLOR);
+        }
     }
 
 
     /***********************************************************
     @return color for the setup wizard.
     ***********************************************************/
-    public Gtk.Color wizard_header_background_color () {
-        return {APPLICATION_WIZARD_HEADER_BACKGROUND_COLOR};
+    public static Gtk.Color wizard_header_background_color {
+        public get {
+            return new Gtk.Color (APPLICATION_WIZARD_HEADER_BACKGROUND_COLOR);
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public Gdk.Pixbuf wizard_application_logo () {
-        if (!Theme.is_branded ()) {
-            return new Gdk.Pixbuf (Theme.hidpi_filename (Theme.theme_prefix + "colored/wizard-nextcloud.png"));
+    public static Gdk.Pixbuf wizard_application_logo {
+        public get {
+            if (!Theme.is_branded) {
+                return new Gdk.Pixbuf (Theme.hidpi_filename (Theme.THEME_PREFIX + "colored/wizard-nextcloud.png"));
+            }
+        // #ifdef APPLICATION_WIZARD_USE_CUSTOM_LOGO
+            var use_svg = should_prefer_svg;
+            const string logo_base_path = Theme.THEME_PREFIX + "colored/wizard_logo";
+            if (use_svg) {
+                var max_height = Theme.is_hidpi () ? 200 : 100;
+                var max_width = 2 * max_height;
+                var icon = new Gtk.Icon (logo_base_path + ".svg");
+                var size = icon.actual_size (QSize (max_width, max_height));
+                return icon.pixmap (size);
+            } else {
+                return Gdk.Pixbuf (hidpi_filename (logo_base_path + ".png"));
+            }
+        // #else
+            var size = Theme.is_hidpi () ? 200 : 100;
+            return application_icon.pixmap (size);
+        // #endif
         }
-    // #ifdef APPLICATION_WIZARD_USE_CUSTOM_LOGO
-        var use_svg = should_prefer_svg ();
-        const string logo_base_path = Theme.theme_prefix + "colored/wizard_logo";
-        if (use_svg) {
-            var max_height = Theme.is_hidpi () ? 200 : 100;
-            var max_width = 2 * max_height;
-            var icon = new Gtk.Icon (logo_base_path + ".svg");
-            var size = icon.actual_size (QSize (max_width, max_height));
-            return icon.pixmap (size);
-        } else {
-            return Gdk.Pixbuf (hidpi_filename (logo_base_path + ".png"));
-        }
-    // #else
-        var size = Theme.is_hidpi () ? 200 : 100;
-        return application_icon ().pixmap (size);
-    // #endif
     }
 
 
     /***********************************************************
     @return logo for the setup wizard.
     ***********************************************************/
-    public Gdk.Pixbuf wizard_header_logo () {
-    // #ifdef APPLICATION_WIZARD_USE_CUSTOM_LOGO
-        var use_svg = should_prefer_svg ();
-        const string logo_base_path = Theme.theme_prefix + "colored/wizard_logo";
-        if (use_svg) {
-            var max_height = 64;
-            var max_width = 2 * max_height;
-            var icon = new Gtk.Icon (logo_base_path + ".svg");
-            var size = icon.actual_size (QSize (max_width, max_height));
-            return icon.pixmap (size);
-        } else {
-            return Gdk.Pixbuf (hidpi_filename (logo_base_path + ".png"));
+    public static Gdk.Pixbuf wizard_header_logo {
+        public get {
+        // #ifdef APPLICATION_WIZARD_USE_CUSTOM_LOGO
+            var use_svg = should_prefer_svg;
+            const string logo_base_path = Theme.THEME_PREFIX + "colored/wizard_logo";
+            if (use_svg) {
+                var max_height = 64;
+                var max_width = 2 * max_height;
+                var icon = new Gtk.Icon (logo_base_path + ".svg");
+                var size = icon.actual_size (QSize (max_width, max_height));
+                return icon.pixmap (size);
+            } else {
+                return Gdk.Pixbuf (hidpi_filename (logo_base_path + ".png"));
+            }
+        // #else
+            return application_icon.pixmap (64);
+        // #endif
         }
-    // #else
-        return application_icon ().pixmap (64);
-    // #endif
     }
 
 
     /***********************************************************
     The default implementation creates a
     background based on
-    \ref wizard_header_title_color ().
+    \ref wizard_header_title_color.
 
     @return banner for the setup wizard.
     ***********************************************************/
-    public Gdk.Pixbuf wizard_header_banner () {
-        Gtk.Color c = wizard_header_background_color ();
-        if (!c.is_valid ()) {
-            return Gdk.Pixbuf ();
-        }
-
-        QSize size = new QSize (750, 78);
-        var screen = Gtk.Application.primary_screen ();
-        if (screen) {
-            // Adjust the the size if there is a different DPI. (Issue #6156)
-            // Indeed, this size need to be big enough to for the banner height, and the wizard's width
-            var ratio = screen.logical_dots_per_inch () / 96.0;
-            if (ratio > 1.0) {
-                size *= ratio;
+    public static Gdk.Pixbuf wizard_header_banner {
+        public get {
+            Gtk.Color c = wizard_header_background_color;
+            if (!c.is_valid ()) {
+                return Gdk.Pixbuf ();
             }
+    
+            QSize size = new QSize (750, 78);
+            var screen = Gtk.Application.primary_screen ();
+            if (screen) {
+                // Adjust the the size if there is a different DPI. (Issue #6156)
+                // Indeed, this size need to be big enough to for the banner height, and the wizard's width
+                var ratio = screen.logical_dots_per_inch () / 96.0;
+                if (ratio > 1.0) {
+                    size *= ratio;
+                }
+            }
+            Gdk.Pixbuf pix = new Gdk.Pixbuf (size);
+            pix.fill (wizard_header_background_color);
+            return pix;
         }
-        Gdk.Pixbuf pix = new Gdk.Pixbuf (size);
-        pix.fill (wizard_header_background_color ());
-        return pix;
     }
 //  #endif
 
     /***********************************************************
     The SHA sum of the released git commit
     ***********************************************************/
-    public string git_sha1 () {
-        string dev_string;
-    // #ifdef GIT_SHA1
-        const string github_prefix =
-            "https://github.com/nextcloud/desktop/commit/";
-        const string git_sha1 = GIT_SHA1;
-        dev_string = _("nextcloud_theme.about ()"
-                     + "<p><small>Built from Git revision <a href=\"%1\">%2</a>"
-                     + " on %3, %4 using Qt %5, %6</small></p>")
-                        .printf (github_prefix + git_sha1)
-                        .printf (git_sha1.left (6))
-                        .printf (__DATE__)
-                        .printf (__TIME__)
-                        .printf (q_version ())
-                        .printf (QSslSocket.ssl_library_version_string ());
-    // #endif
-        return dev_string;
+    public static string git_sha1 {
+        public get {
+            string dev_string;
+        // #ifdef GIT_SHA1
+            const string github_prefix =
+                "https://github.com/nextcloud/desktop/commit/";
+            const string git_sha1 = GIT_SHA1;
+            dev_string = _("nextcloud_theme.about"
+                         + "<p><small>Built from Git revision <a href=\"%1\">%2</a>"
+                         + " on %3, %4 using Qt %5, %6</small></p>")
+                            .printf (github_prefix + git_sha1)
+                            .printf (git_sha1.left (6))
+                            .printf (__DATE__)
+                            .printf (__TIME__)
+                            .printf (q_version ())
+                            .printf (QSslSocket.ssl_library_version_string ());
+        // #endif
+            return dev_string;
+        }
     }
 
 
     /***********************************************************
     About dialog contents
     ***********************************************************/
-    public string about () {
-        //  return MIRALL_VERSION_STRING;
-        // Shorten Qt's OS name: "macOS Mojave (10.14)" . "macOS"
-        string[] os_string_list = Utility.platform_name ().split (' ');
-        string os_name = os_string_list.at (0);
-
-        string dev_string;
-        // : Example text: "<p>Nextcloud Desktop Client</p>"   (%1 is the application name)
-        dev_string = _("<p>%1 Desktop Client</p>")
-                .printf (APPLICATION_NAME);
-
-        dev_string += _("<p>Version %1. For more information please click <a href='%2'>here</a>.</p>")
-                .printf (string.from_latin1 (MIRALL_STRINGIFY (MIRALL_VERSION)) + " (%1)".printf (os_name))
-                .printf (help_url ());
-
-        dev_string += _("<p><small>Using files plugin : %1</small></p>")
-                        .printf (Vfs.Mode.to_string (best_available_vfs_mode ()));
-        dev_string += "<br>%1"
-                .printf (QSysInfo.product_type () % '-' % QSysInfo.kernel_version ());
-
-        return dev_string;
+    public static string about {
+        public get {
+            //  return MIRALL_VERSION_STRING;
+            // Shorten Qt's OS name: "macOS Mojave (10.14)" . "macOS"
+            string[] os_string_list = Utility.platform_name ().split (' ');
+            string os_name = os_string_list.at (0);
+    
+            string dev_string;
+            // : Example text: "<p>Nextcloud Desktop Client</p>"   (%1 is the application name)
+            dev_string = _("<p>%1 Desktop Client</p>")
+                    .printf (APPLICATION_NAME);
+    
+            dev_string += _("<p>Version %1. For more information please click <a href='%2'>here</a>.</p>")
+                    .printf (string.from_latin1 (MIRALL_STRINGIFY (MIRALL_VERSION)) + " (%1)".printf (os_name))
+                    .printf (help_url);
+    
+            dev_string += _("<p><small>Using files plugin : %1</small></p>")
+                            .printf (AbstractVfs.Mode.to_string (best_available_vfs_mode ()));
+            dev_string += "<br>%1"
+                    .printf (QSysInfo.product_type () % '-' % QSysInfo.kernel_version ());
+    
+            return dev_string;
+        }
     }
 
 
     /***********************************************************
     Legal notice dialog version detail contents
     ***********************************************************/
-    string about_details () {
-        string dev_string;
-        dev_string = _("<p>Version %1. For more information please click <a href='%2'>here</a>.</p>")
-                .printf (MIRALL_VERSION_STRING)
-                .printf (help_url ());
-
-        dev_string += _("<p>This release was supplied by %1</p>")
-                .printf (APPLICATION_VENDOR);
-
-        dev_string += git_sha1 ();
-
-        return dev_string;
+    public static string about_details {
+        public get {
+            string dev_string;
+            dev_string = _("<p>Version %1. For more information please click <a href='%2'>here</a>.</p>")
+                    .printf (MIRALL_VERSION_STRING)
+                    .printf (help_url);
+    
+            dev_string += _("<p>This release was supplied by %1</p>")
+                    .printf (APPLICATION_VENDOR);
+    
+            dev_string += git_sha1;
+    
+            return dev_string;
+        }
     }
 
 
@@ -740,17 +829,21 @@ public class Theme : GLib.Object {
     /***********************************************************
     Check if mono icons are available
     ***********************************************************/
-    public bool mono_icons_available () {
-        string theme_dir = Theme.theme_prefix + "%1/".printf (Theme.instance.systray_icon_flavor (true));
-        return QDir (theme_dir).exists ();
+    public static bool mono_icons_available {
+        public get {
+            string theme_dir = Theme.THEME_PREFIX + "%1/".printf (Theme.systray_icon_flavor (true));
+            return GLib.Dir (theme_dir).exists ();
+        }
     }
 
 
     /***********************************************************
     @brief Where to check for new Updates.
     ***********************************************************/
-    public string update_check_url () {
-        return APPLICATION_UPDATE_URL;
+    public static string update_check_url {
+        public get {
+            return APPLICATION_UPDATE_URL;
+        }
     }
 
 
@@ -758,8 +851,10 @@ public class Theme : GLib.Object {
     When true, the setup wizard will show the selective sync
     dialog by default and default to nothing selected
     ***********************************************************/
-    public bool wizard_selective_sync_default_nothing () {
-        return false;
+    public static bool wizard_selective_sync_default_nothing {
+        public get {
+            return false;
+        }
     }
 
 
@@ -769,9 +864,11 @@ public class Theme : GLib.Object {
     Set -1 to never ask confirmation. 0 to ask confirmation for
     every folder.
     ***********************************************************/
-    public int64 new_big_folder_size_limit () {
-        // Default to 500MB
-        return 500;
+    public static int64 new_big_folder_size_limit {
+        public get {
+            // Default to 500MB
+            return 500;
+        }
     }
 
 
@@ -779,8 +876,10 @@ public class Theme : GLib.Object {
     Hide the checkbox that says "Ask for confirmation before
     synchronizing folders larger than X MB" in the account wizard
     ***********************************************************/
-    public bool wizard_hide_folder_size_limit_checkbox () {
-        return false;
+    public static bool wizard_hide_folder_size_limit_checkbox {
+        public get {
+            return false;
+        }
     }
 
 
@@ -788,8 +887,10 @@ public class Theme : GLib.Object {
     Hide the checkbox that says "Ask for confirmation before
     synchronizing external storages" in the account wizard
     ***********************************************************/
-    public bool wizard_hide_external_storage_confirmation_checkbox () {
-        return false;
+    public static bool wizard_hide_external_storage_confirmation_checkbox {
+        public get {
+            return false;
+        }
     }
 
 
@@ -798,15 +899,19 @@ public class Theme : GLib.Object {
 
     Allow link sharing and or user/group sharing
     ***********************************************************/
-    public bool link_sharing () {
-        return true;
+    public static bool link_sharing {
+        public get {
+            return true;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public bool user_group_sharing () {
-        return true;
+    public static bool user_group_sharing {
+        public get {
+            return true;
+        }
     }
 
 
@@ -817,8 +922,10 @@ public class Theme : GLib.Object {
 
     Default returns false.
     ***********************************************************/
-    public bool force_system_network_proxy () {
-        return false;
+    public static bool force_system_network_proxy {
+        public get {
+            return false;
+        }
     }
 
 
@@ -841,8 +948,10 @@ public class Theme : GLib.Object {
 
     @return UserIdentifierType.USER_NAME, unless reimplemented
     ***********************************************************/
-    public UserIdentifierType user_identifier_type () {
-        return UserIdentifierType.USER_NAME;
+    public static UserIdentifierType user_identifier_type {
+        public get {
+            return UserIdentifierType.USER_NAME;
+        }
     }
 
 
@@ -856,8 +965,10 @@ public class Theme : GLib.Object {
 
     @return An empty string, unless reimplemented
     ***********************************************************/
-    public string custom_user_id () {
-        return "";
+    public static string custom_user_id {
+        public get {
+            return "";
+        }
     }
 
 
@@ -867,8 +978,10 @@ public class Theme : GLib.Object {
 
     @return An empty string, unless reimplemented
     ***********************************************************/
-    public string user_id_hint () {
-        return "";
+    public static string user_id_hint {
+        public get {
+            return "";
+        }
     }
 
 
@@ -878,8 +991,10 @@ public class Theme : GLib.Object {
 
     @return An empty string, unless reimplemented
     ***********************************************************/
-    public string wizard_url_postfix () {
-        return "";
+    public static string wizard_url_postfix {
+        public get {
+            return "";
+        }
     }
 
 
@@ -889,8 +1004,10 @@ public class Theme : GLib.Object {
 
     @return An empty string, unless reimplemented
     ***********************************************************/
-    public string WIZARD_URL_HINT () {
-        return "";
+    public static string wizard_url_hint {
+        public get {
+            return "";
+        }
     }
 
 
@@ -905,8 +1022,10 @@ public class Theme : GLib.Object {
 
     Default: "/"
     ***********************************************************/
-    public string quota_base_folder () {
-        return "/";
+    public static string quota_base_folder {
+        public get {
+            return "/";
+        }
     }
 
 
@@ -915,15 +1034,19 @@ public class Theme : GLib.Object {
     Note that client that change these value cannot connect to
     un-branded owncloud servers.
     ***********************************************************/
-    public string oauth_client_id () {
-        return "xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69";
+    public static string oauth_client_id {
+        public get {
+            return "xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69";
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public string oauth_client_secret () {
-        return "UBntmLjC2yYCeHwsyj73Uwo9TAaecAetRwMw0xYcvNL9yRdLSUi0hUAHfvCHFeFh";
+    public static string oauth_client_secret {
+        public get {
+            return "UBntmLjC2yYCeHwsyj73Uwo9TAaecAetRwMw0xYcvNL9yRdLSUi0hUAHfvCHFeFh";
+        }
     }
 
 
@@ -931,26 +1054,26 @@ public class Theme : GLib.Object {
     @brief What should be output for the --version command line
     switch.
 
-    By default, it's a combination of app_name (), version (),
+    By default, it's a combination of app_name, version,
     the GIT SHA1 and some important dependency versions.
     ***********************************************************/
-    public string version_switch_output () {
-        string help_text;
-        QTextStream stream = new QTextStream (&help_text);
-        stream += app_name ();
-        stream += " version ";
-        stream += version () + Qt.endl;
-    // #ifdef GIT_SHA1
-        stream += "Git revision " + GIT_SHA1 + Qt.endl;
-    // #endif
-        stream += "Using Qt " + q_version () + ", built against Qt " + QT_VERSION_STR + Qt.endl;
-
-        if (!QGuiApplication.platform_name () == "")
-            stream += "Using Qt platform plugin '" + QGuiApplication.platform_name () + "'" + Qt.endl;
-
-        stream += "Using '" + QSslSocket.ssl_library_version_string () + "'" + Qt.endl;
-        stream += "Running on " + Utility.platform_name () + ", " + QSysInfo.current_cpu_architecture () + Qt.endl;
-        return help_text;
+    public static string version_switch_output {
+        public get {
+            string help_text;
+            help_text += app_name + " version " + version + "\n";
+        // #ifdef GIT_SHA1
+            help_text += "Git revision " + GIT_SHA1 + "\n";
+        // #endif
+            //  help_text += "Using Qt " + q_version () + ", built against Qt " + QT_VERSION_STR + "\n";
+    
+            if (!Gtk.Application.platform_name () == "") {
+                help_text += "Using Qt platform plugin '" + Gtk.Application.platform_name () + "'\n";
+            }
+    
+            help_text += "Using '" + QSslSocket.ssl_library_version_string () + "'\n";
+            help_text += "Running on " + Utility.platform_name () + ", " + QSysInfo.current_cpu_architecture () + "\n";
+            return help_text;
+        }
     }
 	
 	/***********************************************************
@@ -961,8 +1084,8 @@ public class Theme : GLib.Object {
     implementation for the client UI
     (actually 2019/09/13 only systray theming).
     ***********************************************************/
-	public Gtk.Icon ui_theme_icon (string icon_name, bool ui_has_dark_background) {
-        string icon_path = Theme.theme_prefix + (ui_has_dark_background ? "white/": "black/") + icon_name;
+	public static Gtk.Icon ui_theme_icon (string icon_name, bool ui_has_dark_background) {
+        string icon_path = Theme.THEME_PREFIX + (ui_has_dark_background ? "white/": "black/") + icon_name;
         string icn_path = icon_path.to_utf8 ().const_data ();
         return new Gtk.Icon (Gdk.Pixbuf (icon_path));
     }
@@ -1001,8 +1124,8 @@ public class Theme : GLib.Object {
     2019/12/08: Implemented for the Dark Mode on macOS, because
     the app palette can not account for that (Qt 5.12.5).
     ***********************************************************/
-    public static Gtk.Color get_background_aware_link_color (Gtk.Color background_color = QGuiApplication.palette ().base ().color ()) {
-        return is_dark_color (background_color) ? new Gtk.Color ("#6193dc") : QGuiApplication.palette ().color (QPalette.Link);
+    public static Gtk.Color get_background_aware_link_color (Gtk.Color background_color = Gtk.Application.palette ().base ().color ()) {
+        return is_dark_color (background_color) ? new Gtk.Color ("#6193dc") : Gtk.Application.palette ().color (QPalette.Link);
     }
 
 
@@ -1017,7 +1140,7 @@ public class Theme : GLib.Object {
     This way we also avoid having certain strings re-translated
     on Transifex.
     ***********************************************************/
-    public static void replace_link_color_string_background_aware (string link_string, Gtk.Color background_color = QGuiApplication.palette ().color (QPalette.Base)) {
+    public static void replace_link_color_string_background_aware (string link_string, Gtk.Color background_color = Gtk.Application.palette ().color (QPalette.Base)) {
         replace_link_color_string (link_string, get_background_aware_link_color (background_color));
     }
 
@@ -1045,7 +1168,7 @@ public class Theme : GLib.Object {
 
     2019/12/09: Moved here from SettingsDialog.
     ***********************************************************/
-    public static Gtk.Icon create_color_aware_icon (string name, QPalette palette = QGuiApplication.palette ()) {
+    public static Gtk.Icon create_color_aware_icon (string name, QPalette palette = Gtk.Application.palette ()) {
         QSvgRenderer renderer = new QSvgRenderer (name);
         Gtk.Image img = new Gtk.Image (64, 64, Gtk.Image.FormatARGB32);
         img.fill (Qt.GlobalColor.transparent);
@@ -1082,7 +1205,7 @@ public class Theme : GLib.Object {
 
     2019/12/09: Adapted from create_color_aware_icon.
     ***********************************************************/
-    public static Gdk.Pixbuf create_color_aware_pixmap (string name, QPalette palette = QGuiApplication.palette ()) {
+    public static Gdk.Pixbuf create_color_aware_pixmap (string name, QPalette palette = Gtk.Application.palette ()) {
         Gtk.Image img = new Gtk.Image (name);
         Gtk.Image inverted = new Gtk.Image (img);
         inverted.invert_pixels (Gtk.Image.InvertRgb);
@@ -1104,48 +1227,55 @@ public class Theme : GLib.Object {
     By default, the options are not shown unless experimental
     options are manually enabled in the configuration file.
     ***********************************************************/
-    public bool show_virtual_files_option () {
-        var vfs_mode = best_available_vfs_mode ();
-        return ConfigFile ().show_experimental_options () || vfs_mode == Vfs.WindowsCfApi;
+    public static bool show_virtual_files_option {
+        public get {
+            return ConfigFile ().show_experimental_options () || best_available_vfs_mode () == Vfs.WindowsCfApi;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public bool enforce_virtual_files_sync_folder () {
-        var vfs_mode = best_available_vfs_mode ();
-        return ENFORCE_VIRTUAL_FILES_SYNC_FOLDER && vfs_mode != Occ.Vfs.Off;
+    public static bool enforce_virtual_files_sync_folder {
+        public get {
+            return ENFORCE_VIRTUAL_FILES_SYNC_FOLDER && best_available_vfs_mode () != Occ.Vfs.Off;
+        }
     }
 
 
     /***********************************************************
     @return color for the ErrorBox text.
     ***********************************************************/
-    public Gtk.Color error_box_text_color () {
-        return new Gtk.Color ("white");
+    public static Gtk.Color error_box_text_color {
+        public get {
+            return new Gtk.Color ("white");
+        }
     }
 
 
     /***********************************************************
     @return color for the ErrorBox background.
     ***********************************************************/
-    public Gtk.Color error_box_background_color ();
-    Gtk.Color Theme.error_box_background_color () {
-        return new Gtk.Color ("red");
+    public static Gtk.Color error_box_background_color {
+        public get {
+            return new Gtk.Color ("red");
+        }
     }
 
 
     /***********************************************************
     @return color for the ErrorBox border.
     ***********************************************************/
-    public Gtk.Color error_box_border_color () {
-        return new Gtk.Color ("black");
+    public static Gtk.Color error_box_border_color {
+        public get {
+            return new Gtk.Color ("black");
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public const string theme_prefix = ":/client/theme/";
+    private const string THEME_PREFIX = ":/client/theme/";
 
 
     /***********************************************************
@@ -1169,10 +1299,10 @@ public class Theme : GLib.Object {
                 return cached = Gtk.Icon.from_theme (name);
             }
 
-            const string svg_name = Theme.theme_prefix + "%1/%2.svg".printf (flavor).printf (name);
+            const string svg_name = Theme.THEME_PREFIX + "%1/%2.svg".printf (flavor).printf (name);
             QSvgRenderer renderer = new QSvgRenderer (svg_name);
 
-            var use_svg = should_prefer_svg ();
+            var use_svg = should_prefer_svg;
             GLib.List<int> sizes = use_svg
                 ? { 16, 32, 64, 128, 256 }
                 : { 16, 22, 32, 48, 64, 128, 256, 512, 1024 };
@@ -1206,10 +1336,12 @@ public class Theme : GLib.Object {
 
 
     private static Gdk.Pixbuf load_pixmap (string flavor, string name, int size) {
-        const string pixmap_name = Theme.theme_prefix + "%1/%2-%3.png".printf (flavor).printf (name).printf (size);
+        const string pixmap_name = Theme.THEME_PREFIX + "%1/%2-%3.png".printf (flavor).printf (name).printf (size);
         return Gdk.Pixbuf (pixmap_name);
     }
 //  #endif
+
+
     /***********************************************************
     @brief Generates image path in the resources
     @param name Name of the image file
@@ -1218,14 +1350,14 @@ public class Theme : GLib.Object {
         or not
     @return string image path in the resources
     ***********************************************************/
-    protected string theme_image_path (string name, int size = -1, bool sys_tray = false) {
-        var flavor = (!is_branded () && sys_tray) ? systray_icon_flavor (this.mono): "colored";
-        var use_svg = should_prefer_svg ();
+    protected static string theme_image_path (string name, int size = -1, bool sys_tray = false) {
+        var flavor = (!is_branded && sys_tray) ? systray_icon_flavor (this.mono): "colored";
+        var use_svg = should_prefer_svg;
 
         // branded client may have several sizes of the same icon
         const string file_path = (use_svg || size <= 0)
-                ? Theme.theme_prefix + "%1/%2".printf (flavor).printf (name)
-                : Theme.theme_prefix + "%1/%2-%3".printf (flavor).printf (name).printf (size);
+                ? Theme.THEME_PREFIX + "%1/%2".printf (flavor).printf (name)
+                : Theme.THEME_PREFIX + "%1/%2-%3".printf (flavor).printf (name).printf (size);
 
         // Use the SVG as fallback if a PNG is missing so that we get a chance to display something
         if (use_svg) {
@@ -1238,7 +1370,7 @@ public class Theme : GLib.Object {
     }
 
 
-    private static GLib.Uri image_path_to_url (string image_path) {
+    private static unowned GLib.Uri image_path_to_url (string image_path) {
         if (image_path.starts_with (':')) {
             var url = GLib.Uri ();
             url.scheme ("qrc");
@@ -1249,8 +1381,11 @@ public class Theme : GLib.Object {
         }
     }
 
-    private static bool should_prefer_svg () {
-        return APPLICATION_ICON_SET.to_upper () == "SVG";
+
+    private static bool should_prefer_svg {
+        public get {
+            return APPLICATION_ICON_SET.to_upper () == "SVG";
+        }
     }
 
 } // class Theme

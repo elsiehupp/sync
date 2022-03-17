@@ -33,11 +33,11 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
         connect (this.ui.local_folder_choose_btn, QAbstractButton.clicked, this, FolderWizardLocalPath.on_signal_choose_local_folder);
         this.ui.local_folder_choose_btn.tool_tip (_("Click to select a local folder to sync."));
 
-        GLib.Uri server_url = this.account.url ();
+        GLib.Uri server_url = this.account.url;
         server_url.user_name (this.account.credentials ().user ());
-        string default_path = QDir.home_path () + '/' + Theme.instance.app_name ();
+        string default_path = GLib.Dir.home_path () + '/' + Theme.app_name;
         default_path = FolderMan.instance.find_good_path_for_new_sync_folder (default_path, server_url);
-        this.ui.local_folder_line_edit.on_signal_text (QDir.to_native_separators (default_path));
+        this.ui.local_folder_line_edit.on_signal_text (GLib.Dir.to_native_separators (default_path));
         this.ui.local_folder_line_edit.tool_tip (_("Enter the path to the local folder."));
 
         this.ui.warn_label.text_format (Qt.RichText);
@@ -48,11 +48,11 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
     /***********************************************************
     ***********************************************************/
     public override bool is_complete () {
-        GLib.Uri server_url = this.account.url ();
+        GLib.Uri server_url = this.account.url;
         server_url.user_name (this.account.credentials ().user ());
 
         string error_str = FolderMan.instance.check_path_validity_for_new_folder (
-            QDir.from_native_separators (this.ui.local_folder_line_edit.text ()), server_url);
+            GLib.Dir.from_native_separators (this.ui.local_folder_line_edit.text ()), server_url);
 
         bool is_ok = error_str == "";
         string[] warn_strings;
@@ -91,12 +91,12 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
     ***********************************************************/
     protected void on_signal_choose_local_folder () {
         string sf = QStandardPaths.writable_location (QStandardPaths.HomeLocation);
-        QDir d = new QDir (sf);
+        GLib.Dir d = new GLib.Dir (sf);
 
         // open the first entry of the home directory. Otherwise the directory picker comes
         // up with the closed home directory icon, stupid Qt default...
-        string[] dirs = d.entry_list (QDir.Dirs | QDir.NoDotAndDotDot | QDir.No_sym_links,
-            QDir.Dirs_first | QDir.Name);
+        string[] dirs = d.entry_list (GLib.Dir.Dirs | GLib.Dir.NoDotAndDotDot | GLib.Dir.No_sym_links,
+            GLib.Dir.Dirs_first | GLib.Dir.Name);
 
         if (dirs.count () > 0)
             sf += "/" + dirs.at (0); // Take the first directory in home directory.
@@ -106,7 +106,7 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
             sf);
         if (!directory == "") {
             // set the last directory component name as alias
-            this.ui.local_folder_line_edit.on_signal_text (QDir.to_native_separators (directory));
+            this.ui.local_folder_line_edit.on_signal_text (GLib.Dir.to_native_separators (directory));
         }
         /* emit */ complete_changed ();
     }

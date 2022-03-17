@@ -79,13 +79,13 @@ public class WelcomePage : QWizardPage {
         const var theme = Theme.instance;
         const var background_color = palette ().window ().color ();
 
-        const var wizard_nextcloud_icon_filename = theme.is_branded () ? Theme.hidpi_filename ("wizard-nextcloud.png", background_color)
+        const var wizard_nextcloud_icon_filename = theme.is_branded ? Theme.hidpi_filename ("wizard-nextcloud.png", background_color)
                                                                     : Theme.hidpi_filename (":/client/theme/colored/wizard-nextcloud.png");
-        const var wizard_files_icon_filename = theme.is_branded () ? Theme.hidpi_filename ("wizard-files.png", background_color)
+        const var wizard_files_icon_filename = theme.is_branded ? Theme.hidpi_filename ("wizard-files.png", background_color)
                                                                 : Theme.hidpi_filename (":/client/theme/colored/wizard-files.png");
-        const var wizard_groupware_icon_filename = theme.is_branded () ? Theme.hidpi_filename ("wizard-groupware.png", background_color)
+        const var wizard_groupware_icon_filename = theme.is_branded ? Theme.hidpi_filename ("wizard-groupware.png", background_color)
                                                                     : Theme.hidpi_filename (":/client/theme/colored/wizard-groupware.png");
-        const var wizard_talk_icon_filename = theme.is_branded () ? Theme.hidpi_filename ("wizard-talk.png", background_color)
+        const var wizard_talk_icon_filename = theme.is_branded ? Theme.hidpi_filename ("wizard-talk.png", background_color)
                                                                : Theme.hidpi_filename (":/client/theme/colored/wizard-talk.png");
 
         this.ui.slide_show.add_slide (wizard_nextcloud_icon_filename, _("Keep your data secure and under your control"));
@@ -111,7 +111,7 @@ public class WelcomePage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void set_up_login_button () {
-        const string app_name = Theme.instance.app_name_gui ();
+        const string app_name = Theme.app_name_gui;
 
         this.ui.login_button.on_signal_text (_("Log in to your %1").printf (app_name));
         connect (
@@ -152,7 +152,7 @@ public class WelcomePage : QWizardPage {
         this.oc_wizard.next ();
     //  #else // WITH_WEBENGINE
         this.oc_wizard.registration (true);
-        Utility.open_browser ("https://nextcloud.com/register");
+        OpenExtrernal.open_browser ("https://nextcloud.com/register");
     //  #endif // WITH_WEBENGINE
     }
 

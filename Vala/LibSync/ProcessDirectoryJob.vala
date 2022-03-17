@@ -7,7 +7,7 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 //  #include <QDebug>
 //  #include <algorithm>
 //  #include <QEventLoop>
-//  #include <QDir>
+//  #include <GLib.Dir>
 //  #include <set>
 //  #include <QTextCodec>
 //  #include <GLib.FileInfo>
@@ -1500,18 +1500,18 @@ public class ProcessDirectoryJob : GLib.Object {
         const bool is_file_place_holder = !local_entry.is_directory && this.discovery_data.sync_options.vfs.is_dehydrated_placeholder (this.discovery_data.local_dir + path.local);
 
         // either correct availability, or a result with error if the folder is new or otherwise has no availability set yet
-        var folder_place_holder_availability = local_entry.is_directory ? this.discovery_data.sync_options.vfs.availability (path.local) : Vfs.AvailabilityResult (Vfs.AvailabilityError.NO_SUCH_ITEM);
+        var folder_place_holder_availability = local_entry.is_directory ? this.discovery_data.sync_options.vfs.availability (path.local) : AbstractVfs.AvailabilityResult (Vfs.AvailabilityError.NO_SUCH_ITEM);
 
-        var folder_pin_state = local_entry.is_directory ? this.discovery_data.sync_options.vfs.pin_state (path.local) : Optional<PinStateEnums.PinState> (PinState.PinState.UNSPECIFIED);
+        var folder_pin_state = local_entry.is_directory ? this.discovery_data.sync_options.vfs.pin_state (path.local) : Optional<Vfs.PinState> (PinState.PinState.UNSPECIFIED);
 
         if (!is_file_place_holder && !folder_place_holder_availability.is_valid () && !folder_pin_state.is_valid ()) {
             // not a file placeholder and not a synced folder placeholder (new local folder)
             return;
         }
 
-        var is_folder_pin_state_online_only = (folder_pin_state.is_valid () && *folder_pin_state == PinState.VfsItemAvailability.ONLINE_ONLY);
+        var is_folder_pin_state_online_only = (folder_pin_state.is_valid () && *folder_pin_state == Vfs.ItemAvailability.ONLINE_ONLY);
 
-        var isfolder_place_holder_availability_online_only = (folder_place_holder_availability.is_valid () && *folder_place_holder_availability == VfsItemAvailability.VfsItemAvailability.ONLINE_ONLY);
+        var isfolder_place_holder_availability_online_only = (folder_place_holder_availability.is_valid () && *folder_place_holder_availability == Vfs.ItemAvailability.ONLINE_ONLY);
 
         // a folder is considered online-only if : no files are hydrated, or, if it's an empty folder
         var is_online_only_folder = isfolder_place_holder_availability_online_only || (!folder_place_holder_availability && is_folder_pin_state_online_only);
@@ -2220,8 +2220,8 @@ public class ProcessDirectoryJob : GLib.Object {
         if (!pin || *pin == PinState.PinState.INHERITED)
             pin = this.pin_state;
 
-        // VfsItemAvailability.ONLINE_ONLY hydrated files want to be dehydrated
-        if (record.type == ItemType.FILE && *pin == PinState.VfsItemAvailability.ONLINE_ONLY)
+        // Vfs.ItemAvailability.ONLINE_ONLY hydrated files want to be dehydrated
+        if (record.type == ItemType.FILE && *pin == Vfs.ItemAvailability.ONLINE_ONLY)
             record.type = ItemType.VIRTUAL_FILE_DEHYDRATION;
 
         // PinState.ALWAYS_LOCAL dehydrated files want to be hydrated

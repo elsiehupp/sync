@@ -5,10 +5,8 @@ Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-
 namespace Occ {
-
-namespace PinStateEnums {
+namespace Vfs {
 
 /***********************************************************
 Determines whether items should be available locally permanently or not
@@ -21,7 +19,7 @@ parent path would do.
 
 The pin state of a directory usually only matters for the initial pin an
 hydration state of new remote files. It's perfectly possible for a
-PinState.ALWAYS_LOCAL directory to have only VfsItemAvailability.ONLINE_ONLY items
+PinState.ALWAYS_LOCAL directory to have only Vfs.ItemAvailability.ONLINE_ONLY items
 states is usually done recursively, so one'd need to set the folder to
 pinned and then each contained item to unpinned)
 
@@ -66,63 +64,15 @@ enum PinState {
     New remote files in unspecified directories on_signal_start unspecified, and
     dehydrated (which is an arbitrary decision).
     ***********************************************************/
-    UNSPECIFIED = 3,
+    UNSPECIFIED = 3;
+
+    /***********************************************************
+    Translated text for "making items always available locally"
+    ***********************************************************/
+    public static string vfs_pin_action_text () {
+        return _("Make always available locally");
+    }
 }
 
-/***********************************************************
-A user-facing version of PinState.
-
-PinStates communicate availability intent for an item, but particular
-situations can get complex: An PinState.ALWAYS_LOCAL folder can have VfsItemAvailability.ONLINE_ONLY
-files or directories.
-
-For users this is condensed to a few useful cases.
-
-Note that this is only about intent*. The file could still be out of date,
-or not have been synced for other reasons, like errors.
-
-Note: The numerical values and ordering of this enum are relevant.
-***********************************************************/
-enum VfsItemAvailability {
-    /***********************************************************
-    The item and all its subitems are hydrated and pinned PinState.ALWAYS_LOCAL.
-
-    This guarantees that all contents will be kept in sync.
-    ***********************************************************/
-    ALWAYS_LOCAL = 0,
-
-    /***********************************************************
-    The item and all its subitems are hydrated.
-
-    This may change if the platform or client decide to dehydrate items
-    that have PinState.UNSPECIFIED pin state.
-
-    A folder with no file contents will have this availability.
-    ***********************************************************/
-    ALL_HYDRATED = 1,
-
-    /***********************************************************
-    There are dehydrated and hydrated items.
-
-    This would happen if a dehydration happens to a PinState.UNSPECIFIED item that
-    used to be hydrated.
-    ***********************************************************/
-    MIXED = 2,
-
-    /***********************************************************
-    There are only dehydrated items but the pin state isn't all VfsItemAvailability.ONLINE_ONLY.
-    ***********************************************************/
-    ALL_DEHYDRATED = 3,
-
-    /***********************************************************
-    The item and all its subitems are dehydrated and
-    VfsItemAvailability.ONLINE_ONLY.
-
-    This guarantees that contents will not take up space.
-    ***********************************************************/
-    ONLINE_ONLY = 4,
-}
-
-} // namespace PinStateEnums
-
+} // namespace Vfs
 } // namespace Occ

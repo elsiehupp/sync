@@ -80,7 +80,7 @@ public class DetermineAuthTypeJob : GLib.Object {
         // Start three parallel requests
 
         // 1. determines whether it's a basic auth server
-        var get_request = this.account.send_request ("GET", this.account.url (), request);
+        var get_request = this.account.send_request ("GET", this.account.url, request);
 
         // 2. checks the HTTP auth method.
         var propfind = this.account.send_request ("PROPFIND", this.account.dav_url (), request);

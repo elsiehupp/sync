@@ -41,7 +41,7 @@ public class TestFolderWatcher : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public TestFolderWatcher () {
-        QDir root_directory = new QDir (this.root.path ());
+        GLib.Dir root_directory = new GLib.Dir (this.root.path ());
         this.root_path = root_directory.canonical_path ();
         GLib.debug ("creating test directory tree in " + this.root_path);
 
@@ -65,7 +65,7 @@ public class TestFolderWatcher : GLib.Object {
     ***********************************************************/
     public int count_folders (string path) {
         int n = 0;
-        foreach (var sub in new QDir (path).entry_list (QDir.Dirs | QDir.NoDotAndDotDot))
+        foreach (var sub in new GLib.Dir (path).entry_list (GLib.Dir.Dirs | GLib.Dir.NoDotAndDotDot))
             n += 1 + count_folders (path + '/' + sub);
         return n;
     }

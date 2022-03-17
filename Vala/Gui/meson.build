@@ -54,6 +54,7 @@ srcs = files([
     'OcsNavigationAppsJob.vala',
     'OcsShareeJob.vala',
     'OcsShareJob.vala',
+    'OpenExtrernal.vala',
     'OpenFileManager.vala',
     'OwncloudGui.vala',
     'OwncloudSetupWizard.vala',
@@ -113,7 +114,6 @@ srcs = files([
 
     'UserInfo.vala',
     'UserStatusSelectorModel.vala',
-    'Utility.vala',
 
     'Wizard/AbstractCredentialsWizardPage.vala',
     'Wizard/Flow2AuthCredsPage.vala',

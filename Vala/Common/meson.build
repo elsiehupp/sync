@@ -9,9 +9,11 @@ srcs = files([
     'ComputeChecksum/ValidateChecksumHeader.vala',
 
     'Constants.vala',
+
+    'Errors/InvalidParameterError.vala',
+
     'FileSystem.vala',
     'JenkinsHash.vala',
-    'PinState.vala',
 
     'PluginFactory/PluginFactory.vala',
     'PluginFactory/DefaultPluginFactory.vala',
@@ -31,7 +33,12 @@ srcs = files([
     'SyncJournalFileRecord/SyncJournalFileRecord.vala',
 
     'Utility.vala',
-    'Vfs.vala'
+
+    'Vfs/AbstractVfs.vala',
+    'Vfs/ItemAvailability.vala',
+    'Vfs/PinState.vala',
+    'Vfs/SetupParameters.vala',
+    'Vfs/VfsOff.vala'
 ])
 
 executable(

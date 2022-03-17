@@ -115,7 +115,7 @@ public class Flow2Auth : GLib.Object {
         /* emit */ signal_status_changed (PollStatus.PollStatus.FETCH_TOKEN, 0);
 
         // Step 1 : Initiate a login, do an anonymous POST request
-        GLib.Uri url = Utility.concat_url_path (this.account.url ().to_string (), "/index.php/login/v2");
+        GLib.Uri url = Utility.concat_url_path (this.account.url.to_string (), "/index.php/login/v2");
         this.enforce_https = url.scheme () == "https";
 
         // add 'Content-Length : 0' header (see https://github.com/nextcloud/desktop/issues/1473)
@@ -207,7 +207,7 @@ public class Flow2Auth : GLib.Object {
         switch (action) {
         case TokenAction.OPEN_BROWSER:
             // Try to open Browser
-            if (!Utility.open_browser (authorisation_link ())) {
+            if (!OpenExtrernal.open_browser (authorisation_link ())) {
                 // We cannot open the browser, then we claim we don't support Flow2Auth.
                 // Our UI callee will ask the user to copy and open the link.
                 /* emit */ signal_result (Result.NOT_SUPPORTED);

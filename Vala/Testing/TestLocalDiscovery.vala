@@ -19,8 +19,8 @@ public class TestLocalDiscovery : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         LocalDiscoveryTracker tracker;
-        connect (&fake_folder.sync_engine (), &SyncEngine.item_completed, tracker, &LocalDiscoveryTracker.slot_item_completed);
-        connect (&fake_folder.sync_engine (), &SyncEngine.on_signal_finished, tracker, &LocalDiscoveryTracker.slot_sync_finished);
+        connect (&fake_folder.sync_engine, &SyncEngine.signal_item_completed, tracker, &LocalDiscoveryTracker.slot_item_completed);
+        connect (&fake_folder.sync_engine, &SyncEngine.on_signal_finished, tracker, &LocalDiscoveryTracker.slot_sync_finished);
 
         // More subdirectories are useful for testing
         fake_folder.local_modifier ().mkdir ("A/X");
@@ -44,7 +44,7 @@ public class TestLocalDiscovery : GLib.Object {
         fake_folder.remote_modifier ().append_byte ("C/c1");
         tracker.add_touched_path ("A/X");
 
-        fake_folder.sync_engine ().set_local_discovery_options (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, tracker.local_discovery_paths ());
+        fake_folder.sync_engine.set_local_discovery_options (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, tracker.local_discovery_paths ());
 
         tracker.start_sync_partial_discovery ();
         GLib.assert_true (fake_folder.sync_once ());
@@ -54,12 +54,12 @@ public class TestLocalDiscovery : GLib.Object {
         GLib.assert_true (!fake_folder.current_remote_state ().find ("A/Y/y2"));
         GLib.assert_true (!fake_folder.current_remote_state ().find ("B/b3"));
         GLib.assert_true (fake_folder.current_local_state ().find ("C/c3"));
-        GLib.assert_true (fake_folder.sync_engine ().last_local_discovery_style () == LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM);
+        GLib.assert_true (fake_folder.sync_engine.last_local_discovery_style () == LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM);
         GLib.assert_true (tracker.local_discovery_paths ().empty ());
 
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
-        GLib.assert_true (fake_folder.sync_engine ().last_local_discovery_style () == LocalDiscoveryStyle.FILESYSTEM_ONLY);
+        GLib.assert_true (fake_folder.sync_engine.last_local_discovery_style () == LocalDiscoveryStyle.FILESYSTEM_ONLY);
         GLib.assert_true (tracker.local_discovery_paths ().empty ());
     }
 
@@ -68,13 +68,13 @@ public class TestLocalDiscovery : GLib.Object {
     ***********************************************************/
     private void test_local_discovery_decision () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        var engine = fake_folder.sync_engine ();
+        var engine = fake_folder.sync_engine;
 
         GLib.assert_true (engine.should_discover_locally (""));
         GLib.assert_true (engine.should_discover_locally ("A"));
         GLib.assert_true (engine.should_discover_locally ("A/X"));
 
-        fake_folder.sync_engine ().set_local_discovery_options (
+        fake_folder.sync_engine.set_local_discovery_options (
             LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, { "A/X", "A/X space", "A/X/beta", "foo bar space/touch", "foo/", "zzz", "zzzz" });
 
         GLib.assert_true (engine.should_discover_locally (""));
@@ -101,7 +101,7 @@ public class TestLocalDiscovery : GLib.Object {
             "which is a prefix, and that prefix is followed by a character less than '/'", Continue);
         GLib.assert_true (!engine.should_discover_locally ("A/X o"));
 
-        fake_folder.sync_engine ().set_local_discovery_options (
+        fake_folder.sync_engine.set_local_discovery_options (
             LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, {});
 
         GLib.assert_true (!engine.should_discover_locally (""));
@@ -117,13 +117,13 @@ public class TestLocalDiscovery : GLib.Object {
 
         LocalDiscoveryTracker tracker;
         connect (
-            fake_folder.sync_engine (),
-            SyncEngine.item_completed,
+            fake_folder.sync_engine,
+            SyncEngine.signal_item_completed,
             tracker,
             LocalDiscoveryTracker.slot_item_completed
         );
         connect (
-            fake_folder.sync_engine (),
+            fake_folder.sync_engine,
             SyncEngine.on_signal_finished,
             tracker,
             LocalDiscoveryTracker.slot_sync_finished
@@ -139,7 +139,7 @@ public class TestLocalDiscovery : GLib.Object {
         // We're not adding a4 as touched, it's in the same folder as a3 and will be seen.
         // And due to the error it should be added to the explicit list while a3 gets removed.
 
-        fake_folder.sync_engine ().set_local_discovery_options (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, tracker.local_discovery_paths ());
+        fake_folder.sync_engine.set_local_discovery_options (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, tracker.local_discovery_paths ());
         tracker.start_sync_partial_discovery ();
         GLib.assert_true (!fake_folder.sync_once ());
 
@@ -149,7 +149,7 @@ public class TestLocalDiscovery : GLib.Object {
         GLib.assert_true (tracker_contains ("A/a4"));
         GLib.assert_true (tracker_contains ("A/spurious")); // not removed since overall sync not successful
 
-        fake_folder.sync_engine ().set_local_discovery_options (LocalDiscoveryStyle.FILESYSTEM_ONLY);
+        fake_folder.sync_engine.set_local_discovery_options (LocalDiscoveryStyle.FILESYSTEM_ONLY);
         tracker.start_sync_full_discovery ();
         GLib.assert_true (!fake_folder.sync_once ());
 
@@ -161,7 +161,7 @@ public class TestLocalDiscovery : GLib.Object {
         fake_folder.sync_journal ().wipe_error_blocklist ();
         tracker.add_touched_path ("A/newspurious"); // will be removed due to successful sync
 
-        fake_folder.sync_engine ().set_local_discovery_options (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, tracker.local_discovery_paths ());
+        fake_folder.sync_engine.set_local_discovery_options (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, tracker.local_discovery_paths ());
         tracker.start_sync_partial_discovery ();
         GLib.assert_true (fake_folder.sync_once ());
 
@@ -187,7 +187,7 @@ public class TestLocalDiscovery : GLib.Object {
         var expected_state = fake_folder.current_local_state ();
 
         // Only "A" was modified according to the file system tracker
-        fake_folder.sync_engine ().set_local_discovery_options (
+        fake_folder.sync_engine.set_local_discovery_options (
             LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, { "A" });
 
         GLib.assert_true (fake_folder.sync_once ());
@@ -204,7 +204,7 @@ public class TestLocalDiscovery : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
-        fake_folder.sync_engine ().account.set_capabilities (
+        fake_folder.sync_engine.account.set_capabilities (
             { { "files", new QVariantMap ( { "blocklisted_files", new QVariantList ( ".foo", "bar" ) } ) } });
         fake_folder.local_modifier ().insert ("C/.foo");
         fake_folder.local_modifier ().insert ("C/bar");

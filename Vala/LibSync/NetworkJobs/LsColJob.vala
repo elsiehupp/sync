@@ -28,9 +28,9 @@ public class LsColJob : AbstractNetworkJob {
     public GLib.List<string> properties;
 
 
-    internal signal void directory_listing_subfolders (string[] items);
-    internal signal void directory_listing_iterated (string name, GLib.HashTable<string, string> properties);
-    internal signal void finished_with_error (GLib.InputStream reply);
+    internal signal void signal_directory_listing_subfolders (string[] items);
+    internal signal void signal_directory_listing_iterated (string name, GLib.HashTable<string, string> properties);
+    internal signal void signal_finished_with_error (GLib.InputStream reply);
     internal signal void finished_without_error ();
 
 
@@ -98,30 +98,30 @@ public class LsColJob : AbstractNetworkJob {
     the network, not all in one big blob at the end.
     ***********************************************************/
     private bool on_signal_finished () {
-        GLib.info ("LSCOL of" + reply ().request ().url ()
+        GLib.info ("LSCOL of" + reply ().request ().url
             + " finished with status " + reply_status_string ());
 
         string content_type = reply ().header (Soup.Request.ContentTypeHeader).to_string ();
         int http_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (http_code == 207 && content_type.contains ("application/xml; charset=utf-8")) {
             LsColXMLParser parser;
-            connect (&parser, LsColXMLParser.directory_listing_subfolders,
-                this, LsColJob.directory_listing_subfolders);
-            connect (&parser, LsColXMLParser.directory_listing_iterated,
-                this, LsColJob.directory_listing_iterated);
-            connect (&parser, LsColXMLParser.finished_with_error,
-                this, LsColJob.finished_with_error);
+            connect (&parser, LsColXMLParser.signal_directory_listing_subfolders,
+                this, LsColJob.signal_directory_listing_subfolders);
+            connect (&parser, LsColXMLParser.signal_directory_listing_iterated,
+                this, LsColJob.signal_directory_listing_iterated);
+            connect (&parser, LsColXMLParser.signal_finished_with_error,
+                this, LsColJob.signal_finished_with_error);
             connect (&parser, LsColXMLParser.finished_without_error,
                 this, LsColJob.finished_without_error);
 
-            string expected_path = reply ().request ().url ().path (); // something like "/owncloud/remote.php/dav/folder"
+            string expected_path = reply ().request ().url.path (); // something like "/owncloud/remote.php/dav/folder"
             if (!parser.parse (reply ().read_all (), this.folder_infos, expected_path)) {
                 // XML parse error
-                /* emit */ finished_with_error (reply ());
+                /* emit */ signal_finished_with_error (reply ());
             }
         } else {
             // wrong content type, wrong HTTP code or any other network error
-            /* emit */ finished_with_error (reply ());
+            /* emit */ signal_finished_with_error (reply ());
         }
 
         return true;

@@ -9,7 +9,7 @@ Copyright (C) 2015 by Klaas Freitag <freitag@owncloud.com>
 //  #include <QClipboard>
 //  #include <GLib.FileInfo>
 //  #include <QDesktopServices>
-//  #include <QMessageBox>
+//  #include <Gtk.MessageBox>
 //  #include <QMenu>
 //  #include <QText_edit>
 //  #include <QToolButton>
@@ -675,21 +675,21 @@ public class ShareLinkWidget : Gtk.Widget {
     Confirm with the user and then delete the share
     ***********************************************************/
     void confirm_and_delete_share () {
-        var message_box = new QMessageBox (
-            QMessageBox.Question,
+        var message_box = new Gtk.MessageBox (
+            Gtk.MessageBox.Question,
             _("Confirm Link Share Deletion"),
             _("<p>Do you really want to delete the public link share <i>%1</i>?</p>"
             + "<p>Note: This action cannot be undone.</p>")
                 .printf (share_name ()),
-            QMessageBox.NoButton,
+            Gtk.MessageBox.NoButton,
             this);
         QPushButton yes_button =
-            message_box.add_button (_("Delete"), QMessageBox.YesRole);
-        message_box.add_button (_("Cancel"), QMessageBox.NoRole);
+            message_box.add_button (_("Delete"), Gtk.MessageBox.YesRole);
+        message_box.add_button (_("Cancel"), Gtk.MessageBox.NoRole);
 
         connect (
             message_box,
-            QMessageBox.signal_finished,
+            Gtk.MessageBox.signal_finished,
             this,
             this.on_message_box_signal_finished);
         message_box.open ();
@@ -698,7 +698,7 @@ public class ShareLinkWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private void on_message_box_signal_finished (QMessageBox message_box, Gtk.Button yes_button) {
+    private void on_message_box_signal_finished (Gtk.MessageBox message_box, Gtk.Button yes_button) {
         if (message_box.clicked_button () == yes_button) {
             this.on_signal_toggle_share_link_animation (true);
             this.link_share.delete_share ();
@@ -756,7 +756,7 @@ public class ShareLinkWidget : Gtk.Widget {
         this.ui.confirm_password.icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
         this.ui.confirm_expiration_date.icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
 
-        this.ui.password_progress_indicator.on_signal_color (QGuiApplication.palette ().color (QPalette.Text));
+        this.ui.password_progress_indicator.on_signal_color (Gtk.Application.palette ().color (QPalette.Text));
     }
 
 

@@ -95,8 +95,8 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
         GLib.debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) + "Folder is encrypted, let's get the Id from it.";
         var job = new LsColJob (this.propagator.account, this.propagator.full_remote_path (path), this);
         job.properties ({"resourcetype", "http://owncloud.org/ns:fileid"});
-        connect (job, LsColJob.directory_listing_subfolders, this, AbstractPropagateRemoteDeleteEncrypted.on_signal_folder_encrypted_id_received);
-        connect (job, LsColJob.finished_with_error, this, AbstractPropagateRemoteDeleteEncrypted.task_failed);
+        connect (job, LsColJob.signal_directory_listing_subfolders, this, AbstractPropagateRemoteDeleteEncrypted.on_signal_folder_encrypted_id_received);
+        connect (job, LsColJob.signal_finished_with_error, this, AbstractPropagateRemoteDeleteEncrypted.task_failed);
         job.start ();
     }
 

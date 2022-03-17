@@ -60,7 +60,7 @@ public class StorePrivateKeyApiJob : AbstractNetworkJob {
         request.raw_header ("OCS-APIREQUEST", "true");
         QUrlQuery query;
         query.add_query_item ("format", "json");
-        GLib.Uri url = Utility.concat_url_path (account.url (), path ());
+        GLib.Uri url = Utility.concat_url_path (account.url, path ());
         url.query (query);
 
         GLib.info ("Sending the private key" + this.private_key);

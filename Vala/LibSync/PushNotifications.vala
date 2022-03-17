@@ -137,7 +137,7 @@ public class PushNotifications : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_web_socket_connected () {
-        GLib.info ("Connected to websocket for account " + this.account.url ());
+        GLib.info ("Connected to websocket for account " + this.account.url);
 
         connect (this.web_socket, QWeb_socket.text_message_received, this, PushNotifications.on_signal_web_socket_text_message_received, Qt.UniqueConnection);
 
@@ -148,7 +148,7 @@ public class PushNotifications : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_web_socket_disconnected () {
-        GLib.info ("Disconnected from websocket for account " + this.account.url ());
+        GLib.info ("Disconnected from websocket for account " + this.account.url);
     }
 
 
@@ -181,7 +181,7 @@ public class PushNotifications : GLib.Object {
             return;
         }
 
-        GLib.warning ("Websocket error on with account " + this.account.url () + error);
+        GLib.warning ("Websocket error on with account " + this.account.url + error);
         close_web_socket ();
         /* emit */ connection_lost ();
     }
@@ -190,7 +190,7 @@ public class PushNotifications : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_web_socket_ssl_errors (GLib.List<GnuTLS.ErrorCode> errors) {
-        GLib.warning ("Websocket ssl errors with account " + this.account.url () + errors);
+        GLib.warning ("Websocket ssl errors with account " + this.account.url + errors);
         close_web_socket ();
         /* emit */ authentication_failed ();
     }
@@ -228,7 +228,7 @@ public class PushNotifications : GLib.Object {
         var capabilities = this.account.capabilities ();
         var web_socket_url = capabilities.push_notifications_web_socket_url ();
 
-        GLib.info ("Open connection to websocket on " + web_socket_url + " for account " + this.account.url ());
+        GLib.info ("Open connection to websocket on " + web_socket_url + " for account " + this.account.url);
         connect (this.web_socket, QOverload<QAbstractSocket.SocketError>.of (&QWeb_socket.error), this, PushNotifications.on_signal_web_socket_error);
         connect (this.web_socket, QWeb_socket.signal_ssl_errors, this, PushNotifications.on_signal_web_socket_ssl_errors);
         this.web_socket.open (web_socket_url);
@@ -246,7 +246,7 @@ public class PushNotifications : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void close_web_socket () {
-        GLib.info ("Closing websocket for account " + this.account.url ());
+        GLib.info ("Closing websocket for account " + this.account.url);
 
         this.ping_timer.stop ();
         this.ping_timed_out_timer.stop ();

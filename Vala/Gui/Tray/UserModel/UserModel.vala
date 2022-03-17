@@ -367,7 +367,7 @@ public class UserModel : QAbstractListModel {
 
         const var talk_app = current_user ().talk_app ();
         if (talk_app) {
-            Utility.open_browser (talk_app.url ());
+            OpenExtrernal.open_browser (talk_app.url);
         } else {
             GLib.warning ("The Talk app is not enabled on " + current_user ().server ());
         }
@@ -439,16 +439,16 @@ public class UserModel : QAbstractListModel {
         if (identifier < 0 || identifier >= this.users.size ())
             return;
 
-        QMessageBox message_box = new QMessageBox (
-            QMessageBox.Question,
+        Gtk.MessageBox message_box = new Gtk.MessageBox (
+            Gtk.MessageBox.Question,
             _("Confirm Account Removal"),
             _("<p>Do you really want to remove the connection to the account <i>%1</i>?</p>"
             + "<p><b>Note:</b> This will <b>not</b> delete any files.</p>")
                 .printf (this.users[identifier].name ()),
-            QMessageBox.NoButton);
+            Gtk.MessageBox.NoButton);
         QPushButton yes_button =
-            message_box.add_button (_("Remove connection"), QMessageBox.YesRole);
-        message_box.add_button (_("Cancel"), QMessageBox.NoRole);
+            message_box.add_button (_("Remove connection"), Gtk.MessageBox.YesRole);
+        message_box.add_button (_("Cancel"), Gtk.MessageBox.NoRole);
 
         message_box.exec ();
         if (message_box.clicked_button () != yes_button) {

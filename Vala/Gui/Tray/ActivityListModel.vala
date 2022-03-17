@@ -439,7 +439,7 @@ public class ActivityListModel : QAbstractListModel {
             const var conflicted_relative_path = activity.file;
             const var base_relative_path = folder.journal_database ().conflict_file_base_name (conflicted_relative_path.to_utf8 ());
 
-            const var directory = QDir (folder.path ());
+            const var directory = GLib.Dir (folder.path ());
             const var conflicted_path = directory.file_path (conflicted_relative_path);
             const var base_path = directory.file_path (base_relative_path);
 
@@ -468,7 +468,7 @@ public class ActivityListModel : QAbstractListModel {
             }
 
             var folder = FolderMan.instance.folder_by_alias (activity.folder);
-            const var folder_dir = QDir (folder.path ());
+            const var folder_dir = GLib.Dir (folder.path ());
             this.current_invalid_filename_dialog = new InvalidFilenameDialog (this.account_state.account, folder,
                 folder_dir.file_path (activity.file));
             connect (
@@ -486,7 +486,7 @@ public class ActivityListModel : QAbstractListModel {
             QDesktopServices.open_url (path);
         } else {
             const var link = data (model_index, DataRole.LINK).to_url ();
-            Utility.open_browser (link);
+            OpenExtrernal.open_browser (link);
         }
     }
 
@@ -523,7 +523,7 @@ public class ActivityListModel : QAbstractListModel {
         const var action = activity.links[action_index];
 
         if (action.verb == "WEB") {
-            Utility.open_browser (GLib.Uri (action.link));
+            OpenExtrernal.open_browser (GLib.Uri (action.link));
             return;
         }
 
@@ -697,7 +697,7 @@ public class ActivityListModel : QAbstractListModel {
 
                 AccountApp app = this.account_state.find_app (QLatin1String ("activity"));
                 if (app) {
-                    a.link = app.url ();
+                    a.link = app.url;
                 }
 
                 result_list.append (a);

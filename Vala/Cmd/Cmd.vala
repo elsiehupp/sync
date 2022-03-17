@@ -123,7 +123,7 @@ public class Cmd : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void show_version () {
-        GLib.print (Theme.instance.version_switch_output ());
+        GLib.print (Theme.version_switch_output);
         exit (0);
     }
 
@@ -240,7 +240,7 @@ public class Cmd : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private int main (int argc, char **argv) {
-        QCoreApplication app = new QCoreApplication (argc, argv);
+        Gtk.Application app = new Gtk.Application (argc, argv);
 
         CmdOptions options;
         options.silent = false;
@@ -430,7 +430,7 @@ public class Cmd : GLib.Object {
         );
         GLib.Object.connect (
             engine,
-            SyncEngine.transmission_progress,
+            SyncEngine.signal_transmission_progress,
             cmd,
             Cmd.on_signal_transmission_progress
         );
@@ -494,7 +494,7 @@ public class Cmd : GLib.Object {
     }
 
 
-    private static void on_signal_sync_engine_finished (QCoreApplication app, bool result) {
+    private static void on_signal_sync_engine_finished (Gtk.Application app, bool result) {
         app.exit (result ? EXIT_SUCCESS : EXIT_FAILURE);
     }
 

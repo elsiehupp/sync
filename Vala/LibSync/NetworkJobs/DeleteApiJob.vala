@@ -31,7 +31,7 @@ public class DeleteApiJob : AbstractNetworkJob {
     public new void start () {
         Soup.Request request = new Soup.Request ();
         request.raw_header ("OCS-APIREQUEST", "true");
-        GLib.Uri url = Utility.concat_url_path (account.url (), path ());
+        GLib.Uri url = Utility.concat_url_path (account.url, path ());
         send_request ("DELETE", url, request);
         AbstractNetworkJob.start ();
     }
@@ -40,7 +40,7 @@ public class DeleteApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private bool on_signal_finished () {
-        GLib.info ("JsonApiJob of" + reply ().request ().url ()
+        GLib.info ("JsonApiJob of" + reply ().request ().url
             + " finished with status " + reply ().error ()
             + (reply ().error () == Soup.Reply.NoError ? "" : error_string ()));
 

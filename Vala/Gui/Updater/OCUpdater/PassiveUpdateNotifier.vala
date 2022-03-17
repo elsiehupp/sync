@@ -56,9 +56,9 @@ public class PassiveUpdateNotifier : OCUpdater {
     ***********************************************************/
     private override void version_info_arrived (UpdateInfo info) {
         int64 current_ver = Helper.current_version_to_int ();
-        int64 remote_ver = Helper.string_version_to_int (info.version ());
+        int64 remote_ver = Helper.string_version_to_int (info.version);
 
-        if (info.version () == "" || current_ver >= remote_ver) {
+        if (info.version == "" || current_ver >= remote_ver) {
             GLib.info ("Client is on latest version!");
             download_state (DownloadState.UP_TO_DATE);
         } else {

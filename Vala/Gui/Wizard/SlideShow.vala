@@ -4,7 +4,7 @@ Copyright (C) 2018 by J-P Nurmi <jpnurmi@gmail.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <QGuiApplication>
+//  #include <Gtk.Application>
 //  #include <QMouseEvent>
 //  #include <QPainter>
 //  #include <QStyle>
@@ -76,7 +76,7 @@ public class SlideShow : Gtk.Widget {
     private QPoint press_point;
     private QBasic_timer timer;
     private string[] labels;
-    private GLib.Vector<Gdk.Pixbuf> pixmaps;
+    private GLib.List<Gdk.Pixbuf> pixmaps;
     private QPointer<QVariantAnimation> animation = null;
 
     internal signal void signal_clicked ();
@@ -194,7 +194,7 @@ public class SlideShow : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     protected void mouse_release_event (QMouseEvent event) {
-        if (!this.animation && QLine_f (this.press_point, event.position ()).length () < QGuiApplication.style_hints ().start_drag_distance ())
+        if (!this.animation && QLine_f (this.press_point, event.position ()).length () < Gtk.Application.style_hints ().start_drag_distance ())
             /* emit */ signal_clicked ();
     }
 

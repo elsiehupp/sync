@@ -39,7 +39,7 @@ public class ProppatchJob : AbstractNetworkJob {
     }
 
     internal signal void on_signal_success ();
-    internal signal void finished_with_error ();
+    internal signal void signal_finished_with_error ();
 
     /***********************************************************
     ***********************************************************/
@@ -93,7 +93,7 @@ public class ProppatchJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private bool on_signal_finished () {
-        GLib.info ("PROPPATCH of" + reply ().request ().url ()
+        GLib.info ("PROPPATCH of" + reply ().request ().url
             + " finished with status " + reply_status_string ());
 
         int http_result_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
@@ -103,7 +103,7 @@ public class ProppatchJob : AbstractNetworkJob {
         } else {
             GLib.warning ("*not* successful, http result code is" + http_result_code
                 + (http_result_code == 302 ? reply ().header (Soup.Request.LocationHeader).to_string (): ""));
-            /* emit */ finished_with_error ();
+            /* emit */ signal_finished_with_error ();
         }
         return true;
     }

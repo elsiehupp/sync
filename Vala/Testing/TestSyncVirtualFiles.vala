@@ -85,7 +85,7 @@ public class TestSyncVirtualFiles : GLib.Object {
 
         // If the local virtual file file is removed, it'll just be recreated
         if (!do_local_discovery) {
-            fake_folder.sync_engine ().set_local_discovery_options (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, { "A" });
+            fake_folder.sync_engine.set_local_discovery_options (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM, { "A" });
         }
         fake_folder.local_modifier ().remove ("A/a1" + DVSUFFIX);
         GLib.assert_true (fake_folder.sync_once ());
@@ -131,10 +131,10 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state ().find ("A/a3" + DVSUFFIX));
         TestSyncVirtualFiles.clean_up_test_virtual_file_lifecycle (complete_spy, do_local_discovery, fake_folder);
 
-        fake_folder.sync_engine ().journal ().delete_file_record ("A/a2" + DVSUFFIX);
-        fake_folder.sync_engine ().journal ().delete_file_record ("A/a3" + DVSUFFIX);
+        fake_folder.sync_engine.journal ().delete_file_record ("A/a2" + DVSUFFIX);
+        fake_folder.sync_engine.journal ().delete_file_record ("A/a3" + DVSUFFIX);
         fake_folder.remote_modifier ().remove ("A/a3");
-        fake_folder.sync_engine ().set_local_discovery_options (LocalDiscoveryStyle.FILESYSTEM_ONLY);
+        fake_folder.sync_engine.set_local_discovery_options (LocalDiscoveryStyle.FILESYSTEM_ONLY);
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state ().find ("A/a2" + DVSUFFIX));
         GLib.assert_true (item_instruction (complete_spy, "A/a2" + DVSUFFIX, SyncInstructions.UPDATE_METADATA));
@@ -149,7 +149,7 @@ public class TestSyncVirtualFiles : GLib.Object {
     private static void clean_up_test_virtual_file_lifecycle (ItemCompletedSpy complete_spy, bool do_local_discovery, FakeFolder fake_folder) {
         complete_spy.clear ();
         if (!do_local_discovery) {
-            fake_folder.sync_engine ().set_local_discovery_options (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM);
+            fake_folder.sync_engine.set_local_discovery_options (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM);
         }
     }
 
@@ -882,7 +882,7 @@ public class TestSyncVirtualFiles : GLib.Object {
 
         // Now wipe the virtuals
 
-        SyncEngine.wipe_virtual_files (fake_folder.local_path (), fake_folder.sync_journal (), *fake_folder.sync_engine ().sync_options ().vfs);
+        SyncEngine.wipe_virtual_files (fake_folder.local_path (), fake_folder.sync_journal (), *fake_folder.sync_engine.sync_options ().vfs);
 
         GLib.assert_true (!fake_folder.current_local_state ().find ("f1" + DVSUFFIX));
         GLib.assert_true (!fake_folder.current_local_state ().find ("A/a1" + DVSUFFIX));
@@ -910,7 +910,7 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         TestSyncVirtualFiles.set_pin ("local", PinState.PinState.ALWAYS_LOCAL);
-        TestSyncVirtualFiles.set_pin ("online", PinState.VfsItemAvailability.ONLINE_ONLY);
+        TestSyncVirtualFiles.set_pin ("online", Vfs.ItemAvailability.ONLINE_ONLY);
         TestSyncVirtualFiles.set_pin ("unspec", PinState.PinState.UNSPECIFIED);
 
         // Test 1 : root is PinState.UNSPECIFIED
@@ -947,8 +947,8 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state ().find ("local/file1"));
         GLib.assert_true (fake_folder.current_local_state ().find ("unspec/file1" + DVSUFFIX));
 
-        // Test 3 : change root to VfsItemAvailability.ONLINE_ONLY
-        TestSyncVirtualFiles.set_pin ("", PinState.VfsItemAvailability.ONLINE_ONLY);
+        // Test 3 : change root to Vfs.ItemAvailability.ONLINE_ONLY
+        TestSyncVirtualFiles.set_pin ("", Vfs.ItemAvailability.ONLINE_ONLY);
 
         fake_folder.remote_modifier ().insert ("file3");
         fake_folder.remote_modifier ().insert ("online/file3");
@@ -1177,7 +1177,7 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         TestSyncVirtualFiles.set_pin ("local", PinState.PinState.ALWAYS_LOCAL);
-        TestSyncVirtualFiles.set_pin ("online", PinState.VfsItemAvailability.ONLINE_ONLY);
+        TestSyncVirtualFiles.set_pin ("online", Vfs.ItemAvailability.ONLINE_ONLY);
         TestSyncVirtualFiles.set_pin ("unspec", PinState.PinState.UNSPECIFIED);
 
         fake_folder.remote_modifier ().insert ("file1");
@@ -1189,35 +1189,35 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (fake_folder.sync_once ());
 
         // root is unspecified
-        GLib.assert_true (vfs.availability ("file1" + DVSUFFIX) == VfsItemAvailability.VfsItemAvailability.ALL_DEHYDRATED);
-        GLib.assert_true (vfs.availability ("local") == VfsItemAvailability.PinState.ALWAYS_LOCAL);
-        GLib.assert_true (vfs.availability ("local/file1") == VfsItemAvailability.PinState.ALWAYS_LOCAL);
-        GLib.assert_true (vfs.availability ("online") == VfsItemAvailability.VfsItemAvailability.ONLINE_ONLY);
-        GLib.assert_true (vfs.availability ("online/file1" + DVSUFFIX) == VfsItemAvailability.VfsItemAvailability.ONLINE_ONLY);
-        GLib.assert_true (vfs.availability ("unspec") == VfsItemAvailability.VfsItemAvailability.ALL_DEHYDRATED);
-        GLib.assert_true (vfs.availability ("unspec/file1" + DVSUFFIX) == VfsItemAvailability.VfsItemAvailability.ALL_DEHYDRATED);
+        GLib.assert_true (vfs.availability ("file1" + DVSUFFIX) == Vfs.ItemAvailability.ALL_DEHYDRATED);
+        GLib.assert_true (vfs.availability ("local") == Vfs.ItemAvailability.PinState.ALWAYS_LOCAL);
+        GLib.assert_true (vfs.availability ("local/file1") == Vfs.ItemAvailability.PinState.ALWAYS_LOCAL);
+        GLib.assert_true (vfs.availability ("online") == Vfs.ItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (vfs.availability ("online/file1" + DVSUFFIX) == Vfs.ItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (vfs.availability ("unspec") == Vfs.ItemAvailability.ALL_DEHYDRATED);
+        GLib.assert_true (vfs.availability ("unspec/file1" + DVSUFFIX) == Vfs.ItemAvailability.ALL_DEHYDRATED);
 
         // Subitem pin states can ruin "pure" availabilities
-        TestSyncVirtualFiles.set_pin ("local/sub", PinState.VfsItemAvailability.ONLINE_ONLY);
-        GLib.assert_true (vfs.availability ("local") == VfsItemAvailability.VfsItemAvailability.ALL_HYDRATED);
+        TestSyncVirtualFiles.set_pin ("local/sub", Vfs.ItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (vfs.availability ("local") == Vfs.ItemAvailability.ALL_HYDRATED);
         TestSyncVirtualFiles.set_pin ("online/sub", PinState.PinState.UNSPECIFIED);
-        GLib.assert_true (vfs.availability ("online") == VfsItemAvailability.VfsItemAvailability.ALL_DEHYDRATED);
+        GLib.assert_true (vfs.availability ("online") == Vfs.ItemAvailability.ALL_DEHYDRATED);
 
         trigger_download (fake_folder, "unspec/file1");
-        TestSyncVirtualFiles.set_pin ("local/file2", PinState.VfsItemAvailability.ONLINE_ONLY);
+        TestSyncVirtualFiles.set_pin ("local/file2", Vfs.ItemAvailability.ONLINE_ONLY);
         TestSyncVirtualFiles.set_pin ("online/file2" + DVSUFFIX, PinState.PinState.ALWAYS_LOCAL);
         GLib.assert_true (fake_folder.sync_once ());
 
-        GLib.assert_true (vfs.availability ("unspec") == VfsItemAvailability.VfsItemAvailability.ALL_HYDRATED);
-        GLib.assert_true (vfs.availability ("local") == VfsItemAvailability.VfsItemAvailability.MIXED);
-        GLib.assert_true (vfs.availability ("online") == VfsItemAvailability.VfsItemAvailability.MIXED);
+        GLib.assert_true (vfs.availability ("unspec") == Vfs.ItemAvailability.ALL_HYDRATED);
+        GLib.assert_true (vfs.availability ("local") == Vfs.ItemAvailability.MIXED);
+        GLib.assert_true (vfs.availability ("online") == Vfs.ItemAvailability.MIXED);
 
         GLib.assert_true (vfs.set_pin_state ("local", PinState.PinState.ALWAYS_LOCAL));
-        GLib.assert_true (vfs.set_pin_state ("online", PinState.VfsItemAvailability.ONLINE_ONLY));
+        GLib.assert_true (vfs.set_pin_state ("online", Vfs.ItemAvailability.ONLINE_ONLY));
         GLib.assert_true (fake_folder.sync_once ());
 
-        GLib.assert_true (vfs.availability ("online") == VfsItemAvailability.VfsItemAvailability.ONLINE_ONLY);
-        GLib.assert_true (vfs.availability ("local") == VfsItemAvailability.PinState.ALWAYS_LOCAL);
+        GLib.assert_true (vfs.availability ("online") == Vfs.ItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (vfs.availability ("local") == Vfs.ItemAvailability.PinState.ALWAYS_LOCAL);
 
         var r = vfs.availability ("nonexistant");
         GLib.assert_true (!r);
@@ -1239,7 +1239,7 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         TestSyncVirtualFiles.set_pin ("local", PinState.PinState.ALWAYS_LOCAL);
-        TestSyncVirtualFiles.set_pin ("online", PinState.VfsItemAvailability.ONLINE_ONLY);
+        TestSyncVirtualFiles.set_pin ("online", Vfs.ItemAvailability.ONLINE_ONLY);
         TestSyncVirtualFiles.set_pin ("unspec", PinState.PinState.UNSPECIFIED);
 
         fake_folder.local_modifier ().insert ("file1");
@@ -1270,12 +1270,12 @@ public class TestSyncVirtualFiles : GLib.Object {
         // When a folder is renamed, the pin states inside should be retained
         fake_folder.local_modifier ().rename ("online", "onlinerenamed1");
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_true (vfs.pin_state ("onlinerenamed1") == PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (vfs.pin_state ("onlinerenamed1") == Vfs.ItemAvailability.ONLINE_ONLY);
         GLib.assert_true (vfs.pin_state ("onlinerenamed1/file1rename") == PinState.PinState.UNSPECIFIED);
 
         fake_folder.remote_modifier ().rename ("onlinerenamed1", "onlinerenamed2");
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_true (vfs.pin_state ("onlinerenamed2") == PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (vfs.pin_state ("onlinerenamed2") == Vfs.ItemAvailability.ONLINE_ONLY);
         GLib.assert_true (vfs.pin_state ("onlinerenamed2/file1rename") == PinState.PinState.UNSPECIFIED);
 
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
@@ -1285,11 +1285,11 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (vfs.pin_state ("onlinerenamed2/file1rename") == PinState.PinState.UNSPECIFIED);
         fake_folder.remote_modifier ().remove ("onlinerenamed2/file1rename");
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_true (vfs.pin_state ("onlinerenamed2/file1rename") == PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (vfs.pin_state ("onlinerenamed2/file1rename") == Vfs.ItemAvailability.ONLINE_ONLY);
         fake_folder.remote_modifier ().insert ("onlinerenamed2/file1rename");
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_true (vfs.pin_state ("onlinerenamed2/file1rename") == PinState.VfsItemAvailability.ONLINE_ONLY);
-        GLib.assert_true (vfs.pin_state ("onlinerenamed2/file1rename" + DVSUFFIX) == PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (vfs.pin_state ("onlinerenamed2/file1rename") == Vfs.ItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (vfs.pin_state ("onlinerenamed2/file1rename" + DVSUFFIX) == Vfs.ItemAvailability.ONLINE_ONLY);
 
         // When a file is hydrated or dehydrated due to pin state it retains its pin state
         GLib.assert_true (vfs.set_pin_state ("onlinerenamed2/file1rename" + DVSUFFIX, PinState.PinState.ALWAYS_LOCAL));
@@ -1298,10 +1298,10 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (vfs.pin_state ("onlinerenamed2/file1rename") == PinState.PinState.ALWAYS_LOCAL);
 
         GLib.assert_true (vfs.set_pin_state ("onlinerenamed2", PinState.PinState.UNSPECIFIED));
-        GLib.assert_true (vfs.set_pin_state ("onlinerenamed2/file1rename", PinState.VfsItemAvailability.ONLINE_ONLY));
+        GLib.assert_true (vfs.set_pin_state ("onlinerenamed2/file1rename", Vfs.ItemAvailability.ONLINE_ONLY));
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state ().find ("onlinerenamed2/file1rename" + DVSUFFIX));
-        GLib.assert_true (vfs.pin_state ("onlinerenamed2/file1rename" + DVSUFFIX) == PinState.VfsItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (vfs.pin_state ("onlinerenamed2/file1rename" + DVSUFFIX) == Vfs.ItemAvailability.ONLINE_ONLY);
     }
 
 
@@ -1318,7 +1318,7 @@ public class TestSyncVirtualFiles : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         TestSyncVirtualFiles.set_pin ("local", PinState.PinState.ALWAYS_LOCAL);
-        TestSyncVirtualFiles.set_pin ("online", PinState.VfsItemAvailability.ONLINE_ONLY);
+        TestSyncVirtualFiles.set_pin ("online", Vfs.ItemAvailability.ONLINE_ONLY);
 
         fake_folder.local_modifier ().insert ("local/file1");
         fake_folder.local_modifier ().insert ("online/file1");
@@ -1376,7 +1376,7 @@ public class TestSyncVirtualFiles : GLib.Object {
 
         TestSyncVirtualFiles.clean_up_test_place_holder_exist ();
         // Dehydrate
-        GLib.assert_true (vfs.set_pin_state ("", PinState.VfsItemAvailability.ONLINE_ONLY));
+        GLib.assert_true (vfs.set_pin_state ("", Vfs.ItemAvailability.ONLINE_ONLY));
         GLib.assert_true (!fake_folder.sync_once ());
 
         GLib.assert_true (item_instruction (complete_spy, "A/igno" + DVSUFFIX, SyncInstructions.IGNORE));

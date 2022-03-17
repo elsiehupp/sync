@@ -96,8 +96,8 @@ public class TestRemoteDiscovery : GLib.Object {
 
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
         QSignalSpy error_spy = new QSignalSpy (
-            fake_folder.sync_engine (),
-            SyncEngine.sync_error
+            fake_folder.sync_engine,
+            SyncEngine.signal_sync_error
         );
         GLib.assert_true (fake_folder.sync_once () == sync_succeeds);
 
@@ -130,7 +130,7 @@ public class TestRemoteDiscovery : GLib.Object {
 
 
     private Soup.Reply override_delegate_remote_error (Soup.Operation operation, Soup.Request request, QIODevice device) {
-        if (request.attribute (Soup.Request.CustomVerbAttribute) == "PROPFIND" && request.url ().path ().ends_with (error_folder)) {
+        if (request.attribute (Soup.Request.CustomVerbAttribute) == "PROPFIND" && request.url.path ().ends_with (error_folder)) {
             if (error_kind == InvalidXML) {
                 return new FakeBrokenXmlPropfindReply (fake_folder.remote_modifier (), operation, request, this);
             } else if (error_kind == Timeout) {
@@ -172,7 +172,7 @@ public class TestRemoteDiscovery : GLib.Object {
 
 
     private Soup.Reply override_delegate_missing_data (Soup.Operation operation, Soup.Request request, QIODevice device) {
-        if (request.attribute (Soup.Request.CustomVerbAttribute) == "PROPFIND" && request.url ().path ().ends_with ("nopermissions"))
+        if (request.attribute (Soup.Request.CustomVerbAttribute) == "PROPFIND" && request.url.path ().ends_with ("nopermissions"))
             return new MissingPermissionsPropfindReply (fake_folder.remote_modifier (), operation, request, this);
         return null;
     }

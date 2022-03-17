@@ -7,7 +7,7 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
 //  #include <QtCore>
 //  #include <QtGui>
-//  #include <QMessageBox>
+//  #include <Gtk.MessageBox>
 //  #include <owncloudgui.h>
 //  #include <cstdlib>
 //  #include <QWizard>
@@ -203,7 +203,7 @@ public class OwncloudWizard : QWizard {
         );
 
         Theme theme = Theme.instance;
-        window_title (_("Add %1 account").printf (theme.app_name_gui ()));
+        window_title (_("Add %1 account").printf (theme.app_name_gui));
         wizard_style (QWizard.ModernStyle);
         option (QWizard.NoBackButtonOnStartPage);
         option (QWizard.NoBackButtonOnLastPage);
@@ -329,9 +329,9 @@ public class OwncloudWizard : QWizard {
     ***********************************************************/
     public void center_window () {
         const var wizard_window = window ();
-        const var screen = QGuiApplication.screen_at (wizard_window.position ())
-            ? QGuiApplication.screen_at (wizard_window.position ())
-            : QGuiApplication.primary_screen ();
+        const var screen = Gtk.Application.screen_at (wizard_window.position ())
+            ? Gtk.Application.screen_at (wizard_window.position ())
+            : Gtk.Application.primary_screen ();
         const var screen_geometry = screen.geometry ();
         const var window_geometry = wizard_window.geometry ();
         const var new_window_position = screen_geometry.center () - QPoint (window_geometry.width () / 2, window_geometry.height () / 2);
@@ -349,15 +349,15 @@ public class OwncloudWizard : QWizard {
     ***********************************************************/
     public static void ask_experimental_virtual_files_feature (Gtk.Widget receiver, CallBack callback) {
         const var best_vfs_mode = best_available_vfs_mode ();
-        QMessageBox message_box = null;
+        Gtk.MessageBox message_box = null;
         QPushButton accept_button = null;
         switch (best_vfs_mode) {
         case Vfs.WindowsCfApi:
             callback (true);
             return;
         case Vfs.WithSuffix:
-            message_box = new QMessageBox (
-                QMessageBox.Warning,
+            message_box = new Gtk.MessageBox (
+                Gtk.MessageBox.Warning,
                 _("Enable experimental feature?"),
                 _("When the \"virtual files\" mode is enabled no files will be downloaded initially. "
                 + "Instead, a tiny \"%1\" file will be created for each file that exists on the server. "
@@ -372,9 +372,9 @@ public class OwncloudWizard : QWizard {
                 + "This is a new, experimental mode. If you decide to use it, please report any "
                 + "issues that come up.")
                     .printf (APPLICATION_DOTVIRTUALFILE_SUFFIX),
-                QMessageBox.NoButton, receiver);
-            accept_button = message_box.add_button (_("Enable experimental placeholder mode"), QMessageBox.AcceptRole);
-            message_box.add_button (_("Stay safe"), QMessageBox.RejectRole);
+                Gtk.MessageBox.NoButton, receiver);
+            accept_button = message_box.add_button (_("Enable experimental placeholder mode"), Gtk.MessageBox.AcceptRole);
+            message_box.add_button (_("Stay safe"), Gtk.MessageBox.RejectRole);
             break;
         case Vfs.XAttr:
         case Vfs.Off:
@@ -383,7 +383,7 @@ public class OwncloudWizard : QWizard {
 
         connect (
             message_box,
-            QMessageBox.accepted,
+            Gtk.MessageBox.accepted,
             receiver,
             this.on_message_box_accepted
         );
@@ -393,7 +393,7 @@ public class OwncloudWizard : QWizard {
 
     /***********************************************************
     ***********************************************************/
-    private void on_message_box_accepted (CallBack callback, QMessageBox message_box, QPushButton accept_button) {
+    private void on_message_box_accepted (CallBack callback, Gtk.MessageBox message_box, QPushButton accept_button) {
         callback (message_box.clicked_button () == accept_button);
         message_box.delete_later ();
     }

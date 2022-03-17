@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 //  #include <cstring>
 //  #include <cerrno>
 //  #include <cstdio>
-//  #include <QDir>
+//  #include <GLib.Dir>
 
 namespace Testing {
 
@@ -33,11 +33,11 @@ public class CheckVioExt {
     const int WD_BUFFER_SIZE = 255;
 
     string csync_test_dir () {
-        return QDir.temporary_path () + "/csync_test";
+        return GLib.Dir.temporary_path () + "/csync_test";
     }
 
     int oc_mkdir (string path) {
-        return QDir (path).mkpath (path) ? 0 : -1;
+        return GLib.Dir (path).mkpath (path) ? 0 : -1;
     }
 
     static char wd_buffer[WD_BUFFER_SIZE];
@@ -51,7 +51,7 @@ public class CheckVioExt {
     /***********************************************************
     remove the complete test directory */
     static int wipe_testdir () {
-        QDir tmp = new QDir (csync_test_dir ());
+        GLib.Dir tmp = new GLib.Dir (csync_test_dir ());
         if (tmp.exists ()) {
             return tmp.remove_recursively () ? 0 : 1;
         }

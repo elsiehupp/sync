@@ -247,7 +247,7 @@ public class Flow2AuthWidget : Gtk.Widget {
     ***********************************************************/
     private void logo () {
         const var background_color = palette ().window ().color ();
-        const var logo_icon_filename = Theme.instance.is_branded ()
+        const var logo_icon_filename = Theme.is_branded
             ? Theme.hidpi_filename ("external.png", background_color)
             : Theme.hidpi_filename (":/client/theme/colored/external.png");
         this.ui.logo_label.pixmap (logo_icon_filename);

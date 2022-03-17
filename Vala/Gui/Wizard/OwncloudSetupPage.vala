@@ -5,11 +5,11 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <QDir>
+//  #include <GLib.Dir>
 //  #include <QFileDialog>
 //  #include <QTimer>
 //  #include <QPushButton>
-//  #include <QMessageBox>
+//  #include <Gtk.MessageBox>
 //  #include <QSsl>
 //  #include <QSslCertificate>
 //  #include <QNetworkAccessManager>
@@ -59,10 +59,10 @@ public class OwncloudSetupPage : QWizardPage {
         setup_server_address_description_label ();
 
         Theme theme = Theme.instance;
-        if (theme.override_server_url () == "") {
-            this.ui.le_url.postfix (theme.wizard_url_postfix ());
+        if (theme.override_server_url == "") {
+            this.ui.le_url.postfix (theme.wizard_url_postfix);
             this.ui.le_url.placeholder_text (theme.WIZARD_URL_HINT);
-        } else if (Theme.instance.force_override_server_url ()) {
+        } else if (Theme.force_override_server_url) {
             this.ui.le_url.enabled (false);
         }
 
@@ -111,8 +111,8 @@ public class OwncloudSetupPage : QWizardPage {
 
         this.ui.le_url.focus ();
 
-        const var is_server_url_overridden = !Theme.instance.override_server_url () == "";
-        if (is_server_url_overridden && !Theme.instance.force_override_server_url ()) {
+        const var is_server_url_overridden = !Theme.override_server_url == "";
+        if (is_server_url_overridden && !Theme.force_override_server_url) {
             // If the url is overwritten but we don't force to use that url
             // Just focus the next button to let the user navigate quicker
             if (next_button) {
@@ -395,7 +395,7 @@ public class OwncloudSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void logo () {
-        this.ui.logo_label.pixmap (Theme.instance.wizard_application_logo ());
+        this.ui.logo_label.pixmap (Theme.wizard_application_logo);
     }
 
 
@@ -420,7 +420,7 @@ public class OwncloudSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void setup_server_address_description_label () {
-        const var app_name = Theme.instance.app_name_gui ();
+        const var app_name = Theme.app_name_gui;
         this.ui.server_address_description_label.on_signal_text (_("The link to your %1 web interface when you open it in the browser.", "%1 will be replaced with the application name").printf (app_name));
     }
 

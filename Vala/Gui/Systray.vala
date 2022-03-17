@@ -5,7 +5,7 @@ Copyright (C) by Cédric Bellegarde <gnumdk@gmail.com>
 ***********************************************************/
 
 //  #include <QCursor>
-//  #include <QGuiApplication>
+//  #include <Gtk.Application>
 //  #include <QQmlApplicationEngine>
 //  #include <QQml_context>
 //  #include <QQuick_window>
@@ -162,7 +162,7 @@ public class Systray : QSystemTrayIcon {
         var pause_action = context_menu.add_action (_("Pause sync"), this, Systray.on_signal_pause_all_folders);
         var resume_action = context_menu.add_action (_("Resume sync"), this, Systray.on_signal_unpause_all_folders);
         context_menu.add_action (_("Settings"), this, Systray.signal_open_settings);
-        context_menu.add_action (_("Exit %1").printf (Theme.instance.app_name_gui ()), this, Systray.signal_shutdown);
+        context_menu.add_action (_("Exit %1").printf (Theme.app_name_gui), this, Systray.signal_shutdown);
         context_menu (context_menu);
 
         connect (
@@ -272,7 +272,7 @@ public class Systray : QSystemTrayIcon {
     /***********************************************************
     ***********************************************************/
     public string window_title () {
-        return Theme.instance.app_name_gui ();
+        return Theme.app_name_gui;
     }
 
 
@@ -304,7 +304,7 @@ public class Systray : QSystemTrayIcon {
     /***********************************************************
     ***********************************************************/
     public void tool_tip (string tip) {
-        QSystemTrayIcon.tool_tip (_("%1 : %2").printf (Theme.instance.app_name_gui (), tip));
+        QSystemTrayIcon.tool_tip (_("%1 : %2").printf (Theme.app_name_gui, tip));
     }
 
 
@@ -410,7 +410,7 @@ public class Systray : QSystemTrayIcon {
     /***********************************************************
     ***********************************************************/
     private Gdk.Screen current_screen () {
-        const var screens = QGuiApplication.screens ();
+        const var screens = Gtk.Application.screens ();
         const var cursor_pos = QCursor.position ();
 
         foreach (var screen in screens) {
@@ -421,7 +421,7 @@ public class Systray : QSystemTrayIcon {
 
         // Didn't find anything matching the cursor position,
         // falling back to the primary screen
-        return QGuiApplication.primary_screen ();
+        return Gtk.Application.primary_screen ();
     }
 
 

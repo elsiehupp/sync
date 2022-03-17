@@ -20,10 +20,10 @@ public class TestDownload : GLib.Object {
     ***********************************************************/
     private void test_resume () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().set_ignore_hidden_files (true);
+        fake_folder.sync_engine.set_ignore_hidden_files (true);
         QSignalSpy complete_spy = new QSignalSpy (
-            fake_folder.sync_engine (),
-            item_completed (SyncFileItemPtr)
+            fake_folder.sync_engine,
+            signal_item_completed (SyncFileItemPtr)
         );
         var size = 30 * 1000 * 1000;
         fake_folder.remote_modifier ().insert ("A/a0", size);
@@ -34,7 +34,7 @@ public class TestDownload : GLib.Object {
         GLib.assert_true (!fake_folder.sync_once ()); // The sync must fail because not all the file was downloaded
         GLib.assert_true (get_item (complete_spy, "A/a0").status == SyncFileItem.Status.SOFT_ERROR);
         GLib.assert_true (get_item (complete_spy, "A/a0").error_string == "The file could not be downloaded completely.");
-        GLib.assert_true (fake_folder.sync_engine ().is_another_sync_needed ());
+        GLib.assert_true (fake_folder.sync_engine.is_another_sync_needed ());
 
         // Now, we need to restart, this time, it should resume.
         string ranges;
@@ -47,7 +47,7 @@ public class TestDownload : GLib.Object {
 
 
     private Soup.Reply override_delegate_resume1 (Soup.Operation operation, Soup.Request request, QIODevice device) {
-        if (operation == Soup.GetOperation && request.url ().path ().ends_with ("A/a0")) {
+        if (operation == Soup.GetOperation && request.url.path ().ends_with ("A/a0")) {
             return new BrokenFakeGetReply (fake_folder.remote_modifier (), operation, request, this);
         }
         return null;
@@ -55,7 +55,7 @@ public class TestDownload : GLib.Object {
 
 
     private Soup.Reply override_delegate_resume2 (Soup.Operation operation, Soup.Request request, QIODevice device) {
-        if (operation == Soup.GetOperation && request.url ().path ().ends_with ("A/a0")) {
+        if (operation == Soup.GetOperation && request.url.path ().ends_with ("A/a0")) {
             ranges = request.raw_header ("Range");
         }
         return null;
@@ -68,10 +68,10 @@ public class TestDownload : GLib.Object {
         // This test's main goal is to test that the error string from the server is shown in the UI
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().set_ignore_hidden_files (true);
+        fake_folder.sync_engine.set_ignore_hidden_files (true);
         QSignalSpy complete_spy = new QSignalSpy (
-            fake_folder.sync_engine (),
-            item_completed (SyncFileItemPtr)
+            fake_folder.sync_engine,
+            signal_item_completed (SyncFileItemPtr)
         );
         var size = 3500000;
         fake_folder.remote_modifier ().insert ("A/broken", size);
@@ -84,10 +84,10 @@ public class TestDownload : GLib.Object {
         bool timed_out = false;
         QTimer.single_shot (
             10000,
-            fake_folder.sync_engine (),
+            fake_folder.sync_engine,
             () => {
                 timed_out = true;
-                fake_folder.sync_engine ().on_signal_abort ();
+                fake_folder.sync_engine.on_signal_abort ();
             });
         GLib.assert_true (!fake_folder.sync_once ());  // Fail because A/broken
         GLib.assert_true (!timed_out);
@@ -97,7 +97,7 @@ public class TestDownload : GLib.Object {
 
 
     private Soup.Reply override_delegate_error_message (Soup.Operation operation, Soup.Request request, QIODevice device) {
-        if (operation == Soup.GetOperation && request.url ().path ().ends_with ("A/broken")) {
+        if (operation == Soup.GetOperation && request.url.path ().ends_with ("A/broken")) {
             return new FakeErrorReply (operation, request, this, 400,
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
                 + "<d:error xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\">\n"
@@ -119,8 +119,8 @@ public class TestDownload : GLib.Object {
         fake_folder.set_server_override (this.override_delegate_server_maintenence);
 
         QSignalSpy complete_spy = new QSignalSpy (
-            fake_folder.sync_engine (),
-            SyncEngine.item_completed
+            fake_folder.sync_engine,
+            SyncEngine.signal_item_completed
         );
         GLib.assert_true (!fake_folder.sync_once ()); // Fail because A/broken
         // FatalError means the sync was aborted, which is what we want
@@ -152,15 +152,15 @@ public class TestDownload : GLib.Object {
         // Note that there will be first a notification on the file and the conflict file before.
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().set_ignore_hidden_files (true);
+        fake_folder.sync_engine.set_ignore_hidden_files (true);
         fake_folder.remote_modifier ().set_contents ("A/a1", 'A');
         fake_folder.local_modifier ().set_contents ("A/a1", 'B');
 
         bool prop_connected = false;
         string conflict_file;
         var trans_progress = connect (
-            fake_folder.sync_engine (),
-            SyncEngine.transmission_progress,
+            fake_folder.sync_engine,
+            SyncEngine.signal_transmission_progress,
             this.on_signal_sync_engine_transmission_progress
         );
 
@@ -193,7 +193,7 @@ public class TestDownload : GLib.Object {
 
 
     private void on_signal_sync_engine_transmission_progress (ProgressInfo progress_info) {
-        var propagator = fake_folder.sync_engine ().get_propagator ();
+        var propagator = fake_folder.sync_engine.get_propagator ();
         if (progress_info.status () != ProgressInfo.Status.PROPAGATION || prop_connected || !propagator)
             return;
         prop_connected = true;
@@ -213,7 +213,7 @@ public class TestDownload : GLib.Object {
         }
         if (!conflict_file == "") {
             // Check that the temporary file is still there
-            GLib.assert_true (QDir (fake_folder.local_path () + "A/").entry_list ({ "*.~*" }, QDir.Files | QDir.Hidden).count () == 1);
+            GLib.assert_true (GLib.Dir (fake_folder.local_path () + "A/").entry_list ({ "*.~*" }, GLib.Dir.Files | GLib.Dir.Hidden).count () == 1);
             // Set the permission to read only on the folder, so the rename of the temporary file will fail
             GLib.File (fake_folder.local_path () + "A/").set_permissions (GLib.File.Permissions (0x5555));
         }
@@ -242,8 +242,8 @@ public class TestDownload : GLib.Object {
         resend_expected = 10;
 
         QSignalSpy complete_spy = new QSignalSpy (
-            fake_folder.sync_engine (),
-            item_completed (SyncFileItemPtr)
+            fake_folder.sync_engine,
+            signal_item_completed (SyncFileItemPtr)
         );
         GLib.assert_true (!fake_folder.sync_once ());
         GLib.assert_true (resend_actual == 4); // the 4th fails because it only resends 3 times
@@ -253,7 +253,7 @@ public class TestDownload : GLib.Object {
 
 
     private Soup.Reply override_delegate_http2_resend (Soup.Operation operation, Soup.Request request, QIODevice device) {
-        if (operation == Soup.GetOperation && request.url ().path ().ends_with ("A/resendme") && resend_actual < resend_expected) {
+        if (operation == Soup.GetOperation && request.url.path ().ends_with ("A/resendme") && resend_actual < resend_expected) {
             var error_reply = new FakeErrorReply (operation, request, this, 400, "ignore this body");
             error_reply.set_error (Soup.Reply.ContentReSendError, server_message);
             error_reply.set_attribute (Soup.Request.HTTP2WasUsedAttribute, true);

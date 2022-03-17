@@ -6,7 +6,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 //  #include <QLoggingCategory>
 //  #include <QDataStream>
-//  #include <QDir>
+//  #include <GLib.Dir>
 //  #include <Soup.CookieJar>
 
 namespace Occ {

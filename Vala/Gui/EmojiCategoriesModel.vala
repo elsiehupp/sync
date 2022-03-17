@@ -34,7 +34,7 @@ public class EmojiCategoriesModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private const GLib.Vector<Category> CATEGORIES = {
+    private const GLib.List<Category> CATEGORIES = {
         {
             "⌛️",
             "history"

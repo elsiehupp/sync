@@ -179,7 +179,7 @@ public class DiscoveryPhase : GLib.Object {
     A new folder was discovered and was not synced because of
     the confirmation feature.
     ***********************************************************/
-    internal signal void new_big_folder (string folder, bool is_external);
+    internal signal void signal_new_big_folder (string folder, bool is_external);
 
 
     /***********************************************************
@@ -257,7 +257,7 @@ public class DiscoveryPhase : GLib.Object {
                 return callback (false);
             }
 
-            /* emit */ new_big_folder (path, true);
+            /* emit */ signal_new_big_folder (path, true);
             return callback (true);
         }
 
@@ -280,7 +280,7 @@ public class DiscoveryPhase : GLib.Object {
                 + "http://owncloud.org/ns:size"));
         GLib.Object.connect (
             propfind_job,
-            PropfindJob.finished_with_error,
+            PropfindJob.signal_finished_with_error,
             this, () => {
                 return callback (false);
             });
@@ -298,7 +298,7 @@ public class DiscoveryPhase : GLib.Object {
         var result = values.value ("size").to_long_long ();
         if (result >= limit) {
             // we tell the UI there is a new folder
-            /* emit */ new_big_folder (path, false);
+            /* emit */ signal_new_big_folder (path, false);
             return callback (true);
         } else {
             // it is not too big, put it in the allow list (so we will not do more query for the children)

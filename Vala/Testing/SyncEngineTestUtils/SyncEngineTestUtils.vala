@@ -10,7 +10,7 @@ implied, as to its usefulness for any purpose.
 //  #include <QJsonValue>
 //  #include <memory>
 
-//  #include <QDir>
+//  #include <GLib.Dir>
 //  #include <QtTest>
 //  #include <cstring>
 //  #include <memory>

@@ -5,7 +5,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 //  #include <QMetaType>
-//  #include <QCoreApplication>
+//  #include <Gtk.Application>
 //  #include <QTime>
 //  #include <QQueue>
 //  #include <QElapsedTimer>
@@ -81,7 +81,7 @@ public class ProgressDispatcher : GLib.Object {
     /***********************************************************
     @brief Emitted for a folder when a sync is done, listing all pending conflicts
     ***********************************************************/
-    internal signal void folder_conflicts (string folder, string[] conflict_paths);
+    internal signal void signal_folder_conflicts (string folder, string[] conflict_paths);
 
 
     /***********************************************************

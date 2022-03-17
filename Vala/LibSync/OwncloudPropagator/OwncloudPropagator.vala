@@ -11,7 +11,7 @@ using Soup;
 
 //  #include <GLib.List>
 //  #include <GLib.FileInfo>
-//  #include <QDir>
+//  #include <GLib.Dir>
 //  #include <QLoggingCategory>
 //  #include <QTimer>
 //  #include <QTimerEvent>

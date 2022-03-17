@@ -184,13 +184,13 @@ public class WebFlowCredentials : AbstractCredentials {
 
         this.account.delete_app_password ();
 
-        const string kck = keychain_key (this.account.url ().to_string (), this.user, this.account.identifier ());
+        const string kck = keychain_key (this.account.url.to_string (), this.user, this.account.identifier ());
         if (kck == "") {
             GLib.debug ("InvalidateToken: User is empty, bailing out!");
             return;
         }
 
-        var job = new DeletePasswordJob (Theme.instance.app_name (), this);
+        var job = new DeletePasswordJob (Theme.app_name, this);
         job.insecure_fallback (false);
         job.key (kck);
         job.on_signal_start ();
@@ -263,7 +263,7 @@ public class WebFlowCredentials : AbstractCredentials {
         this.ask_dialog = new WebFlowCredentialsDialog (this.account, use_flow2);
 
         if (!use_flow2) {
-            GLib.Uri url = this.account.url ();
+            GLib.Uri url = this.account.url;
             string path = url.path () + "/index.php/login/flow";
             url.path (path);
             this.ask_dialog.url (url);
@@ -368,12 +368,12 @@ public class WebFlowCredentials : AbstractCredentials {
 
         // Now fetch the actual server password
         const string kck = keychain_key (
-            this.account.url ().to_string (),
+            this.account.url.to_string (),
             this.user,
             this.keychain_migration ? "" : this.account.identifier ()
         );
 
-        var job = new ReadPasswordJob (Theme.instance.app_name (), this);
+        var job = new ReadPasswordJob (Theme.app_name, this);
     //  #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
         add_settings_to_job (this.account, job);
     //  #endif
@@ -475,13 +475,13 @@ public class WebFlowCredentials : AbstractCredentials {
         }
 
         // done storing ca certificates, time for the password
-        var job = new WritePasswordJob (Theme.instance.app_name (), this);
+        var job = new WritePasswordJob (Theme.app_name, this);
     //  #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
         add_settings_to_job (this.account, job);
     //  #endif
         job.insecure_fallback (false);
         connect (job, Job.on_signal_finished, this, WebFlowCredentials.on_signal_write_job_done);
-        job.key (keychain_key (this.account.url ().to_string (), this.user, this.account.identifier ()));
+        job.key (keychain_key (this.account.url.to_string (), this.user, this.account.identifier ()));
         job.text_data (this.password);
         job.on_signal_start ();
     }
@@ -664,7 +664,7 @@ public class WebFlowCredentials : AbstractCredentials {
             this.ask_dialog.error (message);
 
             if (!this.ask_dialog.is_using_flow2 ()) {
-                GLib.Uri url = this.account.url ();
+                GLib.Uri url = this.account.url;
                 string path = url.path () + "/index.php/login/flow";
                 url.path (path);
                 this.ask_dialog.url (url);

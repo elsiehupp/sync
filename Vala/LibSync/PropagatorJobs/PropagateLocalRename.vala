@@ -45,8 +45,8 @@ public class PropagateLocalRename : PropagateItemJob {
                 // it would have to come out the local_filename_clash function
                 on_signal_done (SyncFileItem.Status.NORMAL_ERROR,
                     _("File %1 cannot be renamed to %2 because of a local file name clash")
-                        .printf (QDir.to_native_separators (this.item.file))
-                        .printf (QDir.to_native_separators (this.item.rename_target)));
+                        .printf (GLib.Dir.to_native_separators (this.item.file))
+                        .printf (GLib.Dir.to_native_separators (this.item.rename_target)));
                 return;
             }
 

@@ -13,8 +13,8 @@ version 1.1, included in the file LGPL_EXCEPTION.txt in this pACKage.
 
 //  #include <QLocalServer>
 //  #include <QLocalSocket>
-//  #include <QDir>
-//  #include <QCoreApplication>
+//  #include <GLib.Dir>
+//  #include <Gtk.Application>
 //  #include <QDataStream>
 //  #include <QTime>
 
@@ -41,7 +41,7 @@ public class QtLocalPeer : GLib.Object {
         base (parent);
         this.identifier = app_id;
         if (identifier == "") {
-            identifier = QCoreApplication.application_file_path ();  //### On win, check if this returns .../argv[0] without casefolding; .\MYAPP == .\myapp on Win
+            identifier = Gtk.Application.application_file_path ();  //### On win, check if this returns .../argv[0] without casefolding; .\MYAPP == .\myapp on Win
         }
 
         socket_name = app_session_id (identifier);

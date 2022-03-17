@@ -8,7 +8,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 //  #include <QProcess>
 //  #include <QSettings>
-//  #include <QDir>
+//  #include <GLib.Dir>
 //  #include <QDesktopServices>
 //  #include <Gtk.Application>
 
@@ -121,7 +121,7 @@ public class OpenFileManager {
         // local location
         string xdg_data_home = GLib.File.decode_name (qgetenv ("XDG_DATA_HOME"));
         if (xdg_data_home == "") {
-            xdg_data_home = QDir.home_path () + "/.local/share";
+            xdg_data_home = GLib.Dir.home_path () + "/.local/share";
         }
         dirs.prepend (xdg_data_home);
         return dirs;

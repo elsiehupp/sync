@@ -5,9 +5,9 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 ***********************************************************/
 
 //  #include <GLib.FileInfo>
-//  #include <QDir>
+//  #include <GLib.Dir>
 //  #include <QDirIterator>
-//  #include <QCoreApplication>
+//  #include <Gtk.Application>
 
 
 //  #include <ctime>
@@ -160,13 +160,13 @@ public class FileSystem : GLib.Object {
     signal_delegate () is called for each deleted file or directory, including the root.
     errors are collected in errors.
 
-    Code inspired from Qt5's QDir.remove_recursively
+    Code inspired from Qt5's GLib.Dir.remove_recursively
     ***********************************************************/
     public static bool remove_recursively (string path,
         SignalDelegate signal_delegate = null,
         string[] errors = null) {
         bool all_removed = true;
-        QDirIterator dir_iterator = new QDirIterator (path, QDir.AllEntries | QDir.Hidden | QDir.System | QDir.NoDotAndDotDot);
+        QDirIterator dir_iterator = new QDirIterator (path, GLib.Dir.AllEntries | GLib.Dir.Hidden | GLib.Dir.System | GLib.Dir.NoDotAndDotDot);
 
         while (dir_iterator.has_next ()) {
             dir_iterator.next ();
@@ -186,7 +186,7 @@ public class FileSystem : GLib.Object {
                 } else {
                     if (errors) {
                         errors.append (_("FileSystem", "Error removing \"%1\" : %2")
-                                            .printf (QDir.to_native_separators (dir_iterator.file_path ()), remove_error));
+                                            .printf (GLib.Dir.to_native_separators (dir_iterator.file_path ()), remove_error));
                     }
                     GLib.warning ("Error removing " + dir_iterator.file_path () + " : " + remove_error);
                 }
@@ -196,14 +196,14 @@ public class FileSystem : GLib.Object {
             }
         }
         if (all_removed) {
-            all_removed = new QDir ().rmdir (path);
+            all_removed = new GLib.Dir ().rmdir (path);
             if (all_removed) {
                 if (signal_delegate)
                     signal_delegate (path, true);
             } else {
                 if (errors) {
                     errors.append (_("FileSystem", "Could not remove folder \"%1\"")
-                                        .printf (QDir.to_native_separators (path)));
+                                        .printf (GLib.Dir.to_native_separators (path)));
                 }
                 GLib.warning ("Error removing folder " + path);
             }

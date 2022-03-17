@@ -31,7 +31,7 @@ public class HttpLogger {
             header += q_make_pair (key, request.raw_header (key));
         }
         log_http (request_verb (operation, request),
-            request.url ().to_string (),
+            request.url.to_string (),
             request.raw_header (X_REQUEST_ID ()),
             request.header (Soup.Request.ContentTypeHeader).to_string (),
             header,
@@ -43,7 +43,7 @@ public class HttpLogger {
             reply,
             () => {
             log_http (request_verb (*reply),
-                reply.url ().to_string (),
+                reply.url.to_string (),
                 reply.request ().raw_header (X_REQUEST_ID ()),
                 reply.header (Soup.Request.ContentTypeHeader).to_string (),
                 reply.raw_header_pairs (),

@@ -42,7 +42,7 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
 
         WizardCommon.init_error_label (this.ui.error_label);
 
-        title (WizardCommon.title_template ().printf (_("Connect to %1").printf (Theme.instance.app_name_gui ())));
+        title (WizardCommon.title_template ().printf (_("Connect to %1").printf (Theme.app_name_gui)));
         sub_title (WizardCommon.sub_title_template ().printf (_("Login in your browser")));
 
         connect (this.ui.open_link_button, QCommand_link_button.clicked, this, OwncloudOAuthCredsPage.on_signal_open_browser);
@@ -128,7 +128,7 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
             this.refresh_token = refresh_token;
             var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
             //  Q_ASSERT (oc_wizard);
-            /* emit */ connect_to_oc_url (oc_wizard.account.url ().to_string ());
+            /* emit */ connect_to_oc_url (oc_wizard.account.url.to_string ());
             break;
         }
         }

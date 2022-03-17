@@ -199,7 +199,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
                 return;
             }
         }
-        Utility.open_browser (resource_url);
+        OpenExtrernal.open_browser (resource_url);
     }
 
 
@@ -315,7 +315,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
             provider.is_paginated = false;
         }
 
-        GLib.Vector<UnifiedSearchResult> new_entries;
+        GLib.List<UnifiedSearchResult> new_entries;
 
         foreach (var entry in entries) {
             const var entry_map = entry.to_map ();
@@ -331,7 +331,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
             result.subline = entry_map.value (QStringLiteral ("subline")).to_string ();
 
             const var resource_url = entry_map.value (QStringLiteral ("resource_url")).to_string ();
-            const var account_url = (this.account_state && this.account_state.account) ? this.account_state.account.url () : GLib.Uri ();
+            const var account_url = (this.account_state && this.account_state.account) ? this.account_state.account.url : GLib.Uri ();
 
             result.resource_url = make_resource_url (resource_url, account_url);
             result.icons = icons_from_thumbnail_and_fallback_icon (entry_map.value (QStringLiteral ("thumbnail_url")).to_string (),
@@ -361,7 +361,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
     /***********************************************************
     Append initial search results to the list
     ***********************************************************/
-    private void append_results (GLib.Vector<UnifiedSearchResult> results, UnifiedSearchProvider provider) {
+    private void append_results (GLib.List<UnifiedSearchResult> results, UnifiedSearchProvider provider) {
         if (provider.cursor > 0 && provider.is_paginated) {
             UnifiedSearchResult fetch_more_trigger;
             fetch_more_trigger.provider_id = provider.id;
@@ -411,7 +411,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
     Append pagination results to existing results from the
     initial search
     ***********************************************************/
-    private void append_results_to_provider (GLib.Vector<UnifiedSearchResult> results, UnifiedSearchProvider provider) {
+    private void append_results_to_provider (GLib.List<UnifiedSearchResult> results, UnifiedSearchProvider provider) {
         if (results == "") {
             return;
         }

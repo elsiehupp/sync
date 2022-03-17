@@ -7,8 +7,8 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <sys/inotify.h>
 //  #include <cerrno>
 //  #include <QVarLengthArray>
-//  #include <QSocket_notifier>
-//  #include <QDir>
+//  #include <QSocketNotifier>
+//  #include <GLib.Dir>
 
 namespace Occ {
 namespace Ui {
@@ -33,7 +33,7 @@ public class FolderWatcherPrivate : GLib.Object {
     private string folder;
     private GLib.HashTable<int, string> watch_to_path;
     private GLib.HashTable<string, int> path_to_watch;
-    private QScopedPointer<QSocket_notifier> socket;
+    private QScopedPointer<QSocketNotifier> socket_notifier;
     private int fd;
 
     /***********************************************************
@@ -44,8 +44,10 @@ public class FolderWatcherPrivate : GLib.Object {
         this.folder = path;
         this.fd = inotify_init ();
         if (this.fd != -1) {
-            this.socket.on_signal_reset (new QSocket_notifier (this.fd, QSocket_notifier.Read));
-            connect (this.socket, QSocket_notifier.activated, this, FolderWatcherPrivate.on_signal_received_notification);
+            this.socket_notifier = new QSocketNotifier (this.fd, QSocketNotifier.Read);
+            this.socket_notifier.activated.connect (
+                this.on_signal_received_notification
+            );
         } else {
             GLib.warning ("notify_init () failed: " + strerror (errno));
         }
@@ -135,17 +137,17 @@ public class FolderWatcherPrivate : GLib.Object {
         int subdirectories = 0;
         GLib.debug (" (+) Watcher: " + path);
 
-        QDir in_path = new QDir (path);
+        GLib.Dir in_path = new GLib.Dir (path);
         inotify_register_path (in_path.absolute_path ());
 
         string[] all_subfolders;
-        if (!find_folders_below (QDir (path), all_subfolders)) {
+        if (!find_folders_below (GLib.Dir (path), all_subfolders)) {
             GLib.warning ("Could not traverse all subfolders.");
         }
         var subfolders_it = new QStringListIterator (all_subfolders);
         while (subfolders_it.has_next ()) {
             string subfolder = subfolders_it.next ();
-            QDir folder = new QDir (subfolder);
+            GLib.Dir folder = new GLib.Dir (subfolder);
             if (folder.exists () && !this.path_to_watch.contains (folder.absolute_path ())) {
                 subdirectories++;
                 if (this.parent.path_is_ignored (subfolder)) {
@@ -167,7 +169,7 @@ public class FolderWatcherPrivate : GLib.Object {
     /***********************************************************
     Attention: result list passed by reference!
     ***********************************************************/
-    protected bool find_folders_below (QDir directory, string[] full_list) {
+    protected bool find_folders_below (GLib.Dir directory, string[] full_list) {
         bool ok = true;
         if (! (directory.exists () && directory.is_readable ())) {
             GLib.debug ("Non existing path coming in: " + directory.absolute_path ());
@@ -175,7 +177,7 @@ public class FolderWatcherPrivate : GLib.Object {
         } else {
             string[] name_filter;
             name_filter += "*";
-            QDir.Filters filter = QDir.Dirs | QDir.NoDotAndDotDot | QDir.No_sym_links | QDir.Hidden;
+            GLib.Dir.Filters filter = GLib.Dir.Dirs | GLib.Dir.NoDotAndDotDot | GLib.Dir.No_sym_links | GLib.Dir.Hidden;
             const string[] pathes = directory.entry_list (name_filter, filter);
 
             // FIXME: need to iterate through string[]
@@ -184,7 +186,7 @@ public class FolderWatcherPrivate : GLib.Object {
             //       ++ConstIterator) {
             //      const string full_path (directory.path () + "/" + (*ConstIterator));
             //      full_list.append (full_path);
-            //      ok = find_folders_below (QDir (full_path), full_list);
+            //      ok = find_folders_below (GLib.Dir (full_path), full_list);
             //  }
         }
 

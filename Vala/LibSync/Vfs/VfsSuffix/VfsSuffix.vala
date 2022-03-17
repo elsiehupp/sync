@@ -9,7 +9,7 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 namespace Occ {
 namespace LibSync {
 
-public class VfsSuffix : Vfs {
+public class VfsSuffix : AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
@@ -20,7 +20,7 @@ public class VfsSuffix : Vfs {
 
     /***********************************************************
     ***********************************************************/
-    public Vfs.Mode mode () {
+    public AbstractVfs.Mode mode () {
         return WithSuffix;
     }
 
@@ -196,7 +196,7 @@ public class VfsSuffix : Vfs {
 
     /***********************************************************
     ***********************************************************/
-    protected void start_impl (VfsSetupParams parameters) {
+    protected void start_impl (Vfs.SetupParameters parameters) {
         // It is unsafe for the database to contain any ".owncloud" file entries
         // that are not marked as a virtual file. These could be real .owncloud
         // files that were synced before vfs was enabled.

@@ -124,10 +124,10 @@ public class FakeQNAM : Soup {
             }
         }
         if (!reply) {
-            reply = override_reply_with_error (get_file_path_from_url (new_request.url ()), operation, new_request);
+            reply = override_reply_with_error (get_file_path_from_url (new_request.url), operation, new_request);
         }
         if (!reply) {
-            const bool is_upload = new_request.url ().path ().starts_with (s_upload_url.path ());
+            const bool is_upload = new_request.url.path ().starts_with (s_upload_url.path ());
             FileInfo info = is_upload ? this.upload_file_info : this.remote_root_file_info;
 
             var verb = new_request.attribute (Soup.Request.CustomVerbAttribute);

@@ -100,7 +100,7 @@ public class PUTFileJob : AbstractNetworkJob {
     public bool on_signal_finished () {
         this.device.close ();
 
-        GLib.info ("PUT of " + reply ().request ().url ().to_string () + " finished with status "
+        GLib.info ("PUT of " + reply ().request ().url.to_string () + " finished with status "
             + reply_status_string ()
             + reply ().attribute (Soup.Request.HttpStatusCodeAttribute)
             + reply ().attribute (Soup.Request.HttpReasonPhraseAttribute));

@@ -9,10 +9,10 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QtGlobal>
 
 // Note: This file must compile without QtGui
-//  #include <QCoreApplication>
+//  #include <Gtk.Application>
 //  #include <QSettings>
 //  #include <QTextStream>
-//  #include <QDir>
+//  #include <GLib.Dir>
 //  #include <QProcess>
 //  #include <QThread>
 //  #include <QSysInfo>
@@ -105,7 +105,7 @@ public class Utility {
     ***********************************************************/
     static void setup_fav_link_private (string folder) {
         // Nautilus : add to ~/.gtk-bookmarks
-        GLib.File gtk_bookmarks = GLib.File.new_for_path (QDir.home_path () + "/.config/gtk-3.0/bookmarks");
+        GLib.File gtk_bookmarks = GLib.File.new_for_path (GLib.Dir.home_path () + "/.config/gtk-3.0/bookmarks");
         string folder_url = "file://" + folder.to_utf8 ();
         if (gtk_bookmarks.open (GLib.File.ReadWrite)) {
             string places = gtk_bookmarks.read_all ();
@@ -297,7 +297,7 @@ public class Utility {
                                         + LINUX_APPLICATION_ID
                                         + ".desktop";
         if (enable) {
-            if (!QDir ().exists (user_auto_start_path) && !QDir ().mkpath (user_auto_start_path)) {
+            if (!GLib.Dir ().exists (user_auto_start_path) && !GLib.Dir ().mkpath (user_auto_start_path)) {
                 GLib.warning ("Could not create autostart folder" + user_auto_start_path);
                 return;
             }
@@ -310,7 +310,7 @@ public class Utility {
             // AppImage instead of the path to the executable
             const string app_image_path = q_environment_variable ("APPIMAGE");
             const bool running_inside_app_image = !app_image_path.is_null () && GLib.File.exists (app_image_path);
-            const string executable_path = running_inside_app_image ? app_image_path : QCoreApplication.application_file_path ();
+            const string executable_path = running_inside_app_image ? app_image_path : Gtk.Application.application_file_path ();
 
             string ts; // = new QTextStream (&ini_file);
             //  ts.codec ("UTF-8");
@@ -596,14 +596,14 @@ public class Utility {
 
     /***********************************************************
     Check if two pathes that MUST exist are equal. This function
-    uses QDir.canonical_path () to judge and cares for the
+    uses GLib.Dir.canonical_path () to judge and cares for the
     system's case sensitivity.
 
     OCSYNC_EXPORT
     ***********************************************************/
     public static bool filenames_equal (string fn1, string fn2) {
-        const QDir fd1 = new QDir(fn1);
-        const QDir fd2 = new QDir (fn2);
+        const GLib.Dir fd1 = new GLib.Dir(fn1);
+        const GLib.Dir fd2 = new GLib.Dir (fn2);
 
         // Attention : If the path does not exist, canonical_path returns ""
         // ONLY use this function with existing pathes.

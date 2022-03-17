@@ -274,7 +274,7 @@ public class GETFileJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public new void on_signal_timed_out () {
-        GLib.warning ("Timeout" + reply () ? reply ().request ().url () : path ());
+        GLib.warning ("Timeout" + reply () ? reply ().request ().url : path ());
         if (!reply ())
             return;
         this.error_string = _("Connection Timeout");
@@ -340,7 +340,7 @@ public class GETFileJob : AbstractNetworkJob {
                 this.bandwidth_manager.on_signal_unregister_download_job (this);
             }
             if (!this.has_emitted_finished_signal) {
-                GLib.info ("GET of " + reply ().request ().url ().to_string ()
+                GLib.info ("GET of " + reply ().request ().url.to_string ()
                           + " finished with status " + reply_status_string ()
                           + reply ().raw_header ("Content-Range") + reply ().raw_header ("Content-Length"));
 

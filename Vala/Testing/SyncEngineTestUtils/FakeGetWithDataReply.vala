@@ -20,13 +20,13 @@ public class FakeGetWithDataReply : FakeReply {
     public FakeGetWithDataReply (FileInfo remote_root_file_info, string data, Soup.Operation operation, Soup.Request request, GLib.Object parent) {
         base (parent);
         set_request (request);
-        set_url (request.url ());
+        set_url (request.url);
         set_operation (operation);
         open (QIODevice.ReadOnly);
 
         GLib.assert_true (!data == "");
         payload = data;
-        string filename = get_file_path_from_url (request.url ());
+        string filename = get_file_path_from_url (request.url);
         GLib.assert_true (!filename == "");
         file_info = remote_root_file_info.find (filename);
         QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);

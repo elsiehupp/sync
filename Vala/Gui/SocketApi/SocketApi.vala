@@ -22,11 +22,11 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 //  #include <QMeta_method>
 //  #include <QMetaObject>
 //  #include <QScopedPointer>
-//  #include <QDir>
+//  #include <GLib.Dir>
 //  #include <Gtk.Application>
 //  #include <QLocalSocket>
 //  #include <QString_builder>
-//  #include <QMessageBox>
+//  #include <Gtk.MessageBox>
 //  #include <QInputDialog>
 //  #include <QFileDialog>
 //  #include <QAction>
@@ -89,7 +89,7 @@ public class SocketApi : GLib.Object {
             // TODO: once the windows extension supports multiple
             // client connections, switch back to the theme name
             // See issue #2388
-            // + Theme.instance.app_name ();
+            // + Theme.app_name;
         } else if (Utility.is_mac ()) {
             // This must match the code signing Team setting of the extension
             // Example for developer builds (with ad-hoc signing identity): "" "com.owncloud.desktopclient" ".socket_api"
@@ -98,7 +98,7 @@ public class SocketApi : GLib.Object {
         } else if (Utility.is_linux () || Utility.is_bsd ()) {
             string runtime_dir;
             runtime_dir = QStandardPaths.writable_location (QStandardPaths.Runtime_location);
-            socket_path = runtime_dir + "/" + Theme.instance.app_name () + "/socket";
+            socket_path = runtime_dir + "/" + Theme.app_name + "/socket";
         } else {
             GLib.warning ("An unexpected system detected, so this probably won't work.");
         }
@@ -163,7 +163,7 @@ public class SocketApi : GLib.Object {
                 || folder.sync_result ().status () == SyncResult.Status.ERROR
                 || folder.sync_result ().status () == SyncResult.Status.SETUP_ERROR) {
                 string root_path = remove_trailing_slash (folder.path ());
-                on_signal_broadcast_status_push_message (root_path, folder.sync_engine ().sync_file_status_tracker ().file_status (""));
+                on_signal_broadcast_status_push_message (root_path, folder.sync_engine.sync_file_status_tracker.file_status (""));
 
                 broadcast_message (build_message ("UPDATE_VIEW", root_path));
             } else {
@@ -399,7 +399,7 @@ public class SocketApi : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private static void email_private_link (string link) {
-        Utility.open_email_composer (
+        OpenExtrernal.open_email_composer (
             _("I shared something with you"),
             link,
             null);
@@ -409,7 +409,7 @@ public class SocketApi : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private static void open_private_link (string link) {
-        Utility.open_browser (link);
+        OpenExtrernal.open_browser (link);
     }
 
 
@@ -457,7 +457,7 @@ public class SocketApi : GLib.Object {
         );
         connect (
             prop_find_job,
-            PropfindJob.finished_with_error,
+            PropfindJob.signal_finished_with_error,
             target,
             this.on_signal_prop_find_job_finished_with_error
         );
@@ -516,7 +516,7 @@ public class SocketApi : GLib.Object {
         static FileData file_data (string local_file) {
             FileData data;
     
-            data.local_path = QDir.clean_path (local_file);
+            data.local_path = GLib.Dir.clean_path (local_file);
             if (data.local_path.ends_with ('/'))
                 data.local_path.chop (1);
     
@@ -525,7 +525,7 @@ public class SocketApi : GLib.Object {
                 return data;
     
             data.folder_relative_path = data.local_path.mid (data.folder.clean_path ().length () + 1);
-            data.server_relative_path = QDir (data.folder.remote_path ()).file_path (data.folder_relative_path);
+            data.server_relative_path = GLib.Dir (data.folder.remote_path ()).file_path (data.folder_relative_path);
             string virtual_file_ext = APPLICATION_DOTVIRTUALFILE_SUFFIX;
             if (data.server_relative_path.ends_with (virtual_file_ext)) {
                 data.server_relative_path.chop (virtual_file_ext.size ());
@@ -540,7 +540,7 @@ public class SocketApi : GLib.Object {
             if (!folder) {
                 return SyncFileStatus.SyncFileStatusTag.STATUS_NONE;
             }
-            return folder.sync_engine ().sync_file_status_tracker ().file_status (folder_relative_path);
+            return folder.sync_engine.sync_file_status_tracker.file_status (folder_relative_path);
         }
 
 
@@ -595,20 +595,20 @@ public class SocketApi : GLib.Object {
         var file_data = FileData.file_data (local_file);
         var share_folder = file_data.folder;
         if (!share_folder) {
-            const string message = QLatin1String ("SHARE:NOP:") + QDir.to_native_separators (local_file);
+            const string message = QLatin1String ("SHARE:NOP:") + GLib.Dir.to_native_separators (local_file);
             // files that are not within a sync folder are not synced.
             listener.on_signal_send_message (message);
         } else if (!share_folder.account_state ().is_connected ()) {
-            const string message = QLatin1String ("SHARE:NOTCONNECTED:") + QDir.to_native_separators (local_file);
+            const string message = QLatin1String ("SHARE:NOTCONNECTED:") + GLib.Dir.to_native_separators (local_file);
             // if the folder isn't connected, don't open the share dialog
             listener.on_signal_send_message (message);
-        } else if (!theme.link_sharing () && (!theme.user_group_sharing () || share_folder.account_state ().account.server_version_int () < Account.make_server_version (8, 2, 0))) {
-            const string message = QLatin1String ("SHARE:NOP:") + QDir.to_native_separators (local_file);
+        } else if (!theme.link_sharing && (!theme.user_group_sharing || share_folder.account_state ().account.server_version_int () < Account.make_server_version (8, 2, 0))) {
+            const string message = QLatin1String ("SHARE:NOP:") + GLib.Dir.to_native_separators (local_file);
             listener.on_signal_send_message (message);
         } else {
             // If the file doesn't have a journal record, it might not be uploaded yet
             if (!file_data.journal_record ().is_valid ()) {
-                const string message = QLatin1String ("SHARE:NOTSYNCED:") + QDir.to_native_separators (local_file);
+                const string message = QLatin1String ("SHARE:NOTSYNCED:") + GLib.Dir.to_native_separators (local_file);
                 listener.on_signal_send_message (message);
                 return;
             }
@@ -617,12 +617,12 @@ public class SocketApi : GLib.Object {
 
             // Can't share root folder
             if (remote_path == "/") {
-                const string message = QLatin1String ("SHARE:CANNOTSHAREROOT:") + QDir.to_native_separators (local_file);
+                const string message = QLatin1String ("SHARE:CANNOTSHAREROOT:") + GLib.Dir.to_native_separators (local_file);
                 listener.on_signal_send_message (message);
                 return;
             }
 
-            const string message = QLatin1String ("SHARE:OK:") + QDir.to_native_separators (local_file);
+            const string message = QLatin1String ("SHARE:OK:") + GLib.Dir.to_native_separators (local_file);
             listener.on_signal_send_message (message);
 
             /* emit */ signal_share_command_received (remote_path, file_data.local_path, start_page);
@@ -667,7 +667,7 @@ public class SocketApi : GLib.Object {
             status_string = file_status.to_socket_api_string ();
         }
 
-        const string message = QLatin1String ("STATUS:") % status_string % ':' % QDir.to_native_separators (argument);
+        const string message = QLatin1String ("STATUS:") % status_string % ':' % GLib.Dir.to_native_separators (argument);
         listener.on_signal_send_message (message);
     }
 
@@ -682,8 +682,8 @@ public class SocketApi : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void command_SHARE_MENU_TITLE (string argument, SocketListener listener) {
-        //listener.on_signal_send_message ("SHARE_MENU_TITLE: " + _("Share with %1", "parameter is Nextcloud").printf (Theme.instance.app_name_gui ()));
-        listener.on_signal_send_message ("SHARE_MENU_TITLE:"  + Theme.instance.app_name_gui ());
+        //listener.on_signal_send_message ("SHARE_MENU_TITLE: " + _("Share with %1", "parameter is Nextcloud").printf (Theme.app_name_gui));
+        listener.on_signal_send_message ("SHARE_MENU_TITLE:"  + Theme.app_name_gui);
     }
 
 
@@ -810,7 +810,7 @@ public class SocketApi : GLib.Object {
             }
 
             // Update the pin state on all items
-            if (!data.folder.vfs ().pin_state (data.folder_relative_path, PinState.VfsItemAvailability.ONLINE_ONLY)) {
+            if (!data.folder.vfs ().pin_state (data.folder_relative_path, Vfs.ItemAvailability.ONLINE_ONLY)) {
                 GLib.warning ("Could not set pin state of " + data.folder_relative_path + " to online only.");
             }
 
@@ -832,7 +832,7 @@ public class SocketApi : GLib.Object {
         const var conflicted_relative_path = file_data.folder_relative_path;
         const var base_relative_path = file_data.folder.journal_database ().conflict_file_base_name (file_data.folder_relative_path.to_utf8 ());
 
-        const var directory = QDir (file_data.folder.path ());
+        const var directory = GLib.Dir (file_data.folder.path ());
         const var conflicted_path = directory.file_path (conflicted_relative_path);
         const var base_path = directory.file_path (base_relative_path);
 
@@ -885,7 +885,7 @@ public class SocketApi : GLib.Object {
         }
 
         // Add back the folder path
-        default_dir_and_name = QDir (file_data.folder.path ()).file_path (default_dir_and_name);
+        default_dir_and_name = GLib.Dir (file_data.folder.path ()).file_path (default_dir_and_name);
 
         const var target = QFileDialog.save_filename (
             null,
@@ -983,7 +983,7 @@ public class SocketApi : GLib.Object {
                 "FILE_ACTIVITY_MENU_TITLE", _("Activity")
             },
             {
-                "CONTEXT_MENU_TITLE", Theme.instance.app_name_gui ()
+                "CONTEXT_MENU_TITLE", Theme.app_name_gui
             },
             {
                 "COPY_PRIVATE_LINK_MENU_TITLE", _("Copy private link to clipboard")
@@ -1015,7 +1015,7 @@ public class SocketApi : GLib.Object {
 
         var capabilities = file_data.folder.account_state ().account.capabilities ();
         var theme = Theme.instance;
-        if (!capabilities.share_api () || ! (theme.user_group_sharing () || (theme.link_sharing () && capabilities.share_public_link ())))
+        if (!capabilities.share_api () || ! (theme.user_group_sharing || (theme.link_sharing && capabilities.share_public_link ())))
             return;
 
         // If sharing is globally disabled, do not show any sharing entries.
@@ -1026,7 +1026,7 @@ public class SocketApi : GLib.Object {
             listener.on_signal_send_message (QLatin1String ("MENU_ITEM:SHARE") + flag_string + _("Share options"));
 
             // Do we have public links?
-            bool public_links_enabled = theme.link_sharing () && capabilities.share_public_link ();
+            bool public_links_enabled = theme.link_sharing && capabilities.share_public_link ();
 
             // Is is possible to create a public link without user choices?
             bool can_create_default_public_link = public_links_enabled
@@ -1079,7 +1079,7 @@ public class SocketApi : GLib.Object {
 
         // Sharing actions show for single files only
         if (sync_folder && files.size () == 1 && sync_folder.account_state ().is_connected ()) {
-            string system_path = QDir.clean_path (argument);
+            string system_path = GLib.Dir.clean_path (argument);
             if (system_path.ends_with ('/')) {
                 system_path.truncate (system_path.length () - 1);
             }
@@ -1151,13 +1151,13 @@ public class SocketApi : GLib.Object {
             //  ENFORCE (!files == "");
 
             // Determine the combined availability status of the files
-            var combined = new Optional<VfsItemAvailability> ();
+            var combined = new Optional<Vfs.ItemAvailability> ();
             foreach (var file in files) {
                 var file_data = FileData.file_data (file);
                 var availability = sync_folder.vfs ().availability (file_data.folder_relative_path);
                 if (!availability) {
                     if (availability.error () == Vfs.AvailabilityError.DATABASE_ERROR) {
-                        availability = VfsItemAvailability.VfsItemAvailability.MIXED;
+                        availability = Vfs.ItemAvailability.MIXED;
                     }
                     if (availability.error () == Vfs.AvailabilityError.NO_SUCH_ITEM) {
                         continue;
@@ -1172,15 +1172,15 @@ public class SocketApi : GLib.Object {
 
             if (combined) {
                 switch (*combined) {
-                case VfsItemAvailability.PinState.ALWAYS_LOCAL:
+                case Vfs.ItemAvailability.PinState.ALWAYS_LOCAL:
                     make_pin_context_menu (false, true);
                     break;
-                case VfsItemAvailability.VfsItemAvailability.ALL_HYDRATED:
-                case VfsItemAvailability.VfsItemAvailability.MIXED:
+                case Vfs.ItemAvailability.ALL_HYDRATED:
+                case Vfs.ItemAvailability.MIXED:
                     make_pin_context_menu (true, true);
                     break;
-                case VfsItemAvailability.VfsItemAvailability.ALL_DEHYDRATED:
-                case VfsItemAvailability.VfsItemAvailability.ONLINE_ONLY:
+                case Vfs.ItemAvailability.ALL_DEHYDRATED:
+                case Vfs.ItemAvailability.ONLINE_ONLY:
                     make_pin_context_menu (true, false);
                     break;
                 }
@@ -1193,20 +1193,20 @@ public class SocketApi : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static void merge (VfsItemAvailability lhs, VfsItemAvailability rhs) {
+    private static void merge (Vfs.ItemAvailability lhs, Vfs.ItemAvailability rhs) {
         if (lhs == rhs) {
             return lhs;
         }
         if (int (lhs) > int (rhs)) {
             std.swap (lhs, rhs); // reduce cases ensuring lhs < rhs
         }
-        if (lhs == VfsItemAvailability.PinState.ALWAYS_LOCAL && rhs == VfsItemAvailability.VfsItemAvailability.ALL_HYDRATED) {
-            return VfsItemAvailability.VfsItemAvailability.ALL_HYDRATED;
+        if (lhs == Vfs.ItemAvailability.PinState.ALWAYS_LOCAL && rhs == Vfs.ItemAvailability.ALL_HYDRATED) {
+            return Vfs.ItemAvailability.ALL_HYDRATED;
         }
-        if (lhs == VfsItemAvailability.VfsItemAvailability.ALL_DEHYDRATED && rhs == VfsItemAvailability.VfsItemAvailability.ONLINE_ONLY) {
-            return VfsItemAvailability.VfsItemAvailability.ALL_DEHYDRATED;
+        if (lhs == Vfs.ItemAvailability.ALL_DEHYDRATED && rhs == Vfs.ItemAvailability.ONLINE_ONLY) {
+            return Vfs.ItemAvailability.ALL_DEHYDRATED;
         }
-        return VfsItemAvailability.VfsItemAvailability.MIXED;
+        return Vfs.ItemAvailability.MIXED;
     }
 
 
@@ -1216,8 +1216,8 @@ public class SocketApi : GLib.Object {
     private void make_pin_context_menu (bool make_available_locally, bool free_space) {
         listener.on_signal_send_message (
             "MENU_ITEM:CURRENT_PIN:d:"
-            + Utility.vfs_current_availability_text (*combined));
-        if (!Theme.instance.enforce_virtual_files_sync_folder ()) {
+            + Vfs.ItemAvailability.to_string (combined));
+        if (!Theme.enforce_virtual_files_sync_folder) {
             listener.on_signal_send_message (
                 "MENU_ITEM:MAKE_AVAILABLE_LOCALLY:"
                 + (make_available_locally ? ":" : "d:")
@@ -1274,7 +1274,7 @@ public class SocketApi : GLib.Object {
         var url = GLib.Uri (data.value ("url").to_string ());
 
         if (!url == "") {
-            Utility.open_browser (url);
+            OpenExtrernal.open_browser (url);
         }
     }
 
@@ -1513,7 +1513,7 @@ public class SocketApi : GLib.Object {
     private string build_register_path_message (string path) {
         GLib.FileInfo file_info = new GLib.FileInfo (path);
         string message = "REGISTER_PATH:";
-        message += QDir.to_native_separators (file_info.absolute_file_path ());
+        message += GLib.Dir.to_native_separators (file_info.absolute_file_path ());
         return message;
     }
 
@@ -1620,7 +1620,7 @@ public class SocketApi : GLib.Object {
         if (!path == "") {
             message.append (':');
             GLib.FileInfo file_info = new GLib.FileInfo (path);
-            message.append (QDir.to_native_separators (file_info.absolute_file_path ()));
+            message.append (GLib.Dir.to_native_separators (file_info.absolute_file_path ()));
         }
         return message;
     }

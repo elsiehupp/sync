@@ -19,7 +19,7 @@ public class FakeErrorReply : FakeReply {
             base (parent);
             this.body = body;
             set_request (request);
-            set_url (request.url ());
+            set_url (request.url);
             set_operation (operation);
             open (QIODevice.ReadOnly);
             set_attribute (Soup.Request.HttpStatusCodeAttribute, http_error_code);

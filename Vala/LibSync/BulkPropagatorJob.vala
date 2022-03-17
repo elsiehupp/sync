@@ -5,7 +5,7 @@ Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
 ***********************************************************/
 
 //  #include <GLib.FileInfo>
-//  #include <QDir>
+//  #include <GLib.Dir>
 //  #include <QJsonDocument>
 //  #include <QJsonArray>
 //  #include <QJsonObject>
@@ -111,7 +111,7 @@ public class BulkPropagatorJob : PropagatorJob {
 
         // Check if the specific file can be accessed
         if (propagator ().has_case_clash_accessibility_problem (file_to_upload.file)) {
-            on_signal_done (item, SyncFileItem.Status.NORMAL_ERROR, _("File %1 cannot be uploaded because another file with the same name, differing only in case, exists").printf (QDir.to_native_separators (item.file)));
+            on_signal_done (item, SyncFileItem.Status.NORMAL_ERROR, _("File %1 cannot be uploaded because another file with the same name, differing only in case, exists").printf (GLib.Dir.to_native_separators (item.file)));
             return;
         }
 
@@ -175,7 +175,7 @@ public class BulkPropagatorJob : PropagatorJob {
         item.modtime = FileSystem.get_mod_time (original_file_path);
         if (item.modtime <= 0) {
             this.pending_checksum_files.remove (item.file);
-            on_signal_error_start_folder_unlock (item, SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").printf (QDir.to_native_separators (item.file)));
+            on_signal_error_start_folder_unlock (item, SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").printf (GLib.Dir.to_native_separators (item.file)));
             check_propagation_is_done ();
             return;
         }
@@ -285,7 +285,7 @@ public class BulkPropagatorJob : PropagatorJob {
             || one_file.item.instruction == SyncInstructions.TYPE_CHANGE) {
             var vfs = propagator ().sync_options.vfs;
             var pin = vfs.pin_state (one_file.item.file);
-            if (pin && *pin == PinState.VfsItemAvailability.ONLINE_ONLY && !vfs.pin_state (one_file.item.file, PinState.PinState.UNSPECIFIED)) {
+            if (pin && *pin == Vfs.ItemAvailability.ONLINE_ONLY && !vfs.pin_state (one_file.item.file, PinState.PinState.UNSPECIFIED)) {
                 GLib.warning ("Could not set pin state of " + one_file.item.file + " to unspecified.");
             }
         }
@@ -359,7 +359,7 @@ public class BulkPropagatorJob : PropagatorJob {
             item.modtime = FileSystem.get_mod_time (new_file_path_absolute);
             if (item.modtime <= 0) {
                 this.pending_checksum_files.remove (item.file);
-                on_signal_error_start_folder_unlock (item, SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").printf (QDir.to_native_separators (item.file)));
+                on_signal_error_start_folder_unlock (item, SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").printf (GLib.Dir.to_native_separators (item.file)));
                 check_propagation_is_done ();
                 return;
             }
@@ -415,7 +415,7 @@ public class BulkPropagatorJob : PropagatorJob {
             timeout += single_file.file_size;
         }
 
-        var bulk_upload_url = Utility.concat_url_path (propagator ().account.url (), "/remote.php/dav/bulk");
+        var bulk_upload_url = Utility.concat_url_path (propagator ().account.url, "/remote.php/dav/bulk");
         var job = std.make_unique<PutMultiFileJob> (propagator ().account, bulk_upload_url, std.move (upload_parameters_data), this);
         PutMultiFileJob.signal_finished.connect (job, BulkPropagatorJob.on_signal_put_finished);
 

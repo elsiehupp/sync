@@ -149,7 +149,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
         );
         connect (
             (MkColJob) this.job,
-            MkColJob.finished_with_error,
+            MkColJob.signal_finished_with_error,
             this,
             PropagateRemoteMkdir.on_signal_mkcol_job_finished
         );
@@ -188,7 +188,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
         );
         connect (
             job,
-            MkColJob.finished_with_error,
+            MkColJob.signal_finished_with_error,
             this,
             PropagateRemoteMkdir.on_signal_mkcol_job_finished
         );
@@ -311,7 +311,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
         );
         connect (
             propfind_job,
-            PropfindJob.finished_with_error,
+            PropfindJob.signal_finished_with_error,
             this,
             this.on_signal_prop_find_job_finished_with_error
         );

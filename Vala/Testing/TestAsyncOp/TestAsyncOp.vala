@@ -30,11 +30,11 @@ public class TestAsyncOp : GLib.Object {
     ***********************************************************/
     private void async_upload_operations () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account.set_capabilities ({ { "dav", new QVariantMap ( { "chunking", "1.0" } ) } });
+        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new QVariantMap ( { "chunking", "1.0" } ) } });
         // Reduce max chunk size a bit so we get more chunks
         SyncOptions options;
         options.max_chunk_size = 20 * 1000;
-        fake_folder.sync_engine ().set_sync_options (options);
+        fake_folder.sync_engine.set_sync_options (options);
         int n_get = 0;
 
         GLib.HashTable<string, TestCase> test_cases;
@@ -109,7 +109,7 @@ public class TestAsyncOp : GLib.Object {
 
 
     private FakePayloadReply big_wait_delegate (TestCase test_case, Soup.Request request) {
-        QTimer.single_shot (0, fake_folder.sync_engine (), &SyncEngine.on_signal_abort);
+        QTimer.single_shot (0, fake_folder.sync_engine, &SyncEngine.on_signal_abort);
         return wait_and_chain (wait_forever_callback) (test_case, request);
     }
 
@@ -186,7 +186,7 @@ public class TestAsyncOp : GLib.Object {
 
 
     private Soup.Reply override_delegate_async_upload_operations1 (Soup.Operation operation, Soup.Request request, QIODevice outgoing_data) {
-        var path = request.url ().path ();
+        var path = request.url.path ();
 
         if (operation == Soup.GetOperation && path.starts_with ("/async-poll/")) {
             var file = path.mid ("/async-poll/".size () - 1);
@@ -197,7 +197,7 @@ public class TestAsyncOp : GLib.Object {
 
         if (operation == Soup.PutOperation && !path.contains ("/uploads/")) {
             // Not chunking
-            var file = get_file_path_from_url (request.url ());
+            var file = get_file_path_from_url (request.url);
             GLib.assert_true (test_cases.contains (file));
             var test_case = test_cases[file];
             GLib.assert_true (!test_case.perform);
@@ -205,7 +205,7 @@ public class TestAsyncOp : GLib.Object {
             test_case.perform = (put_payload, request, fake_folder) => {
                 return FakePutReply.perform (fake_folder.remote_modifier (), request, put_payload);
             };
-            return new FakeAsyncReply ("/async-poll/" + file, operation, request, fake_folder.sync_engine ());
+            return new FakeAsyncReply ("/async-poll/" + file, operation, request, fake_folder.sync_engine);
         } else if (request.attribute (Soup.Request.CustomVerbAttribute) == "MOVE") {
             string file = get_file_path_from_url (GLib.Uri.from_encoded (request.raw_header ("Destination")));
             GLib.assert_true (test_cases.contains (file));
@@ -214,7 +214,7 @@ public class TestAsyncOp : GLib.Object {
             test_case.perform = (request, fake_folder) => {
                 return FakeChunkMoveReply.perform (fake_folder.upload_state (), fake_folder.remote_modifier (), request);
             };
-            return new FakeAsyncReply ("/async-poll/" + file, operation, request, fake_folder.sync_engine ());
+            return new FakeAsyncReply ("/async-poll/" + file, operation, request, fake_folder.sync_engine);
         } else if (operation == Soup.GetOperation) {
             n_get++;
         }
@@ -223,7 +223,7 @@ public class TestAsyncOp : GLib.Object {
 
 
     private Soup.Reply override_delegate_async_upload_operations2 (Soup.Operation operation, Soup.Request request, QIODevice device) {
-        var path = request.url ().path ();
+        var path = request.url.path ();
         if (operation == Soup.GetOperation && path.starts_with ("/async-poll/")) {
             var file = path.mid ("/async-poll/".size () - 1);
             GLib.assert_true (test_cases.contains (file));

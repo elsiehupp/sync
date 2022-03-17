@@ -21,7 +21,7 @@ public class FakePutMultiFileReply : FakeReply {
     public FakePutMultiFileReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, string content_type, string put_payload, GLib.Object parent) {
         base (parent);
         set_request (request);
-        set_url (request.url ());
+        set_url (request.url);
         set_operation (operation);
         open (QIODevice.ReadOnly);
         this.all_file_info = perform_multi_part (remote_root_file_info, request, put_payload, content_type);

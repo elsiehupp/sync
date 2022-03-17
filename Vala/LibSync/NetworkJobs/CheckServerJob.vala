@@ -79,7 +79,7 @@ public class CheckServerJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public new void start () {
-        this.server_url = account.url ();
+        this.server_url = account.url;
         send_request ("GET", Utility.concat_url_path (this.server_url, path ()));
         connect (reply (), Soup.Reply.meta_data_changed, this, CheckServerJob.on_signal_metadata_changed);
         connect (reply (), Soup.Reply.encrypted, this, CheckServerJob.on_signal_encrypted);
@@ -92,7 +92,7 @@ public class CheckServerJob : AbstractNetworkJob {
     public new void on_signal_timed_out () {
         GLib.warning ("TIMEOUT");
         if (reply () && reply ().is_running ()) {
-            /* emit */ timeout (reply ().url ());
+            /* emit */ timeout (reply ().url);
         } else if (!reply ()) {
             GLib.warning ("Timeout even there was no reply?");
         }
@@ -124,7 +124,7 @@ public class CheckServerJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private bool on_signal_finished () {
-        if (reply ().request ().url ().scheme () == "https"
+        if (reply ().request ().url.scheme () == "https"
             && reply ().ssl_configuration ().session_ticket () == ""
             && reply ().error () == Soup.Reply.NoError) {
             GLib.warning ("No SSL session identifier / session ticket is used, this might impact sync performance negatively.");
@@ -138,7 +138,7 @@ public class CheckServerJob : AbstractNetworkJob {
             this.subdir_fallback = true;
             path (NEXTCLOUD_DIR_C + STATUS_PHP_C);
             start ();
-            GLib.info ("Retrying with " + reply ().url ());
+            GLib.info ("Retrying with " + reply ().url);
             return false;
         }
 
@@ -152,14 +152,14 @@ public class CheckServerJob : AbstractNetworkJob {
             var status = QJsonDocument.from_json (body, error);
             // empty or invalid response
             if (error.error != QJsonParseError.NoError || status.is_null ()) {
-                GLib.warning ("status.php from server is not valid JSON!" + body + reply ().request ().url () + error.error_string ());
+                GLib.warning ("status.php from server is not valid JSON!" + body + reply ().request ().url + error.error_string ());
             }
 
             GLib.info ("status.php returns: " + status + " " + reply ().error () + " Reply: " + reply ());
             if (status.object ().contains ("installed")) {
                 /* emit */ instance_found (this.server_url, status.object ());
             } else {
-                GLib.warning ("No proper answer on " + reply ().url ());
+                GLib.warning ("No proper answer on " + reply ().url);
                 /* emit */ instance_not_found (reply ());
             }
         }

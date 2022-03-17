@@ -30,7 +30,7 @@ public class FolderMetadata : GLib.Object {
     ***********************************************************/
     public string decrypt_metadata_key (string encrypted_metadata) {
         Biometric private_key_bio;
-        string private_key_pem = this.account.e2e ().private_key;
+        string private_key_pem = this.account.e2e.private_key;
         BIO_write (private_key_bio, private_key_pem.const_data (), private_key_pem.size ());
         var key = PrivateKey.read_private_key (private_key_bio);
 
@@ -174,7 +174,7 @@ public class FolderMetadata : GLib.Object {
         string new_metadata_pass = EncryptionHelper.generate_random (16);
         this.metadata_keys.insert (0, new_metadata_pass);
 
-        string public_key = this.account.e2e ().public_key.to_pem ().to_base64 ();
+        string public_key = this.account.e2e.public_key.to_pem ().to_base64 ();
         string display_name = this.account.display_name ();
 
         this.sharing.append ({display_name, public_key});
@@ -282,7 +282,7 @@ public class FolderMetadata : GLib.Object {
     ***********************************************************/
     private string encrypt_metadata_key (string data) {
         Biometric public_key_bio;
-        string public_key_pem = this.account.e2e ().public_key.to_pem ();
+        string public_key_pem = this.account.e2e.public_key.to_pem ();
         BIO_write (public_key_bio, public_key_pem.const_data (), public_key_pem.size ());
         var public_key = PrivateKey.read_public_key (public_key_bio);
 

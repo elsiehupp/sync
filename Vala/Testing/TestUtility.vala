@@ -183,7 +183,7 @@ public class TestUtility : GLib.Object {
     private void on_signal_test_filenames_equal () {
         QTemporaryDir directory;
         GLib.assert_true (directory.is_valid ());
-        QDir dir2 = new QDir (directory.path ());
+        GLib.Dir dir2 = new GLib.Dir (directory.path ());
         GLib.assert_true (dir2.mkpath ("test"));
         if ( !filesystem_case_preserving () ) {
         GLib.assert_true (dir2.mkpath ("TEST"));

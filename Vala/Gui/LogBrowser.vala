@@ -10,9 +10,9 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QLayout>
 //  #include <QPushBu
 //  #include <QLabe
-//  #include <QDir>
+//  #include <GLib.Dir>
 //  #include <QTextStream>
-//  #include <QMessageBox>
+//  #include <Gtk.MessageBox>
 //  #include <QCoreAppli
 //  #include <QSetting
 //  #include <QAction>
@@ -111,7 +111,7 @@ public class LogBrowser : Gtk.Dialog {
     ***********************************************************/
     private void on_open_folder_button_clicked () {
         string path = Logger.instance.temporary_folder_log_dir_path ();
-        QDir ().mkpath (path);
+        GLib.Dir ().mkpath (path);
         QDesktopServices.open_url (GLib.Uri.from_local_file (path));
     }
 

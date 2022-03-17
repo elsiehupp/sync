@@ -43,7 +43,7 @@ public class OcsJob : AbstractNetworkJob {
     string verb { private get; protected set; }
 
     private GLib.List<QPair<string, string>> params;
-    private GLib.Vector<int> pass_status_codes;
+    private GLib.List<int> pass_status_codes;
     private Soup.Request request;
 
 
@@ -164,7 +164,7 @@ public class OcsJob : AbstractNetworkJob {
             buffer.data (post_data);
         }
         query_items.add_query_item ("format", "json");
-        GLib.Uri url = Utility.concat_url_path (account.url (), path (), query_items);
+        GLib.Uri url = Utility.concat_url_path (account.url, path (), query_items);
         send_request (this.verb, url, this.request, buffer);
         AbstractNetworkJob.on_signal_start ();
     }
@@ -204,7 +204,7 @@ public class OcsJob : AbstractNetworkJob {
             status_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             GLib.warning ("Could not parse reply to "
                         + this.verb
-                        + Utility.concat_url_path (account.url (), path ())
+                        + Utility.concat_url_path (account.url, path ())
                         + this.params
                         + error.error_string ()
                         + ":" + reply_data);
@@ -216,7 +216,7 @@ public class OcsJob : AbstractNetworkJob {
         if (!this.pass_status_codes.contains (status_code)) {
             GLib.warning ("Reply to"
                         + this.verb
-                        + Utility.concat_url_path (account.url (), path ())
+                        + Utility.concat_url_path (account.url, path ())
                         + this.params
                         + " has unexpected status code: " + status_code + reply_data);
             /* emit */ ocs_error (status_code, message);

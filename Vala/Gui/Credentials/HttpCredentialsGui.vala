@@ -9,7 +9,7 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 //  #include <QDesktopServices>
 //  #include <QTimer>
 //  #include <QBuffer>
-//  #include <QMessageBox>
+//  #include <Gtk.MessageBox>
 
 using QKeychain;
 
@@ -77,7 +77,7 @@ public class HttpCredentialsGui : HttpCredentials {
     ***********************************************************/
     static string request_app_password_text (Account account) {
         int version = account.server_version_int ();
-        var url = account.url ().to_string ();
+        var url = account.url.to_string ();
         if (url.ends_with ('/'))
             url.chop (1);
 
@@ -132,7 +132,7 @@ public class HttpCredentialsGui : HttpCredentials {
                          + "<br>"
                          + "User: %2<br>"
                          + "Account: %3<br>")
-                        .printf (Utility.escape (Theme.instance.app_name_gui ()),
+                        .printf (Utility.escape (Theme.app_name_gui),
                             Utility.escape (this.user),
                             Utility.escape (this.account.display_name ()));
 

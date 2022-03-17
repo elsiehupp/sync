@@ -4,8 +4,8 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <QDir>
-//  #include <QCoreApplication>
+//  #include <GLib.Dir>
+//  #include <Gtk.Application>
 //  #include <sys/stat.h>
 //  #include <sys/types.h>
 
@@ -232,7 +232,7 @@ public class FileSystem {
         string trash_path, trash_file_path, trash_info_path;
         string xdg_data_home = GLib.File.decode_name (qgetenv ("XDG_DATA_HOME"));
         if (xdg_data_home == "") {
-            trash_path = QDir.home_path () + "/.local/share/Trash/"; // trash path that should exist
+            trash_path = GLib.Dir.home_path () + "/.local/share/Trash/"; // trash path that should exist
         } else {
             trash_path = xdg_data_home + "/Trash/";
         }
@@ -240,14 +240,14 @@ public class FileSystem {
         trash_file_path = trash_path + "files/"; // trash file path contain delete files
         trash_info_path = trash_path + "info/"; // trash info path contain delete files information
 
-        if (! (QDir ().mkpath (trash_file_path) && QDir ().mkpath (trash_info_path))) {
+        if (! (GLib.Dir ().mkpath (trash_file_path) && GLib.Dir ().mkpath (trash_info_path))) {
             *error_string = _("FileSystem", "Could not make directories in trash");
             return false; //mkpath will return true if path exists
         }
 
         GLib.FileInfo file_info = new GLib.FileInfo (filename);
 
-        QDir file;
+        GLib.Dir file;
         int suffix_number = 1;
         if (file.exists (trash_file_path + file_info.filename ())) { //file in trash already exists, move to "filename.1"
             string path = trash_file_path + file_info.filename () + '.';

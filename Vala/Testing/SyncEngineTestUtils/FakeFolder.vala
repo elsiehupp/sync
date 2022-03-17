@@ -42,7 +42,7 @@ public class FakeFolder : GLib.Object {
         Occ.Logger.instance.set_log_file ("-");
         Occ.Logger.instance.add_log_rule ({ "sync.httplogger=true" });
     
-        QDir root_directory = new QDir (this.temporary_directory.path ());
+        GLib.Dir root_directory = new GLib.Dir (this.temporary_directory.path ());
         GLib.debug ("FakeFolder operating on " + root_directory);
         if (local_file_info) {
             to_disk (root_directory, *local_file_info);
@@ -107,7 +107,7 @@ public class FakeFolder : GLib.Object {
         opts.vfs = vfs;
         this.sync_engine.set_sync_options (opts);
 
-        Occ.VfsSetupParams vfs_params;
+        Occ.Vfs.SetupParameters vfs_params;
         vfs_params.filesystem_path = local_path ();
         vfs_params.remote_path = '/';
         vfs_params.account = this.account;
@@ -169,7 +169,7 @@ public class FakeFolder : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public FileInfo current_local_state () {
-        QDir root_directory = new QDir (this.temporary_directory.path ());
+        GLib.Dir root_directory = new GLib.Dir (this.temporary_directory.path ());
         FileInfo root_template;
         from_disk (root_directory, root_template);
         root_template.fixup_parent_path_recursively ();
@@ -269,7 +269,7 @@ public class FakeFolder : GLib.Object {
     public void exec_until_before_propagation () {
         QSignalSpy spy = new QSignalSpy (
             this.sync_engine.get (),
-            this.sync_engine.about_to_propagate
+            this.sync_engine.signal_about_to_propagate
         );
         GLib.assert_true (spy.wait ());
     }
@@ -280,7 +280,7 @@ public class FakeFolder : GLib.Object {
     public void exec_until_item_completed (string relative_path) {
         QSignalSpy spy = new QSignalSpy (
             this.sync_engine.get (),
-            this.sync_engine.item_completed
+            this.sync_engine.signal_item_completed
         );
         QElapsedTimer t;
         t.on_signal_start ();
@@ -317,10 +317,10 @@ public class FakeFolder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static void to_disk (QDir directory, FileInfo template_file_info) {
+    private static void to_disk (GLib.Dir directory, FileInfo template_file_info) {
         foreach (FileInfo child in template_file_info.children) {
             if (child.is_directory) {
-                QDir sub_directory = new QDir (directory);
+                GLib.Dir sub_directory = new GLib.Dir (directory);
                 directory.mkdir (child.name);
                 sub_directory.cd (child.name);
                 to_disk (sub_directory, child);
@@ -337,10 +337,10 @@ public class FakeFolder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static void from_disk (QDir directory, FileInfo template_file_info) {
-        foreach (GLib.FileInfo disk_child in directory.entry_info_list (QDir.AllEntries | QDir.NoDotAndDotDot)) {
+    private static void from_disk (GLib.Dir directory, FileInfo template_file_info) {
+        foreach (GLib.FileInfo disk_child in directory.entry_info_list (GLib.Dir.AllEntries | GLib.Dir.NoDotAndDotDot)) {
             if (disk_child.is_directory ()) {
-                QDir sub_directory = directory;
+                GLib.Dir sub_directory = directory;
                 sub_directory.cd (disk_child.filename ());
                 FileInfo sub_file_info = template_file_info.children[disk_child.filename ()] = FileInfo ( disk_child.filename ());
                 from_disk (sub_directory, sub_file_info);

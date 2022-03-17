@@ -28,7 +28,7 @@ public class TestSyncConflict : GLib.Object {
 
         // Verify that the conflict names don't have the user name
         foreach (var name in find_conflicts (fake_folder.current_local_state ().children["A"])) {
-            GLib.assert_true (!name.contains (fake_folder.sync_engine ().account.dav_display_name ()));
+            GLib.assert_true (!name.contains (fake_folder.sync_engine.account.dav_display_name ()));
         }
 
         GLib.assert_true (expect_and_wipe_conflict (fake_folder.local_modifier (), fake_folder.current_local_state (), "A/a1"));
@@ -41,7 +41,7 @@ public class TestSyncConflict : GLib.Object {
     ***********************************************************/
     private void test_upload_after_download () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account.set_capabilities ({ { "upload_conflict_files", true } });
+        fake_folder.sync_engine.account.set_capabilities ({ { "upload_conflict_files", true } });
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         GLib.HashTable<string, string> conflict_map;
@@ -65,7 +65,7 @@ public class TestSyncConflict : GLib.Object {
         GLib.assert_true (Utility.conflict_file_base_name_from_pattern (conflict_map[a1FileId]) == "A/a1");
 
         // Check that the conflict file contains the username
-        GLib.assert_true (conflict_map[a1FileId].contains (" (conflicted copy %1 ".printf (fake_folder.sync_engine ().account.dav_display_name ())));
+        GLib.assert_true (conflict_map[a1FileId].contains (" (conflicted copy %1 ".printf (fake_folder.sync_engine.account.dav_display_name ())));
 
         GLib.assert_true (remote.find (conflict_map[a1FileId]).content_char == 'L');
         GLib.assert_true (remote.find ("A/a1").content_char == 'R');
@@ -79,7 +79,7 @@ public class TestSyncConflict : GLib.Object {
         if (operation == Soup.PutOperation) {
             if (request.raw_header ("OC-Conflict") == "1") {
                 var base_file_id = request.raw_header ("OC-ConflictBaseFileId");
-                var components = request.url ().to_string ().split ('/');
+                var components = request.url.to_string ().split ('/');
                 string conflict_file = components.mid (components.size () - 2).join ('/');
                 conflict_map[base_file_id] = conflict_file;
                 GLib.assert_true (!base_file_id == "");
@@ -94,7 +94,7 @@ public class TestSyncConflict : GLib.Object {
     ***********************************************************/
     private void test_separate_upload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account.set_capabilities ({ { "upload_conflict_files", true } });
+        fake_folder.sync_engine.account.set_capabilities ({ { "upload_conflict_files", true } });
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         GLib.HashTable<string, string> conflict_map;
@@ -152,7 +152,7 @@ public class TestSyncConflict : GLib.Object {
         if (operation == Soup.PutOperation) {
             if (request.raw_header ("OC-Conflict") == "1") {
                 var base_file_id = request.raw_header ("OC-ConflictBaseFileId");
-                var components = request.url ().to_string ().split ('/');
+                var components = request.url.to_string ().split ('/');
                 string conflict_file = components.mid (components.size () - 2).join ('/');
                 conflict_map[base_file_id] = conflict_file;
                 GLib.assert_true (!base_file_id == "");
@@ -169,7 +169,7 @@ public class TestSyncConflict : GLib.Object {
     ***********************************************************/
     private void test_downloading_conflict_file () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account.set_capabilities ({ { "upload_conflict_files", true } });
+        fake_folder.sync_engine.account.set_capabilities ({ { "upload_conflict_files", true } });
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // With no headers from the server
@@ -217,7 +217,7 @@ public class TestSyncConflict : GLib.Object {
     ***********************************************************/
     private void test_conflict_record_removal1 () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account.set_capabilities ({ { "upload_donflict_files", true } });
+        fake_folder.sync_engine.account.set_capabilities ({ { "upload_donflict_files", true } });
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // Make conflict records
@@ -247,7 +247,7 @@ public class TestSyncConflict : GLib.Object {
     ***********************************************************/
     private void test_conflict_record_removal2 () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account.set_capabilities ({ { "upload_conflict_files", false } });
+        fake_folder.sync_engine.account.set_capabilities ({ { "upload_conflict_files", false } });
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // Create two conflicts
@@ -372,7 +372,7 @@ public class TestSyncConflict : GLib.Object {
     ***********************************************************/
     private void test_local_dir_remote_file_conflict () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account.set_capabilities ({ { "upload_conflict_files", true } });
+        fake_folder.sync_engine.account.set_capabilities ({ { "upload_conflict_files", true } });
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
 
         clean_up ();
@@ -431,7 +431,7 @@ public class TestSyncConflict : GLib.Object {
 
         // The contents of the conflict directories will only be uploaded after
         // another sync.
-        GLib.assert_true (fake_folder.sync_engine ().is_another_sync_needed () == ImmediateFollowUp);
+        GLib.assert_true (fake_folder.sync_engine.is_another_sync_needed () == ImmediateFollowUp);
         clean_up ();
         GLib.assert_true (fake_folder.sync_once ());
 
@@ -454,7 +454,7 @@ public class TestSyncConflict : GLib.Object {
     ***********************************************************/
     private void test_local_file_remote_dir_conflict () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account.set_capabilities ({ { "upload_conflict_files", true } });
+        fake_folder.sync_engine.account.set_capabilities ({ { "upload_conflict_files", true } });
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
 
         // 1) a NEW/NEW conflict
@@ -532,7 +532,7 @@ public class TestSyncConflict : GLib.Object {
         GLib.assert_true (conflicts[0].contains ("A (conflicted copy"));
         GLib.assert_true (conflicts[1].contains ("B (conflicted copy"));
         foreach (var conflict in conflicts) {
-            QDir (fake_folder.local_path () + conflict).remove_recursively ();
+            GLib.Dir (fake_folder.local_path () + conflict).remove_recursively ();
         }
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
@@ -573,10 +573,10 @@ public class TestSyncConflict : GLib.Object {
         GLib.assert_true (conflicts.size () == 1);
         GLib.assert_true (conflicts[0].contains ("A (conflicted copy"));
         foreach (var conflict in conflicts) {
-            QDir (fake_folder.local_path () + conflict).remove_recursively ();
+            GLib.Dir (fake_folder.local_path () + conflict).remove_recursively ();
         }
 
-        GLib.assert_true (fake_folder.sync_engine ().is_another_sync_needed () == ImmediateFollowUp);
+        GLib.assert_true (fake_folder.sync_engine.is_another_sync_needed () == ImmediateFollowUp);
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }

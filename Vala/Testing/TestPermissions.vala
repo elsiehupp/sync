@@ -22,9 +22,9 @@ public class TestPermissions : GLib.Object {
         // Some of this test depends on the order of discovery. With threading
         // that order becomes effectively random, but we want to make sure to test
         // all cases and thus disable threading.
-        var sync_opts = fake_folder.sync_engine ().sync_options ();
+        var sync_opts = fake_folder.sync_engine.sync_options ();
         sync_opts.parallel_network_jobs = 1;
-        fake_folder.sync_engine ().set_sync_options (sync_opts);
+        fake_folder.sync_engine.set_sync_options (sync_opts);
 
         const int cannot_be_modified_size = 133;
         const int can_be_modified_size = 144;
@@ -305,9 +305,9 @@ public class TestPermissions : GLib.Object {
         // Some of this test depends on the order of discovery. With threading
         // that order becomes effectively random, but we want to make sure to test
         // all cases and thus disable threading.
-        var sync_opts = fake_folder.sync_engine ().sync_options ();
+        var sync_opts = fake_folder.sync_engine.sync_options ();
         sync_opts.parallel_network_jobs = 1;
-        fake_folder.sync_engine ().set_sync_options (sync_opts);
+        fake_folder.sync_engine.set_sync_options (sync_opts);
 
         var lm = fake_folder.local_modifier ();
         var rm = fake_folder.remote_modifier ();
@@ -359,8 +359,8 @@ public class TestPermissions : GLib.Object {
         // also hook into discovery!!
         SyncFileItemVector discovery;
         connect (
-            fake_folder.sync_engine (),
-            SyncEngine.about_to_propagate,
+            fake_folder.sync_engine,
+            SyncEngine.signal_about_to_propagate,
             this,
             this.on_signal_sync_engine_about_to_propagate
         );
@@ -399,7 +399,7 @@ public class TestPermissions : GLib.Object {
         GLib.assert_true (item_instruction (complete_spy, "zallowed/file", SyncInstructions.NEW));
         GLib.assert_true (item_instruction (complete_spy, "zallowed/sub2", SyncInstructions.NEW));
         GLib.assert_true (item_instruction (complete_spy, "zallowed/sub2/file", SyncInstructions.NEW));
-        GLib.assert_true (fake_folder.sync_engine ().is_another_sync_needed () == ImmediateFollowUp);
+        GLib.assert_true (fake_folder.sync_engine.is_another_sync_needed () == ImmediateFollowUp);
 
         // A follow-up sync will restore allowed/file and allowed/sub2 and maintain the nocreatedir/file errors
         complete_spy.clear ();
@@ -435,9 +435,9 @@ public class TestPermissions : GLib.Object {
         // Some of this test depends on the order of discovery. With threading
         // that order becomes effectively random, but we want to make sure to test
         // all cases and thus disable threading.
-        var sync_opts = fake_folder.sync_engine ().sync_options ();
+        var sync_opts = fake_folder.sync_engine.sync_options ();
         sync_opts.parallel_network_jobs = 1;
-        fake_folder.sync_engine ().set_sync_options (sync_opts);
+        fake_folder.sync_engine.set_sync_options (sync_opts);
 
         var lm = fake_folder.local_modifier ();
         var rm = fake_folder.remote_modifier ();

@@ -6,7 +6,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
 //  #include <Soup.Session>
 //  #include <GLib.FileInfo>
-//  #include <QDir>
+//  #include <GLib.Dir>
 //  #include <cmath>
 //  #include <cstring>
 
@@ -99,7 +99,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
             // We need to do add leading 0 because the server orders the chunk alphabetically
             path += "/" + string.number (chunk).right_justified (16, '0'); // 1e16 is 10 petabyte
         }
-        return Utility.concat_url_path (propagator ().account.url (), path);
+        return Utility.concat_url_path (propagator ().account.url, path);
     }
 
 
@@ -136,7 +136,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
             );
             connect (
                 job,
-                LsColJob.finished_with_error,
+                LsColJob.signal_finished_with_error,
                 this,
                 PropagateUploadFileNG.on_signal_propfind_finished_with_error
             );
@@ -148,7 +148,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
             );
             connect (
                 job,
-                LsColJob.directory_listing_iterated,
+                LsColJob.signal_directory_listing_iterated,
                 this,
                 PropagateUploadFileNG.on_signal_propfind_iterate
             );
@@ -198,7 +198,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         headers["OC-Total-Length"] = new string.number (this.file_to_upload.size);
         var job = new MkColJob (propagator ().account, chunk_url (), headers, this);
 
-        connect (job, MkColJob.finished_with_error,
+        connect (job, MkColJob.signal_finished_with_error,
             this, PropagateUploadFileNG.on_signal_mkcol_finished);
         connect (job, MkColJob.finished_without_error,
             this, PropagateUploadFileNG.on_signal_mkcol_finished);
@@ -224,7 +224,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
             // Finish with a MOVE
             // If we changed the file name, we must store the changed filename in the remote folder, not the original one.
-            string destination = QDir.clean_path (propagator ().account.dav_url ().path ()
+            string destination = GLib.Dir.clean_path (propagator ().account.dav_url ().path ()
                 + propagator ().full_remote_path (this.file_to_upload.file));
             var headers = PropagateUploadFileCommon.headers ();
 
@@ -405,7 +405,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
                 abort_with_error (status, job.error_string ());
                 return;
             } else {
-                GLib.warning ("DeleteJob errored out " + job.error_string () + job.reply ().url ());
+                GLib.warning ("DeleteJob errored out " + job.error_string () + job.reply ().url);
                 this.remove_job_error = true;
                 // Let the other jobs finish
             }

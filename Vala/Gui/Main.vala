@@ -18,7 +18,7 @@ Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
 //  #endif
 
 //  #include <QTimer>
-//  #include <QMessageBox>
+//  #include <Gtk.MessageBox>
 //  #include <QDebug>
 //  #include <QQuick_style>
 //  #include <QQuick_window>
@@ -28,13 +28,13 @@ namespace Occ {
 namespace Ui {
 
 void warn_systray () {
-    QMessageBox.critical (null,
+    Gtk.MessageBox.critical (null,
         _("main.cpp", "System Tray not available"),
         _("%1 requires on a working system tray. "
         + "If you are running XFCE, please follow "
         + "<a href=\"http://docs.xfce.org/xfce/xfce4-panel/systray\">these instructions</a>. "
         + "Otherwise, please install a system tray application such as \"trayer\" and try again.")
-            .printf (Theme.instance.app_name_gui ()));
+            .printf (Theme.app_name_gui));
 }
 
 int main (int argc, char **argv) {
@@ -64,8 +64,8 @@ int main (int argc, char **argv) {
 
     // OpenSSL 1.1.0 : No explicit initialisation or de-initialisation is necessary.
 
-    QCoreApplication.attribute (Qt.AAUseHighDpiPixmaps, true);
-    QCoreApplication.attribute (Qt.AA_Enable_high_dpi_scaling, true);
+    Gtk.Application.attribute (Qt.AAUseHighDpiPixmaps, true);
+    Gtk.Application.attribute (Qt.AA_Enable_high_dpi_scaling, true);
     Occ.Application app = new Occ.Application (argc, argv);
 
     if (app.give_help ()) {

@@ -30,7 +30,7 @@ public class FakePayloadReply : FakeReply {
         base (parent);
         this.body = body;
         set_request (request);
-        set_url (request.url ());
+        set_url (request.url);
         set_operation (operation);
         open (QIODevice.ReadOnly);
         QTimer.single_shot (delay, this, &FakePayloadReply.respond);

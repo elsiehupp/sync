@@ -15,7 +15,7 @@ public class FakePutReply : FakeReply {
     public FakePutReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, string put_payload, GLib.Object parent) {
         base (parent);
         set_request (request);
-        set_url (request.url ());
+        set_url (request.url);
         set_operation (operation);
         open (QIODevice.ReadOnly);
         file_info = perform (remote_root_file_info, request, put_payload);
@@ -26,7 +26,7 @@ public class FakePutReply : FakeReply {
     /***********************************************************
     ***********************************************************/
     public static FileInfo perform (FileInfo remote_root_file_info, Soup.Request request, string put_payload) {
-        string filename = get_file_path_from_url (request.url ());
+        string filename = get_file_path_from_url (request.url);
         GLib.assert_true (!filename == "");
         FileInfo file_info = remote_root_file_info.find (filename);
         if (file_info) {

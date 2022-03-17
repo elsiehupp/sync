@@ -39,7 +39,7 @@ public class UserStatusSelectorModel : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private std.shared_ptr<UserStatusConnector> user_status_connector = new UserStatusConnector ();
-    private GLib.Vector<UserStatus> predefined_statuses;
+    private GLib.List<UserStatus> predefined_statuses;
     private UserStatus user_status;
     private std.unique_ptr<DateTimeProvider> date_time_provider = new DateTimeProvider ();
 
@@ -49,7 +49,7 @@ public class UserStatusSelectorModel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Vector<ClearStageType> clear_stages = {
+    private GLib.List<ClearStageType> clear_stages = {
         ClearStageType.DO_NOT_CLEAR,
         ClearStageType.HALF_HOUR,
         ClearStageType.ONE_HOUR,
@@ -148,14 +148,14 @@ public class UserStatusSelectorModel : GLib.Object {
     Q_REQUIRED_RESULT
     ***********************************************************/
     public GLib.Uri online_icon () {
-        return Theme.instance.status_online_image_source ();
+        return Theme.status_online_image_source;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public GLib.Uri away_icon () {
-        return Theme.instance.status_away_image_source ();
+        return Theme.status_away_image_source;
     }
 
 
@@ -163,14 +163,14 @@ public class UserStatusSelectorModel : GLib.Object {
     Q_REQUIRED_RESULT
     ***********************************************************/
     public GLib.Uri dnd_icon () {
-        return Theme.instance.status_do_not_disturb_image_source ();
+        return Theme.status_do_not_disturb_image_source;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public GLib.Uri invisible_icon () {
-        return Theme.instance.status_invisible_image_source ();
+        return Theme.status_invisible_image_source;
     }
 
 
@@ -392,7 +392,7 @@ public class UserStatusSelectorModel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_predefined_statuses_fetched (GLib.Vector<UserStatus> statuses) {
+    private void on_signal_predefined_statuses_fetched (GLib.List<UserStatus> statuses) {
         this.predefined_statuses = statuses;
         /* emit */ predefined_statuses_changed ();
     }

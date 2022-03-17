@@ -125,7 +125,7 @@ public class SyncStatusSummary : GLib.Object {
         base (parent);
         const FolderMan folder_man = FolderMan.instance;
         this.is_syncing = false;
-        this.sync_icon = Theme.instance.sync_status_ok ();
+        this.sync_icon = Theme.sync_status_ok;
         this.sync_status_string = _("All synced!");
         connect (folder_man, FolderMan.signal_folder_list_changed, this, SyncStatusSummary.on_signal_folder_list_changed);
         connect (folder_man, FolderMan.signal_folder_sync_state_change, this, SyncStatusSummary.on_signal_folder_sync_state_changed);
@@ -254,7 +254,7 @@ public class SyncStatusSummary : GLib.Object {
             is_syncing (false);
             sync_status_string (_("Offline"));
             sync_status_detail_string ("");
-            sync_icon (Theme.instance.folder_offline ());
+            sync_icon (Theme.folder_offline);
             return;
         }
 
@@ -268,7 +268,7 @@ public class SyncStatusSummary : GLib.Object {
                 is_syncing (false);
                 sync_status_string (_("All synced!"));
                 sync_status_detail_string ("");
-                sync_icon (Theme.instance.sync_status_ok ());
+                sync_icon (Theme.sync_status_ok);
                 mark_folder_as_success (folder);
             }
             break;
@@ -277,7 +277,7 @@ public class SyncStatusSummary : GLib.Object {
             is_syncing (false);
             sync_status_string (_("Some files couldn't be synced!"));
             sync_status_detail_string (_("See below for errors"));
-            sync_icon (Theme.instance.sync_status_error ());
+            sync_icon (Theme.sync_status_error);
             mark_folder_as_error (folder);
             break;
         case SyncResult.Status.SYNC_RUNNING:
@@ -285,21 +285,21 @@ public class SyncStatusSummary : GLib.Object {
             is_syncing (true);
             sync_status_string (_("Syncing"));
             sync_status_detail_string ("");
-            sync_icon (Theme.instance.sync_status_running ());
+            sync_icon (Theme.sync_status_running ());
             break;
         case SyncResult.Status.PAUSED:
         case SyncResult.Status.SYNC_ABORT_REQUESTED:
             is_syncing (false);
             sync_status_string (_("Sync paused"));
             sync_status_detail_string ("");
-            sync_icon (Theme.instance.sync_status_pause ());
+            sync_icon (Theme.sync_status_pause ());
             break;
         case SyncResult.Status.PROBLEM:
         case SyncResult.Status.UNDEFINED:
             is_syncing (false);
             sync_status_string (_("Some files could not be synced!"));
             sync_status_detail_string (_("See below for warnings"));
-            sync_icon (Theme.instance.sync_status_warning ());
+            sync_icon (Theme.sync_status_warning ());
             mark_folder_as_error (folder);
             break;
         }
@@ -348,10 +348,10 @@ public class SyncStatusSummary : GLib.Object {
         sync_status_detail_string ("");
         if (this.account_state && !this.account_state.is_connected ()) {
             sync_status_string (_("Offline"));
-            sync_icon (Theme.instance.folder_offline ());
+            sync_icon (Theme.folder_offline);
         } else {
             sync_status_string (_("All synced!"));
-            sync_icon (Theme.instance.sync_status_ok ());
+            sync_icon (Theme.sync_status_ok);
         }
     }
 

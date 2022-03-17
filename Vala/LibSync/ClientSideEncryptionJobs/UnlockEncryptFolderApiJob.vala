@@ -41,7 +41,7 @@ public class UnlockEncryptFolderApiJob : AbstractNetworkJob {
         request.raw_header ("OCS-APIREQUEST", "true");
         request.raw_header ("e2e-token", this.token);
 
-        GLib.Uri url = Utility.concat_url_path (account.url (), path ());
+        GLib.Uri url = Utility.concat_url_path (account.url, path ());
         send_request ("DELETE", url, request);
 
         AbstractNetworkJob.start ();

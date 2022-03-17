@@ -64,7 +64,7 @@ public class User : GLib.Object {
         );
         connect (
             ProgressDispatcher.instance,
-            ProgressDispatcher.item_completed,
+            ProgressDispatcher.signal_item_completed,
             this,
             User.on_signal_item_completed
         );
@@ -167,7 +167,7 @@ public class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public string server (bool shortened) {
-        string server_url = this.account_state.account.url ().to_string ();
+        string server_url = this.account_state.account.url.to_string ();
         if (shortened) {
             server_url.replace (QLatin1String ("https://"), QLatin1String (""));
             server_url.replace (QLatin1String ("http://"), QLatin1String (""));
@@ -374,7 +374,7 @@ public class User : GLib.Object {
         activity.status = item.status;
         activity.date_time = GLib.DateTime.current_date_time ();
         activity.message = item.original_file;
-        activity.link = folder.account_state ().account.url ();
+        activity.link = folder.account_state ().account.url;
         activity.acc_name = folder.account_state ().account.display_name ();
         activity.file = item.file;
         activity.folder = folder.alias ();
@@ -555,7 +555,7 @@ public class User : GLib.Object {
             var f = FolderMan.instance.folder_by_alias (folder);
             if (!f)
                 return;
-            const var engine = f.sync_engine ();
+            const var engine = f.sync_engine;
             const var style = engine.last_local_discovery_style ();
             foreach (Activity activity in this.activity_model.errors_list ()) {
                 if (activity.expire_at_msecs != -1) {
@@ -611,7 +611,7 @@ public class User : GLib.Object {
                 }
             }
 
-            /* emit */ ProgressDispatcher.instance.folder_conflicts (folder, conflicts);
+            /* emit */ ProgressDispatcher.instance.signal_folder_conflicts (folder, conflicts);
         }
     }
 

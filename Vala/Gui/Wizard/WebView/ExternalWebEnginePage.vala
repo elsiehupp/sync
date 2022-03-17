@@ -23,7 +23,7 @@ public class ExternalWebEnginePage : QWebEnginePage {
     public bool accept_navigation_request (GLib.Uri url, QWebEnginePage.Navigation_type type, bool is_main_frame) {
         //  Q_UNUSED (type);
         //  Q_UNUSED (is_main_frame);
-        Utility.open_browser (url);
+        OpenExtrernal.open_browser (url);
         return false;
     }
 

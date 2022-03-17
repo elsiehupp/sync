@@ -11,7 +11,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QNetworkCo
 //  #include <QNetw
 //  #include <GLib.FileInfo>
-//  #include <QDir>
+//  #include <GLib.Dir>
 //  #include <QSslKey>
 //  #include <QAuthenticat
 //  #include <QStandardPa
@@ -595,7 +595,7 @@ public class Account : GLib.Object {
         ssl_config.ssl_option (QSsl.SslOptionDisableSessionSharing, false);
         ssl_config.ssl_option (QSsl.SslOptionDisableSessionPersistence, false);
 
-        ssl_config.ocsp_stapling_enabled (Theme.instance.enable_stapling_ocsp ());
+        ssl_config.ocsp_stapling_enabled (Theme.enable_stapling_ocsp);
 
         return ssl_config;
     }
@@ -780,7 +780,7 @@ public class Account : GLib.Object {
             return;
         }
 
-        var delete_password_job = new DeleteJob (Theme.instance.app_name ());
+        var delete_password_job = new DeleteJob (Theme.app_name);
         delete_password_job.insecure_fallback (false);
         delete_password_job.key (kck);
         delete_password_job.signal_finished.connect (
@@ -873,7 +873,7 @@ public class Account : GLib.Object {
             this.identifier
         );
 
-        var read_password_job = new ReadPasswordJob (Theme.instance.app_name ());
+        var read_password_job = new ReadPasswordJob (Theme.app_name);
         read_password_job.insecure_fallback (false);
         read_password_job.key (kck);
         read_password_job.signal_finished.connect (
@@ -916,7 +916,7 @@ public class Account : GLib.Object {
                     this.identifier
         );
 
-        var write_password_job = new WritePasswordJob (Theme.instance.app_name ());
+        var write_password_job = new WritePasswordJob (Theme.app_name);
         write_password_job.insecure_fallback (false);
         write_password_job.key (kck);
         write_password_job.binary_data (app_password.to_latin1 ());
@@ -1031,7 +1031,7 @@ public class Account : GLib.Object {
     ***********************************************************/
     public void on_signal_handle_ssl_errors (GLib.InputStream reply, GLib.List<GnuTLS.ErrorCode> errors) {
         NetworkJobTimeoutPauser pauser = new NetworkJobTimeoutPauser (reply);
-        GLib.debug ("SSL-Errors happened for url " + reply.url ().to_string ());
+        GLib.debug ("SSL-Errors happened for url " + reply.url.to_string ());
         foreach (GnuTLS.ErrorCode error in errors) {
             GLib.debug ("\t_error in " + error.certificate () + ":"
                         + error.error_string () + " (" + error.error () + ")"

@@ -507,8 +507,8 @@ public class OcsUserStatusConnector : UserStatusConnector {
     }
 
 
-    private static GLib.Vector<Occ.UserStatus> json_to_predefined_statuses (QJsonArray json_data_array) {
-        GLib.Vector<Occ.UserStatus> statuses;
+    private static GLib.List<Occ.UserStatus> json_to_predefined_statuses (QJsonArray json_data_array) {
+        GLib.List<Occ.UserStatus> statuses;
         foreach (var json_entry in json_data_array) {
             GLib.assert (json_entry.is_object ());
             if (!json_entry.is_object ()) {

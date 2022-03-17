@@ -10,7 +10,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QScopedPointer>
 //  #include <QElapsedTimer>
 //  #include <QStandardPaths>
-//  #include <QDir>
+//  #include <GLib.Dir>
 
 namespace Occ {
 namespace Ui {
@@ -39,8 +39,8 @@ public class SyncRunFileLog : GLib.Object {
         const int64 logfile_max_size = 10 * 1024 * 1024; // 10Mi_b
 
         const string logpath = QStandardPaths.writable_location (QStandardPaths.AppDataLocation);
-        if (!QDir (logpath).exists ()) {
-            QDir ().mkdir (logpath);
+        if (!GLib.Dir (logpath).exists ()) {
+            GLib.Dir ().mkdir (logpath);
         }
 
         int length = folder_path.split ("/").length ();

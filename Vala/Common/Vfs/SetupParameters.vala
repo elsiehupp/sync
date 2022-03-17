@@ -6,12 +6,13 @@ Copyright (C) by Dominik Schmidt <dschmidt@owncloud.com>
 ***********************************************************/
 
 namespace Occ {
+namespace Vfs {
 
 /***********************************************************
 Collection of parameters for initializing a Vfs instance.
 OCSYNC_EXPORT
 ***********************************************************/
-struct VfsSetupParams {
+public struct SetupParameters {
     /***********************************************************
     The full path to the folder on the local filesystem
 
@@ -70,4 +71,7 @@ struct VfsSetupParams {
     presentaton to identify the accounts
     ***********************************************************/
     bool multiple_accounts_registered = false;
-};
+
+} // namespace Vfs
+} // namespace Occ
+

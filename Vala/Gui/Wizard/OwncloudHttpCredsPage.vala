@@ -41,7 +41,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
         register_field (QLatin1String ("OCPasswd*"), this.ui.le_password);
 
         Theme theme = Theme.instance;
-        switch (theme.user_identifier_type ()) {
+        switch (theme.user_identifier_type) {
         case Theme.UserIdentifierType.USER_NAME:
             // default, handled in ui file
             break;
@@ -49,14 +49,14 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
             this.ui.username_label.on_signal_text (_("&Email"));
             break;
         case Theme.UserIdentifierType.CUSTOM:
-            this.ui.username_label.on_signal_text (theme.custom_user_id ());
+            this.ui.username_label.on_signal_text (theme.custom_user_id);
             break;
         default:
             break;
         }
-        this.ui.le_username.placeholder_text (theme.user_id_hint ());
+        this.ui.le_username.placeholder_text (theme.user_id_hint);
 
-        title (WizardCommon.title_template ().printf (_("Connect to %1").printf (Theme.instance.app_name_gui ())));
+        title (WizardCommon.title_template ().printf (_("Connect to %1").printf (Theme.app_name_gui)));
         sub_title (WizardCommon.sub_title_template ().printf (_("Enter user credentials")));
 
         this.ui.result_layout.add_widget (this.progress_indicator);
@@ -86,7 +86,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
                 this.ui.le_username.on_signal_text (user);
             }
         } else {
-            GLib.Uri url = oc_wizard.account.url ();
+            GLib.Uri url = oc_wizard.account.url;
 
             // If the final url does not have a username, check the
             // user specified url too. Sometimes redirects can lose
@@ -226,7 +226,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
     ***********************************************************/
     private void customize_style () {
         if (this.progress_indicator) {
-            this.progress_indicator.on_signal_color (QGuiApplication.palette ().color (QPalette.Text));
+            this.progress_indicator.on_signal_color (Gtk.Application.palette ().color (QPalette.Text));
         }
     }
 

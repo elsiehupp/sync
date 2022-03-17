@@ -93,7 +93,7 @@ public class RemoteWipe : GLib.Object {
 
         this.app_password = password;
         GLib.Uri request_url = Utility.concat_url_path (
-            this.account.url ().to_string (),
+            this.account.url.to_string (),
             "/index.php/core/wipe/check"
         );
         Soup.Request request;
@@ -198,7 +198,7 @@ public class RemoteWipe : GLib.Object {
     private void on_signal_notify_server_success_job (AccountState account_state, bool value) {
         if (this.account_removed && data_wiped && this.account == account_state.account) {
             GLib.Uri request_url = Utility.concat_url_path (
-                this.account.url ().to_string (),
+                this.account.url.to_string (),
                 "/index.php/core/wipe/on_signal_success");
             Soup.Request request;
             request.header (

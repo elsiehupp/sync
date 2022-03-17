@@ -9,7 +9,7 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 //  #include <QAbstractButton>
 //  #include <QtCore>
 //  #include <QProcess>
-//  #include <QMessageBox>
+//  #include <Gtk.MessageBox>
 //  #include <QDesktopServices>
 //  #include <Gtk.Application>
 //  #include <Gtk.Widget>
@@ -162,7 +162,7 @@ public class OwncloudSetupWizard : GLib.Object {
         // Lookup system proxy in a thread https://github.com/owncloud/client/issues/2993
         if (ClientProxy.is_using_system_default ()) {
             GLib.debug ("Trying to look up system proxy.");
-            ClientProxy.lookup_system_proxy_async (account.url (),
+            ClientProxy.lookup_system_proxy_async (account.url,
                 this, SLOT (on_signal_system_proxy_lookup_done (QNetworkProxy)));
         } else {
             // We want to reset the QNAM proxy so that the global proxy settings are used (via ClientProxy settings)
@@ -194,7 +194,7 @@ public class OwncloudSetupWizard : GLib.Object {
         connect (job, CheckServerJob.instance_found, this, OwncloudSetupWizard.on_signal_found_server);
         connect (job, CheckServerJob.instance_not_found, this, OwncloudSetupWizard.on_signal_find_server_behind_redirect);
         connect (job, CheckServerJob.timeout, this, OwncloudSetupWizard.on_signal_no_server_found_timeout);
-        job.on_signal_timeout ( (account.url ().scheme () == "https") ? 30 * 1000 : 10 * 1000);
+        job.on_signal_timeout ( (account.url.scheme () == "https") ? 30 * 1000 : 10 * 1000);
         job.on_signal_start ();
 
         // Step 2 and 3 are in on_signal_find_server_behind_redirect ()
@@ -207,7 +207,7 @@ public class OwncloudSetupWizard : GLib.Object {
         unowned Account account = this.oc_wizard.account;
 
         // Step 2: Resolve any permanent redirect chains on the base url
-        var redirect_check_job = account.send_request ("GET", account.url ());
+        var redirect_check_job = account.send_request ("GET", account.url);
 
         // Use a significantly reduced timeout for this redirect check:
         // the 5-minute default is inappropriate.
@@ -236,7 +236,7 @@ public class OwncloudSetupWizard : GLib.Object {
     private void on_redirect_check_job (int permanent_redirects, unowned Account account, Soup.Reply reply, GLib.Uri target_url, int count) {
         int http_code = reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (count == *permanent_redirects && (http_code == 301 || http_code == 308)) {
-            GLib.info (account.url () + " was redirected to " + target_url);
+            GLib.info (account.url + " was redirected to " + target_url);
             account.url (target_url);
             *permanent_redirects += 1;
         }
@@ -249,7 +249,7 @@ public class OwncloudSetupWizard : GLib.Object {
         connect (job, CheckServerJob.instance_found, this, OwncloudSetupWizard.on_signal_found_server);
         connect (job, CheckServerJob.instance_not_found, this, OwncloudSetupWizard.on_signal_no_server_found);
         connect (job, CheckServerJob.timeout, this, OwncloudSetupWizard.on_signal_no_server_found_timeout);
-        job.on_signal_timeout ( (account.url ().scheme () == "https") ? 30 * 1000 : 10 * 1000);
+        job.on_signal_timeout ( (account.url.scheme () == "https") ? 30 * 1000 : 10 * 1000);
         job.on_signal_start ();
 }
 
@@ -261,7 +261,7 @@ public class OwncloudSetupWizard : GLib.Object {
 
         this.oc_wizard.on_signal_append_to_configuration_log (_("<font color=\"green\">Successfully connected to %1 : %2 version %3 (%4)</font><br/><br/>")
                                                 .printf (Utility.escape (url.to_string ()),
-                                                    Utility.escape (Theme.instance.app_name_gui ()),
+                                                    Utility.escape (Theme.app_name_gui),
                                                     Utility.escape (CheckServerJob.version_string (info)),
                                                     Utility.escape (server_version)));
 
@@ -269,7 +269,7 @@ public class OwncloudSetupWizard : GLib.Object {
         // https://github.com/owncloud/core/pull/27473/files
         this.oc_wizard.account.server_version (server_version);
 
-        if (url != this.oc_wizard.account.url ()) {
+        if (url != this.oc_wizard.account.url) {
             // We might be redirected, update the account
             this.oc_wizard.account.url (url);
             GLib.info (" was redirected to" + url.to_string ());
@@ -286,12 +286,12 @@ public class OwncloudSetupWizard : GLib.Object {
 
         // Do this early because reply might be deleted in message box event loop
         string message;
-        if (!this.oc_wizard.account.url ().is_valid ()) {
+        if (!this.oc_wizard.account.url.is_valid ()) {
             message = _("Invalid URL");
         } else {
             message = _("Failed to connect to %1 at %2:<br/>%3")
-                      .printf (Utility.escape (Theme.instance.app_name_gui ()),
-                          Utility.escape (this.oc_wizard.account.url ().to_string ()),
+                      .printf (Utility.escape (Theme.app_name_gui),
+                          Utility.escape (this.oc_wizard.account.url.to_string ()),
                           Utility.escape (job.error_string ()));
         }
         bool is_downgrade_advised = check_downgrade_advised (reply);
@@ -310,7 +310,7 @@ public class OwncloudSetupWizard : GLib.Object {
     private void on_signal_no_server_found_timeout (GLib.Uri url) {
         this.oc_wizard.on_signal_display_error (
             _("Timeout while trying to connect to %1 at %2.")
-                .printf (Utility.escape (Theme.instance.app_name_gui ()), Utility.escape (url.to_string ())),
+                .printf (Utility.escape (Theme.app_name_gui), Utility.escape (url.to_string ())),
                     false);
     }
 
@@ -361,7 +361,7 @@ public class OwncloudSetupWizard : GLib.Object {
         this.oc_wizard.field ("OCUrl", url);
         this.oc_wizard.on_signal_append_to_configuration_log (
             _("Trying to connect to %1 at %2 …")
-                .printf (Theme.instance.app_name_gui ())
+                .printf (Theme.app_name_gui)
                 .printf (url)
             );
 
@@ -373,7 +373,7 @@ public class OwncloudSetupWizard : GLib.Object {
     ***********************************************************/
     private void on_signal_create_local_and_remote_folders (string local_folder, string remote_folder) {
         GLib.info ("Setup local sync folder for new o_c connection " + local_folder);
-        const QDir file_info = new QDir (local_folder);
+        const GLib.Dir file_info = new GLib.Dir (local_folder);
 
         bool next_step = true;
         if (file_info.exists ()) {
@@ -407,7 +407,7 @@ public class OwncloudSetupWizard : GLib.Object {
                     Example: https://cloud.example.com/remote.php/dav//
 
             ***********************************************************/
-            GLib.info ("Sanitize got URL path:" + this.oc_wizard.account.url ().to_string () + '/' + this.oc_wizard.account.dav_path () + remote_folder);
+            GLib.info ("Sanitize got URL path:" + this.oc_wizard.account.url.to_string () + '/' + this.oc_wizard.account.dav_path () + remote_folder);
 
             string new_dav_path = this.oc_wizard.account.dav_path (),
                     new_remote_folder = remote_folder;
@@ -428,7 +428,7 @@ public class OwncloudSetupWizard : GLib.Object {
 
             string new_url_path = new_dav_path + '/' + new_remote_folder;
 
-            GLib.info ("Sanitized to URL path:" + this.oc_wizard.account.url ().to_string () + '/' + new_url_path);
+            GLib.info ("Sanitized to URL path:" + this.oc_wizard.account.url.to_string () + '/' + new_url_path);
             /***********************************************************
             END - Sanitize URL paths to eliminate double-slashes
             ***********************************************************/
@@ -548,7 +548,7 @@ public class OwncloudSetupWizard : GLib.Object {
                 var f = folder_man.add_folder (account, folder_definition);
                 if (f) {
                     if (folder_definition.virtual_files_mode != Vfs.Off && this.oc_wizard.use_virtual_file_sync ())
-                        f.root_pin_state (PinState.VfsItemAvailability.ONLINE_ONLY);
+                        f.root_pin_state (Vfs.ItemAvailability.ONLINE_ONLY);
 
                     f.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
                         this.oc_wizard.selective_sync_blocklist ());
@@ -642,7 +642,7 @@ public class OwncloudSetupWizard : GLib.Object {
             if (!this.oc_wizard.account.credentials ().still_valid (reply)) {
                 error_msg = _("Access forbidden by server. To verify that you have proper access, "
                             + "<a href=\"%1\">click here</a> to access the service with your browser.")
-                               .printf (Utility.escape (this.oc_wizard.account.url ().to_string ()));
+                               .printf (Utility.escape (this.oc_wizard.account.url.to_string ()));
             } else {
                 error_msg = job.error_string_parsing_body ();
             }
@@ -666,24 +666,24 @@ public class OwncloudSetupWizard : GLib.Object {
     private void start_wizard () {
         unowned Account account = AccountManager.create_account ();
         account.credentials (CredentialsFactory.create ("dummy"));
-        account.url (Theme.instance.override_server_url ());
+        account.url (Theme.override_server_url);
         this.oc_wizard.account (account);
-        this.oc_wizard.oc_url (account.url ().to_string ());
+        this.oc_wizard.oc_url (account.url.to_string ());
 
-        this.remote_folder = Theme.instance.default_server_folder ();
+        this.remote_folder = Theme.default_server_folder;
         // remote_folder may be empty, which means /
-        string local_folder = Theme.instance.default_client_folder ();
+        string local_folder = Theme.default_client_folder;
 
         // if its a relative path, prepend with users home directory, otherwise use as absolute path
 
-        if (!QDir (local_folder).is_absolute ()) {
-            local_folder = QDir.home_path () + '/' + local_folder;
+        if (!GLib.Dir (local_folder).is_absolute ()) {
+            local_folder = GLib.Dir.home_path () + '/' + local_folder;
         }
 
         this.oc_wizard.property ("local_folder", local_folder);
 
         // remember the local folder to compare later if it changed, but clean first
-        string lf = QDir.from_native_separators (local_folder);
+        string lf = GLib.Dir.from_native_separators (local_folder);
         if (!lf.ends_with ('/')) {
             lf.append ('/');
         }
@@ -725,7 +725,7 @@ public class OwncloudSetupWizard : GLib.Object {
         );
         connect (
             job,
-            PropfindJob.finished_with_error,
+            PropfindJob.signal_finished_with_error,
             this,
             OwncloudSetupWizard.on_signal_auth_error
         );
@@ -744,7 +744,7 @@ public class OwncloudSetupWizard : GLib.Object {
         var job = new MkColJob (this.oc_wizard.account, this.remote_folder, this);
         connect (
             job,
-            MkColJob.finished_with_error,
+            MkColJob.signal_finished_with_error,
             this,
             OwncloudSetupWizard.on_signal_create_remote_folder_finished
         );
@@ -780,7 +780,7 @@ public class OwncloudSetupWizard : GLib.Object {
             this.oc_wizard.on_signal_append_to_configuration_log (
                 "<p><font color=\"green\"><b>"
                 + _("Successfully connected to %1!")
-                    .printf (Theme.instance.app_name_gui ())
+                    .printf (Theme.app_name_gui)
                 + "</b></font></p>");
             this.oc_wizard.on_signal_successful_step ();
         } else {
@@ -788,7 +788,7 @@ public class OwncloudSetupWizard : GLib.Object {
             this.oc_wizard.on_signal_append_to_configuration_log (
                 "<p><font color=\"red\">"
                 + _("Connection to %1 could not be established. Please check again.")
-                    .printf (Theme.instance.app_name_gui ())
+                    .printf (Theme.app_name_gui)
                 + "</font></p>");
         }
     }
@@ -802,13 +802,13 @@ public class OwncloudSetupWizard : GLib.Object {
         while (!rename_ok) {
             rename_ok = FolderMan.instance.start_from_scratch (local_folder);
             if (!rename_ok) {
-                QMessageBox.StandardButton but = QMessageBox.question (
+                Gtk.MessageBox.StandardButton but = Gtk.MessageBox.question (
                     null,
                     _("Folder rename failed"),
                     _("Cannot remove and back up the folder because the folder or a file in it is open in another program."
                     + " Please close the folder or file and hit retry or cancel the setup."),
-                    QMessageBox.Retry | QMessageBox.Abort, QMessageBox.Retry);
-                if (but == QMessageBox.Abort) {
+                    Gtk.MessageBox.Retry | Gtk.MessageBox.Abort, Gtk.MessageBox.Retry);
+                if (but == Gtk.MessageBox.Abort) {
                     break;
                 }
             }
@@ -839,7 +839,7 @@ public class OwncloudSetupWizard : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private bool check_downgrade_advised (Soup.Reply reply) {
-        if (reply.url ().scheme () != "https") {
+        if (reply.url.scheme () != "https") {
             return false;
         }
 

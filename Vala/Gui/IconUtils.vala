@@ -20,12 +20,12 @@ public class IconUtils {
     /***********************************************************
     ***********************************************************/
     public static string find_svg_file_path (string filename, string[] possible_colors) {
-        string result = Occ.Theme.theme_prefix + filename;
+        string result = Occ.Theme.THEME_PREFIX + filename;
         if (GLib.File.exists (result)) {
             return result;
         } else {
             foreach (var color in possible_colors) {
-                result = Occ.Theme.theme_prefix.to_string () + color + "/" + filename;
+                result = Occ.Theme.THEME_PREFIX.to_string () + color + "/" + filename;
 
                 if (GLib.File.exists (result)) {
                     return result;
@@ -73,7 +73,7 @@ public class IconUtils {
 
         if (icon_base_colors.contains (custom_color_name)) {
             result = new Gtk.Image (
-                string (Occ.Theme.theme_prefix) + custom_color_name + "/" + filename
+                string (Occ.Theme.THEME_PREFIX) + custom_color_name + "/" + filename
             );
             if (!result.is_null ()) {
                 return result;

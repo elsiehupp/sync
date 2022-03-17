@@ -6,7 +6,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 
 //  #include <Soup.Session>
 //  #include <GLib.FileInfo>
-//  #include <QDir>
+//  #include <GLib.Dir>
 //  #include <cmath>
 //  #include <cstring>
 

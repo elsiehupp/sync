@@ -18,7 +18,7 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 //  #include <QAction>
 //  #include <QDesktopServices>
 //  #include <QInputDialog>
-//  #include <QMessageBox>
+//  #include <Gtk.MessageBox>
 //  #include <QCryptographicHash>
 //  #include <Gtk.Color>
 //  #include <QPainter>
@@ -504,7 +504,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_private_link_open_browser () {
-        Utility.open_browser (this.private_link_url, this);
+        OpenExtrernal.open_browser (this.private_link_url, this);
     }
 
 
@@ -518,7 +518,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_private_link_email () {
-        Utility.open_email_composer (
+        OpenExtrernal.open_email_composer (
             _("I shared something with you"),
             this.private_link_url,
             this);
@@ -530,10 +530,10 @@ public class ShareUserGroupWidget : Gtk.Widget {
     private void customize_style () {
         this.ui.confirm_share.icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
 
-        this.pi_sharee.on_signal_color (QGuiApplication.palette ().color (QPalette.Text));
+        this.pi_sharee.on_signal_color (Gtk.Application.palette ().color (QPalette.Text));
 
         foreach (var progress_indicator in this.parent_scroll_area.find_children<QProgressIndicator> ()) {
-            progress_indicator.on_signal_color (QGuiApplication.palette ().color (QPalette.Text));;
+            progress_indicator.on_signal_color (Gtk.Application.palette ().color (QPalette.Text));;
         }
     }
 

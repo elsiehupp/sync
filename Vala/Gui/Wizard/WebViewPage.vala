@@ -137,7 +137,7 @@ public class WebViewPage : AbstractCredentialsWizardPage {
     ***********************************************************/
     private bool try_to_wizard_size (int width, int height) {
         const var window = this.oc_wizard.window ();
-        const var screen_geometry = QGuiApplication.screen_at (window.position ()).geometry ();
+        const var screen_geometry = Gtk.Application.screen_at (window.position ()).geometry ();
         const var window_width = screen_geometry.width ();
         const var window_height = screen_geometry.height ();
 

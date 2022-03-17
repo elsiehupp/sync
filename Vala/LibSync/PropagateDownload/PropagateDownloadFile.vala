@@ -10,7 +10,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 //  #include <QLoggingCategory>
 //  #include <QNetworkAc
 //  #include <QFile
-//  #include <QDir>
+//  #include <GLib.Dir>
 //  #include <cmath>
 
 //  #ifdef Q_OS_UNIX
@@ -142,7 +142,7 @@ public class PropagateDownloadFile : PropagateItemJob {
                     on_signal_done (
                         SyncFileItem.Status.NORMAL_ERROR,
                         _("File %1 cannot be downloaded because encryption information is missing.")
-                            .printf (QDir.to_native_separators (this.item.file))
+                            .printf (GLib.Dir.to_native_separators (this.item.file))
                     );
                 }
             );
@@ -178,8 +178,8 @@ public class PropagateDownloadFile : PropagateItemJob {
         }
 
         // Delete the directory if it is empty!
-        QDir directory = new QDir (existing_dir);
-        if (directory.entry_list (QDir.NoDotAndDotDot | QDir.AllEntries).count () == 0) {
+        GLib.Dir directory = new GLib.Dir (existing_dir);
+        if (directory.entry_list (GLib.Dir.NoDotAndDotDot | GLib.Dir.AllEntries).count () == 0) {
             if (directory.rmdir (existing_dir)) {
                 return;
             }
@@ -239,7 +239,7 @@ public class PropagateDownloadFile : PropagateItemJob {
 
         // do a klaas' case clash check.
         if (propagator ().local_filename_clash (this.item.file)) {
-            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 cannot be downloaded because of a local file name clash!").printf (QDir.to_native_separators (this.item.file)));
+            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 cannot be downloaded because of a local file name clash!").printf (GLib.Dir.to_native_separators (this.item.file)));
             return;
         }
 
@@ -578,13 +578,13 @@ public class PropagateDownloadFile : PropagateItemJob {
         // In case of file name clash, report an error
         // This can happen if another parallel download saved a clashing file.
         if (propagator ().local_filename_clash (this.item.file)) {
-            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 cannot be saved because of a local file name clash!").printf (QDir.to_native_separators (this.item.file)));
+            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 cannot be saved because of a local file name clash!").printf (GLib.Dir.to_native_separators (this.item.file)));
             return;
         }
 
         if (this.item.modtime <= 0) {
             FileSystem.remove (this.tmp_file.filename ());
-            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time reported by server. Do not save it.").printf (QDir.to_native_separators (this.item.file)));
+            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time reported by server. Do not save it.").printf (GLib.Dir.to_native_separators (this.item.file)));
             return;
         }
         GLib.assert (this.item.modtime > 0);
@@ -597,7 +597,7 @@ public class PropagateDownloadFile : PropagateItemJob {
         this.item.modtime = FileSystem.get_mod_time (this.tmp_file.filename ());
         if (this.item.modtime <= 0) {
             FileSystem.remove (this.tmp_file.filename ());
-            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time reported by server. Do not save it.").printf (QDir.to_native_separators (this.item.file)));
+            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time reported by server. Do not save it.").printf (GLib.Dir.to_native_separators (this.item.file)));
             return;
         }
         GLib.assert (this.item.modtime > 0);
@@ -708,7 +708,7 @@ public class PropagateDownloadFile : PropagateItemJob {
 
             // Ensure the pin state isn't contradictory
             var pin = vfs.pin_state (this.item.file);
-            if (pin && *pin == PinState.VfsItemAvailability.ONLINE_ONLY)
+            if (pin && *pin == Vfs.ItemAvailability.ONLINE_ONLY)
                 if (!vfs.pin_state (this.item.file, PinState.PinState.UNSPECIFIED)) {
                     GLib.warning ("Could not set pin state of " + this.item.file + " to unspecified.");
                 }
@@ -826,14 +826,14 @@ public class PropagateDownloadFile : PropagateItemJob {
         }
         if (this.item.type == ItemType.VIRTUAL_FILE) {
             if (propagator ().local_filename_clash (this.item.file)) {
-                on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 cannot be downloaded because of a local file name clash!").printf (QDir.to_native_separators (this.item.file)));
+                on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 cannot be downloaded because of a local file name clash!").printf (GLib.Dir.to_native_separators (this.item.file)));
                 return;
             }
 
             GLib.debug ("Creating virtual file " + this.item.file);
             // do a klaas' case clash check.
             if (propagator ().local_filename_clash (this.item.file)) {
-                on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 can not be downloaded because of a local file name clash!").printf (QDir.to_native_separators (this.item.file)));
+                on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 can not be downloaded because of a local file name clash!").printf (GLib.Dir.to_native_separators (this.item.file)));
                 return;
             }
             var r = vfs.create_placeholder (*this.item);
@@ -957,13 +957,13 @@ public class PropagateDownloadFile : PropagateItemJob {
             return;
         }
         GLib.FileInfo existing_file = GLib.File.new_for_path (file_path);
-        QDir base_dir = existing_file.directory ();
+        GLib.Dir base_dir = existing_file.directory ();
 
         while (!file.at_end ()) {
             string line = file.read_line ();
             line.chop (1); // remove trailing \n
 
-            string recalled_file = QDir.clean_path (base_dir.file_path (line));
+            string recalled_file = GLib.Dir.clean_path (base_dir.file_path (line));
             if (!recalled_file.starts_with (folder_path) || !recalled_file.starts_with (base_dir.path ())) {
                 GLib.warning ("Ignoring recall of " + recalled_file);
                 continue;

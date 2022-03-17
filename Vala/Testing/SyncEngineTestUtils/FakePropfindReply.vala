@@ -17,18 +17,18 @@ public class FakePropfindReply : FakeReply {
     public FakePropfindReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, GLib.Object parent) {
         base (parent);
         set_request (request);
-        set_url (request.url ());
+        set_url (request.url);
         set_operation (operation);
         open (QIODevice.ReadOnly);
 
-        string filename = get_file_path_from_url (request.url ());
+        string filename = get_file_path_from_url (request.url);
         GLib.assert_true (!filename.is_null ()); // for root, it should be empty
         const FileInfo file_info = remote_root_file_info.find (filename);
         if (!file_info) {
             QMetaObject.invoke_method (this, "respond_404", Qt.QueuedConnection);
             return;
         }
-        const string prefix = request.url ().path ().left (request.url ().path ().size () - filename.size ());
+        const string prefix = request.url.path ().left (request.url.path ().size () - filename.size ());
 
         // Don't care about the request and just return a full propfind
         const string dav_uri = "DAV:";

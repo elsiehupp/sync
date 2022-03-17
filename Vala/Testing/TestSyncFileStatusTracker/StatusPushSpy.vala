@@ -15,7 +15,7 @@ public class StatusPushSpy : QSignalSpy {
     /***********************************************************
     ***********************************************************/
     public StatusPushSpy (SyncEngine sync_engine) {
-        base (sync_engine.sync_file_status_tracker (), SIGNAL (file_status_changed (string, SyncFileStatus)));
+        base (sync_engine.sync_file_status_tracker, SIGNAL (signal_file_status_changed (string, SyncFileStatus)));
         this.sync_engine (sync_engine);
     }
 

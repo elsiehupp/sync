@@ -175,7 +175,7 @@ public class KMessageWidgetPrivate {
         const double bg_base_color_alpha = 0.2;
         bg_base_color.set_alpha_f (bg_base_color_alpha);
 
-        const QPalette palette = QGuiApplication.palette ();
+        const QPalette palette = Gtk.Application.palette ();
         const Gtk.Color window_color = palette.window ().color ();
         const Gtk.Color text_color = palette.text ().color ();
         const Gtk.Color border = bg_base_color;

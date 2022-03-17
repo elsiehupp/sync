@@ -7,9 +7,9 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 ***********************************************************/
 
 //  #include <QTimer>
-//  #include <QDir>
+//  #include <GLib.Dir>
 //  #include <QSettings>
-//  #include <QMessageBox>
+//  #include <Gtk.MessageBox>
 //  #include <QPushButton>
 //  #include <QApplicat
 //  #include <stri
@@ -27,8 +27,8 @@ namespace Ui {
 ***********************************************************/
 public class Folder : GLib.Object {
 
-    class Map : GLib.HashTable<string, Folder> { }
-    class MapIterator : QMapIterator<string, Folder> { }
+    public class Map : GLib.HashTable<string, Folder> { }
+    public class MapIterator : QMapIterator<string, Folder> { }
 
 
     /***********************************************************
@@ -150,7 +150,7 @@ public class Folder : GLib.Object {
             return this.definition.virtual_files_mode != Vfs.Off && !is_vfs_on_signal_off_switch_pending ();
         }
         public set {
-            Vfs.Mode new_mode = this.definition.virtual_files_mode;
+            AbstractVfs.Mode new_mode = this.definition.virtual_files_mode;
             if (value && this.definition.virtual_files_mode == Vfs.Off) {
                 new_mode = best_available_vfs_mode ();
             } else if (!value && this.definition.virtual_files_mode != Vfs.Off) {
@@ -165,7 +165,7 @@ public class Folder : GLib.Object {
                 this.vfs.unregister_folder ();
         
                 disconnect (this.vfs, null, this, null);
-                disconnect (this.engine.sync_file_status_tracker (), null, this.vfs, null);
+                disconnect (this.engine.sync_file_status_tracker, null, this.vfs, null);
         
                 this.vfs.on_signal_reset (create_vfs_from_plugin (new_mode).release ());
         
@@ -290,101 +290,57 @@ public class Folder : GLib.Object {
             GLib.warning ();
         }
     
-        connect (
-            this.account_state,
-            AccountState.signal_is_connected_changed,
-            this,
-            Folder.signal_can_sync_changed
+        this.account_state.signal_is_connected_changed.connect (
+            this.on_signal_can_sync_changed
         );
-        connect (
-            this.engine,
-            SyncEngine.root_etag,
-            this,
-            Folder.on_signal_etag_retrieved_from_sync_engine
+        this.engine.signal_etag_retrieved_from_sync_engine.connect (
+            this.on_signal_etag_retrieved_from_sync_engine
         );
-        connect (
-            this.engine,
-            SyncEngine.started,
-            this,
-            Folder.on_signal_sync_started,
-            Qt.QueuedConnection
+        this.engine.signa_sync_started.connect (
+            this.on_signal_sync_started // Qt.QueuedConnection
         );
-        connect (
-            this.engine,
-            SyncEngine.on_signal_finished,
-            this,
-            Folder.on_signal_sync_finished,
-            Qt.QueuedConnection
+        this.engine.signal_sync_finished.connect (
+            this.on_signal_sync_finished // Qt.QueuedConnection
         );
-        connect (
-            this.engine,
-            SyncEngine.about_to_remove_all_files,
-            this,
-            Folder.on_signal_about_to_remove_all_files
+        this.engine.about_to_remove_all_files.connect (
+            this.on_signal_about_to_remove_all_files
         );
-        connect (
-            this.engine,
-            SyncEngine.transmission_progress,
-            this,
-            Folder.on_signal_transmission_progress
+        this.engine.signal_transmission_progress.connect (
+            this.on_signal_transmission_progress
         );
-        connect (
-            this.engine,
-            SyncEngine.item_completed,
-            this,
-            Folder.on_signal_item_completed);
-        connect (
-            this.engine,
-            SyncEngine.new_big_folder,
-            this,
-            Folder.on_signal_new_big_folder_discovered);
-        connect (
-            this.engine,
-            SyncEngine.about_to_propagate,
-            this,
-            Folder.on_signal_log_propagation_start);
-        connect (
-            this.engine,
-            SyncEngine.sync_error,
-            this,
-            Folder.on_signal_sync_error
+        this.engine.signal_item_completed.connect (
+            this.on_signal_item_completed
         );
-        connect (
-            this.engine,
-            SyncEngine.add_error_to_gui,
-            this,
-            Folder.on_signal_add_error_to_gui
+        this.engine.signal_new_big_folder.connect (
+            this.on_signal_new_big_folder_discovered
+        );
+        this.engine.signal_about_to_propagate.connect (
+            this.on_signal_log_propagation_start
+        );
+        this.engine.signal_sync_error.connect (
+            this.on_signal_sync_error
+        );
+        this.engine.add_error_to_gui.connect (
+            this.on_signal_add_error_to_gui
         );
         this.schedule_self_timer.single_shot (true);
         this.schedule_self_timer.interval (
             SyncEngine.minimum_file_age_for_upload
         );
-        connect (
-            this.schedule_self_timer,
-            QTimer.timeout,
-            this,
-            Folder.on_signal_schedule_this_folder
+        this.schedule_self_timer.timeout.connect (
+            this.on_signal_schedule_this_folder
         );
-        connect (
-            ProgressDispatcher.instance,
-            ProgressDispatcher.folder_conflicts,
-            this,
-            Folder.on_signal_folder_conflicts
+        ProgressDispatcher.instance.signal_folder_conflicts.connect (
+            this.on_signal_folder_conflicts
         );
-        this.local_discovery_tracker.on_signal_reset (
+        this.local_discovery_tracker.reset (
             new LocalDiscoveryTracker ()
         );
-        connect (
-            this.engine,
-            SyncEngine.on_signal_finished,
-            this.local_discovery_tracker,
-            LocalDiscoveryTracker.on_signal_sync_finished
+        this.engine.signal_finished.connect (
+            this.local_discovery_tracker.on_signal_sync_finished
         );
-        connect (
-            this.engine,
-            SyncEngine.item_completed,
-            this.local_discovery_tracker,
-            LocalDiscoveryTracker.on_signal_item_completed
+        this.engine.signal_item_completed.connect (
+            this.local_discovery_tracker.on_signal_item_completed
         );
     
         // Potentially upgrade suffix vfs to windows vfs
@@ -427,22 +383,27 @@ public class Folder : GLib.Object {
         //  ENFORCE (this.vfs);
         //  ENFORCE (this.vfs.mode () == this.definition.virtual_files_mode);
 
-        VfsSetupParams vfs_params;
+        Vfs.SetupParameters vfs_params;
         vfs_params.filesystem_path = path ();
         vfs_params.display_name = short_gui_remote_path_or_app_name ();
         vfs_params.alias = alias ();
         vfs_params.remote_path = remote_path_trailing_slash ();
         vfs_params.account = this.account_state.account;
         vfs_params.journal = this.journal;
-        vfs_params.provider_name = Theme.instance.app_name_gui ();
-        vfs_params.provider_version = Theme.instance.version ();
+        vfs_params.provider_name = Theme.app_name_gui;
+        vfs_params.provider_version = Theme.version;
         vfs_params.multiple_accounts_registered = AccountManager.instance.accounts ().size () > 1;
 
-        connect (this.vfs, Vfs.begin_hydrating, this, Folder.on_signal_hydration_starts);
-        connect (this.vfs, Vfs.done_hydrating, this, Folder.on_signal_hydration_done);
+        this.vfs.signal_begin_hydrating.connect (
+            this.on_signal_hydration_starts
+        );
+        this.vfs.signal_done_hydrating.connect (
+            this.on_signal_hydration_done
+        );
 
-        connect (this.engine.sync_file_status_tracker (), SyncFileStatusTracker.file_status_changed,
-                this.vfs, Vfs.on_signal_file_status_changed);
+        this.engine.sync_file_status_tracker.signal_file_status_changed.connect (
+            this.vfs.on_signal_file_status_changed
+        );
 
         this.vfs.on_signal_start (vfs_params);
 
@@ -475,7 +436,7 @@ public class Folder : GLib.Object {
             }
             return a;
         } else {
-            return Theme.instance.app_name_gui ();
+            return Theme.app_name_gui;
         }
     }
 
@@ -485,7 +446,7 @@ public class Folder : GLib.Object {
     ***********************************************************/
     public string short_gui_local_path () {
         string p = this.definition.local_path;
-        string home = QDir.home_path ();
+        string home = GLib.Dir.home_path ();
         if (!home.ends_with ('/')) {
             home.append ('/');
         }
@@ -495,7 +456,7 @@ public class Folder : GLib.Object {
         if (p.length () > 1 && p.ends_with ('/')) {
             p.chop (1);
         }
-        return QDir.to_native_separators (p);
+        return GLib.Dir.to_native_separators (p);
     }
 
 
@@ -511,11 +472,11 @@ public class Folder : GLib.Object {
     Cleaned canonical folder path, like path () but never ends
     with a '/'.
 
-    Wrapper for QDir.clean_path (path ()) except for "Z:/",
+    Wrapper for GLib.Dir.clean_path (path ()) except for "Z:/",
     where it returns "Z:" instead of "Z:/".
     ***********************************************************/
     public string clean_path () {
-        string cleaned_path = QDir.clean_path (this.canonical_local_path);
+        string cleaned_path = GLib.Dir.clean_path (this.canonical_local_path);
     
         if (cleaned_path.length () == 3 && cleaned_path.ends_with (":/"))
             cleaned_path.remove (2, 1);
@@ -811,26 +772,18 @@ public class Folder : GLib.Object {
     public void register_folder_watcher () {
         if (this.folder_watcher)
             return;
-        if (!QDir (path ()).exists ())
+        if (!GLib.Dir (path ()).exists ())
             return;
     
         this.folder_watcher.on_signal_reset (new FolderWatcher (this));
-        connect (
-            this.folder_watcher,
-            FolderWatcher.signal_path_changed,
-            this,
+        this.folder_watcher.signal_path_changed.connect (
             this.on_signal_path_changed
         );
-        connect (
-            this.folder_watcher,
-            FolderWatcher.signal_lost_changes,
-            this,
-            Folder.on_signal_next_sync_full_local_discovery);
-        connect (
-            this.folder_watcher,
-            FolderWatcher.signal_became_unreliable,
-            this,
-            Folder.on_signal_watcher_unreliable
+        this.folder_watcher.signal_lost_changes.connect (
+            this.on_signal_next_sync_full_local_discovery
+        );
+        this.folder_watcher.signal_became_unreliable.connect (
+            this.on_signal_watcher_unreliable
         );
         this.folder_watcher.init (path ());
         this.folder_watcher.start_notificaton_test (path () + ".owncloudsync.log");
@@ -958,28 +911,22 @@ public class Folder : GLib.Object {
               + "synchronized with your server, making such files unavailable unless restored.\n"
               + "Are you sure you want to sync those actions with the server?\n"
               + "If this was an accident and you decide to keep your files, they will be re-synced from the server.");
-        var message_box = new QMessageBox (
-            QMessageBox.Warning, _("Remove All Files?"),
+        var message_box = new Gtk.MessageBox (
+            Gtk.MessageBox.Warning, _("Remove All Files?"),
             message.printf (short_gui_local_path ()),
-            QMessageBox.NoButton
+            Gtk.MessageBox.NoButton
         );
         message_box.attribute (Qt.WA_DeleteOnClose);
         message_box.window_flags (message_box.window_flags () | Qt.Window_stays_on_signal_top_hint);
-        message_box.add_button (_("Remove all files"), QMessageBox.DestructiveRole);
-        QPushButton keep_button = message_box.add_button (_("Keep files"), QMessageBox.AcceptRole);
+        message_box.add_button (_("Remove all files"), Gtk.MessageBox.DestructiveRole);
+        QPushButton keep_button = message_box.add_button (_("Keep files"), Gtk.MessageBox.AcceptRole);
         bool old_paused = sync_paused ();
         sync_paused (true);
-        connect (
-            message_box,
-            QMessageBox.on_signal_finished,
-            this,
-            on_signal_message_box_finished
+        message_box.signal_finished.connect (
+            this.on_signal_message_box_finished
         );
-        connect (
-            this,
-            Folder.destroyed,
-            message_box,
-            QMessageBox.delete_later
+        this.destroyed.connect (
+            message_box.delete_later
         );
         message_box.open ();
     }
@@ -987,7 +934,7 @@ public class Folder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_message_box_finished (QMessageBox message_box, QPushButton keep_button, Callback callback, bool old_paused) {
+    private void on_signal_message_box_finished (Gtk.MessageBox message_box, QPushButton keep_button, Callback callback, bool old_paused) {
         const bool cancel = message_box.clicked_button () == keep_button;
         callback (cancel);
         if (cancel) {
@@ -1020,7 +967,7 @@ public class Folder : GLib.Object {
         GLib.info (
             "*** Start syncing " + remote_url ().to_string ()
             + " -" + APPLICATION_NAME + "client version"
-            + Theme.instance.version ().to_string ()
+            + Theme.version.to_string ()
         );
     
         this.file_log.on_signal_start (path ());
@@ -1095,9 +1042,9 @@ public class Folder : GLib.Object {
     ***********************************************************/
     public int on_signal_discard_download_progress () {
         // Delete from journal and from filesystem.
-        QDir folderpath = new QDir (this.definition.local_path);
+        GLib.Dir folderpath = new GLib.Dir (this.definition.local_path);
         GLib.List<string> keep_nothing;
-        const GLib.Vector<SyncJournalDb.DownloadInfo> deleted_infos =
+        const GLib.List<SyncJournalDb.DownloadInfo> deleted_infos =
             this.journal.and_delete_stale_download_infos (keep_nothing);
         foreach (var deleted_info in deleted_infos) {
             const string temporary_path = folderpath.file_path (deleted_info.tmpfile);
@@ -1177,7 +1124,7 @@ public class Folder : GLib.Object {
                     if (pin_state == PinState.PinState.ALWAYS_LOCAL && record.is_virtual_file ()) {
                         spurious = false;
                     }
-                    if (pin_state == PinState.VfsItemAvailability.ONLINE_ONLY && record.is_file ()) {
+                    if (pin_state == Vfs.ItemAvailability.ONLINE_ONLY && record.is_file ()) {
                         spurious = false;
                     }
                 }
@@ -1204,7 +1151,7 @@ public class Folder : GLib.Object {
     "implicit" here means that this download request comes from
     the user wan to access the file's data. The user did not
     change the file's pin state. If the file is currently
-    VfsItemAvailability.ONLINE_ONLY its state will change to
+    Vfs.ItemAvailability.ONLINE_ONLY its state will change to
     Unspecif
 
     The download re (...) in the database. This is necessary
@@ -1235,7 +1182,7 @@ public class Folder : GLib.Object {
         // Change the file's pin state if it's contradictory to being hydrated
         // (suffix-virtual file's pin state is stored at the hydrated path)
         const var pin = this.vfs.pin_state (relative_path);
-        if (pin && *pin == PinState.VfsItemAvailability.ONLINE_ONLY) {
+        if (pin && *pin == Vfs.ItemAvailability.ONLINE_ONLY) {
             if (!this.vfs.pin_state (relative_path, PinState.PinState.UNSPECIFIED)) {
                 GLib.warning ("Could not set pin state of " + relative_path + " to unspecified.");
             }
@@ -1280,7 +1227,7 @@ public class Folder : GLib.Object {
     ***********************************************************/
     private void on_signal_sync_finished (bool success) {
         GLib.info (
-            "Client version" + Theme.instance.version ().to_string ()
+            "Client version" + Theme.version.to_string ()
             + " Qt " + q_version ()
             + " SSL " + QSslSocket.ssl_library_version_string ().to_utf8 ()
         );
@@ -1401,7 +1348,7 @@ public class Folder : GLib.Object {
         this.sync_result.process_completed_item (item);
     
         this.file_log.log_item (*item);
-        /* emit */ ProgressDispatcher.instance.item_completed (alias (), item);
+        /* emit */ ProgressDispatcher.instance.signal_item_completed (alias (), item);
     }
 
 
@@ -1428,7 +1375,9 @@ public class Folder : GLib.Object {
         this.request_etag_job = new RequestEtagJob (account, remote_path (), this);
         this.request_etag_job.on_signal_timeout (60 * 1000);
         // check if the etag is different when retrieved
-        connect (this.request_etag_job, RequestEtagJob.on_signal_etag_retrieved, this, Folder.on_signal_etag_retrieved);
+        this.request_etag_job.signal_etag_retrieved.connect (
+            this.on_signal_etag_retrieved
+        );
         FolderMan.instance.on_signal_schedule_e_tag_job (alias (), this.request_etag_job);
         // The this.request_etag_job is var deleting itself on finish. Our guard pointer this.request_etag_job will then be null.
     }
@@ -1505,13 +1454,13 @@ public class Folder : GLib.Object {
                 /* emit */ signal_new_big_folder_discovered (new_folder);
             }
             string message = !is_external ? (_("A new folder larger than %1 MB has been added : %2.\n")
-                                                    .printf (ConfigFile ().new_big_folder_size_limit ().second)
+                                                    .printf (ConfigFile ().new_big_folder_size_limit.second)
                                                     .printf (new_folder))
                                           : (_("A folder from an external storage has been added.\n"));
             message += _("Please go in the settings to select it if you wish to download it.");
     
             var logger = Logger.instance;
-            logger.post_optional_gui_log (Theme.instance.app_name_gui (), message);
+            logger.post_optional_gui_log (Theme.app_name_gui, message);
         }
     }
 
@@ -1585,7 +1534,7 @@ public class Folder : GLib.Object {
                 + "It will not be synchronized.")
                   .printf (file_info.file_path ());
     
-        Logger.instance.post_optional_gui_log (Theme.instance.app_name_gui (), message);
+        Logger.instance.post_optional_gui_log (Theme.app_name_gui, message);
     }
 
 
@@ -1603,7 +1552,7 @@ public class Folder : GLib.Object {
             + "\n"
             + "%1"
             ).printf (message);
-        Logger.instance.post_gui_log (Theme.instance.app_name_gui (), full_message);
+        Logger.instance.post_gui_log (Theme.app_name_gui, full_message);
     }
 
 
@@ -1668,8 +1617,8 @@ public class Folder : GLib.Object {
         if (this.sync_result.first_item_renamed ()) {
             LogStatus status = LogStatus.RENAME;
             // if the path changes it's rather a move
-            QDir ren_target = GLib.FileInfo (this.sync_result.first_item_renamed ().rename_target).directory ();
-            QDir ren_source = GLib.FileInfo (this.sync_result.first_item_renamed ().file).directory ();
+            GLib.Dir ren_target = GLib.FileInfo (this.sync_result.first_item_renamed ().rename_target).directory ();
+            GLib.Dir ren_source = GLib.FileInfo (this.sync_result.first_item_renamed ().file).directory ();
             if (ren_target != ren_source) {
                 status = LogStatus.MOVE;
             }
@@ -1730,7 +1679,7 @@ public class Folder : GLib.Object {
         SyncOptions opt;
         ConfigFile config_file;
     
-        var new_folder_limit = config_file.new_big_folder_size_limit ();
+        var new_folder_limit = config_file.new_big_folder_size_limit;
         opt.new_big_folder_size_limit = new_folder_limit.first ? new_folder_limit.second * 1000LL * 1000LL : -1; // convert from MB to B
         opt.confirm_external_storage = config_file.confirm_external_storage ();
         opt.move_files_to_trash = config_file.move_to_trash ();
@@ -1757,7 +1706,7 @@ public class Folder : GLib.Object {
         if (count > 0) {
             Logger logger = Logger.instance;
     
-            string file = QDir.to_native_separators (filename);
+            string file = GLib.Dir.to_native_separators (filename);
             string text;
     
             switch (status) {

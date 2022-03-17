@@ -44,7 +44,7 @@ public class SslErrorDialog : Gtk.Dialog {
             this.ui.dialog_button_box.button (QDialogButtonBox.Cancel);
         ok_button.enabled (false);
 
-        this.ui.cb_trust_connect.enabled (!Theme.instance.forbid_bad_ssl ());
+        this.ui.cb_trust_connect.enabled (!Theme.forbid_bad_ssl);
         connect (this.ui.cb_trust_connect, QAbstractButton.clicked,
             ok_button, Gtk.Widget.enabled);
 
@@ -98,7 +98,7 @@ public class SslErrorDialog : Gtk.Dialog {
         message += QL ("<link rel='stylesheet' type='text/css' href='format.css'>");
         message += QL ("</head><body>");
 
-        var host = this.account.url ().host ();
+        var host = this.account.url.host ();
         message += QL ("<h3>") + _("Cannot connect securely to <i>%1</i>:").printf (host) + QL ("</h3>");
         // loop over the unknown certificates and line up their errors.
         message += QL ("<div identifier=\"ca_errors\">");

@@ -115,7 +115,7 @@ public class WriteJob : KeychainChunk.Job {
 
             const string key_with_index = this.key + (index > 0) ? "." + index.to_string () : "";
             const string kck = this.account ? AbstractCredentials.keychain_key (
-                    this.account.url ().to_string (),
+                    this.account.url.to_string (),
                     key_with_index,
                     this.account.identifier ()
                 ) : key_with_index;

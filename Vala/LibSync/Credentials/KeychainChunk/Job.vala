@@ -58,7 +58,7 @@ public class Job : GLib.Object {
     public Job (GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.error = QKeychain.NoError;
-        this.service_name = Theme.instance.app_name ();
+        this.service_name = Theme.app_name;
     }
 
 
@@ -86,7 +86,7 @@ public class Job : GLib.Object {
     ***********************************************************/
     private static void add_settings_to_job (Account account, QKeychain.Job job) {
         //  Q_UNUSED (account)
-        var settings = ConfigFile.settings_with_group (Theme.instance.app_name ());
+        var settings = ConfigFile.settings_with_group (Theme.app_name);
         settings.parent (job); // make the job parent to make setting deleted properly
         job.settings (settings.release ());
     }

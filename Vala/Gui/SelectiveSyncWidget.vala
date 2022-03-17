@@ -231,7 +231,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
         if (!root) {
             root = new SelectiveSyncTreeViewItem (this.folder_tree);
             root.on_signal_text (0, this.root_name);
-            root.icon (0, Theme.instance.application_icon ());
+            root.icon (0, Theme.application_icon);
             root.data (0, Qt.USER_ROLE, "");
             root.check_state (0, Qt.Checked);
             int64 size = job ? job.folder_infos[path_to_remove].size : -1;
@@ -291,7 +291,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
         var job = new LsColJob (this.account, prefix + directory, this);
         job.properties (GLib.List<string> ("resourcetype"
                                                + "http://owncloud.org/ns:size");
-        connect (job, LsColJob.directory_listing_subfolders,
+        connect (job, LsColJob.signal_directory_listing_subfolders,
             this, SelectiveSyncWidget.on_signal_update_directories);
         job.on_signal_start ();
     }
@@ -396,11 +396,11 @@ public class SelectiveSyncWidget : Gtk.Widget {
             props + "http://nextcloud.org/ns:is-encrypted";
         }
         job.properties (props);
-        connect (job, LsColJob.directory_listing_subfolders,
+        connect (job, LsColJob.signal_directory_listing_subfolders,
             this, SelectiveSyncWidget.on_signal_update_directories);
-        connect (job, LsColJob.finished_with_error,
+        connect (job, LsColJob.signal_finished_with_error,
             this, SelectiveSyncWidget.on_signal_lscol_finished_with_error);
-        connect (job, LsColJob.directory_listing_iterated,
+        connect (job, LsColJob.signal_directory_listing_iterated,
             this, SelectiveSyncWidget.on_signal_gather_encrypted_paths);
         job.on_signal_start ();
         this.folder_tree.clear ();

@@ -4,7 +4,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <QDir>
+//  #include <GLib.Dir>
 //  #include <QRegularExpression>
 //  #include <QtGlobal>
 //  #include <QTextCodec>
@@ -107,7 +107,7 @@ public class Logger : GLib.Object {
         }
     }
 
-    private GLib.Vector<string> crash_log;
+    private GLib.List<string> crash_log;
     private int crash_log_index = 0;
 
     internal signal void log_window_log (string value);
@@ -225,7 +225,7 @@ public class Logger : GLib.Object {
     Returns where the automatic logdir would be
     ***********************************************************/
     public string temporary_folder_log_dir_path () {
-        return QDir.temp ().file_path (APPLICATION_SHORTNAME + "-logdir");
+        return GLib.Dir.temp ().file_path (APPLICATION_SHORTNAME + "-logdir");
     }
 
 
@@ -240,7 +240,7 @@ public class Logger : GLib.Object {
     ***********************************************************/
     public void setup_temporary_folder_log_dir () {
         var directory = temporary_folder_log_dir_path ();
-        if (!QDir ().mkpath (directory)) {
+        if (!GLib.Dir ().mkpath (directory)) {
             return;
         }
         this.log_debug = true;
@@ -282,7 +282,7 @@ public class Logger : GLib.Object {
     public void on_signal_enter_next_log_file () {
         if (!this.log_directory == "") {
 
-            QDir directory = new QDir (this.log_directory);
+            GLib.Dir directory = new GLib.Dir (this.log_directory);
             if (!directory.exists ()) {
                 directory.mkpath (".");
             }
@@ -293,7 +293,7 @@ public class Logger : GLib.Object {
 
             // Expire old log files and deal with conflicts
             GLib.List<string> files = directory.entry_list (GLib.List<string> ("*owncloud.log.*"),
-                QDir.Files, QDir.Name);
+                GLib.Dir.Files, GLib.Dir.Name);
             const QRegularExpression regex = new QRegularExpression (QRegularExpression.anchored_pattern (" (.*owncloud\.log\. (\d+).*)"));
             int max_number = -1;
             foreach (string s in files) {
@@ -361,7 +361,7 @@ public class Logger : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void dump_crash_log () {
-        GLib.File log_file = GLib.File.new_for_path (QDir.temp_path () + "/" + APPLICATION_NAME + "-crash.log");
+        GLib.File log_file = GLib.File.new_for_path (GLib.Dir.temp_path () + "/" + APPLICATION_NAME + "-crash.log");
         if (log_file_object.open (GLib.File.WriteOnly)) {
             QTextStream output = new QTextStream (&log_file);
             for (int i = 1; i <= CRASH_LOG_SIZE; ++i) {

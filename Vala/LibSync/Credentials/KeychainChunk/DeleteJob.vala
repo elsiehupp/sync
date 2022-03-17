@@ -44,7 +44,7 @@ public class DeleteJob : KeychainChunk.Job {
         this.error = QKeychain.NoError;
 
         const string kck = this.account ? AbstractCredentials.keychain_key (
-                this.account.url ().to_string (),
+                this.account.url.to_string (),
                 this.key,
                 this.keychain_migration ? "" : this.account.identifier ()
             ) : this.key;

@@ -159,7 +159,7 @@ public class ConnectionValidator : GLib.Object {
         // Lookup system proxy in a thread https://github.com/owncloud/client/issues/2993
         if (ClientProxy.is_using_system_default ()) {
             GLib.debug ("Trying to look up system proxy.");
-            ClientProxy.lookup_system_proxy_async (this.account.url (),
+            ClientProxy.lookup_system_proxy_async (this.account.url,
                 this, SLOT (on_signal_system_proxy_lookup_done (QNetworkProxy)));
         } else {
             // We want to reset the QNAM proxy so that the global proxy settings are used (via ClientProxy settings)
@@ -206,8 +206,12 @@ public class ConnectionValidator : GLib.Object {
         var job = new PropfindJob (this.account, "/", this);
         job.on_signal_timeout (TIMEOUT_TO_USE_MILLISECONDS);
         job.properties (GLib.List<string> ("getlastmodified"));
-        connect (job, PropfindJob.result, this, ConnectionValidator.on_signal_auth_success);
-        connect (job, PropfindJob.finished_with_error, this, ConnectionValidator.on_signal_auth_failed);
+        job.result.connect (
+            this.on_signal_auth_success
+        );
+        job.signal_finished_with_error.connect (
+            this.on_signal_auth_failed
+        );
         job.on_signal_start ();
     }
 
@@ -221,9 +225,15 @@ public class ConnectionValidator : GLib.Object {
         var check_job = new CheckServerJob (this.account, this);
         check_job.on_signal_timeout (TIMEOUT_TO_USE_MILLISECONDS);
         check_job.ignore_credential_failure (true);
-        connect (check_job, CheckServerJob.instance_found, this, ConnectionValidator.on_signal_status_found);
-        connect (check_job, CheckServerJob.instance_not_found, this, ConnectionValidator.on_signal_no_status_found);
-        connect (check_job, CheckServerJob.timeout, this, ConnectionValidator.on_signal_job_timeout);
+        check_job.instance_found.connect (
+            this.on_signal_status_found
+        );
+        check_job.instance_not_found.connect (
+            this.on_signal_no_status_found
+        );
+        check_job.timeout.connect (
+            this.on_signal_job_timeout
+        );
         check_job.on_signal_start ();
     }
 
@@ -243,7 +253,7 @@ public class ConnectionValidator : GLib.Object {
                   + " (" + server_version + ")");
 
         // Update server url in case of redirection
-        if (this.account.url () != url) {
+        if (this.account.url != url) {
             GLib.info ("status.php was redirected to " + url.to_string ());
             this.account.url (url);
             this.account.wants_account_saved (this.account);
@@ -280,7 +290,7 @@ public class ConnectionValidator : GLib.Object {
             // Note: Why would this happen on a status.php request?
             this.errors.append (_("Authentication error : Either username or password are wrong."));
         } else {
-            //this.errors.append (_("Unable to connect to %1").printf (this.account.url ().to_string ()));
+            //this.errors.append (_("Unable to connect to %1").printf (this.account.url.to_string ()));
             this.errors.append (job.error_string ());
         }
         report_result (StatusNotFound);
@@ -335,7 +345,7 @@ public class ConnectionValidator : GLib.Object {
     protected void on_signal_auth_success () {
         this.errors.clear ();
         if (!this.is_checking_server_and_auth) {
-            report_result (Connected);
+            report_result (Status.CONNECTED);
             return;
         }
         check_server_capabilities ();
@@ -368,16 +378,18 @@ public class ConnectionValidator : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_user_fetched (UserInfo user_info) {
-        if (user_info) {
+        if (user_info != null) {
             user_info.active (false);
             user_info.delete_later ();
         }
 
     //  #ifndef TOKEN_AUTH_ONLY
-        connect (this.account.e2e (), ClientSideEncryption.initialization_finished, this, ConnectionValidator.on_signal_report_connected);
-        this.account.e2e ().initialize (this.account);
+        this.account.e2e.initialization_finished.connect (
+            this.on_signal_report_connected
+        );
+        this.account.e2e.initialize (this.account);
     //  #else
-        report_result (Connected);
+        report_result (Status.CONNECTED);
     //  #endif
     }
 
@@ -387,7 +399,7 @@ public class ConnectionValidator : GLib.Object {
     #ifndef TOKEN_AUTH_ONLY
     ***********************************************************/
     private void on_signal_report_connected () {
-        report_result (Connected);
+        report_result (Status.CONNECTED);
     }
 
 
@@ -405,7 +417,9 @@ public class ConnectionValidator : GLib.Object {
         // The main flow now needs the capabilities
         var job = new JsonApiJob (this.account, "ocs/v1.php/cloud/capabilities", this);
         job.on_signal_timeout (TIMEOUT_TO_USE_MILLISECONDS);
-        connect (job, JsonApiJob.json_received, this, ConnectionValidator.on_signal_capabilities_recieved);
+        job.json_received.connect (
+            this.on_signal_capabilities_recieved
+        );
         job.on_signal_start ();
     }
 
@@ -414,7 +428,9 @@ public class ConnectionValidator : GLib.Object {
     ***********************************************************/
     private void fetch_user () {
         var user_info = new UserInfo (this.account_state, true, true, this);
-        connect (user_info, UserInfo.fetched_last_info, this, ConnectionValidator.on_signal_user_fetched);
+        user_info.fetched_last_info.connect (
+            this.on_signal_user_fetched
+        );
         user_info.active (true);
     }
 
@@ -426,7 +442,7 @@ public class ConnectionValidator : GLib.Object {
     old servers.
     ***********************************************************/
     private bool and_check_server_version (string version) {
-        GLib.info (this.account.url () + " has server version " + version);
+        GLib.info (this.account.url + " has server version " + version);
         this.account.server_version (version);
 
         // We cannot deal with servers < 7.0.0

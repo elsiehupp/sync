@@ -102,11 +102,11 @@ public class ServerNotificationHandler : GLib.Object {
             GLib.Uri link = new GLib.Uri (json.value ("link").to_string ());
             if (!link == "") {
                 if (link.host () == "") {
-                    link.scheme (ai.account.url ().scheme ());
-                    link.host (ai.account.url ().host ());
+                    link.scheme (ai.account.url.scheme ());
+                    link.host (ai.account.url.host ());
                 }
                 if (link.port () == -1) {
-                    link.port (ai.account.url ().port ());
+                    link.port (ai.account.url.port ());
                 }
             }
             a.link = link;
@@ -128,7 +128,7 @@ public class ServerNotificationHandler : GLib.Object {
             // https://github.com/owncloud/notifications/blob/master/docs/ocs-endpoint-v1.md#deleting-a-notification-for-a-user
             ActivityLink activity_link;
             activity_link.label = _("Dismiss");
-            activity_link.link = Utility.concat_url_path (ai.account.url (), NOTIFICATIONS_PATH + "/" + string.number (a.id)).to_string ();
+            activity_link.link = Utility.concat_url_path (ai.account.url, NOTIFICATIONS_PATH + "/" + string.number (a.id)).to_string ();
             activity_link.verb = "DELETE";
             activity_link.primary = false;
             a.links.append (activity_link);

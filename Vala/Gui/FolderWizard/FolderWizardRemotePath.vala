@@ -71,7 +71,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
                 continue;
             }
             string cur_dir = f.remote_path_trailing_slash ();
-            if (QDir.clean_path (directory) == QDir.clean_path (cur_dir)) {
+            if (GLib.Dir.clean_path (directory) == GLib.Dir.clean_path (cur_dir)) {
                 warn_strings.append (_("This folder is already being synced."));
             } else if (directory.starts_with (cur_dir)) {
                 warn_strings.append (_("You are already syncing <i>%1</i>, which is a parent folder of <i>%2</i>.").printf (Utility.escape (cur_dir), Utility.escape (directory)));
@@ -158,7 +158,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     ***********************************************************/
     protected void on_signal_create_remote_folder_finished () {
         GLib.debug ("webdav mkdir request on_signal_finished");
-        on_signal_show_warning (_("Folder was successfully created on %1.").printf (Theme.instance.app_name_gui ()));
+        on_signal_show_warning (_("Folder was successfully created on %1.").printf (Theme.app_name_gui));
         on_signal_refresh_folders ();
         this.ui.folder_entry.on_signal_text (static_cast<MkColJob> (sender ()).path ());
         on_signal_ls_col_folder_entry ();
@@ -170,10 +170,10 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     protected void on_signal_handle_mkdir_network_error (Soup.Reply reply) {
         GLib.warning ("webdav mkdir request failed: " + reply.error ());
         if (!this.account.credentials ().still_valid (reply)) {
-            on_signal_show_warning (_("Authentication failed accessing %1").printf (Theme.instance.app_name_gui ()));
+            on_signal_show_warning (_("Authentication failed accessing %1").printf (Theme.app_name_gui));
         } else {
             on_signal_show_warning (_("Failed to create the folder on %1. Please check manually.")
-                         .printf (Theme.instance.app_name_gui ()));
+                         .printf (Theme.app_name_gui));
         }
     }
 
@@ -205,8 +205,8 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
         QTreeWidgetItem root = this.ui.folder_tree_widget.top_level_item (0);
         if (!root) {
             root = new QTreeWidgetItem (this.ui.folder_tree_widget);
-            root.on_signal_text (0, Theme.instance.app_name_gui ());
-            root.icon (0, Theme.instance.application_icon ());
+            root.on_signal_text (0, Theme.app_name_gui);
+            root.icon (0, Theme.application_icon);
             root.tool_tip (0, _("Choose this to sync the entire account"));
             root.data (0, Qt.USER_ROLE, "/");
         }
@@ -310,9 +310,9 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
         // No error handling, no updating, we do this manually
         // because of extra logic in the typed-path case.
         disconnect (job, null, this, null);
-        connect (job, LsColJob.finished_with_error,
+        connect (job, LsColJob.signal_finished_with_error,
             this, FolderWizardRemotePath.on_signal_handle_ls_col_network_error);
-        connect (job, LsColJob.directory_listing_subfolders,
+        connect (job, LsColJob.signal_directory_listing_subfolders,
             this, FolderWizardRemotePath.on_signal_typed_path_found);
     }
 
@@ -334,11 +334,11 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
             props += "http://nextcloud.org/ns:is-encrypted";
         }
         job.properties (props);
-        connect (job, LsColJob.directory_listing_subfolders,
+        connect (job, LsColJob.signal_directory_listing_subfolders,
             this, FolderWizardRemotePath.on_signal_update_directories);
-        connect (job, LsColJob.finished_with_error,
+        connect (job, LsColJob.signal_finished_with_error,
             this, FolderWizardRemotePath.on_signal_handle_ls_col_network_error);
-        connect (job, LsColJob.directory_listing_iterated,
+        connect (job, LsColJob.signal_directory_listing_iterated,
             this, FolderWizardRemotePath.on_signal_gather_encrypted_paths);
         job.on_signal_start ();
 

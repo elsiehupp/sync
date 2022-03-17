@@ -16,7 +16,7 @@ public class FakeAsyncReply : FakeReply {
         base (parent);
         this.poll_location = poll_location;
         set_request (request);
-        set_url (request.url ());
+        set_url (request.url);
         set_operation (operation);
         open (QIODevice.ReadOnly);
 

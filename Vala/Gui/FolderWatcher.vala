@@ -9,7 +9,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <cstdint>
 //  #include <QFileIn
 //  #include <QFlag
-//  #include <QDir>
+//  #include <GLib.Dir>
 //  #include <QMutexLoc
 //  #include <string[]
 //  #include <QTimer>
@@ -17,7 +17,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QLoggingCatego
 //  #include <QElapsedTimer>
 //  #include <QScopedPointer>
-//  #include <QDir>
+//  #include <GLib.Dir>
 
 namespace Occ {
 namespace Ui {
@@ -151,7 +151,7 @@ public class FolderWatcher : GLib.Object {
         GLib.FileInfo file_info = new GLib.FileInfo (path);
         string[] paths = { path };
         if (file_info.is_dir ()) {
-            QDir directory = new QDir (path);
+            GLib.Dir directory = new GLib.Dir (path);
             append_sub_paths (directory, paths);
         }
         on_signal_change_detected_for_multiple_paths (paths);
@@ -234,14 +234,14 @@ public class FolderWatcher : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void append_sub_paths (QDir directory, string[] sub_paths) {
-        string[] new_sub_paths = directory.entry_list (QDir.NoDotAndDotDot | QDir.Dirs | QDir.Files);
+    private void append_sub_paths (GLib.Dir directory, string[] sub_paths) {
+        string[] new_sub_paths = directory.entry_list (GLib.Dir.NoDotAndDotDot | GLib.Dir.Dirs | GLib.Dir.Files);
         for (int i = 0; i < new_sub_paths.size (); i++) {
             string path = directory.path () + "/" + new_sub_paths[i];
             GLib.FileInfo file_info = new GLib.FileInfo (path);
             sub_paths.append (path);
             if (file_info.is_dir ()) {
-                QDir directory = new QDir (path);
+                GLib.Dir directory = new GLib.Dir (path);
                 append_sub_paths (directory, sub_paths);
             }
         }

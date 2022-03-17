@@ -22,7 +22,7 @@ public class TestFolderMan : GLib.Object {
         QTemporaryDir directory;
         ConfigFile.set_configuration_directory (directory.path ()); // we don't want to pollute the user's config file
         GLib.assert_true (directory.is_valid ());
-        QDir dir2 = new QDir (directory.path ());
+        GLib.Dir dir2 = new GLib.Dir (directory.path ());
         GLib.assert_true (dir2.mkpath ("sub/own_cloud1/folder/file"));
         GLib.assert_true (dir2.mkpath ("own_cloud2"));
         GLib.assert_true (dir2.mkpath ("sub/free"));
@@ -122,7 +122,7 @@ public class TestFolderMan : GLib.Object {
         GLib.assert_true (!folder_manager.check_path_validity_for_new_folder ("").is_null ());
 
         // REMOVE own_cloud2 from the filesystem, but keep a folder sync'ed to it.
-        QDir (directory_path + "/own_cloud2/").remove_recursively ();
+        GLib.Dir (directory_path + "/own_cloud2/").remove_recursively ();
         GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/own_cloud2/blublu").is_null ());
         GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/own_cloud2/sub/subsub/sub").is_null ());
     }
@@ -136,7 +136,7 @@ public class TestFolderMan : GLib.Object {
         QTemporaryDir directory;
         ConfigFile.set_configuration_directory (directory.path ()); // we don't want to pollute the user's config file
         GLib.assert_true (directory.is_valid ());
-        QDir dir2 = new QDir (directory.path ());
+        GLib.Dir dir2 = new GLib.Dir (directory.path ());
         GLib.assert_true (dir2.mkpath ("sub/own_cloud1/folder/file"));
         GLib.assert_true (dir2.mkpath ("own_cloud"));
         GLib.assert_true (dir2.mkpath ("own_cloud2"));
@@ -175,7 +175,7 @@ public class TestFolderMan : GLib.Object {
 
         // REMOVE own_cloud2 from the filesystem, but keep a folder sync'ed to it.
         // We should still not suggest this folder as a new folder.
-        QDir (directory_path + "/own_cloud2/").remove_recursively ();
+        GLib.Dir (directory_path + "/own_cloud2/").remove_recursively ();
         GLib.assert_true (folder_manager.find_good_path_for_new_sync_folder (directory_path + "/own_cloud", url) ==
             directory_path + "/own_cloud3");
         GLib.assert_true (folder_manager.find_good_path_for_new_sync_folder (directory_path + "/own_cloud2", url) ==

@@ -12,7 +12,7 @@ public class FakeChunkMoveReply : FakeReply {
         GLib.Object parent) {
         base (parent);
         set_request (request);
-        set_url (request.url ());
+        set_url (request.url);
         set_operation (operation);
         open (QIODevice.ReadOnly);
         file_info = perform (uploads_file_info, remote_root_file_info, request);
@@ -27,7 +27,7 @@ public class FakeChunkMoveReply : FakeReply {
     /***********************************************************
     ***********************************************************/
     public static FileInfo perform (FileInfo uploads_file_info, FileInfo remote_root_file_info, Soup.Request request) {
-        string source = get_file_path_from_url (request.url ());
+        string source = get_file_path_from_url (request.url);
         GLib.assert_true (!source == "");
         GLib.assert_true (source.ends_with ("/.file"));
         source = source.left (source.length () - (int) (qstrlen ("/.file")));

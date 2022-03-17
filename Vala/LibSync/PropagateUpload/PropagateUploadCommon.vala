@@ -141,7 +141,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
             GLib.assert (this.item.modtime > 0);
             if (this.item.modtime <= 0) {
                 GLib.warning ("Invalid modified time " + this.item.file + this.item.modtime);
-                on_signal_error_start_folder_unlock (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").printf (QDir.to_native_separators (this.item.file)));
+                on_signal_error_start_folder_unlock (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").printf (GLib.Dir.to_native_separators (this.item.file)));
                 return;
             }
         }
@@ -216,7 +216,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
 
         // Check if the specific file can be accessed
         if (propagator ().has_case_clash_accessibility_problem (this.file_to_upload.file)) {
-            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 cannot be uploaded because another file with the same name, differing only in case, exists").printf (QDir.to_native_separators (this.item.file)));
+            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("File %1 cannot be uploaded because another file with the same name, differing only in case, exists").printf (GLib.Dir.to_native_separators (this.item.file)));
             return;
         }
 
@@ -283,7 +283,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         // probably temporary one.
         this.item.modtime = FileSystem.get_mod_time (file_path);
         if (this.item.modtime <= 0) {
-            on_signal_error_start_folder_unlock (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").printf (QDir.to_native_separators (this.item.file)));
+            on_signal_error_start_folder_unlock (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").printf (GLib.Dir.to_native_separators (this.item.file)));
             return;
         }
 
@@ -364,7 +364,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
             return on_signal_error_start_folder_unlock (SyncFileItem.Status.SOFT_ERROR, _("File Removed (start upload) %1").printf (full_file_path));
         }
         if (this.item.modtime <= 0) {
-            on_signal_error_start_folder_unlock (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").printf (QDir.to_native_separators (this.item.file)));
+            on_signal_error_start_folder_unlock (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").printf (GLib.Dir.to_native_separators (this.item.file)));
             return;
         }
         GLib.assert (this.item.modtime > 0);
@@ -377,7 +377,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
 
         this.item.modtime = FileSystem.get_mod_time (original_file_path);
         if (this.item.modtime <= 0) {
-            on_signal_error_start_folder_unlock (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").printf (QDir.to_native_separators (this.item.file)));
+            on_signal_error_start_folder_unlock (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").printf (GLib.Dir.to_native_separators (this.item.file)));
             return;
         }
         GLib.assert (this.item.modtime > 0);
@@ -526,7 +526,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
             || this.item.instruction == SyncInstructions.TYPE_CHANGE) {
             var vfs = propagator ().sync_options.vfs;
             var pin = vfs.pin_state (this.item.file);
-            if (pin && *pin == PinState.VfsItemAvailability.ONLINE_ONLY) {
+            if (pin && *pin == Vfs.ItemAvailability.ONLINE_ONLY) {
                 if (!vfs.pin_state (this.item.file, PinState.PinState.UNSPECIFIED)) {
                     GLib.warning ("Could not set pin state of " + this.item.file + " to unspecified");
                 }

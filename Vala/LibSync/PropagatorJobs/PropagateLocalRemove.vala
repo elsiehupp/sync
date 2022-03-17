@@ -38,20 +38,20 @@ public class PropagateLocalRemove : PropagateItemJob {
         GLib.info ("Going to delete:" + filename);
 
         if (propagator ().local_filename_clash (this.item.file)) {
-            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Could not remove %1 because of a local file name clash").printf (QDir.to_native_separators (filename)));
+            on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Could not remove %1 because of a local file name clash").printf (GLib.Dir.to_native_separators (filename)));
             return;
         }
 
         string remove_error;
         if (this.move_to_trash) {
-            if ( (QDir (filename).exists () || FileSystem.file_exists (filename))
+            if ( (GLib.Dir (filename).exists () || FileSystem.file_exists (filename))
                 && !FileSystem.move_to_trash (filename, remove_error)) {
                 on_signal_done (SyncFileItem.Status.NORMAL_ERROR, remove_error);
                 return;
             }
         } else {
             if (this.item.is_directory ()) {
-                if (QDir (filename).exists () && !remove_recursively ("")) {
+                if (GLib.Dir (filename).exists () && !remove_recursively ("")) {
                     on_signal_done (SyncFileItem.Status.NORMAL_ERROR, this.error);
                     return;
                 }

@@ -13,7 +13,7 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 namespace Occ {
 namespace LibSync {
 
-public class VfsXAttr : Vfs {
+public class VfsXAttr : AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
@@ -24,7 +24,7 @@ public class VfsXAttr : Vfs {
 
     /***********************************************************
     ***********************************************************/
-    public Vfs.Mode mode () {
+    public AbstractVfs.Mode mode () {
         return XAttr;
     }
 
@@ -170,7 +170,7 @@ public class VfsXAttr : Vfs {
             stat.type = should_download ? ItemType.VIRTUAL_FILE_DOWNLOAD : ItemType.VIRTUAL_FILE;
             return true;
         } else {
-            var should_dehydrate = pin && (*pin == PinState.VfsItemAvailability.ONLINE_ONLY);
+            var should_dehydrate = pin && (*pin == Vfs.ItemAvailability.ONLINE_ONLY);
             if (should_dehydrate) {
                 stat.type = ItemType.VIRTUAL_FILE_DEHYDRATION;
                 return true;
@@ -210,7 +210,7 @@ public class VfsXAttr : Vfs {
 
     /***********************************************************
     ***********************************************************/
-    protected void start_impl (VfsSetupParams parameters) {
+    protected void start_impl (Vfs.SetupParameters parameters) {
         return;
     }
 

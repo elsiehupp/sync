@@ -77,14 +77,14 @@ public class SyncFileStatusTracker : GLib.Object {
     private GLib.HashTable<string, int> sync_count;
 
 
-    internal signal void file_status_changed (string system_filename, SyncFileStatus file_status);
+    internal signal void signal_file_status_changed (string system_filename, SyncFileStatus file_status);
 
 
     /***********************************************************
     ***********************************************************/
     public SyncFileStatusTracker (SyncEngine sync_engine) {
         this.sync_engine = sync_engine;
-        connect (sync_engine, SyncEngine.about_to_propagate,
+        connect (sync_engine, SyncEngine.signal_about_to_propagate,
             this, SyncFileStatusTracker.on_signal_about_to_propagate);
         connect (sync_engine, SyncEngine.signal_item_completed,
             this, SyncFileStatusTracker.on_signal_item_completed);
@@ -103,7 +103,7 @@ public class SyncFileStatusTracker : GLib.Object {
         string local_path = filename.mid (folder_path.size ());
         this.dirty_paths.insert (local_path);
 
-        /* emit */ file_status_changed (filename, SyncFileStatus.SyncFileStatusTag.STATUS_SYNC);
+        /* emit */ signal_file_status_changed (filename, SyncFileStatus.SyncFileStatusTag.STATUS_SYNC);
     }
 
 
@@ -112,7 +112,7 @@ public class SyncFileStatusTracker : GLib.Object {
     ***********************************************************/
     public void on_signal_add_silently_excluded (string folder_path) {
         this.sync_problems[folder_path] = SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED;
-        /* emit */ file_status_changed (get_system_destination (folder_path), resolve_sync_and_error_status (folder_path, SharedFlag.NOT_SHARED));
+        /* emit */ signal_file_status_changed (get_system_destination (folder_path), resolve_sync_and_error_status (folder_path, SharedFlag.NOT_SHARED));
     }
 
 
@@ -143,7 +143,7 @@ public class SyncFileStatusTracker : GLib.Object {
                 // Mark this path as syncing for instructions that will result in propagation.
                 inc_sync_count_and_emit_status_changed (item.destination (), shared_flag);
             } else {
-                /* emit */ file_status_changed (get_system_destination (item.destination ()), resolve_sync_and_error_status (item.destination (), shared_flag));
+                /* emit */ signal_file_status_changed (get_system_destination (item.destination ()), resolve_sync_and_error_status (item.destination (), shared_flag));
             }
         }
 
@@ -153,7 +153,7 @@ public class SyncFileStatusTracker : GLib.Object {
         GLib.List<string> old_dirty_paths;
         std.swap (this.dirty_paths, old_dirty_paths);
         foreach (var old_dirty_path in q_as_const (old_dirty_paths))
-            /* emit */ file_status_changed (get_system_destination (old_dirty_path), file_status (old_dirty_path));
+            /* emit */ signal_file_status_changed (get_system_destination (old_dirty_path), file_status (old_dirty_path));
 
         // Make sure to push any status that might have been resolved indirectly since the last sync
         // (like an error file being deleted from disk)
@@ -164,7 +164,7 @@ public class SyncFileStatusTracker : GLib.Object {
             SyncFileStatus.SyncFileStatusTag severity = old_problem.second;
             if (severity == SyncFileStatus.SyncFileStatusTag.STATUS_ERROR)
                 invalidate_parent_paths (path);
-            /* emit */ file_status_changed (get_system_destination (path), file_status (path));
+            /* emit */ signal_file_status_changed (get_system_destination (path), file_status (path));
         }
     }
 
@@ -191,7 +191,7 @@ public class SyncFileStatusTracker : GLib.Object {
             // dec_sync_count calls must* be symetric with inc_sync_count calls in on_signal_about_to_propagate
             dec_sync_count_and_emit_status_changed (item.destination (), shared_flag);
         } else {
-            /* emit */ file_status_changed (get_system_destination (item.destination ()), resolve_sync_and_error_status (item.destination (), shared_flag));
+            /* emit */ signal_file_status_changed (get_system_destination (item.destination ()), resolve_sync_and_error_status (item.destination (), shared_flag));
         }
     }
 
@@ -208,7 +208,7 @@ public class SyncFileStatusTracker : GLib.Object {
                 continue;
             }
 
-            /* emit */ file_status_changed (get_system_destination (it.key ()), file_status (it.key ()));
+            /* emit */ signal_file_status_changed (get_system_destination (it.key ()), file_status (it.key ()));
         }
     }
 
@@ -216,7 +216,7 @@ public class SyncFileStatusTracker : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_sync_engine_running_changed () {
-        /* emit */ file_status_changed (get_system_destination (""), resolve_sync_and_error_status ("", SharedFlag.NOT_SHARED));
+        /* emit */ signal_file_status_changed (get_system_destination (""), resolve_sync_and_error_status ("", SharedFlag.NOT_SHARED));
     }
 
 
@@ -279,7 +279,7 @@ public class SyncFileStatusTracker : GLib.Object {
         string[] split_path = path.split ("/", Qt.SkipEmptyParts);
         for (int i = 0; i < split_path.size (); ++i) {
             string parent_path = split_path.mid (0, i).join ("/");
-            /* emit */ file_status_changed (get_system_destination (parent_path), file_status (parent_path));
+            /* emit */ signal_file_status_changed (get_system_destination (parent_path), file_status (parent_path));
         }
     }
 
@@ -306,7 +306,7 @@ public class SyncFileStatusTracker : GLib.Object {
             SyncFileStatus status = shared_flag == SharedFlag.UNKNOWN_SHARED
                 ? file_status (relative_path)
                 : resolve_sync_and_error_status (relative_path, shared_flag);
-            /* emit */ file_status_changed (get_system_destination (relative_path), status);
+            /* emit */ signal_file_status_changed (get_system_destination (relative_path), status);
 
             // We passed from OK to SYNC, increment the parent to keep it marked as
             // SYNC while we propagate ourselves and our own children.
@@ -331,7 +331,7 @@ public class SyncFileStatusTracker : GLib.Object {
             SyncFileStatus status = shared_flag == SharedFlag.UNKNOWN_SHARED
                 ? file_status (relative_path)
                 : resolve_sync_and_error_status (relative_path, shared_flag);
-            /* emit */ file_status_changed (get_system_destination (relative_path), status);
+            /* emit */ signal_file_status_changed (get_system_destination (relative_path), status);
 
             // We passed from SYNC to OK, decrement our parent.
             //  ASSERT (!relative_path.has_suffix ("/"));
@@ -358,7 +358,7 @@ public class SyncFileStatusTracker : GLib.Object {
         // and CSync.ExcludedFiles.Type.EXCLUDE_AND_REMOVE excludes. Even though it's possible
         // that the status of CSync.ExcludedFiles.Type.LIST excludes will change if the user
         // update the exclude list at runtime and doing it statically here removes
-        // our ability to notify changes through the file_status_changed signal,
+        // our ability to notify changes through the signal_file_status_changed signal,
         // it's an acceptable compromize to treat all exclude types the same.
         // Update : This extra check shouldn't hurt even though silently excluded files
         // are now available via on_signal_add_silently_excluded ().

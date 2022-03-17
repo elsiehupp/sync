@@ -195,8 +195,8 @@ public class TestSyncMove : GLib.Object {
         var expected_server_state = fake_folder.current_remote_state ();
 
         // Remove sub_folder_a with selective_sync:
-        fake_folder.sync_engine ().journal ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, { "parent_folder/sub_folder_a/" });
-        fake_folder.sync_engine ().journal ().schedule_path_for_remote_discovery ("parent_folder/sub_folder_a/");
+        fake_folder.sync_engine.journal ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, { "parent_folder/sub_folder_a/" });
+        fake_folder.sync_engine.journal ().schedule_path_for_remote_discovery ("parent_folder/sub_folder_a/");
 
         fake_folder.sync_once ();
 
@@ -944,7 +944,7 @@ public class TestSyncMove : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void test_moved_with_error_data () {
-        QTest.add_column<Vfs.Mode> ("vfs_mode");
+        QTest.add_column<AbstractVfs.Mode> ("vfs_mode");
 
         QTest.new_row ("Vfs.Off") + Vfs.Off;
         QTest.new_row ("Vfs.WithSuffix") + Vfs.WithSuffix;
@@ -954,7 +954,7 @@ public class TestSyncMove : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void test_moved_with_error () {
-        QFETCH (Vfs.Mode, vfs_mode);
+        QFETCH (AbstractVfs.Mode, vfs_mode);
         const string src = "folder/folder_a/file.txt";
         const string dest = "folder/folder_b/file.txt";
         FakeFolder fake_folder = new FakeFolder (
@@ -974,9 +974,9 @@ public class TestSyncMove : GLib.Object {
                 }
             )
         );
-        var sync_opts = fake_folder.sync_engine ().sync_options ();
+        var sync_opts = fake_folder.sync_engine.sync_options ();
         sync_opts.parallel_network_jobs = 0;
-        fake_folder.sync_engine ().set_sync_options (sync_opts);
+        fake_folder.sync_engine.set_sync_options (sync_opts);
 
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
@@ -984,7 +984,7 @@ public class TestSyncMove : GLib.Object {
             var vfs = unowned<Vfs> (create_vfs_from_plugin (vfs_mode).release ());
             GLib.assert_true (vfs);
             fake_folder.switch_to_vfs (vfs);
-            fake_folder.sync_journal ().internal_pin_states ().set_for_path ("", PinState.VfsItemAvailability.ONLINE_ONLY);
+            fake_folder.sync_journal ().internal_pin_states ().set_for_path ("", Vfs.ItemAvailability.ONLINE_ONLY);
 
             // make files virtual
             fake_folder.sync_once ();
@@ -1019,7 +1019,7 @@ public class TestSyncMove : GLib.Object {
     }
 
 
-    private static string get_name (Vfs.Mode vfs_mode, string s) {
+    private static string get_name (AbstractVfs.Mode vfs_mode, string s) {
         if (vfs_mode == Vfs.WithSuffix) {
             return s + APPLICATION_DOTVIRTUALFILE_SUFFIX;
         }

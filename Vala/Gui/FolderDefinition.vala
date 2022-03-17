@@ -48,7 +48,7 @@ public class FolderDefinition {
     /***********************************************************
     Which virtual files setting the folder uses
     ***********************************************************/
-    public Vfs.Mode virtual_files_mode = Vfs.Off;
+    public AbstractVfs.Mode virtual_files_mode = Vfs.Off;
 
     /***********************************************************
     The CLSID where this folder appears in registry for the Explorer navigation pane entry.
@@ -70,7 +70,7 @@ public class FolderDefinition {
         settings.value ("paused", folder.paused);
         settings.value ("ignore_hidden_files", folder.ignore_hidden_files);
 
-        settings.value ("virtual_files_mode", Vfs.Mode.to_string (folder.virtual_files_mode));
+        settings.value ("virtual_files_mode", AbstractVfs.Mode.to_string (folder.virtual_files_mode));
 
         // Ensure new vfs modes won't be attempted by older clients
         if (folder.virtual_files_mode == Vfs.WindowsCfApi) {
@@ -104,7 +104,7 @@ public class FolderDefinition {
         folder.virtual_files_mode = Vfs.Off;
         string vfs_mode_string = settings.value ("virtual_files_mode").to_string ();
         if (!vfs_mode_string == "") {
-            if (var mode = Vfs.Mode.from_string (vfs_mode_string)) {
+            if (var mode = AbstractVfs.Mode.from_string (vfs_mode_string)) {
                 folder.virtual_files_mode = *mode;
             } else {
                 GLib.warning ("Unknown virtual_files_mode:" + vfs_mode_string + "assuming 'off'";
@@ -144,7 +144,7 @@ public class FolderDefinition {
     Ensure / as separator and trailing /.
     ***********************************************************/
     public static string prepare_local_path (string path) {
-        string p = QDir.from_native_separators (path);
+        string p = GLib.Dir.from_native_separators (path);
         if (!p.ends_with ('/')) {
             p.append ('/');
         }
@@ -174,7 +174,7 @@ public class FolderDefinition {
     ***********************************************************/
     public string absolute_journal_path ();
     string FolderDefinition.absolute_journal_path () {
-        return QDir (local_path).file_path (journal_path);
+        return GLib.Dir (local_path).file_path (journal_path);
     }
 
 
@@ -183,7 +183,7 @@ public class FolderDefinition {
     this folder and account.
     ***********************************************************/
     public string default_journal_path (unowned Account account) {
-        return SyncJournalDb.make_database_name (local_path, account.url (), target_path, account.credentials ().user ());
+        return SyncJournalDb.make_database_name (local_path, account.url, target_path, account.credentials ().user ());
     }
 
 } // class FolderDefinition

@@ -70,7 +70,7 @@ public class SocketUploadJob : GLib.Object {
         );
         connect (
             this.engine,
-            Occ.SyncEngine.sync_error,
+            Occ.SyncEngine.signal_sync_error,
             this,
             this.on_signal_sync_engine_sync_error
         );
@@ -132,7 +132,7 @@ public class SocketUploadJob : GLib.Object {
         );
         connect (
             mkcol_job,
-            Occ.MkColJob.finished_with_error,
+            Occ.MkColJob.signal_finished_with_error,
             this,
             this.on_signal_mkcol_job_finished_with_error
         );

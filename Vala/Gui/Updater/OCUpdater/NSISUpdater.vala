@@ -64,7 +64,7 @@ public class NSISUpdater : OCUpdater {
     private void on_signal_seen_version () {
         ConfigFile config;
         QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
-        settings.value (seen_version_c, update_info ().version ());
+        settings.value (seen_version_c, update_info ().version);
     }
 
 
@@ -78,7 +78,7 @@ public class NSISUpdater : OCUpdater {
             return;
         }
 
-        GLib.Uri url = new GLib.Uri (reply.url ());
+        GLib.Uri url = new GLib.Uri (reply.url);
         this.file.close ();
 
         ConfigFile config;
@@ -93,7 +93,7 @@ public class NSISUpdater : OCUpdater {
         GLib.File.copy (this.file.filename (), this.target_file);
         download_state (DownloadState.DOWNLOAD_COMPLETE);
         GLib.info ("Downloaded " + url.to_string () + "to" + this.target_file);
-        settings.value (update_target_version_c, update_info ().version ());
+        settings.value (update_target_version_c, update_info ().version);
         settings.value (update_target_version_string_c, update_info ().version_string ());
         settings.value (update_available_c, this.target_file);
     }
@@ -150,7 +150,7 @@ public class NSISUpdater : OCUpdater {
         string txt = _("<p>A new version of the %1 Client is available.</p>"
                      + "<p><b>%2</b> is available for download. The installed version is %3.</p>")
                         .printf (
-                            Utility.escape (Theme.instance.app_name_gui ()),
+                            Utility.escape (Theme.app_name_gui),
                             Utility.escape (info.version_string ()), Utility.escape (client_version ())
                         );
 
@@ -204,7 +204,7 @@ public class NSISUpdater : OCUpdater {
         string txt = _("<p>A new version of the %1 Client is available but the updating process failed.</p>"
                      + "<p><b>%2</b> has been downloaded. The installed version is %3. If you confirm restart and update, your computer may reboot to complete the installation.</p>")
                         .printf (
-                            Utility.escape (Theme.instance.app_name_gui ()),
+                            Utility.escape (Theme.app_name_gui),
                             Utility.escape (target_version), Utility.escape (client_version ())
                         );
 
@@ -279,18 +279,18 @@ public class NSISUpdater : OCUpdater {
     private override void version_info_arrived (UpdateInfo info) {
         ConfigFile config;
         QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
-        int64 info_version = Helper.string_version_to_int (info.version ());
+        int64 info_version = Helper.string_version_to_int (info.version);
         var seen_string = settings.value (seen_version_c).to_string ();
         int64 seen_version = Helper.string_version_to_int (seen_string);
         int64 curr_version = Helper.current_version_to_int ();
         GLib.info ("Version info arrived:"
                 + "Your version:" + curr_version
                 + "Skipped version:" + seen_version + seen_string
-                + "Available version:" + info_version + info.version ()
+                + "Available version:" + info_version + info.version
                 + "Available version string:" + info.version_string ()
                 + "Web url:" + info.web ()
                 + "Download url:" + info.download_url ());
-        if (info.version () == "") {
+        if (info.version == "") {
             GLib.info ("No version information available at the moment.");
             download_state (DownloadState.UP_TO_DATE);
         } else if (info_version <= curr_version

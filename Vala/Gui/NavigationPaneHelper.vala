@@ -4,8 +4,8 @@ Copyright (C) by Jocelyn Turcotte <jturcotte@woboq.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <QDir>
-//  #include <QCoreApplication>
+//  #include <GLib.Dir>
+//  #include <Gtk.Application>
 //  #include <QTimer>
 
 namespace Occ {
@@ -69,7 +69,7 @@ public class NavigationPaneHelper : GLib.Object {
     private void update_cloud_storage_registry () {
         // Start by looking at every registered namespace extension for the sidebar, and look for an "Application_name" value
         // that matches ours when we saved.
-        GLib.Vector<QUuid> entries_to_remove;
+        GLib.List<QUuid> entries_to_remove;
 
         // Only save folder entries if the option is enabled.
         if (this.show_in_explorer_navigation_pane) {
@@ -91,8 +91,8 @@ public class NavigationPaneHelper : GLib.Object {
                     if (AccountManager.instance.accounts ().size () > 1) {
                         title = title % " - " % folder.account_state ().account.display_name ();
                     }
-                    string icon_path = QDir.to_native_separators (Gtk.Application.application_file_path ());
-                    string target_folder_path = QDir.to_native_separators (folder.clean_path ());
+                    string icon_path = GLib.Dir.to_native_separators (Gtk.Application.application_file_path ());
+                    string target_folder_path = GLib.Dir.to_native_separators (folder.clean_path ());
 
                     GLib.info ("Explorer Cloud storage provider: saving path " + target_folder_path + " to CLSID " + clsid_str);
 

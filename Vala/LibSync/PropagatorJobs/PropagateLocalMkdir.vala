@@ -43,8 +43,8 @@ public class PropagateLocalMkdir : PropagateItemJob {
     /***********************************************************
     ***********************************************************/
     private void start_local_mkdir () {
-        QDir new_dir = new QDir (propagator ().full_local_path (this.item.file));
-        string new_dir_str = QDir.to_native_separators (new_dir.path ());
+        GLib.Dir new_dir = new GLib.Dir (propagator ().full_local_path (this.item.file));
+        string new_dir_str = GLib.Dir.to_native_separators (new_dir.path ());
 
         // When turning something that used to be a file into a directory
         // we need to delete the file first.
@@ -73,7 +73,7 @@ public class PropagateLocalMkdir : PropagateItemJob {
             return;
         }
         /* emit */ propagator ().signal_touched_file (new_dir_str);
-        QDir local_dir = new QDir (propagator ().local_path ());
+        GLib.Dir local_dir = new GLib.Dir (propagator ().local_path ());
         if (!local_dir.mkpath (this.item.file)) {
             on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Could not create folder %1").printf (new_dir_str));
             return;

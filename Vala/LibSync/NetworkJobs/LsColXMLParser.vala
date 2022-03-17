@@ -25,9 +25,9 @@ public class LsColXMLParser : GLib.Object {
         string expected_path);
 
 
-    internal signal void directory_listing_subfolders (string[] items);
-    internal signal void directory_listing_iterated (string name, GLib.HashTable<string, string> properties);
-    internal signal void finished_with_error (GLib.InputStream reply);
+    internal signal void signal_directory_listing_subfolders (string[] items);
+    internal signal void signal_directory_listing_iterated (string name, GLib.HashTable<string, string> properties);
+    internal signal void signal_finished_with_error (GLib.InputStream reply);
     internal signal void finished_without_error ();
 
 
@@ -108,7 +108,7 @@ public class LsColXMLParser : GLib.Object {
                         if (current_href.has_suffix ("/")) {
                             current_href.chop (1);
                         }
-                        /* emit */ directory_listing_iterated (current_href, current_http200Properties);
+                        /* emit */ signal_directory_listing_iterated (current_href, current_http200Properties);
                         current_href.clear ();
                         current_http200Properties.clear ();
                     } else if (reader.name () == "propstat") {
@@ -126,14 +126,14 @@ public class LsColXMLParser : GLib.Object {
         }
 
         if (reader.has_error ()) {
-            // XML Parser error? Whatever had been emitted before will come as directory_listing_iterated
+            // XML Parser error? Whatever had been emitted before will come as signal_directory_listing_iterated
             GLib.warning ("ERROR " + reader.error_string () + xml);
             return false;
         } else if (!inside_multi_status) {
             GLib.warning ("ERROR no WebDAV response? " + xml.to_string ());
             return false;
         } else {
-            /* emit */ directory_listing_subfolders (folders);
+            /* emit */ signal_directory_listing_subfolders (folders);
             /* emit */ finished_without_error ();
         }
         return true;

@@ -6,7 +6,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 
 //  #ifndef TOKEN_AUTH_ONLY
 //  #include <Gtk.Icon>
-//  #include <QCoreApplication>
+//  #include <Gtk.Application>
 
 namespace Occ {
 namespace LibSync {

@@ -4,7 +4,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <QDir>
+//  #include <GLib.Dir>
 
 namespace Occ {
 namespace LibSync {
@@ -71,7 +71,7 @@ public class PropagateRemoteMove : PropagateItemJob {
         }
 
         string remote_source = propagator ().full_remote_path (origin);
-        string remote_destination = QDir.clean_path (propagator ().account.dav_url ().path () + propagator ().full_remote_path (this.item.rename_target));
+        string remote_destination = GLib.Dir.clean_path (propagator ().account.dav_url ().path () + propagator ().full_remote_path (this.item.rename_target));
 
         var vfs = propagator ().sync_options.vfs;
         var itype = this.item.type;

@@ -8,11 +8,11 @@ public class FakeDeleteReply : FakeReply {
     public FakeDeleteReply (FileInfo remote_root_file_info, Soup.Operation operation, Soup.Request request, GLib.Object parent) {
         base (parent);
         set_request (request);
-        set_url (request.url ());
+        set_url (request.url);
         set_operation (operation);
         open (QIODevice.ReadOnly);
     
-        string filename = get_file_path_from_url (request.url ());
+        string filename = get_file_path_from_url (request.url);
         GLib.assert_true (!filename == "");
         remote_root_file_info.remove (filename);
         QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);

@@ -210,7 +210,7 @@ public class NetworkSettings : Gtk.Widget {
             // Check if at least one account is using localhost, because Qt proxy settings have no
             // effect for localhost (#7169)
             foreach (var account in AccountManager.instance.accounts ()) {
-                const var host = account.account.url ().host ();
+                const var host = account.account.url.host ();
                 // Some typical url for localhost
                 if (host == "localhost" || host.starts_with ("127.") || host == "[.1]") {
                     visible = true;
@@ -240,7 +240,7 @@ public class NetworkSettings : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void load_proxy_settings () {
-        if (Theme.instance.force_system_network_proxy ()) {
+        if (Theme.force_system_network_proxy) {
             this.ui.system_proxy_radio_button.checked (true);
             this.ui.proxy_group_box.enabled (false);
             return;

@@ -53,13 +53,13 @@ public class PropagateDownloadEncrypted : GLib.Object {
         );
         connect (
             job,
-            LsColJob.directory_listing_subfolders,
+            LsColJob.signal_directory_listing_subfolders,
             this,
             PropagateDownloadEncrypted.on_signal_check_folder_id
         );
         connect (
             job,
-            LsColJob.finished_with_error,
+            LsColJob.signal_finished_with_error,
             this,
             PropagateDownloadEncrypted.on_signal_folder_id_error
         );

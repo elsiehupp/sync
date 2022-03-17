@@ -11,7 +11,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <qtemporaryfile.h>
 //  #include <qsavefile.h>
 //  #include <qstack.h>
-//  #include <QCoreApplication>
+//  #include <Gtk.Application>
 //  #include <ctime>
 
 namespace Occ {

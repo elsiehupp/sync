@@ -232,11 +232,11 @@ public class HttpCredentials : AbstractCredentials {
             // and we'll just store the bundle password in the keychain. That's prefered
             // since the keychain on older Windows platforms can only store a limited number
             // of bytes per entry and key/cert may exceed that.
-            var job = new QKeychain.WritePasswordJob (Theme.instance.app_name ());
+            var job = new QKeychain.WritePasswordJob (Theme.app_name);
             add_settings_to_job (this.account, job);
             job.insecure_fallback (false);
             connect (job, QKeychain.Job.on_signal_finished, this, HttpCredentials.on_signal_write_client_cert_password_job_done);
-            job.key (keychain_key (this.account.url ().to_string (), this.user + CLIENT_CERT_PASSWORD_C, this.account.identifier ()));
+            job.key (keychain_key (this.account.url.to_string (), this.user + CLIENT_CERT_PASSWORD_C, this.account.identifier ()));
             job.binary_data (this.client_cert_password);
             job.start ();
             this.client_cert_bundle.clear ();
@@ -245,11 +245,11 @@ public class HttpCredentials : AbstractCredentials {
             // Option 2, pre 2.6 configs: We used to store the raw cert/key in the keychain and
             // still do so if no bundle is available. We can't currently migrate to Option 1
             // because we have no functions for creating an encrypted pkcs12 bundle.
-            var job = new QKeychain.WritePasswordJob (Theme.instance.app_name ());
+            var job = new QKeychain.WritePasswordJob (Theme.app_name);
             add_settings_to_job (this.account, job);
             job.insecure_fallback (false);
             connect (job, QKeychain.Job.on_signal_finished, this, HttpCredentials.on_signal_write_client_cert_pem_job_done);
-            job.key (keychain_key (this.account.url ().to_string (), this.user + CLIENT_CERTIFICATE_PEM_C, this.account.identifier ()));
+            job.key (keychain_key (this.account.url.to_string (), this.user + CLIENT_CERTIFICATE_PEM_C, this.account.identifier ()));
             job.binary_data (this.client_ssl_certificate.to_pem ());
             job.start ();
         } else {
@@ -271,7 +271,7 @@ public class HttpCredentials : AbstractCredentials {
         // User must be fetched from config file to generate a valid key
         fetch_user ();
 
-        const string kck = keychain_key (this.account.url ().to_string (), this.user, this.account.identifier ());
+        const string kck = keychain_key (this.account.url.to_string (), this.user, this.account.identifier ());
         if (kck == "") {
             GLib.warning ("InvalidateToken: User is empty; bailing out!");
             return;
@@ -286,7 +286,7 @@ public class HttpCredentials : AbstractCredentials {
             return;
         }
 
-        var job = new QKeychain.DeletePasswordJob (Theme.instance.app_name ());
+        var job = new QKeychain.DeletePasswordJob (Theme.app_name);
         add_settings_to_job (this.account, job);
         job.insecure_fallback (true);
         job.key (kck);
@@ -335,12 +335,12 @@ public class HttpCredentials : AbstractCredentials {
         if (this.refresh_token == "")
             return false;
 
-        GLib.Uri request_token = Utility.concat_url_path (this.account.url (), "/index.php/apps/oauth2/api/v1/token");
+        GLib.Uri request_token = Utility.concat_url_path (this.account.url, "/index.php/apps/oauth2/api/v1/token");
         Soup.Request request = new Soup.Request ();
         request.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
 
         string basic_auth = "%1:%2".printf (
-            Theme.instance.oauth_client_id (), Theme.instance.oauth_client_secret ());
+            Theme.oauth_client_id, Theme.oauth_client_secret);
         request.raw_header ("Authorization", "Basic " + basic_auth.to_utf8 ().to_base64 ());
         request.attribute (HttpCredentials.DontAddCredentialsAttribute, true);
 
@@ -424,7 +424,7 @@ public class HttpCredentials : AbstractCredentials {
         //  Q_UNUSED (authenticator)
         // Because of issue #4326, we need to set the login and password manually at every requests
         // Thus, if we reach this signal, those credentials were invalid and we terminate.
-        GLib.warning ("Stop request: Authentication failed for " + reply.url ().to_string ());
+        GLib.warning ("Stop request: Authentication failed for " + reply.url.to_string ());
         reply.property (AUTHENTICATION_FAILED_C, true);
 
         if (this.is_renewing_oauth_token) {
@@ -478,11 +478,11 @@ public class HttpCredentials : AbstractCredentials {
 
         // Load key too
         const string kck = keychain_key (
-            this.account.url ().to_string (),
+            this.account.url.to_string (),
             this.user + CLIENT_KEY_PEM_C,
             this.keychain_migration ? "" : this.account.identifier ());
 
-        var job = new QKeychain.ReadPasswordJob (Theme.instance.app_name ());
+        var job = new QKeychain.ReadPasswordJob (Theme.app_name);
         add_settings_to_job (this.account, job);
         job.insecure_fallback (false);
         job.key (kck);
@@ -521,11 +521,11 @@ public class HttpCredentials : AbstractCredentials {
     ***********************************************************/
     private void on_signal_read_password_from_keychain () {
         const string kck = keychain_key (
-            this.account.url ().to_string (),
+            this.account.url.to_string (),
             this.user,
             this.keychain_migration ? "" : this.account.identifier ());
 
-        var job = new QKeychain.ReadPasswordJob (Theme.instance.app_name ());
+        var job = new QKeychain.ReadPasswordJob (Theme.app_name);
         add_settings_to_job (this.account, job);
         job.insecure_fallback (false);
         job.key (kck);
@@ -558,11 +558,11 @@ public class HttpCredentials : AbstractCredentials {
 
         // write ssl key if there is one
         if (!this.client_ssl_key.is_null ()) {
-            var job = new QKeychain.WritePasswordJob (Theme.instance.app_name ());
+            var job = new QKeychain.WritePasswordJob (Theme.app_name);
             add_settings_to_job (this.account, job);
             job.insecure_fallback (false);
             connect (job, QKeychain.Job.on_signal_finished, this, HttpCredentials.on_signal_write_client_key_pem_job_done);
-            job.key (keychain_key (this.account.url ().to_string (), this.user + CLIENT_KEY_PEM_C, this.account.identifier ()));
+            job.key (keychain_key (this.account.url.to_string (), this.user + CLIENT_KEY_PEM_C, this.account.identifier ()));
             job.binary_data (this.client_ssl_key.to_pem ());
             job.start ();
         } else {
@@ -642,11 +642,11 @@ public class HttpCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     private void on_signal_write_password_to_keychain () {
-        var job = new QKeychain.WritePasswordJob (Theme.instance.app_name ());
+        var job = new QKeychain.WritePasswordJob (Theme.app_name);
         add_settings_to_job (this.account, job);
         job.insecure_fallback (false);
         connect (job, QKeychain.Job.on_signal_finished, this, HttpCredentials.on_signal_write_job_done);
-        job.key (keychain_key (this.account.url ().to_string (), this.user, this.account.identifier ()));
+        job.key (keychain_key (this.account.url.to_string (), this.user, this.account.identifier ()));
         job.text_data (is_using_oauth () ? this.refresh_token : this.password);
         job.start ();
     }
@@ -676,10 +676,10 @@ public class HttpCredentials : AbstractCredentials {
         if (!this.client_cert_bundle == "") {
             // New case (>=2.6) : We have a bundle in the settings and read the password from
             // the keychain
-            var job = new QKeychain.ReadPasswordJob (Theme.instance.app_name ());
+            var job = new QKeychain.ReadPasswordJob (Theme.app_name);
             add_settings_to_job (this.account, job);
             job.insecure_fallback (false);
-            job.key (keychain_key (this.account.url ().to_string (), this.user + CLIENT_CERT_PASSWORD_C, this.account.identifier ()));
+            job.key (keychain_key (this.account.url.to_string (), this.user + CLIENT_CERT_PASSWORD_C, this.account.identifier ()));
             connect (job, QKeychain.Job.on_signal_finished, this, HttpCredentials.on_signal_read_client_cert_password_job_done);
             job.start ();
             return;
@@ -687,11 +687,11 @@ public class HttpCredentials : AbstractCredentials {
 
         // Old case (pre 2.6) : Read client cert and then key from keychain
         const string kck = keychain_key (
-            this.account.url ().to_string (),
+            this.account.url.to_string (),
             this.user + CLIENT_CERTIFICATE_PEM_C,
             this.keychain_migration ? "" : this.account.identifier ());
 
-        var job = new QKeychain.ReadPasswordJob (Theme.instance.app_name ());
+        var job = new QKeychain.ReadPasswordJob (Theme.app_name);
         add_settings_to_job (this.account, job);
         job.insecure_fallback (false);
         job.key (kck);
@@ -712,10 +712,10 @@ public class HttpCredentials : AbstractCredentials {
 
 
     private void start_delete_job (string user) {
-        var job = new QKeychain.DeletePasswordJob (Theme.instance.app_name ());
+        var job = new QKeychain.DeletePasswordJob (Theme.app_name);
         add_settings_to_job (this.account, job);
         job.insecure_fallback (true);
-        job.key (keychain_key (this.account.url ().to_string (), user, ""));
+        job.key (keychain_key (this.account.url.to_string (), user, ""));
         job.start ();
     }
 
@@ -768,7 +768,7 @@ public class HttpCredentials : AbstractCredentials {
     ***********************************************************/
     private static void add_settings_to_job (Account account, QKeychain.Job job) {
         //  Q_UNUSED (account);
-        var settings = ConfigFile.settings_with_group (Theme.instance.app_name ());
+        var settings = ConfigFile.settings_with_group (Theme.app_name);
         settings.parent (job); // make the job parent to make setting deleted properly
         job.settings (settings.release ());
     }

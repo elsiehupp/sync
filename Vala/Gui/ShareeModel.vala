@@ -12,7 +12,7 @@ public class ShareeModel : QAbstractListModel {
     /***********************************************************
     FIXME: make it a GLib.List<Sharee> when Sharee can be compared
     ***********************************************************/
-    public class ShareeSet : GLib.Vector<unowned Sharee> { }
+    public class ShareeSet : GLib.List<unowned Sharee> { }
 
     /***********************************************************
     ***********************************************************/
@@ -41,8 +41,8 @@ public class ShareeModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.Vector<unowned Sharee> sharees;
-    private GLib.Vector<unowned Sharee> sharee_blocklist;
+    private GLib.List<unowned Sharee> sharees;
+    private GLib.List<unowned Sharee> sharee_blocklist;
 
     internal signal void signal_sharees_ready ();
     internal signal void signal_display_error_message (int code, string value);
@@ -85,11 +85,11 @@ public class ShareeModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     private void on_signal_sharees_fetched (QJsonDocument reply) {
-        GLib.Vector<unowned Sharee> new_sharees;
+        GLib.List<unowned Sharee> new_sharees;
         {
             const string[] sharee_types {"users", "groups", "emails", "remotes", "circles", "rooms"};
 
-            const var append_sharees = [this, sharee_types] (QJsonObject data, GLib.Vector<unowned Sharee>& out) {
+            const var append_sharees = [this, sharee_types] (QJsonObject data, GLib.List<unowned Sharee>& out) {
                 for (var sharee_type : sharee_types) {
                     const var category = data.value (sharee_type).to_array ();
                     for (var sharee : category) {
@@ -103,7 +103,7 @@ public class ShareeModel : QAbstractListModel {
         }
 
         // Filter sharees that we have already shared with
-        GLib.Vector<unowned Sharee> filtered_sharees;
+        GLib.List<unowned Sharee> filtered_sharees;
         foreach (var sharee, new_sharees) {
             bool found = false;
             foreach (var blocklist_sharee, this.sharee_blocklist) {
@@ -128,10 +128,10 @@ public class ShareeModel : QAbstractListModel {
 
     Do that while preserving the model index so the selection stays
     ***********************************************************/
-    private void new_sharees (GLib.Vector<unowned Sharee> new_sharees) {
+    private void new_sharees (GLib.List<unowned Sharee> new_sharees) {
         layout_about_to_be_changed ();
         const var persistent = persistent_index_list ();
-        GLib.Vector<unowned Sharee> old_persistant_sharee;
+        GLib.List<unowned Sharee> old_persistant_sharee;
         old_persistant_sharee.reserve (persistent.size ());
 
         std.transform (persistent.begin (), persistent.end (), std.back_inserter (old_persistant_sharee),

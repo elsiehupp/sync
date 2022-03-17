@@ -52,7 +52,7 @@ public class SetEncryptionFlagApiJob : AbstractNetworkJob {
     public new void start () {
         Soup.Request request = new Soup.Request ();
         request.raw_header ("OCS-APIREQUEST", "true");
-        GLib.Uri url = Utility.concat_url_path (account.url (), path ());
+        GLib.Uri url = Utility.concat_url_path (account.url, path ());
 
         GLib.info ("marking the file with identifier" + this.file_identifier + "as" + (this.flag_action == Set ? "encrypted": "non-encrypted") + ".");
 

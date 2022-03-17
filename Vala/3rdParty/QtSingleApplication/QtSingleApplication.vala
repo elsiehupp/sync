@@ -11,7 +11,7 @@ rights.  These rights are described in the Digia Qt LGPL Exception
 version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
 ***********************************************************/
 
-//  #include <QDir>
+//  #include <GLib.Dir>
 //  #include <QFile_open_even
 //  #include <QShared_memory>
 //  #include <Gtk.Widget>
@@ -72,12 +72,12 @@ public class SingleApplication : Gtk.Application {
             }
         }
         // Add current pid to list and terminate it
-        *pids++ = QCoreApplication.application_pid ();
+        *pids++ = Gtk.Application.application_pid ();
         *pids = 0;
         pid_peer = new QtLocalPeer (
             this,
             app_id + '-' +
-            QCoreApplication.application_pid ().to_string ()
+            Gtk.Application.application_pid ().to_string ()
         );
         pid_peer.signal_message_received.connect (
             this.signal_message_received
@@ -90,7 +90,7 @@ public class SingleApplication : Gtk.Application {
         if (!instances) {
             return;
         }
-        const int64 app_pid = QCoreApplication.application_pid ();
+        const int64 app_pid = Gtk.Application.application_pid ();
         // Rewrite array, removing current pid and previously crashed ones
         var pids = (int64) instances;
         int64 newpids = pids;

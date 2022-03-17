@@ -55,7 +55,7 @@ public class SslButton : QToolButton {
         this.account_state = account_state;
 
         unowned Account account = this.account_state.account;
-        if (account.url ().scheme () == "https") {
+        if (account.url.scheme () == "https") {
             icon (Gtk.Icon (":/client/theme/lock-https.svg"));
             QSslCipher cipher = account.session_cipher;
             tool_tip (_("This connection is encrypted using %1 bit %2.\n").printf (cipher.used_bits ()).printf (cipher.name ()));
@@ -83,7 +83,7 @@ public class SslButton : QToolButton {
             this.menu.add_action ("HTTP/2").enabled (false);
         }
 
-        if (account.url ().scheme () == "https") {
+        if (account.url.scheme () == "https") {
             string ssl_version = account.session_cipher.protocol_string ()
                 + ", " + account.session_cipher.authentication_method ()
                 + ", " + account.session_cipher.key_exchange_method ()

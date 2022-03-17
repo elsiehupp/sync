@@ -125,12 +125,12 @@ public class OAuth : GLib.Object {
 
         string code = rx_match.captured (1); // The 'code' is the first capture of the regexp
 
-        GLib.Uri request_token = Utility.concat_url_path (this.account.url ().to_string (), "/index.php/apps/oauth2/api/v1/token");
+        GLib.Uri request_token = Utility.concat_url_path (this.account.url.to_string (), "/index.php/apps/oauth2/api/v1/token");
         Soup.Request req;
         req.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
 
         string basic_auth = string ("%1:%2").printf (
-            Theme.instance.oauth_client_id (), Theme.instance.oauth_client_secret ());
+            Theme.oauth_client_id, Theme.oauth_client_secret);
         req.raw_header ("Authorization", "Basic " + basic_auth.to_utf8 ().to_base64 ());
         // We just added the Authorization header, don't let HttpCredentialsAccessManager tamper with it
         req.attribute (HttpCredentials.DontAddCredentialsAttribute, true);
@@ -198,7 +198,7 @@ public class OAuth : GLib.Object {
                              + "<p>You logged-in with user <em>%1</em>, but must log in with user <em>%2</em>.<br>"
                              + "Please log out of %3 in another tab, then <a href='%4'>click here</a> "
                              + "and log in as user %2</p>")
-                                  .printf (user, this.expected_user, Theme.instance.app_name_gui (),
+                                  .printf (user, this.expected_user, Theme.app_name_gui,
                                       authorisation_link ().to_string (GLib.Uri.FullyEncoded));
             http_reply_and_close (socket, "200 OK", message.to_utf8 ().const_data ());
             // We are still listening on the socket so we will get the new connection
@@ -218,7 +218,7 @@ public class OAuth : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool open_browser () {
-        if (!Utility.open_browser (authorisation_link ())) {
+        if (!OpenExtrernal.open_browser (authorisation_link ())) {
             // We cannot open the browser, then we claim we don't support OAuth.
             /* emit */ signal_result (Result.NOT_SUPPORTED, "");
             return false;
@@ -262,7 +262,7 @@ public class OAuth : GLib.Object {
             },
             {
                 QLatin1String ("client_id"),
-                Theme.instance.oauth_client_id ()
+                Theme.oauth_client_id
             },
             {
                 QLatin1String ("redirect_uri"),
@@ -271,7 +271,7 @@ public class OAuth : GLib.Object {
         });
         if (!this.expected_user.is_null ())
             query.add_query_item ("user", this.expected_user);
-        GLib.Uri url = Utility.concat_url_path (this.account.url (), QLatin1String ("/index.php/apps/oauth2/authorize"), query);
+        GLib.Uri url = Utility.concat_url_path (this.account.url, QLatin1String ("/index.php/apps/oauth2/authorize"), query);
         return url;
     }
 

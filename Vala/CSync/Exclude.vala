@@ -13,7 +13,7 @@ Copyright (c) 2008-2013 by Andreas Schneider <asn@cryptomilk.
 //  #endif
 
 //  #include <GLib.FileInfo>
-//  #include <QDir>
+//  #include <GLib.Dir>
 
 //  #include <QRegularExpression>
 //  #include <functional>

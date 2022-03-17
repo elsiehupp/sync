@@ -4,7 +4,7 @@ Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <QDir>
+//  #include <GLib.Dir>
 
 namespace Occ {
 namespace LibSync {
@@ -68,7 +68,7 @@ public class MoveJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public bool on_signal_finished () {
-        GLib.info ("MOVE of " + reply ().request ().url ()
+        GLib.info ("MOVE of " + reply ().request ().url
             + " finished with status " + reply_status_string ());
 
         /* emit */ signal_finished ();

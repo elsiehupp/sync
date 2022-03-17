@@ -96,7 +96,7 @@ public class OAuthTestCase : GLib.Object {
         GLib.assert_true (url.to_string ().starts_with (s_oauth_test_server.to_string ()));
         QUrlQuery query = new QUrlQuery (url);
         GLib.assert_true (query.query_item_value ("response_type") == "code");
-        GLib.assert_true (query.query_item_value ("client_id") == Theme.instance.oauth_client_id ());
+        GLib.assert_true (query.query_item_value ("client_id") == Theme.oauth_client_id);
         GLib.Uri redirect_uri = new GLib.Uri (query.query_item_value ("redirect_uri"));
         GLib.assert_true (redirect_uri.host () == "localhost");
         redirect_uri.set_query ("code=" + code);
@@ -134,8 +134,8 @@ public class OAuthTestCase : GLib.Object {
         //  ASSERT (state == BrowserOpened);
         state = TokenAsked;
         //  ASSERT (operation == Soup.PostOperation);
-        //  ASSERT (request.url ().to_string ().starts_with (s_oauth_test_server.to_string ()));
-        //  ASSERT (request.url ().path () == s_oauth_test_server.path () + "/index.php/apps/oauth2/api/v1/token");
+        //  ASSERT (request.url.to_string ().starts_with (s_oauth_test_server.to_string ()));
+        //  ASSERT (request.url.path () == s_oauth_test_server.path () + "/index.php/apps/oauth2/api/v1/token");
         std.unique_ptr<QBuffer> payload = new std.unique_ptr<QBuffer> (new QBuffer ());
         payload.set_data (token_reply_payload ());
         return new FakePostReply (operation, request, std.move (payload), fake_qnam);

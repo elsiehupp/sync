@@ -113,7 +113,7 @@ public class TestSyncEngine : GLib.Object {
     ***********************************************************/
     private void test_dir_upload_with_delayed_algorithm () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account.set_capabilities (
+        fake_folder.sync_engine.account.set_capabilities (
             {
                 {
                     "dav", new QVariantMap (
@@ -284,8 +284,8 @@ public class TestSyncEngine : GLib.Object {
         var expected_server_state = fake_folder.current_remote_state ();
 
         // Remove sub_folder_a with selective_sync:
-        fake_folder.sync_engine ().journal ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, {"parent_folder/sub_folder_a/"});
-        fake_folder.sync_engine ().journal ().schedule_path_for_remote_discovery ("parent_folder/sub_folder_a/");
+        fake_folder.sync_engine.journal ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, {"parent_folder/sub_folder_a/"});
+        fake_folder.sync_engine.journal ().schedule_path_for_remote_discovery ("parent_folder/sub_folder_a/");
         GLib.assert_true (get_etag ("parent_folder") == "this.invalid_");
         GLib.assert_true (get_etag ("parent_folder/sub_folder_a") == "this.invalid_");
         GLib.assert_true (get_etag ("parent_folder/sub_folder_a/subsub_folder") != "this.invalid_");
@@ -333,7 +333,7 @@ public class TestSyncEngine : GLib.Object {
     private void abort_after_failed_mkdir () {
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
         QSignalSpy finished_spy = new QSignalSpy (
-            fake_folder.sync_engine (),
+            fake_folder.sync_engine,
             SIGNAL (on_signal_finished (bool))
         );
         fake_folder.server_error_paths ().append ("NewFolder");
@@ -353,7 +353,7 @@ public class TestSyncEngine : GLib.Object {
     private void test_dir_etag_after_incomplete_sync () {
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
         QSignalSpy finished_spy = new QSignalSpy (
-            fake_folder.sync_engine (),
+            fake_folder.sync_engine,
             SIGNAL (on_signal_finished (bool))
         );
         fake_folder.server_error_paths ().append ("NewFolder/foo");
@@ -534,8 +534,8 @@ public class TestSyncEngine : GLib.Object {
         fake_folder.remote_modifier ().set_modification_time ("C/c1", changed_mtime2);
 
         connect (
-            fake_folder.sync_engine (),
-            SyncEngine.about_to_propagate,
+            fake_folder.sync_engine,
+            SyncEngine.signal_about_to_propagate,
             this.on_signal_sync_engine_about_to_propagate
         );
 
@@ -597,7 +597,7 @@ public class TestSyncEngine : GLib.Object {
         // Disable parallel uploads
         SyncOptions sync_options;
         sync_options.parallel_network_jobs = 0;
-        fake_folder.sync_engine ().set_sync_options (sync_options);
+        fake_folder.sync_engine.set_sync_options (sync_options);
 
         // Produce an error based on upload size
         int remote_quota = 1000;
@@ -720,25 +720,25 @@ public class TestSyncEngine : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         // For current servers, no characters are forbidden
-        fake_folder.sync_engine ().account.set_server_version ("10.0.0");
+        fake_folder.sync_engine.account.set_server_version ("10.0.0");
         fake_folder.local_modifier ().insert ("A/\\:?*\"<>|.txt");
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // For legacy servers, some characters were forbidden by the client
-        fake_folder.sync_engine ().account.set_server_version ("8.0.0");
+        fake_folder.sync_engine.account.set_server_version ("8.0.0");
         fake_folder.local_modifier ().insert ("B/\\:?*\"<>|.txt");
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (!fake_folder.current_remote_state ().find ("B/\\:?*\"<>|.txt"));
 
         // We can override that by setting the capability
-        fake_folder.sync_engine ().account.set_capabilities ({ { "dav", new QVariantMap ( { "invalid_filename_regex", "" } ) } });
+        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new QVariantMap ( { "invalid_filename_regex", "" } ) } });
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // Check that new servers also accept the capability
-        fake_folder.sync_engine ().account.set_server_version ("10.0.0");
-        fake_folder.sync_engine ().account.set_capabilities ({ { "dav", new QVariantMap ( { "invalid_filename_regex", "my[fgh]ile" } ) } });
+        fake_folder.sync_engine.account.set_server_version ("10.0.0");
+        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new QVariantMap ( { "invalid_filename_regex", "my[fgh]ile" } ) } });
         fake_folder.local_modifier ().insert ("C/myfile.txt");
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (!fake_folder.current_remote_state ().find ("C/myfile.txt"));
@@ -752,14 +752,14 @@ public class TestSyncEngine : GLib.Object {
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
-        fake_folder.sync_engine ().set_ignore_hidden_files (true);
+        fake_folder.sync_engine.set_ignore_hidden_files (true);
         fake_folder.remote_modifier ().insert ("A/.hidden");
         fake_folder.local_modifier ().insert ("B/.hidden");
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (!local_file_exists ("A/.hidden"));
         GLib.assert_true (!fake_folder.current_remote_state ().find ("B/.hidden"));
 
-        fake_folder.sync_engine ().set_ignore_hidden_files (false);
+        fake_folder.sync_engine.set_ignore_hidden_files (false);
         fake_folder.sync_journal ().force_remote_discovery_next_sync ();
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (local_file_exists ("A/.hidden"));
@@ -837,14 +837,14 @@ public class TestSyncEngine : GLib.Object {
         options.initial_chunk_size = 10;
         options.max_chunk_size = 10;
         options.min_chunk_size = 10;
-        fake_folder.sync_engine ().set_sync_options (options);
+        fake_folder.sync_engine.set_sync_options (options);
 
         GLib.Object parent;
         int number_of_put = 0;
         fake_folder.set_server_override (this.override_delegate);
 
         fake_folder.local_modifier ().insert ("file", 100, 'W');
-        QTimer.single_shot (100, fake_folder.sync_engine (), () => { fake_folder.sync_engine ().on_signal_abort (); });
+        QTimer.single_shot (100, fake_folder.sync_engine, () => { fake_folder.sync_engine.on_signal_abort (); });
         GLib.assert_true (!fake_folder.sync_once ());
 
         GLib.assert_true (number_of_put == 3);
@@ -921,12 +921,12 @@ public class TestSyncEngine : GLib.Object {
     ***********************************************************/
     private void test_errors_with_bulk_upload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine ().account.set_capabilities ({ { "dav", new QVariantMap ( { "bulkupload", "1.0" } ) } });
+        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new QVariantMap ( { "bulkupload", "1.0" } ) } });
 
         // Disable parallel uploads
         SyncOptions sync_options;
         sync_options.parallel_network_jobs = 0;
-        fake_folder.sync_engine ().set_sync_options (sync_options);
+        fake_folder.sync_engine.set_sync_options (sync_options);
 
         int number_of_put = 0;
         int number_of_post = 0;
@@ -977,7 +977,7 @@ public class TestSyncEngine : GLib.Object {
             }
         } else if (operation == Soup.PutOperation) {
             ++number_of_put;
-            var filename = get_file_path_from_url (request.url ());
+            var filename = get_file_path_from_url (request.url);
             if (filename.ends_with ("A/big2") ||
                     filename.ends_with ("A/big3") ||
                     filename.ends_with ("A/big4") ||

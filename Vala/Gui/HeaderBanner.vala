@@ -97,7 +97,7 @@ https://www.gnu.org/licenses/gpl-3.0.html.
 //  #include <QVBoxLayout>
 //  #include <QPainte
 //  #include <QStyle>
-//  #include <QGuiApplication>
+//  #include <Gtk.Application>
 
 namespace Occ {
 namespace Ui {
@@ -191,7 +191,7 @@ public class HeaderBanner : Gtk.Widget {
         painter.draw_pixmap (0, 0, width (), banner_pixmap.height (), banner_pixmap);
         int x = width () - 2;
         int y = height () - 2;
-        const QPalette pal = QGuiApplication.palette ();
+        const QPalette pal = Gtk.Application.palette ();
         painter.pen (pal.mid ().color ());
         painter.draw_line (0, y, x, y);
         painter.pen (pal.base ().color ());

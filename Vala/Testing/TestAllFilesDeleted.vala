@@ -47,13 +47,13 @@ public class TestAllFilesDeleted : GLib.Object {
         //Just set a blocklist so we can check it is still there. This directory does not exists but
         // that does not matter for our purposes.
         string[] selective_sync_blocklist = { "Q/" };
-        fake_folder.sync_engine ().journal ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
+        fake_folder.sync_engine.journal ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
                                                                 selective_sync_blocklist);
 
         var initial_state = fake_folder.current_local_state ();
         int about_to_remove_all_files_called = 0;
         connect (
-            fake_folder.sync_engine (),
+            fake_folder.sync_engine,
             SyncEngine.about_to_remove_all_files,
             TestAllFilesDeleted.on_signal_about_to_remove_all_files_all_files_deleted_keep
         );
@@ -80,7 +80,7 @@ public class TestAllFilesDeleted : GLib.Object {
         // The selective sync blocklist should be not have been deleted.
         bool ok = true;
         GLib.assert_true (
-            fake_folder.sync_engine ().journal ().get_gelective_sync_list (
+            fake_folder.sync_engine.journal ().get_gelective_sync_list (
                 SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
                 ok
             ) ==
@@ -100,7 +100,7 @@ public class TestAllFilesDeleted : GLib.Object {
             delete_on_remote ? SyncFileItem.Direction.DOWN : SyncFileItem.Direction.UP
         );
         callback (true);
-        fake_folder.sync_engine ().journal ().clear_file_table (); // That's what Folder is doing
+        fake_folder.sync_engine.journal ().clear_file_table (); // That's what Folder is doing
     }
 
 
@@ -123,7 +123,7 @@ public class TestAllFilesDeleted : GLib.Object {
 
         int about_to_remove_all_files_called = 0;
         connect (
-            fake_folder.sync_engine (),
+            fake_folder.sync_engine,
             SyncEngine.about_to_remove_all_files,
             TestAllFilesDeleted.on_signal_about_to_remove_all_files_all_files_deleted_delete
         );
@@ -191,7 +191,7 @@ public class TestAllFilesDeleted : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         // We never remove all files.
         connect (
-            fake_folder.sync_engine (),
+            fake_folder.sync_engine,
             SyncEngine.about_to_remove_all_files,
             TestAllFilesDeleted.on_signal_about_to_remove_all_files_not_delete_metadata_change
         );
@@ -239,7 +239,7 @@ public class TestAllFilesDeleted : GLib.Object {
 
         int about_to_remove_all_files_called = 0;
         connect (
-            fake_folder.sync_engine (),
+            fake_folder.sync_engine,
             SyncEngine.about_to_remove_all_files,
             TestAllFilesDeleted.on_signal_about_to_remove_all_files_reset_server
         );
@@ -429,7 +429,7 @@ public class TestAllFilesDeleted : GLib.Object {
         if (verb == "PROPFIND") {
             var data = stream.read_all ();
             if (data.contains ("data-fingerprint")) {
-                if (request.url ().path ().ends_with ("dav/files/admin/")) {
+                if (request.url.path ().ends_with ("dav/files/admin/")) {
                     ++fingerprint_requests;
                 } else {
                     fingerprint_requests = -10000; // fingerprint queried on incorrect path
@@ -449,7 +449,7 @@ public class TestAllFilesDeleted : GLib.Object {
 
         int about_to_remove_all_files_called = 0;
         connect (
-            fake_folder.sync_engine (),
+            fake_folder.sync_engine,
             SyncEngine.about_to_remove_all_files,
             TestAllFilesDeleted.on_signal_about_to_remove_all_files_single_file_renamed
         );
@@ -486,7 +486,7 @@ public class TestAllFilesDeleted : GLib.Object {
 
         int about_to_remove_all_files_called = 0;
         connect (
-            fake_folder.sync_engine (),
+            fake_folder.sync_engine,
             SyncEngine.about_to_remove_all_files,
             TestAllFilesDeleted.on_signal_about_to_remove_all_files_selective_sync_o_popup
         );
@@ -495,7 +495,7 @@ public class TestAllFilesDeleted : GLib.Object {
         GLib.assert_true (about_to_remove_all_files_called == 0);
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
-        fake_folder.sync_engine ().journal ().set_selective_sync_list (
+        fake_folder.sync_engine.journal ().set_selective_sync_list (
             SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
             {
                 "A/", "B/", "C/", "S/"

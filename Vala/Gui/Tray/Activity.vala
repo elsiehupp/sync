@@ -60,7 +60,7 @@ public class Activity {
     ***********************************************************/
     int status;
 
-    GLib.Vector<ActivityLink> links;
+    GLib.List<ActivityLink> links;
 
     /***********************************************************
     @brief Sort operator to sort the list youngest first.

@@ -36,7 +36,7 @@ public class DeleteMetadataApiJob : AbstractNetworkJob {
         Soup.Request request = new Soup.Request ();
         request.raw_header ("OCS-APIREQUEST", "true");
 
-        GLib.Uri url = Utility.concat_url_path (account.url (), path ());
+        GLib.Uri url = Utility.concat_url_path (account.url, path ());
         send_request ("DELETE", url, request);
 
         AbstractNetworkJob.start ();

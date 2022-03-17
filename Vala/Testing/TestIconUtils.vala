@@ -21,8 +21,8 @@ public class TestIconUtils : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void test_draw_svg_with_custom_fill_color () {
-        const string black_svg_dir_path = Occ.Theme.theme_prefix + "black";
-        const QDir black_svg_dir = new QDir (black_svg_dir_path);
+        const string black_svg_dir_path = Occ.Theme.THEME_PREFIX + "black";
+        const GLib.Dir black_svg_dir = new GLib.Dir (black_svg_dir_path);
         const string[] black_images = black_svg_dir.entry_list ("*.svg");
 
         GLib.assert_true (!black_images == "");
@@ -31,8 +31,8 @@ public class TestIconUtils : GLib.Object {
 
         GLib.assert_true (!Occ.Ui.IconUtils.draw_svg_with_custom_fill_color (black_svg_dir_path + "/" + black_images.at (0), QColorConstants.Svg.green).is_null ());
 
-        const string white_svg_dir_path = Occ.Theme.theme_prefix + "white";
-        const QDir white_svg_dir = new QDir (white_svg_dir_path);
+        const string white_svg_dir_path = Occ.Theme.THEME_PREFIX + "white";
+        const GLib.Dir white_svg_dir = new GLib.Dir (white_svg_dir_path);
         const string[] white_images = white_svg_dir.entry_list ("*.svg");
 
         GLib.assert_true (!white_images == "");
@@ -44,7 +44,7 @@ public class TestIconUtils : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void test_create_svg_pixmap_with_custom_color () {
-        const QDir black_svg_dir = new QDir (Occ.Theme.theme_prefix + "black");
+        const GLib.Dir black_svg_dir = new GLib.Dir (Occ.Theme.THEME_PREFIX + "black");
         const string[] black_images = black_svg_dir.entry_list ("*.svg");
 
         GLib.assert_true (!black_images == "");
@@ -53,7 +53,7 @@ public class TestIconUtils : GLib.Object {
 
         GLib.assert_true (!Occ.Ui.IconUtils.create_svg_image_with_custom_color (black_images.at (0), QColorConstants.Svg.green).is_null ());
 
-        const QDir white_svg_dir = new QDir (Occ.Theme.theme_prefix + "white");
+        const GLib.Dir white_svg_dir = new GLib.Dir (Occ.Theme.THEME_PREFIX + "white");
         const string[] white_images = white_svg_dir.entry_list ("*.svg");
 
         GLib.assert_true (!white_images == "");
@@ -65,10 +65,10 @@ public class TestIconUtils : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void test_pixmap_for_background () {
-        const QDir black_svg_dir = new QDir (Occ.Theme.theme_prefix + "black");
+        const GLib.Dir black_svg_dir = new GLib.Dir (Occ.Theme.THEME_PREFIX + "black");
         const string[] black_images = black_svg_dir.entry_list ("*.svg");
 
-        const QDir white_svg_dir = new QDir (Occ.Theme.theme_prefix + "white");
+        const GLib.Dir white_svg_dir = new GLib.Dir (Occ.Theme.THEME_PREFIX + "white");
         const string[] white_images = white_svg_dir.entry_list ("*.svg");
 
         GLib.assert_true (!black_images == "");

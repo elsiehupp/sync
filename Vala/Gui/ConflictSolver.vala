@@ -5,7 +5,7 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 ***********************************************************/
 
 //  #include <QFileDialog>
-//  #include <QMessageBox>
+//  #include <Gtk.MessageBox>
 
 namespace Occ {
 namespace Ui {
@@ -108,7 +108,7 @@ public class ConflictSolver : GLib.Object {
 
         const string message = info.is_dir () ? _("Do you want to delete the directory <i>%1</i> and all its contents permanently?").printf (info.directory ().dir_name ())
                                           : _("Do you want to delete the file <i>%1</i> permanently?").printf (info.filename ());
-        if (QMessageBox.question (this.parent_widget, _("Confirm deletion"), message, QMessageBox.Yes, QMessageBox.No) != QMessageBox.Yes) {
+        if (Gtk.MessageBox.question (this.parent_widget, _("Confirm deletion"), message, Gtk.MessageBox.Yes, Gtk.MessageBox.No) != Gtk.MessageBox.Yes) {
             return false;
         }
 
@@ -137,7 +137,7 @@ public class ConflictSolver : GLib.Object {
             return true;
         } else {
             GLib.warning ("Rename error: " + error);
-            QMessageBox.warning (this.parent_widget, _("Error"), _("Moving file failed:\n\n%1").printf (error));
+            Gtk.MessageBox.warning (this.parent_widget, _("Error"), _("Moving file failed:\n\n%1").printf (error));
             return false;
         }
     }
@@ -187,7 +187,7 @@ public class ConflictSolver : GLib.Object {
             return true;
         } else {
             GLib.warning ("Rename error: " + error);
-            QMessageBox.warning (this.parent_widget, _("Error"), _("Moving file failed:\n\n%1").printf (error));
+            Gtk.MessageBox.warning (this.parent_widget, _("Error"), _("Moving file failed:\n\n%1").printf (error));
             return false;
         }
     }

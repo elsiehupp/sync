@@ -12,7 +12,7 @@ Copyright (C) 2014 by Olivier Goffart <ogoffart@woboq.com
 //  #include <KIOCore/KFileItemListProperties>
 //  #include <QtWidgets/QAction>
 //  #include <QtWidgets/QMenu>
-//  #include <QtCore/QDir>
+//  #include <QtCore/GLib.Dir>
 //  #include <QtCore/QTimer>
 //  #include <QtCore/QEventLoop>
 
@@ -40,7 +40,7 @@ public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
         const var paths = helper.paths ();
         string files;
         foreach (var url in urls) {
-            QDir local_path = new QDir (url.to_local_file ());
+            GLib.Dir local_path = new GLib.Dir (url.to_local_file ());
             var local_file = local_path.canonical_path ();
             if (!std.any_of (paths.begin (), paths.end (), filter))
                 return {};
@@ -50,7 +50,7 @@ public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
             files += local_file.toUtf8 ();
         }
 
-        if (helper.version () < "1.1") { // in this case, lexicographic order works
+        if (helper.version < "1.1") { // in this case, lexicographic order works
             return legacyActions (file_item_infos, parentWidget);
         }
 
@@ -115,7 +115,7 @@ public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
         GLib.List<GLib.Uri> urls = file_item_infos.url_list ();
         if (urls.count () != 1)
             return {};
-        QDir local_path = new QDir (urls.first ().to_local_file ());
+        GLib.Dir local_path = new GLib.Dir (urls.first ().to_local_file ());
         var local_file = local_path.canonical_path ();
         var helper = OwncloudDolphinPluginHelper.instance;
         var menuaction = new QAction (parentWidget);

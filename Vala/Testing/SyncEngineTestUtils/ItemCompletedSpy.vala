@@ -9,7 +9,7 @@ namespace Testing {
 public class ItemCompletedSpy : QSignalSpy {
 
     ItemCompletedSpy (FakeFolder folder) {
-        base (&folder.sync_engine (), &Occ.SyncEngine.item_completed);
+        base (&folder.sync_engine, &Occ.SyncEngine.signal_item_completed);
     }
 
 

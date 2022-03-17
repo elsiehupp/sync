@@ -116,7 +116,7 @@ public class ShareDialog : Gtk.Dialog {
             this.ui.label_share_path.on_signal_text (_("Folder : %2").printf (oc_dir));
         }
 
-        this.window_title (_("%1 Sharing").printf (Theme.instance.app_name_gui ()));
+        this.window_title (_("%1 Sharing").printf (Theme.app_name_gui));
 
         if (!account_state.account.capabilities ().share_api ()) {
             return;
@@ -136,7 +136,7 @@ public class ShareDialog : Gtk.Dialog {
             + "http://owncloud.org/ns:privatelink");
         job.on_signal_timeout (10 * 1000);
         connect (job, PropfindJob.result, this, ShareDialog.on_signal_propfind_received);
-        connect (job, PropfindJob.finished_with_error, this, ShareDialog.on_signal_propfind_error);
+        connect (job, PropfindJob.signal_finished_with_error, this, ShareDialog.on_signal_propfind_error);
         job.on_signal_start ();
 
         bool sharing_possible = true;
@@ -398,7 +398,7 @@ public class ShareDialog : Gtk.Dialog {
 
         // We only do user/group sharing from 8.2.0
         bool user_group_sharing =
-            theme.user_group_sharing ()
+            theme.user_group_sharing
             && this.account_state.account.server_version_int () >= Account.make_server_version (8, 2, 0);
 
         if (user_group_sharing) {
@@ -411,7 +411,7 @@ public class ShareDialog : Gtk.Dialog {
             this.user_group_widget.on_signal_get_shares ();
         }
 
-        if (theme.link_sharing ()) {
+        if (theme.link_sharing) {
             if (this.manager) {
                 this.manager.fetch_shares (this.share_path);
             }

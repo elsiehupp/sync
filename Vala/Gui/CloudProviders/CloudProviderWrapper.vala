@@ -431,7 +431,7 @@ public class CloudProviderWrapper : GLib.Object {
         }
 
         if (g_str_equal (name, "openwebsite")) {
-            QDesktopServices.open_url (self.folder ().account_state ().account.url ());
+            QDesktopServices.open_url (self.folder ().account_state ().account.url);
         }
 
         if (g_str_equal (name, "openfolder")) {
@@ -460,7 +460,7 @@ public class CloudProviderWrapper : GLib.Object {
         //  Q_UNUSED (action);
         //  Q_UNUSED (parameter);
         var self = static_cast<CloudProviderWrapper> (user_data);
-        QDesktopServices.open_url (self.folder ().account_state ().account.url ());
+        QDesktopServices.open_url (self.folder ().account_state ().account.url);
     }
 
 } // class CloudProviderWrapper

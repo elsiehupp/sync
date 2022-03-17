@@ -14,7 +14,7 @@
 //  #include <QLoggingCategory>
 //  #include <QLocale>
 //  #include <QWebEngineCertificateError>
-//  #include <QMessageBox>
+//  #include <Gtk.MessageBox>
 
 namespace Occ {
 namespace Ui {

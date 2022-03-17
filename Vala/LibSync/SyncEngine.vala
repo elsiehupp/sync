@@ -11,7 +11,7 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <chrono>
 //  #include <QCore
 //  #include <QSslSocket>
-//  #include <QDir>
+//  #include <GLib.Dir>
 //  #include <QLogging
 //  #include <QMutexLoc
 //  #include <QThread>
@@ -202,13 +202,13 @@ public class SyncEngine : GLib.Object {
     /***********************************************************
     During update, before reconcile
     ***********************************************************/
-    internal signal void root_etag (string value1, GLib.DateTime value2);
+    internal signal void signal_etag_retrieved_from_sync_engine (string value1, GLib.DateTime value2);
 
 
     /***********************************************************
     After the above signals. with the items that actually need propagating
     ***********************************************************/
-    internal signal void about_to_propagate (SyncFileItemVector value);
+    internal signal void signal_about_to_propagate (SyncFileItemVector value);
 
 
     /***********************************************************
@@ -257,7 +257,7 @@ public class SyncEngine : GLib.Object {
     A new folder was discovered and was not synced because of
     the confirmation feature
     ***********************************************************/
-    internal signal void new_big_folder (string folder, bool is_external);
+    internal signal void signal_new_big_folder (string folder, bool is_external);
 
 
     /***********************************************************
@@ -358,7 +358,7 @@ public class SyncEngine : GLib.Object {
 
         this.progress_info.reset ();
 
-        if (!QDir (this.local_path).exists ()) {
+        if (!GLib.Dir (this.local_path).exists ()) {
             this.another_sync_needed = AnotherSyncNeeded.DELAYED_FOLLOW_UP;
             // No this.tr, it should only occur in non-mirall
             /* Q_EMIT */ signal_sync_error ("Unable to find local sync folder.");
@@ -503,9 +503,9 @@ public class SyncEngine : GLib.Object {
         );
         connect (
             this.discovery_phase,
-            DiscoveryPhase.new_big_folder,
+            DiscoveryPhase.signal_new_big_folder,
             this,
-            SyncEngine.new_big_folder
+            SyncEngine.signal_new_big_folder
         );
         connect (
             this.discovery_phase,
@@ -814,7 +814,7 @@ public class SyncEngine : GLib.Object {
         if (this.remote_root_etag == "") {
             GLib.debug ("Root etag: " + e);
             this.remote_root_etag = e;
-            /* emit */ root_etag (this.remote_root_etag, time);
+            /* emit */ signal_etag_retrieved_from_sync_engine (this.remote_root_etag, time);
         }
     }
 
@@ -1017,14 +1017,14 @@ public class SyncEngine : GLib.Object {
 
         GLib.assert (std.is_sorted (this.sync_items.begin (), this.sync_items.end ()));
 
-        GLib.info ("#### Reconcile (about_to_propagate) #################################################### " + this.stop_watch.add_lap_time ("Reconcile (about_to_propagate)") + "ms");
+        GLib.info ("#### Reconcile (signal_about_to_propagate) #################################################### " + this.stop_watch.add_lap_time ("Reconcile (signal_about_to_propagate)") + "ms");
 
         this.local_discovery_paths.clear ();
 
         // To announce the beginning of the sync
-        /* emit */ about_to_propagate (this.sync_items);
+        /* emit */ signal_about_to_propagate (this.sync_items);
 
-        GLib.info ("#### Reconcile (about_to_propagate OK) #################################################### "<< this.stop_watch.add_lap_time ("Reconcile (about_to_propagate OK)") + "ms");
+        GLib.info ("#### Reconcile (signal_about_to_propagate OK) #################################################### "<< this.stop_watch.add_lap_time ("Reconcile (signal_about_to_propagate OK)") + "ms");
 
         // it's important to do this before ProgressInfo.start (), to announce start of new sync
         this.progress_info.status = ProgressInfo.Status.PROPAGATION;
@@ -1186,7 +1186,7 @@ public class SyncEngine : GLib.Object {
     private void on_signal_add_touched_file (string filename) {
         QElapsedTimer now;
         now.start ();
-        string file = QDir.clean_path (filename);
+        string file = GLib.Dir.clean_path (filename);
 
         // Iterate from the oldest and remove anything older than 15 seconds.
         while (true) {
@@ -1374,7 +1374,7 @@ public class SyncEngine : GLib.Object {
             foreach (uint32 transfer_identifier in ids) {
                 if (!transfer_identifier)
                     continue; // Was not a chunked upload
-                GLib.Uri url = Utility.concat_url_path (account.url (), "remote.php/dav/uploads/" + account.dav_user () + "/" + string.number (transfer_identifier));
+                GLib.Uri url = Utility.concat_url_path (account.url, "remote.php/dav/uploads/" + account.dav_user () + "/" + string.number (transfer_identifier));
                 (new DeleteJob (account, url, this)).start ();
             }
         }

@@ -190,7 +190,7 @@ public class AbstractNetworkJob : GLib.Object {
     public new void start () {
         this.timer.start ();
 
-        const GLib.Uri url = account.url ();
+        const GLib.Uri url = account.url;
         const string display_url = "%1://%2%3".printf (url.scheme ()).printf (url.host ()).printf (url.path ());
 
         string parent_meta_object_name = parent () ? parent ().meta_object ().class_name (): "";
@@ -276,7 +276,7 @@ public class AbstractNetworkJob : GLib.Object {
     public void retry () {
         //  ENFORCE (this.reply);
         var request = this.reply.request ();
-        GLib.Uri requested_url = request.url ();
+        GLib.Uri requested_url = request.url;
         string verb = HttpLogger.request_verb (*this.reply);
         GLib.info ("Restarting " + verb + requested_url);
         reset_timeout ();
@@ -297,7 +297,7 @@ public class AbstractNetworkJob : GLib.Object {
 
     //  private void on_signal_timeout () {
     //      this.timedout = true;
-    //      GLib.warning ("Network job timeout" + (reply () ? reply ().request ().url () : path ());
+    //      GLib.warning ("Network job timeout" + (reply () ? reply ().request ().url : path ());
     //      on_signal_timed_out ();
     //  }
 
@@ -401,7 +401,7 @@ public class AbstractNetworkJob : GLib.Object {
     Creates a url for the account from a relative path
     ***********************************************************/
     protected GLib.Uri make_account_url (string relative_path) {
-        return Utility.concat_url_path (this.account.url (), relative_path);
+        return Utility.concat_url_path (this.account.url, relative_path);
     }
 
 
@@ -474,15 +474,15 @@ public class AbstractNetworkJob : GLib.Object {
             if ( (this.request_body && !this.request_body.is_sequential ()) || verb == "") {
                 GLib.warning (
                     "Can't resend HTTP2 request; verb or body not suitable "
-                    + this.reply.request ().url () + verb + this.request_body
+                    + this.reply.request ().url + verb + this.request_body
                 );
             } else if (this.http2_resend_count >= max_http2Resends) {
                 GLib.warning (
                     "Not resending HTTP2 request; number of resends exhausted "
-                    + this.reply.request ().url () + this.http2_resend_count
+                    + this.reply.request ().url + this.http2_resend_count
                 );
             } else {
-                GLib.info ("HTTP2 resending " + this.reply.request ().url ());
+                GLib.info ("HTTP2 resending " + this.reply.request ().url);
                 this.http2_resend_count++;
 
                 reset_timeout ();
@@ -494,7 +494,7 @@ public class AbstractNetworkJob : GLib.Object {
                 }
                 send_request (
                     verb,
-                    this.reply.request ().url (),
+                    this.reply.request ().url,
                     this.reply.request (),
                     this.request_body);
                 return;
@@ -519,7 +519,7 @@ public class AbstractNetworkJob : GLib.Object {
         // get the Date timestamp from reply
         this.response_timestamp = this.reply.raw_header ("Date");
 
-        GLib.Uri requested_url = reply ().request ().url ();
+        GLib.Uri requested_url = reply ().request ().url;
         GLib.Uri redirect_url = reply ().attribute (Soup.Request.RedirectionTargetAttribute).to_url ();
         if (this.follow_redirects && !redirect_url == "") {
             // Redirects may be relative
@@ -654,7 +654,7 @@ public class AbstractNetworkJob : GLib.Object {
             return base_string;
         }
 
-        return _(" (Server replied \"%1 %2\" to \"%3 %4\")").printf (string.number (http_status), http_reason, HttpLogger.request_verb (reply), reply.request ().url ().to_display_string ());
+        return _(" (Server replied \"%1 %2\" to \"%3 %4\")").printf (string.number (http_status), http_reason, HttpLogger.request_verb (reply), reply.request ().url.to_display_string ());
     }
 
 } // class AbstractNetworkJob

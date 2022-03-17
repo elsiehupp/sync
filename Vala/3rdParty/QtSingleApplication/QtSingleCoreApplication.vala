@@ -12,11 +12,11 @@ the Digia Qt LGPL Exception version 1.1, included in the
 file LGPL_EXCEPTION.txt in this package.
 ***********************************************************/
 
-//  #include <QCoreApplication>
+//  #include <Gtk.Application>
 
 namespace SharedTools {
 
-public class QtSingleCoreApplication : QCoreApplication {
+public class QtSingleCoreApplication : Gtk.Application {
 
     /***********************************************************
     ***********************************************************/

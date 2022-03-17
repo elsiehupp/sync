@@ -3,7 +3,7 @@
 //  #include <Gtk.Widget>
 //  #include <QInputDialog>
 //  #include <QLineEdit>
-//  #include <QMessageBox>
+//  #include <Gtk.MessageBox>
 
 namespace Occ {
 namespace Ui {
@@ -130,7 +130,7 @@ public class IgnoreListTableWidget : Gtk.Widget {
                 }
             }
         } else {
-            QMessageBox.warning (this, _("Could not open file"),
+            Gtk.MessageBox.warning (this, _("Could not open file"),
                 _("Cannot write changes to \"%1\".").printf (file));
         }
         ignores.close (); //close the file before reloading stuff.

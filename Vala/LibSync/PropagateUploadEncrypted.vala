@@ -3,7 +3,7 @@
 //  #include <QJsonDocument>
 //  #include <QTemporary
 //  #include <QFile
-//  #include <QDir>
+//  #include <GLib.Dir>
 //  #include <QTemporary_file>
 //  #include <QLoggingCategory>
 //  #include <QMimeDatabase>
@@ -101,8 +101,8 @@ public class PropagateUploadEncrypted : GLib.Object {
         GLib.debug ("Folder is encrypted; let's get the Id from it.");
         var job = new LsColJob (this.propagator.account, absolute_remote_parent_path, this);
         job.properties ({"resourcetype", "http://owncloud.org/ns:fileid"});
-        connect (job, LsColJob.directory_listing_subfolders, this, PropagateUploadEncrypted.on_signal_folder_encrypted_id_received);
-        connect (job, LsColJob.finished_with_error, this, PropagateUploadEncrypted.on_signal_folder_encrypted_id_error);
+        connect (job, LsColJob.signal_directory_listing_subfolders, this, PropagateUploadEncrypted.on_signal_folder_encrypted_id_received);
+        connect (job, LsColJob.signal_finished_with_error, this, PropagateUploadEncrypted.on_signal_folder_encrypted_id_error);
         job.start ();
     }
 
@@ -327,7 +327,7 @@ public class PropagateUploadEncrypted : GLib.Object {
             this.complete_filename = encrypted_file.encrypted_filename;
         } else {
             GLib.File input = new GLib.File (info.absolute_file_path ());
-            GLib.File output = new GLib.File (QDir.temp_path () + QDir.separator () + encrypted_file.encrypted_filename);
+            GLib.File output = new GLib.File (GLib.Dir.temp_path () + GLib.Dir.separator () + encrypted_file.encrypted_filename);
 
             string tag;
             bool encryption_result = EncryptionHelper.file_encryption (

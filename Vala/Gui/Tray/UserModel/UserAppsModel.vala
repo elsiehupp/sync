@@ -90,7 +90,7 @@ public class UserAppsModel : QAbstractListModel {
         if (role == UserAppsRoles.NAME) {
             return this.apps[index.row ()].name ();
         } else if (role == UserAppsRoles.URL) {
-            return this.apps[index.row ()].url ();
+            return this.apps[index.row ()].url;
         } else if (role == UserAppsRoles.ICON_URL) {
             return this.apps[index.row ()].icon_url ().to_string ();
         }
@@ -101,7 +101,7 @@ public class UserAppsModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     public void on_signal_open_app_url (GLib.Uri url) {
-        Utility.open_browser (url);
+        OpenExtrernal.open_browser (url);
     }
 
 } // class UserAppsModel

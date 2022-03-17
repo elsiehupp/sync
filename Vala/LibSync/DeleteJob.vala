@@ -67,7 +67,7 @@ public class DeleteJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public bool on_signal_finished () {
-        GLib.info ("DELETE of " + reply ().request ().url ()
+        GLib.info ("DELETE of " + reply ().request ().url
             + " finished with status " + reply_status_string ());
 
         /* emit */ signal_finished ();

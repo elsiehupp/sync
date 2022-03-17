@@ -14,7 +14,7 @@
 //  #include <QDebug>
 //  #include <QLoggingCategory>
 //  #include <GLib.FileInfo>
-//  #include <QDir>
+//  #include <GLib.Dir>
 //  #include <QJsonObject>
 //  #include <QXmlStreamReader>
 //  #include <QXmlStreamNamespaceDeclaration>
@@ -287,9 +287,9 @@ public class ClientSideEncryption : GLib.Object {
 
 
     private void start_delete_job (Account account, string user) {
-        var delete_password_job = new DeletePasswordJob (Theme.instance.app_name ());
+        var delete_password_job = new DeletePasswordJob (Theme.app_name);
         delete_password_job.insecure_fallback (false);
-        delete_password_job.key (AbstractCredentials.keychain_key (account.url ().to_string (), user, account.identifier ()));
+        delete_password_job.key (AbstractCredentials.keychain_key (account.url.to_string (), user, account.identifier ()));
         delete_password_job.start ();
     }
 
@@ -326,12 +326,12 @@ public class ClientSideEncryption : GLib.Object {
         GLib.info ("Public key fetched from keychain.");
 
         const string kck = AbstractCredentials.keychain_key (
-            account.url ().to_string (),
+            account.url.to_string (),
             account.credentials ().user () + E2E_PRIVATE,
             account.identifier ()
         );
 
-        var read_password_job = new ReadPasswordJob (Theme.instance.app_name ());
+        var read_password_job = new ReadPasswordJob (Theme.app_name);
         read_password_job.property (ACCOUNT_PROPERTY, GLib.Variant.from_value (account));
         read_password_job.insecure_fallback (false);
         read_password_job.key (kck);
@@ -366,12 +366,12 @@ public class ClientSideEncryption : GLib.Object {
         GLib.info ("Private key fetched from keychain.");
 
         const string kck = AbstractCredentials.keychain_key (
-                    account.url ().to_string (),
+                    account.url.to_string (),
                     account.credentials ().user () + E2E_MNEMONIC,
                     account.identifier ()
         );
 
-        var read_password_job = new ReadPasswordJob (Theme.instance.app_name ());
+        var read_password_job = new ReadPasswordJob (Theme.app_name);
         read_password_job.property (ACCOUNT_PROPERTY, GLib.Variant.from_value (account));
         read_password_job.insecure_fallback (false);
         read_password_job.key (kck);
@@ -547,12 +547,12 @@ public class ClientSideEncryption : GLib.Object {
     ***********************************************************/
     private void fetch_from_key_chain (Account account) {
         const string kck = AbstractCredentials.keychain_key (
-                    account.url ().to_string (),
+                    account.url.to_string (),
                     account.credentials ().user () + E2E_CERTIFICATE,
                     account.identifier ()
         );
 
-        var read_password_job = new ReadPasswordJob (Theme.instance.app_name ());
+        var read_password_job = new ReadPasswordJob (Theme.app_name);
         read_password_job.property (ACCOUNT_PROPERTY, GLib.Variant.from_value (account));
         read_password_job.insecure_fallback (false);
         read_password_job.key (kck);
@@ -567,14 +567,14 @@ public class ClientSideEncryption : GLib.Object {
         string data = EncryptionHelper.generate_random (64);
 
         Biometric public_key_bio;
-        string public_key_pem = account.e2e ().public_key.to_pem ();
+        string public_key_pem = account.e2e.public_key.to_pem ();
         BIO_write (public_key_bio, public_key_pem.const_data (), public_key_pem.size ());
         var public_key = PrivateKey.read_public_key (public_key_bio);
 
         var encrypted_data = EncryptionHelper.encrypt_string_asymmetric (public_key, data.to_base64 ());
 
         Biometric private_key_bio;
-        string private_key_pem = account.e2e ().private_key;
+        string private_key_pem = account.e2e.private_key;
         BIO_write (private_key_bio, private_key_pem.const_data (), private_key_pem.size ());
         var key = PrivateKey.read_private_key (private_key_bio);
 
@@ -619,12 +619,12 @@ public class ClientSideEncryption : GLib.Object {
     ***********************************************************/
     private void write_private_key (Account account) {
         const string kck = AbstractCredentials.keychain_key (
-                    account.url ().to_string (),
+                    account.url.to_string (),
                     account.credentials ().user () + E2E_PRIVATE,
                     account.identifier ()
         );
 
-        var write_password_job = new WritePasswordJob (Theme.instance.app_name ());
+        var write_password_job = new WritePasswordJob (Theme.app_name);
         write_password_job.insecure_fallback (false);
         write_password_job.key (kck);
         write_password_job.binary_data (this.private_key);
@@ -640,12 +640,12 @@ public class ClientSideEncryption : GLib.Object {
     ***********************************************************/
     private void write_certificate (Account account) {
         const string kck = AbstractCredentials.keychain_key (
-                    account.url ().to_string (),
+                    account.url.to_string (),
                     account.credentials ().user () + E2E_CERTIFICATE,
                     account.identifier ()
         );
 
-        var write_password_job = new WritePasswordJob (Theme.instance.app_name ());
+        var write_password_job = new WritePasswordJob (Theme.app_name);
         write_password_job.insecure_fallback (false);
         write_password_job.key (kck);
         write_password_job.binary_data (this.certificate.to_pem ());
@@ -661,12 +661,12 @@ public class ClientSideEncryption : GLib.Object {
     ***********************************************************/
     private void write_mnemonic (Account account) {
         const string kck = AbstractCredentials.keychain_key (
-            account.url ().to_string (),
+            account.url.to_string (),
             account.credentials ().user () + E2E_MNEMONIC,
             account.identifier ()
         );
 
-        var write_password_job = new WritePasswordJob (Theme.instance.app_name ());
+        var write_password_job = new WritePasswordJob (Theme.app_name);
         write_password_job.insecure_fallback (false);
         write_password_job.key (kck);
         write_password_job.text_data (this.mnemonic);

@@ -55,7 +55,7 @@ public class TestOAuth : GLib.Object {
     class TestRandomConnections : OAuthTestCase {
         override Soup.Reply create_browser_reply (Soup.Request request) {
             QTimer.single_shot (0, this, () => {
-                var port = request.url ().port ();
+                var port = request.url.port ();
                 state = CustomState;
                 GLib.List<string> payloads = {
                     "GET FOFOFO HTTP 1/1\n\n",

@@ -24,7 +24,7 @@ public class FakePostReply : Soup.Reply {
         base (parent);
         payload = std.move (payload_);
         set_request (request);
-        set_url (request.url ());
+        set_url (request.url);
         set_operation (operation);
         open (QIODevice.ReadOnly);
         payload.open (QIODevice.ReadOnly);
