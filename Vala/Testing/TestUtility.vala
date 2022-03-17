@@ -37,25 +37,25 @@ public class TestUtility : GLib.Object {
     ***********************************************************/
     private void on_signal_test_octets_to_string () {
         QLocale.set_default (QLocale ("en"));
-        GLib.assert_cmp (octets_to_string (999), "999 B");
-        GLib.assert_cmp (octets_to_string (1024), "1 KB");
-        GLib.assert_cmp (octets_to_string (1364), "1 KB");
+        GLib.assert_true (octets_to_string (999) == "999 B");
+        GLib.assert_true (octets_to_string (1024) == "1 KB");
+        GLib.assert_true (octets_to_string (1364) == "1 KB");
 
-        GLib.assert_cmp (octets_to_string (9110), "9 KB");
-        GLib.assert_cmp (octets_to_string (9910), "10 KB");
-        GLib.assert_cmp (octets_to_string (10240), "10 KB");
+        GLib.assert_true (octets_to_string (9110) == "9 KB");
+        GLib.assert_true (octets_to_string (9910) == "10 KB");
+        GLib.assert_true (octets_to_string (10240) == "10 KB");
 
-        GLib.assert_cmp (octets_to_string (123456), "121 KB");
-        GLib.assert_cmp (octets_to_string (1234567), "1.2 MB");
-        GLib.assert_cmp (octets_to_string (12345678), "12 MB");
-        GLib.assert_cmp (octets_to_string (123456789), "118 MB");
-        GLib.assert_cmp (octets_to_string (1000LL * 1000*1000 * 5), "4.7 GB");
+        GLib.assert_true (octets_to_string (123456) == "121 KB");
+        GLib.assert_true (octets_to_string (1234567) == "1.2 MB");
+        GLib.assert_true (octets_to_string (12345678) == "12 MB");
+        GLib.assert_true (octets_to_string (123456789) == "118 MB");
+        GLib.assert_true (octets_to_string (1000LL * 1000 * 1000 * 5) == "4.7 GB");
 
-        GLib.assert_cmp (octets_to_string (1), "1 B");
-        GLib.assert_cmp (octets_to_string (2), "2 B");
-        GLib.assert_cmp (octets_to_string (1024), "1 KB");
-        GLib.assert_cmp (octets_to_string (1024*1024), "1 MB");
-        GLib.assert_cmp (octets_to_string (1024LL*1024*1024), "1 GB");
+        GLib.assert_true (octets_to_string (1) == "1 B");
+        GLib.assert_true (octets_to_string (2) == "2 B");
+        GLib.assert_true (octets_to_string (1024) == "1 KB");
+        GLib.assert_true (octets_to_string (1024 * 1024) == "1 MB");
+        GLib.assert_true (octets_to_string (1024LL * 1024 * 1024) == "1 GB");
     }
 
 
@@ -86,34 +86,34 @@ public class TestUtility : GLib.Object {
 
         GLib.DateTime current = GLib.DateTime.current_date_time_utc ();
 
-        GLib.assert_cmp (duration_to_descriptive_string2 (0), "0 second (s)");
-        GLib.assert_cmp (duration_to_descriptive_string2 (5), "0 second (s)");
-        GLib.assert_cmp (duration_to_descriptive_string2 (1000), "1 second (s)");
-        GLib.assert_cmp (duration_to_descriptive_string2 (1005), "1 second (s)");
-        GLib.assert_cmp (duration_to_descriptive_string2 (56123), "56 second (s)");
-        GLib.assert_cmp (duration_to_descriptive_string2 (90 * sec), "1 minute (s) 30 second (s)");
-        GLib.assert_cmp (duration_to_descriptive_string2 (3 * hour), "3 hour (s)");
-        GLib.assert_cmp (duration_to_descriptive_string2 (3 * hour + 20 * sec), "3 hour (s)");
-        GLib.assert_cmp (duration_to_descriptive_string2 (3 * hour + 70 * sec), "3 hour (s) 1 minute (s)");
-        GLib.assert_cmp (duration_to_descriptive_string2 (3 * hour + 100 * sec), "3 hour (s) 2 minute (s)");
-        GLib.assert_cmp (duration_to_descriptive_string2 (current.msecs_to (current.add_years (4).add_months (5).add_days (2).add_secs (23 * 60 * 60))),
+        GLib.assert_true (duration_to_descriptive_string2 (0) == "0 second (s)");
+        GLib.assert_true (duration_to_descriptive_string2 (5) == "0 second (s)");
+        GLib.assert_true (duration_to_descriptive_string2 (1000) == "1 second (s)");
+        GLib.assert_true (duration_to_descriptive_string2 (1005) == "1 second (s)");
+        GLib.assert_true (duration_to_descriptive_string2 (56123) == "56 second (s)");
+        GLib.assert_true (duration_to_descriptive_string2 (90 * sec) == "1 minute (s) 30 second (s)");
+        GLib.assert_true (duration_to_descriptive_string2 (3 * hour) == "3 hour (s)");
+        GLib.assert_true (duration_to_descriptive_string2 (3 * hour + 20 * sec) == "3 hour (s)");
+        GLib.assert_true (duration_to_descriptive_string2 (3 * hour + 70 * sec) == "3 hour (s) 1 minute (s)");
+        GLib.assert_true (duration_to_descriptive_string2 (3 * hour + 100 * sec) == "3 hour (s) 2 minute (s)");
+        GLib.assert_true (duration_to_descriptive_string2 (current.msecs_to (current.add_years (4).add_months (5).add_days (2).add_secs (23 * 60 * 60))) ==
             "4 year (s) 5 month (s)");
-        GLib.assert_cmp (duration_to_descriptive_string2 (current.msecs_to (current.add_days (2).add_secs (23 * 60 * 60))),
+        GLib.assert_true (duration_to_descriptive_string2 (current.msecs_to (current.add_days (2).add_secs (23 * 60 * 60))) ==
             "2 day (s) 23 hour (s)");
 
-        GLib.assert_cmp (duration_to_descriptive_string1 (0), "0 second (s)");
-        GLib.assert_cmp (duration_to_descriptive_string1 (5), "0 second (s)");
-        GLib.assert_cmp (duration_to_descriptive_string1 (1000), "1 second (s)");
-        GLib.assert_cmp (duration_to_descriptive_string1 (1005), "1 second (s)");
-        GLib.assert_cmp (duration_to_descriptive_string1 (56123), "56 second (s)");
-        GLib.assert_cmp (duration_to_descriptive_string1 (90 * sec), "2 minute (s)");
-        GLib.assert_cmp (duration_to_descriptive_string1 (3 * hour), "3 hour (s)");
-        GLib.assert_cmp (duration_to_descriptive_string1 (3 * hour + 20 * sec), "3 hour (s)");
-        GLib.assert_cmp (duration_to_descriptive_string1 (3 * hour + 70 * sec), "3 hour (s)");
-        GLib.assert_cmp (duration_to_descriptive_string1 (3 * hour + 100 * sec), "3 hour (s)");
-        GLib.assert_cmp (duration_to_descriptive_string1 (current.msecs_to (current.add_years (4).add_months (5).add_days (2).add_secs (23 * 60 * 60))),
+        GLib.assert_true (duration_to_descriptive_string1 (0) == "0 second (s)");
+        GLib.assert_true (duration_to_descriptive_string1 (5) == "0 second (s)");
+        GLib.assert_true (duration_to_descriptive_string1 (1000) == "1 second (s)");
+        GLib.assert_true (duration_to_descriptive_string1 (1005) == "1 second (s)");
+        GLib.assert_true (duration_to_descriptive_string1 (56123) == "56 second (s)");
+        GLib.assert_true (duration_to_descriptive_string1 (90 * sec) == "2 minute (s)");
+        GLib.assert_true (duration_to_descriptive_string1 (3 * hour) == "3 hour (s)");
+        GLib.assert_true (duration_to_descriptive_string1 (3 * hour + 20 * sec) == "3 hour (s)");
+        GLib.assert_true (duration_to_descriptive_string1 (3 * hour + 70 * sec) == "3 hour (s)");
+        GLib.assert_true (duration_to_descriptive_string1 (3 * hour + 100 * sec) == "3 hour (s)");
+        GLib.assert_true (duration_to_descriptive_string1 (current.msecs_to (current.add_years (4).add_months (5).add_days (2).add_secs (23 * 60 * 60))) ==
             "4 year (s)");
-        GLib.assert_cmp (duration_to_descriptive_string1 (current.msecs_to (current.add_days (2).add_secs (23 * 60 * 60))),
+        GLib.assert_true (duration_to_descriptive_string1 (current.msecs_to (current.add_days (2).add_secs (23 * 60 * 60))) ==
             "3 day (s)");
 
     }
@@ -145,24 +145,24 @@ public class TestUtility : GLib.Object {
         // Both times in same timezone
         GLib.DateTime d1 = GLib.DateTime.from_string ("2015-01-24T09:20:30+01:00", Qt.ISODate);
         GLib.DateTime d2 = GLib.DateTime.from_string ("2015-01-23T09:20:30+01:00", Qt.ISODate);
-        string s = time_ago_in_words (d2, d1);
-        GLib.assert_cmp (s, "1 day ago");
+        string test_string = time_ago_in_words (d2, d1);
+        GLib.assert_true (test_string == "1 day ago");
 
         // Different timezones
         GLib.DateTime early_timestamp = GLib.DateTime.from_string ("2015-01-24T09:20:30+01:00", Qt.ISODate);
         GLib.DateTime later_timestamp = GLib.DateTime.from_string ("2015-01-24T09:20:30-01:00", Qt.ISODate);
-        s = time_ago_in_words (early_timestamp, later_timestamp);
-        GLib.assert_cmp (s, "2 hours ago");
+        test_string = time_ago_in_words (early_timestamp, later_timestamp);
+        GLib.assert_true (test_string == "2 hours ago");
 
         // 'Now' in whatever timezone
         early_timestamp = GLib.DateTime.current_date_time ();
         later_timestamp = early_timestamp;
-        s = time_ago_in_words (early_timestamp, later_timestamp );
-        GLib.assert_cmp (s, "now");
+        test_string = time_ago_in_words (early_timestamp, later_timestamp );
+        GLib.assert_true (test_string == "now");
 
         early_timestamp = early_timestamp.add_secs (-6);
-        s = time_ago_in_words (early_timestamp, later_timestamp);
-        GLib.assert_cmp (s, "Less than a minute ago");
+        test_string = time_ago_in_words (early_timestamp, later_timestamp);
+        GLib.assert_true (test_string == "Less than a minute ago");
     }
 
 
@@ -231,7 +231,7 @@ public class TestUtility : GLib.Object {
     private void test_sanitize_for_filename () {
         QFETCH (string, input);
         QFETCH (string, output);
-        GLib.assert_cmp (sanitize_for_filename (input), output);
+        GLib.assert_true (sanitize_for_filename (input), output);
     }
 
     void test_normalize_etag () {
@@ -240,7 +240,7 @@ public class TestUtility : GLib.Object {
 
     int CHECK_NORMALIZE_ETAG (string TEST, string EXPECT) {
         string_value = Occ.Utility.normalize_etag (TEST);
-        GLib.assert_cmp (string_value.const_data (), EXPECT);
+        GLib.assert_true (string_value.const_data (), EXPECT);
 
         CHECK_NORMALIZE_ETAG ("foo", "foo");
         CHECK_NORMALIZE_ETAG ("\"foo\"", "foo");

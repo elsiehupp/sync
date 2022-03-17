@@ -18,6 +18,7 @@ public class FakeDeleteReply : FakeReply {
         QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
     }
 
+
     /***********************************************************
     ***********************************************************/
     public void respond () {
@@ -25,6 +26,7 @@ public class FakeDeleteReply : FakeReply {
         /* emit */ signal_meta_data_changed ();
         /* emit */ signal_finished ();
     }
+
 
     /***********************************************************
     ***********************************************************/

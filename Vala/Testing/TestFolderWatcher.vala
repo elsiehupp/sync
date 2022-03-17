@@ -20,7 +20,7 @@ public class TestFolderWatcher : GLib.Object {
 
     bool wait_for_path_changed (string path) {
         QElapsedTimer timer;
-        timer.on_signal_start ();
+        timer.start ();
         while (timer.elapsed () < 5000) {
             // Check if it was already reported as changed by the watcher
             for (int i = 0; i < this.path_changed_spy.size (); ++i) {
@@ -233,7 +233,7 @@ public class TestFolderWatcher : GLib.Object {
 
 
     int check_watch_count (int n) {
-        GLib.assert_cmp (this.watcher.test_linux_watch_count (), (n));
+        GLib.assert_true (this.watcher.test_linux_watch_count () == (n));
     }
 
 

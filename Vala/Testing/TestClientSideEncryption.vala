@@ -17,7 +17,7 @@ namespace Testing {
 public class TestClientSideEncryption : GLib.Object {
 
     string convert_to_old_storage_format (string data) {
-        return data.split ('|').join ("fA==");
+        return data.split ("|").join ("fA==");
     }
 
 
@@ -25,28 +25,28 @@ public class TestClientSideEncryption : GLib.Object {
     ***********************************************************/
     private void should_encrypt_private_keys () {
         // GIVEN
-        var encryption_key = new string ("foo");
-        var private_key = new string ("bar");
-        var original_salt = new string ("baz");
+        var encryption_key = new "foo";
+        var private_key = new "bar";
+        var original_salt = new "baz";
 
         // WHEN
         var cipher = EncryptionHelper.encrypt_private_key (encryption_key, private_key, original_salt);
 
         // THEN
         var parts = cipher.split ('|');
-        GLib.assert_cmp (parts.size (), 3);
+        GLib.assert_true (parts.size () == 3);
 
-        var encrypted_key = string.from_base64 (parts[0]);
-        var iv = string.from_base64 (parts[1]);
-        var salt = string.from_base64 (parts[2]);
+        var encrypted_key = parts[0].to_string ();
+        var initialization_vector = parts[1].to_string ();
+        var salt = parts[2].to_string ();
 
         // We're not here to check the merits of the encryption but at least make sure it's been
         // somewhat ciphered
-        GLib.assert_true (!encrypted_key == "");
+        GLib.assert_true (encrypted_key != "");
         GLib.assert_true (encrypted_key != private_key);
 
-        GLib.assert_true (!iv == "");
-        GLib.assert_cmp (salt, original_salt);
+        GLib.assert_true (initialization_vector != "");
+        GLib.assert_true (salt == original_salt);
     }
 
 
@@ -54,9 +54,9 @@ public class TestClientSideEncryption : GLib.Object {
     ***********************************************************/
     private void should_decrypt_private_keys () {
         // GIVEN
-        var encryption_key = new string ("foo");
-        var original_private_key = new string ("bar");
-        var original_salt = new string ("baz");
+        var encryption_key = new "foo";
+        var original_private_key = new "bar";
+        var original_salt = new "baz";
         var cipher = EncryptionHelper.encrypt_private_key (encryption_key, original_private_key, original_salt);
 
         // WHEN
@@ -64,8 +64,8 @@ public class TestClientSideEncryption : GLib.Object {
         var salt = EncryptionHelper.extract_private_key_salt (cipher);
 
         // THEN
-        GLib.assert_cmp (private_key, original_private_key);
-        GLib.assert_cmp (salt, original_salt);
+        GLib.assert_true (private_key == original_private_key);
+        GLib.assert_true (salt == original_salt);
     }
 
 
@@ -73,9 +73,9 @@ public class TestClientSideEncryption : GLib.Object {
     ***********************************************************/
     private void should_decrypt_private_keys_in_old_storage_format () {
         // GIVEN
-        var encryption_key = new string ("foo");
-        var original_private_key = new string ("bar");
-        var original_salt = new string ("baz");
+        var encryption_key = new "foo";
+        var original_private_key = new "bar";
+        var original_salt = new "baz";
         var cipher = convert_to_old_storage_format (EncryptionHelper.encrypt_private_key (encryption_key, original_private_key, original_salt));
 
         // WHEN
@@ -83,8 +83,8 @@ public class TestClientSideEncryption : GLib.Object {
         var salt = EncryptionHelper.extract_private_key_salt (cipher);
 
         // THEN
-        GLib.assert_cmp (private_key, original_private_key);
-        GLib.assert_cmp (salt, original_salt);
+        GLib.assert_true (private_key == original_private_key);
+        GLib.assert_true (salt == original_salt);
     }
 
 
@@ -92,25 +92,25 @@ public class TestClientSideEncryption : GLib.Object {
     ***********************************************************/
     private void should_symmetric_encrypt_strings () {
         // GIVEN
-        var encryption_key = new string ("foo");
-        var data = new string ("bar");
+        var encryption_key = new "foo";
+        var data = new "bar";
 
         // WHEN
         var cipher = EncryptionHelper.encrypt_string_symmetric (encryption_key, data);
 
         // THEN
         var parts = cipher.split ('|');
-        GLib.assert_cmp (parts.size (), 2);
+        GLib.assert_true (parts.size () == 2);
 
         var encrypted_data = string.from_base64 (parts[0]);
-        var iv = string.from_base64 (parts[1]);
+        var initialization_vector = string.from_base64 (parts[1]);
 
         // We're not here to check the merits of the encryption but at least make sure it's been
         // somewhat ciphered
         GLib.assert_true (!encrypted_data == "");
         GLib.assert_true (encrypted_data != data);
 
-        GLib.assert_true (!iv == "");
+        GLib.assert_true (!initialization_vector == "");
     }
 
 
@@ -118,15 +118,15 @@ public class TestClientSideEncryption : GLib.Object {
     ***********************************************************/
     private void should_symmetric_decrypt_strings () {
         // GIVEN
-        var encryption_key = new string ("foo");
-        var original_data = new string ("bar");
+        var encryption_key = new "foo";
+        var original_data = new "bar";
         var cipher = EncryptionHelper.encrypt_string_symmetric (encryption_key, original_data);
 
         // WHEN
         var data = EncryptionHelper.decrypt_string_symmetric (encryption_key, cipher);
 
         // THEN
-        GLib.assert_cmp (data, original_data);
+        GLib.assert_true (data == original_data);
     }
 
 
@@ -134,15 +134,15 @@ public class TestClientSideEncryption : GLib.Object {
     ***********************************************************/
     private void should_symmetric_decrypt_strings_in_old_storage_format () {
         // GIVEN
-        var encryption_key = new string ("foo");
-        var original_data = new string ("bar");
+        var encryption_key = new "foo";
+        var original_data = new "bar";
         var cipher = convert_to_old_storage_format (EncryptionHelper.encrypt_string_symmetric (encryption_key, original_data));
 
         // WHEN
         var data = EncryptionHelper.decrypt_string_symmetric (encryption_key, cipher);
 
         // THEN
-        GLib.assert_cmp (data, original_data);
+        GLib.assert_true (data == original_data);
     }
 
 
@@ -170,7 +170,7 @@ public class TestClientSideEncryption : GLib.Object {
 
         var dummy_file_random_contents = EncryptionHelper.generate_random (total_bytes);
 
-        GLib.assert_cmp (dummy_input_file.write (dummy_file_random_contents), dummy_file_random_contents.size ());
+        GLib.assert_true (dummy_input_file.write (dummy_file_random_contents) == dummy_file_random_contents.size ());
 
         var generate_hash = [] (string data) => {
             QCryptographicHash hash = new QCryptographicHash (QCryptographicHash.Sha1);
@@ -180,7 +180,7 @@ public class TestClientSideEncryption : GLib.Object {
 
         const string original_file_hash = generate_hash (dummy_file_random_contents);
 
-        GLib.assert_true (!original_file_hash == "");
+        GLib.assert_true (original_file_hash != "");
 
         dummy_input_file.close ();
         GLib.assert_true (!dummy_input_file.is_open ());
@@ -205,7 +205,7 @@ public class TestClientSideEncryption : GLib.Object {
         GLib.assert_true (EncryptionHelper.file_decryption (encryption_key, initialization_vector, dummy_encryption_output_file, dummy_decryption_output_file));
         GLib.assert_true (dummy_decryption_output_file.open ());
         var dummy_decryption_output_file_hash = generate_hash (dummy_decryption_output_file.read_all ());
-        GLib.assert_cmp (dummy_decryption_output_file_hash, original_file_hash);
+        GLib.assert_true (dummy_decryption_output_file_hash == original_file_hash);
 
         // test streaming decryptor
         EncryptionHelper.StreamingDecryptor streaming_decryptor (encryption_key, initialization_vector, dummy_encryption_output_file.size ());
@@ -255,7 +255,7 @@ public class TestClientSideEncryption : GLib.Object {
         chunked_output_decrypted.close ();
 
         GLib.assert_true (chunked_output_decrypted.open (QBuffer.ReadOnly));
-        GLib.assert_cmp (generate_hash (chunked_output_decrypted.read_all ()), original_file_hash);
+        GLib.assert_true (generate_hash (chunked_output_decrypted.read_all ()) == original_file_hash);
         chunked_output_decrypted.close ();
     }
 

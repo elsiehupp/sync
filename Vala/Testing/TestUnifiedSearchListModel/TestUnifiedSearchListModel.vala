@@ -77,7 +77,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
             }
 
             if (!reply) {
-                return qobject_cast<Soup.Reply> (new FakeErrorReply (operation, request, this, 404, new string ("{error : \"Not found!\"}")));
+                return (Soup.Reply)new FakeErrorReply (operation, request, this, 404, "{error : \"Not found!\"}");
             }
 
             return reply;
@@ -101,14 +101,14 @@ public class TestUnifiedSearchListmodel : GLib.Object {
         // #1 test set_search_term actually sets the search term and the signal is emitted
         QSignalSpy search_term_changed = new QSignalSpy (model.data (), Occ.UnifiedSearchResultsListModel.search_term_changed);
         model.set_search_term ("dis");
-        GLib.assert_cmp (search_term_changed.count (), 1);
-        GLib.assert_cmp (model.search_term (), "dis");
+        GLib.assert_true (search_term_changed.count () == 1);
+        GLib.assert_true (model.search_term () == "dis");
 
         // #2 test set_search_term actually sets the search term and the signal is emitted
         search_term_changed.clear ();
         model.set_search_term (model.search_term () + "cuss");
-        GLib.assert_cmp (model.search_term (), "discuss");
-        GLib.assert_cmp (search_term_changed.count (), 1);
+        GLib.assert_true (model.search_term () == "discuss");
+        GLib.assert_true (search_term_changed.count () == 1);
 
         // #3 test that model has not started search yet
         GLib.assert_true (!model.is_search_in_progress ());
@@ -117,7 +117,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
         QSignalSpy search_in_progress_changed = new QSignalSpy (model.data (), &Occ.UnifiedSearchResultsListModel.is_search_in_progress_changed);
         // allow search jobs to get created within the model
         GLib.assert_true (search_in_progress_changed.wait ());
-        GLib.assert_cmp (search_in_progress_changed.count (), 1);
+        GLib.assert_true (search_in_progress_changed.count () == 1);
         GLib.assert_true (model.is_search_in_progress ());
 
         // #5 test that model has stopped the search after setting empty search term
@@ -142,7 +142,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
         GLib.assert_true (search_in_progress_changed.wait ());
 
         // make sure search has started
-        GLib.assert_cmp (search_in_progress_changed.count (), 1);
+        GLib.assert_true (search_in_progress_changed.count () == 1);
         GLib.assert_true (model.is_search_in_progress ());
 
         GLib.assert_true (search_in_progress_changed.wait ());
@@ -170,7 +170,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
         GLib.assert_true (search_in_progress_changed.wait ());
 
         // make sure search has started
-        GLib.assert_cmp (search_in_progress_changed.count (), 1);
+        GLib.assert_true (search_in_progress_changed.count () == 1);
         GLib.assert_true (model.is_search_in_progress ());
 
         GLib.assert_true (search_in_progress_changed.wait ());
@@ -224,7 +224,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
         }
 
         // make sure the current_fetch_more_in_progress_provider_id was set back and forth and correct number fows has been inserted
-        GLib.assert_cmp (current_fetch_more_in_progress_provider_id_changed.count (), 1);
+        GLib.assert_true (current_fetch_more_in_progress_provider_id_changed.count () == 1);
 
         var provider_id_fetch_more_triggered = model.current_fetch_more_in_progress_provider_id ();
 
@@ -234,7 +234,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
 
         GLib.assert_true (model.current_fetch_more_in_progress_provider_id () == "");
 
-        GLib.assert_cmp (rows_inserted.count (), 1);
+        GLib.assert_true (rows_inserted.count () == 1);
 
         var arguments = rows_inserted.take_first ();
 
@@ -243,9 +243,9 @@ public class TestUnifiedSearchListmodel : GLib.Object {
         var first = arguments.at (0).to_int ();
         var last = arguments.at (1).to_int ();
 
-        const int nuiber_of_inserted_expected = last - first;
+        const int number_of_inserted_expected = last - first;
 
-        GLib.assert_cmp (model.row_count () - number_of_rows_in_mmodel_previous, nuiber_of_inserted_expected);
+        GLib.assert_true (model.row_count () - number_of_rows_in_mmodel_previous == number_of_inserted_expected);
 
         // make sure the FetchMoreTrigger gets removed when no more results available
         if (!provider_id_fetch_more_triggered == "") {
@@ -264,7 +264,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
                 }
             }
 
-            GLib.assert_cmp (rows_removed.count (), 1);
+            GLib.assert_true (rows_removed.count () == 1);
 
             bool is_fetch_more_trigger_found = false;
 
@@ -300,7 +300,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
         GLib.assert_true (search_in_progress_changed.wait ());
 
         // make sure search has started
-        GLib.assert_cmp (search_in_progress_changed.count (), 1);
+        GLib.assert_true (search_in_progress_changed.count () == 1);
         GLib.assert_true (model.is_search_in_progress ());
 
         GLib.assert_true (search_in_progress_changed.wait ());
@@ -334,13 +334,13 @@ public class TestUnifiedSearchListmodel : GLib.Object {
             }
         }
 
-        GLib.assert_cmp (signal_result_clicked.count (), 1);
+        GLib.assert_true (signal_result_clicked.count () == 1);
 
         var arguments = signal_result_clicked.take_first ();
 
         var url_open_triggered_via_desktop_services = arguments.at (0).to_string ();
 
-        GLib.assert_cmp (url_open_triggered_via_desktop_services, url_for_clicked_result);
+        GLib.assert_true (url_open_triggered_via_desktop_services == url_for_clicked_result);
     }
 
 

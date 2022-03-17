@@ -66,15 +66,15 @@ public class TestNextcloudPropagator : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void test_parse_etag () {
-        using Test = QPair<const char*, char>;
-        GLib.List<Test> tests;
-        tests.append (Test ("\"abcd\"", "abcd"));
-        tests.append (Test ("\"\"", ""));
-        tests.append (Test ("\"fii\"-gzip", "fii"));
-        tests.append (Test ("W/\"foo\"", "foo"));
+        //  using Test = QPair<const char*, char>;
+        GLib.HashTable<string, string> tests = new GLib.HashTable<string, string> ();
+        tests.append ("\"abcd\"", "abcd");
+        tests.append ("\"\"", "");
+        tests.append ("\"fii\"-gzip", "fii");
+        tests.append ("W/\"foo\"", "foo");
 
         foreach (var test in tests) {
-            GLib.assert_cmp (parse_etag (test.first), string (test.second));
+            GLib.assert_true (parse_etag (test.first) == test.second);
         }
     }
 

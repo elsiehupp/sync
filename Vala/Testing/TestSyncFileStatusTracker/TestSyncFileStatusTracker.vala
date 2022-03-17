@@ -18,8 +18,9 @@ public class TestSyncFileStatusTracker : GLib.Object {
         while (it.has_next ()) {
             string file_path = it.next ().mid (root.size ());
             SyncFileStatus pushed_status = status_spy.status_of (file_path);
-            if (pushed_status != SyncFileStatus ())
-                GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status (file_path), pushed_status);
+            if (pushed_status != new SyncFileStatus ()) {
+                GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status (file_path) == pushed_status);
+            }
         }
     }
 
@@ -35,26 +36,26 @@ public class TestSyncFileStatusTracker : GLib.Object {
         fake_folder.schedule_sync ();
         fake_folder.exec_until_before_propagation ();
         verify_that_push_matches_pull (fake_folder, status_spy);
-        GLib.assert_cmp (status_spy.status_of (""), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("B"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("B/b1"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("C"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("C/c1"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A/a1"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("B/b2"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("C/c2"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("B/b1") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("C") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("C/c1") == SyncFileStatus.StatusSync);
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A/a1") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("B/b2") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("C/c2") == SyncFileStatus.StatusUpToDate);
         status_spy.clear ();
 
         fake_folder.exec_until_finished ();
         verify_that_push_matches_pull (fake_folder, status_spy);
-        GLib.assert_cmp (status_spy.status_of (""), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("B"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("B/b1"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("C"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("C/c1"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("B/b1") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("C") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("C/c1") == SyncFileStatus.StatusUpToDate);
 
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
 
@@ -69,26 +70,26 @@ public class TestSyncFileStatusTracker : GLib.Object {
         fake_folder.schedule_sync ();
         fake_folder.exec_until_before_propagation ();
         verify_that_push_matches_pull (fake_folder, status_spy);
-        GLib.assert_cmp (status_spy.status_of (""), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("B"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("B/b0"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("C"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("C/c0"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A/a1"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("B/b1"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("C/c1"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("B/b0") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("C") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("C/c0") == SyncFileStatus.StatusSync);
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A/a1") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("B/b1") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("C/c1") == SyncFileStatus.StatusUpToDate);
         status_spy.clear ();
 
         fake_folder.exec_until_finished ();
         verify_that_push_matches_pull (fake_folder, status_spy);
-        GLib.assert_cmp (status_spy.status_of (""), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("B"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("B/b0"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("C"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("C/c0"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("B/b0") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("C") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("C/c0") == SyncFileStatus.StatusUpToDate);
 
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
 
@@ -103,23 +104,23 @@ public class TestSyncFileStatusTracker : GLib.Object {
         fake_folder.schedule_sync ();
         fake_folder.exec_until_before_propagation ();
         verify_that_push_matches_pull (fake_folder, status_spy);
-        GLib.assert_cmp (status_spy.status_of (""), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("D"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("D/d0"), SyncFileStatus (SyncFileStatus.StatusSync));
+        GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("D") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("D/d0") == SyncFileStatus.StatusSync);
 
         fake_folder.exec_until_item_completed ("D");
         verify_that_push_matches_pull (fake_folder, status_spy);
-        GLib.assert_cmp (status_spy.status_of (""), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("D"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("D/d0"), SyncFileStatus (SyncFileStatus.StatusSync));
+        GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("D") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("D/d0") == SyncFileStatus.StatusSync);
 
         fake_folder.exec_until_finished ();
         verify_that_push_matches_pull (fake_folder, status_spy);
-        GLib.assert_cmp (status_spy.status_of (""), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("D"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("D/d0"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("D") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("D/d0") == SyncFileStatus.StatusUpToDate);
 
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
 
@@ -134,23 +135,23 @@ public class TestSyncFileStatusTracker : GLib.Object {
         fake_folder.schedule_sync ();
         fake_folder.exec_until_before_propagation ();
         verify_that_push_matches_pull (fake_folder, status_spy);
-        GLib.assert_cmp (status_spy.status_of (""), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("D"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("D/d0"), SyncFileStatus (SyncFileStatus.StatusSync));
+        GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("D") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("D/d0") == SyncFileStatus.StatusSync);
 
         fake_folder.exec_until_item_completed ("D");
         verify_that_push_matches_pull (fake_folder, status_spy);
-        GLib.assert_cmp (status_spy.status_of (""), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("D"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("D/d0"), SyncFileStatus (SyncFileStatus.StatusSync));
+        GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("D") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("D/d0") == SyncFileStatus.StatusSync);
 
         fake_folder.exec_until_finished ();
         verify_that_push_matches_pull (fake_folder, status_spy);
-        GLib.assert_cmp (status_spy.status_of (""), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("D"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("D/d0"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("D") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("D/d0") == SyncFileStatus.StatusUpToDate);
 
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
 
@@ -165,23 +166,23 @@ public class TestSyncFileStatusTracker : GLib.Object {
         fake_folder.schedule_sync ();
         fake_folder.exec_until_before_propagation ();
         verify_that_push_matches_pull (fake_folder, status_spy);
-        GLib.assert_cmp (status_spy.status_of (""), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("B"), SyncFileStatus (SyncFileStatus.StatusSync));
+        GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusSync);
         // Discovered as remotely removed, pending for local removal.
-        GLib.assert_cmp (status_spy.status_of ("B/b1"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("C"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("B/b2"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("C/c2"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        GLib.assert_true (status_spy.status_of ("B/b1") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("C") == SyncFileStatus.StatusSync);
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("B/b2") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("C/c2") == SyncFileStatus.StatusUpToDate);
         status_spy.clear ();
 
         fake_folder.exec_until_finished ();
         verify_that_push_matches_pull (fake_folder, status_spy);
-        GLib.assert_cmp (status_spy.status_of (""), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("B"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("C"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("C") == SyncFileStatus.StatusUpToDate);
 
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
 
@@ -198,43 +199,43 @@ public class TestSyncFileStatusTracker : GLib.Object {
         fake_folder.schedule_sync ();
         fake_folder.exec_until_before_propagation ();
         verify_that_push_matches_pull (fake_folder, status_spy);
-        GLib.assert_cmp (status_spy.status_of ("A/a1"), SyncFileStatus (SyncFileStatus.StatusExcluded));
-        GLib.assert_cmp (status_spy.status_of ("B"), SyncFileStatus (SyncFileStatus.StatusExcluded));
-        QEXPECT_FAIL ("", "csync will stop at ignored directories without traversing children, so we don't currently push the status for newly ignored children of an ignored directory.", Continue);
-        GLib.assert_cmp (status_spy.status_of ("B/b1"), SyncFileStatus (SyncFileStatus.StatusExcluded));
+        GLib.assert_true (status_spy.status_of ("A/a1") == SyncFileStatus.StatusExcluded);
+        GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusExcluded);
+        GLib.assert_fail ("", "csync will stop at ignored directories without traversing children, so we don't currently push the status for newly ignored children of an ignored directory.", Continue);
+        GLib.assert_true (status_spy.status_of ("B/b1") == SyncFileStatus.StatusExcluded);
 
         fake_folder.exec_until_finished ();
         verify_that_push_matches_pull (fake_folder, status_spy);
-        GLib.assert_cmp (status_spy.status_of ("A/a1"), SyncFileStatus (SyncFileStatus.StatusExcluded));
-        GLib.assert_cmp (status_spy.status_of ("B"), SyncFileStatus (SyncFileStatus.StatusExcluded));
-        QEXPECT_FAIL ("", "csync will stop at ignored directories without traversing children, so we don't currently push the status for newly ignored children of an ignored directory.", Continue);
-        GLib.assert_cmp (status_spy.status_of ("B/b1"), SyncFileStatus (SyncFileStatus.StatusExcluded));
-        QEXPECT_FAIL ("", "csync will stop at ignored directories without traversing children, so we don't currently push the status for newly ignored children of an ignored directory.", Continue);
-        GLib.assert_cmp (status_spy.status_of ("B/b2"), SyncFileStatus (SyncFileStatus.StatusExcluded));
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status (""), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        GLib.assert_true (status_spy.status_of ("A/a1") == SyncFileStatus.StatusExcluded);
+        GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusExcluded);
+        GLib.assert_fail ("", "csync will stop at ignored directories without traversing children, so we don't currently push the status for newly ignored children of an ignored directory.", Continue);
+        GLib.assert_true (status_spy.status_of ("B/b1") == SyncFileStatus.StatusExcluded);
+        GLib.assert_fail ("" == "csync will stop at ignored directories without traversing children, so we don't currently push the status for newly ignored children of an ignored directory.", Continue);
+        GLib.assert_true (status_spy.status_of ("B/b2") == SyncFileStatus.StatusExcluded);
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status (""), SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A"), SyncFileStatus.StatusUpToDate);
         status_spy.clear ();
 
         // Clears the exclude expr above
         fake_folder.sync_engine ().excluded_files ().clear_manual_excludes ();
         fake_folder.schedule_sync ();
         fake_folder.exec_until_before_propagation ();
-        GLib.assert_cmp (status_spy.status_of (""), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("A"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("A/a1"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("B"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("B/b1"), SyncFileStatus (SyncFileStatus.StatusSync));
+        GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("A") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("A/a1") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("B/b1") == SyncFileStatus.StatusSync);
         status_spy.clear ();
 
         fake_folder.exec_until_finished ();
         verify_that_push_matches_pull (fake_folder, status_spy);
-        GLib.assert_cmp (status_spy.status_of (""), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("A"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("A/a1"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("B"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("B/b1"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("A") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("A/a1") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("B/b1") == SyncFileStatus.StatusUpToDate);
 
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
 
@@ -247,15 +248,15 @@ public class TestSyncFileStatusTracker : GLib.Object {
         fake_folder.local_modifier ().append_byte ("A/a1");
 
         fake_folder.sync_once ();
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status (""), SyncFileStatus (SyncFileStatus.StatusWarning));
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A"), SyncFileStatus (SyncFileStatus.StatusWarning));
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A/a1"), SyncFileStatus (SyncFileStatus.StatusError));
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("B"), SyncFileStatus (SyncFileStatus.StatusExcluded));
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("") == SyncFileStatus.StatusWarning);
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A") == SyncFileStatus.StatusWarning);
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A/a1") == SyncFileStatus.StatusError);
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("B") == SyncFileStatus.StatusExcluded);
 
         // Should still get the status for different casing on macOS and Windows.
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("a"), SyncFileStatus (Utility.filesystem_case_preserving () ? SyncFileStatus.StatusWarning : SyncFileStatus.StatusNone));
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A/A1"), SyncFileStatus (Utility.filesystem_case_preserving () ? SyncFileStatus.StatusError : SyncFileStatus.StatusNone));
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("b"), SyncFileStatus (Utility.filesystem_case_preserving () ? SyncFileStatus.StatusExcluded : SyncFileStatus.StatusNone));
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("a") == Utility.filesystem_case_preserving () ? SyncFileStatus.StatusWarning : SyncFileStatus.StatusNone);
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A/A1") == Utility.filesystem_case_preserving () ? SyncFileStatus.StatusError : SyncFileStatus.StatusNone);
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("b") == Utility.filesystem_case_preserving () ? SyncFileStatus.StatusExcluded : SyncFileStatus.StatusNone);
     }
 
 
@@ -272,43 +273,43 @@ public class TestSyncFileStatusTracker : GLib.Object {
         fake_folder.schedule_sync ();
         fake_folder.exec_until_before_propagation ();
         verify_that_push_matches_pull (fake_folder, status_spy);
-        GLib.assert_cmp (status_spy.status_of (""), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("A"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("A/a1"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("B"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("B/b0"), SyncFileStatus (SyncFileStatus.StatusSync));
+        GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("A") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("A/a1") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("B/b0") == SyncFileStatus.StatusSync);
         status_spy.clear ();
 
         fake_folder.exec_until_finished ();
         verify_that_push_matches_pull (fake_folder, status_spy);
-        GLib.assert_cmp (status_spy.status_of (""), SyncFileStatus (SyncFileStatus.StatusWarning));
-        GLib.assert_cmp (status_spy.status_of ("A"), SyncFileStatus (SyncFileStatus.StatusWarning));
-        GLib.assert_cmp (status_spy.status_of ("A/a1"), SyncFileStatus (SyncFileStatus.StatusError));
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A/a2"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("B"), SyncFileStatus (SyncFileStatus.StatusWarning));
-        GLib.assert_cmp (status_spy.status_of ("B/b0"), SyncFileStatus (SyncFileStatus.StatusError));
+        GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusWarning);
+        GLib.assert_true (status_spy.status_of ("A") == SyncFileStatus.StatusWarning);
+        GLib.assert_true (status_spy.status_of ("A/a1") == SyncFileStatus.StatusError);
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A/a2") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusWarning);
+        GLib.assert_true (status_spy.status_of ("B/b0") == SyncFileStatus.StatusError);
         status_spy.clear ();
 
-        // Remove the error and on_signal_start a second sync, the blocklist should kick in
+        // Remove the error and start a second sync, the blocklist should kick in
         fake_folder.server_error_paths ().clear ();
         fake_folder.schedule_sync ();
         fake_folder.exec_until_before_propagation ();
         verify_that_push_matches_pull (fake_folder, status_spy);
         // A/a1 and B/b0 should be on the block list for the next few seconds
-        GLib.assert_cmp (status_spy.status_of (""), SyncFileStatus (SyncFileStatus.StatusWarning));
-        GLib.assert_cmp (status_spy.status_of ("A"), SyncFileStatus (SyncFileStatus.StatusWarning));
-        GLib.assert_cmp (status_spy.status_of ("A/a1"), SyncFileStatus (SyncFileStatus.StatusError));
-        GLib.assert_cmp (status_spy.status_of ("B"), SyncFileStatus (SyncFileStatus.StatusWarning));
-        GLib.assert_cmp (status_spy.status_of ("B/b0"), SyncFileStatus (SyncFileStatus.StatusError));
+        GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusWarning);
+        GLib.assert_true (status_spy.status_of ("A") == SyncFileStatus.StatusWarning);
+        GLib.assert_true (status_spy.status_of ("A/a1") == SyncFileStatus.StatusError);
+        GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusWarning);
+        GLib.assert_true (status_spy.status_of ("B/b0") == SyncFileStatus.StatusError);
         status_spy.clear ();
         fake_folder.exec_until_finished ();
         verify_that_push_matches_pull (fake_folder, status_spy);
-        GLib.assert_cmp (status_spy.status_of (""), SyncFileStatus (SyncFileStatus.StatusWarning));
-        GLib.assert_cmp (status_spy.status_of ("A"), SyncFileStatus (SyncFileStatus.StatusWarning));
-        GLib.assert_cmp (status_spy.status_of ("A/a1"), SyncFileStatus (SyncFileStatus.StatusError));
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A/a2"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("B"), SyncFileStatus (SyncFileStatus.StatusWarning));
-        GLib.assert_cmp (status_spy.status_of ("B/b0"), SyncFileStatus (SyncFileStatus.StatusError));
+        GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusWarning);
+        GLib.assert_true (status_spy.status_of ("A") == SyncFileStatus.StatusWarning);
+        GLib.assert_true (status_spy.status_of ("A/a1") == SyncFileStatus.StatusError);
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A/a2") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusWarning);
+        GLib.assert_true (status_spy.status_of ("B/b0") == SyncFileStatus.StatusError);
         status_spy.clear ();
 
         // Start a third sync, this time together with a real file to sync
@@ -318,24 +319,24 @@ public class TestSyncFileStatusTracker : GLib.Object {
         verify_that_push_matches_pull (fake_folder, status_spy);
         // The root should show SYNC even though there is an error underneath,
         // since C/c1 is syncing and the SYNC status has priority.
-        GLib.assert_cmp (status_spy.status_of (""), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("A"), SyncFileStatus (SyncFileStatus.StatusWarning));
-        GLib.assert_cmp (status_spy.status_of ("A/a1"), SyncFileStatus (SyncFileStatus.StatusError));
-        GLib.assert_cmp (status_spy.status_of ("B"), SyncFileStatus (SyncFileStatus.StatusWarning));
-        GLib.assert_cmp (status_spy.status_of ("B/b0"), SyncFileStatus (SyncFileStatus.StatusError));
-        GLib.assert_cmp (status_spy.status_of ("C"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("C/c1"), SyncFileStatus (SyncFileStatus.StatusSync));
+        GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("A") == SyncFileStatus.StatusWarning);
+        GLib.assert_true (status_spy.status_of ("A/a1") == SyncFileStatus.StatusError);
+        GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusWarning);
+        GLib.assert_true (status_spy.status_of ("B/b0") == SyncFileStatus.StatusError);
+        GLib.assert_true (status_spy.status_of ("C") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("C/c1") == SyncFileStatus.StatusSync);
         status_spy.clear ();
         fake_folder.exec_until_finished ();
         verify_that_push_matches_pull (fake_folder, status_spy);
-        GLib.assert_cmp (status_spy.status_of (""), SyncFileStatus (SyncFileStatus.StatusWarning));
-        GLib.assert_cmp (status_spy.status_of ("A"), SyncFileStatus (SyncFileStatus.StatusWarning));
-        GLib.assert_cmp (status_spy.status_of ("A/a1"), SyncFileStatus (SyncFileStatus.StatusError));
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A/a2"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("B"), SyncFileStatus (SyncFileStatus.StatusWarning));
-        GLib.assert_cmp (status_spy.status_of ("B/b0"), SyncFileStatus (SyncFileStatus.StatusError));
-        GLib.assert_cmp (status_spy.status_of ("C"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("C/c1"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusWarning);
+        GLib.assert_true (status_spy.status_of ("A") == SyncFileStatus.StatusWarning);
+        GLib.assert_true (status_spy.status_of ("A/a1") == SyncFileStatus.StatusError);
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A/a2") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusWarning);
+        GLib.assert_true (status_spy.status_of ("B/b0") == SyncFileStatus.StatusError);
+        GLib.assert_true (status_spy.status_of ("C") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("C/c1") == SyncFileStatus.StatusUpToDate);
         status_spy.clear ();
 
         // Another sync after clearing the blocklist entry, everything should return to order.
@@ -344,21 +345,21 @@ public class TestSyncFileStatusTracker : GLib.Object {
         fake_folder.schedule_sync ();
         fake_folder.exec_until_before_propagation ();
         verify_that_push_matches_pull (fake_folder, status_spy);
-        GLib.assert_cmp (status_spy.status_of (""), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("A"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("A/a1"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("B"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("B/b0"), SyncFileStatus (SyncFileStatus.StatusSync));
+        GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("A") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("A/a1") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("B/b0") == SyncFileStatus.StatusSync);
         status_spy.clear ();
         fake_folder.exec_until_finished ();
         verify_that_push_matches_pull (fake_folder, status_spy);
-        GLib.assert_cmp (status_spy.status_of (""), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("A"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("A/a1"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("B"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("B/b0"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("A") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("A/a1") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("B/b0") == SyncFileStatus.StatusUpToDate);
 
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
 
@@ -388,19 +389,20 @@ public class TestSyncFileStatusTracker : GLib.Object {
         fake_folder.schedule_sync ();
         fake_folder.exec_until_before_propagation ();
         // The SyncFileStatusTraker won't push any status for all of them, test with a pull.
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status (""), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A/a1"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A/a"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("") == SyncFileStatus.StatusSync);
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A") == SyncFileStatus.StatusSync);
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A/a1") == SyncFileStatus.StatusSync);
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A/a") == SyncFileStatus.StatusUpToDate);
 
         fake_folder.exec_until_finished ();
         // We use string matching for paths in the implementation,
         // an error should affect only parents and not every path that starts with the problem path.
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status (""), SyncFileStatus (SyncFileStatus.StatusWarning));
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A"), SyncFileStatus (SyncFileStatus.StatusWarning));
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A/a1"), SyncFileStatus (SyncFileStatus.StatusError));
-        GLib.assert_cmp (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A/a"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("") == SyncFileStatus.StatusWarning);
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A") == SyncFileStatus.StatusWarning);
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A/a1") == SyncFileStatus.StatusError);
+        GLib.assert_true (fake_folder.sync_engine ().sync_file_status_tracker ().file_status ("A/a") == SyncFileStatus.StatusUpToDate);
     }
+
 
     /***********************************************************
     Even for status pushes immediately following each other,
@@ -419,11 +421,11 @@ public class TestSyncFileStatusTracker : GLib.Object {
         GLib.assert_true (status_spy.status_emitted_before ("C/c1", "C"));
         GLib.assert_true (status_spy.status_emitted_before ("B", ""));
         GLib.assert_true (status_spy.status_emitted_before ("C", ""));
-        GLib.assert_cmp (status_spy.status_of (""), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("B"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("B/b1"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("C"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("C/c1"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("B/b1") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("C") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("C/c1") == SyncFileStatus.StatusUpToDate);
     }
 
 
@@ -446,25 +448,25 @@ public class TestSyncFileStatusTracker : GLib.Object {
         fake_folder.schedule_sync ();
         fake_folder.exec_until_before_propagation ();
         verify_that_push_matches_pull (fake_folder, status_spy);
-        GLib.assert_cmp (status_spy.status_of (""), SyncFileStatus (SyncFileStatus.StatusSync));
+        GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusSync);
         // We don't care about the shared flag for the sync status,
         // Mac and Windows won't show it and we can't know it for new files.
-        GLib.assert_cmp (status_spy.status_of ("S").tag (), SyncFileStatus.StatusSync);
-        GLib.assert_cmp (status_spy.status_of ("S/s0").tag (), SyncFileStatus.StatusSync);
-        GLib.assert_cmp (status_spy.status_of ("S/s1").tag (), SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("S").tag () == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("S/s0").tag () == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("S/s1").tag () == SyncFileStatus.StatusSync);
 
         fake_folder.exec_until_finished ();
         verify_that_push_matches_pull (fake_folder, status_spy);
-        GLib.assert_cmp (status_spy.status_of (""), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("S"), shared_up_to_date_status);
-        QEXPECT_FAIL ("", "We currently only know if a new file is shared on the second sync, after a PROPFIND.", Continue);
-        GLib.assert_cmp (status_spy.status_of ("S/s0"), shared_up_to_date_status);
-        GLib.assert_cmp (status_spy.status_of ("S/s1"), shared_up_to_date_status);
-        GLib.assert_cmp (status_spy.status_of ("B/b1").shared (), false);
-        GLib.assert_cmp (status_spy.status_of ("B/b3"), shared_up_to_date_status);
-        GLib.assert_cmp (status_spy.status_of ("A/a1"), shared_up_to_date_status);
+        GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("S") == shared_up_to_date_status);
+        GLib.assert_fail ("", "We currently only know if a new file is shared on the second sync, after a PROPFIND.", Continue);
+        GLib.assert_true (status_spy.status_of ("S/s0") == shared_up_to_date_status);
+        GLib.assert_true (status_spy.status_of ("S/s1") == shared_up_to_date_status);
+        GLib.assert_true (status_spy.status_of ("B/b1").shared () == false);
+        GLib.assert_true (status_spy.status_of ("B/b3") == shared_up_to_date_status);
+        GLib.assert_true (status_spy.status_of ("A/a1") == shared_up_to_date_status);
 
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
 
@@ -482,21 +484,21 @@ public class TestSyncFileStatusTracker : GLib.Object {
 
         verify_that_push_matches_pull (fake_folder, status_spy);
 
-        GLib.assert_cmp (status_spy.status_of ("A/a1m"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("A/a1"), status_spy.status_of ("A/a1notexist"));
-        GLib.assert_cmp (status_spy.status_of ("A"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of (""), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("B"), SyncFileStatus (SyncFileStatus.StatusSync));
-        GLib.assert_cmp (status_spy.status_of ("B/b1m"), SyncFileStatus (SyncFileStatus.StatusSync));
+        GLib.assert_true (status_spy.status_of ("A/a1m") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("A/a1") == status_spy.status_of ("A/a1notexist"));
+        GLib.assert_true (status_spy.status_of ("A") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusSync);
+        GLib.assert_true (status_spy.status_of ("B/b1m") == SyncFileStatus.StatusSync);
 
         fake_folder.exec_until_finished ();
         verify_that_push_matches_pull (fake_folder, status_spy);
-        GLib.assert_cmp (status_spy.status_of ("A/a1m"), SyncFileStatus (SyncFileStatus.StatusError));
-        GLib.assert_cmp (status_spy.status_of ("A/a1"), status_spy.status_of ("A/a1notexist"));
-        GLib.assert_cmp (status_spy.status_of ("A"), SyncFileStatus (SyncFileStatus.StatusWarning));
-        GLib.assert_cmp (status_spy.status_of (""), SyncFileStatus (SyncFileStatus.StatusWarning));
-        GLib.assert_cmp (status_spy.status_of ("B"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
-        GLib.assert_cmp (status_spy.status_of ("B/b1m"), SyncFileStatus (SyncFileStatus.StatusUpToDate));
+        GLib.assert_true (status_spy.status_of ("A/a1m") == SyncFileStatus.StatusError);
+        GLib.assert_true (status_spy.status_of ("A/a1") == status_spy.status_of ("A/a1notexist"));
+        GLib.assert_true (status_spy.status_of ("A") == SyncFileStatus.StatusWarning);
+        GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusWarning);
+        GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusUpToDate);
+        GLib.assert_true (status_spy.status_of ("B/b1m") == SyncFileStatus.StatusUpToDate);
         status_spy.clear ();
 
         GLib.assert_true (!fake_folder.sync_once ());
@@ -504,12 +506,12 @@ public class TestSyncFileStatusTracker : GLib.Object {
         status_spy.clear ();
         GLib.assert_true (!fake_folder.sync_once ());
         verify_that_push_matches_pull (fake_folder, status_spy);
-        GLib.assert_cmp (status_spy.status_of ("A/a1m"), SyncFileStatus (SyncFileStatus.StatusError));
-        GLib.assert_cmp (status_spy.status_of ("A/a1"), status_spy.status_of ("A/a1notexist"));
-        GLib.assert_cmp (status_spy.status_of ("A"), SyncFileStatus (SyncFileStatus.StatusWarning));
-        GLib.assert_cmp (status_spy.status_of (""), SyncFileStatus (SyncFileStatus.StatusWarning));
-        GLib.assert_cmp (status_spy.status_of ("B"), SyncFileStatus (SyncFileStatus.StatusNone));
-        GLib.assert_cmp (status_spy.status_of ("B/b1m"), SyncFileStatus (SyncFileStatus.StatusNone));
+        GLib.assert_true (status_spy.status_of ("A/a1m") == SyncFileStatus.StatusError);
+        GLib.assert_true (status_spy.status_of ("A/a1") == status_spy.status_of ("A/a1notexist"));
+        GLib.assert_true (status_spy.status_of ("A") == SyncFileStatus.StatusWarning);
+        GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusWarning);
+        GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusNone);
+        GLib.assert_true (status_spy.status_of ("B/b1m") == SyncFileStatus.StatusNone);
         status_spy.clear ();
     }
 

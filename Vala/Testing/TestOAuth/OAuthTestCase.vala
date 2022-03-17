@@ -65,7 +65,7 @@ public class OAuthTestCase : GLib.Object {
             return this.token_reply (operation, request);
         });
 
-        GLib.Object.connect (
+        connect (
             desktop_service_hook,
             DesktopServiceHook.signal_hooked,
             this,
@@ -73,7 +73,7 @@ public class OAuthTestCase : GLib.Object {
         );
 
         oauth.on_signal_reset (new OAuth (account.data (), null));
-        GLib.Object.connect (
+        connect (
             oauth.data (),
             OAuth.result,
             this,
@@ -87,15 +87,15 @@ public class OAuthTestCase : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public virtual void open_browser_hook (GLib.Uri url) {
-        GLib.assert_cmp (state, StartState);
+        GLib.assert_true (state == StartState);
         state = BrowserOpened;
-        GLib.assert_cmp (url.path (), string (s_oauth_test_server.path () + "/index.php/apps/oauth2/authorize"));
+        GLib.assert_true (url.path () == s_oauth_test_server.path () + "/index.php/apps/oauth2/authorize");
         GLib.assert_true (url.to_string ().starts_with (s_oauth_test_server.to_string ()));
         QUrlQuery query = new QUrlQuery (url);
-        GLib.assert_cmp (query.query_item_value ("response_type"), "code");
-        GLib.assert_cmp (query.query_item_value ("client_id"), Theme.instance ().oauth_client_id ());
+        GLib.assert_true (query.query_item_value ("response_type") == "code");
+        GLib.assert_true (query.query_item_value ("client_id") == Theme.instance ().oauth_client_id ());
         GLib.Uri redirect_uri = new GLib.Uri (query.query_item_value ("redirect_uri"));
-        GLib.assert_cmp (redirect_uri.host (), "localhost");
+        GLib.assert_true (redirect_uri.host () == "localhost");
         redirect_uri.set_query ("code=" + code);
         create_browser_reply (Soup.Request (redirect_uri));
     }
@@ -105,7 +105,7 @@ public class OAuthTestCase : GLib.Object {
     ***********************************************************/
     public virtual Soup.Reply create_browser_reply (Soup.Request request) {
         browser_reply = real_qnam.get (request);
-        GLib.Object.connect (
+        connect (
             browser_reply,
             Soup.Reply.on_signal_finished,
             this,
@@ -117,12 +117,13 @@ public class OAuthTestCase : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public virtual void browser_reply_finished () {
-        GLib.assert_cmp (sender (), browser_reply.data ());
-        GLib.assert_cmp (state, TokenAsked);
+        GLib.assert_true (sender () == browser_reply.data ());
+        GLib.assert_true (state == TokenAsked);
         browser_reply.delete_later ();
-        GLib.assert_cmp (browser_reply.raw_header ("Location"), string ("owncloud://on_signal_success"));
+        GLib.assert_true (browser_reply.raw_header ("Location") == "owncloud://on_signal_success");
         reply_to_browser_ok = true;
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -155,11 +156,11 @@ public class OAuthTestCase : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public virtual void oauth_result (OAuth.Result result, string user, string token , string refresh_token) {
-        GLib.assert_cmp (state, TokenAsked);
-        GLib.assert_cmp (result, OAuth.LoggedIn);
-        GLib.assert_cmp (user, "789");
-        GLib.assert_cmp (token, "123");
-        GLib.assert_cmp (refresh_token, "456");
+        GLib.assert_true (state == TokenAsked);
+        GLib.assert_true (result == OAuth.LoggedIn);
+        GLib.assert_true (user == "789");
+        GLib.assert_true (token == "123");
+        GLib.assert_true (refresh_token == "456");
         got_auth_ok = true;
     }
 

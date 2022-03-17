@@ -22,6 +22,7 @@ public class FakePutReply : FakeReply {
         QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
     }
 
+
     /***********************************************************
     ***********************************************************/
     public static FileInfo perform (FileInfo remote_root_file_info, Soup.Request request, string put_payload) {
@@ -40,6 +41,7 @@ public class FakePutReply : FakeReply {
         return file_info;
     }
 
+
     /***********************************************************
     ***********************************************************/
     public virtual void respond () {
@@ -53,12 +55,14 @@ public class FakePutReply : FakeReply {
         /* emit */ signal_finished ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     public override void on_signal_abort () {
         set_error (OperationCanceledError, "on_signal_abort");
         /* emit */ signal_finished ();
     }
+
 
     /***********************************************************
     ***********************************************************/

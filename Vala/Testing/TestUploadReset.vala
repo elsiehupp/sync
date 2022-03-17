@@ -50,29 +50,29 @@ public class TestUploadReset : GLib.Object {
         GLib.assert_true (!fake_folder.sync_once ());
 
         upload_info = fake_folder.sync_engine ().journal ().get_upload_info ("A/a0");
-        GLib.assert_cmp (upload_info.error_count, 1);
-        GLib.assert_cmp (upload_info.transferid, 1U);
+        GLib.assert_true (upload_info.error_count == 1);
+        GLib.assert_true (upload_info.transferid == 1U);
 
         fake_folder.sync_engine ().journal ().wipe_error_blocklist ();
         GLib.assert_true (!fake_folder.sync_once ());
 
         upload_info = fake_folder.sync_engine ().journal ().get_upload_info ("A/a0");
-        GLib.assert_cmp (upload_info.error_count, 2);
-        GLib.assert_cmp (upload_info.transferid, 1U);
+        GLib.assert_true (upload_info.error_count == 2);
+        GLib.assert_true (upload_info.transferid == 1U);
 
         fake_folder.sync_engine ().journal ().wipe_error_blocklist ();
         GLib.assert_true (!fake_folder.sync_once ());
 
         upload_info = fake_folder.sync_engine ().journal ().get_upload_info ("A/a0");
-        GLib.assert_cmp (upload_info.error_count, 3);
-        GLib.assert_cmp (upload_info.transferid, 1U);
+        GLib.assert_true (upload_info.error_count == 3);
+        GLib.assert_true (upload_info.transferid == 1U);
 
         fake_folder.sync_engine ().journal ().wipe_error_blocklist ();
         GLib.assert_true (!fake_folder.sync_once ());
 
         upload_info = fake_folder.sync_engine ().journal ().get_upload_info ("A/a0");
-        GLib.assert_cmp (upload_info.error_count, 0);
-        GLib.assert_cmp (upload_info.transferid, 0U);
+        GLib.assert_true (upload_info.error_count == 0);
+        GLib.assert_true (upload_info.transferid == 0U);
         GLib.assert_true (!upload_info.valid);
     }
 

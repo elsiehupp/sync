@@ -12,7 +12,7 @@ using Occ;
 
 namespace Testing {
 
-struct FakeBrokenXmlPropfindReply : FakePropfindReply {
+public class FakeBrokenXmlPropfindReply : FakePropfindReply {
     FakeBrokenXmlPropfindReply (FileInfo remote_root_file_info, Soup.Operation operation,
                                const Soup.Request request, GLib.Object parent)
         : FakePropfindReply (remote_root_file_info, operation, request, parent) {
@@ -22,7 +22,7 @@ struct FakeBrokenXmlPropfindReply : FakePropfindReply {
     }
 }
 
-struct MissingPermissionsPropfindReply : FakePropfindReply {
+public class MissingPermissionsPropfindReply : FakePropfindReply {
     MissingPermissionsPropfindReply (FileInfo remote_root_file_info, Soup.Operation operation,
         Soup.Request request, GLib.Object parent) {
         base (remote_root_file_info, operation, request, parent);
@@ -87,20 +87,7 @@ public class TestRemoteDiscovery : GLib.Object {
 
         string error_folder = "dav/files/admin/B";
         string fatal_error_prefix = "Server replied with an error while reading directory \"B\": ";
-        fake_folder.set_server_override (
-            [&] (Soup.Operation operation, Soup.Request request, QIODevice *) => Soup.Reply *{
-                if (request.attribute (Soup.Request.CustomVerbAttribute) == "PROPFIND" && request.url ().path ().ends_with (error_folder)) {
-                    if (error_kind == InvalidXML) {
-                        return new FakeBrokenXmlPropfindReply (fake_folder.remote_modifier (), operation, request, this);
-                    } else if (error_kind == Timeout) {
-                        return new FakeHangingReply (operation, request, this);
-                    } else if (error_kind < 1000) {
-                        return new FakeErrorReply (operation, request, this, error_kind);
-                    }
-                }
-                return null;
-            }
-        );
+        fake_folder.set_server_override (this.override_delegate_remote_error);
 
         // So the test that test timeout finishes fast
         QScopedValueRollback<int> set_http_timeout (AbstractNetworkJob.http_timeout, error_kind == Timeout ? 1 : 10000);
@@ -110,22 +97,22 @@ public class TestRemoteDiscovery : GLib.Object {
             fake_folder.sync_engine (),
             SyncEngine.sync_error
         );
-        GLib.assert_cmp (fake_folder.sync_once (), sync_succeeds);
+        GLib.assert_true (fake_folder.sync_once () == sync_succeeds);
 
         // The folder B should not have been sync'ed (and in particular not removed)
-        GLib.assert_cmp (old_local_state.children["B"], fake_folder.current_local_state ().children["B"]);
-        GLib.assert_cmp (old_remote_state.children["B"], fake_folder.current_remote_state ().children["B"]);
+        GLib.assert_true (old_local_state.children["B"] == fake_folder.current_local_state ().children["B"]);
+        GLib.assert_true (old_remote_state.children["B"] == fake_folder.current_remote_state ().children["B"]);
         if (!sync_succeeds) {
-            GLib.assert_cmp (error_spy.size (), 1);
-            GLib.assert_cmp (error_spy[0][0].to_string (), string (fatal_error_prefix + expected_error_string));
+            GLib.assert_true (error_spy.size () == 1);
+            GLib.assert_true (error_spy[0][0].to_string () == fatal_error_prefix + expected_error_string);
         } else {
-            GLib.assert_cmp (complete_spy.find_item ("B").instruction, SyncInstructions.IGNORE);
+            GLib.assert_true (complete_spy.find_item ("B").instruction == SyncInstructions.IGNORE);
             GLib.assert_true (complete_spy.find_item ("B").error_string.contains (expected_error_string));
 
             // The other folder should have been sync'ed as the sync just ignored the faulty directory
-            GLib.assert_cmp (fake_folder.current_remote_state ().children["A"], fake_folder.current_local_state ().children["A"]);
-            GLib.assert_cmp (fake_folder.current_remote_state ().children["C"], fake_folder.current_local_state ().children["C"]);
-            GLib.assert_cmp (complete_spy.find_item ("A/z1").instruction, SyncInstructions.NEW);
+            GLib.assert_true (fake_folder.current_remote_state ().children["A"] == fake_folder.current_local_state ().children["A"]);
+            GLib.assert_true (fake_folder.current_remote_state ().children["C"] == fake_folder.current_local_state ().children["C"]);
+            GLib.assert_true (complete_spy.find_item ("A/z1").instruction == SyncInstructions.NEW);
         }
 
         //
@@ -135,8 +122,22 @@ public class TestRemoteDiscovery : GLib.Object {
         fatal_error_prefix = "Server replied with an error while reading directory \"\": ";
         error_spy.clear ();
         GLib.assert_true (!fake_folder.sync_once ());
-        GLib.assert_cmp (error_spy.size (), 1);
-        GLib.assert_cmp (error_spy[0][0].to_string (), string (fatal_error_prefix + expected_error_string));
+        GLib.assert_true (error_spy.size () == 1);
+        GLib.assert_true (error_spy[0][0].to_string () == fatal_error_prefix + expected_error_string);
+    }
+
+
+    private Soup.Reply override_delegate_remote_error (Soup.Operation operation, Soup.Request request, QIODevice device) {
+        if (request.attribute (Soup.Request.CustomVerbAttribute) == "PROPFIND" && request.url ().path ().ends_with (error_folder)) {
+            if (error_kind == InvalidXML) {
+                return new FakeBrokenXmlPropfindReply (fake_folder.remote_modifier (), operation, request, this);
+            } else if (error_kind == Timeout) {
+                return new FakeHangingReply (operation, request, this);
+            } else if (error_kind < 1000) {
+                return new FakeErrorReply (operation, request, this, error_kind);
+            }
+        }
+        return null;
     }
 
 
@@ -152,25 +153,27 @@ public class TestRemoteDiscovery : GLib.Object {
         fake_folder.remote_modifier ().mkdir ("nopermissions");
         fake_folder.remote_modifier ().insert ("nopermissions/A");
 
-        fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice *)
-                . Soup.Reply *{
-            if (request.attribute (Soup.Request.CustomVerbAttribute) == "PROPFIND" && request.url ().path ().ends_with ("nopermissions"))
-                return new MissingPermissionsPropfindReply (fake_folder.remote_modifier (), operation, request, this);
-            return null;
-        });
+        fake_folder.set_server_override (this.override_delegate_missing_data);
 
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
         GLib.assert_true (!fake_folder.sync_once ());
 
-        GLib.assert_cmp (complete_spy.find_item ("good").instruction, SyncInstructions.NEW);
-        GLib.assert_cmp (complete_spy.find_item ("noetag").instruction, SyncInstructions.ERROR);
-        GLib.assert_cmp (complete_spy.find_item ("nofileid").instruction, SyncInstructions.ERROR);
-        GLib.assert_cmp (complete_spy.find_item ("nopermissions").instruction, SyncInstructions.NEW);
-        GLib.assert_cmp (complete_spy.find_item ("nopermissions/A").instruction, SyncInstructions.ERROR);
+        GLib.assert_true (complete_spy.find_item ("good").instruction == SyncInstructions.NEW);
+        GLib.assert_true (complete_spy.find_item ("noetag").instruction == SyncInstructions.ERROR);
+        GLib.assert_true (complete_spy.find_item ("nofileid").instruction == SyncInstructions.ERROR);
+        GLib.assert_true (complete_spy.find_item ("nopermissions").instruction == SyncInstructions.NEW);
+        GLib.assert_true (complete_spy.find_item ("nopermissions/A").instruction == SyncInstructions.ERROR);
         GLib.assert_true (complete_spy.find_item ("noetag").error_string.contains ("ETag"));
         GLib.assert_true (complete_spy.find_item ("nofileid").error_string.contains ("file identifier"));
         GLib.assert_true (complete_spy.find_item ("nopermissions/A").error_string.contains ("permission"));
     }
-}
 
-QTEST_GUILESS_MAIN (TestRemoteDiscovery)
+
+    private Soup.Reply override_delegate_missing_data (Soup.Operation operation, Soup.Request request, QIODevice device) {
+        if (request.attribute (Soup.Request.CustomVerbAttribute) == "PROPFIND" && request.url ().path ().ends_with ("nopermissions"))
+            return new MissingPermissionsPropfindReply (fake_folder.remote_modifier (), operation, request, this);
+        return null;
+    }
+
+}
+}

@@ -32,7 +32,7 @@ public class TestLocalDiscovery : GLib.Object {
         tracker.start_sync_full_discovery ();
         GLib.assert_true (fake_folder.sync_once ());
 
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         GLib.assert_true (tracker.local_discovery_paths ().empty ());
 
         // Test begins
@@ -54,12 +54,12 @@ public class TestLocalDiscovery : GLib.Object {
         GLib.assert_true (!fake_folder.current_remote_state ().find ("A/Y/y2"));
         GLib.assert_true (!fake_folder.current_remote_state ().find ("B/b3"));
         GLib.assert_true (fake_folder.current_local_state ().find ("C/c3"));
-        GLib.assert_cmp (fake_folder.sync_engine ().last_local_discovery_style (), LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM);
+        GLib.assert_true (fake_folder.sync_engine ().last_local_discovery_style () == LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM);
         GLib.assert_true (tracker.local_discovery_paths ().empty ());
 
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        GLib.assert_cmp (fake_folder.sync_engine ().last_local_discovery_style (), LocalDiscoveryStyle.FILESYSTEM_ONLY);
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.sync_engine ().last_local_discovery_style () == LocalDiscoveryStyle.FILESYSTEM_ONLY);
         GLib.assert_true (tracker.local_discovery_paths ().empty ());
     }
 
@@ -97,7 +97,7 @@ public class TestLocalDiscovery : GLib.Object {
         GLib.assert_true (engine.should_discover_locally ("zzzz/hello"));
         GLib.assert_true (!engine.should_discover_locally ("zzza/hello"));
 
-        QEXPECT_FAIL ("", "There is a possibility of false positives if the set contains a path "
+        GLib.assert_fail ("", "There is a possibility of false positives if the set contains a path "
             "which is a prefix, and that prefix is followed by a character less than '/'", Continue);
         GLib.assert_true (!engine.should_discover_locally ("A/X o"));
 
@@ -190,8 +190,8 @@ public class TestLocalDiscovery : GLib.Object {
 
         GLib.assert_true (fake_folder.sync_once ());
 
-        GLib.assert_cmp (fake_folder.current_local_state (), expected_state);
-        GLib.assert_cmp (fake_folder.current_remote_state (), expected_state);
+        GLib.assert_true (fake_folder.current_local_state () == expected_state);
+        GLib.assert_true (fake_folder.current_remote_state () == expected_state);
     }
 
 
@@ -200,7 +200,7 @@ public class TestLocalDiscovery : GLib.Object {
     ***********************************************************/
     private void test_server_blocklist () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         fake_folder.sync_engine ().account ().set_capabilities ({ { "files",
             QVariantMap { { "blocklisted_files", QVariantList { ".foo", "bar" } } } } });
@@ -221,7 +221,7 @@ public class TestLocalDiscovery : GLib.Object {
     ***********************************************************/
     private void test_create_file_with_trailing_spaces_local_and_remote_trimmed_do_not_exist_rename_and_upload_file () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         const string file_with_spaces_1 = " foo";
         const string file_with_spaces_2 = " bar  ";
         const string file_with_spaces_3 = "bla ";
@@ -274,7 +274,7 @@ public class TestLocalDiscovery : GLib.Object {
     ***********************************************************/
     private void test_create_file_with_trailing_spaces_local_trimmed_does_exist_dont_rename_and_upload_file () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         const string file_with_spaces = " foo";
         const string file_trimmed "foo";
 
@@ -294,7 +294,7 @@ public class TestLocalDiscovery : GLib.Object {
     ***********************************************************/
     private void test_create_file_with_trailing_spaces_local_trimmed_also_created_dont_rename_and_upload_file () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         const string file_with_spaces (" foo");
         const string file_trimmed ("foo");
 

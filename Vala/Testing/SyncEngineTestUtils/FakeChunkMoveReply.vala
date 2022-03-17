@@ -23,6 +23,7 @@ public class FakeChunkMoveReply : FakeReply {
         }
     }
 
+
     /***********************************************************
     ***********************************************************/
     public static FileInfo perform (FileInfo uploads_file_info, FileInfo remote_root_file_info, Soup.Request request) {
@@ -60,7 +61,7 @@ public class FakeChunkMoveReply : FakeReply {
             GLib.assert_true (request.has_raw_header ("If"));
 
             // And it should condition on the destination file
-            var on_signal_start = string ("<" + request.raw_header ("Destination") + ">");
+            var on_signal_start = "<" + request.raw_header ("Destination") + ">";
             GLib.assert_true (request.raw_header ("If").starts_with (on_signal_start));
 
             if (request.raw_header ("If") != on_signal_start + " ([\"" + file_info.etag + "\"])") {
@@ -79,6 +80,7 @@ public class FakeChunkMoveReply : FakeReply {
         return file_info;
     }
 
+
     /***********************************************************
     ***********************************************************/
     public virtual void respond () {
@@ -90,6 +92,7 @@ public class FakeChunkMoveReply : FakeReply {
         /* emit */ signal_finished ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     public void respond_precondition_failed () {
@@ -99,12 +102,14 @@ public class FakeChunkMoveReply : FakeReply {
         /* emit */ signal_finished ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     public override void on_signal_abort () {
         set_error (OperationCanceledError, "on_signal_abort");
         /* emit */ signal_finished ();
     }
+
 
     /***********************************************************
     ***********************************************************/

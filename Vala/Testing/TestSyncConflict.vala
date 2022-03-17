@@ -61,7 +61,7 @@ public class TestSyncConflict : GLib.Object {
     ***********************************************************/
     private void test_no_upload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         fake_folder.local_modifier ().set_contents ("A/a1", 'L');
         fake_folder.remote_modifier ().set_contents ("A/a1", 'R');
@@ -77,7 +77,7 @@ public class TestSyncConflict : GLib.Object {
 
         GLib.assert_true (expect_and_wipe_conflict (fake_folder.local_modifier (), fake_folder.current_local_state (), "A/a1"));
         GLib.assert_true (expect_and_wipe_conflict (fake_folder.local_modifier (), fake_folder.current_local_state (), "A/a2"));
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
 
@@ -86,24 +86,10 @@ public class TestSyncConflict : GLib.Object {
     private void test_upload_after_download () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().set_capabilities ({ { "upload_conflict_files", true } });
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         GLib.HashTable<string, string> conflict_map;
-        fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice *) . Soup.Reply * {
-            if (operation == Soup.PutOperation) {
-                if (request.raw_header ("OC-Conflict") == "1") {
-                    var base_file_id = request.raw_header ("OC-ConflictBaseFileId");
-                    var components = request.url ().to_string ().split ('/');
-                    string conflict_file = components.mid (components.size () - 2).join ('/');
-                    conflict_map[base_file_id] = conflict_file;
-                    [&] {
-                        GLib.assert_true (!base_file_id == "");
-                        GLib.assert_cmp (request.raw_header ("OC-ConflictInitialBasePath"), Utility.conflict_file_base_name_from_pattern (conflict_file));
-                    } ();
-                }
-            }
-            return null;
-        });
+        fake_folder.set_server_override (this.override_delegate_upload_after_download);
 
         fake_folder.local_modifier ().set_contents ("A/a1", 'L');
         fake_folder.remote_modifier ().set_contents ("A/a1", 'R');
@@ -113,23 +99,40 @@ public class TestSyncConflict : GLib.Object {
         GLib.assert_true (fake_folder.sync_once ());
         var local = fake_folder.current_local_state ();
         var remote = fake_folder.current_remote_state ();
-        GLib.assert_cmp (local, remote);
+        GLib.assert_true (local == remote);
 
         var a1FileId = fake_folder.remote_modifier ().find ("A/a1").file_identifier;
         var a2FileId = fake_folder.remote_modifier ().find ("A/a2").file_identifier;
         GLib.assert_true (conflict_map.contains (a1FileId));
         GLib.assert_true (conflict_map.contains (a2FileId));
-        GLib.assert_cmp (conflict_map.size (), 2);
-        GLib.assert_cmp (Utility.conflict_file_base_name_from_pattern (conflict_map[a1FileId]), string ("A/a1"));
+        GLib.assert_true (conflict_map.size () == 2);
+        GLib.assert_true (Utility.conflict_file_base_name_from_pattern (conflict_map[a1FileId]) == "A/a1");
 
         // Check that the conflict file contains the username
-        GLib.assert_true (conflict_map[a1FileId].contains (string (" (conflicted copy %1 ").printf (fake_folder.sync_engine ().account ().dav_display_name ())));
+        GLib.assert_true (conflict_map[a1FileId].contains (" (conflicted copy %1 ".printf (fake_folder.sync_engine ().account ().dav_display_name ())));
 
-        GLib.assert_cmp (remote.find (conflict_map[a1FileId]).content_char, 'L');
-        GLib.assert_cmp (remote.find ("A/a1").content_char, 'R');
+        GLib.assert_true (remote.find (conflict_map[a1FileId]).content_char == 'L');
+        GLib.assert_true (remote.find ("A/a1").content_char == 'R');
 
-        GLib.assert_cmp (remote.find (conflict_map[a2FileId]).size, 5);
-        GLib.assert_cmp (remote.find ("A/a2").size, 6);
+        GLib.assert_true (remote.find (conflict_map[a2FileId]).size == 5);
+        GLib.assert_true (remote.find ("A/a2").size == 6);
+    }
+
+
+    private Soup.Reply override_delegate_upload_after_download (Soup.Operation operation, Soup.Request request, QIODevice device) {
+        if (operation == Soup.PutOperation) {
+            if (request.raw_header ("OC-Conflict") == "1") {
+                var base_file_id = request.raw_header ("OC-ConflictBaseFileId");
+                var components = request.url ().to_string ().split ('/');
+                string conflict_file = components.mid (components.size () - 2).join ('/');
+                conflict_map[base_file_id] = conflict_file;
+                [&] {
+                    GLib.assert_true (!base_file_id == "");
+                    GLib.assert_true (request.raw_header ("OC-ConflictInitialBasePath") == Utility.conflict_file_base_name_from_pattern (conflict_file));
+                } ();
+            }
+        }
+        return null;
     }
 
 
@@ -138,24 +141,10 @@ public class TestSyncConflict : GLib.Object {
     private void test_separate_upload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().set_capabilities ({ { "upload_conflict_files", true } });
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         GLib.HashTable<string, string> conflict_map;
-        fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice *) . Soup.Reply * {
-            if (operation == Soup.PutOperation) {
-                if (request.raw_header ("OC-Conflict") == "1") {
-                    var base_file_id = request.raw_header ("OC-ConflictBaseFileId");
-                    var components = request.url ().to_string ().split ('/');
-                    string conflict_file = components.mid (components.size () - 2).join ('/');
-                    conflict_map[base_file_id] = conflict_file;
-                    [&] {
-                        GLib.assert_true (!base_file_id == "");
-                        GLib.assert_cmp (request.raw_header ("OC-ConflictInitialBasePath"), Utility.conflict_file_base_name_from_pattern (conflict_file));
-                    } ();
-                }
-            }
-            return null;
-        });
+        fake_folder.set_server_override (this.override_delegate_separate_upload);
 
         // Explicitly add a conflict file to simulate the case where the upload of the
         // file didn't finish in the same sync run that the conflict was created.
@@ -169,25 +158,25 @@ public class TestSyncConflict : GLib.Object {
         conflict_record.initial_base_path = "A/a1";
         fake_folder.sync_journal ().set_conflict_record (conflict_record);
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        GLib.assert_cmp (conflict_map.size (), 1);
-        GLib.assert_cmp (conflict_map[a1FileId], conflict_name);
-        GLib.assert_cmp (fake_folder.current_remote_state ().find (conflict_map[a1FileId]).content_char, 'L');
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+        GLib.assert_true (conflict_map.size () == 1);
+        GLib.assert_true (conflict_map[a1FileId] == conflict_name);
+        GLib.assert_true (fake_folder.current_remote_state ().find (conflict_map[a1FileId]).content_char == 'L');
         conflict_map.clear ();
 
         // Now the user can locally alter the conflict file and it will be uploaded
         // as usual.
         fake_folder.local_modifier ().set_contents (conflict_name, 'P');
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (conflict_map.size (), 1);
-        GLib.assert_cmp (conflict_map[a1FileId], conflict_name);
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (conflict_map.size () == 1);
+        GLib.assert_true (conflict_map[a1FileId] == conflict_name);
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         conflict_map.clear ();
 
         // Similarly, remote modifications of conflict files get propagated downwards
         fake_folder.remote_modifier ().set_contents (conflict_name, 'Q');
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         GLib.assert_true (conflict_map == "");
 
         // Conflict files for conflict files!
@@ -196,13 +185,31 @@ public class TestSyncConflict : GLib.Object {
         fake_folder.remote_modifier ().append_byte (conflict_name);
         fake_folder.local_modifier ().append_byte (conflict_name);
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        GLib.assert_cmp (conflict_map.size (), 1);
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+        GLib.assert_true (conflict_map.size () == 1);
         GLib.assert_true (conflict_map.contains (a1ConflictFileId));
-        GLib.assert_cmp (fake_folder.current_remote_state ().find (conflict_name).size, 66);
-        GLib.assert_cmp (fake_folder.current_remote_state ().find (conflict_map[a1ConflictFileId]).size, 65);
+        GLib.assert_true (fake_folder.current_remote_state ().find (conflict_name).size == 66);
+        GLib.assert_true (fake_folder.current_remote_state ().find (conflict_map[a1ConflictFileId]).size == 65);
         conflict_map.clear ();
     }
+
+
+    private Soup.Reply override_delegate_separate_upload (Soup.Operation operation, Soup.Request request, QIODevice device) {
+        if (operation == Soup.PutOperation) {
+            if (request.raw_header ("OC-Conflict") == "1") {
+                var base_file_id = request.raw_header ("OC-ConflictBaseFileId");
+                var components = request.url ().to_string ().split ('/');
+                string conflict_file = components.mid (components.size () - 2).join ('/');
+                conflict_map[base_file_id] = conflict_file;
+                [&] {
+                    GLib.assert_true (!base_file_id == "");
+                    GLib.assert_true (request.raw_header ("OC-ConflictInitialBasePath") == Utility.conflict_file_base_name_from_pattern (conflict_file));
+                } ();
+            }
+        }
+        return null;
+    }
+
 
     /***********************************************************
     What happens if we download a conflict file? Is the metadata
@@ -211,42 +218,47 @@ public class TestSyncConflict : GLib.Object {
     private void test_downloading_conflict_file () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().set_capabilities ({ { "upload_conflict_files", true } });
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // With no headers from the server
         fake_folder.remote_modifier ().insert ("A/a1 (conflicted copy 1234)");
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         var conflict_record = fake_folder.sync_journal ().conflict_record ("A/a1 (conflicted copy 1234)");
         GLib.assert_true (conflict_record.is_valid ());
-        GLib.assert_cmp (conflict_record.base_file_id, fake_folder.remote_modifier ().find ("A/a1").file_identifier);
-        GLib.assert_cmp (conflict_record.initial_base_path, string ("A/a1"));
+        GLib.assert_true (conflict_record.base_file_id == fake_folder.remote_modifier ().find ("A/a1").file_identifier);
+        GLib.assert_true (conflict_record.initial_base_path == "A/a1");
 
         // Now with server headers
         GLib.Object parent;
         var a2FileId = fake_folder.remote_modifier ().find ("A/a2").file_identifier;
-        fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice *) . Soup.Reply * {
-            if (operation == Soup.GetOperation) {
-                var reply = new FakeGetReply (fake_folder.remote_modifier (), operation, request, parent);
-                reply.set_raw_header ("OC-Conflict", "1");
-                reply.set_raw_header ("OC-ConflictBaseFileId", a2FileId);
-                reply.set_raw_header ("OC-ConflictBaseMtime", "1234");
-                reply.set_raw_header ("OC-ConflictBaseEtag", "etag");
-                reply.set_raw_header ("OC-ConflictInitialBasePath", "A/original");
-                return reply;
-            }
-            return null;
-        });
+        fake_folder.set_server_override (this.override_delegate_downloading_conflict_file);
+
         fake_folder.remote_modifier ().insert ("A/really-a-conflict"); // doesn't look like a conflict, but headers say it is
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         conflict_record = fake_folder.sync_journal ().conflict_record ("A/really-a-conflict");
         GLib.assert_true (conflict_record.is_valid ());
-        GLib.assert_cmp (conflict_record.base_file_id, a2FileId);
-        GLib.assert_cmp (conflict_record.base_modtime, 1234);
-        GLib.assert_cmp (conflict_record.base_etag, string ("etag"));
-        GLib.assert_cmp (conflict_record.initial_base_path, string ("A/original"));
+        GLib.assert_true (conflict_record.base_file_id == a2FileId);
+        GLib.assert_true (conflict_record.base_modtime == 1234);
+        GLib.assert_true (conflict_record.base_etag == "etag");
+        GLib.assert_true (conflict_record.initial_base_path == "A/original");
     }
+
+
+    private Soup.Reply override_delegate_downloading_conflict_file (Soup.Operation operation, Soup.Request request, QIODevice device) {
+        if (operation == Soup.GetOperation) {
+            var reply = new FakeGetReply (fake_folder.remote_modifier (), operation, request, parent);
+            reply.set_raw_header ("OC-Conflict", "1");
+            reply.set_raw_header ("OC-ConflictBaseFileId", a2FileId);
+            reply.set_raw_header ("OC-ConflictBaseMtime", "1234");
+            reply.set_raw_header ("OC-ConflictBaseEtag", "etag");
+            reply.set_raw_header ("OC-ConflictInitialBasePath", "A/original");
+            return reply;
+        }
+        return null;
+    }
+
 
     /***********************************************************
     Check that conflict records are removed when the file is gone
@@ -254,7 +266,7 @@ public class TestSyncConflict : GLib.Object {
     private void test_conflict_record_removal1 () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().set_capabilities ({ { "upload_donflict_files", true } });
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // Make conflict records
         ConflictRecord conflict_record;
@@ -265,17 +277,18 @@ public class TestSyncConflict : GLib.Object {
 
         // A nothing-to-sync keeps them alive
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         GLib.assert_true (fake_folder.sync_journal ().conflict_record ("A/a1").is_valid ());
         GLib.assert_true (fake_folder.sync_journal ().conflict_record ("A/a2").is_valid ());
 
         // When the file is removed, the record is removed too
         fake_folder.local_modifier ().remove ("A/a2");
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         GLib.assert_true (fake_folder.sync_journal ().conflict_record ("A/a1").is_valid ());
         GLib.assert_true (!fake_folder.sync_journal ().conflict_record ("A/a2").is_valid ());
     }
+
 
     /***********************************************************
     Same test, but with upload_conflict_files == false
@@ -283,7 +296,7 @@ public class TestSyncConflict : GLib.Object {
     private void test_conflict_record_removal2 () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine ().account ().set_capabilities ({ { "upload_conflict_files", false } });
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // Create two conflicts
         fake_folder.local_modifier ().append_byte ("A/a1");
@@ -397,7 +410,7 @@ public class TestSyncConflict : GLib.Object {
     private void test_conflict_file_base_name () {
         QFETCH (string, input);
         QFETCH (string, output);
-        GLib.assert_cmp (Utility.conflict_file_base_name_from_pattern (input), output);
+        GLib.assert_true (Utility.conflict_file_base_name_from_pattern (input) == output);
     }
 
 
@@ -434,34 +447,34 @@ public class TestSyncConflict : GLib.Object {
 
         var conflicts = find_conflicts (fake_folder.current_local_state ());
         conflicts += find_conflicts (fake_folder.current_local_state ().children["A"]);
-        GLib.assert_cmp (conflicts.size (), 3);
+        GLib.assert_true (conflicts.size () == 3);
         std.sort (conflicts.begin (), conflicts.end ());
 
         var conflict_records = fake_folder.sync_journal ().conflict_record_paths ();
-        GLib.assert_cmp (conflict_records.size (), 3);
+        GLib.assert_true (conflict_records.size () == 3);
         std.sort (conflict_records.begin (), conflict_records.end ());
 
         // 1)
         GLib.assert_true (item_conflict (complete_spy, "Z"));
-        GLib.assert_cmp (fake_folder.current_local_state ().find ("Z").size, 63);
+        GLib.assert_true (fake_folder.current_local_state ().find ("Z").size == 63);
         GLib.assert_true (conflicts[2].contains ("Z"));
-        GLib.assert_cmp (conflicts[2], conflict_records[2]);
+        GLib.assert_true (conflicts[2] == conflict_records[2]);
         GLib.assert_true (GLib.FileInfo (fake_folder.local_path () + conflicts[2]).is_directory ());
         GLib.assert_true (GLib.File.exists (fake_folder.local_path () + conflicts[2] + "/foo"));
 
         // 2)
         GLib.assert_true (item_conflict (complete_spy, "A/a1"));
-        GLib.assert_cmp (fake_folder.current_local_state ().find ("A/a1").size, 5);
+        GLib.assert_true (fake_folder.current_local_state ().find ("A/a1").size == 5);
         GLib.assert_true (conflicts[0].contains ("A/a1"));
-        GLib.assert_cmp (conflicts[0], conflict_records[0]);
+        GLib.assert_true (conflicts[0] == conflict_records[0]);
         GLib.assert_true (GLib.FileInfo (fake_folder.local_path () + conflicts[0]).is_directory ());
         GLib.assert_true (GLib.File.exists (fake_folder.local_path () + conflicts[0] + "/bar"));
 
         // 3)
         GLib.assert_true (item_conflict (complete_spy, "B"));
-        GLib.assert_cmp (fake_folder.current_local_state ().find ("B").size, 31);
+        GLib.assert_true (fake_folder.current_local_state ().find ("B").size == 31);
         GLib.assert_true (conflicts[1].contains ("B"));
-        GLib.assert_cmp (conflicts[1], conflict_records[1]);
+        GLib.assert_true (conflicts[1] == conflict_records[1]);
         GLib.assert_true (GLib.FileInfo (fake_folder.local_path () + conflicts[1]).is_directory ());
         GLib.assert_true (GLib.File.exists (fake_folder.local_path () + conflicts[1] + "/zzz"));
 
@@ -477,7 +490,7 @@ public class TestSyncConflict : GLib.Object {
         GLib.assert_true (item_successful (complete_spy, conflicts[1] + "/zzz", SyncInstructions.NEW));
         GLib.assert_true (item_successful (complete_spy, conflicts[2], SyncInstructions.NEW));
         GLib.assert_true (item_successful (complete_spy, conflicts[2] + "/foo", SyncInstructions.NEW));
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
 
@@ -508,30 +521,30 @@ public class TestSyncConflict : GLib.Object {
         GLib.assert_true (fake_folder.sync_once ());
         var conflicts = find_conflicts (fake_folder.current_local_state ());
         conflicts += find_conflicts (fake_folder.current_local_state ().children["B"]);
-        GLib.assert_cmp (conflicts.size (), 3);
+        GLib.assert_true (conflicts.size () == 3);
         std.sort (conflicts.begin (), conflicts.end ());
 
         var conflict_records = fake_folder.sync_journal ().conflict_record_paths ();
-        GLib.assert_cmp (conflict_records.size (), 3);
+        GLib.assert_true (conflict_records.size () == 3);
         std.sort (conflict_records.begin (), conflict_records.end ());
 
         // 1)
         GLib.assert_true (item_conflict (complete_spy, "Z"));
         GLib.assert_true (conflicts[2].contains ("Z"));
-        GLib.assert_cmp (conflicts[2], conflict_records[2]);
+        GLib.assert_true (conflicts[2] == conflict_records[2]);
 
         // 2)
         GLib.assert_true (item_conflict (complete_spy, "A"));
         GLib.assert_true (conflicts[0].contains ("A"));
-        GLib.assert_cmp (conflicts[0], conflict_records[0]);
+        GLib.assert_true (conflicts[0] == conflict_records[0]);
 
         // 3)
         GLib.assert_true (item_conflict (complete_spy, "B/b1"));
         GLib.assert_true (conflicts[1].contains ("B/b1"));
-        GLib.assert_cmp (conflicts[1], conflict_records[1]);
+        GLib.assert_true (conflicts[1] == conflict_records[1]);
 
         // Also verifies that conflicts were uploaded
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
 
@@ -564,7 +577,7 @@ public class TestSyncConflict : GLib.Object {
         GLib.assert_true (conflicts[1].contains ("B (conflicted copy"));
         for (var& conflict : conflicts)
             QDir (fake_folder.local_path () + conflict).remove_recursively ();
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // Currently a1 and b1 don't get moved, but redownloaded
     }
@@ -607,8 +620,9 @@ public class TestSyncConflict : GLib.Object {
 
         GLib.assert_true (fake_folder.sync_engine ().is_another_sync_needed () == ImmediateFollowUp);
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
+
 
     /***********************************************************
     Test what happens if we remove entries both on the server,
@@ -621,13 +635,13 @@ public class TestSyncConflict : GLib.Object {
         fake_folder.remote_modifier ().remove ("B/b1");
         fake_folder.local_modifier ().remove ("B/b1");
 
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         var expected_state = fake_folder.current_local_state ();
 
         GLib.assert_true (fake_folder.sync_once ());
 
-        GLib.assert_cmp (fake_folder.current_local_state (), expected_state);
-        GLib.assert_cmp (fake_folder.current_remote_state (), expected_state);
+        GLib.assert_true (fake_folder.current_local_state () == expected_state);
+        GLib.assert_true (fake_folder.current_remote_state () == expected_state);
 
         GLib.assert_true (database_record (fake_folder, "B/b2").is_valid ());
 

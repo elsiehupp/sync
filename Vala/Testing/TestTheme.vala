@@ -27,7 +27,7 @@ public class TestTheme : GLib.Object {
 
         const string icon_path = Occ.Theme.hidpi_filename (icon_name + ".png", background_color, paint_device);
 
-        GLib.assert_cmp (icon_path, ":/client/theme/white/" + icon_name + ".png");
+        GLib.assert_true (icon_path == ":/client/theme/white/" + icon_name + ".png");
     }
 
 
@@ -40,7 +40,7 @@ public class TestTheme : GLib.Object {
 
         var icon_path = Occ.Theme.hidpi_filename (icon_name + ".png", background_color, paint_device);
 
-        GLib.assert_cmp (icon_path, ":/client/theme/black/" + icon_name + ".png");
+        GLib.assert_true (icon_path == ":/client/theme/black/" + icon_name + ".png");
     }
 
 
@@ -54,7 +54,7 @@ public class TestTheme : GLib.Object {
 
         var icon_path = Occ.Theme.hidpi_filename (icon_name + ".png", background_color, paint_device);
 
-        GLib.assert_cmp (icon_path, ":/client/theme/white/" + icon_name + "@2x.png");
+        GLib.assert_true (icon_path == ":/client/theme/white/" + icon_name + "@2x.png");
     }
 
 
@@ -65,7 +65,7 @@ public class TestTheme : GLib.Object {
 
         var result = Occ.Theme.is_dark_color (color);
 
-        GLib.assert_cmp (result, true);
+        GLib.assert_true (result == true);
     }
 
 
@@ -76,7 +76,7 @@ public class TestTheme : GLib.Object {
 
         var result = Occ.Theme.is_dark_color (color);
 
-        GLib.assert_cmp (result, false);
+        GLib.assert_true (result == false);
     }
 
 
@@ -87,7 +87,7 @@ public class TestTheme : GLib.Object {
 
         var result = Occ.Theme.is_dark_color (color);
 
-        GLib.assert_cmp (result, true);
+        GLib.assert_true (result == true);
     }
 
 
@@ -97,14 +97,14 @@ public class TestTheme : GLib.Object {
         FakePaintDevice paint_device;
         paint_device.set_hidpi (true);
 
-        GLib.assert_cmp (Occ.Theme.is_hidpi (&paint_device), true);
+        GLib.assert_true (Occ.Theme.is_hidpi (paint_device) == true);
     }
 
     void test_is_hidpi_lowdpi_return_false () {
         FakePaintDevice paint_device;
         paint_device.set_hidpi (false);
 
-        GLib.assert_cmp (Occ.Theme.is_hidpi (paint_device), false);
+        GLib.assert_true (Occ.Theme.is_hidpi (paint_device) == false);
     }
 }
 }

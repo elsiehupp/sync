@@ -24,11 +24,11 @@ public class FakeQNAM : Soup {
     /***********************************************************
     Monitor requests and optionally provide custom replies
     ***********************************************************/
-    private Override override_value;
+    private OverrideDelegate override_value;
 
     /***********************************************************
     ***********************************************************/
-    public delegate Soup.Reply Override (Operation value1, Soup.Request value2, QIODevice value3);
+    public delegate Soup.Reply OverrideDelegate (Operation value1, Soup.Request value2, QIODevice value3);
 
     /***********************************************************
     ***********************************************************/
@@ -36,6 +36,7 @@ public class FakeQNAM : Soup {
         this.remote_root_file_info = std.move (initial_root_file_info);
         set_cookie_jar (new Occ.CookieJar ());
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -69,7 +70,7 @@ public class FakeQNAM : Soup {
         var put_payload = outgoing_data.peek (outgoing_data.bytes_available ());
         outgoing_data.on_signal_reset ();
         string string_put_payload = put_payload;
-        const int boundary_position = sizeof ("multipart/related; boundary=");
+        const int boundary_position = "multipart/related; boundary=".size ();
         const string boundary_value = "--" + content_type.mid (boundary_position, content_type.length () - boundary_position - 1) + "\r\n";
         var string_put_payload_reference = string_put_payload.left (string_put_payload.size () - 2 - boundary_value.size ());
         var all_parts = string_put_payload_reference.split (boundary_value, Qt.SkipEmptyParts);
@@ -90,6 +91,7 @@ public class FakeQNAM : Soup {
 
         return full_reply;
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -113,12 +115,12 @@ public class FakeQNAM : Soup {
         QIODevice outgoing_data = null) {
         Soup.Reply reply = null;
         var new_request = request;
-        new_request.set_raw_header ("X-Request-ID", Occ.AccessManager.generate_request_iden tifier ());
+        new_request.set_raw_header ("X-Request-ID", Occ.AccessManager.generate_request_identifier ());
         var content_type = request.header (Soup.Request.ContentTypeHeader).to_string ();
         if (this.override_value) {
-            var this.reply = this.override_value (operation, new_request, outgoing_data)
-            if (this.reply) {
-                reply = this.reply;
+            var reply_override = this.override_value (operation, new_request, outgoing_data);
+            if (reply_override) {
+                reply = reply_override;
             }
         }
         if (!reply) {

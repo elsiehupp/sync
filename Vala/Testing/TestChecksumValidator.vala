@@ -41,7 +41,7 @@ public class TestChecksumValidator : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_down_error (string error_message) {
-        GLib.assert_cmp (this.expected_error, error_message);
+        GLib.assert_true (this.expected_error == error_message);
         this.error_seen = true;
     }
 
@@ -87,8 +87,8 @@ public class TestChecksumValidator : GLib.Object {
             QSKIP ("Couldn't execute md5sum to calculate checksum, executable missing?", SkipSingle);
         }
 
-        GLib.assert_true (!sum == "");
-        GLib.assert_cmp (s_sum, sum);
+        GLib.assert_true (sum != "");
+        GLib.assert_true (s_sum == sum);
     }
 
     private void test_sha1_calc () {
@@ -107,19 +107,19 @@ public class TestChecksumValidator : GLib.Object {
             QSKIP ("Couldn't execute sha1sum to calculate checksum, executable missing?", SkipSingle);
         }
 
-        GLib.assert_true (!sum == "");
-        GLib.assert_cmp (s_sum, sum);
+        GLib.assert_true (sum != "");
+        GLib.assert_true (s_sum == sum);
     }
 
     private void test_upload_checksumming_adler () {
         var vali = new ComputeChecksum (this);
-        this.expected_type = new string ("Adler32");
+        this.expected_type = new "Adler32";
         vali.set_checksum_type (this.expected_type);
 
         connect (
             vali,
-            signal_done (string,string),
-            on_signal_up_validated (string,string)
+            signal_done (string, string),
+            on_signal_up_validated (string, string)
         );
 
         var file = GLib.File.new_for_path (this.testfile, vali);

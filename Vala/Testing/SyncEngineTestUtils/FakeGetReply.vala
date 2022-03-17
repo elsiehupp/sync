@@ -34,6 +34,7 @@ public class FakeGetReply : FakeReply {
         QMetaObject.invoke_method (this, &FakeGetReply.respond, Qt.QueuedConnection);
     }
 
+
     /***********************************************************
     ***********************************************************/
     public void respond () {
@@ -56,6 +57,7 @@ public class FakeGetReply : FakeReply {
         }
         /* emit */ signal_finished ();
     }
+
 
     /***********************************************************
     ***********************************************************/

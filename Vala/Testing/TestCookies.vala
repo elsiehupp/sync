@@ -23,7 +23,7 @@ public class TestCookies : GLib.Object {
         const GLib.List<QNetworkCookie> cookies = {cookie_a, QNetworkCookie ("foo2", "bar")};
         CookieJar jar;
         jar.set_all_cookies (cookies);
-        GLib.assert_cmp (cookies, jar.all_cookies ());
+        GLib.assert_true (cookies == jar.all_cookies ());
         GLib.assert_true (jar.save (tmp.file_path ("test.db")));
         // ensure we are able to create a cookie jar in a non exisitning folder (mkdir)
         GLib.assert_true (jar.save (nonexisting_path));
@@ -31,7 +31,7 @@ public class TestCookies : GLib.Object {
         CookieJar jar2;
         GLib.assert_true (jar2.restore (nonexisting_path));
         // here we should have  only cookie_a as the second one was a session cookie
-        GLib.assert_cmp (GLib.List<QNetworkCookie> (cookie_a), jar2.all_cookies ());
+        GLib.assert_true (GLib.List<QNetworkCookie> (cookie_a) == jar2.all_cookies ());
 
     }
 

@@ -27,7 +27,7 @@ public class TestConcatUrl : GLib.Object {
         GLib.Uri result_url = Utility.concat_url_path (base_url, concat, url_query);
         string result = result_url.to_string ();
         string expected_full = "http://example.com" + expected;
-        GLib.assert_cmp (result, expected_full);
+        GLib.assert_true (result == expected_full);
     }
 
 

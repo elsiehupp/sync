@@ -22,6 +22,7 @@ public class FakePayloadReply : FakeReply {
         FakePayloadReply (operation, request, body, FakePayloadReply.DEFAULT_DELAY, parent);
     }
 
+
     /***********************************************************
     ***********************************************************/
     public FakePayloadReply (
@@ -47,11 +48,13 @@ public class FakePayloadReply : FakeReply {
         /* emit */ signal_finished ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     public override void on_signal_abort () {
         return;
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -61,6 +64,7 @@ public class FakePayloadReply : FakeReply {
         this.body = this.body.mid (max);
         return max;
     }
+
 
     /***********************************************************
     ***********************************************************/

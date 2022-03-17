@@ -28,6 +28,7 @@ public class FakePutMultiFileReply : FakeReply {
         QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
     }
 
+
     /***********************************************************
     ***********************************************************/
     public static GLib.Vector<FileInfo> perform_multi_part (FileInfo remote_root_file_info, Soup.Request request, string put_payload, string content_type);
@@ -35,17 +36,17 @@ public class FakePutMultiFileReply : FakeReply {
         GLib.Vector<FileInfo> result;
 
         var string_put_payload = put_payload;
-        const int boundary_position = sizeof ("multipart/related; boundary=");
+        const int boundary_position = "multipart/related; boundary=".size ();
         const string boundary_value = "--" + content_type.mid (boundary_position, content_type.length () - boundary_position - 1) + "\r\n";
-        var string_put_payload_reference = string{string_put_payload}.left (string_put_payload.size () - 2 - boundary_value.size ());
+        var string_put_payload_reference = string_put_payload.left (string_put_payload.size () - 2 - boundary_value.size ());
         var all_parts = string_put_payload_reference.split (boundary_value, Qt.SkipEmptyParts);
-        for (var one_part : all_parts) {
+        foreach (var one_part in all_parts) {
             var header_end_position = one_part.index_of ("\r\n\r\n");
             var one_part_header_part = one_part.left (header_end_position);
             var one_part_body = one_part.mid (header_end_position + 4, one_part.size () - header_end_position - 6);
             var one_part_header = one_part_header_part.split ("\r\n");
             GLib.HashTable<string, string> all_headers;
-            for (var one_header : one_part_header) {
+            foreach (var one_header in one_part_header) {
                 var header_parts = one_header.split (":");
                 all_headers[header_parts.at (0)] = header_parts.at (1);
             }
@@ -66,6 +67,7 @@ public class FakePutMultiFileReply : FakeReply {
         return result;
     }
 
+
     /***********************************************************
     ***********************************************************/
     public virtual void respond ();
@@ -74,9 +76,10 @@ public class FakePutMultiFileReply : FakeReply {
         QJsonObject all_file_info_reply;
 
         int64 total_size = 0;
-        std.for_each (this.all_file_info.begin (), this.all_file_info.end (), [&total_size] (var file_info) {
+
+        foreach (var file_info in this.all_file_info) {
             total_size += file_info.size;
-        });
+        }
 
         foreach (var file_info in this.all_file_info) {
             QJsonObject file_info_reply;
@@ -105,6 +108,7 @@ public class FakePutMultiFileReply : FakeReply {
         /* emit */ signal_finished ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     public override void on_signal_abort () {
@@ -112,16 +116,18 @@ public class FakePutMultiFileReply : FakeReply {
         /* emit */ signal_finished ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     public override int64 bytes_available () {
         return this.payload.size () + QIODevice.bytes_available ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     public override int64 read_data (char *data, int64 maxlen) {
-        int64 len = std.min (int64 { this.payload.size () }, maxlen);
+        int64 len = std.min ((int64)this.payload.size (), maxlen);
         std.copy (this.payload.cbegin (), this.payload.cbegin () + len, data);
         this.payload.remove (0, (int) (len));
         return len;

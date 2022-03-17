@@ -28,7 +28,7 @@ public class TestOAuth : GLib.Object {
             //  ASSERT (browser_reply);
             // simulate the fact that the browser is closing the connection
             browser_reply.on_signal_abort ();
-            QCoreApplication.process_events ();
+            Gtk.Application.process_events ();
 
             //  ASSERT (state == BrowserOpened);
             state = TokenAsked;
@@ -39,8 +39,8 @@ public class TestOAuth : GLib.Object {
         }
 
         override void browser_reply_finished () {
-            GLib.assert_cmp (sender (), browser_reply.data ());
-            GLib.assert_cmp (browser_reply.error (), Soup.Reply.OperationCanceledError);
+            GLib.assert_true (sender () == browser_reply.data ());
+            GLib.assert_true (browser_reply.error () == Soup.Reply.OperationCanceledError);
             reply_to_browser_ok = true;
         }
     }
@@ -78,7 +78,7 @@ public class TestOAuth : GLib.Object {
                     100,
                     this,
                     [this, request] () => {
-                        GLib.assert_cmp (state, CustomState);
+                        GLib.assert_true (state == CustomState);
                         state = BrowserOpened;
                         this.OAuthTestCase.create_browser_reply (request);
                     }
@@ -94,12 +94,13 @@ public class TestOAuth : GLib.Object {
             return OAuthTestCase.token_reply (operation, request);
         }
 
-        override void oauth_result (OAuth.Result result, string user, string token ,
-                        string refresh_token) {
+        override void oauth_result (
+            OAuth.Result result, string user,
+            string token, string refresh_token) {
             if (state != CustomState) {
                 return OAuthTestCase.oauth_result (result, user, token, refresh_token);
             }
-            GLib.assert_cmp (result, OAuth.Error);
+            GLib.assert_true (result == OAuth.Error);
         }
     }
 

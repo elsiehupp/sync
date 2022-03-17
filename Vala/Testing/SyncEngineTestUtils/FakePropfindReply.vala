@@ -40,40 +40,6 @@ public class FakePropfindReply : FakeReply {
         xml.write_namespace (oc_uri, "oc");
         xml.write_start_document ();
         xml.write_start_element (dav_uri, "multistatus");
-        var write_file_response = (FileInfo file_info) => {
-            xml.write_start_element (dav_uri, "response");
-
-            var url = GLib.Uri.to_percent_encoding (file_info.absolute_path (), "/");
-            if (!url.ends_with (char ('/'))) {
-                url.append (char ('/'));
-            }
-            const string href = Occ.Utility.concat_url_path (prefix, url).path ();
-            xml.write_text_element (dav_uri, "href", href);
-            xml.write_start_element (dav_uri, "propstat");
-            xml.write_start_element (dav_uri, "prop");
-
-            if (file_info.is_directory) {
-                xml.write_start_element (dav_uri, "resourcetype");
-                xml.write_empty_element (dav_uri, "collection");
-                xml.write_end_element (); // resourcetype
-            } else {
-                xml.write_empty_element (dav_uri, "resourcetype");
-            }
-
-            var gmt_date = file_info.last_modified.to_utc ();
-            var string_date = QLocale.c ().to_string (gmt_date, "ddd, dd MMM yyyy HH:mm:ss 'GMT'");
-            xml.write_text_element (dav_uri, "getlastmodified", string_date);
-            xml.write_text_element (dav_uri, "getcontentlength", file_info.size.to_string ());
-            xml.write_text_element (dav_uri, "getetag", "\"%1\"".printf (file_info.etag));
-            xml.write_text_element (oc_uri, "permissions", !file_info.permissions.is_null () ? string (file_info.permissions.to_string ()) : file_info.is_shared ? "SRDNVCKW": "RDNVCKW");
-            xml.write_text_element (oc_uri, "identifier", file_info.file_identifier);
-            xml.write_text_element (oc_uri, "checksums", file_info.checksums);
-            buffer.write (file_info.extra_dav_properties);
-            xml.write_end_element (); // prop
-            xml.write_text_element (dav_uri, "status", "HTTP/1.1 200 OK");
-            xml.write_end_element (); // propstat
-            xml.write_end_element (); // response
-        }
 
         write_file_response (file_info);
         foreach (FileInfo child_file_info in file_info.children) {
@@ -85,11 +51,48 @@ public class FakePropfindReply : FakeReply {
         QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
     }
 
+
+    private void write_file_response (FileInfo file_info) {
+        xml.write_start_element (dav_uri, "response");
+
+        var url = GLib.Uri.to_percent_encoding (file_info.absolute_path (), "/");
+        if (!url.ends_with (char ('/'))) {
+            url.append (char ('/'));
+        }
+        const string href = Occ.Utility.concat_url_path (prefix, url).path ();
+        xml.write_text_element (dav_uri, "href", href);
+        xml.write_start_element (dav_uri, "propstat");
+        xml.write_start_element (dav_uri, "prop");
+
+        if (file_info.is_directory) {
+            xml.write_start_element (dav_uri, "resourcetype");
+            xml.write_empty_element (dav_uri, "collection");
+            xml.write_end_element (); // resourcetype
+        } else {
+            xml.write_empty_element (dav_uri, "resourcetype");
+        }
+
+        var gmt_date = file_info.last_modified.to_utc ();
+        var string_date = QLocale.c ().to_string (gmt_date, "ddd, dd MMM yyyy HH:mm:ss 'GMT'");
+        xml.write_text_element (dav_uri, "getlastmodified", string_date);
+        xml.write_text_element (dav_uri, "getcontentlength", file_info.size.to_string ());
+        xml.write_text_element (dav_uri, "getetag", "\"%1\"".printf (file_info.etag));
+        xml.write_text_element (oc_uri, "permissions", !file_info.permissions.is_null () ? file_info.permissions.to_string () : file_info.is_shared ? "SRDNVCKW": "RDNVCKW");
+        xml.write_text_element (oc_uri, "identifier", file_info.file_identifier);
+        xml.write_text_element (oc_uri, "checksums", file_info.checksums);
+        buffer.write (file_info.extra_dav_properties);
+        xml.write_end_element (); // prop
+        xml.write_text_element (dav_uri, "status", "HTTP/1.1 200 OK");
+        xml.write_end_element (); // propstat
+        xml.write_end_element (); // response
+    }
+
+
     /***********************************************************
     ***********************************************************/
     public void respond () {
         set_header (Soup.Request.ContentLengthHeader, payload.size ());
-        set_header (Soup.Request.ContentTypeHeader, new string ("application/xml; charset=utf-8"));
+        set_header (Soup.Request.ContentTypeHeader, "application/xml; charset=utf-8");
         set_attribute (Soup.Request.HttpStatusCodeAttribute, 207);
         set_finished (true);
         /* emit */ signal_meta_data_changed ();
@@ -122,6 +125,7 @@ public class FakePropfindReply : FakeReply {
     public override int64 bytes_available () {
         return payload.size () + QIODevice.bytes_available ();
     }
+
 
     /***********************************************************
     ***********************************************************/

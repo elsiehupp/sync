@@ -66,6 +66,7 @@ public class FakeSearchResultsStorage {
         return this.instance;
     }
 
+
     /***********************************************************
     ***********************************************************/
     public static void destroy () {
@@ -100,6 +101,7 @@ public class FakeSearchResultsStorage {
 
         init_search_results_data ();
     }
+
 
     /***********************************************************
     Initialize the JSON response containing the fake list of

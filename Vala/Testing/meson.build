@@ -90,7 +90,6 @@ srcs = files([
     'TestSetUserStatusDialog/FakeUserStatusConnector.vala',
     'TestSetUserStatusDialog/TestSetUserStatusDialog.vala',
 
-    'TestSyncCfapi.vala',
     'TestSyncConflict.vala',
     'TestSyncDelete.vala',
     'TestSyncEngine.vala',

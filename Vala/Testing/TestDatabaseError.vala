@@ -23,7 +23,7 @@ public class TestDatabaseError : GLib.Object {
 
         FileInfo final_state;
         for (int count = 0; true; ++count) {
-            GLib.info ("Starting Iteration " + count);
+            GLib.info ("Starting Iteration " + count.to_string ());
 
             FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
@@ -52,8 +52,8 @@ public class TestDatabaseError : GLib.Object {
             if (fake_folder.sync_journal ().autotest_fail_counter >= 0) {
                 // No error was thrown, we are on_signal_finished
                 GLib.assert_true (result);
-                GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-                GLib.assert_cmp (fake_folder.current_remote_state (), final_state);
+                GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+                GLib.assert_true (fake_folder.current_remote_state () == final_state);
                 return;
             }
 
@@ -63,12 +63,12 @@ public class TestDatabaseError : GLib.Object {
                 GLib.assert_true (fake_folder.sync_once ());
             }
 
-            GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+            GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
             if (count == 0) {
                 final_state = fake_folder.current_remote_state ();
             } else {
                 // the final state should be the same for every iteration
-                GLib.assert_cmp (fake_folder.current_remote_state (), final_state);
+                GLib.assert_true (fake_folder.current_remote_state () == final_state);
             }
         }
     }

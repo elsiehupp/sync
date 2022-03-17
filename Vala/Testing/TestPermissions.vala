@@ -16,8 +16,8 @@ public class TestPermissions : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void t7pl () {
-        FakeFolder fake_folder = new FakeFolder ( FileInfo ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        FakeFolder fake_folder = new FakeFolder (FileInfo ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // Some of this test depends on the order of discovery. With threading
         // that order becomes effectively random, but we want to make sure to test
@@ -49,7 +49,7 @@ public class TestPermissions : GLib.Object {
         apply_permissions_from_name (fake_folder.remote_modifier ());
 
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         assert_csync_journal_ok (fake_folder.sync_journal ());
         GLib.info ("Do some changes and see how they propagate");
 
@@ -105,29 +105,29 @@ public class TestPermissions : GLib.Object {
 
         //3.
         // File should be recovered
-        GLib.assert_cmp (current_local_state.find ("normal_directory_PERM_CKDNV_/cannot_be_modified_PERM_DVN_.data").size, cannot_be_modified_size);
-        GLib.assert_cmp (current_local_state.find ("readonly_directory_PERM_M_/cannot_be_modified_PERM_DVN_.data").size, cannot_be_modified_size);
+        GLib.assert_true (current_local_state.find ("normal_directory_PERM_CKDNV_/cannot_be_modified_PERM_DVN_.data").size == cannot_be_modified_size);
+        GLib.assert_true (current_local_state.find ("readonly_directory_PERM_M_/cannot_be_modified_PERM_DVN_.data").size == cannot_be_modified_size);
         // and conflict created
         var c1 = find_conflict (current_local_state, "normal_directory_PERM_CKDNV_/cannot_be_modified_PERM_DVN_.data");
         GLib.assert_true (c1);
-        GLib.assert_cmp (c1.size, cannot_be_modified_size + 1);
+        GLib.assert_true (c1.size == cannot_be_modified_size + 1);
         var c2 = find_conflict (current_local_state, "readonly_directory_PERM_M_/cannot_be_modified_PERM_DVN_.data");
         GLib.assert_true (c2);
-        GLib.assert_cmp (c2.size, cannot_be_modified_size + 1);
+        GLib.assert_true (c2.size == cannot_be_modified_size + 1);
         // remove the conflicts for the next state comparison
         fake_folder.local_modifier ().remove (c1.path ());
         fake_folder.local_modifier ().remove (c2.path ());
 
         //4. File should be updated, that's tested by assert_local_and_remote_dir
-        GLib.assert_cmp (current_local_state.find ("normal_directory_PERM_CKDNV_/can_be_modified_PERM_W_.data").size, can_be_modified_size + 1);
-        GLib.assert_cmp (current_local_state.find ("readonly_directory_PERM_M_/can_be_modified_PERM_W_.data").size, can_be_modified_size + 1);
+        GLib.assert_true (current_local_state.find ("normal_directory_PERM_CKDNV_/can_be_modified_PERM_W_.data").size == can_be_modified_size + 1);
+        GLib.assert_true (current_local_state.find ("readonly_directory_PERM_M_/can_be_modified_PERM_W_.data").size == can_be_modified_size + 1);
 
         //5.
         // the file should be in the server and local
         GLib.assert_true (current_local_state.find ("normal_directory_PERM_CKDNV_/new_file_PERM_WDNV_.data"));
 
         // Both side should still be the same
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // Next test
 
@@ -149,7 +149,7 @@ public class TestPermissions : GLib.Object {
         // remove it so next test succeed.
         fake_folder.local_modifier ().remove ("readonly_directory_PERM_M_/new_file_PERM_WDNV_.data");
         // Both side should still be the same
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         //######################################################################
         GLib.info ( "remove the read only directory" );
@@ -163,14 +163,14 @@ public class TestPermissions : GLib.Object {
         GLib.assert_true (current_local_state.find ("readonly_directory_PERM_M_/subdir_PERM_CK_"));
         // the subdirectory had delete permissions, so the contents were deleted
         GLib.assert_true (!current_local_state.find ("readonly_directory_PERM_M_/subdir_PERM_CK_/subsubdir_PERM_CKDNV_"));
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // restore
         fake_folder.remote_modifier ().mkdir ("readonly_directory_PERM_M_/subdir_PERM_CK_/subsubdir_PERM_CKDNV_");
         fake_folder.remote_modifier ().insert ("readonly_directory_PERM_M_/subdir_PERM_CK_/subsubdir_PERM_CKDNV_/normal_file_PERM_WVND_.data");
         apply_permissions_from_name (fake_folder.remote_modifier ());
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         //######################################################################
         GLib.info ( "move a directory in a outside read only folder" );
@@ -191,14 +191,14 @@ public class TestPermissions : GLib.Object {
         // new still exist  (and is uploaded)
         GLib.assert_true (current_local_state.find ("normal_directory_PERM_CKDNV_/subdir_PERM_CKDNV_/subsubdir_PERM_CKDNV_/normal_file_PERM_WVND_.data"));
 
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // restore for further tests
         fake_folder.remote_modifier ().mkdir ("readonly_directory_PERM_M_/subdir_PERM_CK_/subsubdir_PERM_CKDNV_");
         fake_folder.remote_modifier ().insert ("readonly_directory_PERM_M_/subdir_PERM_CK_/subsubdir_PERM_CKDNV_/normal_file_PERM_WVND_.data");
         apply_permissions_from_name (fake_folder.remote_modifier ());
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         //######################################################################
         GLib.info ( "rename a directory in a read only folder and move a directory to a read-only" );
@@ -243,7 +243,7 @@ public class TestPermissions : GLib.Object {
         fake_folder.local_modifier ().remove ("readonly_directory_PERM_M_/moved_PERM_CK_");
         fake_folder.remote_modifier ().remove ("normal_directory_PERM_CKDNV_/subdir_PERM_CKDNV_");
 
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         //######################################################################
         GLib.info ( "multiple restores of a file create different conflict files" );
@@ -277,8 +277,8 @@ public class TestPermissions : GLib.Object {
             current_local_state = fake_folder.current_local_state ();
             count++;
         }
-        GLib.assert_cmp (count, 2);
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (count == 2);
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
 
@@ -393,7 +393,7 @@ public class TestPermissions : GLib.Object {
         GLib.assert_true (item_instruction (complete_spy, "zallowed/file", SyncInstructions.NEW));
         GLib.assert_true (item_instruction (complete_spy, "zallowed/sub2", SyncInstructions.NEW));
         GLib.assert_true (item_instruction (complete_spy, "zallowed/sub2/file", SyncInstructions.NEW));
-        GLib.assert_cmp (fake_folder.sync_engine ().is_another_sync_needed (), ImmediateFollowUp);
+        GLib.assert_true (fake_folder.sync_engine ().is_another_sync_needed () == ImmediateFollowUp);
 
         // A follow-up sync will restore allowed/file and allowed/sub2 and maintain the nocreatedir/file errors
         complete_spy.clear ();
@@ -455,8 +455,8 @@ public class TestPermissions : GLib.Object {
         var expected_state = fake_folder.current_local_state ();
 
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), expected_state);
-        GLib.assert_cmp (fake_folder.current_remote_state (), expected_state);
+        GLib.assert_true (fake_folder.current_local_state () == expected_state);
+        GLib.assert_true (fake_folder.current_remote_state () == expected_state);
     }
 
     static void apply_permissions_from_name (FileInfo info) {
@@ -482,7 +482,7 @@ public class TestPermissions : GLib.Object {
         SqlQuery q = new SqlQuery ("SELECT count (*) from metadata where length (file_identifier) == 0", database);
         GLib.assert_true (q.exec ());
         GLib.assert_true (q.next ().has_data);
-        GLib.assert_cmp (q.int_value (0), 0);
+        GLib.assert_true (q.int_value (0) == 0);
     }
     
     SyncFileItemPtr find_discovery_item (SyncFileItemVector spy, string path) {

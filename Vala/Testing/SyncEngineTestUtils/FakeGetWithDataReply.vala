@@ -61,6 +61,7 @@ public class FakeGetWithDataReply : FakeReply {
         /* emit */ signal_finished ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     public override void on_signal_abort () {

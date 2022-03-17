@@ -6,10 +6,10 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 namespace Testing {
 
-//  #include <QCoreApplication>
+//  #include <Gtk.Application>
 
 int main (int argc, char* argv[]) {
-    QCoreApplication app = new QCoreApplication (argc, argv);
+    Gtk.Application app = new Gtk.Application (argc, argv);
     HttpServer server;
     return app.exec ();
 }

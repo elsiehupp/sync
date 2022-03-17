@@ -22,7 +22,7 @@ public class TestXmlParse : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_directory_listing_sub_folders (string[] list) {
-        GLib.debug ("subfolders: " + list);
+        GLib.debug ("subfolders: " + list.join ("/n"));
         this.subdirectories.append (list);
     }
 
@@ -134,7 +134,7 @@ public class TestXmlParse : GLib.Object {
         GLib.assert_true (parser.parse (test_xml, sizes, "/oc/remote.php/dav/sharefolder" ));
 
         GLib.assert_true (this.success);
-        GLib.assert_cmp (sizes.size (), 1 ); // Quota info in the XML
+        GLib.assert_true (sizes.size () == 1); // Quota info in the XML
 
         GLib.assert_true (this.items.contains ("/oc/remote.php/dav/sharefolder/quitte.pdf"));
         GLib.assert_true (this.items.contains ("/oc/remote.php/dav/sharefolder"));
@@ -503,7 +503,7 @@ public class TestXmlParse : GLib.Object {
         GLib.assert_true (parser.parse ( test_xml, sizes, "/oc/remote.php/dav/sharefolder" ));
 
         GLib.assert_true (this.success);
-        GLib.assert_cmp (sizes.size (), 1 ); // Quota info in the XML
+        GLib.assert_true (sizes.size () == 1); // Quota info in the XML
 
         GLib.assert_true (this.items.contains ("/oc/remote.php/dav/sharefolder/quitte.pdf"));
         GLib.assert_true (this.items.contains ("/oc/remote.php/dav/sharefolder"));

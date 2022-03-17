@@ -18,7 +18,7 @@ public class TestFolder : GLib.Object {
         QFETCH (string, folder);
         QFETCH (string, expected_folder);
         Folder f = new Folder ("alias", folder, "http://foo.bar.net");
-        GLib.assert_cmp (f.path (), expected_folder);
+        GLib.assert_true (f.path () == expected_folder);
         delete f;
     }
 

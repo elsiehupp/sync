@@ -20,6 +20,8 @@ as expected
 ***********************************************************/
 public class TestAllFilesDeleted : GLib.Object {
 
+    private delegate void Callback (bool value);
+
     /***********************************************************
     ***********************************************************/
     private void test_all_files_deleted_keep_data () {
@@ -50,25 +52,10 @@ public class TestAllFilesDeleted : GLib.Object {
 
         var initial_state = fake_folder.current_local_state ();
         int about_to_remove_all_files_called = 0;
-        GLib.Object.connect (
+        connect (
             fake_folder.sync_engine (),
             SyncEngine.about_to_remove_all_files,
-            [&] (
-                SyncFileItem.Direction directory,
-                std.function<void (bool)> callback
-            ) => {
-                GLib.assert_cmp (
-                    about_to_remove_all_files_called,
-                    0
-                );
-                about_to_remove_all_files_called++;
-                GLib.assert_cmp (
-                    directory,
-                    delete_on_remote ? SyncFileItem.Direction.DOWN : SyncFileItem.Direction.UP
-                );
-                callback (true);
-                fake_folder.sync_engine ().journal ().clear_file_table (); // That's what Folder is doing
-            }
+            TestAllFilesDeleted.on_signal_about_to_remove_all_files_all_files_deleted_keep
         );
 
         var modifier = delete_on_remote ? fake_folder.remote_modifier () : fake_folder.local_modifier ();
@@ -77,31 +64,43 @@ public class TestAllFilesDeleted : GLib.Object {
         }
 
         GLib.assert_true (!fake_folder.sync_once ()); // Should fail because we cancel the sync
-        GLib.assert_cmp (
-            about_to_remove_all_files_called,
-            1
-        );
+        GLib.assert_true (about_to_remove_all_files_called == 1);
 
         // Next sync should recover all files
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (
-            fake_folder.current_local_state (),
+        GLib.assert_true (
+            fake_folder.current_local_state () ==
             initial_state
         );
-        GLib.assert_cmp (
-            fake_folder.current_remote_state (),
+        GLib.assert_true (
+            fake_folder.current_remote_state () ==
             initial_state
         );
 
         // The selective sync blocklist should be not have been deleted.
         bool ok = true;
-        GLib.assert_cmp (
+        GLib.assert_true (
             fake_folder.sync_engine ().journal ().get_gelective_sync_list (
                 SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
                 ok
-            ),
+            ) ==
             selective_sync_blocklist
         );
+    }
+
+
+    private void on_signal_about_to_remove_all_files_all_files_deleted_keep (SyncFileItem.Direction directory, Callback callback) {
+        GLib.assert_true (
+            about_to_remove_all_files_called ==
+            0
+        );
+        about_to_remove_all_files_called++;
+        GLib.assert_true (
+            directory ==
+            delete_on_remote ? SyncFileItem.Direction.DOWN : SyncFileItem.Direction.UP
+        );
+        callback (true);
+        fake_folder.sync_engine ().journal ().clear_file_table (); // That's what Folder is doing
     }
 
 
@@ -123,23 +122,10 @@ public class TestAllFilesDeleted : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         int about_to_remove_all_files_called = 0;
-        GLib.Object.connect (
+        connect (
             fake_folder.sync_engine (),
             SyncEngine.about_to_remove_all_files,
-            [&] (
-                SyncFileItem.Direction directory,
-                std.function<void (bool)> callback
-            ) {
-                GLib.assert_cmp (
-                    about_to_remove_all_files_called,
-                    0
-                );
-                about_to_remove_all_files_called++;
-                GLib.assert_cmp (
-                    directory,
-                    delete_on_remote ? SyncFileItem.Direction.DOWN : SyncFileItem.Direction.UP);
-                callback (false);
-            }
+            TestAllFilesDeleted.on_signal_about_to_remove_all_files_all_files_deleted_delete
         );
 
         var modifier = delete_on_remote ? fake_folder.remote_modifier () : fake_folder.local_modifier ();
@@ -150,31 +136,48 @@ public class TestAllFilesDeleted : GLib.Object {
             fake_folder.sync_once ()
         ); // Should succeed and all files must then be deleted
 
-        GLib.assert_cmp (
-            fake_folder.current_local_state (),
+        GLib.assert_true (
+            fake_folder.current_local_state () ==
             fake_folder.current_remote_state ()
         );
-        GLib.assert_cmp (
-            fake_folder.current_local_state ().children.count (),
+        GLib.assert_true (
+            fake_folder.current_local_state ().children.count () ==
             0
         );
 
         // Try another sync to be sure.
 
         GLib.assert_true (fake_folder.sync_once ()); // Should succeed (doing nothing)
-        GLib.assert_cmp (
-            about_to_remove_all_files_called,
+        GLib.assert_true (
+            about_to_remove_all_files_called ==
             1
         ); // should not have been called.
 
-        GLib.assert_cmp (
-            fake_folder.current_local_state (),
+        GLib.assert_true (
+            fake_folder.current_local_state () ==
             fake_folder.current_remote_state ()
         );
-        GLib.assert_cmp (
-            fake_folder.current_local_state ().children.count (),
+        GLib.assert_true (
+            fake_folder.current_local_state ().children.count () ==
             0
         );
+    }
+
+
+    private void on_signal_about_to_remove_all_files_all_files_deleted_delete (
+        SyncFileItem.Direction directory,
+        Callback callback
+    ) {
+        GLib.assert_true (
+            about_to_remove_all_files_called ==
+            0
+        );
+        about_to_remove_all_files_called++;
+        GLib.assert_true (
+            directory ==
+            delete_on_remote ? SyncFileItem.Direction.DOWN : SyncFileItem.Direction.UP
+        );
+        callback (false);
     }
 
 
@@ -187,12 +190,10 @@ public class TestAllFilesDeleted : GLib.Object {
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         // We never remove all files.
-        GLib.Object.connect (
+        connect (
             fake_folder.sync_engine (),
             SyncEngine.about_to_remove_all_files,
-            [&] {
-                GLib.assert_true (false);
-            }
+            TestAllFilesDeleted.on_signal_about_to_remove_all_files_not_delete_metadata_change
         );
         GLib.assert_true (fake_folder.sync_once ());
 
@@ -202,12 +203,12 @@ public class TestAllFilesDeleted : GLib.Object {
         fake_folder.local_modifier ().remove ("A/a1");
         var expected_state = fake_folder.current_local_state ();
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (
-            fake_folder.current_local_state (),
+        GLib.assert_true (
+            fake_folder.current_local_state () ==
             expected_state
         );
-        GLib.assert_cmp (
-            fake_folder.current_remote_state (),
+        GLib.assert_true (
+            fake_folder.current_remote_state () ==
             expected_state
         );
 
@@ -215,14 +216,19 @@ public class TestAllFilesDeleted : GLib.Object {
         change_all_file_id (fake_folder.remote_modifier ());
         expected_state = fake_folder.current_remote_state ();
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (
-            fake_folder.current_local_state (),
+        GLib.assert_true (
+            fake_folder.current_local_state () ==
             expected_state
         );
-        GLib.assert_cmp (
-            fake_folder.current_remote_state (),
+        GLib.assert_true (
+            fake_folder.current_remote_state () ==
             expected_state
         );
+    }
+
+
+    private void on_signal_about_to_remove_all_files_not_delete_metadata_change () {
+        GLib.assert_true (false);
     }
 
 
@@ -232,32 +238,19 @@ public class TestAllFilesDeleted : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         int about_to_remove_all_files_called = 0;
-        GLib.Object.connect (
+        connect (
             fake_folder.sync_engine (),
             SyncEngine.about_to_remove_all_files,
-            [&] (
-                SyncFileItem.Direction directory,
-                std.function<void (bool)> callback
-            ) {
-                GLib.assert_cmp (
-                    about_to_remove_all_files_called,
-                    0
-                );
-                about_to_remove_all_files_called++;
-                GLib.assert_cmp (
-                    directory,
-                    SyncFileItem.Direction.DOWN
-                );
-                callback (false);
-            });
+            TestAllFilesDeleted.on_signal_about_to_remove_all_files_reset_server
+        );
 
         // Some small changes
         fake_folder.local_modifier ().mkdir ("Q");
         fake_folder.local_modifier ().insert ("Q/q1");
         fake_folder.local_modifier ().append_byte ("B/b1");
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (
-            about_to_remove_all_files_called,
+        GLib.assert_true (
+            about_to_remove_all_files_called ==
             0
         );
 
@@ -269,11 +262,27 @@ public class TestAllFilesDeleted : GLib.Object {
 
         // Now, about_to_remove_all_files with down as a direction
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (
-            about_to_remove_all_files_called,
+        GLib.assert_true (
+            about_to_remove_all_files_called ==
             1
         );
+    }
 
+
+    private void on_signal_about_to_remove_all_files_reset_server (
+        SyncFileItem.Direction directory,
+        Callback callback
+    ) {
+        GLib.assert_true (
+            about_to_remove_all_files_called ==
+            0
+        );
+        about_to_remove_all_files_called++;
+        GLib.assert_true (
+            directory ==
+            SyncFileItem.Direction.DOWN
+        );
+        callback (false);
     }
 
 
@@ -311,38 +320,20 @@ public class TestAllFilesDeleted : GLib.Object {
         }
 
         int fingerprint_requests = 0;
-        fake_folder.set_server_override (
-            [&] (
-                Soup.Operation,
-                Soup.Request request,
-                QIODevice stream
-            ) => Soup.Reply * {
-            var verb = request.attribute (Soup.Request.CustomVerbAttribute);
-            if (verb == "PROPFIND") {
-                var data = stream.read_all ();
-                if (data.contains ("data-fingerprint")) {
-                    if (request.url ().path ().ends_with ("dav/files/admin/")) {
-                        ++fingerprint_requests;
-                    } else {
-                        fingerprint_requests = -10000; // fingerprint queried on incorrect path
-                    }
-                }
-            }
-            return null;
-        });
+        fake_folder.set_server_override (this.override_delegate);
 
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (
-            fingerprint_requests,
+        GLib.assert_true (
+            fingerprint_requests ==
             1
         );
         // First sync, we did not change the finger print, so the file should be downloaded as normal
-        GLib.assert_cmp (
-            fake_folder.current_local_state (),
+        GLib.assert_true (
+            fake_folder.current_local_state () ==
             fake_folder.current_remote_state ()
         );
-        GLib.assert_cmp (
-            fake_folder.current_remote_state ().find ("C/c1").content_char,
+        GLib.assert_true (
+            fake_folder.current_remote_state ().find ("C/c1").content_char ==
             'N'
         );
         GLib.assert_true (!fake_folder.current_remote_state ().find ("C/c2"));
@@ -382,14 +373,14 @@ public class TestAllFilesDeleted : GLib.Object {
         fake_folder.remote_modifier ().extra_dav_properties = "<oc:data-fingerprint>new_finger_print</oc:data-fingerprint>";
 
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (
-            fingerprint_requests,
+        GLib.assert_true (
+            fingerprint_requests ==
             2
         );
         var current_state = fake_folder.current_local_state ();
         // Altough the local file is kept as a conflict, the server file is downloaded
-        GLib.assert_cmp (
-            current_state.find ("A/a1").content_char,
+        GLib.assert_true (
+            current_state.find ("A/a1").content_char ==
             'O'
         );
         var conflict = find_conflict (
@@ -397,8 +388,8 @@ public class TestAllFilesDeleted : GLib.Object {
             "A/a1"
         );
         GLib.assert_true (conflict);
-        GLib.assert_cmp (
-            conflict.content_char,
+        GLib.assert_true (
+            conflict.content_char ==
             'W'
         );
         fake_folder.local_modifier ().remove (conflict.path ());
@@ -406,8 +397,8 @@ public class TestAllFilesDeleted : GLib.Object {
         GLib.assert_true (current_state.find ("B/b1"));
 
         // b2 has the new content (was not restored), since its mode time goes forward in time
-        GLib.assert_cmp (
-            current_state.find ("B/b2").content_char,
+        GLib.assert_true (
+            current_state.find ("B/b2").content_char ==
             'N'
         );
         conflict = find_conflict (
@@ -415,8 +406,8 @@ public class TestAllFilesDeleted : GLib.Object {
             "B/b2"
         );
         GLib.assert_true (conflict); // Just to be sure, we kept the old file in a conflict
-        GLib.assert_cmp (
-            conflict.content_char,
+        GLib.assert_true (
+            conflict.content_char ==
             'W'
         );
         fake_folder.local_modifier ().remove (conflict.path ());
@@ -425,7 +416,27 @@ public class TestAllFilesDeleted : GLib.Object {
         GLib.assert_true (current_state.find ("C/c3_removed"));
         GLib.assert_true (current_state.find ("C/old_a2_location"));
 
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+    }
+
+
+    private Soup.Reply override_delegate (
+        Soup.Operation operation,
+        Soup.Request request,
+        QIODevice stream
+    ) {
+        var verb = request.attribute (Soup.Request.CustomVerbAttribute);
+        if (verb == "PROPFIND") {
+            var data = stream.read_all ();
+            if (data.contains ("data-fingerprint")) {
+                if (request.url ().path ().ends_with ("dav/files/admin/")) {
+                    ++fingerprint_requests;
+                } else {
+                    fingerprint_requests = -10000; // fingerprint queried on incorrect path
+                }
+            }
+        }
+        return null;
     }
 
 
@@ -437,29 +448,33 @@ public class TestAllFilesDeleted : GLib.Object {
         );
 
         int about_to_remove_all_files_called = 0;
-        GLib.Object.connect (
+        connect (
             fake_folder.sync_engine (),
             SyncEngine.about_to_remove_all_files,
-            [&] (
-                SyncFileItem.Direction,
-                std.function<void (bool)>
-            ) {
-                about_to_remove_all_files_called++;
-                GLib.assert_not_reached ("should not be called");
-            });
+            TestAllFilesDeleted.on_signal_about_to_remove_all_files_single_file_renamed
+        );
 
         // add a single file
         fake_folder.local_modifier ().insert ("hello.txt");
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (about_to_remove_all_files_called, 0);
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (about_to_remove_all_files_called == 0);
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // rename it
         fake_folder.local_modifier ().rename ("hello.txt", "goodbye.txt");
 
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (about_to_remove_all_files_called, 0);
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (about_to_remove_all_files_called == 0);
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+    }
+
+
+    private void on_signal_about_to_remove_all_files_single_file_renamed (
+        SyncFileItem.Direction direction,
+        Callback callback
+    ) {
+        about_to_remove_all_files_called++;
+        GLib.assert_not_reached ("should not be called");
     }
 
 
@@ -470,28 +485,36 @@ public class TestAllFilesDeleted : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         int about_to_remove_all_files_called = 0;
-        GLib.Object.connect (
+        connect (
             fake_folder.sync_engine (),
             SyncEngine.about_to_remove_all_files,
-            [&] (
-                SyncFileItem.Direction,
-                std.function<void (bool)>
-            ) {
-                about_to_remove_all_files_called++;
-                GLib.assert_not_reached ("should not be called");
-            });
+            TestAllFilesDeleted.on_signal_about_to_remove_all_files_selective_sync_o_popup
+        );
 
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (about_to_remove_all_files_called, 0);
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (about_to_remove_all_files_called == 0);
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
-        fake_folder.sync_engine ().journal ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
-            string[] ("A/" + "B/" + "C/" + "S/");
+        fake_folder.sync_engine ().journal ().set_selective_sync_list (
+            SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
+            {
+                "A/", "B/", "C/", "S/"
+            }
+        );
 
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), FileInfo{}); // all files should be one localy
-        GLib.assert_cmp (fake_folder.current_remote_state (), FileInfo.A12_B12_C12_S12 ()); // Server not changed
-        GLib.assert_cmp (about_to_remove_all_files_called, 0); // But we did not show the popup
+        GLib.assert_true (fake_folder.current_local_state () == new FileInfo ()); // all files should be one localy
+        GLib.assert_true (fake_folder.current_remote_state () == FileInfo.A12_B12_C12_S12 ()); // Server not changed
+        GLib.assert_true (about_to_remove_all_files_called == 0); // But we did not show the popup
+    }
+
+
+    private void on_signal_about_to_remove_all_files_selective_sync_o_popup (
+        SyncFileItem.Direction direction,
+        Callback callback
+    ) {
+        about_to_remove_all_files_called++;
+        GLib.assert_not_reached ("should not be called");
     }
 
 

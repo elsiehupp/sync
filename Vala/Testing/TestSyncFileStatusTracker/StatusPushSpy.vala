@@ -19,6 +19,7 @@ public class StatusPushSpy : QSignalSpy {
         this.sync_engine (sync_engine);
     }
 
+
     /***********************************************************
     ***********************************************************/
     public SyncFileStatus status_of (string relative_path) {

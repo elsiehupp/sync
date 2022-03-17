@@ -63,7 +63,7 @@ public class TestRemoteWipe : GLib.Object {
 //        folder_manager.slot_wipe_folder_for_account (new_account_state);
 
 //        // check if folders dont exist anymore
-//        GLib.assert_cmp (dir_to_remove.exists (), false);
+//        GLib.assert_true (dir_to_remove.exists () == false);
     }
 }
 }

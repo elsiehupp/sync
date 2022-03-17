@@ -59,34 +59,56 @@ public class FileInfo : FileModifier {
         }
     }
 
+
     /***********************************************************
     ***********************************************************/
     public static FileInfo A12_B12_C12_S12 () {
-        {
-            { "A",
+        var json = {
+            {
+                "A",
                 {
-                    { "a1", 4 },
-                    { "a2", 4 }
+                    {
+                        "a1", 4
+                    },
+                    {
+                        "a2", 4
+                    }
                 }
             },
-            { "B",
+            {
+                "B",
                 {
-                    { "b1", 16 },
-                    { "b2", 16 }
+                    {
+                        "b1", 16
+                    },
+                    {
+                        "b2", 16
+                    }
                 }
             },
-            { "C",
+            {
+                "C",
                 {
-                    { "c1", 24 },
-                    { "c2", 24 }
+                    {
+                        "c1", 24
+                    },
+                    {
+                        "c2", 24
+                    }
                 }
             },
-        }
-    };
-        FileInfo shared_folder = new FileInfo ("S", {
-            { "s1", 32 },
-            { "s2", 32 }
-        });
+        };
+        FileInfo shared_folder = new FileInfo (
+            "S",
+            {
+                {
+                    "s1", 32
+                },
+                {
+                    "s2", 32
+                }
+            }
+        );
         shared_folder.is_shared = true;
         shared_folder.children["s1"].is_shared = true;
         shared_folder.children["s2"].is_shared = true;
@@ -107,14 +129,14 @@ public class FileInfo : FileModifier {
     /***********************************************************
     ***********************************************************/
     public override void remove (string relative_path) {
-        const PathComponents path_components ( relative_path };
+        const PathComponents path_components = new PathComponents (relative_path);
         FileInfo parent = find_invalidating_etags (path_components.parent_directory_components ());
         GLib.assert_true (parent);
-        parent.children.erase (std.find_if (parent.children.begin (), parent.children.end (),
-            [&path_components] (FileInfo file_info) => {
-                return file_info.name == path_components.filename ();
+        foreach (var file_info in parent.children) {
+            if (file_info.name == path_components.filename ()) {
+                parent.children.erase (file_info);
             }
-        ));
+        }
     }
 
 
@@ -230,7 +252,7 @@ public class FileInfo : FileModifier {
     /***********************************************************
     ***********************************************************/
     public string path () {
-        return (parent_path == "" ? "" : (parent_path + '/')) + name;
+        return (parent_path == "" ? "" : (parent_path + "/")) + name;
     }
 
 
@@ -243,6 +265,7 @@ public class FileInfo : FileModifier {
             return parent_path + '/' + name;
         }
     }
+
 
     /***********************************************************
     ***********************************************************/

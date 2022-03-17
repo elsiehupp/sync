@@ -36,7 +36,7 @@ public class TestSyncDelete : GLib.Object {
         GLib.assert_true (!fake_folder.current_remote_state ().find ("B/b1"));
         GLib.assert_true (fake_folder.current_remote_state ().find ("B/hello.txt"));
 
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
 
@@ -47,14 +47,14 @@ public class TestSyncDelete : GLib.Object {
 
         fake_folder.local_modifier ().remove ("B");
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // Add a directory that was just removed in the previous sync:
         fake_folder.local_modifier ().mkdir ("B");
         fake_folder.local_modifier ().insert ("B/b1");
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_remote_state ().find ("B/b1"));
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
 }

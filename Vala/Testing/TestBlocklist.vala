@@ -28,7 +28,7 @@ public class TestBlocklist : GLib.Object {
         QFETCH (bool, remote);
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
 
         var modifier = remote ? fake_folder.remote_modifier () : fake_folder.local_modifier ();
@@ -36,22 +36,7 @@ public class TestBlocklist : GLib.Object {
         int counter = 0;
         const string test_filename = "A/new";
         string request_identifier;
-        fake_folder.set_server_override ((Soup.Operation operation, Soup.Request request, QIODevice device) => { // Soup.Reply
-            if (request.url ().path ().ends_with (test_filename)) {
-                request_identifier = request.raw_header ("X-Request-ID");
-            }
-            if (!remote && operation == Soup.PutOperation) {
-                ++counter;
-            }
-            if (remote && operation == Soup.GetOperation) {
-                ++counter;
-            }
-            return;
-        });
-
-        var on_signal_cleanup = [&] () {
-            complete_spy.clear ();
-        }
+        fake_folder.set_server_override (this.override_delegate);
 
         var initial_etag = journal_record (fake_folder, "A").etag;
         GLib.assert_true (!initial_etag == "");
@@ -62,87 +47,88 @@ public class TestBlocklist : GLib.Object {
         GLib.assert_true (!fake_folder.sync_once ()); {
             var it = complete_spy.find_item (test_filename);
             GLib.assert_true (it);
-            GLib.assert_cmp (it.status, SyncFileItem.Status.NORMAL_ERROR); // initial error visible
-            GLib.assert_cmp (it.instruction, SyncInstructions.NEW);
+            GLib.assert_true (it.status == SyncFileItem.Status.NORMAL_ERROR); // initial error visible
+            GLib.assert_true (it.instruction == SyncInstructions.NEW);
 
             var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
             GLib.assert_true (entry.is_valid ());
-            GLib.assert_cmp (entry.error_category, SyncJournalErrorBlocklistRecord.Normal);
-            GLib.assert_cmp (entry.retry_count, 1);
-            GLib.assert_cmp (counter, 1);
+            GLib.assert_true (entry.error_category == SyncJournalErrorBlocklistRecord.Normal);
+            GLib.assert_true (entry.retry_count == 1);
+            GLib.assert_true (counter == 1);
             GLib.assert_true (entry.ignore_duration > 0);
-            GLib.assert_cmp (entry.request_identifier, request_identifier);
+            GLib.assert_true (entry.request_identifier == request_identifier);
 
-            if (remote)
-                GLib.assert_cmp (journal_record (fake_folder, "A").etag, initial_etag);
+            if (remote) {
+                GLib.assert_true (journal_record (fake_folder, "A").etag == initial_etag);
+            }
         }
-        on_signal_cleanup ();
+        clean_up_complete_spy ();
 
         // Ignored during the second run - but soft errors are also errors
         GLib.assert_true (!fake_folder.sync_once ()); {
             var it = complete_spy.find_item (test_filename);
             GLib.assert_true (it);
-            GLib.assert_cmp (it.status, SyncFileItem.Status.BLOCKLISTED_ERROR);
-            GLib.assert_cmp (it.instruction, SyncInstructions.IGNORE); // no retry happened!
+            GLib.assert_true (it.status == SyncFileItem.Status.BLOCKLISTED_ERROR);
+            GLib.assert_true (it.instruction == SyncInstructions.IGNORE); // no retry happened!
 
             var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
             GLib.assert_true (entry.is_valid ());
-            GLib.assert_cmp (entry.error_category, SyncJournalErrorBlocklistRecord.Normal);
-            GLib.assert_cmp (entry.retry_count, 1);
-            GLib.assert_cmp (counter, 1);
+            GLib.assert_true (entry.error_category == SyncJournalErrorBlocklistRecord.Normal);
+            GLib.assert_true (entry.retry_count == 1);
+            GLib.assert_true (counter == 1);
             GLib.assert_true (entry.ignore_duration > 0);
-            GLib.assert_cmp (entry.request_identifier, request_identifier);
+            GLib.assert_true (entry.request_identifier == request_identifier);
 
             if (remote)
-                GLib.assert_cmp (journal_record (fake_folder, "A").etag, initial_etag);
+                GLib.assert_true (journal_record (fake_folder, "A").etag == initial_etag);
         }
-        on_signal_cleanup ();
+        clean_up_complete_spy ();
 
         // Let's expire the blocklist entry to verify it gets retried {
-            var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
-            entry.ignore_duration = 1;
-            entry.last_try_time -= 1;
-            fake_folder.sync_journal ().set_error_blocklist_entry (entry);
-        }
-        GLib.assert_true (!fake_folder.sync_once ()); {
-            var it = complete_spy.find_item (test_filename);
-            GLib.assert_true (it);
-            GLib.assert_cmp (it.status, SyncFileItem.Status.BLOCKLISTED_ERROR); // blocklisted as it's just a retry
-            GLib.assert_cmp (it.instruction, SyncInstructions.NEW); // retry!
+        var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
+        entry.ignore_duration = 1;
+        entry.last_try_time -= 1;
+        fake_folder.sync_journal ().set_error_blocklist_entry (entry);
 
-            var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
-            GLib.assert_true (entry.is_valid ());
-            GLib.assert_cmp (entry.error_category, SyncJournalErrorBlocklistRecord.Normal);
-            GLib.assert_cmp (entry.retry_count, 2);
-            GLib.assert_cmp (counter, 2);
-            GLib.assert_true (entry.ignore_duration > 0);
-            GLib.assert_cmp (entry.request_identifier, request_identifier);
+        GLib.assert_true (!fake_folder.sync_once ());
+        var it = complete_spy.find_item (test_filename);
+        GLib.assert_true (it);
+        GLib.assert_true (it.status == SyncFileItem.Status.BLOCKLISTED_ERROR); // blocklisted as it's just a retry
+        GLib.assert_true (it.instruction == SyncInstructions.NEW); // retry!
 
-            if (remote)
-                GLib.assert_cmp (journal_record (fake_folder, "A").etag, initial_etag);
+        var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
+        GLib.assert_true (entry.is_valid ());
+        GLib.assert_true (entry.error_category == SyncJournalErrorBlocklistRecord.Normal);
+        GLib.assert_true (entry.retry_count == 2);
+        GLib.assert_true (counter == 2);
+        GLib.assert_true (entry.ignore_duration > 0);
+        GLib.assert_true (entry.request_identifier == request_identifier);
+
+        if (remote) {
+            GLib.assert_true (journal_record (fake_folder, "A").etag == initial_etag);
         }
-        on_signal_cleanup ();
+        clean_up_complete_spy ();
 
         // When the file changes a retry happens immediately
         modifier.append_byte (test_filename);
         GLib.assert_true (!fake_folder.sync_once ()); {
             var it = complete_spy.find_item (test_filename);
             GLib.assert_true (it);
-            GLib.assert_cmp (it.status, SyncFileItem.Status.BLOCKLISTED_ERROR);
-            GLib.assert_cmp (it.instruction, SyncInstructions.NEW); // retry!
+            GLib.assert_true (it.status == SyncFileItem.Status.BLOCKLISTED_ERROR);
+            GLib.assert_true (it.instruction == SyncInstructions.NEW); // retry!
 
             var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
             GLib.assert_true (entry.is_valid ());
-            GLib.assert_cmp (entry.error_category, SyncJournalErrorBlocklistRecord.Normal);
-            GLib.assert_cmp (entry.retry_count, 3);
-            GLib.assert_cmp (counter, 3);
+            GLib.assert_true (entry.error_category == SyncJournalErrorBlocklistRecord.Normal);
+            GLib.assert_true (entry.retry_count == 3);
+            GLib.assert_true (counter == 3);
             GLib.assert_true (entry.ignore_duration > 0);
-            GLib.assert_cmp (entry.request_identifier, request_identifier);
+            GLib.assert_true (entry.request_identifier == request_identifier);
 
             if (remote)
-                GLib.assert_cmp (journal_record (fake_folder, "A").etag, initial_etag);
+                GLib.assert_true (journal_record (fake_folder, "A").etag == initial_etag);
         }
-        on_signal_cleanup ();
+        clean_up_complete_spy ();
 
         // When the error goes away and the item is retried, the sync succeeds
         fake_folder.server_error_paths ().clear (); {
@@ -154,20 +140,41 @@ public class TestBlocklist : GLib.Object {
         GLib.assert_true (fake_folder.sync_once ()); {
             var it = complete_spy.find_item (test_filename);
             GLib.assert_true (it);
-            GLib.assert_cmp (it.status, SyncFileItem.Status.SUCCESS);
-            GLib.assert_cmp (it.instruction, SyncInstructions.NEW);
+            GLib.assert_true (it.status == SyncFileItem.Status.SUCCESS);
+            GLib.assert_true (it.instruction ==assert_true SyncInstructions.NEW);
 
             var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
             GLib.assert_true (!entry.is_valid ());
-            GLib.assert_cmp (counter, 4);
+            GLib.assert_true (counter == 4);
 
-            if (remote)
-                GLib.assert_cmp (journal_record (fake_folder, "A").etag, fake_folder.current_remote_state ().find ("A").etag);
+            if (remote) {
+                GLib.assert_true (journal_record (fake_folder, "A").etag == fake_folder.current_remote_state ().find ("A").etag);
+            }
         }
-        on_signal_cleanup ();
+        clean_up_complete_spy ();
 
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
+
+
+    private void clean_up_complete_spy (ItemCompletedSpy complete_spy) {
+        complete_spy.clear ();
+    }
+
+
+    private Soup.Reply override_delegate (Soup.Operation operation, Soup.Request request, QIODevice device) {
+        if (request.url ().path ().ends_with (test_filename)) {
+            request_identifier = request.raw_header ("X-Request-ID");
+        }
+        if (!remote && operation == Soup.PutOperation) {
+            ++counter;
+        }
+        if (remote && operation == Soup.GetOperation) {
+            ++counter;
+        }
+        return;
+    }
+
 
     SyncJournalFileRecord journal_record (FakeFolder folder, string path) {
         SyncJournalFileRecord record;

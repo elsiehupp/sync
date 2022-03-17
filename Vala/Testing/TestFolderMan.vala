@@ -41,7 +41,7 @@ public class TestFolderMan : GLib.Object {
 
         unowned AccountState new_account_state = new unowned AccountState (new AccountState (account));
         FolderMan folder_manager = FolderMan.instance ();
-        GLib.assert_cmp (folder_manager, this.folder_manager);
+        GLib.assert_true (folder_manager == this.folder_manager);
         GLib.assert_true (folder_manager.add_folder (new_account_state.data (), folder_definition (directory_path + "/sub/own_cloud1")));
         GLib.assert_true (folder_manager.add_folder (new_account_state.data (), folder_definition (directory_path + "/own_cloud2")));
 
@@ -54,12 +54,12 @@ public class TestFolderMan : GLib.Object {
         // those should be allowed
         // string FolderMan.check_path_validity_for_new_folder (string path, GLib.Uri server_url, bool for_new_directory)
 
-        GLib.assert_cmp (folder_manager.check_path_validity_for_new_folder (directory_path + "/sub/free"), "");
-        GLib.assert_cmp (folder_manager.check_path_validity_for_new_folder (directory_path + "/free2/"), "");
+        GLib.assert_true (folder_manager.check_path_validity_for_new_folder (directory_path + "/sub/free") == "");
+        GLib.assert_true (folder_manager.check_path_validity_for_new_folder (directory_path + "/free2/") == "");
         // Not an existing directory . Ok
-        GLib.assert_cmp (folder_manager.check_path_validity_for_new_folder (directory_path + "/sub/bliblablu"), "");
-        GLib.assert_cmp (folder_manager.check_path_validity_for_new_folder (directory_path + "/sub/free/bliblablu"), "");
-        // GLib.assert_cmp (folder_manager.check_path_validity_for_new_folder (directory_path + "/sub/bliblablu/some/more"), "");
+        GLib.assert_true (folder_manager.check_path_validity_for_new_folder (directory_path + "/sub/bliblablu") == "");
+        GLib.assert_true (folder_manager.check_path_validity_for_new_folder (directory_path + "/sub/free/bliblablu") == "");
+        // GLib.assert_true (folder_manager.check_path_validity_for_new_folder (directory_path + "/sub/bliblablu/some/more") == "");
 
         // A file . Error
         GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/sub/file.txt").is_null ());
@@ -76,8 +76,8 @@ public class TestFolderMan : GLib.Object {
         // Now it will work because the account is different
         GLib.Uri url3 = new GLib.Uri ("http://anotherexample.org");
         url3.set_user_name ("dummy");
-        GLib.assert_cmp (folder_manager.check_path_validity_for_new_folder (directory_path + "/sub/own_cloud1", url3), "");
-        GLib.assert_cmp (folder_manager.check_path_validity_for_new_folder (directory_path + "/own_cloud2/", url3), "");
+        GLib.assert_true (folder_manager.check_path_validity_for_new_folder (directory_path + "/sub/own_cloud1", url3) == "");
+        GLib.assert_true (folder_manager.check_path_validity_for_new_folder (directory_path + "/own_cloud2/", url3) == "");
 
         GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path).is_null ());
         GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/sub/own_cloud1/folder").is_null ());
@@ -99,7 +99,7 @@ public class TestFolderMan : GLib.Object {
         // link 3 points to an existing sync folder. To make it fail, the account must be the same
         GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/link3", url2).is_null ());
         // while with a different account, this is fine
-        GLib.assert_cmp (folder_manager.check_path_validity_for_new_folder (directory_path + "/link3", url3), "");
+        GLib.assert_true (folder_manager.check_path_validity_for_new_folder (directory_path + "/link3", url3) == "");
 
         GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/link4").is_null ());
         GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/link3/folder").is_null ());
@@ -154,32 +154,32 @@ public class TestFolderMan : GLib.Object {
 
         unowned AccountState new_account_state = new unowned AccountState (new AccountState (account));
         FolderMan folder_manager = FolderMan.instance ();
-        GLib.assert_cmp (folder_manager, this.folder_manager);
+        GLib.assert_true (folder_manager == this.folder_manager);
         GLib.assert_true (folder_manager.add_folder (new_account_state.data (), folder_definition (directory_path + "/sub/own_cloud/")));
         GLib.assert_true (folder_manager.add_folder (new_account_state.data (), folder_definition (directory_path + "/own_cloud2/")));
 
         // TEST
 
-        GLib.assert_cmp (folder_manager.find_good_path_for_new_sync_folder (directory_path + "/oc", url),
-                 string (directory_path + "/oc"));
-        GLib.assert_cmp (folder_manager.find_good_path_for_new_sync_folder (directory_path + "/own_cloud", url),
-                 string (directory_path + "/own_cloud3"));
-        GLib.assert_cmp (folder_manager.find_good_path_for_new_sync_folder (directory_path + "/own_cloud2", url),
-                 string (directory_path + "/own_cloud22"));
-        GLib.assert_cmp (folder_manager.find_good_path_for_new_sync_folder (directory_path + "/own_cloud2/foo", url),
-                 string (directory_path + "/own_cloud2/foo"));
-        GLib.assert_cmp (folder_manager.find_good_path_for_new_sync_folder (directory_path + "/own_cloud2/bar", url),
-                 string (directory_path + "/own_cloud2/bar"));
-        GLib.assert_cmp (folder_manager.find_good_path_for_new_sync_folder (directory_path + "/sub", url),
-                 string (directory_path + "/sub2"));
+        GLib.assert_true (folder_manager.find_good_path_for_new_sync_folder (directory_path + "/oc", url) ==
+            directory_path + "/oc");
+        GLib.assert_true (folder_manager.find_good_path_for_new_sync_folder (directory_path + "/own_cloud", url) ==
+            directory_path + "/own_cloud3");
+        GLib.assert_true (folder_manager.find_good_path_for_new_sync_folder (directory_path + "/own_cloud2", url) ==
+            directory_path + "/own_cloud22");
+        GLib.assert_true (folder_manager.find_good_path_for_new_sync_folder (directory_path + "/own_cloud2/foo", url) ==
+            directory_path + "/own_cloud2/foo");
+        GLib.assert_true (folder_manager.find_good_path_for_new_sync_folder (directory_path + "/own_cloud2/bar", url) ==
+            directory_path + "/own_cloud2/bar");
+        GLib.assert_true (folder_manager.find_good_path_for_new_sync_folder (directory_path + "/sub", url) ==
+            directory_path + "/sub2");
 
         // REMOVE own_cloud2 from the filesystem, but keep a folder sync'ed to it.
         // We should still not suggest this folder as a new folder.
         QDir (directory_path + "/own_cloud2/").remove_recursively ();
-        GLib.assert_cmp (folder_manager.find_good_path_for_new_sync_folder (directory_path + "/own_cloud", url),
-            string (directory_path + "/own_cloud3"));
-        GLib.assert_cmp (folder_manager.find_good_path_for_new_sync_folder (directory_path + "/own_cloud2", url),
-            string (directory_path + "/own_cloud22"));
+        GLib.assert_true (folder_manager.find_good_path_for_new_sync_folder (directory_path + "/own_cloud", url) ==
+            directory_path + "/own_cloud3");
+        GLib.assert_true (folder_manager.find_good_path_for_new_sync_folder (directory_path + "/own_cloud2", url) ==
+            directory_path + "/own_cloud22");
     }
 
 }

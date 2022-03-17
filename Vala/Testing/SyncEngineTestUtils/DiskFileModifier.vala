@@ -16,6 +16,7 @@ public class DiskFileModifier : FileModifier {
         this.root_directory = root_directory;
     }
 
+
     /***********************************************************
     ***********************************************************/
     public override void remove (string relative_path) {
@@ -27,13 +28,14 @@ public class DiskFileModifier : FileModifier {
         }
     }
 
+
     /***********************************************************
     ***********************************************************/
     public override void insert (string relative_path, int64 size = 64, char content_char = 'W') {
         GLib.File file = new GLib.File (this.root_directory.file_path (relative_path));
         GLib.assert_true (!file.exists ());
         file.open (GLib.File.WriteOnly);
-        string buffer = new string (1024, content_char);
+        string buffer = string (1024, content_char);
         for (int x = 0; x < size / buffer.size (); ++x) {
             file.write (buffer);
         }
@@ -41,8 +43,9 @@ public class DiskFileModifier : FileModifier {
         file.close ();
         // Set the mtime 30 seconds in the past, for some tests that need to make sure that the mtime differs.
         Occ.FileSystem.set_modification_time (file.filename (), Occ.Utility.date_time_to_time_t (GLib.DateTime.current_date_time_utc ().add_secs (-30)));
-        GLib.assert_cmp (file.size (), size);
+        GLib.assert_true (file.size () == size);
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -53,6 +56,7 @@ public class DiskFileModifier : FileModifier {
         file.open (GLib.File.WriteOnly);
         file.write ("".fill (content_char, size));
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -65,11 +69,13 @@ public class DiskFileModifier : FileModifier {
         file.write (contents);
     }
 
+
     /***********************************************************
     ***********************************************************/
     public override void mkdir (string relative_path) {
         this.root_directory.mkpath (relative_path);
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -77,6 +83,7 @@ public class DiskFileModifier : FileModifier {
         GLib.assert_true (this.root_directory.exists (from));
         GLib.assert_true (this.root_directory.rename (from, to));
     }
+
 
     /***********************************************************
     ***********************************************************/

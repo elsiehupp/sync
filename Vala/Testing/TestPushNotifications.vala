@@ -116,18 +116,18 @@ public class TestPushNotifications : GLib.Object {
 
         // Wait for authentication attempt and then sent invalid credentials
         GLib.assert_true (fake_server.wait_for_text_messages ());
-        GLib.assert_cmp (fake_server.text_messages_count (), 2);
+        GLib.assert_true (fake_server.text_messages_count () == 2);
         var socket = fake_server.socket_for_text_message (0);
         var first_password_sent = fake_server.text_message (1);
-        GLib.assert_cmp (first_password_sent, account.credentials ().password ());
+        GLib.assert_true (first_password_sent == account.credentials ().password ());
         fake_server.clear_text_messages ();
-        socket.send_text_message ("err : Invalid credentials");
+        socket.send_text_message ("Error: Invalid credentials");
 
         // Wait for a new authentication attempt
         GLib.assert_true (fake_server.wait_for_text_messages ());
-        GLib.assert_cmp (fake_server.text_messages_count (), 2);
+        GLib.assert_true (fake_server.text_messages_count () == 2);
         var second_password_sent = fake_server.text_message (1);
-        GLib.assert_cmp (second_password_sent, account.credentials ().password ());
+        GLib.assert_true (second_password_sent == account.credentials ().password ());
     }
 
 
@@ -142,13 +142,13 @@ public class TestPushNotifications : GLib.Object {
 
         // Wait for authentication and then sent a network error
         GLib.assert_true (fake_server.wait_for_text_messages ());
-        GLib.assert_cmp (fake_server.text_messages_count (), 2);
+        GLib.assert_true (fake_server.text_messages_count () == 2);
         var socket = fake_server.socket_for_text_message (0);
         socket.on_signal_abort ();
 
         GLib.assert_true (connection_lost_spy.wait ());
         // Account handled connection_lost signal and disabled push notifications
-        GLib.assert_cmp (push_notifications_disabled_spy.count (), 1);
+        GLib.assert_true (push_notifications_disabled_spy.count () == 1);
     }
 
 
@@ -161,7 +161,7 @@ public class TestPushNotifications : GLib.Object {
 
         GLib.assert_true (fail_three_authentication_attempts (fake_server, account));
         // Account disabled the push notifications
-        GLib.assert_cmp (push_notifications_disabled_spy.count (), 1);
+        GLib.assert_true (push_notifications_disabled_spy.count () == 1);
     }
 
 
@@ -180,7 +180,7 @@ public class TestPushNotifications : GLib.Object {
         /* emit */ push_notifications_web_socket_children[0].ssl_errors (GLib.List<QSslError> ());
 
         // Account handled connection_lost signal and the authentication_failed Signal should be emitted
-        GLib.assert_cmp (push_notifications_disabled_spy.count (), 1);
+        GLib.assert_true (push_notifications_disabled_spy.count () == 1);
     }
 
 
@@ -204,12 +204,12 @@ public class TestPushNotifications : GLib.Object {
         socket.on_signal_abort ();
 
         GLib.assert_true (push_notifications_disabled_spy.wait ());
-        GLib.assert_cmp (push_notifications_disabled_spy.count (), 1);
+        GLib.assert_true (push_notifications_disabled_spy.count () == 1);
 
-        GLib.assert_cmp (connection_lost_spy.count (), 1);
+        GLib.assert_true (connection_lost_spy.count () == 1);
 
         var account_sent = push_notifications_disabled_spy.at (0).at (0).value<Occ.Account> ();
-        GLib.assert_cmp (account_sent, account.data ());
+        GLib.assert_true (account_sent == account.data ());
     }
 
 
@@ -225,9 +225,9 @@ public class TestPushNotifications : GLib.Object {
         GLib.assert_true (fail_three_authentication_attempts (fake_server, account));
 
         // Now the push_notifications_disabled Signal should be emitted
-        GLib.assert_cmp (push_notifications_disabled_spy.count (), 1);
+        GLib.assert_true (push_notifications_disabled_spy.count () == 1);
         var account_sent = push_notifications_disabled_spy.at (0).at (0).value<Occ.Account> ();
-        GLib.assert_cmp (account_sent, account.data ());
+        GLib.assert_true (account_sent == account.data ());
     }
 
 

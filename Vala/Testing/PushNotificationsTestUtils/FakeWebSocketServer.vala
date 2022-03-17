@@ -99,6 +99,7 @@ public class FakeWebSocketServer : GLib.Object {
         return socket;
     }
 
+
     /***********************************************************
     ***********************************************************/
     public void close () {
@@ -112,17 +113,20 @@ public class FakeWebSocketServer : GLib.Object {
         }
     }
 
+
     /***********************************************************
     ***********************************************************/
     public bool wait_for_text_messages () {
         return this.process_text_message_spy.wait ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     public uint32 text_messages_count () {
         return this.process_text_message_spy.count ();
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -131,6 +135,7 @@ public class FakeWebSocketServer : GLib.Object {
         return this.process_text_message_spy.at (message_number).at (1).to_string ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     public QWebSocket socket_for_text_message (int message_number) {
@@ -138,11 +143,13 @@ public class FakeWebSocketServer : GLib.Object {
         return this.process_text_message_spy.at (message_number).at (0).value<QWebSocket> ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     public void clear_text_messages () {
         this.process_text_message_spy.clear ();
     }
+
 
     /***********************************************************
     ***********************************************************/
@@ -182,6 +189,7 @@ public class FakeWebSocketServer : GLib.Object {
         /* emit */ signal_process_text_message (client, message);
     }
 
+
     /***********************************************************
     ***********************************************************/
     private void on_signal_new_connection () {
@@ -194,6 +202,7 @@ public class FakeWebSocketServer : GLib.Object {
 
         this.clients + socket;
     }
+
 
     /***********************************************************
     ***********************************************************/

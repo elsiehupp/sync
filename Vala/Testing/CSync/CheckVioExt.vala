@@ -47,6 +47,7 @@ public class CheckVioExt {
         string ignored_dir;
     }
 
+
     /***********************************************************
     remove the complete test directory */
     static int wipe_testdir () {
@@ -98,6 +99,7 @@ public class CheckVioExt {
         return 0;
     }
 
+
     /***********************************************************
     This function takes a relative path, prepends it with the csync_test_dir ()
     and creates each sub directory.
@@ -127,6 +129,7 @@ public class CheckVioExt {
             i++;
         }
     }
+
 
     /***********************************************************
     This function uses the vio_opendir, vio_readdir and vio_closedir functions

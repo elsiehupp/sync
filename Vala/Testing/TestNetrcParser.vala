@@ -48,10 +48,10 @@ public class TestNetrcParser : GLib.Object {
     private void on_signal_test_valid_netrc () {
         NetrcParser parser = new NetrcParser (testfile_c);
         GLib.assert_true (parser.parse ());
-        GLib.assert_cmp (parser.find ("foo"), new Pair<string, string>  (string ("bar"), string ("baz")));
-        GLib.assert_cmp (parser.find ("broken"), new Pair<string, string>  (string ("bar2"), ""));
-        GLib.assert_cmp (parser.find ("funnysplit"), new Pair<string, string>  (string ("bar3"), string ("baz3")));
-        GLib.assert_cmp (parser.find ("frob"), new Pair<string, string>  (string ("user with spaces"), string ("space pwd")));
+        GLib.assert_true (parser.find ("foo") == new Pair<string, string> ("bar", "baz"));
+        GLib.assert_true (parser.find ("broken") == new Pair<string, string> ("bar2", ""));
+        GLib.assert_true (parser.find ("funnysplit") == new Pair<string, string> ("bar3", "baz3"));
+        GLib.assert_true (parser.find ("frob") == new Pair<string, string> ("user with spaces", "space pwd"));
     }
 
 
@@ -60,7 +60,7 @@ public class TestNetrcParser : GLib.Object {
     private void on_signal_test_empty_netrc () {
         NetrcParser parser = new NetrcParser (testfile_empty_c);
         GLib.assert_true (!parser.parse ());
-        GLib.assert_cmp (parser.find ("foo"), new Pair<string, string>  ("", ""));
+        GLib.assert_true (parser.find ("foo") == new Pair<string, string> ("", ""));
     }
 
 
@@ -69,8 +69,8 @@ public class TestNetrcParser : GLib.Object {
     private void on_signal_test_valid_netrc_with_default () {
         NetrcParser parser = new NetrcParser (testfile_with_default_c);
         GLib.assert_true (parser.parse ());
-        GLib.assert_cmp (parser.find ("foo"), new Pair<string, string>  (string ("bar"), string ("baz")));
-        GLib.assert_cmp (parser.find ("dontknow"), new Pair<string, string>  (string ("user"), string ("pass")));
+        GLib.assert_true (parser.find ("foo") == new Pair<string, string> ("bar", "baz"));
+        GLib.assert_true (parser.find ("dontknow") == new Pair<string, string> ("user", "pass"));
     }
 
 

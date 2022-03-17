@@ -61,7 +61,7 @@ public class TestSyncEngine : GLib.Object {
         fake_folder.remote_modifier ().insert ("A/a0");
         fake_folder.sync_once ();
         GLib.assert_true (item_did_complete_successfully (complete_spy, "A/a0"));
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
 
@@ -73,7 +73,7 @@ public class TestSyncEngine : GLib.Object {
         fake_folder.local_modifier ().insert ("A/a0");
         fake_folder.sync_once ();
         GLib.assert_true (item_did_complete_successfully (complete_spy, "A/a0"));
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
 
@@ -89,7 +89,7 @@ public class TestSyncEngine : GLib.Object {
         GLib.assert_true (item_did_complete_successfully (complete_spy, "Y"));
         GLib.assert_true (item_did_complete_successfully (complete_spy, "Z"));
         GLib.assert_true (item_did_complete_successfully (complete_spy, "Z/d0"));
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
 
@@ -105,7 +105,7 @@ public class TestSyncEngine : GLib.Object {
         GLib.assert_true (item_did_complete_successfully (complete_spy, "Y"));
         GLib.assert_true (item_did_complete_successfully (complete_spy, "Z"));
         GLib.assert_true (item_did_complete_successfully (complete_spy, "Z/d0"));
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
 
@@ -149,7 +149,7 @@ public class TestSyncEngine : GLib.Object {
         GLib.assert_true (item_successfully_completed_get_rank (complete_spy, "r0") > 1);
         GLib.assert_true (item_did_complete_successfully (complete_spy, "r1"));
         GLib.assert_true (item_successfully_completed_get_rank (complete_spy, "r1") > 1);
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
 
@@ -161,7 +161,7 @@ public class TestSyncEngine : GLib.Object {
         fake_folder.remote_modifier ().remove ("A/a1");
         fake_folder.sync_once ();
         GLib.assert_true (item_did_complete_successfully (complete_spy, "A/a1"));
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
 
@@ -173,7 +173,7 @@ public class TestSyncEngine : GLib.Object {
         fake_folder.local_modifier ().remove ("A/a1");
         fake_folder.sync_once ();
         GLib.assert_true (item_did_complete_successfully (complete_spy, "A/a1"));
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
 
@@ -196,11 +196,11 @@ public class TestSyncEngine : GLib.Object {
         }
 
         // printf 'A%.0s' {1..64} | sha1sum -
-        string reference_checksum = new string ("SHA1:30b86e44e6001403827a62c58b08893e77cf121f");
-        GLib.assert_cmp (get_database_checksum ("a1.eml"), reference_checksum);
-        GLib.assert_cmp (get_database_checksum ("a2.eml"), reference_checksum);
-        GLib.assert_cmp (get_database_checksum ("a3.eml"), reference_checksum);
-        GLib.assert_cmp (get_database_checksum ("b3.txt"), reference_checksum);
+        string reference_checksum = new "SHA1:30b86e44e6001403827a62c58b08893e77cf121f";
+        GLib.assert_true (get_database_checksum ("a1.eml") == reference_checksum);
+        GLib.assert_true (get_database_checksum ("a2.eml") == reference_checksum);
+        GLib.assert_true (get_database_checksum ("a3.eml") == reference_checksum);
+        GLib.assert_true (get_database_checksum ("b3.txt") == reference_checksum);
 
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
         // Touch the file without changing the content, shouldn't upload
@@ -211,15 +211,15 @@ public class TestSyncEngine : GLib.Object {
         fake_folder.local_modifier ().append_byte ("b3.txt");
         fake_folder.sync_once ();
 
-        GLib.assert_cmp (get_database_checksum ("a1.eml"), reference_checksum);
-        GLib.assert_cmp (get_database_checksum ("a2.eml"), string ("SHA1:84951fc23a4dafd10020ac349da1f5530fa65949"));
-        GLib.assert_cmp (get_database_checksum ("a3.eml"), string ("SHA1:826b7e7a7af8a529ae1c7443c23bf185c0ad440c"));
-        GLib.assert_cmp (get_database_checksum ("b3.eml"), get_database_checksum ("a3.txt"));
+        GLib.assert_true (get_database_checksum ("a1.eml") == reference_checksum);
+        GLib.assert_true (get_database_checksum ("a2.eml") == "SHA1:84951fc23a4dafd10020ac349da1f5530fa65949");
+        GLib.assert_true (get_database_checksum ("a3.eml") == "SHA1:826b7e7a7af8a529ae1c7443c23bf185c0ad440c");
+        GLib.assert_true (get_database_checksum ("b3.eml") == get_database_checksum ("a3.txt"));
 
         GLib.assert_true (!item_did_complete (complete_spy, "a1.eml"));
         GLib.assert_true (item_did_complete_successfully (complete_spy, "a2.eml"));
         GLib.assert_true (item_did_complete_successfully (complete_spy, "a3.eml"));
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
 
@@ -279,12 +279,12 @@ public class TestSyncEngine : GLib.Object {
             )
         );
 
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         var expected_server_state = fake_folder.current_remote_state ();
 
         // Remove sub_folder_a with selective_sync:
         fake_folder.sync_engine ().journal ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, {"parent_folder/sub_folder_a/"});
-        fake_folder.sync_engine ().journal ().schedule_path_for_remote_discovery (new string ("parent_folder/sub_folder_a/"));
+        fake_folder.sync_engine ().journal ().schedule_path_for_remote_discovery ("parent_folder/sub_folder_a/");
         var get_etag = (string file) => {
             SyncJournalFileRecord record;
             fake_folder.sync_journal ().get_file_record (file, record);
@@ -306,9 +306,9 @@ public class TestSyncEngine : GLib.Object {
 
         for (int i = 0; i < 3; ++i) {
             fake_folder.sync_once ();
- {
+            {
                 // Nothing changed on the server
-                GLib.assert_cmp (fake_folder.current_remote_state (), expected_server_state);
+                GLib.assert_true (fake_folder.current_remote_state () == expected_server_state);
                 // The local state should still have sub_folder_a
                 var local = fake_folder.current_local_state ();
                 GLib.assert_true (local.find ("parent_folder/sub_folder_a"));
@@ -338,8 +338,8 @@ public class TestSyncEngine : GLib.Object {
         // This should be aborted and would otherwise fail in FileInfo.create.
         fake_folder.local_modifier ().insert ("NewFolder/NewFile");
         fake_folder.sync_once ();
-        GLib.assert_cmp (finished_spy.size (), 1);
-        GLib.assert_cmp (finished_spy.first ().first ().to_bool (), false);
+        GLib.assert_true (finished_spy.size () == 1);
+        GLib.assert_true (finished_spy.first ().first ().to_bool () == false);
     }
 
 
@@ -359,9 +359,9 @@ public class TestSyncEngine : GLib.Object {
         GLib.assert_true (!fake_folder.sync_once ());
 
         SyncJournalFileRecord record;
-        fake_folder.sync_journal ().get_file_record (new string ("NewFolder"), record);
+        fake_folder.sync_journal ().get_file_record ("NewFolder", record);
         GLib.assert_true (record.is_valid ());
-        GLib.assert_cmp (record.etag, new string ("this.invalid_"));
+        GLib.assert_true (record.etag == "this.invalid_");
         GLib.assert_true (!record.file_identifier == "");
     }
 
@@ -386,7 +386,7 @@ public class TestSyncEngine : GLib.Object {
         fake_folder.server_error_paths ().append ("Y/Z/d2", 503);
         fake_folder.server_error_paths ().append ("Y/Z/d3", 503);
         GLib.assert_true (!fake_folder.sync_once ());
-        QCoreApplication.process_events (); // should not crash
+        Gtk.Application.process_events (); // should not crash
 
         GLib.Set<string> seen;
         foreach (GLib.List<GLib.Variant> args in complete_spy) {
@@ -418,19 +418,19 @@ public class TestSyncEngine : GLib.Object {
             << 0;
 
         QTest.new_row ("Same mtime, weak server checksum differ . downloaded")
-            + true + string ("Adler32:bad")
+            + true + "Adler32:bad"
             << 1;
 
         QTest.new_row ("Same mtime, matching weak checksum . skipped")
-            + true + string ("Adler32:2a2010d")
+            + true + "Adler32:2a2010d"
             << 0;
 
         QTest.new_row ("Same mtime, strong server checksum differ . downloaded")
-            + true + string ("SHA1:bad")
+            + true + "SHA1:bad"
             << 1;
 
         QTest.new_row ("Same mtime, matching strong checksum . skipped")
-            + true + string ("SHA1:56900fb1d337cf7237ff766276b9c1e8ce507427")
+            + true + "SHA1:56900fb1d337cf7237ff766276b9c1e8ce507427"
             << 0;
 
         QTest.new_row ("mtime changed, but no server checksum . download")
@@ -438,11 +438,11 @@ public class TestSyncEngine : GLib.Object {
             << 1;
 
         QTest.new_row ("mtime changed, weak checksum match . download anyway")
-            + false + string ("Adler32:2a2010d")
+            + false + "Adler32:2a2010d"
             << 1;
 
         QTest.new_row ("mtime changed, strong checksum match . skip")
-            + false + string ("SHA1:56900fb1d337cf7237ff766276b9c1e8ce507427")
+            + false + "SHA1:56900fb1d337cf7237ff766276b9c1e8ce507427"
             << 0;
     }
 
@@ -457,11 +457,7 @@ public class TestSyncEngine : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         int n_get = 0;
-        fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request &, QIODevice *) {
-            if (operation == Soup.GetOperation)
-                ++n_get;
-            return null;
-        });
+        fake_folder.set_server_override (this.override_delegate_fake_conflict);
 
         // For directly editing the remote checksum
         var remote_info = fake_folder.remote_modifier ();
@@ -478,17 +474,24 @@ public class TestSyncEngine : GLib.Object {
         fake_folder.remote_modifier ().set_modification_time ("A/a1", mtime);
         remote_info.find ("A/a1").checksums = checksums;
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (n_get, expected_get);
+        GLib.assert_true (n_get == expected_get);
 
         // check that mtime in journal and filesystem agree
         string a1path = fake_folder.local_path () + "A/a1";
         SyncJournalFileRecord a1record;
-        fake_folder.sync_journal ().get_file_record (string ("A/a1"), a1record);
-        GLib.assert_cmp (a1record.modtime, (int64)FileSystem.get_mod_time (a1path));
+        fake_folder.sync_journal ().get_file_record ("A/a1", a1record);
+        GLib.assert_true (a1record.modtime == (int64)FileSystem.get_mod_time (a1path));
 
         // Extra sync reads from database, no difference
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (n_get, expected_get);
+        GLib.assert_true (n_get == expected_get);
+    }
+
+
+    private Soup.Reply override_delegate_fake_conflict (Soup.Operation operation, Soup.Request request, QIODevice device) {
+        if (operation == Soup.GetOperation)
+            ++n_get;
+        return null;
     }
 
 
@@ -540,31 +543,31 @@ public class TestSyncEngine : GLib.Object {
 
             // a1 : should have local size and modtime
             GLib.assert_true (a1);
-            GLib.assert_cmp (a1.instruction, SyncInstructions.SYNC);
-            GLib.assert_cmp (a1.direction, SyncFileItem.Direction.UP);
-            GLib.assert_cmp (a1.size, int64 (5));
+            GLib.assert_true (a1.instruction == SyncInstructions.SYNC);
+            GLib.assert_true (a1.direction, ==SyncFileItem.Direction.UP);
+            GLib.assert_true (a1.size == int64 (5));
 
-            GLib.assert_cmp (Utility.date_time_from_time_t (a1.modtime), changed_mtime);
-            GLib.assert_cmp (a1.previous_size, int64 (4));
-            GLib.assert_cmp (Utility.date_time_from_time_t (a1.previous_modtime), initial_mtime);
+            GLib.assert_true (Utility.date_time_from_time_t (a1.modtime) == changed_mtime);
+            GLib.assert_true (a1.previous_size == int64 (4));
+            GLib.assert_true (Utility.date_time_from_time_t (a1.previous_modtime) == initial_mtime);
 
             // b2 : should have remote size and modtime
             GLib.assert_true (b1);
-            GLib.assert_cmp (b1.instruction, SyncInstructions.SYNC);
-            GLib.assert_cmp (b1.direction, SyncFileItem.Direction.DOWN);
-            GLib.assert_cmp (b1.size, int64 (17));
-            GLib.assert_cmp (Utility.date_time_from_time_t (b1.modtime), changed_mtime);
-            GLib.assert_cmp (b1.previous_size, int64 (16));
-            GLib.assert_cmp (Utility.date_time_from_time_t (b1.previous_modtime), initial_mtime);
+            GLib.assert_true (b1.instruction == SyncInstructions.SYNC);
+            GLib.assert_true (b1.direction == SyncFileItem.Direction.DOWN);
+            GLib.assert_true (b1.size == int64 (17));
+            GLib.assert_true (Utility.date_time_from_time_t (b1.modtime) == changed_mtime);
+            GLib.assert_true (b1.previous_size == int64 (16));
+            GLib.assert_true (Utility.date_time_from_time_t (b1.previous_modtime) == initial_mtime);
 
             // c1 : conflicts are downloads, so remote size and modtime
             GLib.assert_true (c1);
-            GLib.assert_cmp (c1.instruction, SyncInstructions.CONFLICT);
-            GLib.assert_cmp (c1.direction, SyncFileItem.Direction.NONE);
-            GLib.assert_cmp (c1.size, int64 (25));
-            GLib.assert_cmp (Utility.date_time_from_time_t (c1.modtime), changed_mtime2);
-            GLib.assert_cmp (c1.previous_size, int64 (26));
-            GLib.assert_cmp (Utility.date_time_from_time_t (c1.previous_modtime), changed_mtime);
+            GLib.assert_true (c1.instruction == SyncInstructions.CONFLICT);
+            GLib.assert_true (c1.direction == SyncFileItem.Direction.NONE);
+            GLib.assert_true (c1.size == int64 (25));
+            GLib.assert_true (Utility.date_time_from_time_t (c1.modtime) == changed_mtime2);
+            GLib.assert_true (c1.previous_size == int64 (26));
+            GLib.assert_true (Utility.date_time_from_time_t (c1.previous_modtime) == changed_mtime);
         });
 
         GLib.assert_true (fake_folder.sync_once ());
@@ -587,23 +590,12 @@ public class TestSyncEngine : GLib.Object {
         int remote_quota = 1000;
         int n507 = 0, number_of_put = 0;
         GLib.Object parent;
-        fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice outgoing_data) . Soup.Reply * {
-            Q_UNUSED (outgoing_data)
-
-            if (operation == Soup.PutOperation) {
-                number_of_put++;
-                if (request.raw_header ("OC-Total-Length").to_int () > remote_quota) {
-                    n507++;
-                    return new FakeErrorReply (operation, request, parent, 507);
-                }
-            }
-            return null;
-        });
+        fake_folder.set_server_override (this.override_delegate_insufficient_remote_storage);
 
         fake_folder.local_modifier ().insert ("A/big", 800);
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (number_of_put, 1);
-        GLib.assert_cmp (n507, 0);
+        GLib.assert_true (number_of_put == 1);
+        GLib.assert_true (n507 == 0);
 
         number_of_put = 0;
         fake_folder.local_modifier ().insert ("A/big1", 500); // ok
@@ -617,9 +609,24 @@ public class TestSyncEngine : GLib.Object {
 
         fake_folder.local_modifier ().insert ("B/big8", 1150); // 507
         GLib.assert_true (!fake_folder.sync_once ());
-        GLib.assert_cmp (number_of_put, 6);
-        GLib.assert_cmp (n507, 3);
+        GLib.assert_true (number_of_put == 6);
+        GLib.assert_true (n507 == 3);
     }
+
+
+    private Soup.Reply override_delegate_insufficient_remote_storage (Soup.Operation operation, Soup.Request request, QIODevice outgoing_data) {
+        Q_UNUSED (outgoing_data)
+
+        if (operation == Soup.PutOperation) {
+            number_of_put++;
+            if (request.raw_header ("OC-Total-Length").to_int () > remote_quota) {
+                n507++;
+                return new FakeErrorReply (operation, request, parent, 507);
+            }
+        }
+        return null;
+    }
+
 
     /***********************************************************
     Checks whether downloads with bad checksums are accepted
@@ -631,22 +638,12 @@ public class TestSyncEngine : GLib.Object {
         string checksum_value;
         string content_md5_value;
 
-        fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice *) . Soup.Reply * {
-            if (operation == Soup.GetOperation) {
-                var reply = new FakeGetReply (fake_folder.remote_modifier (), operation, request, parent);
-                if (!checksum_value.is_null ())
-                    reply.set_raw_header ("OC-Checksum", checksum_value);
-                if (!content_md5_value.is_null ())
-                    reply.set_raw_header ("Content-MD5", content_md5_value);
-                return reply;
-            }
-            return null;
-        });
+        fake_folder.set_server_override (this.override_delegate_checksum_validation);
 
         // Basic case
         fake_folder.remote_modifier ().create ("A/a3", 16, 'A');
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // Bad OC-Checksum
         checksum_value = "SHA1:bad";
@@ -656,7 +653,7 @@ public class TestSyncEngine : GLib.Object {
         // Good OC-Checksum
         checksum_value = "SHA1:19b1928d58a2030d08023f3d7054516dbc186f20"; // printf 'A%.0s' {1..16} | sha1sum -
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         checksum_value = "";
 
         // Bad Content-MD5
@@ -667,7 +664,7 @@ public class TestSyncEngine : GLib.Object {
         // Good Content-MD5
         content_md5_value = "d8a73157ce10cd94a91c2079fc9a92c8"; // printf 'A%.0s' {1..16} | md5sum -
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // Invalid OC-Checksum is ignored
         checksum_value = "garbage";
@@ -679,7 +676,7 @@ public class TestSyncEngine : GLib.Object {
         GLib.assert_true (!fake_folder.sync_once ());
         content_md5_value.clear ();
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // OC-Checksum contains Unsupported checksums
         checksum_value = "Unsupported:XXXX SHA1:invalid Invalid:XxX";
@@ -687,8 +684,22 @@ public class TestSyncEngine : GLib.Object {
         GLib.assert_true (!fake_folder.sync_once ()); // Since the supported SHA1 checksum is invalid, no download
         checksum_value =  "Unsupported:XXXX SHA1:19b1928d58a2030d08023f3d7054516dbc186f20 Invalid:XxX";
         GLib.assert_true (fake_folder.sync_once ()); // The supported SHA1 checksum is valid now, so the file are downloaded
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
+
+
+    private Soup.Reply override_delegate_checksum_validation (Soup.Operation operation, Soup.Request request, QIODevice device) {
+        if (operation == Soup.GetOperation) {
+            var reply = new FakeGetReply (fake_folder.remote_modifier (), operation, request, parent);
+            if (!checksum_value.is_null ())
+                reply.set_raw_header ("OC-Checksum", checksum_value);
+            if (!content_md5_value.is_null ())
+                reply.set_raw_header ("Content-MD5", content_md5_value);
+            return reply;
+        }
+        return null;
+    }
+
 
     /***********************************************************
     Tests the behavior of invalid filename detection
@@ -700,7 +711,7 @@ public class TestSyncEngine : GLib.Object {
         fake_folder.sync_engine ().account ().set_server_version ("10.0.0");
         fake_folder.local_modifier ().insert ("A/\\:?*\"<>|.txt");
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // For legacy servers, some characters were forbidden by the client
         fake_folder.sync_engine ().account ().set_server_version ("8.0.0");
@@ -711,7 +722,7 @@ public class TestSyncEngine : GLib.Object {
         // We can override that by setting the capability
         fake_folder.sync_engine ().account ().set_capabilities ({ { "dav", QVariantMap{ { "invalid_filename_regex", "" } } } });
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // Check that new servers also accept the capability
         fake_folder.sync_engine ().account ().set_server_version ("10.0.0");
@@ -727,7 +738,7 @@ public class TestSyncEngine : GLib.Object {
     private void test_discovery_hidden_file () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // We can't depend on current_local_state for hidden files since
         // it should rightfully skip things like download temporaries
@@ -760,7 +771,7 @@ public class TestSyncEngine : GLib.Object {
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // Utf8 locale can sync both
         fake_folder.remote_modifier ().insert ("A/tößt");
@@ -801,6 +812,7 @@ public class TestSyncEngine : GLib.Object {
         QTextCodec.set_codec_for_locale (utf8Locale);
     }
 
+
     /***********************************************************
     Aborting has had bugs when there are parallel upload jobs
     ***********************************************************/
@@ -814,7 +826,8 @@ public class TestSyncEngine : GLib.Object {
 
         GLib.Object parent;
         int number_of_put = 0;
-        fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice *) . Soup.Reply * {
+        fake_folder.set_server_override (this.override_delegate);
+        private Soup.Reply override_delegate (Soup.Operation operation, Soup.Request request, QIODevice device) {
             if (operation == Soup.PutOperation) {
                 ++number_of_put;
                 return new FakeHangingReply (operation, request, parent);
@@ -826,7 +839,7 @@ public class TestSyncEngine : GLib.Object {
         QTimer.single_shot (100, fake_folder.sync_engine (), [&] () { fake_folder.sync_engine ().on_signal_abort (); });
         GLib.assert_true (!fake_folder.sync_once ());
 
-        GLib.assert_cmp (number_of_put, 3);
+        GLib.assert_true (number_of_put == 3);
     }
 
 
@@ -843,12 +856,12 @@ public class TestSyncEngine : GLib.Object {
         fake_folder.local_modifier ().append_byte ("A/a2");
         fake_folder.local_modifier ().append_byte ("A/a2");
         fake_folder.sync_once (); // perms should be preserved
-        GLib.assert_cmp (GLib.new FileInfo (fake_folder.local_path () + "A/a1").permissions (), perm);
-        GLib.assert_cmp (GLib.new FileInfo (fake_folder.local_path () + "A/a2").permissions (), perm);
+        GLib.assert_true (new FileInfo (fake_folder.local_path () + "A/a1").permissions () == perm);
+        GLib.assert_true (new FileInfo (fake_folder.local_path () + "A/a2").permissions () == perm);
 
         var conflict_name = fake_folder.sync_journal ().conflict_record (fake_folder.sync_journal ().conflict_record_paths ().first ()).path;
         GLib.assert_true (conflict_name.contains ("A/a2"));
-        GLib.assert_cmp (new FileInfo (fake_folder.local_path () + conflict_name).permissions (), perm);
+        GLib.assert_true (new FileInfo (fake_folder.local_path () + conflict_name).permissions () == perm);
     }
 
 
@@ -859,11 +872,12 @@ public class TestSyncEngine : GLib.Object {
         fake_folder.remote_modifier ().mkdir ("foo");
 
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         GLib.assert_true (fake_folder.current_local_state ().find ("foo"));
 
     }
+
 
     /***********************************************************
     Check that server mtime is set on directories on initial
@@ -878,9 +892,9 @@ public class TestSyncEngine : GLib.Object {
         fake_folder.remote_modifier ().find ("foo").last_modified = datetime;
 
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
-        GLib.assert_cmp (GLib.new FileInfo (fake_folder.local_path () + "foo").last_modified (), datetime);
+        GLib.assert_true (new FileInfo (fake_folder.local_path () + "foo").last_modified () == datetime);
     }
 
 
@@ -899,56 +913,12 @@ public class TestSyncEngine : GLib.Object {
 
         int number_of_put = 0;
         int number_of_post = 0;
-        fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request request, QIODevice outgoing_data) . Soup.Reply * {
-            var content_type = request.header (Soup.Request.ContentTypeHeader).to_string ();
-            if (operation == Soup.PostOperation) {
-                ++number_of_post;
-                if (content_type.starts_with ("multipart/related; boundary=")) {
-                    var json_reply_object = fake_folder.for_each_reply_part (outgoing_data, content_type, [] (GLib.HashTable<string, string> all_headers) . QJsonObject {
-                        var reply = QJsonObject{};
-                        var filename = all_headers["X-File-Path"];
-                        if (filename.ends_with ("A/big2") ||
-                                filename.ends_with ("A/big3") ||
-                                filename.ends_with ("A/big4") ||
-                                filename.ends_with ("A/big5") ||
-                                filename.ends_with ("A/big7") ||
-                                filename.ends_with ("B/big8")) {
-                            reply.insert ("error", true);
-                            reply.insert ("etag", {});
-                            return reply;
-                        } else {
-                            reply.insert ("error", false);
-                            reply.insert ("etag", {});
-                        }
-                        return reply;
-                    });
-                    if (json_reply_object.size ()) {
-                        var json_reply = QJsonDocument{};
-                        json_reply.set_object (json_reply_object);
-                        return new FakeJsonErrorReply{operation, request, this, 200, json_reply};
-                    }
-                    return  null;
-                }
-            } else if (operation == Soup.PutOperation) {
-                ++number_of_put;
-                var filename = get_file_path_from_url (request.url ());
-                if (filename.ends_with ("A/big2") ||
-                        filename.ends_with ("A/big3") ||
-                        filename.ends_with ("A/big4") ||
-                        filename.ends_with ("A/big5") ||
-                        filename.ends_with ("A/big7") ||
-                        filename.ends_with ("B/big8")) {
-                    return new FakeErrorReply (operation, request, this, 412);
-                }
-                return  null;
-            }
-            return null;
-        });
+        fake_folder.set_server_override (this.override_delegate_with_bulk_upload);
 
         fake_folder.local_modifier ().insert ("A/big", 1);
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (number_of_put, 0);
-        GLib.assert_cmp (number_of_post, 1);
+        GLib.assert_true (number_of_put == 0);
+        GLib.assert_true (number_of_post == 1);
         number_of_put = 0;
         number_of_post = 0;
 
@@ -963,15 +933,62 @@ public class TestSyncEngine : GLib.Object {
         fake_folder.local_modifier ().insert ("B/big8", 1); // ko
 
         GLib.assert_true (!fake_folder.sync_once ());
-        GLib.assert_cmp (number_of_put, 0);
-        GLib.assert_cmp (number_of_post, 1);
+        GLib.assert_true (number_of_put == 0);
+        GLib.assert_true (number_of_post == 1);
         number_of_put = 0;
         number_of_post = 0;
 
         GLib.assert_true (!fake_folder.sync_once ());
-        GLib.assert_cmp (number_of_put, 6);
-        GLib.assert_cmp (number_of_post, 0);
+        GLib.assert_true (number_of_put == 6);
+        GLib.assert_true (number_of_post == 0);
     }
-}
 
-QTEST_GUILESS_MAIN (TestSyncEngine)
+
+    private Soup.Reply override_delegate_with_bulk_upload (Soup.Operation operation, Soup.Request request, QIODevice outgoing_data) {
+        var content_type = request.header (Soup.Request.ContentTypeHeader).to_string ();
+        if (operation == Soup.PostOperation) {
+            ++number_of_post;
+            if (content_type.starts_with ("multipart/related; boundary=")) {
+                var json_reply_object = fake_folder.for_each_reply_part (outgoing_data, content_type, [] (GLib.HashTable<string, string> all_headers) . QJsonObject {
+                    var reply = QJsonObject{};
+                    var filename = all_headers["X-File-Path"];
+                    if (filename.ends_with ("A/big2") ||
+                            filename.ends_with ("A/big3") ||
+                            filename.ends_with ("A/big4") ||
+                            filename.ends_with ("A/big5") ||
+                            filename.ends_with ("A/big7") ||
+                            filename.ends_with ("B/big8")) {
+                        reply.insert ("error", true);
+                        reply.insert ("etag", {});
+                        return reply;
+                    } else {
+                        reply.insert ("error", false);
+                        reply.insert ("etag", {});
+                    }
+                    return reply;
+                });
+                if (json_reply_object.size ()) {
+                    var json_reply = QJsonDocument{};
+                    json_reply.set_object (json_reply_object);
+                    return new FakeJsonErrorReply{operation, request, this, 200, json_reply};
+                }
+                return  null;
+            }
+        } else if (operation == Soup.PutOperation) {
+            ++number_of_put;
+            var filename = get_file_path_from_url (request.url ());
+            if (filename.ends_with ("A/big2") ||
+                    filename.ends_with ("A/big3") ||
+                    filename.ends_with ("A/big4") ||
+                    filename.ends_with ("A/big5") ||
+                    filename.ends_with ("A/big7") ||
+                    filename.ends_with ("B/big8")) {
+                return new FakeErrorReply (operation, request, this, 412);
+            }
+            return  null;
+        }
+        return null;
+    }
+
+}
+}

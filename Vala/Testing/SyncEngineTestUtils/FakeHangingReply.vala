@@ -21,6 +21,7 @@ public class FakeHangingReply : FakeReply {
         open (QIODevice.ReadOnly);
     }
 
+
     /***********************************************************
     ***********************************************************/
     public override void on_signal_abort () {
@@ -31,6 +32,7 @@ public class FakeHangingReply : FakeReply {
         set_finished (true);
         /* emit */ signal_finished ();
     }
+
 
     /***********************************************************
     ***********************************************************/

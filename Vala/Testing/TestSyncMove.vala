@@ -11,8 +11,8 @@ using Occ;
 
 namespace Testing {
 
-struct OperationCounter {
-    int n_get = 0;
+public class OperationCounter {
+    int number_of_get = 0;
     int number_of_put = 0;
     int number_of_move = 0;
     int number_of_delete = 0;
@@ -22,7 +22,7 @@ struct OperationCounter {
     var functor () {
         return [&] (Soup.Operation operation, Soup.Request request, QIODevice *) {
             if (operation == Soup.GetOperation)
-                ++n_get;
+                ++number_of_get;
             if (operation == Soup.PutOperation)
                 ++number_of_put;
             if (operation == Soup.DeleteOperation)
@@ -44,7 +44,7 @@ bool item_conflict (ItemCompletedSpy spy, string path) {
     return item.status == SyncFileItem.Status.CONFLICT && item.instruction == SyncInstructions.CONFLICT;
 }
 
-bool item_successful_ move (ItemCompletedSpy spy, string path) {
+bool item_successful_move (ItemCompletedSpy spy, string path) {
     return item_successful (spy, path, SyncInstructions.RENAME);
 }
 
@@ -111,10 +111,10 @@ public class TestSyncMove : GLib.Object {
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
         GLib.assert_true (fake_folder.sync_once ());
 
-        GLib.assert_cmp (counter.n_get, 0);
-        GLib.assert_cmp (counter.number_of_put, 0);
-        GLib.assert_cmp (counter.number_of_move, 1);
-        GLib.assert_cmp (counter.number_of_delete, 0);
+        GLib.assert_true (counter.number_of_get == 0);
+        GLib.assert_true (counter.number_of_put == 0);
+        GLib.assert_true (counter.number_of_move == 1);
+        GLib.assert_true (counter.number_of_delete == 0);
 
         GLib.assert_true (item_successful (complete_spy, "f1", SyncInstructions.RENAME));
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/f1"));
@@ -142,21 +142,21 @@ public class TestSyncMove : GLib.Object {
             )
         );
 
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // Edit a file in a moved directory.
         fake_folder.remote_modifier ().set_contents ("folder/folder_a/file.txt", 'a');
         fake_folder.remote_modifier ().rename ("folder/folder_a", "folder/folder_b/folder_a");
         fake_folder.sync_once ();
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         var old_state = fake_folder.current_local_state ();
         GLib.assert_true (old_state.find ("folder/folder_b/folder_a/file.txt"));
         GLib.assert_true (!old_state.find ("folder/folder_a/file.txt"));
 
         // This sync should not remove the file
         fake_folder.sync_once ();
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        GLib.assert_cmp (fake_folder.current_local_state (), old_state);
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == old_state);
     }
 
 
@@ -188,56 +188,53 @@ public class TestSyncMove : GLib.Object {
             )
         );
 
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         var expected_server_state = fake_folder.current_remote_state ();
 
         // Remove sub_folder_a with selective_sync:
         fake_folder.sync_engine ().journal ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, { "parent_folder/sub_folder_a/" });
-        fake_folder.sync_engine ().journal ().schedule_path_for_remote_discovery (new string ("parent_folder/sub_folder_a/"));
+        fake_folder.sync_engine ().journal ().schedule_path_for_remote_discovery ("parent_folder/sub_folder_a/");
 
         fake_folder.sync_once ();
- {
-            // Nothing changed on the server
-            GLib.assert_cmp (fake_folder.current_remote_state (), expected_server_state);
-            // The local state should not have sub_folder_a
-            var remote_state = fake_folder.current_remote_state ();
-            remote_state.remove ("parent_folder/sub_folder_a");
-            GLib.assert_cmp (fake_folder.current_local_state (), remote_state);
-        }
+
+        // Nothing changed on the server
+        GLib.assert_true (fake_folder.current_remote_state () == expected_server_state);
+        // The local state should not have sub_folder_a
+        var remote_state = fake_folder.current_remote_state ();
+        remote_state.remove ("parent_folder/sub_folder_a");
+        GLib.assert_true (fake_folder.current_local_state () == remote_state);
 
         // Rename parent_folder on the server
         fake_folder.remote_modifier ().rename ("parent_folder", "parent_folder_renamed");
         expected_server_state = fake_folder.current_remote_state ();
         fake_folder.sync_once ();
- {
-            GLib.assert_cmp (fake_folder.current_remote_state (), expected_server_state);
-            var remote_state = fake_folder.current_remote_state ();
-            // The sub_folder_a should still be there on the server.
-            GLib.assert_true (remote_state.find ("parent_folder_renamed/sub_folder_a/file_a.txt"));
-            // But not on the client because of the selective sync
-            remote_state.remove ("parent_folder_renamed/sub_folder_a");
-            GLib.assert_cmp (fake_folder.current_local_state (), remote_state);
-        }
+
+        GLib.assert_true (fake_folder.current_remote_state () == expected_server_state);
+        var remote_state = fake_folder.current_remote_state ();
+        // The sub_folder_a should still be there on the server.
+        GLib.assert_true (remote_state.find ("parent_folder_renamed/sub_folder_a/file_a.txt"));
+        // But not on the client because of the selective sync
+        remote_state.remove ("parent_folder_renamed/sub_folder_a");
+        GLib.assert_true (fake_folder.current_local_state () == remote_state);
 
         // Rename it again, locally this time.
         fake_folder.local_modifier ().rename ("parent_folder_renamed", "parent_third_name");
         fake_folder.sync_once ();
- {
-            var remote_state = fake_folder.current_remote_state ();
-            // The sub_folder_a should still be there on the server.
-            GLib.assert_true (remote_state.find ("parent_third_name/sub_folder_a/file_a.txt"));
-            // But not on the client because of the selective sync
-            remote_state.remove ("parent_third_name/sub_folder_a");
-            GLib.assert_cmp (fake_folder.current_local_state (), remote_state);
 
-            expected_server_state = fake_folder.current_remote_state ();
-            ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
-            fake_folder.sync_once (); // This sync should do nothing
-            GLib.assert_cmp (complete_spy.count (), 0);
+        var remote_state = fake_folder.current_remote_state ();
+        // The sub_folder_a should still be there on the server.
+        GLib.assert_true (remote_state.find ("parent_third_name/sub_folder_a/file_a.txt"));
+        // But not on the client because of the selective sync
+        remote_state.remove ("parent_third_name/sub_folder_a");
+        GLib.assert_true (fake_folder.current_local_state () == remote_state);
 
-            GLib.assert_cmp (fake_folder.current_remote_state (), expected_server_state);
-            GLib.assert_cmp (fake_folder.current_local_state (), remote_state);
-        }
+        expected_server_state = fake_folder.current_remote_state ();
+        ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
+        fake_folder.sync_once (); // This sync should do nothing
+        GLib.assert_true (complete_spy.count () == 0);
+
+        GLib.assert_true (fake_folder.current_remote_state () == expected_server_state);
+        GLib.assert_true (fake_folder.current_local_state () == remote_state);
     }
 
 
@@ -248,13 +245,7 @@ public class TestSyncMove : GLib.Object {
 
         int number_of_put = 0;
         int number_of_delete = 0;
-        fake_folder.set_server_override ([&] (Soup.Operation operation, Soup.Request &, QIODevice *) {
-            if (operation == Soup.PutOperation)
-                ++number_of_put;
-            if (operation == Soup.DeleteOperation)
-                ++number_of_delete;
-            return null;
-        });
+        fake_folder.set_server_override (this.override_delegate_local_move_detection);
 
         // For directly editing the remote checksum
         FileInfo remote_info = fake_folder.remote_modifier ();
@@ -262,27 +253,27 @@ public class TestSyncMove : GLib.Object {
         // Simple move causing a remote rename
         fake_folder.local_modifier ().rename ("A/a1", "A/a1m");
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), remote_info);
-        GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (remote_info));
-        GLib.assert_cmp (number_of_put, 0);
+        GLib.assert_true (fake_folder.current_local_state () == remote_info);
+        GLib.assert_true (print_database_data (fake_folder.database_state ()) == print_database_data (remote_info));
+        GLib.assert_true (number_of_put == 0);
 
         // Move-and-change, causing a upload and delete
         fake_folder.local_modifier ().rename ("A/a2", "A/a2m");
         fake_folder.local_modifier ().append_byte ("A/a2m");
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), remote_info);
-        GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (remote_info));
-        GLib.assert_cmp (number_of_put, 1);
-        GLib.assert_cmp (number_of_delete, 1);
+        GLib.assert_true (fake_folder.current_local_state () == remote_info);
+        GLib.assert_true (print_database_data (fake_folder.database_state ()) == print_database_data (remote_info));
+        GLib.assert_true (number_of_put == 1);
+        GLib.assert_true (number_of_delete == 1);
 
         // Move-and-change, mtime+content only
         fake_folder.local_modifier ().rename ("B/b1", "B/b1m");
         fake_folder.local_modifier ().set_contents ("B/b1m", 'C');
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), remote_info);
-        GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (remote_info));
-        GLib.assert_cmp (number_of_put, 2);
-        GLib.assert_cmp (number_of_delete, 2);
+        GLib.assert_true (fake_folder.current_local_state () == remote_info);
+        GLib.assert_true (print_database_data (fake_folder.database_state ()) == print_database_data (remote_info));
+        GLib.assert_true (number_of_put == 2);
+        GLib.assert_true (number_of_delete == 2);
 
         // Move-and-change, size+content only
         var mtime = fake_folder.remote_modifier ().find ("B/b2").last_modified;
@@ -290,10 +281,10 @@ public class TestSyncMove : GLib.Object {
         fake_folder.local_modifier ().append_byte ("B/b2m");
         fake_folder.local_modifier ().set_modification_time ("B/b2m", mtime);
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), remote_info);
-        GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (remote_info));
-        GLib.assert_cmp (number_of_put, 3);
-        GLib.assert_cmp (number_of_delete, 3);
+        GLib.assert_true (fake_folder.current_local_state () == remote_info);
+        GLib.assert_true (print_database_data (fake_folder.database_state ()) == print_database_data (remote_info));
+        GLib.assert_true (number_of_put == 3);
+        GLib.assert_true (number_of_delete == 3);
 
         // Move-and-change, content only -- c1 has no checksum, so we fail to detect this!
         // Note: This is an expected failure.
@@ -302,18 +293,18 @@ public class TestSyncMove : GLib.Object {
         fake_folder.local_modifier ().set_contents ("C/c1m", 'C');
         fake_folder.local_modifier ().set_modification_time ("C/c1m", mtime);
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (number_of_put, 3);
-        GLib.assert_cmp (number_of_delete, 3);
+        GLib.assert_true (number_of_put == 3);
+        GLib.assert_true (number_of_delete == 3);
         GLib.assert_true (! (fake_folder.current_local_state () == remote_info));
 
         // on_signal_cleanup, and upload a file that will have a checksum in the database
         fake_folder.local_modifier ().remove ("C/c1m");
         fake_folder.local_modifier ().insert ("C/c3");
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), remote_info);
-        GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (remote_info));
-        GLib.assert_cmp (number_of_put, 4);
-        GLib.assert_cmp (number_of_delete, 4);
+        GLib.assert_true (fake_folder.current_local_state () == remote_info);
+        GLib.assert_true (print_database_data (fake_folder.database_state ()) == print_database_data (remote_info));
+        GLib.assert_true (number_of_put == 4);
+        GLib.assert_true (number_of_delete == 4);
 
         // Move-and-change, content only, this time while having a checksum
         mtime = fake_folder.remote_modifier ().find ("C/c3").last_modified;
@@ -321,10 +312,19 @@ public class TestSyncMove : GLib.Object {
         fake_folder.local_modifier ().set_contents ("C/c3m", 'C');
         fake_folder.local_modifier ().set_modification_time ("C/c3m", mtime);
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (number_of_put, 5);
-        GLib.assert_cmp (number_of_delete, 5);
-        GLib.assert_cmp (fake_folder.current_local_state (), remote_info);
-        GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (remote_info));
+        GLib.assert_true (number_of_put == 5);
+        GLib.assert_true (number_of_delete == 5);
+        GLib.assert_true (fake_folder.current_local_state () == remote_info);
+        GLib.assert_true (print_database_data (fake_folder.database_state ()) == print_database_data (remote_info));
+    }
+
+
+    private Soup.Reply override_delegate_local_move_detection (Soup.Operation operation, Soup.Request &, QIODevice *) {
+        if (operation == Soup.PutOperation)
+            ++number_of_put;
+        if (operation == Soup.DeleteOperation)
+            ++number_of_delete;
+        return null;
     }
 
 
@@ -362,7 +362,7 @@ public class TestSyncMove : GLib.Object {
         // horribly confused if we add new files that have the same
         // fileid as existing ones
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         OperationCounter counter;
         fake_folder.set_server_override (counter.functor ());
@@ -371,29 +371,29 @@ public class TestSyncMove : GLib.Object {
         remote.rename ("A/a1", "A/W/a1m");
         remote.rename (prefix + "/A/a1", prefix + "/A/W/a1m");
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        GLib.assert_cmp (counter.n_get, 0);
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+        GLib.assert_true (counter.number_of_get == 0);
 
         // And a remote directory move
         remote.rename ("A/W", "A/Q/W");
         remote.rename (prefix + "/A/W", prefix + "/A/Q/W");
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        GLib.assert_cmp (counter.n_get, 0);
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+        GLib.assert_true (counter.number_of_get == 0);
 
         // Partial file removal (in practice, A/a2 may be moved to O/a2, but we don't care)
         remote.rename (prefix + "/A/a2", prefix + "/a2");
         remote.remove ("A/a2");
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        GLib.assert_cmp (counter.n_get, 0);
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+        GLib.assert_true (counter.number_of_get == 0);
 
         // Local change plus remote move at the same time
         fake_folder.local_modifier ().append_byte (prefix + "/a2");
         remote.rename (prefix + "/a2", prefix + "/a3");
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        GLib.assert_cmp (counter.n_get, 1);
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+        GLib.assert_true (counter.number_of_get == 1);
         counter.on_signal_reset ();
 
         // remove localy, and remote move at the same time
@@ -401,8 +401,8 @@ public class TestSyncMove : GLib.Object {
         remote.rename ("A/Q/W/a1m", "A/Q/W/a1p");
         remote.rename (prefix + "/A/Q/W/a1m", prefix + "/A/Q/W/a1p");
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        GLib.assert_cmp (counter.n_get, 1);
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+        GLib.assert_true (counter.number_of_get == 1);
         counter.on_signal_reset ();
     }
 
@@ -423,17 +423,17 @@ public class TestSyncMove : GLib.Object {
             remote.rename ("B/b1", "B/b1m");
             ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
             GLib.assert_true (fake_folder.sync_once ());
-            GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-            GLib.assert_cmp (counter.n_get, 0);
-            GLib.assert_cmp (counter.number_of_put, 0);
-            GLib.assert_cmp (counter.number_of_move, 1);
-            GLib.assert_cmp (counter.number_of_delete, 0);
-            GLib.assert_true (item_successful_ move (complete_spy, "A/a1m"));
-            GLib.assert_true (item_successful_ move (complete_spy, "B/b1m"));
-            GLib.assert_cmp (complete_spy.find_item ("A/a1m").file, "A/a1");
-            GLib.assert_cmp (complete_spy.find_item ("A/a1m").rename_target, "A/a1m");
-            GLib.assert_cmp (complete_spy.find_item ("B/b1m").file, "B/b1");
-            GLib.assert_cmp (complete_spy.find_item ("B/b1m").rename_target, "B/b1m");
+            GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+            GLib.assert_true (counter.number_of_get == 0);
+            GLib.assert_true (counter.number_of_put == 0);
+            GLib.assert_true (counter.number_of_move == 1);
+            GLib.assert_true (counter.number_of_delete == 0);
+            GLib.assert_true (item_successful_move (complete_spy, "A/a1m"));
+            GLib.assert_true (item_successful_move (complete_spy, "B/b1m"));
+            GLib.assert_true (complete_spy.find_item ("A/a1m").file == "A/a1");
+            GLib.assert_true (complete_spy.find_item ("A/a1m").rename_target == "A/a1m");
+            GLib.assert_true (complete_spy.find_item ("B/b1m").file == "B/b1");
+            GLib.assert_true (complete_spy.find_item ("B/b1m").rename_target == "B/b1m");
         }
 
         // Touch+Move on same side
@@ -443,14 +443,14 @@ public class TestSyncMove : GLib.Object {
         remote.rename ("B/b2", "B/b2m");
         remote.set_contents ("B/b2m", 'A');
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (fake_folder.current_remote_state ()));
-        GLib.assert_cmp (counter.n_get, 1);
-        GLib.assert_cmp (counter.number_of_put, 1);
-        GLib.assert_cmp (counter.number_of_move, 0);
-        GLib.assert_cmp (counter.number_of_delete, 1);
-        GLib.assert_cmp (remote.find ("A/a2m").content_char, 'A');
-        GLib.assert_cmp (remote.find ("B/b2m").content_char, 'A');
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+        GLib.assert_true (print_database_data (fake_folder.database_state ()), print_database_data (fake_folder.current_remote_state ()));
+        GLib.assert_true (counter.number_of_get == 1);
+        GLib.assert_true (counter.number_of_put == 1);
+        GLib.assert_true (counter.number_of_move == 0);
+        GLib.assert_true (counter.number_of_delete == 1);
+        GLib.assert_true (remote.find ("A/a2m").content_char == 'A');
+        GLib.assert_true (remote.find ("B/b2m").content_char == 'A');
 
         // Touch+Move on opposite sides
         counter.on_signal_reset ();
@@ -459,20 +459,20 @@ public class TestSyncMove : GLib.Object {
         remote.rename ("B/b1m", "B/b1m2");
         local.set_contents ("B/b1m", 'B');
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (fake_folder.current_remote_state ()));
-        GLib.assert_cmp (counter.n_get, 2);
-        GLib.assert_cmp (counter.number_of_put, 2);
-        GLib.assert_cmp (counter.number_of_move, 0);
-        GLib.assert_cmp (counter.number_of_delete, 0);
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+        GLib.assert_true (print_database_data (fake_folder.database_state ()) == print_database_data (fake_folder.current_remote_state ()));
+        GLib.assert_true (counter.number_of_get == 2);
+        GLib.assert_true (counter.number_of_put == 2);
+        GLib.assert_true (counter.number_of_move == 0);
+        GLib.assert_true (counter.number_of_delete == 0);
         // All these files existing afterwards is debatable. Should we propagate
         // the rename in one direction and grab the new contents in the other?
         // Currently there's no propagation job that would do that, and this does
         // at least not lose data.
-        GLib.assert_cmp (remote.find ("A/a1m").content_char, 'B');
-        GLib.assert_cmp (remote.find ("B/b1m").content_char, 'B');
-        GLib.assert_cmp (remote.find ("A/a1m2").content_char, 'W');
-        GLib.assert_cmp (remote.find ("B/b1m2").content_char, 'W');
+        GLib.assert_true (remote.find ("A/a1m").content_char == 'B');
+        GLib.assert_true (remote.find ("B/b1m").content_char == 'B');
+        GLib.assert_true (remote.find ("A/a1m2").content_char == 'W');
+        GLib.assert_true (remote.find ("B/b1m2").content_char == 'W');
 
         // Touch+create on one side, move on the other {
             counter.on_signal_reset ();
@@ -486,12 +486,12 @@ public class TestSyncMove : GLib.Object {
             GLib.assert_true (fake_folder.sync_once ());
             GLib.assert_true (expect_and_wipe_conflict (local, fake_folder.current_local_state (), "A/a1mt"));
             GLib.assert_true (expect_and_wipe_conflict (local, fake_folder.current_local_state (), "B/b1mt"));
-            GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-            GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (fake_folder.current_remote_state ()));
-            GLib.assert_cmp (counter.n_get, 3);
-            GLib.assert_cmp (counter.number_of_put, 1);
-            GLib.assert_cmp (counter.number_of_move, 0);
-            GLib.assert_cmp (counter.number_of_delete, 0);
+            GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+            GLib.assert_true (print_database_data (fake_folder.database_state ()) == print_database_data (fake_folder.current_remote_state ()));
+            GLib.assert_true (counter.number_of_get == 3);
+            GLib.assert_true (counter.number_of_put == 1);
+            GLib.assert_true (counter.number_of_move == 0);
+            GLib.assert_true (counter.number_of_delete == 0);
             GLib.assert_true (item_successful (complete_spy, "A/a1m", SyncInstructions.NEW));
             GLib.assert_true (item_successful (complete_spy, "B/b1m", SyncInstructions.NEW));
             GLib.assert_true (item_conflict (complete_spy, "A/a1mt"));
@@ -508,12 +508,12 @@ public class TestSyncMove : GLib.Object {
             GLib.assert_true (fake_folder.sync_once ());
             GLib.assert_true (expect_and_wipe_conflict (local, fake_folder.current_local_state (), "A/a1N"));
             GLib.assert_true (expect_and_wipe_conflict (local, fake_folder.current_local_state (), "B/b1N"));
-            GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-            GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (fake_folder.current_remote_state ()));
-            GLib.assert_cmp (counter.n_get, 2);
-            GLib.assert_cmp (counter.number_of_put, 0);
-            GLib.assert_cmp (counter.number_of_move, 0);
-            GLib.assert_cmp (counter.number_of_delete, 1);
+            GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+            GLib.assert_true (print_database_data (fake_folder.database_state ()) == print_database_data (fake_folder.current_remote_state ()));
+            GLib.assert_true (counter.number_of_get == 2);
+            GLib.assert_true (counter.number_of_put == 0);
+            GLib.assert_true (counter.number_of_move == 0);
+            GLib.assert_true (counter.number_of_delete == 1);
             GLib.assert_true (item_successful (complete_spy, "A/a1mt", SyncInstructions.REMOVE));
             GLib.assert_true (item_successful (complete_spy, "B/b1mt", SyncInstructions.REMOVE));
             GLib.assert_true (item_conflict (complete_spy, "A/a1N"));
@@ -526,12 +526,12 @@ public class TestSyncMove : GLib.Object {
         remote.rename ("C/c1", "C/c1m_r");
         GLib.assert_true (fake_folder.sync_once ());
         // end up with both files
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (fake_folder.current_remote_state ()));
-        GLib.assert_cmp (counter.n_get, 1);
-        GLib.assert_cmp (counter.number_of_put, 1);
-        GLib.assert_cmp (counter.number_of_move, 0);
-        GLib.assert_cmp (counter.number_of_delete, 0);
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+        GLib.assert_true (print_database_data (fake_folder.database_state ()) == print_database_data (fake_folder.current_remote_state ()));
+        GLib.assert_true (counter.number_of_get == 1);
+        GLib.assert_true (counter.number_of_put == 1);
+        GLib.assert_true (counter.number_of_move == 0);
+        GLib.assert_true (counter.number_of_delete == 0);
 
         // Rename/rename conflict on a folder
         counter.on_signal_reset ();
@@ -539,12 +539,12 @@ public class TestSyncMove : GLib.Object {
         local.rename ("C", "CML");
         GLib.assert_true (fake_folder.sync_once ());
         // End up with both folders
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (fake_folder.current_remote_state ()));
-        GLib.assert_cmp (counter.n_get, 3); // 3 files in C
-        GLib.assert_cmp (counter.number_of_put, 3);
-        GLib.assert_cmp (counter.number_of_move, 0);
-        GLib.assert_cmp (counter.number_of_delete, 0);
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+        GLib.assert_true (print_database_data (fake_folder.database_state ()) == print_database_data (fake_folder.current_remote_state ()));
+        GLib.assert_true (counter.number_of_get == 3); // 3 files in C
+        GLib.assert_true (counter.number_of_put == 3);
+        GLib.assert_true (counter.number_of_move == 0);
+        GLib.assert_true (counter.number_of_delete == 0);
 
         // Folder move {
             counter.on_signal_reset ();
@@ -552,18 +552,18 @@ public class TestSyncMove : GLib.Object {
             remote.rename ("B", "BM");
             ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
             GLib.assert_true (fake_folder.sync_once ());
-            GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-            GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (fake_folder.current_remote_state ()));
-            GLib.assert_cmp (counter.n_get, 0);
-            GLib.assert_cmp (counter.number_of_put, 0);
-            GLib.assert_cmp (counter.number_of_move, 1);
-            GLib.assert_cmp (counter.number_of_delete, 0);
-            GLib.assert_true (item_successful_ move (complete_spy, "AM"));
-            GLib.assert_true (item_successful_ move (complete_spy, "BM"));
-            GLib.assert_cmp (complete_spy.find_item ("AM").file, "A");
-            GLib.assert_cmp (complete_spy.find_item ("AM").rename_target, "AM");
-            GLib.assert_cmp (complete_spy.find_item ("BM").file, "B");
-            GLib.assert_cmp (complete_spy.find_item ("BM").rename_target, "BM");
+            GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+            GLib.assert_true (print_database_data (fake_folder.database_state ()) == print_database_data (fake_folder.current_remote_state ()));
+            GLib.assert_true (counter.number_of_get == 0);
+            GLib.assert_true (counter.number_of_put == 0);
+            GLib.assert_true (counter.number_of_move == 1);
+            GLib.assert_true (counter.number_of_delete == 0);
+            GLib.assert_true (item_successful_move (complete_spy == "AM"));
+            GLib.assert_true (item_successful_move (complete_spy == "BM"));
+            GLib.assert_true (complete_spy.find_item ("AM").file == "A");
+            GLib.assert_true (complete_spy.find_item ("AM").rename_target == "AM");
+            GLib.assert_true (complete_spy.find_item ("BM").file == "B");
+            GLib.assert_true (complete_spy.find_item ("BM").rename_target == "BM");
         }
 
         // Folder move with contents touched on the same side {
@@ -579,16 +579,16 @@ public class TestSyncMove : GLib.Object {
             remote.rename ("BM", "B2");
             ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
             GLib.assert_true (fake_folder.sync_once ());
-            GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-            GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (fake_folder.current_remote_state ()));
-            GLib.assert_cmp (counter.n_get, 1);
-            GLib.assert_cmp (counter.number_of_put, 1);
-            GLib.assert_cmp (counter.number_of_move, 1);
-            GLib.assert_cmp (counter.number_of_delete, 0);
-            GLib.assert_cmp (remote.find ("A2/a2m").content_char, 'C');
-            GLib.assert_cmp (remote.find ("B2/b2m").content_char, 'C');
-            GLib.assert_true (item_successful_ move (complete_spy, "A2"));
-            GLib.assert_true (item_successful_ move (complete_spy, "B2"));
+            GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+            GLib.assert_true (print_database_data (fake_folder.database_state ()) == print_database_data (fake_folder.current_remote_state ()));
+            GLib.assert_true (counter.number_of_get == 1);
+            GLib.assert_true (counter.number_of_put == 1);
+            GLib.assert_true (counter.number_of_move == 1);
+            GLib.assert_true (counter.number_of_delete == 0);
+            GLib.assert_true (remote.find ("A2/a2m").content_char == 'C');
+            GLib.assert_true (remote.find ("B2/b2m").content_char == 'C');
+            GLib.assert_true (item_successful_move (complete_spy, "A2"));
+            GLib.assert_true (item_successful_move (complete_spy, "B2"));
         }
 
         // Folder rename with contents touched on the other tree
@@ -602,14 +602,14 @@ public class TestSyncMove : GLib.Object {
         local.append_byte ("B2/b2m");
         remote.rename ("B2", "B3");
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (fake_folder.current_remote_state ()));
-        GLib.assert_cmp (counter.n_get, 1);
-        GLib.assert_cmp (counter.number_of_put, 1);
-        GLib.assert_cmp (counter.number_of_move, 1);
-        GLib.assert_cmp (counter.number_of_delete, 0);
-        GLib.assert_cmp (remote.find ("A3/a2m").content_char, 'D');
-        GLib.assert_cmp (remote.find ("B3/b2m").content_char, 'D');
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+        GLib.assert_true (print_database_data (fake_folder.database_state ()) == print_database_data (fake_folder.current_remote_state ()));
+        GLib.assert_true (counter.number_of_get == 1);
+        GLib.assert_true (counter.number_of_put == 1);
+        GLib.assert_true (counter.number_of_move == 1);
+        GLib.assert_true (counter.number_of_delete == 0);
+        GLib.assert_true (remote.find ("A3/a2m").content_char == 'D');
+        GLib.assert_true (remote.find ("B3/b2m").content_char == 'D');
 
         // Folder rename with contents touched on both ends
         counter.on_signal_reset ();
@@ -628,25 +628,25 @@ public class TestSyncMove : GLib.Object {
         GLib.assert_true (fake_folder.sync_once ());
         var current_local = fake_folder.current_local_state ();
         var conflicts = find_conflicts (current_local.children["A4"]);
-        GLib.assert_cmp (conflicts.size (), 1);
+        GLib.assert_true (conflicts.size () == 1);
         foreach (var c in conflicts) {
-            GLib.assert_cmp (current_local.find (c).content_char, 'L');
+            GLib.assert_true (current_local.find (c).content_char == 'L');
             local.remove (c);
         }
         conflicts = find_conflicts (current_local.children["B4"]);
-        GLib.assert_cmp (conflicts.size (), 1);
-        for (var& c : conflicts) {
-            GLib.assert_cmp (current_local.find (c).content_char, 'L');
+        GLib.assert_true (conflicts.size () == 1);
+        foreach (var c in conflicts) {
+            GLib.assert_true (current_local.find (c).content_char == 'L');
             local.remove (c);
         }
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (fake_folder.current_remote_state ()));
-        GLib.assert_cmp (counter.n_get, 2);
-        GLib.assert_cmp (counter.number_of_put, 0);
-        GLib.assert_cmp (counter.number_of_move, 1);
-        GLib.assert_cmp (counter.number_of_delete, 0);
-        GLib.assert_cmp (remote.find ("A4/a2m").content_char, 'R');
-        GLib.assert_cmp (remote.find ("B4/b2m").content_char, 'R');
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+        GLib.assert_true (print_database_data (fake_folder.database_state ()) == print_database_data (fake_folder.current_remote_state ()));
+        GLib.assert_true (counter.number_of_get == 2);
+        GLib.assert_true (counter.number_of_put == 0);
+        GLib.assert_true (counter.number_of_move == 1);
+        GLib.assert_true (counter.number_of_delete == 0);
+        GLib.assert_true (remote.find ("A4/a2m").content_char == 'R');
+        GLib.assert_true (remote.find ("B4/b2m").content_char == 'R');
 
         // Rename a folder and rename the contents at the same time
         counter.on_signal_reset ();
@@ -655,12 +655,12 @@ public class TestSyncMove : GLib.Object {
         remote.rename ("B4/b2m", "B4/b2m2");
         remote.rename ("B4", "B5");
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
-        GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (fake_folder.current_remote_state ()));
-        GLib.assert_cmp (counter.n_get, 0);
-        GLib.assert_cmp (counter.number_of_put, 0);
-        GLib.assert_cmp (counter.number_of_move, 2);
-        GLib.assert_cmp (counter.number_of_delete, 0);
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
+        GLib.assert_true (print_database_data (fake_folder.database_state ()) == print_database_data (fake_folder.current_remote_state ()));
+        GLib.assert_true (counter.number_of_get == 0);
+        GLib.assert_true (counter.number_of_put == 0);
+        GLib.assert_true (counter.number_of_move == 2);
+        GLib.assert_true (counter.number_of_delete == 0);
     }
 
     // These renames can be troublesome on windows
@@ -676,12 +676,12 @@ public class TestSyncMove : GLib.Object {
         remote.rename ("A/a2", "A/A2");
 
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), remote);
-        GLib.assert_cmp (print_database_data (fake_folder.database_state ()), print_database_data (fake_folder.current_remote_state ()));
-        GLib.assert_cmp (counter.n_get, 0);
-        GLib.assert_cmp (counter.number_of_put, 0);
-        GLib.assert_cmp (counter.number_of_move, 1);
-        GLib.assert_cmp (counter.number_of_delete, 0);
+        GLib.assert_true (fake_folder.current_local_state () == remote);
+        GLib.assert_true (print_database_data (fake_folder.database_state ()) == print_database_data (fake_folder.current_remote_state ()));
+        GLib.assert_true (counter.number_of_get == 0);
+        GLib.assert_true (counter.number_of_put == 0);
+        GLib.assert_true (counter.number_of_move == 1);
+        GLib.assert_true (counter.number_of_delete == 0);
     }
 
     // Check interaction of moves with file type changes
@@ -700,7 +700,7 @@ public class TestSyncMove : GLib.Object {
             ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
             GLib.assert_true (fake_folder.sync_once ());
             // BUG : This doesn't behave right
-            //GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+            //GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         }
     }
 
@@ -720,19 +720,19 @@ public class TestSyncMove : GLib.Object {
         fake_folder.local_modifier ().rename ("A/a2", "A/a2_local_renamed");
 
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (counter.n_get, 0);
-        GLib.assert_cmp (counter.number_of_put, 0);
-        GLib.assert_cmp (counter.number_of_move, 1);
-        GLib.assert_cmp (counter.number_of_delete, 0);
+        GLib.assert_true (counter.number_of_get == 0);
+        GLib.assert_true (counter.number_of_put == 0);
+        GLib.assert_true (counter.number_of_move == 1);
+        GLib.assert_true (counter.number_of_delete == 0);
 
         // Another sync should do nothing
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (counter.n_get, 0);
-        GLib.assert_cmp (counter.number_of_put, 0);
-        GLib.assert_cmp (counter.number_of_move, 1);
-        GLib.assert_cmp (counter.number_of_delete, 0);
+        GLib.assert_true (counter.number_of_get == 0);
+        GLib.assert_true (counter.number_of_put == 0);
+        GLib.assert_true (counter.number_of_move == 1);
+        GLib.assert_true (counter.number_of_delete == 0);
 
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
     // Test for https://github.com/owncloud/client/issues/6694
@@ -761,11 +761,11 @@ public class TestSyncMove : GLib.Object {
 
         var expected_state = fake_folder.current_local_state ();
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), expected_state);
-        GLib.assert_cmp (fake_folder.current_remote_state (), expected_state);
-        GLib.assert_cmp (counter.number_of_delete, 0);
-        GLib.assert_cmp (counter.n_get, 0);
-        GLib.assert_cmp (counter.number_of_put, 0);
+        GLib.assert_true (fake_folder.current_local_state () == expected_state);
+        GLib.assert_true (fake_folder.current_remote_state () == expected_state);
+        GLib.assert_true (counter.number_of_delete == 0);
+        GLib.assert_true (counter.number_of_get == 0);
+        GLib.assert_true (counter.number_of_put == 0);
 
         // Now, the revert, but "crossed"
         fake_folder.local_modifier ().rename ("Empty/A", "A");
@@ -774,11 +774,11 @@ public class TestSyncMove : GLib.Object {
         fake_folder.local_modifier ().rename ("AllEmpty", "A/AllEmpty");
         expected_state = fake_folder.current_local_state ();
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), expected_state);
-        GLib.assert_cmp (fake_folder.current_remote_state (), expected_state);
-        GLib.assert_cmp (counter.number_of_delete, 0);
-        GLib.assert_cmp (counter.n_get, 0);
-        GLib.assert_cmp (counter.number_of_put, 0);
+        GLib.assert_true (fake_folder.current_local_state () == expected_state);
+        GLib.assert_true (fake_folder.current_remote_state () == expected_state);
+        GLib.assert_true (counter.number_of_delete == 0);
+        GLib.assert_true (counter.number_of_get == 0);
+        GLib.assert_true (counter.number_of_put == 0);
 
         // Reverse on remote
         fake_folder.remote_modifier ().rename ("A/AllEmpty", "AllEmpty");
@@ -787,11 +787,11 @@ public class TestSyncMove : GLib.Object {
         fake_folder.remote_modifier ().rename ("A", "Empty/A");
         expected_state = fake_folder.current_remote_state ();
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), expected_state);
-        GLib.assert_cmp (fake_folder.current_remote_state (), expected_state);
-        GLib.assert_cmp (counter.number_of_delete, 0);
-        GLib.assert_cmp (counter.n_get, 0);
-        GLib.assert_cmp (counter.number_of_put, 0);
+        GLib.assert_true (fake_folder.current_local_state () == expected_state);
+        GLib.assert_true (fake_folder.current_remote_state () == expected_state);
+        GLib.assert_true (counter.number_of_delete == 0);
+        GLib.assert_true (counter.number_of_get == 0);
+        GLib.assert_true (counter.number_of_put == 0);
     }
 
 
@@ -839,12 +839,12 @@ public class TestSyncMove : GLib.Object {
         modifier.rename ("FolA/FolD_Renamed/FolE", "FolB_Renamed/New/FolE");
         var expected = local ? fake_folder.current_local_state () : fake_folder.current_remote_state ();
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), expected);
-        GLib.assert_cmp (fake_folder.current_remote_state (), expected);
-        GLib.assert_cmp (counter.number_of_delete, local ? 1 : 0); // FolC was is renamed to an existing name, so it is not considered as renamed
+        GLib.assert_true (fake_folder.current_local_state () == expected);
+        GLib.assert_true (fake_folder.current_remote_state () == expected);
+        GLib.assert_true (counter.number_of_delete == local ? 1 : 0); // FolC was is renamed to an existing name, so it is not considered as renamed
         // There was 5 inserts
-        GLib.assert_cmp (counter.n_get, local ? 0 : 5);
-        GLib.assert_cmp (counter.number_of_put, local ? 5 : 0);
+        GLib.assert_true (counter.number_of_get == local ? 0 : 5);
+        GLib.assert_true (counter.number_of_put == local ? 5 : 0);
     }
 
 
@@ -864,13 +864,13 @@ public class TestSyncMove : GLib.Object {
         fake_folder.remote_modifier ().rename ("B", "this.B");
 
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_remote_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_remote_state () == fake_folder.current_remote_state ());
         GLib.assert_true (fake_folder.current_remote_state ().find ("this.A/a1m"));
         GLib.assert_true (fake_folder.current_remote_state ().find ("this.B/b1m"));
-        GLib.assert_cmp (counter.number_of_delete, 0);
-        GLib.assert_cmp (counter.n_get, 0);
-        GLib.assert_cmp (counter.number_of_put, 0);
-        GLib.assert_cmp (counter.number_of_move, 2);
+        GLib.assert_true (counter.number_of_delete == 0);
+        GLib.assert_true (counter.number_of_get == 0);
+        GLib.assert_true (counter.number_of_put == 0);
+        GLib.assert_true (counter.number_of_move == 2);
         counter.on_signal_reset ();
 
         // 2) move alphabetically after
@@ -879,13 +879,13 @@ public class TestSyncMove : GLib.Object {
         fake_folder.local_modifier ().rename ("this.A", "S/A");
         fake_folder.remote_modifier ().rename ("this.B", "S/B");
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_remote_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_remote_state () == fake_folder.current_remote_state ());
         GLib.assert_true (fake_folder.current_remote_state ().find ("S/A/a2m"));
         GLib.assert_true (fake_folder.current_remote_state ().find ("S/B/b2m"));
-        GLib.assert_cmp (counter.number_of_delete, 0);
-        GLib.assert_cmp (counter.n_get, 0);
-        GLib.assert_cmp (counter.number_of_put, 0);
-        GLib.assert_cmp (counter.number_of_move, 2);
+        GLib.assert_true (counter.number_of_delete == 0);
+        GLib.assert_true (counter.number_of_get == 0);
+        GLib.assert_true (counter.number_of_put == 0);
+        GLib.assert_true (counter.number_of_move == 2);
     }
 
 
@@ -905,18 +905,19 @@ public class TestSyncMove : GLib.Object {
         fake_folder.remote_modifier ().rename ("B/b2", "C/b2");
 
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_remote_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_remote_state () == fake_folder.current_remote_state ());
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/b1"));
         GLib.assert_true (fake_folder.current_remote_state ().find ("C/b1"));
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/b2"));
         GLib.assert_true (fake_folder.current_remote_state ().find ("C/b2"));
-        GLib.assert_cmp (counter.number_of_move, 0); // Unfortunately, we can't really make a move in this case
-        GLib.assert_cmp (counter.n_get, 2);
-        GLib.assert_cmp (counter.number_of_put, 2);
-        GLib.assert_cmp (counter.number_of_delete, 0);
+        GLib.assert_true (counter.number_of_move == 0); // Unfortunately, we can't really make a move in this case
+        GLib.assert_true (counter.number_of_get == 2);
+        GLib.assert_true (counter.number_of_put == 2);
+        GLib.assert_true (counter.number_of_delete == 0);
         counter.on_signal_reset ();
 
     }
+
 
     /***********************************************************
     Test that deletes don't run before renames
@@ -926,14 +927,14 @@ public class TestSyncMove : GLib.Object {
         fake_folder.remote_modifier ().mkdir ("A");
         fake_folder.remote_modifier ().insert ("A/file");
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         fake_folder.local_modifier ().mkdir ("B");
         fake_folder.local_modifier ().rename ("A/file", "B/file");
         fake_folder.local_modifier ().remove ("A");
 
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
 
@@ -980,7 +981,7 @@ public class TestSyncMove : GLib.Object {
         sync_opts.parallel_network_jobs = 0;
         fake_folder.sync_engine ().set_sync_options (sync_opts);
 
-        GLib.assert_cmp (fake_folder.current_local_state (), fake_folder.current_remote_state ());
+        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         if (vfs_mode != Vfs.Off) {
             var vfs = unowned<Vfs> (create_vfs_from_plugin (vfs_mode).release ());

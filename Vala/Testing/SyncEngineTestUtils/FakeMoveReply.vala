@@ -25,6 +25,7 @@ public class FakeMoveReply : FakeReply {
         QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
     }
 
+
     /***********************************************************
     ***********************************************************/
     public void respond () {
@@ -33,11 +34,13 @@ public class FakeMoveReply : FakeReply {
         /* emit */ signal_finished ();
     }
 
+
     /***********************************************************
     ***********************************************************/
     public override void on_signal_abort () {
         return;
     }
+
 
     /***********************************************************
     ***********************************************************/

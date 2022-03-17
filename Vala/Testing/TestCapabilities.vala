@@ -7,7 +7,7 @@ public class TestCapabilities : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void test_push_notifications_available_push_notifications_for_activities_available_return_true () {
-        string[] type_list;
+        GLib.List<string> type_list = new GLib.List<string> ();
         type_list.append ("activities");
 
         QVariantMap notify_push_map;
@@ -19,14 +19,14 @@ public class TestCapabilities : GLib.Object {
         var capabilities = Occ.Capabilities (capabilities_map);
         var activities_push_notifications_available = capabilities.available_push_notifications ().test_flag (Occ.PushNotificationType.ACTIVITIES);
 
-        GLib.assert_cmp (activities_push_notifications_available, true);
+        GLib.assert_true (activities_push_notifications_available == true);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void test_push_notifications_available_push_notifications_for_activities_not_available_return_false () {
-        string[] type_list;
+        GLib.List<string> type_list = new GLib.List<string> ();
         type_list.append ("noactivities");
 
         QVariantMap notify_push_map;
@@ -38,14 +38,14 @@ public class TestCapabilities : GLib.Object {
         var capabilities = Occ.Capabilities (capabilities_map);
         var activities_push_notifications_available = capabilities.available_push_notifications ().test_flag (Occ.PushNotificationType.ACTIVITIES);
 
-        GLib.assert_cmp (activities_push_notifications_available, false);
+        GLib.assert_true (activities_push_notifications_available == false);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void test_push_notifications_available_push_notifications_for_files_available_return_true () {
-        string[] type_list;
+        GLib.List<string> type_list = new GLib.List<string> ();
         type_list.append ("files");
 
         QVariantMap notify_push_map;
@@ -57,14 +57,14 @@ public class TestCapabilities : GLib.Object {
         var capabilities = Occ.Capabilities (capabilities_map);
         var files_push_notifications_available = capabilities.available_push_notifications ().test_flag (Occ.PushNotificationType.FILES);
 
-        GLib.assert_cmp (files_push_notifications_available, true);
+        GLib.assert_true (files_push_notifications_available == true);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void test_push_notifications_available_push_notifications_for_files_not_available_return_false () {
-        string[] type_list;
+        GLib.List<string> type_list = new GLib.List<string> ();
         type_list.append ("nofiles");
 
         QVariantMap notify_push_map;
@@ -76,14 +76,14 @@ public class TestCapabilities : GLib.Object {
         var capabilities = Occ.Capabilities (capabilities_map);
         var files_push_notifications_available = capabilities.available_push_notifications ().test_flag (Occ.PushNotificationType.FILES);
 
-        GLib.assert_cmp (files_push_notifications_available, false);
+        GLib.assert_true (files_push_notifications_available == false);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void test_push_notifications_available_push_notifications_for_notifications_available_return_true () {
-        string[] type_list;
+        GLib.List<string> type_list = new GLib.List<string> ();
         type_list.append ("notifications");
 
         QVariantMap notify_push_map;
@@ -95,14 +95,14 @@ public class TestCapabilities : GLib.Object {
         var capabilities = Occ.Capabilities (capabilities_map);
         var notifications_push_notifications_available = capabilities.available_push_notifications ().test_flag (Occ.PushNotificationType.NOTIFICATIONS);
 
-        GLib.assert_cmp (notifications_push_notifications_available, true);
+        GLib.assert_true (notifications_push_notifications_available == true);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void test_push_notifications_available_push_notifications_for_notifications_not_available_return_false () {
-        string[] type_list;
+        GLib.List<string> type_list = new GLib.List<string> ();
         type_list.append ("nonotifications");
 
         QVariantMap notify_push_map;
@@ -114,7 +114,7 @@ public class TestCapabilities : GLib.Object {
         var capabilities = Occ.Capabilities (capabilities_map);
         var notifications_push_notifications_available = capabilities.available_push_notifications ().test_flag (Occ.PushNotificationType.NOTIFICATIONS);
 
-        GLib.assert_cmp (notifications_push_notifications_available, false);
+        GLib.assert_true (notifications_push_notifications_available == false);
     }
 
 
@@ -126,9 +126,9 @@ public class TestCapabilities : GLib.Object {
         var files_push_notifications_available = capabilities.available_push_notifications ().test_flag (Occ.PushNotificationType.FILES);
         var notifications_push_notifications_available = capabilities.available_push_notifications ().test_flag (Occ.PushNotificationType.NOTIFICATIONS);
 
-        GLib.assert_cmp (activities_push_notifications_available, false);
-        GLib.assert_cmp (files_push_notifications_available, false);
-        GLib.assert_cmp (notifications_push_notifications_available, false);
+        GLib.assert_true (activities_push_notifications_available == false);
+        GLib.assert_true (files_push_notifications_available == false);
+        GLib.assert_true (notifications_push_notifications_available == false);
     }
 
 
@@ -148,7 +148,7 @@ public class TestCapabilities : GLib.Object {
 
         var capabilities = Occ.Capabilities (capabilities_map);
 
-        GLib.assert_cmp (capabilities.push_notifications_web_socket_url (), websocket_url);
+        GLib.assert_true (capabilities.push_notifications_web_socket_url () == websocket_url);
     }
 
 
@@ -252,7 +252,7 @@ public class TestCapabilities : GLib.Object {
         const Occ.Capabilities capabilities = new Occ.Capabilities (capabilities_map);
         var default_share_permissions_not_in_capabilities = capabilities.share_default_permissions ();
 
-        GLib.assert_cmp (default_share_permissions_not_in_capabilities, {});
+        GLib.assert_true (default_share_permissions_not_in_capabilities == {});
     }
 
 
@@ -269,7 +269,7 @@ public class TestCapabilities : GLib.Object {
         const Occ.Capabilities capabilities = new Occ.Capabilities (capabilities_map);
         var default_share_permissions_available = capabilities.share_default_permissions ();
 
-        GLib.assert_cmp (default_share_permissions_available, 31);
+        GLib.assert_true (default_share_permissions_available == 31);
     }
 
 
@@ -285,7 +285,7 @@ public class TestCapabilities : GLib.Object {
         var capabilities = Occ.Capabilities (capabilities_map);
         var bulkupload_available = capabilities.bulk_upload ();
 
-        GLib.assert_cmp (bulkupload_available, true);
+        GLib.assert_true (bulkupload_available == true);
     }
 
 } // class TestCapabilities
