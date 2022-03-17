@@ -29,7 +29,7 @@ We only request the info when the UI is visible otherwise this might slow down t
 too many requests.
 quota is not updated fast enough when changed on the server.
 
-If the fetch job is not on_signal_finished within 30 seconds, it is cancelled and another
+If the fetch job is not finished within 30 seconds, it is cancelled and another
 
 Constructor notes:
  - allow_disconnected_account_state : set to true if you want to ignore AccountState's is_connected () state,
@@ -97,7 +97,7 @@ public class UserInfo : GLib.Object {
     /***********************************************************
     The currently running job
     ***********************************************************/
-    private QPointer<JsonApiJob> job;
+    private QPointer<JsonApiJob> json_api_job;
 
 
     internal signal void quota_updated (int64 total, int64 used);
@@ -114,9 +114,14 @@ public class UserInfo : GLib.Object {
         this.last_quota_total_bytes = 0;
         this.last_quota_used_bytes = 0;
         this.active = false;
-        connect (account_state, AccountState.signal_state_changed,
-            this, UserInfo.on_signal_account_state_changed);
-        connect (this.job_restart_timer, QTimer.timeout, this, UserInfo.on_signal_fetch_info);
+        connect (
+            account_state, AccountState.signal_state_changed,
+            this, UserInfo.on_signal_account_state_changed
+        );
+        connect (
+            this.job_restart_timer, QTimer.timeout,
+            this, UserInfo.on_signal_fetch_info
+        );
         this.job_restart_timer.single_shot (true);
     }
 
@@ -128,17 +133,23 @@ public class UserInfo : GLib.Object {
             return;
         }
 
-        if (this.job) {
-            // The previous job was not on_signal_finished?  Then we cancel it!
-            this.job.delete_later ();
+        if (this.json_api_job) {
+            // The previous job was not finished?  Then we cancel it!
+            this.json_api_job.delete_later ();
         }
 
         unowned Account account = this.account_state.account;
-        this.job = new JsonApiJob (account, "ocs/v1.php/cloud/user", this);
-        this.job.on_signal_timeout (20 * 1000);
-        connect (this.job, JsonApiJob.json_received, this, UserInfo.on_signal_update_last_info);
-        connect (this.job, AbstractNetworkJob.network_error, this, UserInfo.on_signal_request_failed);
-        this.job.on_signal_start ();
+        this.json_api_job = new JsonApiJob (account, "ocs/v1.php/cloud/user", this);
+        this.json_api_job.on_signal_timeout (20 * 1000);
+        connect (
+            this.json_api_job, JsonApiJob.json_received,
+            this, UserInfo.on_signal_update_last_info
+        );
+        connect (
+            this.json_api_job, AbstractNetworkJob.network_error,
+            this, UserInfo.on_signal_request_failed
+        );
+        this.json_api_job.on_signal_start ();
     }
 
 
@@ -175,10 +186,13 @@ public class UserInfo : GLib.Object {
 
         // Avatar Image
         if (this.fetch_avatar_image) {
-            var job = new AvatarJob (account, account.dav_user (), 128, this);
-            job.on_signal_timeout (20 * 1000);
-            connect (job, AvatarJob.avatar_pixmap, this, UserInfo.on_signal_avatar_image);
-            job.on_signal_start ();
+            var avatar_job = new AvatarJob (account, account.dav_user (), 128, this);
+            avatar_job.on_signal_timeout (20 * 1000);
+            connect (
+                avatar_job, AvatarJob.avatar_pixmap,
+                this, UserInfo.on_signal_avatar_image
+            );
+            avatar_job.on_signal_start ();
         }
         else
             /* emit */ fetched_last_info (this);

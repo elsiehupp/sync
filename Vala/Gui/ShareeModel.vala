@@ -61,10 +61,19 @@ public class ShareeModel : QAbstractListModel {
     public void fetch (string search, ShareeSet blocklist, LookupMode lookup_mode) {
         this.search = search;
         this.sharee_blocklist = blocklist;
-        var job = new OcsShareeJob (this.account);
-        connect (job, OcsShareeJob.signal_sharee_job_finished, this, ShareeModel.on_signal_sharees_fetched);
-        connect (job, OcsJob.ocs_error, this, ShareeModel.signal_display_error_message);
-        job.sharees (this.search, this.type, 1, 50, lookup_mode == LookupMode.GLOBAL_SEARCH ? true : false);
+        var ocs_sharee_job = new OcsShareeJob (this.account);
+        connect (
+            ocs_sharee_job, OcsShareeJob.signal_sharee_job_finished,
+            this, ShareeModel.on_signal_sharees_fetched
+        );
+        connect (
+            ocs_sharee_job, OcsJob.ocs_error,
+            this, ShareeModel.signal_display_error_message
+        );
+        ocs_sharee_job.sharees (
+            this.search, this.type, 1, 50,
+            lookup_mode == LookupMode.GLOBAL_SEARCH
+        );
     }
 
 
@@ -189,7 +198,7 @@ public class ShareeModel : QAbstractListModel {
             // the full name and the user name and thus we include both
             // in the output here. But we need to take care this string
             // doesn't leak to the user.
-            return string (sharee.display_name () + " (" + sharee.share_with () + ")");
+            return sharee.display_name () + " (" + sharee.share_with () + ")";
 
         } else if (role == Qt.USER_ROLE) {
             return GLib.Variant.from_value (sharee);

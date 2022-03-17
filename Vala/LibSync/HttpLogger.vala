@@ -77,8 +77,8 @@ public class HttpLogger {
 
 
     public static bool is_text_body (string s) {
-        const QRegularExpression regex = new QRegularExpression ("^ (text/.*| (application/ (xml|json|x-www-form-urlencoded) (;|$)))");
-        return regex.match (s).has_match ();
+        const QRegularExpression regular_expression = new QRegularExpression ("^ (text/.*| (application/ (xml|json|x-www-form-urlencoded) (;|$)))");
+        return regular_expression.match (s).has_match ();
     }
 
 

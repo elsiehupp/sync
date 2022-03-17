@@ -35,15 +35,33 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
         this.ui.folder_tree_widget.sorting_enabled (true);
         this.ui.folder_tree_widget.sort_by_column (0, Qt.AscendingOrder);
 
-        connect (this.ui.add_folder_button, QAbstractButton.clicked, this, FolderWizardRemotePath.on_signal_add_remote_folder);
-        connect (this.ui.refresh_button, QAbstractButton.clicked, this, FolderWizardRemotePath.on_signal_refresh_folders);
-        connect (this.ui.folder_tree_widget, QTreeWidget.item_expanded, this, FolderWizardRemotePath.on_signal_item_expanded);
-        connect (this.ui.folder_tree_widget, QTreeWidget.current_item_changed, this, FolderWizardRemotePath.on_signal_current_item_changed);
-        connect (this.ui.folder_entry, QLineEdit.text_edited, this, FolderWizardRemotePath.on_signal_folder_entry_edited);
+        connect (
+            this.ui.add_folder_button, QAbstractButton.clicked,
+            this, FolderWizardRemotePath.on_signal_add_remote_folder
+        );
+        connect (
+            this.ui.refresh_button, QAbstractButton.clicked,
+            this, FolderWizardRemotePath.on_signal_refresh_folders
+        );
+        connect (
+            this.ui.folder_tree_widget, QTreeWidget.item_expanded,
+            this, FolderWizardRemotePath.on_signal_item_expanded
+        );
+        connect (
+            this.ui.folder_tree_widget, QTreeWidget.current_item_changed,
+            this, FolderWizardRemotePath.on_signal_current_item_changed
+        );
+        connect (
+            this.ui.folder_entry, QLineEdit.text_edited,
+            this, FolderWizardRemotePath.on_signal_folder_entry_edited
+        );
 
         this.lscol_timer.interval (500);
         this.lscol_timer.single_shot (true);
-        connect (this.lscol_timer, QTimer.timeout, this, FolderWizardRemotePath.on_signal_ls_col_folder_entry);
+        connect (
+            this.lscol_timer, QTimer.timeout,
+            this, FolderWizardRemotePath.on_signal_ls_col_folder_entry
+        );
 
         this.ui.folder_tree_widget.header ().section_resize_mode (0, QHeaderView.ResizeToContents);
         // Make sure that there will be a scrollbar when the contents is too wide
@@ -147,9 +165,14 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
 
         var job = new MkColJob (this.account, full_path, this);
         /* check the owncloud configuration file and query the own_cloud */
-        connect (job, MkColJob.finished_without_error,
-            this, FolderWizardRemotePath.on_signal_create_remote_folder_finished);
-        connect (job, AbstractNetworkJob.network_error, this, FolderWizardRemotePath.on_signal_handle_mkdir_network_error);
+        connect (
+            job, MkColJob.finished_without_error,
+            this, FolderWizardRemotePath.on_signal_create_remote_folder_finished
+        );
+        connect (
+            job, AbstractNetworkJob.network_error,
+            this, FolderWizardRemotePath.on_signal_handle_mkdir_network_error
+        );
         job.on_signal_start ();
     }
 
@@ -310,10 +333,14 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
         // No error handling, no updating, we do this manually
         // because of extra logic in the typed-path case.
         disconnect (job, null, this, null);
-        connect (job, LsColJob.signal_finished_with_error,
-            this, FolderWizardRemotePath.on_signal_handle_ls_col_network_error);
-        connect (job, LsColJob.signal_directory_listing_subfolders,
-            this, FolderWizardRemotePath.on_signal_typed_path_found);
+        connect (
+            job, LsColJob.signal_finished_with_error,
+            this, FolderWizardRemotePath.on_signal_handle_ls_col_network_error
+        );
+        connect (
+            job, LsColJob.signal_directory_listing_subfolders,
+            this, FolderWizardRemotePath.on_signal_typed_path_found
+        );
     }
 
 
@@ -334,12 +361,18 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
             props += "http://nextcloud.org/ns:is-encrypted";
         }
         job.properties (props);
-        connect (job, LsColJob.signal_directory_listing_subfolders,
-            this, FolderWizardRemotePath.on_signal_update_directories);
-        connect (job, LsColJob.signal_finished_with_error,
-            this, FolderWizardRemotePath.on_signal_handle_ls_col_network_error);
-        connect (job, LsColJob.signal_directory_listing_iterated,
-            this, FolderWizardRemotePath.on_signal_gather_encrypted_paths);
+        connect (
+            job, LsColJob.signal_directory_listing_subfolders,
+            this, FolderWizardRemotePath.on_signal_update_directories
+        );
+        connect (
+            job, LsColJob.signal_finished_with_error,
+            this, FolderWizardRemotePath.on_signal_handle_ls_col_network_error
+        );
+        connect (
+            job, LsColJob.signal_directory_listing_iterated,
+            this, FolderWizardRemotePath.on_signal_gather_encrypted_paths
+        );
         job.on_signal_start ();
 
         return job;

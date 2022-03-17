@@ -44,7 +44,10 @@ public class WebViewPage : AbstractCredentialsWizardPage {
         layout.add_widget (this.web_view);
         layout (layout);
 
-        connect (this.web_view, WebView.on_signal_url_catched, this, WebViewPage.on_signal_url_catched);
+        connect (
+            this.web_view, WebView.signal_url_catched,
+            this, WebViewPage.on_signal_url_catched
+        );
 
         // this.use_system_proxy = QNetworkProxyFactory.uses_system_configuration ();
     }

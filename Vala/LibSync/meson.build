@@ -29,7 +29,7 @@ srcs = files([
     'ClientSideEncryptionJobs/LockEncryptFolderApiJob.vala',
     'ClientSideEncryptionJobs/SetEncryptionFlagApiJob.vala',
     'ClientSideEncryptionJobs/SignPublicKeyApiJob.vala',
-    'ClientSideEncryptionJobs/StoreMetaDataApiJob.vala',
+    'ClientSideEncryptionJobs/StoreMetadataApiJob.vala',
     'ClientSideEncryptionJobs/StorePrivateKeyApiJob.vala',
     'ClientSideEncryptionJobs/UnlockEncryptFolderApiJob.vala',
     'ClientSideEncryptionJobs/UpdateMetadataApiJob.vala',

@@ -73,17 +73,17 @@ public class OpenFileManager {
         }
 
         if (OpenFileManager.name == "") {
-            OpenFileManager.name = desktop_file.value (string.from_latin1 ("Desktop Entry/Name[%1]").printf (Gtk.Application.property ("ui_lang").to_string ())).to_string ();
+            OpenFileManager.name = desktop_file.value ("Desktop Entry/Name[%1]".printf (Gtk.Application.property ("ui_lang").to_string ())).to_string ();
             if (OpenFileManager.name == "") {
-                OpenFileManager.name = desktop_file.value (string.from_latin1 ("Desktop Entry/Name")).to_string ();
+                OpenFileManager.name = desktop_file.value ("Desktop Entry/Name").to_string ();
             }
         }
 
-        std.replace (args.begin (), args.end (), string.from_latin1 ("%c"), OpenFileManager.name);
-        std.replace (args.begin (), args.end (), string.from_latin1 ("%u"), file_to_open);
-        std.replace (args.begin (), args.end (), string.from_latin1 ("%U"), file_to_open);
-        std.replace (args.begin (), args.end (), string.from_latin1 ("%f"), file_to_open);
-        std.replace (args.begin (), args.end (), string.from_latin1 ("%F"), file_to_open);
+        std.replace (args.begin (), args.end (), "%c", OpenFileManager.name);
+        std.replace (args.begin (), args.end (), "%u", file_to_open);
+        std.replace (args.begin (), args.end (), "%U", file_to_open);
+        std.replace (args.begin (), args.end (), "%f", file_to_open);
+        std.replace (args.begin (), args.end (), "%F", file_to_open);
 
         // fixme: needs to append --icon, according to http://standards.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html#exec-variables
         foreach (string arg in args) {
@@ -109,12 +109,12 @@ public class OpenFileManager {
     According to the QStandardDir implementation from Qt5
     ***********************************************************/
     public static string[] xdg_data_dirs () {
-        string[] dirs;
+        GLib.List<string> dirs = new GLib.List<string> ();
         // http://standards.freedesktop.org/basedir-spec/latest/
         string xdg_data_dirs_env = GLib.File.decode_name (qgetenv ("XDG_DATA_DIRS"));
         if (xdg_data_dirs_env == "") {
-            dirs.append (string.from_latin1 ("/usr/local/share"));
-            dirs.append (string.from_latin1 ("/usr/share"));
+            dirs.append ("/usr/local/share");
+            dirs.append ("/usr/share");
         } else {
             dirs = xdg_data_dirs_env.split (':');
         }

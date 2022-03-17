@@ -253,13 +253,15 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
             return;
         }
 
-        var job = new JsonApiJob (this.account_state.account,
-            QLatin1String ("ocs/v2.php/search/providers/%1/search").printf (provider_id));
+        var job = new JsonApiJob (
+            this.account_state.account,
+            "ocs/v2.php/search/providers/%1/search".printf (provider_id)
+        );
 
         QUrlQuery parameters;
-        parameters.add_query_item (QStringLiteral ("term"), this.search_term);
+        parameters.add_query_item ("term", this.search_term);
         if (cursor > 0) {
-            parameters.add_query_item (QStringLiteral ("cursor"), string.number (cursor));
+            parameters.add_query_item ("cursor", string.number (cursor));
             job.property ("append_results", true);
         }
         job.property ("provider_id", provider_id);
@@ -278,8 +280,8 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     private void parse_results_for_provider (QJsonObject data, string provider_id, bool fetched_more) {
-        const var cursor = data.value (QStringLiteral ("cursor")).to_int ();
-        const var entries = data.value (QStringLiteral ("entries")).to_variant ().to_list ();
+        const var cursor = data.value ("cursor").to_int ();
+        const var entries = data.value ("entries").to_variant ().to_list ();
 
         var provider = this.providers[provider_id];
 
@@ -301,7 +303,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
             return;
         }
 
-        provider.is_paginated = data.value (QStringLiteral ("is_paginated")).to_bool ();
+        provider.is_paginated = data.value ("is_paginated").to_bool ();
         provider.cursor = cursor;
 
         if (provider.page_size == -1) {
@@ -326,16 +328,19 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
             result.provider_id = provider.id;
             result.order = provider.order;
             result.provider_name = provider.name;
-            result.is_rounded = entry_map.value (QStringLiteral ("rounded")).to_bool ();
-            result.title = entry_map.value (QStringLiteral ("title")).to_string ();
-            result.subline = entry_map.value (QStringLiteral ("subline")).to_string ();
+            result.is_rounded = entry_map.value ("rounded").to_bool ();
+            result.title = entry_map.value ("title").to_string ();
+            result.subline = entry_map.value ("subline").to_string ();
 
-            const var resource_url = entry_map.value (QStringLiteral ("resource_url")).to_string ();
-            const var account_url = (this.account_state && this.account_state.account) ? this.account_state.account.url : GLib.Uri ();
+            string resource_url = entry_map.value ("resource_url").to_string ();
+            string account_url = (this.account_state && this.account_state.account) ? this.account_state.account.url : GLib.Uri ();
 
             result.resource_url = make_resource_url (resource_url, account_url);
-            result.icons = icons_from_thumbnail_and_fallback_icon (entry_map.value (QStringLiteral ("thumbnail_url")).to_string (),
-                entry_map.value (QStringLiteral ("icon")).to_string (), account_url);
+            result.icons = icons_from_thumbnail_and_fallback_icon (
+                entry_map.value ("thumbnail_url").to_string (),
+                entry_map.value ("icon").to_string (),
+                account_url
+            );
 
             new_entries.push_back (result);
         }
@@ -529,8 +534,10 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
         if (!this.search_term == "") {
             this.unified_search_text_editing_finished_timer.interval (SEARCH_TERM_EDITING_FINISHED_SEARCH_START_DELAY);
-            connect (this.unified_search_text_editing_finished_timer, QTimer.timeout, this,
-                &UnifiedSearchResultsListModel.on_signal_search_term_editing_finished);
+            connect (
+                this.unified_search_text_editing_finished_timer, QTimer.timeout,
+                this, UnifiedSearchResultsListModel.on_signal_search_term_editing_finished
+            );
             this.unified_search_text_editing_finished_timer.on_signal_start ();
         }
 
@@ -545,17 +552,21 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     private void on_signal_search_term_editing_finished () {
-        disconnect (this.unified_search_text_editing_finished_timer, QTimer.timeout, this,
-            &UnifiedSearchResultsListModel.on_signal_search_term_editing_finished);
+        disconnect (
+            this.unified_search_text_editing_finished_timer, QTimer.timeout,
+            this, UnifiedSearchResultsListModel.on_signal_search_term_editing_finished);
 
         if (!this.account_state || !this.account_state.account) {
-            GLib.critical () + string ("Account state is invalid. Could not on_signal_start search!");
+            GLib.critical ("Account state is invalid. Could not on_signal_start search!");
             return;
         }
 
         if (this.providers == "") {
-            var job = new JsonApiJob (this.account_state.account, QLatin1String ("ocs/v2.php/search/providers"));
-            connect (job, JsonApiJob.json_received, this, UnifiedSearchResultsListModel.on_signal_fetch_providers_finished);
+            var job = new JsonApiJob (this.account_state.account, "ocs/v2.php/search/providers");
+            connect (
+                job, JsonApiJob.json_received,
+                this, UnifiedSearchResultsListModel.on_signal_fetch_providers_finished
+            );
             job.on_signal_start ();
         } else {
             start_search ();
@@ -569,33 +580,35 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
         const var job = qobject_cast<JsonApiJob> (sender ());
 
         if (!job) {
-            GLib.critical () + string ("Failed to fetch providers.").printf (this.search_term);
+            GLib.critical ("Failed to fetch providers.".printf (this.search_term));
             this.error_string += _("Failed to fetch providers.") + '\n';
             /* emit */ signal_error_string_changed ();
             return;
         }
 
         if (status_code != 200) {
-            GLib.critical () + string ("%1 : Failed to fetch search providers for '%2'. Error : %3")
-                                               .printf (status_code)
-                                               .printf (this.search_term)
-                                               .printf (job.error_string ());
+            GLib.critical (
+                "%1 : Failed to fetch search providers for '%2'. Error: %3"
+                    .printf (status_code)
+                    .printf (this.search_term)
+                    .printf (job.error_string ()
+            );
             this.error_string +=
-                _("Failed to fetch search providers for '%1'. Error : %2").printf (this.search_term).printf (job.error_string ())
+                _("Failed to fetch search providers for '%1'. Error: %2").printf (this.search_term).printf (job.error_string ())
                 + '\n';
             /* emit */ signal_error_string_changed ();
             return;
         }
 
-        foreach (var provider in json.object ().value (QStringLiteral ("ocs")).to_object ().value ("data").to_variant ().to_list ()) {
+        foreach (var provider in json.object ().value ("ocs").to_object ().value ("data").to_variant ().to_list ()) {
             const var provider_map = provider.to_map ();
-            const var identifier = provider_map[QStringLiteral ("identifier")].to_string ();
-            const var name = provider_map[QStringLiteral ("name")].to_string ();
-            if (!name == "" && identifier != QStringLiteral ("talk-message-current")) {
+            const var identifier = provider_map["identifier"].to_string ();
+            const var name = provider_map["name"].to_string ();
+            if (!name == "" && identifier != "talk-message-current") {
                 UnifiedSearchProvider new_provider;
                 new_provider.name = name;
                 new_provider.id = identifier;
-                new_provider.order = provider_map[QStringLiteral ("order")].to_int ();
+                new_provider.order = provider_map["order"].to_int ();
                 this.providers.insert (new_provider.id, new_provider);
             }
         }
@@ -614,7 +627,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
         const var job = qobject_cast<JsonApiJob> (sender ());
 
         if (!job) {
-            GLib.critical () + string ("Search has failed for '%2'.").printf (this.search_term);
+            GLib.critical ("Search has failed for '%2'.".printf (this.search_term));
             this.error_string += _("Search has failed for '%2'.").printf (this.search_term) + '\n';
             /* emit */ signal_error_string_changed ();
             return;
@@ -639,17 +652,18 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
         }
 
         if (status_code != 200) {
-            GLib.critical () + string ("%1 : Search has failed for '%2'. Error : %3")
-                                               .printf (status_code)
-                                               .printf (this.search_term)
-                                               .printf (job.error_string ());
+            GLib.critical ("%1 : Search has failed for '%2'. Error : %3"
+                .printf (status_code)
+                .printf (this.search_term)
+                .printf (job.error_string ()
+            );
             this.error_string +=
                 _("Search has failed for '%1'. Error : %2").printf (this.search_term).printf (job.error_string ()) + '\n';
             /* emit */ signal_error_string_changed ();
             return;
         }
 
-        const var data = json.object ().value (QStringLiteral ("ocs")).to_object ().value (QStringLiteral ("data")).to_object ();
+        const var data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
         if (!data == "") {
             parse_results_for_provider (data, provider_id, job.property ("append_results").to_bool ());
         }
@@ -659,44 +673,44 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     private static string image_placeholder_url_for_provider_id (string provider_id) {
-        if (provider_id.contains (QStringLiteral ("message"), Qt.CaseInsensitive)
-            || provider_id.contains (QStringLiteral ("talk"), Qt.CaseInsensitive)) {
-            return QStringLiteral ("qrc:///client/theme/black/wizard-talk.svg");
-        } else if (provider_id.contains (QStringLiteral ("file"), Qt.CaseInsensitive)) {
-            return QStringLiteral ("qrc:///client/theme/black/edit.svg");
-        } else if (provider_id.contains (QStringLiteral ("deck"), Qt.CaseInsensitive)) {
-            return QStringLiteral ("qrc:///client/theme/black/deck.svg");
-        } else if (provider_id.contains (QStringLiteral ("calendar"), Qt.CaseInsensitive)) {
-            return QStringLiteral ("qrc:///client/theme/black/calendar.svg");
-        } else if (provider_id.contains (QStringLiteral ("mail"), Qt.CaseInsensitive)) {
-            return QStringLiteral ("qrc:///client/theme/black/email.svg");
-        } else if (provider_id.contains (QStringLiteral ("comment"), Qt.CaseInsensitive)) {
-            return QStringLiteral ("qrc:///client/theme/black/comment.svg");
+        if (provider_id.contains ("message", Qt.CaseInsensitive)
+            || provider_id.contains ("talk", Qt.CaseInsensitive)) {
+            return "qrc:///client/theme/black/wizard-talk.svg";
+        } else if (provider_id.contains ("file", Qt.CaseInsensitive)) {
+            return "qrc:///client/theme/black/edit.svg";
+        } else if (provider_id.contains ("deck", Qt.CaseInsensitive)) {
+            return "qrc:///client/theme/black/deck.svg";
+        } else if (provider_id.contains ("calendar", Qt.CaseInsensitive)) {
+            return "qrc:///client/theme/black/calendar.svg";
+        } else if (provider_id.contains ("mail", Qt.CaseInsensitive)) {
+            return "qrc:///client/theme/black/email.svg";
+        } else if (provider_id.contains ("comment", Qt.CaseInsensitive)) {
+            return "qrc:///client/theme/black/comment.svg";
         }
 
-        return QStringLiteral ("qrc:///client/theme/change.svg");
+        return "qrc:///client/theme/change.svg";
     }
 
 
     /***********************************************************
     ***********************************************************/
     private static string local_icon_path_from_icon_prefix (string icon_name_with_prefix) {
-        if (icon_name_with_prefix.contains (QStringLiteral ("message"), Qt.CaseInsensitive)
-            || icon_name_with_prefix.contains (QStringLiteral ("talk"), Qt.CaseInsensitive)) {
-            return QStringLiteral (":/client/theme/black/wizard-talk.svg");
-        } else if (icon_name_with_prefix.contains (QStringLiteral ("folder"), Qt.CaseInsensitive)) {
-            return QStringLiteral (":/client/theme/black/folder.svg");
-        } else if (icon_name_with_prefix.contains (QStringLiteral ("deck"), Qt.CaseInsensitive)) {
-            return QStringLiteral (":/client/theme/black/deck.svg");
-        } else if (icon_name_with_prefix.contains (QStringLiteral ("contacts"), Qt.CaseInsensitive)) {
-            return QStringLiteral (":/client/theme/black/wizard-groupware.svg");
-        } else if (icon_name_with_prefix.contains (QStringLiteral ("calendar"), Qt.CaseInsensitive)) {
-            return QStringLiteral (":/client/theme/black/calendar.svg");
-        } else if (icon_name_with_prefix.contains (QStringLiteral ("mail"), Qt.CaseInsensitive)) {
-            return QStringLiteral (":/client/theme/black/email.svg");
+        if (icon_name_with_prefix.contains ("message", Qt.CaseInsensitive)
+            || icon_name_with_prefix.contains ("talk", Qt.CaseInsensitive)) {
+            return ":/client/theme/black/wizard-talk.svg";
+        } else if (icon_name_with_prefix.contains ("folder", Qt.CaseInsensitive)) {
+            return ":/client/theme/black/folder.svg";
+        } else if (icon_name_with_prefix.contains ("deck", Qt.CaseInsensitive)) {
+            return ":/client/theme/black/deck.svg";
+        } else if (icon_name_with_prefix.contains ("contacts", Qt.CaseInsensitive)) {
+            return ":/client/theme/black/wizard-groupware.svg";
+        } else if (icon_name_with_prefix.contains ("calendar", Qt.CaseInsensitive)) {
+            return ":/client/theme/black/calendar.svg";
+        } else if (icon_name_with_prefix.contains ("mail", Qt.CaseInsensitive)) {
+            return ":/client/theme/black/email.svg";
         }
 
-        return QStringLiteral (":/client/theme/change.svg");
+        return ":/client/theme/change.svg";
     }
 
 
@@ -719,21 +733,21 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
                     return icon_file_path;
                 }
 
-                const string black_icon_file_path = QStringLiteral (":/client/theme/black/") + parts[1] + QStringLiteral (".svg");
+                const string black_icon_file_path = ":/client/theme/black/" + parts[1] + ".svg";
 
                 if (GLib.File.exists (black_icon_file_path)) {
                     return black_icon_file_path;
                 }
             }
 
-            const var icon_name_from_icon_prefix = local_icon_path_from_icon_prefix (default_icon_name);
+            const string icon_name_from_icon_prefix = local_icon_path_from_icon_prefix (default_icon_name);
 
-            if (!icon_name_from_icon_prefix == "") {
+            if (icon_name_from_icon_prefix != "") {
                 return icon_name_from_icon_prefix;
             }
         }
 
-        return QStringLiteral (":/client/theme/change.svg");
+        return ":/client/theme/change.svg";
     }
 
 

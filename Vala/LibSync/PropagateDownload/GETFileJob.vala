@@ -419,10 +419,10 @@ public class GETFileJob : AbstractNetworkJob {
         int64 start = 0;
         string ranges = reply ().raw_header ("Content-Range");
         if (!ranges == "") {
-            const QRegularExpression rx = new QRegularExpression ("bytes (\\d+)-");
-            var rx_match = rx.match (ranges);
-            if (rx_match.has_match ()) {
-                start = rx_match.captured (1).to_long_long ();
+            const QRegularExpression regular_expression = new QRegularExpression ("bytes (\\d+)-");
+            var regular_expression_match = regular_expression.match (ranges);
+            if (regular_expression_match.has_match ()) {
+                start = regular_expression_match.captured (1).to_long_long ();
             }
         }
         if (start != this.resume_start) {

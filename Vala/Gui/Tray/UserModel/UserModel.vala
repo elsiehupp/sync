@@ -112,8 +112,10 @@ public class UserModel : QAbstractListModel {
             build_user_list ();
         }
 
-        connect (AccountManager.instance, AccountManager.signal_account_added,
-            this, UserModel.build_user_list);
+        connect (
+            AccountManager.instance, AccountManager.signal_account_added,
+            this, UserModel.build_user_list
+        );
     }
 
 

@@ -123,12 +123,18 @@ public class SyncStatusSummary : GLib.Object {
     ***********************************************************/
     public SyncStatusSummary (GLib.Object parent = new GLib.Object ()) {
         base (parent);
-        const FolderMan folder_man = FolderMan.instance;
+        FolderMan folder_man = FolderMan.instance;
         this.is_syncing = false;
         this.sync_icon = Theme.sync_status_ok;
         this.sync_status_string = _("All synced!");
-        connect (folder_man, FolderMan.signal_folder_list_changed, this, SyncStatusSummary.on_signal_folder_list_changed);
-        connect (folder_man, FolderMan.signal_folder_sync_state_change, this, SyncStatusSummary.on_signal_folder_sync_state_changed);
+        connect (
+            folder_man, FolderMan.signal_folder_list_changed,
+            this, SyncStatusSummary.on_signal_folder_list_changed
+        );
+        connect (
+            folder_man, FolderMan.signal_folder_sync_state_change,
+            this, SyncStatusSummary.on_signal_folder_sync_state_changed
+        );
     }
 
 

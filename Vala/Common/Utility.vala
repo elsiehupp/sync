@@ -84,7 +84,7 @@ public class Utility {
             hash.append (' ');
         }
 
-        string fp = string.from_latin1 (hash.trimmed ());
+        string fp = hash.trimmed ();
         if (colon_separated) {
             fp.replace (' ', ':');
         }

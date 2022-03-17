@@ -105,7 +105,7 @@ public class FolderWatcherPrivate : GLib.Object {
             if (event.len == 0 || event.wd <= -1) {
                 continue;
             }
-            string filename = new string (event.name);
+            string filename = event.name;
             // Filter out journal changes - redundant with filtering in
             // FolderWatcher.path_is_ignored.
             if (filename.starts_with (".sync_")

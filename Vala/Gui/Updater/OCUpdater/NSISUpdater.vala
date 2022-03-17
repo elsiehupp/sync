@@ -166,12 +166,27 @@ public class NSISUpdater : OCUpdater {
         QPushButton reject = bb.add_button (_("Skip this time"), QDialogButtonBox.AcceptRole);
         QPushButton update = bb.add_button (_("Get update"), QDialogButtonBox.AcceptRole);
 
-        connect (skip, QAbstractButton.clicked, message_box, Gtk.Dialog.reject);
-        connect (reject, QAbstractButton.clicked, message_box, Gtk.Dialog.reject);
-        connect (update, QAbstractButton.clicked, message_box, Gtk.Dialog.accept);
+        connect (
+            skip, QAbstractButton.clicked,
+            message_box, Gtk.Dialog.reject
+        );
+        connect (
+            reject, QAbstractButton.clicked,
+            message_box, Gtk.Dialog.reject
+        );
+        connect (
+            update, QAbstractButton.clicked,
+            message_box, Gtk.Dialog.accept
+        );
 
-        connect (skip, QAbstractButton.clicked, this, NSISUpdater.on_signal_seen_version);
-        connect (update, QAbstractButton.clicked, this, NSISUpdater.on_signal_open_update_url);
+        connect (
+            skip, QAbstractButton.clicked,
+            this, NSISUpdater.on_signal_seen_version
+        );
+        connect (
+            update, QAbstractButton.clicked,
+            this, NSISUpdater.on_signal_open_update_url
+        );
 
         layout.add_widget (bb);
 
@@ -221,29 +236,34 @@ public class NSISUpdater : OCUpdater {
         var retry = bb.add_button (_("Restart and update"), QDialogButtonBox.AcceptRole);
         var update = bb.add_button (_("Update manually"), QDialogButtonBox.AcceptRole);
 
-        connect (skip, QAbstractButton.clicked, message_box, Gtk.Dialog.reject);
-        connect (askagain, QAbstractButton.clicked, message_box, Gtk.Dialog.reject);
-        connect (retry, QAbstractButton.clicked, message_box, Gtk.Dialog.accept);
-        connect (update, QAbstractButton.clicked, message_box, Gtk.Dialog.accept);
-
         connect (
-            skip,
-            QAbstractButton.clicked,
-            this,
-            this.on_skip_button_clicked
+            skip, QAbstractButton.clicked,
+            message_box, Gtk.Dialog.reject
+        );
+        connect (
+            askagain, QAbstractButton.clicked,
+            message_box, Gtk.Dialog.reject
+        );
+        connect (
+            retry, QAbstractButton.clicked,
+            message_box, Gtk.Dialog.accept
+        );
+        connect (
+            update, QAbstractButton.clicked,
+            message_box, Gtk.Dialog.accept
+        );
+        connect (
+            skip, QAbstractButton.clicked,
+            this, this.on_skip_button_clicked
         );
         // askagain : do nothing
         connect (
-            retry,
-            QAbstractButton.clicked,
-            this,
-            this.on_retry_button_clicked
+            retry, QAbstractButton.clicked,
+            this, this.on_retry_button_clicked
         );
         connect (
-            update,
-            QAbstractButton.clicked,
-            this,
-            this.on_get_update_button_clicked
+            update, QAbstractButton.clicked,
+            this, this.on_get_update_button_clicked
         );
 
         layout.add_widget (bb);
@@ -309,8 +329,14 @@ public class NSISUpdater : OCUpdater {
                     var request = Soup.Request (GLib.Uri (url));
                     request.attribute (Soup.Request.Redirect_policy_attribute, Soup.Request.No_less_safe_redirect_policy);
                     Soup.Reply reply = qnam ().get (request);
-                    connect (reply, QIODevice.ready_read, this, NSISUpdater.on_signal_write_file);
-                    connect (reply, Soup.Reply.on_signal_finished, this, NSISUpdater.on_signal_download_finished);
+                    connect (
+                        reply, QIODevice.ready_read,
+                        this, NSISUpdater.on_signal_write_file
+                    );
+                    connect (
+                        reply, Soup.Reply.on_signal_finished,
+                        this, NSISUpdater.on_signal_download_finished
+                    );
                     download_state (DownloadState.DOWNLOADING);
                     this.file.on_signal_reset (new QTemporaryFile ());
                     this.file.auto_remove (true);

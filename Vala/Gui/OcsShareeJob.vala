@@ -33,7 +33,7 @@ public class OcsShareeJob : OcsJob {
             this,
             OcsJob.signal_job_finished,
             this,
-            OcsShareeJob.on_signal_job_done
+            OcsShareeJob.on_signal_job_finished
         );
     }
 
@@ -46,11 +46,11 @@ public class OcsShareeJob : OcsJob {
     public void sharees (string search, string item_type, int page = 1, int per_page = 50, bool lookup = false) {
         verb ("GET");
 
-        add_param (string.from_latin1 ("search"), search);
-        add_param (string.from_latin1 ("item_type"), item_type);
-        add_param (string.from_latin1 ("page"), string.number (page));
-        add_param (string.from_latin1 ("per_page"), string.number (per_page));
-        add_param (string.from_latin1 ("lookup"), GLib.Variant (lookup).to_string ());
+        add_param ("search", search);
+        add_param ("item_type", item_type);
+        add_param ("page", string.number (page));
+        add_param ("per_page", string.number (per_page));
+        add_param ("lookup", GLib.Variant (lookup).to_string ());
 
         on_signal_start ();
     }
@@ -59,7 +59,7 @@ public class OcsShareeJob : OcsJob {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_job_done (QJsonDocument reply) {
+    private void on_signal_job_finished (QJsonDocument reply) {
         /* emit */ signal_sharee_job_finished (reply);
     }
 

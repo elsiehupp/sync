@@ -29,7 +29,7 @@ public class WebFlowCredentialsAccessManager : AccessManager {
         Soup.Request req (request);
         if (!req.attribute (WebFlowCredentials.DontAddCredentialsAttribute).to_bool ()) {
             if (this.credentials && !this.credentials.password () == "") {
-                string cred_hash = string (this.credentials.user ().to_utf8 () + ":" + this.credentials.password ().to_utf8 ()).to_base64 ();
+                string cred_hash = (this.credentials.user ().to_utf8 () + ":" + this.credentials.password ().to_utf8 ()).to_base64 ();
                 req.raw_header ("Authorization", "Basic " + cred_hash);
             }
         }

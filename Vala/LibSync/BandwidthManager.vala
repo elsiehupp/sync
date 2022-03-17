@@ -103,9 +103,9 @@ public class BandwidthManager : GLib.Object {
      * For relative limiting, do less measuring and more delaying+giving quota
      * For relative limiting, smoothen measurements
     ***********************************************************/
-    public BandwidthManager (OwncloudPropagator p) {
+    public BandwidthManager (OwncloudPropagator upload_propagator) {
         base ();
-        this.propagator = p;
+        this.propagator = upload_propagator;
         this.relative_limit_current_measured_device = null;
         this.relative_upload_limit_progress_at_measuring_restart = 0;
         this.current_upload_limit = 0;
@@ -114,34 +114,48 @@ public class BandwidthManager : GLib.Object {
         this.current_upload_limit = this.propagator.upload_limit;
         this.current_download_limit = this.propagator.download_limit;
 
-        GLib.Object.connect (&this.switching_timer, QTimer.timeout, this, BandwidthManager.on_signal_switching_timer_expired);
+        connect (
+            this.switching_timer, QTimer.timeout,
+            this, BandwidthManager.on_signal_switching_timer_expired
+        );
         this.switching_timer.interval (10 * 1000);
         this.switching_timer.start ();
         QMetaObject.invoke_method (this, "on_signal_switching_timer_expired", Qt.QueuedConnection);
 
         // absolute uploads/downloads
-        GLib.Object.connect (&this.absolute_limit_timer, QTimer.timeout, this, BandwidthManager.on_signal_absolute_limit_timer_expired);
+        connect (
+            this.absolute_limit_timer, QTimer.timeout,
+            this, BandwidthManager.on_signal_absolute_limit_timer_expired
+        );
         this.absolute_limit_timer.interval (1000);
         this.absolute_limit_timer.start ();
 
         // Relative uploads
-        GLib.Object.connect (&this.relative_upload_measuring_timer, QTimer.timeout,
-            this, BandwidthManager.on_signal_relative_upload_measuring_timer_expired);
+        connect (
+            this.relative_upload_measuring_timer, QTimer.timeout,
+            this, BandwidthManager.on_signal_relative_upload_measuring_timer_expired
+        );
         this.relative_upload_measuring_timer.interval (relative_limit_measuring_timer_interval_msec);
         this.relative_upload_measuring_timer.start ();
         this.relative_upload_measuring_timer.single_shot (true); // will be restarted from the delay timer
-        GLib.Object.connect (&this.relative_upload_delay_timer, QTimer.timeout,
-            this, BandwidthManager.on_signal_relative_upload_delay_timer_expired);
+        connect (
+            this.relative_upload_delay_timer, QTimer.timeout,
+            this, BandwidthManager.on_signal_relative_upload_delay_timer_expired
+        );
         this.relative_upload_delay_timer.single_shot (true); // will be restarted from the measuring timer
 
         // Relative downloads
-        GLib.Object.connect (&this.relative_download_measuring_timer, QTimer.timeout,
-            this, BandwidthManager.on_signal_relative_download_measuring_timer_expired);
+        connect (
+            this.relative_download_measuring_timer, QTimer.timeout,
+            this, BandwidthManager.on_signal_relative_download_measuring_timer_expired
+        );
         this.relative_download_measuring_timer.interval (relative_limit_measuring_timer_interval_msec);
         this.relative_download_measuring_timer.start ();
         this.relative_download_measuring_timer.single_shot (true); // will be restarted from the delay timer
-        GLib.Object.connect (&this.relative_download_delay_timer, QTimer.timeout,
-            this, BandwidthManager.on_signal_relative_download_delay_timer_expired);
+        connect (
+            this.relative_download_delay_timer, QTimer.timeout,
+            this, BandwidthManager.on_signal_relative_download_delay_timer_expired
+        );
         this.relative_download_delay_timer.single_shot (true); // will be restarted from the measuring timer
     }
 
@@ -176,20 +190,23 @@ public class BandwidthManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_register_upload_device (UploadDevice p) {
-        this.absolute_upload_device_list.push_back (p);
-        this.relative_upload_device_list.push_back (p);
-        GLib.Object.connect (p, GLib.Object.destroyed, this, BandwidthManager.on_signal_unregister_upload_device);
+    public void on_signal_register_upload_device (UploadDevice upload_device) {
+        this.absolute_upload_device_list.push_back (upload_device);
+        this.relative_upload_device_list.push_back (upload_device);
+        connect (
+            upload_device, GLib.Object.destroyed, this,
+            BandwidthManager.on_signal_unregister_upload_device
+        );
 
         if (using_absolute_upload_limit ()) {
-            p.bandwidth_limited (true);
-            p.choked (false);
+            upload_device.bandwidth_limited (true);
+            upload_device.choked (false);
         } else if (using_relative_upload_limit ()) {
-            p.bandwidth_limited (true);
-            p.choked (true);
+            upload_device.bandwidth_limited (true);
+            upload_device.choked (true);
         } else {
-            p.bandwidth_limited (false);
-            p.choked (false);
+            upload_device.bandwidth_limited (false);
+            upload_device.choked (false);
         }
     }
 
@@ -197,10 +214,10 @@ public class BandwidthManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_unregister_upload_device (GLib.Object o) {
-        var p = reinterpret_cast<UploadDevice> (o); // note, we might already be in the ~GLib.Object
-        this.absolute_upload_device_list.remove (p);
-        this.relative_upload_device_list.remove (p);
-        if (p == this.relative_limit_current_measured_device) {
+        var upload_device = reinterpret_cast<UploadDevice> (o); // note, we might already be in the ~GLib.Object
+        this.absolute_upload_device_list.remove (upload_device);
+        this.relative_upload_device_list.remove (upload_device);
+        if (upload_device == this.relative_limit_current_measured_device) {
             this.relative_limit_current_measured_device = null;
             this.relative_upload_limit_progress_at_measuring_restart = 0;
         }
@@ -209,19 +226,22 @@ public class BandwidthManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_register_download_job (GETFileJob j) {
-        this.download_job_list.push_back (j);
-        GLib.Object.connect (j, GLib.Object.destroyed, this, BandwidthManager.on_signal_unregister_download_job);
+    public void on_signal_register_download_job (GETFileJob get_file_job) {
+        this.download_job_list.push_back (get_file_job);
+        connect (
+            get_file_job, GLib.Object.destroyed,
+            this, BandwidthManager.on_signal_unregister_download_job
+        );
 
         if (using_absolute_download_limit ()) {
-            j.bandwidth_limited (true);
-            j.choked (false);
+            get_file_job.bandwidth_limited (true);
+            get_file_job.choked (false);
         } else if (using_relative_download_limit ()) {
-            j.bandwidth_limited (true);
-            j.choked (true);
+            get_file_job.bandwidth_limited (true);
+            get_file_job.choked (true);
         } else {
-            j.bandwidth_limited (false);
-            j.choked (false);
+            get_file_job.bandwidth_limited (false);
+            get_file_job.choked (false);
         }
     }
 
@@ -291,9 +311,9 @@ public class BandwidthManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void BandwidthManager.on_signal_unregister_download_job (GLib.Object o) {
-        var j = reinterpret_cast<GETFileJob> (o); // note, we might already be in the ~GLib.Object
-        this.download_job_list.remove (j);
-        if (this.relative_limit_current_measured_job == j) {
+        var get_file_job = reinterpret_cast<GETFileJob> (o); // note, we might already be in the ~GLib.Object
+        this.download_job_list.remove (get_file_job);
+        if (this.relative_limit_current_measured_job == get_file_job) {
             this.relative_limit_current_measured_job = null;
             this.relative_download_limit_progress_at_measuring_restart = 0;
         }
@@ -314,9 +334,9 @@ public class BandwidthManager : GLib.Object {
         if (using_absolute_download_limit () && !this.download_job_list.empty ()) {
             int64 quota_per_job = this.current_download_limit / q_max ( 1, this.download_job_list.size ());
             GLib.debug (quota_per_job + this.download_job_list.size () + this.current_download_limit);
-            foreach (GETFileJob j in this.download_job_list) {
-                j.give_bandwidth_quota (quota_per_job);
-                GLib.debug ("Gave " + quota_per_job / 1024.0 + " k_b to" + j);
+            foreach (GETFileJob get_file_job in this.download_job_list) {
+                get_file_job.give_bandwidth_quota (quota_per_job);
+                GLib.debug ("Gave " + quota_per_job / 1024.0 + " k_b to" + get_file_job);
             }
         }
     }
@@ -346,16 +366,16 @@ public class BandwidthManager : GLib.Object {
         if (new_download_limit != this.current_download_limit) {
             GLib.info ("Download Bandwidth limit changed " + this.current_download_limit + new_download_limit);
             this.current_download_limit = new_download_limit;
-            foreach (GETFileJob j in this.download_job_list) {
+            foreach (GETFileJob get_file_job in this.download_job_list) {
                 if (using_absolute_download_limit ()) {
-                    j.bandwidth_limited (true);
-                    j.choked (false);
+                    get_file_job.bandwidth_limited (true);
+                    get_file_job.choked (false);
                 } else if (using_relative_download_limit ()) {
-                    j.bandwidth_limited (true);
-                    j.choked (true);
+                    get_file_job.bandwidth_limited (true);
+                    get_file_job.choked (true);
                 } else {
-                    j.bandwidth_limited (false);
-                    j.choked (false);
+                    get_file_job.bandwidth_limited (false);
+                    get_file_job.choked (false);
                 }
             }
         }

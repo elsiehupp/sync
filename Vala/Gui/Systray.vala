@@ -171,13 +171,19 @@ public class Systray : QSystemTrayIcon {
             on_signal_context_menu_about_to_show
         );
 
-        connect (UserModel.instance, UserModel.signal_new_user_selected,
-            this, Systray.on_signal_new_user_selected);
-        connect (UserModel.instance, UserModel.signal_add_account,
-                this, Systray.signal_open_account_wizard);
+        connect (
+            UserModel.instance, UserModel.signal_new_user_selected,
+            this, Systray.on_signal_new_user_selected
+        );
+        connect (
+            UserModel.instance, UserModel.signal_add_account,
+            this, Systray.signal_open_account_wizard
+        );
 
-        connect (AccountManager.instance, AccountManager.signal_account_added,
-            this, Systray.show_window);
+        connect (
+            AccountManager.instance, AccountManager.signal_account_added,
+            this, Systray.show_window
+        );
     }
 
 

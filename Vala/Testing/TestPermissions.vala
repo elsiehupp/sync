@@ -472,8 +472,8 @@ public class TestPermissions : GLib.Object {
     }
 
     static void apply_permissions_from_name (FileInfo info) {
-        QRegularExpression rx = new QRegularExpression ("this.PERM_ ([^this.]*)this.[^/]*$");
-        var m = rx.match (info.name);
+        QRegularExpression regular_expression = new QRegularExpression ("this.PERM_ ([^this.]*)this.[^/]*$");
+        var m = regular_expression.match (info.name);
         if (m.has_match ()) {
             info.permissions = RemotePermissions.from_server_string (m.captured (1));
         }

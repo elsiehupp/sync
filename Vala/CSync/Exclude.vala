@@ -185,7 +185,7 @@ public class ExcludedFiles : GLib.Object {
     public ExcludedFiles (string local_path = "/") {
         this.local_path = local_path;
         this.client_version = { MIRALL_VERSION_MAJOR, MIRALL_VERSION_MINOR, MIRALL_VERSION_PATCH };
-        //  Q_ASSERT (this.local_path.ends_with (QStringLiteral ("/")));
+        //  Q_ASSERT (this.local_path.ends_with ("/"));
         // Windows used to use PathMatchSpec which allows foo to match abc/deffoo.
         this.wildcards_match_slash = Utility.is_windows ();
 
@@ -246,7 +246,7 @@ public class ExcludedFiles : GLib.Object {
             // We do want to be able to sync with a hidden folder as the target.
             while (path.size () > base_path.size ()) {
                 GLib.FileInfo file_info = new GLib.FileInfo (path);
-                if (file_info.filename () != QStringLiteral (".sync-exclude.lst")
+                if (file_info.filename () != ".sync-exclude.lst"
                     && (file_info.is_hidden () || file_info.filename ().starts_with ('.'))) {
                     return true;
                 }
@@ -346,7 +346,7 @@ public class ExcludedFiles : GLib.Object {
 
         // Directories are guaranteed to be visited before their files
         if (filetype == ItemType.DIRECTORY) {
-            const var base_path = string (this.local_path + path + '/');
+            const string base_path = this.local_path + path + '/';
             const string absolute_path = base_path + ".sync-exclude.lst";
             GLib.FileInfo exclude_file_info = new GLib.FileInfo (absolute_path);
 
@@ -359,7 +359,7 @@ public class ExcludedFiles : GLib.Object {
         }
 
         // Check the bname part of the path to see whether the full
-        // regex should be run.
+        // regular_expression should be run.
         QStringRef bname_str = new QStringRef (path);
         int last_slash = path.last_index_of ('/');
         if (last_slash >= 0) {
@@ -369,22 +369,22 @@ public class ExcludedFiles : GLib.Object {
         string base_path = this.local_path + path;
         while (base_path.size () > this.local_path.size ()) {
             base_path = left_include_last (base_path, '/');
-            QRegularExpressionMatch m;
+            QRegularExpressionMatch regular_expression_match;
             if (filetype == ItemType.DIRECTORY
                 && this.bname_traversal_regex_dir.contains (base_path)) {
-                m = this.bname_traversal_regex_dir[base_path].match (bname_str);
+                regular_expression_match = this.bname_traversal_regex_dir[base_path].match (bname_str);
             } else if (filetype == ItemType.FILE
                 && this.bname_traversal_regex_file.contains (base_path)) {
-                m = this.bname_traversal_regex_file[base_path].match (bname_str);
+                regular_expression_match = this.bname_traversal_regex_file[base_path].match (bname_str);
             } else {
                 continue;
             }
 
-            if (!m.has_match ())
+            if (!regular_expression_match.has_match ())
                 return CSync.ExcludedFiles.Type.NOT_EXCLUDED;
-            if (m.captured_start (QStringLiteral ("exclude")) != -1) {
+            if (regular_expression_match.captured_start ("exclude") != -1) {
                 return CSync.ExcludedFiles.Type.LIST;
-            } else if (m.captured_start (QStringLiteral ("excluderemove")) != -1) {
+            } else if (regular_expression_match.captured_start ("excluderemove") != -1) {
                 return CSync.ExcludedFiles.Type.AND_REMOVE;
             }
         }
@@ -393,21 +393,21 @@ public class ExcludedFiles : GLib.Object {
         base_path = this.local_path + path;
         while (base_path.size () > this.local_path.size ()) {
             base_path = left_include_last (base_path, '/');
-            QRegularExpressionMatch m;
+            QRegularExpressionMatch regular_expression_match;
             if (filetype == ItemType.DIRECTORY
                 && this.full_traversal_regex_dir.contains (base_path)) {
-                m = this.full_traversal_regex_dir[base_path].match (path);
+                regular_expression_match = this.full_traversal_regex_dir[base_path].match (path);
             } else if (filetype == ItemType.FILE
                 && this.full_traversal_regex_file.contains (base_path)) {
-                m = this.full_traversal_regex_file[base_path].match (path);
+                regular_expression_match = this.full_traversal_regex_file[base_path].match (path);
             } else {
                 continue;
             }
 
-            if (m.has_match ()) {
-                if (m.captured_start (QStringLiteral ("exclude")) != -1) {
+            if (regular_expression_match.has_match ()) {
+                if (regular_expression_match.captured_start ("exclude") != -1) {
                     return CSync.ExcludedFiles.Type.LIST;
-                } else if (m.captured_start (QStringLiteral ("excluderemove")) != -1) {
+                } else if (regular_expression_match.captured_start ("excluderemove") != -1) {
                     return CSync.ExcludedFiles.Type.AND_REMOVE;
                 }
             }
@@ -421,7 +421,7 @@ public class ExcludedFiles : GLib.Object {
     ***********************************************************/
     public bool on_signal_reload_exclude_files () {
         this.all_excludes.clear ();
-        // clear all regex
+        // clear all regular_expression
         this.bname_traversal_regex_file.clear ();
         this.bname_traversal_regex_dir.clear ();
         this.full_traversal_regex_file.clear ();
@@ -544,21 +544,21 @@ public class ExcludedFiles : GLib.Object {
         string base_path = this.local_path + path;
         while (base_path.size () > this.local_path.size ()) {
             base_path = left_include_last (base_path, '/');
-            QRegularExpressionMatch m;
+            QRegularExpressionMatch regular_expression_match;
             if (filetype == ItemType.DIRECTORY
                 && this.full_regex_dir.contains (base_path)) {
-                m = this.full_regex_dir[base_path].match (p);
+                regular_expression_match = this.full_regex_dir[base_path].match (p);
             } else if (filetype == ItemType.FILE
                 && this.full_regex_file.contains (base_path)) {
-                m = this.full_regex_file[base_path].match (p);
+                regular_expression_match = this.full_regex_file[base_path].match (p);
             } else {
                 continue;
             }
 
-            if (m.has_match ()) {
-                if (m.captured_start (QStringLiteral ("exclude")) != -1) {
+            if (regular_expression_match.has_match ()) {
+                if (regular_expression_match.captured_start ("exclude") != -1) {
                     return CSync.ExcludedFiles.Type.LIST;
-                } else if (m.captured_start (QStringLiteral ("excluderemove")) != -1) {
+                } else if (regular_expression_match.captured_start ("excluderemove") != -1) {
                     return CSync.ExcludedFiles.Type.AND_REMOVE;
                 }
             }
@@ -695,7 +695,7 @@ public class ExcludedFiles : GLib.Object {
         empty_match_nothing (bname_trigger_file_dir);
         empty_match_nothing (bname_trigger_dir);
 
-        // The bname regex is applied to the bname only, so it must be
+        // The bname regular_expression is applied to the bname only, so it must be
         // anchored in the beginning and in the end. It has the structure:
         // (exclude)| (excluderemove)| (bname triggers).
         // If the third group matches, the full_activated_regex needs to be applied
@@ -711,8 +711,8 @@ public class ExcludedFiles : GLib.Object {
             + "^ (?P<trigger>%5|%6)$"
                 .printf (bname_file_dir_keep, bname_dir_keep, bname_file_dir_remove, bname_dir_remove, bname_trigger_file_dir, bname_trigger_dir));
 
-        // The full traveral regex is applied to the full path if the trigger capture of
-        // the bname regex matches. Its basic form is (exclude)| (excluderemove)".
+        // The full traveral regular_expression is applied to the full path if the trigger capture of
+        // the bname regular_expression matches. Its basic form is (exclude)| (excluderemove)".
         // This pattern can be much simpler than full_regex since we can assume a traversal
         // situation and doesn't need to look for bname patterns in parent paths.
         this.full_traversal_regex_file[base_path].pattern (
@@ -727,7 +727,7 @@ public class ExcludedFiles : GLib.Object {
             + "^ (?P<excluderemove>%3|%4) (?:$|/)"
                 .printf (full_file_dir_keep, full_dir_keep, full_file_dir_remove, full_dir_remove));
 
-        // The full regex is applied to the full path and incorporates both bname and
+        // The full regular_expression is applied to the full path and incorporates both bname and
         // full-path patterns. It has the form " (exclude)| (excluderemove)".
         this.full_regex_file[base_path].pattern (
             " (?P<exclude>"
@@ -776,7 +776,7 @@ public class ExcludedFiles : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void prepare () {
-        // clear all regex
+        // clear all regular_expression
         this.bname_traversal_regex_file.clear ();
         this.bname_traversal_regex_dir.clear ();
         this.full_traversal_regex_file.clear ();
@@ -887,7 +887,7 @@ public class ExcludedFiles : GLib.Object {
                 case 't' : line[o++] = '\t'; break;
                 case 'v' : line[o++] = '\v'; break;
                 default:
-                    // '\*' '\?' '\[' '\\' will be processed during regex translation
+                    // '\*' '\?' '\[' '\\' will be processed during regular_expression translation
                     // '\\' is intentionally not expanded here (to avoid '\\*' and '\*'
                     // ending up meaning the same thing)
                     line[o++] = line[i];
@@ -1000,10 +1000,10 @@ public class ExcludedFiles : GLib.Object {
     /***********************************************************
     On linux we used to use fnmatch with FNM_PATHNAME, but the windows function we used
     didn't have that behavior. wildcards_match_slash can be used to control which behavior
-    the resulting regex shall use.
+    the resulting regular_expression shall use.
     ***********************************************************/
     private static string convert_to_regexp_syntax (string exclude, bool wildcards_match_slash) {
-        // Translate *, ?, [...] to their regex variants.
+        // Translate *, ?, [...] to their regular_expression variants.
         // The escape sequences \*, \?, \[. \\ have a special meaning,
         // the other ones have already been expanded before
         // (like "\\n" being replaced by "\n").
@@ -1013,7 +1013,7 @@ public class ExcludedFiles : GLib.Object {
         // code points. To avoid problems we delegate as much work as possible to
         // QRegularExpression.escape () : It always receives as long a sequence
         // as code units as possible.
-        string regex;
+        string regular_expression;
         int i = 0;
         int chars_to_escape = 0;
         var len = exclude.size ();
@@ -1022,17 +1022,17 @@ public class ExcludedFiles : GLib.Object {
             case '*':
                 flush ();
                 if (wildcards_match_slash) {
-                    regex.append (".*");
+                    regular_expression.append (".*");
                 } else {
-                    regex.append ("[^/]*");
+                    regular_expression.append ("[^/]*");
                 }
                 break;
             case '?':
                 flush ();
                 if (wildcards_match_slash) {
-                    regex.append ('.');
+                    regular_expression.append ('.');
                 } else {
-                    regex.append (QStringLiteral ("[^/]"));
+                    regular_expression.append ("[^/]");
                 }
                 break;
             case '[': {
@@ -1049,7 +1049,7 @@ public class ExcludedFiles : GLib.Object {
                 }
                 if (j == len) {
                     // no matching ], just insert the escaped [
-                    regex.append (QStringLiteral ("\\["));
+                    regular_expression.append ("\\[");
                     break;
                 }
                 // Translate [! to [^
@@ -1057,14 +1057,14 @@ public class ExcludedFiles : GLib.Object {
                 if (bracket_expr.starts_with ("[!")) {
                     bracket_expr[1] = '^';
                 }
-                regex.append (bracket_expr);
+                regular_expression.append (bracket_expr);
                 i = j;
                 break;
             }
             case '\\':
                 flush ();
                 if (i == len - 1) {
-                    regex.append (QStringLiteral ("\\\\"));
+                    regular_expression.append ("\\\\");
                     break;
                 }
                 // '\*' . '\*', but '\z' . '\\z'
@@ -1073,7 +1073,7 @@ public class ExcludedFiles : GLib.Object {
                 case '?':
                 case '[':
                 case '\\':
-                    regex.append (QRegularExpression.escape (exclude.mid (i + 1, 1)));
+                    regular_expression.append (QRegularExpression.escape (exclude.mid (i + 1, 1)));
                     break;
                 default:
                     chars_to_escape += 2;
@@ -1087,7 +1087,7 @@ public class ExcludedFiles : GLib.Object {
             }
         }
         flush ();
-        return regex;
+        return regular_expression;
     }
 
 
@@ -1096,7 +1096,7 @@ public class ExcludedFiles : GLib.Object {
     longer inline.
     ***********************************************************/
     private static void flush () {
-        regex.append (QRegularExpression.escape (exclude.mid (i - chars_to_escape, chars_to_escape)));
+        regular_expression.append (QRegularExpression.escape (exclude.mid (i - chars_to_escape, chars_to_escape)));
         chars_to_escape = 0;
     }
 

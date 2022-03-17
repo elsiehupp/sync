@@ -45,8 +45,14 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
         title (WizardCommon.title_template ().printf (_("Connect to %1").printf (Theme.app_name_gui)));
         sub_title (WizardCommon.sub_title_template ().printf (_("Login in your browser")));
 
-        connect (this.ui.open_link_button, QCommand_link_button.clicked, this, OwncloudOAuthCredsPage.on_signal_open_browser);
-        connect (this.ui.copy_link_button, QCommand_link_button.clicked, this, OwncloudOAuthCredsPage.on_signal_copy_link_to_clipboard);
+        connect (
+            this.ui.open_link_button, QCommand_link_button.clicked,
+            this, OwncloudOAuthCredsPage.on_signal_open_browser
+        );
+        connect (
+            this.ui.copy_link_button, QCommand_link_button.clicked,
+            this, OwncloudOAuthCredsPage.on_signal_copy_link_to_clipboard
+        );
     }
 
 
@@ -67,7 +73,11 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
         //  Q_ASSERT (oc_wizard);
         oc_wizard.account.credentials (CredentialsFactory.create ("http"));
         this.async_auth.on_signal_reset (new OAuth (oc_wizard.account, this));
-        connect (this.async_auth, OAuth.result, this, OwncloudOAuthCredsPage.on_signal_async_auth_result, Qt.QueuedConnection);
+        connect (
+            this.async_auth, OAuth.result,
+            this, OwncloudOAuthCredsPage.on_signal_async_auth_result,
+            Qt.QueuedConnection
+        );
         this.async_auth.on_signal_start ();
 
         // Don't hide the wizard (avoid user confusion)!

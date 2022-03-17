@@ -169,8 +169,8 @@ public class User : GLib.Object {
     public string server (bool shortened) {
         string server_url = this.account_state.account.url.to_string ();
         if (shortened) {
-            server_url.replace (QLatin1String ("https://"), QLatin1String (""));
-            server_url.replace (QLatin1String ("http://"), QLatin1String (""));
+            server_url.replace ("https://", "");
+            server_url.replace ("http://", "");
         }
         return server_url;
     }
@@ -237,7 +237,11 @@ public class User : GLib.Object {
             connect_push_notifications ();
             return true;
         } else {
-            connect (this.account_state.account, Account.push_notifications_ready, this, User.on_signal_push_notifications_ready, Qt.UniqueConnection);
+            connect (
+                this.account_state.account, Account.push_notifications_ready,
+                this, User.on_signal_push_notifications_ready,
+                Qt.UniqueConnection
+            );
             return false;
         }
     }
@@ -695,11 +699,13 @@ public class User : GLib.Object {
     ***********************************************************/
     public void on_signal_refresh_notifications () {
         if (this.notification_requests_running == 0) {
-            var snh = new ServerNotificationHandler (this.account_state);
-            connect (snh, ServerNotificationHandler.signal_new_notification_list,
-                this, User.on_signal_build_notification_display);
+            var server_notification_handler = new ServerNotificationHandler (this.account_state);
+            connect (
+                server_notification_handler, ServerNotificationHandler.signal_new_notification_list,
+                this, User.on_signal_build_notification_display
+            );
 
-            snh.on_signal_fetch_notifications ();
+            server_notification_handler.on_signal_fetch_notifications ();
         } else {
             GLib.warning ("Notification request counter not zero.");
         }

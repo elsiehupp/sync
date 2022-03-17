@@ -99,11 +99,17 @@ public class PropagateUploadEncrypted : GLib.Object {
     public new void start () {
 
         GLib.debug ("Folder is encrypted; let's get the Id from it.");
-        var job = new LsColJob (this.propagator.account, absolute_remote_parent_path, this);
-        job.properties ({"resourcetype", "http://owncloud.org/ns:fileid"});
-        connect (job, LsColJob.signal_directory_listing_subfolders, this, PropagateUploadEncrypted.on_signal_folder_encrypted_id_received);
-        connect (job, LsColJob.signal_finished_with_error, this, PropagateUploadEncrypted.on_signal_folder_encrypted_id_error);
-        job.start ();
+        var ls_col_job = new LsColJob (this.propagator.account, absolute_remote_parent_path, this);
+        ls_col_job.properties ({"resourcetype", "http://owncloud.org/ns:fileid"});
+        connect (
+            ls_col_job, LsColJob.signal_directory_listing_subfolders,
+            this, PropagateUploadEncrypted.on_signal_folder_encrypted_id_received
+        );
+        connect (
+            ls_col_job, LsColJob.signal_finished_with_error,
+            this, PropagateUploadEncrypted.on_signal_folder_encrypted_id_error
+        );
+        ls_col_job.start ();
     }
 
 
@@ -190,8 +196,8 @@ public class PropagateUploadEncrypted : GLib.Object {
     ***********************************************************/
     private void on_signal_folder_encrypted_id_received (string[] list) {
         GLib.debug ("Received identifier of folder; trying to lock it so we can prepare the metadata.");
-        var job = (LsColJob) sender ();
-        var folder_info = job.folder_infos.value (list.first ());
+        var ls_col_job = (LsColJob) sender ();
+        var folder_info = ls_col_job.folder_infos.value (list.first ());
         this.folder_lock_first_try.start ();
         on_signal_try_lock (folder_info.file_identifier);
     }
@@ -215,21 +221,21 @@ public class PropagateUploadEncrypted : GLib.Object {
         this.folder_identifier = file_identifier;
         this.is_folder_locked = true;
 
-        var job = new GetMetadataApiJob (this.propagator.account, this.folder_identifier);
+        var get_metatdata_api_job = new GetMetadataApiJob (this.propagator.account, this.folder_identifier);
         connect (
-            job,
+            get_metatdata_api_job,
             GetMetadataApiJob.signal_json_received,
             this,
             PropagateUploadEncrypted.on_signal_folder_encrypted_metadata_received
         );
         connect (
-            job,
+            get_metatdata_api_job,
             GetMetadataApiJob.error,
             this,
             PropagateUploadEncrypted.on_signal_folder_encrypted_metadata_error
         );
 
-        job.start ();
+        get_metatdata_api_job.start ();
     }
 
 
@@ -270,8 +276,14 @@ public class PropagateUploadEncrypted : GLib.Object {
     ***********************************************************/
     private void on_signal_try_lock (string file_identifier) {
         var lock_job = new LockEncryptFolderApiJob (this.propagator.account, file_identifier, this);
-        connect (lock_job, LockEncryptFolderApiJob.on_signal_success, this, PropagateUploadEncrypted.on_signal_folder_locked_successfully);
-        connect (lock_job, LockEncryptFolderApiJob.error, this, PropagateUploadEncrypted.on_signal_folder_locked_error);
+        connect (
+            lock_job, LockEncryptFolderApiJob.on_signal_success,
+            this, PropagateUploadEncrypted.on_signal_folder_locked_successfully
+        );
+        connect (
+            lock_job, LockEncryptFolderApiJob.error, this,
+            PropagateUploadEncrypted.on_signal_folder_locked_error
+        );
         lock_job.start ();
     }
 
@@ -359,21 +371,37 @@ public class PropagateUploadEncrypted : GLib.Object {
         GLib.debug ("Metadata created; sending to the server.");
 
         if (status_code == 404) {
-            var job = new StoreMetaDataApiJob (this.propagator.account,
-                                                this.folder_identifier,
-                                                this.metadata.encrypted_metadata ());
-            connect (job, StoreMetaDataApiJob.on_signal_success, this, PropagateUploadEncrypted.on_signal_update_metadata_success);
-            connect (job, StoreMetaDataApiJob.error, this, PropagateUploadEncrypted.on_signal_update_metadata_error);
-            job.start ();
+            var store_metatdata_api_job = new StoreMetadataApiJob (
+                this.propagator.account,
+                this.folder_identifier,
+                this.metadata.encrypted_metadata ()
+            );
+            connect (
+                store_metatdata_api_job, StoreMetadataApiJob.on_signal_success,
+                this, PropagateUploadEncrypted.on_signal_update_metadata_success
+            );
+            connect (
+                store_metatdata_api_job, StoreMetadataApiJob.error,
+                this, PropagateUploadEncrypted.on_signal_update_metadata_error
+            );
+            store_metatdata_api_job.start ();
         } else {
-            var job = new UpdateMetadataApiJob (this.propagator.account,
-                                                this.folder_identifier,
-                                                this.metadata.encrypted_metadata (),
-                                                this.folder_token);
+            var store_metatdata_api_job = new UpdateMetadataApiJob (
+                this.propagator.account,
+                this.folder_identifier,
+                this.metadata.encrypted_metadata (),
+                this.folder_token
+            );
 
-            connect (job, UpdateMetadataApiJob.on_signal_success, this, PropagateUploadEncrypted.on_signal_update_metadata_success);
-            connect (job, UpdateMetadataApiJob.error, this, PropagateUploadEncrypted.on_signal_update_metadata_error);
-            job.start ();
+            connect (
+                store_metatdata_api_job, UpdateMetadataApiJob.on_signal_success,
+                this, PropagateUploadEncrypted.on_signal_update_metadata_success
+            );
+            connect (
+                store_metatdata_api_job, UpdateMetadataApiJob.error,
+                this, PropagateUploadEncrypted.on_signal_update_metadata_error
+            );
+            store_metatdata_api_job.start ();
         }
     }
 

@@ -152,8 +152,8 @@ public class JsonApiJob : AbstractNetworkJob {
 
         string json_str = string.from_utf8 (reply ().read_all ());
         if (json_str.contains ("<?xml version=\"1.0\"?>")) {
-            const QRegularExpression regex = new QRegularExpression ("<statuscode> (\\d+)</statuscode>");
-            var rex_match = regex.match (json_str);
+            const QRegularExpression regular_expression = new QRegularExpression ("<statuscode> (\\d+)</statuscode>");
+            var rex_match = regular_expression.match (json_str);
             if (rex_match.has_match ()) {
                 // this is a error message coming back from ocs.
                 status_code = rex_match.captured (1).to_int ();
@@ -162,11 +162,11 @@ public class JsonApiJob : AbstractNetworkJob {
             GLib.warning ("Nothing changed so nothing to retrieve - status code: " + http_status_code);
             status_code = http_status_code;
         } else {
-            const QRegularExpression regex = new QRegularExpression (" (\"statuscode\" : (\\d+))");
+            const QRegularExpression regular_expression = new QRegularExpression (" (\"statuscode\" : (\\d+))");
             // example: "{"ocs":{"meta":{"status":"ok","statuscode":100,"message":null},"data":{"version":{"major":8,"minor":"... (504)
-            var rx_match = regex.match (json_str);
-            if (rx_match.has_match ()) {
-                status_code = rx_match.captured (1).to_int ();
+            var regular_expression_match = regular_expression.match (json_str);
+            if (regular_expression_match.has_match ()) {
+                status_code = regular_expression_match.captured (1).to_int ();
             }
         }
 

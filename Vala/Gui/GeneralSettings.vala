@@ -101,7 +101,7 @@ public class GeneralSettings : Gtk.Widget {
 
             zip.add_file ("__nextcloud_client_parameters.txt", Gtk.Application.arguments ().join (' ').to_utf8 ());
 
-            const var build_info = string (Occ.Theme.about + "\n\n" + Occ.Theme.about_details);
+            const string build_info = Occ.Theme.about + "\n\n" + Occ.Theme.about_details;
             zip.add_file ("__nextcloud_client_buildinfo.txt", build_info.to_utf8 ());
         }
     }

@@ -128,10 +128,14 @@ public class PropagateDownloadEncrypted : GLib.Object {
 
         // Now that we have the folder-identifier we need it's JSON metadata
         var metadata_job = new GetMetadataApiJob (this.propagator.account, folder_info.file_identifier);
-        connect (metadata_job, GetMetadataApiJob.signal_json_received,
-                        this, PropagateDownloadEncrypted.on_signal_check_folder_encrypted_metadata);
-        connect (metadata_job, GetMetadataApiJob.error,
-                        this, PropagateDownloadEncrypted.on_signal_folder_encrypted_metadata_error);
+        connect (
+            metadata_job, GetMetadataApiJob.signal_json_received,
+            this, PropagateDownloadEncrypted.on_signal_check_folder_encrypted_metadata
+        );
+        connect (
+            metadata_job, GetMetadataApiJob.error,
+            this, PropagateDownloadEncrypted.on_signal_folder_encrypted_metadata_error
+        );
 
         metadata_job.start ();
     }

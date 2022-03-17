@@ -91,15 +91,18 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
 
         GLib.debug (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) + "Metadata updated, sending to the server.";
 
-        var job = new UpdateMetadataApiJob (this.propagator.account, this.folder_identifier, metadata.encrypted_metadata (), this.folder_token);
+        var update_metadata_api_job = new UpdateMetadataApiJob (this.propagator.account, this.folder_identifier, metadata.encrypted_metadata (), this.folder_token);
         connect (
-            job,
+            update_metadata_api_job,
             UpdateMetadataApiJob.signal_success,
             this,
             this.on_signal_update_metadata_api_job_success
         );
-        connect (job, UpdateMetadataApiJob.error, this, PropagateRemoteDeleteEncryptedRootFolder.task_failed);
-        job.start ();
+        connect (
+            update_metadata_api_job, UpdateMetadataApiJob.error,
+            this, PropagateRemoteDeleteEncryptedRootFolder.task_failed
+        );
+        update_metadata_api_job.start ();
     }
 
 
@@ -182,20 +185,20 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
     /***********************************************************
     ***********************************************************/
     private void decrypt_and_remote_delete () {
-        var job = new Occ.SetEncryptionFlagApiJob (this.propagator.account, this.item.file_id, Occ.SetEncryptionFlagApiJob.Clear, this);
+        var set_encryption_flag_api_job = new Occ.SetEncryptionFlagApiJob (this.propagator.account, this.item.file_id, Occ.SetEncryptionFlagApiJob.Clear, this);
         connect (
-            job,
+            set_encryption_flag_api_job,
             Occ.SetEncryptionFlagApiJob.on_signal_success,
             this,
             this.on_signal_set_encryption_flag_api_job_success
         );
         connect (
-            job,
+            set_encryption_flag_api_job,
             Occ.SetEncryptionFlagApiJob.error,
             this,
             this.on_signal_set_encryption_flag_api_job_error
         );
-        job.start ();
+        set_encryption_flag_api_job.start ();
     }
 
 
@@ -225,7 +228,10 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
         delete_job.folder_token (this.folder_token);
         delete_job.property (ENCRYPTED_FILENAME_PROPERTY_KEY, filename);
 
-        connect (delete_job, DeleteJob.signal_finished, this, PropagateRemoteDeleteEncryptedRootFolder.on_signal_delete_nested_remote_item_finished);
+        connect (
+            delete_job, DeleteJob.signal_finished,
+            this, PropagateRemoteDeleteEncryptedRootFolder.on_signal_delete_nested_remote_item_finished
+        );
 
         delete_job.start ();
     }

@@ -57,7 +57,8 @@ public class FolderMan : GLib.Object {
     private const string PAR_O_TAG = "__PAR_OPEN__";
     private const string PAR_C_TAG = "__PAR_CLOSE__";
 
-    private static FolderMan instance = null;
+    public static FolderMan instance { public get; private set; }
+    // = null;
 
     /***********************************************************
     ***********************************************************/

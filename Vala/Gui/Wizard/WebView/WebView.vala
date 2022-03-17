@@ -64,12 +64,12 @@ public class WebView : Gtk.Widget {
         ***********************************************************/ {
             string system_locale = QLocale.system ().name ().replace (char.from_latin1 ('_'),char.from_latin1 ('-'));
             string accept_language;
-            if (system_locale == QLatin1String ("C")) {
-                accept_language = string.from_latin1 ("en,*");
-            } else if (system_locale.starts_with (QLatin1String ("en-"))) {
-                accept_language = system_locale + QLatin1String (",*");
+            if (system_locale == "C") {
+                accept_language = "en,*";
+            } else if (system_locale.starts_with ("en-")) {
+                accept_language = system_locale + ",*";
             } else {
-                accept_language = system_locale + QLatin1String (",en,*");
+                accept_language = system_locale + ",en,*";
             }
             this.profile.http_accept_language (accept_language);
         }
@@ -77,8 +77,14 @@ public class WebView : Gtk.Widget {
         this.webview.page (this.page);
         this.ui.vertical_layout.add_widget (this.webview);
 
-        connect (this.webview, QWebEngineView.load_progress, this.ui.progress_bar, QProgressBar.value);
-        connect (this.scheme_handler, WebViewPageUrlSchemeHandler.on_signal_url_catched, this, WebView.on_signal_url_catched);
+        connect (
+            this.webview, QWebEngineView.load_progress,
+            this.ui.progress_bar, QProgressBar.value
+        );
+        connect (
+            this.scheme_handler, WebViewPageUrlSchemeHandler.signal_url_catched,
+            this, WebView.on_signal_url_catched
+        );
     }
 
 

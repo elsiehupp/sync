@@ -193,11 +193,11 @@ public class OwncloudPropagator : GLib.Object {
         // In order to do that we loop over the items. (which are sorted by destination)
         // When we enter a directory, we can create the directory job and push it on the stack.
 
-        var regex = sync_options.file_regex ();
-        if (regex.is_valid ()) {
+        var regular_expression = sync_options.file_regex ();
+        if (regular_expression.is_valid ()) {
             GLib.List<QStringRef> names;
             foreach (var i in synced_items) {
-                if (regex.match (i.file).has_match ()) {
+                if (regular_expression.match (i.file).has_match ()) {
                     int index = -1;
                     QStringRef string_ref;
                     do {

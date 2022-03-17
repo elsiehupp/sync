@@ -59,7 +59,10 @@ public class QtLocalPeer : GLib.Object {
         if (!res) {
             GLib.warning ("QtSingleCoreApplication : listen on local socket failed, %s", q_printable (server.error_string ()));
         }
-        GLib.Object.connect (server, &QLocalServer.new_connection, this, &QtLocalPeer.on_signal_receive_connection);
+        connect (
+            server, QLocalServer.new_connection,
+            this, QtLocalPeer.on_signal_receive_connection
+        );
         return false;
     }
 
@@ -89,7 +92,7 @@ public class QtLocalPeer : GLib.Object {
             return false;
         }
 
-        string u_msg = new string (message.to_utf8 ());
+        string u_msg = message.to_utf8 ();
         QDataStream ds = new QDataStream (socket);
         ds.write_bytes (u_msg.const_data (), u_msg.size ());
         bool res = socket.wait_for_bytes_written (timeout);

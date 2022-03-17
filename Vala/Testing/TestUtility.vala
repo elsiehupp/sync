@@ -131,8 +131,8 @@ public class TestUtility : GLib.Object {
             GLib.debug ("Version of installed Nextcloud: " + version);
             GLib.assert_true (!version == "");
 
-            const QRegularExpression rx = new QRegularExpression (QRegularExpression.anchored_pattern (APPLICATION_SHORTNAME + " ( version \d+\.\d+\.\d+.*)"));
-            GLib.assert_true (rx.match (version).has_match ());
+            const QRegularExpression regular_expression = new QRegularExpression (QRegularExpression.anchored_pattern (APPLICATION_SHORTNAME + " ( version \d+\.\d+\.\d+.*)"));
+            GLib.assert_true (regular_expression.match (version).has_match ());
         } else {
             GLib.assert_true (version_of_installed_binary () == "");
         }

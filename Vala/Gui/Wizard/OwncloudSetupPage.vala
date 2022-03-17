@@ -66,7 +66,7 @@ public class OwncloudSetupPage : QWizardPage {
             this.ui.le_url.enabled (false);
         }
 
-        register_field (QLatin1String ("OCUrl*"), this.ui.le_url);
+        register_field ("OCUrl*", this.ui.le_url);
 
         var size_policy = this.progress_indicator.size_policy ();
         size_policy.retain_size_when_hidden (true);
@@ -77,12 +77,22 @@ public class OwncloudSetupPage : QWizardPage {
 
         set_up_customization ();
 
-        on_signal_url_changed (QLatin1String ("")); // don't jitter UI
-        connect (this.ui.le_url, QLineEdit.text_changed, this, OwncloudSetupPage.on_signal_url_changed);
-        connect (this.ui.le_url, QLineEdit.editing_finished, this, OwncloudSetupPage.on_signal_url_edit_finished);
+        on_signal_url_changed (""); // don't jitter UI
+
+        connect (
+            this.ui.le_url, QLineEdit.text_changed,
+            this, OwncloudSetupPage.on_signal_url_changed
+        );
+        connect (
+            this.ui.le_url, QLineEdit.editing_finished,
+            this, OwncloudSetupPage.on_signal_url_edit_finished
+        );
 
         add_cert_dial = new AddCertificateDialog (this);
-        connect (add_cert_dial, Gtk.Dialog.accepted, this, OwncloudSetupPage.on_signal_certificate_accepted);
+        connect (
+            add_cert_dial, Gtk.Dialog.accepted,
+            this, OwncloudSetupPage.on_signal_certificate_accepted
+        );
     }
 
 

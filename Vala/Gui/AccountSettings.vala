@@ -221,7 +221,7 @@ public class AccountSettings : Gtk.Widget {
 
         // quota_progress_bar style now set in customize_style ()
         /*Gtk.Color color = palette ().highlight ().color ();
-         this.ui.quota_progress_bar.style_sheet (string.from_latin1 (PROGRESS_BAR_STYLE_C).printf (color.name ()));*/
+         this.ui.quota_progress_bar.style_sheet (PROGRESS_BAR_STYLE_C.printf (color.name ()));*/
 
         // Connect E2E stuff
         this.signal_request_mnemonic.connect (
@@ -754,7 +754,10 @@ public class AccountSettings : Gtk.Widget {
         var connection = std.make_shared<QMetaObject.Connection> ();
 
         if (folder.is_sync_running ()) {
-            connection = connect (folder, Folder.signal_sync_finished, this, switch_vfs_on);
+            connection = connect (
+                folder, Folder.signal_sync_finished,
+                this, switch_vfs_on
+            );
             folder.vfs_on_signal_off_switch_pending (true);
             folder.on_signal_terminate_sync ();
             this.ui.folder_list.do_items_layout ();
@@ -845,7 +848,10 @@ public class AccountSettings : Gtk.Widget {
     
 
         if (folder.is_sync_running ()) {
-            connection = connect (folder, Folder.signal_sync_finished, this, switch_vfs_off);
+            connection = connect (
+                folder, Folder.signal_sync_finished,
+                this, switch_vfs_off
+            );
             folder.vfs_on_signal_off_switch_pending (true);
             folder.on_signal_terminate_sync ();
             this.ui.folder_list.do_items_layout ();
@@ -1161,9 +1167,11 @@ public class AccountSettings : Gtk.Widget {
                 );
             } else {
                 // Ingore decrypting for now since it only works with an empty folder
-                // connect (encrypt_action.triggered. [this, info] {
-                //    on_signal_mark_subfolder_decrypted (info);
-                // });
+                encrypt_action.triggered.connect (
+                    () => {
+                        on_signal_mark_subfolder_decrypted (info);
+                    }
+                );
             }
         }
 
@@ -1618,7 +1626,7 @@ public class AccountSettings : Gtk.Widget {
         this.ui.connect_label.on_signal_text (message);
 
         Gtk.Color color = palette ().highlight ().color ();
-        this.ui.quota_progress_bar.style_sheet (string.from_latin1 (PROGRESS_BAR_STYLE_C).printf (color.name ()));
+        this.ui.quota_progress_bar.style_sheet (PROGRESS_BAR_STYLE_C.printf (color.name ()));
     }
 
 

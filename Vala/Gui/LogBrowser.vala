@@ -61,7 +61,9 @@ public class LogBrowser : Gtk.Dialog {
         var enable_logging_button = new QCheckBox ();
         enable_logging_button.on_signal_text (_("Enable logging to temporary folder"));
         enable_logging_button.checked (ConfigFile ().automatic_log_dir ());
-        connect (enable_logging_button, QCheckBox.toggled, this, LogBrowser.toggle_permanent_logging);
+        enable_logging_button.toggled.connect (
+            this.toggle_permanent_logging
+        );
         main_layout.add_widget (enable_logging_button);
 
         label = new Gtk.Label (
@@ -73,21 +75,15 @@ public class LogBrowser : Gtk.Dialog {
 
         var open_folder_button = new QPushButton ();
         open_folder_button.on_signal_text (_("Open folder"));
-        connect (
-            open_folder_button,
-            QPushButton.clicked,
-            this,
+        open_folder_button.clicked.connect (
             this.on_open_folder_button_clicked
         );
         main_layout.add_widget (open_folder_button);
 
         var btnbox = new QDialogButtonBox ();
-        QPushButton close_btn = btnbox.add_button (QDialogButtonBox.Close);
-        connect (
-            close_btn,
-            QAbstractButton.clicked,
-            this,
-            Gtk.Widget.close
+        QPushButton close_button = btnbox.add_button (QDialogButtonBox.Close);
+        close_button.clicked.connect (
+            this.close
         );
 
         main_layout.add_stretch ();
@@ -97,10 +93,12 @@ public class LogBrowser : Gtk.Dialog {
 
         modal (false);
 
-        var show_log_window = new QAction (this);
-        show_log_window.shortcut (QKeySequence ("F12"));
-        connect (show_log_window, QAction.triggered, this, Gtk.Widget.close);
-        add_action (show_log_window);
+        var show_log_window_action = new QAction (this);
+        show_log_window_action.shortcut (QKeySequence ("F12"));
+        show_log_window_action.triggered.connect (
+            this.close
+        );
+        add_action (show_log_window_action);
 
         ConfigFile config;
         config.restore_geometry (this);

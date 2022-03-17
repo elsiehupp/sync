@@ -116,21 +116,23 @@ public class OAuth : GLib.Object {
         string peek = socket.peek (q_min (socket.bytes_available (), 4000LL)); //The code should always be within the first 4K
         if (peek.index_of ('\n') < 0)
             return; // wait until we find a \n
-        const QRegularExpression rx = new QRegularExpression ("^GET /\\?code= ([a-z_a-Z0-9]+)[& ]"); // Match a  /?code=...  URL
-        const var rx_match = rx.match (peek);
-        if (!rx_match.has_match ()) {
+        const QRegularExpression regular_expression = new QRegularExpression ("^GET /\\?code= ([a-z_a-Z0-9]+)[& ]"); // Match a  /?code=...  URL
+        const var regular_expression_match = regular_expression.match (peek);
+        if (!regular_expression_match.has_match ()) {
             http_reply_and_close (socket, "404 Not Found", "<html><head><title>404 Not Found</title></head><body><center><h1>404 Not Found</h1></center></body></html>");
             return;
         }
 
-        string code = rx_match.captured (1); // The 'code' is the first capture of the regexp
+        string code = regular_expression_match.captured (1); // The 'code' is the first capture of the regexp
 
         GLib.Uri request_token = Utility.concat_url_path (this.account.url.to_string (), "/index.php/apps/oauth2/api/v1/token");
         Soup.Request req;
         req.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
 
-        string basic_auth = string ("%1:%2").printf (
-            Theme.oauth_client_id, Theme.oauth_client_secret);
+        string basic_auth = "%1:%2".printf (
+            Theme.oauth_client_id,
+            Theme.oauth_client_secret
+        );
         req.raw_header ("Authorization", "Basic " + basic_auth.to_utf8 ().to_base64 ());
         // We just added the Authorization header, don't let HttpCredentialsAccessManager tamper with it
         req.attribute (HttpCredentials.DontAddCredentialsAttribute, true);
@@ -165,7 +167,7 @@ public class OAuth : GLib.Object {
 
         if (reply.error () != Soup.Reply.NoError || json_parse_error.error != QJsonParseError.NoError
             || json_data == "" || json == "" || refresh_token == "" || access_token == ""
-            || json["token_type"].to_string () != QLatin1String ("Bearer")) {
+            || json["token_type"].to_string () != "Bearer") {
             string error_reason;
             string error_from_json = json["error"].to_string ();
             if (!error_from_json == "") {
@@ -207,7 +209,7 @@ public class OAuth : GLib.Object {
         const string login_successfull_html = "<h1>Login Successful</h1><p>You can close this window.</p>";
         if (message_url.is_valid ()) {
             http_reply_and_close (socket, "303 See Other", login_successfull_html,
-                string ("Location: " + message_url.to_encoded ()).const_data ());
+                ("Location: " + message_url.to_encoded ()).const_data ());
         } else {
             http_reply_and_close (socket, "200 OK", login_successfull_html);
         }
@@ -257,21 +259,21 @@ public class OAuth : GLib.Object {
         QUrlQuery query;
         query.query_items ({
             {
-                QLatin1String ("response_type"),
-                QLatin1String ("code")
+                "response_type",
+                "code"
             },
             {
-                QLatin1String ("client_id"),
+                "client_id",
                 Theme.oauth_client_id
             },
             {
-                QLatin1String ("redirect_uri"),
-                QLatin1String ("http://localhost:") + string.number (this.server.server_port ())
+                "redirect_uri",
+                "http://localhost:" + this.server.server_port ().to_string ()
             }
         });
         if (!this.expected_user.is_null ())
             query.add_query_item ("user", this.expected_user);
-        GLib.Uri url = Utility.concat_url_path (this.account.url, QLatin1String ("/index.php/apps/oauth2/authorize"), query);
+        GLib.Uri url = Utility.concat_url_path (this.account.url, "/index.php/apps/oauth2/authorize", query);
         return url;
     }
 

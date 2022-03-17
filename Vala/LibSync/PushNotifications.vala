@@ -86,17 +86,37 @@ public class PushNotifications : GLib.Object {
         this.reconnect_timer_interval = 20 * 1000;
         this.is_ready = false;
         this.web_socket = new QWeb_socket ("", QWeb_socket_protocol.Version_latest, this);
-        connect (this.web_socket, QOverload<QAbstractSocket.SocketError>.of (&QWeb_socket.error), this, PushNotifications.on_signal_web_socket_error);
-        connect (this.web_socket, QWeb_socket.signal_ssl_errors, this, PushNotifications.on_signal_web_socket_ssl_errors);
-        connect (this.web_socket, QWeb_socket.connected, this, PushNotifications.on_signal_web_socket_connected);
-        connect (this.web_socket, QWeb_socket.disconnected, this, PushNotifications.on_signal_web_socket_disconnected);
-        connect (this.web_socket, QWeb_socket.pong, this, PushNotifications.on_signal_web_socket_pong_received);
-
-        connect (&this.ping_timer, QTimer.timeout, this, PushNotifications.ping_web_socket_server);
+        connect (
+            this.web_socket, QOverload<QAbstractSocket.SocketError>.of (&QWeb_socket.error),
+            this, PushNotifications.on_signal_web_socket_error
+        );
+        connect (
+            this.web_socket, QWeb_socket.signal_ssl_errors,
+            this, PushNotifications.on_signal_web_socket_ssl_errors
+        );
+        connect (
+            this.web_socket, QWeb_socket.connected,
+            this, PushNotifications.on_signal_web_socket_connected
+        );
+        connect (
+            this.web_socket, QWeb_socket.disconnected,
+            this, PushNotifications.on_signal_web_socket_disconnected
+        );
+        connect (
+            this.web_socket, QWeb_socket.pong,
+            this, PushNotifications.on_signal_web_socket_pong_received
+        );
+        connect (
+            this.ping_timer, QTimer.timeout, this,
+            PushNotifications.ping_web_socket_server
+        );
         this.ping_timer.single_shot (true);
         this.ping_timer.interval (PING_INTERVAL);
 
-        connect (&this.ping_timed_out_timer, QTimer.timeout, this, PushNotifications.on_signal_ping_timed_out);
+        connect (
+            this.ping_timed_out_timer, QTimer.timeout,
+            this, PushNotifications.on_signal_ping_timed_out
+        );
         this.ping_timed_out_timer.single_shot (true);
         this.ping_timed_out_timer.interval (PING_INTERVAL);
     }
@@ -139,7 +159,11 @@ public class PushNotifications : GLib.Object {
     private void on_signal_web_socket_connected () {
         GLib.info ("Connected to websocket for account " + this.account.url);
 
-        connect (this.web_socket, QWeb_socket.text_message_received, this, PushNotifications.on_signal_web_socket_text_message_received, Qt.UniqueConnection);
+        connect (
+            this.web_socket, QWeb_socket.text_message_received,
+            this, PushNotifications.on_signal_web_socket_text_message_received,
+            Qt.UniqueConnection
+        );
 
         authenticate_on_signal_web_socket ();
     }

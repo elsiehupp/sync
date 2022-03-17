@@ -27,23 +27,26 @@ public class SocketUploadJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public SocketUploadJob (unowned SocketApiJobV2 job) {
-        this.api_job = job;
-        connect (job, SocketApiJobV2.on_signal_finished, this, SocketUploadJob.delete_later);
+    public SocketUploadJob (SocketApiJobV2 socket_api_v2_job) {
+        this.api_job = socket_api_v2_job;
+        connect (
+            socket_api_v2_job, SocketApiJobV2.on_signal_finished,
+            this, SocketUploadJob.delete_later
+        );
 
-        this.local_path = this.api_job.arguments ()[QLatin1String ("local_path")].to_string ();
-        this.remote_path = this.api_job.arguments ()[QLatin1String ("remote_path")].to_string ();
+        this.local_path = this.api_job.arguments ()["local_path"].to_string ();
+        this.remote_path = this.api_job.arguments ()["remote_path"].to_string ();
         if (!this.remote_path.starts_with ('/')) {
             this.remote_path = '/' + this.remote_path;
         }
 
-        this.pattern = job.arguments ()[QLatin1String ("pattern")].to_string ();
+        this.pattern = socket_api_v2_job.arguments ()["pattern"].to_string ();
         // TODO: use uuid
-        const var accname = job.arguments ()[QLatin1String ("account")][QLatin1String ("name")].to_string ();
+        const var accname = socket_api_v2_job.arguments ()["account"]["name"].to_string ();
         var account = AccountManager.instance.account (accname);
 
         if (!GLib.FileInfo (this.local_path).is_absolute ()) {
-            job.failure ("Local path must be a an absolute path");
+            socket_api_v2_job.failure ("Local path must be a an absolute path");
             return;
         }
         if (!this.tmp.open ()) {

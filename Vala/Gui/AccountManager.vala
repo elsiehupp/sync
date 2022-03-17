@@ -343,9 +343,10 @@ public class AccountManager : GLib.Object {
             settings.value (AUTH_TYPE_C, auth_type);
 
             foreach (string key in settings.child_keys ()) {
-                if (!key.starts_with ("http_"))
+                if (!key.starts_with ("http_")) {
                     continue;
-                var newkey = string.from_latin1 ("webflow_").append (key.mid (5));
+                }
+                var newkey = "webflow_".append (key.mid (5));
                 settings.value (newkey, settings.value ( (key)));
                 settings.remove (key);
             }

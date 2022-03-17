@@ -421,7 +421,7 @@ public class Capabilities : GLib.Object {
     For servers >= that version, it defaults to the empty rege
     will indicate invalid characters through an upload error)
 
-    Note that it just needs to be contained. The regex [ab] is contained in "car".
+    Note that it just needs to be contained. The regular_expression [ab] is contained in "car".
     ***********************************************************/
     public string invalid_filename_regex () {
         return this.capabilities["dav"].to_map ()["invalid_filename_regex"].to_string ();

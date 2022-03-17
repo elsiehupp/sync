@@ -294,7 +294,7 @@ public class Logger : GLib.Object {
             // Expire old log files and deal with conflicts
             GLib.List<string> files = directory.entry_list (GLib.List<string> ("*owncloud.log.*"),
                 GLib.Dir.Files, GLib.Dir.Name);
-            const QRegularExpression regex = new QRegularExpression (QRegularExpression.anchored_pattern (" (.*owncloud\.log\. (\d+).*)"));
+            const QRegularExpression regular_expression = new QRegularExpression (QRegularExpression.anchored_pattern (" (.*owncloud\.log\. (\d+).*)"));
             int max_number = -1;
             foreach (string s in files) {
                 if (this.log_expire > 0) {
@@ -303,9 +303,9 @@ public class Logger : GLib.Object {
                         directory.remove (s);
                     }
                 }
-                var rx_match = regex.match (s);
-                if (s.starts_with (new_log_name) && rx_match.has_match ()) {
-                    max_number = q_max (max_number, rx_match.captured (1).to_int ());
+                var regular_expression_match = regular_expression.match (s);
+                if (s.starts_with (new_log_name) && regular_expression_match.has_match ()) {
+                    max_number = q_max (max_number, regular_expression_match.captured (1).to_int ());
                 }
             }
             new_log_name.append ("." + string.number (max_number + 1));

@@ -353,14 +353,14 @@ public class TestUnifiedSearchListmodel : GLib.Object {
     ***********************************************************/
     private void on_signal_test_search_term_results_error () {
         // make sure the model is empty
-        model.set_search_term (QStringLiteral (""));
+        model.set_search_term ("");
         GLib.assert_true (model.row_count () == 0);
 
         QSignalSpy error_string_changed = new QSignalSpy (model, &Occ.UnifiedSearchResultsListModel.error_string_changed);
         QSignalSpy search_in_progress_changed = new QSignalSpy (
             model, &Occ.UnifiedSearchResultsListModel.is_search_in_progress_changed);
 
-        model.set_search_term (model.search_term () + QStringLiteral ("[HTTP500]"));
+        model.set_search_term (model.search_term () + "[HTTP500]");
 
         GLib.assert_true (search_in_progress_changed.wait ());
 

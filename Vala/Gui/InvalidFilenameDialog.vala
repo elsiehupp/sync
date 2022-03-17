@@ -64,23 +64,14 @@ public class InvalidFilenameDialog : Gtk.Dialog {
         this.ui.explanation_label.on_signal_text (_("The following characters are not allowed on the system : * \" | & ? , ; : \\ / ~ < >"));
         this.ui.filename_line_edit.on_signal_text (file_path_file_info.filename ());
 
-        connect (
-            this.ui.button_box,
-            QDialogButtonBox.accepted,
-            this,
-            Gtk.Dialog.accept
+        this.ui.button_box.accepted.connect (
+            this.accept
         );
-        connect (
-            this.ui.button_box,
-            QDialogButtonBox.rejected,
-            this,
-            Gtk.Dialog.reject);
-
-        connect (
-            this.ui.filename_line_edit,
-            QLineEdit.text_changed,
-            this,
-            InvalidFilenameDialog.on_signal_filename_line_edit_text_changed
+        this.ui.button_box.rejected.connect (
+            this.reject
+        );
+        this.ui.filename_line_edit.text_changed.connect (
+            this.on_signal_filename_line_edit_text_changed
         );
 
         check_if_allowed_to_rename ();
@@ -92,19 +83,13 @@ public class InvalidFilenameDialog : Gtk.Dialog {
     public override void on_signal_accept () {
         this.new_filename = this.relative_file_path + this.ui.filename_line_edit.text ().trimmed ();
         const var propfind_job = new PropfindJob (this.account, GLib.Dir.clean_path (this.folder.remote_path () + this.new_filename));
-        connect (
-            propfind_job,
-            PropfindJob.result,
-            this,
-            InvalidFilenameDialog.on_signal_remote_file_already_exists
+        propfind_job.signal_result.connect (
+            this.on_signal_remote_file_already_exists
         );
-        connect (
-            propfind_job,
-            PropfindJob.signal_finished_with_error,
-            this,
-            InvalidFilenameDialog.on_signal_remote_file_does_not_exist
+        propfind_job.signal_finished_with_error.connect (
+            this.on_signal_remote_file_does_not_exist
         );
-        propfind_job.on_signal_start ();
+        propfind_job.start ();
     }
 
 
@@ -161,8 +146,15 @@ public class InvalidFilenameDialog : Gtk.Dialog {
         // File does not exist. We can rename it.
         const var remote_source = GLib.Dir.clean_path (this.folder.remote_path () + this.original_filename);
         const var remote_destionation = GLib.Dir.clean_path (this.account.dav_url ().path () + this.folder.remote_path () + this.new_filename);
-        const var move_job = new MoveJob (this.account, remote_source, remote_destionation, this);
-        connect (move_job, MoveJob.finished_signal, this, InvalidFilenameDialog.on_signal_move_job_finished);
+        const var move_job = new MoveJob (
+            this.account,
+            remote_source,
+            remote_destionation,
+            this
+        );
+        move_job.finished_signal.connect (
+            this.on_signal_move_job_finished
+        );
         move_job.on_signal_start ();
     }
 
@@ -174,7 +166,9 @@ public class InvalidFilenameDialog : Gtk.Dialog {
         propfind_job.properties ({
             "http://owncloud.org/ns:permissions"
         });
-        connect (propfind_job, PropfindJob.result, this, InvalidFilenameDialog.on_signal_propfind_permission_success);
+        propfind_job.result.connect (
+            this.on_signal_propfind_permission_success
+        );
         propfind_job.on_signal_start ();
     }
 

@@ -26,7 +26,9 @@ public class LegalNotice : Gtk.Dialog {
         this.ui = new Ui.LegalNotice ();
         this.ui.up_ui (this);
 
-        connect (this.ui.close_button, QPushButton.clicked, this, LegalNotice.accept);
+        this.ui.close_button.clicked.connect (
+            this.accept
+        );
 
         customize_style ();
     }

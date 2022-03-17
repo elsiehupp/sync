@@ -51,12 +51,18 @@ public class ServerNotificationHandler : GLib.Object {
 
         // if the previous notification job has on_signal_finished, on_signal_start next.
         this.notification_job = new JsonApiJob (this.account_state.account, NOTIFICATIONS_PATH, this);
-        connect (this.notification_job, JsonApiJob.json_received,
-            this, ServerNotificationHandler.on_signal_notifications_received);
-        connect (this.notification_job, JsonApiJob.etag_response_header_received,
-            this, ServerNotificationHandler.on_signal_etag_response_header_received);
-        connect (this.notification_job, JsonApiJob.allow_desktop_notifications_changed,
-                this, ServerNotificationHandler.on_signal_allow_desktop_notifications_changed);
+        connect (
+            this.notification_job, JsonApiJob.json_received,
+            this, ServerNotificationHandler.on_signal_notifications_received
+        );
+        connect (
+            this.notification_job, JsonApiJob.etag_response_header_received,
+            this, ServerNotificationHandler.on_signal_etag_response_header_received
+        );
+        connect (
+            this.notification_job, JsonApiJob.allow_desktop_notifications_changed,
+            this, ServerNotificationHandler.on_signal_allow_desktop_notifications_changed
+        );
         this.notification_job.property (PROPERTY_ACCOUNT_STATE, GLib.Variant.from_value<AccountState> (this.account_state));
         this.notification_job.add_raw_header ("If-None-Match", this.account_state.notifications_etag_response_header ());
         this.notification_job.on_signal_start ();

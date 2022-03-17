@@ -41,39 +41,88 @@ public class NetworkSettings : Gtk.Widget {
         this.ui.user_line_edit.enabled (true);
         this.ui.password_line_edit.enabled (true);
         this.ui.auth_widgets.enabled (this.ui.auth_requiredcheck_box.is_checked ());
-        connect (this.ui.auth_requiredcheck_box, QAbstractButton.toggled,
-            this.ui.auth_widgets, Gtk.Widget.enabled);
-
-        connect (this.ui.manual_proxy_radio_button, QAbstractButton.toggled,
-            this.ui.manual_settings, Gtk.Widget.enabled);
-        connect (this.ui.manual_proxy_radio_button, QAbstractButton.toggled,
-            this.ui.type_combo_box, Gtk.Widget.enabled);
-        connect (this.ui.manual_proxy_radio_button, QAbstractButton.toggled,
-            this, NetworkSettings.on_signal_check_account_localhost);
+        this.ui.auth_requiredcheck_box.toggled.connect (
+            this.ui.auth_widgets.enabled
+        );
+        this.ui.manual_proxy_radio_button.toggled.connect (
+            this.ui.manual_settings.enabled
+        );
+        this.ui.manual_proxy_radio_button.toggled.connect (
+            this.ui.type_combo_box.enabled
+        );
+        this.ui.manual_proxy_radio_button.toggled.connect (
+            this.on_signal_check_account_localhost
+        );
 
         load_proxy_settings ();
         load_bandwidth_limit_settings ();
 
         // proxy
-        connect (this.ui.type_combo_box, (CurrentIndexChanged) QComboBox.current_index_changed, this, NetworkSettings.on_signal_save_proxy_settings);
-        connect (this.ui.proxy_button_group, (ProxyButtonGroupClicked) QButtonGroup.button_clicked, this, NetworkSettings.on_signal_save_proxy_settings);
-        connect (this.ui.host_line_edit, QLineEdit.editing_finished, this, NetworkSettings.on_signal_save_proxy_settings);
-        connect (this.ui.user_line_edit, QLineEdit.editing_finished, this, NetworkSettings.on_signal_save_proxy_settings);
-        connect (this.ui.password_line_edit, QLineEdit.editing_finished, this, NetworkSettings.on_signal_save_proxy_settings);
-        connect (this.ui.port_spin_box, QAbstract_spin_box.editing_finished, this, NetworkSettings.on_signal_save_proxy_settings);
-        connect (this.ui.auth_requiredcheck_box, QAbstractButton.toggled, this, NetworkSettings.on_signal_save_proxy_settings);
+        connect (
+            this.ui.type_combo_box, (CurrentIndexChanged) QComboBox.current_index_changed,
+            this, NetworkSettings.on_signal_save_proxy_settings);
+        connect (
+            this.ui.proxy_button_group, (ProxyButtonGroupClicked) QButtonGroup.button_clicked,
+            this, NetworkSettings.on_signal_save_proxy_settings);
+        connect (
+            this.ui.host_line_edit, QLineEdit.editing_finished,
+            this, NetworkSettings.on_signal_save_proxy_settings);
+        connect (
+            this.ui.user_line_edit, QLineEdit.editing_finished,
+            this, NetworkSettings.on_signal_save_proxy_settings
+        );
+        connect (
+            this.ui.password_line_edit, QLineEdit.editing_finished,
+            this, NetworkSettings.on_signal_save_proxy_settings
+        );
+        connect (
+            this.ui.port_spin_box, QAbstract_spin_box.editing_finished,
+            this, NetworkSettings.on_signal_save_proxy_settings
+        );
+        connect (
+            this.ui.auth_requiredcheck_box, QAbstractButton.toggled,
+            this, NetworkSettings.on_signal_save_proxy_settings
+        );
 
-        connect (this.ui.upload_limit_radio_button, QAbstractButton.clicked, this, NetworkSettings.on_signal_save_bandwidth_limit_settings);
-        connect (this.ui.no_upload_limit_radio_button, QAbstractButton.clicked, this, NetworkSettings.on_signal_save_bandwidth_limit_settings);
-        connect (this.ui.auto_upload_limit_radio_button, QAbstractButton.clicked, this, NetworkSettings.on_signal_save_bandwidth_limit_settings);
-        connect (this.ui.download_limit_radio_button, QAbstractButton.clicked, this, NetworkSettings.on_signal_save_bandwidth_limit_settings);
-        connect (this.ui.no_download_limit_radio_button, QAbstractButton.clicked, this, NetworkSettings.on_signal_save_bandwidth_limit_settings);
-        connect (this.ui.auto_download_limit_radio_button, QAbstractButton.clicked, this, NetworkSettings.on_signal_save_bandwidth_limit_settings);
-        connect (this.ui.download_spin_box, (DownloadSpinBoxValueChanged) QSpinBox.value_changed, this, NetworkSettings.on_signal_save_bandwidth_limit_settings);
-        connect (this.ui.upload_spin_box, (UploadSpinBoxValueChanged) QSpinBox.value_changed, this, NetworkSettings.on_signal_save_bandwidth_limit_settings);
+        // Limits
+        connect (
+            this.ui.upload_limit_radio_button, QAbstractButton.clicked,
+            this, NetworkSettings.on_signal_save_bandwidth_limit_settings
+        );
+        connect (
+            this.ui.no_upload_limit_radio_button, QAbstractButton.clicked,
+            this, NetworkSettings.on_signal_save_bandwidth_limit_settings
+        );
+        connect (
+            this.ui.auto_upload_limit_radio_button, QAbstractButton.clicked,
+            this, NetworkSettings.on_signal_save_bandwidth_limit_settings
+        );
+        connect (
+            this.ui.download_limit_radio_button, QAbstractButton.clicked,
+            this, NetworkSettings.on_signal_save_bandwidth_limit_settings
+        );
+        connect (
+            this.ui.no_download_limit_radio_button, QAbstractButton.clicked,
+            this, NetworkSettings.on_signal_save_bandwidth_limit_settings
+        );
+        connect (
+            this.ui.auto_download_limit_radio_button, QAbstractButton.clicked,
+            this, NetworkSettings.on_signal_save_bandwidth_limit_settings
+        );
+        connect (
+            this.ui.download_spin_box, (DownloadSpinBoxValueChanged) QSpinBox.value_changed,
+            this, NetworkSettings.on_signal_save_bandwidth_limit_settings
+        );
+        connect (
+            this.ui.upload_spin_box, (UploadSpinBoxValueChanged) QSpinBox.value_changed,
+            this, NetworkSettings.on_signal_save_bandwidth_limit_settings
+        );
 
         // Warn about empty proxy host
-        connect (this.ui.host_line_edit, QLineEdit.text_changed, this, NetworkSettings.on_signal_check_empty_proxy_host);
+        connect (
+            this.ui.host_line_edit, QLineEdit.text_changed,
+            this, NetworkSettings.on_signal_check_empty_proxy_host
+        );
         on_signal_check_empty_proxy_host ();
         on_signal_check_account_localhost ();
     }

@@ -27,7 +27,7 @@ public class KMessageWidgetPrivate {
 
     /***********************************************************
     ***********************************************************/
-    public KMessageWidget q;
+    public KMessageWidget widget;
     public Gdk.Frame content = null;
     public Gtk.Label icon_label = null;
     public Gtk.Label text_label = null;
@@ -46,16 +46,20 @@ public class KMessageWidgetPrivate {
     /***********************************************************
     ***********************************************************/
     public void on_init (KMessageWidget widget) {
-        q = widget;
-
-        q.set_size_policy (QSizePolicy.Minimum, QSizePolicy.Fixed);
+        widget.set_size_policy (QSizePolicy.Minimum, QSizePolicy.Fixed);
 
         // Note: when changing the value 500, also update KMessageWidgetTest
-        time_line = new QTimeLine (500, q);
-        GLib.Object.connect (time_line, SIGNAL (value_changed (double)), q, SLOT (on_time_line_changed (double)));
-        GLib.Object.connect (time_line, SIGNAL (on_finished ()), q, SLOT (on_time_line_finished ()));
+        time_line = new QTimeLine (500, widget);
+        connect (
+            time_line, value_changed (double),
+            widget, on_time_line_changed (double)
+        );
+        connect (
+            time_line, finished (),
+            widget, on_time_line_finished ()
+        );
 
-        content = new Gdk.Frame (q);
+        content = new Gdk.Frame (widget);
         content.set_object_name ("content_widget");
         content.set_size_policy (QSizePolicy.Expanding, QSizePolicy.Fixed);
 
@@ -68,21 +72,30 @@ public class KMessageWidgetPrivate {
         text_label = new Gtk.Label (content);
         text_label.set_size_policy (QSizePolicy.Expanding, QSizePolicy.Fixed);
         text_label.set_text_interaction_flags (Qt.TextBrowserInteraction);
-        GLib.Object.connect (text_label, &Gtk.Label.link_activated, q, &KMessageWidget.link_activated);
-        GLib.Object.connect (text_label, &Gtk.Label.link_hovered, q, &KMessageWidget.link_hovered);
+        connect (
+            text_label, Gtk.Label.link_activated,
+            widget, KMessageWidget.link_activated
+        );
+        connect (
+            text_label, Gtk.Label.link_hovered,
+            widget, KMessageWidget.link_hovered
+        );
 
-        var close_action = new QAction (q);
+        var close_action = new QAction (widget);
         close_action.on_set_text (KMessageWidget._("&Close"));
         close_action.set_tool_tip (KMessageWidget._("Close message"));
         close_action.on_signal_set_icon (Gtk.Icon (":/client/theme/close.svg")); // ivan : NC customization
 
-        GLib.Object.connect (close_action, &QAction.triggered, q, &KMessageWidget.on_signal_animated_hide);
+        connect (
+            close_action, QAction.triggered,
+            widget, KMessageWidget.on_signal_animated_hide
+        );
 
         close_button = new QToolButton (content);
         close_button.set_auto_raise (true);
         close_button.set_default_action (close_action);
 
-        q.on_signal_set_message_type (KMessageWidget.Information);
+        widget.on_signal_set_message_type (KMessageWidget.Information);
     }
 
 
@@ -91,12 +104,12 @@ public class KMessageWidgetPrivate {
     public void create_layout () {
         delete content.layout ();
 
-        content.resize (q.size ());
+        content.resize (widget.size ());
 
         q_delete_all (buttons);
         buttons.clear ();
 
-        foreach (QAction action in q.actions ()) {
+        foreach (QAction action in widget.actions ()) {
             var button = new QToolButton (content);
             button.set_default_action (action);
             button.set_tool_button_style (Qt.ToolButtonTextBesideIcon);
@@ -143,10 +156,10 @@ public class KMessageWidgetPrivate {
             layout.add_widget (close_button);
         }
 
-        if (q.is_visible ()) {
-            q.set_fixed_height (content.size_hint ().height ());
+        if (widget.is_visible ()) {
+            widget.set_fixed_height (content.size_hint ().height ());
         }
-        q.update_geometry ();
+        widget.update_geometry ();
     }
 
 
@@ -193,7 +206,7 @@ public class KMessageWidgetPrivate {
             + "border-radius : 4px;"
             + "border: 2px solid %2;".printf (border.name ())
             // DefaultFrameWidth returns the size of the external margin + border width. We know our border is 1px, so we subtract this from the frame normal QStyle FrameWidth to get our margin
-            + "margin: %3px;".printf (q.style ().pixel_metric (QStyle.PM_DefaultFrameWidth, null, q) - 1)
+            + "margin: %3px;".printf (widget.style ().pixel_metric (QStyle.PM_DefaultFrameWidth, null, widget) - 1)
             + "}"
             + ".Gtk.Label { color : %4; }".printf (text_color.name ())
         );
@@ -216,8 +229,8 @@ public class KMessageWidgetPrivate {
         // window layouts to be activated. Calling this method from resize_event ()
         // can lead to infinite recursion, see:
         // https://bugs.kde.org/show_bug.cgi?id=311336
-        content_snap_shot = Gdk.Pixbuf (content.size () * q.device_pixel_ratio ());
-        content_snap_shot.set_device_pixel_ratio (q.device_pixel_ratio ());
+        content_snap_shot = Gdk.Pixbuf (content.size () * widget.device_pixel_ratio ());
+        content_snap_shot.set_device_pixel_ratio (widget.device_pixel_ratio ());
         content_snap_shot.fill (Qt.transparent);
         content.render (&content_snap_shot, QPoint (), QRegion (), Gtk.Widget.DrawChildren);
     }
@@ -226,8 +239,8 @@ public class KMessageWidgetPrivate {
     /***********************************************************
     ***********************************************************/
     public void on_time_line_changed (double value) {
-        q.set_fixed_height (q_min (q_round (value * 2.0), 1) * content.height ());
-        q.update ();
+        widget.set_fixed_height (q_min (q_round (value * 2.0), 1) * content.height ());
+        widget.update ();
     }
 
 
@@ -238,14 +251,14 @@ public class KMessageWidgetPrivate {
             // Show
             // We set the whole geometry here, because it may be wrong if a
             // KMessageWidget is shown right when the toplevel window is created.
-            content.set_geometry (0, 0, q.width (), best_content_height ());
+            content.set_geometry (0, 0, widget.width (), best_content_height ());
 
             // notify about on_finished animation
-            /* emit */ q.show_animation_finished ();
+            /* emit */ widget.show_animation_finished ();
         } else {
             // hide and notify about on_finished animation
-            q.hide ();
-            /* emit */ q.hide_animation_finished ();
+            widget.hide ();
+            /* emit */ widget.hide_animation_finished ();
         }
     }
 
@@ -253,7 +266,7 @@ public class KMessageWidgetPrivate {
     /***********************************************************
     ***********************************************************/
     public int best_content_height () {
-        int height = content.height_for_width (q.width ());
+        int height = content.height_for_width (widget.width ());
         if (height == -1) {
             height = content.size_hint ().height ();
         }

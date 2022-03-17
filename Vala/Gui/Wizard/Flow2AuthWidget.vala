@@ -35,8 +35,14 @@ public class Flow2AuthWidget : Gtk.Widget {
         WizardCommon.initErrorLabel (this.ui.error_label);
         this.ui.error_label.setTextFormat (Qt.RichText);
 
-        connect (this.ui.open_link_label, LinkLabel.clicked, this, Flow2AuthWidget.on_signal_open_browser);
-        connect (this.ui.copy_link_label, LinkLabel.clicked, this, Flow2AuthWidget.on_signal_copy_link_to_clipboard);
+        connect (
+            this.ui.open_link_label, LinkLabel.clicked,
+            this, Flow2AuthWidget.on_signal_open_browser
+        );
+        connect (
+            this.ui.copy_link_label, LinkLabel.clicked,
+            this, Flow2AuthWidget.on_signal_copy_link_to_clipboard
+        );
 
         var size_policy = this.progress_indicator.size_policy ();
         size_policy.retain_size_when_hidden (true);
@@ -69,9 +75,19 @@ public class Flow2AuthWidget : Gtk.Widget {
             this.account = account;
 
             this.async_auth.reset (new Flow2Auth (this.account, this));
-            connect (this.async_auth, Flow2Auth.result, this, Flow2AuthWidget.slotAuthResult, Qt.QueuedConnection);
-            connect (this.async_auth, Flow2Auth.status_changed, this, Flow2AuthWidget.slotStatusChanged);
-            connect (this, Flow2AuthWidget.poll_now, this.async_auth, Flow2Auth.slotPollNow);
+            connect (
+                this.async_auth, Flow2Auth.result,
+                this, Flow2AuthWidget.slotAuthResult,
+                Qt.QueuedConnection
+            );
+            connect (
+                this.async_auth, Flow2Auth.status_changed,
+                this, Flow2AuthWidget.slotStatusChanged
+            );
+            connect (
+                this, Flow2AuthWidget.poll_now,
+                this.async_auth, Flow2Auth.slotPollNow
+            );
             this.async_auth.start ();
         }
     }
@@ -138,7 +154,7 @@ public class Flow2AuthWidget : Gtk.Widget {
                 this.status_update_skip_count--;
                 break;
             }
-            this.ui.status_label.setext (_("Waiting for authorization") + string ("… (%1)").printf (secondsLeft));
+            this.ui.status_label.setext (_("Waiting for authorization") + "… (%1)".printf (secondsLeft));
             stop_spinner (true);
             break;
         case Flow2Auth.statusPollNow:

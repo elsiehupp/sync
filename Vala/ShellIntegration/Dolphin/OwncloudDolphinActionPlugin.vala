@@ -63,7 +63,7 @@ public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
             on_signal_helper_commad_received
         );
         QTimer.singleShot (100, loop, SLOT (quit ())); // add a timeout to be sure we don't freeze dolphin
-        helper.send_command (string ("GET_MENU_ITEMS:" + files + "\n"));
+        helper.send_command ("GET_MENU_ITEMS:" + files + "\n");
         loop.exec (QEventLoop.ExcludeUserInputEvents);
         disconnect (con);
         if (menu.actions ().isEmpty ()) {
@@ -160,7 +160,7 @@ public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
 
 
     private static void on_signal_copy_private_link_action_triggered (string local_file, OwncloudDolphinPluginHelper helper) {
-        helper.send_command (string ("COPY_PRIVATE_LINK:" + local_file.toUtf8 () + "\n"));
+        helper.send_command ("COPY_PRIVATE_LINK:" + local_file.toUtf8 () + "\n");
     }
 
 

@@ -45,7 +45,9 @@ public class NavigationPaneHelper : GLib.Object {
         this.show_in_explorer_navigation_pane = config.show_in_explorer_navigation_pane ();
 
         this.update_cloud_storage_registry_timer.single_shot (true);
-        connect (this.update_cloud_storage_registry_timer, QTimer.timeout, this, NavigationPaneHelper.update_cloud_storage_registry);
+        this.update_cloud_storage_registry_timer.timeout.connect (
+            this.on_signal_update_cloud_storage_registry_timer_timeout
+        );
 
         // Ensure that the folder integration stays persistent in Explorer,
         // the uninstaller removes the folder upon updating the client.
@@ -61,6 +63,11 @@ public class NavigationPaneHelper : GLib.Object {
         if (!this.update_cloud_storage_registry_timer.is_active ()) {
             this.update_cloud_storage_registry_timer.on_signal_start (500);
         }
+    }
+
+
+    private void on_signal_update_cloud_storage_registry_timer_timeout () {
+        update_cloud_storage_registry ();
     }
 
 

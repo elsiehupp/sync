@@ -157,7 +157,7 @@ public class HttpCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     public string signal_auth_type () {
-        return string.from_latin1 ("http");
+        return "http";
     }
 
 

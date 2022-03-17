@@ -123,7 +123,7 @@ public class CloudProviderWrapper : GLib.Object {
         this.folder = folder;
         GMenuModel model;
         GActionGroup action_group;
-        string account_name = string ("Folder/%1").printf (folder_identifier);
+        string account_name = "Folder/%1".printf (folder_identifier);
 
         this.cloud_provider = CLOUD_PROVIDERS_PROVIDER_EXPORTER (cloudprovider);
         this.cloud_provider_account = cloud_providers_account_exporter_new (this.cloud_provider, account_name.to_utf8 ());
@@ -245,7 +245,7 @@ public class CloudProviderWrapper : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void update_status_text (string status_text) {
-        string status = string ("%1 - %2").printf (this.folder.account_state ().state_string (this.folder.account_state ().state ()), status_text);
+        string status = "%1 - %2".printf (this.folder.account_state ().state_string (this.folder.account_state ().state ()), status_text);
         cloud_providers_account_exporter_status_details (this.cloud_provider_account, status.to_utf8 ());
     }
 
@@ -303,7 +303,7 @@ public class CloudProviderWrapper : GLib.Object {
                         this.recently_changed.remove_first ();
                     this.recently_changed.append (q_make_pair (action_text, full_path));
                 } else {
-                    this.recently_changed.append (q_make_pair (action_text, string ("")));
+                    this.recently_changed.append (q_make_pair (action_text, ""));
                 }
             }
 
@@ -441,7 +441,7 @@ public class CloudProviderWrapper : GLib.Object {
         if (g_str_equal (name, "showfile")) {
             const gchar path = g_variant_get_string (parameter, null);
             g_print ("showfile => %s\n", path);
-            show_in_file_manager (string (path));
+            show_in_file_manager (path);
         }
 
         if (g_str_equal (name, "log_out")) {

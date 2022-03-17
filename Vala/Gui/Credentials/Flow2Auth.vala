@@ -89,7 +89,10 @@ public class Flow2Auth : GLib.Object {
         this.is_busy = false;
         this.has_token = false;
         this.poll_timer.interval (1000);
-        connect (this.poll_timer, QTimer.timeout, this, Flow2Auth.on_signal_poll_timer_timeout);
+        connect (
+            this.poll_timer, QTimer.timeout,
+            this, Flow2Auth.on_signal_poll_timer_timeout
+        );
     }
 
 

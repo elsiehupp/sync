@@ -118,7 +118,10 @@ public class SettingsDialog : Gtk.Dialog {
         // People perceive this as a Window, so also make Ctrl+W work
         var close_window_action = new QAction (this);
         close_window_action.shortcut (QKeySequence ("Ctrl+W"));
-        connect (close_window_action, QAction.triggered, this, SettingsDialog.accept);
+        connect (
+            close_window_action, QAction.triggered,
+            this, SettingsDialog.accept
+        );
         add_action (close_window_action);
 
         object_name ("Settings"); // required as group for save_geometry call
@@ -126,14 +129,21 @@ public class SettingsDialog : Gtk.Dialog {
         // : This name refers to the application name e.g Nextcloud
         window_title (_("%1 Settings").printf (Theme.app_name_gui));
 
-        connect (AccountManager.instance, AccountManager.signal_account_added,
-            this, SettingsDialog.signal_account_added);
-        connect (AccountManager.instance, AccountManager.on_signal_account_removed,
-            this, SettingsDialog.on_signal_account_removed);
+        connect (
+            AccountManager.instance, AccountManager.signal_account_added,
+            this, SettingsDialog.signal_account_added
+        );
+        connect (
+            AccountManager.instance, AccountManager.on_signal_account_removed,
+            this, SettingsDialog.on_signal_account_removed
+        );
 
         this.action_group = new QAction_group (this);
         this.action_group.exclusive (true);
-        connect (this.action_group, QAction_group.triggered, this, SettingsDialog.on_signal_switch_page);
+        connect (
+            this.action_group, QAction_group.triggered,
+            this, SettingsDialog.on_signal_switch_page
+        );
 
         // Adds space between users + activities and general + network actions
         var spacer = new Gtk.Widget ();
@@ -148,7 +158,10 @@ public class SettingsDialog : Gtk.Dialog {
         this.ui.stack.add_widget (general_settings);
 
         // Connect signal_style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
-        connect (this, SettingsDialog.signal_style_changed, general_settings, GeneralSettings.on_signal_style_changed);
+        connect (
+            this, SettingsDialog.signal_style_changed,
+            general_settings, GeneralSettings.on_signal_style_changed
+        );
 
         QAction network_action = create_color_aware_action (":/client/theme/network.svg", _("Network"));
         this.action_group.add_action (network_action);
@@ -167,15 +180,24 @@ public class SettingsDialog : Gtk.Dialog {
 
         var show_log_window = new QAction (this);
         show_log_window.shortcut (QKeySequence ("F12"));
-        connect (show_log_window, QAction.triggered, gui, OwncloudGui.on_signal_toggle_log_browser);
+        connect (
+            show_log_window, QAction.triggered,
+            gui, OwncloudGui.on_signal_toggle_log_browser
+        );
         add_action (show_log_window);
 
         var show_log_window2 = new QAction (this);
         show_log_window2.shortcut (QKeySequence (Qt.CTRL + Qt.Key_L));
-        connect (show_log_window2, QAction.triggered, gui, OwncloudGui.on_signal_toggle_log_browser);
+        connect (
+            show_log_window2, QAction.triggered, gui,
+            OwncloudGui.on_signal_toggle_log_browser
+        );
         add_action (show_log_window2);
 
-        connect (this, SettingsDialog.on_signal_activate, gui, OwncloudGui.on_signal_settings_dialog_activated);
+        connect (
+            this, SettingsDialog.on_signal_activate,
+            gui, OwncloudGui.on_signal_settings_dialog_activated
+        );
 
         customize_style ();
 
@@ -332,15 +354,32 @@ public class SettingsDialog : Gtk.Dialog {
         this.action_for_account.insert (s.account, account_action);
         account_action.trigger ();
 
-        connect (account_settings, AccountSettings.signal_folder_changed, this.gui, OwncloudGui.on_signal_folders_changed);
-        connect (account_settings, AccountSettings.signal_open_folder_alias,
-            this.gui, OwncloudGui.on_signal_folder_open_action);
-        connect (account_settings, AccountSettings.on_signal_show_issues_list, this, SettingsDialog.on_signal_show_issues_list);
-        connect (s.account, Account.account_changed_avatar, this, SettingsDialog.on_signal_account_avatar_changed);
-        connect (s.account, Account.account_changed_display_name, this, SettingsDialog.on_signal_account_display_name_changed);
+        connect (
+            account_settings, AccountSettings.signal_folder_changed,
+            this.gui, OwncloudGui.on_signal_folders_changed
+        );
+        connect (
+            account_settings, AccountSettings.signal_open_folder_alias,
+            this.gui, OwncloudGui.on_signal_folder_open_action
+        );
+        connect (
+            account_settings, AccountSettings.on_signal_show_issues_list,
+            this, SettingsDialog.on_signal_show_issues_list
+        );
+        connect (
+            s.account, Account.account_changed_avatar,
+            this, SettingsDialog.on_signal_account_avatar_changed
+        );
+        connect (
+            s.account, Account.account_changed_display_name,
+            this, SettingsDialog.on_signal_account_display_name_changed
+        );
 
         // Connect signal_style_changed event, to adapt (Dark-/Light-Mode switching)
-        connect (this, SettingsDialog.signal_style_changed, account_settings, AccountSettings.on_signal_style_changed);
+        connect (
+            this, SettingsDialog.signal_style_changed,
+            account_settings, AccountSettings.on_signal_style_changed
+        );
     }
 
 

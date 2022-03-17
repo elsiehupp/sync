@@ -73,7 +73,7 @@ public class IconUtils {
 
         if (icon_base_colors.contains (custom_color_name)) {
             result = new Gtk.Image (
-                string (Occ.Theme.THEME_PREFIX) + custom_color_name + "/" + filename
+                Occ.Theme.THEME_PREFIX + custom_color_name + "/" + filename
             );
             if (!result.is_null ()) {
                 return result;

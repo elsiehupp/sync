@@ -66,7 +66,10 @@ public class PropagateRemoteMkdir : PropagateItemJob {
         this.job = new DeleteJob (propagator ().account,
             propagator ().full_remote_path (this.item.file),
             this);
-        connect (qobject_cast<DeleteJob> (this.job), DeleteJob.signal_finished, this, PropagateRemoteMkdir.on_signal_mkdir);
+        connect (
+            qobject_cast<DeleteJob> (this.job), DeleteJob.signal_finished,
+            this, PropagateRemoteMkdir.on_signal_mkdir
+        );
         this.job.start ();
     }
 
@@ -333,9 +336,12 @@ public class PropagateRemoteMkdir : PropagateItemJob {
             // We're expecting directory path in /Foo/Bar convention...
             GLib.assert (job_path.starts_with ("/") && !job_path.has_suffix ("/"));
             // But encryption job expect it in Foo/Bar/ convention
-            var job = new Occ.EncryptFolderJob (propagator ().account, propagator ().journal, job_path.mid (1), this.item.file_id, this);
-            connect (job, Occ.EncryptFolderJob.on_signal_finished, this, PropagateRemoteMkdir.on_signal_encrypt_folder_finished);
-            job.start ();
+            var encrypt_folder_job = new Occ.EncryptFolderJob (propagator ().account, propagator ().journal, job_path.mid (1), this.item.file_id, this);
+            connect (
+                encrypt_folder_job, Occ.EncryptFolderJob.on_signal_finished,
+                this, PropagateRemoteMkdir.on_signal_encrypt_folder_finished
+            );
+            encrypt_folder_job.start ();
         }
     }
 

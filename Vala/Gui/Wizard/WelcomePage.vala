@@ -93,18 +93,27 @@ public class WelcomePage : QWizardPage {
         this.ui.slide_show.add_slide (wizard_groupware_icon_filename, _("Easy-to-use web mail, calendaring & contacts"));
         this.ui.slide_show.add_slide (wizard_talk_icon_filename, _("Screensharing, online meetings & web conferences"));
 
-        const var is_dark_background = Theme.is_dark_color (background_color);
-        this.ui.slide_show_next_button.icon (theme.ui_theme_icon (string ("control-next.svg"), is_dark_background));
-        this.ui.slide_show_previous_button.icon (theme.ui_theme_icon (string ("control-prev.svg"), is_dark_background));
+        const bool is_dark_background = Theme.is_dark_color (background_color);
+        this.ui.slide_show_next_button.icon (theme.ui_theme_icon ("control-next.svg", is_dark_background));
+        this.ui.slide_show_previous_button.icon (theme.ui_theme_icon ("control-prev.svg", is_dark_background));
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void set_up_slide_show () {
-        connect (this.ui.slide_show, SlideShow.clicked, this.ui.slide_show, SlideShow.on_signal_stop_show);
-        connect (this.ui.slide_show_next_button, QPushButton.clicked, this.ui.slide_show, SlideShow.on_signal_next_slide);
-        connect (this.ui.slide_show_previous_button, QPushButton.clicked, this.ui.slide_show, SlideShow.on_signal_prev_slide);
+        connect (
+            this.ui.slide_show, SlideShow.clicked,
+            this.ui.slide_show, SlideShow.on_signal_stop_show
+        );
+        connect (
+            this.ui.slide_show_next_button, QPushButton.clicked,
+            this.ui.slide_show, SlideShow.on_signal_next_slide
+        );
+        connect (
+            this.ui.slide_show_previous_button, QPushButton.clicked,
+            this.ui.slide_show, SlideShow.on_signal_prev_slide
+        );
     }
 
 

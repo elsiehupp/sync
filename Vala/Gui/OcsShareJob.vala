@@ -49,7 +49,7 @@ public class OcsShareJob : OcsJob {
             this,
             OcsJob.signal_job_finished,
             this,
-            OcsShareJob.on_signal_job_done);
+            OcsShareJob.on_signal_job_finished);
     }
 
 
@@ -61,8 +61,8 @@ public class OcsShareJob : OcsJob {
     public void on_signal_get_shares (string path = "") {
         verb ("GET");
 
-        add_param (string.from_latin1 ("path"), path);
-        add_param (string.from_latin1 ("reshares"), string ("true"));
+        add_param ("path", path);
+        add_param ("reshares", "true");
         add_pass_status_code (404);
 
         on_signal_start ();
@@ -91,9 +91,9 @@ public class OcsShareJob : OcsJob {
         verb ("PUT");
 
         if (date.is_valid ()) {
-            add_param (string.from_latin1 ("expire_date"), date.to_string ("yyyy-MM-dd"));
+            add_param ("expire_date", date.to_string ("yyyy-MM-dd"));
         } else {
-            add_param (string.from_latin1 ("expire_date"), "");
+            add_param ("expire_date", "");
         }
         this.value = date;
 
@@ -128,7 +128,7 @@ public class OcsShareJob : OcsJob {
         append_path (share_id);
         verb ("PUT");
 
-        add_param (string.from_latin1 ("password"), password);
+        add_param ("password", password);
         this.value = password;
 
         on_signal_start ();
@@ -209,14 +209,14 @@ public class OcsShareJob : OcsJob {
         string password) {
         verb ("POST");
 
-        add_param (string.from_latin1 ("path"), path);
-        add_param (string.from_latin1 ("share_type"), string.number (Share.Type.LINK));
+        add_param ("path", path);
+        add_param ("share_type", string.number (Share.Type.LINK));
 
         if (!name == "") {
-            add_param (string.from_latin1 ("name"), name);
+            add_param ("name", name);
         }
         if (!password == "") {
-            add_param (string.from_latin1 ("password"), password);
+            add_param ("password", password);
         }
 
         add_pass_status_code (403);
@@ -267,7 +267,7 @@ public class OcsShareJob : OcsJob {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_job_done (QJsonDocument reply) {
+    private void on_signal_job_finished (QJsonDocument reply) {
         /* emit */ share_job_finished (reply, this.value);
     }
 

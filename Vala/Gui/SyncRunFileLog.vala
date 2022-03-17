@@ -57,13 +57,16 @@ public class SyncRunFileLog : GLib.Object {
             if (string.compare (folder_path,line,Qt.CaseSensitive)!=0) {
                 depth_index++;
                 if (depth_index <= length) {
-                    filename_single = folder_path.split ("/").at (length - depth_index) + string ("this.") ///
-                            + filename_single;
-                    filename = logpath + "/" + filename_single + "this.sync.log";
+                    filename_single
+                        = folder_path.split ("/").at (length - depth_index)
+                        + "_"
+                        + filename_single;
+                    filename
+                        = logpath + "/" + filename_single + "_sync.log";
                 }
                 else {
-                    filename_single = filename_single + "this.1";
-                    filename = logpath + "/" + filename_single + "this.sync.log";
+                    filename_single = filename_single + "_1";
+                    filename = logpath + "/" + filename_single + "_sync.log";
                 }
             }
             else break;
@@ -108,12 +111,12 @@ public class SyncRunFileLog : GLib.Object {
             || item.instruction == SyncInstructions.IGNORE) {
             return;
         }
-        string ts = string.from_latin1 (item.response_time_stamp);
+        string ts = item.response_time_stamp;
         if (ts.length () > 6) {
-            const QRegularExpression rx = new QRegularExpression (" ( (\d\d:\d\d:\d\d))");
-            const var rx_match = rx.match (ts);
-            if (rx_match.has_match ()) {
-                ts = rx_match.captured (0);
+            const QRegularExpression regular_expression = new QRegularExpression (" ( (\d\d:\d\d:\d\d))");
+            const var regular_expression_match = regular_expression.match (ts);
+            if (regular_expression_match.has_match ()) {
+                ts = regular_expression_match.captured (0);
             }
         }
 

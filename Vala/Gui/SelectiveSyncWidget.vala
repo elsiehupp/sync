@@ -57,10 +57,14 @@ public class SelectiveSyncWidget : Gtk.Widget {
 
         layout.add_widget (this.folder_tree);
 
-        connect (this.folder_tree, QTreeWidget.item_expanded,
-            this, SelectiveSyncWidget.on_signal_item_expanded);
-        connect (this.folder_tree, QTreeWidget.item_changed,
-            this, SelectiveSyncWidget.on_signal_item_changed);
+        connect (
+            this.folder_tree, QTreeWidget.item_expanded,
+            this, SelectiveSyncWidget.on_signal_item_expanded
+        );
+        connect (
+            this.folder_tree, QTreeWidget.item_changed,
+            this, SelectiveSyncWidget.on_signal_item_changed
+        );
         this.folder_tree.sorting_enabled (true);
         this.folder_tree.sort_by_column (0, Qt.AscendingOrder);
         this.folder_tree.column_count (2);
@@ -184,7 +188,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_update_directories (string[] list) {
-        var job = qobject_cast<LsColJob> (sender ());
+        var ls_col_job = qobject_cast<LsColJob> (sender ());
         QScopedValueRollback<bool> is_inserting (this.inserting);
         this.inserting = true;
 
@@ -234,7 +238,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
             root.icon (0, Theme.application_icon);
             root.data (0, Qt.USER_ROLE, "");
             root.check_state (0, Qt.Checked);
-            int64 size = job ? job.folder_infos[path_to_remove].size : -1;
+            int64 size = ls_col_job ? ls_col_job.folder_infos[path_to_remove].size : -1;
             if (size >= 0) {
                 root.on_signal_text (1, Utility.octets_to_string (size));
                 root.data (1, Qt.USER_ROLE, size);
@@ -243,7 +247,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
 
         Utility.sort_filenames (list);
         foreach (string path, list) {
-            var size = job ? job.folder_infos[path].size : 0;
+            var size = ls_col_job ? ls_col_job.folder_infos[path].size : 0;
             path.remove (path_to_remove);
 
             // Don't allow to select subfolders of encrypted subfolders
@@ -288,12 +292,18 @@ public class SelectiveSyncWidget : Gtk.Widget {
         if (!this.folder_path == "") {
             prefix = this.folder_path + '/';
         }
-        var job = new LsColJob (this.account, prefix + directory, this);
-        job.properties (GLib.List<string> ("resourcetype"
-                                               + "http://owncloud.org/ns:size");
-        connect (job, LsColJob.signal_directory_listing_subfolders,
-            this, SelectiveSyncWidget.on_signal_update_directories);
-        job.on_signal_start ();
+        var ls_col_job = new LsColJob (this.account, prefix + directory, this);
+        ls_col_job.properties (
+            {
+                "resourcetype",
+                "http://owncloud.org/ns:size"
+            }
+        );
+        connect (
+            ls_col_job, LsColJob.signal_directory_listing_subfolders,
+            this, SelectiveSyncWidget.on_signal_update_directories
+        );
+        ls_col_job.on_signal_start ();
     }
 
 
@@ -389,20 +399,26 @@ public class SelectiveSyncWidget : Gtk.Widget {
     private void refresh_folders () {
         this.encrypted_paths.clear ();
 
-        var job = new LsColJob (this.account, this.folder_path, this);
+        var ls_col_job = new LsColJob (this.account, this.folder_path, this);
         var props = GLib.List<string> ("resourcetype"
                                          + "http://owncloud.org/ns:size";
         if (this.account.capabilities ().client_side_encryption_available ()) {
             props + "http://nextcloud.org/ns:is-encrypted";
         }
-        job.properties (props);
-        connect (job, LsColJob.signal_directory_listing_subfolders,
-            this, SelectiveSyncWidget.on_signal_update_directories);
-        connect (job, LsColJob.signal_finished_with_error,
-            this, SelectiveSyncWidget.on_signal_lscol_finished_with_error);
-        connect (job, LsColJob.signal_directory_listing_iterated,
-            this, SelectiveSyncWidget.on_signal_gather_encrypted_paths);
-        job.on_signal_start ();
+        ls_col_job.properties (props);
+        connect (
+            ls_col_job, LsColJob.signal_directory_listing_subfolders,
+            this, SelectiveSyncWidget.on_signal_update_directories
+        );
+        connect (
+            ls_col_job, LsColJob.signal_finished_with_error,
+            this, SelectiveSyncWidget.on_signal_lscol_finished_with_error
+        );
+        connect (
+            ls_col_job, LsColJob.signal_directory_listing_iterated,
+            this, SelectiveSyncWidget.on_signal_gather_encrypted_paths
+        );
+        ls_col_job.on_signal_start ();
         this.folder_tree.clear ();
         this.loading.show ();
         this.loading.move (10, this.folder_tree.header ().height () + 10);

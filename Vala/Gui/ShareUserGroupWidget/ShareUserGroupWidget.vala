@@ -108,10 +108,16 @@ public class ShareUserGroupWidget : Gtk.Widget {
 
         this.completer = new QCompleter (this);
         this.completer_model = new ShareeModel (this.account,
-            this.is_file ? QLatin1String ("file") : QLatin1String ("folder"),
+            this.is_file ? "file" : "folder",
             this.completer);
-        connect (this.completer_model, ShareeModel.signal_sharees_ready, this, ShareUserGroupWidget.on_signal_sharees_ready);
-        connect (this.completer_model, ShareeModel.signal_display_error_message, this, ShareUserGroupWidget.on_signal_display_error);
+        connect (
+            this.completer_model, ShareeModel.signal_sharees_ready,
+            this, ShareUserGroupWidget.on_signal_sharees_ready
+        );
+        connect (
+            this.completer_model, ShareeModel.signal_display_error_message,
+            this, ShareUserGroupWidget.on_signal_display_error
+        );
 
         this.completer.model (this.completer_model);
         this.completer.case_sensitivity (Qt.CaseInsensitive);
@@ -132,29 +138,56 @@ public class ShareUserGroupWidget : Gtk.Widget {
         this.ui.sharee_line_edit.add_action (search_globally_action, QLineEdit.Leading_position);
 
         this.manager = new ShareManager (this.account, this);
-        connect (this.manager, ShareManager.on_signal_shares_fetched, this, ShareUserGroupWidget.on_signal_shares_fetched);
-        connect (this.manager, ShareManager.signal_share_created, this, ShareUserGroupWidget.on_signal_share_created);
-        connect (this.manager, ShareManager.on_signal_server_error, this, ShareUserGroupWidget.on_signal_display_error);
-        connect (this.ui.sharee_line_edit, QLineEdit.return_pressed, this, ShareUserGroupWidget.on_signal_line_edit_return);
-        connect (this.ui.confirm_share, QAbstractButton.clicked, this, ShareUserGroupWidget.on_signal_line_edit_return);
-        // TODO connect (this.ui.private_link_text, Gtk.Label.link_activated, this, ShareUserGroupWidget.on_signal_private_link_share);
+        connect (
+            this.manager, ShareManager.on_signal_shares_fetched,
+            this, ShareUserGroupWidget.on_signal_shares_fetched
+        );
+        connect (
+            this.manager, ShareManager.signal_share_created,
+            this, ShareUserGroupWidget.on_signal_share_created
+        );
+        connect (
+            this.manager, ShareManager.on_signal_server_error,
+            this, ShareUserGroupWidget.on_signal_display_error
+        );
+        connect (
+            this.ui.sharee_line_edit, QLineEdit.return_pressed,
+            this, ShareUserGroupWidget.on_signal_line_edit_return
+        );
+        connect (
+            this.ui.confirm_share, QAbstractButton.clicked,
+            this, ShareUserGroupWidget.on_signal_line_edit_return
+        );
+        // TODO
+        //  connect (
+        //      this.ui.private_link_text, Gtk.Label.link_activated,
+        //      this, ShareUserGroupWidget.on_signal_private_link_share
+        //  );
 
         // By making the next two Queued_connections we can override
         // the strings the completer sets on the line edit.
-        connect (this.completer, SIGNAL (activated (QModelIndex)), SLOT (on_signal_completer_activated (QModelIndex)),
-            Qt.QueuedConnection);
-        connect (this.completer, SIGNAL (highlighted (QModelIndex)), SLOT (on_signal_completer_highlighted (QModelIndex)),
-            Qt.QueuedConnection);
+        connect (
+            this.completer, SIGNAL (activated (QModelIndex)),
+            SLOT (on_signal_completer_activated (QModelIndex)),
+            Qt.QueuedConnection
+        );
+        connect (
+            this.completer, SIGNAL (highlighted (QModelIndex)),
+            SLOT (on_signal_completer_highlighted (QModelIndex)),
+            Qt.QueuedConnection
+        );
 
         // Queued connection so this signal is recieved after text_changed
-        connect (this.ui.sharee_line_edit, QLineEdit.text_edited,
-            this, ShareUserGroupWidget.on_signal_line_edit_text_edited, Qt.QueuedConnection);
+        connect (
+            this.ui.sharee_line_edit, QLineEdit.text_edited,
+            this, ShareUserGroupWidget.on_signal_line_edit_text_edited,
+            Qt.QueuedConnection
+        );
         this.ui.sharee_line_edit.install_event_filter (this);
         connect (
-            this.completion_timer,
-            QTimer.timeout,
-            this,
-            this.on_completion_timer);
+            this.completion_timer, QTimer.timeout,
+            this, this.on_completion_timer
+        );
         this.completion_timer.single_shot (true);
         this.completion_timer.interval (600);
 
@@ -194,9 +227,9 @@ public class ShareUserGroupWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_share_created (unowned Share share) {
+    public void on_signal_share_created (Share share) {
         if (share && this.account.capabilities ().share_email_password_enabled () && !this.account.capabilities ().share_email_password_enforced ()) {
-            // remember this share Id so we can set it's password Line Edit to focus later
+            // remember this share Id so we can set its password Line Edit to focus later
             this.last_created_share_id = share.identifier ();
         }
         // fetch all shares including the one we've just created
@@ -240,25 +273,39 @@ public class ShareUserGroupWidget : Gtk.Widget {
             // the owner of the file that shared it first
             // leave out if it's the current user
             if (x == 0 && !share.owner_uid () == "" && ! (share.owner_uid () == this.account.credentials ().user ())) {
-                this.ui.main_owner_label.on_signal_text (string ("SharedFlag.SHARED with you by ").append (share.owner_display_name ()));
+                this.ui.main_owner_label.on_signal_text ("SharedFlag.SHARED with you by " += share.owner_display_name ());
             }
 
             //  Q_ASSERT (Share.is_share_type_user_group_email_room_or_remote (share.share_type ()));
             var user_group_share = q_shared_pointer_dynamic_cast<UserGroupShare> (share);
-            var s = new ShareUserLine (this.account, user_group_share, this.max_sharing_permissions, this.is_file, this.parent_scroll_area);
-            connect (s, ShareUserLine.resize_requested, this, ShareUserGroupWidget.on_signal_adjust_scroll_widget_size);
-            connect (s, ShareUserLine.visual_deletion_done, this, ShareUserGroupWidget.on_signal_get_shares);
-            s.background_role (layout.count () % 2 == 0 ? QPalette.Base : QPalette.Alternate_base);
+            var share_user_line = new ShareUserLine (this.account, user_group_share, this.max_sharing_permissions, this.is_file, this.parent_scroll_area);
+            connect (
+                share_user_line, ShareUserLine.resize_requested,
+                this, ShareUserGroupWidget.on_signal_adjust_scroll_widget_size
+            );
+            connect (
+                share_user_line, ShareUserLine.visual_deletion_done,
+                this, ShareUserGroupWidget.on_signal_get_shares
+            );
+            share_user_line.background_role (
+                layout.count () % 2 == 0
+                ? QPalette.Base
+                : QPalette.Alternate_base
+            );
 
-            // Connect signal_style_changed events to our widget, so it can adapt (Dark-/Light-Mode switching)
-            connect (this, ShareUserGroupWidget.signal_style_changed, s, ShareUserLine.on_signal_style_changed);
+            // Connect signal_style_changed events to our widget
+            // so it can adapt (Dark-/Light-Mode switching)
+            connect (
+                this, ShareUserGroupWidget.signal_style_changed,
+                share_user_line, ShareUserLine.on_signal_style_changed
+            );
 
-            layout.add_widget (s);
+            layout.add_widget (share_user_line);
 
             if (!this.last_created_share_id == "" && share.identifier () == this.last_created_share_id) {
                 this.last_created_share_id = "";
                 if (this.account.capabilities ().share_email_password_enabled () && !this.account.capabilities ().share_email_password_enforced ()) {
-                    just_created_share_that_needs_password = s;
+                    just_created_share_that_needs_password = share_user_line;
                 }
             }
 
@@ -269,7 +316,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         }
 
         foreach (string owner in link_owners) {
-            var owner_label = new Gtk.Label (string (owner + " shared via link"));
+            var owner_label = new Gtk.Label (owner + " shared via link");
             layout.add_widget (owner_label);
             owner_label.visible (true);
 

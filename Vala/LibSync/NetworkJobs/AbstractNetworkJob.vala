@@ -250,8 +250,8 @@ public class AbstractNetworkJob : GLib.Object {
     Warning : Needs to call reply ().read_all ().
     ***********************************************************/
     public string error_string_parsing_body (string body = null) {
-        string base = error_string ();
-        if (base == "" || !reply ()) {
+        string base_string = error_string ();
+        if (base_string == "" || !reply ()) {
             return "";
         }
 
@@ -263,10 +263,10 @@ public class AbstractNetworkJob : GLib.Object {
         string extra = extract_error_message (reply_body);
         // Don't append the XML error message to a OC-ErrorString message.
         if (!extra == "" && !reply ().has_raw_header ("OC-ErrorString")) {
-            return string.from_latin1 ("%1 (%2)").printf (base, extra);
+            return "%1 (%2)".printf (base_string, extra);
         }
 
-        return base;
+        return base_string;
     }
 
 
@@ -628,7 +628,7 @@ public class AbstractNetworkJob : GLib.Object {
         string message = base_error;
         string extra = extract_error_message (body);
         if (!extra == "") {
-            message += string.from_latin1 (" (%1)").printf (extra);
+            message += " (%1)".printf (extra);
         }
         return message;
     }

@@ -489,7 +489,7 @@ public class Account : GLib.Object {
     ***********************************************************/
     public GLib.Uri deprecated_private_link_url (string numeric_file_id) {
         return Utility.concat_url_path (this.user_visible_url,
-            "/index.php/f/" + GLib.Uri.to_percent_encoding (string.from_latin1 (numeric_file_id)));
+            "/index.php/f/" + GLib.Uri.to_percent_encoding (numeric_file_id));
     }
 
 
@@ -738,21 +738,27 @@ public class Account : GLib.Object {
             if (this.push_notifications == null) {
                 this.push_notifications = new PushNotifications (this, this);
 
-                PushNotifications.signal_ready.connect (this.push_notifications, on_signal_ready);
-                PushNotifications.signal_connection_lost.connect (this.push_notifications, on_signal_connection_lost);
-                PushNotifications.signal_authentication_failed.connect (this.push_notifications, on_signal_connection_lost);
+                this.push_notifications.signal_ready.connect (
+                    this.on_push_notifications_signal_ready
+                );
+                this.push_notifications.signal_connection_lost.connect (
+                    this.on_push_notifications_connection_lost
+                );
+                this.push_notifications.signal_authentication_failed.connect (
+                    this.on_push_notifications_connection_lost
+                );
             }
             // If push notifications already running it is no problem to call setup again
             this.push_notifications.up ();
         }
     }
 
-    private void on_signal_ready () {
+    private void on_push_notifications_signal_ready () {
         this.push_notifications_reconnect_timer.stop ();
         /* emit */ signal_push_notifications_ready (this);
     }
 
-    private void on_signal_connection_lost () {
+    private void on_push_notifications_connection_lost () {
         GLib.info ("Disable push notifications object because authentication failed or connection lost.");
         if (!this.push_notifications) {
             return;
@@ -831,7 +837,9 @@ public class Account : GLib.Object {
         this.soup_session.signal_ssl_errors.connect (
             this.on_signal_handle_ssl_errors
         );
-        Account.signal_proxy_authentication_required.connect (this.soup_session, Soup.Session.signal_proxy_authentication_required);
+        Account.signal_proxy_authentication_required.connect (
+            this.soup_session.proxy_authentication_required
+        );
     }
 
 
@@ -980,7 +988,9 @@ public class Account : GLib.Object {
             (direct_editing_e_tag == "" || direct_editing_e_tag != this.last_direct_editing_e_tag)) {
                 // Fetch the available editors and their mime types
                 var json_api_job = new JsonApiJob (shared_from_this (), "ocs/v2.php/apps/files/api/v1/direct_editing");
-                GLib.Object.JsonApiJob.signal_json_received.connect (json_api_job, this, Account.on_signal_direct_editing_recieved);
+                json_api_job.signal_json_received.connect (
+                    this.on_signal_json_api_job_direct_editing_recieved
+                );
                 json_api_job.start ();
         }
     }
@@ -1142,7 +1152,7 @@ public class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_direct_editing_recieved (QJsonDocument json) {
+    protected void on_signal_json_api_job_direct_editing_recieved (QJsonDocument json) {
         var data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
         var editors = data.value ("editors").to_object ();
 

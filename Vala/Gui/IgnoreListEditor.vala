@@ -41,16 +41,11 @@ public class IgnoreListEditor : Gtk.Dialog {
         const var user_config = config_file.exclude_file (ConfigFile.Scope.USER_SCOPE);
         ui.ignore_table_widget.read_ignore_file (user_config);
 
-        connect (
-            this,
-            Gtk.Dialog.accepted,
+        this.accepted.connect (
             this.on_dialog_accepted
         );
-        connect (
-            ui.button_box,
-            QDialogButtonBox.clicked,
-            this,
-            IgnoreListEditor.on_signal_restore_defaults
+        ui.button_box.clicked.connect (
+            this.on_signal_restore_defaults
         );
 
         ui.sync_hidden_files_check_box.checked (!FolderMan.instance.ignore_hidden_files ());

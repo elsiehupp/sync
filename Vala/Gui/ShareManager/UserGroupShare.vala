@@ -43,8 +43,14 @@ public class UserGroupShare : Share {
             }
 
             var ocs_share_job = new OcsShareJob (this.account);
-            connect (ocs_share_job, OcsShareJob.share_job_finished, this, UserGroupShare.on_signal_expire_date_set);
-            connect (ocs_share_job, OcsJob.ocs_error, this, UserGroupShare.on_signal_ocs_error);
+            connect (
+                ocs_share_job, OcsShareJob.share_job_finished,
+                this, UserGroupShare.on_signal_expire_date_set
+            );
+            connect (
+                ocs_share_job, OcsJob.ocs_error, this,
+                UserGroupShare.on_signal_ocs_error
+            );
             ocs_share_job.expire_date (identifier (), value);
         }
     }

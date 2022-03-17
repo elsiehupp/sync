@@ -570,7 +570,7 @@ public class ProcessDirectoryJob : GLib.Object {
         bool is_hidden, bool is_symlink) {
         var excluded = this.discovery_data.excludes.traversal_pattern_match (path, is_directory ? ItemType.DIRECTORY : ItemType.FILE);
 
-        // FIXME: move to ExcludedFiles 's regex ?
+        // FIXME: move to ExcludedFiles 's regular_expression ?
         bool is_invalid_pattern = false;
         if (excluded == CSync.ExcludedFiles.Type.NOT_EXCLUDED && !this.discovery_data.invalid_filename_rx.pattern () == "") {
             if (path.contains (this.discovery_data.invalid_filename_rx)) {
@@ -1133,14 +1133,14 @@ public class ProcessDirectoryJob : GLib.Object {
         } else {
             // we need to make a request to the server to know that the original file is deleted on the server
             this.pending_async_jobs++;
-            var job = new RequestEtagJob (this.discovery_data.account, this.discovery_data.remote_folder + original_path, this);
+            var request_etag_job = new RequestEtagJob (this.discovery_data.account, this.discovery_data.remote_folder + original_path, this);
             connect (
-                job,
+                request_etag_job,
                 RequestEtagJob.finished_with_result,
                 this,
                 this.on_signal_request_etag_job_finished_with_result
             );
-            job.start ();
+            request_etag_job.start ();
             done = true; // Ideally, if the origin still exist on the server, we should continue searching...  but that'd be difficult
             async = true;
         }
@@ -1425,13 +1425,13 @@ public class ProcessDirectoryJob : GLib.Object {
             string server_original_path = this.discovery_data.remote_folder + this.discovery_data.adjust_renamed_path (original_path, SyncFileItem.Direction.DOWN);
             if (base_record.is_virtual_file () && is_vfs_with_suffix ())
                 chop_virtual_file_suffix (server_original_path);
-            var job = new RequestEtagJob (this.discovery_data.account, server_original_path, this);
+            var request_etag_job = new RequestEtagJob (this.discovery_data.account, server_original_path, this);
             connect (
-                job,
+                request_etag_job,
                 RequestEtagJob.finished_with_result,
                 this,
                 this.on_signal_request_etag_job_finished_with_result (Occ.LibSync.HttpResult<string> etag));
-            job.start ();
+            request_etag_job.start ();
             return;
         }
 
@@ -1765,15 +1765,17 @@ public class ProcessDirectoryJob : GLib.Object {
             recurse = false;
         }
         if (recurse) {
-            var job = new ProcessDirectoryJob (path, item, recurse_query_local, recurse_query_server,
+            var process_directory_job = new ProcessDirectoryJob (path, item, recurse_query_local, recurse_query_server,
                 this.last_sync_timestamp, this);
-            job.is_inside_encrypted_tree (is_inside_encrypted_tree () || item.is_encrypted);
+            process_directory_job.is_inside_encrypted_tree (is_inside_encrypted_tree () || item.is_encrypted);
             if (removed) {
-                job.parent (this.discovery_data);
-                this.discovery_data.queued_deleted_directories[path.original] = job;
+                process_directory_job.parent (this.discovery_data);
+                this.discovery_data.queued_deleted_directories[path.original] = process_directory_job;
             } else {
-                ProcessDirectoryJob.signal_finished.connect (job, ProcessDirectoryJob.sub_job_finished);
-                this.queued_jobs.push_back (job);
+                ProcessDirectoryJob.signal_finished.connect (
+                    process_directory_job, ProcessDirectoryJob.sub_job_finished
+                );
+                this.queued_jobs.push_back (process_directory_job);
             }
         } else {
             if (removed
@@ -1941,9 +1943,12 @@ public class ProcessDirectoryJob : GLib.Object {
         GLib.info ("Discovered (blocklisted) " + item.file + item.instruction + item.direction + item.is_directory ());
 
         if (item.is_directory () && item.instruction != SyncInstructions.IGNORE) {
-            var job = new ProcessDirectoryJob (path, item, NORMAL_QUERY, IN_BLOCK_LIST, this.last_sync_timestamp, this);
-            connect (job, ProcessDirectoryJob.on_signal_finished, this, ProcessDirectoryJob.sub_job_finished);
-            this.queued_jobs.push_back (job);
+            var process_directory_job = new ProcessDirectoryJob (path, item, NORMAL_QUERY, IN_BLOCK_LIST, this.last_sync_timestamp, this);
+            connect (
+                process_directory_job, ProcessDirectoryJob.on_signal_finished,
+                this, ProcessDirectoryJob.sub_job_finished
+            );
+            this.queued_jobs.push_back (process_directory_job);
         } else {
             /* emit */ this.discovery_data.item_discovered (item);
         }
@@ -1953,18 +1958,18 @@ public class ProcessDirectoryJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void sub_job_finished () {
-        var job = qobject_cast<ProcessDirectoryJob> (sender ());
-        //  ASSERT (job);
+        var process_directory_job = qobject_cast<ProcessDirectoryJob> (sender ());
+        //  ASSERT (process_directory_job);
 
-        this.child_ignored |= job.child_ignored;
-        this.child_modified |= job.child_modified;
+        this.child_ignored |= process_directory_job.child_ignored;
+        this.child_modified |= process_directory_job.child_modified;
 
-        if (job.dir_item)
-            /* emit */ this.discovery_data.item_discovered (job.dir_item);
+        if (process_directory_job.dir_item)
+            /* emit */ this.discovery_data.item_discovered (process_directory_job.dir_item);
 
-        int count = this.running_jobs.remove_all (job);
+        int count = this.running_jobs.remove_all (process_directory_job);
         //  ASSERT (count == 1);
-        job.delete_later ();
+        process_directory_job.delete_later ();
         QTimer.single_shot (0, this.discovery_data, DiscoveryPhase.schedule_more_jobs);
     }
 

@@ -791,7 +791,7 @@ public class Theme : GLib.Object {
                     .printf (APPLICATION_NAME);
     
             dev_string += _("<p>Version %1. For more information please click <a href='%2'>here</a>.</p>")
-                    .printf (string.from_latin1 (MIRALL_STRINGIFY (MIRALL_VERSION)) + " (%1)".printf (os_name))
+                    .printf (MIRALL_STRINGIFY (MIRALL_VERSION) + " (%1)".printf (os_name))
                     .printf (help_url);
     
             dev_string += _("<p><small>Using files plugin : %1</small></p>")
@@ -1156,7 +1156,7 @@ public class Theme : GLib.Object {
     on Transifex.
     ***********************************************************/
     public static void replace_link_color_string (string link_string, Gtk.Color new_color) {
-        link_string.replace (QRegularExpression (" (<a href|<a style='color:# ([a-z_a-Z0-9]{6});' href)"), string.from_latin1 ("<a style='color:%1;' href").printf (new_color.name ()));
+        link_string.replace (QRegularExpression (" (<a href|<a style='color:# ([a-z_a-Z0-9]{6});' href)"), "<a style='color:%1;' href".printf (new_color.name ()));
     }
 
 

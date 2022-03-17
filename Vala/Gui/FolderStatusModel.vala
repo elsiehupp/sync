@@ -344,7 +344,7 @@ public class FolderStatusModel : QAbstractItemModel {
                 // : Example text: "File.txt (23KB)"
                 return x.size < 0 ? x.name : _("%1 (%2)").printf (x.name, Utility.octets_to_string (x.size));
             case Qt.ToolTipRole:
-                return string ("<qt>" + Utility.escape (x.size < 0 ? x.name : _("%1 (%2)").printf (x.name, Utility.octets_to_string (x.size))) + "</qt>");
+                return "<qt>" + Utility.escape (x.size < 0 ? x.name : _("%1 (%2)").printf (x.name, Utility.octets_to_string (x.size))) + "</qt>";
             case Qt.CheckStateRole:
                 if (supports_selective_sync) {
                     return x.checked;
@@ -381,7 +381,7 @@ public class FolderStatusModel : QAbstractItemModel {
             case Qt.Display_role:
                 if (x.has_error) {
                     return GLib.Variant (_("Error while loading the list of folders from the server.")
-                        + string ("\n") + x.last_error_string);
+                        + "\n" + x.last_error_string);
                 } else {
                     return _("Fetching folder list from server …");
                 }

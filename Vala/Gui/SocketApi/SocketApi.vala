@@ -181,7 +181,14 @@ public class SocketApi : GLib.Object {
 
         Folder folder = FolderMan.instance.folder_by_alias (alias);
         if (folder)
-            broadcast_message (build_message (QLatin1String ("UNREGISTER_PATH"), remove_trailing_slash (folder.path ()), ""), true);
+            broadcast_message (
+                build_message (
+                    "UNREGISTER_PATH",
+                    remove_trailing_slash (folder.path ()),
+                    ""
+                ),
+                true
+            );
 
         this.registered_aliases.remove (alias);
     }
@@ -210,7 +217,11 @@ public class SocketApi : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_broadcast_status_push_message (string system_path, SyncFileStatus file_status) {
-        string message = build_message (QLatin1String ("STATUS"), system_path, file_status.to_socket_api_string ());
+        string message = build_message (
+            "STATUS",
+            system_path,
+            file_status.to_socket_api_string ()
+        );
         //  Q_ASSERT (!system_path.ends_with ('/'));
         uint32 directory_hash = q_hash (system_path.left (system_path.last_index_of ('/')));
         foreach (var listener in this.listeners) {
@@ -255,9 +266,18 @@ public class SocketApi : GLib.Object {
             return;
         }
         GLib.info ("New connection " + socket);
-        connect (socket, QIODevice.ready_read, this, SocketApi.on_signal_read_socket);
-        connect (socket, SIGNAL (disconnected ()), this, SLOT (on_signal_lost_connection ()));
-        connect (socket, GLib.Object.destroyed, this, SocketApi.on_signal_socket_destroyed);
+        connect (
+            socket, QIODevice.ready_read,
+            this, SocketApi.on_signal_read_socket
+        );
+        connect (
+            socket, SIGNAL (disconnected ()),
+            this, SLOT (on_signal_lost_connection ())
+        );
+        connect (
+            socket, GLib.Object.destroyed,
+            this, SocketApi.on_signal_socket_destroyed
+        );
         //  ASSERT (socket.read_all () == "");
 
         unowned var listener = SocketListener.create (socket);
@@ -373,11 +393,11 @@ public class SocketApi : GLib.Object {
     private static int index_of_method () {
         string function_with_arguments = "command_";
         if (command.starts_with ("ASYNC_")) {
-            function_with_arguments += command + QByteArrayLiteral (" (unowned SocketApiJob)");
+            function_with_arguments += command + " (SocketApiJob)";
         } else if (command.starts_with ("V2/")) {
-            function_with_arguments += QByteArrayLiteral ("V2_") + command.mid (3) + QByteArrayLiteral (" (unowned SocketApiJobV2)");
+            function_with_arguments += "V2_" + command.mid (3) + " (SocketApiJobV2)";
         } else {
-            function_with_arguments += command + QByteArrayLiteral (" (string,SocketListener*)");
+            function_with_arguments += command + " (string,SocketListener*)";
         }
         //  Q_ASSERT (static_qt_meta_object.normalized_signature (function_with_arguments) == function_with_arguments);
         const var output = static_meta_object.index_of_method (function_with_arguments);
@@ -595,20 +615,20 @@ public class SocketApi : GLib.Object {
         var file_data = FileData.file_data (local_file);
         var share_folder = file_data.folder;
         if (!share_folder) {
-            const string message = QLatin1String ("SHARE:NOP:") + GLib.Dir.to_native_separators (local_file);
+            const string message = "SHARE:NOP:" + GLib.Dir.to_native_separators (local_file);
             // files that are not within a sync folder are not synced.
             listener.on_signal_send_message (message);
         } else if (!share_folder.account_state ().is_connected ()) {
-            const string message = QLatin1String ("SHARE:NOTCONNECTED:") + GLib.Dir.to_native_separators (local_file);
+            const string message = "SHARE:NOTCONNECTED:" + GLib.Dir.to_native_separators (local_file);
             // if the folder isn't connected, don't open the share dialog
             listener.on_signal_send_message (message);
         } else if (!theme.link_sharing && (!theme.user_group_sharing || share_folder.account_state ().account.server_version_int () < Account.make_server_version (8, 2, 0))) {
-            const string message = QLatin1String ("SHARE:NOP:") + GLib.Dir.to_native_separators (local_file);
+            const string message = "SHARE:NOP:" + GLib.Dir.to_native_separators (local_file);
             listener.on_signal_send_message (message);
         } else {
             // If the file doesn't have a journal record, it might not be uploaded yet
             if (!file_data.journal_record ().is_valid ()) {
-                const string message = QLatin1String ("SHARE:NOTSYNCED:") + GLib.Dir.to_native_separators (local_file);
+                const string message = "SHARE:NOTSYNCED:" + GLib.Dir.to_native_separators (local_file);
                 listener.on_signal_send_message (message);
                 return;
             }
@@ -617,12 +637,12 @@ public class SocketApi : GLib.Object {
 
             // Can't share root folder
             if (remote_path == "/") {
-                const string message = QLatin1String ("SHARE:CANNOTSHAREROOT:") + GLib.Dir.to_native_separators (local_file);
+                const string message = "SHARE:CANNOTSHAREROOT:" + GLib.Dir.to_native_separators (local_file);
                 listener.on_signal_send_message (message);
                 return;
             }
 
-            const string message = QLatin1String ("SHARE:OK:") + GLib.Dir.to_native_separators (local_file);
+            const string message = "SHARE:OK:" + GLib.Dir.to_native_separators (local_file);
             listener.on_signal_send_message (message);
 
             /* emit */ signal_share_command_received (remote_path, file_data.local_path, start_page);
@@ -656,7 +676,7 @@ public class SocketApi : GLib.Object {
         var file_data = FileData.file_data (argument);
         if (!file_data.folder) {
             // this can happen in offline mode e.g. : nothing to worry about
-            status_string = QLatin1String ("NOP");
+            status_string = "NOP";
         } else {
             // The user probably visited this directory in the file shell.
             // Let the listener know that it should now send status pushes for sibblings of this file.
@@ -667,8 +687,7 @@ public class SocketApi : GLib.Object {
             status_string = file_status.to_socket_api_string ();
         }
 
-        const string message = QLatin1String ("STATUS:") % status_string % ':' % GLib.Dir.to_native_separators (argument);
-        listener.on_signal_send_message (message);
+        listener.on_signal_send_message ("STATUS:" + status_string + ':' + GLib.Dir.to_native_separators (argument));
     }
 
 
@@ -936,7 +955,7 @@ public class SocketApi : GLib.Object {
     /***********************************************************
     External sync
     ***********************************************************/
-    private void command_V2_UPLOAD_FILES_FROM (unowned SocketApiJobV2 socket_api_v2_job) {
+    private void command_V2_UPLOAD_FILES_FROM (SocketApiJobV2 socket_api_v2_job) {
         var upload_job = new SocketUploadJob (socket_api_v2_job);
         upload_job.on_signal_start ();
     }
@@ -1011,7 +1030,7 @@ public class SocketApi : GLib.Object {
     private void send_sharing_context_menu_options (FileData file_data, SocketListener listener, bool enabled) {
         var record = file_data.journal_record ();
         bool is_on_signal_the_server = record.is_valid ();
-        var flag_string = is_on_signal_the_server && enabled ? QLatin1String (".") : QLatin1String (":d:");
+        var flag_string = is_on_signal_the_server && enabled ? "." : ":d:";
 
         var capabilities = file_data.folder.account_state ().account.capabilities ();
         var theme = Theme.instance;
@@ -1021,9 +1040,9 @@ public class SocketApi : GLib.Object {
         // If sharing is globally disabled, do not show any sharing entries.
         // If there is no permission to share for this file, add a disabled entry saying so
         if (is_on_signal_the_server && !record.remote_perm.is_null () && !record.remote_perm.has_permission (RemotePermissions.Permissions.CAN_RESHARE)) {
-            listener.on_signal_send_message (QLatin1String ("MENU_ITEM:DISABLED:d:") + (!record.is_directory () ? _("Resharing this file is not allowed") : _("Resharing this folder is not allowed")));
+            listener.on_signal_send_message ("MENU_ITEM:DISABLED:d:" + (!record.is_directory () ? _("Resharing this file is not allowed") : _("Resharing this folder is not allowed")));
         } else {
-            listener.on_signal_send_message (QLatin1String ("MENU_ITEM:SHARE") + flag_string + _("Share options"));
+            listener.on_signal_send_message ("MENU_ITEM:SHARE" + flag_string + _("Share options"));
 
             // Do we have public links?
             bool public_links_enabled = theme.link_sharing && capabilities.share_public_link ();
@@ -1035,17 +1054,17 @@ public class SocketApi : GLib.Object {
                 && !capabilities.share_public_link_enforce_password ();
 
             if (can_create_default_public_link) {
-                listener.on_signal_send_message (QLatin1String ("MENU_ITEM:COPY_PUBLIC_LINK") + flag_string + _("Copy public link"));
+                listener.on_signal_send_message ("MENU_ITEM:COPY_PUBLIC_LINK" + flag_string + _("Copy public link"));
             } else if (public_links_enabled) {
-                listener.on_signal_send_message (QLatin1String ("MENU_ITEM:MANAGE_PUBLIC_LINKS") + flag_string + _("Copy public link"));
+                listener.on_signal_send_message ("MENU_ITEM:MANAGE_PUBLIC_LINKS" + flag_string + _("Copy public link"));
             }
         }
 
-        listener.on_signal_send_message (QLatin1String ("MENU_ITEM:COPY_PRIVATE_LINK") + flag_string + _("Copy internal link"));
+        listener.on_signal_send_message ("MENU_ITEM:COPY_PRIVATE_LINK" + flag_string + _("Copy internal link"));
 
         // Disabled : only providing email option for private links would look odd,
         // and the copy option is more general.
-        //listener.on_signal_send_message (QLatin1String ("MENU_ITEM:EMAIL_PRIVATE_LINK") + flag_string + _("Send private link by email …"));
+        //listener.on_signal_send_message ("MENU_ITEM:EMAIL_PRIVATE_LINK" + flag_string + _("Send private link by email …"));
     }
 
 
@@ -1059,7 +1078,7 @@ public class SocketApi : GLib.Object {
     and ends with GET_MENU_ITEMS:END
     ***********************************************************/
     private void command_GET_MENU_ITEMS (string argument, SocketListener listener) {
-        listener.on_signal_send_message (string ("GET_MENU_ITEMS:BEGIN"));
+        listener.on_signal_send_message ("GET_MENU_ITEMS:BEGIN");
         const string[] files = split (argument);
 
         // Find the common sync folder.
@@ -1088,19 +1107,19 @@ public class SocketApi : GLib.Object {
             const var record = file_data.journal_record ();
             const bool is_on_signal_the_server = record.is_valid ();
             const var is_e2e_encrypted_path = file_data.journal_record ().is_e2e_encrypted || !file_data.journal_record ().e2e_mangled_name == "";
-            var flag_string = is_on_signal_the_server && !is_e2e_encrypted_path ? QLatin1String (".") : QLatin1String (":d:");
+            var flag_string = is_on_signal_the_server && !is_e2e_encrypted_path ? "." : ":d:";
 
             const GLib.FileInfo file_info = new GLib.FileInfo (file_data.local_path);
             if (!file_info.is_dir ()) {
-                listener.on_signal_send_message (QLatin1String ("MENU_ITEM:ACTIVITY") + flag_string + _("Activity"));
+                listener.on_signal_send_message ("MENU_ITEM:ACTIVITY" + flag_string + _("Activity"));
             }
 
             DirectEditor editor = direct_editor_for_local_file (file_data.local_path);
             if (editor) {
-                //listener.on_signal_send_message (QLatin1String ("MENU_ITEM:EDIT") + flag_string + _("Edit via ") + editor.name ());
-                listener.on_signal_send_message (QLatin1String ("MENU_ITEM:EDIT") + flag_string + _("Edit"));
+                //listener.on_signal_send_message ("MENU_ITEM:EDIT" + flag_string + _("Edit via ") + editor.name ());
+                listener.on_signal_send_message ("MENU_ITEM:EDIT" + flag_string + _("Edit"));
             } else {
-                listener.on_signal_send_message (QLatin1String ("MENU_ITEM:OPEN_PRIVATE_LINK") + flag_string + _("Open in browser"));
+                listener.on_signal_send_message ("MENU_ITEM:OPEN_PRIVATE_LINK" + flag_string + _("Open in browser"));
             }
 
             send_sharing_context_menu_options (file_data, listener, !is_e2e_encrypted_path);
@@ -1123,23 +1142,23 @@ public class SocketApi : GLib.Object {
 
                 if (is_conflict && can_change_file) {
                     if (can_add_to_dir) {
-                        listener.on_signal_send_message (QLatin1String ("MENU_ITEM:RESOLVE_CONFLICT.") + _("Resolve conflict …"));
+                        listener.on_signal_send_message ("MENU_ITEM:RESOLVE_CONFLICT." + _("Resolve conflict …"));
                     } else {
                         if (is_on_signal_the_server) {
                             // Uploaded conflict file in read-only directory
-                            listener.on_signal_send_message (QLatin1String ("MENU_ITEM:MOVE_ITEM.") + _("Move and rename …"));
+                            listener.on_signal_send_message ("MENU_ITEM:MOVE_ITEM." + _("Move and rename …"));
                         } else {
                             // Local-only conflict file in a read-only directory
-                            listener.on_signal_send_message (QLatin1String ("MENU_ITEM:MOVE_ITEM.") + _("Move, rename and upload …"));
+                            listener.on_signal_send_message ("MENU_ITEM:MOVE_ITEM." + _("Move, rename and upload …"));
                         }
-                        listener.on_signal_send_message (QLatin1String ("MENU_ITEM:DELETE_ITEM.") + _("Delete local changes"));
+                        listener.on_signal_send_message ("MENU_ITEM:DELETE_ITEM." + _("Delete local changes"));
                     }
                 }
 
                 // File in a read-only directory?
                 if (!is_conflict && !is_on_signal_the_server && !can_add_to_dir) {
-                    listener.on_signal_send_message (QLatin1String ("MENU_ITEM:MOVE_ITEM.") + _("Move and upload …"));
-                    listener.on_signal_send_message (QLatin1String ("MENU_ITEM:DELETE_ITEM.") + _("Delete"));
+                    listener.on_signal_send_message ("MENU_ITEM:MOVE_ITEM." + _("Move and upload …"));
+                    listener.on_signal_send_message ("MENU_ITEM:DELETE_ITEM." + _("Delete"));
                 }
             }
         }
@@ -1252,7 +1271,7 @@ public class SocketApi : GLib.Object {
             return;
         }
 
-        var json_api_job = new JsonApiJob (file_data.folder.account_state ().account, QLatin1String ("ocs/v2.php/apps/files/api/v1/direct_editing/open"), this);
+        var json_api_job = new JsonApiJob (file_data.folder.account_state ().account, "ocs/v2.php/apps/files/api/v1/direct_editing/open", this);
 
         QUrlQuery parameters;
         parameters.add_query_item ("path", file_data.server_relative_path);
@@ -1307,15 +1326,15 @@ public class SocketApi : GLib.Object {
     /***********************************************************
     #if GUI_TESTING
     ***********************************************************/
-    private void command_ASYNC_ASSERT_ICON_IS_EQUAL (unowned SocketApiJob socket_api_job) {
-        var widget = find_widget (socket_api_job.arguments ()[QLatin1String ("query_string")].to_string ());
+    private void command_ASYNC_ASSERT_ICON_IS_EQUAL (SocketApiJob socket_api_job) {
+        var widget = find_widget (socket_api_job.arguments ()["query_string"].to_string ());
         if (!widget) {
-            string message = string (QLatin1String ("Object not found : 6 : %1")).printf (socket_api_job.arguments ()["query_string"].to_string ());
+            string message = "Object not found: 6: %1".printf (socket_api_job.arguments ()["query_string"].to_string ());
             socket_api_job.reject (message);
             return;
         }
 
-        var property_name = socket_api_job.arguments ()[QLatin1String ("PROPERTY_PATH")].to_string ();
+        var property_name = socket_api_job.arguments ()["PROPERTY_PATH"].to_string ();
 
         var segments = property_name.split ('.');
 
@@ -1366,12 +1385,12 @@ public class SocketApi : GLib.Object {
     /***********************************************************
     #if GUI_TESTING
     ***********************************************************/
-    private void command_ASYNC_INVOKE_WIDGET_METHOD (unowned SocketApiJob socket_api_job) {
+    private void command_ASYNC_INVOKE_WIDGET_METHOD (SocketApiJob socket_api_job) {
         var arguments = socket_api_job.arguments ();
 
         var widget = find_widget (arguments["object_name"].to_string ());
         if (!widget) {
-            socket_api_job.reject (QLatin1String ("widget not found"));
+            socket_api_job.reject ("widget not found");
             return;
         }
 
@@ -1383,16 +1402,16 @@ public class SocketApi : GLib.Object {
     /***********************************************************
     #if GUI_TESTING
     ***********************************************************/
-    private void command_ASYNC_GET_WIDGET_PROPERTY (unowned SocketApiJob socket_api_job) {
-        string widget_name = socket_api_job.arguments ()[QLatin1String ("object_name")].to_string ();
+    private void command_ASYNC_GET_WIDGET_PROPERTY (SocketApiJob socket_api_job) {
+        string widget_name = socket_api_job.arguments ()["object_name"].to_string ();
         var widget = find_widget (widget_name);
         if (!widget) {
-            string message = string (QLatin1String ("Widget not found : 2 : %1")).printf (widget_name);
+            string message = "Widget not found : 2 : %1".printf (widget_name);
             socket_api_job.reject (message);
             return;
         }
 
-        var property_name = socket_api_job.arguments ()[QLatin1String ("property")].to_string ();
+        var property_name = socket_api_job.arguments ()["property"].to_string ();
 
         var segments = property_name.split ('.');
 
@@ -1412,7 +1431,7 @@ public class SocketApi : GLib.Object {
             if (tmp_object) {
                 current_object = tmp_object;
             } else {
-                string message = string (QLatin1String ("Widget not found : 3 : %1")).printf (widget_name);
+                string message = "Widget not found: 3 : %1".printf (widget_name);
                 socket_api_job.reject (message);
                 return;
             }
@@ -1425,12 +1444,12 @@ public class SocketApi : GLib.Object {
     /***********************************************************
     #if GUI_TESTING
     ***********************************************************/
-    private void command_ASYNC_SET_WIDGET_PROPERTY (unowned SocketApiJob socket_api_job) {
+    private void command_ASYNC_SET_WIDGET_PROPERTY (SocketApiJob socket_api_job) {
         var arguments = socket_api_job.arguments ();
         string widget_name = arguments["object_name"].to_string ();
         var widget = find_widget (widget_name);
         if (!widget) {
-            string message = string (QLatin1String ("Widget not found : 4 : %1")).printf (widget_name);
+            string message = "Widget not found: 4: %1".printf (widget_name);
             socket_api_job.reject (message);
             return;
         }
@@ -1449,7 +1468,7 @@ public class SocketApi : GLib.Object {
         string widget_name = arguments["object_name"].to_string ();
         var widget = find_widget (arguments["object_name"].to_string ());
         if (!widget) {
-            string message = string (QLatin1String ("Widget not found : 5 : %1")).printf (widget_name);
+            string message = "Widget not found: 5: %1".printf (widget_name);
             socket_api_job.reject (message);
             return;
         }
@@ -1484,7 +1503,7 @@ public class SocketApi : GLib.Object {
         var object_name = arguments["object_name"].to_string ();
         var widget = find_widget (object_name);
         if (!widget) {
-            string message = string (QLatin1String ("Object not found : 1 : %1")).printf (object_name);
+            string message = "Object not found: 1: %1".printf (object_name);
             socket_api_job.reject (message);
             return;
         }

@@ -22,7 +22,7 @@ public class CSyncChecksumHook : ComputeChecksumBase {
     The return value will be owned by csync.
     ***********************************************************/
     public static string hook (string path, string other_checksum_header, void this_obj) {
-        string type = parse_checksum_header_type (string (other_checksum_header));
+        string type = parse_checksum_header_type (other_checksum_header);
         if (type == "") {
             return null;
         }

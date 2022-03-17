@@ -176,8 +176,14 @@ public class LinkShare : Share {
     ***********************************************************/
     public OcsShareJob create_share_job (Link_share_slot on_signal_function) {
         var job = new OcsShareJob (this.account);
-        connect (job, OcsShareJob.share_job_finished, this, on_signal_function);
-        connect (job, OcsJob.ocs_error, this, LinkShare.on_signal_ocs_error);
+        connect (
+            job, OcsShareJob.share_job_finished,
+            this, on_signal_function
+        );
+        connect (
+            job, OcsJob.ocs_error, this,
+            LinkShare.on_signal_ocs_error
+        );
         return job;
     }
 

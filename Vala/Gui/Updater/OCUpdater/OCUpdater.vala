@@ -170,9 +170,15 @@ public class OCUpdater : Updater {
     ***********************************************************/
     public override void check_for_update () {
         Soup.Reply reply = this.access_manager.get (Soup.Request (this.update_url));
-        connect (this.timeout_watchdog, QTimer.timeout, this, OCUpdater.on_signal_timed_out);
+        connect (
+            this.timeout_watchdog, QTimer.timeout,
+            this, OCUpdater.on_signal_timed_out
+        );
         this.timeout_watchdog.on_signal_start (30 * 1000);
-        connect (reply, Soup.Reply.on_signal_finished, this, OCUpdater.on_signal_version_info_arrived);
+        connect (
+            reply, Soup.Reply.on_signal_finished,
+            this, OCUpdater.on_signal_version_info_arrived
+        );
 
         download_state (DownloadState.CHECKING_SERVER);
     }
@@ -242,12 +248,12 @@ public class OCUpdater : Updater {
             // | Out-Null forces powershell to wait for msiexec to finish.
 
             string msi_log_file = config.config_path () + "msi.log";
-            string command = string ("&{msiexec /promptrestart /passive /i '%1' /L*V '%2'| Out-Null ; &'%3'}")
-                 .printf (prepare_path_for_powershell (update_file))
-                 .printf (prepare_path_for_powershell (msi_log_file))
-                 .printf (prepare_path_for_powershell (Gtk.Application.application_file_path ()));
+            string command = "&{msiexec /promptrestart /passive /i '%1' /L*V '%2'| Out-Null ; &'%3'}"
+                .printf (prepare_path_for_powershell (update_file))
+                .printf (prepare_path_for_powershell (msi_log_file))
+                .printf (prepare_path_for_powershell (Gtk.Application.application_file_path ()));
 
-            QProcess.start_detached ("powershell.exe", {"-Command", command});
+            QProcess.start_detached ("powershell.exe", { "-Command", command });
         }
         Gtk.Application.quit ();
     }

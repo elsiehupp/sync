@@ -249,21 +249,21 @@ public class ActivityListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     public GLib.Variant data (QModelIndex index, int role) {
-        Activity a;
+        Activity activity;
 
         if (!index.is_valid ())
             return GLib.Variant ();
 
-        a = this.final_list.at (index.row ());
-        unowned AccountState ast = AccountManager.instance.account (a.acc_name);
+        activity = this.final_list.at (index.row ());
+        unowned AccountState ast = AccountManager.instance.account (activity.acc_name);
         if (!ast && this.account_state != ast)
             return GLib.Variant ();
 
         switch (role) {
         case DataRole.DISPLAY_PATH:
-            if (!a.file == "") {
-                var folder = FolderMan.instance.folder_by_alias (a.folder);
-                string relative_path = a.file;
+            if (!activity.file == "") {
+                var folder = FolderMan.instance.folder_by_alias (activity.folder);
+                string relative_path = activity.file;
                 if (folder) {
                     relative_path.prepend (folder.remote_path ());
                 }
@@ -278,10 +278,10 @@ public class ActivityListModel : QAbstractListModel {
             }
             return "";
         case DataRole.PATH:
-            if (!a.file == "") {
-                const var folder = FolderMan.instance.folder_by_alias (a.folder);
+            if (!activity.file == "") {
+                const var folder = FolderMan.instance.folder_by_alias (activity.folder);
 
-                string relative_path = a.file;
+                string relative_path = activity.file;
                 if (folder) {
                     relative_path.prepend (folder.remote_path ());
                 }
@@ -297,7 +297,7 @@ public class ActivityListModel : QAbstractListModel {
                 // hiding the share button which is what we want
                 if (folder) {
                     SyncJournalFileRecord record;
-                    folder.journal_database ().file_record (a.file.mid (1), record);
+                    folder.journal_database ().file_record (activity.file.mid (1), record);
                     if (record.is_valid () && (record.is_e2e_encrypted || !record.e2e_mangled_name == "")) {
                         return "";
                     }
@@ -307,9 +307,9 @@ public class ActivityListModel : QAbstractListModel {
             }
             return "";
         case DataRole.ABSOLUTE_PATH: {
-            const var folder = FolderMan.instance.folder_by_alias (a.folder);
-            string relative_path = a.file;
-            if (!a.file == "") {
+            const var folder = FolderMan.instance.folder_by_alias (activity.folder);
+            string relative_path = activity.file;
+            if (!activity.file == "") {
                 if (folder) {
                     relative_path.prepend (folder.remote_path ());
                 }
@@ -327,35 +327,35 @@ public class ActivityListModel : QAbstractListModel {
         }
         case DataRole.ACTION_LINKS: {
             GLib.List<GLib.Variant> custom_list;
-            foreach (ActivityLink activity_link in a.links) {
+            foreach (ActivityLink activity_link in activity.links) {
                 custom_list += GLib.Variant.from_value (activity_link);
             }
             return custom_list;
         }
         case DataRole.ACTION_ICON: {
-            if (a.type == Activity.Type.NOTIFICATION) {
+            if (activity.type == Activity.Type.NOTIFICATION) {
                 return "qrc:///client/theme/black/bell.svg";
-            } else if (a.type == Activity.Type.SYNC_RESULT) {
+            } else if (activity.type == Activity.Type.SYNC_RESULT) {
                 return "qrc:///client/theme/black/state-error.svg";
-            } else if (a.type == Activity.Type.SYNC_FILE_ITEM) {
-                if (a.status == SyncFileItem.Status.NORMAL_ERROR
-                    || a.status == SyncFileItem.Status.FATAL_ERROR
-                    || a.status == SyncFileItem.Status.DETAIL_ERROR
-                    || a.status == SyncFileItem.Status.BLOCKLISTED_ERROR) {
+            } else if (activity.type == Activity.Type.SYNC_FILE_ITEM) {
+                if (activity.status == SyncFileItem.Status.NORMAL_ERROR
+                    || activity.status == SyncFileItem.Status.FATAL_ERROR
+                    || activity.status == SyncFileItem.Status.DETAIL_ERROR
+                    || activity.status == SyncFileItem.Status.BLOCKLISTED_ERROR) {
                     return "qrc:///client/theme/black/state-error.svg";
-                } else if (a.status == SyncFileItem.Status.SOFT_ERROR
-                    || a.status == SyncFileItem.Status.CONFLICT
-                    || a.status == SyncFileItem.Status.RESTORATION
-                    || a.status == SyncFileItem.Status.FILE_LOCKED
-                    || a.status == SyncFileItem.Status.FILENAME_INVALID) {
+                } else if (activity.status == SyncFileItem.Status.SOFT_ERROR
+                    || activity.status == SyncFileItem.Status.CONFLICT
+                    || activity.status == SyncFileItem.Status.RESTORATION
+                    || activity.status == SyncFileItem.Status.FILE_LOCKED
+                    || activity.status == SyncFileItem.Status.FILENAME_INVALID) {
                     return "qrc:///client/theme/black/state-warning.svg";
-                } else if (a.status == SyncFileItem.Status.FILE_IGNORED) {
+                } else if (activity.status == SyncFileItem.Status.FILE_IGNORED) {
                     return "qrc:///client/theme/black/state-info.svg";
                 } else {
                     // File sync successful
-                    if (a.file_action == "file_created") {
+                    if (activity.file_action == "file_created") {
                         return "qrc:///client/theme/colored/add.svg";
-                    } else if (a.file_action == "file_deleted") {
+                    } else if (activity.file_action == "file_deleted") {
                         return "qrc:///client/theme/colored/delete.svg";
                     } else {
                         return "qrc:///client/theme/change.svg";
@@ -363,17 +363,17 @@ public class ActivityListModel : QAbstractListModel {
                 }
             } else {
                 // We have an activity
-                if (a.icon == "") {
+                if (activity.icon == "") {
                     return "qrc:///client/theme/black/activity.svg";
                 }
 
-                return a.icon;
+                return activity.icon;
             }
         }
         case DataRole.OBJECT_TYPE:
-            return a.object_type;
+            return activity.object_type;
         case DataRole.ACTION: {
-            switch (a.type) {
+            switch (activity.type) {
             case Activity.Type.ACTIVITY:
                 return "Activity";
             case Activity.Type.NOTIFICATION:
@@ -387,29 +387,29 @@ public class ActivityListModel : QAbstractListModel {
             }
         }
         case DataRole.ACTION_TEXT:
-            return a.subject;
+            return activity.subject;
         case DataRole.ACTION_TEXT_COLOR:
-            return a.id == -1 ? QLatin1String ("#808080") : QLatin1String ("#222");   // FIXME: This is a temporary workaround for this.show_more_activities_available_entry
+            return activity.id == -1 ? "#808080" : "#222";   // FIXME: This is a temporary workaround for this.show_more_activities_available_entry
         case DataRole.MESSAGE:
-            return a.message;
+            return activity.message;
         case DataRole.LINK: {
-            if (a.link == "") {
+            if (activity.link == "") {
                 return "";
             } else {
-                return a.link;
+                return activity.link;
             }
         }
         case DataRole.ACCOUNT:
-            return a.acc_name;
+            return activity.acc_name;
         case DataRole.POINT_IN_TIME:
-            //return a.id == -1 ? "" : string ("%1 - %2").printf (Utility.time_ago_in_words (a.date_time.to_local_time ()), a.date_time.to_local_time ().to_string (Qt.Default_locale_short_date));
-            return a.id == -1 ? "" : Utility.time_ago_in_words (a.date_time.to_local_time ());
+            //  return activity.id == -1 ? "" : "%1 - %2".printf (Utility.time_ago_in_words (activity.date_time.to_local_time ()), activity.date_time.to_local_time ().to_string (Qt.Default_locale_short_date));
+            return activity.id == -1 ? "" : Utility.time_ago_in_words (activity.date_time.to_local_time ());
         case DataRole.ACCOUNT_CONNECTED:
             return (ast && ast.is_connected ());
         case DataRole.DISPLAY_ACTIONS:
             return this.display_actions;
         case DataRole.SHAREABLE:
-            return !data (index, DataRole.PATH).to_string () == "" && this.display_actions && a.file_action != "file_deleted" && a.status != SyncFileItem.Status.FILE_IGNORED;
+            return !data (index, DataRole.PATH).to_string () == "" && this.display_actions && activity.file_action != "file_deleted" && activity.status != SyncFileItem.Status.FILE_IGNORED;
         default:
             return GLib.Variant ();
         }
@@ -585,25 +585,25 @@ public class ActivityListModel : QAbstractListModel {
         foreach (var activ in activities) {
             var json = activ.to_object ();
 
-            Activity a;
-            a.type = Activity.Type.ACTIVITY;
-            a.object_type = json.value ("object_type").to_string ();
-            a.acc_name = ast.account.display_name ();
-            a.id = json.value ("activity_id").to_int ();
-            a.file_action = json.value ("type").to_string ();
-            a.subject = json.value ("subject").to_string ();
-            a.message = json.value ("message").to_string ();
-            a.file = json.value ("object_name").to_string ();
-            a.link = GLib.Uri (json.value ("link").to_string ());
-            a.date_time = GLib.DateTime.from_string (json.value ("datetime").to_string (), Qt.ISODate);
-            a.icon = json.value ("icon").to_string ();
+            Activity activity;
+            activity.type = Activity.Type.ACTIVITY;
+            activity.object_type = json.value ("object_type").to_string ();
+            activity.acc_name = ast.account.display_name ();
+            activity.id = json.value ("activity_id").to_int ();
+            activity.file_action = json.value ("type").to_string ();
+            activity.subject = json.value ("subject").to_string ();
+            activity.message = json.value ("message").to_string ();
+            activity.file = json.value ("object_name").to_string ();
+            activity.link = GLib.Uri (json.value ("link").to_string ());
+            activity.date_time = GLib.DateTime.from_string (json.value ("datetime").to_string (), Qt.ISODate);
+            activity.icon = json.value ("icon").to_string ();
 
-            list.append (a);
+            list.append (activity);
             this.current_item = list.last ().id;
 
             this.total_activities_fetched++;
             if (this.total_activities_fetched == this.max_activities
-                || (this.hide_old_activities && a.date_time < oldest_date)) {
+                || (this.hide_old_activities && activity.date_time < oldest_date)) {
                 this.show_more_activities_available_entry = true;
                 this.done_fetching = true;
                 break;
@@ -646,13 +646,15 @@ public class ActivityListModel : QAbstractListModel {
         if (!this.account_state.is_connected ()) {
             return;
         }
-        var job = new JsonApiJob (this.account_state.account, QLatin1String ("ocs/v2.php/apps/activity/api/v2/activity"), this);
-        connect (job, JsonApiJob.json_received,
-            this, ActivityListModel.activities_received);
+        var job = new JsonApiJob (this.account_state.account, "ocs/v2.php/apps/activity/api/v2/activity", this);
+        connect (
+            job, JsonApiJob.json_received,
+            this, ActivityListModel.activities_received
+        );
 
         QUrlQuery parameters;
-        parameters.add_query_item (QLatin1String ("since"), string.number (this.current_item));
-        parameters.add_query_item (QLatin1String ("limit"), string.number (50));
+        parameters.add_query_item ("since", this.current_item.to_string ());
+        parameters.add_query_item ("limit", 50.to_string ());
         job.add_query_params (parameters);
 
         this.currently_fetching = true;
@@ -688,19 +690,19 @@ public class ActivityListModel : QAbstractListModel {
             result_list.append (this.activity_lists);
 
             if (this.show_more_activities_available_entry) {
-                Activity a;
-                a.type = Activity.Type.ACTIVITY;
-                a.acc_name = this.account_state.account.display_name ();
-                a.id = -1;
-                a.subject = _("For more activities please open the Activity app.");
-                a.date_time = GLib.DateTime.current_date_time ();
+                Activity activity;
+                activity.type = Activity.Type.ACTIVITY;
+                activity.acc_name = this.account_state.account.display_name ();
+                activity.id = -1;
+                activity.subject = _("For more activities please open the Activity app.");
+                activity.date_time = GLib.DateTime.current_date_time ();
 
-                AccountApp app = this.account_state.find_app (QLatin1String ("activity"));
+                AccountApp app = this.account_state.find_app ("activity");
                 if (app) {
-                    a.link = app.url;
+                    activity.link = app.url;
                 }
 
-                result_list.append (a);
+                result_list.append (activity);
             }
         }
 

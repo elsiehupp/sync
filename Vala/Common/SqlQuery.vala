@@ -169,14 +169,14 @@ public class SqlQuery {
     /***********************************************************
     ***********************************************************/
     public bool is_select () {
-        return starts_with_insensitive (this.sql, QByteArrayLiteral ("SELECT"));
+        return starts_with_insensitive (this.sql, "SELECT");
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool is_pragma () {
-        return starts_with_insensitive (this.sql, QByteArrayLiteral ("PRAGMA"));
+        return starts_with_insensitive (this.sql, "PRAGMA");
     }
 
 

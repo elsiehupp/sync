@@ -78,7 +78,7 @@ public class WebFlowCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     public override string auth_type () {
-        return string.from_latin1 ("webflow");
+        return "webflow";
     }
 
 
@@ -146,12 +146,16 @@ public class WebFlowCredentials : AbstractCredentials {
 
         // write cert if there is one
         if (!this.client_ssl_certificate.is_null ()) {
-            var job = new KeychainChunk.WriteJob (this.account,
-                                                this.user + CLIENT_CERTIFICATE_PEM_C,
-                                                this.client_ssl_certificate.to_pem (),
-                                                this);
-            connect (job, KeychainChunk.WriteJob.on_signal_finished, this, WebFlowCredentials.on_signal_write_client_cert_pem_job_done);
-            job.on_signal_start ();
+            var kechain_chunk_write_job = new KeychainChunk.WriteJob (
+                this.account,
+                this.user + CLIENT_CERTIFICATE_PEM_C,
+                this.client_ssl_certificate.to_pem (),
+                this
+            );
+            connect (
+                kechain_chunk_write_job, KeychainChunk.WriteJob.signal_finished,
+                this, WebFlowCredentials.on_signal_write_client_cert_pem_job_done);
+            kechain_chunk_write_job.on_signal_start ();
         } else {
             // no cert, just write credentials
             on_signal_write_client_cert_pem_job_done (null);
@@ -190,10 +194,10 @@ public class WebFlowCredentials : AbstractCredentials {
             return;
         }
 
-        var job = new DeletePasswordJob (Theme.app_name, this);
-        job.insecure_fallback (false);
-        job.key (kck);
-        job.on_signal_start ();
+        var delete_password_job = new DeletePasswordJob (Theme.app_name, this);
+        delete_password_job.insecure_fallback (false);
+        delete_password_job.key (kck);
+        delete_password_job.on_signal_start ();
 
         invalidate_token ();
 
@@ -238,13 +242,13 @@ public class WebFlowCredentials : AbstractCredentials {
     private void ask_from_user () {
         // Determine if the old flow has to be used (GS for now)
         // Do a DetermineAuthTypeJob to make sure that the server is still using Flow2
-        var job = new DetermineAuthTypeJob (this.account.shared_from_this (), this);
+        var determine_auth_type_job = new DetermineAuthTypeJob (this.account.shared_from_this (), this);
         connect (
-            job,
+            determine_auth_type_job,
             DetermineAuthTypeJob.auth_type,
             on_signal_determine_auth_type
         );
-        job.on_signal_start ();
+        determine_auth_type_job.on_signal_start ();
 
         GLib.debug ("User needs to reauth!");
     }
@@ -275,8 +279,14 @@ public class WebFlowCredentials : AbstractCredentials {
 
         this.ask_dialog.show ();
 
-        connect (this.ask_dialog, WebFlowCredentialsDialog.on_signal_url_catched, this, WebFlowCredentials.on_signal_ask_from_user_credentials_provided);
-        connect (this.ask_dialog, WebFlowCredentialsDialog.on_signal_close, this, WebFlowCredentials.on_signal_ask_from_user_cancelled);
+        connect (
+            this.ask_dialog, WebFlowCredentialsDialog.signal_url_catched,
+            this, WebFlowCredentials.on_signal_ask_from_user_credentials_provided
+        );
+        connect (
+            this.ask_dialog, WebFlowCredentialsDialog.signal_close,
+            this, WebFlowCredentials.on_signal_ask_from_user_cancelled
+        );
     }
 
 
@@ -305,12 +315,17 @@ public class WebFlowCredentials : AbstractCredentials {
         }
 
         // Load key too
-        var job = new KeychainChunk.ReadJob (this.account,
-                                            this.user + CLIENT_KEY_PEM_C,
-                                            this.keychain_migration,
-                                            this);
-        connect (job, KeychainChunk.ReadJob.on_signal_finished, this, WebFlowCredentials.on_signal_read_client_key_pem_job_done);
-        job.on_signal_start ();
+        var keychain_chunk_read_job = new KeychainChunk.ReadJob (
+            this.account,
+            this.user + CLIENT_KEY_PEM_C,
+            this.keychain_migration,
+            this
+        );
+        connect (
+            keychain_chunk_read_job, KeychainChunk.ReadJob.on_signal_finished,
+            this, WebFlowCredentials.on_signal_read_client_key_pem_job_done
+        );
+        keychain_chunk_read_job.on_signal_start ();
     }
 
 
@@ -373,22 +388,25 @@ public class WebFlowCredentials : AbstractCredentials {
             this.keychain_migration ? "" : this.account.identifier ()
         );
 
-        var job = new ReadPasswordJob (Theme.app_name, this);
+        var read_password_job = new ReadPasswordJob (Theme.app_name, this);
     //  #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
-        add_settings_to_job (this.account, job);
+        add_settings_to_job (this.account, read_password_job);
     //  #endif
-        job.insecure_fallback (false);
-        job.key (kck);
-        connect (job, Job.on_signal_finished, this, WebFlowCredentials.on_signal_read_password_job_done);
-        job.on_signal_start ();
+        read_password_job.insecure_fallback (false);
+        read_password_job.key (kck);
+        connect (
+            read_password_job, Job.signal_finished,
+            this, WebFlowCredentials.on_signal_read_password_job_finished
+        );
+        read_password_job.on_signal_start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_read_password_job_done (QKeychain.Job incoming_job) {
-        var job = qobject_cast<ReadPasswordJob> (incoming_job);
-        QKeychain.Error error = job.error ();
+    private void on_signal_read_password_job_finished (QKeychain.Job incoming_job) {
+        var read_password_job = qobject_cast<ReadPasswordJob> (incoming_job);
+        QKeychain.Error error = read_password_job.error ();
 
         // If we could not find the entry try the old entries
         if (!this.keychain_migration && error == QKeychain.EntryNotFound) {
@@ -402,7 +420,7 @@ public class WebFlowCredentials : AbstractCredentials {
         }
 
         if (error == QKeychain.NoError) {
-            this.password = job.text_data ();
+            this.password = read_password_job.text_data ();
             this.ready = true;
             this.credentials_valid = true;
         } else {
@@ -426,12 +444,17 @@ public class WebFlowCredentials : AbstractCredentials {
         //  Q_UNUSED (write_job)
         // write ssl key if there is one
         if (!this.client_ssl_key.is_null ()) {
-            var job = new KeychainChunk.WriteJob (this.account,
-                                                this.user + CLIENT_KEY_PEM_C,
-                                                this.client_ssl_key.to_pem (),
-                                                this);
-            connect (job, KeychainChunk.WriteJob.on_signal_finished, this, WebFlowCredentials.on_signal_write_client_key_pem_job_done);
-            job.on_signal_start ();
+            var keychain_chunk_write_job = new KeychainChunk.WriteJob (
+                this.account,
+                this.user + CLIENT_KEY_PEM_C,
+                this.client_ssl_key.to_pem (),
+                this
+            );
+            connect (
+                keychain_chunk_write_job, KeychainChunk.WriteJob.on_signal_finished,
+                this, WebFlowCredentials.on_signal_write_client_key_pem_job_done
+            );
+            keychain_chunk_write_job.on_signal_start ();
         } else {
             // no key, just write credentials
             on_signal_write_client_key_pem_job_done (null);
@@ -475,27 +498,30 @@ public class WebFlowCredentials : AbstractCredentials {
         }
 
         // done storing ca certificates, time for the password
-        var job = new WritePasswordJob (Theme.app_name, this);
+        var write_password_job = new WritePasswordJob (Theme.app_name, this);
     //  #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
-        add_settings_to_job (this.account, job);
+        add_settings_to_job (this.account, write_password_job);
     //  #endif
-        job.insecure_fallback (false);
-        connect (job, Job.on_signal_finished, this, WebFlowCredentials.on_signal_write_job_done);
-        job.key (keychain_key (this.account.url.to_string (), this.user, this.account.identifier ()));
-        job.text_data (this.password);
-        job.on_signal_start ();
+        write_password_job.insecure_fallback (false);
+        connect (
+            write_password_job, Job.on_signal_finished,
+            this, WebFlowCredentials.on_signal_write_job_done
+        );
+        write_password_job.key (keychain_key (this.account.url.to_string (), this.user, this.account.identifier ()));
+        write_password_job.text_data (this.password);
+        write_password_job.on_signal_start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_write_job_done (QKeychain.Job job) {
-        delete job.settings ();
-        switch (job.error ()) {
+    private void on_signal_write_job_done (QKeychain.Job qkeychain_job) {
+        delete qkeychain_job.settings ();
+        switch (qkeychain_job.error ()) {
         case NoError:
             break;
         default:
-            GLib.warning ("Error while writing password " + job.error_string ());
+            GLib.warning ("Error while writing password " + qkeychain_job.error_string ());
         }
     }
 
@@ -509,19 +535,19 @@ public class WebFlowCredentials : AbstractCredentials {
     private void read_single_client_ca_cert_pem () {
         // try to fetch a client ca cert
         if (this.client_ssl_ca_certificates.count () < this.client_ssl_ca_certificates_max_count) {
-            var job = new KeychainChunk.ReadJob (
+            var keychain_chunk_read_job = new KeychainChunk.ReadJob (
                 this.account,
                 this.user + client_ca_certificate_pemC + this.client_ssl_ca_certificates.count ().to_string (),
                 this.keychain_migration,
                 this
             );
             connect (
-                job,
+                keychain_chunk_read_job,
                 KeychainChunk.ReadJob.on_signal_finished,
                 this,
                 WebFlowCredentials.on_signal_read_client_ca_certificates_pem_job_done
             );
-            job.on_signal_start ();
+            keychain_chunk_read_job.on_signal_start ();
         } else {
             GLib.warning ("Maximum client CA cert count exceeded while reading, ignoring after " + this.client_ssl_ca_certificates_max_count);
 
@@ -550,12 +576,17 @@ public class WebFlowCredentials : AbstractCredentials {
                 return;
             }
 
-            var job = new KeychainChunk.WriteJob (this.account,
-                                                this.user + client_ca_certificate_pemC + string.number (index),
-                                                cert.to_pem (),
-                                                this);
-            connect (job, KeychainChunk.WriteJob.on_signal_finished, this, WebFlowCredentials.on_signal_write_client_ca_certificates_pem_job_done);
-            job.on_signal_start ();
+            var keychain_chunk_write_job = new KeychainChunk.WriteJob (
+                this.account,
+                this.user + client_ca_certificate_pemC + string.number (index),
+                cert.to_pem (),
+                this
+            );
+            connect (
+                keychain_chunk_write_job, KeychainChunk.WriteJob.on_signal_finished,
+                this, WebFlowCredentials.on_signal_write_client_ca_certificates_pem_job_done
+            );
+            keychain_chunk_write_job.on_signal_start ();
         } else {
             on_signal_write_client_ca_certificates_pem_job_done (null);
         }
@@ -573,12 +604,16 @@ public class WebFlowCredentials : AbstractCredentials {
     ***********************************************************/
     protected void fetch_from_keychain_helper () {
         // Read client cert from keychain
-        var job = new KeychainChunk.ReadJob (this.account,
-                                            this.user + CLIENT_CERTIFICATE_PEM_C,
-                                            this.keychain_migration,
-                                            this);
-        connect (job, KeychainChunk.ReadJob.on_signal_finished, this, WebFlowCredentials.on_signal_read_client_cert_pem_job_done);
-        job.on_signal_start ();
+        var keychain_chunk_read_job = new KeychainChunk.ReadJob (
+            this.account,
+            this.user + CLIENT_CERTIFICATE_PEM_C,
+            this.keychain_migration,
+            this);
+        connect (
+            keychain_chunk_read_job, KeychainChunk.ReadJob.on_signal_finished,
+            this, WebFlowCredentials.on_signal_read_client_cert_pem_job_done
+        );
+        keychain_chunk_read_job.on_signal_start ();
     }
 
 

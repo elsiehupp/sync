@@ -25,12 +25,15 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public FolderWizardLocalPath (unowned Account account) {
+    public FolderWizardLocalPath (Account account) {
         base ();
         this.account = account;
         this.ui.up_ui (this);
         register_field ("source_folder*", this.ui.local_folder_line_edit);
-        connect (this.ui.local_folder_choose_btn, QAbstractButton.clicked, this, FolderWizardLocalPath.on_signal_choose_local_folder);
+        connect (
+            this.ui.local_folder_choose_btn, QAbstractButton.clicked,
+            this, FolderWizardLocalPath.on_signal_choose_local_folder
+        );
         this.ui.local_folder_choose_btn.tool_tip (_("Click to select a local folder to sync."));
 
         GLib.Uri server_url = this.account.url;

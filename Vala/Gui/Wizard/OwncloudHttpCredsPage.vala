@@ -37,8 +37,8 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
             this.oc_wizard = qobject_cast<OwncloudWizard> (parent);
         }
 
-        register_field (QLatin1String ("OCUser*"), this.ui.le_username);
-        register_field (QLatin1String ("OCPasswd*"), this.ui.le_password);
+        register_field ("OCUser*", this.ui.le_username);
+        register_field ("OCPasswd*", this.ui.le_password);
 
         Theme theme = Theme.instance;
         switch (theme.user_identifier_type) {

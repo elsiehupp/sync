@@ -16,6 +16,11 @@ Copyright (C) by Christian Kamm <mail@ckamm.de>
 namespace Occ {
 namespace Ui {
 
+public errordomain OpenExternalError {
+    INVALID_URL_SCHEME,
+    OPEN_EXTERNAL_FAILED,
+}
+
 public class OpenExtrernal {
 
     /***********************************************************
@@ -23,7 +28,7 @@ public class OpenExtrernal {
 
     If launching the browser fails, display a message.
     ***********************************************************/
-    public static bool open_browser (GLib.Uri url, Gtk.Widget error_widget_parent = null) {
+    public static void open_browser (GLib.Uri url, Gtk.Widget error_widget_parent = new Gtk.Widget ()) throws OpenExternalError {
         const string[] allowed_url_schemes = {
             "http",
             "https",
@@ -32,11 +37,11 @@ public class OpenExtrernal {
 
         if (!allowed_url_schemes.contains (url.scheme ())) {
             GLib.warning ("URL format is not supported, or it has been compromised for: " + url.to_string ());
-            return false;
+            throw new OpenExternalError.INVALID_URL_SCHEME ("URL format is not supported, or it has been compromised for: " + url.to_string ());
         }
 
         if (!QDesktopServices.open_url (url)) {
-            if (error_widget_parent) {
+            if (error_widget_parent != null) {
                 Gtk.MessageBox.warning (
                     error_widget_parent,
                     _("Could not open browser"),
@@ -46,9 +51,9 @@ public class OpenExtrernal {
                         .printf (url.to_string ()));
             }
             GLib.warning ("QDesktopServices.open_url failed for " + url);
-            return false;
+            throw new OpenExternalError.OPEN_EXTERNAL_FAILED ("QDesktopServices.open_url failed for " + url.to_string ());
         }
-        return true;
+        return;
     }
 
 
@@ -57,9 +62,9 @@ public class OpenExtrernal {
 
     If launching the email program fails, display a message.
     ***********************************************************/
-    public static bool open_email_composer (
+    public static void open_email_composer (
         string subject, string body,
-        Gtk.Widget error_widget_parent) {
+        Gtk.Widget error_widget_parent) throws OpenExternalError {
         GLib.Uri url = new GLib.Uri ("mailto:");
         QUrlQuery query;
         query.query_items (
@@ -77,7 +82,7 @@ public class OpenExtrernal {
         url.query (query);
 
         if (!QDesktopServices.open_url (url)) {
-            if (error_widget_parent) {
+            if (error_widget_parent != null) {
                 Gtk.MessageBox.warning (
                     error_widget_parent,
                     _("Could not open email client"),
@@ -87,9 +92,8 @@ public class OpenExtrernal {
                     + "configured?"));
             }
             GLib.warning ("QDesktopServices.open_url failed for " + url);
-            return false;
+            throw new OpenExternalError.INVALID_URL_SCHEME ("QDesktopServices.open_url failed for " + url.to_string ());
         }
-        return true;
     }
 
 } // class Utility

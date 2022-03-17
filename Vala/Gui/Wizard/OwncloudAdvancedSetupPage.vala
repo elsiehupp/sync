@@ -51,7 +51,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
 
         set_up_resolution_widget ();
 
-        register_field (QLatin1String ("OCSync_from_scratch"), this.ui.cb_sync_from_scratch);
+        register_field ("OCSync_from_scratch", this.ui.cb_sync_from_scratch);
 
         var size_policy = this.progress_indicator.size_policy ();
         size_policy.retain_size_when_hidden (true);
@@ -61,7 +61,10 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         on_signal_stop_spinner ();
         set_up_customization ();
 
-        connect (this.ui.pb_select_local_folder, QAbstractButton.clicked, this, OwncloudAdvancedSetupPage.on_signal_select_folder);
+        connect (
+            this.ui.pb_select_local_folder, QAbstractButton.clicked,
+            this, OwncloudAdvancedSetupPage.on_signal_select_folder
+        );
         button_text (QWizard.FinishButton, _("Connect"));
 
         if (Theme.enforce_virtual_files_sync_folder) {
@@ -486,15 +489,15 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         string error_str = FolderMan.instance.check_path_validity_for_new_folder (loc_folder, server_url ());
         this.local_folder_valid = error_str == "";
 
-        string t;
+        string status_string;
 
         local_folder_push_button_path (loc_folder);
 
         if (on_signal_data_changed ()) {
-            if (this.remote_folder == "" || this.remote_folder == QLatin1String ("/")) {
-                t = "";
+            if (this.remote_folder == "" || this.remote_folder == "/") {
+                status_string = "";
             } else {
-                t = Utility.escape (_(" (%1 folder \"%2\" is synced to local folder \"%3\")")
+                status_string = Utility.escape (_(" (%1 folder \"%2\" is synced to local folder \"%3\")")
                                         .printf (
                                             Theme.app_name,
                                             this.remote_folder,
@@ -506,7 +509,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
 
             const bool dir_not_empty = new GLib.Dir (loc_folder).entry_list (GLib.Dir.AllEntries | GLib.Dir.NoDotAndDotDot).count () > 0;
             if (dir_not_empty) {
-                t += _("Warning : The local folder is not empty. Pick a resolution!");
+                status_string += _("Warning : The local folder is not empty. Pick a resolution!");
             }
             resolution_gui_visible (dir_not_empty);
         } else {
@@ -514,9 +517,9 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         }
 
         string lfree_space_str = Utility.octets_to_string (available_local_space ());
-        this.ui.l_free_space.on_signal_text (string (_("%1 free space", "%1 gets replaced with the size and a matching unit. Example: 3 MB or 5 GB")).printf (lfree_space_str));
+        this.ui.l_free_space.text (_("%1 free space", "%1 gets replaced with the size and a matching unit. Example: 3 MB or 5 GB").printf (lfree_space_str));
 
-        this.ui.sync_mode_label.on_signal_text (t);
+        this.ui.sync_mode_label.text (status_string);
         this.ui.sync_mode_label.fixed_height (this.ui.sync_mode_label.size_hint ().height ());
 
         int64 r_space = this.ui.r_sync_everything.is_checked () ? this.r_size : this.r_selected_size;
@@ -637,7 +640,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void style_sync_logo () {
-        const var sync_arrow_icon = Theme.create_color_aware_icon (QLatin1String (":/client/theme/sync-arrow.svg"), palette ());
+        const var sync_arrow_icon = Theme.create_color_aware_icon (":/client/theme/sync-arrow.svg", palette ());
         this.ui.sync_logo_label.pixmap (sync_arrow_icon.pixmap (QSize (50, 50)));
     }
 

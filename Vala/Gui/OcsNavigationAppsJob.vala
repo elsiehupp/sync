@@ -25,10 +25,12 @@ public class OcsNavigationAppsJob : OcsJob {
 
     /***********************************************************
     ***********************************************************/
-    public OcsNavigationAppsJob (unowned Account account) {
+    public OcsNavigationAppsJob (Account account) {
         base (account);
         path ("ocs/v2.php/core/navigation/apps");
-        connect (this, OcsNavigationAppsJob.signal_job_finished, this, OcsNavigationAppsJob.on_signal_job_done);
+        this.signal_job_finished.connect (
+            this.on_signal_job_finished
+        );
     }
 
 
@@ -45,7 +47,7 @@ public class OcsNavigationAppsJob : OcsJob {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_job_done (QJsonDocument reply, int status_code) {
+    private void on_signal_job_finished (QJsonDocument reply, int status_code) {
         /* emit */ signal_apps_job_finished (reply, status_code);
     }
 

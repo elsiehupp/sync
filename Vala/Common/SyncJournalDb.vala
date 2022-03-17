@@ -392,7 +392,7 @@ public class SyncJournalDb : GLib.Object {
         string key = "%1@%2:%3".printf (user, remote_url.to_string (), remote_path);
 
         string ba = QCryptographicHash.hash (key.to_utf8 (), QCryptographicHash.Md5);
-        journal_path += string.from_latin1 (ba.left (6).to_hex ()) + ".db";
+        journal_path += ba.left (6).to_hex () + ".db";
 
         // If it exists already, the path is clearly usable
         GLib.File file = GLib.File.new_for_path (GLib.Dir (local_path).file_path (journal_path));
@@ -446,38 +446,38 @@ public class SyncJournalDb : GLib.Object {
 
         if (FileSystem.file_exists (new_database_name)) {
             if (!FileSystem.remove (new_database_name, error)) {
-                GLib.warning ("Database migration : Could not remove database file" + new_database_name
+                GLib.warning ("Database migration: Could not remove database file" + new_database_name
                                 + "due to" + error);
                 return false;
             }
         }
         if (FileSystem.file_exists (new_database_name_wal)) {
             if (!FileSystem.remove (new_database_name_wal, error)) {
-                GLib.warning ("Database migration : Could not remove database WAL file" + new_database_name_wal
+                GLib.warning ("Database migration: Could not remove database WAL file" + new_database_name_wal
                                 + "due to" + error);
                 return false;
             }
         }
         if (FileSystem.file_exists (new_database_name_shm)) {
             if (!FileSystem.remove (new_database_name_shm, error)) {
-                GLib.warning ("Database migration : Could not remove database SHM file" + new_database_name_shm
+                GLib.warning ("Database migration: Could not remove database SHM file" + new_database_name_shm
                                 + "due to" + error);
                 return false;
             }
         }
 
         if (!FileSystem.rename (old_database_name, new_database_name, error)) {
-            GLib.warning ("Database migration : could not rename" + old_database_name
+            GLib.warning ("Database migration: could not rename" + old_database_name
                             + "to" + new_database_name + ":" + error);
             return false;
         }
         if (!FileSystem.rename (old_database_name_wal, new_database_name_wal, error)) {
-            GLib.warning ("Database migration : could not rename" + old_database_name_wal
+            GLib.warning ("Database migration: could not rename" + old_database_name_wal
                             + "to" + new_database_name_wal + ":" + error);
             return false;
         }
         if (!FileSystem.rename (old_database_name_shm, new_database_name_shm, error)) {
-            GLib.warning ("Database migration : could not rename" + old_database_name_shm
+            GLib.warning ("Database migration: could not rename" + old_database_name_shm
                             + "to" + new_database_name_shm + ":" + error);
             return false;
         }
@@ -809,12 +809,8 @@ public class SyncJournalDb : GLib.Object {
         if (check_connect ()) {
             int plen = record.path.length ();
 
-            string etag = new string (record.etag);
-            if (etag == "")
-                etag = "";
-            string file_id = new string (record.file_id);
-            if (file_id == "")
-                file_id = "";
+            string etag = record.etag;
+            string file_id = record.file_id;
             string remote_perm = record.remote_perm.to_database_value ();
             string checksum_type;
             string checksum;
@@ -873,7 +869,7 @@ public class SyncJournalDb : GLib.Object {
             return;
         }
 
-        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.SET_KEY_VALUE_STORE_QUERY, QByteArrayLiteral ("INSERT OR REPLACE INTO key_value_store (key, value) VALUES (?1, ?2);"), this.database);
+        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.SET_KEY_VALUE_STORE_QUERY, "INSERT OR REPLACE INTO key_value_store (key, value) VALUES (?1, ?2);", this.database);
         if (!query) {
             return;
         }
@@ -892,7 +888,7 @@ public class SyncJournalDb : GLib.Object {
             return default_value;
         }
 
-        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_KEY_VALUE_STORE_QUERY, QByteArrayLiteral ("SELECT value FROM key_value_store WHERE key=?1"), this.database);
+        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_KEY_VALUE_STORE_QUERY, "SELECT value FROM key_value_store WHERE key=?1", this.database);
         if (!query) {
             return default_value;
         }
@@ -912,7 +908,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void key_value_store_delete (string key) {
-        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_KEY_VALUE_STORE_QUERY, QByteArrayLiteral ("DELETE FROM key_value_store WHERE key=?1;"), this.database);
+        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_KEY_VALUE_STORE_QUERY, "DELETE FROM key_value_store WHERE key=?1;", this.database);
         if (!query) {
             GLib.warning ("Failed to init_or_reset this.delete_key_value_store_query");
             //  Q_ASSERT (false);
@@ -935,7 +931,7 @@ public class SyncJournalDb : GLib.Object {
             // if (!recursively) {
             // always delete the actual file.
             {
-                PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_FILE_RECORD_PHASH, QByteArrayLiteral ("DELETE FROM metadata WHERE phash=?1"), this.database);
+                PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_FILE_RECORD_PHASH, "DELETE FROM metadata WHERE phash=?1", this.database);
                 if (!query) {
                     return false;
                 }
@@ -1236,7 +1232,7 @@ public class SyncJournalDb : GLib.Object {
         DownloadInfo res;
 
         if (check_connect ()) {
-            PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_DOWNLOAD_INFO_QUERY, QByteArrayLiteral ("SELECT tmpfile, etag, errorcount FROM downloadinfo WHERE path=?1"), this.database);
+            PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_DOWNLOAD_INFO_QUERY, "SELECT tmpfile, etag, errorcount FROM downloadinfo WHERE path=?1", this.database);
             if (!query) {
                 return res;
             }
@@ -1662,7 +1658,7 @@ public class SyncJournalDb : GLib.Object {
             return result;
         }
 
-        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_SELECTIVE_SYNC_LIST_QUERY, QByteArrayLiteral ("SELECT path FROM selectivesync WHERE type=?1"), this.database);
+        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_SELECTIVE_SYNC_LIST_QUERY, "SELECT path FROM selectivesync WHERE type=?1", this.database);
         if (!query) {
             *ok = false;
             return result;
@@ -1871,7 +1867,7 @@ public class SyncJournalDb : GLib.Object {
         }
 
         // Retrieve the identifier
-        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_CHECKSUM_TYPE_QUERY, QByteArrayLiteral ("SELECT name FROM checksumtype WHERE identifier=?1"), this.database);
+        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_CHECKSUM_TYPE_QUERY, "SELECT name FROM checksumtype WHERE identifier=?1", this.database);
         if (!query) {
             return {};
         }
@@ -1898,8 +1894,8 @@ public class SyncJournalDb : GLib.Object {
                 return;
             }
 
-            PreparedSqlQuery data_fingerprint_query1 = this.query_manager.get (PreparedSqlQueryManager.Key.SET_DATA_FINGERPRINT_QUERY1, QByteArrayLiteral ("DELETE FROM datafingerprint;"), this.database);
-            PreparedSqlQuery data_fingerprint_query2 = this.query_manager.get (PreparedSqlQueryManager.Key.SET_DATA_FINGERPRINT_QUERY2, QByteArrayLiteral ("INSERT INTO datafingerprint (fingerprint) VALUES (?1);"), this.database);
+            PreparedSqlQuery data_fingerprint_query1 = this.query_manager.get (PreparedSqlQueryManager.Key.SET_DATA_FINGERPRINT_QUERY1, "DELETE FROM datafingerprint;", this.database);
+            PreparedSqlQuery data_fingerprint_query2 = this.query_manager.get (PreparedSqlQueryManager.Key.SET_DATA_FINGERPRINT_QUERY2, "INSERT INTO datafingerprint (fingerprint) VALUES (?1);", this.database);
             if (!data_fingerprint_query1 || !data_fingerprint_query2) {
                 return;
             }
@@ -1915,7 +1911,7 @@ public class SyncJournalDb : GLib.Object {
                 return "";
             }
 
-            PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_DATA_FINGERPRINT_QUERY, QByteArrayLiteral ("SELECT fingerprint FROM datafingerprint"), this.database);
+            PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_DATA_FINGERPRINT_QUERY, "SELECT fingerprint FROM datafingerprint", this.database);
             if (!query) {
                 return "";
             }
@@ -1970,7 +1966,7 @@ public class SyncJournalDb : GLib.Object {
         if (!check_connect ()) {
             return entry;
         }
-        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_CONFLICT_RECORD_QUERY, QByteArrayLiteral ("SELECT base_file_id, base_modtime, base_etag, base_path FROM conflicts WHERE path=?1;"), this.database);
+        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_CONFLICT_RECORD_QUERY, "SELECT base_file_id, base_modtime, base_etag, base_path FROM conflicts WHERE path=?1;", this.database);
         //  ASSERT (query)
         query.bind_value (1, path);
         //  ASSERT (query.exec ())
@@ -1995,7 +1991,7 @@ public class SyncJournalDb : GLib.Object {
         if (!check_connect ())
             return;
 
-        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_CONFLICT_RECORD_QUERY, QByteArrayLiteral ("DELETE FROM conflicts WHERE path=?1;"), this.database);
+        PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_CONFLICT_RECORD_QUERY, "DELETE FROM conflicts WHERE path=?1;", this.database);
         //  ASSERT (query)
         query.bind_value (1, path);
         //  ASSERT (query.exec ())
@@ -2099,7 +2095,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     Access to PinStates stored in the database.
 
-    Important : Not all vfs plugins store the pin states in the database,
+    Important: Not all vfs plugins store the pin states in the database,
     prefer to use Vfs.pin_state () etc.
     ***********************************************************/
     public PinStateInterface internal_pin_states () {
@@ -2184,22 +2180,22 @@ public class SyncJournalDb : GLib.Object {
             SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE metadata ADD COLUMN fileid VARCHAR (128);");
             if (!query.exec ()) {
-                sql_fail ("update_metadata_table_structure : Add column fileid", query);
+                sql_fail ("update_metadata_table_structure: Add column fileid", query);
                 re = false;
             }
 
             query.prepare ("CREATE INDEX metadata_file_id ON metadata (fileid);");
             if (!query.exec ()) {
-                sql_fail ("update_metadata_table_structure : create index fileid", query);
+                sql_fail ("update_metadata_table_structure: create index fileid", query);
                 re = false;
             }
-            commit_internal ("update database structure : add fileid col");
+            commit_internal ("update database structure: add fileid col");
         }
         if (columns.index_of ("remote_perm") == -1) {
             SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE metadata ADD COLUMN remote_perm VARCHAR (128);");
             if (!query.exec ()) {
-                sql_fail ("update_metadata_table_structure : add column remote_perm", query);
+                sql_fail ("update_metadata_table_structure: add column remote_perm", query);
                 re = false;
             }
             commit_internal ("update database structure (remote_perm)");
@@ -2208,89 +2204,89 @@ public class SyncJournalDb : GLib.Object {
             SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE metadata ADD COLUMN filesize BIGINT;");
             if (!query.exec ()) {
-                sql_fail ("update_database_structure : add column filesize", query);
+                sql_fail ("update_database_structure: add column filesize", query);
                 re = false;
             }
-            commit_internal ("update database structure : add filesize col");
+            commit_internal ("update database structure: add filesize col");
         }
 
         if (true) {
             SqlQuery query = new SqlQuery (this.database);
             query.prepare ("CREATE INDEX IF NOT EXISTS metadata_inode ON metadata (inode);");
             if (!query.exec ()) {
-                sql_fail ("update_metadata_table_structure : create index inode", query);
+                sql_fail ("update_metadata_table_structure: create index inode", query);
                 re = false;
             }
-            commit_internal ("update database structure : add inode index");
+            commit_internal ("update database structure: add inode index");
         }
 
         if (true) {
             SqlQuery query = new SqlQuery (this.database);
             query.prepare ("CREATE INDEX IF NOT EXISTS metadata_path ON metadata (path);");
             if (!query.exec ()) {
-                sql_fail ("update_metadata_table_structure : create index path", query);
+                sql_fail ("update_metadata_table_structure: create index path", query);
                 re = false;
             }
-            commit_internal ("update database structure : add path index");
+            commit_internal ("update database structure: add path index");
         }
 
         if (true) {
             SqlQuery query = new SqlQuery (this.database);
             query.prepare ("CREATE INDEX IF NOT EXISTS metadata_parent ON metadata (parent_hash (path));");
             if (!query.exec ()) {
-                sql_fail ("update_metadata_table_structure : create index parent", query);
+                sql_fail ("update_metadata_table_structure: create index parent", query);
                 re = false;
             }
-            commit_internal ("update database structure : add parent index");
+            commit_internal ("update database structure: add parent index");
         }
 
         if (columns.index_of ("ignored_children_remote") == -1) {
             SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE metadata ADD COLUMN ignored_children_remote INT;");
             if (!query.exec ()) {
-                sql_fail ("update_metadata_table_structure : add ignored_children_remote column", query);
+                sql_fail ("update_metadata_table_structure: add ignored_children_remote column", query);
                 re = false;
             }
-            commit_internal ("update database structure : add ignored_children_remote col");
+            commit_internal ("update database structure: add ignored_children_remote col");
         }
 
         if (columns.index_of ("content_checksum") == -1) {
             SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE metadata ADD COLUMN content_checksum TEXT;");
             if (!query.exec ()) {
-                sql_fail (QStringLiteral ("update_metadata_table_structure : add content_checksum column"), query);
+                sql_fail ("update_metadata_table_structure: add content_checksum column", query);
                 re = false;
             }
-            commit_internal (QStringLiteral ("update database structure : add content_checksum col"));
+            commit_internal ("update database structure: add content_checksum col");
         }
         if (columns.index_of ("content_checksum_type_id") == -1) {
             SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE metadata ADD COLUMN content_checksum_type_id INTEGER;");
             if (!query.exec ()) {
-                sql_fail (QStringLiteral ("update_metadata_table_structure : add content_checksum_type_id column"), query);
+                sql_fail ("update_metadata_table_structure: add content_checksum_type_id column", query);
                 re = false;
             }
-            commit_internal (QStringLiteral ("update database structure : add content_checksum_type_id col"));
+            commit_internal ("update database structure: add content_checksum_type_id col");
         }
 
         if (!columns.contains ("e2e_mangled_name")) {
             SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE metadata ADD COLUMN e2e_mangled_name TEXT;");
             if (!query.exec ()) {
-                sql_fail (QStringLiteral ("update_metadata_table_structure : add e2e_mangled_name column"), query);
+                sql_fail ("update_metadata_table_structure: add e2e_mangled_name column", query);
                 re = false;
             }
-            commit_internal (QStringLiteral ("update database structure : add e2e_mangled_name col"));
+            commit_internal ("update database structure: add e2e_mangled_name col");
         }
 
         if (!columns.contains ("is_e2e_encrypted")) {
             SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE metadata ADD COLUMN is_e2e_encrypted INTEGER;");
             if (!query.exec ()) {
-                sql_fail (QStringLiteral ("update_metadata_table_structure : add is_e2e_encrypted column"), query);
+                sql_fail ("update_metadata_table_structure: add is_e2e_encrypted column", query);
                 re = false;
             }
-            commit_internal (QStringLiteral ("update database structure : add is_e2e_encrypted col"));
+            commit_internal ("update database structure: add is_e2e_encrypted col");
         }
 
         var upload_info_columns = table_columns ("uploadinfo");
@@ -2300,10 +2296,10 @@ public class SyncJournalDb : GLib.Object {
             SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE uploadinfo ADD COLUMN content_checksum TEXT;");
             if (!query.exec ()) {
-                sql_fail (QStringLiteral ("update_metadata_table_structure : add content_checksum column"), query);
+                sql_fail ("update_metadata_table_structure: add content_checksum column", query);
                 re = false;
             }
-            commit_internal (QStringLiteral ("update database structure : add content_checksum col for uploadinfo"));
+            commit_internal ("update database structure: add content_checksum col for uploadinfo");
         }
 
         var conflicts_columns = table_columns ("conflicts");
@@ -2313,7 +2309,7 @@ public class SyncJournalDb : GLib.Object {
             SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE conflicts ADD COLUMN base_path TEXT;");
             if (!query.exec ()) {
-                sql_fail (QStringLiteral ("update_metadata_table_structure : add base_path column"), query);
+                sql_fail ("update_metadata_table_structure: add base_path column", query);
                 re = false;
             }
         }
@@ -2322,10 +2318,10 @@ public class SyncJournalDb : GLib.Object {
             SqlQuery query = new SqlQuery (this.database);
             query.prepare ("CREATE INDEX IF NOT EXISTS metadata_e2e_id ON metadata (e2e_mangled_name);");
             if (!query.exec ()) {
-                sql_fail (QStringLiteral ("update_metadata_table_structure : create index e2e_mangled_name"), query);
+                sql_fail ("update_metadata_table_structure: create index e2e_mangled_name", query);
                 re = false;
             }
-            commit_internal (QStringLiteral ("update database structure : add e2e_mangled_name index"));
+            commit_internal ("update database structure: add e2e_mangled_name index");
         }
 
         return re;
@@ -2346,50 +2342,50 @@ public class SyncJournalDb : GLib.Object {
             SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE blocklist ADD COLUMN last_try_time INTEGER (8);");
             if (!query.exec ()) {
-                sql_fail (QStringLiteral ("update_blocklist_table_structure : Add last_try_time fileid"), query);
+                sql_fail ("update_blocklist_table_structure: Add last_try_time fileid", query);
                 re = false;
             }
             query.prepare ("ALTER TABLE blocklist ADD COLUMN ignore_duration INTEGER (8);");
             if (!query.exec ()) {
-                sql_fail (QStringLiteral ("update_blocklist_table_structure : Add ignore_duration fileid"), query);
+                sql_fail ("update_blocklist_table_structure: Add ignore_duration fileid", query);
                 re = false;
             }
-            commit_internal (QStringLiteral ("update database structure : add last_try_time, ignore_duration cols"));
+            commit_internal ("update database structure: add last_try_time, ignore_duration cols");
         }
         if (columns.index_of ("rename_target") == -1) {
             SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE blocklist ADD COLUMN rename_target VARCHAR (4096);");
             if (!query.exec ()) {
-                sql_fail (QStringLiteral ("update_blocklist_table_structure : Add rename_target"), query);
+                sql_fail ("update_blocklist_table_structure: Add rename_target", query);
                 re = false;
             }
-            commit_internal (QStringLiteral ("update database structure : add rename_target col"));
+            commit_internal ("update database structure: add rename_target col");
         }
 
         if (columns.index_of ("error_category") == -1) {
             SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE blocklist ADD COLUMN error_category INTEGER (8);");
             if (!query.exec ()) {
-                sql_fail (QStringLiteral ("update_blocklist_table_structure : Add error_category"), query);
+                sql_fail ("update_blocklist_table_structure: Add error_category", query);
                 re = false;
             }
-            commit_internal (QStringLiteral ("update database structure : add error_category col"));
+            commit_internal ("update database structure: add error_category col");
         }
 
         if (columns.index_of ("request_id") == -1) {
             SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE blocklist ADD COLUMN request_id VARCHAR (36);");
             if (!query.exec ()) {
-                sql_fail (QStringLiteral ("update_blocklist_table_structure : Add request_id"), query);
+                sql_fail ("update_blocklist_table_structure: Add request_id", query);
                 re = false;
             }
-            commit_internal (QStringLiteral ("update database structure : add error_category col"));
+            commit_internal ("update database structure: add error_category col");
         }
 
         SqlQuery query = new SqlQuery (this.database);
         query.prepare ("CREATE INDEX IF NOT EXISTS blocklist_index ON blocklist (path collate nocase);");
         if (!query.exec ()) {
-            sql_fail (QStringLiteral ("update_error_blocklist_table_structure : create index blocklit"), query);
+            sql_fail ("update_error_blocklist_table_structure: create index blocklit", query);
             re = false;
         }
 
@@ -2597,13 +2593,13 @@ public class SyncJournalDb : GLib.Object {
                 return check_connect ();
             }
 
-            return sql_fail (QStringLiteral ("Create table metadata"), create_query);
+            return sql_fail ("Create table metadata", create_query);
         }
 
         create_query.prepare ("CREATE TABLE IF NOT EXISTS key_value_store (key VARCHAR (4096), value VARCHAR (4096), PRIMARY KEY (key));");
 
         if (!create_query.exec ()) {
-            return sql_fail (QStringLiteral ("Create table key_value_store"), create_query);
+            return sql_fail ("Create table key_value_store", create_query);
         }
 
         create_query.prepare ("CREATE TABLE IF NOT EXISTS downloadinfo ("
@@ -2615,7 +2611,7 @@ public class SyncJournalDb : GLib.Object {
                              + ");");
 
         if (!create_query.exec ()) {
-            return sql_fail (QStringLiteral ("Create table downloadinfo"), create_query);
+            return sql_fail ("Create table downloadinfo", create_query);
         }
 
         create_query.prepare ("CREATE TABLE IF NOT EXISTS uploadinfo ("
@@ -2630,7 +2626,7 @@ public class SyncJournalDb : GLib.Object {
                              + ");");
 
         if (!create_query.exec ()) {
-            return sql_fail (QStringLiteral ("Create table uploadinfo"), create_query);
+            return sql_fail ("Create table uploadinfo", create_query);
         }
 
         // create the blocklist table.
@@ -2644,7 +2640,7 @@ public class SyncJournalDb : GLib.Object {
                              + ");");
 
         if (!create_query.exec ()) {
-            return sql_fail (QStringLiteral ("Create table blocklist"), create_query);
+            return sql_fail ("Create table blocklist", create_query);
         }
 
         create_query.prepare ("CREATE TABLE IF NOT EXISTS async_poll ("
@@ -2653,7 +2649,7 @@ public class SyncJournalDb : GLib.Object {
                              + "filesize BIGINT,"
                              + "pollpath VARCHAR (4096));");
         if (!create_query.exec ()) {
-            return sql_fail (QStringLiteral ("Create table async_poll"), create_query);
+            return sql_fail ("Create table async_poll", create_query);
         }
 
         // create the selectivesync table.
@@ -2663,7 +2659,7 @@ public class SyncJournalDb : GLib.Object {
                              + ");");
 
         if (!create_query.exec ()) {
-            return sql_fail (QStringLiteral ("Create table selectivesync"), create_query);
+            return sql_fail ("Create table selectivesync", create_query);
         }
 
         // create the checksumtype table.
@@ -2672,7 +2668,7 @@ public class SyncJournalDb : GLib.Object {
                              + "name TEXT UNIQUE"
                              + ");");
         if (!create_query.exec ()) {
-            return sql_fail (QStringLiteral ("Create table checksumtype"), create_query);
+            return sql_fail ("Create table checksumtype", create_query);
         }
 
         // create the datafingerprint table.
@@ -2680,7 +2676,7 @@ public class SyncJournalDb : GLib.Object {
                              + "fingerprint TEXT UNIQUE"
                              + ");");
         if (!create_query.exec ()) {
-            return sql_fail (QStringLiteral ("Create table datafingerprint"), create_query);
+            return sql_fail ("Create table datafingerprint", create_query);
         }
 
         // create the flags table.
@@ -2689,7 +2685,7 @@ public class SyncJournalDb : GLib.Object {
                              + "pin_state INTEGER"
                              + ");");
         if (!create_query.exec ()) {
-            return sql_fail (QStringLiteral ("Create table flags"), create_query);
+            return sql_fail ("Create table flags", create_query);
         }
 
         // create the conflicts table.
@@ -2700,7 +2696,7 @@ public class SyncJournalDb : GLib.Object {
                              + "base_modtime INTEGER"
                              + ");");
         if (!create_query.exec ()) {
-            return sql_fail (QStringLiteral ("Create table conflicts"), create_query);
+            return sql_fail ("Create table conflicts", create_query);
         }
 
         create_query.prepare ("CREATE TABLE IF NOT EXISTS version ("
@@ -2710,7 +2706,7 @@ public class SyncJournalDb : GLib.Object {
                              + "custom VARCHAR (256)"
                              + ");");
         if (!create_query.exec ()) {
-            return sql_fail (QStringLiteral ("Create table version"), create_query);
+            return sql_fail ("Create table version", create_query);
         }
 
         bool force_remote_discovery = false;
@@ -2725,7 +2721,7 @@ public class SyncJournalDb : GLib.Object {
             create_query.bind_value (3, MIRALL_VERSION_PATCH);
             create_query.bind_value (4, MIRALL_VERSION_BUILD);
             if (!create_query.exec ()) {
-                return sql_fail (QStringLiteral ("Update version"), create_query);
+                return sql_fail ("Update version", create_query);
             }
 
         } else {
@@ -2759,12 +2755,12 @@ public class SyncJournalDb : GLib.Object {
                 create_query.bind_value (6, minor);
                 create_query.bind_value (7, patch);
                 if (!create_query.exec ()) {
-                    return sql_fail (QStringLiteral ("Update version"), create_query);
+                    return sql_fail ("Update version", create_query);
                 }
             }
         }
 
-        commit_internal (QStringLiteral ("check_connect"));
+        commit_internal ("check_connect");
 
         bool rc = update_database_structure ();
         if (!rc) {
@@ -2783,31 +2779,30 @@ public class SyncJournalDb : GLib.Object {
         if (force_remote_discovery) {
             force_remote_discovery_next_sync_locked ();
         }
-        PreparedSqlQuery delete_download_info = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_DOWNLOAD_INFO_QUERY, QByteArrayLiteral ("DELETE FROM downloadinfo WHERE path=?1"), this.database);
+        PreparedSqlQuery delete_download_info = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_DOWNLOAD_INFO_QUERY, "DELETE FROM downloadinfo WHERE path=?1", this.database);
         if (!delete_download_info) {
             return sql_fail ("prepare this.delete_download_info_query", *delete_download_info);
         }
 
-        PreparedSqlQuery delete_upload_info_query = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_UPLOAD_INFO_QUERY, QByteArrayLiteral ("DELETE FROM uploadinfo WHERE path=?1"), this.database);
+        PreparedSqlQuery delete_upload_info_query = this.query_manager.get (PreparedSqlQueryManager.Key.DELETE_UPLOAD_INFO_QUERY, "DELETE FROM uploadinfo WHERE path=?1", this.database);
         if (!delete_upload_info_query) {
             return sql_fail ("prepare this.delete_upload_info_query", *delete_upload_info_query);
         }
 
-        string sql = new string (
-            "SELECT last_try_etag, last_try_modtime, retrycount, errorstring, last_try_time, ignore_duration, rename_target, error_category, request_id "
-            + "FROM blocklist WHERE path=?1");
+        string sql_string = "SELECT last_try_etag, last_try_modtime, retrycount, errorstring, last_try_time, ignore_duration, rename_target, error_category, request_id "
+                   + "FROM blocklist WHERE path=?1";
         if (Utility.fs_case_preserving ()) {
             // if the file system is case preserving we have to check the blocklist
             // case insensitively
-            sql += " COLLATE NOCASE";
+            sql_string += " COLLATE NOCASE";
         }
-        PreparedSqlQuery get_error_blocklist_query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_ERROR_BLOCKLIST_QUERY, sql, this.database);
+        PreparedSqlQuery get_error_blocklist_query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_ERROR_BLOCKLIST_QUERY, sql_string, this.database);
         if (!get_error_blocklist_query) {
-            return sql_fail (QStringLiteral ("prepare this.get_error_blocklist_query"), *get_error_blocklist_query);
+            return sql_fail ("prepare this.get_error_blocklist_query", get_error_blocklist_query);
         }
 
-        // don't on_signal_start a new transaction now
-        commit_internal (QStringLiteral ("check_connect End"), false);
+        // don't start a new transaction now
+        commit_internal ("check_connect End", false);
 
         // This avoid reading from the DB if we already know it is empty
         // thereby speeding up the initial discovery significantly.
@@ -2815,9 +2810,9 @@ public class SyncJournalDb : GLib.Object {
 
         // Hide 'em all!
         FileSystem.file_hidden (database_file_path (), true);
-        FileSystem.file_hidden (database_file_path () + QStringLiteral ("-wal"), true);
-        FileSystem.file_hidden (database_file_path () + QStringLiteral ("-shm"), true);
-        FileSystem.file_hidden (database_file_path () + QStringLiteral ("-journal"), true);
+        FileSystem.file_hidden (database_file_path () + "-wal", true);
+        FileSystem.file_hidden (database_file_path () + "-shm", true);
+        FileSystem.file_hidden (database_file_path () + "-journal", true);
 
         return rc;
     }
@@ -2851,7 +2846,7 @@ public class SyncJournalDb : GLib.Object {
 
         // Ensure the checksum type is in the database
         {
-            PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.INSERT_CHECKSUM_TYPE_QUERY, QByteArrayLiteral ("INSERT OR IGNORE INTO checksumtype (name) VALUES (?1)"), this.database);
+            PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.INSERT_CHECKSUM_TYPE_QUERY, "INSERT OR IGNORE INTO checksumtype (name) VALUES (?1)", this.database);
             if (!query) {
                 return 0;
             }
@@ -2863,7 +2858,7 @@ public class SyncJournalDb : GLib.Object {
 
         // Retrieve the identifier
         {
-            PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_CHECKSUM_TYPE_ID_QUERY, QByteArrayLiteral ("SELECT identifier FROM checksumtype WHERE name=?1"), this.database);
+            PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_CHECKSUM_TYPE_ID_QUERY, "SELECT identifier FROM checksumtype WHERE name=?1", this.database);
             if (!query) {
                 return 0;
             }

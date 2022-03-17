@@ -1082,7 +1082,7 @@ public class ConfigFile : GLib.Object {
     public string update_channel;
     string ConfigFile.update_channel {
         string default_update_channel = "stable";
-        string suffix = string.from_latin1 (MIRALL_STRINGIFY (MIRALL_VERSION_SUFFIX));
+        string suffix = MIRALL_STRINGIFY (MIRALL_VERSION_SUFFIX);
         if (suffix.starts_with ("daily")
             || suffix.starts_with ("nightly")
             || suffix.starts_with ("alpha")

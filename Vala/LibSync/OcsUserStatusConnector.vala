@@ -109,7 +109,10 @@ public class OcsUserStatusConnector : UserStatusConnector {
     public void clear_message () {
         this.clear_message_job = new JsonApiJob (this.account, USER_STATUS_BASE_URL + "/message");
         this.clear_message_job.verb (JsonApiJob.Verb.DELETE);
-        connect (this.clear_message_job, JsonApiJob.signal_json_received, this, OcsUserStatusConnector.on_signal_message_cleared);
+        connect (
+            this.clear_message_job, JsonApiJob.signal_json_received,
+            this, OcsUserStatusConnector.on_signal_message_cleared
+        );
         this.clear_message_job.start ();
     }
 
@@ -212,7 +215,10 @@ public class OcsUserStatusConnector : UserStatusConnector {
         }
 
         this.get_user_status_job = new JsonApiJob (this.account, USER_STATUS_BASE_URL, this);
-        connect (this.get_user_status_job, JsonApiJob.signal_json_received, this, OcsUserStatusConnector.on_signal_user_status_fetched);
+        connect (
+            this.get_user_status_job, JsonApiJob.signal_json_received,
+            this, OcsUserStatusConnector.on_signal_user_status_fetched
+        );
         this.get_user_status_job.start ();
     }
 
@@ -255,7 +261,10 @@ public class OcsUserStatusConnector : UserStatusConnector {
         QJsonDocument body;
         body.object (data_object);
         this.online_status_job.body (body);
-        connect (this.online_status_job, JsonApiJob.signal_json_received, this, OcsUserStatusConnector.on_signal_user_status_online_status_set);
+        connect (
+            this.online_status_job, JsonApiJob.signal_json_received,
+            this, OcsUserStatusConnector.on_signal_user_status_online_status_set
+        );
         this.online_status_job.start ();
     }
 
@@ -292,7 +301,10 @@ public class OcsUserStatusConnector : UserStatusConnector {
         QJsonDocument body;
         body.object (data_object);
         this.message_job.body (body);
-        connect (this.message_job, JsonApiJob.signal_json_received, this, OcsUserStatusConnector.on_signal_user_status_message_set);
+        connect (
+            this.message_job, JsonApiJob.signal_json_received,
+            this, OcsUserStatusConnector.on_signal_user_status_message_set
+        );
         this.message_job.start ();
     }
 
@@ -324,7 +336,10 @@ public class OcsUserStatusConnector : UserStatusConnector {
         QJsonDocument body;
         body.object (data_object);
         this.message_job.body (body);
-        connect (this.message_job, JsonApiJob.signal_json_received, this, OcsUserStatusConnector.on_signal_user_status_message_set);
+        connect (
+            this.message_job, JsonApiJob.signal_json_received,
+            this, OcsUserStatusConnector.on_signal_user_status_message_set
+        );
         this.message_job.start ();
     }
 

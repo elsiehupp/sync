@@ -939,7 +939,7 @@ public class Application : Gtk.Application {
     /***********************************************************
     ***********************************************************/
     private static string application_tr_path () {
-        string dev_tr_path = Gtk.Application.application_dir_path () + string.from_latin1 ("/../src/gui/");
+        string dev_tr_path = Gtk.Application.application_dir_path () + "/../src/gui/";
         if (GLib.Dir (dev_tr_path).exists ()) {
             // might miss Qt, QtKeyChain, etc.
             GLib.warning ("Running from build location! Translations may be incomplete!");

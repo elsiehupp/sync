@@ -138,10 +138,15 @@ public class BulkPropagatorJob : PropagatorJob {
             compute_checksum.checksum_type ("");
         }
 
-        ComputeChecksum.signal_done.connect ((compute_checksum, content_checksum_type, content_checksum) => {
-            on_signal_start_upload (item, file_to_upload, content_checksum_type, content_checksum);
-        });
-        ComputeChecksum.signal_done.connect (compute_checksum, GLib.Object.delete_later);
+        ComputeChecksum.signal_done.connect (
+            (compute_checksum, content_checksum_type, content_checksum) => {
+                on_signal_start_upload (item, file_to_upload, content_checksum_type, content_checksum);
+            }
+        );
+        ComputeChecksum.signal_done.connect (
+            compute_checksum,
+            GLib.Object.delete_later
+        );
         compute_checksum.release ().start (file_to_upload.path);
     }
 
@@ -222,12 +227,12 @@ public class BulkPropagatorJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_put_finished () {
-        var job = qobject_cast<PutMultiFileJob> (sender ());
-        GLib.assert (job);
+        var put_multi_file_job = qobject_cast<PutMultiFileJob> (sender ());
+        GLib.assert (put_multi_file_job);
 
-        on_signal_job_destroyed (job); // remove it from the this.jobs list
+        on_signal_job_destroyed (put_multi_file_job); // remove it from the this.jobs list
 
-        var reply_data = job.reply ().read_all ();
+        var reply_data = put_multi_file_job.reply ().read_all ();
         var reply_json = QJsonDocument.from_json (reply_data);
         var full_reply_object = reply_json.object ();
 
@@ -236,7 +241,7 @@ public class BulkPropagatorJob : PropagatorJob {
                 continue;
             }
             var single_reply_object = full_reply_object[single_file.remote_path].to_object ();
-            on_signal_put_finished_one_file (single_file, job, single_reply_object);
+            on_signal_put_finished_one_file (single_file, put_multi_file_job, single_reply_object);
         }
 
         finalize (full_reply_object);
@@ -312,8 +317,8 @@ public class BulkPropagatorJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_job_destroyed (GLib.Object job) {
-        this.jobs.erase (std.remove (this.jobs.begin (), this.jobs.end (), job), this.jobs.end ());
+    private void on_signal_job_destroyed (GLib.Object any_job) {
+        this.jobs.erase (std.remove (this.jobs.begin (), this.jobs.end (), any_job), this.jobs.end ());
     }
 
 
@@ -416,18 +421,22 @@ public class BulkPropagatorJob : PropagatorJob {
         }
 
         var bulk_upload_url = Utility.concat_url_path (propagator ().account.url, "/remote.php/dav/bulk");
-        var job = std.make_unique<PutMultiFileJob> (propagator ().account, bulk_upload_url, std.move (upload_parameters_data), this);
-        PutMultiFileJob.signal_finished.connect (job, BulkPropagatorJob.on_signal_put_finished);
+        var put_multi_file_job = std.make_unique<PutMultiFileJob> (propagator ().account, bulk_upload_url, std.move (upload_parameters_data), this);
+        put_multi_file_job.signal_finished.connect (
+            this.on_signal_put_finished
+        );
 
         foreach (var single_file in this.files_to_upload) {
-            PutMultiFileJob.signal_upload_progress.connect ((job, sent, total) => {
-                on_signal_upload_progress (single_file.item, sent, total);
-            });
+            put_multi_file_job.signal_upload_progress.connect (
+                (single_file, sent, total) => {
+                    on_signal_upload_progress (single_file.item, sent, total);
+                }
+            );
         }
 
-        adjust_last_job_timeout (job, timeout);
-        this.jobs.append (job);
-        job.release ().start ();
+        adjust_last_job_timeout (put_multi_file_job, timeout);
+        this.jobs.append (put_multi_file_job);
+        put_multi_file_job.release ().start ();
         if (parallelism () == PropagatorJob.JobParallelism.FULL_PARALLELISM && this.jobs.size () < PARALLEL_JOBS_MAXIMUM_COUNT) {
             on_signal_schedule_self_or_child ();
         }
@@ -455,11 +464,11 @@ public class BulkPropagatorJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     private void adjust_last_job_timeout (
-        AbstractNetworkJob job, int64 file_size) {
+        AbstractNetworkJob abstract_netowrk_job, int64 file_size) {
         const double three_minutes = 3.0 * 60 * 1000;
 
-        job.on_signal_timeout (q_bound (
-            job.timeout_msec (),
+        abstract_netowrk_job.on_signal_timeout (q_bound (
+            abstract_netowrk_job.timeout_msec (),
             // Calculate 3 minutes for each gigabyte of data
             q_round64 (three_minutes * static_cast<double> (file_size) / 1e9),
             // Maximum of 30 minutes
@@ -471,7 +480,7 @@ public class BulkPropagatorJob : PropagatorJob {
     ***********************************************************/
     private void on_signal_put_finished_one_file (
         BulkUploadItem single_file,
-        PutMultiFileJob job,
+        PutMultiFileJob put_multi_file_job,
         QJsonObject file_reply) {
         bool finished = false;
 
@@ -483,8 +492,8 @@ public class BulkPropagatorJob : PropagatorJob {
             single_file.item.http_error_code = static_cast<uint16> (412);
         }
 
-        single_file.item.response_time_stamp = job.response_timestamp ();
-        single_file.item.request_id = job.request_id ();
+        single_file.item.response_time_stamp = put_multi_file_job.response_timestamp ();
+        single_file.item.request_id = put_multi_file_job.request_id ();
         if (single_file.item.http_error_code != 200) {
             common_error_handling (single_file.item, file_reply["message"].to_string ());
             return;

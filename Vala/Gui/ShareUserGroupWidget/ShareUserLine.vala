@@ -177,7 +177,7 @@ public class ShareUserLine : Gtk.Widget {
         menu.add_separator ();
 
         // Adds action to delete share widget
-        Gtk.Icon delete_icon = Gtk.Icon.from_theme (QLatin1String ("user-trash"),Gtk.Icon (QLatin1String (":/client/theme/delete.svg")));
+        Gtk.Icon delete_icon = Gtk.Icon.from_theme ("user-trash", new Gtk.Icon (":/client/theme/delete.svg"));
         this.delete_share_button= new QAction (delete_icon,_("Unshare"), this);
 
         menu.add_action (this.delete_share_button);
@@ -666,9 +666,16 @@ public class ShareUserLine : Gtk.Widget {
         Currently only regular users can have avatars.
         ***********************************************************/
         if (this.share.share_with ().type () == Sharee.Type.USER) {
-            var job = new AvatarJob (this.share.account, this.share.share_with ().share_with (), avatar_size, this);
-            connect (job, AvatarJob.avatar_pixmap, this, ShareUserLine.on_signal_avatar_loaded);
-            job.on_signal_start ();
+            var avatar_line = new AvatarJob (
+                this.share.account,
+                this.share.share_with ().share_with (),
+                avatar_size,
+                this);
+            connect (
+                avatar_line, AvatarJob.avatar_pixmap, this,
+                ShareUserLine.on_signal_avatar_loaded
+            );
+            avatar_line.on_signal_start ();
         }
     }
 

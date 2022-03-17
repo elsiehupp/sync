@@ -70,8 +70,11 @@ public class AsyncImageResponse : QQuickImageResponse {
             const GLib.Uri icon_url = new GLib.Uri (this.image_paths.at (this.index));
             if (icon_url.is_valid () && !icon_url.scheme () == "") {
                 // fetch the remote resource
-                const var reply = current_user.account.send_raw_request (QByteArrayLiteral ("GET"), icon_url);
-                connect (reply, Soup.Reply.on_signal_finished, this, AsyncImageResponse.on_signal_process_network_reply);
+                const var reply = current_user.account.send_raw_request ("GET", icon_url);
+                connect (
+                    reply, Soup.Reply.on_signal_finished,
+                    this, AsyncImageResponse.on_signal_process_network_reply
+                );
                 ++this.index;
                 return;
             }
@@ -93,10 +96,10 @@ public class AsyncImageResponse : QQuickImageResponse {
         const string image_data = reply.read_all ();
         // server returns "[]" for some some file previews (have no idea why), so, we use another image
         // from the list if available
-        if (image_data == "" || image_data == QByteArrayLiteral ("[]")) {
+        if (image_data == "" || image_data == "[]") {
             process_next_image ();
         } else {
-            if (image_data.starts_with (QByteArrayLiteral ("<svg"))) {
+            if (image_data.starts_with ("<svg")) {
                 // SVG image needs proper scaling, let's do it with QPainter and QSvgRenderer
                 QSvgRenderer svg_renderer;
                 if (svg_renderer.on_signal_load (image_data)) {
