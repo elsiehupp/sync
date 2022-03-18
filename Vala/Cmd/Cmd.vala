@@ -25,8 +25,6 @@ Copyright (C) by Daniel Heule <daniel.heule@gmail.com>
 //  #include <termios.h>
 //  #include <unistd.h>
 
-using Occ;
-
 /***********************************************************
 @brief Helper class for command line client
 @ingroup cmd

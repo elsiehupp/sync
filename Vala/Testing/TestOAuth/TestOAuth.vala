@@ -7,8 +7,7 @@ implied, as to its usefulness for any purpose.
 //  #include <QtTest/QtTest>
 //  #include <QDesktopServices>
 
-using Occ;
-
+namespace Occ {
 namespace Testing {
 
 public class TestOAuth : GLib.Object {
@@ -153,4 +152,6 @@ public class TestOAuth : GLib.Object {
     }
 
 }
-}
+
+} // namespace Testing
+} // namespace Occ

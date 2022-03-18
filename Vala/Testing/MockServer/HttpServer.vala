@@ -11,6 +11,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 
 //  #include <QTcpServer>
 
+namespace Occ {
 namespace Testing {
 
 public class HttpServer : QTcpServer {
@@ -74,4 +75,6 @@ public class HttpServer : QTcpServer {
     }
 
 }
-}
+
+} // namespace Testing
+} // namespace Occ

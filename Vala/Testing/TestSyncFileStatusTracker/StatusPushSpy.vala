@@ -4,8 +4,7 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-using Occ;
-
+namespace Occ {
 namespace Testing {
 
 public class StatusPushSpy : QSignalSpy {

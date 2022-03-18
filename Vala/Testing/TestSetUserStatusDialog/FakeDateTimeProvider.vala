@@ -4,6 +4,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/
 
+namespace Occ {
 namespace Testing {
 
 public class FakeDateTimeProvider : DateTimeProvider {
@@ -65,4 +66,6 @@ public class FakeDateTimeProvider : DateTimeProvider {
     }
 
 }
-}
+
+} // namespace Testing
+} // namespace Occ

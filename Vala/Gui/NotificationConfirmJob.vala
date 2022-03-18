@@ -16,7 +16,7 @@ namespace Ui {
 
 Class to call an action-link of a notification coming from
 the server. All the communication logic is handled in this
-class.
+public class.
 
 ***********************************************************/
 public class NotificationConfirmJob : AbstractNetworkJob {

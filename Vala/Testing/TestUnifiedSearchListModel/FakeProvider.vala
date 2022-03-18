@@ -4,6 +4,7 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/
 
+namespace Occ {
 namespace Testing {
 
 /***********************************************************

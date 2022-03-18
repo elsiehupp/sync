@@ -8,6 +8,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 //  #include <QSignalSpy>
 //  #include <memory>
 
+namespace Occ {
 namespace Testing {
 
 public class TestSetUserStatusDialog : GLib.Object {
@@ -677,4 +678,6 @@ public class TestSetUserStatusDialog : GLib.Object {
     }
 
 }
-}
+
+} // namespace Testing
+} // namespace Occ

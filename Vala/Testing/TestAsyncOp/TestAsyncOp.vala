@@ -4,11 +4,9 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-//  #include <QtTest>
 //  #include <syncengine.h>
 
-using Occ;
-
+namespace Occ {
 namespace Testing {
 
 public class TestAsyncOp : GLib.Object {
@@ -243,3 +241,4 @@ public class TestAsyncOp : GLib.Object {
 
 } // class TestAsyncOp
 } // namespace Testing
+} // namespace Occ

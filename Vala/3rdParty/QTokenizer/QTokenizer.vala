@@ -43,7 +43,7 @@ $QT_END_LICENSE$
 
 //  template <class T, class ConstIterator>
 
-class QTokenizerPrivate<T> : GLib.Object {
+public class QTokenizerPrivate<T> : GLib.Object {
     //  using CharType = typename T.value_type;
 
     public T string_value;

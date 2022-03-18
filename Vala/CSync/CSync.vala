@@ -148,7 +148,7 @@ enum ItemType {
 //  struct CSyncFileStatS : CSyncFileStatT {}
 
 // OCSYNC_EXPORT
-class CSyncFileStatS : CSyncFileStatT {
+public class CSyncFileStatS : CSyncFileStatT {
     time_t modtime = 0;
     int64 size = 0;
     uint64 inode = 0;

@@ -47,7 +47,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 namespace CSync {
 
-class Time {
+public class Time {
 
     //  #ifdef HAVE_UTIMES
     int c_utimes (string uri, timeval times) {

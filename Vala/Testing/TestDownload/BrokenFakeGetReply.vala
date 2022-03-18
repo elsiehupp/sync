@@ -4,6 +4,7 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
+namespace Occ {
 namespace Testing {
 
 /***********************************************************
@@ -50,3 +51,4 @@ public class BrokenFakeGetReply : FakeGetReply {
 
 } // class BrokenFakeGetReply
 } // namespace Testing
+} // namespace Occ

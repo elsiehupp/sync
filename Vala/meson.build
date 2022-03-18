@@ -1,5 +1,5 @@
 
-subdir('3rdParty')
+# subdir('3rdParty')
 subdir('Cmd')
 subdir('Common')
 subdir('CrashReporter')

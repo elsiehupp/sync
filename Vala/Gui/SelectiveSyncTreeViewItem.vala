@@ -56,4 +56,6 @@ public class SelectiveSyncTreeViewItem : QTreeWidgetItem {
 }
 
 }
-}
+
+} // namespace Testing
+} // namespace Occ

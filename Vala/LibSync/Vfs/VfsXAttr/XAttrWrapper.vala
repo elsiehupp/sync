@@ -10,7 +10,7 @@ Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
 namespace Occ {
 namespace LibSync {
 
-class XAttrWrapper : GLib.Object {
+public class XAttrWrapper : GLib.Object {
 
     const string HYDRATE_EXEC_ATTRIBUT_NAME = "user.nextcloud.hydrate_exec";
 

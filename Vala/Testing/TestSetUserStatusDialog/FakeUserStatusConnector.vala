@@ -4,6 +4,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/
 
+namespace Occ {
 namespace Testing {
 
 public class FakeUserStatusConnector : UserStatusConnector {
@@ -154,4 +155,6 @@ public class FakeUserStatusConnector : UserStatusConnector {
     }
 
 }
-}
+
+} // namespace Testing
+} // namespace Occ

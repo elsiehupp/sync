@@ -4,6 +4,7 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/
 
+namespace Occ {
 namespace Testing {
 
 /***********************************************************
@@ -22,4 +23,6 @@ public class FakeDesktopServicesUrlHandler : GLib.Object {
     internal signal void signal_result_clicked (GLib.Uri url);
 
 }
-}
+
+} // namespace Testing
+} // namespace Occ

@@ -9,6 +9,7 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 //  #include <QSignalSpy>
 //  #include <QTest>
 
+namespace Occ {
 namespace Testing {
 
 public class TestUnifiedSearchListmodel : GLib.Object {

@@ -4,10 +4,8 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-//  #include <QtTest>
 
-using Occ;
-
+namespace Occ {
 namespace Testing {
 
 public class TestSyncFileStatusTracker : GLib.Object {
@@ -516,4 +514,6 @@ public class TestSyncFileStatusTracker : GLib.Object {
     }
 
 }
-}
+
+} // namespace Testing
+} // namespace Occ

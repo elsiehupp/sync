@@ -4,12 +4,10 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-//  #include <QtTest>
 //  #include <syncengine.h>
 //  #include <owncloudpropagator.h>
 
-using Occ;
-
+namespace Occ {
 namespace Testing {
 
 public class TestDownload : GLib.Object {
@@ -111,7 +109,7 @@ public class TestDownload : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void server_maintenence () {
+    private void test_server_maintenence () {
         // Server in maintenance must on_signal_abort the sync.
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
@@ -143,13 +141,18 @@ public class TestDownload : GLib.Object {
 
 
     /***********************************************************
+    We want to test the case in which the renaming of the
+    original to the conflict file succeeds, but renaming the
+    temporary file fails. This test uses the fact that a
+    "touched_file" notification will be sent at the right moment.
+
+    Note that there will be first a notification on the file and
+    the conflict file before.
+
+
+    Test for https://github.com/owncloud/client/issues/7015
     ***********************************************************/
     private void test_move_fails_in_a_conflict () {
-        // Test for https://github.com/owncloud/client/issues/7015
-        // We want to test the case in which the renaming of the original to the conflict file succeeds,
-        // but renaming the temporary file fails.
-        // This tests uses the fact that a "touched_file" notification will be sent at the right moment.
-        // Note that there will be first a notification on the file and the conflict file before.
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine.set_ignore_hidden_files (true);
@@ -263,4 +266,6 @@ public class TestDownload : GLib.Object {
     }
 
 }
-}
+
+} // namespace Testing
+} // namespace Occ
