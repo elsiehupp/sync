@@ -7,7 +7,7 @@
 //  #include <QtTest>
 //  #include <QTemporaryDir>
 
-using Occ.Utility;
+using Utility;
 
 //  namespace Occ {
 //  OCSYNC_EXPORT extern bool filesystem_case_preserving_override;
@@ -62,7 +62,7 @@ public class TestUtility : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_test_launch_on_signal_startup () {
-        string postfix = Occ.Utility.rand ().to_string ();
+        string postfix = Utility.rand ().to_string ();
 
         const string app_name = "on_signal_test_launch_on_signal_startup.%1".printf (postfix);
         const string gui_name = "LaunchOnStartup GUI Name";
@@ -170,10 +170,10 @@ public class TestUtility : GLib.Object {
     ***********************************************************/
     private void on_signal_test_fs_case_preserving () {
         GLib.assert_true (is_mac () || is_windows () ? filesystem_case_preserving () : ! filesystem_case_preserving ());
-        QScopedValueRollback<bool> scope = new QScopedValueRollback<bool> (Occ.filesystem_case_preserving_override);
-        Occ.filesystem_case_preserving_override = true;
+        QScopedValueRollback<bool> scope = new QScopedValueRollback<bool> (filesystem_case_preserving_override);
+        filesystem_case_preserving_override = true;
         GLib.assert_true (filesystem_case_preserving ());
-        Occ.filesystem_case_preserving_override = false;
+        filesystem_case_preserving_override = false;
         GLib.assert_true (! filesystem_case_preserving ());
     }
 
@@ -199,7 +199,7 @@ public class TestUtility : GLib.Object {
         GLib.assert_true (file_names_equal (a+"/test", b+"/test")); // both exist
         GLib.assert_true (file_names_equal (a+"/test/TESTI", b+"/test/../test/TESTI")); // both exist
 
-        QScopedValueRollback<bool> scope = new QScopedValueRollback<bool> (Occ.filesystem_case_preserving_override, true);
+        QScopedValueRollback<bool> scope = new QScopedValueRollback<bool> (filesystem_case_preserving_override, true);
         GLib.assert_true (file_names_equal (a+"/test", b+"/TEST")); // both exist
 
         GLib.assert_true (!file_names_equal (a+"/test", b+"/test/TESTI")); // both are different
@@ -239,7 +239,7 @@ public class TestUtility : GLib.Object {
     }
 
     int CHECK_NORMALIZE_ETAG (string TEST, string EXPECT) {
-        string_value = Occ.Utility.normalize_etag (TEST);
+        string_value = Utility.normalize_etag (TEST);
         GLib.assert_true (string_value.const_data (), EXPECT);
 
         CHECK_NORMALIZE_ETAG ("foo", "foo");

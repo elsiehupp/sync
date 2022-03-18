@@ -177,7 +177,7 @@ public class OcsJob : AbstractNetworkJob {
     @param status_code The actual status code
     @param message The message provided by the server
     ***********************************************************/
-    private void ocs_error (int status_code, string message);
+    private void signal_error (int status_code, string message);
 
 
     /***********************************************************
@@ -219,7 +219,7 @@ public class OcsJob : AbstractNetworkJob {
                         + Utility.concat_url_path (account.url, path ())
                         + this.params
                         + " has unexpected status code: " + status_code + reply_data);
-            /* emit */ ocs_error (status_code, message);
+            /* emit */ signal_error (status_code, message);
 
         } else {
             // save new ETag value

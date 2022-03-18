@@ -58,9 +58,8 @@ public class PutMultiFileJob : AbstractNetworkJob {
         this.body.content_type (QHttpMultiPart.Related_type);
         foreach (var single_device in this.devices) {
             single_device.device.parent (this);
-            connect (
-                this, PutMultiFileJob.signal_upload_progress,
-                single_device.device, UploadDevice.on_signal_job_upload_progress
+            this.signal_upload_progress.connect (
+                single_device.device.on_signal_job_upload_progress
             );
         }
     }
@@ -91,13 +90,11 @@ public class PutMultiFileJob : AbstractNetworkJob {
             GLib.warning (" Network error: " + this.reply.error_string ());
         }
 
-        connect (
-            this.reply, Soup.Reply.signal_upload_progress,
-            this, PutMultiFileJob.signal_upload_progress
+        this.reply.signal_upload_progress.connect (
+            this.on_signal_upload_progress
         );
-        connect (
-            this, AbstractNetworkJob.signal_network_activity,
-            account, Account.signal_propagator_network_activity
+        this.signal_network_activity.connect (
+            account.on_signal_propagator_network_activity
         );
         this.request_timer.start ();
         AbstractNetworkJob.start ();

@@ -203,16 +203,16 @@ public class ConnectionValidator : GLib.Object {
         // simply GET the webdav root, will fail if credentials are wrong.
         // continue in on_signal_auth_check here :-)
         GLib.debug ("# Check whether authenticated propfind works.");
-        var job = new PropfindJob (this.account, "/", this);
-        job.on_signal_timeout (TIMEOUT_TO_USE_MILLISECONDS);
-        job.properties (GLib.List<string> ("getlastmodified"));
-        job.result.connect (
+        var propfind_job = new PropfindJob (this.account, "/", this);
+        propfind_job.on_signal_timeout (TIMEOUT_TO_USE_MILLISECONDS);
+        propfind_job.properties (GLib.List<string> ("getlastmodified"));
+        propfind_job.result.connect (
             this.on_signal_auth_success
         );
-        job.signal_finished_with_error.connect (
+        propfind_job.signal_finished_with_error.connect (
             this.on_signal_auth_failed
         );
-        job.on_signal_start ();
+        propfind_job.on_signal_start ();
     }
 
 
@@ -279,8 +279,8 @@ public class ConnectionValidator : GLib.Object {
     status.php could not be loaded (network or server issue!).
     ***********************************************************/
     protected void on_signal_no_status_found (Soup.Reply reply) {
-        var job = qobject_cast<CheckServerJob> (sender ());
-        GLib.warning () + reply.error () + job.error_string () + reply.peek (1024);
+        var check_server_job = qobject_cast<CheckServerJob> (sender ());
+        GLib.warning () + reply.error () + check_server_job.error_string () + reply.peek (1024);
         if (reply.error () == Soup.Reply.SslHandshakeFailedError) {
             report_result (SslError);
             return;
@@ -291,7 +291,7 @@ public class ConnectionValidator : GLib.Object {
             this.errors.append (_("Authentication error : Either username or password are wrong."));
         } else {
             //this.errors.append (_("Unable to connect to %1").printf (this.account.url.to_string ()));
-            this.errors.append (job.error_string ());
+            this.errors.append (check_server_job.error_string ());
         }
         report_result (StatusNotFound);
     }
@@ -312,21 +312,21 @@ public class ConnectionValidator : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_auth_failed (Soup.Reply reply) {
-        var job = (PropfindJob) sender ();
+        var propfind_job = (PropfindJob) sender ();
         Status stat = Status.TIMEOUT;
 
         if (reply.error () == Soup.Reply.SslHandshakeFailedError) {
-            this.errors + job.error_string_parsing_body ();
+            this.errors + propfind_job.error_string_parsing_body ();
             stat = Status.SSL_ERROR;
 
         } else if (reply.error () == Soup.Reply.AuthenticationRequiredError
             || !this.account.credentials ().still_valid (reply)) {
-            GLib.warning ("******** Password is wrong! " + reply.error () + job.error_string ());
+            GLib.warning ("******** Password is wrong! " + reply.error () + propfind_job.error_string ());
             this.errors + _("The provided credentials are not correct");
             stat = Status.CREDENTIALS_WRONG;
 
         } else if (reply.error () != Soup.Reply.NoError) {
-            this.errors + job.error_string_parsing_body ();
+            this.errors + propfind_job.error_string_parsing_body ();
 
             const int http_status =
                 reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
@@ -415,12 +415,12 @@ public class ConnectionValidator : GLib.Object {
     ***********************************************************/
     private void check_server_capabilities () {
         // The main flow now needs the capabilities
-        var job = new JsonApiJob (this.account, "ocs/v1.php/cloud/capabilities", this);
-        job.on_signal_timeout (TIMEOUT_TO_USE_MILLISECONDS);
-        job.json_received.connect (
+        var json_api_job = new JsonApiJob (this.account, "ocs/v1.php/cloud/capabilities", this);
+        json_api_job.on_signal_timeout (TIMEOUT_TO_USE_MILLISECONDS);
+        json_api_job.json_received.connect (
             this.on_signal_capabilities_recieved
         );
-        job.on_signal_start ();
+        json_api_job.on_signal_start ();
     }
 
 
@@ -459,11 +459,11 @@ public class ConnectionValidator : GLib.Object {
     //  #if QT_VERSION >= QT_VERSION_CHECK (5, 9, 0)
         // Record that the server supports HTTP/2
         // Actual decision if we should use HTTP/2 is done in AccessManager.create_request
-        var job = (AbstractNetworkJob) sender ();
-        if (job) {
-            if (job.reply ()) {
+        var abstract_network_job = (AbstractNetworkJob) sender ();
+        if (abstract_network_job) {
+            if (abstract_network_job.reply ()) {
                 this.account.http2_supported (
-                    job.reply ().attribute (
+                    abstract_network_job.reply ().attribute (
                         Soup.Request.HTTP2WasUsedAttribute
                     ).to_bool ()
                 );

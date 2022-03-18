@@ -60,7 +60,7 @@ public class TestRemoteWipe : GLib.Object {
 //        // remote folders
 //        GLib.debug () +  "Removing folder for account " + new_account_state.account.url;
 
-//        folder_manager.slot_wipe_folder_for_account (new_account_state);
+//        folder_manager.on_signal_wipe_folder_for_account (new_account_state);
 
 //        // check if folders dont exist anymore
 //        GLib.assert_true (dir_to_remove.exists () == false);

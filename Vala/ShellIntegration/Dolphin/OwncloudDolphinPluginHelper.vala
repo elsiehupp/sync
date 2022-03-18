@@ -105,13 +105,11 @@ public class OwncloudDolphinPluginHelper : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected OwncloudDolphinPluginHelper () {
-        connect (
-            this.socket, QLocalSocket.connected,
-            this, OwncloudDolphinPluginHelper.on_signal_connected
+        this.socket.connected.connect (
+            this.on_signal_socket_connected
         );
-        connect (
-            this.socket, QLocalSocket.readyRead,
-            this, OwncloudDolphinPluginHelper.on_signal_ready_to_read
+        this.socket.ready_read.connect (
+            this.on_signal_ready_to_read
         );
         this.connect_timer.on_signal_start (45 * 1000, Qt.VeryCoarseTimer, this);
         try_to_connect ();
@@ -120,8 +118,7 @@ public class OwncloudDolphinPluginHelper : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_connected ();
-    void OwncloudDolphinPluginHelper.on_signal_connected () {
+    protected void on_signal_socket_connected () {
         send_command ("VERSION:\n");
         send_command ("GET_STRINGS:\n");
     }

@@ -8,7 +8,7 @@ implied, as to its usefulness for any purpose.
 //  #include <GLib.Dir>
 
 using Occ;
-using Occ.Utility;
+using Utility;
 
 namespace Testing {
 
@@ -112,108 +112,86 @@ public class TestChecksumValidator : GLib.Object {
     }
 
     private void test_upload_checksumming_adler () {
-        var vali = new ComputeChecksum (this);
+        var compute_checksum = new ComputeChecksum (this);
         this.expected_type = new Adler32 ();
-        vali.set_checksum_type (this.expected_type);
+        compute_checksum.set_checksum_type (this.expected_type);
 
-        connect (
-            vali,
-            signal_done (string, string),
-            on_signal_up_validated (string, string)
+        compute_checksum.signal_finished.connect (
+            this.on_signal_up_validated
         );
 
-        var file = GLib.File.new_for_path (this.testfile, vali);
+        var file = GLib.File.new_for_path (this.testfile, compute_checksum);
         file.open (QIODevice.ReadOnly);
         this.expected = calc_adler32 (file);
         GLib.debug ("XX Expected Checksum: " + this.expected);
-        vali.on_signal_start (this.testfile);
+        compute_checksum.on_signal_start (this.testfile);
 
         QEventLoop loop;
-        connect (
-            vali,
-            signal_done (string,string),
-            loop,
-            quit (),
-            Qt.QueuedConnection
+        compute_checksum.signal_finished.connect (
+            loop.quit // Qt.QueuedConnection
         );
         loop.exec ();
 
-        delete vali;
+        delete compute_checksum;
     //  #endif
     }
 
     private void test_upload_checksumming_md5 () {
 
-        var vali = new ComputeChecksum (this);
-        this.expected_type = Occ.checksum_md5c;
-        vali.set_checksum_type (this.expected_type);
-        connect (
-            vali,
-            signal_done (string, string),
-            this,
-            on_signal_up_validated (string, string));
+        var compute_checksum = new ComputeChecksum (this);
+        this.expected_type = checksum_md5c;
+        compute_checksum.set_checksum_type (this.expected_type);
+        compute_checksum.signal_finished.connect (
+            this.on_signal_up_validated
+        );
 
-        var file = GLib.File.new_for_path (this.testfile, vali);
+        var file = GLib.File.new_for_path (this.testfile, compute_checksum);
         file.open (QIODevice.ReadOnly);
         this.expected = calc_md5 (file);
-        vali.on_signal_start (this.testfile);
+        compute_checksum.on_signal_start (this.testfile);
 
         QEventLoop loop;
-        connect (
-            vali, SIGNAL (signal_done (string,string)),
-            loop, SLOT (quit ()), Qt.QueuedConnection
+        compute_checksum.signal_finished.connect (
+            loop.quit // Qt.QueuedConnection
         );
         loop.exec ();
 
-        delete vali;
+        delete compute_checksum;
     }
 
     private void test_upload_checksumming_sha1 () {
-        var vali = new ComputeChecksum (this);
-        this.expected_type = Occ.CheckSumSHA1C;
-        vali.set_checksum_type (this.expected_type);
-        connect (
-            vali,
-            signal_done (string,string),
-            this,
-            on_signal_up_validated (string,string)
+        var compute_checksum = new ComputeChecksum (this);
+        this.expected_type = CheckSumSHA1C;
+        compute_checksum.set_checksum_type (this.expected_type);
+        compute_checksum.signal_finished.connect (
+            this.on_signal_up_validated
         );
 
-        var file = GLib.File.new_for_path (this.testfile, vali);
+        var file = GLib.File.new_for_path (this.testfile, compute_checksum);
         file.open (QIODevice.ReadOnly);
         this.expected = calc_sha1 (file);
 
-        vali.on_signal_start (this.testfile);
+        compute_checksum.on_signal_start (this.testfile);
 
         QEventLoop loop;
-        connect (
-            vali,
-            signal_done (string,string),
-            loop,
-            quit (),
-            Qt.QueuedConnection
+        compute_checksum.signal_finished.connect (
+            loop.quit // Qt.QueuedConnection
         );
         loop.exec ();
 
-        delete vali;
+        delete compute_checksum;
     }
 
     private void test_download_checksumming_adler () {
-        var vali = new ValidateChecksumHeader (this);
-        connect (
-            vali,
-            ValidateChecksumHeader.signal_validated,
-            this,
-            TestChecksumValidator.on_signal_down_validated
+        var compute_checksum = new ValidateChecksumHeader (this);
+        compute_checksum.signal_validated.connect (
+            this.on_signal_down_validated
         );
-        connect (
-            vali,
-            ValidateChecksumHeader.signal_validation_failed,
-            this,
-            TestChecksumValidator.on_signal_down_error
+        compute_checksum.signal_validation_failed.connect (
+            this.on_signal_down_error
         );
 
-        var file = GLib.File.new_for_path (this.testfile, vali);
+        var file = GLib.File.new_for_path (this.testfile, compute_checksum);
         file.open (QIODevice.ReadOnly);
         this.expected = calc_adler32 (file);
 
@@ -223,23 +201,23 @@ public class TestChecksumValidator : GLib.Object {
 
         file.seek (0);
         this.success_down = false;
-        vali.on_signal_start (this.testfile, adler);
+        compute_checksum.on_signal_start (this.testfile, adler);
 
         QTRY_VERIFY (this.success_down);
 
         this.expected_error = "The downloaded file does not match the checksum, it will be resumed. \"543345\" != \"%1\"".printf (this.expected);
         this.error_seen = false;
         file.seek (0);
-        vali.on_signal_start (this.testfile, "Adler32:543345");
+        compute_checksum.on_signal_start (this.testfile, "Adler32:543345");
         QTRY_VERIFY (this.error_seen);
 
         this.expected_error = "The checksum header contained an unknown checksum type \"Klaas32\"";
         this.error_seen = false;
         file.seek (0);
-        vali.on_signal_start (this.testfile, "Klaas32:543345");
+        compute_checksum.on_signal_start (this.testfile, "Klaas32:543345");
         QTRY_VERIFY (this.error_seen);
 
-        delete vali;
+        delete compute_checksum;
     }
 
     private void on_signal_cleanup_test_case () {

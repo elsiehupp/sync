@@ -114,14 +114,14 @@ public class EncryptionHelper : GLib.Object {
         clen += len;
 
         // Get the e2Ee_tag
-        string e2Ee_tag = new string (Occ.Constants.E2EE_TAG_SIZE, '\0');
-        if (1 != EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_GET_TAG, Occ.Constants.E2EE_TAG_SIZE, unsigned_data (e2Ee_tag))) {
+        string e2Ee_tag = new string (Constants.E2EE_TAG_SIZE, '\0');
+        if (1 != EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_GET_TAG, Constants.E2EE_TAG_SIZE, unsigned_data (e2Ee_tag))) {
             GLib.info ("Error getting the e2Ee_tag.");
             handle_errors ();
         }
 
         string cipher_text2;
-        cipher_text2.reserve (clen + Occ.Constants.E2EE_TAG_SIZE);
+        cipher_text2.reserve (clen + Constants.E2EE_TAG_SIZE);
         cipher_text2.append (cipher_text, clen);
         cipher_text2.append (e2Ee_tag);
 
@@ -156,8 +156,8 @@ public class EncryptionHelper : GLib.Object {
         string cipher_text2 = new string.from_base64 (cipher_t_xT64);
         string initialization_vector = new string.from_base64 (iv_b64);
 
-        const string e2Ee_tag = cipher_text2.right (Occ.Constants.E2EE_TAG_SIZE);
-        cipher_text2.chop (Occ.Constants.E2EE_TAG_SIZE);
+        const string e2Ee_tag = cipher_text2.right (Constants.E2EE_TAG_SIZE);
+        cipher_text2.chop (Constants.E2EE_TAG_SIZE);
 
         // Init
         CipherContext context;
@@ -186,7 +186,7 @@ public class EncryptionHelper : GLib.Object {
             return "";
         }
 
-        string ptext = new string (cipher_text2.size () + Occ.Constants.E2EE_TAG_SIZE, '\0');
+        string ptext = new string (cipher_text2.size () + Constants.E2EE_TAG_SIZE, '\0');
         int plen = 0;
 
 
@@ -299,15 +299,15 @@ public class EncryptionHelper : GLib.Object {
         clen += len;
 
         // Get the e2Ee_tag
-        string e2Ee_tag = new string (Occ.Constants.E2EE_TAG_SIZE, '\0');
-        if (1 != EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_GET_TAG, Occ.Constants.E2EE_TAG_SIZE, unsigned_data (e2Ee_tag))) {
+        string e2Ee_tag = new string (Constants.E2EE_TAG_SIZE, '\0');
+        if (1 != EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_GET_TAG, Constants.E2EE_TAG_SIZE, unsigned_data (e2Ee_tag))) {
             GLib.info ("Error getting the e2Ee_tag");
             handle_errors ();
             return {};
         }
 
         string cipher_text2;
-        cipher_text2.reserve (clen + Occ.Constants.E2EE_TAG_SIZE);
+        cipher_text2.reserve (clen + Constants.E2EE_TAG_SIZE);
         cipher_text2.append (cipher_text, clen);
         cipher_text2.append (e2Ee_tag);
 
@@ -340,8 +340,8 @@ public class EncryptionHelper : GLib.Object {
         string cipher_text2 = new string.from_base64 (cipher_t_xT64);
         string initialization_vector = new string.from_base64 (iv_b64);
 
-        const string e2Ee_tag = cipher_text2.right (Occ.Constants.E2EE_TAG_SIZE);
-        cipher_text2.chop (Occ.Constants.E2EE_TAG_SIZE);
+        const string e2Ee_tag = cipher_text2.right (Constants.E2EE_TAG_SIZE);
+        cipher_text2.chop (Constants.E2EE_TAG_SIZE);
 
         // Init
         CipherContext context;
@@ -370,7 +370,7 @@ public class EncryptionHelper : GLib.Object {
             return "";
         }
 
-        string ptext = new string (cipher_text2.size () + Occ.Constants.E2EE_TAG_SIZE, '\0');
+        string ptext = new string (cipher_text2.size () + Constants.E2EE_TAG_SIZE, '\0');
         int plen = 0;
 
 
@@ -572,7 +572,7 @@ public class EncryptionHelper : GLib.Object {
             return false;
         }
 
-        string output = new string (BLOCK_SIZE + Occ.Constants.E2EE_TAG_SIZE - 1, '\0');
+        string output = new string (BLOCK_SIZE + Constants.E2EE_TAG_SIZE - 1, '\0');
         int len = 0;
         int total_len = 0;
 
@@ -602,14 +602,14 @@ public class EncryptionHelper : GLib.Object {
         total_len += len;
 
         // Get the e2Ee_tag
-        string e2Ee_tag = new string (Occ.Constants.E2EE_TAG_SIZE, '\0');
-        if (1 != EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_GET_TAG, Occ.Constants.E2EE_TAG_SIZE, unsigned_data (e2Ee_tag))) {
+        string e2Ee_tag = new string (Constants.E2EE_TAG_SIZE, '\0');
+        if (1 != EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_GET_TAG, Constants.E2EE_TAG_SIZE, unsigned_data (e2Ee_tag))) {
             GLib.info ("Could not get e2Ee_tag");
             return false;
         }
 
         return_tag = e2Ee_tag;
-        output.write (e2Ee_tag, Occ.Constants.E2EE_TAG_SIZE);
+        output.write (e2Ee_tag, Constants.E2EE_TAG_SIZE);
 
         input.close ();
         output.close ();
@@ -653,9 +653,9 @@ public class EncryptionHelper : GLib.Object {
             return false;
         }
 
-        int64 size = input.size () - Occ.Constants.E2EE_TAG_SIZE;
+        int64 size = input.size () - Constants.E2EE_TAG_SIZE;
 
-        string output = new string (BLOCK_SIZE + Occ.Constants.E2EE_TAG_SIZE - 1, '\0');
+        string output = new string (BLOCK_SIZE + Constants.E2EE_TAG_SIZE - 1, '\0');
         int len = 0;
 
         while (input.position () < size) {
@@ -680,7 +680,7 @@ public class EncryptionHelper : GLib.Object {
             output.write (output, len);
         }
 
-        const string e2Ee_tag = input.read (Occ.Constants.E2EE_TAG_SIZE);
+        const string e2Ee_tag = input.read (Constants.E2EE_TAG_SIZE);
 
         // Set expected e2Ee_tag value. Works in OpenSSL 1.0.1d and later
         if (!EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_SET_TAG, e2Ee_tag.size (), (uchar *)e2Ee_tag.const_data ())) {

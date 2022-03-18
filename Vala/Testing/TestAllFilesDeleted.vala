@@ -13,7 +13,7 @@ using Occ;
 namespace Testing {
 
 /***********************************************************
-This test ensure that the SyncEngine.about_to_remove_all_files
+This test ensure that the SyncEngine.signal_about_to_remove_all_files
 is correctly called and that when we the user choose to
 remove all files SyncJournalDb.clear_file_table makes works
 as expected
@@ -52,10 +52,8 @@ public class TestAllFilesDeleted : GLib.Object {
 
         var initial_state = fake_folder.current_local_state ();
         int about_to_remove_all_files_called = 0;
-        connect (
-            fake_folder.sync_engine,
-            SyncEngine.about_to_remove_all_files,
-            TestAllFilesDeleted.on_signal_about_to_remove_all_files_all_files_deleted_keep
+        fake_folder.sync_engine.signal_about_to_remove_all_files.connect (
+            this.on_signal_about_to_remove_all_files_all_files_deleted_keep
         );
 
         var modifier = delete_on_remote ? fake_folder.remote_modifier () : fake_folder.local_modifier ();
@@ -122,10 +120,8 @@ public class TestAllFilesDeleted : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         int about_to_remove_all_files_called = 0;
-        connect (
-            fake_folder.sync_engine,
-            SyncEngine.about_to_remove_all_files,
-            TestAllFilesDeleted.on_signal_about_to_remove_all_files_all_files_deleted_delete
+        fake_folder.sync_engine.signal_about_to_remove_all_files.connect (
+            this.on_signal_about_to_remove_all_files_all_files_deleted_delete
         );
 
         var modifier = delete_on_remote ? fake_folder.remote_modifier () : fake_folder.local_modifier ();
@@ -190,10 +186,8 @@ public class TestAllFilesDeleted : GLib.Object {
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         // We never remove all files.
-        connect (
-            fake_folder.sync_engine,
-            SyncEngine.about_to_remove_all_files,
-            TestAllFilesDeleted.on_signal_about_to_remove_all_files_not_delete_metadata_change
+        fake_folder.sync_engine.signal_about_to_remove_all_files.connect (
+            this.on_signal_about_to_remove_all_files_not_delete_metadata_change
         );
         GLib.assert_true (fake_folder.sync_once ());
 
@@ -238,10 +232,8 @@ public class TestAllFilesDeleted : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         int about_to_remove_all_files_called = 0;
-        connect (
-            fake_folder.sync_engine,
-            SyncEngine.about_to_remove_all_files,
-            TestAllFilesDeleted.on_signal_about_to_remove_all_files_reset_server
+        fake_folder.sync_engine.signal_about_to_remove_all_files.connect (
+            this.on_signal_about_to_remove_all_files_reset_server
         );
 
         // Some small changes
@@ -260,7 +252,7 @@ public class TestAllFilesDeleted : GLib.Object {
         // reset the server.
         fake_folder.remote_modifier () = FileInfo.A12_B12_C12_S12 ();
 
-        // Now, about_to_remove_all_files with down as a direction
+        // Now, signal_about_to_remove_all_files with down as a direction
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (
             about_to_remove_all_files_called ==
@@ -448,10 +440,8 @@ public class TestAllFilesDeleted : GLib.Object {
         );
 
         int about_to_remove_all_files_called = 0;
-        connect (
-            fake_folder.sync_engine,
-            SyncEngine.about_to_remove_all_files,
-            TestAllFilesDeleted.on_signal_about_to_remove_all_files_single_file_renamed
+        fake_folder.sync_engine.signal_about_to_remove_all_files.connect (
+            this.on_signal_about_to_remove_all_files_single_file_renamed
         );
 
         // add a single file
@@ -485,10 +475,8 @@ public class TestAllFilesDeleted : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         int about_to_remove_all_files_called = 0;
-        connect (
-            fake_folder.sync_engine,
-            SyncEngine.about_to_remove_all_files,
-            TestAllFilesDeleted.on_signal_about_to_remove_all_files_selective_sync_o_popup
+        fake_folder.sync_engine.signal_about_to_remove_all_files.connect (
+            this.on_signal_about_to_remove_all_files_selective_sync_o_popup
         );
 
         GLib.assert_true (fake_folder.sync_once ());

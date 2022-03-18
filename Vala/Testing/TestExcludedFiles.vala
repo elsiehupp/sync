@@ -515,7 +515,7 @@ public class TestExcludedFiles : GLib.Object {
 
 
     private string translate_to_regexp_syntax (string pattern) {
-        string storage = Occ.ExcludedFiles.convert_to_regexp_syntax (pattern, false);
+        string storage = ExcludedFiles.convert_to_regexp_syntax (pattern, false);
         return storage.const_data ();
     }
 

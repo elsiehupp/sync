@@ -57,7 +57,7 @@ public class HttpCredentialsGui : HttpCredentials {
     public override void ask_from_user () {
         // This function can be called from AccountState.on_signal_invalid_credentials,
         // which (indirectly, through HttpCredentials.invalidate_token) schedules
-        // a cache wipe of the qnam. We can only execute a network job again once
+        // a cache wipe of the access_manager. We can only execute a network job again once
         // the cache has been cleared, otherwise we'd interfere with the job.
         GLib.Timeout.single_shot (100, this, HttpCredentialsGui.on_signal_ask_from_user_async);
     }
@@ -159,10 +159,7 @@ public class HttpCredentialsGui : HttpCredentials {
         }
 
         dialog.open ();
-        connect (
-            dialog,
-            Gtk.Dialog.signal_finished,
-            this,
+        dialog.signal_finished.connect (
             this.on_signal_finished_with_result
         );
     }
@@ -185,15 +182,13 @@ public class HttpCredentialsGui : HttpCredentials {
     ***********************************************************/
     private void on_signal_ask_from_user_async () {
         // First, we will check what kind of auth we need.
-        var job = new DetermineAuthTypeJob (
+        var determine_auth_type_job = new DetermineAuthTypeJob (
             this.account.shared_from_this (), this
         );
-        connect (
-            job,
-            DetermineAuthTypeJob.auth_type,
-            this, on_signal_auth_type
+        determine_auth_type_job.signal_auth_type.connect (
+            this.on_signal_auth_type
         );
-        job.on_signal_start ();
+        determine_auth_type_job.on_signal_start ();
     }
 
 
@@ -204,17 +199,11 @@ public class HttpCredentialsGui : HttpCredentials {
 
             this.async_auth.on_signal_reset (new OAuth (this.account, this));
             this.async_auth.expected_user = this.account.dav_user ();
-            connect (
-                this.async_auth,
-                OAuth.result,
-                this,
-                HttpCredentialsGui.on_signal_async_auth_result
+            this.async_auth.signal_result.connect (
+                this.on_signal_async_auth_result
             );
-            connect (
-                this.async_auth,
-                OAuth.destroyed,
-                this,
-                HttpCredentialsGui.signal_authorisation_link_changed
+            this.async_auth.destroyed.connect (
+                this.signal_authorisation_link_changed
             );
             this.async_auth.on_signal_start ();
             /* emit */ signal_authorisation_link_changed ();

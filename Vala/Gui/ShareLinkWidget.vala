@@ -67,7 +67,7 @@ public class ShareLinkWidget : Gtk.Widget {
 
     internal signal void create_link_share ();
     internal signal void delete_link_share ();
-    internal signal void on_signal_resize_requested ();
+    internal signal void signal_resize_requested ();
     internal signal void visual_deletion_done ();
     internal signal void create_password (string password);
     internal signal void create_password_processed ();
@@ -224,7 +224,7 @@ public class ShareLinkWidget : Gtk.Widget {
             this.allow_upload_link_action.checked (checked);
         }
 
-        this.share_link_elided_label = new Occ.ElidedLabel (this);
+        this.share_link_elided_label = new ElidedLabel (this);
         this.share_link_elided_label.elide_mode (Qt.Elide_right);
         display_share_link_label ();
         this.ui.horizontal_layout.insert_widget (2, this.share_link_elided_label);

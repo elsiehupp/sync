@@ -95,22 +95,13 @@ public class DetermineAuthTypeJob : GLib.Object {
         propfind.ignore_credential_failure (true);
         old_flow_required.ignore_credential_failure (true);
 
-        connect (
-            get_request,
-            SimpleNetworkJob.signal_finished,
-            this,
+        get_request.signal_finished.connect (
             this.on_signal_get_request_finished
         );
-        connect (
-            propfind,
-            SimpleNetworkJob.signal_finished,
-            this,
+        propfind.signal_finished.connect (
             this.on_signal_propfind_finished
         );
-        connect (
-            old_flow_required,
-            JsonApiJob.signal_json_received,
-            this,
+        old_flow_required.signal_json_received.connect (
             this.on_signal_json_received
         );
 

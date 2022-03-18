@@ -39,7 +39,7 @@ public class OwncloudWizard : QWizard {
     private OwncloudSetupPage setup_page;
     private OwncloudHttpCredsPage http_creds_page;
     private OwncloudOAuthCredsPage browser_creds_page;
-    private Flow2AuthCredsPage flow2creds_page;
+    private Flow2AuthCredsPage flow_2_creds_page;
     private OwncloudAdvancedSetupPage advanced_setup_page;
     private OwncloudWizardResultPage result_page;
     private AbstractCredentialsWizardPage credentials_page = null;
@@ -110,7 +110,7 @@ public class OwncloudWizard : QWizard {
     internal signal void skip_folder_configuration ();
     internal signal void need_certificate ();
     internal signal void signal_style_changed ();
-    internal signal void on_signal_activate ();
+    internal signal void signal_activate ();
 
 
     /***********************************************************
@@ -123,7 +123,7 @@ public class OwncloudWizard : QWizard {
         this.setup_page = new OwncloudSetupPage (this);
         this.http_creds_page = new OwncloudHttpCredsPage (this);
         this.browser_creds_page = new OwncloudOAuthCredsPage (this);
-        this.flow2creds_page = new Flow2AuthCredsPage (this);
+        this.flow_2_creds_page = new Flow2AuthCredsPage (this);
         this.advanced_setup_page = new OwncloudAdvancedSetupPage (this);
     //  #ifdef WITH_WEBENGINE
         this.web_view_page = new WebViewPage (this);
@@ -137,73 +137,45 @@ public class OwncloudWizard : QWizard {
         page (WizardCommon.Pages.PAGE_SERVER_SETUP, this.setup_page);
         page (WizardCommon.Pages.PAGE_HTTP_CREDS, this.http_creds_page);
         page (WizardCommon.Pages.PAGE_OAUTH_CREDS, this.browser_creds_page);
-        page (WizardCommon.Pages.PAGE_FLOW2AUTH_CREDS, this.flow2creds_page);
+        page (WizardCommon.Pages.PAGE_FLOW2AUTH_CREDS, this.flow_2_creds_page);
         page (WizardCommon.Pages.PAGE_ADVANCED_SETUP, this.advanced_setup_page);
     //  #ifdef WITH_WEBENGINE
         page (WizardCommon.Pages.PAGE_WEB_VIEW, this.web_view_page);
     //  #endif WITH_WEBENGINE
 
-        connect (
-            this,
-            Gtk.Dialog.on_signal_finished,
-            this,
-            OwncloudWizard.basic_setup_finished
+        this.signal_finished.connect (
+            this.basic_setup_finished
         );
 
         // note: start id is set by the calling class depending on if the
         // welcome text is to be shown or not.
 
-        connect (
-            this,
-            QWizard.current_id_changed,
-            this,
-            OwncloudWizard.on_signal_current_page_changed
+        this.current_id_changed.connect (
+            this.on_signal_current_page_changed
         );
-        connect (
-            this.setup_page,
-            OwncloudSetupPage.determine_auth_type,
-            this,
-            OwncloudWizard.determine_auth_type
+        this.setup_page.signal_determine_auth_type.connect (
+            this.on_signal_determine_auth_type
         );
-        connect (
-            this.http_creds_page,
-            OwncloudHttpCredsPage.connect_to_oc_url,
-            this,
-            OwncloudWizard.connect_to_oc_url
+        this.http_creds_page.signal_connect_to_oc_url.connect (
+            this.on_signal_connect_to_oc_url
         );
-        connect (
-            this.browser_creds_page,
-            OwncloudOAuthCredsPage.connect_to_oc_url,
-            this,
-            OwncloudWizard.connect_to_oc_url
+        this.browser_creds_page.signal_connect_to_oc_url.connect (
+            this.on_signal_connect_to_oc_url
         );
-        connect (
-            this.flow2creds_page,
-            Flow2AuthCredsPage.connect_to_oc_url,
-            this,
-            OwncloudWizard.connect_to_oc_url
+        this.flow_2_creds_page.signal_connect_to_oc_url.connect (
+            this.on_signal_connect_to_oc_url
         );
-        connect (
-            this.web_view_page,
-            WebViewPage.connect_to_oc_url,
-            this,
-            OwncloudWizard.connect_to_oc_url
+        this.web_view_page.signal_connect_to_oc_url.connect (
+            this.on_signal_connect_to_oc_url
         );
-        connect (
-            this.advanced_setup_page,
-            OwncloudAdvancedSetupPage.create_local_and_remote_folders,
-            this,
-            OwncloudWizard.create_local_and_remote_folders
+        this.advanced_setup_page.signal_create_local_and_remote_folders.connect (
+            this.on_signal_create_local_and_remote_folders
         );
-        connect (
-            this,
-            QWizard.custom_button_clicked,
-            this,
-            OwncloudWizard.skip_folder_configuration
+        this.custom_button_clicked.connect (
+            this.on_signal_skip_folder_configuration
         );
 
-        Theme theme = Theme.instance;
-        window_title (_("Add %1 account").printf (theme.app_name_gui));
+        window_title (_("Add %1 account").printf (Theme.instance.app_name_gui));
         wizard_style (QWizard.ModernStyle);
         option (QWizard.NoBackButtonOnStartPage);
         option (QWizard.NoBackButtonOnLastPage);
@@ -218,33 +190,21 @@ public class OwncloudWizard : QWizard {
         button (QWizard.NextButton).size_policy (next_button_size_policy);
 
         // Connect signal_style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
-        connect (
-            this,
-            OwncloudWizard.signal_style_changed,
-            this.setup_page,
-            OwncloudSetupPage.on_signal_style_changed
+        this.signal_style_changed.connect (
+            this.setup_page.on_signal_style_changed
         );
-        connect (
-            this,
-            OwncloudWizard.signal_style_changed,
-            this.advanced_setup_page,
-            OwncloudAdvancedSetupPage.on_signal_style_changed
+        this.signal_style_changed.connect (
+            this.advanced_setup_page.on_signal_style_changed
         );
-        connect (
-            this,
-            OwncloudWizard.signal_style_changed,
-            this.flow2creds_page,
-            Flow2AuthCredsPage.on_signal_style_changed
+        this.signal_style_changed.connect (
+            this.flow_2_creds_page.on_signal_style_changed
         );
 
         customize_style ();
 
         // allow Flow2 page to poll on window activation
-        connect (
-            this,
-            OwncloudWizard.on_signal_activate,
-            this.flow2creds_page,
-            Flow2AuthCredsPage.on_signal_poll_now
+        this.signal_activate.connect (
+            this.flow_2_creds_page.on_signal_poll_now
         );
 
         adjust_wizard_size ();
@@ -381,11 +341,8 @@ public class OwncloudWizard : QWizard {
             GLib.assert_not_reached ();
         }
 
-        connect (
-            message_box,
-            Gtk.MessageBox.accepted,
-            receiver,
-            this.on_message_box_accepted
+        message_box.accepted.connect (
+            receiver.on_message_box_accepted
         );
         message_box.open ();
     }
@@ -407,7 +364,7 @@ public class OwncloudWizard : QWizard {
         if (type == DetermineAuthTypeJob.AuthType.OAUTH) {
             this.credentials_page = this.browser_creds_page;
         } else if (type == DetermineAuthTypeJob.AuthType.LOGIN_FLOW_V2) {
-            this.credentials_page = this.flow2creds_page;
+            this.credentials_page = this.flow_2_creds_page;
     //  #ifdef WITH_WEBENGINE
         } else if (type == DetermineAuthTypeJob.WEB_VIEW_FLOW) {
             this.credentials_page = this.web_view_page;
@@ -468,7 +425,7 @@ public class OwncloudWizard : QWizard {
             /* emit */ clear_pending_requests ();
         }
 
-        if (identifier == WizardCommon.Pages.PAGE_ADVANCED_SETUP && (this.credentials_page == this.browser_creds_page || this.credentials_page == this.flow2creds_page)) {
+        if (identifier == WizardCommon.Pages.PAGE_ADVANCED_SETUP && (this.credentials_page == this.browser_creds_page || this.credentials_page == this.flow_2_creds_page)) {
             // For OAuth, disable the back button in the PAGE_ADVANCED_SETUP because we don't want
             // to re-open the browser.
             button (QWizard.BackButton).enabled (false);
@@ -501,7 +458,7 @@ public class OwncloudWizard : QWizard {
             break;
 
         case WizardCommon.Pages.PAGE_FLOW2AUTH_CREDS:
-            this.flow2creds_page.connected ();
+            this.flow_2_creds_page.connected ();
             break;
 
     //  #ifdef WITH_WEBENGINE
@@ -521,7 +478,7 @@ public class OwncloudWizard : QWizard {
 
         OwncloudGui.raise_dialog (this);
         if (next_id () == -1) {
-            disconnect (this, Gtk.Dialog.on_signal_finished, this, OwncloudWizard.basic_setup_finished);
+            disconnect (this, Gtk.Dialog.signal_finished, this, OwncloudWizard.basic_setup_finished);
             /* emit */ basic_setup_finished (Gtk.Dialog.Accepted);
         } else {
             next ();

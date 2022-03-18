@@ -59,9 +59,8 @@ public class SlideShow : Gtk.Widget {
                 this.animation.duration (SLIDE_DURATION);
                 this.animation.easing_curve (QEasing_curve.Out_cubic);
                 this.animation.start_value (static_cast<double> (this.current_slide));
-                connect (
-                    this.animation, SIGNAL (value_changed (GLib.Variant)),
-                    this, SLOT (update ())
+                this.animation.value_changed.connect (
+                    this.update
                 );
             }
             this.animation.end_value (static_cast<double> (value));

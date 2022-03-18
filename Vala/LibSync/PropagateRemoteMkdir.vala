@@ -15,7 +15,8 @@ namespace LibSync {
 ***********************************************************/
 public class PropagateRemoteMkdir : PropagateItemJob {
 
-    QPointer<AbstractNetworkJob> job;
+    DeleteJob delete_job;
+    MkColJob mkcol_job;
 
     /***********************************************************
     Whether an existing entity with the same name may be deleted before
@@ -50,35 +51,40 @@ public class PropagateRemoteMkdir : PropagateItemJob {
     /***********************************************************
     ***********************************************************/
     public new void start () {
-        if (propagator ().abort_requested) {
+        if (this.propagator.abort_requested) {
             return;
         }
 
         GLib.debug (this.item.file);
 
-        propagator ().active_job_list.append (this);
+        this.propagator.active_job_list.append (this);
 
         if (!this.delete_existing) {
             on_signal_mkdir ();
             return;
         }
 
-        this.job = new DeleteJob (propagator ().account,
-            propagator ().full_remote_path (this.item.file),
-            this);
-        connect (
-            qobject_cast<DeleteJob> (this.job), DeleteJob.signal_finished,
-            this, PropagateRemoteMkdir.on_signal_mkdir
+        this.delete_job = new DeleteJob (
+            this.propagator.account,
+            this.propagator.full_remote_path (this.item.file),
+            this
         );
-        this.job.start ();
+        this.delete_job.signal_finished.connect (
+            this.on_signal_mkdir
+        );
+        this.delete_job.start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public new void abort (PropagatorJob.AbortType abort_type) {
-        if (this.job && this.job.reply ())
-            this.job.reply ().abort ();
+        if (this.mkcol_job && this.mkcol_job.reply ()) {
+            this.mkcol_job.reply ().abort ();
+        }
+        if (this.delete_job && this.delete_job.reply ()) {
+            this.delete_job.reply ().abort ();
+        }
 
         if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
             /* emit */ signal_abort_finished ();
@@ -102,7 +108,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
         var parent_path = slash_position >= 0 ? path.left (slash_position): "";
 
         SyncJournalFileRecord parent_rec;
-        bool ok = propagator ().journal.get_file_record (parent_path, parent_rec);
+        bool ok = this.propagator.journal.get_file_record (parent_path, parent_rec);
         if (!ok) {
             on_signal_done (SyncFileItem.Status.NORMAL_ERROR);
             return;
@@ -115,16 +121,11 @@ public class PropagateRemoteMkdir : PropagateItemJob {
 
         // We should be encrypted as well since our parent is
         var remote_parent_path = parent_rec.e2e_mangled_name == "" ? parent_path : parent_rec.e2e_mangled_name;
-        this.upload_encrypted_helper = new PropagateUploadEncrypted (propagator (), remote_parent_path, this.item, this);
-        connect (
-            this.upload_encrypted_helper,
-            PropagateUploadEncrypted.finalized,
-            this,
-            PropagateRemoteMkdir.on_signal_start_encrypted_mkcol_job
+        this.upload_encrypted_helper = new PropagateUploadEncrypted (this.propagator, remote_parent_path, this.item, this);
+        this.upload_encrypted_helper.signal_finalized.connect (
+            this.on_signal_start_encrypted_mkcol_job
         );
-        connect (
-            this.upload_encrypted_helper,
-            PropagateUploadEncrypted.error,
+        this.upload_encrypted_helper.signal_error.connect (
             this.on_signal_propagate_upload_encrypted_error
         );
         this.upload_encrypted_helper.start ();
@@ -139,30 +140,24 @@ public class PropagateRemoteMkdir : PropagateItemJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_start_mkcol_job () {
-        if (propagator ().abort_requested) {
+        if (this.propagator.abort_requested) {
             return;
         }
 
         GLib.debug (this.item.file);
 
-        this.job = new MkColJob (
-            propagator ().account,
-            propagator ().full_remote_path (this.item.file),
+        this.mkcol_job = new MkColJob (
+            this.propagator.account,
+            this.propagator.full_remote_path (this.item.file),
             this
         );
-        connect (
-            (MkColJob) this.job,
-            MkColJob.signal_finished_with_error,
-            this,
-            PropagateRemoteMkdir.on_signal_mkcol_job_finished
+        this.mkcol_job.signal_finished_with_error.connect (
+            this.on_signal_mkcol_job_finished
         );
-        connect (
-            (MkColJob) this.job,
-            MkColJob.finished_without_error,
-            this,
-            PropagateRemoteMkdir.on_signal_mkcol_job_finished
+        this.mkcol_job.signal_finished_without_error.connect (
+            this.on_signal_mkcol_job_finished
         );
-        this.job.start ();
+        this.mkcol_job.start ();
     }
 
 
@@ -172,15 +167,15 @@ public class PropagateRemoteMkdir : PropagateItemJob {
         //  Q_UNUSED (path)
         //  Q_UNUSED (size)
 
-        if (propagator ().abort_requested) {
+        if (this.propagator.abort_requested) {
             return;
         }
 
         GLib.debug (filename);
 
-        var job = new MkColJob (
-            propagator ().account,
-            propagator ().full_remote_path (filename),
+        var mkcol_job = new MkColJob (
+            this.propagator.account,
+            this.propagator.full_remote_path (filename),
             {
                 {
                     "e2e-token",
@@ -189,49 +184,40 @@ public class PropagateRemoteMkdir : PropagateItemJob {
             },
             this
         );
-        connect (
-            job,
-            MkColJob.signal_finished_with_error,
-            this,
-            PropagateRemoteMkdir.on_signal_mkcol_job_finished
+        mkcol_job.signal_finished_with_error.connect (
+            this.on_signal_mkcol_job_finished
         );
-        connect (
-            job,
-            MkColJob.finished_without_error,
-            this,
-            PropagateRemoteMkdir.on_signal_mkcol_job_finished
+        mkcol_job.signal_finished_without_error.connect (
+            this.on_signal_mkcol_job_finished
         );
-        this.job = job;
-        this.job.start ();
+        this.mkcol_job = mkcol_job;
+        this.mkcol_job.start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_signal_mkcol_job_finished () {
-        propagator ().active_job_list.remove_one (this);
+        this.propagator.active_job_list.remove_one (this);
 
-        //  ASSERT (this.job);
+        //  ASSERT (this.mkcol_job);
 
-        Soup.Reply.NetworkError err = this.job.reply ().error ();
-        this.item.http_error_code = this.job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-        this.item.response_time_stamp = this.job.response_timestamp ();
-        this.item.request_id = this.job.request_id ();
+        Soup.Reply.NetworkError err = this.mkcol_job.reply ().error ();
+        this.item.http_error_code = this.mkcol_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        this.item.response_time_stamp = this.mkcol_job.response_timestamp ();
+        this.item.request_id = this.mkcol_job.request_id ();
 
-        this.item.file_id = this.job.reply ().raw_header ("OC-File_id");
+        this.item.file_id = this.mkcol_job.reply ().raw_header ("OC-File_id");
 
-        this.item.error_string = this.job.error_string ();
+        this.item.error_string = this.mkcol_job.error_string ();
 
-        var job_http_reason_phrase_string = this.job.reply ().attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ();
+        var job_http_reason_phrase_string = this.mkcol_job.reply ().attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ();
 
-        var job_path = this.job.path ();
+        var job_path = this.mkcol_job.path ();
 
         if (this.upload_encrypted_helper && this.upload_encrypted_helper.is_folder_locked () && !this.upload_encrypted_helper.is_unlock_running ()) {
             // since we are done, we need to unlock a folder in case it was locked
-            connect (
-                this.upload_encrypted_helper,
-                PropagateUploadEncrypted.folder_unlocked,
-                this,
+            this.upload_encrypted_helper.signal_folder_unlocked.connect (
                 this.on_signal_propagate_upload_encrypted_folder_unlocked
             );
             this.upload_encrypted_helper.unlock_folder ();
@@ -250,7 +236,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
     ***********************************************************/
     private void on_signal_encrypt_folder_finished () {
         GLib.debug ("Success making the new folder encrypted.");
-        propagator ().active_job_list.remove_one (this);
+        this.propagator.active_job_list.remove_one (this);
         this.item.is_encrypted = true;
         on_signal_success ();
     }
@@ -265,7 +251,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
         item_copy.etag.clear ();
 
         // save the file identifier already so we can detect rename or remove
-        var result = propagator ().update_metadata (item_copy);
+        var result = this.propagator.update_metadata (item_copy);
         if (!result) {
             on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error writing metadata to the database : %1").printf (result.error ()));
             return;
@@ -288,7 +274,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
             SyncFileItem.Status status = classify_error (
                 err,
                 this.item.http_error_code,
-                propagator ().another_sync_needed
+                this.propagator.another_sync_needed
             );
             on_signal_done (status, this.item.error_string);
             return;
@@ -303,19 +289,13 @@ public class PropagateRemoteMkdir : PropagateItemJob {
             return;
         }
 
-        propagator ().active_job_list.append (this);
-        var propfind_job = new PropfindJob (propagator ().account, job_path, this);
+        this.propagator.active_job_list.append (this);
+        var propfind_job = new PropfindJob (this.propagator.account, job_path, this);
         propfind_job.properties ({"http://owncloud.org/ns:permissions"});
-        connect (
-            propfind_job,
-            PropfindJob.result,
-            this,
+        propfind_job.signal_result.connect (
             this.on_signal_prop_find_job_result
         );
-        connect (
-            propfind_job,
-            PropfindJob.signal_finished_with_error,
-            this,
+        propfind_job.signal_finished_with_error.connect (
             this.on_signal_prop_find_job_finished_with_error
         );
         propfind_job.start ();
@@ -323,7 +303,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
 
 
     private void on_signal_prop_find_job_result (string job_path, GLib.HashTable<string, GLib.Variant> result) {
-        propagator ().active_job_list.remove_one (this);
+        this.propagator.active_job_list.remove_one (this);
         this.item.remote_perm = RemotePermissions.from_server_string (result.value ("permissions").to_string ());
 
         if (!this.upload_encrypted_helper && !this.item.is_encrypted) {
@@ -331,15 +311,14 @@ public class PropagateRemoteMkdir : PropagateItemJob {
         } else {
             // We still need to mark that folder encrypted in case we were uploading it as encrypted one
             // Another scenario, is we are creating a new folder because of move operation on an encrypted folder that works via remove + re-upload
-            propagator ().active_job_list.append (this);
+            this.propagator.active_job_list.append (this);
 
             // We're expecting directory path in /Foo/Bar convention...
             GLib.assert (job_path.starts_with ("/") && !job_path.has_suffix ("/"));
             // But encryption job expect it in Foo/Bar/ convention
-            var encrypt_folder_job = new Occ.EncryptFolderJob (propagator ().account, propagator ().journal, job_path.mid (1), this.item.file_id, this);
-            connect (
-                encrypt_folder_job, Occ.EncryptFolderJob.on_signal_finished,
-                this, PropagateRemoteMkdir.on_signal_encrypt_folder_finished
+            var encrypt_folder_job = new EncryptFolderJob (this.propagator.account, this.propagator.journal, job_path.mid (1), this.item.file_id, this);
+            encrypt_folder_job.signal_finished.connect (
+                this.on_signal_encrypt_folder_finished
             );
             encrypt_folder_job.start ();
         }
@@ -348,7 +327,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
 
     private void on_signal_prop_find_job_finished_with_error () {
         // ignore the PROPFIND error
-        propagator ().active_job_list.remove_one (this);
+        this.propagator.active_job_list.remove_one (this);
         on_signal_done (SyncFileItem.Status.NORMAL_ERROR);
     }
 

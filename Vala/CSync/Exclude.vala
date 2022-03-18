@@ -755,7 +755,7 @@ public class ExcludedFiles : GLib.Object {
                 .printf (full_file_dir_keep, full_dir_keep, bname_file_dir_keep, bname_dir_keep, full_file_dir_remove, full_dir_remove, bname_file_dir_remove, bname_dir_remove));
 
         QRegularExpression.PatternOptions pattern_options = QRegularExpression.NoPatternOption;
-        if (Occ.Utility.fs_case_preserving ()) {
+        if (Utility.fs_case_preserving ()) {
             pattern_options |= QRegularExpression.CaseInsensitiveOption;
         }
         this.bname_traversal_regex_file[base_path].pattern_options (pattern_options);
@@ -899,7 +899,7 @@ public class ExcludedFiles : GLib.Object {
                 line[o++] = line[i];
             }
         }
-        input.resize (Occ.Utility.convert_size_to_int (o));
+        input.resize (Utility.convert_size_to_int (o));
     }
 
 
@@ -984,7 +984,7 @@ public class ExcludedFiles : GLib.Object {
             return CSync.ExcludedFiles.Type.EXCLUDE_SILENT;
         }
 
-        if (exclude_conflict_files && Occ.Utility.is_conflict_file (path)) {
+        if (exclude_conflict_files && Utility.is_conflict_file (path)) {
             return CSync.ExcludedFiles.Type.CONFLICT;
         }
         return CSync.ExcludedFiles.Type.NOT_EXCLUDED;

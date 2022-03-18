@@ -71,7 +71,7 @@ abstract class AbstractCredentials : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public abstract Soup.Session create_qnam ();
+    public abstract Soup.Session create_access_manager ();
 
 
     /***********************************************************

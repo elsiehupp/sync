@@ -11,7 +11,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 namespace Testing {
 
-public class CredentialsStub : Occ.AbstractCredentials {
+public class CredentialsStub : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
@@ -49,7 +49,7 @@ public class CredentialsStub : Occ.AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public Soup create_qnam () {
+    public Soup create_access_manager () {
         return null;
     }
 

@@ -14,7 +14,7 @@ namespace LibSync {
 Setting the desired properties with properties
 
 Note that this job is only for querying one item.
-There is also the LsColJob which can be used to list collections
+There is also the LscolJob which can be used to list collections
 
 @ingroup libsync
 ***********************************************************/

@@ -42,7 +42,7 @@ bool item_did_complete_successfully_with_expected_rank (ItemCompletedSpy spy, st
 
 int item_successfully_completed_get_rank (ItemCompletedSpy spy, string path) {
     var it_item = std.find_if (spy.begin (), spy.end (), (current_item) => {
-        var item = current_item[0].template_value<Occ.SyncFileItemPtr> ();
+        var item = current_item[0].template_value<SyncFileItemPtr> ();
         return item.destination () == path;
     });
     if (it_item != spy.end ()) {
@@ -533,9 +533,7 @@ public class TestSyncEngine : GLib.Object {
         fake_folder.remote_modifier ().append_byte ("C/c1");
         fake_folder.remote_modifier ().set_modification_time ("C/c1", changed_mtime2);
 
-        connect (
-            fake_folder.sync_engine,
-            SyncEngine.signal_about_to_propagate,
+        fake_folder.sync_engine.signal_about_to_propagate.connect (
             this.on_signal_sync_engine_about_to_propagate
         );
 

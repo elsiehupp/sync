@@ -28,9 +28,9 @@ State machine:
         /                  PROPFIND
     start_new_upload () <-+        +----------------------------
         |               |        |
-        MKCOL            + on_signal_propfind_finished_with_error ()     on_signal_propfind_finished ()
+        MKCOL            + on_signal_lscol_job_finished_with_error ()     on_signal_lscol_job_finished ()
         |                                                       Is there stale files to remove?
-    on_signal_mkcol_finished ()                                         |                      |
+    on_signal_mkcol_job_finished ()                                         |                      |
         |                                                       no                    yes
         |                                                       |                      |
         |                                                       |                  DeleteJob
@@ -50,8 +50,8 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
     /***********************************************************
     Map chunk number with its size  from the PROPFIND on resume.
-    (Only used from on_signal_propfind_iterate or 
-    on_signal_propfind_finished because the LsColJob use
+    (Only used from on_signal_lscol_job_directory_listing_iterated or 
+    on_signal_lscol_job_finished because the LscolJob use
     signals to report data.)
     ***********************************************************/
     private struct ServerChunkInfo {
@@ -93,13 +93,13 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
     ***********************************************************/
     private GLib.Uri chunk_url (int chunk = -1) {
         string path = "remote.php/dav/uploads/"
-            + propagator ().account.dav_user ()
+            + this.propagator.account.dav_user ()
             + "/" + this.transfer_identifier.to_string ();
         if (chunk >= 0) {
             // We need to do add leading 0 because the server orders the chunk alphabetically
             path += "/" + string.number (chunk).right_justified (16, '0'); // 1e16 is 10 petabyte
         }
-        return Utility.concat_url_path (propagator ().account.url, path);
+        return Utility.concat_url_path (this.propagator.account.url, path);
     }
 
 
@@ -113,9 +113,9 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
     /***********************************************************
     ***********************************************************/
     public new void do_start_upload () {
-        propagator ().active_job_list.append (this);
+        this.propagator.active_job_list.append (this);
 
-        const SyncJournalDb.UploadInfo progress_info = propagator ().journal.get_upload_info (this.item.file);
+        const SyncJournalDb.UploadInfo progress_info = this.propagator.journal.get_upload_info (this.item.file);
         GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
             GLib.warning ("Invalid modified time " + this.item.file + this.item.modtime);
@@ -124,41 +124,32 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
                 && progress_info.size == this.item.size) {
             this.transfer_identifier = progress_info.transferid;
             var url = chunk_url ();
-            var job = new LsColJob (propagator ().account, url, this);
-            this.jobs.append (job);
-            job.properties (GLib.List<string> ("resourcetype"
-                                                + "getcontentlength"));
-            connect (
-                job,
-                LsColJob.finished_without_error,
-                this,
-                PropagateUploadFileNG.on_signal_propfind_finished
+            var lscol_job = new LscolJob (this.propagator.account, url, this);
+            this.jobs.append (lscol_job);
+            lscol_job.properties = {
+                "resourcetype",
+                "getcontentlength"
+            };
+            lscol_job.signal_finished_without_error.connect (
+                this.on_signal_lscol_job_finished
             );
-            connect (
-                job,
-                LsColJob.signal_finished_with_error,
+            lscol_job.signal_finished_with_error.connect (
                 this,
-                PropagateUploadFileNG.on_signal_propfind_finished_with_error
+                PropagateUploadFileNG.on_signal_lscol_job_finished_with_error
             );
-            connect (
-                job,
-                GLib.Object.destroyed,
-                this,
-                PropagateUploadFileCommon.on_signal_job_destroyed
+            lscol_job.destroyed.connect (
+                this.on_signal_network_job_destroyed
             );
-            connect (
-                job,
-                LsColJob.signal_directory_listing_iterated,
-                this,
-                PropagateUploadFileNG.on_signal_propfind_iterate
+            lscol_job.signal_directory_listing_iterated.connect (
+                this.on_signal_lscol_job_directory_listing_iterated
             );
-            job.start ();
+            lscol_job.start ();
             return;
         } else if (progress_info.valid && progress_info.is_chunked ()) {
             // The upload info is stale. remove the stale chunks on the server
             this.transfer_identifier = progress_info.transferid;
             // Fire and forget. Any error will be ignored.
-            (new DeleteJob (propagator ().account, chunk_url (), this)).start ();
+            (new DeleteJob (this.propagator.account, chunk_url (), this)).start ();
             // start_new_upload will reset the this.transfer_identifier and the UploadInfo in the database.
         }
 
@@ -169,7 +160,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
     /***********************************************************
     ***********************************************************/
     private void start_new_upload () {
-        //  ASSERT (propagator ().active_job_list.count (this) == 1);
+        //  ASSERT (this.propagator.active_job_list.count (this) == 1);
         GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
             GLib.warning ("Invalid modified time" + this.item.file + this.item.modtime);
@@ -178,7 +169,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         this.sent = 0;
         this.current_chunk = 0;
 
-        propagator ().report_progress (*this.item, 0);
+        this.propagator.report_progress (*this.item, 0);
 
         SyncJournalDb.UploadInfo pi;
         pi.valid = true;
@@ -190,40 +181,37 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         pi.modtime = this.item.modtime;
         pi.content_checksum = this.item.checksum_header;
         pi.size = this.item.size;
-        propagator ().journal.upload_info (this.item.file, pi);
-        propagator ().journal.commit ("Upload info");
+        this.propagator.journal.upload_info (this.item.file, pi);
+        this.propagator.journal.commit ("Upload info");
         GLib.HashTable<string, string> headers;
 
         // But we should send the temporary (or something) one.
         headers["OC-Total-Length"] = new string.number (this.file_to_upload.size);
-        var mk_col_job = new MkColJob (propagator ().account, chunk_url (), headers, this);
+        var mkcol_job = new MkColJob (this.propagator.account, chunk_url (), headers, this);
 
-        connect (
-            mk_col_job, MkColJob.signal_finished_with_error,
-            this, PropagateUploadFileNG.on_signal_mkcol_finished
+        mkcol_job.signal_finished_with_error.connect (
+            this.on_signal_mkcol_job_finished
         );
-        connect (
-            mk_col_job, MkColJob.finished_without_error,
-            this, PropagateUploadFileNG.on_signal_mkcol_finished
+        mkcol_job.signal_finished_without_error.connect (
+            this.on_signal_mkcol_job_finished
         );
-        connect (
-            mk_col_job, GLib.Object.destroyed,
-            this, PropagateUploadFileCommon.on_signal_job_destroyed
+        mkcol_job.destroyed.connect (
+            this.on_signal_network_job_destroyed
         );
-        mk_col_job.start ();
+        mkcol_job.start ();
     }
 
     /***********************************************************
     ***********************************************************/
     private void on_signal_start_next_chunk () {
-        if (propagator ().abort_requested)
+        if (this.propagator.abort_requested)
             return;
 
         int64 file_size = this.file_to_upload.size;
         //  ENFORCE (file_size >= this.sent, "Sent data exceeds file size");
 
         // prevent situation that chunk size is bigger then required one to send
-        this.current_chunk_size = q_min (propagator ().chunk_size, file_size - this.sent);
+        this.current_chunk_size = q_min (this.propagator.chunk_size, file_size - this.sent);
 
         if (this.current_chunk_size == 0) {
             GLib.assert (this.jobs == ""); // There should be no running job anymore
@@ -231,8 +219,8 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
             // Finish with a MOVE
             // If we changed the file name, we must store the changed filename in the remote folder, not the original one.
-            string destination = GLib.Dir.clean_path (propagator ().account.dav_url ().path ()
-                + propagator ().full_remote_path (this.file_to_upload.file));
+            string destination = GLib.Dir.clean_path (this.propagator.account.dav_url ().path ()
+                + this.propagator.full_remote_path (this.file_to_upload.file));
             var headers = PropagateUploadFileCommon.headers ();
 
             // "If-Match applies to the source, but we are interested in comparing the etag of the destination
@@ -246,18 +234,16 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
             }
             headers["OC-Total-Length"] = new string.number (file_size);
 
-            var move_job = new MoveJob (propagator ().account, Utility.concat_url_path (chunk_url (), "/.file"),
+            var move_job = new MoveJob (this.propagator.account, Utility.concat_url_path (chunk_url (), "/.file"),
                 destination, headers, this);
             this.jobs.append (move_job);
-            connect (
-                move_job, MoveJob.signal_finished,
-                this, PropagateUploadFileNG.on_signal_move_job_finished
+            move_job.signal_finished.connect (
+                this.on_signal_move_job_finished
             );
-            connect (
-                move_job, GLib.Object.destroyed,
-                this, PropagateUploadFileCommon.on_signal_job_destroyed
+            move_job.destroyed.connect (
+                this.on_signal_network_job_destroyed
             );
-            propagator ().active_job_list.append (this);
+            this.propagator.active_job_list.append (this);
             adjust_last_job_timeout (move_job, file_size);
             move_job.start ();
             return;
@@ -265,7 +251,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
         const string filename = this.file_to_upload.path;
         var device = std.make_unique<UploadDevice> (
-                filename, this.sent, this.current_chunk_size, propagator ().bandwidth_manager);
+                filename, this.sent, this.current_chunk_size, this.propagator.bandwidth_manager);
         if (!device.open (QIODevice.ReadOnly)) {
             GLib.warning ("Could not prepare upload device: " + device.error_string ());
 
@@ -282,26 +268,22 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
         // job takes ownership of device via a QScopedPointer. Job deletes itself when finishing
         var device_ptr = device; // for connections later
-        var put_file_job = new PUTFileJob (propagator ().account, url, std.move (device), headers, this.current_chunk, this);
+        var put_file_job = new PUTFileJob (this.propagator.account, url, std.move (device), headers, this.current_chunk, this);
         this.jobs.append (put_file_job);
-        connect (
-            put_file_job, PUTFileJob.signal_finished,
-            this, PropagateUploadFileNG.on_signal_put_finished
+        put_file_job.signal_finished.connect (
+            this.on_signal_put_file_job_finished
         );
-        connect (
-            put_file_job, PUTFileJob.signal_upload_progress,
-            this, PropagateUploadFileNG.on_signal_upload_progress
+        put_file_job.signal_upload_progress.connect (
+            this.on_signal_put_file_job_upload_progress
         );
-        connect (
-            put_file_job, PUTFileJob.signal_upload_progress,
-            device_ptr, UploadDevice.on_signal_job_upload_progress
+        put_file_job.signal_upload_progress.connect (
+            device_ptr.on_signal_put_file_job_upload_progress
         );
-        connect (
-            put_file_job, GLib.Object.destroyed,
-            this, PropagateUploadFileCommon.on_signal_job_destroyed
+        put_file_job.destroyed.connect (
+            this.on_signal_network_job_destroyed
         );
         put_file_job.start ();
-        propagator ().active_job_list.append (this);
+        this.propagator.active_job_list.append (this);
         this.current_chunk++;
     }
 
@@ -323,10 +305,10 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_propfind_finished () {
-        var ls_col_job = qobject_cast<LsColJob> (sender ());
-        on_signal_job_destroyed (ls_col_job); // remove it from the this.jobs list
-        propagator ().active_job_list.remove_one (this);
+    private void on_signal_lscol_job_finished () {
+        var lscol_job = qobject_cast<LscolJob> (sender ());
+        on_signal_network_job_destroyed (lscol_job); // remove it from the this.jobs list
+        this.propagator.active_job_list.remove_one (this);
 
         this.current_chunk = 0;
         this.sent = 0;
@@ -347,9 +329,9 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
             // Wipe the old chunking data.
             // Fire and forget. Any error will be ignored.
-            new DeleteJob (propagator ().account, chunk_url (), this).start ();
+            new DeleteJob (this.propagator.account, chunk_url (), this).start ();
 
-            propagator ().active_job_list.append (this);
+            this.propagator.active_job_list.append (this);
             start_new_upload ();
             return;
         }
@@ -358,17 +340,16 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
         if (!this.server_chunks == "") {
             GLib.info ("To Delete " + this.server_chunks.keys ());
-            propagator ().active_job_list.append (this);
+            this.propagator.active_job_list.append (this);
             this.remove_job_error = false;
 
             // Make sure that if there is a "hole" and then a few more chunks, on the server
             // we should remove the later chunks. Otherwise when we do dynamic chunk sizing, we may end up
             // with corruptions if there are too many chunks, or if we abort and there are still stale chunks.
             foreach (var server_chunk in q_as_const (this.server_chunks)) {
-                var delete_job = new DeleteJob (propagator ().account, Utility.concat_url_path (chunk_url (), server_chunk.original_name), this);
-                connect (
-                    delete_job, DeleteJob.signal_finished,
-                    this, PropagateUploadFileNG.on_signal_delete_job_finished
+                var delete_job = new DeleteJob (this.propagator.account, Utility.concat_url_path (chunk_url (), server_chunk.original_name), this);
+                delete_job.signal_finished.connect (
+                    this.on_signal_delete_job_finished
                 );
                 this.jobs.append (delete_job);
                 delete_job.start ();
@@ -382,16 +363,16 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_propfind_finished_with_error () {
-        var ls_col_job = qobject_cast<LsColJob> (sender ());
-        on_signal_job_destroyed (ls_col_job); // remove it from the this.jobs list
-        Soup.Reply.NetworkError err = ls_col_job.reply ().error ();
-        var http_error_code = ls_col_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-        var status = classify_error (err, http_error_code, propagator ().another_sync_needed);
+    private void on_signal_lscol_job_finished_with_error () {
+        var lscol_job = qobject_cast<LscolJob> (sender ());
+        on_signal_network_job_destroyed (lscol_job); // remove it from the this.jobs list
+        Soup.Reply.NetworkError err = lscol_job.reply ().error ();
+        var http_error_code = lscol_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        var status = classify_error (err, http_error_code, this.propagator.another_sync_needed);
         if (status == SyncFileItem.Status.FATAL_ERROR) {
-            this.item.request_id = ls_col_job.request_id ();
-            propagator ().active_job_list.remove_one (this);
-            abort_with_error (status, ls_col_job.error_string_parsing_body ());
+            this.item.request_id = lscol_job.request_id ();
+            this.propagator.active_job_list.remove_one (this);
+            abort_with_error (status, lscol_job.error_string_parsing_body ());
             return;
         }
         start_new_upload ();
@@ -399,7 +380,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_propfind_iterate (string name, GLib.HashTable<string, string> properties) {
+    private void on_signal_lscol_job_directory_listing_iterated (string name, GLib.HashTable<string, string> properties) {
         if (name == chunk_url ().path ()) {
             return; // skip the info about the path itself
         }
@@ -438,7 +419,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         }
 
         if (this.jobs == "") {
-            propagator ().active_job_list.remove_one (this);
+            this.propagator.active_job_list.remove_one (this);
             if (this.remove_job_error) {
                 // There was an error removing some files, just start over
                 start_new_upload ();
@@ -450,18 +431,18 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_mkcol_finished () {
-        propagator ().active_job_list.remove_one (this);
-        var mk_col_job = qobject_cast<MkColJob> (sender ());
-        on_signal_job_destroyed (mk_col_job); // remove it from the this.jobs list
-        Soup.Reply.NetworkError err = mk_col_job.reply ().error ();
-        this.item.http_error_code = mk_col_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+    private void on_signal_mkcol_job_finished () {
+        this.propagator.active_job_list.remove_one (this);
+        var mkcol_job = qobject_cast<MkColJob> (sender ());
+        on_signal_network_job_destroyed (mkcol_job); // remove it from the this.jobs list
+        Soup.Reply.NetworkError err = mkcol_job.reply ().error ();
+        this.item.http_error_code = mkcol_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
 
         if (err != Soup.Reply.NoError || this.item.http_error_code != 201) {
-            this.item.request_id = mk_col_job.request_id ();
+            this.item.request_id = mkcol_job.request_id ();
             SyncFileItem.Status status = classify_error (err, this.item.http_error_code,
-                propagator ().another_sync_needed);
-            abort_with_error (status, mk_col_job.error_string_parsing_body ());
+                this.propagator.another_sync_needed);
+            abort_with_error (status, mkcol_job.error_string_parsing_body ());
             return;
         }
         on_signal_start_next_chunk ();
@@ -469,13 +450,13 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_put_finished () {
+    private void on_signal_put_file_job_finished () {
         var put_file_job = qobject_cast<PUTFileJob> (sender ());
         //  ASSERT (put_file_job);
 
-        on_signal_job_destroyed (put_file_job); // remove it from the this.jobs list
+        on_signal_network_job_destroyed (put_file_job); // remove it from the this.jobs list
 
-        propagator ().active_job_list.remove_one (this);
+        this.propagator.active_job_list.remove_one (this);
 
         if (this.finished) {
             // We have sent the on_signal_finished signal already. We don't need to handle any remaining jobs
@@ -497,7 +478,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         //
         // Dynamic chunk sizing is enabled if the server configured a
         // target duration for each chunk upload.
-        var target_duration = propagator ().sync_options.target_chunk_upload_duration;
+        var target_duration = this.propagator.sync_options.target_chunk_upload_duration;
         if (target_duration.count () > 0) {
             var upload_time = ++put_file_job.ms_since_start (); // add one to avoid div-by-zero
             int64 predicted_good_size = (this.current_chunk_size * target_duration) / upload_time;
@@ -508,32 +489,32 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
             //
             // We use an exponential moving average here as a cheap way of smoothing
             // the chunk sizes a bit.
-            int64 target_size = propagator ().chunk_size / 2 + predicted_good_size / 2;
+            int64 target_size = this.propagator.chunk_size / 2 + predicted_good_size / 2;
 
             // Adjust the dynamic chunk size this.chunk_size used for sizing of the item's chunks to be send
-            propagator ().chunk_size = q_bound (
-                propagator ().sync_options.min_chunk_size,
+            this.propagator.chunk_size = q_bound (
+                this.propagator.sync_options.min_chunk_size,
                 target_size,
-                propagator ().sync_options.max_chunk_size);
+                this.propagator.sync_options.max_chunk_size);
 
             GLib.info (
                 "Chunked upload of " + this.current_chunk_size.to_string () + " bytes took " + upload_time.count ()
                 + "ms, desired is " + target_duration.count () + "ms, expected good chunk size is "
                 + predicted_good_size + " bytes and nudged next chunk size to "
-                + propagator ().chunk_size + " bytes."
+                + this.propagator.chunk_size + " bytes."
             );
         }
 
         this.finished = this.sent == this.item.size;
 
         // Check if the file still exists
-        const string full_file_path = propagator ().full_local_path (this.item.file);
+        const string full_file_path = this.propagator.full_local_path (this.item.file);
         if (!FileSystem.file_exists (full_file_path)) {
             if (!this.finished) {
                 abort_with_error (SyncFileItem.Status.SOFT_ERROR, _("The local file was removed during sync."));
                 return;
             } else {
-                propagator ().another_sync_needed = true;
+                this.propagator.another_sync_needed = true;
             }
         }
 
@@ -543,7 +524,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
             GLib.warning ("Invalid modified time " + this.item.file + this.item.modtime);
         }
         if (!FileSystem.verify_file_unchanged (full_file_path, this.item.size, this.item.modtime)) {
-            propagator ().another_sync_needed = true;
+            this.propagator.another_sync_needed = true;
             if (!this.finished) {
                 abort_with_error (SyncFileItem.Status.SOFT_ERROR, _("Local file changed during sync."));
                 return;
@@ -553,15 +534,15 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         if (!this.finished) {
             // Deletes an existing blocklist entry on successful chunk upload
             if (this.item.has_blocklist_entry) {
-                propagator ().journal.wipe_error_blocklist_entry (this.item.file);
+                this.propagator.journal.wipe_error_blocklist_entry (this.item.file);
                 this.item.has_blocklist_entry = false;
             }
 
             // Reset the error count on successful chunk upload
-            var upload_info = propagator ().journal.get_upload_info (this.item.file);
+            var upload_info = this.propagator.journal.get_upload_info (this.item.file);
             upload_info.error_count = 0;
-            propagator ().journal.upload_info (this.item.file, upload_info);
-            propagator ().journal.commit ("Upload info");
+            this.propagator.journal.upload_info (this.item.file, upload_info);
+            this.propagator.journal.commit ("Upload info");
         }
         on_signal_start_next_chunk ();
     }
@@ -569,9 +550,9 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
     /***********************************************************
     ***********************************************************/
     private void on_signal_move_job_finished () {
-        propagator ().active_job_list.remove_one (this);
+        this.propagator.active_job_list.remove_one (this);
         var move_job = qobject_cast<MoveJob> (sender ());
-        on_signal_job_destroyed (move_job); // remove it from the this.jobs list
+        on_signal_network_job_destroyed (move_job); // remove it from the this.jobs list
         Soup.Reply.NetworkError err = move_job.reply ().error ();
         this.item.http_error_code = move_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         this.item.response_time_stamp = move_job.response_timestamp ();
@@ -623,7 +604,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_upload_progress (int64 sent, int64 total) {
+    private void on_signal_put_file_job_upload_progress (int64 sent, int64 total) {
         // Completion is signaled with sent=0, total=0; avoid accidentally
         // resetting progress due to the sent being zero by ignoring it.
         // signal_finished () is bound to be emitted soon anyway.
@@ -631,7 +612,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         if (sent == 0 && total == 0) {
             return;
         }
-        propagator ().report_progress (*this.item, this.sent + sent - total);
+        this.propagator.report_progress (*this.item, this.sent + sent - total);
     }
 
 } // class PropagateUploadFileNG

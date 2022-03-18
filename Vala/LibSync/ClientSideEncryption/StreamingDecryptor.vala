@@ -90,20 +90,20 @@ public class StreamingDecryptor : GLib.Object {
             return "";
         }
 
-        GLib.assert (this.decrypted_so_far + chunk_size < Occ.Constants.E2EE_TAG_SIZE || this.total_size - Occ.Constants.E2EE_TAG_SIZE >= this.decrypted_so_far + chunk_size - Occ.Constants.E2EE_TAG_SIZE);
-        if (this.decrypted_so_far + chunk_size > Occ.Constants.E2EE_TAG_SIZE && this.total_size - Occ.Constants.E2EE_TAG_SIZE < this.decrypted_so_far + chunk_size - Occ.Constants.E2EE_TAG_SIZE) {
+        GLib.assert (this.decrypted_so_far + chunk_size < Constants.E2EE_TAG_SIZE || this.total_size - Constants.E2EE_TAG_SIZE >= this.decrypted_so_far + chunk_size - Constants.E2EE_TAG_SIZE);
+        if (this.decrypted_so_far + chunk_size > Constants.E2EE_TAG_SIZE && this.total_size - Constants.E2EE_TAG_SIZE < this.decrypted_so_far + chunk_size - Constants.E2EE_TAG_SIZE) {
             GLib.critical ("Decryption failed. Incorrect chunk!");
             return "";
         }
 
         const bool is_last_chunk = this.decrypted_so_far + chunk_size == this.total_size;
 
-        // last Occ.Constants.E2EE_TAG_SIZE bytes is ALWAYS a e2Ee_tag!!!
-        const int64 size = is_last_chunk ? chunk_size - Occ.Constants.E2EE_TAG_SIZE : chunk_size;
+        // last Constants.E2EE_TAG_SIZE bytes is ALWAYS a e2Ee_tag!!!
+        const int64 size = is_last_chunk ? chunk_size - Constants.E2EE_TAG_SIZE : chunk_size;
 
         // either the size is more than 0 and an e2Ee_tag is at the end of chunk, or, chunk is the e2Ee_tag itself
-        GLib.assert (size > 0 || chunk_size == Occ.Constants.E2EE_TAG_SIZE);
-        if (size <= 0 && chunk_size != Occ.Constants.E2EE_TAG_SIZE) {
+        GLib.assert (size > 0 || chunk_size == Constants.E2EE_TAG_SIZE);
+        if (size <= 0 && chunk_size != Constants.E2EE_TAG_SIZE) {
             GLib.critical ("Decryption failed. Invalid input size: " + size + " !");
             return "";
         }
@@ -111,7 +111,7 @@ public class StreamingDecryptor : GLib.Object {
         int64 bytes_written = 0;
         int64 input_pos = 0;
 
-        string decrypted_block = new string (BLOCK_SIZE + Occ.Constants.E2EE_TAG_SIZE - 1, '\0');
+        string decrypted_block = new string (BLOCK_SIZE + Constants.E2EE_TAG_SIZE - 1, '\0');
 
         while (input_pos < size) {
             // read BLOCK_SIZE or less bytes
@@ -148,15 +148,15 @@ public class StreamingDecryptor : GLib.Object {
         if (is_last_chunk) {
             // if it's a last chunk, we'd need to read a e2Ee_tag at the end and on_signal_finalize the decryption
 
-            GLib.assert (chunk_size - input_pos == Occ.Constants.E2EE_TAG_SIZE);
-            if (chunk_size - input_pos != Occ.Constants.E2EE_TAG_SIZE) {
+            GLib.assert (chunk_size - input_pos == Constants.E2EE_TAG_SIZE);
+            if (chunk_size - input_pos != Constants.E2EE_TAG_SIZE) {
                 GLib.critical ("Decryption failed. e2Ee_tag is missing!");
                 return "";
             }
 
             int out_len = 0;
 
-            string e2Ee_tag = new string (input + input_pos, Occ.Constants.E2EE_TAG_SIZE);
+            string e2Ee_tag = new string (input + input_pos, Constants.E2EE_TAG_SIZE);
 
             // Set expected e2Ee_tag value. Works in OpenSSL 1.0.1d and later
             if (!EVP_CIPHER_CTX_ctrl (this.context, EVP_CTRL_GCM_SET_TAG, e2Ee_tag.size (), reinterpret_cast<uchar> (e2Ee_tag))) {
@@ -179,7 +179,7 @@ public class StreamingDecryptor : GLib.Object {
 
             bytes_written += written_to_output;
 
-            this.decrypted_so_far += Occ.Constants.E2EE_TAG_SIZE;
+            this.decrypted_so_far += Constants.E2EE_TAG_SIZE;
 
             this.is_finished = true;
         }

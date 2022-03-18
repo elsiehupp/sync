@@ -10,11 +10,11 @@ namespace Occ {
 @brief The SimpleSslErrorHandler class
 @ingroup cmd
 ***********************************************************/
-public class SimpleSslErrorHandler : Occ.AbstractSslErrorHandler {
+public class SimpleSslErrorHandler : AbstractSslErrorHandler {
 
     /***********************************************************
     ***********************************************************/
-    public override bool handle_errors (GLib.List<QSslError> errors, QSslConfiguration conf, GLib.List<QSslCertificate> certificates, Occ.Account account) {
+    public override bool handle_errors (GLib.List<QSslError> errors, QSslConfiguration conf, GLib.List<QSslCertificate> certificates, Account account) {
         (void)account;
         (void)conf;
 

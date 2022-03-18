@@ -6,7 +6,7 @@ Copyright (C) by Dominik Schmidt <dschmidt@owncloud.com>
 
 namespace Occ {
 
-// Q_DECLARE_INTERFACE (Occ.PluginFactory, "org.owncloud.PluginFactory")
+// Q_DECLARE_INTERFACE (PluginFactory, "org.owncloud.PluginFactory")
 
 public abstract class PluginFactory {
 

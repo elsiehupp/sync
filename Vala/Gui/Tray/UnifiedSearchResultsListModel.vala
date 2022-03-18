@@ -253,7 +253,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
             return;
         }
 
-        var job = new JsonApiJob (
+        var json_api_job = new JsonApiJob (
             this.account_state.account,
             "ocs/v2.php/search/providers/%1/search".printf (provider_id)
         );
@@ -262,18 +262,20 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
         parameters.add_query_item ("term", this.search_term);
         if (cursor > 0) {
             parameters.add_query_item ("cursor", string.number (cursor));
-            job.property ("append_results", true);
+            json_api_job.property ("append_results", true);
         }
-        job.property ("provider_id", provider_id);
-        job.add_query_params (parameters);
+        json_api_job.property ("provider_id", provider_id);
+        json_api_job.add_query_params (parameters);
         const var was_search_in_progress = is_search_in_progress ();
         this.search_job_connections.insert (provider_id,
-            connect (
-                job, JsonApiJob.json_received, this, UnifiedSearchResultsListModel.on_signal_search_for_provider_finished));
+            json_api_job.json_received.connect (
+                this.on_signal_search_for_provider_finished
+            )
+        );
         if (is_search_in_progress () && !was_search_in_progress) {
             /* emit */ signal_is_search_in_progress_changed ();
         }
-        job.on_signal_start ();
+        json_api_job.on_signal_start ();
     }
 
 
@@ -534,9 +536,8 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
         if (!this.search_term == "") {
             this.unified_search_text_editing_finished_timer.interval (SEARCH_TERM_EDITING_FINISHED_SEARCH_START_DELAY);
-            connect (
-                this.unified_search_text_editing_finished_timer, GLib.Timeout.timeout,
-                this, UnifiedSearchResultsListModel.on_signal_search_term_editing_finished
+            this.unified_search_text_editing_finished_timer.timeout.connect (
+                this.on_signal_search_term_editing_finished
             );
             this.unified_search_text_editing_finished_timer.on_signal_start ();
         }
@@ -562,12 +563,11 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
         }
 
         if (this.providers == "") {
-            var job = new JsonApiJob (this.account_state.account, "ocs/v2.php/search/providers");
-            connect (
-                job, JsonApiJob.json_received,
-                this, UnifiedSearchResultsListModel.on_signal_fetch_providers_finished
+            var json_api_job = new JsonApiJob (this.account_state.account, "ocs/v2.php/search/providers");
+            json_api_job.json_received.connect (
+                this.on_signal_fetch_providers_finished
             );
-            job.on_signal_start ();
+            json_api_job.on_signal_start ();
         } else {
             start_search ();
         }
@@ -577,9 +577,9 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     private void on_signal_fetch_providers_finished (QJsonDocument json, int status_code) {
-        const var job = qobject_cast<JsonApiJob> (sender ());
+        const var json_api_job = qobject_cast<JsonApiJob> (sender ());
 
-        if (!job) {
+        if (!json_api_job) {
             GLib.critical ("Failed to fetch providers.".printf (this.search_term));
             this.error_string += _("Failed to fetch providers.") + '\n';
             /* emit */ signal_error_string_changed ();
@@ -591,10 +591,10 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
                 "%1 : Failed to fetch search providers for '%2'. Error: %3"
                     .printf (status_code)
                     .printf (this.search_term)
-                    .printf (job.error_string ()
+                    .printf (json_api_job.error_string ()
             );
             this.error_string +=
-                _("Failed to fetch search providers for '%1'. Error: %2").printf (this.search_term).printf (job.error_string ())
+                _("Failed to fetch search providers for '%1'. Error: %2").printf (this.search_term).printf (json_api_job.error_string ())
                 + '\n';
             /* emit */ signal_error_string_changed ();
             return;
@@ -624,16 +624,16 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
     private void on_signal_search_for_provider_finished (QJsonDocument json, int status_code) {
         //  Q_ASSERT (this.account_state && this.account_state.account);
 
-        const var job = qobject_cast<JsonApiJob> (sender ());
+        const var json_api_job = qobject_cast<JsonApiJob> (sender ());
 
-        if (!job) {
+        if (!json_api_job) {
             GLib.critical ("Search has failed for '%2'.".printf (this.search_term));
             this.error_string += _("Search has failed for '%2'.").printf (this.search_term) + '\n';
             /* emit */ signal_error_string_changed ();
             return;
         }
 
-        const var provider_id = job.property ("provider_id").to_string ();
+        const var provider_id = json_api_job.property ("provider_id").to_string ();
 
         if (provider_id == "") {
             return;
@@ -655,17 +655,17 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
             GLib.critical ("%1 : Search has failed for '%2'. Error : %3"
                 .printf (status_code)
                 .printf (this.search_term)
-                .printf (job.error_string ()
+                .printf (json_api_job.error_string ()
             );
             this.error_string +=
-                _("Search has failed for '%1'. Error : %2").printf (this.search_term).printf (job.error_string ()) + '\n';
+                _("Search has failed for '%1'. Error : %2").printf (this.search_term).printf (json_api_job.error_string ()) + '\n';
             /* emit */ signal_error_string_changed ();
             return;
         }
 
         const var data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
         if (!data == "") {
-            parse_results_for_provider (data, provider_id, job.property ("append_results").to_bool ());
+            parse_results_for_provider (data, provider_id, json_api_job.property ("append_results").to_bool ());
         }
     }
 

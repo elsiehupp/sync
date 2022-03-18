@@ -180,7 +180,7 @@ public class LinkShare : Share {
         ocs_share_job.signal_share_job_finished.connect (
             this.on_signal_ocs_share_job_finished
         );
-        ocs_share_job.ocs_error.connect (
+        ocs_share_job.signal_error.connect (
             this.on_signal_ocs_share_job_error
         );
         return ocs_share_job;

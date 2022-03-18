@@ -60,7 +60,7 @@ public class FakePutMultiFileReply : FakeReply {
                 // Assume that the file is filled with the same character
                 file_info = remote_root_file_info.create (filename, one_part_body.size (), one_part_body.at (0));
             }
-            file_info.last_modified = Occ.Utility.date_time_from_time_t (request.raw_header ("X-OC-Mtime").to_int64 ());
+            file_info.last_modified = Utility.date_time_from_time_t (request.raw_header ("X-OC-Mtime").to_int64 ());
             remote_root_file_info.find (filename, /*invalidate_etags=*/true);
             result.push_back (file_info);
         }

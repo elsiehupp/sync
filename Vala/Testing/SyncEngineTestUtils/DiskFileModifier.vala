@@ -42,7 +42,7 @@ public class DiskFileModifier : FileModifier {
         file.write (buffer, size % buffer.size ());
         file.close ();
         // Set the mtime 30 seconds in the past, for some tests that need to make sure that the mtime differs.
-        Occ.FileSystem.set_modification_time (file.filename (), Occ.Utility.date_time_to_time_t (GLib.DateTime.current_date_time_utc ().add_secs (-30)));
+        FileSystem.set_modification_time (file.filename (), Utility.date_time_to_time_t (GLib.DateTime.current_date_time_utc ().add_secs (-30)));
         GLib.assert_true (file.size () == size);
     }
 
@@ -88,7 +88,7 @@ public class DiskFileModifier : FileModifier {
     /***********************************************************
     ***********************************************************/
     public override void set_modification_time (string relative_path, GLib.DateTime modification_time) {
-        Occ.FileSystem.set_modification_time (this.root_directory.file_path (relative_path), Occ.Utility.date_time_to_time_t (modification_time));
+        FileSystem.set_modification_time (this.root_directory.file_path (relative_path), Utility.date_time_to_time_t (modification_time));
     }
 
 }

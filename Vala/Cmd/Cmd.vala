@@ -215,7 +215,7 @@ public class Cmd : GLib.Object {
     to disable the read from database. (The normal client does
     it in SelectiveSyncDialog.accept).
     ***********************************************************/
-    private void selective_sync_fixup (Occ.SyncJournalDb journal, string[] new_list) {
+    private void selective_sync_fixup (SyncJournalDb journal, string[] new_list) {
         SqlDatabase database;
         if (!database.open_or_create_read_write (journal.database_file_path ())) {
             return;
@@ -363,23 +363,23 @@ public class Cmd : GLib.Object {
         account.ssl_error_handler (ssl_error_handler);
 
         QEventLoop loop;
-        var job = new JsonApiJob (account, "ocs/v1.php/cloud/capabilities");
-        job.json_received.connect (
+        var json_api_job = new JsonApiJob (account, "ocs/v1.php/cloud/capabilities");
+        json_api_job.json_received.connect (
             this.on_signal_capabilities_json_received
         );
-        job.on_signal_start ();
+        json_api_job.on_signal_start ();
         loop.exec ();
 
-        if (job.reply ().error () != Soup.Reply.NoError) {
+        if (json_api_job.reply ().error () != Soup.Reply.NoError) {
             GLib.print ("Error connecting to server");
             return EXIT_FAILURE;
         }
 
-        job = new JsonApiJob (account, "ocs/v1.php/cloud/user");
-        job.json_received.connect (
+        json_api_job = new JsonApiJob (account, "ocs/v1.php/cloud/user");
+        json_api_job.json_received.connect (
             this.on_signal_user_json_received
         );
-        job.on_signal_start ();
+        json_api_job.on_signal_start ();
         loop.exec ();
 
         // much lower age than the default since this utility is usually made to be run right after a change in the tests

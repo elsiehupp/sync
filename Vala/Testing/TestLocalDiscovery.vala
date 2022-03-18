@@ -19,13 +19,11 @@ public class TestLocalDiscovery : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         LocalDiscoveryTracker tracker;
-        connect (
-            fake_folder.sync_engine, SyncEngine.signal_item_completed,
-            tracker, LocalDiscoveryTracker.slot_item_completed
+        fake_folder.sync_engine.signal_item_completed.connect (
+            tracker.on_signal_item_completed
         );
-        connect (
-            fake_folder.sync_engine, SyncEngine.on_signal_finished,
-            tracker, LocalDiscoveryTracker.slot_sync_finished
+        fake_folder.sync_engine.signal_finished.connect (
+            tracker.on_signal_sync_finished
         );
 
         // More subdirectories are useful for testing
@@ -122,17 +120,11 @@ public class TestLocalDiscovery : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         LocalDiscoveryTracker tracker;
-        connect (
-            fake_folder.sync_engine,
-            SyncEngine.signal_item_completed,
-            tracker,
-            LocalDiscoveryTracker.slot_item_completed
+        fake_folder.sync_engine.signal_item_completed.connect (
+            tracker.on_signal_item_completed
         );
-        connect (
-            fake_folder.sync_engine,
-            SyncEngine.on_signal_finished,
-            tracker,
-            LocalDiscoveryTracker.slot_sync_finished
+        fake_folder.sync_engine.signal_finished.connect (
+            tracker.on_signal_sync_finished
         );
 
         tracker.add_touched_path ("A/spurious");

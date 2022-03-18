@@ -65,7 +65,7 @@ public class ShareeModel : QAbstractListModel {
         ocs_sharee_job.signal_sharee_job_finished.connect (
             this.on_signal_sharees_fetched
         );
-        ocs_sharee_job.ocs_error.connect (
+        ocs_sharee_job.signal_error.connect (
             this.signal_display_error_message
         );
         ocs_sharee_job.sharees (

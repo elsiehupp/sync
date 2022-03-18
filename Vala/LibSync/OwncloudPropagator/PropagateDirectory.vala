@@ -35,23 +35,21 @@ public class PropagateDirectory : PropagatorJob {
         this.first_job = propagator.create_job (item);
         this.sub_jobs = propagator;
         if (this.first_job) {
-            connect (
-                this.first_job, PropagatorJob.on_signal_finished,
-                this, PropagateDirectory.on_signal_first_job_finished
+            this.first_job.signal_finished.connect (
+                this.on_signal_first_job_finished
             );
             this.first_job.associated_composite (this.sub_jobs);
         }
-        connect (
-            this.sub_jobs, PropagatorJob.on_signal_finished,
-            this, PropagateDirectory.on_signal_sub_jobs_finished
+        this.sub_jobs.signal_finished.connect (
+            this.on_signal_sub_jobs_finished
         );
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void append_job (PropagatorJob job) {
-        this.sub_jobs.append_job (job);
+    public void append_job (PropagatorJob propagator_job) {
+        this.sub_jobs.append_job (propagator_job);
     }
 
 
@@ -109,9 +107,8 @@ public class PropagateDirectory : PropagatorJob {
             this.first_job.abort (PropagatorJob.AbortType.SYNCHRONOUS);
 
         if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
-            connect (
-                this.sub_jobs, PropagatorCompositeJob.signal_abort_finished,
-                this, PropagateDirectory.signal_abort_finished
+            this.sub_jobs.signal_abort_finished.connect (
+                this.on_signal_abort_finished
             );
         }
         this.sub_jobs.abort (abort_type);
@@ -145,12 +142,12 @@ public class PropagateDirectory : PropagatorJob {
                 abort (PropagatorJob.AbortType.SYNCHRONOUS);
                 this.state = Finished;
                 GLib.info ("PropagateDirectory.on_signal_first_job_finished " + " emit finished " + status);
-                /* emit */ finished (status);
+                /* emit */ signal_finished (status);
             }
             return;
         }
 
-        propagator ().schedule_next_job ();
+        this.propagator.schedule_next_job ();
     }
 
 
@@ -162,7 +159,7 @@ public class PropagateDirectory : PropagatorJob {
             // that may still exist below the old path.
             if (this.item.instruction == SyncInstructions.RENAME
                 && this.item.original_file != this.item.rename_target) {
-                propagator ().journal.delete_file_record (this.item.original_file, true);
+                this.propagator.journal.delete_file_record (this.item.original_file, true);
             }
 
             if (this.item.instruction == SyncInstructions.NEW && this.item.direction == SyncFileItem.Direction.DOWN) {
@@ -175,7 +172,7 @@ public class PropagateDirectory : PropagatorJob {
                     GLib.warning ("Error writing to the database for file " + this.item.file);
                 }
 
-                FileSystem.mod_time (propagator ().full_local_path (this.item.destination ()), this.item.modtime);
+                FileSystem.mod_time (this.propagator.full_local_path (this.item.destination ()), this.item.modtime);
             }
 
             // For new directories we always want to update the etag once
@@ -184,7 +181,7 @@ public class PropagateDirectory : PropagatorJob {
             if (this.item.instruction == SyncInstructions.RENAME
                 || this.item.instruction == SyncInstructions.NEW
                 || this.item.instruction == SyncInstructions.UPDATE_METADATA) {
-                var result = propagator ().update_metadata (*this.item);
+                var result = this.propagator.update_metadata (*this.item);
                 if (!result) {
                     status = this.item.status = SyncFileItem.Status.FATAL_ERROR;
                     this.item.error_string = _("Error updating metadata : %1").printf (result.error ());
@@ -197,7 +194,7 @@ public class PropagateDirectory : PropagatorJob {
         }
         this.state = Finished;
         GLib.info ("PropagateDirectory.on_signal_sub_jobs_finished " + " emit finished " + status);
-        /* emit */ finished (status);
+        /* emit */ signal_finished (status);
     }
 
 } // class PropagateDirectory

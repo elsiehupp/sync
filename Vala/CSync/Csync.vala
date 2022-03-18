@@ -153,7 +153,7 @@ class CSyncFileStatS : CSyncFileStatT {
     int64 size = 0;
     uint64 inode = 0;
 
-    Occ.RemotePermissions remote_perm;
+    RemotePermissions remote_perm;
     ItemType type = BITFIELD (4);
     bool child_modified = BITFIELD (1);
     bool has_ignored_files = BITFIELD (1); // Specify that a directory, or child directory contains ignored files.

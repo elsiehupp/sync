@@ -6,7 +6,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 namespace Testing {
 
-public class FakeDateTimeProvider : Occ.DateTimeProvider {
+public class FakeDateTimeProvider : DateTimeProvider {
 
     /***********************************************************
     ***********************************************************/
@@ -28,17 +28,17 @@ public class FakeDateTimeProvider : Occ.DateTimeProvider {
 
     /***********************************************************
     ***********************************************************/
-    static GLib.List<Occ.UserStatus> create_fake_predefined_statuses (GLib.DateTime current_time) {
-        GLib.List<Occ.UserStatus> statuses;
+    static GLib.List<UserStatus> create_fake_predefined_statuses (GLib.DateTime current_time) {
+        GLib.List<UserStatus> statuses;
 
         const string user_status_id = "fake-identifier";
         const string user_status_message = "Predefined status";
         const string user_status_icon = "🏖";
-        const Occ.UserStatus.OnlineStatus user_status_state = Occ.UserStatus.OnlineStatus.Online;
+        const UserStatus.OnlineStatus user_status_state = UserStatus.OnlineStatus.Online;
         const bool user_status_message_predefined = true;
-        Occ.Optional<Occ.ClearAt> user_status_clear_at;
-        Occ.ClearAt clear_at;
-        clear_at.type = Occ.ClearAtType.Timestamp;
+        Optional<ClearAt> user_status_clear_at;
+        ClearAt clear_at;
+        clear_at.type = ClearAtType.Timestamp;
         clear_at.timestamp = current_time.add_secs (60 * 60).to_time_t ();
         user_status_clear_at = clear_at;
 

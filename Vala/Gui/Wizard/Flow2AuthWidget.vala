@@ -35,13 +35,11 @@ public class Flow2AuthWidget : Gtk.Widget {
         WizardCommon.initErrorLabel (this.ui.error_label);
         this.ui.error_label.setTextFormat (Qt.RichText);
 
-        connect (
-            this.ui.open_link_label, LinkLabel.clicked,
-            this, Flow2AuthWidget.on_signal_open_browser
+        this.ui.open_link_label.clicked.connect (
+            this.on_signal_open_browser
         );
-        connect (
-            this.ui.copy_link_label, LinkLabel.clicked,
-            this, Flow2AuthWidget.on_signal_copy_link_to_clipboard
+        this.ui.copy_link_label.clicked.connect (
+            this.on_signal_copy_link_to_clipboard
         );
 
         var size_policy = this.progress_indicator.size_policy ();
@@ -75,18 +73,14 @@ public class Flow2AuthWidget : Gtk.Widget {
             this.account = account;
 
             this.async_auth.reset (new Flow2Auth (this.account, this));
-            connect (
-                this.async_auth, Flow2Auth.result,
-                this, Flow2AuthWidget.slotAuthResult,
-                Qt.QueuedConnection
+            this.async_auth.signal_result.connect (
+                this.on_signal_auth_result // Qt.QueuedConnection
             );
-            connect (
-                this.async_auth, Flow2Auth.status_changed,
-                this, Flow2AuthWidget.slotStatusChanged
+            this.async_auth.signal_status_changed.connect (
+                this.on_signal_status_changed
             );
-            connect (
-                this, Flow2AuthWidget.poll_now,
-                this.async_auth, Flow2Auth.slotPollNow
+            this.signal_poll_now.connect (
+                this.async_auth.on_signal_poll_now
             );
             this.async_auth.start ();
         }

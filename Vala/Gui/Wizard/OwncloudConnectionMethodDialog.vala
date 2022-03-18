@@ -38,23 +38,14 @@ public class OwncloudConnectionMethodDialog : Gtk.Dialog {
         this.ui = new Ui.OwncloudConnectionMethodDialog ();
         ui.up_ui (this);
 
-        connect (
-            ui.btn_no_tls,
-            QAbstractButton.clicked,
-            this,
-            OwncloudConnectionMethodDialog.on_signal_return_no_tls
+        ui.no_tls_button.clicked.connect (
+            this.on_signal_return_no_tls
         );
-        connect (
-            ui.btn_client_side_tLS,
-            QAbstractButton.clicked,
-            this,
-            OwncloudConnectionMethodDialog.on_signal_return_client_side_tls
+        ui.client_side_tls_button.clicked.connect (
+            this.on_signal_return_client_side_tls
         );
-        connect (
-            ui.btn_back,
-            QAbstractButton.clicked,
-            this,
-            OwncloudConnectionMethodDialog.return_back
+        ui.back_button.clicked.connect (
+            this.return_back
         );
     }
 

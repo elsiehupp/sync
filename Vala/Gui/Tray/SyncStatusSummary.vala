@@ -28,11 +28,8 @@ public class SyncStatusSummary : GLib.Object {
                 );
             }
             this.account_state = value;
-            connect (
-                this.account_state,
-                AccountState.signal_is_connected_changed,
-                this,
-                SyncStatusSummary.on_signal_is_connected_changed
+            this.account_state.signal_is_connected_changed.connect (
+                this.on_signal_is_connected_changed
             );
         }
     }
@@ -127,29 +124,27 @@ public class SyncStatusSummary : GLib.Object {
         this.is_syncing = false;
         this.sync_icon = Theme.sync_status_ok;
         this.sync_status_string = _("All synced!");
-        connect (
-            folder_man, FolderMan.signal_folder_list_changed,
-            this, SyncStatusSummary.on_signal_folder_list_changed
+        folder_man.signal_folder_list_changed.connect (
+            this.on_signal_folder_list_changed
         );
-        connect (
-            folder_man, FolderMan.signal_folder_sync_state_change,
-            this, SyncStatusSummary.on_signal_folder_sync_state_changed
+        folder_man.signal_folder_sync_state_change.connect (
+            this.on_signal_folder_sync_state_changed
         );
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private Occ.SyncResult.Status determine_sync_status (Occ.SyncResult sync_result) {
+    private SyncResult.Status determine_sync_status (SyncResult sync_result) {
         const var status = sync_result.status ();
 
-        if (status == Occ.SyncResult.Status.SUCCESS || status == Occ.SyncResult.Status.PROBLEM) {
+        if (status == SyncResult.Status.SUCCESS || status == SyncResult.Status.PROBLEM) {
             if (sync_result.has_unresolved_conflicts ()) {
-                return Occ.SyncResult.Status.PROBLEM;
+                return SyncResult.Status.PROBLEM;
             }
-            return Occ.SyncResult.Status.SUCCESS;
-        } else if (status == Occ.SyncResult.Status.SYNC_PREPARE || status == Occ.SyncResult.Status.UNDEFINED) {
-            return Occ.SyncResult.Status.SYNC_RUNNING;
+            return SyncResult.Status.SUCCESS;
+        } else if (status == SyncResult.Status.SYNC_PREPARE || status == SyncResult.Status.UNDEFINED) {
+            return SyncResult.Status.SYNC_RUNNING;
         }
         return status;
     }
@@ -174,12 +169,8 @@ public class SyncStatusSummary : GLib.Object {
     private void connect_to_folders_progress (Folder.Map map) {
         foreach (Folder folder in folder_map) {
             if (folder.account_state () == this.account_state) {
-                connect (
-                    folder,
-                    Folder.signal_progress_info,
-                    this,
-                    SyncStatusSummary.on_signal_folder_progress_info,
-                    Qt.UniqueConnection
+                folder.signal_progress_info.connect (
+                    this.on_signal_folder_progress_info // Qt.UniqueConnection
                 );
             } else {
                 disconnect (
@@ -195,7 +186,7 @@ public class SyncStatusSummary : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_folder_list_changed (Occ.Folder.Map folder_map) {
+    private void on_signal_folder_list_changed (Folder.Map folder_map) {
         connect_to_folders_progress (folder_map);
     }
 

@@ -86,7 +86,7 @@ public class BulkPropagatorJob : PropagatorJob {
                 UploadFileInfo file_to_upload;
                 file_to_upload.file = current_item.file;
                 file_to_upload.size = current_item.size;
-                file_to_upload.path = propagator ().full_local_path (file_to_upload.file);
+                file_to_upload.path = this.propagator.full_local_path (file_to_upload.file);
                 on_signal_start_upload_file (current_item, file_to_upload);
             }); // We could be in a different thread (neon jobs)
         }
@@ -105,12 +105,12 @@ public class BulkPropagatorJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_start_upload_file (SyncFileItem item, UploadFileInfo file_to_upload) {
-        if (propagator ().abort_requested) {
+        if (this.propagator.abort_requested) {
             return;
         }
 
         // Check if the specific file can be accessed
-        if (propagator ().has_case_clash_accessibility_problem (file_to_upload.file)) {
+        if (this.propagator.has_case_clash_accessibility_problem (file_to_upload.file)) {
             on_signal_done (item, SyncFileItem.Status.NORMAL_ERROR, _("File %1 cannot be uploaded because another file with the same name, differing only in case, exists").printf (GLib.Dir.to_native_separators (item.file)));
             return;
         }
@@ -128,22 +128,22 @@ public class BulkPropagatorJob : PropagatorJob {
         UploadFileInfo file_to_upload) {
         // Reuse the content checksum as the transmission checksum if possible
         var supported_transmission_checksums =
-            propagator ().account.capabilities ().supported_checksum_types ();
+            this.propagator.account.capabilities ().supported_checksum_types ();
 
         // Compute the transmission checksum.
         var compute_checksum = std.make_unique<ComputeChecksum> (this);
         if (upload_checksum_enabled ()) {
-            compute_checksum.checksum_type ("MD5" /*propagator ().account.capabilities ().upload_checksum_type ()*/);
+            compute_checksum.checksum_type ("MD5" /*this.propagator.account.capabilities ().upload_checksum_type ()*/);
         } else {
             compute_checksum.checksum_type ("");
         }
 
-        ComputeChecksum.signal_done.connect (
+        ComputeChecksum.signal_finished.connect (
             (compute_checksum, content_checksum_type, content_checksum) => {
                 on_signal_start_upload (item, file_to_upload, content_checksum_type, content_checksum);
             }
         );
-        ComputeChecksum.signal_done.connect (
+        ComputeChecksum.signal_finished.connect (
             compute_checksum,
             GLib.Object.delete_later
         );
@@ -165,7 +165,7 @@ public class BulkPropagatorJob : PropagatorJob {
         item.checksum_header = transmission_checksum_header;
 
         const string full_file_path = file_to_upload.path;
-        const string original_file_path = propagator ().full_local_path (item.file);
+        const string original_file_path = this.propagator.full_local_path (item.file);
 
         if (!FileSystem.file_exists (full_file_path)) {
             this.pending_checksum_files.remove (item.file);
@@ -185,7 +185,7 @@ public class BulkPropagatorJob : PropagatorJob {
             return;
         }
         if (prev_modtime != item.modtime) {
-            propagator ().another_sync_needed = true;
+            this.propagator.another_sync_needed = true;
             this.pending_checksum_files.remove (item.file);
             GLib.debug ("Trigger another sync after checking modified time of item " + item.file + " prev_modtime " + prev_modtime + " Curr " + item.modtime);
             on_signal_error_start_folder_unlock (item, SyncFileItem.Status.SOFT_ERROR, _("Local file changed during syncing. It will be resumed."));
@@ -200,7 +200,7 @@ public class BulkPropagatorJob : PropagatorJob {
         // That usually indicates a file that is still being changed
         // or not yet fully copied to the destination.
         if (file_is_still_changing (*item)) {
-            propagator ().another_sync_needed = true;
+            this.propagator.another_sync_needed = true;
             this.pending_checksum_files.remove (item.file);
             on_signal_error_start_folder_unlock (item, SyncFileItem.Status.SOFT_ERROR, _("Local file changed during sync."));
             check_propagation_is_done ();
@@ -275,7 +275,7 @@ public class BulkPropagatorJob : PropagatorJob {
     ***********************************************************/
     private void finalize_one_file (BulkUploadItem one_file) {
         // Update the database entry
-        var result = propagator ().update_metadata (*one_file.item);
+        var result = this.propagator.update_metadata (*one_file.item);
         if (!result) {
             on_signal_done (one_file.item, SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error ()));
             return;
@@ -288,7 +288,7 @@ public class BulkPropagatorJob : PropagatorJob {
         // even if their parent folder is online-only.
         if (one_file.item.instruction == SyncInstructions.NEW
             || one_file.item.instruction == SyncInstructions.TYPE_CHANGE) {
-            var vfs = propagator ().sync_options.vfs;
+            var vfs = this.propagator.sync_options.vfs;
             var pin = vfs.pin_state (one_file.item.file);
             if (pin && *pin == Vfs.ItemAvailability.ONLINE_ONLY && !vfs.pin_state (one_file.item.file, PinState.PinState.UNSPECIFIED)) {
                 GLib.warning ("Could not set pin state of " + one_file.item.file + " to unspecified.");
@@ -296,8 +296,8 @@ public class BulkPropagatorJob : PropagatorJob {
         }
 
         // Remove from the progress database:
-        propagator ().journal.upload_info (one_file.item.file, SyncJournalDb.UploadInfo ());
-        propagator ().journal.commit ("upload file start");
+        this.propagator.journal.upload_info (one_file.item.file, SyncJournalDb.UploadInfo ());
+        this.propagator.journal.commit ("upload file start");
     }
 
 
@@ -311,7 +311,7 @@ public class BulkPropagatorJob : PropagatorJob {
         if (sent == 0 && total == 0) {
             return;
         }
-        propagator ().report_progress (item, sent - total);
+        this.propagator.report_progress (item, sent - total);
     }
 
 
@@ -328,7 +328,7 @@ public class BulkPropagatorJob : PropagatorJob {
         SyncFileItem item,
         UploadFileInfo file_to_upload,
         string transmission_checksum_header) {
-        if (propagator ().abort_requested) {
+        if (this.propagator.abort_requested) {
             return;
         }
 
@@ -343,16 +343,16 @@ public class BulkPropagatorJob : PropagatorJob {
         pi.error_count = 0;
         pi.content_checksum = item.checksum_header;
         pi.size = item.size;
-        propagator ().journal.upload_info (item.file, pi);
-        propagator ().journal.commit ("Upload info");
+        this.propagator.journal.upload_info (item.file, pi);
+        this.propagator.journal.commit ("Upload info");
 
         var current_headers = headers (item);
         current_headers["Content-Length"] = new string.number (file_to_upload.size);
 
         if (!item.rename_target == "" && item.file != item.rename_target) {
             // Try to rename the file
-            var original_file_path_absolute = propagator ().full_local_path (item.file);
-            var new_file_path_absolute = propagator ().full_local_path (item.rename_target);
+            var original_file_path_absolute = this.propagator.full_local_path (item.file);
+            var new_file_path_absolute = this.propagator.full_local_path (item.rename_target);
             var rename_success = GLib.File.rename (original_file_path_absolute, new_file_path_absolute);
             if (!rename_success) {
                 on_signal_done (item, SyncFileItem.Status.NORMAL_ERROR, "File contains trailing spaces and couldn't be renamed");
@@ -360,7 +360,7 @@ public class BulkPropagatorJob : PropagatorJob {
             }
             GLib.warning (item.file + item.rename_target);
             file_to_upload.file = item.file = item.rename_target;
-            file_to_upload.path = propagator ().full_local_path (file_to_upload.file);
+            file_to_upload.path = this.propagator.full_local_path (file_to_upload.file);
             item.modtime = FileSystem.get_mod_time (new_file_path_absolute);
             if (item.modtime <= 0) {
                 this.pending_checksum_files.remove (item.file);
@@ -370,12 +370,12 @@ public class BulkPropagatorJob : PropagatorJob {
             }
         }
 
-        var remote_path = propagator ().full_remote_path (file_to_upload.file);
+        var remote_path = this.propagator.full_remote_path (file_to_upload.file);
 
         current_headers["X-File-MD5"] = transmission_checksum_header;
 
         BulkUploadItem new_upload_file = BulkUploadItem (
-            propagator ().account, item, file_to_upload,
+            this.propagator.account, item, file_to_upload,
             remote_path, file_to_upload.path,
             file_to_upload.size, current_headers
         );
@@ -400,18 +400,18 @@ public class BulkPropagatorJob : PropagatorJob {
         foreach (var single_file in this.files_to_upload) {
             // job takes ownership of device via a QScopedPointer. Job deletes itself when finishing
             var device = std.make_unique<UploadDevice> (
-                    single_file.local_path, 0, single_file.file_size, propagator ().bandwidth_manager);
+                    single_file.local_path, 0, single_file.file_size, this.propagator.bandwidth_manager);
             if (!device.open (QIODevice.ReadOnly)) {
                 GLib.warning ("Could not prepare upload device: " + device.error_string ());
 
                 // If the file is currently locked, we want to retry the sync
                 // when it becomes available again.
                 if (FileSystem.is_file_locked (single_file.local_path)) {
-                    /* emit */ propagator ().seen_locked_file (single_file.local_path);
+                    /* emit */ this.propagator.seen_locked_file (single_file.local_path);
                 }
 
                 abort_with_error (single_file.item, SyncFileItem.Status.NORMAL_ERROR, device.error_string ());
-                /* emit */ finished (SyncFileItem.Status.NORMAL_ERROR);
+                /* emit */ signal_finished (SyncFileItem.Status.NORMAL_ERROR);
 
                 return;
             }
@@ -420,8 +420,8 @@ public class BulkPropagatorJob : PropagatorJob {
             timeout += single_file.file_size;
         }
 
-        var bulk_upload_url = Utility.concat_url_path (propagator ().account.url, "/remote.php/dav/bulk");
-        var put_multi_file_job = std.make_unique<PutMultiFileJob> (propagator ().account, bulk_upload_url, std.move (upload_parameters_data), this);
+        var bulk_upload_url = Utility.concat_url_path (this.propagator.account.url, "/remote.php/dav/bulk");
+        var put_multi_file_job = std.make_unique<PutMultiFileJob> (this.propagator.account, bulk_upload_url, std.move (upload_parameters_data), this);
         put_multi_file_job.signal_finished.connect (
             this.on_signal_put_finished
         );
@@ -453,8 +453,8 @@ public class BulkPropagatorJob : PropagatorJob {
             }
 
             GLib.info ("final status" + this.final_status);
-            /* emit */ finished (this.final_status);
-            propagator ().schedule_next_job ();
+            /* emit */ signal_finished (this.final_status);
+            this.propagator.schedule_next_job ();
         } else {
             on_signal_schedule_self_or_child ();
         }
@@ -513,7 +513,7 @@ public class BulkPropagatorJob : PropagatorJob {
         var etag = get_etag_from_json_reply (file_reply);
         finished = etag.length () > 0;
 
-        var full_file_path = propagator ().full_local_path (single_file.item.file);
+        var full_file_path = this.propagator.full_local_path (single_file.item.file);
 
         // Check if the file still exists
         if (!check_file_still_exists (single_file.item, finished, full_file_path)) {
@@ -542,9 +542,9 @@ public class BulkPropagatorJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     private static string get_etag_from_json_reply (QJsonObject reply) {
-        var oc_etag = Occ.parse_etag (reply.value ("OC-ETag").to_string ().to_latin1 ());
-        var ETag = Occ.parse_etag (reply.value ("ETag").to_string ().to_latin1 ());
-        var  etag = Occ.parse_etag (reply.value ("etag").to_string ().to_latin1 ());
+        var oc_etag = parse_etag (reply.value ("OC-ETag").to_string ().to_latin1 ());
+        var ETag = parse_etag (reply.value ("ETag").to_string ().to_latin1 ());
+        var  etag = parse_etag (reply.value ("etag").to_string ().to_latin1 ());
         string ret = oc_etag;
         if (ret == "") {
             ret = ETag;
@@ -553,7 +553,7 @@ public class BulkPropagatorJob : PropagatorJob {
             ret = etag;
         }
         if (oc_etag.length () > 0 && oc_etag != etag && oc_etag != ETag) {
-            GLib.debug (Occ.lc_bulk_propagator_job) + "Quite peculiar, we have an etag != OC-Etag [no problem!]" + etag + ETag + oc_etag;
+            GLib.debug (lc_bulk_propagator_job) + "Quite peculiar, we have an etag != OC-Etag [no problem!]" + etag + ETag + oc_etag;
         }
         return ret;
     }
@@ -579,7 +579,7 @@ public class BulkPropagatorJob : PropagatorJob {
 
         handle_file_restoration (item, error_string);
 
-        if (propagator ().abort_requested && (item.status == SyncFileItem.Status.NORMAL_ERROR
+        if (this.propagator.abort_requested && (item.status == SyncFileItem.Status.NORMAL_ERROR
                                                 || item.status == SyncFileItem.Status.FATAL_ERROR)) {
             // an abort request is ongoing. Change the status to Soft-Error
             item.status = SyncFileItem.Status.SOFT_ERROR;
@@ -588,12 +588,12 @@ public class BulkPropagatorJob : PropagatorJob {
         if (item.status != SyncFileItem.Status.SUCCESS) {
             // Blocklist handling
             handle_bulk_upload_block_list (item);
-            propagator ().another_sync_needed = true;
+            this.propagator.another_sync_needed = true;
         }
 
         handle_job_done_errors (item, status);
 
-        /* emit */ propagator ().signal_item_completed (item);
+        /* emit */ this.propagator.signal_item_completed (item);
     }
 
 
@@ -628,7 +628,7 @@ public class BulkPropagatorJob : PropagatorJob {
         }
 
         // Set up a conflict file header pointing to the original file
-        var conflict_record = propagator ().journal.conflict_record (item.file.to_utf8 ());
+        var conflict_record = this.propagator.journal.conflict_record (item.file.to_utf8 ());
         if (conflict_record.is_valid ()) {
             headers["OC-Conflict"] = "1";
             if (!conflict_record.initial_base_path == "") {
@@ -667,8 +667,8 @@ public class BulkPropagatorJob : PropagatorJob {
     ***********************************************************/
     private void check_resetting_errors (SyncFileItem item) {
         if (item.http_error_code == 412
-            || propagator ().account.capabilities ().http_error_codes_that_reset_failing_chunked_uploads ().contains (item.http_error_code)) {
-            var upload_info = propagator ().journal.get_upload_info (item.file);
+            || this.propagator.account.capabilities ().http_error_codes_that_reset_failing_chunked_uploads ().contains (item.http_error_code)) {
+            var upload_info = this.propagator.journal.get_upload_info (item.file);
             upload_info.error_count += 1;
             if (upload_info.error_count > 3) {
                 GLib.info ("Reset transfer of " + item.file
@@ -679,8 +679,8 @@ public class BulkPropagatorJob : PropagatorJob {
                         + "on file" + item.file
                         + "is" + upload_info.error_count);
             }
-            propagator ().journal.upload_info (item.file, upload_info);
-            propagator ().journal.commit ("Upload info");
+            this.propagator.journal.upload_info (item.file, upload_info);
+            this.propagator.journal.commit ("Upload info");
         }
     }
 
@@ -709,7 +709,7 @@ public class BulkPropagatorJob : PropagatorJob {
                 abort_with_error (item, SyncFileItem.Status.SOFT_ERROR, _("The local file was removed during sync."));
                 return false;
             } else {
-                propagator ().another_sync_needed = true;
+                this.propagator.another_sync_needed = true;
             }
         }
 
@@ -724,7 +724,7 @@ public class BulkPropagatorJob : PropagatorJob {
         bool finished,
         string full_file_path) {
         if (!FileSystem.verify_file_unchanged (full_file_path, item.size, item.modtime)) {
-            propagator ().another_sync_needed = true;
+            this.propagator.another_sync_needed = true;
             if (!finished) {
                 abort_with_error (item, SyncFileItem.Status.SOFT_ERROR, _("Local file changed during sync."));
                 // FIXME:  the legacy code was retrying for a few seconds.
@@ -775,7 +775,7 @@ public class BulkPropagatorJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     private void handle_bulk_upload_block_list (SyncFileItem item) {
-        propagator ().add_to_bulk_upload_block_list (item.file);
+        this.propagator.add_to_bulk_upload_block_list (item.file);
     }
 
 
@@ -792,7 +792,7 @@ public class BulkPropagatorJob : PropagatorJob {
 
         if (item.status == SyncFileItem.Status.FATAL_ERROR) {
             // Abort all remaining jobs.
-            propagator ().abort ();
+            this.propagator.abort ();
         }
 
         switch (item.status) {

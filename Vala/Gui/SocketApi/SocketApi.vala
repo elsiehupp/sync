@@ -118,19 +118,13 @@ public class SocketApi : GLib.Object {
             GLib.info ("Server started, listening at " + socket_path);
         }
 
-        connect (
-            this.local_server,
-            SocketApiServer.new_connection,
-            this,
-            SocketApi.on_signal_new_connection
+        this.local_server.new_connection.connect (
+            this.on_signal_new_connection
         );
 
         // folder watcher
-        connect (
-            FolderMan.instance,
-            FolderMan.signal_folder_sync_state_change,
-            this,
-            SocketApi.on_signal_update_folder_view
+        FolderMan.instance.signal_folder_sync_state_change.connect (
+            this.on_signal_update_folder_view
         );
     }
 
@@ -265,17 +259,14 @@ public class SocketApi : GLib.Object {
             return;
         }
         GLib.info ("New connection " + socket);
-        connect (
-            socket, QIODevice.ready_read,
-            this, SocketApi.on_signal_read_socket
+        socket.ready_read.connect (
+            this.on_signal_read_socket
         );
-        connect (
-            socket, SIGNAL (disconnected ()),
-            this, SLOT (on_signal_lost_connection ())
+        socket.disconnected.connect (
+            this.on_signal_lost_connection
         );
-        connect (
-            socket, GLib.Object.destroyed,
-            this, SocketApi.on_signal_socket_destroyed
+        socket.destroyed.connect (
+            this.on_signal_socket_destroyed
         );
         //  ASSERT (socket.read_all () == "");
 
@@ -468,15 +459,11 @@ public class SocketApi : GLib.Object {
             + "http://owncloud.org/ns:fileid" // numeric file identifier for fallback private link generation
             + "http://owncloud.org/ns:privatelink");
         prop_find_job.on_signal_timeout (10 * 1000);
-        connect (
-            prop_find_job,
-            PropfindJob.result,
+        prop_find_job.result.connect (
             target,
             this.on_signal_prop_find_job_result
         );
-        connect (
-            prop_find_job,
-            PropfindJob.signal_finished_with_error,
+        prop_find_job.signal_finished_with_error.connect (
             target,
             this.on_signal_prop_find_job_finished_with_error
         );
@@ -741,16 +728,10 @@ public class SocketApi : GLib.Object {
 
         unowned Account account = file_data.folder.account_state ().account;
         var get_or_create_public_link_share_job = new GetOrCreatePublicLinkShare (account, file_data.server_relative_path, this);
-        connect (
-            get_or_create_public_link_share_job,
-            GetOrCreatePublicLinkShare.done,
-            this,
-            this.on_signal_get_or_create_public_link_share_done
+        get_or_create_public_link_share_job.signal_finished.connect (
+            this.on_signal_get_or_create_public_link_share_finished
         );
-        connect (
-            get_or_create_public_link_share_job,
-            GetOrCreatePublicLinkShare.error,
-            this,
+        get_or_create_public_link_share_job.signal_error.connect (
             this.on_signal_get_or_create_public_link_share_error
         );
         get_or_create_public_link_share_job.run ();
@@ -1278,9 +1259,7 @@ public class SocketApi : GLib.Object {
         json_api_job.add_query_params (parameters);
         json_api_job.verb (JsonApiJob.Verb.POST);
 
-        connect (
-            json_api_job,
-            JsonApiJob.json_received,
+        json_api_job.json_received.connect (
             this.on_signal_json_received
         );
         json_api_job.on_signal_start ();
@@ -1478,12 +1457,8 @@ public class SocketApi : GLib.Object {
         signal_signature.prepend ("2");
         var utf8 = signal_signature.to_utf8 ();
         var signal_signature_final = utf8.const_data ();
-        connect (
-            widget,
-            signal_signature_final,
-            closure,
-            on_signal_closure (),
-            Qt.QueuedConnection
+        widget.signal_signature_final.connect (
+            closure.on_signal_closure // Qt.QueuedConnection
         );
     }
 

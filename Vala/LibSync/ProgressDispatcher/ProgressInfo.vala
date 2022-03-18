@@ -300,9 +300,8 @@ public class ProgressInfo : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public ProgressInfo () {
-        connect (
-            this.update_estimates_timer, GLib.Timeout.timeout,
-            this, ProgressInfo.on_signal_update_estimates
+        this.update_estimates_timer.timeout.connect (
+            this.on_signal_update_estimates_timer_timeout
         );
         reset ();
     }
@@ -558,7 +557,7 @@ public class ProgressInfo : GLib.Object {
     Called every second once started, this function updates the
     estimates.
     ***********************************************************/
-    private void on_signal_update_estimates () {
+    private void on_signal_update_estimates_timer_timeout () {
         this.size_progress.update ();
         this.file_progress.update ();
 

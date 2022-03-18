@@ -358,10 +358,7 @@ public class TestPermissions : GLib.Object {
 
         // also hook into discovery!!
         SyncFileItemVector discovery;
-        connect (
-            fake_folder.sync_engine,
-            SyncEngine.signal_about_to_propagate,
-            this,
+        fake_folder.sync_engine.signal_about_to_propagate.connect (
             this.on_signal_sync_engine_about_to_propagate
         );
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);

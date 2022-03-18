@@ -70,53 +70,29 @@ public class ShareUserLine : Gtk.Widget {
     
         this.ui.permissions_edit.enabled (enabled);
 
-        connect (
-            this.ui.permissions_edit,
-            QAbstractButton.clicked,
-            this,
-            ShareUserLine.on_signal_edit_permissions_changed
+        this.ui.permissions_edit.clicked.connect (
+            this.on_signal_edit_permissions_changed
         );
-        connect (
-            this.ui.note_confirm_button,
-            QAbstractButton.clicked,
-            this,
-            ShareUserLine.on_signal_note_confirm_button_clicked
+        this.ui.note_confirm_button.clicked.connect (
+            this.on_signal_note_confirm_button_clicked
         );
-        connect (
-            this.ui.calendar,
-            QDateTimeEdit.date_changed,
-            this,
-            ShareUserLine.expire_date
+        this.ui.calendar.date_changed.connect (
+            this.on_signal_expire_date
         );
-        connect (
-            this.share,
-            UserGroupShare.signal_note_set,
-            this,
-            ShareUserLine.disable_progess_indicator_animation
+        this.share.signal_note_set.connect (
+            this.disable_progess_indicator_animation
         );
-        connect (
-            this.share,
-            UserGroupShare.signal_note_error,
-            this,
-            ShareUserLine.disable_progess_indicator_animation
+        this.share.signal_note_error.connect (
+            this.disable_progess_indicator_animation
         );
-        connect (
-            this.share,
-            UserGroupShare.signal_expire_date_set,
-            this,
-            ShareUserLine.disable_progess_indicator_animation
+        this.share.signal_expire_date_set.connect (
+            this.disable_progess_indicator_animation
         );
-        connect (
-            this.ui.confirm_password,
-            QToolButton.clicked,
-            this,
-            ShareUserLine.on_signal_confirm_password_clicked
+        this.ui.confirm_password.clicked.connect (
+            this.on_signal_confirm_password_clicked
         );
-        connect (
-            this.ui.line_edit_password,
-            QLineEdit.return_pressed,
-            this,
-            ShareUserLine.on_signal_line_edit_password_return_pressed
+        this.ui.line_edit_password.return_pressed.connect (
+            this.on_signal_line_edit_password_return_pressed
         );
 
         // create menu with checkable permissions
@@ -125,11 +101,8 @@ public class ShareUserLine : Gtk.Widget {
         this.permission_reshare.checkable (true);
         this.permission_reshare.enabled (max_sharing_permissions & Share_permission_share);
         menu.add_action (this.permission_reshare);
-        connect (
-            this.permission_reshare,
-            QAction.triggered,
-            this,
-            ShareUserLine.on_signal_permissions_changed
+        this.permission_reshare.triggered.connect (
+            this.on_signal_permissions_changed
         );
 
         show_note_options (false);
@@ -140,11 +113,8 @@ public class ShareUserLine : Gtk.Widget {
             this.note_link_action = new QAction (_("Note to recipient"));
             this.note_link_action.checkable (true);
             menu.add_action (this.note_link_action);
-            connect (
-                this.note_link_action,
-                QAction.triggered,
-                this,
-                ShareUserLine.toggle_note_options
+            this.note_link_action.triggered.connect (
+                this.toggle_note_options
             );
             if (!this.share.note () == "") {
                 this.note_link_action.checked (true);
@@ -161,16 +131,13 @@ public class ShareUserLine : Gtk.Widget {
             this.expiration_date_link_action = new QAction (_("Set expiration date"));
             this.expiration_date_link_action.checkable (true);
             menu.add_action (this.expiration_date_link_action);
-            connect (
-                this.expiration_date_link_action,
-                QAction.triggered,
-                this,
-                ShareUserLine.toggle_expire_date_options
+            this.expiration_date_link_action.triggered.connect (
+                this.toggle_expire_date_options
             );
-            const var expire_date = this.share.expire_date ().is_valid () ? share.expire_date () : QDate ();
-            if (!expire_date.is_null ()) {
+            const var on_signal_expire_date = this.share.on_signal_expire_date ().is_valid () ? share.on_signal_expire_date () : QDate ();
+            if (!on_signal_expire_date.is_null ()) {
                 this.expiration_date_link_action.checked (true);
-                show_expire_date_options (true, expire_date);
+                show_expire_date_options (true, on_signal_expire_date);
             }
         }
 
@@ -181,11 +148,8 @@ public class ShareUserLine : Gtk.Widget {
         this.delete_share_button= new QAction (delete_icon,_("Unshare"), this);
 
         menu.add_action (this.delete_share_button);
-        connect (
-            this.delete_share_button,
-            QAction.triggered,
-            this,
-            ShareUserLine.on_signal_delete_share_button_clicked
+        this.delete_share_button.triggered.connect (
+            this.on_signal_delete_share_button_clicked
         );
 
         /***********************************************************
@@ -196,33 +160,24 @@ public class ShareUserLine : Gtk.Widget {
             this.permission_create.checkable (true);
             this.permission_create.enabled (max_sharing_permissions & Share_permission_create);
             menu.add_action (this.permission_create);
-            connect (
-                this.permission_create,
-                QAction.triggered,
-                this,
-                ShareUserLine.on_signal_permissions_changed
+            this.permission_create.triggered.connect (
+                this.on_signal_permissions_changed
             );
 
             this.permission_change = new QAction (_("Can change"), this);
             this.permission_change.checkable (true);
             this.permission_change.enabled (max_sharing_permissions & Share_permission_update);
             menu.add_action (this.permission_change);
-            connect (
-                this.permission_change,
-                QAction.triggered,
-                this,
-                ShareUserLine.on_signal_permissions_changed
+            this.permission_change.triggered.connect (
+                this.on_signal_permissions_changed
             );
 
             this.permission_delete = new QAction (_("Can delete"), this);
             this.permission_delete.checkable (true);
             this.permission_delete.enabled (max_sharing_permissions & Share_permission_delete);
             menu.add_action (this.permission_delete);
-            connect (
-                this.permission_delete,
-                QAction.triggered,
-                this,
-                ShareUserLine.on_signal_permissions_changed
+            this.permission_delete.triggered.connect (
+                this.on_signal_permissions_changed
             );
         }
 
@@ -235,26 +190,17 @@ public class ShareUserLine : Gtk.Widget {
             this.password_protect_link_action.enabled (!this.share.is_password_set () || !this.account.capabilities ().share_email_password_enforced ());
 
             menu.add_action (this.password_protect_link_action);
-            connect (
-                this.password_protect_link_action,
-                QAction.triggered,
-                this,
-                ShareUserLine.on_signal_password_checkbox_changed
+            this.password_protect_link_action.triggered.connect (
+                this.on_signal_password_checkbox_changed
             );
 
             on_signal_refresh_password_line_edit_placeholder ();
 
-            connect (
-                this.share,
-                Share.signal_password_set,
-                this,
-                ShareUserLine.on_signal_link_share_password_set
+            this.share.signal_password_set.connect (
+                this.on_signal_link_share_password_set
             );
-            connect (
-                this.share,
-                Share.signal_password_error,
-                this,
-                ShareUserLine.on_signal_link_share_password_error
+            this.share.signal_password_error.connect (
+                this.on_signal_link_share_password_error
             );
         }
 
@@ -281,17 +227,11 @@ public class ShareUserLine : Gtk.Widget {
             this.ui.permission_tool_button.visible (false);
         }
 
-        connect (
-            share,
-            Share.signal_permissions_set,
-            this,
-            ShareUserLine.on_signal_permissions_set
+        share.signal_permissions_set.connect (
+            this.on_signal_permissions_set
         );
-        connect (
-            share,
-            Share.signal_share_deleted,
-            this,
-            ShareUserLine.on_signal_share_deleted
+        share.signal_share_deleted.connect (
+            this.on_signal_share_deleted
         );
 
         if (!share.account.capabilities ().share_resharing ()) {
@@ -299,11 +239,8 @@ public class ShareUserLine : Gtk.Widget {
         }
 
         const AvatarEventFilter avatar_event_filter = new AvatarEventFilter (this.ui.avatar);
-        connect (
-            avatar_event_filter,
-            AvatarEventFilter.context_menu,
-            this,
-            ShareUserLine.on_signal_avatar_context_menu
+        avatar_event_filter.context_menu.connect (
+            this.on_signal_avatar_context_menu
         );
         this.ui.avatar.install_event_filter (avatar_event_filter);
 
@@ -450,11 +387,8 @@ public class ShareUserLine : Gtk.Widget {
         // There is a painting bug where a small line of this widget isn't
         // properly cleared. This explicit repaint () call makes sure any trace of
         // the share widget is removed once it's destroyed. #4189
-        connect (
-            this, 
-            destroyed (object),
-            parent_widget (),
-            repaint ()
+        this.destroyed.connect (
+            parent_widget ().repaint
         );
     }
 
@@ -510,17 +444,11 @@ public class ShareUserLine : Gtk.Widget {
         animation.start_value (height ());
         animation.end_value (0);
 
-        connect (
-            animation,
-            QAbstractAnimation.on_signal_finished,
-            this,
-            ShareUserLine.on_signal_delete_animation_finished
+        animation.on_signal_finished.connect (
+            this.on_signal_delete_animation_finished
         );
-        connect (
-            animation,
-            QVariantAnimation.value_changed,
-            this,
-            ShareUserLine.resize_requested
+        animation.value_changed.connect (
+            this.resize_requested
         );
 
         animation.on_signal_start ();
@@ -670,10 +598,10 @@ public class ShareUserLine : Gtk.Widget {
                 this.share.account,
                 this.share.share_with ().share_with (),
                 avatar_size,
-                this);
-            connect (
-                avatar_line, AvatarJob.avatar_pixmap, this,
-                ShareUserLine.on_signal_avatar_loaded
+                this
+            );
+            avatar_line.avatar_pixmap.connect (
+                this.on_signal_avatar_loaded
             );
             avatar_line.on_signal_start ();
         }
@@ -810,7 +738,7 @@ public class ShareUserLine : Gtk.Widget {
         show_expire_date_options (enable);
 
         if (!enable) {
-            this.share.expire_date (QDate ());
+            this.share.on_signal_expire_date (QDate ());
         }
     }
 
@@ -839,9 +767,9 @@ public class ShareUserLine : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private void expire_date () {
+    private void on_signal_expire_date () {
         enable_progess_indicator_animation (true);
-        this.share.expire_date (this.ui.calendar.date ());
+        this.share.on_signal_expire_date (this.ui.calendar.date ());
     }
 
 

@@ -235,7 +235,7 @@ public class SyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    internal signal void finished (bool success);
+    internal signal void signal_finished (bool success);
 
 
     /***********************************************************
@@ -250,7 +250,7 @@ public class SyncEngine : GLib.Object {
     was reset or something. Set cancel to true in a slot
     connected from this signal to abort the sync.
     ***********************************************************/
-    internal signal void about_to_remove_all_files (SyncFileItem.Direction direction, RemoveDelegate f);
+    internal signal void signal_about_to_remove_all_files (SyncFileItem.Direction direction, RemoveDelegate f);
 
 
     /***********************************************************
@@ -301,15 +301,10 @@ public class SyncEngine : GLib.Object {
 
         this.clear_touched_files_timer.single_shot (true);
         this.clear_touched_files_timer.interval (30 * 1000);
-        connect (
-            this.clear_touched_files_timer,
-            GLib.Timeout.timeout,
-            this,
-            this.on_signal_clear_touched_files
+        this.clear_touched_files_timer.timeout.connect (
+            this.on_signal_clear_touched_files_timer_timeout
         );
-        connect (
-            this,
-            SyncEngine.signal_finished,
+        this.signal_finished.connect (
             this.on_signal_finished
         );
     }
@@ -333,15 +328,19 @@ public class SyncEngine : GLib.Object {
             GLib.List<SyncJournalDb.PollInfo> poll_infos = this.journal.get_poll_infos ();
             if (!poll_infos == "") {
                 GLib.info ("Finish Poll jobs before starting a sync");
-                var cleanup_polls_job = new CleanupPollsJob (poll_infos, this.account,
-                    this.journal, this.local_path, this.sync_options.vfs, this);
-                connect (
-                    cleanup_polls_job, CleanupPollsJob.on_signal_finished,
-                    this, SyncEngine.on_signal_start_sync
+                var cleanup_polls_job = new CleanupPollsJob (
+                    poll_infos,
+                    this.account,
+                    this.journal,
+                    this.local_path,
+                    this.sync_options.vfs,
+                    this
                 );
-                connect (
-                    cleanup_polls_job, CleanupPollsJob.aborted,
-                    this, SyncEngine.on_signal_clean_polls_job_aborted
+                cleanup_polls_job.signal_finished.connect (
+                    this.on_signal_start_sync
+                );
+                cleanup_polls_job.signal_aborted.connect (
+                    this.on_signal_clean_polls_job_aborted
                 );
                 cleanup_polls_job.start ();
                 return;
@@ -501,35 +500,20 @@ public class SyncEngine : GLib.Object {
         this.discovery_phase.server_blocklisted_files = this.account.capabilities ().blocklisted_files ();
         this.discovery_phase.ignore_hidden_files = ignore_hidden_files ();
 
-        connect (
-            this.discovery_phase,
-            DiscoveryPhase.item_discovered,
-            this,
-            SyncEngine.on_signal_item_discovered
+        this.discovery_phase.signal_item_discovered.connect (
+            this.on_signal_item_discovered
         );
-        connect (
-            this.discovery_phase,
-            DiscoveryPhase.signal_new_big_folder,
-            this,
-            SyncEngine.signal_new_big_folder
+        this.discovery_phase.signal_new_big_folder.connect (
+            this.on_signal_new_big_folder
         );
-        connect (
-            this.discovery_phase,
-            DiscoveryPhase.fatal_error,
-            this,
+        this.discovery_phase.signal_fatal_error.connect (
             this.on_signal_fatal_error
         );
-        connect (
-            this.discovery_phase,
-            DiscoveryPhase.on_signal_finished,
-            this,
-            SyncEngine.on_signal_discovery_finished
+        this.discovery_phase.signal_finished.connect (
+            this.on_signal_discovery_finished
         );
-        connect (
-            this.discovery_phase,
-            DiscoveryPhase.silently_excluded,
-            this.sync_file_status_tracker,
-            SyncFileStatusTracker.on_signal_add_silently_excluded
+        this.discovery_phase.signal_silently_excluded.connect (
+            this.sync_file_status_tracker.on_signal_silently_excluded
         );
         var discovery_job = new ProcessDirectoryJob (
             this.discovery_phase,
@@ -538,17 +522,11 @@ public class SyncEngine : GLib.Object {
             this.discovery_phase
         );
         this.discovery_phase.start_job (discovery_job);
-        connect (
-            discovery_job,
-            ProcessDirectoryJob.etag,
-            this,
-            SyncEngine.on_signal_root_etag_received
+        discovery_job.signal_etag.connect (
+            this.on_signal_root_etag_received
         );
-        connect (
-            this.discovery_phase,
-            DiscoveryPhase.add_error_to_gui,
-            this,
-            SyncEngine.add_error_to_gui
+        this.discovery_phase.signal_add_error_to_gui.connect (
+            this.on_signal_add_error_to_gui
         );
     }
 
@@ -998,7 +976,7 @@ public class SyncEngine : GLib.Object {
 
             QPointer<GLib.Object> guard = new GLib.Object ();
             QPointer<GLib.Object> self = this;
-            /* emit */ about_to_remove_all_files (side >= 0 ? SyncFileItem.Direction.DOWN : SyncFileItem.Direction.UP, callback);
+            /* emit */ signal_about_to_remove_all_files (side >= 0 ? SyncFileItem.Direction.DOWN : SyncFileItem.Direction.UP, callback);
             return;
         }
         finish_delegate ();
@@ -1059,52 +1037,29 @@ public class SyncEngine : GLib.Object {
         this.propagator = new OwncloudPropagator (
             this.account, this.local_path, this.remote_path, this.journal, this.bulk_upload_block_list);
         this.propagator.sync_options (this.sync_options);
-        connect (
-            this.propagator,
-            OwncloudPropagator.signal_item_completed,
-            this,
-            SyncEngine.on_signal_item_completed
+        this.propagator.signal_item_completed.connect (
+            this.on_signal_item_completed
         );
-        connect (
-            this.propagator,
-            OwncloudPropagator.progress,
-            this,
-            SyncEngine.on_signal_progress
+        this.propagator.signal_progress.connect (
+            this.on_signal_progress
         );
-        connect (
-            this.propagator,
-            OwncloudPropagator.on_signal_finished,
-            this,
-            SyncEngine.on_signal_propagation_finished, Qt.QueuedConnection
+        this.propagator.signal_finished.connect (
+            this.on_signal_propagation_finished // Qt.QueuedConnection
         );
-        connect (
-            this.propagator,
-            OwncloudPropagator.seen_locked_file,
-            this,
-            SyncEngine.seen_locked_file);
-        connect (
-            this.propagator,
-            OwncloudPropagator.signal_touched_file,
-            this,
-            SyncEngine.on_signal_add_touched_file
+        this.propagator.signal_seen_locked_file.connect (
+            this.on_signal_seen_locked_file
         );
-        connect (
-            this.propagator,
-            OwncloudPropagator.signal_insufficient_local_storage,
-            this,
-            SyncEngine.on_signal_insufficient_local_storage
+        this.propagator.signal_touched_file.connect (
+            this.on_signal_add_touched_file
         );
-        connect (
-            this.propagator,
-            OwncloudPropagator.signal_insufficient_remote_storage,
-            this,
-            SyncEngine.on_signal_insufficient_remote_storage
+        this.propagator.signal_insufficient_local_storage.connect (
+            this.on_signal_insufficient_local_storage
         );
-        connect (
-            this.propagator,
-            OwncloudPropagator.signal_new_item,
-            this,
-            SyncEngine.on_signal_new_item
+        this.propagator.signal_insufficient_remote_storage.connect (
+            this.on_signal_insufficient_remote_storage
+        );
+        this.propagator.signal_new_item.connect (
+            this.on_signal_new_item
         );
 
         // apply the network limits to the propagator
@@ -1218,7 +1173,7 @@ public class SyncEngine : GLib.Object {
     /***********************************************************
     Wipes the this.touched_files hash
     ***********************************************************/
-    private void on_signal_clear_touched_files () {
+    private void on_signal_clear_touched_files_timer_timeout () {
         this.touched_files.clear ();
     }
 
@@ -1464,7 +1419,7 @@ public class SyncEngine : GLib.Object {
         }
         is_any_sync_running = false;
         this.sync_running = false;
-        /* emit */ finished (on_signal_success);
+        /* emit */ signal_finished (on_signal_success);
 
         // Delete the propagator only after emitting the signal.
         this.propagator.clear ();

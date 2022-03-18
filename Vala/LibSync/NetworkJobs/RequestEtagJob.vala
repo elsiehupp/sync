@@ -13,8 +13,8 @@ namespace LibSync {
 ***********************************************************/
 public class RequestEtagJob : AbstractNetworkJob {
 
-    internal signal void on_signal_etag_retrieved (string etag, GLib.DateTime time);
-    internal signal void finished_with_result (HttpResult<string> etag);
+    internal signal void signal_etag_retrieved (string etag, GLib.DateTime time);
+    internal signal void signal_finished_with_result (HttpResult<string> etag);
 
     /***********************************************************
     ***********************************************************/
@@ -76,12 +76,12 @@ public class RequestEtagJob : AbstractNetworkJob {
                 }
             }
             /* emit */ etag_retrieved (etag, GLib.DateTime.from_string (string.from_utf8 (this.response_timestamp), Qt.RFC2822Date));
-            /* emit */ finished_with_result (etag);
+            /* emit */ signal_finished_with_result (etag);
         } else {
             HttpError error;
             error.code = http_code;
             error.message = error_string ();
-            /* emit */ finished_with_result (error);
+            /* emit */ signal_finished_with_result (error);
         }
         return true;
     }

@@ -21,19 +21,19 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, QRunnable*/ {
     ***********************************************************/
     private string local_path;
     private unowned Account account;
-    private Occ.Vfs vfs;
+    private Vfs vfs;
 
 
     internal signal void signal_finished (GLib.List<LocalInfo> result);
     internal signal void finished_fatal_error (string error_string);
     internal signal void finished_non_fatal_error (string error_string);
 
-    internal signal void item_discovered (unowned SyncFileItem item);
+    internal signal void signal_item_discovered (unowned SyncFileItem item);
     internal signal void child_ignored (bool b);
 
     /***********************************************************
     ***********************************************************/
-    public DiscoverySingleLocalDirectoryJob.for_account (unowned Account account, string local_path, Occ.Vfs vfs, GLib.Object parent = new GLib.Object ()) {
+    public DiscoverySingleLocalDirectoryJob.for_account (unowned Account account, string local_path, Vfs vfs, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.local_path = local_path;
         this.account = account;
@@ -91,7 +91,7 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, QRunnable*/ {
                 item.instruction = SyncInstructions.IGNORE;
                 item.status = SyncFileItem.Status.NORMAL_ERROR;
                 item.error_string = _("Filename encoding is not valid");
-                /* emit */ item_discovered (item);
+                /* emit */ signal_item_discovered (item);
                 continue;
             }
             i.modtime = dirent.modtime;
@@ -119,7 +119,7 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, QRunnable*/ {
             GLib.warning ("closedir failed for file in " + local_path + " - errno: " + errno;
         }
 
-        /* emit */ finished (results);
+        /* emit */ signal_finished (results);
     }
 
 } // class DiscoverySingleLocalDirectoryJob

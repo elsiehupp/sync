@@ -91,9 +91,9 @@ public class FolderStatusModel : QAbstractItemModel {
 
 
         /***********************************************************
-        Currently running LsColJob
+        Currently running LscolJob
         ***********************************************************/
-        LsColJob fetching_job;
+        LscolJob fetching_job;
 
 
         /***********************************************************
@@ -673,15 +673,15 @@ public class FolderStatusModel : QAbstractItemModel {
         info.reset_subs (this, parent);
         string path = info.folder.remote_path_trailing_slash ();
 
-        // info.path always contains non-mangled name, so we need to use mangled when requesting nested folders for encrypted subfolders as required by LsColJob
+        // info.path always contains non-mangled name, so we need to use mangled when requesting nested folders for encrypted subfolders as required by LscolJob
         const string info_path = (info.is_encrypted && !info.e2e_mangled_name == "") ? info.e2e_mangled_name : info.path;
 
         if (info_path != "/") {
             path += info_path;
         }
 
-        var ls_col_job = new LsColJob (this.account_state.account, path, this);
-        info.fetching_job = ls_col_job;
+        var lscol_job = new LscolJob (this.account_state.account, path, this);
+        info.fetching_job = lscol_job;
         var props = GLib.List<string> ("resourcetype"
                                               + "http://owncloud.org/ns:size"
                                               + "http://owncloud.org/ns:permissions"
@@ -689,26 +689,26 @@ public class FolderStatusModel : QAbstractItemModel {
         if (this.account_state.account.capabilities ().client_side_encryption_available ()) {
             props += "http://nextcloud.org/ns:is-encrypted";
         }
-        ls_col_job.properties (props);
+        lscol_job.properties (props);
 
-        ls_col_job.on_signal_timeout (60 * 1000);
-        ls_col_job.signal_directory_listing_subfolders.connect (
+        lscol_job.on_signal_timeout (60 * 1000);
+        lscol_job.signal_directory_listing_subfolders.connect (
             this.on_signal_update_directories
         );
-        ls_col_job.signal_finished_with_error.connect (
+        lscol_job.signal_finished_with_error.connect (
             this.on_signal_lscol_finished_with_error
         );
-        ls_col_job.signal_directory_listing_iterated.connect (
+        lscol_job.signal_directory_listing_iterated.connect (
             this.on_signal_gather_permissions
         );
-        ls_col_job.signal_directory_listing_iterated.connect (
+        lscol_job.signal_directory_listing_iterated.connect (
             this.on_signal_gather_encryption_status
         );
 
-        ls_col_job.start ();
+        lscol_job.start ();
 
         QPersistentModelIndex persistent_index = new QPersistentModelIndex (parent);
-        ls_col_job.property (PROPERTY_PARENT_INDEX_C, GLib.Variant.from_value (persistent_index));
+        lscol_job.property (PROPERTY_PARENT_INDEX_C, GLib.Variant.from_value (persistent_index));
 
         // Show 'fetching data...' hint after a while.
         this.fetching_items[persistent_index].on_signal_start ();
@@ -1223,14 +1223,14 @@ public class FolderStatusModel : QAbstractItemModel {
     /***********************************************************
     ***********************************************************/
     private void on_signal_update_directories (string[] list) {
-        var ls_col_job = (LsColJob) sender ());
-        //  ASSERT (ls_col_job);
-        QModelIndex index = qvariant_cast<QPersistentModelIndex> (ls_col_job.property (PROPERTY_PARENT_INDEX_C));
+        var lscol_job = (LscolJob) sender ());
+        //  ASSERT (lscol_job);
+        QModelIndex index = qvariant_cast<QPersistentModelIndex> (lscol_job.property (PROPERTY_PARENT_INDEX_C));
         var parent_info = info_for_index (index);
         if (!parent_info) {
             return;
         }
-        //  ASSERT (parent_info.fetching_job == ls_col_job);
+        //  ASSERT (parent_info.fetching_job == lscol_job);
         //  ASSERT (parent_info.subs == "");
 
         if (parent_info.has_label ()) {
@@ -1268,8 +1268,8 @@ public class FolderStatusModel : QAbstractItemModel {
                 selective_sync_undecided_set.insert (string_value);
             }
         }
-        const var permission_map = ls_col_job.property (PROPERTY_PERMISSION_MAP).to_map ();
-        const var encryption_map = ls_col_job.property (PROPERTY_ENCRYPTION_MAP).to_map ();
+        const var permission_map = lscol_job.property (PROPERTY_PERMISSION_MAP).to_map ();
+        const var encryption_map = lscol_job.property (PROPERTY_ENCRYPTION_MAP).to_map ();
 
         string[] sorted_subfolders = list;
         if (!sorted_subfolders == "")
@@ -1300,7 +1300,7 @@ public class FolderStatusModel : QAbstractItemModel {
                 new_info.name = remove_trailing_slash (record.path).split ('/').last ();
                 if (record.is_e2e_encrypted && !record.e2e_mangled_name == "") {
                     // we must use local path for Settings Dialog's filesystem tree, otherwise open and create new folder actions won't work
-                    // hence, we are storing this.e2e_mangled_name separately so it can be use later for LsColJob
+                    // hence, we are storing this.e2e_mangled_name separately so it can be use later for LscolJob
                     new_info.e2e_mangled_name = relative_path;
                     new_info.path = record.path;
                 }
@@ -1311,7 +1311,7 @@ public class FolderStatusModel : QAbstractItemModel {
                 new_info.name = remove_trailing_slash (relative_path).split ('/').last ();
             }
 
-            const var folder_info = ls_col_job.folder_infos.value (path);
+            const var folder_info = lscol_job.folder_infos.value (path);
             new_info.size = folder_info.size;
             new_info.file_id = folder_info.file_id;
             if (relative_path == "")
@@ -1385,12 +1385,12 @@ public class FolderStatusModel : QAbstractItemModel {
         if (it == map.end ())
             return;
 
-        var job = sender ();
-        var permission_map = job.property (PROPERTY_PERMISSION_MAP).to_map ();
-        job.property (PROPERTY_PERMISSION_MAP, GLib.Variant ()); // avoid a detach of the map while it is modified
-        //  ASSERT (!href.ends_with ('/'), "LsColXMLParser.parse should remove the trailing slash before calling us.");
+        var abstract_network_job = sender ();
+        var permission_map = abstract_network_job.property (PROPERTY_PERMISSION_MAP).to_map ();
+        abstract_network_job.property (PROPERTY_PERMISSION_MAP, GLib.Variant ()); // avoid a detach of the map while it is modified
+        //  ASSERT (!href.ends_with ('/'), "LscolXMLParser.parse should remove the trailing slash before calling us.");
         permission_map[href] = *it;
-        job.property (PROPERTY_PERMISSION_MAP, permission_map);
+        abstract_network_job.property (PROPERTY_PERMISSION_MAP, permission_map);
     }
 
 
@@ -1401,21 +1401,21 @@ public class FolderStatusModel : QAbstractItemModel {
         if (it == properties.end ())
             return;
 
-        var job = sender ();
-        var encryption_map = job.property (PROPERTY_ENCRYPTION_MAP).to_map ();
-        job.property (PROPERTY_ENCRYPTION_MAP, GLib.Variant ()); // avoid a detach of the map while it is modified
-        //  ASSERT (!href.ends_with ('/'), "LsColXMLParser.parse should remove the trailing slash before calling us.");
+        var abstract_network_job = sender ();
+        var encryption_map = abstract_network_job.property (PROPERTY_ENCRYPTION_MAP).to_map ();
+        abstract_network_job.property (PROPERTY_ENCRYPTION_MAP, GLib.Variant ()); // avoid a detach of the map while it is modified
+        //  ASSERT (!href.ends_with ('/'), "LscolXMLParser.parse should remove the trailing slash before calling us.");
         encryption_map[href] = *it;
-        job.property (PROPERTY_ENCRYPTION_MAP, encryption_map);
+        abstract_network_job.property (PROPERTY_ENCRYPTION_MAP, encryption_map);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_signal_lscol_finished_with_error (Soup.Reply r) {
-        var ls_col_job = qobject_cast<LsColJob> (sender ());
-        //  ASSERT (ls_col_job);
-        QModelIndex index = qvariant_cast<QPersistentModelIndex> (ls_col_job.property (PROPERTY_PARENT_INDEX_C));
+        var lscol_job = qobject_cast<LscolJob> (sender ());
+        //  ASSERT (lscol_job);
+        QModelIndex index = qvariant_cast<QPersistentModelIndex> (lscol_job.property (PROPERTY_PARENT_INDEX_C));
         if (!index.is_valid ()) {
             return;
         }
@@ -1557,7 +1557,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    private string[] create_block_list (Occ.FolderStatusModel.SubFolderInfo root,
+    private string[] create_block_list (FolderStatusModel.SubFolderInfo root,
         string[] old_block_list) {
         switch (root.checked) {
         case Qt.Unchecked:

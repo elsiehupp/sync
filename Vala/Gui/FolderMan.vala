@@ -174,7 +174,7 @@ public class FolderMan : GLib.Object {
     /***********************************************************
     ***********************************************************/
 
-    //  private friend class Occ.Application;
+    //  private friend class Application;
     //  private friend class .TestFolderMan;
 
     /***********************************************************
@@ -1226,8 +1226,8 @@ public class FolderMan : GLib.Object {
     /***********************************************************
     Slot to schedule an ETag job (from Folder only)
     ***********************************************************/
-    public void on_signal_schedule_e_tag_job (string alias, RequestEtagJob job) {
-        job.destroyed.connect (
+    public void on_signal_schedule_e_tag_job (string alias, RequestEtagJob request_etag_job) {
+        request_etag_job.destroyed.connect (
             this.on_signal_etag_job_destroyed
         );
         QMetaObject.invoke_method (
@@ -1997,7 +1997,7 @@ public class FolderMan : GLib.Object {
         if (ENFORCE_VIRTUAL_FILES_SYNC_FOLDER &&
                 folder_definition.virtual_files_mode != best_available_vfs_mode () &&
                 folder_definition.virtual_files_mode == Vfs.Off &&
-                Occ.Theme.show_virtual_files_option) {
+                Theme.show_virtual_files_option) {
             result = true;
         }
 

@@ -39,7 +39,7 @@ public class HttpLogger {
 
         GLib.Object.connect (
             reply,
-            Soup.Reply.on_signal_finished,
+            Soup.Reply.signal_finished,
             reply,
             () => {
             log_http (request_verb (*reply),

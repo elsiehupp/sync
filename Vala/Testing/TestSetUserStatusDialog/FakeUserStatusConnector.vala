@@ -6,14 +6,14 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 namespace Testing {
 
-public class FakeUserStatusConnector : Occ.UserStatusConnector {
+public class FakeUserStatusConnector : UserStatusConnector {
 
 
     /***********************************************************
     ***********************************************************/
-    private Occ.UserStatus user_status_set_by_caller_of_set_user_status;
-    private Occ.UserStatus user_status;
-    private GLib.List<Occ.UserStatus> predefined_statuses;
+    private UserStatus user_status_set_by_caller_of_set_user_status;
+    private UserStatus user_status;
+    private GLib.List<UserStatus> predefined_statuses;
     private bool is_message_cleared = false;
     private bool could_not_fetch_predefined_user_statuses = false;
     private bool could_not_fetch_user_status = false;
@@ -53,7 +53,7 @@ public class FakeUserStatusConnector : Occ.UserStatusConnector {
 
     /***********************************************************
     ***********************************************************/
-    public override void set_user_status (Occ.UserStatus user_status) {
+    public override void set_user_status (UserStatus user_status) {
         if (this.could_not_set_user_status_message) {
             /* emit */ error (Error.CouldNotSetUserStatus);
             return;
@@ -77,14 +77,14 @@ public class FakeUserStatusConnector : Occ.UserStatusConnector {
 
     /***********************************************************
     ***********************************************************/
-    public override Occ.UserStatus user_status () {
+    public override UserStatus user_status () {
         return {}; // Not implemented
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void set_fake_user_status (Occ.UserStatus user_status) {
+    public void set_fake_user_status (UserStatus user_status) {
         this.user_status = user_status;
     }
 
@@ -92,14 +92,14 @@ public class FakeUserStatusConnector : Occ.UserStatusConnector {
     /***********************************************************
     ***********************************************************/
     public void set_fake_predefined_statuses (
-        GLib.List<Occ.UserStatus> statuses) {
+        GLib.List<UserStatus> statuses) {
         this.predefined_statuses = statuses;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public Occ.UserStatus user_status_set_by_caller_of_set_user_status () {
+    public UserStatus user_status_set_by_caller_of_set_user_status () {
         return this.user_status_set_by_caller_of_set_user_status;
     }
 

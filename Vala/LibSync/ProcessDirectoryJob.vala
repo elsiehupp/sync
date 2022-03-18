@@ -36,7 +36,7 @@ Internally, this job will call DiscoveryPhase.schedule_more_jobs when one of its
 finished. DiscoveryPhase.schedule_more_jobs will call process_sub_jobs () to continue work until
 the job is finished.
 
-Results are fed outwards via the DiscoveryPhase.item_discovered () signal.
+Results are fed outwards via the DiscoveryPhase.signal_item_discovered () signal.
 ***********************************************************/
 public class ProcessDirectoryJob : GLib.Object {
 
@@ -198,7 +198,7 @@ public class ProcessDirectoryJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private QPointer<DiscoverySingleDirectoryJob> server_job;
+    private DiscoverySingleDirectoryJob discovery_single_directory_job;
 
     /***********************************************************
     Number of currently running async jobs.
@@ -277,9 +277,13 @@ public class ProcessDirectoryJob : GLib.Object {
 
     The base_record pin state is used if the root directory's pin state can't be retrieved.
     ***********************************************************/
-    public ProcessDirectoryJob.root_job (DiscoveryPhase data, PinState base_pin_state,
-        int64 last_sync_timestamp, GLib.Object parent) {
-        base_record (parent);
+    public ProcessDirectoryJob.root_job (
+        DiscoveryPhase data,
+        PinState base_pin_state,
+        int64 last_sync_timestamp,
+        GLib.Object parent
+    ) {
+        base (parent);
         this.last_sync_timestamp = last_sync_timestamp;
         this.discovery_data = data;
         compute_pin_state (base_pin_state);
@@ -360,7 +364,7 @@ public class ProcessDirectoryJob : GLib.Object {
                     this.dir_item.instruction = SyncInstructions.NONE;
                 }
             }
-            /* emit */ finished ();
+            /* emit */ signal_finished ();
         }
 
         int started = 0;
@@ -416,7 +420,7 @@ public class ProcessDirectoryJob : GLib.Object {
                 item.instruction = SyncInstructions.ERROR;
                 item.status = SyncFileItem.Status.NORMAL_ERROR;
                 item.error_string = error_message;
-                /* emit */ this.discovery_data.item_discovered (item);
+                /* emit */ this.discovery_data.signal_item_discovered (item);
                 return false;
             }
         }
@@ -604,7 +608,7 @@ public class ProcessDirectoryJob : GLib.Object {
         if (excluded == CSync.ExcludedFiles.Type.NOT_EXCLUDED && !is_symlink) {
             return false;
         } else if (excluded == CSync.ExcludedFiles.Type.EXCLUDE_SILENT || excluded == CSync.ExcludedFiles.Type.EXCLUDE_AND_REMOVE) {
-            /* emit */ this.discovery_data.silently_excluded (path);
+            /* emit */ this.discovery_data.signal_silently_excluded (path);
             return true;
         }
 
@@ -674,7 +678,7 @@ public class ProcessDirectoryJob : GLib.Object {
         }
 
         this.child_ignored = true;
-        /* emit */ this.discovery_data.item_discovered (item);
+        /* emit */ this.discovery_data.signal_item_discovered (item);
         return true;
     }
 
@@ -683,7 +687,7 @@ public class ProcessDirectoryJob : GLib.Object {
     Reconcile local/remote/database information for a single item.
 
     Can be a file or a directory.
-    Usually ends up emitting item_discovered () or creating a subdirectory job.
+    Usually ends up emitting signal_item_discovered () or creating a subdirectory job.
 
     This main function delegates some work to the process_file* functions.
     ***********************************************************/
@@ -753,7 +757,7 @@ public class ProcessDirectoryJob : GLib.Object {
                 item.instruction = SyncInstructions.IGNORE;
                 item.error_string = _("File has extension reserved for virtual files.");
                 this.child_ignored = true;
-                /* emit */ this.discovery_data.item_discovered (item);
+                /* emit */ this.discovery_data.signal_item_discovered (item);
                 return;
             }
         }
@@ -823,7 +827,7 @@ public class ProcessDirectoryJob : GLib.Object {
             item.instruction = SyncInstructions.ERROR;
             this.child_ignored = true;
             item.error_string = _("Server reported no %1").printf (missing_data.join (", "));
-            /* emit */ this.discovery_data.item_discovered (item);
+            /* emit */ this.discovery_data.signal_item_discovered (item);
             return;
         }
 
@@ -997,7 +1001,7 @@ public class ProcessDirectoryJob : GLib.Object {
     }
 
 
-    private void list_files_callback (int64 local_folder_size, Occ.SyncJournalFileRecord record) {
+    private void list_files_callback (int64 local_folder_size, SyncJournalFileRecord record) {
         if (record.is_file ()) {
             // add Constants.E2EE_TAG_SIZE so we will know the size of E2EE file on the server
             local_folder_size += record.file_size + Constants.E2EE_TAG_SIZE;
@@ -1008,7 +1012,7 @@ public class ProcessDirectoryJob : GLib.Object {
     }
 
 
-    private void post_process_rename (SyncFileItem item, Occ.SyncJournalFileRecord base_record, string original_path, PathTuple path) {
+    private void post_process_rename (SyncFileItem item, SyncJournalFileRecord base_record, string original_path, PathTuple path) {
         var adjusted_original_path = this.discovery_data.adjust_renamed_path (original_path, SyncFileItem.Direction.UP);
         this.discovery_data.renamed_items_remote.insert (original_path, path.target);
         item.modtime = base_record.modtime;
@@ -1047,7 +1051,7 @@ public class ProcessDirectoryJob : GLib.Object {
 
 
     // This function will be executed for every candidate
-    private void rename_candidate_processing (Occ.SyncJournalFileRecord base_record) {
+    private void rename_candidate_processing (SyncJournalFileRecord base_record) {
         if (done)
             return;
         if (!base_record.is_valid ())
@@ -1134,10 +1138,7 @@ public class ProcessDirectoryJob : GLib.Object {
             // we need to make a request to the server to know that the original file is deleted on the server
             this.pending_async_jobs++;
             var request_etag_job = new RequestEtagJob (this.discovery_data.account, this.discovery_data.remote_folder + original_path, this);
-            connect (
-                request_etag_job,
-                RequestEtagJob.finished_with_result,
-                this,
+            request_etag_job.signal_finished_with_result.connect (
                 this.on_signal_request_etag_job_finished_with_result
             );
             request_etag_job.start ();
@@ -1357,7 +1358,7 @@ public class ProcessDirectoryJob : GLib.Object {
         this.child_modified = true;
 
         // Check if it is a move
-        Occ.SyncJournalFileRecord base_record;
+        SyncJournalFileRecord base_record;
         if (!this.discovery_data.statedatabase.get_file_record_by_inode (local_entry.inode, base_record)) {
             db_error ();
             return;
@@ -1426,11 +1427,9 @@ public class ProcessDirectoryJob : GLib.Object {
             if (base_record.is_virtual_file () && is_vfs_with_suffix ())
                 chop_virtual_file_suffix (server_original_path);
             var request_etag_job = new RequestEtagJob (this.discovery_data.account, server_original_path, this);
-            connect (
-                request_etag_job,
-                RequestEtagJob.finished_with_result,
-                this,
-                this.on_signal_request_etag_job_finished_with_result (Occ.LibSync.HttpResult<string> etag));
+            request_etag_job.signal_finished_with_result.connect (
+                this.on_signal_request_etag_job_finished_with_result
+            );
             request_etag_job.start ();
             return;
         }
@@ -1556,7 +1555,7 @@ public class ProcessDirectoryJob : GLib.Object {
     private void process_rename (
         SyncFileItem item,
         string original_path,
-        Occ.SyncJournalFileRecord base_record,
+        SyncJournalFileRecord base_record,
         PathTuple path) {
         var adjusted_original_path = this.discovery_data.adjust_renamed_path (original_path, SyncFileItem.Direction.DOWN);
         this.discovery_data.renamed_items_local.insert (original_path, path.target);
@@ -1699,7 +1698,7 @@ public class ProcessDirectoryJob : GLib.Object {
             // Update the etag and other server metadata in the journal already
             // (We can't use a typical SyncInstructions.UPDATE_METADATA because
             // we must not store the size/modtime from the file system)
-            Occ.SyncJournalFileRecord record;
+            SyncJournalFileRecord record;
             if (this.discovery_data.statedatabase.get_file_record (path.original, record)) {
                 record.path = path.original.to_utf8 ();
                 record.etag = server_entry.etag;
@@ -1783,7 +1782,7 @@ public class ProcessDirectoryJob : GLib.Object {
                 || (item.type == ItemType.VIRTUAL_FILE && item.instruction == SyncInstructions.NEW)) {
                 this.discovery_data.deleted_item[path.original] = item;
             }
-            /* emit */ this.discovery_data.item_discovered (item);
+            /* emit */ this.discovery_data.signal_item_discovered (item);
         }
     }
 
@@ -1793,7 +1792,7 @@ public class ProcessDirectoryJob : GLib.Object {
     @return false indicate that this is an error and if it is a directory, one should not recurse
     inside it.
     ***********************************************************/
-    private bool check_permissions (Occ.SyncFileItem item) {
+    private bool check_permissions (SyncFileItem item) {
         if (item.direction != SyncFileItem.Direction.UP) {
             // Currently we only check server-side permissions
             return true;
@@ -1918,7 +1917,7 @@ public class ProcessDirectoryJob : GLib.Object {
     ***********************************************************/
     void process_blocklisted (
         PathTuple path,
-        Occ.LocalInfo local_entry,
+        LocalInfo local_entry,
         SyncJournalFileRecord database_entry
     ) {
         if (!local_entry.is_valid ()) {
@@ -1944,13 +1943,12 @@ public class ProcessDirectoryJob : GLib.Object {
 
         if (item.is_directory () && item.instruction != SyncInstructions.IGNORE) {
             var process_directory_job = new ProcessDirectoryJob (path, item, NORMAL_QUERY, IN_BLOCK_LIST, this.last_sync_timestamp, this);
-            connect (
-                process_directory_job, ProcessDirectoryJob.on_signal_finished,
-                this, ProcessDirectoryJob.sub_job_finished
+            process_directory_job.signal_finished.connect (
+                this.on_signal_sub_job_finished
             );
             this.queued_jobs.push_back (process_directory_job);
         } else {
-            /* emit */ this.discovery_data.item_discovered (item);
+            /* emit */ this.discovery_data.signal_item_discovered (item);
         }
     }
 
@@ -1965,7 +1963,7 @@ public class ProcessDirectoryJob : GLib.Object {
         this.child_modified |= process_directory_job.child_modified;
 
         if (process_directory_job.dir_item)
-            /* emit */ this.discovery_data.item_discovered (process_directory_job.dir_item);
+            /* emit */ this.discovery_data.signal_item_discovered (process_directory_job.dir_item);
 
         int count = this.running_jobs.remove_all (process_directory_job);
         //  ASSERT (count == 1);
@@ -1978,7 +1976,7 @@ public class ProcessDirectoryJob : GLib.Object {
     An DB operation failed
     ***********************************************************/
     private void db_error () {
-        this.discovery_data.fatal_error (_("Error while reading the database"));
+        this.discovery_data.signal_fatal_error (_("Error while reading the database"));
     }
 
 
@@ -2024,43 +2022,35 @@ public class ProcessDirectoryJob : GLib.Object {
     It fills this.server_normal_query_entries and sets this.server_query_done when done.
     ***********************************************************/
     private DiscoverySingleDirectoryJob start_async_server_query () {
-        var server_job = new DiscoverySingleDirectoryJob (this.discovery_data.account,
+        var discovery_single_directory_job = new DiscoverySingleDirectoryJob (this.discovery_data.account,
             this.discovery_data.remote_folder + this.current_folder.server, this);
-        if (!this.dir_item)
-            server_job.is_root_path_true (); // query the fingerprint on the root
-        connect (
-            server_job,
-            DiscoverySingleDirectoryJob.etag,
-            this,
-            ProcessDirectoryJob.etag
+        if (!this.dir_item) {
+            discovery_single_directory_job.is_root_path_true (); // query the fingerprint on the root
+        }
+        discovery_single_directory_job.signal_etag.connect (
+            this.on_signal_etag
         );
         this.discovery_data.currently_active_jobs++;
         this.pending_async_jobs++;
-        connect (
-            server_job,
-            DiscoverySingleDirectoryJob.on_signal_finished,
-            this,
+        discovery_single_directory_job.signal_finished.connect (
             this.on_signal_discovery_single_directory_job_finished
         );
-        connect (
-            server_job,
-            DiscoverySingleDirectoryJob.first_directory_permissions,
-            this,
+        discovery_single_directory_job.signal_first_directory_permissions.connect (
             this.on_signal_discovery_single_directory_job_first_directory_permissions
         );
-        server_job.start ();
-        return server_job;
+        discovery_single_directory_job.start ();
+        return discovery_single_directory_job;
     }
 
 
-    private void on_signal_discovery_single_directory_job_finished (DiscoverySingleDirectoryJob server_job, var results) {
+    private void on_signal_discovery_single_directory_job_finished (DiscoverySingleDirectoryJob discovery_single_directory_job, var results) {
         this.discovery_data.currently_active_jobs--;
         this.pending_async_jobs--;
         if (results) {
             this.server_normal_query_entries = *results;
             this.server_query_done = true;
-            if (!server_job.data_fingerprint == "" && this.discovery_data.data_fingerprint == "")
-                this.discovery_data.data_fingerprint = server_job.data_fingerprint;
+            if (!discovery_single_directory_job.data_fingerprint == "" && this.discovery_data.data_fingerprint == "")
+                this.discovery_data.data_fingerprint = discovery_single_directory_job.data_fingerprint;
             if (this.local_query_done)
                 this.process ();
         } else {
@@ -2080,7 +2070,7 @@ public class ProcessDirectoryJob : GLib.Object {
                 /* emit */ this.on_signal_finished ();
             } else {
                 // Fatal for the root job since it has no SyncFileItem, or for the network errors
-                /* emit */ this.discovery_data.fatal_error (_("Server replied with an error while reading directory \"%1\" : %2")
+                /* emit */ this.discovery_data.signal_fatal_error (_("Server replied with an error while reading directory \"%1\" : %2")
                     .printf (this.current_folder.server, results.error ().message));
             }
         }
@@ -2104,38 +2094,23 @@ public class ProcessDirectoryJob : GLib.Object {
         this.discovery_data.currently_active_jobs++;
         this.pending_async_jobs++;
 
-        connect (
-            local_job,
-            DiscoverySingleLocalDirectoryJob.item_discovered,
-            this.discovery_data,
-            DiscoveryPhase.item_discovered
+        local_job.signal_item_discovered.connect (
+            this.discovery_data.on_signal_item_discovered
         );
 
-        connect (
-            local_job,
-            DiscoverySingleLocalDirectoryJob.child_ignored,
-            this,
+        local_job.signal_child_ignored.connect (
             this.on_signal_discovery_single_local_directory_job_child_ignored
         );
 
-        connect (
-            local_job,
-            DiscoverySingleLocalDirectoryJob.finished_fatal_error,
-            this,
+        local_job.signal_finished_fatal_error.connect (
             this.on_signal_discovery_single_local_directory_job_finished_fatal_error
         );
 
-        connect (
-            local_job,
-            DiscoverySingleLocalDirectoryJob.finished_non_fatal_error,
-            this,
+        local_job.finished_non_fatal_error.connect (
             this.on_signal_discovery_single_local_directory_job_finished_non_fatal_error
         );
 
-        connect (
-            local_job,
-            DiscoverySingleLocalDirectoryJob.signal_finished,
-            this,
+        local_job.signal_finished.connect (
             this.on_signal_discovery_single_local_directory_job_finished
         );
 
@@ -2152,10 +2127,10 @@ public class ProcessDirectoryJob : GLib.Object {
     private void on_signal_discovery_single_local_directory_job_finished_fatal_error (string message) {
         this.discovery_data.currently_active_jobs--;
         this.pending_async_jobs--;
-        if (this.server_job)
-            this.server_job.abort ();
+        if (this.discovery_single_directory_job)
+            this.discovery_single_directory_job.abort ();
 
-        /* emit */ this.discovery_data.fatal_error (message);
+        /* emit */ this.discovery_data.signal_fatal_error (message);
     }
 
 
@@ -2169,7 +2144,7 @@ public class ProcessDirectoryJob : GLib.Object {
             /* emit */ this.on_signal_finished ();
         } else {
             // Fatal for the root job since it has no SyncFileItem
-            /* emit */ this.discovery_data.fatal_error (message);
+            /* emit */ this.discovery_data.signal_fatal_error (message);
         }
     }
 

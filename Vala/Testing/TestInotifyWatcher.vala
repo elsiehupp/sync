@@ -19,7 +19,7 @@ public class TestInotifyWatcher : FolderWatcherPrivate {
     /***********************************************************
     ***********************************************************/
     private void on_signal_init_test_case () {
-        this.root = GLib.Dir.temporary_path () + "/" + "test_" + string.number (Occ.Utility.rand ());
+        this.root = GLib.Dir.temporary_path () + "/" + "test_" + string.number (Utility.rand ());
         GLib.debug ("creating test directory tree in " + this.root);
         GLib.Dir root_directory = new GLib.Dir (this.root);
 

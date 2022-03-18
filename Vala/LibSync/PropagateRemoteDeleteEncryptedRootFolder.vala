@@ -6,7 +6,7 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 
 /***********************************************************
 Removing the root encrypted folder is consisted of multiple steps:
-- 1st step is to obtain the folder_iD via LsColJob so it then can be used for the next step
+- 1st step is to obtain the folder_iD via LscolJob so it then can be used for the next step
 - 2nd step is to lock the root folder useing the folder_iD from the previous step. !!! Note: If there are no nested items in the folder, this, and subsequent steps are skipped until step 7.
 - 3rd step is to obtain the root folder's metadata (it contains list of nested files and folders)
 - 4th step is to remove the nested files and folders from the metadata and send it to the server via UpdateMetadataApiJob
@@ -29,7 +29,7 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
     /***********************************************************
     Nested files and folders
     ***********************************************************/
-    private GLib.HashTable<string, Occ.SyncJournalFileRecord> nested_items;
+    private GLib.HashTable<string, SyncJournalFileRecord> nested_items;
 
     /***********************************************************
     ***********************************************************/
@@ -54,11 +54,11 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
             return;
         }
 
-        start_ls_col_job (this.item.file);
+        start_lscol_job (this.item.file);
     }
 
 
-    private void result_list_filter (Occ.SyncJournalFileRecord record) {
+    private void result_list_filter (SyncJournalFileRecord record) {
         this.nested_items[record.e2e_mangled_name] = record;
     }
 
@@ -92,15 +92,11 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
         GLib.debug (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) + "Metadata updated, sending to the server.";
 
         var update_metadata_api_job = new UpdateMetadataApiJob (this.propagator.account, this.folder_identifier, metadata.encrypted_metadata (), this.folder_token);
-        connect (
-            update_metadata_api_job,
-            UpdateMetadataApiJob.signal_success,
-            this,
+        update_metadata_api_job.signal_success.connect (
             this.on_signal_update_metadata_api_job_success
         );
-        connect (
-            update_metadata_api_job, UpdateMetadataApiJob.error,
-            this, PropagateRemoteDeleteEncryptedRootFolder.task_failed
+        update_metadata_api_job.signal_error.connect (
+            this.on_signal_task_failed
         );
         update_metadata_api_job.start ();
     }
@@ -164,7 +160,7 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
             if (network_error () != Soup.Reply.NetworkError.NoError || this.item.http_error_code != 0) {
                 const int error_code = network_error () != Soup.Reply.NetworkError.NoError ? network_error () : this.item.http_error_code;
                 GLib.critical (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) + "Delete of nested items on_signal_finished with error" + error_code + ". Failing the entire sequence.";
-                task_failed ();
+                on_signal_task_failed ();
                 return;
             }
             unlock_folder ();
@@ -185,17 +181,11 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
     /***********************************************************
     ***********************************************************/
     private void decrypt_and_remote_delete () {
-        var set_encryption_flag_api_job = new Occ.SetEncryptionFlagApiJob (this.propagator.account, this.item.file_id, Occ.SetEncryptionFlagApiJob.Clear, this);
-        connect (
-            set_encryption_flag_api_job,
-            Occ.SetEncryptionFlagApiJob.on_signal_success,
-            this,
+        var set_encryption_flag_api_job = new SetEncryptionFlagApiJob (this.propagator.account, this.item.file_id, SetEncryptionFlagApiJob.Clear, this);
+        set_encryption_flag_api_job.signal_success.connect (
             this.on_signal_set_encryption_flag_api_job_success
         );
-        connect (
-            set_encryption_flag_api_job,
-            Occ.SetEncryptionFlagApiJob.error,
-            this,
+        set_encryption_flag_api_job.signal_error.connect (
             this.on_signal_set_encryption_flag_api_job_error
         );
         set_encryption_flag_api_job.start ();
@@ -215,7 +205,7 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
     private void on_signal_set_encryption_flag_api_job_error (string file_identifier, int http_return_code) {
         //  Q_UNUSED (file_identifier);
         this.item.http_error_code = http_return_code;
-        task_failed ();
+        on_signal_task_failed ();
     }
 
 
@@ -228,9 +218,8 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
         delete_job.folder_token (this.folder_token);
         delete_job.property (ENCRYPTED_FILENAME_PROPERTY_KEY, filename);
 
-        connect (
-            delete_job, DeleteJob.signal_finished,
-            this, PropagateRemoteDeleteEncryptedRootFolder.on_signal_delete_nested_remote_item_finished
+        delete_job.signal_finished.connect (
+            this.on_signal_delete_nested_remote_item_finished
         );
 
         delete_job.start ();

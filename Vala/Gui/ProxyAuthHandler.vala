@@ -124,15 +124,15 @@ public class ProxyAuthHandler : GLib.Object {
         }
 
         // Find the responsible QNAM if possible.
-        QPointer<QNetworkAccessManager> sending_qnam = null;
+        QPointer<QNetworkAccessManager> sending_access_manager = null;
         var account = (Account) sender ();
         if (account) {
-            // Since we go into an event loop, it's possible for the account's qnam
+            // Since we go into an event loop, it's possible for the account's access_manager
             // to be destroyed before we get back. We can use this to check for its
             // liveness.
-            sending_qnam = account.shared_network_access_manager ();
+            sending_access_manager = account.shared_network_access_manager ();
         }
-        if (!sending_qnam) {
+        if (!sending_access_manager) {
             GLib.warning ("Could not get the sending QNAM for " + sender ());
         }
 
@@ -144,7 +144,7 @@ public class ProxyAuthHandler : GLib.Object {
         // gave presumably valid credentials to the same QNAM.
         bool invalidated = false;
         if (!this.waiting_for_dialog && !this.waiting_for_keychain && (!authenticator.user () == ""
-                                                            || (sending_qnam && this.gave_credentials_to.contains (sending_qnam)))) {
+                                                            || (sending_access_manager && this.gave_credentials_to.contains (sending_access_manager)))) {
             GLib.info ("Invalidating old credentials " + key);
             this.username.clear ();
             this.password.clear ();
@@ -167,9 +167,9 @@ public class ProxyAuthHandler : GLib.Object {
         GLib.info ("Got credentials for " + this.proxy);
         authenticator.user (this.username);
         authenticator.password (this.password);
-        if (sending_qnam) {
-            this.gave_credentials_to.insert (sending_qnam);
-            sending_qnam.destroyed.connect (
+        if (sending_access_manager) {
+            this.gave_credentials_to.insert (sending_access_manager);
+            sending_access_manager.destroyed.connect (
                 this.on_signal_sender_destroyed
             );
         }
@@ -212,7 +212,7 @@ public class ProxyAuthHandler : GLib.Object {
         // it's done.
         if (this.dialog) {
             exec_await (this.dialog,
-                    &Gtk.Dialog.on_signal_finished,
+                    &Gtk.Dialog.signal_finished,
                     this.waiting_for_dialog,
                     QEventLoop.Exclude_socket_notifiers);
         }
@@ -257,7 +257,7 @@ public class ProxyAuthHandler : GLib.Object {
         // but before the while loop has on_signal_finished.
         exec_await (
             this.read_password_job,
-            QKeychain.Job.on_signal_finished,
+            QKeychain.Job.signal_finished,
             this.waiting_for_keychain);
 
         if (this.read_password_job.error () == NoError) {
@@ -286,22 +286,22 @@ public class ProxyAuthHandler : GLib.Object {
 
         this.settings.value (keychain_username_key (), this.username);
 
-        var job = new WritePasswordJob (Theme.app_name, this);
-        job.settings (this.settings);
-        job.insecure_fallback (false);
-        job.key (keychain_password_key ());
-        job.text_data (this.password);
-        job.auto_delete (false);
-        job.on_signal_start ();
+        var write_password_job = new WritePasswordJob (Theme.app_name, this);
+        write_password_job.settings (this.settings);
+        write_password_job.insecure_fallback (false);
+        write_password_job.key (keychain_password_key ());
+        write_password_job.text_data (this.password);
+        write_password_job.auto_delete (false);
+        write_password_job.on_signal_start ();
 
         exec_await (
-            job,
-            QKeychain.Job.on_signal_finished,
+            write_password_job,
+            QKeychain.Job.signal_finished,
             this.waiting_for_keychain);
 
-        job.delete_later ();
-        if (job.error () != NoError) {
-            GLib.warning ("WritePasswordJob failed with " + job.error_string ());
+        write_password_job.delete_later ();
+        if (write_password_job.error () != NoError) {
+            GLib.warning ("WritePasswordJob failed with " + write_password_job.error_string ());
         }
     }
 

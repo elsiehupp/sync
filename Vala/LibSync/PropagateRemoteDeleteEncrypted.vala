@@ -25,7 +25,7 @@ public class PropagateRemoteCeleteEncrypted : AbstractPropagateRemoteDeleteEncry
         GLib.assert (!this.item.encrypted_filename == "");
 
         const GLib.FileInfo info = GLib.File.new_for_path (this.item.encrypted_filename);
-        start_ls_col_job (info.path ());
+        start_lscol_job (info.path ());
     }
 
 
@@ -33,7 +33,7 @@ public class PropagateRemoteCeleteEncrypted : AbstractPropagateRemoteDeleteEncry
     ***********************************************************/
     private new void on_signal_folder_unlocked_successfully (string folder_identifier) {
         AbstractPropagateRemoteDeleteEncrypted.on_signal_folder_unlocked_successfully (folder_identifier);
-        /* emit */ finished (!this.is_task_failed);
+        /* emit */ signal_finished (!this.is_task_failed);
     }
 
 
@@ -72,20 +72,14 @@ public class PropagateRemoteCeleteEncrypted : AbstractPropagateRemoteDeleteEncry
 
         GLib.debug (PROPAGATE_REMOVE_ENCRYPTED + "Metadata updated, sending to the server.");
 
-        var job = new UpdateMetadataApiJob (this.propagator.account, this.folder_identifier, metadata.encrypted_metadata (), this.folder_token);
-        connect (
-            job,
-            UpdateMetadataApiJob.on_signal_success,
-            this,
+        var update_metadata_api_job = new UpdateMetadataApiJob (this.propagator.account, this.folder_identifier, metadata.encrypted_metadata (), this.folder_token);
+        update_metadata_api_job.signal_success.connect (
             this.on_signal_update_metadata_api_job_success
         );
-        connect (
-            job,
-            UpdateMetadataApiJob.error,
-            this,
-            PropagateRemoteCeleteEncrypted.task_failed
+        update_metadata_api_job.signal_error.connect (
+            this.on_signal_task_failed
         );
-        job.start ();
+        update_metadata_api_job.start ();
     }
 
 

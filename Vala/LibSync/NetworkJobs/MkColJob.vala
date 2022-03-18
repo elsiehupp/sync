@@ -23,7 +23,7 @@ public class MkColJob : AbstractNetworkJob {
 
 
     internal signal void signal_finished_with_error (GLib.InputStream reply);
-    internal signal void finished_without_error ();
+    internal signal void signal_finished_without_error ();
 
 
     /***********************************************************
@@ -81,7 +81,7 @@ public class MkColJob : AbstractNetworkJob {
         if (this.reply.error () != Soup.Reply.NoError) {
             /* Q_EMIT */ signal_finished_with_error (this.reply);
         } else {
-            /* Q_EMIT */ finished_without_error ();
+            /* Q_EMIT */ signal_finished_without_error ();
         }
         return true;
     }

@@ -88,13 +88,11 @@ public class PUTFileJob : AbstractNetworkJob {
             GLib.warning (" Network error: " + this.input_stream.error_string ());
         }
 
-        connect (
-            this.input_stream, Soup.Reply.signal_upload_progress,
-            this, PUTFileJob.signal_upload_progress
+        this.input_stream.signal_upload_progress.connect (
+            this.on_signal_upload_progress
         );
-        connect (
-            this, AbstractNetworkJob.signal_network_activity,
-            account, Account.signal_propagator_network_activity
+        this.signal_network_activity.connect (
+            account.on_signal_propagator_network_activity
         );
         this.request_timer.start ();
         AbstractNetworkJob.start ();

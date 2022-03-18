@@ -57,7 +57,7 @@ public class DiscoverySingleDirectoryJob : GLib.Object {
     ***********************************************************/
     private int64 size = 0;
     private string error;
-    private QPointer<LsColJob> ls_col_job;
+    private QPointer<LscolJob> lscol_job;
 
 
     /***********************************************************
@@ -70,7 +70,7 @@ public class DiscoverySingleDirectoryJob : GLib.Object {
     ***********************************************************/
     internal signal void first_directory_permissions (RemotePermissions);
     internal signal void etag (string , GLib.DateTime time);
-    internal signal void finished (HttpResult<GLib.List<RemoteInfo>> result);
+    internal signal void signal_finished (HttpResult<GLib.List<RemoteInfo>> result);
 
 
     /***********************************************************
@@ -99,7 +99,7 @@ public class DiscoverySingleDirectoryJob : GLib.Object {
     ***********************************************************/
     public new void start () {
         // Start the actual HTTP job
-        var ls_col_job = new LsColJob (this.account, this.sub_path, this);
+        var lscol_job = new LscolJob (this.account, this.sub_path, this);
 
         GLib.List<string> props = new GLib.List<string> ();
         props.append ("resourcetype");
@@ -123,31 +123,28 @@ public class DiscoverySingleDirectoryJob : GLib.Object {
             props.append ("http://nextcloud.org/ns:is-encrypted");
         }
 
-        ls_col_job.properties (props);
+        lscol_job.properties (props);
 
-        connect (
-            ls_col_job, LsColJob.signal_directory_listing_iterated,
-            this, DiscoverySingleDirectoryJob.on_signal_directory_listing_iterated_slot
+        lscol_job.signal_directory_listing_iterated.connect (
+            this.on_signal_directory_listing_iterated_slot
         );
-        connect (
-            ls_col_job, LsColJob.signal_finished_with_error,
-            this, DiscoverySingleDirectoryJob.on_signal_ls_job_finished_with_error_slot
+        lscol_job.signal_finished_with_error.connect (
+            this.on_signal_ls_job_finished_with_error_slot
         );
-        connect (
-            ls_col_job, LsColJob.finished_without_error,
-            this, DiscoverySingleDirectoryJob.on_signal_ls_job_finished_without_error_slot
+        lscol_job.signal_finished_without_error.connect (
+            this.on_signal_ls_job_finished_without_error_slot
         );
-        ls_col_job.start ();
+        lscol_job.start ();
 
-        this.ls_col_job = ls_col_job;
+        this.lscol_job = lscol_job;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public new void abort () {
-        if (this.ls_col_job && this.ls_col_job.reply ()) {
-            this.ls_col_job.reply ().abort ();
+        if (this.lscol_job && this.lscol_job.reply ()) {
+            this.lscol_job.reply ().abort ();
         }
     }
 

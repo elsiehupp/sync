@@ -36,7 +36,7 @@ public class OcsShareJob : OcsJob {
     @param reply The reply
     @param value To what did we set a variable (if we set any).
     ***********************************************************/
-    internal signal void share_job_finished (QJsonDocument reply, GLib.Variant value);
+    internal signal void signal_finished (QJsonDocument reply, GLib.Variant value);
 
 
     /***********************************************************
@@ -266,7 +266,7 @@ public class OcsShareJob : OcsJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_job_finished (QJsonDocument reply) {
-        /* emit */ share_job_finished (reply, this.value);
+        /* emit */ signal_finished (reply, this.value);
     }
 
 } // class OcsShareJob

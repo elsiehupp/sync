@@ -29,16 +29,10 @@ public class FolderWizardSelectiveSync : QWizardPage {
 
         if (Theme.show_virtual_files_option && best_available_vfs_mode () != Vfs.Off) {
             this.virtual_files_check_box = new QCheckBox (_("Use virtual files instead of downloading content immediately %1").printf (best_available_vfs_mode () == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
-            connect (
-                this.virtual_files_check_box,
-                QCheckBox.clicked,
-                this,
-                FolderWizardSelectiveSync.on_signal_virtual_files_checkbox_clicked
+            this.virtual_files_check_box.clicked.connect (
+                this.on_signal_virtual_files_checkbox_clicked
             );
-            connect (
-                this.virtual_files_check_box,
-                QCheckBox.signal_state_changed,
-                this,
+            this.virtual_files_check_box.signal_state_changed.connect (
                 this.on_virtual_files_check_box_state_changed
             );
             this.virtual_files_check_box.checked (best_available_vfs_mode () == Vfs.WindowsCfApi);

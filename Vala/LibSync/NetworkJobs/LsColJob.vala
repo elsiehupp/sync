@@ -8,7 +8,7 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 namespace Occ {
 namespace LibSync {
 
-public class LsColJob : AbstractNetworkJob {
+public class LscolJob : AbstractNetworkJob {
 
     public GLib.HashTable<string, ExtraFolderInfo> folder_infos;
 
@@ -30,20 +30,20 @@ public class LsColJob : AbstractNetworkJob {
 
     internal signal void signal_directory_listing_subfolders (string[] items);
     internal signal void signal_directory_listing_iterated (string name, GLib.HashTable<string, string> properties);
-    internal signal void signal_finished_with_error (GLib.InputStream reply);
-    internal signal void finished_without_error ();
+    internal signal void signal_finished_with_error (GLib.InputStream input_stream);
+    internal signal void signal_finished_without_error ();
 
 
     /***********************************************************
     ***********************************************************/
-    public LsColJob.for_path (Account account, string path, GLib.Object parent = new GLib.Object ()) {
+    public LscolJob.for_path (Account account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public LsColJob.for_url (Account account, GLib.Uri url, GLib.Object parent = new GLib.Object ()) {
+    public LscolJob.for_url (Account account, GLib.Uri url, GLib.Object parent = new GLib.Object ()) {
         base (account, "", parent);
         this.url = url;
     }
@@ -98,44 +98,40 @@ public class LsColJob : AbstractNetworkJob {
     the network, not all in one big blob at the end.
     ***********************************************************/
     private bool on_signal_finished () {
-        GLib.info ("LSCOL of" + this.reply.request ().url
-            + " finished with status " + reply_status_string ());
+        GLib.info ("LSCOL of" + this.input_stream.request ().url
+            + " finished with status " + input_stream_status_string ());
 
-        string content_type = this.reply.header (Soup.Request.ContentTypeHeader).to_string ();
-        int http_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        string content_type = this.input_stream.header (Soup.Request.ContentTypeHeader).to_string ();
+        int http_code = this.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (http_code == 207 && content_type.contains ("application/xml; charset=utf-8")) {
-            LsColXMLParser ls_col_xml_parser;
-            connect (
-                ls_col_xml_parser, LsColXMLParser.signal_directory_listing_subfolders,
-                this, LsColJob.signal_directory_listing_subfolders
+            LscolXMLParser lscol_xml_parser;
+            lscol_xml_parser.signal_directory_listing_subfolders.connect (
+                this.on_signal_directory_listing_subfolders
             );
-            connect (
-                ls_col_xml_parser, LsColXMLParser.signal_directory_listing_iterated,
-                this, LsColJob.signal_directory_listing_iterated
+            lscol_xml_parser.signal_directory_listing_iterated.connect (
+                this.on_signal_directory_listing_iterated
             );
-            connect (
-                ls_col_xml_parser, LsColXMLParser.signal_finished_with_error,
-                this, LsColJob.signal_finished_with_error
+            lscol_xml_parser.signal_finished_with_error.connect (
+                this.on_signal_finished_with_error
             );
-            connect (
-                ls_col_xml_parser, LsColXMLParser.finished_without_error,
-                this, LsColJob.finished_without_error
+            lscol_xml_parser.signal_finished_without_error.connect (
+                this.on_signal_finished_without_error
             );
 
-            string expected_path = this.reply.request ().url.path (); // something like "/owncloud/remote.php/dav/folder"
-            if (!ls_col_xml_parser.parse (this.reply.read_all (), this.folder_infos, expected_path)) {
+            string expected_path = this.input_stream.request ().url.path (); // something like "/owncloud/remote.php/dav/folder"
+            if (!lscol_xml_parser.parse (this.input_stream.read_all (), this.folder_infos, expected_path)) {
                 // XML parse error
-                /* emit */ signal_finished_with_error (this.reply);
+                /* emit */ signal_finished_with_error (this.input_stream);
             }
         } else {
             // wrong content type, wrong HTTP code or any other network error
-            /* emit */ signal_finished_with_error (this.reply);
+            /* emit */ signal_finished_with_error (this.input_stream);
         }
 
         return true;
     }
 
-} // class LsColJob
+} // class LscolJob
 
 } // namespace LibSync
 } // namespace Occ

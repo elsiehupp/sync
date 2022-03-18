@@ -146,7 +146,7 @@ public class NSISUpdater : OCUpdater {
         var ico = new Gtk.Label ();
         ico.fixed_size (icon_size, icon_size);
         ico.pixmap (info_icon.pixmap (icon_size));
-        var lbl = new Gtk.Label ();
+        var update_label = new Gtk.Label ();
         string txt = _("<p>A new version of the %1 Client is available.</p>"
                      + "<p><b>%2</b> is available for download. The installed version is %3.</p>")
                         .printf (
@@ -154,41 +154,36 @@ public class NSISUpdater : OCUpdater {
                             Utility.escape (info.version_string ()), Utility.escape (client_version ())
                         );
 
-        lbl.on_signal_text (txt);
-        lbl.text_format (Qt.RichText);
-        lbl.word_wrap (true);
+        update_label.on_signal_text (txt);
+        update_label.text_format (Qt.RichText);
+        update_label.word_wrap (true);
 
         hlayout.add_widget (ico);
-        hlayout.add_widget (lbl);
+        hlayout.add_widget (update_label);
 
-        var bb = new QDialogButtonBox ();
-        QPushButton skip = bb.add_button (_("Skip this version"), QDialogButtonBox.Reset_role);
-        QPushButton reject = bb.add_button (_("Skip this time"), QDialogButtonBox.AcceptRole);
-        QPushButton update = bb.add_button (_("Get update"), QDialogButtonBox.AcceptRole);
+        var button_box = new QDialogButtonBox ();
+        QPushButton skip_version_button = button_box.add_button (_("Skip this version"), QDialogButtonBox.Reset_role);
+        QPushButton skip_once_button = button_box.add_button (_("Skip this time"), QDialogButtonBox.AcceptRole);
+        QPushButton get_update_button = button_box.add_button (_("Get update"), QDialogButtonBox.AcceptRole);
 
-        connect (
-            skip, QAbstractButton.clicked,
-            message_box, Gtk.Dialog.reject
+        skip_version_button.clicked.connect (
+            message_box.skip_once_button
         );
-        connect (
-            reject, QAbstractButton.clicked,
-            message_box, Gtk.Dialog.reject
+        skip_once_button.clicked.connect (
+            message_box.reject
         );
-        connect (
-            update, QAbstractButton.clicked,
-            message_box, Gtk.Dialog.accept
+        get_update_button.clicked.connect (
+            message_box.accept
         );
 
-        connect (
-            skip, QAbstractButton.clicked,
-            this, NSISUpdater.on_signal_seen_version
+        skip_version_button.clicked.connect (
+            this.on_signal_seen_version
         );
-        connect (
-            update, QAbstractButton.clicked,
-            this, NSISUpdater.on_signal_open_update_url
+        get_update_button.clicked.connect (
+            this.on_signal_open_update_url
         );
 
-        layout.add_widget (bb);
+        layout.add_widget (button_box);
 
         message_box.open ();
     }
@@ -215,7 +210,7 @@ public class NSISUpdater : OCUpdater {
         var ico = new Gtk.Label ();
         ico.fixed_size (icon_size, icon_size);
         ico.pixmap (info_icon.pixmap (icon_size));
-        var lbl = new Gtk.Label ();
+        var update_label = new Gtk.Label ();
         string txt = _("<p>A new version of the %1 Client is available but the updating process failed.</p>"
                      + "<p><b>%2</b> has been downloaded. The installed version is %3. If you confirm restart and update, your computer may reboot to complete the installation.</p>")
                         .printf (
@@ -223,50 +218,43 @@ public class NSISUpdater : OCUpdater {
                             Utility.escape (target_version), Utility.escape (client_version ())
                         );
 
-        lbl.on_signal_text (txt);
-        lbl.text_format (Qt.RichText);
-        lbl.word_wrap (true);
+        update_label.on_signal_text (txt);
+        update_label.text_format (Qt.RichText);
+        update_label.word_wrap (true);
 
         hlayout.add_widget (ico);
-        hlayout.add_widget (lbl);
+        hlayout.add_widget (update_label);
 
-        var bb = new QDialogButtonBox ();
-        var skip = bb.add_button (_("Skip this version"), QDialogButtonBox.Reset_role);
-        var askagain = bb.add_button (_("Ask again later"), QDialogButtonBox.Reset_role);
-        var retry = bb.add_button (_("Restart and update"), QDialogButtonBox.AcceptRole);
-        var update = bb.add_button (_("Update manually"), QDialogButtonBox.AcceptRole);
+        var button_box = new QDialogButtonBox ();
+        var skip_version_button = button_box.add_button (_("Skip this version"), QDialogButtonBox.Reset_role);
+        var askagain = button_box.add_button (_("Ask again later"), QDialogButtonBox.Reset_role);
+        var retry = button_box.add_button (_("Restart and update"), QDialogButtonBox.AcceptRole);
+        var get_update_button = button_box.add_button (_("Update manually"), QDialogButtonBox.AcceptRole);
 
-        connect (
-            skip, QAbstractButton.clicked,
-            message_box, Gtk.Dialog.reject
+        skip_version_button.clicked.connect (
+            message_box.reject
         );
-        connect (
-            askagain, QAbstractButton.clicked,
-            message_box, Gtk.Dialog.reject
+        askagain.clicked.connect (
+            message_box.reject
         );
-        connect (
-            retry, QAbstractButton.clicked,
-            message_box, Gtk.Dialog.accept
+        retry.clicked.connect (
+            message_box.accept
         );
-        connect (
-            update, QAbstractButton.clicked,
-            message_box, Gtk.Dialog.accept
+        get_update_button.clicked.connect (
+            message_box.accept
         );
-        connect (
-            skip, QAbstractButton.clicked,
-            this, this.on_skip_button_clicked
+        skip_version_button.clicked.connect (
+            this.on_skip_button_clicked
         );
-        // askagain : do nothing
-        connect (
-            retry, QAbstractButton.clicked,
-            this, this.on_retry_button_clicked
+        // askagain: do nothing
+        retry.clicked.connect (
+            this.on_retry_button_clicked
         );
-        connect (
-            update, QAbstractButton.clicked,
-            this, this.on_get_update_button_clicked
+        get_update_button.clicked.connect (
+            this.on_get_update_button_clicked
         );
 
-        layout.add_widget (bb);
+        layout.add_widget (button_box);
 
         message_box.open ();
     }
@@ -328,14 +316,12 @@ public class NSISUpdater : OCUpdater {
                 } else {
                     var request = Soup.Request (GLib.Uri (url));
                     request.attribute (Soup.Request.Redirect_policy_attribute, Soup.Request.No_less_safe_redirect_policy);
-                    Soup.Reply reply = qnam ().get (request);
-                    connect (
-                        reply, QIODevice.ready_read,
-                        this, NSISUpdater.on_signal_write_file
+                    Soup.Reply reply = access_manager ().get (request);
+                    reply.ready_read.connect (
+                        this.on_signal_write_file
                     );
-                    connect (
-                        reply, Soup.Reply.on_signal_finished,
-                        this, NSISUpdater.on_signal_download_finished
+                    reply.signal_finished.connect (
+                        this.on_signal_download_finished
                     );
                     download_state (DownloadState.DOWNLOADING);
                     this.file.on_signal_reset (new QTemporaryFile ());

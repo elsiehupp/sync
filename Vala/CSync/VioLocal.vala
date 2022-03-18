@@ -30,7 +30,7 @@ CSyncVioHandleT csync_vio_local_opendir (string name);
 int csync_vio_local_closedir (CSyncVioHandleT dhandle);
 
 // OCSYNC_EXPORT
-std.unique_ptr<CSyncFileStatT> csync_vio_local_readdir (CSyncVioHandleT dhandle, Occ.Vfs vfs);
+std.unique_ptr<CSyncFileStatT> csync_vio_local_readdir (CSyncVioHandleT dhandle, Vfs vfs);
 
 // OCSYNC_EXPORT
 int csync_vio_local_stat (string uri, CSyncFileStatT buf);
@@ -114,7 +114,7 @@ int csync_vio_local_closedir (CSyncVioHandleT dhandle) {
         return rc;
 }
 
-std.unique_ptr<CSyncFileStatT> csync_vio_local_readdir (CSyncVioHandleT handle, Occ.Vfs vfs) {
+std.unique_ptr<CSyncFileStatT> csync_vio_local_readdir (CSyncVioHandleT handle, Vfs vfs) {
 
     dirent dirent = null;
     std.unique_ptr<CSyncFileStatT> file_stat;

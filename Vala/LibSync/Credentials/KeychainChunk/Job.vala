@@ -84,11 +84,11 @@ public class Job : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static void add_settings_to_job (Account account, QKeychain.Job job) {
+    private static void add_settings_to_job (Account account, QKeychain.Job qkeychain_job) {
         //  Q_UNUSED (account)
         var settings = ConfigFile.settings_with_group (Theme.app_name);
-        settings.parent (job); // make the job parent to make setting deleted properly
-        job.settings (settings.release ());
+        settings.parent (qkeychain_job); // make the qkeychain_job parent to make setting deleted properly
+        qkeychain_job.settings (settings.release ());
     }
 
 } // class Job

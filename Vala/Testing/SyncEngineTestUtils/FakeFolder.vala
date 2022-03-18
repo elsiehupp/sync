@@ -12,14 +12,14 @@ public class FakeFolder : GLib.Object {
     ***********************************************************/
     public struct ErrorList {
 
-        FakeQNAM qnam;
+        FakeQNAM access_manager;
 
         void append (string path, int error = 500) {
-            this.qnam.error_paths ().insert (path, error);
+            this.access_manager.error_paths ().insert (path, error);
         }
 
         void clear () {
-            this.qnam.error_paths ().clear ();
+            this.access_manager.error_paths ().clear ();
         }
     }
 
@@ -27,20 +27,20 @@ public class FakeFolder : GLib.Object {
     DiskFileModifier local_modifier;
 
     // FIXME: Clarify ownership, double delete
-    FakeQNAM fake_qnam;
-    unowned Occ.Account account;
-    std.unique_ptr<Occ.SyncJournalDb> journal_database;
-    std.unique_ptr<Occ.SyncEngine> sync_engine;
+    FakeQNAM fake_access_manager;
+    unowned Account account;
+    std.unique_ptr<SyncJournalDb> journal_database;
+    std.unique_ptr<SyncEngine> sync_engine;
 
 
     /***********************************************************
     ***********************************************************/
-    public FakeFolder (FileInfo template_file_info, Occ.Optional<FileInfo> local_file_info = new Occ.Optional<FileInfo> (), string remote_path = "") {
+    public FakeFolder (FileInfo template_file_info, Optional<FileInfo> local_file_info = new Optional<FileInfo> (), string remote_path = "") {
         this.local_modifier = this.temporary_directory.path ();
         // Needs to be done once
-        Occ.SyncEngine.minimum_file_age_for_upload = std.chrono.milliseconds (0);
-        Occ.Logger.instance.set_log_file ("-");
-        Occ.Logger.instance.add_log_rule ({ "sync.httplogger=true" });
+        SyncEngine.minimum_file_age_for_upload = std.chrono.milliseconds (0);
+        Logger.instance.set_log_file ("-");
+        Logger.instance.add_log_rule ({ "sync.httplogger=true" });
     
         GLib.Dir root_directory = new GLib.Dir (this.temporary_directory.path ());
         GLib.debug ("FakeFolder operating on " + root_directory);
@@ -50,24 +50,22 @@ public class FakeFolder : GLib.Object {
             to_disk (root_directory, template_file_info);
         }
     
-        this.fake_qnam = new FakeQNAM (template_file_info);
-        this.account = Occ.Account.create ();
+        this.fake_access_manager = new FakeQNAM (template_file_info);
+        this.account = Account.create ();
         this.account.set_url (GLib.Uri ("http://admin:admin@localhost/owncloud"));
-        this.account.set_credentials (new FakeCredentials (this.fake_qnam));
+        this.account.set_credentials (new FakeCredentials (this.fake_access_manager));
         this.account.set_dav_display_name ("fakename");
         this.account.set_server_version ("10.0.0");
     
-        this.journal_database = std.make_unique<Occ.SyncJournalDb> (local_path () + ".sync_test.db");
-        this.sync_engine = std.make_unique<Occ.SyncEngine> (this.account, local_path (), remote_path, this.journal_database.get ());
+        this.journal_database = std.make_unique<SyncJournalDb> (local_path () + ".sync_test.db");
+        this.sync_engine = std.make_unique<SyncEngine> (this.account, local_path (), remote_path, this.journal_database.get ());
         // Ignore temporary files from the download. (This is in the default exclude list, but we don't load it)
         this.sync_engine.excluded_files ().add_manual_exclude ("]*.~*");
     
-        // handle about_to_remove_all_files with a timeout in case our test does not handle it
-        connect (
-            this.sync_engine.get (),
-            Occ.SyncEngine.about_to_remove_all_files,
-            this.sync_engine.get (),
-            this.on_signal_sync_engine_about_to_remove_all_files);
+        // handle signal_about_to_remove_all_files with a timeout in case our test does not handle it
+        this.sync_engine.signal_about_to_remove_all_files.connect (
+            this.on_signal_sync_engine_about_to_remove_all_files
+        );
     
         // Ensure we have a valid VfsOff instance "running"
         switch_to_vfs (this.sync_engine.sync_options ().vfs);
@@ -82,7 +80,7 @@ public class FakeFolder : GLib.Object {
     delegate void Callback (bool value);
 
 
-    void on_signal_sync_engine_about_to_remove_all_files (Occ.SyncFileItem.Direction direction, Callback callback) {
+    void on_signal_sync_engine_about_to_remove_all_files (SyncFileItem.Direction direction, Callback callback) {
         GLib.Timeout.single_shot (
             1 * 1000,
             this.sync_engine.get (),
@@ -98,7 +96,7 @@ public class FakeFolder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void switch_to_vfs (Occ.Vfs vfs) {
+    public void switch_to_vfs (Vfs vfs) {
         var opts = this.sync_engine.sync_options ();
 
         opts.vfs.stop ();
@@ -107,25 +105,21 @@ public class FakeFolder : GLib.Object {
         opts.vfs = vfs;
         this.sync_engine.set_sync_options (opts);
 
-        Occ.Vfs.SetupParameters vfs_params;
+        Vfs.SetupParameters vfs_params;
         vfs_params.filesystem_path = local_path ();
         vfs_params.remote_path = '/';
         vfs_params.account = this.account;
         vfs_params.journal = this.journal_database.get ();
         vfs_params.provider_name = "OC-TEST";
         vfs_params.provider_version = "0.1";
-        connect (
-            this.sync_engine.get (),
-            GLib.Object.destroyed,
-            vfs,
-            FakeFolder.on_signal_sync_engine_destroyed
+        this.sync_engine.destroyed.connect (
+            vfs.on_signal_sync_engine_destroyed
         );
-
         vfs.on_signal_start (vfs_params);
     }
 
 
-    private void on_signal_sync_engine_destroyed (Occ.Vfs vfs) {
+    private void on_signal_sync_engine_destroyed (Vfs vfs) {
         vfs.stop ();
         vfs.unregister_folder ();
     }
@@ -133,21 +127,21 @@ public class FakeFolder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public Occ.Account account {
+    public Account account {
         return this.account;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public Occ.SyncEngine sync_engine () {
+    public SyncEngine sync_engine () {
         return this.sync_engine;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public Occ.SyncJournalDb sync_journal () {
+    public SyncJournalDb sync_journal () {
         return this.journal_database;
     }
 
@@ -162,7 +156,7 @@ public class FakeFolder : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public FileInfo remote_modifier () {
-        return this.fake_qnam.current_remote_state ();
+        return this.fake_access_manager.current_remote_state ();
     }
 
 
@@ -180,14 +174,14 @@ public class FakeFolder : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public FileInfo current_remote_state () {
-        return this.fake_qnam.current_remote_state ();
+        return this.fake_access_manager.current_remote_state ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public FileInfo upload_state () {
-        return this.fake_qnam.upload_state ();
+        return this.fake_access_manager.upload_state ();
     }
 
 
@@ -203,7 +197,7 @@ public class FakeFolder : GLib.Object {
     }
 
 
-    private void database_record_filter (Occ.SyncJournalFileRecord record) {
+    private void database_record_filter (SyncJournalFileRecord record) {
         var components = PathComponents (record.path ());
         var parent_directory = find_or_create_directories (result, components.parent_directory_components ());
         var name = components.filename ();
@@ -214,7 +208,7 @@ public class FakeFolder : GLib.Object {
         item.is_directory = record.type == ItemType.DIRECTORY;
         item.permissions = record.remote_perm;
         item.etag = record.etag;
-        item.last_modified = Occ.Utility.date_time_from_time_t (record.modtime);
+        item.last_modified = Utility.date_time_from_time_t (record.modtime);
         item.file_identifier = record.file_identifier;
         item.checksums = record.checksum_header;
         // item.content_char can't be set from the database
@@ -224,14 +218,14 @@ public class FakeFolder : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public ErrorList server_error_paths () {
-        return this.fake_qnam;
+        return this.fake_access_manager;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void set_server_override (FakeQNAM.OverrideDelegate qnam_override) {
-        this.fake_qnam.set_override(qnam_override);
+    public void set_server_override (FakeQNAM.OverrideDelegate access_manager_override) {
+        this.fake_access_manager.set_override(access_manager_override);
     }
 
     delegate QJsonObject ReplyFunction (GLib.HashTable<string, string> map);
@@ -242,7 +236,7 @@ public class FakeFolder : GLib.Object {
         QIODevice outgoing_data,
         string content_type,
         ReplyFunction reply_function) {
-        return this.fake_qnam.for_each_reply_part (outgoing_data, content_type, reply_function);
+        return this.fake_access_manager.for_each_reply_part (outgoing_data, content_type, reply_function);
     }
 
 
@@ -288,7 +282,7 @@ public class FakeFolder : GLib.Object {
             spy.clear ();
             GLib.assert_true (spy.wait ());
             foreach (GLib.List<GLib.Variant> args in spy) {
-                var item = args[0].value<Occ.SyncFileItemPtr> ();
+                var item = args[0].value<SyncFileItemPtr> ();
                 if (item.destination () == relative_path)
                     return;
             }
@@ -329,7 +323,7 @@ public class FakeFolder : GLib.Object {
                 file.open (GLib.File.WriteOnly);
                 file.write ("".fill (child.content_char, child.size));
                 file.close ();
-                Occ.FileSystem.set_modification_time (file.filename (), Occ.Utility.date_time_to_time_t (child.last_modified));
+                FileSystem.set_modification_time (file.filename (), Utility.date_time_to_time_t (child.last_modified));
             }
         }
     }

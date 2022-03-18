@@ -54,8 +54,8 @@ public class FileActivityListModel : ActivityListModel {
         currently_fetching (true);
 
         const string url = "ocs/v2.php/apps/activity/api/v2/activity/filter";
-        var job = new JsonApiJob (account_state ().account, url, this);
-        job.json_received.connect (
+        var json_api_job = new JsonApiJob (account_state ().account, url, this);
+        json_api_job.json_received.connect (
             this.activities_received
         );
 
@@ -63,10 +63,10 @@ public class FileActivityListModel : ActivityListModel {
         parameters.add_query_item ("sort", "asc");
         parameters.add_query_item ("object_type", "files");
         parameters.add_query_item ("object_id", this.file_id);
-        job.add_query_params (parameters);
+        json_api_job.add_query_params (parameters);
         done_fetching (true);
         hide_old_activities (true);
-        job.on_signal_start ();
+        json_api_job.on_signal_start ();
     }
 
 } // class FileActivityListModel

@@ -44,9 +44,9 @@ public class PropagatorCompositeJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public void append_job (PropagatorJob job) {
-        job.associated_composite (this);
-        this.jobs_to_do.append (job);
+    public void append_job (PropagatorJob propagator_job) {
+        propagator_job.associated_composite (this);
+        this.jobs_to_do.append (propagator_job);
     }
 
 
@@ -90,12 +90,12 @@ public class PropagatorCompositeJob : PropagatorJob {
         while (this.jobs_to_do == "" && !this.tasks_to_do == "") {
             unowned SyncFileItem next_task = this.tasks_to_do.first ();
             this.tasks_to_do.remove (0);
-            PropagatorJob job = propagator ().create_job (next_task);
-            if (!job) {
+            PropagatorJob propagator_job = this.propagator.create_job (next_task);
+            if (!propagator_job) {
                 GLib.warning ("Useless task found for file " + next_task.destination () + " instruction " + next_task.instruction);
                 continue;
             }
-            append_job (job);
+            append_job (propagator_job);
             break;
         }
         // Then run the next job
@@ -140,9 +140,8 @@ public class PropagatorCompositeJob : PropagatorJob {
             this.aborts_count = this.running_jobs.size ();
             foreach (PropagatorJob propagator_job in this.running_jobs) {
                 if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
-                    connect (
-                        propagator_job, PropagatorJob.signal_abort_finished,
-                        this, PropagatorCompositeJob.on_signal_sub_job_abort_finished
+                    propagator_job.signal_abort_finished.connect (
+                        this.on_signal_sub_job_abort_finished
                     );
                 }
                 propagator_job.abort (abort_type);
@@ -157,8 +156,8 @@ public class PropagatorCompositeJob : PropagatorJob {
     ***********************************************************/
     public new int64 committed_disk_space () {
         int64 needed = 0;
-        foreach (PropagatorJob job in this.running_jobs) {
-            needed += job.committed_disk_space ();
+        foreach (PropagatorJob propagator_job in this.running_jobs) {
+            needed += propagator_job.committed_disk_space ();
         }
         return needed;
     }
@@ -181,9 +180,8 @@ public class PropagatorCompositeJob : PropagatorJob {
     ***********************************************************/
     private bool on_signal_possibly_run_next_job (PropagatorJob next_propagator_job) {
         if (next_propagator_job.state == NotYetStarted) {
-            connect (
-                next_propagator_job, PropagatorJob.on_signal_finished,
-                this, PropagatorCompositeJob.on_signal_sub_job_finished
+            next_propagator_job.signal_finished.connect (
+                this.on_signal_next_propagator_job_finished
             );
         }
         return next_propagator_job.on_signal_schedule_self_or_child ();
@@ -192,7 +190,7 @@ public class PropagatorCompositeJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_sub_job_finished (SyncFileItem.Status status) {
+    private void on_signal_next_propagator_job_finished (SyncFileItem.Status status) {
         var sub_job = static_cast<PropagatorJob> (sender ());
         //  ASSERT (sub_job);
 
@@ -215,7 +213,7 @@ public class PropagatorCompositeJob : PropagatorJob {
         if (this.jobs_to_do == "" && this.tasks_to_do == "" && this.running_jobs == "") {
             on_signal_finalize ();
         } else {
-            propagator ().schedule_next_job ();
+            this.propagator.schedule_next_job ();
         }
     }
 
@@ -229,7 +227,7 @@ public class PropagatorCompositeJob : PropagatorJob {
             return;
 
         this.state = Finished;
-        /* emit */ finished (this.has_error == SyncFileItem.Status.NO_STATUS ? SyncFileItem.Status.SUCCESS : this.has_error);
+        /* emit */ signal_finished (this.has_error == SyncFileItem.Status.NO_STATUS ? SyncFileItem.Status.SUCCESS : this.has_error);
     }
 
 } // class PropagatorCompositeJob

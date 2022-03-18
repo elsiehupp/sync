@@ -97,7 +97,7 @@ public class SqlQuery {
                 rc = sqlite3_prepare_v2 (this.database, this.sql.const_data (), -1, this.stmt, null);
                 if ( (rc == SQLITE_BUSY) || (rc == SQLITE_LOCKED)) {
                     n++;
-                    Occ.Utility.usleep (SQLITE_SLEEP_TIME_USEC);
+                    Utility.usleep (SQLITE_SLEEP_TIME_USEC);
                 }
             } while ( (n < SQLITE_REPEAT_COUNT) && ( (rc == SQLITE_BUSY) || (rc == SQLITE_LOCKED)));
             this.err_id = rc;
@@ -207,9 +207,9 @@ public class SqlQuery {
                 if (rc == SQLITE_LOCKED) {
                     rc = sqlite3_reset (this.stmt); // This will also return SQLITE_LOCKED
                     n++;
-                    Occ.Utility.usleep (SQLITE_SLEEP_TIME_USEC);
+                    Utility.usleep (SQLITE_SLEEP_TIME_USEC);
                 } else if (rc == SQLITE_BUSY) {
-                    Occ.Utility.usleep (SQLITE_SLEEP_TIME_USEC);
+                    Utility.usleep (SQLITE_SLEEP_TIME_USEC);
                     n++;
                 }
             } while ( (n < SQLITE_REPEAT_COUNT) && ( (rc == SQLITE_BUSY) || (rc == SQLITE_LOCKED)));
@@ -253,7 +253,7 @@ public class SqlQuery {
             if (n < SQLITE_REPEAT_COUNT && first_step && (this.err_id == SQLITE_LOCKED || this.err_id == SQLITE_BUSY)) {
                 sqlite3_reset (this.stmt); // not necessary after sqlite version 3.6.23.1
                 n++;
-                Occ.Utility.usleep (SQLITE_SLEEP_TIME_USEC);
+                Utility.usleep (SQLITE_SLEEP_TIME_USEC);
             } else {
                 break;
             }

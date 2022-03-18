@@ -90,7 +90,7 @@ public class Systray : QSystemTrayIcon {
     
             this.tray_engine.add_import_path ("qrc:/qml/theme");
             this.tray_engine.add_ImageProvider ("avatars", new ImageProvider ());
-            this.tray_engine.add_ImageProvider ("svgimage-custom-color", new Occ.Ui.SvgImageProvider ());
+            this.tray_engine.add_ImageProvider ("svgimage-custom-color", new Ui.SvgImageProvider ());
             this.tray_engine.add_ImageProvider ("unified-search-result-icon", new UnifiedSearchResultImageProvider ());
         }
     }
@@ -237,7 +237,7 @@ public class Systray : QSystemTrayIcon {
     public void create () {
         if (this.tray_engine) {
             if (!AccountManager.instance.accounts () == "") {
-                this.tray_engine.root_context ().context_property ("activity_model", UserModel.instance.current_activity_model ());
+                this.tray_engine.root_context ().context_property ("activity_model", UserModel.instance.current_activity_model);
             }
             this.tray_engine.on_signal_load ("qrc:/qml/src/gui/tray/Window.qml");
         }
@@ -355,7 +355,7 @@ public class Systray : QSystemTrayIcon {
     public void on_signal_new_user_selected () {
         if (this.tray_engine) {
             // Change Activity_model
-            this.tray_engine.root_context ().context_property ("activity_model", UserModel.instance.current_activity_model ());
+            this.tray_engine.root_context ().context_property ("activity_model", UserModel.instance.current_activity_model);
         }
 
         // Rebuild App list

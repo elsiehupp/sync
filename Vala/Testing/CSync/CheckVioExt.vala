@@ -154,7 +154,7 @@ public class CheckVioExt {
         dh = csync_vio_local_opendir (directory);
         assert_non_null (dh);
 
-        Occ.Vfs vfs = null;
+        Vfs vfs = null;
         while ( (dirent = csync_vio_local_readdir (dh, vfs)) ) {
             assert_non_null (dirent.get ());
             if (!dirent.original_path == "") {

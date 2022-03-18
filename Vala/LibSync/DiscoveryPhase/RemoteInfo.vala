@@ -21,7 +21,7 @@ public class RemoteInfo : Glib.Object {
     string etag;
     string file_identifier;
     string checksum_header;
-    Occ.RemotePermissions remote_perm;
+    RemotePermissions remote_perm;
     time_t modtime = 0;
     int64 size = 0;
     int64 size_of_folder = 0;

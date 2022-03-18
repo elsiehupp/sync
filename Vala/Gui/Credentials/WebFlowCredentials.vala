@@ -84,7 +84,7 @@ public class WebFlowCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public override QNetworkAccessManager create_qnam () {
+    public override QNetworkAccessManager create_access_manager () {
         GLib.info ("Getting QNAM");
         AccessManager access_manager = new WebFlowCredentialsAccessManager (this);
 
@@ -168,7 +168,7 @@ public class WebFlowCredentials : AbstractCredentials {
         // indirectly) from QNetworkAccessManagerPrivate.signal_authentication_required, which itself
         // is a called from a BlockingQueuedConnection from the Qt HTTP thread. And clearing the
         // cache needs to synchronize again with the HTTP thread.
-        GLib.Timeout.single_shot (0, this.account, Account.on_signal_clear_qnam_cache);
+        GLib.Timeout.single_shot (0, this.account, Account.on_signal_clear_access_manager_cache);
     }
 
 

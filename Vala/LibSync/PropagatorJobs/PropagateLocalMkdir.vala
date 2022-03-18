@@ -33,7 +33,7 @@ public class PropagateLocalMkdir : PropagateItemJob {
     /***********************************************************
     ***********************************************************/
     public new void start () {
-        if (propagator ().abort_requested)
+        if (this.propagator.abort_requested)
             return;
 
         start_local_mkdir ();
@@ -43,7 +43,7 @@ public class PropagateLocalMkdir : PropagateItemJob {
     /***********************************************************
     ***********************************************************/
     private void start_local_mkdir () {
-        GLib.Dir new_dir = new GLib.Dir (propagator ().full_local_path (this.item.file));
+        GLib.Dir new_dir = new GLib.Dir (this.propagator.full_local_path (this.item.file));
         string new_dir_str = GLib.Dir.to_native_separators (new_dir.path ());
 
         // When turning something that used to be a file into a directory
@@ -60,20 +60,20 @@ public class PropagateLocalMkdir : PropagateItemJob {
                 }
             } else if (this.item.instruction == SyncInstructions.CONFLICT) {
                 string error;
-                if (!propagator ().create_conflict (this.item, this.associated_composite, error)) {
+                if (!this.propagator.create_conflict (this.item, this.associated_composite, error)) {
                     on_signal_done (SyncFileItem.Status.SOFT_ERROR, error);
                     return;
                 }
             }
         }
 
-        if (Utility.fs_case_preserving () && propagator ().local_filename_clash (this.item.file)) {
+        if (Utility.fs_case_preserving () && this.propagator.local_filename_clash (this.item.file)) {
             GLib.warning ("New folder to create locally already exists with different case:" + this.item.file);
             on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Attention, possible case sensitivity clash with %1").printf (new_dir_str));
             return;
         }
-        /* emit */ propagator ().signal_touched_file (new_dir_str);
-        GLib.Dir local_dir = new GLib.Dir (propagator ().local_path ());
+        /* emit */ this.propagator.signal_touched_file (new_dir_str);
+        GLib.Dir local_dir = new GLib.Dir (this.propagator.local_path ());
         if (!local_dir.mkpath (this.item.file)) {
             on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Could not create folder %1").printf (new_dir_str));
             return;
@@ -86,7 +86,7 @@ public class PropagateLocalMkdir : PropagateItemJob {
         // before the correct etag is stored.
         SyncFileItem signal_new_item = new SyncFileItem (this.item);
         signal_new_item.etag = "this.invalid_";
-        var result = propagator ().update_metadata (signal_new_item);
+        var result = this.propagator.update_metadata (signal_new_item);
         if (!result) {
             on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error ()));
             return;
@@ -94,7 +94,7 @@ public class PropagateLocalMkdir : PropagateItemJob {
             on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").printf (signal_new_item.file));
             return;
         }
-        propagator ().journal.commit ("local_mkdir");
+        this.propagator.journal.commit ("local_mkdir");
 
         var result_status = this.item.instruction == SyncInstructions.CONFLICT
             ? SyncFileItem.Status.CONFLICT

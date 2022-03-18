@@ -135,7 +135,7 @@ public class PropagatorJob : GLib.Object {
     public virtual bool on_signal_schedule_self_or_child ();
 
 
-    protected OwncloudPropagator propagator () {
+    protected OwncloudPropagator this.propagator {
         return qobject_cast<OwncloudPropagator> (parent ());
     }
 

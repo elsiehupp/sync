@@ -19,10 +19,10 @@ public class TestUnifiedSearchListmodel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public FakeQNAM fake_qnam;
-    public unowned Occ.Account account;
-    public Occ.AccountState account_state;
-    public Occ.UnifiedSearchResultsListModel model;
+    public FakeQNAM fake_access_manager;
+    public unowned Account account;
+    public AccountState account_state;
+    public UnifiedSearchResultsListModel model;
     public QAbstractItemModelTester model_tester;
 
     /***********************************************************
@@ -36,18 +36,18 @@ public class TestUnifiedSearchListmodel : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_init_test_case () {
-        fake_qnam.on_signal_reset (new FakeQNAM ({}));
-        account = Occ.Account.create ();
-        account.set_credentials (new FakeCredentials (fake_qnam));
+        fake_access_manager.on_signal_reset (new FakeQNAM ({}));
+        account = Account.create ();
+        account.set_credentials (new FakeCredentials (fake_access_manager));
         account.set_url (GLib.Uri ("http://example.de"));
 
-        account_state.on_signal_reset (new Occ.AccountState (account));
+        account_state.on_signal_reset (new AccountState (account));
 
-        fake_qnam.set_override (
+        fake_access_manager.set_override (
             this.init_test_case_override_delegate
         );
 
-        model.on_signal_reset (new Occ.UnifiedSearchResultsListModel (account_state));
+        model.on_signal_reset (new UnifiedSearchResultsListModel (account_state));
 
         model_tester.on_signal_reset (new QAbstractItemModelTester (model));
 
@@ -75,7 +75,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
         // handle fetch of providers list
         if (path.starts_with ("/ocs/v2.php/search/providers") && search_term == "") {
             reply = new FakePayloadReply (operation, request,
-                FakeSearchResultsStorage.instance.fake_providers_response_json (), fake_qnam);
+                FakeSearchResultsStorage.instance.fake_providers_response_json (), fake_access_manager);
         // handle search for provider
         } else if (path.starts_with ("/ocs/v2.php/search/providers") && !search_term == "") {
             var path_split = path.mid ("/ocs/v2.php/search/providers".size ())
@@ -84,7 +84,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
             if (!path_split == "" && path.contains (path_split.first ())) {
                 reply = new FakePayloadReply (operation, request,
                     FakeSearchResultsStorage.instance.query_provider (path_split.first (), search_term, cursor),
-                    SEARCH_RESULTS_REPLY_DELAY, fake_qnam);
+                    SEARCH_RESULTS_REPLY_DELAY, fake_access_manager);
             }
         }
 
@@ -104,7 +104,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
         GLib.assert_true (model.row_count () == 0);
 
         // #1 test set_search_term actually sets the search term and the signal is emitted
-        QSignalSpy search_term_changed = new QSignalSpy (model, Occ.UnifiedSearchResultsListModel.search_term_changed);
+        QSignalSpy search_term_changed = new QSignalSpy (model, UnifiedSearchResultsListModel.search_term_changed);
         model.set_search_term ("dis");
         GLib.assert_true (search_term_changed.count () == 1);
         GLib.assert_true (model.search_term () == "dis");
@@ -119,7 +119,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
         GLib.assert_true (!model.is_search_in_progress ());
 
         // #4 test that model has started the search after specific delay
-        QSignalSpy search_in_progress_changed = new QSignalSpy (model, &Occ.UnifiedSearchResultsListModel.is_search_in_progress_changed);
+        QSignalSpy search_in_progress_changed = new QSignalSpy (model, &UnifiedSearchResultsListModel.is_search_in_progress_changed);
         // allow search jobs to get created within the model
         GLib.assert_true (search_in_progress_changed.wait ());
         GLib.assert_true (search_in_progress_changed.count () == 1);
@@ -142,7 +142,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
         model.set_search_term (model.search_term () + "discuss");
 
         QSignalSpy search_in_progress_changed = new QSignalSpy (
-            model, Occ.UnifiedSearchResultsListModel.is_search_in_progress_changed);
+            model, UnifiedSearchResultsListModel.is_search_in_progress_changed);
 
         GLib.assert_true (search_in_progress_changed.wait ());
 
@@ -170,7 +170,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
         model.set_search_term (model.search_term () + "[empty]");
 
         QSignalSpy search_in_progress_changed = new QSignalSpy (
-            model, Occ.UnifiedSearchResultsListModel.is_search_in_progress_changed);
+            model, UnifiedSearchResultsListModel.is_search_in_progress_changed);
 
         GLib.assert_true (search_in_progress_changed.wait ());
 
@@ -195,7 +195,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
         GLib.assert_true (model.row_count () == 0);
 
         QSignalSpy search_in_progress_changed = new QSignalSpy (
-            model, Occ.UnifiedSearchResultsListModel.is_search_in_progress_changed);
+            model, UnifiedSearchResultsListModel.is_search_in_progress_changed);
 
         // test that search term gets set, search gets started and enough results get returned
         model.set_search_term (model.search_term () + "whatever");
@@ -214,14 +214,14 @@ public class TestUnifiedSearchListmodel : GLib.Object {
 
         // test fetch more results
         QSignalSpy current_fetch_more_in_progress_provider_id_changed = new QSignalSpy (
-            model, &Occ.UnifiedSearchResultsListModel.current_fetch_more_in_progress_provider_id_changed);
-        QSignalSpy rows_inserted = new QSignalSpy (model, &Occ.UnifiedSearchResultsListModel.rows_inserted);
+            model, &UnifiedSearchResultsListModel.current_fetch_more_in_progress_provider_id_changed);
+        QSignalSpy rows_inserted = new QSignalSpy (model, &UnifiedSearchResultsListModel.rows_inserted);
         for (int i = 0; i < model.row_count (); ++i) {
-            var type = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.TypeRole);
+            var type = model.data (model.index (i), UnifiedSearchResultsListModel.DataRole.TypeRole);
 
-            if (type == Occ.UnifiedSearchResult.Type.FetchMoreTrigger) {
+            if (type == UnifiedSearchResult.Type.FetchMoreTrigger) {
                 var provider_id =
-                    model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.ProviderIdRole)
+                    model.data (model.index (i), UnifiedSearchResultsListModel.DataRole.ProviderIdRole)
                         .to_string ();
                 model.fetch_more_trigger_clicked (provider_id);
                 break;
@@ -257,7 +257,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
             current_fetch_more_in_progress_provider_id_changed.clear ();
             rows_inserted.clear ();
 
-            QSignalSpy rows_removed = new QSignalSpy (model, &Occ.UnifiedSearchResultsListModel.rows_removed);
+            QSignalSpy rows_removed = new QSignalSpy (model, &UnifiedSearchResultsListModel.rows_removed);
 
             for (int i = 0; i < 10; ++i) {
                 model.fetch_more_trigger_clicked (provider_id_fetch_more_triggered);
@@ -274,10 +274,10 @@ public class TestUnifiedSearchListmodel : GLib.Object {
             bool is_fetch_more_trigger_found = false;
 
             for (int i = 0; i < model.row_count (); ++i) {
-                var type = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.TypeRole);
-                var provider_id =  model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.ProviderIdRole)
+                var type = model.data (model.index (i), UnifiedSearchResultsListModel.DataRole.TypeRole);
+                var provider_id =  model.data (model.index (i), UnifiedSearchResultsListModel.DataRole.ProviderIdRole)
                             .to_string ();
-                if (type == Occ.UnifiedSearchResult.Type.FetchMoreTrigger
+                if (type == UnifiedSearchResult.Type.FetchMoreTrigger
                     && provider_id == provider_id_fetch_more_triggered) {
                     is_fetch_more_trigger_found = true;
                     break;
@@ -300,7 +300,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
         model.set_search_term (model.search_term () + "discuss");
 
         QSignalSpy search_in_progress_changed = new QSignalSpy (
-            model, Occ.UnifiedSearchResultsListModel.is_search_in_progress_changed);
+            model, UnifiedSearchResultsListModel.is_search_in_progress_changed);
 
         GLib.assert_true (search_in_progress_changed.wait ());
 
@@ -324,13 +324,13 @@ public class TestUnifiedSearchListmodel : GLib.Object {
         string url_for_clicked_result;
 
         for (int i = 0; i < model.row_count (); ++i) {
-            var type = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.TypeRole);
+            var type = model.data (model.index (i), UnifiedSearchResultsListModel.DataRole.TypeRole);
 
-            if (type == Occ.UnifiedSearchResult.Type.DEFAULT) {
+            if (type == UnifiedSearchResult.Type.DEFAULT) {
                 var provider_id =
-                    model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.ProviderIdRole)
+                    model.data (model.index (i), UnifiedSearchResultsListModel.DataRole.ProviderIdRole)
                         .to_string ();
-                url_for_clicked_result = model.data (model.index (i), Occ.UnifiedSearchResultsListModel.DataRole.ResourceUrlRole).to_string ();
+                url_for_clicked_result = model.data (model.index (i), UnifiedSearchResultsListModel.DataRole.ResourceUrlRole).to_string ();
 
                 if (!provider_id == "" && !url_for_clicked_result == "") {
                     model.signal_result_clicked (provider_id, GLib.Uri (url_for_clicked_result));
@@ -356,9 +356,9 @@ public class TestUnifiedSearchListmodel : GLib.Object {
         model.set_search_term ("");
         GLib.assert_true (model.row_count () == 0);
 
-        QSignalSpy error_string_changed = new QSignalSpy (model, &Occ.UnifiedSearchResultsListModel.error_string_changed);
+        QSignalSpy error_string_changed = new QSignalSpy (model, &UnifiedSearchResultsListModel.error_string_changed);
         QSignalSpy search_in_progress_changed = new QSignalSpy (
-            model, &Occ.UnifiedSearchResultsListModel.is_search_in_progress_changed);
+            model, &UnifiedSearchResultsListModel.is_search_in_progress_changed);
 
         model.set_search_term (model.search_term () + "[HTTP500]");
 

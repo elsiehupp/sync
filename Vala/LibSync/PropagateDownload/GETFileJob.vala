@@ -76,7 +76,7 @@ public class GETFileJob : AbstractNetworkJob {
 
 
     internal signal void signal_finished ();
-    internal signal void download_progress (int64 value1, int64 value2);
+    internal signal void signal_download_progress (int64 value1, int64 value2);
 
 
     /***********************************************************
@@ -163,9 +163,8 @@ public class GETFileJob : AbstractNetworkJob {
             this.bandwidth_manager.on_signal_register_download_job (this);
         }
 
-        connect (
-            this, AbstractNetworkJob.signal_network_activity,
-            account, Account.signal_propagator_network_activity
+        this.signal_network_activity.connect (
+            account.signal_propagator_network_activity
         );
 
         AbstractNetworkJob.start ();
@@ -208,21 +207,17 @@ public class GETFileJob : AbstractNetworkJob {
     public void new_reply_hook (GLib.InputStream input_stream) {
         input_stream.read_buffer_size (16 * 1024); // keep low so we can easier limit the bandwidth
 
-        connect (
-            input_stream, Soup.Reply.meta_data_changed,
-            this, GETFileJob.on_signal_meta_data_changed
+        input_stream.meta_data_changed.connect (
+            this.on_signal_meta_data_changed
         );
-        connect (
-            input_stream, QIODevice.ready_read,
-            this, GETFileJob.on_signal_ready_read
+        input_stream.ready_read.connect (
+            this.on_signal_ready_read
         );
-        connect (
-            input_stream, Soup.Reply.on_signal_finished,
-            this, GETFileJob.on_signal_ready_read
+        input_stream.signal_finished.connect (
+            this.on_signal_ready_read
         );
-        connect (
-            input_stream, Soup.Reply.download_progress,
-            this, GETFileJob.download_progress
+        input_stream.signal_download_progress.connect (
+            this.on_signal_download_progress
         );
     }
 
@@ -380,7 +375,7 @@ public class GETFileJob : AbstractNetworkJob {
             // Redirects and auth failures (oauth token renew) are handled by AbstractNetworkJob and
             // will end up restarting the job. We do not want to process further data from the initial
             // request. new_reply_hook () will reestablish signal connections for the follow-up request.
-            bool ok = disconnect (this.input_stream, Soup.Reply.on_signal_finished, this, GETFileJob.on_signal_ready_read)
+            bool ok = disconnect (this.input_stream, Soup.Reply.signal_finished, this, GETFileJob.on_signal_ready_read)
                 && disconnect (this.input_stream, Soup.Reply.ready_read, this, GETFileJob.on_signal_ready_read);
             //  ASSERT (ok);
             return;

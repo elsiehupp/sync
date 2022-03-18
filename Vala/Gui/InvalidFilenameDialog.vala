@@ -116,8 +116,8 @@ public class InvalidFilenameDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void on_signal_move_job_finished () {
-        const var job = qobject_cast<MoveJob> (sender ());
-        const var error = job.reply ().error ();
+        const var move_job = qobject_cast<MoveJob> (sender ());
+        const var error = move_job.reply ().error ();
 
         if (error != Soup.Reply.NoError) {
             this.ui.error_label.on_signal_text (_("Could not rename file. Please make sure you are connected to the server."));

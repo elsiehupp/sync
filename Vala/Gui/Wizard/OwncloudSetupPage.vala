@@ -41,7 +41,7 @@ public class OwncloudSetupPage : QWizardPage {
     ***********************************************************/
     private QProgressIndicator progress_indicator;
     private OwncloudWizard oc_wizard;
-    private AddCertificateDialog add_cert_dial = null;
+    private AddCertificateDialog add_certificate_dialog = null;
 
 
     internal signal void determine_auth_type (string value);
@@ -78,19 +78,16 @@ public class OwncloudSetupPage : QWizardPage {
 
         on_signal_url_changed (""); // don't jitter UI
 
-        connect (
-            this.ui.le_url, QLineEdit.text_changed,
-            this, OwncloudSetupPage.on_signal_url_changed
+        this.ui.le_url.text_changed.connect (
+            this.on_signal_url_changed
         );
-        connect (
-            this.ui.le_url, QLineEdit.editing_finished,
-            this, OwncloudSetupPage.on_signal_url_edit_finished
+        this.ui.le_url.editing_finished.connect (
+            this.on_signal_url_edit_finished
         );
 
-        add_cert_dial = new AddCertificateDialog (this);
-        connect (
-            add_cert_dial, Gtk.Dialog.accepted,
-            this, OwncloudSetupPage.on_signal_certificate_accepted
+        add_certificate_dialog = new AddCertificateDialog (this);
+        add_certificate_dialog.accepted.connect (
+            this.on_signal_certificate_accepted
         );
     }
 
@@ -257,7 +254,7 @@ public class OwncloudSetupPage : QWizardPage {
                         wizard ().next ();
                     } break;
                     case OwncloudConnectionMethodDialog.Method.CLIENT_SIDE_TLS:
-                        add_cert_dial.show ();
+                        add_certificate_dialog.show ();
                         break;
                     case OwncloudConnectionMethodDialog.Method.CLOSED:
                     case OwncloudConnectionMethodDialog.Method.BACK:
@@ -299,10 +296,10 @@ public class OwncloudSetupPage : QWizardPage {
     Called during the validation of the client certificate.
     ***********************************************************/
     public void on_signal_certificate_accepted () {
-        GLib.File cert_file = new GLib.File (add_cert_dial.certificate_path ());
+        GLib.File cert_file = new GLib.File (add_certificate_dialog.certificate_path ());
         cert_file.open (GLib.File.ReadOnly);
         string cert_data = cert_file.read_all ();
-        string cert_password = add_cert_dial.certificate_password ().to_local8Bit ();
+        string cert_password = add_certificate_dialog.certificate_password ().to_local8Bit ();
 
         QBuffer cert_data_buffer = new QBuffer (cert_data);
         cert_data_buffer.open (QIODevice.ReadOnly);
@@ -312,13 +309,13 @@ public class OwncloudSetupPage : QWizardPage {
             this.oc_wizard.client_cert_bundle = cert_data;
             this.oc_wizard.client_cert_password = cert_password;
 
-            add_cert_dial.reinit (); // FIXME: Why not just have this only created on use?
+            add_certificate_dialog.reinit (); // FIXME: Why not just have this only created on use?
 
             // The extracted SSL key and cert gets added to the QSslConfiguration in check_server ()
             validate_page ();
         } else {
-            add_cert_dial.show_error_message (_("Could not load certificate. Maybe wrong password?"));
-            add_cert_dial.show ();
+            add_certificate_dialog.show_error_message (_("Could not load certificate. Maybe wrong password?"));
+            add_certificate_dialog.show ();
         }
     }
 

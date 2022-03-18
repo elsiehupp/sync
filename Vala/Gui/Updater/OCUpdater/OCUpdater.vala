@@ -153,10 +153,7 @@ public class OCUpdater : Updater {
 
             message_box_start_installer.attribute (Qt.WA_DeleteOnClose);
 
-            connect (
-                message_box_start_installer,
-                Gtk.MessageBox.on_signal_finished,
-                this,
+            message_box_start_installer.signal_finished.connect (
                 this.on_signal_start_installer
             );
             message_box_start_installer.open ();
@@ -169,14 +166,12 @@ public class OCUpdater : Updater {
     ***********************************************************/
     public override void check_for_update () {
         Soup.Reply reply = this.access_manager.get (Soup.Request (this.update_url));
-        connect (
-            this.timeout_watchdog, GLib.Timeout.timeout,
-            this, OCUpdater.on_signal_timed_out
+        this.timeout_watchdog.timeout.connect (
+            this.on_signal_timed_out
         );
         this.timeout_watchdog.on_signal_start (30 * 1000);
-        connect (
-            reply, Soup.Reply.on_signal_finished,
-            this, OCUpdater.on_signal_version_info_arrived
+        reply.signal_finished.connect (
+            this.on_signal_version_info_arrived
         );
 
         download_state (DownloadState.CHECKING_SERVER);
@@ -349,7 +344,7 @@ public class OCUpdater : Updater {
 
     /***********************************************************
     ***********************************************************/
-    protected QNetworkAccessManager qnam () {
+    protected QNetworkAccessManager access_manager () {
         return this.access_manager;
     }
 

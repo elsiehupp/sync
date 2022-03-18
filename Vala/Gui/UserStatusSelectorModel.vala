@@ -5,7 +5,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 ***********************************************************/
 
 //  #include <ocsuserstatusconnector.h>
-//  #include <qnamespace.h>
+//  #include <access_managerespace.h>
 //  #include <userstatusconnector.h>
 //  #include <theme.h>
 //  #include <QLoggingCa
@@ -64,7 +64,7 @@ public class UserStatusSelectorModel : GLib.Object {
     internal signal void online_status_changed ();
     internal signal void clear_at_changed ();
     internal signal void predefined_statuses_changed ();
-    internal signal void on_signal_finished ();
+    internal signal void signal_finished ();
         
 
     /***********************************************************
@@ -343,7 +343,7 @@ public class UserStatusSelectorModel : GLib.Object {
                 &UserStatusSelectorModel.on_signal_user_status_fetched);
             disconnect (this.user_status_connector.get (), UserStatusConnector.signal_predefined_statuses_fetched, this,
                 &UserStatusSelectorModel.on_signal_predefined_statuses_fetched);
-            disconnect (this.user_status_connector.get (), UserStatusConnector.error, this,
+            disconnect (this.user_status_connector.get (), UserStatusConnector.signal_error, this,
                 &UserStatusSelectorModel.on_signal_error);
             disconnect (this.user_status_connector.get (), UserStatusConnector.signal_user_status_set, this,
                 &UserStatusSelectorModel.on_signal_user_status_set);
@@ -386,14 +386,14 @@ public class UserStatusSelectorModel : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_user_status_set () {
-        /* emit */ finished ();
+        /* emit */ signal_finished ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_signal_message_cleared () {
-        /* emit */ finished ();
+        /* emit */ signal_finished ();
     }
 
 

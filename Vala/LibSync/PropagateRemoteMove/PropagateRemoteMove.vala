@@ -15,7 +15,7 @@ namespace LibSync {
 ***********************************************************/
 public class PropagateRemoteMove : PropagateItemJob {
 
-    QPointer<MoveJob> job;
+    MoveJob move_job;
 
     /***********************************************************
     ***********************************************************/
@@ -27,14 +27,14 @@ public class PropagateRemoteMove : PropagateItemJob {
     /***********************************************************
     ***********************************************************/
     public new void start () {
-        if (propagator ().abort_requested) {
+        if (this.propagator.abort_requested) {
             return;
         }
 
-        string origin = propagator ().adjust_renamed_path (this.item.file);
+        string origin = this.propagator.adjust_renamed_path (this.item.file);
         GLib.debug (origin + this.item.rename_target);
 
-        string target_file = propagator ().full_local_path (this.item.rename_target);
+        string target_file = this.propagator.full_local_path (this.item.rename_target);
 
         if (origin == this.item.rename_target) {
             // The parent has been renamed already so there is nothing more to do.
@@ -43,14 +43,14 @@ public class PropagateRemoteMove : PropagateItemJob {
                 // when renaming non-encrypted folder that contains encrypted folder, nested files of its encrypted folder are incorrectly displayed in the Settings dialog
                 // encrypted name is displayed instead of a local folder name, unless the sync folder is removed, then added again and re-synced
                 // we are fixing it by modifying the "this.encrypted_filename" in such a way so it will have a renamed root path at the beginning of it as expected
-                // corrected "this.encrypted_filename" is later used in propagator ().update_metadata () call that will update the record in the Sync journal DB
+                // corrected "this.encrypted_filename" is later used in this.propagator.update_metadata () call that will update the record in the Sync journal DB
 
                 var path = this.item.file;
                 var slash_position = path.last_index_of ("/");
                 var parent_path = slash_position >= 0 ? path.left (slash_position): "";
 
                 SyncJournalFileRecord parent_rec;
-                bool ok = propagator ().journal.get_file_record (parent_path, parent_rec);
+                bool ok = this.propagator.journal.get_file_record (parent_path, parent_rec);
                 if (!ok) {
                     on_signal_done (SyncFileItem.Status.NORMAL_ERROR);
                     return;
@@ -70,10 +70,10 @@ public class PropagateRemoteMove : PropagateItemJob {
             return;
         }
 
-        string remote_source = propagator ().full_remote_path (origin);
-        string remote_destination = GLib.Dir.clean_path (propagator ().account.dav_url ().path () + propagator ().full_remote_path (this.item.rename_target));
+        string remote_source = this.propagator.full_remote_path (origin);
+        string remote_destination = GLib.Dir.clean_path (this.propagator.account.dav_url ().path () + this.propagator.full_remote_path (this.item.rename_target));
 
-        var vfs = propagator ().sync_options.vfs;
+        var vfs = this.propagator.sync_options.vfs;
         var itype = this.item.type;
         //  ASSERT (itype != ItemType.VIRTUAL_FILE_DOWNLOAD && itype != ItemType.VIRTUAL_FILE_DEHYDRATION);
         if (vfs.mode () == Vfs.WithSuffix && itype != ItemType.DIRECTORY) {
@@ -111,8 +111,8 @@ public class PropagateRemoteMove : PropagateItemJob {
                 folder_target_alt.chop (suffix.size ());
             }
 
-            string local_target = propagator ().full_local_path (folder_target);
-            string local_target_alt = propagator ().full_local_path (folder_target_alt);
+            string local_target = this.propagator.full_local_path (folder_target);
+            string local_target_alt = this.propagator.full_local_path (folder_target_alt);
 
             // If the expected target doesn't exist but a file with different hydration
             // state does, rename the local file to bring it in line with what the discovery
@@ -132,23 +132,20 @@ public class PropagateRemoteMove : PropagateItemJob {
         }
         GLib.debug (remote_source + remote_destination);
 
-        this.job = new MoveJob (propagator ().account, remote_source, remote_destination, this);
-        connect (
-            this.job,
-            MoveJob.signal_finished,
-            this,
-            PropagateRemoteMove.on_signal_move_job_finished
+        this.move_job = new MoveJob (this.propagator.account, remote_source, remote_destination, this);
+        this.move_job.signal_finished.connect (
+            this.on_signal_move_job_finished
         );
-        propagator ().active_job_list.append (this);
-        this.job.start ();
+        this.propagator.active_job_list.append (this);
+        this.move_job.start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public new void abort (PropagatorJob.AbortType abort_type) {
-        if (this.job && this.job.reply ())
-            this.job.reply ().abort ();
+        if (this.move_job && this.move_job.reply ())
+            this.move_job.reply ().abort ();
 
         if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
             /* emit */ signal_abort_finished ();
@@ -197,19 +194,19 @@ public class PropagateRemoteMove : PropagateItemJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_move_job_finished () {
-        propagator ().active_job_list.remove_one (this);
+        this.propagator.active_job_list.remove_one (this);
 
-        //  ASSERT (this.job);
+        //  ASSERT (this.move_job);
 
-        Soup.Reply.NetworkError err = this.job.reply ().error ();
-        this.item.http_error_code = this.job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-        this.item.response_time_stamp = this.job.response_timestamp ();
-        this.item.request_id = this.job.request_id ();
+        Soup.Reply.NetworkError err = this.move_job.reply ().error ();
+        this.item.http_error_code = this.move_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        this.item.response_time_stamp = this.move_job.response_timestamp ();
+        this.item.request_id = this.move_job.request_id ();
 
         if (err != Soup.Reply.NoError) {
             SyncFileItem.Status status = classify_error (err, this.item.http_error_code,
-                propagator ().another_sync_needed);
-            on_signal_done (status, this.job.error_string ());
+                this.propagator.another_sync_needed);
+            on_signal_done (status, this.move_job.error_string ());
             return;
         }
 
@@ -220,7 +217,7 @@ public class PropagateRemoteMove : PropagateItemJob {
             on_signal_done (SyncFileItem.Status.NORMAL_ERROR,
                 _("Wrong HTTP code returned by server. Expected 201, but received \"%1 %2\".")
                     .printf (this.item.http_error_code)
-                    .printf (this.job.reply ().attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ()));
+                    .printf (this.move_job.reply ().attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ()));
             return;
         }
 
@@ -237,12 +234,12 @@ public class PropagateRemoteMove : PropagateItemJob {
         // The database is only queried to transfer the content checksum from the old
         // to the new record. It is not a problem to skip it here.
         SyncJournalFileRecord old_record;
-        propagator ().journal.get_file_record (this.item.original_file, old_record);
-        var vfs = propagator ().sync_options.vfs;
+        this.propagator.journal.get_file_record (this.item.original_file, old_record);
+        var vfs = this.propagator.sync_options.vfs;
         var pin_state = vfs.pin_state (this.item.original_file);
 
         // Delete old database data.
-        propagator ().journal.delete_file_record (this.item.original_file);
+        this.propagator.journal.delete_file_record (this.item.original_file);
         if (!vfs.pin_state (this.item.original_file, PinState.PinState.INHERITED)) {
             GLib.warning ("Could not set pin state of " + this.item.original_file + " to inherited.");
         }
@@ -258,7 +255,7 @@ public class PropagateRemoteMove : PropagateItemJob {
                 signal_new_item.size = old_record.file_size;
             }
         }
-        var result = propagator ().update_metadata (signal_new_item);
+        var result = this.propagator.update_metadata (signal_new_item);
         if (!result) {
             on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error ()));
             return;
@@ -273,14 +270,14 @@ public class PropagateRemoteMove : PropagateItemJob {
         }
 
         if (this.item.is_directory ()) {
-            propagator ().renamed_directories.insert (this.item.file, this.item.rename_target);
-            if (!adjust_selective_sync (propagator ().journal, this.item.file, this.item.rename_target)) {
+            this.propagator.renamed_directories.insert (this.item.file, this.item.rename_target);
+            if (!adjust_selective_sync (this.propagator.journal, this.item.file, this.item.rename_target)) {
                 on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error writing metadata to the database"));
                 return;
             }
         }
 
-        propagator ().journal.commit ("Remote Rename");
+        this.propagator.journal.commit ("Remote Rename");
         on_signal_done (SyncFileItem.Status.SUCCESS);
     }
 

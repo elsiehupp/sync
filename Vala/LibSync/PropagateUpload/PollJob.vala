@@ -45,12 +45,10 @@ public class PollJob : AbstractNetworkJob {
         GLib.Uri final_url = GLib.Uri.from_user_input (account_url.scheme () + "://" + account_url.authority ()
             + (path ().starts_with ("/") ? "" : "/") + path ());
         send_request ("GET", final_url);
-        connect (
-            this.input_stream, Soup.Reply.download_progress,
-            this, AbstractNetworkJob.reset_timeout,
-            Qt.UniqueConnection
+        this.input_stream.download_progress.connect (
+            this.on_signal_reset_timeout // Qt.UniqueConnection
         );
-        AbstractNetworkJob.start ();
+        base.start ();
     }
 
 

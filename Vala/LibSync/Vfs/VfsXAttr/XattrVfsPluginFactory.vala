@@ -11,7 +11,7 @@ public class XattrVfsPluginFactory : DefaultPluginFactory<VfsXAttr> {
 
     construct {
         Q_PLUGIN_METADATA (IID + "org.owncloud.PluginFactory" + FILE + "vfspluginmetadata.json");
-        Q_INTERFACES (Occ.PluginFactory);
+        Q_INTERFACES (PluginFactory);
     }
 
 }

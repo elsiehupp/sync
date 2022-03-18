@@ -20,16 +20,16 @@ public class TestSetUserStatusDialog : GLib.Object {
         const string user_status_id = "fake-identifier";
         const string user_status_message = "Some status";
         const string user_status_icon = "❤";
-        const Occ.UserStatus.OnlineStatus user_status_state = Occ.UserStatus.OnlineStatus.DoNotDisturb;
+        const UserStatus.OnlineStatus user_status_state = UserStatus.OnlineStatus.DoNotDisturb;
         const bool user_status_message_predefined = false;
-        Occ.Optional<Occ.ClearAt> user_status_clear_at; {
-            Occ.ClearAt clear_at;
-            clear_at.type = Occ.ClearAtType.Timestamp;
+        Optional<ClearAt> user_status_clear_at; {
+            ClearAt clear_at;
+            clear_at.type = ClearAtType.Timestamp;
             clear_at.timestamp = current_date_time.add_days (1).to_time_t ();
             user_status_clear_at = clear_at;
         }
 
-        const Occ.UserStatus user_status = new Occ.UserStatus (user_status_id, user_status_message,
+        const UserStatus user_status = new UserStatus (user_status_id, user_status_message,
             user_status_icon, user_status_state, user_status_message_predefined, user_status_clear_at);
 
         var fake_predefined_statuses = create_fake_predefined_statuses (create_date_time ());
@@ -39,7 +39,7 @@ public class TestSetUserStatusDialog : GLib.Object {
         fake_date_time_provider.set_current_date_time (current_date_time);
         fake_user_status_job.set_fake_user_status (user_status);
         fake_user_status_job.set_fake_predefined_statuses (fake_predefined_statuses);
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (fake_user_status_job, std.move (fake_date_time_provider));
+        UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job, std.move (fake_date_time_provider));
 
         // Was user status set correctly?
         GLib.assert_true (model.user_status_message () == user_status_message);
@@ -67,7 +67,7 @@ public class TestSetUserStatusDialog : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void test_ctor_no_status_set_show_sensible_defaults () {
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (null, null);
+        UserStatusSelectorModel model = new UserStatusSelectorModel (null, null);
 
         GLib.assert_true (model.user_status_message () == "");
         GLib.assert_true (model.user_status_emoji () == "😀");
@@ -80,10 +80,10 @@ public class TestSetUserStatusDialog : GLib.Object {
     private void test_ctor_fetch_status_but_no_status_set_show_sensible_defaults () {
         var fake_user_status_job = new FakeUserStatusConnector ();
         fake_user_status_job.set_fake_user_status ({ "", "", "",
-            Occ.UserStatus.OnlineStatus.Offline, false, {} });
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (fake_user_status_job);
+            UserStatus.OnlineStatus.Offline, false, {} });
+        UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
 
-        GLib.assert_true (model.online_status () == Occ.UserStatus.OnlineStatus.Online);
+        GLib.assert_true (model.online_status () == UserStatus.OnlineStatus.Online);
         GLib.assert_true (model.user_status_message () == "");
         GLib.assert_true (model.user_status_emoji () == "😀");
         GLib.assert_true (model.clear_at () == _("Don't clear"));
@@ -93,12 +93,12 @@ public class TestSetUserStatusDialog : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void test_set_online_status_emit_online_status_changed () {
-        const Occ.UserStatus.OnlineStatus online_status = Occ.UserStatus.OnlineStatus.Invisible;
+        const UserStatus.OnlineStatus online_status = UserStatus.OnlineStatus.Invisible;
         var fake_user_status_job = new FakeUserStatusConnector ();
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (fake_user_status_job);
+        UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
         QSignalSpy online_status_changed_spy = new QSignalSpy (
             model,
-            Occ.UserStatusSelectorModel.online_status_changed
+            UserStatusSelectorModel.online_status_changed
         );
 
         model.set_online_status (online_status);
@@ -111,15 +111,15 @@ public class TestSetUserStatusDialog : GLib.Object {
     ***********************************************************/
     private void test_set_user_status_set_custom_message_user_status_set_correct () {
         var fake_user_status_job = new FakeUserStatusConnector ();
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (fake_user_status_job);
+        UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
         QSignalSpy finished_spy = new QSignalSpy (
             model,
-            Occ.UserStatusSelectorModel.on_signal_finished
+            UserStatusSelectorModel.on_signal_finished
         );
 
         const string user_status_message = "Some status";
         const string user_status_icon = "❤";
-        const Occ.UserStatus.OnlineStatus user_status_state = Occ.UserStatus.OnlineStatus.Online;
+        const UserStatus.OnlineStatus user_status_state = UserStatus.OnlineStatus.Online;
 
         model.set_online_status (user_status_state);
         model.set_user_status_message (user_status_message);
@@ -136,7 +136,7 @@ public class TestSetUserStatusDialog : GLib.Object {
         GLib.assert_true (signal_user_status_set.message_predefined () == false);
         var clear_at = signal_user_status_set.clear_at ();
         GLib.assert_true (clear_at.is_valid ());
-        GLib.assert_true (clear_at.type == Occ.ClearAtType.Period);
+        GLib.assert_true (clear_at.type == ClearAtType.Period);
         GLib.assert_true (clear_at.period == 60 * 30);
     }
 
@@ -146,15 +146,15 @@ public class TestSetUserStatusDialog : GLib.Object {
     private void test_set_user_status_message_predefined_status_was_set_user_status_set_correct () {
         var fake_user_status_job = new FakeUserStatusConnector ();
         fake_user_status_job.set_fake_predefined_statuses (create_fake_predefined_statuses (create_date_time ()));
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (fake_user_status_job);
+        UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
         model.set_predefined_status (0);
         QSignalSpy finished_spy = new QSignalSpy (
             model,
-            Occ.UserStatusSelectorModel.on_signal_finished
+            UserStatusSelectorModel.on_signal_finished
         );
 
         const string user_status_message = "Some status";
-        const Occ.UserStatus.OnlineStatus user_status_state = Occ.UserStatus.OnlineStatus.Online;
+        const UserStatus.OnlineStatus user_status_state = UserStatus.OnlineStatus.Online;
 
         model.set_online_status (user_status_state);
         model.set_user_status_message (user_status_message);
@@ -169,7 +169,7 @@ public class TestSetUserStatusDialog : GLib.Object {
         GLib.assert_true (signal_user_status_set.message_predefined () == false);
         var clear_at = signal_user_status_set.clear_at ();
         GLib.assert_true (clear_at.is_valid ());
-        GLib.assert_true (clear_at.type == Occ.ClearAtType.Period);
+        GLib.assert_true (clear_at.type == ClearAtType.Period);
         GLib.assert_true (clear_at.period == 60 * 30);
     }
 
@@ -179,15 +179,15 @@ public class TestSetUserStatusDialog : GLib.Object {
     private void test_set_user_status_emoji_predefined_status_was_set_user_status_set_correct () {
         var fake_user_status_job = new FakeUserStatusConnector ();
         fake_user_status_job.set_fake_predefined_statuses (create_fake_predefined_statuses (create_date_time ()));
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (fake_user_status_job);
+        UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
         model.set_predefined_status (0);
         QSignalSpy finished_spy = new QSignalSpy (
             model,
-            Occ.UserStatusSelectorModel.on_signal_finished
+            UserStatusSelectorModel.on_signal_finished
         );
 
         const string user_status_icon = "❤";
-        const Occ.UserStatus.OnlineStatus user_status_state = Occ.UserStatus.OnlineStatus.Online;
+        const UserStatus.OnlineStatus user_status_state = UserStatus.OnlineStatus.Online;
 
         model.set_online_status (user_status_state);
         model.set_user_status_emoji (user_status_icon);
@@ -202,7 +202,7 @@ public class TestSetUserStatusDialog : GLib.Object {
         GLib.assert_true (signal_user_status_set.message_predefined () == false);
         var clear_at = signal_user_status_set.clear_at ();
         GLib.assert_true (clear_at.is_valid ());
-        GLib.assert_true (clear_at.type == Occ.ClearAtType.Period);
+        GLib.assert_true (clear_at.type == ClearAtType.Period);
         GLib.assert_true (clear_at.period == 60 * 30);
     }
 
@@ -216,18 +216,18 @@ public class TestSetUserStatusDialog : GLib.Object {
         fake_date_time_provider.set_current_date_time (current_time);
         var fake_predefined_statuses = create_fake_predefined_statuses (current_time);
         fake_user_status_job.set_fake_predefined_statuses (fake_predefined_statuses);
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (
+        UserStatusSelectorModel model = new UserStatusSelectorModel (
             std.move (fake_user_status_job),
             std.move (fake_date_time_provider)
         );
 
         QSignalSpy user_status_changed_spy = new QSignalSpy (
             model,
-            Occ.UserStatusSelectorModel.user_status_changed
+            UserStatusSelectorModel.user_status_changed
         );
         QSignalSpy clear_at_changed_spy = new QSignalSpy (
             model,
-            Occ.UserStatusSelectorModel.clear_at_changed
+            UserStatusSelectorModel.clear_at_changed
         );
 
         var fake_predefined_user_status_index = 0;
@@ -249,10 +249,10 @@ public class TestSetUserStatusDialog : GLib.Object {
     ***********************************************************/
     private void test_set_clear_set_clear_at_stage0_emit_clear_at_changed_and_clear_at_set () {
         var fake_user_status_job = new FakeUserStatusConnector ();
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (fake_user_status_job);
+        UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
         QSignalSpy clear_at_changed_spy = new QSignalSpy (
             model,
-            Occ.UserStatusSelectorModel.clear_at_changed
+            UserStatusSelectorModel.clear_at_changed
         );
 
         var clear_at_index = 0;
@@ -267,10 +267,10 @@ public class TestSetUserStatusDialog : GLib.Object {
     ***********************************************************/
     private void test_set_clear_set_clear_at_stage1_emit_clear_at_changed_and_clear_at_set () {
         var fake_user_status_job = new FakeUserStatusConnector ();
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (fake_user_status_job);
+        UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
         QSignalSpy clear_at_changed_spy = new QSignalSpy (
             model,
-            Occ.UserStatusSelectorModel.clear_at_changed
+            UserStatusSelectorModel.clear_at_changed
         );
 
         var clear_at_index = 1;
@@ -285,10 +285,10 @@ public class TestSetUserStatusDialog : GLib.Object {
     ***********************************************************/
     private void test_set_clear_set_clear_at_stage2_emit_clear_at_changed_and_clear_at_set () {
         var fake_user_status_job = new FakeUserStatusConnector ();
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (fake_user_status_job);
+        UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
         QSignalSpy clear_at_changed_spy = new QSignalSpy (
             model,
-            Occ.UserStatusSelectorModel.clear_at_changed
+            UserStatusSelectorModel.clear_at_changed
         );
 
         var clear_at_index = 2;
@@ -303,10 +303,10 @@ public class TestSetUserStatusDialog : GLib.Object {
     ***********************************************************/
     private void test_set_clear_set_clear_at_stage3_emit_clear_at_changed_and_clear_at_set () {
         var fake_user_status_job = new FakeUserStatusConnector ();
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (fake_user_status_job);
+        UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
         QSignalSpy clear_at_changed_spy = new QSignalSpy (
             model,
-            Occ.UserStatusSelectorModel.clear_at_changed
+            UserStatusSelectorModel.clear_at_changed
         );
 
         var clear_at_index = 3;
@@ -321,10 +321,10 @@ public class TestSetUserStatusDialog : GLib.Object {
     ***********************************************************/
     private void test_set_clear_set_clear_at_stage4_emit_clear_at_changed_and_clear_at_set () {
         var fake_user_status_job = new FakeUserStatusConnector ();
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (fake_user_status_job);
+        UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
         QSignalSpy clear_at_changed_spy = new QSignalSpy (
             model,
-            Occ.UserStatusSelectorModel.clear_at_changed
+            UserStatusSelectorModel.clear_at_changed
         );
 
         var clear_at_index = 4;
@@ -339,10 +339,10 @@ public class TestSetUserStatusDialog : GLib.Object {
     ***********************************************************/
     private void test_set_clear_set_clear_at_stage5_emit_clear_at_changed_and_clear_at_set () {
         var fake_user_status_job = new FakeUserStatusConnector ();
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (fake_user_status_job);
+        UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
         QSignalSpy clear_at_changed_spy = new QSignalSpy (
             model,
-            Occ.UserStatusSelectorModel.clear_at_changed
+            UserStatusSelectorModel.clear_at_changed
         );
 
         var clear_at_index = 5;
@@ -357,7 +357,7 @@ public class TestSetUserStatusDialog : GLib.Object {
     ***********************************************************/
     private void test_clear_at_stages () {
         var fake_user_status_job = new FakeUserStatusConnector ();
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (fake_user_status_job);
+        UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
 
         GLib.assert_true (model.clear_at () == _("Don't clear"));
         var clear_at_values = model.clear_at_values ();
@@ -387,112 +387,112 @@ public class TestSetUserStatusDialog : GLib.Object {
 
 
     private void clear_at_clear_at_timestamp_test_1 (GLib.DateTime current_time) {
-        Occ.UserStatus user_status;
-        Occ.ClearAt clear_at;
-        clear_at.type = Occ.ClearAtType.Timestamp;
+        UserStatus user_status;
+        ClearAt clear_at;
+        clear_at.type = ClearAtType.Timestamp;
         clear_at.timestamp = current_time.add_secs (30).to_time_t ();
         user_status.set_clear_at (clear_at);
 
         var fake_date_time_provider = new FakeDateTimeProvider ();
         fake_date_time_provider.set_current_date_time (current_time);
 
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status, std.move (fake_date_time_provider));
+        UserStatusSelectorModel model = new UserStatusSelectorModel (user_status, std.move (fake_date_time_provider));
 
         GLib.assert_true (model.clear_at () == _("Less than a minute"));
     }
 
 
     private void clear_at_clear_at_timestamp_test_2 (GLib.DateTime current_time) {
-        Occ.UserStatus user_status;
-        Occ.ClearAt clear_at;
-        clear_at.type = Occ.ClearAtType.Timestamp;
+        UserStatus user_status;
+        ClearAt clear_at;
+        clear_at.type = ClearAtType.Timestamp;
         clear_at.timestamp = current_time.add_secs (60).to_time_t ();
         user_status.set_clear_at (clear_at);
 
         var fake_date_time_provider = new FakeDateTimeProvider ();
         fake_date_time_provider.set_current_date_time (current_time);
 
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status, std.move (fake_date_time_provider));
+        UserStatusSelectorModel model = new UserStatusSelectorModel (user_status, std.move (fake_date_time_provider));
 
         GLib.assert_true (model.clear_at () == _("1 minute"));
     }
 
 
     private void clear_at_clear_at_timestamp_test_3 (GLib.DateTime current_time) {
-        Occ.UserStatus user_status;
-        Occ.ClearAt clear_at;
-        clear_at.type = Occ.ClearAtType.Timestamp;
+        UserStatus user_status;
+        ClearAt clear_at;
+        clear_at.type = ClearAtType.Timestamp;
         clear_at.timestamp = current_time.add_secs (60 * 30).to_time_t ();
         user_status.set_clear_at (clear_at);
 
         var fake_date_time_provider = new FakeDateTimeProvider ();
         fake_date_time_provider.set_current_date_time (current_time);
 
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status, std.move (fake_date_time_provider));
+        UserStatusSelectorModel model = new UserStatusSelectorModel (user_status, std.move (fake_date_time_provider));
 
         GLib.assert_true (model.clear_at () == _("30 minutes"));
     }
 
 
     private void clear_at_clear_at_timestamp_test_4 (GLib.DateTime current_time) {
-        Occ.UserStatus user_status;
-        Occ.ClearAt clear_at;
-        clear_at.type = Occ.ClearAtType.Timestamp;
+        UserStatus user_status;
+        ClearAt clear_at;
+        clear_at.type = ClearAtType.Timestamp;
         clear_at.timestamp = current_time.add_secs (60 * 60).to_time_t ();
         user_status.set_clear_at (clear_at);
 
         var fake_date_time_provider = new FakeDateTimeProvider ();
         fake_date_time_provider.set_current_date_time (current_time);
 
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status, std.move (fake_date_time_provider));
+        UserStatusSelectorModel model = new UserStatusSelectorModel (user_status, std.move (fake_date_time_provider));
 
         GLib.assert_true (model.clear_at () == _("1 hour"));
     }
 
 
     private void clear_at_clear_at_timestamp_test_5 (GLib.DateTime current_time) {
-        Occ.UserStatus user_status;
-        Occ.ClearAt clear_at;
-        clear_at.type = Occ.ClearAtType.Timestamp;
+        UserStatus user_status;
+        ClearAt clear_at;
+        clear_at.type = ClearAtType.Timestamp;
         clear_at.timestamp = current_time.add_secs (60 * 60 * 4).to_time_t ();
         user_status.set_clear_at (clear_at);
 
         var fake_date_time_provider = new FakeDateTimeProvider ();
         fake_date_time_provider.set_current_date_time (current_time);
 
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status, std.move (fake_date_time_provider));
+        UserStatusSelectorModel model = new UserStatusSelectorModel (user_status, std.move (fake_date_time_provider));
 
         GLib.assert_true (model.clear_at () == _("4 hours"));
     }
 
 
     private void clear_at_clear_at_timestamp_test_6 (GLib.DateTime current_time) {
-        Occ.UserStatus user_status;
-        Occ.ClearAt clear_at;
-        clear_at.type = Occ.ClearAtType.Timestamp;
+        UserStatus user_status;
+        ClearAt clear_at;
+        clear_at.type = ClearAtType.Timestamp;
         clear_at.timestamp = current_time.add_days (1).to_time_t ();
         user_status.set_clear_at (clear_at);
 
         var fake_date_time_provider = new FakeDateTimeProvider ();
         fake_date_time_provider.set_current_date_time (current_time);
 
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status, std.move (fake_date_time_provider));
+        UserStatusSelectorModel model = new UserStatusSelectorModel (user_status, std.move (fake_date_time_provider));
 
         GLib.assert_true (model.clear_at () == _("1 day"));
     }
 
 
     private void clear_at_clear_at_timestamp_test_7 (GLib.DateTime current_time) {
-        Occ.UserStatus user_status;
-        Occ.ClearAt clear_at;
-        clear_at.type = Occ.ClearAtType.Timestamp;
+        UserStatus user_status;
+        ClearAt clear_at;
+        clear_at.type = ClearAtType.Timestamp;
         clear_at.timestamp = current_time.add_days (7).to_time_t ();
         user_status.set_clear_at (clear_at);
 
         var fake_date_time_provider = new FakeDateTimeProvider ();
         fake_date_time_provider.set_current_date_time (current_time);
 
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status, std.move (fake_date_time_provider));
+        UserStatusSelectorModel model = new UserStatusSelectorModel (user_status, std.move (fake_date_time_provider));
 
         GLib.assert_true (model.clear_at () == _("7 days"));
     }
@@ -508,26 +508,26 @@ public class TestSetUserStatusDialog : GLib.Object {
 
 
     private void clear_at_clear_at_end_of_test_1 () {
-        Occ.UserStatus user_status;
-        Occ.ClearAt clear_at;
-        clear_at.type = Occ.ClearAtType.EndOf;
+        UserStatus user_status;
+        ClearAt clear_at;
+        clear_at.type = ClearAtType.EndOf;
         clear_at.endof = "day";
         user_status.set_clear_at (clear_at);
 
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status);
+        UserStatusSelectorModel model = new UserStatusSelectorModel (user_status);
 
         GLib.assert_true (model.clear_at () == _("Today"));
     }
 
 
     private void clear_at_clear_at_end_of_test_2 () {
-        Occ.UserStatus user_status;
-        Occ.ClearAt clear_at;
-        clear_at.type = Occ.ClearAtType.EndOf;
+        UserStatus user_status;
+        ClearAt clear_at;
+        clear_at.type = ClearAtType.EndOf;
         clear_at.endof = "week";
         user_status.set_clear_at (clear_at);
 
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status);
+        UserStatusSelectorModel model = new UserStatusSelectorModel (user_status);
 
         GLib.assert_true (model.clear_at () == _("This week"));
     }
@@ -537,24 +537,24 @@ public class TestSetUserStatusDialog : GLib.Object {
     ***********************************************************/
     private void test_clear_at_clear_at_after_period () {
         {
-            Occ.UserStatus user_status;
-            Occ.ClearAt clear_at;
-            clear_at.type = Occ.ClearAtType.Period;
+            UserStatus user_status;
+            ClearAt clear_at;
+            clear_at.type = ClearAtType.Period;
             clear_at.period = 60 * 30;
             user_status.set_clear_at (clear_at);
 
-            Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status);
+            UserStatusSelectorModel model = new UserStatusSelectorModel (user_status);
 
             GLib.assert_true (model.clear_at () == _("30 minutes"));
         }
         {
-            Occ.UserStatus user_status;
-            Occ.ClearAt clear_at;
-            clear_at.type = Occ.ClearAtType.Period;
+            UserStatus user_status;
+            ClearAt clear_at;
+            clear_at.type = ClearAtType.Period;
             clear_at.period = 60 * 60;
             user_status.set_clear_at (clear_at);
 
-            Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (user_status);
+            UserStatusSelectorModel model = new UserStatusSelectorModel (user_status);
 
             GLib.assert_true (model.clear_at () == _("1 hour"));
         }
@@ -565,7 +565,7 @@ public class TestSetUserStatusDialog : GLib.Object {
     ***********************************************************/
     private void test_clear_user_status () {
         var fake_user_status_job = new FakeUserStatusConnector ();
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (fake_user_status_job);
+        UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
 
         model.clear_user_status ();
 
@@ -578,7 +578,7 @@ public class TestSetUserStatusDialog : GLib.Object {
     private void test_error_could_not_fetch_predefined_statuses_emit_error () {
         var fake_user_status_job = new FakeUserStatusConnector ();
         fake_user_status_job.set_error_could_not_fetch_predefined_user_statuses (true);
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (fake_user_status_job);
+        UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
 
         GLib.assert_true (model.error_message () ==
             _("Could not fetch predefined statuses. Make sure you are connected to the server."));
@@ -590,7 +590,7 @@ public class TestSetUserStatusDialog : GLib.Object {
     private void test_error_could_not_fetch_user_status_emit_error () {
         var fake_user_status_job = new FakeUserStatusConnector ();
         fake_user_status_job.set_error_could_not_fetch_user_status (true);
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (fake_user_status_job);
+        UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
 
         GLib.assert_true (model.error_message () ==
             _("Could not fetch user status. Make sure you are connected to the server."));
@@ -602,7 +602,7 @@ public class TestSetUserStatusDialog : GLib.Object {
     private void test_error_user_status_not_supported_emit_error () {
         var fake_user_status_job = new FakeUserStatusConnector ();
         fake_user_status_job.set_error_user_status_not_supported (true);
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (fake_user_status_job);
+        UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
 
         GLib.assert_true (model.error_message () ==
             _("User status feature is not supported. You will not be able to set your user status."));
@@ -614,7 +614,7 @@ public class TestSetUserStatusDialog : GLib.Object {
     private void test_error_could_set_user_status_emit_error () {
         var fake_user_status_job = new FakeUserStatusConnector ();
         fake_user_status_job.set_error_could_not_set_user_status_message (true);
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (fake_user_status_job);
+        UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
         model.set_user_status ();
 
         GLib.assert_true (model.error_message () ==
@@ -627,7 +627,7 @@ public class TestSetUserStatusDialog : GLib.Object {
     private void test_error_emojis_not_supported_emit_error () {
         var fake_user_status_job = new FakeUserStatusConnector ();
         fake_user_status_job.set_error_emojis_not_supported (true);
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (fake_user_status_job);
+        UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
 
         GLib.assert_true (model.error_message () ==
             _("Emojis feature is not supported. Some user status functionality may not work."));
@@ -639,7 +639,7 @@ public class TestSetUserStatusDialog : GLib.Object {
     private void test_error_could_not_clear_message_emit_error () {
         var fake_user_status_job = new FakeUserStatusConnector ();
         fake_user_status_job.set_error_could_not_clear_user_status_message (true);
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (fake_user_status_job);
+        UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
         model.clear_user_status ();
 
         GLib.assert_true (model.error_message () ==
@@ -651,7 +651,7 @@ public class TestSetUserStatusDialog : GLib.Object {
     ***********************************************************/
     private void test_error_set_user_status_clear_error_message () {
         var fake_user_status_job = new FakeUserStatusConnector ();
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (fake_user_status_job);
+        UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
 
         fake_user_status_job.set_error_could_not_set_user_status_message (true);
         model.set_user_status ();
@@ -666,7 +666,7 @@ public class TestSetUserStatusDialog : GLib.Object {
     ***********************************************************/
     private void test_error_clear_user_status_clear_erroressage () {
         var fake_user_status_job = new FakeUserStatusConnector ();
-        Occ.UserStatusSelectorModel model = new Occ.UserStatusSelectorModel (fake_user_status_job);
+        UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
 
         fake_user_status_job.set_error_could_not_set_user_status_message (true);
         model.set_user_status ();

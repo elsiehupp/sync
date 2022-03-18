@@ -60,9 +60,8 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         on_signal_stop_spinner ();
         set_up_customization ();
 
-        connect (
-            this.ui.pb_select_local_folder, QAbstractButton.clicked,
-            this, OwncloudAdvancedSetupPage.on_signal_select_folder
+        this.ui.pb_select_local_folder.clicked.connect (
+            this.on_signal_select_folder
         );
         button_text (QWizard.FinishButton, _("Connect"));
 
@@ -72,40 +71,25 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
             this.ui.b_selective_sync.disabled (true);
         }
 
-        connect (
-            this.ui.r_sync_everything,
-            QAbstractButton.clicked,
-            this,
-            OwncloudAdvancedSetupPage.on_signal_sync_everything_clicked
+        this.ui.r_sync_everything.clicked.connect (
+            this.on_signal_sync_everything_clicked
         );
-        connect (
-            this.ui.r_selective_sync,
-            QAbstractButton.clicked,
-            this,
-            OwncloudAdvancedSetupPage.on_signal_selective_sync_clicked
+        this.ui.r_selective_sync.clicked.connect (
+            this.on_signal_selective_sync_clicked
         );
-        connect (
-            this.ui.r_virtual_file_sync,
-            QAbstractButton.clicked,
-            this,
-            OwncloudAdvancedSetupPage.on_signal_virtual_file_sync_clicked
+        this.ui.r_virtual_file_sync.clicked.connect (
+            this.on_signal_virtual_file_sync_clicked
         );
-        connect (
-            this.ui.r_virtual_file_sync,
-            QRadioButton.toggled,
-            this,
+        this.ui.r_virtual_file_sync.toggled.connect (
             this.on_virtual_file_sync_toggled
         );
-        connect (
-            this.ui.b_selective_sync,
-            QAbstractButton.clicked,
-            this,
-            OwncloudAdvancedSetupPage.on_signal_selective_sync_clicked
+        this.ui.b_selective_sync.clicked.connect (
+            this.on_signal_selective_sync_clicked
         );
 
-        const var theme = Theme.instance;
-        const var app_icon = theme.application_icon;
-        const var app_icon_size = Theme.is_hidpi () ? 128 : 64;
+        const Theme theme = Theme.instance;
+        const Gtk.Icon app_icon = theme.application_icon;
+        const int app_icon_size = Theme.is_hidpi () ? 128 : 64;
 
         this.ui.l_server_icon.pixmap (app_icon.pixmap (app_icon_size));
 
@@ -168,11 +152,8 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         var quota_job = new PropfindJob (acc, this.remote_folder, this);
         quota_job.properties (new GLib.List<string> ("http://owncloud.org/ns:size"));
 
-        connect (
-            quota_job,
-            PropfindJob.result,
-            this,
-            OwncloudAdvancedSetupPage.on_signal_quota_retrieved
+        quota_job.signal_result.connect (
+            this.on_signal_quota_retrieved
         );
         quota_job.on_signal_start ();
 
@@ -353,10 +334,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         var dialog = new SelectiveSyncDialog (acc, this.remote_folder, this.selective_sync_blocklist, this);
         dialog.attribute (Qt.WA_DeleteOnClose);
 
-        connect (
-            dialog,
-            SelectiveSyncDialog.signal_finished,
-            this,
+        dialog.signal_finished.connect (
             this.on_signal_selective_sync_finished
         );
     
@@ -693,10 +671,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         }
         const AvatarJob avatar_job = new AvatarJob (account, account.dav_user (), avatar_size, this);
         avatar_job.on_signal_timeout (20 * 1000);
-        connect (
-            avatar_job,
-            AvatarJob.avatar_pixmap,
-            this,
+        avatar_job.signal_avatar_pixmap.connect (
             this.on_avatar_job_avatar_pixmap
         );
         avatar_job.on_signal_start ();

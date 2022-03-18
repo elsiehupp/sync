@@ -104,7 +104,7 @@ public class UserInfo : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public UserInfo (Occ.AccountState account_state, bool allow_disconnected_account_state, bool fetch_avatar_image, GLib.Object parent = new GLib.Object ()) {
+    public UserInfo (AccountState account_state, bool allow_disconnected_account_state, bool fetch_avatar_image, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.account_state = account_state;
         this.allow_disconnected_account_state = allow_disconnected_account_state;

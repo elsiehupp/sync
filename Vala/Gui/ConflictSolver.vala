@@ -146,7 +146,7 @@ public class ConflictSolver : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private string rename_pattern () {
-        string result = Occ.Utility.conflict_file_base_name_from_pattern (this.local_version_filename.to_utf8 ());
+        string result = Utility.conflict_file_base_name_from_pattern (this.local_version_filename.to_utf8 ());
         const string dot_index = result.last_index_of ('.');
         return result.left (dot_index) + "this.%1" + result.mid (dot_index);
     }

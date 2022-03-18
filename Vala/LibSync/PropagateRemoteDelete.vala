@@ -30,19 +30,16 @@ public class PropagateRemoteDelete : PropagateItemJob {
     public new void start () {
         GLib.info ("Start propagate remote delete job for" + this.item.file);
 
-        if (propagator ().abort_requested)
+        if (this.propagator.abort_requested)
             return;
 
-        if (!this.item.encrypted_filename == "" || this.item.is_encrypted) {
-            if (!this.item.encrypted_filename == "") {
-                this.delete_encrypted_helper = new PropagateRemoteCeleteEncrypted (propagator (), this.item, this);
+        if (this.item.encrypted_filename != "" || this.item.is_encrypted) {
+            if (this.item.encrypted_filename != "") {
+                this.delete_encrypted_helper = new PropagateRemoteCeleteEncrypted (this.propagator, this.item, this);
             } else {
-                this.delete_encrypted_helper = new PropagateRemoteDeleteEncryptedRootFolder (propagator (), this.item, this);
+                this.delete_encrypted_helper = new PropagateRemoteDeleteEncryptedRootFolder (this.propagator, this.item, this);
             }
-            connect (
-                this.delete_encrypted_helper,
-                AbstractPropagateRemoteDeleteEncrypted.on_signal_finished,
-                this,
+            this.delete_encrypted_helper.signal_finished.connect (
                 this.on_signal_abstract_propagate_remote_delete_encrypted_finished
             );
             this.delete_encrypted_helper.start ();
@@ -56,7 +53,7 @@ public class PropagateRemoteDelete : PropagateItemJob {
         if (!on_signal_success) {
             SyncFileItem.Status status = SyncFileItem.Status.NORMAL_ERROR;
             if (this.delete_encrypted_helper.network_error () != Soup.Reply.NoError && this.delete_encrypted_helper.network_error () != Soup.Reply.ContentNotFoundError) {
-                status = classify_error (this.delete_encrypted_helper.network_error (), this.item.http_error_code, propagator ().another_sync_needed);
+                status = classify_error (this.delete_encrypted_helper.network_error (), this.item.http_error_code, this.propagator.another_sync_needed);
             }
             on_signal_done (status, this.delete_encrypted_helper.error_string ());
         } else {
@@ -70,15 +67,16 @@ public class PropagateRemoteDelete : PropagateItemJob {
     public void create_delete_job (string filename) {
         GLib.info ("Deleting file, local" + this.item.file + "remote" + filename);
 
-        this.delete_job = new DeleteJob (propagator ().account,
-            propagator ().full_remote_path (filename),
-            this);
-
-        connect (
-            this.delete_job, DeleteJob.signal_finished,
-            this, PropagateRemoteDelete.on_signal_delete_job_finished
+        this.delete_job = new DeleteJob (
+            this.propagator.account,
+            this.propagator.full_remote_path (filename),
+            this
         );
-        propagator ().active_job_list.append (this);
+
+        this.delete_job.signal_finished.connect (
+            this.on_signal_delete_job_finished
+        );
+        this.propagator.active_job_list.append (this);
         this.delete_job.start ();
     }
 
@@ -105,7 +103,7 @@ public class PropagateRemoteDelete : PropagateItemJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_delete_job_finished () {
-        propagator ().active_job_list.remove_one (this);
+        this.propagator.active_job_list.remove_one (this);
 
         //  ASSERT (this.delete_job);
 
@@ -117,7 +115,7 @@ public class PropagateRemoteDelete : PropagateItemJob {
 
         if (err != Soup.Reply.NoError && err != Soup.Reply.ContentNotFoundError) {
             SyncFileItem.Status status = classify_error (err, this.item.http_error_code,
-                propagator ().another_sync_needed);
+                this.propagator.another_sync_needed);
             on_signal_done (status, this.delete_job.error_string ());
             return;
         }
@@ -137,8 +135,8 @@ public class PropagateRemoteDelete : PropagateItemJob {
             return;
         }
 
-        propagator ().journal.delete_file_record (this.item.original_file, this.item.is_directory ());
-        propagator ().journal.commit ("Remote Remove");
+        this.propagator.journal.delete_file_record (this.item.original_file, this.item.is_directory ());
+        this.propagator.journal.commit ("Remote Remove");
 
         on_signal_done (SyncFileItem.Status.SUCCESS);
     }

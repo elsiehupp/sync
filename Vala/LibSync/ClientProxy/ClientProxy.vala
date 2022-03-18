@@ -30,7 +30,7 @@ public class ClientProxy : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static bool is_using_system_default () {
-        Occ.ConfigFile config;
+        ConfigFile config;
 
         // if there is no config file, default to system proxy.
         if (config.exists ()) {
@@ -47,12 +47,11 @@ public class ClientProxy : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void lookup_system_proxy_async (GLib.Uri url, GLib.Object destination, DestinationDelegate destination_delegate) {
-        SystemProxyRunnable runnable = new SystemProxyRunnable (url);
-        connect (
-            runnable, SIGNAL (system_proxy_looked_up (Soup.ProxyResolverDefault)),
-            destination, destination_delegate
+        SystemProxyRunnable system_proxy_runnable = new SystemProxyRunnable (url);
+        system_proxy_runnable.system_proxy_looked_up.connect (
+            destination.destination_delegate
         );
-        QThreadPool.global_instance.start (runnable); // takes ownership and deletes
+        QThreadPool.global_instance.start (system_proxy_runnable); // takes ownership and deletes
     }
 
 
@@ -106,7 +105,7 @@ public class ClientProxy : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_setup_qt_proxy_from_config () {
-        Occ.ConfigFile config;
+        ConfigFile config;
         int proxy_type = Soup.ProxyResolverDefault.DefaultProxy;
         Soup.ProxyResolverDefault proxy;
 

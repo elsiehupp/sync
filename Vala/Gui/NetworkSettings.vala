@@ -282,7 +282,7 @@ public class NetworkSettings : Gtk.Widget {
             return;
         }
         // load current proxy settings
-        Occ.ConfigFile config_file;
+        ConfigFile config_file;
         int type = config_file.proxy_type ();
         switch (type) {
         case QNetworkProxy.NoProxy:

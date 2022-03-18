@@ -23,7 +23,7 @@ public class DummyCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public override Soup.Session create_qnam () {
+    public override Soup.Session create_access_manager () {
         return new AccessManager ();
     }
 

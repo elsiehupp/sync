@@ -186,7 +186,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_update_directories (string[] list) {
-        var ls_col_job = qobject_cast<LsColJob> (sender ());
+        var lscol_job = qobject_cast<LscolJob> (sender ());
         QScopedValueRollback<bool> is_inserting (this.inserting);
         this.inserting = true;
 
@@ -236,7 +236,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
             root.icon (0, Theme.application_icon);
             root.data (0, Qt.USER_ROLE, "");
             root.check_state (0, Qt.Checked);
-            int64 size = ls_col_job ? ls_col_job.folder_infos[path_to_remove].size : -1;
+            int64 size = lscol_job ? lscol_job.folder_infos[path_to_remove].size : -1;
             if (size >= 0) {
                 root.on_signal_text (1, Utility.octets_to_string (size));
                 root.data (1, Qt.USER_ROLE, size);
@@ -245,7 +245,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
 
         Utility.sort_filenames (list);
         foreach (string path, list) {
-            var size = ls_col_job ? ls_col_job.folder_infos[path].size : 0;
+            var size = lscol_job ? lscol_job.folder_infos[path].size : 0;
             path.remove (path_to_remove);
 
             // Don't allow to select subfolders of encrypted subfolders
@@ -290,17 +290,17 @@ public class SelectiveSyncWidget : Gtk.Widget {
         if (!this.folder_path == "") {
             prefix = this.folder_path + '/';
         }
-        var ls_col_job = new LsColJob (this.account, prefix + directory, this);
-        ls_col_job.properties (
+        var lscol_job = new LscolJob (this.account, prefix + directory, this);
+        lscol_job.properties (
             {
                 "resourcetype",
                 "http://owncloud.org/ns:size"
             }
         );
-        ls_col_job.signal_directory_listing_subfolders.connect (
+        lscol_job.signal_directory_listing_subfolders.connect (
             this.on_signal_update_directories
         );
-        ls_col_job.on_signal_start ();
+        lscol_job.on_signal_start ();
     }
 
 
@@ -396,23 +396,23 @@ public class SelectiveSyncWidget : Gtk.Widget {
     private void refresh_folders () {
         this.encrypted_paths.clear ();
 
-        var ls_col_job = new LsColJob (this.account, this.folder_path, this);
+        var lscol_job = new LscolJob (this.account, this.folder_path, this);
         var props = GLib.List<string> ("resourcetype"
                                          + "http://owncloud.org/ns:size";
         if (this.account.capabilities ().client_side_encryption_available ()) {
             props + "http://nextcloud.org/ns:is-encrypted";
         }
-        ls_col_job.properties (props);
-        ls_col_job.signal_directory_listing_subfolders.connect (
+        lscol_job.properties (props);
+        lscol_job.signal_directory_listing_subfolders.connect (
             this.on_signal_update_directories
         );
-        ls_col_job.signal_finished_with_error.connect (
+        lscol_job.signal_finished_with_error.connect (
             this.on_signal_lscol_finished_with_error
         );
-        ls_col_job.signal_directory_listing_iterated.connect (
+        lscol_job.signal_directory_listing_iterated.connect (
             this.on_signal_gather_encrypted_paths
         );
-        ls_col_job.on_signal_start ();
+        lscol_job.on_signal_start ();
         this.folder_tree.clear ();
         this.loading.show ();
         this.loading.move (10, this.folder_tree.header ().height () + 10);

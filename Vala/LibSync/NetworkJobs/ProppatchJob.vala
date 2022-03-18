@@ -38,7 +38,7 @@ public class ProppatchJob : AbstractNetworkJob {
         }
     }
 
-    internal signal void on_signal_success ();
+    internal signal void signal_success ();
     internal signal void signal_finished_with_error ();
 
     /***********************************************************

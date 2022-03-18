@@ -14,7 +14,7 @@ public class FileInfo : FileModifier {
     public int operation_status = 200;
     public bool is_directory = true;
     public bool is_shared = false;
-    public Occ.RemotePermissions permissions; // When uset, defaults to everything
+    public RemotePermissions permissions; // When uset, defaults to everything
     public GLib.DateTime last_modified = GLib.DateTime.current_date_time_utc ().add_days (-7);
 
     public string checksums;

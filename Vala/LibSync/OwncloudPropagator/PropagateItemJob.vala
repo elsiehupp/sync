@@ -61,7 +61,7 @@ public class PropagateItemJob : PropagatorJob {
 
 
     ~PropagateItemJob () {
-        var p = propagator ();
+        var p = this.propagator;
         if (p) {
             // Normally, every job should clean itself from the this.active_job_list. So this should not be
             // needed. But if a job has a bug or is deleted before the network jobs signal get received,
@@ -74,7 +74,7 @@ public class PropagateItemJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     protected bool has_encrypted_ancestor () {
-        if (!propagator ().account.capabilities ().client_side_encryption_available ()) {
+        if (!this.propagator.account.capabilities ().client_side_encryption_available ()) {
             return false;
         }
 
@@ -85,7 +85,7 @@ public class PropagateItemJob : PropagatorJob {
         var path_components = parent_path.split ("/");
         while (!path_components == "") {
             SyncJournalFileRecord record;
-            propagator ().journal.get_file_record (path_components.join ("/"), record);
+            this.propagator.journal.get_file_record (path_components.join ("/"), record);
             if (record.is_valid () && record.is_e2e_encrypted) {
                 return true;
             }
@@ -159,7 +159,7 @@ public class PropagateItemJob : PropagatorJob {
             }
         }
 
-        if (propagator ().abort_requested && (this.item.status == SyncFileItem.Status.NORMAL_ERROR
+        if (this.propagator.abort_requested && (this.item.status == SyncFileItem.Status.NORMAL_ERROR
                                             || this.item.status == SyncFileItem.Status.FATAL_ERROR)) {
             // an abort request is ongoing. Change the status to Soft-Error
             this.item.status = SyncFileItem.Status.SOFT_ERROR;
@@ -172,16 +172,16 @@ public class PropagateItemJob : PropagatorJob {
         case SyncFileItem.Status.NORMAL_ERROR:
         case SyncFileItem.Status.DETAIL_ERROR:
             // Check the blocklist, possibly adjusting the item (including its status)
-            blocklist_update (propagator ().journal, this.item);
+            blocklist_update (this.propagator.journal, this.item);
             break;
         case SyncFileItem.Status.SUCCESS:
         case SyncFileItem.Status.RESTORATION:
             if (this.item.has_blocklist_entry) {
                 // wipe blocklist entry.
-                propagator ().journal.wipe_error_blocklist_entry (this.item.file);
+                this.propagator.journal.wipe_error_blocklist_entry (this.item.file);
                 // remove a blocklist entry in case the file was moved.
                 if (this.item.original_file != this.item.file) {
-                    propagator ().journal.wipe_error_blocklist_entry (this.item.original_file);
+                    this.propagator.journal.wipe_error_blocklist_entry (this.item.original_file);
                 }
             }
             break;
@@ -199,12 +199,12 @@ public class PropagateItemJob : PropagatorJob {
             GLib.warning ("Could not complete propagation of " + this.item.destination () + " by " + this + " with status " + this.item.status + " and error: " + this.item.error_string);
         else
             GLib.info ("Completed propagation of " + this.item.destination () + " by " + this + " with status " + this.item.status);
-        /* emit */ propagator ().signal_item_completed (this.item);
-        /* emit */ finished (this.item.status);
+        /* emit */ this.propagator.signal_item_completed (this.item);
+        /* emit */ signal_finished (this.item.status);
 
         if (this.item.status == SyncFileItem.Status.FATAL_ERROR) {
             // Abort all remaining jobs.
-            propagator ().abort ();
+            this.propagator.abort ();
         }
     }
 

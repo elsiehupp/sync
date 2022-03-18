@@ -53,13 +53,11 @@ public class UserModel : QAbstractListModel {
     ***********************************************************/
     const int NOTIFICATION_REQUEST_FREE_PERIOD = 15000;
 
-
     /***********************************************************
     Time span in milliseconds which must elapse between
     sequential checks for expired activities
     ***********************************************************/
     const int64 EXPIRED_ACTIVITIES_CHECK_INTERVAL_MSEC = 1000 * 60;
-
 
     /***********************************************************
     Time span in milliseconds after which activities will
@@ -70,7 +68,7 @@ public class UserModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    static UserModel instance {
+    public static UserModel instance {
         public get {
             if (!this.instance) {
                 this.instance = new UserModel ();
@@ -81,10 +79,14 @@ public class UserModel : QAbstractListModel {
             this.instance = value;
         }
     }
+
+
     private GLib.List<User> users;
+
+
     /***********************************************************
     ***********************************************************/
-    int current_user_id {
+    public int current_user_id {
         public get {
             return this.current_user_id;
         }
@@ -94,6 +96,41 @@ public class UserModel : QAbstractListModel {
         //  construct {
         //      this.current_user_id = 0;
         //  }
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public User current_user {
+        public get {
+            if (this.current_user_id < 0 || this.current_user_id >= this.users.size ()) {
+                return null;
+            }
+    
+            return this.users[this.current_user_id];
+        }
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public string current_user_server {
+        public get {
+            if (this.current_user_id < 0 || this.current_user_id >= this.users.size ()) {
+                return "";
+            }
+    
+            return this.users[this.current_user_id].server;
+        }
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public int number_of_users {
+        public get {
+            return this.users.size ();
+        }
     }
 
     private bool init = true;
@@ -112,9 +149,8 @@ public class UserModel : QAbstractListModel {
             build_user_list ();
         }
 
-        connect (
-            AccountManager.instance, AccountManager.signal_account_added,
-            this, UserModel.build_user_list
+        AccountManager.instance.signal_account_added.connect (
+            this.on_signal_build_user_list
         );
     }
 
@@ -126,23 +162,6 @@ public class UserModel : QAbstractListModel {
             return false;
 
         return this.users[identifier].is_connected ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public string current_user_server () {
-        if (this.current_user_id < 0 || this.current_user_id >= this.users.size ())
-            return {};
-
-        return this.users[this.current_user_id].server ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public int current_user_index () {
-        return this.current_user_id;
     }
 
 
@@ -200,21 +219,11 @@ public class UserModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public User current_user () {
-        if (current_user_id () < 0 || current_user_id () >= this.users.size ())
-            return null;
-
-        return this.users[current_user_id ()];
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public int find_identifier_for_account (AccountState account) {
+    public int find_identifier_for_account (AccountState account_state) {
         int identifier = 0;
         foreach (var user in this.users) {
             identifer++;
-            if (user.account.identifier () == account.account.identifier ()) {
+            if (user.account.identifier () == account_state.account.identifier ()) {
                 break;
             }
         }
@@ -228,19 +237,20 @@ public class UserModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     public void fetch_current_activity_model () {
-        if (current_user_id () < 0 || current_user_id () >= this.users.size ())
+        if (this.current_user_id < 0 || this.current_user_id >= this.users.size ()) {
             return;
+        }
 
-        this.users[current_user_id ()].on_signal_refresh ();
+        this.users[this.current_user_id].on_signal_refresh ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public void add_user (unowned AccountState user, bool is_current) {
+    public void add_user (AccountState account_state, bool is_current) {
         bool contains_user = false;
-        foreach (var u in this.users) {
-            if (u.account == user.account) {
+        foreach (var user in this.users) {
+            if (user.account == account_state.account) {
                 contains_user = true;
                 continue;
             }
@@ -250,37 +260,25 @@ public class UserModel : QAbstractListModel {
             int row = row_count ();
             begin_insert_rows (QModelIndex (), row, row);
 
-            User u = new User (user, is_current);
+            User new_user = new User (account_state, is_current);
 
-            connect (
-                u,
-                User.signal_avatar_changed,
-                this,
+            new_user.signal_avatar_changed.connect (
                 this.on_signal_avatar_changed
             );
 
-            connect (
-                u,
-                User.signal_status_changed,
-                this,
+            new_user.signal_status_changed.connect (
                 this.on_signal_status_changed
             );
 
-            connect (
-                u,
-                User.signal_desktop_notifications_allowed_changed,
-                this,
+            new_user.signal_desktop_notifications_allowed_changed.connect (
                 this.on_signal_desktop_notifications_allowed_changed
             );
 
-            connect (
-                u,
-                User.signal_account_state_changed,
-                this,
+            new_user.signal_account_state_changed.connect (
                 this.on_signal_account_state_changed
             );
 
-            this.users += u;
+            this.users += new_user;
 
             if (is_current) {
                 this.current_user_id = this.users.index_of (this.users.last ());
@@ -363,15 +361,15 @@ public class UserModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     public void open_current_account_talk () {
-        if (!current_user ()) {
+        if (!this.current_user) {
             return;
         }
 
-        const var talk_app = current_user ().talk_app ();
+        const var talk_app = this.current_user.talk_app ();
         if (talk_app) {
             OpenExtrernal.open_browser (talk_app.url);
         } else {
-            GLib.warning ("The Talk app is not enabled on " + current_user ().server ());
+            GLib.warning ("The Talk app is not enabled on " + this.current_user.server ());
         }
     }
 
@@ -389,13 +387,6 @@ public class UserModel : QAbstractListModel {
         }
 
         QDesktopServices.open_url (url);
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public int number_of_users () {
-        return this.users.size ();
     }
 
 
@@ -476,7 +467,7 @@ public class UserModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public std.shared_ptr<Occ.UserStatusConnector> user_status_connector (int identifier) {
+    public UserStatusConnector user_status_connector (int identifier) {
         if (identifier < 0 || identifier >= this.users.size ()) {
             return null;
         }
@@ -487,21 +478,27 @@ public class UserModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public ActivityListModel current_activity_model () {
-        if (current_user_index () < 0 || current_user_index () >= this.users.size ())
-            return null;
-
-        return this.users[current_user_index ()].activity_model ();
+    public ActivityListModel current_activity_model {
+        public get {
+            if (current_user_id < 0 || current_user_id >= this.users.size ()) {
+                return null;
+            }
+    
+            return this.users[current_user_id].activity_model ();
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public AccountAppList app_list (){
-        if (this.current_user_id < 0 || this.current_user_id >= this.users.size ())
-            return {};
-
-        return this.users[this.current_user_id].app_list ();
+    public AccountAppList app_list {
+        public get {
+            if (this.current_user_id < 0 || this.current_user_id >= this.users.size ()) {
+                return {};
+            }
+    
+            return this.users[this.current_user_id].app_list;
+        }
     }
 
 

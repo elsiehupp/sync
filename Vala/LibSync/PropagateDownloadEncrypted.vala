@@ -44,26 +44,20 @@ public class PropagateDownloadEncrypted : GLib.Object {
         var remote_parent_path = remote_path.left (remote_path.last_index_of ("/"));
 
         // Is encrypted Now we need the folder-identifier
-        var job = new LsColJob (this.propagator.account, remote_parent_path, this);
-        job.properties (
+        var lscol_job = new LscolJob (this.propagator.account, remote_parent_path, this);
+        lscol_job.properties (
             {
                 "resourcetype",
                 "http://owncloud.org/ns:fileid"
             }
         );
-        connect (
-            job,
-            LsColJob.signal_directory_listing_subfolders,
-            this,
-            PropagateDownloadEncrypted.on_signal_check_folder_id
+        lscol_job.signal_directory_listing_subfolders.connect (
+            this.on_signal_check_folder_id
         );
-        connect (
-            job,
-            LsColJob.signal_finished_with_error,
-            this,
-            PropagateDownloadEncrypted.on_signal_folder_id_error
+        lscol_job.signal_finished_with_error.connect (
+            this.on_signal_folder_id_error
         );
-        job.start ();
+        lscol_job.start ();
     }
 
 
@@ -120,24 +114,22 @@ public class PropagateDownloadEncrypted : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_check_folder_id (string[] list) {
-        var job = qobject_cast<LsColJob> (sender ());
+        var lscol_job = qobject_cast<LscolJob> (sender ());
         const string folder_identifier = list.first ();
         GLib.debug ("Received identifier of folder" + folder_identifier);
 
-        const ExtraFolderInfo folder_info = job.folder_infos.value (folder_identifier);
+        const ExtraFolderInfo folder_info = lscol_job.folder_infos.value (folder_identifier);
 
         // Now that we have the folder-identifier we need it's JSON metadata
-        var metadata_job = new GetMetadataApiJob (this.propagator.account, folder_info.file_identifier);
-        connect (
-            metadata_job, GetMetadataApiJob.signal_json_received,
-            this, PropagateDownloadEncrypted.on_signal_check_folder_encrypted_metadata
+        var get_metadata_api_job = new GetMetadataApiJob (this.propagator.account, folder_info.file_identifier);
+        get_metadata_api_job.signal_json_received.connect (
+            this.on_signal_check_folder_encrypted_metadata
         );
-        connect (
-            metadata_job, GetMetadataApiJob.error,
-            this, PropagateDownloadEncrypted.on_signal_folder_encrypted_metadata_error
+        get_metadata_api_job.signal_error.connect (
+            this.on_signal_folder_encrypted_metadata_error
         );
 
-        metadata_job.start ();
+        get_metadata_api_job.start ();
     }
 
 

@@ -453,9 +453,7 @@ public class ActivityListModel : QAbstractListModel {
             this.current_conflict_dialog.on_signal_local_version_filename (conflicted_path);
             this.current_conflict_dialog.on_signal_remote_version_filename (base_path);
             this.current_conflict_dialog.attribute (Qt.WA_DeleteOnClose);
-            connect (
-                this.current_conflict_dialog,
-                ConflictDialog.accepted,
+            this.current_conflict_dialog.accepted.connect (
                 folder,
                 this.on_signal_current_conflict_dialog_accepted
             );
@@ -469,11 +467,12 @@ public class ActivityListModel : QAbstractListModel {
 
             var folder = FolderMan.instance.folder_by_alias (activity.folder);
             const var folder_dir = GLib.Dir (folder.path ());
-            this.current_invalid_filename_dialog = new InvalidFilenameDialog (this.account_state.account, folder,
-                folder_dir.file_path (activity.file));
-            connect (
-                this.current_invalid_filename_dialog,
-                InvalidFilenameDialog.accepted,
+            this.current_invalid_filename_dialog = new InvalidFilenameDialog (
+                this.account_state.account,
+                folder,
+                folder_dir.file_path (activity.file)
+            );
+            this.current_invalid_filename_dialog.accepted.connect (
                 folder,
                 this.on_signal_current_invalid_filename_dialog_accepted
             );
@@ -646,20 +645,19 @@ public class ActivityListModel : QAbstractListModel {
         if (!this.account_state.is_connected ()) {
             return;
         }
-        var job = new JsonApiJob (this.account_state.account, "ocs/v2.php/apps/activity/api/v2/activity", this);
-        connect (
-            job, JsonApiJob.json_received,
-            this, ActivityListModel.activities_received
+        var json_api_job = new JsonApiJob (this.account_state.account, "ocs/v2.php/apps/activity/api/v2/activity", this);
+        json_api_job.json_received.connect (
+            this.activities_received
         );
 
         QUrlQuery parameters;
         parameters.add_query_item ("since", this.current_item.to_string ());
         parameters.add_query_item ("limit", 50.to_string ());
-        job.add_query_params (parameters);
+        json_api_job.add_query_params (parameters);
 
         this.currently_fetching = true;
         GLib.info ("Start fetching activities for " + this.account_state.account.display_name ());
-        job.on_signal_start ();
+        json_api_job.on_signal_start ();
     }
 
 

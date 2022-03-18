@@ -21,9 +21,8 @@ public class OwncloudDolphinPlugin : KOverlayIconPlugin {
     ***********************************************************/
     public OwncloudDolphinPlugin () {
         var helper = OwncloudDolphinPluginHelper.instance;
-        connect (
-            helper, OwncloudDolphinPluginHelper.signal_command_received,
-            this, OwncloudDolphinPlugin.slotCommandRecieved
+        helper.signal_command_received.connect (
+            this.on_signal_command_received
         );
     }
 
@@ -76,7 +75,7 @@ public class OwncloudDolphinPlugin : KOverlayIconPlugin {
 
     /***********************************************************
     ***********************************************************/
-    private void slotCommandRecieved (string line) {
+    private void on_signal_command_received (string line) {
 
         GLib.List<string> tokens = line.split (':');
         if (tokens.count () < 3)

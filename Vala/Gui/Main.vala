@@ -43,16 +43,16 @@ int main (int argc, char **argv) {
     qml_register_type<SyncStatusSummary> ("com.nextcloud.desktopclient", 1, 0, "SyncStatusSummary");
     qml_register_type<EmojiModel> ("com.nextcloud.desktopclient", 1, 0, "EmojiModel");
     qml_register_type<UserStatusSelectorModel> ("com.nextcloud.desktopclient", 1, 0, "UserStatusSelectorModel");
-    qml_register_type<Occ.ActivityListModel> ("com.nextcloud.desktopclient", 1, 0, "ActivityListModel");
-    qml_register_type<Occ.FileActivityListModel> ("com.nextcloud.desktopclient", 1, 0, "FileActivityListModel");
-    qml_register_uncreatable_type<Occ.UnifiedSearchResultsListModel> (
+    qml_register_type<ActivityListModel> ("com.nextcloud.desktopclient", 1, 0, "ActivityListModel");
+    qml_register_type<FileActivityListModel> ("com.nextcloud.desktopclient", 1, 0, "FileActivityListModel");
+    qml_register_uncreatable_type<UnifiedSearchResultsListModel> (
         "com.nextcloud.desktopclient", 1, 0, "UnifiedSearchResultsListModel", "UnifiedSearchResultsListModel");
     q_register_meta_type<UnifiedSearchResultsListModel> ("UnifiedSearchResultsListModel*");
 
-    qml_register_uncreatable_type<Occ.UserStatus> ("com.nextcloud.desktopclient", 1, 0, "UserStatus", "Access to Status enum");
+    qml_register_uncreatable_type<UserStatus> ("com.nextcloud.desktopclient", 1, 0, "UserStatus", "Access to Status enum");
 
     q_register_meta_type_stream_operators<Emoji> ();
-    q_register_meta_type<Occ.UserStatus> ("UserStatus");
+    q_register_meta_type<UserStatus> ("UserStatus");
 
     // Work around a bug in KDE's qqc2-desktop-style which breaks
     // buttons with icons not based on a name, by forcing a style name
@@ -65,7 +65,7 @@ int main (int argc, char **argv) {
 
     Gtk.Application.attribute (Qt.AAUseHighDpiPixmaps, true);
     Gtk.Application.attribute (Qt.AA_Enable_high_dpi_scaling, true);
-    Occ.Application app = new Occ.Application (argc, argv);
+    Application app = new Application (argc, argv);
 
     if (app.give_help ()) {
         app.show_help ();

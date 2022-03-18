@@ -11,7 +11,7 @@ public class SuffixVfsPluginFactory : GLib.Object, DefaultPluginFactory<VfsSuffi
 
     construct {
         Q_PLUGIN_METADATA (IID + "org.owncloud.PluginFactory" + FILE + "vfspluginmetadata.json");
-        Q_INTERFACES (Occ.PluginFactory);
+        Q_INTERFACES (PluginFactory);
     }
 
 }

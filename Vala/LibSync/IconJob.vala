@@ -17,7 +17,7 @@ namespace LibSync {
 public class IconJob : GLib.Object {
 
     internal signal void signal_job_finished (string icon_data);
-    internal signal void error (Soup.Reply.NetworkError error_type);
+    internal signal void signal_error (Soup.Reply.NetworkError error_type);
 
 
     /***********************************************************
@@ -27,11 +27,8 @@ public class IconJob : GLib.Object {
         Soup.Request request = new Soup.Request (url);
         request.attribute (Soup.Request.FollowRedirectsAttribute, true);
         var reply = account.send_raw_request ("GET", url, request);
-        connect (
-            reply,
-            Soup.Reply.on_signal_finished,
-            this,
-            IconJob.on_signal_finished
+        reply.signal_finished.connect (
+            this.on_signal_finished
         );
     }
 

@@ -109,9 +109,8 @@ public class OcsUserStatusConnector : UserStatusConnector {
     public void clear_message () {
         this.clear_message_job = new JsonApiJob (this.account, USER_STATUS_BASE_URL + "/message");
         this.clear_message_job.verb (JsonApiJob.Verb.DELETE);
-        connect (
-            this.clear_message_job, JsonApiJob.signal_json_received,
-            this, OcsUserStatusConnector.on_signal_message_cleared
+        this.clear_message_job.signal_json_received.connect (
+            this.on_signal_message_cleared
         );
         this.clear_message_job.start ();
     }
@@ -215,9 +214,8 @@ public class OcsUserStatusConnector : UserStatusConnector {
         }
 
         this.get_user_status_job = new JsonApiJob (this.account, USER_STATUS_BASE_URL, this);
-        connect (
-            this.get_user_status_job, JsonApiJob.signal_json_received,
-            this, OcsUserStatusConnector.on_signal_user_status_fetched
+        this.get_user_status_job.signal_json_received.connect (
+            this.on_signal_user_status_fetched
         );
         this.get_user_status_job.start ();
     }
@@ -236,11 +234,8 @@ public class OcsUserStatusConnector : UserStatusConnector {
             BASE_URL + "/predefined_statuses",
             this
         );
-        connect (
-            this.get_predefined_stauses_job,
-            JsonApiJob.signal_json_received,
-            this,
-            OcsUserStatusConnector.on_signal_predefined_statuses_fetched
+        this.get_predefined_stauses_job.signal_json_received.connect (
+            this.on_signal_predefined_statuses_fetched
         );
         this.get_predefined_stauses_job.start ();
     }
@@ -261,9 +256,8 @@ public class OcsUserStatusConnector : UserStatusConnector {
         QJsonDocument body;
         body.object (data_object);
         this.online_status_job.body (body);
-        connect (
-            this.online_status_job, JsonApiJob.signal_json_received,
-            this, OcsUserStatusConnector.on_signal_user_status_online_status_set
+        this.online_status_job.signal_json_received.connect (
+            this.on_signal_user_status_online_status_set
         );
         this.online_status_job.start ();
     }
@@ -301,9 +295,8 @@ public class OcsUserStatusConnector : UserStatusConnector {
         QJsonDocument body;
         body.object (data_object);
         this.message_job.body (body);
-        connect (
-            this.message_job, JsonApiJob.signal_json_received,
-            this, OcsUserStatusConnector.on_signal_user_status_message_set
+        this.message_job.signal_json_received.connect (
+            this.on_signal_user_status_message_set
         );
         this.message_job.start ();
     }
@@ -336,62 +329,61 @@ public class OcsUserStatusConnector : UserStatusConnector {
         QJsonDocument body;
         body.object (data_object);
         this.message_job.body (body);
-        connect (
-            this.message_job, JsonApiJob.signal_json_received,
-            this, OcsUserStatusConnector.on_signal_user_status_message_set
+        this.message_job.signal_json_received.connect (
+            this.on_signal_user_status_message_set
         );
         this.message_job.start ();
     }
 
 
-    private static Occ.UserStatus.OnlineStatus string_to_user_online_status (string status) {
+    private static UserStatus.OnlineStatus string_to_user_online_status (string status) {
         // it needs to match the Status enum
-        const GLib.HashTable<string, Occ.UserStatus.OnlineStatus> pre_defined_status = {
+        const GLib.HashTable<string, UserStatus.OnlineStatus> pre_defined_status = {
             {
-                "online", Occ.UserStatus.OnlineStatus.Online
+                "online", UserStatus.OnlineStatus.Online
             },
             {
-                "dnd", Occ.UserStatus.OnlineStatus.DoNotDisturb
+                "dnd", UserStatus.OnlineStatus.DoNotDisturb
             },
             {
-                "away", Occ.UserStatus.OnlineStatus.Away
+                "away", UserStatus.OnlineStatus.Away
             },
             {
-                "offline", Occ.UserStatus.OnlineStatus.Offline
+                "offline", UserStatus.OnlineStatus.Offline
             },
             {
-                "invisible", Occ.UserStatus.OnlineStatus.Invisible
+                "invisible", UserStatus.OnlineStatus.Invisible
             }
         };
 
         // api should return invisible, dnd,... down () it is to make sure
         // it matches this.pre_defined_status, otherwise the default is online (0)
-        return pre_defined_status.value (status.down (), Occ.UserStatus.OnlineStatus.Online);
+        return pre_defined_status.value (status.down (), UserStatus.OnlineStatus.Online);
     }
 
 
-    private static string online_status_to_string (Occ.UserStatus.OnlineStatus status) {
+    private static string online_status_to_string (UserStatus.OnlineStatus status) {
         switch (status) {
-        case Occ.UserStatus.OnlineStatus.Online:
+        case UserStatus.OnlineStatus.Online:
             return "online";
-        case Occ.UserStatus.OnlineStatus.DoNotDisturb:
+        case UserStatus.OnlineStatus.DoNotDisturb:
             return "dnd";
-        case Occ.UserStatus.OnlineStatus.Away:
+        case UserStatus.OnlineStatus.Away:
             return "offline";
-        case Occ.UserStatus.OnlineStatus.Offline:
+        case UserStatus.OnlineStatus.Offline:
             return "offline";
-        case Occ.UserStatus.OnlineStatus.Invisible:
+        case UserStatus.OnlineStatus.Invisible:
             return "invisible";
         }
         return "online";
     }
 
 
-    private static Occ.Optional<Occ.ClearAt> json_extract_clear_at (QJsonObject json_object) {
-        Occ.Optional<Occ.ClearAt> clear_at = new JsonApiJob ();
+    private static Optional<ClearAt> json_extract_clear_at (QJsonObject json_object) {
+        Optional<ClearAt> clear_at = new JsonApiJob ();
         if (json_object.contains ("clear_at") && !json_object.value ("clear_at").is_null ()) {
-            Occ.ClearAt clear_at_value;
-            clear_at_value.type = Occ.ClearAtType.Timestamp;
+            ClearAt clear_at_value;
+            clear_at_value.type = ClearAtType.Timestamp;
             clear_at_value.timestamp = json_object.value ("clear_at").to_int ();
             clear_at = clear_at_value;
         }
@@ -399,8 +391,8 @@ public class OcsUserStatusConnector : UserStatusConnector {
     }
 
 
-    private static Occ.UserStatus json_extract_user_status (QJsonObject json) {
-        return new Occ.UserStatus (
+    private static UserStatus json_extract_user_status (QJsonObject json) {
+        return new UserStatus (
             json.value ("message_id").to_string (),
             json.value ("message").to_string ().trimmed (),
             json.value ("icon").to_string ().trimmed (),
@@ -411,7 +403,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
     }
 
 
-    private static Occ.UserStatus json_to_user_status (QJsonDocument json) {
+    private static UserStatus json_to_user_status (QJsonDocument json) {
         QJsonObject d = new QJsonObject (
             {
                 "icon",
@@ -439,8 +431,8 @@ public class OcsUserStatusConnector : UserStatusConnector {
     }
 
 
-    private static uint64 clear_at_end_of_to_timestamp (Occ.ClearAt clear_at) {
-        GLib.assert (clear_at.type == Occ.ClearAtType.EndOf);
+    private static uint64 clear_at_end_of_to_timestamp (ClearAt clear_at) {
+        GLib.assert (clear_at.type == ClearAtType.EndOf);
 
         if (clear_at.endof == "day") {
             return QDate.current_date ().add_days (1).start_of_day ().to_time_t ();
@@ -453,22 +445,22 @@ public class OcsUserStatusConnector : UserStatusConnector {
     }
 
 
-    private static uint64 clear_at_period_to_timestamp (Occ.ClearAt clear_at) {
+    private static uint64 clear_at_period_to_timestamp (ClearAt clear_at) {
         return GLib.DateTime.current_date_time ().add_secs (clear_at.period).to_time_t ();
     }
 
 
-    private static uint64 clear_at_to_timestamp (Occ.ClearAt clear_at) {
+    private static uint64 clear_at_to_timestamp (ClearAt clear_at) {
         switch (clear_at.type) {
-        case Occ.ClearAtType.Period: {
+        case ClearAtType.Period: {
             return clear_at_period_to_timestamp (clear_at);
         }
 
-        case Occ.ClearAtType.EndOf: {
+        case ClearAtType.EndOf: {
             return clear_at_end_of_to_timestamp (clear_at);
         }
 
-        case Occ.ClearAtType.Timestamp: {
+        case ClearAtType.Timestamp: {
             return clear_at.timestamp;
         }
         }
@@ -477,7 +469,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
     }
 
 
-    private static uint64 clear_at_to_timestamp_optional (Occ.Optional<Occ.ClearAt> clear_at) {
+    private static uint64 clear_at_to_timestamp_optional (Optional<ClearAt> clear_at) {
         if (clear_at) {
             return clear_at_to_timestamp (*clear_at);
         }
@@ -485,20 +477,20 @@ public class OcsUserStatusConnector : UserStatusConnector {
     }
 
 
-    private static Occ.Optional<Occ.ClearAt> json_to_clear_at (QJsonObject json_object) {
-        Occ.Optional<Occ.ClearAt> clear_at;
+    private static Optional<ClearAt> json_to_clear_at (QJsonObject json_object) {
+        Optional<ClearAt> clear_at;
 
         if (json_object.value ("clear_at").is_object () && !json_object.value ("clear_at").is_null ()) {
-            Occ.ClearAt clear_at_value;
+            ClearAt clear_at_value;
             var clear_at_object = json_object.value ("clear_at").to_object ();
             var type_value = clear_at_object.value ("type").to_string () + " period";
             if (type_value == "period") {
                 var time_value = clear_at_object.value ("time").to_int (0);
-                clear_at_value.type = Occ.ClearAtType.Period;
+                clear_at_value.type = ClearAtType.Period;
                 clear_at_value.period = time_value;
             } else if (type_value == "end-of") {
                 var time_value = clear_at_object.value ("time").to_string () + " day";
-                clear_at_value.type = Occ.ClearAtType.EndOf;
+                clear_at_value.type = ClearAtType.EndOf;
                 clear_at_value.endof = time_value;
             } else {
                 GLib.warning ("Can not handle clear type value " + type_value);
@@ -510,20 +502,20 @@ public class OcsUserStatusConnector : UserStatusConnector {
     }
 
 
-    private static Occ.UserStatus json_to_user_status (QJsonObject json_object) {
-        return new Occ.UserStatus (
+    private static UserStatus json_to_user_status (QJsonObject json_object) {
+        return new UserStatus (
             json_object.value ("identifier").to_string () + "no-identifier",
             json_object.value ("message").to_string () + "No message",
             json_object.value ("icon").to_string () + "no-icon",
-            Occ.UserStatus.OnlineStatus.Online,
+            UserStatus.OnlineStatus.Online,
             true,
             json_to_clear_at (json_object)
         );
     }
 
 
-    private static GLib.List<Occ.UserStatus> json_to_predefined_statuses (QJsonArray json_data_array) {
-        GLib.List<Occ.UserStatus> statuses;
+    private static GLib.List<UserStatus> json_to_predefined_statuses (QJsonArray json_data_array) {
+        GLib.List<UserStatus> statuses;
         foreach (var json_entry in json_data_array) {
             GLib.assert (json_entry.is_object ());
             if (!json_entry.is_object ()) {

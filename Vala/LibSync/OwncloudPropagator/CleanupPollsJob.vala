@@ -20,7 +20,7 @@ public class CleanupPollsJob : GLib.Object {
     unowned Vfs vfs;
 
     internal signal void signal_finished ();
-    internal signal void aborted (string error);
+    internal signal void signal_aborted (string error);
 
     /***********************************************************
     ***********************************************************/
@@ -46,7 +46,7 @@ public class CleanupPollsJob : GLib.Object {
     ***********************************************************/
     public new void start () {
         if (this.poll_infos.empty ()) {
-            /* emit */ finished ();
+            /* emit */ signal_finished ();
             delete_later ();
             return;
         }
@@ -58,9 +58,8 @@ public class CleanupPollsJob : GLib.Object {
         item.modtime = info.modtime;
         item.size = info.file_size;
         var poll_job = new PollJob (this.account, info.url, item, this.journal, this.local_path, this);
-        connect (
-            poll_job, PollJob.signal_finished,
-            this, CleanupPollsJob.on_signal_poll_finished
+        poll_job.signal_finished.connect (
+            this.on_signal_poll_finished
         );
         poll_job.start ();
     }

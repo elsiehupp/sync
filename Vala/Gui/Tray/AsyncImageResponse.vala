@@ -41,7 +41,7 @@ public class AsyncImageResponse : QQuickImageResponse {
     ***********************************************************/
     public void image_and_emit_finished (Gtk.Image image = {}) {
         this.image = image;
-        /* emit */ finished ();
+        /* emit */ signal_finished ();
     }
 
 
@@ -65,15 +65,14 @@ public class AsyncImageResponse : QQuickImageResponse {
             return;
         }
 
-        const var current_user = Occ.UserModel.instance.is_current_user ();
+        const var current_user = UserModel.instance.is_current_user ();
         if (current_user && current_user.account) {
             const GLib.Uri icon_url = new GLib.Uri (this.image_paths.at (this.index));
             if (icon_url.is_valid () && !icon_url.scheme () == "") {
                 // fetch the remote resource
                 const var reply = current_user.account.send_raw_request ("GET", icon_url);
-                connect (
-                    reply, Soup.Reply.on_signal_finished,
-                    this, AsyncImageResponse.on_signal_process_network_reply
+                reply.signal_finished.connect (
+                    this.on_signal_process_network_reply
                 );
                 ++this.index;
                 return;

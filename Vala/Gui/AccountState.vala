@@ -290,7 +290,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
 
     /***********************************************************
     ***********************************************************/
-    public AccountAppList app_list () {
+    public AccountAppList app_list {
         return this.apps;
     }
 
@@ -299,7 +299,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     ***********************************************************/
     public AccountApp find_app (string app_id) {
         if (!app_id != "") {
-            foreach (var app in app_list ()) {
+            foreach (var app in app_list) {
                 if (app.identifier () == app_id) {
                     return app;
                 }
@@ -484,7 +484,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
         ocs_navigation_apps_job.etag_response_header_received.connect (
             this.on_signal_etag_response_header_received
         );
-        ocs_navigation_apps_job.ocs_error.connect (
+        ocs_navigation_apps_job.signal_error.connect (
             this.on_signal_ocs_error
         );
         ocs_navigation_apps_job.navigation_apps ();

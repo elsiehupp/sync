@@ -26,11 +26,8 @@ public class PropagateRootDirectory : PropagateDirectory {
     public PropagateRootDirectory (OwncloudPropagator propagator) {
         base (propagator, new SyncFileItem ());
         this.dir_deletion_jobs = propagator;
-        connect (
-            this.dir_deletion_jobs,
-            PropagatorJob.on_signal_finished,
-            this,
-            PropagateRootDirectory.on_signal_dir_deletion_jobs_finished
+        this.dir_deletion_jobs.signal_finished.connect (
+            this.on_signal_dir_deletion_jobs_finished
         );
     }
 
@@ -38,13 +35,13 @@ public class PropagateRootDirectory : PropagateDirectory {
     /***********************************************************
     ***********************************************************/
     public new bool on_signal_schedule_self_or_child () {
-        GLib.info ("on_signal_schedule_self_or_child " + this.state + " pending uploads" + propagator ().delayed_tasks ().size () + " subjobs state " + this.sub_jobs.state);
+        GLib.info ("on_signal_schedule_self_or_child " + this.state + " pending uploads" + this.propagator.delayed_tasks ().size () + " subjobs state " + this.sub_jobs.state);
 
         if (this.state == Finished) {
             return false;
         }
 
-        if (PropagateDirectory.on_signal_schedule_self_or_child () && propagator ().delayed_tasks ().empty ()) {
+        if (PropagateDirectory.on_signal_schedule_self_or_child () && this.propagator.delayed_tasks ().empty ()) {
             return true;
         }
 
@@ -53,7 +50,7 @@ public class PropagateRootDirectory : PropagateDirectory {
             return false;
         }
 
-        if (!propagator ().delayed_tasks ().empty ()) {
+        if (!this.propagator.delayed_tasks ().empty ()) {
             return schedule_delayed_jobs ();
         }
 
@@ -87,17 +84,12 @@ public class PropagateRootDirectory : PropagateDirectory {
         if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
             var abort_status = new AbortsFinished ();
 
-            connect (
-                this.sub_jobs,
-                PropagatorCompositeJob.signal_abort_finished,
-                this,
-                this.on_signal_propagator_abort_finished_1
+            this.sub_jobs.signal_abort_finished.connect (
+                this.on_signal_sub_jobs_abort_finished
             );
-            connect (
-                this.dir_deletion_jobs,
-                PropagatorCompositeJob.signal_abort_finished,
+            this.dir_deletion_jobs.signal_abort_finished.connect (
                 this,
-                this.on_signal_propagator_abort_finished_2
+                this.on_signal_ir_deletion_jobs_abort_finished
             );
         }
         this.sub_jobs.abort (abort_type);
@@ -107,7 +99,7 @@ public class PropagateRootDirectory : PropagateDirectory {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_propagator_abort_finished_1 (AbortsFinished abort_status) {
+    private void on_signal_sub_jobs_abort_finished (AbortsFinished abort_status) {
         abort_status.sub_jobs_finished = true;
         if (abort_status.sub_jobs_finished && abort_status.dir_deletion_finished) {
             /* emit */ signal_abort_finished ();
@@ -117,7 +109,7 @@ public class PropagateRootDirectory : PropagateDirectory {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_propagator_abort_finished_2 (AbortsFinished abort_status) {
+    private void on_signal_ir_deletion_jobs_abort_finished (AbortsFinished abort_status) {
         abort_status.dir_deletion_finished = true;
         if (abort_status.sub_jobs_finished && abort_status.dir_deletion_finished) {
             /* emit */ signal_abort_finished ();
@@ -144,9 +136,9 @@ public class PropagateRootDirectory : PropagateDirectory {
     /***********************************************************
     ***********************************************************/
     private void on_signal_sub_jobs_finished (SyncFileItem.Status status) {
-        GLib.info (status.to_string () + " on_signal_sub_jobs_finished " + this.state.to_string () + " pending uploads " + propagator ().delayed_tasks ().size () + " subjobs state " + this.sub_jobs.state);
+        GLib.info (status.to_string () + " on_signal_sub_jobs_finished " + this.state.to_string () + " pending uploads " + this.propagator.delayed_tasks ().size () + " subjobs state " + this.sub_jobs.state);
 
-        if (!propagator ().delayed_tasks ().empty ()) {
+        if (!this.propagator.delayed_tasks ().empty ()) {
             schedule_delayed_jobs ();
             return;
         }
@@ -164,7 +156,7 @@ public class PropagateRootDirectory : PropagateDirectory {
             return;
         }
 
-        propagator ().schedule_next_job ();
+        this.propagator.schedule_next_job ();
     }
 
 
@@ -172,9 +164,9 @@ public class PropagateRootDirectory : PropagateDirectory {
     ***********************************************************/
     private bool schedule_delayed_jobs () {
         GLib.info ("PropagateRootDirectory.schedule_delayed_jobs");
-        propagator ().schedule_delayed_tasks (true);
-        var bulk_propagator_job = std.make_unique<BulkPropagatorJob> (propagator (), propagator ().delayed_tasks ());
-        propagator ().clear_delayed_tasks ();
+        this.propagator.schedule_delayed_tasks (true);
+        var bulk_propagator_job = std.make_unique<BulkPropagatorJob> (this.propagator, this.propagator.delayed_tasks ());
+        this.propagator.clear_delayed_tasks ();
         this.sub_jobs.append_job (bulk_propagator_job.release ());
         this.sub_jobs.state = Running;
         return this.sub_jobs.on_signal_schedule_self_or_child ();

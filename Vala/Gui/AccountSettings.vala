@@ -1119,7 +1119,7 @@ public class AccountSettings : Gtk.Widget {
         // Folder info have directory paths in Foo/Bar/ convention...
         //  Q_ASSERT (!path.starts_with ('/') && path.ends_with ('/'));
         // But EncryptFolderJob expects directory path Foo/Bar convention
-        var encrypt_folder_job = new Occ.EncryptFolderJob (
+        var encrypt_folder_job = new EncryptFolderJob (
             on_signal_accounts_state ().account,
             folder.journal_database (),
             path.chopped (1),

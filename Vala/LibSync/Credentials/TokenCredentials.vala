@@ -63,17 +63,14 @@ public class TokenCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public new Soup.Session create_qnam () {
-        AccessManager qnam = new TokenCredentialsAccessManager (this);
+    public new Soup.Session create_access_manager () {
+        AccessManager access_manager = new TokenCredentialsAccessManager (this);
 
-        connect (
-            qnam,
-            authentication_required (reply, auth),
-            this,
-            on_signal_authentication (reply, auth)
+        access_manager.authentication_required.connect (
+            this.on_signal_authentication
         );
 
-        return qnam;
+        return access_manager;
     }
 
 

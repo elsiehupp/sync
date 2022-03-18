@@ -301,7 +301,7 @@ public class Folder : GLib.Object {
         this.engine.signal_sync_finished.connect (
             this.on_signal_sync_finished // Qt.QueuedConnection
         );
-        this.engine.about_to_remove_all_files.connect (
+        this.engine.signal_about_to_remove_all_files.connect (
             this.on_signal_about_to_remove_all_files
         );
         this.engine.signal_transmission_progress.connect (

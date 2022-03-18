@@ -1115,11 +1115,8 @@ public class TestSyncXAttr : GLib.Object {
 
     private static Vfs set_up_vfs (FakeFolder folder) {
         var xattr_vfs = unowned<Vfs> (create_vfs_from_plugin (Vfs.XAttr).release ());
-        connect (
-            folder.sync_engine.sync_file_status_tracker,
-            SyncFileStatusTracker.signal_file_status_changed,
-            xattr_vfs,
-            Vfs.signal_file_status_changed
+        folder.sync_engine.sync_file_status_tracker.signal_file_status_changed.connect (
+            xattr_vfs.on_signal_file_status_changed
         );
         folder.switch_to_vfs (xattr_vfs);
 

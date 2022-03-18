@@ -2,7 +2,7 @@
 
 namespace Testing {
 
-public class HttpCredentialsTest : Occ.HttpCredentials {
+public class HttpCredentialsTest : HttpCredentials {
 
     /***********************************************************
     ***********************************************************/
@@ -20,8 +20,8 @@ public class HttpCredentialsTest : Occ.HttpCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public static Occ.FolderDefinition folder_definition (string path) {
-        Occ.FolderDefinition definition;
+    public static FolderDefinition folder_definition (string path) {
+        FolderDefinition definition;
         definition.local_path = path;
         definition.target_path = path;
         definition.alias = path;

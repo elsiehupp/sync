@@ -274,7 +274,7 @@ public class Account : GLib.Object {
             // Note: This way the QNAM can outlive the Account and Credentials.
             // This is necessary to avoid issues with the QNAM being deleted while
             // processing on_signal_handle_ssl_errors ().
-            //  this.soup_session = new Soup.Session (this.credentials.create_qnam (), GLib.Object.delete_later);
+            //  this.soup_session = new Soup.Session (this.credentials.create_access_manager (), GLib.Object.delete_later);
             this.soup_session = new Soup.Session ();
 
             if (jar != null) {
@@ -829,7 +829,7 @@ public class Account : GLib.Object {
 
         // Use a unowned to allow locking the life of the QNAM on the stack.
         // Make it call delete_later to make sure that we can return to any QNAM stack frames safely.
-        this.soup_session = new /*unowned*/ Soup.Session (this.credentials.create_qnam (), GLib.Object.delete_later);
+        this.soup_session = new /*unowned*/ Soup.Session (this.credentials.create_access_manager (), GLib.Object.delete_later);
 
         this.soup_session.add_feature (jar); // takes ownership of the old cookie jar
         this.soup_session.add_feature (proxy);   // Remember proxy (issue #2108)
@@ -1032,7 +1032,7 @@ public class Account : GLib.Object {
     /***********************************************************
     Used when forgetting credentials
     ***********************************************************/
-    public void on_signal_clear_qnam_cache () {
+    public void on_signal_clear_access_manager_cache () {
         this.soup_session.clear_access_cache ();
     }
 
@@ -1074,7 +1074,7 @@ public class Account : GLib.Object {
         // the delete_later () of the QNAM before we have the chance of unwinding our stack.
         // Keep a ref here on our stackframe to make sure that it doesn't get deleted before
         // handle_errors returns.
-        unowned Soup.Session qnam_lock = this.soup_session;
+        unowned Soup.Session access_manager_lock = this.soup_session;
         QPointer<GLib.Object> guard = reply;
 
         if (this.ssl_error_handler.handle_errors (errors, reply.ssl_configuration (), approved_certificates, shared_from_this ())) {

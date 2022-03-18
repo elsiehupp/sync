@@ -34,7 +34,7 @@ public class FakeQNAM : Soup {
     ***********************************************************/
     public FakeQNAM (FileInfo initial_root_file_info) {
         this.remote_root_file_info = std.move (initial_root_file_info);
-        set_cookie_jar (new Occ.CookieJar ());
+        set_cookie_jar (new CookieJar ());
     }
 
 
@@ -115,7 +115,7 @@ public class FakeQNAM : Soup {
         QIODevice outgoing_data = null) {
         Soup.Reply reply = null;
         var new_request = request;
-        new_request.set_raw_header ("X-Request-ID", Occ.AccessManager.generate_request_identifier ());
+        new_request.set_raw_header ("X-Request-ID", AccessManager.generate_request_identifier ());
         var content_type = request.header (Soup.Request.ContentTypeHeader).to_string ();
         if (this.override_value) {
             var reply_override = this.override_value (operation, new_request, outgoing_data);
@@ -155,7 +155,7 @@ public class FakeQNAM : Soup {
                 Q_UNREACHABLE ();
             }
         }
-        Occ.HttpLogger.log_request (reply, operation, outgoing_data);
+        HttpLogger.log_request (reply, operation, outgoing_data);
         return reply;
     }
 

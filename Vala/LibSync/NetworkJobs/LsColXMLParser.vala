@@ -9,14 +9,14 @@ namespace Occ {
 namespace LibSync {
 
 /***********************************************************
-@brief The LsColJob class
+@brief The LscolJob class
 @ingroup libsync
 ***********************************************************/
-public class LsColXMLParser : GLib.Object {
+public class LscolXMLParser : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public LsColXMLParser ();
+    public LscolXMLParser ();
 
     /***********************************************************
     ***********************************************************/
@@ -28,14 +28,14 @@ public class LsColXMLParser : GLib.Object {
     internal signal void signal_directory_listing_subfolders (string[] items);
     internal signal void signal_directory_listing_iterated (string name, GLib.HashTable<string, string> properties);
     internal signal void signal_finished_with_error (GLib.InputStream reply);
-    internal signal void finished_without_error ();
+    internal signal void signal_finished_without_error ();
 
 
 
 
-    //  LsColXMLParser.LsColXMLParser () = default;
+    //  LscolXMLParser.LscolXMLParser () = default;
 
-    bool LsColXMLParser.parse (string xml, GLib.HashTable<string, ExtraFolderInfo> *file_info, string expected_path) {
+    bool LscolXMLParser.parse (string xml, GLib.HashTable<string, ExtraFolderInfo> *file_info, string expected_path) {
         // Parse DAV response
         QXmlStreamReader reader = new QXmlStreamReader (xml);
         reader.add_extra_namespace_declaration (QXmlStreamNamespaceDeclaration ("d", "DAV:"));
@@ -134,7 +134,7 @@ public class LsColXMLParser : GLib.Object {
             return false;
         } else {
             /* emit */ signal_directory_listing_subfolders (folders);
-            /* emit */ finished_without_error ();
+            /* emit */ signal_finished_without_error ();
         }
         return true;
     }
@@ -166,7 +166,7 @@ public class LsColXMLParser : GLib.Object {
         return result;
     }
 
-} // class LsColXMLParser
+} // class LscolXMLParser
 
 } // namespace LibSync
 } // namespace Occ

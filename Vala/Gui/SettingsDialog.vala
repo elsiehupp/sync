@@ -450,7 +450,7 @@ public class SettingsDialog : Gtk.Dialog {
     settings. If width is bigger than 0, the string will be
     ellided so it does not exceed that width.
     ***********************************************************/
-    private static string short_display_name_for_settings (Occ.Account account, int width) {
+    private static string short_display_name_for_settings (Account account, int width) {
         string user = account.dav_display_name ();
         if (user == "") {
             user = account.credentials ().user ();

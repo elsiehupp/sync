@@ -77,13 +77,11 @@ public class WebView : Gtk.Widget {
         this.webview.page (this.page);
         this.ui.vertical_layout.add_widget (this.webview);
 
-        connect (
-            this.webview, QWebEngineView.load_progress,
-            this.ui.progress_bar, QProgressBar.value
+        this.webview.load_progress.connect (
+            this.ui.progress_bar.value
         );
-        connect (
-            this.scheme_handler, WebViewPageUrlSchemeHandler.signal_url_catched,
-            this, WebView.on_signal_url_catched
+        this.scheme_handler.signal_url_catched.connect (
+            this.on_signal_url_catched
         );
     }
 

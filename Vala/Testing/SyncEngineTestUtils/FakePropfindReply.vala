@@ -59,7 +59,7 @@ public class FakePropfindReply : FakeReply {
         if (!url.ends_with (char ('/'))) {
             url.append (char ('/'));
         }
-        const string href = Occ.Utility.concat_url_path (prefix, url).path ();
+        const string href = Utility.concat_url_path (prefix, url).path ();
         xml.write_text_element (dav_uri, "href", href);
         xml.write_start_element (dav_uri, "propstat");
         xml.write_start_element (dav_uri, "prop");

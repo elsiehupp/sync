@@ -70,7 +70,7 @@ public class ShareManager : GLib.Object {
         create_link_share_job.signal_finished.connect (
             this.on_signal_create_link_share_job_finished
         );
-        create_link_share_job.ocs_error.connect (
+        create_link_share_job.signal_error.connect (
             this.on_signal_ocs_share_job_error
         );
         create_link_share_job.create_link_share (path, name, password);
@@ -93,7 +93,7 @@ public class ShareManager : GLib.Object {
         Share.Permissions permissions,
         string password = "") {
         var ocs_share_job = new OcsShareJob (this.account);
-        ocs_share_job.ocs_error.connect (
+        ocs_share_job.signal_error.connect (
             this.on_signal_ocs_share_job_error
         );
         ocs_share_job.signal_finished.connect (
@@ -116,7 +116,7 @@ public class ShareManager : GLib.Object {
         ocs_share_job.signal_finished.connect (
             this.on_signal_shares_fetched
         );
-        ocs_share_job.ocs_error.connect (
+        ocs_share_job.signal_error.connect (
             this.on_signal_ocs_share_job_error
         );
         ocs_share_job.on_signal_get_shares (path);
@@ -149,7 +149,7 @@ public class ShareManager : GLib.Object {
         ocs_share_job.signal_finished.connect (
             this.on_signal_share_created
         );
-        ocs_share_job.ocs_error.connect (
+        ocs_share_job.signal_error.connect (
             this.on_signal_ocs_share_job_error
         );
         ocs_share_job.create_share (

@@ -34,7 +34,7 @@ class XAttrWrapper : GLib.Object {
     }
 
 
-    public static Occ.Optional<string> xattr_get (string path, string name) {
+    public static Optional<string> xattr_get (string path, string name) {
         const int BUFFER_SIZE = 256;
         string result;
         result.resize (BUFFER_SIZE);

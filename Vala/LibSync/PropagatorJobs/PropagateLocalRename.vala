@@ -24,20 +24,20 @@ public class PropagateLocalRename : PropagateItemJob {
     /***********************************************************
     ***********************************************************/
     public new void start () {
-        if (propagator ().abort_requested)
+        if (this.propagator.abort_requested)
             return;
 
-        string existing_file = propagator ().full_local_path (propagator ().adjust_renamed_path (this.item.file));
-        string target_file = propagator ().full_local_path (this.item.rename_target);
+        string existing_file = this.propagator.full_local_path (this.propagator.adjust_renamed_path (this.item.file));
+        string target_file = this.propagator.full_local_path (this.item.rename_target);
 
         // if the file is a file underneath a moved directory, the this.item.file is equal
         // to this.item.rename_target and the file is not moved as a result.
         if (this.item.file != this.item.rename_target) {
-            propagator ().report_progress (*this.item, 0);
+            this.propagator.report_progress (*this.item, 0);
             GLib.debug ("MOVE " + existing_file + " => " + target_file);
 
             if (string.compare (this.item.file, this.item.rename_target, Qt.CaseInsensitive) != 0
-                && propagator ().local_filename_clash (this.item.rename_target)) {
+                && this.propagator.local_filename_clash (this.item.rename_target)) {
                 // Only use local_filename_clash for the destination if we know that the source was not
                 // the one conflicting  (renaming  A.txt . a.txt is OK)
 
@@ -50,8 +50,8 @@ public class PropagateLocalRename : PropagateItemJob {
                 return;
             }
 
-            /* emit */ propagator ().signal_touched_file (existing_file);
-            /* emit */ propagator ().signal_touched_file (target_file);
+            /* emit */ this.propagator.signal_touched_file (existing_file);
+            /* emit */ this.propagator.signal_touched_file (target_file);
             string rename_error;
             if (!FileSystem.rename (existing_file, target_file, rename_error)) {
                 on_signal_done (SyncFileItem.Status.NORMAL_ERROR, rename_error);
@@ -60,10 +60,10 @@ public class PropagateLocalRename : PropagateItemJob {
         }
 
         SyncJournalFileRecord old_record;
-        propagator ().journal.get_file_record (this.item.original_file, old_record);
-        propagator ().journal.delete_file_record (this.item.original_file);
+        this.propagator.journal.get_file_record (this.item.original_file, old_record);
+        this.propagator.journal.delete_file_record (this.item.original_file);
 
-        var vfs = propagator ().sync_options.vfs;
+        var vfs = this.propagator.sync_options.vfs;
         var pin_state = vfs.pin_state (this.item.original_file);
         if (!vfs.pin_state (this.item.original_file, PinState.PinState.INHERITED)) {
             GLib.warning ("Could not set pin state of " + this.item.original_file + " to inherited.");
@@ -76,7 +76,7 @@ public class PropagateLocalRename : PropagateItemJob {
             if (old_record.is_valid ()) {
                 signal_new_item.checksum_header = old_record.checksum_header;
             }
-            var result = propagator ().update_metadata (signal_new_item);
+            var result = this.propagator.update_metadata (signal_new_item);
             if (!result) {
                 on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error ()));
                 return;
@@ -85,8 +85,8 @@ public class PropagateLocalRename : PropagateItemJob {
                 return;
             }
         } else {
-            propagator ().renamed_directories.insert (old_file, this.item.rename_target);
-            if (!PropagateRemoteMove.adjust_selective_sync (propagator ().journal, old_file, this.item.rename_target)) {
+            this.propagator.renamed_directories.insert (old_file, this.item.rename_target);
+            if (!PropagateRemoteMove.adjust_selective_sync (this.propagator.journal, old_file, this.item.rename_target)) {
                 on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Failed to rename file"));
                 return;
             }
@@ -97,7 +97,7 @@ public class PropagateLocalRename : PropagateItemJob {
             return;
         }
 
-        propagator ().journal.commit ("local_rename");
+        this.propagator.journal.commit ("local_rename");
 
         on_signal_done (SyncFileItem.Status.SUCCESS);
     }

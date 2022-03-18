@@ -1,14 +1,14 @@
 
 namespace Testing {
 
-public class FakeCredentials : Occ.AbstractCredentials {
+public class FakeCredentials : AbstractCredentials {
 
-    Soup qnam;
+    Soup access_manager;
 
     /***********************************************************
     ***********************************************************/
-    public FakeCredentials (Soup qnam) {
-        this.qnam = qnam;
+    public FakeCredentials (Soup access_manager) {
+        this.access_manager = access_manager;
     }
 
 
@@ -35,8 +35,8 @@ public class FakeCredentials : Occ.AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public override Soup create_qnam () {
-        return this.qnam;
+    public override Soup create_access_manager () {
+        return this.access_manager;
     }
 
 

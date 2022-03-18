@@ -49,7 +49,7 @@ public class GeneralSettings : Gtk.Widget {
             return entry;
         }
 
-        public static ZipEntry sync_folder_to_zip_entry (Occ.Folder f) {
+        public static ZipEntry sync_folder_to_zip_entry (Folder f) {
             const var journal_path = f.journal_database ().database_file_path ();
             const var journal_info = GLib.FileInfo (journal_path);
             return file_info_to_zip_entry (journal_info);
@@ -57,11 +57,11 @@ public class GeneralSettings : Gtk.Widget {
 
         public static GLib.List<ZipEntry> create_file_list () {
             var list = GLib.List<ZipEntry> ();
-            Occ.ConfigFile config;
+            ConfigFile config;
 
             list.append (file_info_to_zip_entry (GLib.FileInfo (config.config_file ())));
 
-            const var logger = Occ.Logger.instance;
+            const var logger = Logger.instance;
 
             if (!logger.log_dir () == "") {
                 list.append ({"", "logs"});
@@ -75,7 +75,7 @@ public class GeneralSettings : Gtk.Widget {
                 list.append (file_info_to_zip_entry (GLib.FileInfo (logger.log_file ())));
             }
 
-            const var folders = Occ.FolderMan.instance.map ().values ();
+            const var folders = FolderMan.instance.map ().values ();
             std.transform (std.cbegin (folders), std.cend (folders),
                         std.back_inserter (list),
                         sync_folder_to_zip_entry);
@@ -101,7 +101,7 @@ public class GeneralSettings : Gtk.Widget {
 
             zip.add_file ("__nextcloud_client_parameters.txt", Gtk.Application.arguments ().join (' ').to_utf8 ());
 
-            const string build_info = Occ.Theme.about + "\n\n" + Occ.Theme.about_details;
+            const string build_info = Theme.about + "\n\n" + Theme.about_details;
             zip.add_file ("__nextcloud_client_buildinfo.txt", build_info.to_utf8 ());
         }
     }

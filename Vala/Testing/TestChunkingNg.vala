@@ -24,17 +24,13 @@ public class TestChunkingNg : GLib.Object {
         fake_folder.local_modifier ().insert (name, size);
         // Abort when the upload is at 1/3
         int64 size_when_abort = -1;
-        connect (
-            fake_folder.sync_engine,
-            SyncEngine.signal_transmission_progress,
-            TestChunkingNg.on_signal_progress_delegate
+        fake_folder.sync_engine.signal_transmission_progress.connect (
+            this.on_signal_progress_delegate
         );
 
         GLib.assert_true (!fake_folder.sync_once ()); // there should have been an error
-        disconnect (
-            fake_folder.sync_engine,
-            SyncEngine.signal_transmission_progress,
-            TestChunkingNg.on_signal_progress_delegate
+        fake_folder.sync_engine.signal_transmission_progress.disconnect (
+            this.on_signal_progress_delegate
         );
         GLib.assert_true (size_when_abort > 0);
         GLib.assert_true (size_when_abort < size);

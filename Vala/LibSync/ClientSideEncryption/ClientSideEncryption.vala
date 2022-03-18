@@ -339,9 +339,8 @@ public class ClientSideEncryption : GLib.Object {
         read_password_job.property (ACCOUNT_PROPERTY, GLib.Variant.from_value (account));
         read_password_job.insecure_fallback (false);
         read_password_job.key (kck);
-        connect (
-            read_password_job, ReadPasswordJob.on_signal_finished,
-            this, ClientSideEncryption.on_signal_private_key_fetched
+        read_password_job.signal_finished.connect (
+            this.on_signal_private_key_fetched
         );
         read_password_job.start ();
     }
@@ -382,9 +381,8 @@ public class ClientSideEncryption : GLib.Object {
         read_password_job.property (ACCOUNT_PROPERTY, GLib.Variant.from_value (account));
         read_password_job.insecure_fallback (false);
         read_password_job.key (kck);
-        connect (
-            read_password_job, ReadPasswordJob.on_signal_finished,
-            this, ClientSideEncryption.on_signal_mnemonic_key_fetched
+        read_password_job.signal_finished.connect (
+            this.on_signal_mnemonic_key_fetched
         );
         read_password_job.start ();
     }
@@ -570,9 +568,8 @@ public class ClientSideEncryption : GLib.Object {
         read_password_job.property (ACCOUNT_PROPERTY, GLib.Variant.from_value (account));
         read_password_job.insecure_fallback (false);
         read_password_job.key (kck);
-        connect (
-            read_password_job, ReadPasswordJob.on_signal_finished,
-            this, ClientSideEncryption.on_signal_public_key_fetched
+        read_password_job.signal_finished.connect (
+            this.on_signal_public_key_fetched
         );
         read_password_job.start ();
     }

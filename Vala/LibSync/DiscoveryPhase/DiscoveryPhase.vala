@@ -51,7 +51,7 @@ public class DiscoveryPhase : GLib.Object {
 
     If it turns out the item was renamed after all, the instruction
     can be changed. See find_and_cancel_deleted_job (). Note that
-    item_discovered () will already have been emitted for the item.
+    signal_item_discovered () will already have been emitted for the item.
     ***********************************************************/
     GLib.HashTable<string, unowned SyncFileItem> deleted_item;
 
@@ -170,8 +170,8 @@ public class DiscoveryPhase : GLib.Object {
     public bool another_sync_needed = false;
 
 
-    internal signal void fatal_error (string error_string);
-    internal signal void item_discovered (SyncFileItem item);
+    internal signal void signal_fatal_error (string error_string);
+    internal signal void signal_item_discovered (SyncFileItem item);
     internal signal void signal_finished ();
 
 
@@ -183,11 +183,11 @@ public class DiscoveryPhase : GLib.Object {
 
 
     /***********************************************************
-    For excluded items that don't show up in item_discovered ()
+    For excluded items that don't show up in signal_item_discovered ()
 
     The path is relative to the sync folder, similar to item.file
     ***********************************************************/
-    internal signal void silently_excluded (string folder_path);
+    internal signal void signal_silently_excluded (string folder_path);
 
     /***********************************************************
     ***********************************************************/
@@ -323,7 +323,7 @@ public class DiscoveryPhase : GLib.Object {
     C/D/file, but checking A/B would yield A/B.
     ***********************************************************/
     string adjust_renamed_path (string original, SyncFileItem.Direction d) {
-        return Occ.adjust_renamed_path (d == SyncFileItem.Direction.DOWN ? this.renamed_items_remote : this.renamed_items_local, original);
+        return adjust_renamed_path (d == SyncFileItem.Direction.DOWN ? this.renamed_items_remote : this.renamed_items_local, original);
     }
 
 
@@ -384,7 +384,7 @@ public class DiscoveryPhase : GLib.Object {
                     GLib.warning (" (*it).is_restoration " + (*it).is_restoration);
                     GLib.assert (false);
                     add_error_to_gui (SyncFileItem.Status.FatalError, _("Error while canceling delete of a file"), original_path);
-                    /* emit */ fatal_error (_("Error while canceling delete of %1").printf (original_path));
+                    /* emit */ signal_fatal_error (_("Error while canceling delete of %1").printf (original_path));
                 }
                 (*it).instruction = SyncInstructions.NONE;
                 result = true;
@@ -406,33 +406,30 @@ public class DiscoveryPhase : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void start_job (ProcessDirectoryJob job) {
+    public void start_job (ProcessDirectoryJob process_directory_job) {
         //  ENFORCE (!this.current_root_job);
-        connect (
-            job,
-            ProcessDirectoryJob.signal_finished,
-            this,
+        process_directory_job.signal_finished.connect (
             this.on_signal_process_directory_job_finished
         );
-        this.current_root_job = job;
-        job.start ();
+        this.current_root_job = process_directory_job;
+        process_directory_job.start ();
     }
 
 
-    private void on_signal_process_directory_job_finished (ProcessDirectoryJob job) {
+    private void on_signal_process_directory_job_finished (ProcessDirectoryJob process_directory_job) {
         //  ENFORCE (this.current_root_job == sender ());
         this.current_root_job = null;
-        if (job.dir_item)
-            /* emit */ item_discovered (job.dir_item);
-        job.delete_later ();
+        if (process_directory_job.dir_item)
+            /* emit */ signal_item_discovered (process_directory_job.dir_item);
+        process_directory_job.delete_later ();
 
-        // Once the main job has on_signal_finished recurse here to execute the remaining
+        // Once the main process_directory_job has on_signal_finished recurse here to execute the remaining
         // jobs for queued deleted directories.
         if (!this.queued_deleted_directories == "") {
             var next_job = this.queued_deleted_directories.take (this.queued_deleted_directories.first_key ());
             start_job (next_job);
         } else {
-            /* emit */ finished ();
+            /* emit */ signal_finished ();
         }
     }
 

@@ -60,9 +60,8 @@ public class WriteJob : KeychainChunk.Job {
         start ();
 
         QEventLoop wait_loop;
-        connect (
-            this, WriteJob.on_signal_finished,
-            wait_loop, QEventLoop.quit
+        this.signal_finished.connect (
+            wait_loop.quit
         );
         wait_loop.exec ();
 
@@ -108,7 +107,7 @@ public class WriteJob : KeychainChunk.Job {
 
                 this.chunk_buffer.clear ();
 
-                /* emit */ finished (this);
+                /* emit */ signal_finished (this);
 
                 if (this.auto_delete) {
                     delete_later ();
@@ -128,9 +127,8 @@ public class WriteJob : KeychainChunk.Job {
             add_settings_to_job (this.account, qkeychain_write_password_job);
     // #endif
             qkeychain_write_password_job.insecure_fallback (this.insecure_fallback);
-            connect (
-                qkeychain_write_password_job, QKeychain.Job.on_signal_finished,
-                this, KeychainChunk.WriteJob.on_signal_write_job_done
+            qkeychain_write_password_job.signal_finished.connect (
+                this.on_signal_write_job_done
             );
             // only add the key's (sub)"index" after the first element, to stay compatible with older versions and non-Windows
             qkeychain_write_password_job.key (kck);
@@ -139,7 +137,7 @@ public class WriteJob : KeychainChunk.Job {
 
             chunk.clear ();
         } else {
-            /* emit */ finished (this);
+            /* emit */ signal_finished (this);
 
             if (this.auto_delete) {
                 delete_later ();

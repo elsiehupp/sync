@@ -733,14 +733,14 @@ public class OwncloudSetupWizard : GLib.Object {
                 .printf (this.remote_folder)
         );
 
-        var mk_col_job = new MkColJob (this.oc_wizard.account, this.remote_folder, this);
-        mk_col_job.signal_finished_with_error.connect (
+        var mkcol_job = new MkColJob (this.oc_wizard.account, this.remote_folder, this);
+        mkcol_job.signal_finished_with_error.connect (
             this.on_signal_create_remote_folder_finished
         );
-        mk_col_job.finished_without_error.connect (
+        mkcol_job.signal_finished_without_error.connect (
             this.on_signal_mkcol_job_finished_without_error
         );
-        mk_col_job.on_signal_start ();
+        mkcol_job.on_signal_start ();
     }
 
 

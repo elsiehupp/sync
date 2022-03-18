@@ -56,101 +56,54 @@ public class User : GLib.Object {
         this.activity_model = new ActivityListModel (this.account_state, this);
         this.unified_search_results_model = new UnifiedSearchResultsListModel (this.account_state, this);
         this.notification_requests_running = 0;
-        connect (
-            ProgressDispatcher.instance,
-            ProgressDispatcher.progress_info,
-            this,
-            User.on_signal_progress_info
+        ProgressDispatcher.instance.progress_info.connect (
+            this.on_signal_progress_info
         );
-        connect (
-            ProgressDispatcher.instance,
-            ProgressDispatcher.signal_item_completed,
-            this,
-            User.on_signal_item_completed
+        ProgressDispatcher.instance.signal_item_completed.connect (
+            this.on_signal_item_completed
         );
-        connect (
-            ProgressDispatcher.instance,
-            ProgressDispatcher.sync_error,
-            this,
-            User.on_signal_add_error
+        ProgressDispatcher.instance.sync_error.connect (
+            this.on_signal_add_error
         );
-        connect (
-            ProgressDispatcher.instance,
-            ProgressDispatcher.add_error_to_gui,
-            this,
-            User.on_signal_add_error_to_gui
+        ProgressDispatcher.instance.signal_add_error_to_gui.connect (
+            this.on_signal_add_error_to_gui
         );
-        connect (
-            this.notification_check_timer,
-            GLib.Timeout.timeout,
-            this,
-            User.on_signal_refresh
+        this.notification_check_timer.timeout.connect (
+            this.on_signal_refresh
         );
-        connect (
-            this.expired_activities_check_timer,
-            GLib.Timeout.timeout,
-            this,
-            User.on_signal_check_expired_activities
+        this.expired_activities_check_timer.timeout.connect (
+            this.on_signal_check_expired_activities
         );
-        connect (
-            this.account_state,
-            AccountState.signal_state_changed,
+        this.account_state.signal_state_changed.connect (
             this.on_signal_account_state_changed
         );
-        connect (
-            this.account_state,
-            AccountState.signal_state_changed,
-            this,
-            User.signal_account_state_changed
+        this.account_state.signal_state_changed.connect (
+            this.on_signal_account_state_changed
         );
-        connect (
-            this.account_state,
-            AccountState.signal_has_fetched_navigation_apps,
-            this,
-            User.on_signal_rebuild_navigation_app_list
+        this.account_state.signal_has_fetched_navigation_apps.connect (
+            this.on_signal_rebuild_navigation_app_list
         );
-        connect (
-            this.account_state.account,
-            Account.account_changed_display_name,
-            this,
-            User.signal_name_changed
+        this.account_state.account.account_changed_display_name.connect (
+            this.on_signal_name_changed
         );
-        connect (
-            FolderMan.instance,
-            FolderMan.signal_folder_list_changed,
-            this,
-            User.signal_has_local_folder_changed
+        FolderMan.instance.signal_folder_list_changed.connect (
+            this.on_signal_has_local_folder_changed
         );
-        connect (
-            this,
-            User.signal_gui_log,
-            Logger.instance,
-            Logger.signal_gui_log
+        this.signal_gui_log.connect (
+            Logger.instance.on_signal_gui_log
         );
-        connect (
-            this.account_state.account,
-            Account.account_changed_avatar,
-            this,
-            User.signal_avatar_changed
+        this.account_state.account.account_changed_avatar.connect (
+            this.signal_avatar_changed
         );
-        connect (
-            this.account_state.account,
-            Account.user_status_changed,
-            this,
-            User.signal_status_changed
+        this.account_state.account.user_status_changed.connect (
+            this.signal_status_changed
         );
-        connect (
-            this.account_state,
-            AccountState.signal_desktop_notifications_allowed_changed,
-            this,
-            User.signal_desktop_notifications_allowed_changed
+        this.account_state.signal_desktop_notifications_allowed_changed.connect (
+            this.on_signal_desktop_notifications_allowed_changed
         );
 
-        connect (
-            this.activity_model,
-            ActivityListModel.send_notification_request,
-            this,
-            User.on_signal_send_notification_request
+        this.activity_model.send_notification_request.connect (
+            this.on_signal_send_notification_request
         );
     }
 
@@ -178,8 +131,8 @@ public class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public AccountAppList app_list () {
-        return this.account_state.app_list ();
+    public AccountAppList app_list {
+        return this.account_state.app_list;
     }
 
 
@@ -237,10 +190,8 @@ public class User : GLib.Object {
             connect_push_notifications ();
             return true;
         } else {
-            connect (
-                this.account_state.account, Account.push_notifications_ready,
-                this, User.on_signal_push_notifications_ready,
-                Qt.UniqueConnection
+            this.account_state.account.signal_push_notifications_ready.connect (
+                this.on_signal_push_notifications_ready // Qt.UniqueConnection
             );
             return false;
         }
@@ -538,8 +489,8 @@ public class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_notify_network_error (Soup.Reply reply) {
-        var job = qobject_cast<NotificationConfirmJob> (sender ());
-        if (!job) {
+        var notification_confirm_job = qobject_cast<NotificationConfirmJob> (sender ());
+        if (!notification_confirm_job) {
             return;
         }
 
@@ -635,23 +586,17 @@ public class User : GLib.Object {
         if (valid_verbs.contains (verb)) {
             unowned AccountState acc = AccountManager.instance.account (account_name);
             if (acc) {
-                var job = new NotificationConfirmJob (acc.account);
+                var notification_confirm_job = new NotificationConfirmJob (acc.account);
                 GLib.Uri l = new GLib.Uri (link);
-                job.link_and_verb (l, verb);
-                job.property ("activity_row", GLib.Variant.from_value (row));
-                connect (
-                    job,
-                    AbstractNetworkJob.network_error,
-                    this,
-                    User.on_signal_notify_network_error
+                notification_confirm_job.link_and_verb (l, verb);
+                notification_confirm_job.property ("activity_row", GLib.Variant.from_value (row));
+                notification_confirm_job.signal_network_error.connect (
+                    this.on_signal_notify_network_error
                 );
-                connect (
-                    job,
-                    NotificationConfirmJob.signal_job_finished,
-                    this,
-                    User.on_signal_notify_server_finished
+                notification_confirm_job.signal_job_finished.connect (
+                    this.on_signal_notify_server_finished
                 );
-                job.on_signal_start ();
+                notification_confirm_job.on_signal_start ();
 
                 // count the number of running notification requests. If this member var
                 // is larger than zero, no new fetching of notifications is started
@@ -666,8 +611,8 @@ public class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_notify_server_finished (string reply, int reply_code) {
-        var job = qobject_cast<NotificationConfirmJob> (sender ());
-        if (!job) {
+        var notification_confirm_job = qobject_cast<NotificationConfirmJob> (sender ());
+        if (!notification_confirm_job) {
             return;
         }
 
@@ -700,9 +645,8 @@ public class User : GLib.Object {
     public void on_signal_refresh_notifications () {
         if (this.notification_requests_running == 0) {
             var server_notification_handler = new ServerNotificationHandler (this.account_state);
-            connect (
-                server_notification_handler, ServerNotificationHandler.signal_new_notification_list,
-                this, User.on_signal_build_notification_display
+            server_notification_handler.signal_new_notification_list.connect (
+                this.on_signal_build_notification_display
             );
 
             server_notification_handler.on_signal_fetch_notifications ();
@@ -852,27 +796,15 @@ public class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void connect_push_notifications () {
-        connect (
-            this.account_state.account,
-            Account.push_notifications_disabled,
-            this,
-            User.on_signal_disconnect_push_notifications,
-            Qt.UniqueConnection
+        this.account_state.account.push_notifications_disabled.connect (
+            this.on_signal_disconnect_push_notifications // Qt.UniqueConnection
         );
 
-        connect (
-            this.account_state.account.push_notifications (),
-            PushNotifications.notifications_changed,
-            this,
-            User.on_signal_received_push_notification,
-            Qt.UniqueConnection
+        this.account_state.account.push_notifications.notifications_changed.connect (
+            this.on_signal_received_push_notification // Qt.UniqueConnection
         );
-        connect (
-            this.account_state.account.push_notifications (),
-            PushNotifications.activities_changed,
-            this,
-            User.on_signal_received_push_activity,
-            Qt.UniqueConnection
+        this.account_state.account.push_notifications.activities_changed.connect (
+            this.on_signal_received_push_activity // Qt.UniqueConnection
         );
     }
 

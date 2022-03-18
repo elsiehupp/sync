@@ -29,13 +29,11 @@ public class HttpServer : QTcpServer {
         if (disabled)
             return;
         QTcpSocket tcp_socket = new QTcpSocket (this);
-        connect (
-            tcp_socket, SIGNAL (signal_ready_read ()),
-            this, SLOT (on_signal_read_client ())
+        tcp_socket.signal_ready_read.connect (
+            this.on_signal_read_client
         );
-        connect (
-            tcp_socket, SIGNAL (disconnected ()),
-            this, SLOT (on_signal_discard_client ())
+        tcp_socket.disconnected.connect (
+            this.on_signal_discard_client
         );
         tcp_socket.set_socket_descriptor (socket);
     }

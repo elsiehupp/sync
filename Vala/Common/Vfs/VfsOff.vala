@@ -271,7 +271,7 @@ public class VfsOff : AbstractVfs {
     /***********************************************************
     ***********************************************************/
     //  const int OCC_DEFINE_VFS_FACTORY (name, Type) {
-    //      static_assert (std.is_base_of<Occ.Vfs, Type>.value, "Please define VFS factories only for Occ.Vfs subclasses");
+    //      static_assert (std.is_base_of<Vfs, Type>.value, "Please define VFS factories only for Vfs subclasses");
     //  }
 
 

@@ -42,12 +42,12 @@ public class SyncEngineTestUtils {
     }
 
     inline string generate_etag () {
-        return string.number (GLib.DateTime.current_date_time_utc ().to_m_secs_since_epoch (), 16) + string.number (Occ.Utility.rand (), 16);
+        return string.number (GLib.DateTime.current_date_time_utc ().to_m_secs_since_epoch (), 16) + string.number (Utility.rand (), 16);
     }
 
 
     inline string generate_file_id () {
-        return string.number (Occ.Utility.rand (), 16);
+        return string.number (Utility.rand (), 16);
     }
 
     // QTest.to_string overloads

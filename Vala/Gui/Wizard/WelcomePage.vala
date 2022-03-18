@@ -102,17 +102,14 @@ public class WelcomePage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void set_up_slide_show () {
-        connect (
-            this.ui.slide_show, SlideShow.clicked,
-            this.ui.slide_show, SlideShow.on_signal_stop_show
+        this.ui.slide_show.clicked.connect (
+            this.ui.slide_show.on_signal_stop_show
         );
-        connect (
-            this.ui.slide_show_next_button, QPushButton.clicked,
-            this.ui.slide_show, SlideShow.on_signal_next_slide
+        this.ui.slide_show_next_button.clicked.connect (
+            this.ui.slide_show.on_signal_next_slide
         );
-        connect (
-            this.ui.slide_show_previous_button, QPushButton.clicked,
-            this.ui.slide_show, SlideShow.on_signal_prev_slide
+        this.ui.slide_show_previous_button.clicked.connect (
+            this.ui.slide_show.on_signal_prev_slide
         );
     }
 
@@ -123,10 +120,7 @@ public class WelcomePage : QWizardPage {
         const string app_name = Theme.app_name_gui;
 
         this.ui.login_button.on_signal_text (_("Log in to your %1").printf (app_name));
-        connect (
-            this.ui.login_button,
-            QPushButton.clicked,
-            this,
+        this.ui.login_button.clicked.connect (
             this.on_login_button_clicked
         );
     }
@@ -143,10 +137,7 @@ public class WelcomePage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void set_up_create_account_button () {
-        connect (
-            this.ui.create_account_button,
-            QPushButton.clicked,
-            this,
+        this.ui.create_account_button.clicked.connect (
             this.on_create_account_button_clicked
         );
     }

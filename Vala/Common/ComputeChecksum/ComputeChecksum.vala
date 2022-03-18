@@ -171,7 +171,7 @@ public class ComputeChecksum : ComputeChecksumBase {
     }
 
 
-    internal signal void done (string checksum_type, string checksum);
+    internal signal void signal_finished (string checksum_type, string checksum);
 
 
     /***********************************************************

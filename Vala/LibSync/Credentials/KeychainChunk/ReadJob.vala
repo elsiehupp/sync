@@ -65,9 +65,8 @@ public class ReadJob : KeychainChunk.Job {
     // #endif
         qkeychain_read_password_job.insecure_fallback (this.insecure_fallback);
         qkeychain_read_password_job.key (kck);
-        connect (
-            qkeychain_read_password_job, QKeychain.Job.on_signal_finished,
-            this, KeychainChunk.ReadJob.on_signal_read_job_done
+        qkeychain_read_password_job.signal_finished.connect (
+            this.on_signal_read_job_done
         );
         qkeychain_read_password_job.start ();
     }
@@ -83,9 +82,8 @@ public class ReadJob : KeychainChunk.Job {
         start ();
 
         QEventLoop wait_loop;
-        connect (
-            this, ReadJob.on_signal_finished,
-            wait_loop, QEventLoop.quit
+        this.signal_finished.connect (
+            wait_loop.quit
         );
         wait_loop.exec ();
 
@@ -137,7 +135,7 @@ public class ReadJob : KeychainChunk.Job {
 
         read_job.delete_later ();
 
-        /* emit */ finished (this);
+        /* emit */ signal_finished (this);
 
         if (this.auto_delete) {
             delete_later ();

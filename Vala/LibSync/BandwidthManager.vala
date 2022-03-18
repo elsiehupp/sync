@@ -113,47 +113,41 @@ public class BandwidthManager : GLib.Object {
         this.current_upload_limit = this.propagator.upload_limit;
         this.current_download_limit = this.propagator.download_limit;
 
-        connect (
-            this.switching_timer, GLib.Timeout.timeout,
-            this, BandwidthManager.on_signal_switching_timer_expired
+        this.switching_timer.timeout.connect (
+            this.on_signal_switching_timer_timeout
         );
         this.switching_timer.interval (10 * 1000);
         this.switching_timer.start ();
-        QMetaObject.invoke_method (this, "on_signal_switching_timer_expired", Qt.QueuedConnection);
+        QMetaObject.invoke_method (this, "on_signal_switching_timer_timeout", Qt.QueuedConnection);
 
         // absolute uploads/downloads
-        connect (
-            this.absolute_limit_timer, GLib.Timeout.timeout,
-            this, BandwidthManager.on_signal_absolute_limit_timer_expired
+        this.absolute_limit_timer.timeout.connect (
+            this.on_signal_absolute_limit_timer_timeout
         );
         this.absolute_limit_timer.interval (1000);
         this.absolute_limit_timer.start ();
 
         // Relative uploads
-        connect (
-            this.relative_upload_measuring_timer, GLib.Timeout.timeout,
-            this, BandwidthManager.on_signal_relative_upload_measuring_timer_expired
+        this.relative_upload_measuring_timer.timeout.connect (
+            this.on_signal_relative_upload_measuring_timer_timeout
         );
         this.relative_upload_measuring_timer.interval (relative_limit_measuring_timer_interval_msec);
         this.relative_upload_measuring_timer.start ();
         this.relative_upload_measuring_timer.single_shot (true); // will be restarted from the delay timer
-        connect (
-            this.relative_upload_delay_timer, GLib.Timeout.timeout,
-            this, BandwidthManager.on_signal_relative_upload_delay_timer_expired
+        this.relative_upload_delay_timer.timeout.connect (
+            this, BandwidthManager.on_signal_relative_upload_delay_timer_timeout
         );
         this.relative_upload_delay_timer.single_shot (true); // will be restarted from the measuring timer
 
         // Relative downloads
-        connect (
-            this.relative_download_measuring_timer, GLib.Timeout.timeout,
-            this, BandwidthManager.on_signal_relative_download_measuring_timer_expired
+        this.relative_download_measuring_timer.timeout.connect (
+            this.on_signal_relative_download_measuring_timer_timeout
         );
         this.relative_download_measuring_timer.interval (relative_limit_measuring_timer_interval_msec);
         this.relative_download_measuring_timer.start ();
         this.relative_download_measuring_timer.single_shot (true); // will be restarted from the delay timer
-        connect (
-            this.relative_download_delay_timer, GLib.Timeout.timeout,
-            this, BandwidthManager.on_signal_relative_download_delay_timer_expired
+        this.relative_download_delay_timer.timeout.connect (
+            this.on_signal_relative_download_delay_timer_timeout
         );
         this.relative_download_delay_timer.single_shot (true); // will be restarted from the measuring timer
     }
@@ -192,9 +186,8 @@ public class BandwidthManager : GLib.Object {
     public void on_signal_register_upload_device (UploadDevice upload_device) {
         this.absolute_upload_device_list.push_back (upload_device);
         this.relative_upload_device_list.push_back (upload_device);
-        connect (
-            upload_device, GLib.Object.destroyed, this,
-            BandwidthManager.on_signal_unregister_upload_device
+        upload_device.destroyed.connect (
+            this.on_signal_unregister_upload_device
         );
 
         if (using_absolute_upload_limit ()) {
@@ -227,9 +220,8 @@ public class BandwidthManager : GLib.Object {
     ***********************************************************/
     public void on_signal_register_download_job (GETFileJob get_file_job) {
         this.download_job_list.push_back (get_file_job);
-        connect (
-            get_file_job, GLib.Object.destroyed,
-            this, BandwidthManager.on_signal_unregister_download_job
+        get_file_job.destroyed.connect (
+            this.on_signal_unregister_download_job
         );
 
         if (using_absolute_download_limit ()) {
@@ -247,7 +239,7 @@ public class BandwidthManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_relative_upload_measuring_timer_expired () {
+    public void on_signal_relative_upload_measuring_timer_timeout () {
         if (!using_relative_upload_limit () || this.relative_upload_device_list.empty ()) {
             // Not in this limiting mode, just wait 1 sec to continue the cycle
             this.relative_upload_delay_timer.interval (1000);
@@ -321,7 +313,7 @@ public class BandwidthManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_absolute_limit_timer_expired () {
+    public void on_signal_absolute_limit_timer_timeout () {
         if (using_absolute_upload_limit () && !this.absolute_upload_device_list.empty ()) {
             int64 quota_per_device = this.current_upload_limit / q_max ( 1, this.absolute_upload_device_list.size ());
             GLib.debug (quota_per_device + this.absolute_upload_device_list.size () + this.current_upload_limit);
@@ -343,7 +335,7 @@ public class BandwidthManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_switching_timer_expired () {
+    public void on_signal_switching_timer_timeout () {
         int64 new_upload_limit = this.propagator.upload_limit;
         if (new_upload_limit != this.current_upload_limit) {
             GLib.info ("Upload Bandwidth limit changed" + this.current_upload_limit + new_upload_limit);
@@ -383,7 +375,7 @@ public class BandwidthManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_relative_upload_delay_timer_expired () {
+    public void on_signal_relative_upload_delay_timer_timeout () {
         // Switch to measuring state
         this.relative_upload_measuring_timer.start (); // always start to continue the cycle
 
@@ -423,7 +415,7 @@ public class BandwidthManager : GLib.Object {
     /***********************************************************
     // for downloads:
     ***********************************************************/
-    public void on_signal_relative_download_measuring_timer_expired () {
+    public void on_signal_relative_download_measuring_timer_timeout () {
         if (!using_relative_download_limit () || this.download_job_list.empty ()) {
             // Not in this limiting mode, just wait 1 sec to continue the cycle
             this.relative_download_delay_timer.interval (1000);
@@ -482,7 +474,7 @@ public class BandwidthManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_relative_download_delay_timer_expired () {
+    public void on_signal_relative_download_delay_timer_timeout () {
         // Switch to measuring state
         this.relative_download_measuring_timer.start (); // always start to continue the cycle
 

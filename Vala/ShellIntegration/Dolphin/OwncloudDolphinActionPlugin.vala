@@ -95,10 +95,8 @@ public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
                 action.setDisabled (true);
             }
             var call = args.value (1).toLatin1 ();
-            connect (
-                action,
-                QAction.triggered,
-                on_signal_action_triggered
+            action.triggered.connect (
+                this.on_signal_action_triggered
             );
         }
     }
@@ -124,30 +122,21 @@ public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
         menuaction.setMenu (menu);
 
         var share_action = menu.add_action (helper.share_action_title ());
-        connect (
-            share_action,
-            Action.triggered,
-            this,
-            on_signal_share_action_triggered
+        share_action.triggered.connect (
+            this.on_signal_share_action_triggered
         );
 
         if (!helper.copy_private_link_title ().isEmpty ()) {
             var copy_private_link_action = menu.add_action (helper.copy_private_link_title ());
-            connect (
-                copy_private_link_action,
-                QAction.triggered,
-                this,
-                on_signal_copy_private_link_action_triggered
+            copy_private_link_action.triggered.connect (
+                this.on_signal_copy_private_link_action_triggered
             );
         }
 
         if (!helper.emailPrivateLinkTitle ().isEmpty ()) {
             var email_private_link_action = menu.add_action (helper.emailPrivateLinkTitle ());
-            connect (
-                email_private_link_action,
-                QAction.triggered,
-                this,
-                on_signal_email_private_link_action_triggered
+            email_private_link_action.triggered.connect (
+                this.on_signal_email_private_link_action_triggered
             );
         }
         return { menuaction };

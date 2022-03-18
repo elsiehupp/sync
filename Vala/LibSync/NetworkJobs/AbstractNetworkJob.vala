@@ -102,7 +102,7 @@ public class AbstractNetworkJob : GLib.Object {
     (QPointer because the NetworkManager may be destroyed before
     the jobs at exit)
     ***********************************************************/
-    QPointer<GLib.InputStream> input_stream {
+    public GLib.InputStream input_stream {
         public get {
             return this.input_stream;
         }
@@ -165,36 +165,33 @@ public class AbstractNetworkJob : GLib.Object {
 
         this.timer.single_shot (true);
         this.timer.interval ( (http_timeout ? http_timeout : 300) * 1000); // default to 5 minutes.
-        connect (
-            this.timer, GLib.Timeout.timeout,
-            this, AbstractNetworkJob.on_signal_timeout
+        this.timer.timeout.connect (
+            this.on_signal_timeout
         );
 
-        connect (
-            this, AbstractNetworkJob.signal_network_activity,
-            this, AbstractNetworkJob.reset_timeout
+        this.signal_network_activity.connect (
+            this.reset_timeout
         );
 
         // Network activity on the propagator jobs (GET/PUT) keeps all requests alive.
         // This is a workaround for OC instances which only support one
         // parallel up and download
         if (this.account) {
-            connect (
-                this.account, Account.signal_propagator_network_activity,
-                this, AbstractNetworkJob.reset_timeout
+            this.account.signal_propagator_network_activity.connect (
+                this.reset_timeout
             );
         }
     }
 
 
     ~AbstractNetworkJob () {
-        input_stream (null);
+        input_stream = null;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public new void start () {
+    public void start () {
         this.timer.start ();
 
         const GLib.Uri url = account.url;
@@ -384,33 +381,26 @@ public class AbstractNetworkJob : GLib.Object {
 
 
     protected void up_connections (GLib.InputStream input_stream) {
-        connect (
-            input_stream, Soup.Reply.on_signal_finished,
-            this, AbstractNetworkJob.on_signal_finished
+        input_stream.signal_finished.connect (
+            this.on_signal_finished
         );
-        connect (
-            input_stream, Soup.Reply.encrypted,
-            this, AbstractNetworkJob.signal_network_activity
+        input_stream.encrypted.connect (
+            this.on_signal_network_activity
         );
-        connect (
-            input_stream.manager (), Soup.Session.signal_proxy_authentication_required,
-            this, AbstractNetworkJob.signal_network_activity
+        input_stream.manager.signal_proxy_authentication_required.connect (
+            this.on_signal_network_activity
         );
-        connect (
-            input_stream, Soup.Reply.signal_ssl_errors,
-            this, AbstractNetworkJob.signal_network_activity
+        input_stream.signal_ssl_errors.connect (
+            this.on_signal_network_activity
         );
-        connect (
-            input_stream, Soup.Reply.meta_data_changed,
-            this, AbstractNetworkJob.signal_network_activity
+        input_stream.meta_data_changed.connect (
+            this.on_signal_network_activity
         );
-        connect (
-            input_stream, Soup.Reply.download_progress,
-            this, AbstractNetworkJob.signal_network_activity
+        input_stream.download_progress.connect (
+            this.on_signal_network_activity
         );
-        connect (
-            input_stream, Soup.Reply.signal_upload_progress,
-            this, AbstractNetworkJob.signal_network_activity
+        input_stream.signal_upload_progress.connect (
+            this.on_signal_network_activity
         );
     }
 

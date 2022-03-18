@@ -163,12 +163,11 @@ public class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public Soup.Session create_qnam () {
+    public Soup.Session create_access_manager () {
         AccessManager access_manager = new HttpCredentialsAccessManager (this);
 
-        connect (
-            access_manager, Soup.Session.signal_authentication_required,
-            this, HttpCredentials.on_signal_authentication
+        access_manager.signal_authentication_required.connect (
+            this.on_signal_authentication
         );
 
         return access_manager;
@@ -203,11 +202,11 @@ public class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public bool still_valid (GLib.InputStream reply) {
-        return ( (reply.error () != Soup.Reply.AuthenticationRequiredError)
+    public bool still_valid (GLib.InputStream input_stream) {
+        return ( (input_stream.error () != Soup.Reply.AuthenticationRequiredError)
             // returned if user or password is incorrect
-            && (reply.error () != Soup.Reply.OperationCanceledError
-                   || !reply.property (AUTHENTICATION_FAILED_C).to_bool ()));
+            && (input_stream.error () != Soup.Reply.OperationCanceledError
+                   || !input_stream.property (AUTHENTICATION_FAILED_C).to_bool ()));
     }
 
 
@@ -237,9 +236,8 @@ public class HttpCredentials : AbstractCredentials {
             var qkeychain_write_password_job = new QKeychain.WritePasswordJob (Theme.app_name);
             add_settings_to_job (this.account, qkeychain_write_password_job);
             qkeychain_write_password_job.insecure_fallback (false);
-            connect (
-                qkeychain_write_password_job, QKeychain.Job.on_signal_finished,
-                this, HttpCredentials.on_signal_write_client_cert_password_job_done
+            qkeychain_write_password_job.signal_finished.connect (
+                this.on_signal_write_client_cert_password_job_done
             );
             qkeychain_write_password_job.key (keychain_key (this.account.url.to_string (), this.user + CLIENT_CERT_PASSWORD_C, this.account.identifier ()));
             qkeychain_write_password_job.binary_data (this.client_cert_password);
@@ -253,9 +251,8 @@ public class HttpCredentials : AbstractCredentials {
             var qkeychain_write_password_job = new QKeychain.WritePasswordJob (Theme.app_name);
             add_settings_to_job (this.account, qkeychain_write_password_job);
             qkeychain_write_password_job.insecure_fallback (false);
-            connect (
-                qkeychain_write_password_job, QKeychain.Job.on_signal_finished,
-                this, HttpCredentials.on_signal_write_client_cert_pem_job_done
+            qkeychain_write_password_job.signal_finished.connect (
+                this.on_signal_write_client_cert_pem_job_done
             );
             qkeychain_write_password_job.key (keychain_key (this.account.url.to_string (), this.user + CLIENT_CERTIFICATE_PEM_C, this.account.identifier ()));
             qkeychain_write_password_job.binary_data (this.client_ssl_certificate.to_pem ());
@@ -305,7 +302,7 @@ public class HttpCredentials : AbstractCredentials {
         // indirectly) from QNetworkAccessManagerPrivate.signal_authentication_required, which itself
         // is a called from a BlockingQueuedConnection from the Qt HTTP thread. And clearing the
         // cache needs to synchronize again with the HTTP thread.
-        GLib.Timeout.single_shot (0, this.account, Account.on_signal_clear_qnam_cache);
+        GLib.Timeout.single_shot (0, this.account, Account.on_signal_clear_access_manager_cache);
     }
 
 
@@ -340,15 +337,18 @@ public class HttpCredentials : AbstractCredentials {
     asynchronously and emit fetched () otherwise return false
     ***********************************************************/
     public bool refresh_access_token () {
-        if (this.refresh_token == "")
+        if (this.refresh_token == "") {
             return false;
+        }
 
         GLib.Uri request_token = Utility.concat_url_path (this.account.url, "/index.php/apps/oauth2/api/v1/token");
         Soup.Request request = new Soup.Request ();
         request.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
 
         string basic_auth = "%1:%2".printf (
-            Theme.oauth_client_id, Theme.oauth_client_secret);
+            Theme.oauth_client_id,
+            Theme.oauth_client_secret
+        );
         request.raw_header ("Authorization", "Basic " + basic_auth.to_utf8 ().to_base64 ());
         request.attribute (HttpCredentials.DontAddCredentialsAttribute, true);
 
@@ -358,18 +358,17 @@ public class HttpCredentials : AbstractCredentials {
 
         var simple_network_job = this.account.send_request ("POST", request_token, request, request_body);
         simple_network_job.on_signal_timeout (q_min (30 * 1000ll, simple_network_job.timeout_msec ()));
-        connect (
-            simple_network_job, SimpleNetworkJob.signal_finished,
-            this, (reply) => {
-                var json_data = reply.read_all ();
+        simple_network_job.signal_finished.connect (
+            (input_stream) => {
+                var json_data = input_stream.read_all ();
                 QJsonParseError json_parse_error;
                 QJsonObject json = QJsonDocument.from_json (json_data, json_parse_error).object ();
                 string access_token = json["access_token"].to_string ();
                 if (json_parse_error.error != QJsonParseError.NoError || json == "") {
                     // Invalid or empty JSON : Network error maybe?
-                    GLib.warning ("Error while refreshing the token " + reply.error_string () + json_data + json_parse_error.error_string ());
+                    GLib.warning ("Error while refreshing the token " + input_stream.error_string () + json_data + json_parse_error.error_string ());
                 } else if (access_token == "") {
-                    // If the json was valid, but the reply did not contain an access token, the token
+                    // If the json was valid, but the input_stream did not contain an access token, the token
                     // is considered expired. (Usually the HTTP reply code is 400)
                     GLib.debug ("Expired refresh token. Logging out.");
                     this.refresh_token.clear ();
@@ -416,8 +415,8 @@ public class HttpCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     public bool retry_if_needed (AbstractNetworkJob job_to_retry) {
-        var reply = job_to_retry.reply ();
-        if (!reply || !reply.property (NEED_RETRY_C).to_bool ())
+        var input_stream = job_to_retry.input_stream;
+        if (!input_stream || !input_stream.property (NEED_RETRY_C).to_bool ())
             return false;
         if (this.is_renewing_oauth_token) {
             this.retry_queue.append (job_to_retry);
@@ -430,18 +429,19 @@ public class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_authentication (GLib.InputStream reply, QAuthenticator authenticator) {
-        if (!this.ready)
+    private void on_signal_authentication (GLib.InputStream input_stream, QAuthenticator authenticator) {
+        if (!this.ready) {
             return;
+        }
         //  Q_UNUSED (authenticator)
         // Because of issue #4326, we need to set the login and password manually at every requests
         // Thus, if we reach this signal, those credentials were invalid and we terminate.
-        GLib.warning ("Stop request: Authentication failed for " + reply.url.to_string ());
-        reply.property (AUTHENTICATION_FAILED_C, true);
+        GLib.warning ("Stop request: Authentication failed for " + input_stream.url.to_string ());
+        input_stream.property (AUTHENTICATION_FAILED_C, true);
 
         if (this.is_renewing_oauth_token) {
-            reply.property (NEED_RETRY_C, true);
-        } else if (is_using_oauth () && !reply.property (NEED_RETRY_C).to_bool ()) {
+            input_stream.property (NEED_RETRY_C, true);
+        } else if (is_using_oauth () && !input_stream.property (NEED_RETRY_C).to_bool ()) {
             reply.property (NEED_RETRY_C, true);
             GLib.info ("Refreshing token.");
             refresh_access_token ();
@@ -498,9 +498,8 @@ public class HttpCredentials : AbstractCredentials {
         add_settings_to_job (this.account, qkeychain_read_password_job);
         qkeychain_read_password_job.insecure_fallback (false);
         qkeychain_read_password_job.key (kck);
-        connect (
-            qkeychain_read_password_job, QKeychain.ReadPasswordJob.on_signal_finished,
-            this, HttpCredentials.on_signal_read_client_key_pem_job_done
+        qkeychain_read_password_job.signal_finished.connect (
+            this.on_signal_read_client_key_pem_job_done
         );
         qkeychain_read_password_job.start ();
     }
@@ -544,9 +543,8 @@ public class HttpCredentials : AbstractCredentials {
         add_settings_to_job (this.account, qkeychain_read_password_job);
         qkeychain_read_password_job.insecure_fallback (false);
         qkeychain_read_password_job.key (kck);
-        connect (
-            qkeychain_read_password_job, QKeychain.ReadPasswordJob.on_signal_finished,
-            this, HttpCredentials.on_signal_read_job_done
+        qkeychain_read_password_job.signal_finished.connect (
+            this.on_signal_read_job_done
         );
         qkeychain_read_password_job.start ();
     }
@@ -579,9 +577,8 @@ public class HttpCredentials : AbstractCredentials {
             var qkeychain_write_password_job = new QKeychain.WritePasswordJob (Theme.app_name);
             add_settings_to_job (this.account, qkeychain_write_password_job);
             qkeychain_write_password_job.insecure_fallback (false);
-            connect (
-                qkeychain_write_password_job, QKeychain.Job.on_signal_finished,
-                this, HttpCredentials.on_signal_write_client_key_pem_job_done
+            qkeychain_write_password_job.signal_finished.connect (
+                this.on_signal_write_client_key_pem_job_done
             );
             qkeychain_write_password_job.key (keychain_key (this.account.url.to_string (), this.user + CLIENT_KEY_PEM_C, this.account.identifier ()));
             qkeychain_write_password_job.binary_data (this.client_ssl_key.to_pem ());
@@ -666,9 +663,8 @@ public class HttpCredentials : AbstractCredentials {
         var qkeychain_write_password_job = new QKeychain.WritePasswordJob (Theme.app_name);
         add_settings_to_job (this.account, qkeychain_write_password_job);
         qkeychain_write_password_job.insecure_fallback (false);
-        connect (
-            qkeychain_write_password_job, QKeychain.Job.on_signal_finished,
-            this, HttpCredentials.on_signal_write_job_done
+        qkeychain_write_password_job.signal_finished.connect (
+            this.on_signal_write_job_done
         );
         qkeychain_write_password_job.key (keychain_key (this.account.url.to_string (), this.user, this.account.identifier ()));
         qkeychain_write_password_job.text_data (is_using_oauth () ? this.refresh_token : this.password);
@@ -704,9 +700,8 @@ public class HttpCredentials : AbstractCredentials {
             add_settings_to_job (this.account, qkeychain_read_password_job);
             qkeychain_read_password_job.insecure_fallback (false);
             qkeychain_read_password_job.key (keychain_key (this.account.url.to_string (), this.user + CLIENT_CERT_PASSWORD_C, this.account.identifier ()));
-            connect (
-                qkeychain_read_password_job, QKeychain.Job.on_signal_finished,
-                this, HttpCredentials.on_signal_read_client_cert_password_job_done
+            qkeychain_read_password_job.signal_finished.connect (
+                this.on_signal_read_client_cert_password_job_done
             );
             qkeychain_read_password_job.start ();
             return;
@@ -722,9 +717,8 @@ public class HttpCredentials : AbstractCredentials {
         add_settings_to_job (this.account, qkeychain_read_password_job);
         qkeychain_read_password_job.insecure_fallback (false);
         qkeychain_read_password_job.key (kck);
-        connect (
-            qkeychain_read_password_job, QKeychain.Job.on_signal_finished,
-            this, HttpCredentials.on_signal_read_client_cert_pem_job_done
+        qkeychain_read_password_job.signal_finished.connect (
+            this.on_signal_read_client_cert_pem_job_done
         );
         qkeychain_read_password_job.start ();
     }

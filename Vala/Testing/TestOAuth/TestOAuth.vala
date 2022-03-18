@@ -35,7 +35,7 @@ public class TestOAuth : GLib.Object {
 
             std.unique_ptr<QBuffer> payload = new std.unique_ptr<QBuffer> (new QBuffer ());
             payload.set_data (token_reply_payload ());
-            return new SlowFakePostReply (operation, request, std.move (payload), fake_qnam);
+            return new SlowFakePostReply (operation, request, std.move (payload), fake_access_manager);
         }
 
         override void browser_reply_finished () {
@@ -137,7 +137,7 @@ public class TestOAuth : GLib.Object {
                 return reply;
             } else {
                 // ^^ This is with a custom reply and not actually HTTP, so we're testing the HTTP redirect code
-                // we have in AbstractNetworkJob.slot_finished ()
+                // we have in AbstractNetworkJob.on_signal_finished ()
                 redirects_done++;
                 return OAuthTestCase.token_reply (operation, request);
             }

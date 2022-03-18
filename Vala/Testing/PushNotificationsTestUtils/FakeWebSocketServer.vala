@@ -35,17 +35,11 @@ public class FakeWebSocketServer : GLib.Object {
         if (!this.web_socket_server.listen (QHostAddress.Any, port)) {
             Q_UNREACHABLE ();
         }
-        connect (
-            this.web_socket_server,
-            QWebSocketServer.new_connection,
-            this,
-            FakeWebSocketServer.on_signal_new_connection
+        this.web_socket_server.new_connection.connect (
+            this.on_signal_new_connection
         );
-        connect (
-            this.web_socket_server,
-            QWebSocketServer.signal_closed,
-            this,
-            FakeWebSocketServer.signal_closed
+        this.web_socket_server.signal_closed.connect (
+            this.signal_closed
         );
         GLib.info ("Open fake websocket server on port: " + port.to_string ());
         this.process_text_message_spy = std.make_unique<QSignalSpy> (this, &FakeWebSocketServer.signal_process_text_message);
@@ -55,15 +49,15 @@ public class FakeWebSocketServer : GLib.Object {
         close ();
     }
 
-    delegate void BeforeAuthentication (Occ.PushNotifications push_notifications);
+    delegate void BeforeAuthentication (PushNotifications push_notifications);
     delegate void AfterAuthentication ();
 
     /***********************************************************
     ***********************************************************/
-    public QWebSocket authenticate_account (Occ.Account account, BeforeAuthentication before_authentication, AfterAuthentication after_authentication) {
+    public QWebSocket authenticate_account (Account account, BeforeAuthentication before_authentication, AfterAuthentication after_authentication) {
         var push_notifications = account.push_notifications ();
         GLib.assert_true (push_notifications);
-        QSignalSpy ready_spy = new QSignalSpy (push_notifications, &Occ.PushNotifications.ready);
+        QSignalSpy ready_spy = new QSignalSpy (push_notifications, &PushNotifications.ready);
 
         before_authentication (push_notifications);
 
@@ -153,8 +147,8 @@ public class FakeWebSocketServer : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static unowned Occ.Account create_account (string username = "user", string password = "password") {
-        var account = Occ.Account.create ();
+    public static unowned Account create_account (string username = "user", string password = "password") {
+        var account = Account.create ();
 
         string[] type_list;
         type_list.append ("files");

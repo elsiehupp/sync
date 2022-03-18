@@ -15,10 +15,10 @@ public class UserGroupShare : Share {
         }
         public set {
             var ocs_share_job = new OcsShareJob (this.account);
-            ocs_share_job.share_job_finished.connect (
+            ocs_share_job.signal_finished.connect (
                 this.on_signal_link_share_note_set
             );
-            ocs_share_job.ocs_error.connect (
+            ocs_share_job.signal_error.connect (
                 this.signal_note_error
             );
             ocs_share_job.note (identifier (), value);
@@ -37,10 +37,10 @@ public class UserGroupShare : Share {
             }
 
             var ocs_share_job = new OcsShareJob (this.account);
-            ocs_share_job.share_job_finished.connect (
+            ocs_share_job.signal_finished.connect (
                 this.on_signal_expire_date_set
             );
-            ocs_share_job.ocs_error.connect (
+            ocs_share_job.signal_error.connect (
                 this.on_signal_ocs_error
             );
             ocs_share_job.expire_date (identifier (), value);

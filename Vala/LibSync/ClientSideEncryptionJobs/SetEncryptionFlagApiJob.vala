@@ -34,8 +34,8 @@ public class SetEncryptionFlagApiJob : AbstractNetworkJob {
     private FlagAction flag_action = Set;
 
 
-    internal signal void success (string file_identifier);
-    internal signal void error (string file_identifier, int http_return_code);
+    internal signal void signal_success (string file_identifier);
+    internal signal void signal_error (string file_identifier, int http_return_code);
 
     
     /***********************************************************

@@ -21,27 +21,18 @@ public class UpdaterScheduler : GLib.Object {
     ***********************************************************/
     public UpdaterScheduler (GLib.Object parent) {
         base (parent);
-        connect (
-            this.update_check_timer,
-            GLib.Timeout.timeout,
-            this,
-            UpdaterScheduler.on_signal_timer_fired
+        this.update_check_timer.timeout.connect (
+            this.on_signal_timer_fired
         );
 
         var updater = (OCUpdater) Updater.instance;
         // Note: the sparkle-updater is not an OCUpdater
         if (updater) {
-            connect (
-                updater,
-                OCUpdater.signal_new_update_available,
-                this,
-                UpdaterScheduler.on_signal_updater_announcement
+            updater.signal_new_update_available.connect (
+                this.on_signal_updater_announcement
             );
-            connect (
-                updater,
-                OCUpdater.signal_request_restart,
-                this,
-                UpdaterScheduler.on_signal_request_restart
+            updater.signal_request_restart.connect (
+                this.on_signal_request_restart
             );
         }
 

@@ -193,13 +193,11 @@ public class TestDownload : GLib.Object {
 
 
     private void on_signal_sync_engine_transmission_progress (ProgressInfo progress_info) {
-        var propagator = fake_folder.sync_engine.get_propagator ();
+        var propagator = fake_folder.sync_engine.propagator;
         if (progress_info.status () != ProgressInfo.Status.PROPAGATION || prop_connected || !propagator)
             return;
         prop_connected = true;
-        connect (
-            propagator,
-            OwncloudPropagator.touched_file,
+        propagator.touched_file.connect (
             this.on_signal_propagator_touched_file
         );
     }

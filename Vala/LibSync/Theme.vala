@@ -1238,7 +1238,7 @@ public class Theme : GLib.Object {
     ***********************************************************/
     public static bool enforce_virtual_files_sync_folder {
         public get {
-            return ENFORCE_VIRTUAL_FILES_SYNC_FOLDER && best_available_vfs_mode () != Occ.Vfs.Off;
+            return ENFORCE_VIRTUAL_FILES_SYNC_FOLDER && best_available_vfs_mode () != Vfs.Off;
         }
     }
 

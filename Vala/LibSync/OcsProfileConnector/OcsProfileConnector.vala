@@ -18,7 +18,7 @@ public class OcsProfileConnector : GLib.Object {
     private unowned Account account;
     private Hovercard current_hovercard;
 
-    internal signal void error ();
+    internal signal void signal_error ();
     internal signal void hovercard_fetched ();
     internal signal void icon_loaded (size_t hovercard_action_index);
 
@@ -87,15 +87,10 @@ public class OcsProfileConnector : GLib.Object {
     private void start_fetch_icon_job (size_t hovercard_action_index) {
         var hovercard_action = this.current_hovercard.actions[hovercard_action_index];
         var icon_job = new IconJob (this.account, hovercard_action.icon_url, this);
-        connect (
-            icon_job,
-            IconJob.signal_job_finished,
+        icon_job.signal_job_finished.connect (
             this.on_signal_icon_job_finished
         );
-        connect (
-            icon_job,
-            IconJob.error,
-            this,
+        icon_job.signal_error.connect (
             this.on_signal_icon_job_error
         );
     }
@@ -137,10 +132,10 @@ public class OcsProfileConnector : GLib.Object {
     }
 
 
-    private static Occ.HovercardAction json_to_action (QJsonObject json_action_object) {
+    private static HovercardAction json_to_action (QJsonObject json_action_object) {
         var icon_url = json_action_object.value ("icon").to_string ("no-icon");
         Gdk.Pixbuf icon_pixmap;
-        Occ.HovercardAction hovercard_action = new Occ.HovercardAction (
+        HovercardAction hovercard_action = new HovercardAction (
             json_action_object.value ("title").to_string ("No title"), icon_url,
             json_action_object.value ("hyperlink").to_string ("no-link")
         );
@@ -151,8 +146,8 @@ public class OcsProfileConnector : GLib.Object {
     }
 
 
-    private static Occ.Hovercard json_to_hovercard (QJsonArray json_data_array) {
-        Occ.Hovercard hovercard;
+    private static Hovercard json_to_hovercard (QJsonArray json_data_array) {
+        Hovercard hovercard;
         hovercard.actions.reserve (json_data_array.size ());
         foreach (var json_entry in json_data_array) {
             GLib.assert (json_entry.is_object ());
@@ -165,13 +160,13 @@ public class OcsProfileConnector : GLib.Object {
     }
 
 
-    private static Occ.Optional<Gdk.Pixbuf> create_pixmap_from_svg_data (string icon_data) {
+    private static Optional<Gdk.Pixbuf> create_pixmap_from_svg_data (string icon_data) {
         QSvgRenderer svg_renderer;
         if (!svg_renderer.on_signal_load (icon_data)) {
             return {};
         }
         QSize image_size = new QSize (16, 16);
-        if (Occ.Theme.is_hidpi ()) {
+        if (Theme.is_hidpi ()) {
             image_size = new QSize (32, 32);
         }
         Gtk.Image scaled_svg = new Gtk.Image (image_size, Gtk.Image.FormatARGB32);
@@ -182,7 +177,7 @@ public class OcsProfileConnector : GLib.Object {
     }
 
 
-    private static Occ.Optional<Gdk.Pixbuf> icon_data_to_pixmap (string icon_data) {
+    private static Optional<Gdk.Pixbuf> icon_data_to_pixmap (string icon_data) {
         if (!icon_data.starts_with ("<svg")) {
             return {};
         }

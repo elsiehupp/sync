@@ -222,11 +222,11 @@ public class TestClientSideEncryption : GLib.Object {
                 to_read = dummy_encryption_output_file.size () - dummy_encryption_output_file.position ();
             }
 
-            if (bytes_remaining - to_read != 0 && bytes_remaining - to_read < Occ.Constants.e2EeTagSize) {
-                // decryption is going to fail if last chunk does not include or does not equal to Occ.Constants.e2EeTagSize bytes tag
-                // since we are emulating random size of network packets, we may end up reading beyond Occ.Constants.e2EeTagSize bytes tag at the end
-                // in that case, we don't want to try and decrypt less than Occ.Constants.e2EeTagSize ending bytes of tag, we will accumulate all the incoming data till the end
-                // and then, we are going to decrypt the entire chunk containing Occ.Constants.e2EeTagSize bytes at the end
+            if (bytes_remaining - to_read != 0 && bytes_remaining - to_read < Constants.e2EeTagSize) {
+                // decryption is going to fail if last chunk does not include or does not equal to Constants.e2EeTagSize bytes tag
+                // since we are emulating random size of network packets, we may end up reading beyond Constants.e2EeTagSize bytes tag at the end
+                // in that case, we don't want to try and decrypt less than Constants.e2EeTagSize ending bytes of tag, we will accumulate all the incoming data till the end
+                // and then, we are going to decrypt the entire chunk containing Constants.e2EeTagSize bytes at the end
                 pending_bytes += dummy_encryption_output_file.read (bytes_remaining);
                 continue;
             }

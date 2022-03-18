@@ -102,7 +102,7 @@ public class OwncloudPropagator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private QScopedPointer<PropagateRootDirectory> root_job;
+    private PropagateRootDirectory propagate_root_directory_job;
 
     SyncOptions sync_options {
         public get {
@@ -214,9 +214,9 @@ public class OwncloudPropagator : GLib.Object {
         }
 
         reset_delayed_upload_tasks ();
-        this.root_job.reset (new PropagateRootDirectory (this));
+        this.propagate_root_directory_job.reset (new PropagateRootDirectory (this));
         GLib.List<QPair<string /* directory name */, PropagateDirectory /* job */>> directories; // should be a LIFO stack
-        directories.push (q_make_pair ("", this.root_job));
+        directories.push (q_make_pair ("", this.propagate_root_directory_job));
         GLib.List<PropagatorJob> directories_to_remove;
         string removed_directory;
         string maybe_conflict_directory;
@@ -288,12 +288,11 @@ public class OwncloudPropagator : GLib.Object {
         }
 
         foreach (PropagatorJob it in directories_to_remove) {
-            this.root_job.dir_deletion_jobs.append_job (it);
+            this.propagate_root_directory_job.dir_deletion_jobs.append_job (it);
         }
 
-        connect (
-            this.root_job, PropagatorJob.on_signal_finished,
-            this, OwncloudPropagator.on_signal_emit_finished
+        this.propagate_root_directory_job.signal_finished.connect (
+            this.on_signal_propagate_root_directory_job_finished
         );
 
         this.job_scheduled = false;
@@ -368,9 +367,9 @@ public class OwncloudPropagator : GLib.Object {
         string maybe_conflict_directory) {
         if (item.instruction == SyncInstructions.TYPE_CHANGE) {
             // will delete directories, so defer execution
-            var job = create_job (item);
-            if (job) {
-                directories_to_remove.prepend (job);
+            var propagate_item_job = create_job (item);
+            if (propagate_item_job) {
+                directories_to_remove.prepend (propagate_item_job);
             }
             removed_directory = item.file + "/";
         } else {
@@ -517,24 +516,24 @@ public class OwncloudPropagator : GLib.Object {
             if (item.is_directory ()) {
                 // CONFLICT has this.direction == None
                 if (item.direction != SyncFileItem.Direction.UP) {
-                    var job = new PropagateLocalMkdir (this, item);
-                    job.delete_existing_file (delete_existing);
-                    return job;
+                    var propagate_local_mkdir_job = new PropagateLocalMkdir (this, item);
+                    propagate_local_mkdir_job.delete_existing_file (delete_existing);
+                    return propagate_local_mkdir_job;
                 } else {
-                    var job = new PropagateRemoteMkdir (this, item);
-                    job.delete_existing (delete_existing);
-                    return job;
+                    var propagate_remote_mkdir_job = new PropagateRemoteMkdir (this, item);
+                    propagate_remote_mkdir_job.delete_existing (delete_existing);
+                    return propagate_remote_mkdir_job;
                 }
             } //fall through
         case SyncInstructions.SYNC:
             if (item.direction != SyncFileItem.Direction.UP) {
-                var job = new PropagateDownloadFile (this, item);
-                job.delete_existing_folder (delete_existing);
-                return job;
+                var propagate_download_file_job = new PropagateDownloadFile (this, item);
+                propagate_download_file_job.delete_existing_folder (delete_existing);
+                return propagate_download_file_job;
             } else {
                 if (delete_existing || !is_delayed_upload_item (item)) {
-                    var job = create_upload_job (item, delete_existing);
-                    return job.release ();
+                    var propagate_upload_file_job = create_upload_job (item, delete_existing);
+                    return propagate_upload_file_job.release ();
                 } else {
                     push_delayed_upload_task (item);
                     return null;
@@ -580,22 +579,21 @@ public class OwncloudPropagator : GLib.Object {
         if (this.abort_requested) {
             return;
         }
-        if (this.root_job) {
+        if (this.propagate_root_directory_job) {
             // Connect to signal_abort_finished  which signals that abort has been asynchronously on_signal_finished
-            connect (
-                this.root_job, PropagateDirectory.signal_abort_finished,
-                this, OwncloudPropagator.on_signal_emit_finished
+            this.propagate_root_directory_job.signal_abort_finished.connect (
+                this.on_signal_propagate_root_directory_job_finished
             );
 
             // Use Queued Connection because we're possibly already in an item's on_signal_finished stack
-            QMetaObject.invoke_method (this.root_job, "abort", Qt.QueuedConnection,
+            QMetaObject.invoke_method (this.propagate_root_directory_job, "abort", Qt.QueuedConnection,
                                       Q_ARG (PropagatorJob.AbortType, PropagatorJob.AbortType.ASYNCHRONOUS));
 
             // Give asynchronous abort 5000 msec to finish on its own
             GLib.Timeout.single_shot (5000, this, SLOT (on_signal_abort_timeout ()));
         } else {
-            // No root job, call on_signal_emit_finished
-            on_signal_emit_finished (SyncFileItem.Status.NORMAL_ERROR);
+            // No root job, call on_signal_propagate_root_directory_job_finished
+            on_signal_propagate_root_directory_job_finished (SyncFileItem.Status.NORMAL_ERROR);
         }
     }
 
@@ -625,7 +623,7 @@ public class OwncloudPropagator : GLib.Object {
             return DiskSpaceCritical;
         }
 
-        if (free_bytes - this.root_job.committed_disk_space () < free_space_limit ()) {
+        if (free_bytes - this.propagate_root_directory_job.committed_disk_space () < free_space_limit ()) {
             return DiskSpaceFailure;
         }
 
@@ -716,7 +714,7 @@ public class OwncloudPropagator : GLib.Object {
     ***********************************************************/
     public string adjust_renamed_path (string original);
     string OwncloudPropagator.adjust_renamed_path (string original) {
-        return Occ.adjust_renamed_path (this.renamed_directories, original);
+        return adjust_renamed_path (this.renamed_directories, original);
     }
 
 
@@ -811,17 +809,17 @@ public class OwncloudPropagator : GLib.Object {
     ***********************************************************/
     private void on_signal_abort_timeout () {
         // Abort synchronously and finish
-        this.root_job.abort (PropagatorJob.AbortType.SYNCHRONOUS);
-        on_signal_emit_finished (SyncFileItem.Status.NORMAL_ERROR);
+        this.propagate_root_directory_job.abort (PropagatorJob.AbortType.SYNCHRONOUS);
+        on_signal_propagate_root_directory_job_finished (SyncFileItem.Status.NORMAL_ERROR);
     }
 
 
     /***********************************************************
     Emit the on_signal_finished signal and make sure it is only emitted once
     ***********************************************************/
-    private void on_signal_emit_finished (SyncFileItem.Status status) {
+    private void on_signal_propagate_root_directory_job_finished (SyncFileItem.Status status) {
         if (!this.finished_emited) {
-            /* emit */ finished (status == SyncFileItem.Status.SUCCESS);
+            /* emit */ signal_finished (status == SyncFileItem.Status.SUCCESS);
         }
         this.finished_emited = true;
     }
@@ -838,7 +836,7 @@ public class OwncloudPropagator : GLib.Object {
         this.job_scheduled = false;
 
         if (this.active_job_list.count () < maximum_active_transfer_job ()) {
-            if (this.root_job.on_signal_schedule_self_or_child ()) {
+            if (this.propagate_root_directory_job.on_signal_schedule_self_or_child ()) {
                 schedule_next_job ();
             }
         } else if (this.active_job_list.count () < hard_maximum_active_job ()) {
@@ -854,7 +852,7 @@ public class OwncloudPropagator : GLib.Object {
             }
             if (this.active_job_list.count () < maximum_active_transfer_job () + likely_finished_quickly_count) {
                 GLib.debug ("Can pump in another request! active_jobs = " + this.active_job_list.count ());
-                if (this.root_job.on_signal_schedule_self_or_child ()) {
+                if (this.propagate_root_directory_job.on_signal_schedule_self_or_child ()) {
                     schedule_next_job ();
                 }
             }
@@ -865,20 +863,20 @@ public class OwncloudPropagator : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private PropagateUploadFileCommon create_upload_job (SyncFileItem item, bool delete_existing) {
-        var job = new PropagateUploadFileCommon ();
+        var propagate_upload_file_job = new PropagateUploadFileCommon ();
 
         if (item.size > sync_options.initial_chunk_size && account.capabilities ().chunking_ng ()) {
             // Item is above this.initial_chunk_size, thus will be classified as to be chunked
-            job = std.make_unique<PropagateUploadFileNG> (this, item);
+            propagate_upload_file_job = std.make_unique<PropagateUploadFileNG> (this, item);
         } else {
-            job = std.make_unique<PropagateUploadFileV1> (this, item);
+            propagate_upload_file_job = std.make_unique<PropagateUploadFileV1> (this, item);
         }
 
-        job.delete_existing (delete_existing);
+        propagate_upload_file_job.delete_existing (delete_existing);
 
         remove_from_bulk_upload_block_list (item.file);
 
-        return job;
+        return propagate_upload_file_job;
     }
 
 
@@ -1064,11 +1062,11 @@ public class OwncloudPropagator : GLib.Object {
     manager. If that delay between file-change notification and sync
     has passed, we should accept the file for upload here.
     ***********************************************************/
-    public static bool file_is_still_changing (Occ.SyncFileItem item) {
-        var modtime = Occ.Utility.q_date_time_from_time_t (item.modtime);
+    public static bool file_is_still_changing (SyncFileItem item) {
+        var modtime = Utility.q_date_time_from_time_t (item.modtime);
         const int64 ms_since_mod = modtime.msecs_to (GLib.DateTime.current_date_time_utc ());
 
-        return GLib.TimeSpan (ms_since_mod) < Occ.SyncEngine.minimum_file_age_for_upload
+        return GLib.TimeSpan (ms_since_mod) < SyncEngine.minimum_file_age_for_upload
             // if the mtime is too much in the future we do* upload the file
             && ms_since_mod > -10000;
     }

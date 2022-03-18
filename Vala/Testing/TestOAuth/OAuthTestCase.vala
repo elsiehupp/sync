@@ -30,8 +30,8 @@ public class OAuthTestCase : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public FakeQNAM fake_qnam;
-    public Soup real_qnam;
+    public FakeQNAM fake_access_manager;
+    public Soup real_access_manager;
     public Soup.Reply browser_reply;
 
 
@@ -39,14 +39,14 @@ public class OAuthTestCase : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public unowned Occ.Account account;
+    public Account account;
 
     /***********************************************************
     ***********************************************************/
     public OAuth oauth;
 
 
-    public virtual bool signal_done () {
+    public virtual bool finished () {
         return reply_to_browser_ok && got_auth_ok;
     }
 
@@ -54,29 +54,23 @@ public class OAuthTestCase : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public virtual void test () {
-        fake_qnam = new FakeQNAM ({});
-        account = Occ.Account.create ();
+        fake_access_manager = new FakeQNAM ({});
+        account = Account.create ();
         account.set_url (s_oauth_test_server);
-        account.set_credentials (new FakeCredentials (fake_qnam));
-        fake_qnam.set_parent (this);
-        fake_qnam.set_override (this.oauth_test_case_override);
+        account.set_credentials (new FakeCredentials (fake_access_manager));
+        fake_access_manager.set_parent (this);
+        fake_access_manager.set_override (this.oauth_test_case_override);
 
-        connect (
-            desktop_service_hook,
-            DesktopServiceHook.signal_hooked,
-            this,
-            OAuthTestCase.open_browser_hook
+        desktop_service_hook.signal_hooked.connect (
+            this.on_signal_open_browser_hook
         );
 
         oauth.on_signal_reset (new OAuth (account, null));
-        connect (
-            oauth,
-            OAuth.result,
-            this,
-            OAuthTestCase.oauth_result
+        oauth.signal_result.connect (
+            this.on_signal_oauth_result
         );
         oauth.on_signal_start ();
-        QTRY_VERIFY (signal_done ());
+        QTRY_VERIFY (signal_finished ());
     }
 
 
@@ -89,7 +83,7 @@ public class OAuthTestCase : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public virtual void open_browser_hook (GLib.Uri url) {
+    public virtual void on_signal_open_browser_hook (GLib.Uri url) {
         GLib.assert_true (state == StartState);
         state = BrowserOpened;
         GLib.assert_true (url.path () == s_oauth_test_server.path () + "/index.php/apps/oauth2/authorize");
@@ -107,19 +101,16 @@ public class OAuthTestCase : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public virtual Soup.Reply create_browser_reply (Soup.Request request) {
-        browser_reply = real_qnam.get (request);
-        connect (
-            browser_reply,
-            Soup.Reply.on_signal_finished,
-            this,
-            OAuthTestCase.browser_reply_finished);
+        browser_reply = real_access_manager.get (request);
+        browser_reply.signal_finished.connect (
+            this.on_signal_browser_reply_finished);
         return browser_reply;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public virtual void browser_reply_finished () {
+    public virtual void on_signal_browser_reply_finished () {
         GLib.assert_true (sender () == browser_reply);
         GLib.assert_true (state == TokenAsked);
         browser_reply.delete_later ();
@@ -138,7 +129,7 @@ public class OAuthTestCase : GLib.Object {
         //  ASSERT (request.url.path () == s_oauth_test_server.path () + "/index.php/apps/oauth2/api/v1/token");
         std.unique_ptr<QBuffer> payload = new std.unique_ptr<QBuffer> (new QBuffer ());
         payload.set_data (token_reply_payload ());
-        return new FakePostReply (operation, request, std.move (payload), fake_qnam);
+        return new FakePostReply (operation, request, std.move (payload), fake_access_manager);
     }
 
 
@@ -158,7 +149,7 @@ public class OAuthTestCase : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public virtual void oauth_result (OAuth.Result result, string user, string token , string refresh_token) {
+    public virtual void on_signal_oauth_result (OAuth.Result result, string user, string token , string refresh_token) {
         GLib.assert_true (state == TokenAsked);
         GLib.assert_true (result == OAuth.LoggedIn);
         GLib.assert_true (user == "789");

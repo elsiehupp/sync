@@ -55,17 +55,11 @@ public class Share : GLib.Object {
         ***********************************************************/
         public set {
             OcsShareJob ocs_share_job = new OcsShareJob (this.account);
-            connect (
-                ocs_share_job,
-                OcsShareJob.share_job_finished,
-                this,
-                Share.on_signal_permissions_set
+            ocs_share_job.signal_finished.connect (
+                this.on_signal_permissions_set
             );
-            connect (
-                ocs_share_job,
-                OcsJob.ocs_error,
-                this,
-                Share.on_signal_ocs_error
+            ocs_share_job.signal_error.connect (
+                this.on_signal_ocs_share_job_error
             );
             ocs_share_job.permissions (identifier (), value);
         }
@@ -111,17 +105,11 @@ public class Share : GLib.Object {
     ***********************************************************/
     public void password (string password) {
         const OcsShareJob ocs_share_job = new OcsShareJob (this.account);
-        connect (
-            ocs_share_job,
-            OcsShareJob.share_job_finished,
-            this,
-            Share.on_signal_password_set
+        ocs_share_job.signal_finished.connect (
+            this.on_signal_password_set
         );
-        connect (
-            ocs_share_job,
-            OcsJob.ocs_error,
-            this,
-            Share.on_signal_password_error
+        ocs_share_job.signal_error.connect (
+            this.on_signal_password_error
         );
         ocs_share_job.password (identifier (), password);
     }
@@ -135,17 +123,11 @@ public class Share : GLib.Object {
     ***********************************************************/
     public void delete_share () {
         OcsShareJob ocs_share_job = new OcsShareJob (this.account);
-        connect (
-            ocs_share_job,
-            OcsShareJob.share_job_finished,
-            this,
-            Share.on_signal_deleted
+        ocs_share_job.signal_finished.connect (
+            this.on_signal_deleted
         );
-        connect (
-            ocs_share_job,
-            OcsJob.ocs_error,
-            this,
-            Share.on_signal_ocs_error
+        ocs_share_job.signal_error.connect (
+            this.on_signal_ocs_share_job_error
         );
         ocs_share_job.delete_share (identifier ());
     }
@@ -162,7 +144,7 @@ public class Share : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_ocs_error (int status_code, string message) {
+    protected void on_signal_ocs_share_job_error (int status_code, string message) {
         /* emit */ server_error (status_code, message);
     }
 

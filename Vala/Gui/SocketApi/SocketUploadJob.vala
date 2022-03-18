@@ -22,16 +22,15 @@ public class SocketUploadJob : GLib.Object {
     private string pattern;
     private QTemporaryFile tmp;
     private SyncJournalDb database;
-    private SyncEngine engine;
+    private SyncEngine sync_engine;
     private string[] synced_files;
 
     /***********************************************************
     ***********************************************************/
     public SocketUploadJob (SocketApiJobV2 socket_api_v2_job) {
         this.api_job = socket_api_v2_job;
-        connect (
-            socket_api_v2_job, SocketApiJobV2.on_signal_finished,
-            this, SocketUploadJob.delete_later
+        socket_api_v2_job.signal_finished.connect (
+            this.delete_later
         );
 
         this.local_path = this.api_job.arguments ()["local_path"].to_string ();
@@ -50,31 +49,22 @@ public class SocketUploadJob : GLib.Object {
             return;
         }
         if (!this.tmp.open ()) {
-            job.failure ("Failed to create temporary database");
+            socket_api_v2_job.failure ("Failed to create temporary database");
             return;
         }
 
         this.database = new SyncJournalDb (this.tmp.filename (), this);
-        this.engine = new SyncEngine (account.account, this.local_path.ends_with ('/') ? this.local_path : this.local_path + '/', this.remote_path, this.database);
-        this.engine.parent (this.database);
+        this.sync_engine = new SyncEngine (account.account, this.local_path.ends_with ('/') ? this.local_path : this.local_path + '/', this.remote_path, this.database);
+        this.sync_engine.parent (this.database);
 
-        connect (
-            this.engine,
-            Occ.SyncEngine.signal_item_completed,
-            this,
+        this.sync_engine.signal_item_completed.connect (
             this.on_signal_sync_engine_item_completed
         );
 
-        connect (
-            this.engine,
-            Occ.SyncEngine.signal_finished,
-            this,
+        this.sync_engine.signal_finished.connect (
             this.on_signal_sync_engine_finished
         );
-        connect (
-            this.engine,
-            Occ.SyncEngine.signal_sync_error,
-            this,
+        this.sync_engine.signal_sync_error.connect (
             this.on_signal_sync_engine_sync_error
         );
     }
@@ -82,7 +72,7 @@ public class SocketUploadJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_sync_engine_item_completed (Occ.SyncFileItemPtr item) {
+    private void on_signal_sync_engine_item_completed (SyncFileItemPtr item) {
         this.synced_files.append (item.file);
     }
 
@@ -117,26 +107,21 @@ public class SocketUploadJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_start () {
-        var opt = this.engine.sync_options ();
+        var opt = this.sync_engine.sync_options ();
         opt.file_pattern (this.pattern);
         if (!opt.file_regex ().is_valid ()) {
             this.api_job.failure (opt.file_regex ().error_string ());
             return;
         }
-        this.engine.sync_options (opt);
+        this.sync_engine.sync_options (opt);
 
         // create the directory, fail if it already exists
-        var mkcol_job = new Occ.MkColJob (this.engine.account, this.remote_path);
-        connect (
-            mkcol_job,
-            Occ.MkColJob.finished_without_error,
-            this.engine,
-            Occ.SyncEngine.on_signal_start_sync
+        var mkcol_job = new MkColJob (this.sync_engine.account, this.remote_path);
+        mkcol_job.signal_finished_without_error.connect (
+            this.sync_engine,
+            SyncEngine.on_signal_start_sync
         );
-        connect (
-            mkcol_job,
-            Occ.MkColJob.signal_finished_with_error,
-            this,
+        mkcol_job.signal_finished_with_error.connect (
             this.on_signal_mkcol_job_finished_with_error
         );
         mkcol_job.on_signal_start ();

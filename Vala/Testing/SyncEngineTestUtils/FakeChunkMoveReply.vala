@@ -74,7 +74,7 @@ public class FakeChunkMoveReply : FakeReply {
             // Assume that the file is filled with the same character
             file_info = remote_root_file_info.create (filename, size, payload);
         }
-        file_info.last_modified = Occ.Utility.date_time_from_time_t (request.raw_header ("X-OC-Mtime").to_int64 ());
+        file_info.last_modified = Utility.date_time_from_time_t (request.raw_header ("X-OC-Mtime").to_int64 ());
         remote_root_file_info.find (filename, /*invalidate_etags=*/true);
 
         return file_info;

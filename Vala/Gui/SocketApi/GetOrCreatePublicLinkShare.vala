@@ -22,7 +22,7 @@ public class GetOrCreatePublicLinkShare : GLib.Object {
     private string local_file;
 
 
-    internal signal void signal_done (string link);
+    internal signal void signal_finished (string link);
     internal signal void signal_error (string message);
 
     /***********************************************************
@@ -33,29 +33,17 @@ public class GetOrCreatePublicLinkShare : GLib.Object {
         this.account = account;
         this.share_manager = account;
         this.local_file = local_file;
-        connect (
-            this.share_manager,
-            ShareManager.on_signal_shares_fetched,
-            this,
-            GetOrCreatePublicLinkShare.on_signal_shares_fetched
+        this.share_manager.signal_shares_fetched.connect (
+            this.on_signal_shares_fetched
         );
-        connect (
-            this.share_manager,
-            ShareManager.on_signal_link_share_created,
-            this,
-            GetOrCreatePublicLinkShare.on_signal_link_share_created
+        this.share_manager.signal_link_share_created.connect (
+            this.on_signal_link_share_created
         );
-        connect (
-            this.share_manager,
-            ShareManager.on_signal_link_share_requires_password,
-            this,
-            GetOrCreatePublicLinkShare.on_signal_link_share_requires_password
+        this.share_manager.signal_link_share_requires_password.connect (
+            this.on_signal_link_share_requires_password
         );
-        connect (
-            this.share_manager,
-            ShareManager.on_signal_server_error,
-            this,
-            GetOrCreatePublicLinkShare.on_signal_server_error
+        this.share_manager.signal_server_error.connect (
+            this.on_signal_server_error
         );
     }
 
