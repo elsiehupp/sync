@@ -38,7 +38,7 @@ public class GeneralSettings : Gtk.Widget {
 
         public static ZipEntry file_info_to_zip_entry (GLib.FileInfo info) {
             return new ZipEntry (
-                info.absolute_file_path (),
+                info.absolute_file_path,
                 info.filename ()
             );
         }
@@ -50,7 +50,7 @@ public class GeneralSettings : Gtk.Widget {
         }
 
         public static ZipEntry sync_folder_to_zip_entry (Folder f) {
-            const var journal_path = f.journal_database ().database_file_path ();
+            const var journal_path = f.journal_database ().database_file_path;
             const var journal_info = GLib.FileInfo (journal_path);
             return file_info_to_zip_entry (journal_info);
         }
@@ -301,14 +301,14 @@ public class GeneralSettings : Gtk.Widget {
         ConfigFile config_file;
         config_file.show_in_explorer_navigation_pane (checked);
         // Now update the registry with the change.
-        FolderMan.instance.navigation_pane_helper ().show_in_explorer_navigation_pane (checked);
+        FolderMan.instance.navigation_pane_helper.show_in_explorer_navigation_pane = checked;
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_signal_ignored_files_button_clicked () {
-        if (this.ignore_editor.is_null ()) {
+        if (this.ignore_editor == null) {
             ConfigFile config_file;
             this.ignore_editor = new IgnoreListEditor (this);
             this.ignore_editor.attribute (Qt.WA_DeleteOnClose, true);
@@ -434,7 +434,7 @@ public class GeneralSettings : Gtk.Widget {
     #if defined (BUILD_UPDATER)
     ***********************************************************/
     private void on_signal_update_state_label_link_activated (string link) {
-        OpenExtrernal.open_browser (GLib.Uri (link));
+        OpenExternal.open_browser (GLib.Uri (link));
     }
 
 
@@ -477,8 +477,8 @@ public class GeneralSettings : Gtk.Widget {
     private void on_signal_change_update_channel_message_box_finished (string channel, Gtk.MessageBox change_update_channel_message_box, Gtk.Button accept_button) {
         change_update_channel_message_box.delete_later ();
         if (change_update_channel_message_box.clicked_button () == accept_button) {
-            ConfigFile ().update_channel (channel);
-            Updater.instance.update_url (Updater.update_url ());
+            ConfigFile.update_channel = channel;
+            Updater.instance.update_url = Updater.update_url;
             Updater.instance.check_for_update ();
         } else {
             this.ui.update_channel.current_text (ConfigFile ().update_channel);

@@ -76,7 +76,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     }
 
     public unowned Account account { public get; private set; }
-    State state {
+    public State state {
         public get {
             return this.state;
         }
@@ -111,8 +111,8 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
         }
     }
 
-    ConnectionValidator.Status connection_status { public get; private set; }
-    string[] connection_errors { public get; private set; }
+    public ConnectionValidator.Status connection_status { public get; private set; }
+    public string[] connection_errors { public get; private set; }
 
 
     private bool waiting_for_new_credentials;
@@ -168,7 +168,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     ***********************************************************/
     private AccountAppList apps;
 
-    bool are_desktop_notifications_allowed {
+    public bool are_desktop_notifications_allowed {
         /***********************************************************
         Returns the notifications status retrieved by the
         notificatons endpoint
@@ -230,7 +230,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
 
     private void on_signal_is_connected_changed () {
         // Get the Apps available on the server if we're now connected.
-        if (is_connected ()) {
+        if (is_connected) {
             fetch_navigation_apps ();
         }
 
@@ -300,7 +300,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     public AccountApp find_app (string app_id) {
         if (!app_id != "") {
             foreach (var app in app_list) {
-                if (app.identifier () == app_id) {
+                if (app.identifier == app_id) {
                     return app;
                 }
             }
@@ -314,9 +314,9 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     for the account and forgets the password.
     ***********************************************************/
     public void sign_out_by_ui () {
-        account.credentials ().forget_sensitive_data ();
-        account.clear_cookie_jar ();
-        state (State.SIGNED_OUT);
+        this.account.credentials ().forget_sensitive_data ();
+        this.account.clear_cookie_jar ();
+        this.state = State.SIGNED_OUT;
     }
 
 
@@ -330,8 +330,9 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     Useful for when network settings (proxy) change.
     ***********************************************************/
     public void fresh_connection_attempt () {
-        if (is_connected ())
-            state (State.DISCONNECTED);
+        if (is_connected) {
+            this.state = State.DISCONNECTED;
+        }
         on_signal_check_connectivity ();
     }
 
@@ -342,15 +343,17 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     public void sign_in () {
         if (this.state == State.SIGNED_OUT) {
             this.waiting_for_new_credentials = false;
-            state (State.DISCONNECTED);
+            this.state = State.DISCONNECTED;
         }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public bool is_connected () {
-        return this.state == State.CONNECTED;
+    public bool is_connected {
+        public get {
+            return this.state == State.CONNECTED;
+        }
     }
 
 
@@ -360,7 +363,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     ***********************************************************/
     public std.unique_ptr<QSettings> settings () {
         var s = ConfigFile.settings_with_group ("Accounts");
-        s.begin_group (this.account.identifier ());
+        s.begin_group (this.account.identifier);
         return s;
     }
 
@@ -394,7 +397,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
                                + " asking user.");
 
         this.waiting_for_new_credentials = true;
-        state (State.ASKING_CREDENTIALS);
+        this.state = State.ASKING_CREDENTIALS;
 
         if (account.credentials ().ready ()) {
             account.credentials ().invalidate_token ();
@@ -419,7 +422,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
         }
 
         if (this.connection_validator) {
-            GLib.warning ("ConnectionValidator already running, ignoring " + account.display_name ());
+            GLib.warning ("ConnectionValidator already running, ignoring " + account.display_name);
             return;
         }
 
@@ -435,9 +438,9 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
         // if the last successful etag check job is not so long ago.
         const var polltime = std.chrono.duration_cast<std.chrono.seconds> (ConfigFile ().remote_poll_interval ());
         const var elapsed = this.time_of_last_e_tag_check.secs_to (GLib.DateTime.current_date_time_utc ());
-        if (is_connected () && this.time_of_last_e_tag_check.is_valid ()
+        if (is_connected && this.time_of_last_e_tag_check.is_valid ()
             && elapsed <= polltime.count ()) {
-            GLib.debug (account.display_name () + "The last ETag check succeeded within the last " + polltime.count () + "s (" + elapsed + "s). No connection check needed!");
+            GLib.debug (account.display_name + "The last ETag check succeeded within the last " + polltime.count () + "s (" + elapsed + "s). No connection check needed!");
             return;
         }
 
@@ -446,7 +449,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
             this.on_signal_connection_validator_result
         );
 
-        if (is_connected ()) {
+        if (is_connected) {
             // Use a small authed propfind as a minimal ping when we're
             // already connected.
             this.connection_validator.on_signal_check_authentication ();
@@ -527,7 +530,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
         switch (status) {
         case ConnectionValidator.State.CONNECTED:
             if (this.state != State.CONNECTED) {
-                state (State.CONNECTED);
+                this.state = State.CONNECTED;
 
                 // Get the Apps available on the server.
                 fetch_navigation_apps ();
@@ -538,34 +541,34 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
             break;
         case ConnectionValidator.Status.UNDEFINED:
         case ConnectionValidator.Status.NOT_CONFIGURED:
-            state (State.DISCONNECTED);
+            this.state = State.DISCONNECTED;
             break;
         case ConnectionValidator.Status.SERVER_VERSION_MISMATCH:
-            state (State.CONFIGURATION_ERROR);
+            this.state = State.CONFIGURATION_ERROR;
             break;
         case ConnectionValidator.StatusNotFound:
             // This can happen either because the server does not exist
             // or because we are having network issues. The latter one is
             // much more likely, so keep trying to connect.
-            state (State.NETWORK_ERROR);
+            this.state = State.NETWORK_ERROR;
             break;
         case ConnectionValidator.Status.CREDENTIALS_WRONG:
         case ConnectionValidator.Status.CREDENTIALS_NOT_READY:
-            handle_invalid_credentials ();
+            this.handle_invalid_credentials ();
             break;
         case ConnectionValidator.SslError:
-            state (State.SIGNED_OUT);
+            this.state = State.SIGNED_OUT;
             break;
         case ConnectionValidator.State.SERVICE_UNAVAILABLE:
             this.time_since_maintenance_over.invalidate ();
-            state (State.SERVICE_UNAVAILABLE);
+            this.state = State.SERVICE_UNAVAILABLE;
             break;
         case ConnectionValidator.State.MAINTENANCE_MODE:
             this.time_since_maintenance_over.invalidate ();
-            state (State.MAINTENANCE_MODE);
+            this.state = State.MAINTENANCE_MODE;
             break;
         case ConnectionValidator.Timeout:
-            state (State.NETWORK_ERROR);
+            this.state = State.NETWORK_ERROR;
             break;
         }
     }
@@ -583,7 +586,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
                                + "; checking for remote wipe request.");
 
         this.waiting_for_new_credentials = false;
-        state (State.SIGNED_OUT);
+        this.state = State.SIGNED_OUT;
     }
 
 
@@ -610,7 +613,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
 
         if (!credentials.ready ()) {
             // User canceled the connection or did not give a password
-            state (State.SIGNED_OUT);
+            this.state = State.SIGNED_OUT;
             return;
         }
 
@@ -661,7 +664,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     protected void on_signal_etag_response_header_received (string value, int status_code) {
         if (status_code == 200) {
             GLib.debug ("New navigation apps ETag Response Header received " + value);
-            navigation_apps_etag_response_header (value);
+            this.navigation_apps_etag_response_header = value;
         }
     }
 
@@ -669,7 +672,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_ocs_error (int status_code, string message) {
-        GLib.debug ("Error " + status_code + " while fetching new navigation apps: " + message);
+        GLib.debug ("Error " + status_code.to_string () + " while fetching new navigation apps: " + message);
     }
 
 } // class AccountState

@@ -31,7 +31,7 @@ public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
     ***********************************************************/
     public override GLib.List<QAction> actions (KFileItemListProperties file_item_infos, Gtk.Widget* parentWidget) {
         var helper = OwncloudDolphinPluginHelper.instance;
-        if (!helper.is_connected () || !file_item_infos.is_local ()) {
+        if (!helper.is_connected || !file_item_infos.is_local ()) {
             return {};
         }
 
@@ -41,7 +41,7 @@ public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
         string files;
         foreach (var url in urls) {
             GLib.Dir local_path = new GLib.Dir (url.to_local_file ());
-            var local_file = local_path.canonical_path ();
+            var local_file = local_path.canonical_path;
             if (!std.any_of (paths.begin (), paths.end (), filter))
                 return {};
 
@@ -114,7 +114,7 @@ public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
         if (urls.count () != 1)
             return {};
         GLib.Dir local_path = new GLib.Dir (urls.first ().to_local_file ());
-        var local_file = local_path.canonical_path ();
+        var local_file = local_path.canonical_path;
         var helper = OwncloudDolphinPluginHelper.instance;
         var menuaction = new QAction (parentWidget);
         menuaction.setText (helper.context_menu_title ());

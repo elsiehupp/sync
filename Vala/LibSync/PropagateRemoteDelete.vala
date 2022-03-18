@@ -52,10 +52,10 @@ public class PropagateRemoteDelete : PropagateItemJob {
     private void on_signal_abstract_propagate_remote_delete_encrypted_finished (bool on_signal_success) {
         if (!on_signal_success) {
             SyncFileItem.Status status = SyncFileItem.Status.NORMAL_ERROR;
-            if (this.delete_encrypted_helper.network_error () != Soup.Reply.NoError && this.delete_encrypted_helper.network_error () != Soup.Reply.ContentNotFoundError) {
-                status = classify_error (this.delete_encrypted_helper.network_error (), this.item.http_error_code, this.propagator.another_sync_needed);
+            if (this.delete_encrypted_helper.network_error != Soup.Reply.NoError && this.delete_encrypted_helper.network_error != Soup.Reply.ContentNotFoundError) {
+                status = this.classify_error (this.delete_encrypted_helper.network_error, this.item.http_error_code, this.propagator.another_sync_needed);
             }
-            on_signal_done (status, this.delete_encrypted_helper.error_string ());
+            on_signal_done (status, this.delete_encrypted_helper.error_string);
         } else {
             on_signal_done (SyncFileItem.Status.SUCCESS);
         }
@@ -84,8 +84,8 @@ public class PropagateRemoteDelete : PropagateItemJob {
     /***********************************************************
     ***********************************************************/
     public new void abort (PropagatorJob.AbortType abort_type) {
-        if (this.delete_job && this.delete_job.reply ())
-            this.delete_job.reply ().abort ();
+        if (this.delete_job && this.delete_job.input_stream)
+            this.delete_job.input_stream.abort ();
 
         if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
             /* emit */ signal_abort_finished ();
@@ -107,16 +107,16 @@ public class PropagateRemoteDelete : PropagateItemJob {
 
         //  ASSERT (this.delete_job);
 
-        Soup.Reply.NetworkError err = this.delete_job.reply ().error ();
-        const int http_status = this.delete_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        Soup.Reply.NetworkError err = this.delete_job.input_stream.error;
+        const int http_status = this.delete_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         this.item.http_error_code = http_status;
-        this.item.response_time_stamp = this.delete_job.response_timestamp ();
+        this.item.response_time_stamp = this.delete_job.response_timestamp;
         this.item.request_id = this.delete_job.request_id ();
 
         if (err != Soup.Reply.NoError && err != Soup.Reply.ContentNotFoundError) {
             SyncFileItem.Status status = classify_error (err, this.item.http_error_code,
                 this.propagator.another_sync_needed);
-            on_signal_done (status, this.delete_job.error_string ());
+            on_signal_done (status, this.delete_job.error_string);
             return;
         }
 
@@ -131,7 +131,7 @@ public class PropagateRemoteDelete : PropagateItemJob {
             on_signal_done (SyncFileItem.Status.NORMAL_ERROR,
                 _("Wrong HTTP code returned by server. Expected 204, but received \"%1 %2\".")
                     .printf (this.item.http_error_code)
-                    .printf (this.delete_job.reply ().attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ()));
+                    .printf (this.delete_job.input_stream.attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ()));
             return;
         }
 

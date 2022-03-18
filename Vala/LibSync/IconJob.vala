@@ -42,9 +42,9 @@ public class IconJob : GLib.Object {
         }
         delete_later ();
 
-        var network_error = reply.error ();
+        var network_error = reply.error;
         if (network_error != Soup.Reply.NoError) {
-            /* emit */ error (signal_network_error);
+            /* emit */ signal_error (signal_network_error);
             return;
         }
 

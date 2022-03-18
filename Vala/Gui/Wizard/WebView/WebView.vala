@@ -42,7 +42,7 @@ public class WebView : Gtk.Widget {
     ***********************************************************/
     public WebView (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
-        this.ui ();
+        this.ui;
         this.ui.up_ui (this);
         QWebEngineUrlScheme.register_scheme (new QWebEngineUrlScheme ("nc"));
         this.webview = new QWebEngineView (this);

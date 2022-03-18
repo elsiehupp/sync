@@ -71,7 +71,7 @@ public class PropagateRemoteMove : PropagateItemJob {
         }
 
         string remote_source = this.propagator.full_remote_path (origin);
-        string remote_destination = GLib.Dir.clean_path (this.propagator.account.dav_url ().path () + this.propagator.full_remote_path (this.item.rename_target));
+        string remote_destination = GLib.Dir.clean_path (this.propagator.account.dav_url ().path + this.propagator.full_remote_path (this.item.rename_target));
 
         var vfs = this.propagator.sync_options.vfs;
         var itype = this.item.type;
@@ -144,8 +144,8 @@ public class PropagateRemoteMove : PropagateItemJob {
     /***********************************************************
     ***********************************************************/
     public new void abort (PropagatorJob.AbortType abort_type) {
-        if (this.move_job && this.move_job.reply ())
-            this.move_job.reply ().abort ();
+        if (this.move_job && this.move_job.input_stream)
+            this.move_job.input_stream.abort ();
 
         if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
             /* emit */ signal_abort_finished ();
@@ -198,15 +198,15 @@ public class PropagateRemoteMove : PropagateItemJob {
 
         //  ASSERT (this.move_job);
 
-        Soup.Reply.NetworkError err = this.move_job.reply ().error ();
-        this.item.http_error_code = this.move_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-        this.item.response_time_stamp = this.move_job.response_timestamp ();
+        Soup.Reply.NetworkError err = this.move_job.input_stream.error;
+        this.item.http_error_code = this.move_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        this.item.response_time_stamp = this.move_job.response_timestamp;
         this.item.request_id = this.move_job.request_id ();
 
         if (err != Soup.Reply.NoError) {
             SyncFileItem.Status status = classify_error (err, this.item.http_error_code,
                 this.propagator.another_sync_needed);
-            on_signal_done (status, this.move_job.error_string ());
+            on_signal_done (status, this.move_job.error_string);
             return;
         }
 
@@ -217,7 +217,7 @@ public class PropagateRemoteMove : PropagateItemJob {
             on_signal_done (SyncFileItem.Status.NORMAL_ERROR,
                 _("Wrong HTTP code returned by server. Expected 201, but received \"%1 %2\".")
                     .printf (this.item.http_error_code)
-                    .printf (this.move_job.reply ().attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ()));
+                    .printf (this.move_job.input_stream.attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ()));
             return;
         }
 
@@ -257,7 +257,7 @@ public class PropagateRemoteMove : PropagateItemJob {
         }
         var result = this.propagator.update_metadata (signal_new_item);
         if (!result) {
-            on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error ()));
+            on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error));
             return;
         } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
             on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").printf (signal_new_item.file));

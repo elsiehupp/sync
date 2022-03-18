@@ -191,7 +191,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
             const string relative_path = directory + '/' + filename;
             const var local_files =
-                FolderMan.instance.find_file_in_local_folders (GLib.FileInfo (relative_path).path (), this.account_state.account);
+                FolderMan.instance.find_file_in_local_folders (GLib.FileInfo (relative_path).path, this.account_state.account);
 
             if (!local_files == "") {
                 GLib.info ("Opening file: " + local_files.const_first ());
@@ -199,7 +199,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
                 return;
             }
         }
-        OpenExtrernal.open_browser (resource_url);
+        OpenExternal.open_browser (resource_url);
     }
 
 
@@ -487,7 +487,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
     private void disconnect_and_clear_search_jobs () {
         foreach (var connection in this.search_job_connections) {
             if (connection) {
-                GLib.Object.disconnect (connection);
+                disconnect (connection);
             }
         }
 
@@ -591,10 +591,10 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
                 "%1 : Failed to fetch search providers for '%2'. Error: %3"
                     .printf (status_code)
                     .printf (this.search_term)
-                    .printf (json_api_job.error_string ()
+                    .printf (json_api_job.error_string
             );
             this.error_string +=
-                _("Failed to fetch search providers for '%1'. Error: %2").printf (this.search_term).printf (json_api_job.error_string ())
+                _("Failed to fetch search providers for '%1'. Error: %2").printf (this.search_term).printf (json_api_job.error_string)
                 + '\n';
             /* emit */ signal_error_string_changed ();
             return;
@@ -655,10 +655,10 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
             GLib.critical ("%1 : Search has failed for '%2'. Error : %3"
                 .printf (status_code)
                 .printf (this.search_term)
-                .printf (json_api_job.error_string ()
+                .printf (json_api_job.error_string
             );
             this.error_string +=
-                _("Search has failed for '%1'. Error : %2").printf (this.search_term).printf (json_api_job.error_string ()) + '\n';
+                _("Search has failed for '%1'. Error : %2").printf (this.search_term).printf (json_api_job.error_string) + '\n';
             /* emit */ signal_error_string_changed ();
             return;
         }

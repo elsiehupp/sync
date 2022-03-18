@@ -67,8 +67,10 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public AbstractCredentials credentials () {
-        return new HttpCredentialsGui (this.ui.le_username.text (), this.ui.le_password.text (), this.oc_wizard.client_cert_bundle, this.oc_wizard.client_cert_password);
+    public AbstractCredentials credentials {
+        public get {
+            return new HttpCredentialsGui (this.ui.le_username.text (), this.ui.le_password.text (), this.oc_wizard.client_cert_bundle, this.oc_wizard.client_cert_password);
+        }
     }
 
 
@@ -77,8 +79,8 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
     public void initialize_page () {
         WizardCommon.init_error_label (this.ui.error_label);
 
-        var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
-        AbstractCredentials credentials = oc_wizard.account.credentials ();
+        var oc_wizard = (OwncloudWizard) wizard ();
+        AbstractCredentials credentials = oc_wizard.account.credentials;
         var http_creds = qobject_cast<HttpCredentials> (credentials);
         if (http_creds) {
             const string user = http_creds.fetch_user ();
@@ -152,8 +154,10 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public int next_id () {
-        return WizardCommon.Pages.PAGE_ADVANCED_SETUP;
+    public int next_id {
+        public get {
+            return WizardCommon.Pages.PAGE_ADVANCED_SETUP;
+        }
     }
 
 
@@ -213,7 +217,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
 
         Theme theme = Theme.instance;
         GLib.Variant variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_TOP);
-        if (!variant.is_null ()) {
+        if (!variant == null) {
             WizardCommon.set_up_custom_media (variant, this.ui.top_label);
         }
 

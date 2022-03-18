@@ -112,7 +112,7 @@ public class GetOrCreatePublicLinkShare : GLib.Object {
     ***********************************************************/
     private void on_signal_link_share_requires_password (string message) {
         GLib.info ("Could not create link share:" + message;
-        /* emit */ error (message);
+        /* emit */ signal_error (message);
         delete_later ();
     }
 
@@ -127,7 +127,7 @@ public class GetOrCreatePublicLinkShare : GLib.Object {
             _("Could not retrieve or create the public link share. Error:\n\n%1").printf (message),
             Gtk.MessageBox.Ok,
             Gtk.MessageBox.NoButton);
-        /* emit */ error (message);
+        /* emit */ signal_error (message);
         delete_later ();
     }
 

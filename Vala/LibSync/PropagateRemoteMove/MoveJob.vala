@@ -55,11 +55,11 @@ public class MoveJob : AbstractNetworkJob {
         if (this.url.is_valid ()) {
             send_request ("MOVE", this.url, request);
         } else {
-            send_request ("MOVE", make_dav_url (path ()), request);
+            send_request ("MOVE", make_dav_url (path), request);
         }
 
-        if (this.reply.error () != Soup.Reply.NoError) {
-            GLib.warning ("Network error: " + this.reply.error_string ());
+        if (this.reply.error != Soup.Reply.NoError) {
+            GLib.warning ("Network error: " + this.reply.error_string);
         }
         AbstractNetworkJob.start ();
     }

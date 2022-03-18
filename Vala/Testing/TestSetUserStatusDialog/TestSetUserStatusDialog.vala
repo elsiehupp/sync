@@ -52,8 +52,8 @@ public class TestSetUserStatusDialog : GLib.Object {
         GLib.assert_true (predefined_statuses_count == fake_predefined_statuses.size ());
         for (int i = 0; i < predefined_statuses_count; ++i) {
             var predefined_status = model.predefined_status (i);
-            GLib.assert_true (predefined_status.identifier () ==
-                fake_predefined_statuses[i].identifier ());
+            GLib.assert_true (predefined_status.identifier ==
+                fake_predefined_statuses[i].identifier);
             GLib.assert_true (predefined_status.message () ==
                 fake_predefined_statuses[i].message ());
             GLib.assert_true (predefined_status.icon () ==
@@ -132,7 +132,7 @@ public class TestSetUserStatusDialog : GLib.Object {
         var signal_user_status_set = fake_user_status_job.user_status_set_by_caller_of_set_user_status ();
         GLib.assert_true (signal_user_status_set.icon () == user_status_icon);
         GLib.assert_true (signal_user_status_set.message () == user_status_message);
-        GLib.assert_true (signal_user_status_set.state () == user_status_state);
+        GLib.assert_true (signal_user_status_set.state == user_status_state);
         GLib.assert_true (signal_user_status_set.message_predefined () == false);
         var clear_at = signal_user_status_set.clear_at ();
         GLib.assert_true (clear_at.is_valid ());
@@ -165,7 +165,7 @@ public class TestSetUserStatusDialog : GLib.Object {
 
         var signal_user_status_set = fake_user_status_job.user_status_set_by_caller_of_set_user_status ();
         GLib.assert_true (signal_user_status_set.message () == user_status_message);
-        GLib.assert_true (signal_user_status_set.state () == user_status_state);
+        GLib.assert_true (signal_user_status_set.state == user_status_state);
         GLib.assert_true (signal_user_status_set.message_predefined () == false);
         var clear_at = signal_user_status_set.clear_at ();
         GLib.assert_true (clear_at.is_valid ());
@@ -198,7 +198,7 @@ public class TestSetUserStatusDialog : GLib.Object {
 
         var signal_user_status_set = fake_user_status_job.user_status_set_by_caller_of_set_user_status ();
         GLib.assert_true (signal_user_status_set.icon () == user_status_icon);
-        GLib.assert_true (signal_user_status_set.state () == user_status_state);
+        GLib.assert_true (signal_user_status_set.state == user_status_state);
         GLib.assert_true (signal_user_status_set.message_predefined () == false);
         var clear_at = signal_user_status_set.clear_at ();
         GLib.assert_true (clear_at.is_valid ());
@@ -240,7 +240,7 @@ public class TestSetUserStatusDialog : GLib.Object {
         var fake_predefined_user_status = fake_predefined_statuses[fake_predefined_user_status_index];
         GLib.assert_true (model.user_status_message () == fake_predefined_user_status.message ());
         GLib.assert_true (model.user_status_emoji () == fake_predefined_user_status.icon ());
-        GLib.assert_true (model.online_status () == fake_predefined_user_status.state ());
+        GLib.assert_true (model.online_status () == fake_predefined_user_status.state);
         GLib.assert_true (model.clear_at () == _("1 hour"));
     }
 

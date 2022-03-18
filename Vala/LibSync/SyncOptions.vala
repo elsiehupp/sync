@@ -17,7 +17,6 @@ Value class containing the options given to the sync engine
 ***********************************************************/
 public class SyncOptions : GLib.Object {
 
-
     /***********************************************************
     Maximum size (in Bytes) a folder can have without asking
     for confirmation.
@@ -26,25 +25,21 @@ public class SyncOptions : GLib.Object {
     ***********************************************************/
     public int64 new_big_folder_size_limit = -1;
 
-
     /***********************************************************
     If a confirmation should be asked for external storages
     ***********************************************************/
     public bool confirm_external_storage = false;
-
 
     /***********************************************************
     If remotely deleted files are needed to move to trash
     ***********************************************************/
     public bool move_files_to_trash = false;
 
-
     /***********************************************************
     Create a virtual file for new files instead of downloading.
     May not be null
     ***********************************************************/
     public unowned Vfs vfs;
-
 
     /***********************************************************
     The initial un-adjusted chunk size in bytes for chunked
@@ -57,18 +52,15 @@ public class SyncOptions : GLib.Object {
     ***********************************************************/
     public int64 initial_chunk_size = 10 * 1000 * 1000; // 10MB
 
-
     /***********************************************************
     The minimum chunk size in bytes for chunked uploads
     ***********************************************************/
     public int64 min_chunk_size = 1 * 1000 * 1000; // 1MB
 
-
     /***********************************************************
     The maximum chunk size in bytes for chunked uploads
     ***********************************************************/
     public int64 max_chunk_size = 1000 * 1000 * 1000; // 1000MB
-
 
     /***********************************************************
     The target duration of chunk uploads for dynamic chunk sizing.
@@ -77,12 +69,10 @@ public class SyncOptions : GLib.Object {
     ***********************************************************/
     public GLib.TimeSpan target_chunk_upload_duration = std.chrono.minutes (1);
 
-
     /***********************************************************
     The maximum number of active jobs in parallel
     ***********************************************************/
     public int parallel_network_jobs = 6;
-
 
     /***********************************************************
     Only sync files that match the expression
@@ -91,7 +81,7 @@ public class SyncOptions : GLib.Object {
     If no pattern is provided the default is an invalid regular
     expression.
     ***********************************************************/
-    QRegularExpression file_regex { public get; private set; }
+    public QRegularExpression file_regex { public get; private set; }
 
 
     /***********************************************************

@@ -78,7 +78,7 @@ public class PropagateLocalRename : PropagateItemJob {
             }
             var result = this.propagator.update_metadata (signal_new_item);
             if (!result) {
-                on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error ()));
+                on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error));
                 return;
             } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
                 on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").printf (signal_new_item.file));

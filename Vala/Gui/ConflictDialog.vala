@@ -18,7 +18,25 @@ public class ConflictDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    string base_filename { public get; private set; }
+    public string base_filename { public get; private set; }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public string local_version_filename {
+        public get {
+            return this.solver.local_version_filename;
+        }
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public string remote_version_filename {
+        public get {
+            return this.solver.remote_version_filename;
+        }
+    }
 
     private QScopedPointer<Ui.ConflictDialog> ui;
     private ConflictSolver solver;
@@ -58,28 +76,14 @@ public class ConflictDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void on_local_version_button_clicked () {
-        QDesktopServices.open_url (GLib.Uri.from_local_file (this.solver.local_version_filename ()));
+        QDesktopServices.open_url (GLib.Uri.from_local_file (this.solver.local_version_filename));
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_remote_version_button_clicked () {
-        QDesktopServices.open_url (GLib.Uri.from_local_file (this.solver.remote_version_filename ()));
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public string local_version_filename () {
-        return this.solver.local_version_filename ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public string remote_version_filename () {
-        return this.solver.remote_version_filename ();
+        QDesktopServices.open_url (GLib.Uri.from_local_file (this.solver.remote_version_filename));
     }
 
 
@@ -134,7 +138,7 @@ public class ConflictDialog : Gtk.Dialog {
     private void update_widgets () {
         QMimeDatabase mime_database;
 
-        const var local_version = this.solver.local_version_filename ();
+        const var local_version = this.solver.local_version_filename;
         update_group (local_version,
                     this.ui.local_version_link,
                     _("Open local version"),
@@ -142,7 +146,7 @@ public class ConflictDialog : Gtk.Dialog {
                     this.ui.local_version_size,
                     this.ui.local_version_button);
 
-        const string remote_version = this.solver.remote_version_filename ();
+        const string remote_version = this.solver.remote_version_filename;
         update_group (remote_version,
                     this.ui.remote_version_link,
                     _("Open server version"),

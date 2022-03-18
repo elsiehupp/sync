@@ -85,35 +85,31 @@ public class SyncEngine : GLib.Object {
 
     private bool needs_update;
     private bool sync_running;
-    string local_path { public get; private set; }
+    public string local_path { public get; private set; }
     private string remote_path;
     private string remote_root_etag;
-    SyncJournalDb journal { public get; private set; }
+    public SyncJournalDb journal { public get; private set; }
     private QScopedPointer<DiscoveryPhase> discovery_phase;
     private unowned OwncloudPropagator propagator;
-
 
     /***********************************************************
     ***********************************************************/
     private GLib.List<string> bulk_upload_block_list;
-
 
     /***********************************************************
     List of all files with conflicts
     ***********************************************************/
     private GLib.List<string> seen_conflict_files;
 
+    /***********************************************************
+    ***********************************************************/
+    private ProgressInfo progress_info;
 
     /***********************************************************
     ***********************************************************/
-    private QScopedPointer<ProgressInfo> progress_info;
-
-
-    /***********************************************************
-    ***********************************************************/
-    private QScopedPointer<ExcludedFiles> excluded_files { public get; private set; }
-    QScopedPointer<SyncFileStatusTracker> sync_file_status_tracker { public get; private set; }
-    Utility.StopWatch stop_watch { public get; private set; }
+    public ExcludedFiles excluded_files { public get; private set; }
+    public SyncFileStatusTracker sync_file_status_tracker { public get; private set; }
+    public Utility.StopWatch stop_watch { public get; private set; }
 
 
     /***********************************************************
@@ -426,7 +422,7 @@ public class SyncEngine : GLib.Object {
         // undo the filter to allow this sync to retrieve and store the correct etags.
         this.journal.clear_etag_storage_filter ();
 
-        this.excluded_files.exclude_conflict_files (!this.account.capabilities ().upload_conflict_files ());
+        this.excluded_files.exclude_conflict_files (!this.account.capabilities.upload_conflict_files ());
 
         this.last_local_discovery_style = this.local_discovery_style;
 
@@ -485,9 +481,9 @@ public class SyncEngine : GLib.Object {
         }
 
         // Check for invalid character in old server version
-        string invalid_filename_pattern = this.account.capabilities ().invalid_filename_regex ();
-        if (invalid_filename_pattern.is_null ()
-            && this.account.server_version_int () < Account.make_server_version (8, 1, 0)) {
+        string invalid_filename_pattern = this.account.capabilities.invalid_filename_regex ();
+        if (invalid_filename_pattern == null
+            && this.account.server_version_int < Account.make_server_version (8, 1, 0)) {
             // Server versions older than 8.1 don't support some characters in filenames.
             // If the capability is not set, default to a pattern that avoids uploading
             // files with names that contain these.
@@ -497,8 +493,8 @@ public class SyncEngine : GLib.Object {
         }
         if (!invalid_filename_pattern == "")
             this.discovery_phase.invalid_filename_rx = QRegularExpression (invalid_filename_pattern);
-        this.discovery_phase.server_blocklisted_files = this.account.capabilities ().blocklisted_files ();
-        this.discovery_phase.ignore_hidden_files = ignore_hidden_files ();
+        this.discovery_phase.server_blocklisted_files = this.account.capabilities.blocklisted_files ();
+        this.discovery_phase.ignore_hidden_files = ignore_hidden_files;
 
         this.discovery_phase.signal_item_discovered.connect (
             this.on_signal_item_discovered
@@ -638,7 +634,7 @@ public class SyncEngine : GLib.Object {
         string prev;
         var it = this.local_discovery_paths.begin ();
         while (it != this.local_discovery_paths.end ()) {
-            if (!prev.is_null () && it.starts_with (prev) && (prev.has_suffix ("/") || *it == prev || it.at (prev.size ()) <= "/")) {
+            if (!prev == null && it.starts_with (prev) && (prev.has_suffix ("/") || *it == prev || it.at (prev.size ()) <= "/")) {
                 it = this.local_discovery_paths.erase (it);
             } else {
                 prev = *it;
@@ -724,14 +720,14 @@ public class SyncEngine : GLib.Object {
             return;
         }
 
-        GLib.debug ("Removing database record for " + record.path ());
+        GLib.debug ("Removing database record for " + record.path);
         journal.delete_file_record (record.path);
 
         // If the local file is a dehydrated placeholder, wipe it too.
         // Otherwise leave it to allow the next sync to have a new-new conflict.
         string local_file = local_path + record.path;
         if (GLib.File.exists (local_file) && vfs.is_dehydrated_placeholder (local_file)) {
-            GLib.debug ("Removing local dehydrated placeholder " + record.path ());
+            GLib.debug ("Removing local dehydrated placeholder " + record.path);
             GLib.File.remove (local_file);
         }
     }
@@ -749,7 +745,7 @@ public class SyncEngine : GLib.Object {
 
 
     private static files_below_path_switch_filter (SyncJournalFileRecord record) {
-        var path = record.path ();
+        var path = record.path;
         var filename = GLib.File.new_for_path (path).filename ();
         if (FileSystem.is_exclude_file (filename)) {
             return;
@@ -758,7 +754,7 @@ public class SyncEngine : GLib.Object {
         string local_file = local_path + path;
         var result = vfs.convert_to_placeholder (local_file, item, local_file);
         if (!result.is_valid ()) {
-            GLib.warning ("Could not convert file to placeholder" + result.error ());
+            GLib.warning ("Could not convert file to placeholder" + result.error);
         }
     }
 
@@ -810,7 +806,7 @@ public class SyncEngine : GLib.Object {
         if (Utility.is_conflict_file (item.file)) {
             this.seen_conflict_files.insert (item.file);
         }
-        if (item.instruction == SyncInstructions.UPDATE_METADATA && !item.is_directory ()) {
+        if (item.instruction == CSync.SyncInstructions.UPDATE_METADATA && !item.is_directory ()) {
             // For directories, metadata-only updates will be done after all their files are propagated.
 
             // Update the database now already :  New remote fileid or Etag or Remote_perm
@@ -835,7 +831,7 @@ public class SyncEngine : GLib.Object {
                 if (this.journal.get_file_record (item.file, prev)
                     && prev.is_valid ()
                     && prev.remote_perm.has_permission (RemotePermissions.Permissions.CAN_WRITE) != item.remote_perm.has_permission (RemotePermissions.Permissions.CAN_WRITE)) {
-                    const bool is_read_only = !item.remote_perm.is_null () && !item.remote_perm.has_permission (RemotePermissions.Permissions.CAN_WRITE);
+                    const bool is_read_only = !item.remote_perm == null && !item.remote_perm.has_permission (RemotePermissions.Permissions.CAN_WRITE);
                     FileSystem.file_read_only_weak (file_path, is_read_only);
                 }
                 var record = item.to_sync_journal_file_record_with_inode (file_path);
@@ -847,8 +843,8 @@ public class SyncEngine : GLib.Object {
                 if (item.type == ItemType.FILE) {
                     var result = this.sync_options.vfs.convert_to_placeholder (file_path, *item);
                     if (!result) {
-                        item.instruction = SyncInstructions.ERROR;
-                        item.error_string = _("Could not update file : %1").printf (result.error ());
+                        item.instruction = CSync.SyncInstructions.ERROR;
+                        item.error_string = _("Could not update file : %1").printf (result.error);
                         return;
                     }
                 }
@@ -857,8 +853,8 @@ public class SyncEngine : GLib.Object {
                 if (item.type == ItemType.VIRTUAL_FILE) {
                     var r = this.sync_options.vfs.update_metadata (file_path, item.modtime, item.size, item.file_id);
                     if (!r) {
-                        item.instruction = SyncInstructions.ERROR;
-                        item.error_string = _("Could not update virtual file metadata : %1").printf (r.error ());
+                        item.instruction = CSync.SyncInstructions.ERROR;
+                        item.error_string = _("Could not update virtual file metadata : %1").printf (r.error);
                         return;
                     }
                 }
@@ -874,23 +870,23 @@ public class SyncEngine : GLib.Object {
             }
             this.has_none_files = true;
             return;
-        } else if (item.instruction == SyncInstructions.NONE) {
+        } else if (item.instruction == CSync.SyncInstructions.NONE) {
             this.has_none_files = true;
-            if (this.account.capabilities ().upload_conflict_files () && Utility.is_conflict_file (item.file)) {
+            if (this.account.capabilities.upload_conflict_files () && Utility.is_conflict_file (item.file)) {
                 // For uploaded conflict files, files with no action performed on them should
                 // be displayed : but we mustn't overwrite the instruction if something happens
                 // to the file!
                 item.error_string = _("Unresolved conflict.");
-                item.instruction = SyncInstructions.IGNORE;
+                item.instruction = CSync.SyncInstructions.IGNORE;
                 item.status = SyncFileItem.Status.CONFLICT;
             }
             return;
-        } else if (item.instruction == SyncInstructions.REMOVE && !item.is_selective_sync) {
+        } else if (item.instruction == CSync.SyncInstructions.REMOVE && !item.is_selective_sync) {
             this.has_remove_file = true;
-        } else if (item.instruction == SyncInstructions.RENAME) {
+        } else if (item.instruction == CSync.SyncInstructions.RENAME) {
             this.has_none_files = true; // If a file (or every file) has been renamed, it means not al files where deleted
-        } else if (item.instruction == SyncInstructions.TYPE_CHANGE
-            || item.instruction == SyncInstructions.SYNC) {
+        } else if (item.instruction == CSync.SyncInstructions.TYPE_CHANGE
+            || item.instruction == CSync.SyncInstructions.SYNC) {
             if (item.direction == SyncFileItem.Direction.UP) {
                 // An upload of an existing file means that the file was left unchanged on the server
                 // This counts as a NONE for detecting if all the files on the server were changed
@@ -969,7 +965,7 @@ public class SyncEngine : GLib.Object {
             GLib.info ("All the files are going to be changed, asking the user");
             int side = 0; // > 0 means more deleted on the server.  < 0 means more deleted on the client
             foreach (var it in this.sync_items) {
-                if (it.instruction == SyncInstructions.REMOVE) {
+                if (it.instruction == CSync.SyncInstructions.REMOVE) {
                     side += it.direction == SyncFileItem.Direction.DOWN ? 1 : -1;
                 }
             }
@@ -1035,8 +1031,13 @@ public class SyncEngine : GLib.Object {
         this.journal.commit ("post treewalk");
 
         this.propagator = new OwncloudPropagator (
-            this.account, this.local_path, this.remote_path, this.journal, this.bulk_upload_block_list);
-        this.propagator.sync_options (this.sync_options);
+            this.account,
+            this.local_path,
+            this.remote_path,
+            this.journal,
+            this.bulk_upload_block_list
+        );
+        this.propagator.sync_options = this.sync_options;
         this.propagator.signal_item_completed.connect (
             this.on_signal_item_completed
         );
@@ -1156,7 +1157,9 @@ public class SyncEngine : GLib.Object {
                 break;
             // Compare to our new QElapsedTimer instead of using elapsed ().
             // This avoids querying the current time from the OS for every loop.
-            var elapsed = GLib.TimeSpan (now.msecs_since_reference () - first.key ().msecs_since_reference ());
+            var elapsed = new GLib.TimeSpan (
+                now.msecs_since_reference () - first.key ().msecs_since_reference ()
+            );
             if (elapsed <= S_TOUCHED_FILES_MAX_AGE_MICROSECONDS) {
                 // We found the first path younger than the maximum age, keep the rest.
                 break;
@@ -1273,7 +1276,7 @@ public class SyncEngine : GLib.Object {
         // for reporting and for making sure we don't update the blocklist
         // entry yet.
         // Classification is this this.instruction and this.status
-        item.instruction = SyncInstructions.IGNORE;
+        item.instruction = CSync.SyncInstructions.IGNORE;
         item.status = SyncFileItem.Status.BLOCKLISTED_ERROR;
 
         var wait_seconds_str = Utility.duration_to_descriptive_string1 (1000 * wait_seconds);
@@ -1306,7 +1309,7 @@ public class SyncEngine : GLib.Object {
         const GLib.List<SyncJournalDb.DownloadInfo> deleted_infos =
             this.journal.get_and_delete_stale_download_infos (download_file_paths);
         foreach (SyncJournalDb.DownloadInfo deleted_info in deleted_infos) {
-            const string temporary_path = this.propagator.full_local_path (deleted_info.tmpfile);
+            const string temporary_path = this.propagator.full_local_path (deleted_info.temporaryfile);
             GLib.info ("Deleting stale temporary file: " + temporary_path);
             FileSystem.remove (temporary_path);
         }
@@ -1331,11 +1334,11 @@ public class SyncEngine : GLib.Object {
         var ids = this.journal.delete_stale_upload_infos (upload_file_paths);
 
         // Delete the stales chunk on the server.
-        if (account.capabilities ().chunking_ng ()) {
+        if (account.capabilities.chunking_ng ()) {
             foreach (uint32 transfer_identifier in ids) {
                 if (!transfer_identifier)
                     continue; // Was not a chunked upload
-                GLib.Uri url = Utility.concat_url_path (account.url, "remote.php/dav/uploads/" + account.dav_user () + "/" + string.number (transfer_identifier));
+                GLib.Uri url = Utility.concat_url_path (account.url, "remote.php/dav/uploads/" + account.dav_user + "/" + string.number (transfer_identifier));
                 (new DeleteJob (account, url, this)).start ();
             }
         }
@@ -1461,17 +1464,17 @@ public class SyncEngine : GLib.Object {
                 continue;
 
             switch (sync_item.instruction) {
-            case SyncInstructions.SYNC:
+            case CSync.SyncInstructions.SYNC:
                 GLib.warning ("restore_old_files: RESTORING " + sync_item.file);
-                sync_item.instruction = SyncInstructions.CONFLICT;
+                sync_item.instruction = CSync.SyncInstructions.CONFLICT;
                 break;
-            case SyncInstructions.REMOVE:
+            case CSync.SyncInstructions.REMOVE:
                 GLib.warning ("restore_old_files: RESTORING " + sync_item.file);
-                sync_item.instruction = SyncInstructions.NEW;
+                sync_item.instruction = CSync.SyncInstructions.NEW;
                 sync_item.direction = SyncFileItem.Direction.UP;
                 break;
-            case SyncInstructions.RENAME:
-            case SyncInstructions.NEW:
+            case CSync.SyncInstructions.RENAME:
+            case CSync.SyncInstructions.NEW:
                 // Ideally we should try to revert the rename or remove, but this would be dangerous
                 // without re-doing the reconcile phase.  So just let it happen.
             default:
@@ -1483,11 +1486,11 @@ public class SyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static bool is_file_transfer_instruction (SyncInstructions instruction) {
-        return instruction == SyncInstructions.CONFLICT
-            || instruction == SyncInstructions.NEW
-            || instruction == SyncInstructions.SYNC
-            || instruction == SyncInstructions.TYPE_CHANGE;
+    private static bool is_file_transfer_instruction (CSync.SyncInstructions instruction) {
+        return instruction == CSync.SyncInstructions.CONFLICT
+            || instruction == CSync.SyncInstructions.NEW
+            || instruction == CSync.SyncInstructions.SYNC
+            || instruction == CSync.SyncInstructions.TYPE_CHANGE;
     }
 
 } // class SyncEngine

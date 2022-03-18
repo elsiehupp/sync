@@ -47,7 +47,7 @@ public class TestDownload : GLib.Object {
 
 
     private Soup.Reply override_delegate_resume1 (Soup.Operation operation, Soup.Request request, QIODevice device) {
-        if (operation == Soup.GetOperation && request.url.path ().ends_with ("A/a0")) {
+        if (operation == Soup.GetOperation && request.url.path.ends_with ("A/a0")) {
             return new BrokenFakeGetReply (fake_folder.remote_modifier (), operation, request, this);
         }
         return null;
@@ -55,7 +55,7 @@ public class TestDownload : GLib.Object {
 
 
     private Soup.Reply override_delegate_resume2 (Soup.Operation operation, Soup.Request request, QIODevice device) {
-        if (operation == Soup.GetOperation && request.url.path ().ends_with ("A/a0")) {
+        if (operation == Soup.GetOperation && request.url.path.ends_with ("A/a0")) {
             ranges = request.raw_header ("Range");
         }
         return null;
@@ -97,7 +97,7 @@ public class TestDownload : GLib.Object {
 
 
     private Soup.Reply override_delegate_error_message (Soup.Operation operation, Soup.Request request, QIODevice device) {
-        if (operation == Soup.GetOperation && request.url.path ().ends_with ("A/broken")) {
+        if (operation == Soup.GetOperation && request.url.path.ends_with ("A/broken")) {
             return new FakeErrorReply (operation, request, this, 400,
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
                 + "<d:error xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\">\n"
@@ -154,7 +154,7 @@ public class TestDownload : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine.set_ignore_hidden_files (true);
         fake_folder.remote_modifier ().set_contents ("A/a1", 'A');
-        fake_folder.local_modifier ().set_contents ("A/a1", 'B');
+        fake_folder.local_modifier.set_contents ("A/a1", 'B');
 
         bool prop_connected = false;
         string conflict_file;
@@ -168,9 +168,9 @@ public class TestDownload : GLib.Object {
         GLib.assert_true (!conflict_file == "");
 
         // restore permissions
-        GLib.File (fake_folder.local_path () + "A/").set_permissions (GLib.File.Permissions (0x7777));
+        GLib.File (fake_folder.local_path + "A/").set_permissions (GLib.File.Permissions (0x7777));
 
-        GLib.Object.disconnect (trans_progress);
+        disconnect (trans_progress);
         fake_folder.set_server_override (this.override_delegate_move_fails_in_a_conflict);
 
         GLib.assert_true (fake_folder.sync_once ());
@@ -211,9 +211,9 @@ public class TestDownload : GLib.Object {
         }
         if (!conflict_file == "") {
             // Check that the temporary file is still there
-            GLib.assert_true (GLib.Dir (fake_folder.local_path () + "A/").entry_list ({ "*.~*" }, GLib.Dir.Files | GLib.Dir.Hidden).count () == 1);
+            GLib.assert_true (GLib.Dir (fake_folder.local_path + "A/").entry_list ({ "*.~*" }, GLib.Dir.Files | GLib.Dir.Hidden).count () == 1);
             // Set the permission to read only on the folder, so the rename of the temporary file will fail
-            GLib.File (fake_folder.local_path () + "A/").set_permissions (GLib.File.Permissions (0x5555));
+            GLib.File (fake_folder.local_path + "A/").set_permissions (GLib.File.Permissions (0x5555));
         }
     }
 
@@ -251,7 +251,7 @@ public class TestDownload : GLib.Object {
 
 
     private Soup.Reply override_delegate_http2_resend (Soup.Operation operation, Soup.Request request, QIODevice device) {
-        if (operation == Soup.GetOperation && request.url.path ().ends_with ("A/resendme") && resend_actual < resend_expected) {
+        if (operation == Soup.GetOperation && request.url.path.ends_with ("A/resendme") && resend_actual < resend_expected) {
             var error_reply = new FakeErrorReply (operation, request, this, 400, "ignore this body");
             error_reply.set_error (Soup.Reply.ContentReSendError, server_message);
             error_reply.set_attribute (Soup.Request.HTTP2WasUsedAttribute, true);

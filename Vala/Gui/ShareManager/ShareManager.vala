@@ -215,7 +215,7 @@ public class ShareManager : GLib.Object {
 
         /* emit */ link_share_created (share);
 
-        update_folder (this.account, share.path ());
+        update_folder (this.account, share.path);
     }
 
 
@@ -228,7 +228,7 @@ public class ShareManager : GLib.Object {
 
         /* emit */ signal_share_created (share);
 
-        update_folder (this.account, share.path ());
+        update_folder (this.account, share.path);
     }
 
 
@@ -248,7 +248,7 @@ public class ShareManager : GLib.Object {
         // From own_cloud server 8.2 the url field is always set for public shares
         if (data.contains ("url")) {
             url = GLib.Uri (data.value ("url").to_string ());
-        } else if (this.account.server_version_int () >= Account.make_server_version (8, 0, 0)) {
+        } else if (this.account.server_version_int >= Account.make_server_version (8, 0, 0)) {
             // From own_cloud server version 8 on, a different share link scheme is used.
             url = GLib.Uri (Utility.concat_url_path (this.account.url, "index.php/s/" + data.value ("token").to_string ())).to_string ();
         } else {
@@ -349,14 +349,14 @@ public class ShareManager : GLib.Object {
     ***********************************************************/
     private static void update_folder (unowned Account account, string path) {
         foreach (Folder folder in FolderMan.instance.map ()) {
-            if (folder.account_state ().account != account) {
+            if (folder.account_state.account != account) {
                 continue;
             }
-            var folder_path = folder.remote_path ();
+            var folder_path = folder.remote_path;
             if (path.starts_with (folder_path) && (path == folder_path || folder_path.ends_with ('/') || path[folder_path.size ()] == '/')) {
                 // Workaround the fact that the server does not invalidate the etags of parent directories
                 // when something is shared.
-                var relative = path.mid_ref (folder.remote_path_trailing_slash ().length ());
+                var relative = path.mid_ref (folder.remote_path_trailing_slash.length);
                 folder.journal_database ().schedule_path_for_remote_discovery (relative.to_string ());
 
                 // Schedule a sync so it can update the remote permission flag and let the socket API

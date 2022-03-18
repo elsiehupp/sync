@@ -14,10 +14,9 @@ public class PropagateDownloadEncrypted : GLib.Object {
     private GLib.FileInfo info;
     private EncryptedFile encrypted_info;
 
-
     /***********************************************************
     ***********************************************************/
-    string error_string { public get; protected set; }
+    public string error_string { public get; protected set; }
 
 
     internal signal void file_metadata_found ();
@@ -63,8 +62,8 @@ public class PropagateDownloadEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private string root_path () {
-        string result = this.propagator.remote_path ();
+    private string root_path {
+        string result = this.propagator.remote_path;
         if (result.starts_with ("/")) {
             return result.mid (1);
         } else {
@@ -76,36 +75,36 @@ public class PropagateDownloadEncrypted : GLib.Object {
     /***********************************************************
     TODO: Fix this. Exported in the wrong place.
     ***********************************************************/
-    public string create_download_tmp_filename (string previous);
+    public string create_download_temporary_filename (string previous);
 
 
     /***********************************************************
     ***********************************************************/
-    public bool decrypt_file (GLib.File tmp_file) {
-            const string tmp_filename = create_download_tmp_filename (this.item.file + "_dec");
-            GLib.debug ("Content Checksum Computed starting decryption" + tmp_filename);
+    public bool decrypt_file (GLib.File temporary_file) {
+            const string temporary_filename = create_download_temporary_filename (this.item.file + "_dec");
+            GLib.debug ("Content Checksum Computed starting decryption" + temporary_filename);
 
-            tmp_file.close ();
-            GLib.File tmp_output = GLib.File.new_for_path (this.propagator.full_local_path (tmp_filename), this);
+            temporary_file.close ();
+            GLib.File temporary_output = GLib.File.new_for_path (this.propagator.full_local_path (temporary_filename), this);
             EncryptionHelper.file_decryption (this.encrypted_info.encryption_key,
                                                                             this.encrypted_info.initialization_vector,
-                                                                            tmp_file,
-                                                                            this.tmp_output);
+                                                                            temporary_file,
+                                                                            this.temporary_output);
 
-            GLib.debug ("Decryption on_signal_finished" + tmp_file.filename () + tmp_output.filename ());
+            GLib.debug ("Decryption on_signal_finished" + temporary_file.filename () + temporary_output.filename ());
 
-            tmp_file.close ();
-            this.tmp_output.close ();
+            temporary_file.close ();
+            this.temporary_output.close ();
 
             // we decripted the temporary into another temporary, so good bye old one
-            if (!tmp_file.remove ()) {
-                    GLib.debug ("Failed to remove temporary file" + tmp_file.error_string ());
-                    this.error_string = tmp_file.error_string ();
+            if (!temporary_file.remove ()) {
+                    GLib.debug ("Failed to remove temporary file" + temporary_file.error_string);
+                    this.error_string = temporary_file.error_string;
                     return false;
             }
 
             // Let's fool the rest of the logic into thinking this was the actual download
-            tmp_file.filename (this.tmp_output.filename ());
+            temporary_file.filename (this.temporary_output.filename ());
 
             return true;
     }

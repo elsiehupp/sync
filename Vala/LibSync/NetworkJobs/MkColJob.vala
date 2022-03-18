@@ -66,7 +66,7 @@ public class MkColJob : AbstractNetworkJob {
         if (this.url.is_valid ()) {
             send_request ("MKCOL", this.url, request);
         } else {
-            send_request ("MKCOL", make_dav_url (path ()), request);
+            send_request ("MKCOL", make_dav_url (path), request);
         }
         AbstractNetworkJob.start ();
     }
@@ -78,7 +78,7 @@ public class MkColJob : AbstractNetworkJob {
         GLib.info ("MKCOL of" + this.reply.request ().url
             + " finished with status " + reply_status_string ());
 
-        if (this.reply.error () != Soup.Reply.NoError) {
+        if (this.reply.error != Soup.Reply.NoError) {
             /* Q_EMIT */ signal_finished_with_error (this.reply);
         } else {
             /* Q_EMIT */ signal_finished_without_error ();

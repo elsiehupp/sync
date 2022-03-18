@@ -128,12 +128,12 @@ public class BulkPropagatorJob : PropagatorJob {
         UploadFileInfo file_to_upload) {
         // Reuse the content checksum as the transmission checksum if possible
         var supported_transmission_checksums =
-            this.propagator.account.capabilities ().supported_checksum_types ();
+            this.propagator.account.capabilities.supported_checksum_types ();
 
         // Compute the transmission checksum.
         var compute_checksum = std.make_unique<ComputeChecksum> (this);
         if (upload_checksum_enabled ()) {
-            compute_checksum.checksum_type ("MD5" /*this.propagator.account.capabilities ().upload_checksum_type ()*/);
+            compute_checksum.checksum_type ("MD5" /*this.propagator.account.capabilities.upload_checksum_type ()*/);
         } else {
             compute_checksum.checksum_type ("");
         }
@@ -232,7 +232,7 @@ public class BulkPropagatorJob : PropagatorJob {
 
         on_signal_job_destroyed (put_multi_file_job); // remove it from the this.jobs list
 
-        var reply_data = put_multi_file_job.reply ().read_all ();
+        var reply_data = put_multi_file_job.input_stream.read_all ();
         var reply_json = QJsonDocument.from_json (reply_data);
         var full_reply_object = reply_json.object ();
 
@@ -277,7 +277,7 @@ public class BulkPropagatorJob : PropagatorJob {
         // Update the database entry
         var result = this.propagator.update_metadata (*one_file.item);
         if (!result) {
-            on_signal_done (one_file.item, SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error ()));
+            on_signal_done (one_file.item, SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error));
             return;
         } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
             on_signal_done (one_file.item, SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").printf (one_file.item.file));
@@ -286,8 +286,8 @@ public class BulkPropagatorJob : PropagatorJob {
 
         // Files that were new on the remote shouldn't have online-only pin state
         // even if their parent folder is online-only.
-        if (one_file.item.instruction == SyncInstructions.NEW
-            || one_file.item.instruction == SyncInstructions.TYPE_CHANGE) {
+        if (one_file.item.instruction == CSync.SyncInstructions.NEW
+            || one_file.item.instruction == CSync.SyncInstructions.TYPE_CHANGE) {
             var vfs = this.propagator.sync_options.vfs;
             var pin = vfs.pin_state (one_file.item.file);
             if (pin && *pin == Vfs.ItemAvailability.ONLINE_ONLY && !vfs.pin_state (one_file.item.file, PinState.PinState.UNSPECIFIED)) {
@@ -402,7 +402,7 @@ public class BulkPropagatorJob : PropagatorJob {
             var device = std.make_unique<UploadDevice> (
                     single_file.local_path, 0, single_file.file_size, this.propagator.bandwidth_manager);
             if (!device.open (QIODevice.ReadOnly)) {
-                GLib.warning ("Could not prepare upload device: " + device.error_string ());
+                GLib.warning ("Could not prepare upload device: " + device.error_string);
 
                 // If the file is currently locked, we want to retry the sync
                 // when it becomes available again.
@@ -410,7 +410,7 @@ public class BulkPropagatorJob : PropagatorJob {
                     /* emit */ this.propagator.seen_locked_file (single_file.local_path);
                 }
 
-                abort_with_error (single_file.item, SyncFileItem.Status.NORMAL_ERROR, device.error_string ());
+                abort_with_error (single_file.item, SyncFileItem.Status.NORMAL_ERROR, device.error_string);
                 /* emit */ signal_finished (SyncFileItem.Status.NORMAL_ERROR);
 
                 return;
@@ -487,12 +487,12 @@ public class BulkPropagatorJob : PropagatorJob {
         GLib.info (single_file.item.file + " file headers " + file_reply);
 
         if (file_reply.contains ("error") && !file_reply["error"].to_bool ()) {
-            single_file.item.http_error_code = static_cast<uint16> (200);
+            single_file.item.http_error_code = (uint16) 200;
         } else {
-            single_file.item.http_error_code = static_cast<uint16> (412);
+            single_file.item.http_error_code = (uint16) 412;
         }
 
-        single_file.item.response_time_stamp = put_multi_file_job.response_timestamp ();
+        single_file.item.response_time_stamp = put_multi_file_job.response_timestamp;
         single_file.item.request_id = put_multi_file_job.request_id ();
         if (single_file.item.http_error_code != 200) {
             common_error_handling (single_file.item, file_reply["message"].to_string ());
@@ -511,7 +511,7 @@ public class BulkPropagatorJob : PropagatorJob {
         // yet, the upload can be stopped and an error can be displayed, because
         // the server hasn't registered the new file yet.
         var etag = get_etag_from_json_reply (file_reply);
-        finished = etag.length () > 0;
+        finished = etag.length > 0;
 
         var full_file_path = this.propagator.full_local_path (single_file.item.file);
 
@@ -552,8 +552,8 @@ public class BulkPropagatorJob : PropagatorJob {
         if (ret == "") {
             ret = etag;
         }
-        if (oc_etag.length () > 0 && oc_etag != etag && oc_etag != ETag) {
-            GLib.debug (lc_bulk_propagator_job) + "Quite peculiar, we have an etag != OC-Etag [no problem!]" + etag + ETag + oc_etag;
+        if (oc_etag.length > 0 && oc_etag != etag && oc_etag != ETag) {
+            GLib.debug ("Quite peculiar, we have an etag != OC-Etag [no problem!] " + etag + ETag + oc_etag);
         }
         return ret;
     }
@@ -620,8 +620,8 @@ public class BulkPropagatorJob : PropagatorJob {
         }
 
         if (!item.etag == "" && item.etag != "empty_etag"
-            && item.instruction != SyncInstructions.NEW // On new files never send a If-Match
-            && item.instruction != SyncInstructions.TYPE_CHANGE) {
+            && item.instruction != CSync.SyncInstructions.NEW // On new files never send a If-Match
+            && item.instruction != CSync.SyncInstructions.TYPE_CHANGE) {
             // We add quotes because the owncloud server always adds quotes around the etag, and
             //  csync_owncloud.c's owncloud_file_id always strips the quotes.
             headers["If-Match"] = '"' + item.etag + '"';
@@ -667,7 +667,7 @@ public class BulkPropagatorJob : PropagatorJob {
     ***********************************************************/
     private void check_resetting_errors (SyncFileItem item) {
         if (item.http_error_code == 412
-            || this.propagator.account.capabilities ().http_error_codes_that_reset_failing_chunked_uploads ().contains (item.http_error_code)) {
+            || this.propagator.account.capabilities.http_error_codes_that_reset_failing_chunked_uploads ().contains (item.http_error_code)) {
             var upload_info = this.propagator.journal.get_upload_info (item.file);
             upload_info.error_count += 1;
             if (upload_info.error_count > 3) {

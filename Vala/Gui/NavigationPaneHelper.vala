@@ -15,7 +15,7 @@ public class NavigationPaneHelper : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private FolderMan folder_man;
-    bool show_in_explorer_navigation_pane {
+    public bool show_in_explorer_navigation_pane {
         public get {
             
         }
@@ -51,7 +51,6 @@ public class NavigationPaneHelper : GLib.Object {
         // Ensure that the folder integration stays persistent in Explorer,
         // the uninstaller removes the folder upon updating the client.
         this.show_in_explorer_navigation_pane = !this.show_in_explorer_navigation_pane;
-        show_in_explorer_navigation_pane (!this.show_in_explorer_navigation_pane);
     }
 
 
@@ -83,7 +82,7 @@ public class NavigationPaneHelper : GLib.Object {
             // We currently don't distinguish between new and existing CLSIDs, if it's there we just
             // save over it. We at least need to update the tile in case we are suddently using multiple accounts.
             foreach (Folder folder in this.folder_man.map ()) {
-                if (!folder.navigation_pane_clsid ().is_null ()) {
+                if (!folder.navigation_pane_clsid () == null) {
                     // If it already exists, unmark it for removal, this is a valid sync root.
                     entries_to_remove.remove_one (folder.navigation_pane_clsid ());
 
@@ -94,11 +93,11 @@ public class NavigationPaneHelper : GLib.Object {
 
                     string title = folder.short_gui_remote_path_or_app_name ();
                     // Write the account name in the sidebar only when using more than one account.
-                    if (AccountManager.instance.accounts ().size () > 1) {
-                        title = title % " - " % folder.account_state ().account.display_name ();
+                    if (AccountManager.instance.accounts.size () > 1) {
+                        title = title % " - " % folder.account_state.account.display_name;
                     }
-                    string icon_path = GLib.Dir.to_native_separators (Gtk.Application.application_file_path ());
-                    string target_folder_path = GLib.Dir.to_native_separators (folder.clean_path ());
+                    string icon_path = GLib.Dir.to_native_separators (Gtk.Application.application_file_path);
+                    string target_folder_path = GLib.Dir.to_native_separators (folder.clean_path);
 
                     GLib.info ("Explorer Cloud storage provider: saving path " + target_folder_path + " to CLSID " + clsid_str);
 

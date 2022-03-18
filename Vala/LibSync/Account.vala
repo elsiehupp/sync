@@ -45,7 +45,8 @@ about credentials, SSL errors and certificates.
 ***********************************************************/
 public class Account : GLib.Object {
 
-    const string app_password = "app-password";
+    const string APP_PASSWORD = "app-password";
+    const string DAV_BASE_PATH = "/remote.php/dav/files";
 
     const int PUSH_NOTIFICATIONS_RECONNECT_INTERVAL = 1000 * 60 * 2;
     const int USERNAME_PREFILL_SERVER_VERSION_MIN_SUPPORTED_MAJOR = 24;
@@ -54,7 +55,7 @@ public class Account : GLib.Object {
     @brief Reimplement this to handle SSL errors from libsync
     @ingroup libsync
     ***********************************************************/
-    abstract class AbstractSslErrorHandler {
+    public abstract class AbstractSslErrorHandler {
         public abstract bool handle_errors (GLib.List<GnuTLS.ErrorCode> error_list, QSslConfiguration conf, GLib.List<GLib.TlsCertificate> cert_list, Account account);
     }
 
@@ -65,11 +66,9 @@ public class Account : GLib.Object {
     ***********************************************************/
     public GnuTLS.CipherAlgorithm session_cipher;
 
-
     /***********************************************************
     ***********************************************************/
     public string session_ticket;
-
 
     /***********************************************************
     ***********************************************************/
@@ -77,7 +76,7 @@ public class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    unowned Account shared_this {
+    public unowned Account shared_this {
         private get {
             return this.shared_this;
         }
@@ -90,7 +89,7 @@ public class Account : GLib.Object {
     /***********************************************************
     The internal identifier of the account.
     ***********************************************************/
-    string identifier { public get; private set; }
+    public string identifier { public get; private set; }
 
     /***********************************************************
     The user that can be used in dav url.
@@ -98,7 +97,7 @@ public class Account : GLib.Object {
     This can very well be different frome the login user that's
     stored in credentials.user ().
     ***********************************************************/
-    string dav_user {
+    public unowned string dav_user {
         public get {
             return this.dav_user == "" && this.credentials != null ? this.credentials.user : this.dav_user;
         }
@@ -114,7 +113,7 @@ public class Account : GLib.Object {
     /***********************************************************
     The name of the account as shown in the toolbar
     ***********************************************************/
-    string display_name {
+    public string display_name {
         public get {
             string dn = "%1@%2".printf (this.credentials.user, this.url.host);
             int port = this.url.port ();
@@ -137,7 +136,7 @@ public class Account : GLib.Object {
     /***********************************************************
     ***********************************************************/
 //  #ifndef TOKEN_AUTH_ONLY
-    Gtk.Image avatar {
+    public Gtk.Image avatar {
         public get {
             return this.avatar;
         }
@@ -155,7 +154,7 @@ public class Account : GLib.Object {
     /***********************************************************
     Server url of the account
     ***********************************************************/
-    GLib.Uri url {
+    public GLib.Uri url {
         public get {
             return this.url;
         }
@@ -178,7 +177,7 @@ public class Account : GLib.Object {
     /***********************************************************
     The certificates of the account
     ***********************************************************/
-    GLib.List<GLib.TlsCertificate> approved_certificates {
+    public GLib.List<GLib.TlsCertificate> approved_certificates {
         public get {
             return this.approved_certificates;
         }
@@ -190,12 +189,12 @@ public class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    QSslConfiguration ssl_configuration { public get; public set; }
+    public QSslConfiguration ssl_configuration { public get; public set; }
 
     /***********************************************************
     Access the server capabilities
     ***********************************************************/
-    GLib.HashTable<string, GLib.Variant> capabilities {
+    public GLib.HashTable<string, GLib.Variant> capabilities {
         public get {
             return this.capabilities;
         }
@@ -213,7 +212,7 @@ public class Account : GLib.Object {
     For servers >= 10.0.0, this can be the empty string until
     capabilities have been received.
     ***********************************************************/
-    string server_version {
+    public string server_version {
         private get {
             return this.server_version;
         }
@@ -231,7 +230,7 @@ public class Account : GLib.Object {
     /***********************************************************
     Pluggable handler
     ***********************************************************/
-    AbstractSslErrorHandler ssl_error_handler {
+    public AbstractSslErrorHandler ssl_error_handler {
         private get {
             return this.ssl_error_handler;
         }
@@ -247,7 +246,7 @@ public class Account : GLib.Object {
     /***********************************************************
     Holds the accounts credentials
     ***********************************************************/
-    AbstractCredentials credentials {
+    public AbstractCredentials credentials {
         public get {
             return this.credentials;
         }
@@ -315,7 +314,7 @@ public class Account : GLib.Object {
     Qt expects everything in the connect to be a pointer, so
     return a pointer.
     ***********************************************************/
-    ClientSideEncryption e2e { public get; private set; }
+    public ClientSideEncryption e2e { public get; private set; }
 
     /***********************************************************
     Used in RemoteWipe
@@ -333,11 +332,11 @@ public class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    PushNotifications push_notifications { public get; private set; }
+    public PushNotifications push_notifications { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
-    unowned UserStatusConnector user_status_connector { public get; private set; }
+    public unowned UserStatusConnector user_status_connector { public get; private set; }
 
     /***********************************************************
     IMPORTANT - remove later - FIXME MS@2019-12-07 -.
@@ -414,7 +413,7 @@ public class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    internal signal void signal_ssl_errors (GLib.InputStream reply, GLib.List<GnuTLS.ErrorCode> error_list);
+    internal signal void signal_ssl_errors (GLib.InputStream input_stream, GLib.List<GnuTLS.ErrorCode> error_list);
 
     /***********************************************************
     ***********************************************************/
@@ -437,7 +436,7 @@ public class Account : GLib.Object {
     ***********************************************************/
     public static Account create () {
         Account account = new Account ();
-        account.shared_this (account);
+        account.shared_this = account;
         return account;
     }
 
@@ -462,21 +461,18 @@ public class Account : GLib.Object {
            a trailing slash.
     @returns the (themeable) dav path for the account.
     ***********************************************************/
-    public string dav_path () {
-        return dav_path_base () + "/" + this.dav_user + "/";
-    }
-
-
-    private static string dav_path_base () {
-        return "/remote.php/dav/files";
+    public string dav_path {
+        public get {
+            return DAV_BASE_PATH + "/" + this.dav_user + "/";
+        }
     }
 
 
     /***********************************************************
-    Returns webdav entry URL, based on url ()
+    Returns webdav entry URL, based on this.url
     ***********************************************************/
     public GLib.Uri dav_url () {
-        return Utility.concat_url_path (url (), dav_path ());
+        return Utility.concat_url_path (this.url, dav_path);
     }
 
 
@@ -500,9 +496,11 @@ public class Account : GLib.Object {
     this function. Other places should prefer to use jobs or
     send_request ().
     ***********************************************************/
-    public GLib.InputStream send_raw_request_for_device (string verb,
+    public GLib.InputStream send_raw_request_for_device (
+        string verb,
         GLib.Uri url, Soup.Request request = Soup.Request (),
-        QIODevice data = null) {
+        QIODevice data = null
+    ) {
         request.url (url);
         request.ssl_configuration (this.get_or_create_ssl_config ());
         if (verb == "HEAD" && !data) {
@@ -526,7 +524,8 @@ public class Account : GLib.Object {
         string verb,
         GLib.Uri url,
         string data,
-        Soup.Request request = Soup.Request ())  {
+        Soup.Request request = Soup.Request ()
+    ) {
         request.url (url);
         request.ssl_configuration (this.get_or_create_ssl_config ());
         if (verb == "HEAD" && data == "") {
@@ -546,10 +545,12 @@ public class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.InputStream send_raw_request_for_multipart (string verb,
+    public GLib.InputStream send_raw_request_for_multipart (
+        string verb,
         GLib.Uri url,
         QHttpMultiPart data,
-        Soup.Request request = Soup.Request ()) {
+        Soup.Request request = Soup.Request ()
+    ) {
         request.url (url);
         request.ssl_configuration (this.get_or_create_ssl_config ());
         if (verb == "PUT") {
@@ -567,9 +568,12 @@ public class Account : GLib.Object {
     More complicated requests typically create their own job
     types.
     ***********************************************************/
-    public SimpleNetworkJob send_request (string verb,
-        GLib.Uri url, Soup.Request request = Soup.Request (),
-        QIODevice data = null) {
+    public SimpleNetworkJob send_request (
+        string verb,
+        GLib.Uri url,
+        Soup.Request request = Soup.Request (),
+        QIODevice data = null
+    ) {
         var simple_network_job = new SimpleNetworkJob (shared_from_this ());
         simple_network_job.start_request (verb, url, request, data);
         return simple_network_job;
@@ -580,7 +584,7 @@ public class Account : GLib.Object {
     The ssl configuration during the first connection
     ***********************************************************/
     public QSslConfiguration get_or_create_ssl_config () {
-        if (!this.ssl_configuration.is_null ()) {
+        if (!this.ssl_configuration == null) {
             // Will be set by CheckServerJob.on_signal_finished ()
             // We need to use a central shared config to get SSL session tickets
             return this.ssl_configuration;
@@ -604,7 +608,7 @@ public class Account : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void add_approved_certificates (GLib.List<GLib.TlsCertificate> certificates) {
-        this.approved_certificates += certificates;
+        this.approved_certificates.append (certificates);
     }
 
 
@@ -622,23 +626,23 @@ public class Account : GLib.Object {
     To be called by credentials only, for storing username and the like
     ***********************************************************/
     public GLib.Variant credential_setting_key (string key) {
-        if (this.credentials) {
-            string prefix = this.credentials.signal_auth_type ();
+        if (this.credentials != null) {
+            string prefix = this.credentials.auth_type_string ();
             GLib.Variant value = this.settings_map.value (prefix + "this." + key);
-            if (value.is_null ()) {
+            if (value == null) {
                 value = this.settings_map.value (key);
             }
             return value;
         }
-        return GLib.Variant ();
+        return new GLib.Variant ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void credential_setting_key_value (string key, GLib.Variant value) {
-        if (this.credentials) {
-            string prefix = this.credentials.signal_auth_type ();
+        if (this.credentials != null) {
+            string prefix = this.credentials.auth_type_string;
             this.settings_map.insert (prefix + "this." + key, value);
         }
     }
@@ -647,22 +651,25 @@ public class Account : GLib.Object {
     /***********************************************************
     Assign a client certificate
     ***********************************************************/
-    public void certificate (string certficate = "", string private_key = "");
+    //  public void certificate (string certficate = "", string private_key = "");
 
 
     /***********************************************************
     Server version for easy comparison.
 
-    Example: server_version_int () >= make_server_version (11, 2, 3)
+    Example: server_version_int >= make_server_version (11, 2, 3)
 
     Will be 0 if the version is not available yet.
     ***********************************************************/
-    public int server_version_int () {
-        // FIXME: Use Qt 5.5 QVersionNumber
-        var components = server_version ().split ('.');
-        return make_server_version (components.value (0).to_int (),
-            components.value (1).to_int (),
-            components.value (2).to_int ());
+    public int server_version_int {
+        public get {
+            // FIXME: Use Qt 5.5 QVersionNumber
+            var components = this.server_version.split (".");
+            return make_server_version (components.value (0).to_int (),
+                components.value (1).to_int (),
+                components.value (2).to_int ()
+            );
+        }
     }
 
 
@@ -685,20 +692,27 @@ public class Account : GLib.Object {
     This function returns true if the server is beyond the weak
     limit.
     ***********************************************************/
-    public bool server_version_unsupported () {
-        if (server_version_int () == 0) {
-            // not detected yet, assume it is fine.
-            return false;
+    public bool server_version_unsupported {
+        public get {
+            if (server_version_int == 0) {
+                // not detected yet, assume it is fine.
+                return false;
+            }
+            return server_version_int < make_server_version (
+                NEXTCLOUD_SERVER_VERSION_MIN_SUPPORTED_MAJOR,
+                NEXTCLOUD_SERVER_VERSION_MIN_SUPPORTED_MINOR,
+                NEXTCLOUD_SERVER_VERSION_MIN_SUPPORTED_PATCH
+            );
         }
-        return server_version_int () < make_server_version (NEXTCLOUD_SERVER_VERSION_MIN_SUPPORTED_MAJOR,
-                NEXTCLOUD_SERVER_VERSION_MIN_SUPPORTED_MINOR, NEXTCLOUD_SERVER_VERSION_MIN_SUPPORTED_PATCH);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public bool is_username_prefill_supported () {
-        return server_version_int () >= make_server_version (USERNAME_PREFILL_SERVER_VERSION_MIN_SUPPORTED_MAJOR, 0, 0);
+    public bool is_username_prefill_supported {
+        public get {
+            return server_version_int >= make_server_version (USERNAME_PREFILL_SERVER_VERSION_MIN_SUPPORTED_MAJOR, 0, 0);
+        }
     }
 
 
@@ -753,20 +767,26 @@ public class Account : GLib.Object {
         }
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_push_notifications_signal_ready () {
         this.push_notifications_reconnect_timer.stop ();
         /* emit */ signal_push_notifications_ready (this);
     }
 
+
+    /***********************************************************
+    ***********************************************************/
     private void on_push_notifications_connection_lost () {
         GLib.info ("Disable push notifications object because authentication failed or connection lost.");
         if (!this.push_notifications) {
             return;
         }
-        if (!this.push_notifications.is_ready ()) {
+        if (!this.push_notifications.is_ready) {
             /* emit */ signal_push_notifications_disabled (this);
         }
-        if (!this.push_notifications_reconnect_timer.is_active ()) {
+        if (!this.push_notifications_reconnect_timer.is_active) {
             this.push_notifications_reconnect_timer.start ();
         }
     }
@@ -775,20 +795,20 @@ public class Account : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void delete_app_password () {
-        string kck = AbstractCredentials.keychain_key (
+        string keychain_key = AbstractCredentials.keychain_key (
             this.url.to_string (),
-            this.credentials.user + app_password,
+            this.credentials.user + APP_PASSWORD,
             this.identifier
         );
 
-        if (kck == "") {
-            GLib.debug ("app_password is empty");
+        if (keychain_key == "") {
+            GLib.debug ("APP_PASSWORD is empty");
             return;
         }
 
         var delete_password_job = new DeleteJob (Theme.app_name);
         delete_password_job.insecure_fallback (false);
-        delete_password_job.key (kck);
+        delete_password_job.key (keychain_key);
         delete_password_job.signal_finished.connect (
             this.on_signal_delete_password_job_finished
         );
@@ -796,12 +816,12 @@ public class Account : GLib.Object {
     }
 
 
-    private void on_signal_delete_password_job_finished (Job incoming) {
+    private void on_signal_delete_password_job_finished (AbstractNetworkJob incoming) {
         var delete_job = (DeleteJob) incoming;
         if (delete_job.error == NoError) {
-            GLib.info ("app_password deleted from keychain.");
+            GLib.info ("APP_PASSWORD deleted from keychain.");
         } else {
-            GLib.warning ("Unable to delete app_password from keychain " + delete_job.error_string ());
+            GLib.warning ("Unable to delete APP_PASSWORD from keychain " + delete_job.error_string);
         }
 
         // Allow storing a new app password on re-login
@@ -811,8 +831,10 @@ public class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public string cookie_jar_path () {
-        return GLib.Environment.get_user_config_dir () + "/cookies" + this.identifier + ".db";
+    public string cookie_jar_path {
+        public get {
+            return GLib.Environment.get_user_config_dir () + "/cookies" + this.identifier + ".db";
+        }
     }
 
 
@@ -845,15 +867,19 @@ public class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public Soup.Session network_access_manager () {
-        return this.soup_session;
+    public Soup.Session network_access_manager {
+        public get {
+            return this.soup_session;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public unowned Soup.Session shared_network_access_manager () {
-        return this.soup_session;
+    public unowned Soup.Session shared_network_access_manager {
+        public get {
+            return this.soup_session;
+        }
     }
 
 
@@ -875,15 +901,15 @@ public class Account : GLib.Object {
     Used in RemoteWipe
     ***********************************************************/
     public void retrieve_app_password () {
-        const string kck = AbstractCredentials.keychain_key (
-            url ().to_string (),
-            credentials.user () + app_password,
+        string keychain_key = AbstractCredentials.keychain_key (
+            this.url.to_string (),
+            this.credentials.user + APP_PASSWORD,
             this.identifier
         );
 
         var read_password_job = new ReadPasswordJob (Theme.app_name);
         read_password_job.insecure_fallback (false);
-        read_password_job.key (kck);
+        read_password_job.key (keychain_key);
         read_password_job.signal_finished.connect (
             this.on_signal_read_password_job_finished
         );
@@ -891,12 +917,13 @@ public class Account : GLib.Object {
     }
 
 
-    private void on_signal_read_password_job_finished (Job incoming) {
+    private void on_signal_read_password_job_finished (AbstractNetworkJob incoming) {
         var read_job = (ReadPasswordJob) incoming;
         string password = "";
         // Error or no valid public key error out
-        if (read_job.error () == NoError &&
-                read_job.binary_data ().length () > 0) {
+        if (read_job.error == NoError &&
+            read_job.binary_data ().length > 0
+        ) {
             password = read_job.binary_data ();
         }
 
@@ -906,7 +933,7 @@ public class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void write_app_password_once (string app_password) {
+    public void write_app_password_once (string APP_PASSWORD) {
         if (this.wrote_app_password)
             return;
 
@@ -915,19 +942,19 @@ public class Account : GLib.Object {
         // there'll be a zombie keychain slot forever, never used again ;p
         //
         // Also don't write empty passwords (Log out . Relaunch)
-        if (this.identifier == "" || app_password == "")
+        if (this.identifier == "" || APP_PASSWORD == "")
             return;
 
-        const string kck = AbstractCredentials.keychain_key (
-                    url ().to_string (),
-                    this.dav_user + app_password,
-                    this.identifier
+        string keychain_key = AbstractCredentials.keychain_key (
+            url.to_string (),
+            this.dav_user + APP_PASSWORD,
+            this.identifier
         );
 
         var write_password_job = new WritePasswordJob (Theme.app_name);
         write_password_job.insecure_fallback (false);
-        write_password_job.key (kck);
-        write_password_job.binary_data (app_password.to_latin1 ());
+        write_password_job.key (keychain_key);
+        write_password_job.binary_data (APP_PASSWORD.to_latin1 ());
         write_password_job.signal_finished.connect (
             this.on_signal_write_password_job_finished
         );
@@ -935,12 +962,12 @@ public class Account : GLib.Object {
     }
 
 
-    private void on_signal_write_password_job_finished (Job incoming) {
+    private void on_signal_write_password_job_finished (AbstractNetworkJob incoming) {
         var write_job = (WritePasswordJob) (incoming);
-        if (write_job.error () == NoError) {
-            GLib.info ("app_password stored in keychain.");
+        if (write_job.error == NoError) {
+            GLib.info ("APP_PASSWORD stored in keychain.");
         } else {
-            GLib.warning ("Unable to store app_password in keychain " + write_job.error_string ());
+            GLib.warning ("Unable to store APP_PASSWORD in keychain " + write_job.error_string);
         }
 
         // We don't try this again on error, to not raise CPU consumption
@@ -962,11 +989,11 @@ public class Account : GLib.Object {
     private void on_signal_delete_job_finished () {
         var delete_job = (DeleteJob)GLib.Object.sender ();
         if (delete_job) {
-            var http_code = delete_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+            var http_code = delete_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             if (http_code != 200) {
-                GLib.warning ("AppToken remove failed for user: " + display_name () + " with code: " + http_code);
+                GLib.warning ("AppToken remove failed for user: " + display_name + " with code: " + http_code);
             } else {
-                GLib.info ("AppToken for user: " + display_name () + " has been removed.");
+                GLib.info ("AppToken for user: " + display_name + " has been removed.");
             }
         } else {
             GLib.assert (false);
@@ -980,18 +1007,20 @@ public class Account : GLib.Object {
     Check for the direct_editing capability
     ***********************************************************/
     public void fetch_direct_editors (GLib.Uri direct_editing_url, string direct_editing_e_tag) {
-        if (direct_editing_url == "" || direct_editing_e_tag == "")
+        if (direct_editing_url == null || direct_editing_e_tag == "") {
             return;
+        }
 
         // Check for the direct_editing capability
-        if (!direct_editing_url == "" &&
-            (direct_editing_e_tag == "" || direct_editing_e_tag != this.last_direct_editing_e_tag)) {
-                // Fetch the available editors and their mime types
-                var json_api_job = new JsonApiJob (shared_from_this (), "ocs/v2.php/apps/files/api/v1/direct_editing");
-                json_api_job.signal_json_received.connect (
-                    this.on_signal_json_api_job_direct_editing_recieved
-                );
-                json_api_job.start ();
+        if (direct_editing_url != null &&
+            (direct_editing_e_tag == "" || direct_editing_e_tag != this.last_direct_editing_e_tag)
+        ) {
+            // Fetch the available editors and their mime types
+            var json_api_job = new JsonApiJob (shared_from_this (), "ocs/v2.php/apps/files/api/v1/direct_editing");
+            json_api_job.signal_json_received.connect (
+                this.on_signal_json_api_job_direct_editing_recieved
+            );
+            json_api_job.start ();
         }
     }
 
@@ -1039,17 +1068,17 @@ public class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_handle_ssl_errors (GLib.InputStream reply, GLib.List<GnuTLS.ErrorCode> errors) {
-        NetworkJobTimeoutPauser pauser = new NetworkJobTimeoutPauser (reply);
-        GLib.debug ("SSL-Errors happened for url " + reply.url.to_string ());
+    public void on_signal_handle_ssl_errors (GLib.InputStream input_stream, GLib.List<GnuTLS.ErrorCode> errors) {
+        NetworkJobTimeoutPauser pauser = new NetworkJobTimeoutPauser (input_stream);
+        GLib.debug ("SSL-Errors happened for url " + input_stream.url.to_string ());
         foreach (GnuTLS.ErrorCode error in errors) {
             GLib.debug ("\t_error in " + error.certificate () + ":"
-                        + error.error_string () + " (" + error.error () + ")"
+                        + error.error_string + " (" + error.error + ")"
                         + "\n");
         }
 
         //  GLib.info ("ssl errors" + output);
-        GLib.info (reply.ssl_configuration ().peer_certificate_chain ());
+        GLib.info (input_stream.ssl_configuration ().peer_certificate_chain ());
 
         bool all_previously_rejected = true;
         foreach (GnuTLS.ErrorCode error in errors) {
@@ -1065,8 +1094,8 @@ public class Account : GLib.Object {
         }
 
         GLib.List<GLib.TlsCertificate> approved_certificates;
-        if (this.ssl_error_handler.is_null ()) {
-            GLib.warning (output + "called without valid SSL error handler for account" + url ());
+        if (this.ssl_error_handler == null) {
+            GLib.warning (output + "called without valid SSL error handler for account" + this.url);
             return;
         }
 
@@ -1075,13 +1104,14 @@ public class Account : GLib.Object {
         // Keep a ref here on our stackframe to make sure that it doesn't get deleted before
         // handle_errors returns.
         unowned Soup.Session access_manager_lock = this.soup_session;
-        QPointer<GLib.Object> guard = reply;
+        QPointer<GLib.Object> guard = input_stream;
 
-        if (this.ssl_error_handler.handle_errors (errors, reply.ssl_configuration (), approved_certificates, shared_from_this ())) {
-            if (!guard)
+        if (this.ssl_error_handler.handle_errors (errors, input_stream.ssl_configuration (), approved_certificates, shared_from_this ())) {
+            if (!guard) {
                 return;
+            }
 
-            if (!approved_certificates == "") {
+            if (approved_certificates != "") {
                 QSslConfiguration.default_configuration ().add_ca_certificates (approved_certificates);
                 add_approved_certificates (approved_certificates);
                 /* emit */ signal_wants_account_saved (this);
@@ -1093,10 +1123,11 @@ public class Account : GLib.Object {
             // Warning : Do not* use ignore_ssl_errors () (without args) here:
             // it permanently ignores all SSL errors for this host, even
             // certificate changes.
-            reply.ignore_ssl_errors (errors);
+            input_stream.ignore_ssl_errors (errors);
         } else {
-            if (!guard)
+            if (guard == null) {
                 return;
+            }
 
             // Mark all involved certificates as rejected, so we don't ask the user again.
             foreach (GnuTLS.ErrorCode error in errors) {
@@ -1162,7 +1193,7 @@ public class Account : GLib.Object {
             const string identifier = editor.value ("identifier").to_string ();
             const string name = editor.value ("name").to_string ();
 
-            if (!identifier == "" && !name == "") {
+            if (identifier != "" && name != "") {
                 var mime_types = editor.value ("mimetypes").to_array ();
                 var optional_mime_types = editor.value ("optional_mimetypes").to_array ();
 

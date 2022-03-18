@@ -56,7 +56,7 @@ public class ProfilePageMenu : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private static void on_signal_hovercard_open_browser (string link) {
-        OpenExtrernal.open_browser (link);
+        OpenExternal.open_browser (link);
     }
 
 

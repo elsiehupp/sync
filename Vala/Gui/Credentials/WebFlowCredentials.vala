@@ -119,11 +119,11 @@ public class WebFlowCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     public override bool still_valid (Soup.Reply reply) {
-        if (reply.error () != Soup.Reply.NoError) {
-            GLib.warning (reply.error ());
-            GLib.warning (reply.error_string ());
+        if (reply.error != Soup.Reply.NoError) {
+            GLib.warning (reply.error);
+            GLib.warning (reply.error_string);
         }
-        return (reply.error () != Soup.Reply.AuthenticationRequiredError);
+        return (reply.error != Soup.Reply.AuthenticationRequiredError);
     }
 
 
@@ -139,7 +139,7 @@ public class WebFlowCredentials : AbstractCredentials {
         this.account.wants_account_saved (this.account);
 
         // write cert if there is one
-        if (!this.client_ssl_certificate.is_null ()) {
+        if (!this.client_ssl_certificate == null) {
             var kechain_chunk_write_job = new KeychainChunk.WriteJob (
                 this.account,
                 this.user + CLIENT_CERTIFICATE_PEM_C,
@@ -182,15 +182,15 @@ public class WebFlowCredentials : AbstractCredentials {
 
         this.account.delete_app_password ();
 
-        const string kck = keychain_key (this.account.url.to_string (), this.user, this.account.identifier ());
-        if (kck == "") {
+        const string keychain_key = keychain_key (this.account.url.to_string (), this.user, this.account.identifier);
+        if (keychain_key == "") {
             GLib.debug ("InvalidateToken: User is empty, bailing out!");
             return;
         }
 
         var delete_password_job = new DeletePasswordJob (Theme.app_name, this);
         delete_password_job.insecure_fallback (false);
-        delete_password_job.key (kck);
+        delete_password_job.key (keychain_key);
         delete_password_job.on_signal_start ();
 
         invalidate_token ();
@@ -260,13 +260,13 @@ public class WebFlowCredentials : AbstractCredentials {
 
         if (!use_flow2) {
             GLib.Uri url = this.account.url;
-            string path = url.path () + "/index.php/login/flow";
+            string path = url.path + "/index.php/login/flow";
             url.path (path);
             this.ask_dialog.url (url);
         }
 
         string message = _("You have been logged out of %1 as user %2. Please log in again.")
-                        .printf (this.account.display_name (), this.user);
+                        .printf (this.account.display_name, this.user);
         this.ask_dialog.info (message);
 
         this.ask_dialog.show ();
@@ -297,9 +297,9 @@ public class WebFlowCredentials : AbstractCredentials {
     ***********************************************************/
     private void on_signal_read_client_cert_pem_job_done (KeychainChunk.ReadJob read_job) {
         // Store PEM in memory
-        if (read_job.error () == NoError && read_job.binary_data ().length () > 0) {
+        if (read_job.error == NoError && read_job.binary_data ().length > 0) {
             GLib.List<QSslCertificate> ssl_certificate_list = QSslCertificate.from_data (read_job.binary_data (), QSsl.Pem);
-            if (ssl_certificate_list.length () >= 1) {
+            if (ssl_certificate_list.length >= 1) {
                 this.client_ssl_certificate = ssl_certificate_list.at (0);
             }
         }
@@ -322,23 +322,23 @@ public class WebFlowCredentials : AbstractCredentials {
     ***********************************************************/
     private void on_signal_read_client_key_pem_job_done (KeychainChunk.ReadJob read_job) {
         // Store key in memory
-        if (read_job.error () == NoError && read_job.binary_data ().length () > 0) {
+        if (read_job.error == NoError && read_job.binary_data ().length > 0) {
             string client_key_pem = read_job.binary_data ();
             // FIXME Unfortunately Qt has a bug and we can't just use QSsl.Opaque to let it
             // load whatever we have. So we try until it works.
             this.client_ssl_key = QSslKey (client_key_pem, QSsl.Rsa);
-            if (this.client_ssl_key.is_null ()) {
+            if (this.client_ssl_key == null) {
                 this.client_ssl_key = QSslKey (client_key_pem, QSsl.Dsa);
             }
-            if (this.client_ssl_key.is_null ()) {
+            if (this.client_ssl_key == null) {
                 this.client_ssl_key = QSslKey (client_key_pem, QSsl.Ec);
             }
-            if (this.client_ssl_key.is_null ()) {
+            if (this.client_ssl_key == null) {
                 GLib.warning ("Could not load SSL key into Qt!");
             }
             client_key_pem.clear ();
         } else {
-            GLib.warning ("Unable to read client key " + read_job.error_string ());
+            GLib.warning ("Unable to read client key " + read_job.error_string);
         }
 
         // Start fetching client CA certificates
@@ -353,9 +353,9 @@ public class WebFlowCredentials : AbstractCredentials {
     private void on_signal_read_client_ca_certificates_pem_job_done (KeychainChunk.ReadJob read_job) {
         // Store cert in memory
         if (read_job) {
-            if (read_job.error () == NoError && read_job.binary_data ().length () > 0) {
+            if (read_job.error == NoError && read_job.binary_data ().length > 0) {
                 GLib.List<QSslCertificate> ssl_certificate_list = QSslCertificate.from_data (read_job.binary_data (), QSsl.Pem);
-                if (ssl_certificate_list.length () >= 1) {
+                if (ssl_certificate_list.length >= 1) {
                     this.client_ssl_ca_certificates.append (ssl_certificate_list.at (0));
                 }
 
@@ -363,18 +363,18 @@ public class WebFlowCredentials : AbstractCredentials {
                 read_single_client_ca_cert_pem ();
                 return;
             } else {
-                if (read_job.error () != QKeychain.Error.EntryNotFound ||
-                    ( (read_job.error () == QKeychain.Error.EntryNotFound) && this.client_ssl_ca_certificates.count () == 0)) {
-                    GLib.warning ("Unable to read client CA cert slot " + this.client_ssl_ca_certificates.count ().to_string () + read_job.error_string ());
+                if (read_job.error != QKeychain.Error.EntryNotFound ||
+                    ( (read_job.error == QKeychain.Error.EntryNotFound) && this.client_ssl_ca_certificates.count () == 0)) {
+                    GLib.warning ("Unable to read client CA cert slot " + this.client_ssl_ca_certificates.count ().to_string () + read_job.error_string);
                 }
             }
         }
 
         // Now fetch the actual server password
-        const string kck = keychain_key (
+        const string keychain_key = keychain_key (
             this.account.url.to_string (),
             this.user,
-            this.keychain_migration ? "" : this.account.identifier ()
+            this.keychain_migration ? "" : this.account.identifier
         );
 
         var read_password_job = new ReadPasswordJob (Theme.app_name, this);
@@ -382,7 +382,7 @@ public class WebFlowCredentials : AbstractCredentials {
         add_settings_to_job (this.account, read_password_job);
     //  #endif
         read_password_job.insecure_fallback (false);
-        read_password_job.key (kck);
+        read_password_job.key (keychain_key);
         read_password_job.signal_finished.connect (
             this.on_signal_read_password_job_finished
         );
@@ -394,7 +394,7 @@ public class WebFlowCredentials : AbstractCredentials {
     ***********************************************************/
     private void on_signal_read_password_job_finished (QKeychain.Job incoming_job) {
         var read_password_job = qobject_cast<ReadPasswordJob> (incoming_job);
-        QKeychain.Error error = read_password_job.error ();
+        QKeychain.Error error = read_password_job.error;
 
         // If we could not find the entry try the old entries
         if (!this.keychain_migration && error == QKeychain.EntryNotFound) {
@@ -431,7 +431,7 @@ public class WebFlowCredentials : AbstractCredentials {
     private void on_signal_write_client_cert_pem_job_done (KeychainChunk.WriteJob write_job) {
         //  Q_UNUSED (write_job)
         // write ssl key if there is one
-        if (!this.client_ssl_key.is_null ()) {
+        if (!this.client_ssl_key == null) {
             var keychain_chunk_write_job = new KeychainChunk.WriteJob (
                 this.account,
                 this.user + CLIENT_KEY_PEM_C,
@@ -473,8 +473,8 @@ public class WebFlowCredentials : AbstractCredentials {
     private void on_signal_write_client_ca_certificates_pem_job_done (KeychainChunk.WriteJob write_job) {
         // errors / next ca cert?
         if (write_job && !this.client_ssl_ca_certificates == "") {
-            if (write_job.error () != NoError) {
-                GLib.warning ("Error while writing client CA cert " + write_job.error_string ());
+            if (write_job.error != NoError) {
+                GLib.warning ("Error while writing client CA cert " + write_job.error_string);
             }
 
             if (!this.client_ssl_ca_certificates_write_queue == "") {
@@ -493,7 +493,7 @@ public class WebFlowCredentials : AbstractCredentials {
         write_password_job.signal_finished.connect (
             this.on_signal_write_job_done
         );
-        write_password_job.key (keychain_key (this.account.url.to_string (), this.user, this.account.identifier ()));
+        write_password_job.key (keychain_key (this.account.url.to_string (), this.user, this.account.identifier));
         write_password_job.text_data (this.password);
         write_password_job.on_signal_start ();
     }
@@ -503,11 +503,11 @@ public class WebFlowCredentials : AbstractCredentials {
     ***********************************************************/
     private void on_signal_write_job_done (QKeychain.Job qkeychain_job) {
         delete qkeychain_job.settings ();
-        switch (qkeychain_job.error ()) {
+        switch (qkeychain_job.error) {
         case NoError:
             break;
         default:
-            GLib.warning ("Error while writing password " + qkeychain_job.error_string ());
+            GLib.warning ("Error while writing password " + qkeychain_job.error_string);
         }
     }
 
@@ -653,7 +653,7 @@ public class WebFlowCredentials : AbstractCredentials {
     private void on_signal_finished (Soup.Reply reply) {
         GLib.info ("request on_signal_finished");
 
-        if (reply.error () == Soup.Reply.NoError) {
+        if (reply.error == Soup.Reply.NoError) {
             this.credentials_valid = true;
 
             /***********************************************************
@@ -682,7 +682,7 @@ public class WebFlowCredentials : AbstractCredentials {
 
             if (!this.ask_dialog.is_using_flow2 ()) {
                 GLib.Uri url = this.account.url;
-                string path = url.path () + "/index.php/login/flow";
+                string path = url.path + "/index.php/login/flow";
                 url.path (path);
                 this.ask_dialog.url (url);
             }

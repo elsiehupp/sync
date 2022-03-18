@@ -85,7 +85,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
         if (this.item.modtime <= 0) {
             GLib.warning ("Invalid modified time " + this.item.file.to_string () + this.item.modtime.to_string ());
         }
-        if (progress_info.valid && progress_info.is_chunked () && progress_info.modtime == this.item.modtime && progress_info.size == this.item.size
+        if (progress_info.valid && progress_info.is_chunked && progress_info.modtime == this.item.modtime && progress_info.size == this.item.size
             && (progress_info.content_checksum == this.item.checksum_header || progress_info.content_checksum == "" || this.item.checksum_header == "")) {
             this.start_chunk = progress_info.chunk;
             this.transfer_identifier = progress_info.transferid;
@@ -198,10 +198,10 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
         var device = std.make_unique<UploadDevice> (
                 filename, chunk_start, current_chunk_size, this.propagator.bandwidth_manager);
         if (!device.open (QIODevice.ReadOnly)) {
-            GLib.warning ("Could not prepare upload device: " + device.error_string ());
+            GLib.warning ("Could not prepare upload device: " + device.error_string);
 
             // Soft error because this is likely caused by the user modifying his files while syncing
-            abort_with_error (SyncFileItem.Status.SOFT_ERROR, device.error_string ());
+            abort_with_error (SyncFileItem.Status.SOFT_ERROR, device.error_string);
             return;
         }
 
@@ -230,7 +230,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
 
         bool parallel_chunk_upload = true;
 
-        if (this.propagator.account.capabilities ().chunking_parallel_upload_disabled ()) {
+        if (this.propagator.account.capabilities.chunking_parallel_upload_disabled ()) {
             // Server may also disable parallel chunked upload for any higher version
             parallel_chunk_upload = false;
         } else {
@@ -238,7 +238,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
             if (!env == "") {
                 parallel_chunk_upload = env != "false" && env != "0";
             } else {
-                int version_num = this.propagator.account.server_version_int ();
+                int version_num = this.propagator.account.server_version_int;
                 if (version_num < Account.make_server_version (8, 0, 3)) {
                     // Disable parallel chunk upload severs older than 8.0.3 to avoid too many
                     // internal sever errors (#2743, #2938)
@@ -278,10 +278,10 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
             return;
         }
 
-        this.item.http_error_code = put_file_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-        this.item.response_time_stamp = put_file_job.response_timestamp ();
+        this.item.http_error_code = put_file_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        this.item.response_time_stamp = put_file_job.response_timestamp;
         this.item.request_id = put_file_job.request_id ();
-        Soup.Reply.NetworkError err = put_file_job.reply ().error ();
+        Soup.Reply.NetworkError err = put_file_job.input_stream.error;
         if (err != Soup.Reply.NoError) {
             common_error_handling (put_file_job);
             return;
@@ -289,7 +289,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
 
         // The server needs some time to process the request and provide us with a poll URL
         if (this.item.http_error_code == 202) {
-            string path = string.from_utf8 (put_file_job.reply ().raw_header ("OC-Job_status-Location"));
+            string path = string.from_utf8 (put_file_job.input_stream.raw_header ("OC-Job_status-Location"));
             if (path == "") {
                 on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Poll URL missing"));
                 return;
@@ -308,8 +308,8 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
         // But if the upload is ongoing, because not all chunks were uploaded
         // yet, the upload can be stopped and an error can be displayed, because
         // the server hasn't registered the new file yet.
-        string etag = get_etag_from_reply (put_file_job.reply ());
-        this.finished = etag.length () > 0;
+        string etag = get_etag_from_reply (put_file_job.input_stream);
+        this.finished = etag.length > 0;
 
         // Check if the file still exists
         const string full_file_path = this.propagator.full_local_path (this.item.file);
@@ -382,7 +382,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
         // the following code only happens after all chunks were uploaded.
 
         // the file identifier should only be empty for new files up- or downloaded
-        string fid = put_file_job.reply ().raw_header ("OC-FileID");
+        string fid = put_file_job.input_stream.raw_header ("OC-FileID");
         if (!fid == "") {
             if (!this.item.file_id == "" && this.item.file_id != fid) {
                 GLib.warning ("File ID changed! " + this.item.file_id.to_string () + fid.to_string ());
@@ -392,10 +392,10 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
 
         this.item.etag = etag;
 
-        if (put_file_job.reply ().raw_header ("X-OC-MTime") != "accepted") {
+        if (put_file_job.input_stream.raw_header ("X-OC-MTime") != "accepted") {
             // X-OC-MTime is supported since owncloud 5.0.   But not when chunking.
             // Normally Owncloud 6 always puts X-OC-MTime
-            GLib.warning ("Server does not support X-OC-MTime " + put_file_job.reply ().raw_header ("X-OC-MTime"));
+            GLib.warning ("Server does not support X-OC-MTime " + put_file_job.input_stream.raw_header ("X-OC-MTime"));
             // Well, the mtime was not set
         }
 

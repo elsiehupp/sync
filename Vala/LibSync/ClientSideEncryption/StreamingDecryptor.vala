@@ -53,17 +53,17 @@ public class StreamingDecryptor : GLib.Object {
 
     public string chunk_decryption (char input, uint64 chunk_size) {
         string byte_array;
-        Soup.Buffer buffer = new Soup.Buffer (&byte_array);
+        Soup.Buffer buffer = new Soup.Buffer (byte_array);
         buffer.open (QIODevice.WriteOnly);
 
-        GLib.assert (is_initialized ());
-        if (!is_initialized ()) {
+        GLib.assert (this.is_initialized);
+        if (!this.is_initialized) {
             GLib.critical ("Decryption failed. Decryptor is not initialized!");
             return "";
         }
 
-        GLib.assert (buffer.is_open () && buffer.is_writable ());
-        if (!buffer.is_open () || !buffer.is_writable ()) {
+        GLib.assert (buffer.is_open && buffer.is_writable ());
+        if (!buffer.is_open || !buffer.is_writable ()) {
             GLib.critical ("Decryption failed. Incorrect output device!");
             return "";
         }
@@ -184,7 +184,7 @@ public class StreamingDecryptor : GLib.Object {
             this.is_finished = true;
         }
 
-        if (is_finished ()) {
+        if (this.is_finished) {
             GLib.debug ("Decryption complete.");
         }
 

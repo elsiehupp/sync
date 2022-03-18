@@ -21,7 +21,7 @@ public errordomain OpenExternalError {
     OPEN_EXTERNAL_FAILED,
 }
 
-public class OpenExtrernal {
+public class OpenExternal {
 
     /***********************************************************
     Open an url in the browser.

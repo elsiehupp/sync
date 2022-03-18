@@ -76,7 +76,7 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
     private new void on_signal_folder_encrypted_metadata_received (QJsonDocument json, int status_code)  {
         if (status_code == 404) {
             // we've eneded up having no metadata, but, this.nested_items is not empty since we went this far, let's proceed with removing the nested items without modifying the metadata
-            GLib.debug (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) + "There is no metadata for this folder. Just remove it's nested items.";
+            GLib.debug (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER + "There is no metadata for this folder. Just remove it's nested items.");
             for (var it = this.nested_items.const_begin (); it != this.nested_items.const_end (); ++it) {
                 delete_nested_remote_item (it.key ());
             }
@@ -85,11 +85,11 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
 
         FolderMetadata metadata = new FolderMetadata (this.propagator.account, json.to_json (QJsonDocument.Compact), status_code);
 
-        GLib.debug (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) + "It's a root encrypted folder. Let's remove nested items first.";
+        GLib.debug (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER + "It's a root encrypted folder. Let's remove nested items first.");
 
         metadata.remove_all_encrypted_files ();
 
-        GLib.debug (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) + "Metadata updated, sending to the server.";
+        GLib.debug (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER + "Metadata updated, sending to the server.");
 
         var update_metadata_api_job = new UpdateMetadataApiJob (this.propagator.account, this.folder_identifier, metadata.encrypted_metadata (), this.folder_token);
         update_metadata_api_job.signal_success.connect (
@@ -124,16 +124,16 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
             }
         }
 
-        Soup.Reply.NetworkError err = delete_job.reply ().error ();
+        Soup.Reply.NetworkError network_error = delete_job.input_stream.error;
 
-        var http_error_code = delete_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-        this.item.response_time_stamp = delete_job.response_timestamp ();
+        var http_error_code = delete_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        this.item.response_time_stamp = delete_job.response_timestamp;
         this.item.request_id = delete_job.request_id ();
 
-        if (err != Soup.Reply.NoError && err != Soup.Reply.ContentNotFoundError) {
-            store_first_error (err);
-            store_first_error_string (delete_job.error_string ());
-            GLib.warning (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) + "Delete nested item on_signal_finished with error" + err + ".";
+        if (network_error != Soup.Reply.NoError && network_error != Soup.Reply.ContentNotFoundError) {
+            store_first_error (network_error);
+            store_first_error_string (delete_job.error_string);
+            GLib.warning (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER + "Delete nested item on_signal_finished with error" + network_error + ".");
         } else if (http_error_code != 204 && http_error_code != 404) {
             // A 404 reply is also considered a on_signal_success here : We want to make sure
             // a file is gone from the server. It not being there in the first place
@@ -146,20 +146,20 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
             store_first_error_string (
                 _("Wrong HTTP code returned by server. Expected 204, but received \"%1 %2\".")
                     .printf (http_error_code)
-                    .printf (delete_job.reply ().attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ())
+                    .printf (delete_job.input_stream.attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ())
             );
             if (this.item.http_error_code == 0) {
                 this.item.http_error_code = http_error_code;
             }
 
-            GLib.warning (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) + "Delete nested item on_signal_finished with error" + http_error_code + ".";
+            GLib.warning (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER + "Delete nested item finished with error " + http_error_code + ".");
         }
 
         if (this.nested_items.size () == 0) {
             // we wait for all this.nested_items' Delete_jobs to finish, and then - fail if any of those jobs has failed
-            if (network_error () != Soup.Reply.NetworkError.NoError || this.item.http_error_code != 0) {
-                const int error_code = network_error () != Soup.Reply.NetworkError.NoError ? network_error () : this.item.http_error_code;
-                GLib.critical (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) + "Delete of nested items on_signal_finished with error" + error_code + ". Failing the entire sequence.";
+            if (network_error != Soup.Reply.NetworkError.NoError || this.item.http_error_code != 0) {
+                const int error_code = network_error != Soup.Reply.NetworkError.NoError ? network_error : this.item.http_error_code;
+                GLib.critical (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER + "Delete of nested items finished with error " + error_code.to_string () + ". Failing the entire sequence.");
                 on_signal_task_failed ();
                 return;
             }

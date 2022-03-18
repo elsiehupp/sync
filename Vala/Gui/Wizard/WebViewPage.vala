@@ -33,7 +33,7 @@ public class WebViewPage : AbstractCredentialsWizardPage {
     /***********************************************************
     ***********************************************************/
     public WebViewPage (Gtk.Widget parent = new Gtk.Widget ()) {
-        base ();
+        base (parent);
         this.oc_wizard = (OwncloudWizard)parent;
 
         GLib.info ("Time for a webview!");
@@ -93,22 +93,28 @@ public class WebViewPage : AbstractCredentialsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public int next_id () {
-        return WizardCommon.Pages.PAGE_ADVANCED_SETUP;
+    public int next_id {
+        public get {
+            return WizardCommon.Pages.PAGE_ADVANCED_SETUP;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public bool is_complete () {
-        return false;
+    public bool is_complete {
+        public get {
+            return false;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public AbstractCredentials credentials () {
-        return new WebFlowCredentials (this.user, this.pass, this.oc_wizard.client_ssl_certificate, this.oc_wizard.client_ssl_key);
+    public AbstractCredentials credentials {
+        public get {
+            return new WebFlowCredentials (this.user, this.pass, this.oc_wizard.client_ssl_certificate, this.oc_wizard.client_ssl_key);
+        }
     }
 
 

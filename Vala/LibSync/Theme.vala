@@ -637,7 +637,7 @@ public class Theme : GLib.Object {
         string img_path = Theme.THEME_PREFIX + "colored/%1.png".printf (key);
         if (GLib.File.exists (img_path)) {
             Gdk.Pixbuf pix = new Gdk.Pixbuf (img_path);
-            if (pix.is_null ()) {
+            if (pix == null) {
                 // pixmap loading hasn't succeeded. We take the text instead.
                 re.value (key);
             } else {
@@ -795,7 +795,7 @@ public class Theme : GLib.Object {
                     .printf (help_url);
     
             dev_string += _("<p><small>Using files plugin : %1</small></p>")
-                            .printf (AbstractVfs.Mode.to_string (best_available_vfs_mode ()));
+                            .printf (AbstractVfs.Mode.to_string (this.best_available_vfs_mode));
             dev_string += "<br>%1"
                     .printf (QSysInfo.product_type () % '-' % QSysInfo.kernel_version ());
     
@@ -1229,7 +1229,7 @@ public class Theme : GLib.Object {
     ***********************************************************/
     public static bool show_virtual_files_option {
         public get {
-            return ConfigFile ().show_experimental_options () || best_available_vfs_mode () == Vfs.WindowsCfApi;
+            return ConfigFile ().show_experimental_options () || this.best_available_vfs_mode == Vfs.WindowsCfApi;
         }
     }
 
@@ -1238,7 +1238,7 @@ public class Theme : GLib.Object {
     ***********************************************************/
     public static bool enforce_virtual_files_sync_folder {
         public get {
-            return ENFORCE_VIRTUAL_FILES_SYNC_FOLDER && best_available_vfs_mode () != Vfs.Off;
+            return ENFORCE_VIRTUAL_FILES_SYNC_FOLDER && this.best_available_vfs_mode != Vfs.Off;
         }
     }
 
@@ -1293,7 +1293,7 @@ public class Theme : GLib.Object {
 
         string key = name + "," + flavor;
         Gtk.Icon cached = this.icon_cache[key];
-        if (cached.is_null ()) {
+        if (cached == null) {
             if (Gtk.Icon.has_theme_icon (name)) {
                 // use from theme
                 return cached = Gtk.Icon.from_theme (name);
@@ -1308,7 +1308,7 @@ public class Theme : GLib.Object {
                 : { 16, 22, 32, 48, 64, 128, 256, 512, 1024 };
             foreach (int size in sizes) {
                 var px = use_svg ? create_pixmap_from_svg (size) : load_pixmap (size);
-                if (px.is_null ()) {
+                if (px == null) {
                     continue;
                 }
                 // HACK, get rid of it by supporting FDO icon themes, this is really just emulating ubuntu-mono

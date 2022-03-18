@@ -53,10 +53,10 @@ public class ReadJob : KeychainChunk.Job {
         this.chunk_buffer.clear ();
         this.error = QKeychain.NoError;
 
-        const string kck = this.account ? AbstractCredentials.keychain_key (
+        const string keychain_key = this.account ? AbstractCredentials.keychain_key (
                 this.account.url.to_string (),
                 this.key,
-                this.keychain_migration ? "" : this.account.identifier ()
+                this.keychain_migration ? "" : this.account.identifier
             ) : this.key;
 
         var qkeychain_read_password_job = new QKeychain.ReadPasswordJob (this.service_name, this);
@@ -64,7 +64,7 @@ public class ReadJob : KeychainChunk.Job {
         add_settings_to_job (this.account, qkeychain_read_password_job);
     // #endif
         qkeychain_read_password_job.insecure_fallback (this.insecure_fallback);
-        qkeychain_read_password_job.key (kck);
+        qkeychain_read_password_job.key (keychain_key);
         qkeychain_read_password_job.signal_finished.connect (
             this.on_signal_read_job_done
         );
@@ -87,14 +87,14 @@ public class ReadJob : KeychainChunk.Job {
         );
         wait_loop.exec ();
 
-        if (error () == NoError) {
+        if (this.error == NoError) {
             return true;
         }
 
         this.chunk_count = 0;
         this.chunk_buffer.clear ();
-        if (error () != EntryNotFound) {
-            GLib.warning ("ReadPasswordJob failed with " + error_string ());
+        if (this.error != EntryNotFound) {
+            GLib.warning ("ReadPasswordJob failed with " + this.error_string);
         }
         return false;
     }
@@ -107,17 +107,17 @@ public class ReadJob : KeychainChunk.Job {
         var read_job = qobject_cast<QKeychain.ReadPasswordJob> (incoming_job);
         GLib.assert (read_job);
 
-        if (read_job.error () == NoError && !read_job.binary_data () == "") {
+        if (read_job.error == NoError && !read_job.binary_data () == "") {
             this.chunk_buffer.append (read_job.binary_data ());
             this.chunk_count++;
         } else {
             if (!read_job.insecure_fallback ()) { // If insecure_fallback is set, the next test would be pointless
-                if (this.retry_on_signal_key_chain_error && (read_job.error () == QKeychain.NoBackendAvailable
-                        || read_job.error () == QKeychain.OtherError)) {
+                if (this.retry_on_signal_key_chain_error && (read_job.error == QKeychain.NoBackendAvailable
+                        || read_job.error == QKeychain.OtherError)) {
                     // Could be that the backend was not yet available. Wait some extra seconds.
                     // (Issues #4274 and #6522)
                     // (For kwallet, the error is OtherError instead of NoBackendAvailable, maybe a bug in QtKeychain)
-                    GLib.info ("Backend unavailable (yet?) Retrying in a few seconds. " + read_job.error_string ());
+                    GLib.info ("Backend unavailable (yet?) Retrying in a few seconds. " + read_job.error_string);
                     GLib.Timeout.single_shot (10000, this, ReadJob.start);
                     this.retry_on_signal_key_chain_error = false;
                     read_job.delete_later ();
@@ -125,11 +125,11 @@ public class ReadJob : KeychainChunk.Job {
                 }
                 this.retry_on_signal_key_chain_error = false;
             }
-            if (read_job.error () != QKeychain.EntryNotFound ||
-                ( (read_job.error () == QKeychain.EntryNotFound) && this.chunk_count == 0)) {
-                this.error = read_job.error ();
-                this.error_string = read_job.error_string ();
-                GLib.warning ("Unable to read " + read_job.key () + " chunk " + string.number (this.chunk_count) + read_job.error_string ());
+            if (read_job.error != QKeychain.EntryNotFound ||
+                ( (read_job.error == QKeychain.EntryNotFound) && this.chunk_count == 0)) {
+                this.error = read_job.error;
+                this.error_string = read_job.error_string;
+                GLib.warning ("Unable to read " + read_job.key () + " chunk " + string.number (this.chunk_count) + read_job.error_string);
             }
         }
 

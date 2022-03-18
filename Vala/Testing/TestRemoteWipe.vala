@@ -17,13 +17,13 @@ public class TestRemoteWipe : GLib.Object {
     // TODO
     private void test_wipe () {
 //        QTemporaryDir directory;
-//        ConfigFile.set_configuration_directory (directory.path ()); // we don't want to pollute the user's config file
+//        ConfigFile.set_configuration_directory (directory.path); // we don't want to pollute the user's config file
 //        GLib.assert_true (directory.is_valid ());
 
-//        GLib.Dir dir_to_remove = new GLib.Dir (directory.path ());
+//        GLib.Dir dir_to_remove = new GLib.Dir (directory.path);
 //        GLib.assert_true (dir_to_remove.mkpath ("nextcloud"));
 
-//        string directory_path = dir_to_remove.canonical_path ();
+//        string directory_path = dir_to_remove.canonical_path;
 
 //        unowned Account account = Account.create ();
 //        GLib.assert_true (account);
@@ -45,7 +45,7 @@ public class TestRemoteWipe : GLib.Object {
 
 //        // check if account exists
 //        GLib.debug ("Does account exists?!";
-//        GLib.assert_true (!account.identifier () == "");
+//        GLib.assert_true (!account.identifier == "");
 
 //        manager.delete_account (new_account_state);
 //        manager.save ();

@@ -79,11 +79,11 @@ public class PropagateRemoteMkdir : PropagateItemJob {
     /***********************************************************
     ***********************************************************/
     public new void abort (PropagatorJob.AbortType abort_type) {
-        if (this.mkcol_job && this.mkcol_job.reply ()) {
-            this.mkcol_job.reply ().abort ();
+        if (this.mkcol_job && this.mkcol_job.input_stream) {
+            this.mkcol_job.input_stream.abort ();
         }
-        if (this.delete_job && this.delete_job.reply ()) {
-            this.delete_job.reply ().abort ();
+        if (this.delete_job && this.delete_job.input_stream) {
+            this.delete_job.input_stream.abort ();
         }
 
         if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
@@ -202,20 +202,20 @@ public class PropagateRemoteMkdir : PropagateItemJob {
 
         //  ASSERT (this.mkcol_job);
 
-        Soup.Reply.NetworkError err = this.mkcol_job.reply ().error ();
-        this.item.http_error_code = this.mkcol_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-        this.item.response_time_stamp = this.mkcol_job.response_timestamp ();
+        Soup.Reply.NetworkError err = this.mkcol_job.input_stream.error;
+        this.item.http_error_code = this.mkcol_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        this.item.response_time_stamp = this.mkcol_job.response_timestamp;
         this.item.request_id = this.mkcol_job.request_id ();
 
-        this.item.file_id = this.mkcol_job.reply ().raw_header ("OC-File_id");
+        this.item.file_id = this.mkcol_job.input_stream.raw_header ("OC-File_id");
 
-        this.item.error_string = this.mkcol_job.error_string ();
+        this.item.error_string = this.mkcol_job.error_string;
 
-        var job_http_reason_phrase_string = this.mkcol_job.reply ().attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ();
+        var job_http_reason_phrase_string = this.mkcol_job.input_stream.attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ();
 
-        var job_path = this.mkcol_job.path ();
+        var job_path = this.mkcol_job.path;
 
-        if (this.upload_encrypted_helper && this.upload_encrypted_helper.is_folder_locked () && !this.upload_encrypted_helper.is_unlock_running ()) {
+        if (this.upload_encrypted_helper && this.upload_encrypted_helper.is_folder_locked && !this.upload_encrypted_helper.is_unlock_running) {
             // since we are done, we need to unlock a folder in case it was locked
             this.upload_encrypted_helper.signal_folder_unlocked.connect (
                 this.on_signal_propagate_upload_encrypted_folder_unlocked
@@ -253,7 +253,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
         // save the file identifier already so we can detect rename or remove
         var result = this.propagator.update_metadata (item_copy);
         if (!result) {
-            on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error writing metadata to the database : %1").printf (result.error ()));
+            on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error writing metadata to the database : %1").printf (result.error));
             return;
         } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
             on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("The file %1 is currently in use").printf (this.item.file));

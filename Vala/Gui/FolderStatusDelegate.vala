@@ -98,7 +98,7 @@ public class FolderStatusDelegate : QStyledItemDelegate {
             opt.rect = add_button_rect (option.rect, option.direction);
             painter.save ();
             painter.font (Gtk.Application.font ("QPushButton"));
-            Gtk.Application.style ().draw_control (QStyle.CE_Push_button, opt, painter, option.widget);
+            Gtk.Application.this.style.draw_control (QStyle.CE_Push_button, opt, painter, option.widget);
             painter.restore ();
             return;
         }
@@ -178,7 +178,7 @@ public class FolderStatusDelegate : QStyledItemDelegate {
 
         var palette = option.palette;
 
-        if (Gtk.Application.style ().inherits ("QWindows_vista_style")) {
+        if (Gtk.Application.this.style.inherits ("QWindows_vista_style")) {
             // Hack : Windows Vista's light blue is not contrasting enough for white
 
             // (code from QWindows_vista_style.draw_control for CE_Item_view_item)
@@ -247,7 +247,7 @@ public class FolderStatusDelegate : QStyledItemDelegate {
             p_bar_opt.progress = overall_percent;
             p_bar_opt.orientation = Qt.Horizontal;
             p_bar_opt.rect = QStyle.visual_rect (option.direction, option.rect, p_bRect);
-            Gtk.Application.style ().draw_control (QStyle.CE_Progress_bar, p_bar_opt, painter, option.widget);
+            Gtk.Application.this.style.draw_control (QStyle.CE_Progress_bar, p_bar_opt, painter, option.widget);
 
             // Overall Progress Text
             QRect overall_progress_rect;
@@ -274,9 +274,9 @@ public class FolderStatusDelegate : QStyledItemDelegate {
             btn_opt.sub_controls = QStyle.SC_Tool_button;
             btn_opt.rect = options_button_visual_rect;
             btn_opt.icon = this.icon_more;
-            int e = Gtk.Application.style ().pixel_metric (QStyle.PM_Button_icon_size);
+            int e = Gtk.Application.this.style.pixel_metric (QStyle.PM_Button_icon_size);
             btn_opt.icon_size = QSize (e,e);
-            Gtk.Application.style ().draw_complex_control (QStyle.CC_Tool_button, btn_opt, painter);
+            Gtk.Application.this.style.draw_complex_control (QStyle.CC_Tool_button, btn_opt, painter);
         }
     }
 
@@ -336,7 +336,7 @@ public class FolderStatusDelegate : QStyledItemDelegate {
             QFontMetrics font_metrics = new QFontMetrics (Gtk.Application.font ("QPushButton"));
             QStyleOptionButton opt = (QStyleOption) option;
             opt.text = add_folder_text ();
-            return Gtk.Application.style ().size_from_contents (
+            return Gtk.Application.this.style.size_from_contents (
                 QStyle.CT_Push_button, opt, font_metrics.size (Qt.Text_single_line, opt.text))
                     .expanded_to (Gtk.Application.global_strut ())
                 + QSize (0, margins);
@@ -404,11 +404,11 @@ public class FolderStatusDelegate : QStyledItemDelegate {
         within.height (FolderStatusDelegate.root_folder_height_without_errors (font_metrics, alias_font_metrics));
 
         QStyle_option_tool_button opt;
-        int e = Gtk.Application.style ().pixel_metric (QStyle.PM_Button_icon_size);
+        int e = Gtk.Application.this.style.pixel_metric (QStyle.PM_Button_icon_size);
         opt.rect.size (QSize (e,e));
-        QSize size = Gtk.Application.style ().size_from_contents (QStyle.CT_Tool_button, opt, opt.rect.size ()).expanded_to (Gtk.Application.global_strut ());
+        QSize size = Gtk.Application.this.style.size_from_contents (QStyle.CT_Tool_button, opt, opt.rect.size ()).expanded_to (Gtk.Application.global_strut ());
 
-        int margin = Gtk.Application.style ().pixel_metric (QStyle.PM_Default_layout_spacing);
+        int margin = Gtk.Application.this.style.pixel_metric (QStyle.PM_Default_layout_spacing);
         QRect rectangle = new QRect (
             QPoint (within.right () - size.width () - margin,
             within.top () + within.height () / 2 - size.height () / 2),
@@ -424,7 +424,7 @@ public class FolderStatusDelegate : QStyledItemDelegate {
         QFontMetrics font_metrics = new QFontMetrics (Gtk.Application.font ("QPushButton"));
         QStyleOptionButton opt;
         opt.text = add_folder_text ();
-        QSize size = Gtk.Application.style ().size_from_contents (QStyle.CT_Push_button, opt, font_metrics.size (Qt.Text_single_line, opt.text)).expanded_to (Gtk.Application.global_strut ());
+        QSize size = Gtk.Application.this.style.size_from_contents (QStyle.CT_Push_button, opt, font_metrics.size (Qt.Text_single_line, opt.text)).expanded_to (Gtk.Application.global_strut ());
         QRect rectangle = new QRect (
             QPoint (within.left (),
             within.top () + within.height () / 2 - size.height () / 2),

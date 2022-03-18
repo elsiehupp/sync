@@ -95,7 +95,7 @@ public class ShareDialog : Gtk.Dialog {
         this.ui.label_name.font (font);
 
         string oc_dir = this.share_path;
-        oc_dir.truncate (oc_dir.length () - filename.length ());
+        oc_dir.truncate (oc_dir.length - filename.length);
 
         oc_dir.replace (QRegularExpression ("^/*"), "");
         oc_dir.replace (QRegularExpression ("/*$"), "");
@@ -115,7 +115,7 @@ public class ShareDialog : Gtk.Dialog {
 
         this.window_title (_("%1 Sharing").printf (Theme.app_name_gui));
 
-        if (!account_state.account.capabilities ().share_api ()) {
+        if (!account_state.account.capabilities.share_api ()) {
             return;
         }
 
@@ -143,7 +143,7 @@ public class ShareDialog : Gtk.Dialog {
         propfind_job.on_signal_start ();
 
         bool sharing_possible = true;
-        if (!account_state.account.capabilities ().share_public_link ()) {
+        if (!account_state.account.capabilities.share_public_link ()) {
             GLib.warning ("Link shares have been disabled.");
             sharing_possible = false;
         } else if (!(max_sharing_permissions & Share_permission_share)) {
@@ -256,7 +256,7 @@ public class ShareDialog : Gtk.Dialog {
         const string version_string = this.account_state.account.server_version ();
         GLib.info (version_string + "Fetched" + shares.count () + "shares");
         foreach (var share in shares) {
-            if (share.share_type () != Share.Type.LINK || share.owner_uid () != share.account.dav_user ()) {
+            if (share.share_type != Share.Type.LINK || share.owner_uid != share.account.dav_user) {
                 continue;
             }
 
@@ -273,9 +273,9 @@ public class ShareDialog : Gtk.Dialog {
     ***********************************************************/
     private void on_signal_add_link_share_widget (LinkShare link_share) {
         /* emit */ signal_toggle_share_link_animation (true);
-        const var added_link_share_widget = add_link_share_widget (link_share);
+        ShareLinkWidget added_link_share_widget = add_link_share_widget (link_share);
         init_link_share_widget ();
-        if (link_share.is_password_set ()) {
+        if (link_share.password_is_set) {
             added_link_share_widget.on_signal_focus_password_line_edit ();
         }
         /* emit */ signal_toggle_share_link_animation (false);
@@ -297,7 +297,7 @@ public class ShareDialog : Gtk.Dialog {
     ***********************************************************/
     private void on_signal_create_link_share () {
         if (this.share_manager) {
-            const var ask_optional_password = this.account_state.account.capabilities ().share_public_link_ask_optional_password ();
+            const var ask_optional_password = this.account_state.account.capabilities.share_public_link_ask_optional_password ();
             const var password = ask_optional_password ? create_random_password (): "";
             this.share_manager.create_link_share (this.share_path, "", password);
         }
@@ -411,7 +411,7 @@ public class ShareDialog : Gtk.Dialog {
         // We only do user/group sharing from 8.2.0
         bool user_group_sharing =
             theme.user_group_sharing
-            && this.account_state.account.server_version_int () >= Account.make_server_version (8, 2, 0);
+            && this.account_state.account.server_version_int >= Account.make_server_version (8, 2, 0);
 
         if (user_group_sharing) {
             this.user_group_widget = new ShareUserGroupWidget (this.account_state.account, this.share_path, this.local_path, this.max_sharing_permissions, this.private_link_url, this);
@@ -435,10 +435,10 @@ public class ShareDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private ShareLinkWidget add_link_share_widget (unowned LinkShare link_share) {
+    private ShareLinkWidget add_link_share_widget (LinkShare link_share) {
         this.link_widget_list.append (new ShareLinkWidget (this.account_state.account, this.share_path, this.local_path, this.max_sharing_permissions, this));
 
-        const var link_share_widget = this.link_widget_list.at (this.link_widget_list.size () - 1);
+        ShareLinkWidget link_share_widget = this.link_widget_list.at (this.link_widget_list.size () - 1);
         link_share_widget.link_share (link_share);
 
         link_share.signal_server_error.connect (

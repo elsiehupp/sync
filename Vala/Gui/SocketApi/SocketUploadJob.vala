@@ -20,7 +20,7 @@ public class SocketUploadJob : GLib.Object {
     private string local_path;
     private string remote_path;
     private string pattern;
-    private QTemporaryFile tmp;
+    private QTemporaryFile temporary;
     private SyncJournalDb database;
     private SyncEngine sync_engine;
     private string[] synced_files;
@@ -48,12 +48,12 @@ public class SocketUploadJob : GLib.Object {
             socket_api_v2_job.failure ("Local path must be a an absolute path");
             return;
         }
-        if (!this.tmp.open ()) {
+        if (!this.temporary.open ()) {
             socket_api_v2_job.failure ("Failed to create temporary database");
             return;
         }
 
-        this.database = new SyncJournalDb (this.tmp.filename (), this);
+        this.database = new SyncJournalDb (this.temporary.filename (), this);
         this.sync_engine = new SyncEngine (account.account, this.local_path.ends_with ('/') ? this.local_path : this.local_path + '/', this.remote_path, this.database);
         this.sync_engine.parent (this.database);
 
@@ -110,7 +110,7 @@ public class SocketUploadJob : GLib.Object {
         var opt = this.sync_engine.sync_options ();
         opt.file_pattern (this.pattern);
         if (!opt.file_regex ().is_valid ()) {
-            this.api_job.failure (opt.file_regex ().error_string ());
+            this.api_job.failure (opt.file_regex ().error_string);
             return;
         }
         this.sync_engine.sync_options (opt);
@@ -131,10 +131,10 @@ public class SocketUploadJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_mkcol_job_finished_with_error (Soup.Reply reply) {
-        if (reply.error () == 202) {
+        if (reply.error == 202) {
             this.api_job.failure ("Destination %1 already exists".printf (this.remote_path));
         } else {
-            this.api_job.failure (reply.error_string ());
+            this.api_job.failure (reply.error_string);
         }
     }
 

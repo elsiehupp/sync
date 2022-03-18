@@ -48,13 +48,13 @@ public class FileActivityListModel : ActivityListModel {
     /***********************************************************
     ***********************************************************/
     protected override void start_fetch_job () {
-        if (!account_state ().is_connected ()) {
+        if (!account_state.is_connected) {
             return;
         }
         currently_fetching (true);
 
         const string url = "ocs/v2.php/apps/activity/api/v2/activity/filter";
-        var json_api_job = new JsonApiJob (account_state ().account, url, this);
+        var json_api_job = new JsonApiJob (account_state.account, url, this);
         json_api_job.json_received.connect (
             this.activities_received
         );

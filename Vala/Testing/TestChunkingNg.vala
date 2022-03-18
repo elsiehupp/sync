@@ -21,7 +21,7 @@ public class TestChunkingNg : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         GLib.assert_true (fake_folder.upload_state ().children.count () == 0); // The state should be clean
 
-        fake_folder.local_modifier ().insert (name, size);
+        fake_folder.local_modifier.insert (name, size);
         // Abort when the upload is at 1/3
         int64 size_when_abort = -1;
         fake_folder.sync_engine.signal_transmission_progress.connect (
@@ -74,14 +74,14 @@ public class TestChunkingNg : GLib.Object {
             set_chunk_size (fake_folder.sync_engine, 1 * 1000 * 1000);
             int size = 10 * 1000 * 1000; // 10 MB
 
-            fake_folder.local_modifier ().insert ("A/a0", size);
+            fake_folder.local_modifier.insert ("A/a0", size);
             GLib.assert_true (fake_folder.sync_once ());
             GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
             GLib.assert_true (fake_folder.upload_state ().children.count () == 1); // the transfer was done with chunking
             GLib.assert_true (fake_folder.current_remote_state ().find ("A/a0").size == size);
 
             // Check that another upload of the same file also work.
-            fake_folder.local_modifier ().append_byte ("A/a0");
+            fake_folder.local_modifier.append_byte ("A/a0");
             GLib.assert_true (fake_folder.sync_once ());
             GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
             GLib.assert_true (fake_folder.upload_state ().children.count () == 2); // the transfer was done with chunking
@@ -124,7 +124,7 @@ public class TestChunkingNg : GLib.Object {
                 // Test that we properly resuming and are not sending past data again.
                 GLib.assert_true (request.raw_header ("OC-Chunk-Offset").to_int64 () >= uploaded_size);
             } else if (operation == Soup.DeleteOperation) {
-                GLib.assert_true (request.url.path ().ends_with ("/10000"));
+                GLib.assert_true (request.url.path.ends_with ("/10000"));
             }
             return null;
         }
@@ -186,7 +186,7 @@ public class TestChunkingNg : GLib.Object {
                 // Test that we properly resuming, not resending the first chunk
                 GLib.assert_true (request.raw_header ("OC-Chunk-Offset").to_int64 () >= first_chunk.size);
             } else if (operation == Soup.DeleteOperation) {
-                deleted_paths.append (request.url.path ());
+                deleted_paths.append (request.url.path);
             }
             return null;
         }
@@ -290,7 +290,7 @@ public class TestChunkingNg : GLib.Object {
             fake_folder.set_server_override (this.override_delegate_abort_hard);
 
             // Test 1 : NEW file aborted
-            fake_folder.local_modifier ().insert ("A/a0", size);
+            fake_folder.local_modifier.insert ("A/a0", size);
             GLib.assert_true (!fake_folder.sync_once ()); // error : on_signal_abort!
 
             var connection = connect (
@@ -304,7 +304,7 @@ public class TestChunkingNg : GLib.Object {
             GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
             // Test 2 : modified file upload aborted
-            fake_folder.local_modifier ().append_byte ("A/a0");
+            fake_folder.local_modifier.append_byte ("A/a0");
             GLib.assert_true (!fake_folder.sync_once ()); // error : on_signal_abort!
 
             // An EVAL/EVAL conflict is also UPDATE_METADATA when there's no checksums
@@ -318,7 +318,7 @@ public class TestChunkingNg : GLib.Object {
             GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
             // Test 3 : modified file upload aborted, with good checksums
-            fake_folder.local_modifier ().append_byte ("A/a0");
+            fake_folder.local_modifier.append_byte ("A/a0");
             GLib.assert_true (!fake_folder.sync_once ()); // error : on_signal_abort!
 
             // Set the remote checksum -- the test setup doesn't do it automatically
@@ -331,9 +331,9 @@ public class TestChunkingNg : GLib.Object {
             GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
             // Test 4 : New file, that gets deleted locally before the next sync
-            fake_folder.local_modifier ().insert ("A/a3", size);
+            fake_folder.local_modifier.insert ("A/a3", size);
             GLib.assert_true (!fake_folder.sync_once ()); // error : on_signal_abort!
-            fake_folder.local_modifier ().remove ("A/a3");
+            fake_folder.local_modifier.remove ("A/a3");
 
             // bug : in this case we must expect a re-download of A/A3
             GLib.assert_true (fake_folder.sync_once ());
@@ -380,12 +380,12 @@ public class TestChunkingNg : GLib.Object {
             fake_folder.set_server_override (this.override_delegate_abort_recoverable);
 
             // Test 1 : NEW file aborted
-            fake_folder.local_modifier ().insert ("A/a0", size);
+            fake_folder.local_modifier.insert ("A/a0", size);
             GLib.assert_true (fake_folder.sync_once ());
             GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
             // Test 2 : modified file upload aborted
-            fake_folder.local_modifier ().append_byte ("A/a0");
+            fake_folder.local_modifier.append_byte ("A/a0");
             GLib.assert_true (fake_folder.sync_once ());
             GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         }
@@ -412,8 +412,8 @@ public class TestChunkingNg : GLib.Object {
             GLib.assert_true (fake_folder.upload_state ().children.count () == 1);
             var chunking_identifier = fake_folder.upload_state ().children.first ().name;
 
-            fake_folder.local_modifier ().set_contents ("A/a0", 'B');
-            fake_folder.local_modifier ().append_byte ("A/a0");
+            fake_folder.local_modifier.set_contents ("A/a0", 'B');
+            fake_folder.local_modifier.append_byte ("A/a0");
 
             GLib.assert_true (fake_folder.sync_once ());
 
@@ -435,7 +435,7 @@ public class TestChunkingNg : GLib.Object {
             partial_upload (fake_folder, "A/a0", size);
             GLib.assert_true (fake_folder.upload_state ().children.count () == 1);
 
-            fake_folder.local_modifier ().remove ("A/a0");
+            fake_folder.local_modifier.remove ("A/a0");
 
             GLib.assert_true (fake_folder.sync_once ());
             GLib.assert_true (fake_folder.upload_state ().children.count () == 0);
@@ -456,8 +456,8 @@ public class TestChunkingNg : GLib.Object {
             GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
             // Modify the file localy and on_signal_start the upload
-            fake_folder.local_modifier ().set_contents ("A/a0", 'B');
-            fake_folder.local_modifier ().append_byte ("A/a0");
+            fake_folder.local_modifier.set_contents ("A/a0", 'B');
+            fake_folder.local_modifier.append_byte ("A/a0");
 
             // But in the middle of the sync, modify the file on the server
             QMetaObject.Connection con = connect (
@@ -494,7 +494,7 @@ public class TestChunkingNg : GLib.Object {
             GLib.assert_true (file_info.size == size + 1);
 
             // Remove the conflict file so the comparison works!
-            fake_folder.local_modifier ().remove ("A/" + it.name);
+            fake_folder.local_modifier.remove ("A/" + it.name);
 
             GLib.assert_cassert_truemp (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
@@ -505,7 +505,7 @@ public class TestChunkingNg : GLib.Object {
         private void on_signal_sync_engine_transmission_progress_create_conflict_while_syncing (ProgressInfo progress) {
             if (progress.completed_size () > (progress.total_size () / 2 )) {
                 fake_folder.remote_modifier ().set_contents ("A/a0", 'C');
-                GLib.Object.disconnect (con);
+                disconnect (con);
             }
         }
 
@@ -519,7 +519,7 @@ public class TestChunkingNg : GLib.Object {
             int size = 10 * 1000 * 1000; // 10 MB
             set_chunk_size (fake_folder.sync_engine, 1 * 1000 * 1000);
 
-            fake_folder.local_modifier ().insert ("A/a0", size);
+            fake_folder.local_modifier.insert ("A/a0", size);
 
             // middle of the sync, modify the file
             QMetaObject.Connection con = connect (
@@ -550,9 +550,9 @@ public class TestChunkingNg : GLib.Object {
 
         private void on_signal_sync_engine_transmission_progress_modify_local_file_while_uploading (ProgressInfo progress) {
             if (progress.completed_size () > (progress.total_size () / 2 )) {
-                fake_folder.local_modifier ().set_contents ("A/a0", 'B');
-                fake_folder.local_modifier ().append_byte ("A/a0");
-                GLib.Object.disconnect (con);
+                fake_folder.local_modifier.set_contents ("A/a0", 'B');
+                fake_folder.local_modifier.append_byte ("A/a0");
+                disconnect (con);
             }
         }
 
@@ -608,7 +608,7 @@ public class TestChunkingNg : GLib.Object {
             fake_folder.set_server_override (this.override_delegate_connection_dropped);
 
             // Test 1 : a NEW file
-            fake_folder.local_modifier ().insert ("A/a0", size);
+            fake_folder.local_modifier.insert ("A/a0", size);
             GLib.assert_true (!fake_folder.sync_once ()); // timeout!
             GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ()); // but the upload succeeded
             GLib.assert_true (!checksum_header == "");
@@ -619,12 +619,12 @@ public class TestChunkingNg : GLib.Object {
             GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
             // Test 2 : Modify the file further
-            fake_folder.local_modifier ().append_byte ("A/a0");
+            fake_folder.local_modifier.append_byte ("A/a0");
             GLib.assert_true (!fake_folder.sync_once ()); // timeout!
             GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ()); // but the upload succeeded
             fake_folder.remote_modifier ().find ("A/a0").checksums = checksum_header;
             // modify again, should not cause conflict
-            fake_folder.local_modifier ().append_byte ("A/a0");
+            fake_folder.local_modifier.append_byte ("A/a0");
             GLib.assert_true (!fake_folder.sync_once ()); // now it's trying to upload the modified file
             GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
             fake_folder.remote_modifier ().find ("A/a0").checksums = checksum_header;
@@ -635,7 +635,7 @@ public class TestChunkingNg : GLib.Object {
 
         private Soup.Reply override_delegate_connection_dropped (Soup.Operation operation, Soup.Request request, QIODevice outgoing_data) {
             if (!chunking) {
-                GLib.assert_true (!request.url.path ().contains ("/uploads/")
+                GLib.assert_true (!request.url.path.contains ("/uploads/")
                     && "Should not touch uploads endpoint when not chunking");
             }
             if (!chunking && operation == Soup.PutOperation) {
@@ -659,12 +659,12 @@ public class TestChunkingNg : GLib.Object {
             int size = 5 * 1000 * 1000;
             set_chunk_size (fake_folder.sync_engine, 1 * 1000 * 1000);
 
-            fake_folder.local_modifier ().insert ("A/file % \u20ac", size);
+            fake_folder.local_modifier.insert ("A/file % \u20ac", size);
             GLib.assert_true (fake_folder.sync_once ());
             GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
             // Only the second upload contains an "If" header
-            fake_folder.local_modifier ().append_byte ("A/file % \u20ac");
+            fake_folder.local_modifier.append_byte ("A/file % \u20ac");
             GLib.assert_true (fake_folder.sync_once ());
             GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         }
@@ -690,7 +690,7 @@ public class TestChunkingNg : GLib.Object {
             GLib.assert_true (fake_folder.upload_state ().children.first ().name == chunking_identifier);
 
             // Upload another file again, this time without interruption
-            fake_folder.local_modifier ().append_byte ("A/a0");
+            fake_folder.local_modifier.append_byte ("A/a0");
             GLib.assert_true (fake_folder.sync_once ());
             GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
             GLib.assert_true (fake_folder.current_remote_state ().find ("A/a0").size == size + 1);

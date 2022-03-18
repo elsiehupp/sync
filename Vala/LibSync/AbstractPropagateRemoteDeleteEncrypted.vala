@@ -45,16 +45,15 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    Soup.Reply.NetworkError network_error { public get; protected set; }
+    public Soup.Reply.NetworkError network_error { public get; protected set; }
 
     /***********************************************************
     ***********************************************************/
-    string error_string { public get; protected set; }
+    public string error_string { public get; protected set; }
 
     /***********************************************************
     ***********************************************************/
     internal signal void signal_finished (bool success);
-
 
     /***********************************************************
     ***********************************************************/
@@ -92,7 +91,7 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected void start_lscol_job (string path) {
-        GLib.debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) + "Folder is encrypted, let's get the Id from it.";
+        GLib.debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED + "Folder is encrypted, let's get the Id from it.");
         var lscol_job = new LscolJob (this.propagator.account, this.propagator.full_remote_path (path), this);
         lscol_job.properties ({"resourcetype", "http://owncloud.org/ns:fileid"});
         lscol_job.signal_directory_listing_subfolders.connect (
@@ -108,7 +107,7 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_folder_encrypted_id_received (string[] list) {
-        GLib.debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) + "Received identifier of folder, trying to lock it so we can prepare the metadata";
+        GLib.debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED + "Received identifier of folder, trying to lock it so we can prepare the metadata");
         var lscol_job = qobject_cast<LscolJob> (sender ());
         const ExtraFolderInfo folder_info = lscol_job.folder_infos.value (list.first ());
         on_signal_try_lock (folder_info.file_identifier);
@@ -132,7 +131,7 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_folder_locked_successfully (string folder_identifier, string token) {
-        GLib.debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) + "Folder identifier" + folder_identifier + "Locked Successfully for Upload, Fetching Metadata";
+        GLib.debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED + "Folder identifier" + folder_identifier + "Locked Successfully for Upload, Fetching Metadata");
         this.folder_locked = true;
         this.folder_token = token;
         this.folder_identifier = folder_identifier;
@@ -152,7 +151,7 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
     ***********************************************************/
     protected virtual void on_signal_folder_unlocked_successfully (string folder_identifier) {
         //  Q_UNUSED (folder_identifier);
-        GLib.debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) + "Folder identifier" + folder_identifier + "successfully unlocked";
+        GLib.debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED + "Folder identifier " + folder_identifier + " successfully unlocked.");
         this.folder_locked = false;
         this.folder_token = "";
     }
@@ -176,12 +175,12 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
             return;
         }
 
-        this.item.http_error_code = delete_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-        this.item.response_time_stamp = delete_job.response_timestamp ();
+        this.item.http_error_code = delete_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        this.item.response_time_stamp = delete_job.response_timestamp;
         this.item.request_id = delete_job.request_id ();
 
         if (delete_job.reply.error != Soup.Reply.NoError && delete_job.reply.error != Soup.Reply.ContentNotFoundError) {
-            store_first_error_string (delete_job.error_string ());
+            store_first_error_string (delete_job.error_string);
             store_first_error (delete_job.reply.error);
 
             on_signal_task_failed ();
@@ -198,7 +197,7 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
             // throw an error.
             store_first_error_string (_("Wrong HTTP code returned by server. Expected 204, but received \"%1 %2\".")
                         .printf (this.item.http_error_code)
-                        .printf (delete_job.reply ().attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ()));
+                        .printf (delete_job.input_stream.attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ()));
 
             on_signal_task_failed ();
             return;
@@ -214,7 +213,7 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected void delete_remote_item (string filename) {
-        GLib.info (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) + "Deleting nested encrypted item" + filename;
+        GLib.info (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED + "Deleting nested encrypted item " + filename);
 
         var delete_job = new DeleteJob (this.propagator.account, this.propagator.full_remote_path (filename), this);
         delete_job.folder_token (this.folder_token);
@@ -235,7 +234,7 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
             return;
         }
 
-        GLib.debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED) + "Unlocking folder" + this.folder_identifier;
+        GLib.debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED + "Unlocking folder " + this.folder_identifier);
         var unlock_encrypt_folder_job = new UnlockEncryptFolderApiJob (this.propagator.account, this.folder_identifier, this.folder_token, this);
 
         unlock_encrypt_folder_job.signal_success.connect (

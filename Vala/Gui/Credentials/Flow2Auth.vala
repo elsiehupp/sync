@@ -140,7 +140,7 @@ public class Flow2Auth : GLib.Object {
         QJsonObject json = QJsonDocument.from_json (json_data, json_parse_error).object ();
         string poll_token, poll_endpoint, login_url;
 
-        if (reply.error () == Soup.Reply.NoError && json_parse_error.error == QJsonParseError.NoError
+        if (reply.error == Soup.Reply.NoError && json_parse_error.error == QJsonParseError.NoError
             && !json == "") {
             poll_token = json.value ("poll").to_object ().value ("token").to_string ();
             poll_endpoint = json.value ("poll").to_object ().value ("endpoint").to_string ();
@@ -152,19 +152,19 @@ public class Flow2Auth : GLib.Object {
             login_url = json["login"].to_string ();
         }
 
-        if (reply.error () != Soup.Reply.NoError || json_parse_error.error != QJsonParseError.NoError
+        if (reply.error != Soup.Reply.NoError || json_parse_error.error != QJsonParseError.NoError
             || json == "" || poll_token == "" || poll_endpoint == "" || login_url == "") {
             string error_reason;
             string error_from_json = json["error"].to_string ();
             if (!error_from_json == "") {
                 error_reason = _("Error returned from the server : <em>%1</em>")
                     .printf (error_from_json.to_html_escaped ());
-            } else if (reply.error () != Soup.Reply.NoError) {
+            } else if (reply.error != Soup.Reply.NoError) {
                 error_reason = _("There was an error accessing the \"token\" endpoint : <br><em>%1</em>")
-                    .printf (reply.error_string ().to_html_escaped ());
+                    .printf (reply.error_string.to_html_escaped ());
             } else if (json_parse_error.error != QJsonParseError.NoError) {
                 error_reason = _("Could not parse the JSON returned from the server : <br><em>%1</em>")
-                    .printf (json_parse_error.error_string ());
+                    .printf (json_parse_error.error_string);
             } else {
                 error_reason = _("The reply from the server did not contain all expected fields");
             }
@@ -177,7 +177,7 @@ public class Flow2Auth : GLib.Object {
 
         this.login_url = login_url;
 
-        if (this.account.is_username_prefill_supported ()) {
+        if (this.account.is_username_prefill_supported) {
             const var user_name = Utility.current_user_name ();
             if (!user_name == "") {
                 var query = QUrlQuery (this.login_url);
@@ -204,7 +204,9 @@ public class Flow2Auth : GLib.Object {
         switch (action) {
         case TokenAction.OPEN_BROWSER:
             // Try to open Browser
-            if (!OpenExtrernal.open_browser (authorisation_link ())) {
+            try {
+                OpenExternal.open_browser (authorisation_link ())
+            } catch {
                 // We cannot open the browser, then we claim we don't support Flow2Auth.
                 // Our UI callee will ask the user to copy and open the link.
                 /* emit */ signal_result (Result.NOT_SUPPORTED);
@@ -297,7 +299,7 @@ public class Flow2Auth : GLib.Object {
         GLib.Uri server_url;
         string login_name, app_password;
 
-        if (reply.error () == Soup.Reply.NoError && json_parse_error.error == QJsonParseError.NoError
+        if (reply.error == Soup.Reply.NoError && json_parse_error.error == QJsonParseError.NoError
             && !json == "") {
             server_url = json["server"].to_string ();
             if (this.enforce_https && server_url.scheme () != "https") {
@@ -309,26 +311,26 @@ public class Flow2Auth : GLib.Object {
             app_password = json["app_password"].to_string ();
         }
 
-        if (reply.error () != Soup.Reply.NoError || json_parse_error.error != QJsonParseError.NoError
+        if (reply.error != Soup.Reply.NoError || json_parse_error.error != QJsonParseError.NoError
             || json == "" || server_url == "" || login_name == "" || app_password == "") {
             string error_reason;
             string error_from_json = json["error"].to_string ();
             if (!error_from_json == "") {
                 error_reason = _("Error returned from the server : <em>%1</em>")
                                   .printf (error_from_json.to_html_escaped ());
-            } else if (reply.error () != Soup.Reply.NoError) {
+            } else if (reply.error != Soup.Reply.NoError) {
                 error_reason = _("There was an error accessing the \"token\" endpoint : <br><em>%1</em>")
-                                  .printf (reply.error_string ().to_html_escaped ());
+                                  .printf (reply.error_string.to_html_escaped ());
             } else if (json_parse_error.error != QJsonParseError.NoError) {
                 error_reason = _("Could not parse the JSON returned from the server : <br><em>%1</em>")
-                                  .printf (json_parse_error.error_string ());
+                                  .printf (json_parse_error.error_string);
             } else {
                 error_reason = _("The reply from the server did not contain all expected fields");
             }
             GLib.debug ("Error when polling for the app_password " + json + error_reason);
 
             // We get a 404 until authentication is done, so don't show this error in the GUI.
-            if (reply.error () != Soup.Reply.ContentNotFoundError) {
+            if (reply.error != Soup.Reply.ContentNotFoundError) {
                 /* emit */ signal_result (Result.ERROR, error_reason);
             }
 

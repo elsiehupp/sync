@@ -44,7 +44,7 @@ public class PropagateLocalMkdir : PropagateItemJob {
     ***********************************************************/
     private void start_local_mkdir () {
         GLib.Dir new_dir = new GLib.Dir (this.propagator.full_local_path (this.item.file));
-        string new_dir_str = GLib.Dir.to_native_separators (new_dir.path ());
+        string new_dir_str = GLib.Dir.to_native_separators (new_dir.path);
 
         // When turning something that used to be a file into a directory
         // we need to delete the file first.
@@ -58,7 +58,7 @@ public class PropagateLocalMkdir : PropagateItemJob {
                             .printf (new_dir_str, remove_error));
                     return;
                 }
-            } else if (this.item.instruction == SyncInstructions.CONFLICT) {
+            } else if (this.item.instruction == CSync.SyncInstructions.CONFLICT) {
                 string error;
                 if (!this.propagator.create_conflict (this.item, this.associated_composite, error)) {
                     on_signal_done (SyncFileItem.Status.SOFT_ERROR, error);
@@ -73,7 +73,7 @@ public class PropagateLocalMkdir : PropagateItemJob {
             return;
         }
         /* emit */ this.propagator.signal_touched_file (new_dir_str);
-        GLib.Dir local_dir = new GLib.Dir (this.propagator.local_path ());
+        GLib.Dir local_dir = new GLib.Dir (this.propagator.local_path);
         if (!local_dir.mkpath (this.item.file)) {
             on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Could not create folder %1").printf (new_dir_str));
             return;
@@ -88,7 +88,7 @@ public class PropagateLocalMkdir : PropagateItemJob {
         signal_new_item.etag = "this.invalid_";
         var result = this.propagator.update_metadata (signal_new_item);
         if (!result) {
-            on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error ()));
+            on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error));
             return;
         } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
             on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").printf (signal_new_item.file));
@@ -96,7 +96,7 @@ public class PropagateLocalMkdir : PropagateItemJob {
         }
         this.propagator.journal.commit ("local_mkdir");
 
-        var result_status = this.item.instruction == SyncInstructions.CONFLICT
+        var result_status = this.item.instruction == CSync.SyncInstructions.CONFLICT
             ? SyncFileItem.Status.CONFLICT
             : SyncFileItem.Status.SUCCESS;
         on_signal_done (result_status);

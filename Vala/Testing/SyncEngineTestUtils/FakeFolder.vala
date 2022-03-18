@@ -24,25 +24,25 @@ public class FakeFolder : GLib.Object {
     }
 
     QTemporaryDir temporary_directory;
-    DiskFileModifier local_modifier;
+    public DiskFileModifier local_modifier;
 
     // FIXME: Clarify ownership, double delete
     FakeQNAM fake_access_manager;
     unowned Account account;
-    std.unique_ptr<SyncJournalDb> journal_database;
-    std.unique_ptr<SyncEngine> sync_engine;
+    SyncJournalDb journal_database;
+    public SyncEngine sync_engine;
 
 
     /***********************************************************
     ***********************************************************/
     public FakeFolder (FileInfo template_file_info, Optional<FileInfo> local_file_info = new Optional<FileInfo> (), string remote_path = "") {
-        this.local_modifier = this.temporary_directory.path ();
+        this.local_modifier = this.temporary_directory.path;
         // Needs to be done once
         SyncEngine.minimum_file_age_for_upload = std.chrono.milliseconds (0);
         Logger.instance.set_log_file ("-");
         Logger.instance.add_log_rule ({ "sync.httplogger=true" });
     
-        GLib.Dir root_directory = new GLib.Dir (this.temporary_directory.path ());
+        GLib.Dir root_directory = new GLib.Dir (this.temporary_directory.path);
         GLib.debug ("FakeFolder operating on " + root_directory);
         if (local_file_info) {
             to_disk (root_directory, *local_file_info);
@@ -57,8 +57,8 @@ public class FakeFolder : GLib.Object {
         this.account.set_dav_display_name ("fakename");
         this.account.set_server_version ("10.0.0");
     
-        this.journal_database = std.make_unique<SyncJournalDb> (local_path () + ".sync_test.db");
-        this.sync_engine = std.make_unique<SyncEngine> (this.account, local_path (), remote_path, this.journal_database.get ());
+        this.journal_database = std.make_unique<SyncJournalDb> (local_path + ".sync_test.db");
+        this.sync_engine = std.make_unique<SyncEngine> (this.account, local_path, remote_path, this.journal_database.get ());
         // Ignore temporary files from the download. (This is in the default exclude list, but we don't load it)
         this.sync_engine.excluded_files ().add_manual_exclude ("]*.~*");
     
@@ -100,13 +100,13 @@ public class FakeFolder : GLib.Object {
         var opts = this.sync_engine.sync_options ();
 
         opts.vfs.stop ();
-        GLib.Object.disconnect (this.sync_engine.get (), null, opts.vfs, null);
+        disconnect (this.sync_engine.get (), null, opts.vfs, null);
 
         opts.vfs = vfs;
         this.sync_engine.set_sync_options (opts);
 
         Vfs.SetupParameters vfs_params;
-        vfs_params.filesystem_path = local_path ();
+        vfs_params.filesystem_path = local_path;
         vfs_params.remote_path = '/';
         vfs_params.account = this.account;
         vfs_params.journal = this.journal_database.get ();
@@ -148,7 +148,7 @@ public class FakeFolder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public FileModifier local_modifier () {
+    public FileModifier local_modifier {
         return this.local_modifier;
     }
 
@@ -163,7 +163,7 @@ public class FakeFolder : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public FileInfo current_local_state () {
-        GLib.Dir root_directory = new GLib.Dir (this.temporary_directory.path ());
+        GLib.Dir root_directory = new GLib.Dir (this.temporary_directory.path);
         FileInfo root_template;
         from_disk (root_directory, root_template);
         root_template.fixup_parent_path_recursively ();
@@ -198,12 +198,12 @@ public class FakeFolder : GLib.Object {
 
 
     private void database_record_filter (SyncJournalFileRecord record) {
-        var components = PathComponents (record.path ());
+        var components = PathComponents (record.path);
         var parent_directory = find_or_create_directories (result, components.parent_directory_components ());
         var name = components.filename ();
         var item = parent_directory.children[name];
         item.name = name;
-        item.parent_path = parent_directory.path ();
+        item.parent_path = parent_directory.path;
         item.size = record.file_size;
         item.is_directory = record.type == ItemType.DIRECTORY;
         item.permissions = record.remote_perm;
@@ -242,11 +242,11 @@ public class FakeFolder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public string local_path () {
+    public string local_path {
         // SyncEngine wants a trailing slash
-        if (this.temporary_directory.path ().ends_with ('/'))
-            return this.temporary_directory.path ();
-        return this.temporary_directory.path () + '/';
+        if (this.temporary_directory.path.ends_with ('/'))
+            return this.temporary_directory.path;
+        return this.temporary_directory.path + '/';
     }
 
 
@@ -339,11 +339,11 @@ public class FakeFolder : GLib.Object {
                 FileInfo sub_file_info = template_file_info.children[disk_child.filename ()] = FileInfo ( disk_child.filename ());
                 from_disk (sub_directory, sub_file_info);
             } else {
-                GLib.File f = new GLib.File (disk_child.file_path ());
+                GLib.File f = new GLib.File (disk_child.file_path);
                 f.open (GLib.File.ReadOnly);
                 var content = f.read (1);
                 if (content.size () == 0) {
-                    GLib.warning ("Empty file at: " + disk_child.file_path ());
+                    GLib.warning ("Empty file at: " + disk_child.file_path);
                     continue;
                 }
                 char content_char = content.at (0);
@@ -362,7 +362,7 @@ public class FakeFolder : GLib.Object {
             return find_or_create_directories (*it, components.sub_components ());
         }
         var new_directory = base.children[child_name] = new FileInfo (child_name);
-        new_directory.parent_path = base.path ();
+        new_directory.parent_path = base.path;
         return find_or_create_directories (new_directory, components.sub_components ());
     }
 

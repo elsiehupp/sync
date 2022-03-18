@@ -145,7 +145,7 @@ public class UserModel : QAbstractListModel {
     private UserModel (GLib.Object parent = new GLib.Object ()) {
         base (parent);
         // TODO: Remember selected user from last quit via settings file
-        if (AccountManager.instance.accounts ().size () > 0) {
+        if (AccountManager.instance.accounts.size () > 0) {
             build_user_list ();
         }
 
@@ -161,7 +161,7 @@ public class UserModel : QAbstractListModel {
         if (identifier < 0 || identifier >= this.users.size ())
             return false;
 
-        return this.users[identifier].is_connected ();
+        return this.users[identifier].is_connected;
     }
 
 
@@ -193,13 +193,13 @@ public class UserModel : QAbstractListModel {
         } else if (role == UserRoles.STATUS_MESSAGE) {
             return this.users[index.row ()].status_message ();
         } else if (role == UserRoles.DESKTOP_NOTIFICATION) {
-            return this.users[index.row ()].are_desktop_notifications_allowed ();
+            return this.users[index.row ()].are_desktop_notifications_allowed;
         } else if (role == UserRoles.AVATAR) {
             return this.users[index.row ()].avatar_url ();
         } else if (role == UserRoles.IS_CURRENT_USER) {
             return this.users[index.row ()].is_current_user ();
         } else if (role == UserRoles.IS_CONNECTED) {
-            return this.users[index.row ()].is_connected ();
+            return this.users[index.row ()].is_connected;
         } else if (role == UserRoles.IDENTIFIER) {
             return index.row ();
         }
@@ -223,7 +223,7 @@ public class UserModel : QAbstractListModel {
         int identifier = 0;
         foreach (var user in this.users) {
             identifer++;
-            if (user.account.identifier () == account_state.account.identifier ()) {
+            if (user.account.identifier == account_state.account.identifier) {
                 break;
             }
         }
@@ -367,7 +367,7 @@ public class UserModel : QAbstractListModel {
 
         const var talk_app = this.current_user.talk_app ();
         if (talk_app) {
-            OpenExtrernal.open_browser (talk_app.url);
+            OpenExternal.open_browser (talk_app.url);
         } else {
             GLib.warning ("The Talk app is not enabled on " + this.current_user.server ());
         }
@@ -505,8 +505,8 @@ public class UserModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     private void build_user_list () {
-        for (int i = 0; i < AccountManager.instance.accounts ().size (); i++) {
-            var user = AccountManager.instance.accounts ().at (i);
+        for (int i = 0; i < AccountManager.instance.accounts.size (); i++) {
+            var user = AccountManager.instance.accounts.at (i);
             add_user (user);
         }
         if (this.init) {

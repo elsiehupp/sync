@@ -21,7 +21,7 @@ public class QtSingleCoreApplication : Gtk.Application {
     /***********************************************************
     ***********************************************************/
     private QtLocalPeer peer;
-    private bool block;
+    public bool block { private get; public set; }
 
 
     internal signal void signal_message_received (string message);
@@ -32,7 +32,7 @@ public class QtSingleCoreApplication : Gtk.Application {
     public QtSingleCoreApplication (int argc, char **argv) {
         base (argc, argv);
         peer = new QtLocalPeer (this);
-        block = false;
+        this.block = false;
         peer.signal_message_received.connect (
             this.signal_message_received);
     }
@@ -40,7 +40,7 @@ public class QtSingleCoreApplication : Gtk.Application {
 
     /***********************************************************
     ***********************************************************/
-    public QtSingleCoreApplication (string app_id, int argc, char **argv) {
+    public QtSingleCoreApplication.with_app_id (string app_id, int argc, char **argv) {
         base (argc, argv);
         peer = new QtLocalPeer (this, app_id);
         peer.signal_message_received.connect (
@@ -50,20 +50,18 @@ public class QtSingleCoreApplication : Gtk.Application {
 
     /***********************************************************
     ***********************************************************/
-    public bool is_running () {
-        return peer.is_client ();
+    public bool is_running {
+        public get {
+            return peer.is_client ();
+        }
     }
 
     /***********************************************************
     ***********************************************************/
-    public string identifier () {
-        return peer.application_id ();
-    }
-
-    /***********************************************************
-    ***********************************************************/
-    public void set_block (bool value) {
-        block = value;
+    public string identifier {
+        public get {
+            return peer.application_id ();
+        }
     }
 
     /***********************************************************

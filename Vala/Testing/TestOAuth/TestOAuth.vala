@@ -40,7 +40,7 @@ public class TestOAuth : GLib.Object {
 
         override void browser_reply_finished () {
             GLib.assert_true (sender () == browser_reply);
-            GLib.assert_true (browser_reply.error () == Soup.Reply.OperationCanceledError);
+            GLib.assert_true (browser_reply.error == Soup.Reply.OperationCanceledError);
             reply_to_browser_ok = true;
         }
     }

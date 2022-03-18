@@ -55,16 +55,18 @@ public class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public AbstractCredentials credentials () {
-        var oc_wizard = (OwncloudWizard) wizard ();
-        //  Q_ASSERT (oc_wizard);
-        return new WebFlowCredentials (
-                    this.user,
-                    this.app_password,
-                    oc_wizard.client_ssl_certificate,
-                    oc_wizard.client_ssl_key,
-                    oc_wizard.client_ssl_ca_certificates
-        );
+    public AbstractCredentials credentials  {
+        public get {
+            OwncloudWizard oc_wizard = (OwncloudWizard) wizard ();
+            //  Q_ASSERT (oc_wizard);
+            return new WebFlowCredentials (
+                        this.user,
+                        this.app_password,
+                        oc_wizard.client_ssl_certificate,
+                        oc_wizard.client_ssl_key,
+                        oc_wizard.client_ssl_ca_certificates
+            );
+        }
     }
 
 
@@ -101,8 +103,10 @@ public class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public int next_id () {
-        return WizardCommon.Pages.PAGE_ADVANCED_SETUP;
+    public int next_id {
+        public get {
+            return WizardCommon.Pages.PAGE_ADVANCED_SETUP;
+        }
     }
 
 
@@ -118,9 +122,12 @@ public class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
 
 
     /***********************************************************
+    We can never go forward manually
     ***********************************************************/
-    public bool is_complete () {
-        return false; /* We can never go forward manually */
+    public bool is_complete {
+        public get {
+            return false;
+        }
     }
 
 

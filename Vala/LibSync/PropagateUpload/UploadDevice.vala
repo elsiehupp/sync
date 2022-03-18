@@ -34,7 +34,7 @@ public class UploadDevice : QIODevice {
     /***********************************************************
     Position between this.start and this.start+this.size
     ***********************************************************/
-    private int64 read = 0;
+    public private int64 read = 0;
 
 
     /***********************************************************
@@ -52,14 +52,14 @@ public class UploadDevice : QIODevice {
     /***********************************************************
     Bandwidth manager related
     ***********************************************************/
-    private int64 read_with_progress = 0;
+    public private int64 read_with_progress = 0;
 
 
     /***********************************************************
     Bandwidth manager related
     If this.bandwidth_quota will be used
     ***********************************************************/
-    bool bandwidth_limited {
+    public bool bandwidth_limited {
         public get {
             return this.bandwidth_limited;
         }
@@ -74,7 +74,7 @@ public class UploadDevice : QIODevice {
     Bandwidth manager related
     If upload is paused (read_data () will return 0)
     ***********************************************************/
-    bool choked {
+    public bool choked {
         public get {
             return this.choked;
         }
@@ -175,7 +175,7 @@ public class UploadDevice : QIODevice {
 
         var c = this.file.read (data, maxlen);
         if (c < 0) {
-            on_signal_error_string (this.file.error_string ());
+            on_signal_error_string (this.file.error_string);
             return -1;
         }
         this.read += c;

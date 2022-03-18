@@ -104,7 +104,7 @@ public class OwncloudPropagator : GLib.Object {
     ***********************************************************/
     private PropagateRootDirectory propagate_root_directory_job;
 
-    SyncOptions sync_options {
+    public SyncOptions sync_options {
         public get {
             return this.sync_options;
         }
@@ -191,7 +191,7 @@ public class OwncloudPropagator : GLib.Object {
         // In order to do that we loop over the items. (which are sorted by destination)
         // When we enter a directory, we can create the directory job and push it on the stack.
 
-        var regular_expression = sync_options.file_regex ();
+        var regular_expression = sync_options.file_regex;
         if (regular_expression.is_valid ()) {
             GLib.List<QStringRef> names;
             foreach (var i in synced_items) {
@@ -226,9 +226,9 @@ public class OwncloudPropagator : GLib.Object {
                 var del_dir_job = qobject_cast<PropagateDirectory> (directories_to_remove.first ());
 
                 var is_new_directory = item.is_directory () &&
-                        (item.instruction == SyncInstructions.NEW || item.instruction == SyncInstructions.TYPE_CHANGE);
+                        (item.instruction == CSync.SyncInstructions.NEW || item.instruction == CSync.SyncInstructions.TYPE_CHANGE);
 
-                if (item.instruction == SyncInstructions.REMOVE || is_new_directory) {
+                if (item.instruction == CSync.SyncInstructions.REMOVE || is_new_directory) {
                     // If it is a remove it is already taken care of by the removal of the parent directory
 
                     // If it is a new directory then it is inside a deleted directory... That can happen if
@@ -240,9 +240,9 @@ public class OwncloudPropagator : GLib.Object {
                         del_dir_job.increase_affected_count ();
                     }
                     continue;
-                } else if (item.instruction == SyncInstructions.IGNORE) {
+                } else if (item.instruction == CSync.SyncInstructions.IGNORE) {
                     continue;
-                } else if (item.instruction == SyncInstructions.RENAME) {
+                } else if (item.instruction == CSync.SyncInstructions.RENAME) {
                     // all is good, the rename will be executed before the directory deletion
                 } else {
                     GLib.warning (
@@ -261,7 +261,7 @@ public class OwncloudPropagator : GLib.Object {
                         "Skipping job inside CONFLICT directory "
                         + item.file + item.instruction
                     );
-                    item.instruction = SyncInstructions.NONE;
+                    item.instruction = CSync.SyncInstructions.NONE;
                     continue;
                 } else {
                     maybe_conflict_directory.clear ();
@@ -319,7 +319,7 @@ public class OwncloudPropagator : GLib.Object {
         SyncFileItemVector synced_items) {
         var directory_propagation_job = std.make_unique<PropagateDirectory> (this, item);
 
-        if (item.instruction == SyncInstructions.TYPE_CHANGE
+        if (item.instruction == CSync.SyncInstructions.TYPE_CHANGE
             && item.direction == SyncFileItem.Direction.UP) {
             // Skip all potential uploads to the new folder.
             // Processing them now leads to problems with permissions:
@@ -328,13 +328,13 @@ public class OwncloudPropagator : GLib.Object {
             // to the new directory is ok...
             foreach (unowned SyncFileItem dir_item in synced_items) {
                 if (dir_item.destination ().starts_with (item.destination () + "/")) {
-                    dir_item.instruction = SyncInstructions.NONE;
+                    dir_item.instruction = CSync.SyncInstructions.NONE;
                     this.another_sync_needed = true;
                 }
             }
         }
 
-        if (item.instruction == SyncInstructions.REMOVE) {
+        if (item.instruction == CSync.SyncInstructions.REMOVE) {
             // We do the removal of directories at the end, because there might be moves from
             // these directories that will happen later.
             directories_to_remove.prepend (directory_propagation_job);
@@ -345,8 +345,8 @@ public class OwncloudPropagator : GLib.Object {
             // Note: Currently this means that we don't update those etag at all in this sync,
             //       but it should not be a problem, they will be updated in the next sync.
             for (int i = 0; i < directories.size (); ++i) {
-                if (directories[i].second.item.instruction == SyncInstructions.UPDATE_METADATA) {
-                    directories[i].second.item.instruction = SyncInstructions.NONE;
+                if (directories[i].second.item.instruction == CSync.SyncInstructions.UPDATE_METADATA) {
+                    directories[i].second.item.instruction = CSync.SyncInstructions.NONE;
                 }
             }
         } else {
@@ -365,7 +365,7 @@ public class OwncloudPropagator : GLib.Object {
         GLib.List<PropagatorJob> directories_to_remove,
         string removed_directory,
         string maybe_conflict_directory) {
-        if (item.instruction == SyncInstructions.TYPE_CHANGE) {
+        if (item.instruction == CSync.SyncInstructions.TYPE_CHANGE) {
             // will delete directories, so defer execution
             var propagate_item_job = create_job (item);
             if (propagate_item_job) {
@@ -376,7 +376,7 @@ public class OwncloudPropagator : GLib.Object {
             directories.top ().second.append_task (item);
         }
 
-        if (item.instruction == SyncInstructions.CONFLICT) {
+        if (item.instruction == CSync.SyncInstructions.CONFLICT) {
             // This might be a file or a directory on the local side. If it's a
             // directory we want to skip processing items inside it.
             maybe_conflict_directory = item.file + "/";
@@ -467,14 +467,14 @@ public class OwncloudPropagator : GLib.Object {
     /***********************************************************
     Q_REQUIRED_RESULT
     ***********************************************************/
-    public string full_local_path (string tmp_filename) {
-        return this.local_dir + tmp_filename;
+    public string full_local_path (string temporary_filename) {
+        return this.local_dir + temporary_filename;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public string local_path () {
+    public string local_path {
         return this.local_dir;
     }
 
@@ -487,14 +487,14 @@ public class OwncloudPropagator : GLib.Object {
 
     Q_REQUIRED_RESULT
     ***********************************************************/
-    public string full_remote_path (string tmp_filename) {
-        return this.remote_folder + tmp_filename;
+    public string full_remote_path (string temporary_filename) {
+        return this.remote_folder + temporary_filename;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public string remote_path () {
+    public string remote_path {
         return this.remote_folder;
     }
 
@@ -503,16 +503,16 @@ public class OwncloudPropagator : GLib.Object {
     Creates the job for an item.
     ***********************************************************/
     public PropagateItemJob create_job (SyncFileItem item) {
-        bool delete_existing = item.instruction == SyncInstructions.TYPE_CHANGE;
+        bool delete_existing = item.instruction == CSync.SyncInstructions.TYPE_CHANGE;
         switch (item.instruction) {
-        case SyncInstructions.REMOVE:
+        case CSync.SyncInstructions.REMOVE:
             if (item.direction == SyncFileItem.Direction.DOWN)
                 return new PropagateLocalRemove (this, item);
             else
                 return new PropagateRemoteDelete (this, item);
-        case SyncInstructions.NEW:
-        case SyncInstructions.TYPE_CHANGE:
-        case SyncInstructions.CONFLICT:
+        case CSync.SyncInstructions.NEW:
+        case CSync.SyncInstructions.TYPE_CHANGE:
+        case CSync.SyncInstructions.CONFLICT:
             if (item.is_directory ()) {
                 // CONFLICT has this.direction == None
                 if (item.direction != SyncFileItem.Direction.UP) {
@@ -525,7 +525,7 @@ public class OwncloudPropagator : GLib.Object {
                     return propagate_remote_mkdir_job;
                 }
             } //fall through
-        case SyncInstructions.SYNC:
+        case CSync.SyncInstructions.SYNC:
             if (item.direction != SyncFileItem.Direction.UP) {
                 var propagate_download_file_job = new PropagateDownloadFile (this, item);
                 propagate_download_file_job.delete_existing_folder (delete_existing);
@@ -539,14 +539,14 @@ public class OwncloudPropagator : GLib.Object {
                     return null;
                 }
             }
-        case SyncInstructions.RENAME:
+        case CSync.SyncInstructions.RENAME:
             if (item.direction == SyncFileItem.Direction.UP) {
                 return new PropagateRemoteMove (this, item);
             } else {
                 return new PropagateLocalRename (this, item);
             }
-        case SyncInstructions.IGNORE:
-        case SyncInstructions.ERROR:
+        case CSync.SyncInstructions.IGNORE:
+        case CSync.SyncInstructions.ERROR:
             return new PropagateIgnoreJob (this, item);
         default:
             return null;
@@ -644,18 +644,19 @@ public class OwncloudPropagator : GLib.Object {
     public bool create_conflict (
         SyncFileItem item,
         PropagatorCompositeJob composite,
-        string error) {
+        string *error) {
         string fn = full_local_path (item.file);
 
         string rename_error;
         var conflict_mod_time = FileSystem.get_mod_time (fn);
         if (conflict_mod_time <= 0) {
-            *error = _("Impossible to get modification time for file in conflict %1").printf (fn);
+            error = _("Impossible to get modification time for file in conflict %1").printf (fn);
             return false;
         }
         string conflict_user_name;
-        if (account.capabilities ().upload_conflict_files ())
+        if (account.capabilities.upload_conflict_files ()) {
             conflict_user_name = account.display_name;
+        }
         string conflict_filename = Utility.make_conflict_filename (
             item.file, Utility.q_date_time_from_time_t (conflict_mod_time), conflict_user_name);
         string conflict_file_path = full_local_path (conflict_filename);
@@ -688,13 +689,13 @@ public class OwncloudPropagator : GLib.Object {
         this.journal.conflict_record (conflict_record);
 
         // Create a new upload job if the new conflict file should be uploaded
-        if (account.capabilities ().upload_conflict_files ()) {
+        if (account.capabilities.upload_conflict_files ()) {
             if (composite && !GLib.File.new_for_path (conflict_file_path).query_info ().get_file_type () == FileType.DIRECTORY) {
                 SyncFileItem conflict_item = new SyncFileItem ();
                 conflict_item.file = conflict_filename;
                 conflict_item.type = ItemType.FILE;
                 conflict_item.direction = SyncFileItem.Direction.UP;
-                conflict_item.instruction = SyncInstructions.NEW;
+                conflict_item.instruction = CSync.SyncInstructions.NEW;
                 conflict_item.modtime = conflict_mod_time;
                 conflict_item.size = item.previous_size;
                 /* emit */ signal_new_item (conflict_item);
@@ -746,14 +747,14 @@ public class OwncloudPropagator : GLib.Object {
         const string fs_path = local_dir + item.destination ();
         var result = vfs.convert_to_placeholder (fs_path, item);
         if (!result) {
-            return result.error ();
+            return result.error;
         } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
             return Vfs.ConvertToPlaceholderResult.Locked;
         }
         var record = item.to_sync_journal_file_record_with_inode (fs_path);
         var d_bresult = journal.file_record (record);
         if (!d_bresult) {
-            return d_bresult.error ();
+            return d_bresult.error;
         }
         return Vfs.ConvertToPlaceholderResult.Ok;
     }
@@ -763,7 +764,7 @@ public class OwncloudPropagator : GLib.Object {
     Q_REQUIRED_RESULT
     ***********************************************************/
     public bool is_delayed_upload_item (SyncFileItem item) {
-        return account.capabilities ().bulk_upload () && !this.schedule_delayed_tasks && !item.is_encrypted && this.sync_options.min_chunk_size > item.size && !is_in_bulk_upload_block_list (item.file);
+        return account.capabilities.bulk_upload () && !this.schedule_delayed_tasks && !item.is_encrypted && this.sync_options.min_chunk_size > item.size && !is_in_bulk_upload_block_list (item.file);
     }
 
 
@@ -865,7 +866,7 @@ public class OwncloudPropagator : GLib.Object {
     private PropagateUploadFileCommon create_upload_job (SyncFileItem item, bool delete_existing) {
         var propagate_upload_file_job = new PropagateUploadFileCommon ();
 
-        if (item.size > sync_options.initial_chunk_size && account.capabilities ().chunking_ng ()) {
+        if (item.size > sync_options.initial_chunk_size && account.capabilities.chunking_ng ()) {
             // Item is above this.initial_chunk_size, thus will be classified as to be chunked
             propagate_upload_file_job = std.make_unique<PropagateUploadFileNG> (this, item);
         } else {
@@ -1066,7 +1067,7 @@ public class OwncloudPropagator : GLib.Object {
         var modtime = Utility.q_date_time_from_time_t (item.modtime);
         const int64 ms_since_mod = modtime.msecs_to (GLib.DateTime.current_date_time_utc ());
 
-        return GLib.TimeSpan (ms_since_mod) < SyncEngine.minimum_file_age_for_upload
+        return new GLib.TimeSpan (ms_since_mod) < SyncEngine.minimum_file_age_for_upload
             // if the mtime is too much in the future we do* upload the file
             && ms_since_mod > -10000;
     }
@@ -1080,7 +1081,7 @@ public class OwncloudPropagator : GLib.Object {
         if (ret == "") {
             ret = etag;
         }
-        if (oc_etag.length () > 0 && oc_etag != etag) {
+        if (oc_etag.length > 0 && oc_etag != etag) {
             GLib.debug ("Quite peculiar, we have an etag != OC-Etag [no problem!] " + etag + oc_etag);
         }
         return ret;

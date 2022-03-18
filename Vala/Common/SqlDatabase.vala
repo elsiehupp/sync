@@ -41,11 +41,11 @@ public class SqlDatabase {
     /***********************************************************
     Last error string
     ***********************************************************/
-    string error {
+    public string error {
         public get {
-            string err = this.error;
-            // this.error.clear ();
-            return err;
+            unowned string last_error = this.error;
+            this.error = ""; // was commented out
+            return last_error;
         }
         private set {
             error = value;
@@ -84,15 +84,17 @@ public class SqlDatabase {
 
     /***********************************************************
     ***********************************************************/
-    public bool is_open () {
-        return this.database != null;
+    public bool is_open {
+        public get {
+            return this.database != null;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool open_or_create_read_write (string filename) {
-        if (is_open ()) {
+        if (is_open) {
             return true;
         }
 
@@ -105,7 +107,7 @@ public class SqlDatabase {
             if (check_result == CheckDbResult.CANT_PREPARE) {
                 // When disk space is low, preparing may fail even though the database is fine.
                 // Typically CANTOPEN or IOERR.
-                int64 free_space = Utility.free_disk_space (GLib.FileInfo (filename).directory ().absolute_path ());
+                int64 free_space = Utility.free_disk_space (GLib.FileInfo (filename).directory ().absolute_path);
                 if (free_space != -1 && free_space < 1000000) {
                     GLib.warning ("Can't prepare consistency check and disk space is low: " + free_space);
                     close ();
@@ -135,7 +137,7 @@ public class SqlDatabase {
     /***********************************************************
     ***********************************************************/
     public bool open_read_only (string filename) {
-        if (is_open ()) {
+        if (is_open) {
             return true;
         }
 
@@ -200,7 +202,7 @@ public class SqlDatabase {
     /***********************************************************
     ***********************************************************/
     private bool open_helper (string filename, int sqlite_flags) {
-        if (is_open ()) {
+        if (is_open) {
             return true;
         }
 
@@ -240,13 +242,13 @@ public class SqlDatabase {
         if (quick_check.prepare ("PRAGMA quick_check;", /*allow_failure=*/true) != SQLITE_OK) {
             GLib.warning ("Error preparing quick_check on database");
             this.err_id = quick_check.error_id ();
-            this.error = quick_check.error ();
+            this.error = quick_check.error;
             return CheckDbResult.CANT_PREPARE;
         }
         if (!quick_check.exec ()) {
             GLib.warning ("Error running quick_check on database");
             this.err_id = quick_check.error_id ();
-            this.error = quick_check.error ();
+            this.error = quick_check.error;
             return CheckDbResult.CANT_EXEC;
         }
 

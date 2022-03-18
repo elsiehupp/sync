@@ -46,19 +46,19 @@ $QT_END_LICENSE$
 class QTokenizerPrivate<T> : GLib.Object {
     //  using CharType = typename T.value_type;
 
-    T string_value;
+    public T string_value;
     // ### copies begin and end for performance, premature optimization?
-    ConstIterator begin;
-    ConstIterator end;
-    ConstIterator token_begin;
-    ConstIterator token_end;
-    T delimiters;
-    T quotes;
-    bool is_delim;
-    bool return_delimiters;
-    bool return_quotes;
+    public ConstIterator begin;
+    public ConstIterator end;
+    public ConstIterator token_begin;
+    public ConstIterator token_end;
+    public T delimiters;
+    public T quotes;
+    public bool is_delim;
+    public bool return_delimiters;
+    public bool return_quotes;
 
-    class State : GLib.Object {
+    public class State : GLib.Object {
         public bool in_quote = false;
         public bool in_escape = false;
         public CharType quote_char = '\0';
@@ -117,7 +117,7 @@ public class QTokenizer<T> : GLib.Object {
     /***********************************************************
     ***********************************************************/
     //  private friend class QStringTokenizer;
-    private unowned QTokenizerPrivate<T, ConstIterator> d;
+    internal unowned QTokenizerPrivate<T, ConstIterator> tokenizer_private;
 
 
     /***********************************************************
@@ -146,7 +146,7 @@ public class QTokenizer<T> : GLib.Object {
     \sa QStringTokenizer, QByte_array_tokenizer, String_tokenizer, WString_tokenizer
     ***********************************************************/
     public QTokenizer (T string_value, T delimiters) {
-        this.d = new QTokenizerPrivate<T, ConstIterator> (string_value, delimiters);
+        this.tokenizer_private = new QTokenizerPrivate<T, ConstIterator> (string_value, delimiters);
     }
 
 
@@ -155,7 +155,7 @@ public class QTokenizer<T> : GLib.Object {
     \see set_quote_characters
     ***********************************************************/
     public void set_return_delimiters (bool enable) {
-        d.return_delimiters = enable;
+        tokenizer_private.return_delimiters = enable;
     }
 
 
@@ -171,7 +171,7 @@ public class QTokenizer<T> : GLib.Object {
     \param quotes Characters that delimit quotes.
     ***********************************************************/
     public void set_quote_characters (T quotes) {
-        d.quotes = quotes;
+        tokenizer_private.quotes = quotes;
     }
 
 
@@ -180,7 +180,7 @@ public class QTokenizer<T> : GLib.Object {
     \see set_quote_characters
     ***********************************************************/
     public void set_return_quote_characters (bool enable) {
-        d.return_quotes = enable;
+        tokenizer_private.return_quotes = enable;
     }
 
 
@@ -193,21 +193,21 @@ public class QTokenizer<T> : GLib.Object {
     ***********************************************************/
     public bool has_next () {
         //  typename QTokenizerPrivate<T, ConstIterator>.State state;
-        d.is_delim = false;
+        tokenizer_private.is_delim = false;
         for (;;) {
-            d.token_begin = d.token_end;
-            if (d.token_end == d.end)
+            tokenizer_private.token_begin = tokenizer_private.token_end;
+            if (tokenizer_private.token_end == tokenizer_private.end)
                 return false;
-            d.token_end++;
-            if (d.next_char (&state, *d.token_begin))
+            tokenizer_private.token_end++;
+            if (tokenizer_private.next_char (&state, *tokenizer_private.token_begin))
                 break;
-            if (d.return_delimiters) {
-                d.is_delim = true;
+            if (tokenizer_private.return_delimiters) {
+                tokenizer_private.is_delim = true;
                 return true;
             }
         }
-        while (d.token_end != d.end && d.next_char (&state, *d.token_end)) {
-            d.token_end++;
+        while (tokenizer_private.token_end != tokenizer_private.end && tokenizer_private.next_char (&state, *tokenizer_private.token_end)) {
+            tokenizer_private.token_end++;
         }
         return true;
     }
@@ -217,7 +217,7 @@ public class QTokenizer<T> : GLib.Object {
     Resets the tokenizer to the starting position.
     ***********************************************************/
     public void on_reset () {
-        d.token_end = d.begin;
+        tokenizer_private.token_end = tokenizer_private.begin;
     }
 
 
@@ -226,7 +226,7 @@ public class QTokenizer<T> : GLib.Object {
     if one more more delimiting characters have been set.
     ***********************************************************/
     public bool is_delimiter () {
-        return d.is_delim;
+        return tokenizer_private.is_delim;
     }
 
 
@@ -236,13 +236,13 @@ public class QTokenizer<T> : GLib.Object {
     Use \c has_next () to fetch the next token.
     ***********************************************************/
     public T next () {
-        int len = std.distance (d.token_begin, d.token_end);
-        ConstIterator tmp_start = d.token_begin;
-        if (!d.return_quotes && len > 1 && d.is_quote (*d.token_begin)) {
-            tmp_start++;
+        int len = std.distance (tokenizer_private.token_begin, tokenizer_private.token_end);
+        ConstIterator temporary_start = tokenizer_private.token_begin;
+        if (!tokenizer_private.return_quotes && len > 1 && tokenizer_private.is_quote (*tokenizer_private.token_begin)) {
+            temporary_start++;
             len -= 2;
         }
-        return T (tmp_start, len);
+        return new T (temporary_start, len);
     }
 
 }

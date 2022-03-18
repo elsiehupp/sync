@@ -77,7 +77,7 @@ public class Utility {
     ***********************************************************/
     public static string format_fingerprint (string fmhash, bool colon_separated = true) {
         string hash;
-        int steps = fmhash.length () / 2;
+        int steps = fmhash.length / 2;
         for (int i = 0; i < steps; i++) {
             hash.append (fmhash[i * 2]);
             hash.append (fmhash[i * 2 + 1]);
@@ -105,7 +105,7 @@ public class Utility {
     ***********************************************************/
     static void setup_fav_link_private (string folder) {
         // Nautilus : add to ~/.gtk-bookmarks
-        GLib.File gtk_bookmarks = GLib.File.new_for_path (GLib.Dir.home_path () + "/.config/gtk-3.0/bookmarks");
+        GLib.File gtk_bookmarks = GLib.File.new_for_path (GLib.Dir.home_path + "/.config/gtk-3.0/bookmarks");
         string folder_url = "file://" + folder.to_utf8 ();
         if (gtk_bookmarks.open (GLib.File.ReadWrite)) {
             string places = gtk_bookmarks.read_all ();
@@ -309,8 +309,8 @@ public class Utility {
             // When running inside an AppImage, we need to set the path to the
             // AppImage instead of the path to the executable
             const string app_image_path = q_environment_variable ("APPIMAGE");
-            const bool running_inside_app_image = !app_image_path.is_null () && GLib.File.exists (app_image_path);
-            const string executable_path = running_inside_app_image ? app_image_path : Gtk.Application.application_file_path ();
+            const bool running_inside_app_image = !app_image_path == null && GLib.File.exists (app_image_path);
+            const string executable_path = running_inside_app_image ? app_image_path : Gtk.Application.application_file_path;
 
             string ts; // = new QTextStream (&ini_file);
             //  ts.codec ("UTF-8");
@@ -596,7 +596,7 @@ public class Utility {
 
     /***********************************************************
     Check if two pathes that MUST exist are equal. This function
-    uses GLib.Dir.canonical_path () to judge and cares for the
+    uses GLib.Dir.canonical_path to judge and cares for the
     system's case sensitivity.
 
     OCSYNC_EXPORT
@@ -607,8 +607,8 @@ public class Utility {
 
         // Attention : If the path does not exist, canonical_path returns ""
         // ONLY use this function with existing pathes.
-        const string a = fd1.canonical_path ();
-        const string b = fd2.canonical_path ();
+        const string a = fd1.canonical_path;
+        const string b = fd2.canonical_path;
         bool re = !a == "" && string.compare (a, b, fs_case_preserving () ? Qt.CaseInsensitive : Qt.CaseSensitive) == 0;
         return re;
     }
@@ -706,40 +706,40 @@ public class Utility {
         }
 
         if (dt.days_to (now) == 1) {
-            return GLib.Object._("%n day ago", "", dt.days_to (now));
+            return _("%n day ago", "", dt.days_to (now));
         } else if (dt.days_to (now) > 1) {
-            return GLib.Object._("%n days ago", "", dt.days_to (now));
+            return _("%n days ago", "", dt.days_to (now));
         } else {
             int64 secs = dt.secs_to (now);
             if (secs < 0) {
-                return GLib.Object._("in the future");
+                return _("in the future");
             }
 
             if (floor (secs / 3600.0) > 0) {
                 int hours = floor (secs / 3600.0);
                 if (hours == 1) {
-                    return (GLib.Object._("%n hour ago", "", hours));
+                    return (_("%n hour ago", "", hours));
                 } else {
-                    return (GLib.Object._("%n hours ago", "", hours));
+                    return (_("%n hours ago", "", hours));
                 }
             } else {
                 int minutes = q_round (secs / 60.0);
 
                 if (minutes == 0) {
                     if (secs < 5) {
-                        return GLib.Object._("now");
+                        return _("now");
                     } else {
-                        return GLib.Object._("Less than a minute ago");
+                        return _("Less than a minute ago");
                     }
 
                 } else if (minutes == 1) {
-                    return (GLib.Object._("%n minute ago", "", minutes));
+                    return (_("%n minute ago", "", minutes));
                 } else {
-                    return (GLib.Object._("%n minutes ago", "", minutes));
+                    return (_("%n minutes ago", "", minutes));
                 }
             }
         }
-        return GLib.Object._("Some time ago");
+        return _("Some time ago");
     }
 
     class StopWatch {
@@ -822,7 +822,7 @@ public class Utility {
     public static GLib.Uri concat_url_path (
         GLib.Uri url, string concat_path,
         QUrlQuery query_items = {}) {
-        string path = url.path ();
+        string path = url.path;
         if (!concat_path == "") {
             // avoid '//'
             if (path.ends_with ('/') && concat_path.starts_with ('/')) {
@@ -834,10 +834,10 @@ public class Utility {
             path += concat_path; // put the complete path together
         }
 
-        GLib.Uri tmp_url = url;
-        tmp_url.path (path);
-        tmp_url.query (query_items);
-        return tmp_url;
+        GLib.Uri temporary_url = url;
+        temporary_url.path (path);
+        temporary_url.query (query_items);
+        return temporary_url;
     }
 
 

@@ -16,7 +16,7 @@ public class DummyCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public new string signal_auth_type () {
+    public new string auth_type_string () {
         return "dummy";
     }
 

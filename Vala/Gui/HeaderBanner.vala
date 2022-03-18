@@ -153,7 +153,7 @@ public class HeaderBanner : Gtk.Widget {
     public void setup (
         string title, Gdk.Pixbuf logo, Gdk.Pixbuf banner,
         Qt.Text_format title_format, string style_sheet) {
-        QStyle style = parent_widget ().style ();
+        QStyle style = parent_widget ().this.style;
         //const int layout_horizontal_spacing = style.pixel_metric (QStyle.PM_Layout_horizontal_spacing);
         int top_level_margin_left = style.pixel_metric (QStyle.PM_Layout_left_margin, null, parent_widget ());
         int top_level_margin_right = style.pixel_metric (QStyle.PM_Layout_right_margin, null, parent_widget ());
@@ -173,7 +173,7 @@ public class HeaderBanner : Gtk.Widget {
             title_label.style_sheet (style_sheet);
         logo_label.pixmap (logo);
         banner_pixmap = banner;
-        if (banner_pixmap.is_null ()) {
+        if (banner_pixmap == null) {
             QSize size = layout.total_minimum_size ();
             minimum_size (size);
             maximum_size (QWIDGETSIZE_MAX, size.height ());

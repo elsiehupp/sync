@@ -39,10 +39,10 @@ public class RequestEtagJob : AbstractNetworkJob {
         buf.data (xml);
         buf.open (QIODevice.ReadOnly);
         // assumes ownership
-        send_request ("PROPFIND", make_dav_url (path ()), request, buf);
+        send_request ("PROPFIND", make_dav_url (path), request, buf);
 
-        if (this.reply.error () != Soup.Reply.NoError) {
-            GLib.warning ("Request network error: " + this.reply.error_string ());
+        if (this.reply.error != Soup.Reply.NoError) {
+            GLib.warning ("Request network error: " + this.reply.error_string);
         }
         AbstractNetworkJob.start ();
     }
@@ -80,7 +80,7 @@ public class RequestEtagJob : AbstractNetworkJob {
         } else {
             HttpError error;
             error.code = http_code;
-            error.message = error_string ();
+            error.message = this.error_string;
             /* emit */ signal_finished_with_result (error);
         }
         return true;

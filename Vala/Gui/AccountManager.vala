@@ -34,22 +34,26 @@ public class AccountManager : GLib.Object {
     private const string SERVER_VERSION_C = "server_version";
 
     /***********************************************************
+    The maximum versions that this client can read
     ***********************************************************/
-    // The maximum versions that this client can read
     const int MAX_ACCOUNTS_VERSION = 2;
+
+    /***********************************************************
+    The maximum versions that this client can read
+    ***********************************************************/
     const int MAX_ACCOUNT_VERSION = 1;
 
 
     /***********************************************************
     ***********************************************************/
-    static AccountManager instance { public get; private set; }
+    public static AccountManager instance { public get; private set; }
 
     /***********************************************************
     Return a list of all accounts.
     (this is a list of unowned for internal reasons, one should
     normally not keep a copy of them)
     ***********************************************************/
-    GLib.List<unowned AccountState> accounts { public get; private set; }
+    public GLib.List<unowned AccountState> accounts { public get; private set; }
 
     /***********************************************************
     Account ids from settings that weren't read
@@ -73,7 +77,7 @@ public class AccountManager : GLib.Object {
         var settings = ConfigFile.settings_with_group (ACCOUNTS_C);
         settings.value (VERSION_C, MAX_ACCOUNTS_VERSION);
         foreach (var acc in this.accounts) {
-            settings.begin_group (acc.account.identifier ());
+            settings.begin_group (acc.account.identifier);
             save_account_helper (acc.account, *settings, save_credentials);
             acc.write_to_settings (*settings);
             settings.end_group ();
@@ -126,7 +130,7 @@ public class AccountManager : GLib.Object {
                         var jar = qobject_cast<CookieJar> (acc.am.cookie_jar ());
                         //  ASSERT (jar);
                         if (jar) {
-                            jar.restore (acc.cookie_jar_path ());
+                            jar.restore (acc.cookie_jar_path);
                         }
                         add_account_state (acc_state);
                     }
@@ -147,7 +151,7 @@ public class AccountManager : GLib.Object {
     Typically called from the wizard
     ***********************************************************/
     public AccountState add_account (unowned Account new_account) {
-        var identifier = new_account.identifier ();
+        var identifier = new_account.identifier;
         if (identifier == "" || !is_account_id_available (identifier)) {
             identifier = generate_free_account_id ();
         }
@@ -178,7 +182,7 @@ public class AccountManager : GLib.Object {
     ***********************************************************/
     public unowned AccountState account (string name) {
         foreach (Account acc in this.accounts) {
-            if (acc.account.display_name () == name) {
+            if (acc.account.display_name == name) {
                 return acc;
             }
         }
@@ -199,10 +203,10 @@ public class AccountManager : GLib.Object {
 
         // Forget account credentials, cookies
         account.account.credentials ().forget_sensitive_data ();
-        GLib.File.remove (account.account.cookie_jar_path ());
+        GLib.File.remove (account.account.cookie_jar_path);
 
         var settings = ConfigFile.settings_with_group (ACCOUNTS_C);
-        settings.remove (account.account.identifier ());
+        settings.remove (account.account.identifier);
 
         // Forget E2E keys
         account.account.e2e.forget_sensitive_data (account.account);
@@ -293,9 +297,9 @@ public class AccountManager : GLib.Object {
         if (acc.am) {
             var jar = qobject_cast<CookieJar> (acc.am.cookie_jar ());
             if (jar) {
-                GLib.info ("Saving cookies to " + acc.cookie_jar_path ());
-                if (!jar.save (acc.cookie_jar_path ())) {
-                    GLib.warning ("Failed to save cookies to " + acc.cookie_jar_path ());
+                GLib.info ("Saving cookies to " + acc.cookie_jar_path);
+                if (!jar.save (acc.cookie_jar_path)) {
+                    GLib.warning ("Failed to save cookies to " + acc.cookie_jar_path);
                 }
             }
         }
@@ -447,7 +451,7 @@ public class AccountManager : GLib.Object {
         }
 
         foreach (var account in this.accounts) {
-            if (account.account.identifier () == identifier) {
+            if (account.account.identifier == identifier) {
                 return true;
             }
         }
@@ -492,7 +496,7 @@ public class AccountManager : GLib.Object {
     public void on_signal_save_account (Account a) {
         GLib.debug ("Saving account " + a.url.to_string ());
         var settings = ConfigFile.settings_with_group (ACCOUNTS_C);
-        settings.begin_group (a.identifier ());
+        settings.begin_group (a.identifier);
         save_account_helper (a, *settings, false); // don't save credentials they might not have been loaded yet
         settings.end_group ();
 
@@ -507,7 +511,7 @@ public class AccountManager : GLib.Object {
     public void on_signal_save_account_state (AccountState a) {
         GLib.debug ("Saving account state " + a.account.url.to_string ());
         var settings = ConfigFile.settings_with_group (ACCOUNTS_C);
-        settings.begin_group (a.account.identifier ());
+        settings.begin_group (a.account.identifier);
         a.write_to_settings (*settings);
         settings.end_group ();
 

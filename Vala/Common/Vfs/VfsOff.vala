@@ -177,7 +177,7 @@ public class VfsOff : AbstractVfs {
         // Attempting to load the plugin is essential as it could have dependencies that
         // can't be resolved and thus not be available after all.
         if (!loader.on_signal_load ()) {
-            GLib.warning ("Plugin " + loader.filename () + " failed to load with error " + loader.error_string ());
+            GLib.warning ("Plugin " + loader.filename () + " failed to load with error " + loader.error_string);
             return false;
         }
 
@@ -189,36 +189,38 @@ public class VfsOff : AbstractVfs {
     Return the best available VFS mode.
     OCSYNC_EXPORT
     ***********************************************************/
-    override AbstractVfs.Mode best_available_vfs_mode () {
-        if (is_vfs_plugin_available (Mode.WINDOWS_CF_API)) {
-            return Mode.WINDOWS_CF_API;
+    override AbstractVfs.Mode best_available_vfs_mode {
+        get {
+            if (is_vfs_plugin_available (Mode.WINDOWS_CF_API)) {
+                return Mode.WINDOWS_CF_API;
+            }
+    
+            if (is_vfs_plugin_available (Mode.WITH_SUFFIX)) {
+                return Mode.WITH_SUFFIX;
+            }
+    
+            // For now the "suffix" backend has still precedence over the "xattr" backend.
+            // Ultimately the order of those ifs will change when xattr will be more mature.
+            // But what does "more mature" means here?
+            //
+            //  * On Mac when it properly reads and writes com.apple.LaunchServices.OpenWith
+            // This will require reverse engineering to see what they stuff in there. Maybe a good
+            // starting point:
+            // https://eclecticlight.co/2017/12/20/xattr-com-apple-launchservices-openwith-sets-a-custom-app-to-open-a-file/
+            //
+            //  * On Linux when our user.nextcloud.hydrate_exec is adopted by at least KDE and Gnome
+            // the "user.nextcloud" prefix might turn into "user.xdg" in the process since it would
+            // be best to have a freedesktop.org spec for it.
+            // When that time comes, it might still require detecting at runtime if that's indeed
+            // supported in the user session or even per sync folder (in case user would pick a folder
+            // which wouldn't support xattr for some reason)
+    
+            if (is_vfs_plugin_available (Mode.XATTR)) {
+                return Mode.XATTR;
+            }
+    
+            return Mode.OFF;
         }
-
-        if (is_vfs_plugin_available (Mode.WITH_SUFFIX)) {
-            return Mode.WITH_SUFFIX;
-        }
-
-        // For now the "suffix" backend has still precedence over the "xattr" backend.
-        // Ultimately the order of those ifs will change when xattr will be more mature.
-        // But what does "more mature" means here?
-        //
-        //  * On Mac when it properly reads and writes com.apple.LaunchServices.OpenWith
-        // This will require reverse engineering to see what they stuff in there. Maybe a good
-        // starting point:
-        // https://eclecticlight.co/2017/12/20/xattr-com-apple-launchservices-openwith-sets-a-custom-app-to-open-a-file/
-        //
-        //  * On Linux when our user.nextcloud.hydrate_exec is adopted by at least KDE and Gnome
-        // the "user.nextcloud" prefix might turn into "user.xdg" in the process since it would
-        // be best to have a freedesktop.org spec for it.
-        // When that time comes, it might still require detecting at runtime if that's indeed
-        // supported in the user session or even per sync folder (in case user would pick a folder
-        // which wouldn't support xattr for some reason)
-
-        if (is_vfs_plugin_available (Mode.XATTR)) {
-            return Mode.XATTR;
-        }
-
-        return Mode.OFF;
     }
 
 
@@ -247,7 +249,7 @@ public class VfsOff : AbstractVfs {
         QPluginLoader loader = new QPluginLoader (plugin_path);
         var plugin = loader.instance;
         if (!plugin) {
-            GLib.critical ("Could not load plugin" + plugin_path + loader.error_string ());
+            GLib.critical ("Could not load plugin" + plugin_path + loader.error_string);
             return null;
         }
 

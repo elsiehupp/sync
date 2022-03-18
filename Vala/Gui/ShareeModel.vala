@@ -29,7 +29,7 @@ public class ShareeModel : QAbstractListModel {
         const Sharee sharee;
 
         bool operator (unowned Sharee s2) {
-            return s2.to_string () == sharee.to_string () && s2.display_name () == sharee.to_string ();
+            return s2.to_string () == sharee.to_string () && s2.display_name == sharee.to_string ();
         }
     }
 
@@ -196,7 +196,7 @@ public class ShareeModel : QAbstractListModel {
             // the full name and the user name and thus we include both
             // in the output here. But we need to take care this string
             // doesn't leak to the user.
-            return sharee.display_name () + " (" + sharee.share_with () + ")";
+            return sharee.display_name + " (" + sharee.share_with () + ")";
 
         } else if (role == Qt.USER_ROLE) {
             return GLib.Variant.from_value (sharee);

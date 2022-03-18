@@ -48,7 +48,7 @@ public class Job : GLib.Object {
 
     public QKeychain.Error error { public get; protected set; }
 
-    string error_string { public get; protected set; }
+    public string error_string { public get; protected set; }
 
     protected int chunk_count = 0;
     protected string chunk_buffer;
@@ -84,7 +84,7 @@ public class Job : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static void add_settings_to_job (Account account, QKeychain.Job qkeychain_job) {
+    protected static void add_settings_to_job (Account account, QKeychain.Job qkeychain_job) {
         //  Q_UNUSED (account)
         var settings = ConfigFile.settings_with_group (Theme.app_name);
         settings.parent (qkeychain_job); // make the qkeychain_job parent to make setting deleted properly

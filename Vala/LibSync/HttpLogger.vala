@@ -111,7 +111,7 @@ public class HttpLogger {
         stream += "} Data : [";
         if (content_length > 0) {
             if (is_text_body (content_type)) {
-                if (!device.is_open ()) {
+                if (!device.is_open) {
                     GLib.assert (dynamic_cast<Soup.Buffer> (device));
                     // should we close item again?
                     device.open (QIODevice.ReadOnly);

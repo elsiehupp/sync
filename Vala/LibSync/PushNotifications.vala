@@ -33,7 +33,7 @@ public class PushNotifications : GLib.Object {
 
     Ready to use means connected and authenticated.
     ***********************************************************/
-    bool is_ready { public get; private set; }
+    public bool is_ready { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
@@ -239,7 +239,7 @@ public class PushNotifications : GLib.Object {
     ***********************************************************/
     private void open_web_socket () {
         // Open websocket
-        var capabilities = this.account.capabilities ();
+        var capabilities = this.account.capabilities;
         var web_socket_url = capabilities.push_notifications_web_socket_url ();
 
         GLib.info ("Open connection to websocket on " + web_socket_url + " for account " + this.account.url);

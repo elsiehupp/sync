@@ -188,8 +188,10 @@ public class KMessageWidget : Gdk.Frame {
     Get the text of this message widget.
     @see on_set_text ()
     ***********************************************************/
-    public string text () {
-        return d.text_label.text ();
+    public string text {
+        public get {
+            return d.text_label.text ();
+        }
     }
 
 
@@ -301,7 +303,7 @@ public class KMessageWidget : Gdk.Frame {
     ***********************************************************/
     public bool is_hide_animation_running () {
         return (d.time_line.direction () == QTimeLine.Backward)
-            && (d.time_line.state () == QTimeLine.Running);
+            && (d.time_line.state == QTimeLine.Running);
     }
 
 
@@ -315,7 +317,7 @@ public class KMessageWidget : Gdk.Frame {
     ***********************************************************/
     public bool is_show_animation_running () {
         return (d.time_line.direction () == QTimeLine.Forward)
-            && (d.time_line.state () == QTimeLine.Running);
+            && (d.time_line.state == QTimeLine.Running);
     }
 
 
@@ -393,14 +395,14 @@ public class KMessageWidget : Gdk.Frame {
             /* emit */ hide_animation_finished ();
         }
 
-        if (!style ().style_hint (QStyle.SH_WidgetAnimate, null, this)
+        if (!this.style.style_hint (QStyle.SH_WidgetAnimate, null, this)
          || (parent_widget () && !parent_widget ().is_visible ())) {
             show ();
             /* emit */ show_animation_finished ();
             return;
         }
 
-        if (is_visible () && (d.time_line.state () == QTimeLine.NotRunning) && (height () == d.best_content_height ()) && (d.content.position ().y () == 0)) {
+        if (is_visible () && (d.time_line.state == QTimeLine.NotRunning) && (height () == d.best_content_height ()) && (d.content.position ().y () == 0)) {
             /* emit */ show_animation_finished ();
             return;
         }
@@ -415,7 +417,7 @@ public class KMessageWidget : Gdk.Frame {
         d.update_snap_shot ();
 
         d.time_line.set_direction (QTimeLine.Forward);
-        if (d.time_line.state () == QTimeLine.NotRunning) {
+        if (d.time_line.state == QTimeLine.NotRunning) {
             d.time_line.on_start ();
         }
     }
@@ -433,7 +435,7 @@ public class KMessageWidget : Gdk.Frame {
             /* emit */ show_animation_finished ();
         }
 
-        if (!style ().style_hint (QStyle.SH_WidgetAnimate, null, this)) {
+        if (!this.style.style_hint (QStyle.SH_WidgetAnimate, null, this)) {
             hide ();
             /* emit */ hide_animation_finished ();
             return;
@@ -450,7 +452,7 @@ public class KMessageWidget : Gdk.Frame {
         d.update_snap_shot ();
 
         d.time_line.set_direction (QTimeLine.Backward);
-        if (d.time_line.state () == QTimeLine.NotRunning) {
+        if (d.time_line.state == QTimeLine.NotRunning) {
             d.time_line.on_start ();
         }
     }
@@ -462,10 +464,10 @@ public class KMessageWidget : Gdk.Frame {
     ***********************************************************/
     public void on_signal_set_icon (Gtk.Icon icon) {
         d.icon = icon;
-        if (d.icon.is_null ()) {
+        if (d.icon == null) {
             d.icon_label.hide ();
         } else {
-            const int size = style ().pixel_metric (QStyle.PM_ToolBarIconSize);
+            const int size = this.style.pixel_metric (QStyle.PM_ToolBarIconSize);
             d.icon_label.set_pixmap (d.icon.pixmap (size));
             d.icon_label.show ();
         }
@@ -476,7 +478,7 @@ public class KMessageWidget : Gdk.Frame {
     ***********************************************************/
     protected override void paint_event (QPaintEvent event) {
         Gdk.Frame.paint_event (event);
-        if (d.time_line.state () == QTimeLine.Running) {
+        if (d.time_line.state == QTimeLine.Running) {
             QPainter painter = new QPainter (this);
             painter.set_opacity (d.time_line.current_value () * d.time_line.current_value ());
             painter.draw_pixmap (0, 0, d.content_snap_shot);
@@ -506,7 +508,7 @@ public class KMessageWidget : Gdk.Frame {
     protected override void resize_event (QResizeEvent event) {
         Gdk.Frame.resize_event (event);
 
-        if (d.time_line.state () == QTimeLine.NotRunning) {
+        if (d.time_line.state == QTimeLine.NotRunning) {
             d.content.resize (width (), d.best_content_height ());
         }
     }

@@ -93,7 +93,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
     ***********************************************************/
     private GLib.Uri chunk_url (int chunk = -1) {
         string path = "remote.php/dav/uploads/"
-            + this.propagator.account.dav_user ()
+            + this.propagator.account.dav_user
             + "/" + this.transfer_identifier.to_string ();
         if (chunk >= 0) {
             // We need to do add leading 0 because the server orders the chunk alphabetically
@@ -120,7 +120,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         if (this.item.modtime <= 0) {
             GLib.warning ("Invalid modified time " + this.item.file + this.item.modtime);
         }
-        if (progress_info.valid && progress_info.is_chunked () && progress_info.modtime == this.item.modtime
+        if (progress_info.valid && progress_info.is_chunked && progress_info.modtime == this.item.modtime
                 && progress_info.size == this.item.size) {
             this.transfer_identifier = progress_info.transferid;
             var url = chunk_url ();
@@ -145,7 +145,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
             );
             lscol_job.start ();
             return;
-        } else if (progress_info.valid && progress_info.is_chunked ()) {
+        } else if (progress_info.valid && progress_info.is_chunked) {
             // The upload info is stale. remove the stale chunks on the server
             this.transfer_identifier = progress_info.transferid;
             // Fire and forget. Any error will be ignored.
@@ -219,7 +219,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
             // Finish with a MOVE
             // If we changed the file name, we must store the changed filename in the remote folder, not the original one.
-            string destination = GLib.Dir.clean_path (this.propagator.account.dav_url ().path ()
+            string destination = GLib.Dir.clean_path (this.propagator.account.dav_url ().path
                 + this.propagator.full_remote_path (this.file_to_upload.file));
             var headers = PropagateUploadFileCommon.headers ();
 
@@ -253,10 +253,10 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         var device = std.make_unique<UploadDevice> (
                 filename, this.sent, this.current_chunk_size, this.propagator.bandwidth_manager);
         if (!device.open (QIODevice.ReadOnly)) {
-            GLib.warning ("Could not prepare upload device: " + device.error_string ());
+            GLib.warning ("Could not prepare upload device: " + device.error_string);
 
             // Soft error because this is likely caused by the user modifying his files while syncing
-            abort_with_error (SyncFileItem.Status.SOFT_ERROR, device.error_string ());
+            abort_with_error (SyncFileItem.Status.SOFT_ERROR, device.error_string);
             return;
         }
 
@@ -366,8 +366,8 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
     private void on_signal_lscol_job_finished_with_error () {
         var lscol_job = qobject_cast<LscolJob> (sender ());
         on_signal_network_job_destroyed (lscol_job); // remove it from the this.jobs list
-        Soup.Reply.NetworkError err = lscol_job.reply ().error ();
-        var http_error_code = lscol_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        Soup.Reply.NetworkError err = lscol_job.input_stream.error;
+        var http_error_code = lscol_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         var status = classify_error (err, http_error_code, this.propagator.another_sync_needed);
         if (status == SyncFileItem.Status.FATAL_ERROR) {
             this.item.request_id = lscol_job.request_id ();
@@ -381,7 +381,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
     /***********************************************************
     ***********************************************************/
     private void on_signal_lscol_job_directory_listing_iterated (string name, GLib.HashTable<string, string> properties) {
-        if (name == chunk_url ().path ()) {
+        if (name == chunk_url ().path) {
             return; // skip the info about the path itself
         }
         bool ok = false;
@@ -403,16 +403,16 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         //  ASSERT (delete_job);
         this.jobs.remove (this.jobs.index_of (delete_job));
 
-        Soup.Reply.NetworkError err = delete_job.reply ().error ();
+        Soup.Reply.NetworkError err = delete_job.input_stream.error;
         if (err != Soup.Reply.NoError && err != Soup.Reply.ContentNotFoundError) {
-            const int http_status = delete_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+            const int http_status = delete_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             SyncFileItem.Status status = classify_error (err, http_status);
             if (status == SyncFileItem.Status.FATAL_ERROR) {
                 this.item.request_id = delete_job.request_id ();
-                abort_with_error (status, delete_job.error_string ());
+                abort_with_error (status, delete_job.error_string);
                 return;
             } else {
-                GLib.warning ("DeleteJob errored out " + delete_job.error_string () + delete_job.reply ().url);
+                GLib.warning ("DeleteJob errored out " + delete_job.error_string + delete_job.input_stream.url);
                 this.remove_job_error = true;
                 // Let the other jobs finish
             }
@@ -435,8 +435,8 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         this.propagator.active_job_list.remove_one (this);
         var mkcol_job = qobject_cast<MkColJob> (sender ());
         on_signal_network_job_destroyed (mkcol_job); // remove it from the this.jobs list
-        Soup.Reply.NetworkError err = mkcol_job.reply ().error ();
-        this.item.http_error_code = mkcol_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        Soup.Reply.NetworkError err = mkcol_job.input_stream.error;
+        this.item.http_error_code = mkcol_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
 
         if (err != Soup.Reply.NoError || this.item.http_error_code != 201) {
             this.item.request_id = mkcol_job.request_id ();
@@ -463,10 +463,10 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
             return;
         }
 
-        Soup.Reply.NetworkError err = put_file_job.reply ().error ();
+        Soup.Reply.NetworkError err = put_file_job.input_stream.error;
 
         if (err != Soup.Reply.NoError) {
-            this.item.http_error_code = put_file_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+            this.item.http_error_code = put_file_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             this.item.request_id = put_file_job.request_id ();
             common_error_handling (put_file_job);
             return;
@@ -480,7 +480,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         // target duration for each chunk upload.
         var target_duration = this.propagator.sync_options.target_chunk_upload_duration;
         if (target_duration.count () > 0) {
-            var upload_time = ++put_file_job.ms_since_start (); // add one to avoid div-by-zero
+            var upload_time = ++put_file_job.ms_since_start; // add one to avoid div-by-zero
             int64 predicted_good_size = (this.current_chunk_size * target_duration) / upload_time;
 
             // The whole targeting is heuristic. The predicted_good_size will fluctuate
@@ -553,9 +553,9 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         this.propagator.active_job_list.remove_one (this);
         var move_job = qobject_cast<MoveJob> (sender ());
         on_signal_network_job_destroyed (move_job); // remove it from the this.jobs list
-        Soup.Reply.NetworkError err = move_job.reply ().error ();
-        this.item.http_error_code = move_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-        this.item.response_time_stamp = move_job.response_timestamp ();
+        Soup.Reply.NetworkError err = move_job.input_stream.error;
+        this.item.http_error_code = move_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        this.item.response_time_stamp = move_job.response_timestamp;
         this.item.request_id = move_job.request_id ();
 
         if (err != Soup.Reply.NoError) {
@@ -564,7 +564,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         }
 
         if (this.item.http_error_code == 202) {
-            string path = string.from_utf8 (move_job.reply ().raw_header ("OC-Job_status-Location"));
+            string path = string.from_utf8 (move_job.input_stream.raw_header ("OC-Job_status-Location"));
             if (path == "") {
                 on_signal_done (SyncFileItem.Status.NORMAL_ERROR, _("Poll URL missing"));
                 return;
@@ -579,7 +579,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
             return;
         }
 
-        string fid = move_job.reply ().raw_header ("OC-FileID");
+        string fid = move_job.input_stream.raw_header ("OC-FileID");
         if (fid == "") {
             GLib.warning ("Server did not return a OC-FileID " + this.item.file);
             abort_with_error (SyncFileItem.Status.NORMAL_ERROR, _("Missing File ID from server"));
@@ -592,7 +592,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
             this.item.file_id = fid;
         }
 
-        this.item.etag = get_etag_from_reply (move_job.reply ());
+        this.item.etag = get_etag_from_reply (move_job.input_stream);
         ;
         if (this.item.etag == "") {
             GLib.warning ("Server did not return an ETAG " + this.item.file);

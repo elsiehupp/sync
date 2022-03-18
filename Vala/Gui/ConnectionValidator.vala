@@ -163,7 +163,7 @@ public class ConnectionValidator : GLib.Object {
                 this, SLOT (on_signal_system_proxy_lookup_done (QNetworkProxy)));
         } else {
             // We want to reset the QNAM proxy so that the global proxy settings are used (via ClientProxy settings)
-            this.account.network_access_manager ().proxy (QNetworkProxy (QNetworkProxy.DefaultProxy));
+            this.account.network_access_manager.proxy (QNetworkProxy (QNetworkProxy.DefaultProxy));
             // use a queued invocation so we're as asynchronous as with the other code path
             QMetaObject.invoke_method (this, "on_signal_actual_check", Qt.QueuedConnection);
         }
@@ -183,7 +183,7 @@ public class ConnectionValidator : GLib.Object {
         } else {
             GLib.info ("No system proxy set by OS.");
         }
-        this.account.network_access_manager ().proxy (proxy);
+        this.account.network_access_manager.proxy (proxy);
 
         on_signal_check_server_and_auth ();
     }
@@ -280,8 +280,8 @@ public class ConnectionValidator : GLib.Object {
     ***********************************************************/
     protected void on_signal_no_status_found (Soup.Reply reply) {
         var check_server_job = qobject_cast<CheckServerJob> (sender ());
-        GLib.warning () + reply.error () + check_server_job.error_string () + reply.peek (1024);
-        if (reply.error () == Soup.Reply.SslHandshakeFailedError) {
+        GLib.warning (reply.error + check_server_job.error_string + reply.peek (1024));
+        if (reply.error == Soup.Reply.SslHandshakeFailedError) {
             report_result (SslError);
             return;
         }
@@ -291,7 +291,7 @@ public class ConnectionValidator : GLib.Object {
             this.errors.append (_("Authentication error : Either username or password are wrong."));
         } else {
             //this.errors.append (_("Unable to connect to %1").printf (this.account.url.to_string ()));
-            this.errors.append (check_server_job.error_string ());
+            this.errors.append (check_server_job.error_string);
         }
         report_result (StatusNotFound);
     }
@@ -315,17 +315,17 @@ public class ConnectionValidator : GLib.Object {
         var propfind_job = (PropfindJob) sender ();
         Status stat = Status.TIMEOUT;
 
-        if (reply.error () == Soup.Reply.SslHandshakeFailedError) {
+        if (reply.error == Soup.Reply.SslHandshakeFailedError) {
             this.errors + propfind_job.error_string_parsing_body ();
             stat = Status.SSL_ERROR;
 
-        } else if (reply.error () == Soup.Reply.AuthenticationRequiredError
+        } else if (reply.error == Soup.Reply.AuthenticationRequiredError
             || !this.account.credentials ().still_valid (reply)) {
-            GLib.warning ("******** Password is wrong! " + reply.error () + propfind_job.error_string ());
+            GLib.warning ("******** Password is wrong! " + reply.error + propfind_job.error_string);
             this.errors + _("The provided credentials are not correct");
             stat = Status.CREDENTIALS_WRONG;
 
-        } else if (reply.error () != Soup.Reply.NoError) {
+        } else if (reply.error != Soup.Reply.NoError) {
             this.errors + propfind_job.error_string_parsing_body ();
 
             const int http_status =
@@ -379,7 +379,7 @@ public class ConnectionValidator : GLib.Object {
     ***********************************************************/
     protected void on_signal_user_fetched (UserInfo user_info) {
         if (user_info != null) {
-            user_info.active (false);
+            user_info.active = false;
             user_info.delete_later ();
         }
 
@@ -431,7 +431,7 @@ public class ConnectionValidator : GLib.Object {
         user_info.fetched_last_info.connect (
             this.on_signal_user_fetched
         );
-        user_info.active (true);
+        user_info.active = true;
     }
 
 
@@ -446,24 +446,24 @@ public class ConnectionValidator : GLib.Object {
         this.account.server_version (version);
 
         // We cannot deal with servers < 7.0.0
-        if (this.account.server_version_int ()
-            && this.account.server_version_int () < Account.make_server_version (7, 0, 0)) {
+        if (this.account.server_version_int
+            && this.account.server_version_int < Account.make_server_version (7, 0, 0)) {
             this.errors.append (_("The configured server for this client is too old"));
             this.errors.append (_("Please update to the latest server and restart the client."));
             report_result (ServerVersionMismatch);
             return false;
         }
         // We attempt to work with servers >= 7.0.0 but warn users.
-        // Check usages of Account.server_version_unsupported () for details.
+        // Check usages of Account.server_version_unsupported for details.
 
     //  #if QT_VERSION >= QT_VERSION_CHECK (5, 9, 0)
         // Record that the server supports HTTP/2
         // Actual decision if we should use HTTP/2 is done in AccessManager.create_request
         var abstract_network_job = (AbstractNetworkJob) sender ();
         if (abstract_network_job) {
-            if (abstract_network_job.reply ()) {
+            if (abstract_network_job.input_stream) {
                 this.account.http2_supported (
-                    abstract_network_job.reply ().attribute (
+                    abstract_network_job.input_stream.attribute (
                         Soup.Request.HTTP2WasUsedAttribute
                     ).to_bool ()
                 );

@@ -41,7 +41,7 @@ public class StoreMetadataApiJob : AbstractNetworkJob {
         request.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
         QUrlQuery query;
         query.add_query_item ("format", "json");
-        GLib.Uri url = Utility.concat_url_path (account.url, path ());
+        GLib.Uri url = Utility.concat_url_path (account.url, this.path);
         url.query (query);
 
         string data = "meta_data=" + GLib.Uri.to_percent_encoding (this.b64_metadata);
@@ -59,12 +59,12 @@ public class StoreMetadataApiJob : AbstractNetworkJob {
     protected bool on_signal_finished () {
         int return_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             if (return_code != 200) {
-                GLib.info ("Error sending the metadata " + path () + error_string () + return_code);
-                /* emit */ error (this.file_identifier, return_code);
+                GLib.info ("Error sending the metadata " + this.path + this.error_string + return_code);
+                /* emit */ signal_error (this.file_identifier, return_code);
             }
 
             GLib.info ("Metadata submited to the server successfully");
-            /* emit */ success (this.file_identifier);
+            /* emit */ signal_success (this.file_identifier);
         return true;
     }
 

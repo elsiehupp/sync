@@ -69,7 +69,7 @@ public class PropagatorJob : GLib.Object {
     when a job is added and from PropagateDirectory to
     associate the sub_jobs with the first job.
     ***********************************************************/
-    PropagatorCompositeJob associated_composite { public set; protected get; }
+    public PropagatorCompositeJob associated_composite { public set; protected get; }
 
     /***********************************************************
     Emitted when the job is fully on_signal_finished

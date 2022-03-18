@@ -108,7 +108,7 @@ public class ClientSideEncryption : GLib.Object {
         GLib.assert (account);
 
         GLib.info ("Initializing");
-        if (!account.capabilities ().client_side_encryption_available ()) {
+        if (!account.capabilities.client_side_encryption_available) {
             GLib.info ("No Client side encryption available on server.");
             /* emit */ initialization_finished ();
             return;
@@ -166,7 +166,7 @@ public class ClientSideEncryption : GLib.Object {
     ***********************************************************/
     private void generate_csr.for_account (Account account, EVP_PKEY key_pair) {
         // OpenSSL expects const char.
-        var cn_array = account.dav_user ().to_local8Bit ();
+        var cn_array = account.dav_user.to_local8Bit ();
         GLib.info ("Getting the following array for the account identifier " + cn_array);
 
         var cert_params = new GLib.HashTable<string, char> ();
@@ -293,7 +293,7 @@ public class ClientSideEncryption : GLib.Object {
     private void start_delete_job (Account account, string user) {
         var delete_password_job = new DeletePasswordJob (Theme.app_name);
         delete_password_job.insecure_fallback (false);
-        delete_password_job.key (AbstractCredentials.keychain_key (account.url.to_string (), user, account.identifier ()));
+        delete_password_job.key (AbstractCredentials.keychain_key (account.url.to_string (), user, account.identifier));
         delete_password_job.start ();
     }
 
@@ -313,14 +313,14 @@ public class ClientSideEncryption : GLib.Object {
         GLib.assert (account);
 
         // Error or no valid public key error out
-        if (read_job.error () != NoError || read_job.binary_data ().length () == 0) {
+        if (read_job.error != NoError || read_job.binary_data ().length == 0) {
             get_public_key_from_server (account);
             return;
         }
 
         this.certificate = GLib.TlsCertificate (read_job.binary_data (), QSsl.Pem);
 
-        if (this.certificate.is_null ()) {
+        if (this.certificate == null) {
             get_public_key_from_server (account);
             return;
         }
@@ -329,16 +329,16 @@ public class ClientSideEncryption : GLib.Object {
 
         GLib.info ("Public key fetched from keychain.");
 
-        const string kck = AbstractCredentials.keychain_key (
+        const string keychain_key = AbstractCredentials.keychain_key (
             account.url.to_string (),
             account.credentials ().user () + E2E_PRIVATE,
-            account.identifier ()
+            account.identifier
         );
 
         var read_password_job = new ReadPasswordJob (Theme.app_name);
         read_password_job.property (ACCOUNT_PROPERTY, GLib.Variant.from_value (account));
         read_password_job.insecure_fallback (false);
-        read_password_job.key (kck);
+        read_password_job.key (keychain_key);
         read_password_job.signal_finished.connect (
             this.on_signal_private_key_fetched
         );
@@ -354,7 +354,7 @@ public class ClientSideEncryption : GLib.Object {
         GLib.assert (account);
 
         // Error or no valid public key error out
-        if (read_job.error () != NoError || read_job.binary_data ().length () == 0) {
+        if (read_job.error != NoError || read_job.binary_data ().length == 0) {
             this.certificate = GLib.TlsCertificate ();
             this.public_key = QSslKey ();
             get_public_key_from_server (account);
@@ -364,23 +364,23 @@ public class ClientSideEncryption : GLib.Object {
         //this.private_key = QSslKey (read_job.binary_data (), QSsl.Rsa, QSsl.Pem, QSsl.PrivateKey);
         this.private_key = read_job.binary_data ();
 
-        if (this.private_key.is_null ()) {
+        if (this.private_key == null) {
             get_private_key_from_server (account);
             return;
         }
 
         GLib.info ("Private key fetched from keychain.");
 
-        const string kck = AbstractCredentials.keychain_key (
+        const string keychain_key = AbstractCredentials.keychain_key (
                     account.url.to_string (),
                     account.credentials ().user () + E2E_MNEMONIC,
-                    account.identifier ()
+                    account.identifier
         );
 
         var read_password_job = new ReadPasswordJob (Theme.app_name);
         read_password_job.property (ACCOUNT_PROPERTY, GLib.Variant.from_value (account));
         read_password_job.insecure_fallback (false);
-        read_password_job.key (kck);
+        read_password_job.key (keychain_key);
         read_password_job.signal_finished.connect (
             this.on_signal_mnemonic_key_fetched
         );
@@ -396,7 +396,7 @@ public class ClientSideEncryption : GLib.Object {
         GLib.assert (account);
 
         // Error or no valid public key error out
-        if (read_job.error () != NoError || read_job.text_data ().length () == 0) {
+        if (read_job.error != NoError || read_job.text_data ().length == 0) {
             this.certificate = GLib.TlsCertificate ();
             this.public_key = QSslKey ();
             this.private_key = "";
@@ -443,7 +443,7 @@ public class ClientSideEncryption : GLib.Object {
         JsonApiJob.signal_json_received.connect (
             (json_api_job, doc, return_code) => {
                 if (return_code == 200) {
-                    string public_key = doc.object ()["ocs"].to_object ()["data"].to_object ()["public-keys"].to_object ()[account.dav_user ()].to_string ();
+                    string public_key = doc.object ()["ocs"].to_object ()["data"].to_object ()["public-keys"].to_object ()[account.dav_user].to_string ();
                     this.certificate = GLib.TlsCertificate (public_key.to_local8Bit (), QSsl.Pem);
                     this.public_key = this.certificate.public_key ();
                     GLib.info ("Found Public key, requesting Server Public Key. Public key: " + public_key);
@@ -502,7 +502,7 @@ public class ClientSideEncryption : GLib.Object {
                         + "User : %2<br>"
                         + "Account : %3<br>")
                         .printf (Utility.escape (account.credentials ().user ()),
-                            Utility.escape (account.display_name ()));
+                            Utility.escape (account.display_name));
 
         QInputDialog dialog;
         dialog.window_title (_("Enter E2E passphrase"));
@@ -537,7 +537,7 @@ public class ClientSideEncryption : GLib.Object {
 
                 GLib.info ("Private key: " + this.private_key.to_string ());
 
-                if (!this.private_key.is_null () && check_public_key_validity (account)) {
+                if (!this.private_key == null && check_public_key_validity (account)) {
                     write_private_key (account);
                     write_certificate (account);
                     write_mnemonic (account);
@@ -558,16 +558,16 @@ public class ClientSideEncryption : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void fetch_from_key_chain (Account account) {
-        const string kck = AbstractCredentials.keychain_key (
+        const string keychain_key = AbstractCredentials.keychain_key (
                     account.url.to_string (),
                     account.credentials ().user () + E2E_CERTIFICATE,
-                    account.identifier ()
+                    account.identifier
         );
 
         var read_password_job = new ReadPasswordJob (Theme.app_name);
         read_password_job.property (ACCOUNT_PROPERTY, GLib.Variant.from_value (account));
         read_password_job.insecure_fallback (false);
-        read_password_job.key (kck);
+        read_password_job.key (keychain_key);
         read_password_job.signal_finished.connect (
             this.on_signal_public_key_fetched
         );
@@ -632,15 +632,15 @@ public class ClientSideEncryption : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void write_private_key (Account account) {
-        const string kck = AbstractCredentials.keychain_key (
+        const string keychain_key = AbstractCredentials.keychain_key (
                     account.url.to_string (),
                     account.credentials ().user () + E2E_PRIVATE,
-                    account.identifier ()
+                    account.identifier
         );
 
         var write_password_job = new WritePasswordJob (Theme.app_name);
         write_password_job.insecure_fallback (false);
-        write_password_job.key (kck);
+        write_password_job.key (keychain_key);
         write_password_job.binary_data (this.private_key);
         WritePasswordJob.on_signal_finished.
             (write_password_job, incoming) => {
@@ -655,15 +655,15 @@ public class ClientSideEncryption : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void write_certificate (Account account) {
-        const string kck = AbstractCredentials.keychain_key (
+        const string keychain_key = AbstractCredentials.keychain_key (
                     account.url.to_string (),
                     account.credentials ().user () + E2E_CERTIFICATE,
-                    account.identifier ()
+                    account.identifier
         );
 
         var write_password_job = new WritePasswordJob (Theme.app_name);
         write_password_job.insecure_fallback (false);
-        write_password_job.key (kck);
+        write_password_job.key (keychain_key);
         write_password_job.binary_data (this.certificate.to_pem ());
         WritePasswordJob.on_signal_finished.connect (
             (write_password_job, incoming) => {
@@ -678,15 +678,15 @@ public class ClientSideEncryption : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void write_mnemonic (Account account) {
-        const string kck = AbstractCredentials.keychain_key (
+        const string keychain_key = AbstractCredentials.keychain_key (
             account.url.to_string (),
             account.credentials ().user () + E2E_MNEMONIC,
-            account.identifier ()
+            account.identifier
         );
 
         var write_password_job = new WritePasswordJob (Theme.app_name);
         write_password_job.insecure_fallback (false);
-        write_password_job.key (kck);
+        write_password_job.key (keychain_key);
         write_password_job.text_data (this.mnemonic);
         WritePasswordJob.on_signal_finished.connect (
             (write_password_job, incoming) => {

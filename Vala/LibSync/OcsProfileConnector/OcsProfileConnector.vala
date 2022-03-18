@@ -33,10 +33,10 @@ public class OcsProfileConnector : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void fetch_hovercard (string user_id) {
-        if (this.account.server_version_int () < Account.make_server_version (23, 0, 0)) {
+        if (this.account.server_version_int < Account.make_server_version (23, 0, 0)) {
             GLib.info ("Server version " + this.account.server_version ()
                 + " does not support profile page.");
-            /* emit */ error ();
+            /* emit */ signal_error ();
             return;
         }
         const string url = "/ocs/v2.php/hovercard/v1/%1".printf (user_id);

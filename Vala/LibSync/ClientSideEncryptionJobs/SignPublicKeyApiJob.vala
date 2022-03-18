@@ -26,14 +26,14 @@ public class SignPublicKeyApiJob : AbstractNetworkJob {
     @brief csr - the CSR with the public key.
     This function needs to be called before start () obviously.
     ***********************************************************/
-    Soup.Buffer csr {
+    public Soup.Buffer csr {
         private get {
             return this.csr;
         }
         public set {
             string data = "csr=";
             data += GLib.Uri.to_percent_encoding (value);
-            this.csr.data (data);
+            this.csr.data = data;
         }
     }
 
@@ -61,7 +61,7 @@ public class SignPublicKeyApiJob : AbstractNetworkJob {
         request.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
         QUrlQuery query;
         query.add_query_item ("format", "json");
-        GLib.Uri url = Utility.concat_url_path (account.url, path ());
+        GLib.Uri url = Utility.concat_url_path (account.url, this.path);
         url.query (query);
 
         GLib.info ("Sending the CSR " + this.csr);
@@ -73,7 +73,7 @@ public class SignPublicKeyApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     protected bool on_signal_finished () {
-        GLib.info ("Sending CSR ended with " + path () + error_string () + this.reply.attribute (Soup.Request.HttpStatusCodeAttribute));
+        GLib.info ("Sending CSR ended with " + this.path + this.error_string + this.reply.attribute (Soup.Request.HttpStatusCodeAttribute));
 
         QJsonParseError error;
         var json = QJsonDocument.from_json (this.reply.read_all (), error);

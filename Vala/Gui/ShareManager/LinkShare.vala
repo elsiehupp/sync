@@ -16,7 +16,7 @@ public class LinkShare : Share {
 
     /***********************************************************
     ***********************************************************/
-    string name {
+    public string name {
         /***********************************************************
         Returns the name of the link share. Can be empty.
         ***********************************************************/
@@ -29,12 +29,12 @@ public class LinkShare : Share {
         Emits either signal_name_set () or on_signal_server_error ().
         ***********************************************************/
         public set {
-            create_share_job (LinkShare.on_signal_name_set).name (identifier (), value);
+            create_share_job (LinkShare.on_signal_name_set).name (identifier, value);
         }
     }
 
 
-    string token {
+    public string token {
         /***********************************************************
         Returns the token of the link share.
         ***********************************************************/
@@ -47,7 +47,7 @@ public class LinkShare : Share {
     }
 
 
-    string note {
+    public string note {
         /***********************************************************
         Returns the note of the link share.
         ***********************************************************/
@@ -58,12 +58,12 @@ public class LinkShare : Share {
         Set the note of the link share.
         ***********************************************************/
         public set {
-            create_share_job (LinkShare.on_signal_link_share_note_set).note (identifier (), value);
+            create_share_job (LinkShare.on_signal_link_share_note_set).note (identifier, value);
         }
     }
 
 
-    QDate expire_date {
+    public QDate expire_date {
         /***********************************************************
         Get the expiration date
         ***********************************************************/
@@ -77,12 +77,12 @@ public class LinkShare : Share {
         In case of a server error the on_signal_server_error signal is emitted.
         ***********************************************************/
         public set {
-            create_share_job (LinkShare.on_signal_expire_date_set).expire_date (identifier (), value);
+            create_share_job (LinkShare.on_signal_expire_date_set).expire_date (identifier, value);
         }
     }
 
 
-    GLib.Uri share_link {
+    public GLib.Uri share_link {
         /***********************************************************
         Get the share link
         ***********************************************************/
@@ -95,7 +95,7 @@ public class LinkShare : Share {
     }
 
 
-    string label {
+    public string label {
         /***********************************************************
         Returns the label of the link share.
         ***********************************************************/
@@ -106,7 +106,7 @@ public class LinkShare : Share {
         Set the label of the share link.
         ***********************************************************/
         public set {
-            create_share_job (LinkShare.on_signal_link_share_label_set).label (identifier (), value);
+            create_share_job (LinkShare.on_signal_link_share_label_set).label (identifier, value);
         }
     }
 
@@ -120,7 +120,7 @@ public class LinkShare : Share {
     /***********************************************************
     ***********************************************************/
     public LinkShare (
-        unowned Account account,
+        Account account,
         string identifier,
         string owner_uid,
         string owner_display_name,
@@ -128,12 +128,12 @@ public class LinkShare : Share {
         string name,
         string token,
         Permissions permissions,
-        bool is_password_set,
+        bool password_is_set,
         GLib.Uri url,
         QDate expire_date,
         string note,
         string label) {
-        base (account, identifier, owner_uid, owner_display_name, path, Share.Type.LINK, is_password_set, permissions);
+        base (account, identifier, owner_uid, owner_display_name, path, Share.Type.LINK, password_is_set, permissions);
         this.name = name;
         this.token = token;
         this.note = note;
@@ -148,7 +148,7 @@ public class LinkShare : Share {
     ***********************************************************/
     public GLib.Uri direct_download_link () {
         GLib.Uri url = this.share_link;
-        url.path (url.path () + "/download");
+        url.path (url.path + "/download");
         return url;
     }
 

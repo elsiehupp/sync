@@ -74,10 +74,9 @@ public class SlideShow : Gtk.Widget {
         }
     }
 
-
     private QPoint press_point;
     private QBasic_timer timer;
-    private string[] labels;
+    private Glib.List<string> labels;
     private GLib.List<Gdk.Pixbuf> pixmaps;
     private QPointer<QVariantAnimation> animation = null;
 
@@ -114,12 +113,12 @@ public class SlideShow : Gtk.Widget {
     ***********************************************************/
     public void draw_slide (QPainter painter, int index) {
         string label = this.labels.value (index);
-        QRect label_rect = style ().item_text_rect (font_metrics (), rect (), Qt.Align_bottom | Qt.AlignHCenter, is_enabled (), label);
-        style ().draw_item_text (painter, label_rect, Qt.AlignCenter, palette (), is_enabled (), label, QPalette.Window_text);
+        QRect label_rect = this.style.item_text_rect (font_metrics (), rect (), Qt.Align_bottom | Qt.AlignHCenter, is_enabled (), label);
+        this.style.draw_item_text (painter, label_rect, Qt.AlignCenter, palette (), is_enabled (), label, QPalette.Window_text);
 
         Gdk.Pixbuf pixmap = this.pixmaps.value (index);
-        QRect pixmap_rect = style ().item_pixmap_rect (QRect (0, 0, width (), label_rect.top () - SPACING), Qt.AlignCenter, pixmap);
-        style ().draw_item_pixmap (painter, pixmap_rect, Qt.AlignCenter, pixmap);
+        QRect pixmap_rect = this.style.item_pixmap_rect (QRect (0, 0, width (), label_rect.top () - SPACING), Qt.AlignCenter, pixmap);
+        this.style.draw_item_pixmap (painter, pixmap_rect, Qt.AlignCenter, pixmap);
     }
 
 
@@ -162,7 +161,7 @@ public class SlideShow : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public void on_signal_next_slide () {
-        current_slide ( (this.current_slide + 1) % this.labels.count ());
+        current_slide = (this.current_slide + 1) % this.labels.count ();
         this.reverse = false;
     }
 
@@ -170,7 +169,7 @@ public class SlideShow : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public void on_signal_prev_slide () {
-        current_slide ( (this.current_slide > 0 ? this.current_slide : this.labels.count ()) - 1);
+        this.current_slide = (this.current_slide > 0 ? this.current_slide : this.labels.count ()) - 1;
         this.reverse = true;
     }
 
@@ -196,7 +195,7 @@ public class SlideShow : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     protected void mouse_release_event (QMouseEvent event) {
-        if (!this.animation && QLine_f (this.press_point, event.position ()).length () < Gtk.Application.style_hints ().start_drag_distance ())
+        if (!this.animation && QLine_f (this.press_point, event.position ()).length < Gtk.Application.style_hints ().start_drag_distance ())
             /* emit */ signal_clicked ();
     }
 

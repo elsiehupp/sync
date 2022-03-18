@@ -19,7 +19,7 @@ public class TestSyncJournalDB : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public TestSyncJournalDB () {
-        this.database = this.temporary_directory.path () + "/sync.db";
+        this.database = this.temporary_directory.path + "/sync.db";
         GLib.assert_true (this.temporary_directory.is_valid ());
     }
 
@@ -41,7 +41,7 @@ public class TestSyncJournalDB : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_cleanup_test_case () {
-        const string file = this.database.database_file_path ();
+        const string file = this.database.database_file_path;
         GLib.File.remove (file);
     }
 
@@ -141,7 +141,7 @@ public class TestSyncJournalDB : GLib.Object {
         record.error_count = 5;
         record.etag = "ABCDEF";
         record.valid = true;
-        record.tmpfile = "/tmp/foo";
+        record.temporaryfile = "/temporary/foo";
         this.database.set_download_info ("foo", record);
 
         SyncJournalDb.DownloadInfo stored_record = this.database.get_download_info ("foo");
@@ -348,8 +348,8 @@ public class TestSyncJournalDB : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void test_pin_state () {
-        this.database.internal_pin_states ().wipe_for_path_and_below ("");
-        var list = this.database.internal_pin_states ().raw_list ();
+        this.database.internal_pin_states.wipe_for_path_and_below ("");
+        var list = this.database.internal_pin_states.raw_list ();
         GLib.assert_true (list.size () == 0);
 
         // Make a thrice-nested setup
@@ -369,7 +369,7 @@ public class TestSyncJournalDB : GLib.Object {
             }
         }
 
-        list = this.database.internal_pin_states ().raw_list ();
+        list = this.database.internal_pin_states.raw_list ();
         GLib.assert_true (list.size () == 4 + 9 + 27);
 
         // Baseline direct checks (the fallback for unset root pinstate is PinState.ALWAYS_LOCAL)
@@ -431,35 +431,35 @@ public class TestSyncJournalDB : GLib.Object {
 
         // Wiping
         GLib.assert_true (get_raw ("local/local") == PinState.PinState.ALWAYS_LOCAL);
-        this.database.internal_pin_states ().wipe_for_path_and_below ("local/local");
+        this.database.internal_pin_states.wipe_for_path_and_below ("local/local");
         GLib.assert_true (get_raw ("local") == PinState.PinState.ALWAYS_LOCAL);
         GLib.assert_true (get_raw ("local/local") == PinState.PinState.INHERITED);
         GLib.assert_true (get_raw ("local/local/local") == PinState.PinState.INHERITED);
         GLib.assert_true (get_raw ("local/local/online") == PinState.PinState.INHERITED);
-        list = this.database.internal_pin_states ().raw_list ();
+        list = this.database.internal_pin_states.raw_list ();
         GLib.assert_true (list.size () == 4 + 9 + 27 - 4);
 
         // Wiping everything
-        this.database.internal_pin_states ().wipe_for_path_and_below ("");
+        this.database.internal_pin_states.wipe_for_path_and_below ("");
         GLib.assert_true (get_raw ("") == PinState.PinState.INHERITED);
         GLib.assert_true (get_raw ("local") == PinState.PinState.INHERITED);
         GLib.assert_true (get_raw ("online") == PinState.PinState.INHERITED);
-        list = this.database.internal_pin_states ().raw_list ();
+        list = this.database.internal_pin_states.raw_list ();
         GLib.assert_true (list.size () == 0);
     }
 
 
 
     private void make (string path, PinState state) {
-        this.database.internal_pin_states ().set_for_path (path, state);
-        var pin_state = this.database.internal_pin_states ().raw_for_path (path);
+        this.database.internal_pin_states.set_for_path (path, state);
+        var pin_state = this.database.internal_pin_states.raw_for_path (path);
         GLib.assert_true (pin_state);
         GLib.assert_true (pin_state == state);
     }
 
 
     private PinState get_pin_state (string path)  {
-        var state = this.database.internal_pin_states ().effective_for_path (path);
+        var state = this.database.internal_pin_states.effective_for_path (path);
         if (!state) {
             GLib.assert_fail ("couldn't read pin state", __FILE__, __LINE__);
             return PinState.PinState.INHERITED;
@@ -469,7 +469,7 @@ public class TestSyncJournalDB : GLib.Object {
 
 
     private PinState get_recursive (string path) {
-        var state = this.database.internal_pin_states ().effective_for_path_recursive (path);
+        var state = this.database.internal_pin_states.effective_for_path_recursive (path);
         if (!state) {
             GLib.assert_fail ("couldn't read pin state", __FILE__, __LINE__);
             return PinState.PinState.INHERITED;
@@ -479,7 +479,7 @@ public class TestSyncJournalDB : GLib.Object {
 
 
     private PinState get_raw (string path) {
-        var state = this.database.internal_pin_states ().raw_for_path (path);
+        var state = this.database.internal_pin_states.raw_for_path (path);
         if (!state) {
             GLib.assert_fail ("couldn't read pin state", __FILE__, __LINE__);
             return PinState.PinState.INHERITED;

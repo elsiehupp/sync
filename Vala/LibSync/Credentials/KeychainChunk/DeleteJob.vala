@@ -43,10 +43,10 @@ public class DeleteJob : KeychainChunk.Job {
         this.chunk_count = 0;
         this.error = QKeychain.NoError;
 
-        const string kck = this.account ? AbstractCredentials.keychain_key (
+        const string keychain_key = this.account ? AbstractCredentials.keychain_key (
                 this.account.url.to_string (),
                 this.key,
-                this.keychain_migration ? "" : this.account.identifier ()
+                this.keychain_migration ? "" : this.account.identifier
             ) : this.key;
 
         var qkeychain_delete_password_job = new QKeychain.DeletePasswordJob (this.service_name, this);
@@ -54,7 +54,7 @@ public class DeleteJob : KeychainChunk.Job {
         add_settings_to_job (this.account, qkeychain_delete_password_job);
     // #endif
         qkeychain_delete_password_job.insecure_fallback (this.insecure_fallback);
-        qkeychain_delete_password_job.key (kck);
+        qkeychain_delete_password_job.key (keychain_key);
         qkeychain_delete_password_job.signal_finished.connect (
             this.on_signal_delete_job_done
         );
@@ -77,13 +77,13 @@ public class DeleteJob : KeychainChunk.Job {
         );
         wait_loop.exec ();
 
-        if (error () == NoError) {
+        if (this.error == NoError) {
             return true;
         }
 
         this.chunk_count = 0;
-        if (error () != EntryNotFound) {
-            GLib.warning ("DeletePasswordJob failed with " + error_string ());
+        if (this.error != EntryNotFound) {
+            GLib.warning ("DeletePasswordJob failed with " + this.error_string);
         }
         return false;
     }
@@ -96,14 +96,14 @@ public class DeleteJob : KeychainChunk.Job {
         var delete_job = qobject_cast<QKeychain.DeletePasswordJob> (incoming_job);
         GLib.assert (delete_job);
 
-        if (delete_job.error () == NoError) {
+        if (delete_job.error == NoError) {
             this.chunk_count++;
         } else {
-            if (delete_job.error () != QKeychain.EntryNotFound ||
-                ( (delete_job.error () == QKeychain.EntryNotFound) && this.chunk_count == 0)) {
-                this.error = delete_job.error ();
-                this.error_string = delete_job.error_string ();
-                GLib.warning ("Unable to delete " + delete_job.key () + " chunk " + this.chunk_count + delete_job.error_string ());
+            if (delete_job.error != QKeychain.EntryNotFound ||
+                ( (delete_job.error == QKeychain.EntryNotFound) && this.chunk_count == 0)) {
+                this.error = delete_job.error;
+                this.error_string = delete_job.error_string;
+                GLib.warning ("Unable to delete " + delete_job.key () + " chunk " + this.chunk_count + delete_job.error_string);
             }
         }
 

@@ -30,17 +30,17 @@ public class Share : GLib.Object {
     /***********************************************************
     The account the share is defined on.
     ***********************************************************/
-    unowned Account account { public get; protected set; }
+    public unowned Account account { public get; protected set; }
 
-    string identifier { public get; protected set; }
-    string owner_uid { public get; protected set; }
-    string owner_display_name { public get; protected set; }
-    string path { public get; protected set; }
-    Share.Type share_type { public get; protected set; }
-    bool is_password_set { public get; protected set; }
-    Sharee share_with { public get; protected set; }
+    public string identifier { public get; protected set; }
+    public string owner_uid { public get; protected set; }
+    public string owner_display_name { public get; protected set; }
+    public string path { public get; protected set; }
+    public Share.Type share_type { public get; protected set; }
+    public bool password_is_set { public get; protected set; }
+    public Sharee share_with { public get; protected set; }
 
-    Permissions permissions {
+    public Permissions permissions {
         /***********************************************************
         Get permissions
         ***********************************************************/
@@ -61,7 +61,7 @@ public class Share : GLib.Object {
             ocs_share_job.signal_error.connect (
                 this.on_signal_ocs_share_job_error
             );
-            ocs_share_job.permissions (identifier (), value);
+            ocs_share_job.permissions (identifier, value);
         }
     }
 
@@ -82,7 +82,7 @@ public class Share : GLib.Object {
         string owner_display_name,
         string path,
         Share.Type share_type,
-        bool is_password_set = false,
+        bool password_is_set = false,
         Permissions permissions = Share_permission_default,
         Sharee share_with = new Sharee (null)) {
         this.account = account;
@@ -91,7 +91,7 @@ public class Share : GLib.Object {
         this.owner_display_name = owner_display_name;
         this.path = path;
         this.share_type = share_type;
-        this.is_password_set = is_password_set;
+        this.password_is_set = password_is_set;
         this.permissions = permissions;
         this.share_with = share_with;
     }
@@ -111,7 +111,7 @@ public class Share : GLib.Object {
         ocs_share_job.signal_error.connect (
             this.on_signal_password_error
         );
-        ocs_share_job.password (identifier (), password);
+        ocs_share_job.password (identifier, password);
     }
 
 
@@ -129,7 +129,7 @@ public class Share : GLib.Object {
         ocs_share_job.signal_error.connect (
             this.on_signal_ocs_share_job_error
         );
-        ocs_share_job.delete_share (identifier ());
+        ocs_share_job.delete_share (identifier);
     }
 
 
@@ -152,7 +152,7 @@ public class Share : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_password_set (QJsonDocument reply, GLib.Variant value) {
-        this.is_password_set = !value.to_string () == "";
+        this.password_is_set = !value.to_string () == "";
         /* emit */ signal_password_set ();
     }
 

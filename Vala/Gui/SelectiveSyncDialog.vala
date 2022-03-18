@@ -47,7 +47,7 @@ public class SelectiveSyncDialog : Gtk.Dialog {
         on_signal_init (account);
         string[] selective_sync_list = this.folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
         if (ok) {
-            this.selective_sync.folder_info (this.folder.remote_path (), this.folder.alias (), selective_sync_list);
+            this.selective_sync.folder_info (this.folder.remote_path, this.folder.alias (), selective_sync_list);
         } else {
             this.ok_button.enabled (false);
         }

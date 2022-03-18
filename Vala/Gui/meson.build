@@ -54,7 +54,7 @@ srcs = files([
     'OcsNavigationAppsJob.vala',
     'OcsShareeJob.vala',
     'OcsShareJob.vala',
-    'OpenExtrernal.vala',
+    'OpenExternal.vala',
     'OpenFileManager.vala',
     'OwncloudGui.vala',
     'OwncloudSetupWizard.vala',

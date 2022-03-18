@@ -44,11 +44,11 @@ public class PropagateUploadEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    bool is_unlock_running { public get; private set; }
+    public bool is_unlock_running { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
-    private bool is_folder_locked { public get; private set; }
+    public bool is_folder_locked { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
@@ -120,8 +120,8 @@ public class PropagateUploadEncrypted : GLib.Object {
     }
 
 
-    private void root_path () {
-        var result = this.propagator.remote_path ();
+    private void root_path {
+        var result = this.propagator.remote_path;
         if (result.starts_with ("/")) {
             return result.mid (1);
         } else {
@@ -130,7 +130,7 @@ public class PropagateUploadEncrypted : GLib.Object {
     }
 
 
-    private void absolute_remote_parent_path () {
+    private void absolute_remote_parent_path {
         var path = root_path + this.remote_parent_path;
         if (path.has_suffix ("/")) {
             path.chop (1);
@@ -337,8 +337,8 @@ public class PropagateUploadEncrypted : GLib.Object {
         if (info.query_info ().get_file_type () == FileType.DIRECTORY) {
             this.complete_filename = encrypted_file.encrypted_filename;
         } else {
-            GLib.File input = new GLib.File (info.absolute_file_path ());
-            GLib.File output = new GLib.File (GLib.Dir.temp_path () + GLib.Dir.separator () + encrypted_file.encrypted_filename);
+            GLib.File input = new GLib.File (info.absolute_file_path);
+            GLib.File output = new GLib.File (GLib.Dir.temp_path + GLib.Dir.separator () + encrypted_file.encrypted_filename);
 
             string tag;
             bool encryption_result = EncryptionHelper.file_encryption (
@@ -418,9 +418,9 @@ public class PropagateUploadEncrypted : GLib.Object {
         GLib.debug ("Uploading of the metadata succeeded; encrypting the file.");
         GLib.FileInfo output_info = GLib.File.new_for_path (this.complete_filename);
 
-        GLib.debug ("Encrypted info: " + output_info.path () + output_info.filename () + output_info.size ());
+        GLib.debug ("Encrypted info: " + output_info.path + output_info.filename () + output_info.size ());
         GLib.debug ("Finalizing the upload part; now the actual uploader will take over.");
-        /* emit */ finalized (output_info.path () + "/" + output_info.filename (),
+        /* emit */ finalized (output_info.path + "/" + output_info.filename (),
             this.remote_parent_path + "/" + output_info.filename (),
             output_info.size ());
     }

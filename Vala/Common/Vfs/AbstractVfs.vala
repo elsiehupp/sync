@@ -114,7 +114,7 @@ public abstract class AbstractVfs : GLib.Object {
     }
 
 
-    protected abstract Mode best_available_vfs_mode ();
+    protected Mode best_available_vfs_mode { protected get; protected set; }
 
 
     /***********************************************************
@@ -122,7 +122,7 @@ public abstract class AbstractVfs : GLib.Object {
     public static Result<bool, string> check_availability (string path) {
         //  Q_UNUSED (mode)
         //  Q_UNUSED (path)
-        return new Result<bool, string> (true, Mode.to_string (best_available_vfs_mode ()));
+        return new Result<bool, string> (true, Mode.to_string (this.best_available_vfs_mode));
     }
 
 
@@ -355,9 +355,9 @@ public abstract class AbstractVfs : GLib.Object {
     ***********************************************************/
     protected bool is_pin_state_in_database (string folder_path, PinState state) {
         var path = folder_path.to_utf8 ();
-        this.setup_params.journal.internal_pin_states ().wipe_for_path_and_below (path);
+        this.setup_params.journal.internal_pin_states.wipe_for_path_and_below (path);
         if (state != PinState.PinState.INHERITED) {
-            this.setup_params.journal.internal_pin_states ().for_path (path, state);
+            this.setup_params.journal.internal_pin_states.for_path (path, state);
         }
         return true;
     }
@@ -366,7 +366,7 @@ public abstract class AbstractVfs : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected Optional<PinState> find_pin_state_in_database (string folder_path) {
-        var pin = this.setup_params.journal.internal_pin_states ().effective_for_path (folder_path.to_utf8 ());
+        var pin = this.setup_params.journal.internal_pin_states.effective_for_path (folder_path.to_utf8 ());
         return pin;
     }
 
@@ -375,7 +375,7 @@ public abstract class AbstractVfs : GLib.Object {
     ***********************************************************/
     protected AvailabilityResult availability_in_database (string folder_path) {
         var path = folder_path.to_utf8 ();
-        var pin = this.setup_params.journal.internal_pin_states ().effective_for_path_recursive (path);
+        var pin = this.setup_params.journal.internal_pin_states.effective_for_path_recursive (path);
         // not being able to retrieve the pin state isn't too bad
         var hydration_status = this.setup_params.journal.has_hydrated_or_dehydrated_files (path);
         if (!hydration_status)

@@ -2,7 +2,7 @@ namespace Occ {
 namespace LibSync {
 
 public class Hovercard : GLib.Object {
-    GLib.List<HovercardAction> actions;
+    public GLib.List<HovercardAction> actions;
 }
 
 } // namespace LibSync

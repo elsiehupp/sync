@@ -54,11 +54,11 @@ public class DeleteJob : AbstractNetworkJob {
         if (this.url.is_valid ()) {
             send_request ("DELETE", this.url, request);
         } else {
-            send_request ("DELETE", make_dav_url (path ()), request);
+            send_request ("DELETE", make_dav_url (path), request);
         }
 
-        if (this.reply.error () != Soup.Reply.NoError) {
-            GLib.warning ("Network error: " + this.reply.error_string ());
+        if (this.reply.error != Soup.Reply.NoError) {
+            GLib.warning ("Network error: " + this.reply.error_string);
         }
         AbstractNetworkJob.start ();
     }

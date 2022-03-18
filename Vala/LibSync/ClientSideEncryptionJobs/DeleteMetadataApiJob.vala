@@ -36,7 +36,7 @@ public class DeleteMetadataApiJob : AbstractNetworkJob {
         Soup.Request request = new Soup.Request ();
         request.raw_header ("OCS-APIREQUEST", "true");
 
-        GLib.Uri url = Utility.concat_url_path (account.url, path ());
+        GLib.Uri url = Utility.concat_url_path (account.url, this.path);
         send_request ("DELETE", url, request);
 
         AbstractNetworkJob.start ();
@@ -49,12 +49,12 @@ public class DeleteMetadataApiJob : AbstractNetworkJob {
     protected bool on_signal_finished () {
         int return_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (return_code != 200) {
-            GLib.info ("Error removing metadata for " + path () + error_string () + return_code);
+            GLib.info ("Error removing metadata for " + this.path + this.error_string + return_code);
             GLib.info ("Full Error Log " + this.reply.read_all ());
-            /* emit */ error (this.file_identifier, return_code);
+            /* emit */ signal_error (this.file_identifier, return_code);
             return true;
         }
-        /* emit */ success (this.file_identifier);
+        /* emit */ signal_success (this.file_identifier);
         return true;
     }
 

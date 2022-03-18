@@ -8,12 +8,10 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QLoggingCategory>
 //  #include <Gtk.Application>
 
-using CSync;
-
 namespace Occ {
 namespace LibSync {
 
-abstract class AbstractCredentials : GLib.Object {
+public abstract class AbstractCredentials : GLib.Object {
 
     /***********************************************************
     The bound account for the credentials instance.
@@ -34,7 +32,7 @@ abstract class AbstractCredentials : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    string signal_auth_type { public get; protected set; }
+    public string auth_type_string { public get; protected set; }
 
     /***********************************************************
     ***********************************************************/

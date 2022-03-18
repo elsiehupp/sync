@@ -20,7 +20,7 @@ public class GETFileJob : AbstractNetworkJob {
             if (!this.error_string == "") {
                 return this.error_string;
             }
-            return AbstractNetworkJob.error_string ();
+            return AbstractNetworkJob.error_string;
         }
         private set {
             this.error_string = value;
@@ -55,7 +55,7 @@ public class GETFileJob : AbstractNetworkJob {
     /***********************************************************
     If this.bandwidth_quota will be used
     ***********************************************************/
-    bool bandwidth_limited;
+    public bool bandwidth_limited;
 
     /***********************************************************
     If download is paused (won't read on ready_read ())
@@ -152,7 +152,7 @@ public class GETFileJob : AbstractNetworkJob {
         request.priority (Soup.Request.Low_priority); // Long downloads must not block non-propagation jobs.
 
         if (this.direct_download_url == "") {
-            send_request ("GET", make_dav_url (path ()), request);
+            send_request ("GET", make_dav_url (path), request);
         } else {
             // Use direct URL
             send_request ("GET", this.direct_download_url, request);
@@ -196,7 +196,7 @@ public class GETFileJob : AbstractNetworkJob {
         if (network_reply && network_reply.is_running ()) {
             network_reply.abort ();
         }
-        if (this.device && this.device.is_open ()) {
+        if (this.device && this.device.is_open) {
             this.device.close ();
         }
     }
@@ -264,7 +264,7 @@ public class GETFileJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public int64 current_download_position () {
-        if (this.device && this.device.position () > 0 && this.device.position () > int64 (this.resume_start)) {
+        if (this.device && this.device.position () > 0 && this.device.position () > (int64) (this.resume_start)) {
             return this.device.position ();
         }
         return this.resume_start;
@@ -283,7 +283,7 @@ public class GETFileJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public new void on_signal_timed_out () {
-        GLib.warning ("Timeout" + this.input_stream ? this.input_stream.request ().url : path ());
+        GLib.warning ("Timeout" + this.input_stream ? this.input_stream.request ().url : this.path);
         if (!this.input_stream)
             return;
         this.error_string = _("Connection Timeout");
@@ -335,7 +335,7 @@ public class GETFileJob : AbstractNetworkJob {
 
             const int64 written_bytes = write_to_device (string.from_raw_data (buffer.const_data (), read_bytes));
             if (written_bytes != read_bytes) {
-                this.error_string = this.device.error_string ();
+                this.error_string = this.device.error_string;
                 this.error_status = SyncFileItem.Status.NORMAL_ERROR;
                 GLib.warning ("Error while writing to file " + written_bytes + read_bytes + this.error_string);
                 this.input_stream.abort ();
@@ -389,7 +389,7 @@ public class GETFileJob : AbstractNetworkJob {
             this.input_stream.read_buffer_size (0);
             return;
         }
-        if (this.input_stream.error () != Soup.Reply.NoError) {
+        if (this.input_stream.error != Soup.Reply.NoError) {
             return;
         }
         this.etag = get_etag_from_reply (this.input_stream);
@@ -440,7 +440,7 @@ public class GETFileJob : AbstractNetworkJob {
                 // device doesn't support range, just try again from scratch
                 this.device.close ();
                 if (!this.device.open (QIODevice.WriteOnly)) {
-                    this.error_string = this.device.error_string ();
+                    this.error_string = this.device.error_string;
                     this.error_status = SyncFileItem.Status.NORMAL_ERROR;
                     this.input_stream.abort ();
                     return;
@@ -455,7 +455,7 @@ public class GETFileJob : AbstractNetworkJob {
         }
 
         var last_modified = this.input_stream.header (Soup.Request.Last_modified_header);
-        if (!last_modified.is_null ()) {
+        if (!last_modified == null) {
             this.last_modified = Utility.q_date_time_to_time_t (last_modified.to_date_time ());
         }
 

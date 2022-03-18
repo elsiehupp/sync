@@ -64,36 +64,38 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public bool is_complete () {
-        if (!this.ui.folder_tree_widget.current_item ())
-            return false;
-
-        string[] warn_strings;
-        string directory = this.ui.folder_tree_widget.current_item ().data (0, Qt.USER_ROLE).to_string ();
-        if (!directory.starts_with ('/')) {
-            directory.prepend ('/');
-        }
-        wizard ().property ("target_path", directory);
-
-        Folder.Map map = FolderMan.instance.map ();
-        Folder.Map.ConstIterator i = map.const_begin ();
-        for (i = map.const_begin (); i != map.const_end (); i++) {
-            var f = static_cast<Folder> (i.value ());
-            if (f.account_state ().account != this.account) {
-                continue;
+    public bool is_complete {
+        public get {
+            if (!this.ui.folder_tree_widget.current_item ())
+                return false;
+    
+            string[] warn_strings;
+            string directory = this.ui.folder_tree_widget.current_item ().data (0, Qt.USER_ROLE).to_string ();
+            if (!directory.starts_with ('/')) {
+                directory.prepend ('/');
             }
-            string cur_dir = f.remote_path_trailing_slash ();
-            if (GLib.Dir.clean_path (directory) == GLib.Dir.clean_path (cur_dir)) {
-                warn_strings.append (_("This folder is already being synced."));
-            } else if (directory.starts_with (cur_dir)) {
-                warn_strings.append (_("You are already syncing <i>%1</i>, which is a parent folder of <i>%2</i>.").printf (Utility.escape (cur_dir), Utility.escape (directory)));
-            } else if (cur_dir.starts_with (directory)) {
-                warn_strings.append (_("You are already syncing <i>%1</i>, which is a subfolder of <i>%2</i>.").printf (Utility.escape (cur_dir), Utility.escape (directory)));
+            wizard ().property ("target_path", directory);
+    
+            Folder.Map map = FolderMan.instance.map ();
+            Folder.Map.ConstIterator i = map.const_begin ();
+            for (i = map.const_begin (); i != map.const_end (); i++) {
+                var f = static_cast<Folder> (i.value ());
+                if (f.account_state.account != this.account) {
+                    continue;
+                }
+                string cur_dir = f.remote_path_trailing_slash;
+                if (GLib.Dir.clean_path (directory) == GLib.Dir.clean_path (cur_dir)) {
+                    warn_strings.append (_("This folder is already being synced."));
+                } else if (directory.starts_with (cur_dir)) {
+                    warn_strings.append (_("You are already syncing <i>%1</i>, which is a parent folder of <i>%2</i>.").printf (Utility.escape (cur_dir), Utility.escape (directory)));
+                } else if (cur_dir.starts_with (directory)) {
+                    warn_strings.append (_("You are already syncing <i>%1</i>, which is a subfolder of <i>%2</i>.").printf (Utility.escape (cur_dir), Utility.escape (directory)));
+                }
             }
+    
+            on_signal_show_warning (format_warnings (warn_strings));
+            return true;
         }
-
-        on_signal_show_warning (format_warnings (warn_strings));
-        return true;
     }
 
     /***********************************************************
@@ -175,7 +177,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
         GLib.debug ("webdav mkdir request on_signal_finished");
         on_signal_show_warning (_("Folder was successfully created on %1.").printf (Theme.app_name_gui));
         on_signal_refresh_folders ();
-        this.ui.folder_entry.on_signal_text (static_cast<MkColJob> (sender ()).path ());
+        this.ui.folder_entry.on_signal_text (static_cast<MkColJob> (sender ()).path);
         on_signal_lscol_folder_entry ();
     }
 
@@ -183,7 +185,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_handle_mkdir_network_error (Soup.Reply reply) {
-        GLib.warning ("webdav mkdir request failed: " + reply.error ());
+        GLib.warning ("webdav mkdir request failed: " + reply.error);
         if (!this.account.credentials ().still_valid (reply)) {
             on_signal_show_warning (_("Authentication failed accessing %1").printf (Theme.app_name_gui));
         } else {
@@ -215,7 +217,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_update_directories (string[] list) {
-        string webdav_folder = GLib.Uri (this.account.dav_url ()).path ();
+        string webdav_folder = GLib.Uri (this.account.dav_url ()).path;
 
         QTreeWidgetItem root = this.ui.folder_tree_widget.top_level_item (0);
         if (!root) {
@@ -257,7 +259,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
             return;
         }
 
-        const var webdav_folder = GLib.Uri (this.account.dav_url ()).path ();
+        const var webdav_folder = GLib.Uri (this.account.dav_url ()).path;
         //  Q_ASSERT (path.starts_with (webdav_folder));
         this.encrypted_paths + path.mid (webdav_folder.size ());
     }
@@ -347,7 +349,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     private LscolJob run_lscol_job (string path) {
         var lscol_job = new LscolJob (this.account, path, this);
         var props = new GLib.List<string> ({ "resourcetype" });
-        if (this.account.capabilities ().client_side_encryption_available ()) {
+        if (this.account.capabilities.client_side_encryption_available ()) {
             props += "http://nextcloud.org/ns:is-encrypted";
         }
         lscol_job.properties (props);

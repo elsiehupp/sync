@@ -97,7 +97,7 @@ public class CloudProviderWrapper : GLib.Object {
             g_clear_object (action_group);
             action_group = g_simple_action_group_new ();
             g_action_map_add_action_entries (G_ACTION_MAP (action_group), actions, G_N_ELEMENTS (actions), this);
-            bool state = this.folder.sync_paused ();
+            bool state = this.folder.sync_paused;
             GAction pause = g_action_map_lookup_action (G_ACTION_MAP (action_group), "pause");
             g_simple_action_state (G_SIMPLE_ACTION (pause), g_variant_new_boolean (state));
             return G_ACTION_GROUP (g_object_ref (action_group));
@@ -107,7 +107,7 @@ public class CloudProviderWrapper : GLib.Object {
         }
     }
 
-    Folder folder { public get; private set; }
+    public Folder folder { public get; private set; }
 
     private CloudProvidersProviderExporter cloud_provider;
     private CloudProvidersAccountExporter cloud_provider_account;
@@ -128,13 +128,13 @@ public class CloudProviderWrapper : GLib.Object {
         this.cloud_provider = CLOUD_PROVIDERS_PROVIDER_EXPORTER (cloudprovider);
         this.cloud_provider_account = cloud_providers_account_exporter_new (this.cloud_provider, account_name.to_utf8 ());
 
-        cloud_providers_account_exporter_name (this.cloud_provider_account, folder.short_gui_local_path ().to_utf8 ());
+        cloud_providers_account_exporter_name (this.cloud_provider_account, folder.short_gui_local_path.to_utf8 ());
         cloud_providers_account_exporter_icon (this.cloud_provider_account, g_icon_new_for_string (APPLICATION_ICON_NAME, null));
-        cloud_providers_account_exporter_path (this.cloud_provider_account, folder.clean_path ().to_utf8 ());
+        cloud_providers_account_exporter_path (this.cloud_provider_account, folder.clean_path.to_utf8 ());
         cloud_providers_account_exporter_status (this.cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_IDLE);
         model = menu_model ();
         cloud_providers_account_exporter_menu_model (this.cloud_provider_account, model);
-        action_group = action_group ();
+        action_group = this.action_group;
         cloud_providers_account_exporter_action_group (this.cloud_provider_account, action_group);
 
         ProgressDispatcher.instance.signal_progress_info.connect (
@@ -150,7 +150,7 @@ public class CloudProviderWrapper : GLib.Object {
             this.on_signal_sync_paused_changed
         );
 
-        this.paused = this.folder.sync_paused ();
+        this.paused = this.folder.sync_paused;
         update_pause_status ();
         g_clear_object (model);
         g_clear_object (action_group);
@@ -233,7 +233,7 @@ public class CloudProviderWrapper : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void update_status_text (string status_text) {
-        string status = "%1 - %2".printf (this.folder.account_state ().state_string (this.folder.account_state ().state ()), status_text);
+        string status = "%1 - %2".printf (this.folder.account_state.state_string (this.folder.account_state.state), status_text);
         cloud_providers_account_exporter_status_details (this.cloud_provider_account, status.to_utf8 ());
     }
 
@@ -263,11 +263,11 @@ public class CloudProviderWrapper : GLib.Object {
     public void on_signal_sync_finished (SyncResult result) {
         if (result.status () == result.Success || result.status () == result.Problem) {
             cloud_providers_account_exporter_status (this.cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_IDLE);
-            update_status_text (result.status_string ());
+            update_status_text (result.status_string);
             return;
         }
         cloud_providers_account_exporter_status (this.cloud_provider_account, CLOUD_PROVIDERS_ACCOUNT_STATUS_ERROR);
-        update_status_text (result.status_string ());
+        update_status_text (result.status_string);
     }
 
 
@@ -285,10 +285,11 @@ public class CloudProviderWrapper : GLib.Object {
             string time_str = QTime.current_time ().to_string ("hh:mm");
             string action_text = _("%1 (%2, %3)").printf (progress.last_completed_item.file, kind_str, time_str);
             if (f) {
-                string full_path = f.path () + '/' + progress.last_completed_item.file;
-                if (GLib.File (full_path).exists ()) {
-                    if (this.recently_changed.length () > 5)
+                string full_path = f.path + '/' + progress.last_completed_item.file;
+                if (new GLib.File (full_path).exists ()) {
+                    if (this.recently_changed.length > 5) {
                         this.recently_changed.remove_first ();
+                    }
                     this.recently_changed.append (q_make_pair (action_text, full_path));
                 } else {
                     this.recently_changed.append (q_make_pair (action_text, ""));
@@ -373,7 +374,7 @@ public class CloudProviderWrapper : GLib.Object {
 
         old_state = g_action_get_state (G_ACTION (action));
         new_state = g_variant_new_boolean (! (bool)g_variant_get_boolean (old_state));
-        self.folder ().sync_paused ( (bool)g_variant_get_boolean (new_state));
+        self.folder.sync_paused = (bool)g_variant_get_boolean (new_state);
         g_simple_action_state (action, new_state);
         g_variant_unref (old_state);
     }
@@ -383,8 +384,8 @@ public class CloudProviderWrapper : GLib.Object {
     ***********************************************************/
     private static bool should_show_in_recents_menu (SyncFileItem item) {
         return !Progress.is_ignored_kind (item.status)
-                && item.instruction != SyncInstructions.EVAL
-                && item.instruction != SyncInstructions.NONE;
+                && item.instruction != CSync.SyncInstructions.EVAL
+                && item.instruction != CSync.SyncInstructions.NONE;
     }
 
 
@@ -419,11 +420,11 @@ public class CloudProviderWrapper : GLib.Object {
         }
 
         if (g_str_equal (name, "openwebsite")) {
-            QDesktopServices.open_url (self.folder ().account_state ().account.url);
+            QDesktopServices.open_url (self.folder.account_state.account.url);
         }
 
         if (g_str_equal (name, "openfolder")) {
-            show_in_file_manager (self.folder ().clean_path ());
+            show_in_file_manager (self.folder.clean_path);
         }
 
         if (g_str_equal (name, "showfile")) {
@@ -433,7 +434,7 @@ public class CloudProviderWrapper : GLib.Object {
         }
 
         if (g_str_equal (name, "log_out")) {
-            self.folder ().account_state ().sign_out_by_ui ();
+            self.folder.account_state.sign_out_by_ui ();
         }
 
         if (g_str_equal (name, "quit")) {
@@ -448,7 +449,7 @@ public class CloudProviderWrapper : GLib.Object {
         //  Q_UNUSED (action);
         //  Q_UNUSED (parameter);
         var self = static_cast<CloudProviderWrapper> (user_data);
-        QDesktopServices.open_url (self.folder ().account_state ().account.url);
+        QDesktopServices.open_url (self.folder.account_state.account.url);
     }
 
 } // class CloudProviderWrapper

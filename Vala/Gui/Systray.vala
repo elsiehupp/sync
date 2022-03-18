@@ -76,10 +76,10 @@ public class Systray : QSystemTrayIcon {
 
     /***********************************************************
     ***********************************************************/
-    bool is_open { public get; private set; }
-    bool sync_is_paused { public get; private set; }
+    public bool is_open { public get; private set; }
+    public bool sync_is_paused { public get; private set; }
 
-    QQmlApplicationEngine tray_engine {
+    public QQmlApplicationEngine tray_engine {
         private get {
             return this.tray_engine;
         }
@@ -153,7 +153,7 @@ public class Systray : QSystemTrayIcon {
         qml_register_type<WheelHandler> ("com.nextcloud.desktopclient", 1, 0, "WheelHandler");
 
         var context_menu = new QMenu ();
-        if (AccountManager.instance.accounts () == "") {
+        if (AccountManager.instance.accounts == "") {
             context_menu.add_action (_("Add account"), this, Systray.signal_open_account_wizard);
         } else {
             context_menu.add_action (_("Open main dialog"), this, Systray.signal_open_main_dialog);
@@ -207,7 +207,7 @@ public class Systray : QSystemTrayIcon {
         GLib.List<Folder> all_paused = new GLib.List<Folder> ();
 
         foreach (Folder folder in folders) {
-            if (folder.sync_paused ()) {
+            if (folder.sync_paused) {
                 all_paused.append (folder);
             }
         }
@@ -220,7 +220,7 @@ public class Systray : QSystemTrayIcon {
         GLib.List<Folder> any_paused = new GLib.List<Folder> ();
 
         foreach (Folder folder in folders) {
-            if (folder.sync_paused ()) {
+            if (folder.sync_paused) {
                 any_paused.append (folder);
             }
         }
@@ -236,7 +236,7 @@ public class Systray : QSystemTrayIcon {
     ***********************************************************/
     public void create () {
         if (this.tray_engine) {
-            if (!AccountManager.instance.accounts () == "") {
+            if (!AccountManager.instance.accounts == "") {
                 this.tray_engine.root_context ().context_property ("activity_model", UserModel.instance.current_activity_model);
             }
             this.tray_engine.on_signal_load ("qrc:/qml/src/gui/tray/Window.qml");
@@ -246,7 +246,7 @@ public class Systray : QSystemTrayIcon {
 
         const var folder_map = FolderMan.instance.map ();
         foreach (var folder in folder_map) {
-            if (!folder.sync_paused ()) {
+            if (!folder.sync_paused) {
                 this.sync_is_paused = false;
                 break;
             }
@@ -258,8 +258,16 @@ public class Systray : QSystemTrayIcon {
     public void show_message (string title, string message, Message_icon icon) {
         if (QDBusInterface (NOTIFICATIONS_SERVICE, NOTIFICATIONS_PATH, NOTIFICATIONS_IFACE).is_valid ()) {
             const QVariantMap hints = {{"desktop-entry", LINUX_APPLICATION_ID}};
-            GLib.List<GLib.Variant> args = GLib.List<GLib.Variant> () + APPLICATION_NAME + uint32 (0) + APPLICATION_ICON_NAME
-                                                    + title + message + { } + hints + int32 (-1);
+            GLib.List<GLib.Variant> args = {
+                APPLICATION_NAME,
+                (uint32)0,
+                APPLICATION_ICON_NAME.
+                title.
+                message.
+                { },
+                hints,
+                (int32)-1
+            };
             QDBus_message method = QDBus_message.create_method_call (NOTIFICATIONS_SERVICE, NOTIFICATIONS_PATH, NOTIFICATIONS_IFACE, "Notify");
             method.arguments (args);
             QDBusConnection.session_bus ().async_call (method);
@@ -382,7 +390,7 @@ public class Systray : QSystemTrayIcon {
     private void pause_on_signal_all_folders_helper (bool pause) {
         const var folders = FolderMan.instance.map ();
         foreach (var folder in folders) {
-            if (accounts.contains (folder.account_state ())) {
+            if (accounts.contains (folder.account_state)) {
                 folder.sync_paused (pause);
                 if (pause) {
                     folder.on_signal_terminate_sync ();
@@ -394,13 +402,13 @@ public class Systray : QSystemTrayIcon {
 
 
     /***********************************************************
-    For some reason we get the raw pointer from Folder.account_state ()
+    For some reason we get the raw pointer from Folder.account_state
     that's why we need a list of raw pointers for the call to
     contains later on...
     ***********************************************************/
     private static AccountState accounts () {
         GLib.List<AccountState> account_state_list = new GLib.List<AccountState> ();
-        foreach (AccountState account in AccountManager.instance.accounts ()) {
+        foreach (AccountState account in AccountManager.instance.accounts) {
             account_state_list.append (account);
         }
         return account_state_list;

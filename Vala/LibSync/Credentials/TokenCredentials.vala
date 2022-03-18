@@ -56,7 +56,7 @@ public class TokenCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public string signal_auth_type () {
+    public string auth_type_string () {
         return "token";
     }
 
@@ -92,9 +92,9 @@ public class TokenCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     public new bool still_valid (GLib.InputStream reply) {
-        return ( (reply.error () != Soup.Reply.AuthenticationRequiredError)
+        return ( (reply.error != Soup.Reply.AuthenticationRequiredError)
             // returned if user/password or token are incorrect
-            && (reply.error () != Soup.Reply.OperationCanceledError
+            && (reply.error != Soup.Reply.OperationCanceledError
                    || !reply.property (AUTHENTICATION_FAILED_C).to_bool ()));
     }
 

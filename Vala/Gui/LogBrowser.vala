@@ -51,7 +51,7 @@ public class LogBrowser : Gtk.Dialog {
             + "run and compress older ones. It will also delete log files after a couple "
             + "of hours to avoid consuming too much disk space.\n"
             + "If enabled, logs will be written to %1")
-            .printf (Logger.instance.temporary_folder_log_dir_path ()));
+            .printf (Logger.instance.temporary_folder_log_dir_path));
         label.word_wrap (true);
         label.text_interaction_flags (Qt.Text_selectable_by_mouse);
         label.size_policy (QSizePolicy.Expanding, QSizePolicy.Minimum_expanding);
@@ -89,9 +89,9 @@ public class LogBrowser : Gtk.Dialog {
         main_layout.add_stretch ();
         main_layout.add_widget (btnbox);
 
-        layout (main_layout);
+        this.layout = main_layout;
 
-        modal (false);
+        this.modal = false;
 
         var show_log_window_action = new QAction (this);
         show_log_window_action.shortcut (QKeySequence ("F12"));
@@ -108,7 +108,7 @@ public class LogBrowser : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void on_open_folder_button_clicked () {
-        string path = Logger.instance.temporary_folder_log_dir_path ();
+        string path = Logger.instance.temporary_folder_log_dir_path;
         GLib.Dir ().mkpath (path);
         QDesktopServices.open_url (GLib.Uri.from_local_file (path));
     }

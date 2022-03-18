@@ -50,7 +50,7 @@ public class OwncloudSetupWizard : GLib.Object {
     private OwncloudSetupWizard (GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.oc_wizard = new OwncloudWizard ();
-        this.remote_folder ();
+        this.remote_folder;
 
         this.oc_wizard.determine_auth_type.connect (
             this.on_signal_check_server
@@ -99,7 +99,7 @@ public class OwncloudSetupWizard : GLib.Object {
         setup_wizard.signal_own_cloud_wizard_done.connect (
             object.wizard_done_delegate
         );
-        FolderMan.instance.sync_enabled (false);
+        FolderMan.instance.sync_enabled = false;
         setup_wizard.start_wizard ();
     }
 
@@ -107,7 +107,7 @@ public class OwncloudSetupWizard : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static bool bring_wizard_to_front_if_visible () {
-        if (setup_wizard.is_null ()) {
+        if (setup_wizard == null) {
             return false;
         }
 
@@ -132,13 +132,13 @@ public class OwncloudSetupWizard : GLib.Object {
 
         // Reset the proxy which might had been determined previously in ConnectionValidator.on_signal_check_server_and_auth ()
         // when there was a previous account.
-        account.network_access_manager ().proxy (QNetworkProxy (QNetworkProxy.NoProxy));
+        account.network_access_manager.proxy (QNetworkProxy (QNetworkProxy.NoProxy));
 
         // And also reset the QSslConfiguration, for the same reason (#6832)
         // Here the client certificate is added, if any. Later it'll be in HttpCredentials
         account.ssl_configuration (QSslConfiguration ());
         var ssl_configuration = account.or_create_ssl_config (); // let Account set defaults
-        if (!this.oc_wizard.client_ssl_certificate.is_null ()) {
+        if (!this.oc_wizard.client_ssl_certificate == null) {
             ssl_configuration.local_certificate (this.oc_wizard.client_ssl_certificate);
             ssl_configuration.private_key (this.oc_wizard.client_ssl_key);
         }
@@ -149,7 +149,7 @@ public class OwncloudSetupWizard : GLib.Object {
         account.ssl_configuration (ssl_configuration);
 
         // Make sure TCP connections get re-established
-        account.network_access_manager ().clear_access_cache ();
+        account.network_access_manager.clear_access_cache ();
 
         // Lookup system proxy in a thread https://github.com/owncloud/client/issues/2993
         if (ClientProxy.is_using_system_default ()) {
@@ -158,7 +158,7 @@ public class OwncloudSetupWizard : GLib.Object {
                 this, SLOT (on_signal_system_proxy_lookup_done (QNetworkProxy)));
         } else {
             // We want to reset the QNAM proxy so that the global proxy settings are used (via ClientProxy settings)
-            account.network_access_manager ().proxy (QNetworkProxy (QNetworkProxy.DefaultProxy));
+            account.network_access_manager.proxy (QNetworkProxy (QNetworkProxy.DefaultProxy));
             // use a queued invocation so we're as asynchronous as with the other code path
             QMetaObject.invoke_method (this, "on_signal_find_server", Qt.QueuedConnection);
         }
@@ -290,7 +290,7 @@ public class OwncloudSetupWizard : GLib.Object {
             message = _("Failed to connect to %1 at %2:<br/>%3")
                       .printf (Utility.escape (Theme.app_name_gui),
                           Utility.escape (this.oc_wizard.account.url.to_string ()),
-                          Utility.escape (check_server_job.error_string ()));
+                          Utility.escape (check_server_job.error_string));
         }
         bool is_downgrade_advised = check_downgrade_advised (reply);
 
@@ -328,8 +328,7 @@ public class OwncloudSetupWizard : GLib.Object {
     ***********************************************************/
     private void on_signal_connect_to_oc_url (string url) {
         GLib.info ("Connect to url: " + url);
-        AbstractCredentials creds = this.oc_wizard.credentials ();
-        this.oc_wizard.account.credentials (creds);
+        this.oc_wizard.account.credentials = this.oc_wizard.credentials;
 
         const var fetch_user_name_job = new JsonApiJob (this.oc_wizard.account.shared_from_this (), "/ocs/v1.php/cloud/user");
         fetch_user_name_job.json_received.connect (
@@ -388,7 +387,7 @@ public class OwncloudSetupWizard : GLib.Object {
                 res += _("OK");
             } else {
                 res += _("failed.");
-                GLib.warning ("Failed to create " + file_info.path ());
+                GLib.warning ("Failed to create " + file_info.path);
                 this.oc_wizard.on_signal_display_error (_("Could not create local folder %1").printf (Utility.escape (local_folder)), false);
                 next_step = false;
             }
@@ -403,9 +402,9 @@ public class OwncloudSetupWizard : GLib.Object {
                     Example: https://cloud.example.com/remote.php/dav//
 
             ***********************************************************/
-            GLib.info ("Sanitize got URL path:" + this.oc_wizard.account.url.to_string () + '/' + this.oc_wizard.account.dav_path () + remote_folder);
+            GLib.info ("Sanitize got URL path:" + this.oc_wizard.account.url.to_string () + '/' + this.oc_wizard.account.dav_path + remote_folder);
 
-            string new_dav_path = this.oc_wizard.account.dav_path (),
+            string new_dav_path = this.oc_wizard.account.dav_path,
                     new_remote_folder = remote_folder;
 
             while (new_dav_path.starts_with ('/')) {
@@ -448,7 +447,7 @@ public class OwncloudSetupWizard : GLib.Object {
         var entity_exists_job = qobject_cast<EntityExistsJob> (sender ());
         bool ok = true;
         string error;
-        Soup.Reply.NetworkError err_id = reply.error ();
+        Soup.Reply.NetworkError err_id = reply.error;
 
         if (err_id == Soup.Reply.NoError) {
             GLib.info ("Remote folder found, all cool!");
@@ -460,7 +459,7 @@ public class OwncloudSetupWizard : GLib.Object {
                 create_remote_folder ();
             }
         } else {
-            error = _("Error: %1").printf (entity_exists_job.error_string ());
+            error = _("Error: %1").printf (entity_exists_job.error_string);
             ok = false;
         }
 
@@ -475,7 +474,7 @@ public class OwncloudSetupWizard : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_create_remote_folder_finished (Soup.Reply reply) {
-        var error = reply.error ();
+        var error = reply.error;
         GLib.debug ("** webdav mkdir request finished " + error);
         //    disconnect (own_cloud_info.instance, SIGNAL (webdav_col_created (Soup.Reply.NetworkError)),
         //               this, SLOT (on_signal_create_remote_folder_finished (Soup.Reply.NetworkError)));
@@ -536,11 +535,11 @@ public class OwncloudSetupWizard : GLib.Object {
                 FolderDefinition folder_definition;
                 folder_definition.local_path = local_folder;
                 folder_definition.target_path = FolderDefinition.prepare_target_path (this.remote_folder);
-                folder_definition.ignore_hidden_files = folder_man.ignore_hidden_files ();
+                folder_definition.ignore_hidden_files = folder_man.ignore_hidden_files;
                 if (this.oc_wizard.use_virtual_file_sync ()) {
-                    folder_definition.virtual_files_mode = best_available_vfs_mode ();
+                    folder_definition.virtual_files_mode = this.best_available_vfs_mode;
                 }
-                if (folder_man.navigation_pane_helper ().show_in_explorer_navigation_pane ())
+                if (folder_man.navigation_pane_helper.show_in_explorer_navigation_pane)
                     folder_definition.navigation_pane_clsid = QUuid.create_uuid ();
 
                 var f = folder_man.add_folder (account, folder_definition);
@@ -589,7 +588,7 @@ public class OwncloudSetupWizard : GLib.Object {
             GLib.info ("No system proxy set by OS.");
         }
         unowned Account account = this.oc_wizard.account;
-        account.network_access_manager ().proxy (proxy);
+        account.network_access_manager.proxy (proxy);
 
         on_signal_find_server ();
     }
@@ -605,7 +604,7 @@ public class OwncloudSetupWizard : GLib.Object {
             GLib.warning ("Cannot check for authed redirects. This slot should be invoked from PropfindJob!");
             return;
         }
-        Soup.Reply reply = propfind_job.reply ();
+        Soup.Reply reply = propfind_job.input_stream;
 
         // If there were redirects on the authed* requests, also store
         // the updated server URL, similar to redirects on status.php.
@@ -614,8 +613,8 @@ public class OwncloudSetupWizard : GLib.Object {
             GLib.info ("Authed request was redirected to " + redirect_url.to_string ());
 
             // strip the expected path
-            string path = redirect_url.path ();
-            OwncloudSetupWizard.expected_path = "/" + this.oc_wizard.account.dav_path ();
+            string path = redirect_url.path;
+            OwncloudSetupWizard.expected_path = "/" + this.oc_wizard.account.dav_path;
             if (path.ends_with (OwncloudSetupWizard.expected_path)) {
                 path.chop (OwncloudSetupWizard.expected_path.size ());
                 redirect_url.path (path);
@@ -631,12 +630,12 @@ public class OwncloudSetupWizard : GLib.Object {
 
             // A 404 is actually a on_signal_success : we were authorized to know that the folder does
             // not exist. It will be created later...
-        } else if (reply.error () == Soup.Reply.ContentNotFoundError) {
+        } else if (reply.error == Soup.Reply.ContentNotFoundError) {
             this.oc_wizard.on_signal_successful_step ();
             return;
 
             // Provide messages for other errors, such as invalid credentials.
-        } else if (reply.error () != Soup.Reply.NoError) {
+        } else if (reply.error != Soup.Reply.NoError) {
             if (!this.oc_wizard.account.credentials ().still_valid (reply)) {
                 error_msg = _("Access forbidden by server. To verify that you have proper access, "
                             + "<a href=\"%1\">click here</a> to access the service with your browser.")
@@ -665,8 +664,8 @@ public class OwncloudSetupWizard : GLib.Object {
         unowned Account account = AccountManager.create_account ();
         account.credentials (CredentialsFactory.create ("dummy"));
         account.url (Theme.override_server_url);
-        this.oc_wizard.account (account);
-        this.oc_wizard.oc_url (account.url.to_string ());
+        this.oc_wizard.account = account;
+        this.oc_wizard.oc_url = account.url.to_string ();
 
         this.remote_folder = Theme.default_server_folder;
         // remote_folder may be empty, which means /
@@ -675,7 +674,7 @@ public class OwncloudSetupWizard : GLib.Object {
         // if its a relative path, prepend with users home directory, otherwise use as absolute path
 
         if (!GLib.Dir (local_folder).is_absolute ()) {
-            local_folder = GLib.Dir.home_path () + '/' + local_folder;
+            local_folder = GLib.Dir.home_path + '/' + local_folder;
         }
 
         this.oc_wizard.property ("local_folder", local_folder);
@@ -812,7 +811,7 @@ public class OwncloudSetupWizard : GLib.Object {
         // wizard to ensure it doesn't accidentally get modified
         // later (such as from running on_signal_cleanup such as
         // AbstractCredentialsWizardPage.clean_up_page ())
-        this.oc_wizard.account (AccountManager.create_account ());
+        this.oc_wizard.account = AccountManager.create_account ();
 
         var manager = AccountManager.instance;
 
@@ -829,7 +828,7 @@ public class OwncloudSetupWizard : GLib.Object {
             return false;
         }
 
-        switch (reply.error ()) {
+        switch (reply.error) {
         case Soup.Reply.NoError:
         case Soup.Reply.ContentNotFoundError:
         case Soup.Reply.AuthenticationRequiredError:

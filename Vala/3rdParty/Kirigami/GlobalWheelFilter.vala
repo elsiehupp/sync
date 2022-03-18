@@ -19,8 +19,10 @@ public class GlobalWheelFilter : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public GlobalWheelFilter self () {
-        return GlobalWheelFilterSingleton.private_global_wheel_filter_self ().self;
+    public static GlobalWheelFilter instance {
+        public get {
+            return GlobalWheelFilterSingleton.private_global_wheel_filter_self ().self;
+        }
     }
 
 

@@ -177,7 +177,7 @@ public class TestClientSideEncryption : GLib.Object {
         GLib.assert_true (original_file_hash != "");
 
         dummy_input_file.close ();
-        GLib.assert_true (!dummy_input_file.is_open ());
+        GLib.assert_true (!dummy_input_file.is_open);
 
         var encryption_key = EncryptionHelper.generate_random (16);
         var initialization_vector = EncryptionHelper.generate_random (16);
@@ -189,10 +189,10 @@ public class TestClientSideEncryption : GLib.Object {
 
         GLib.assert_true (EncryptionHelper.file_encryption (encryption_key, initialization_vector, dummy_input_file, dummy_encryption_output_file, tag));
         dummy_input_file.close ();
-        GLib.assert_true (!dummy_input_file.is_open ());
+        GLib.assert_true (!dummy_input_file.is_open);
 
         dummy_encryption_output_file.close ();
-        GLib.assert_true (!dummy_encryption_output_file.is_open ());
+        GLib.assert_true (!dummy_encryption_output_file.is_open);
 
         QTemporaryFile dummy_decryption_output_file;
 

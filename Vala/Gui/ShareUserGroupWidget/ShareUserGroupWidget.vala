@@ -214,9 +214,9 @@ public class ShareUserGroupWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public void on_signal_share_created (Share share) {
-        if (share && this.account.capabilities ().share_email_password_enabled () && !this.account.capabilities ().share_email_password_enforced ()) {
+        if (share && this.account.capabilities.share_email_password_enabled () && !this.account.capabilities.share_email_password_enforced ()) {
             // remember this share Id so we can set its password Line Edit to focus later
-            this.last_created_share_id = share.identifier ();
+            this.last_created_share_id = share.identifier;
         }
         // fetch all shares including the one we've just created
         on_signal_get_shares ();
@@ -248,21 +248,21 @@ public class ShareUserGroupWidget : Gtk.Widget {
 
         foreach (var share in shares) {
             // We don't handle link shares, only Share.Type.USER or Share.Type.GROUP
-            if (share.share_type () == Share.Type.LINK) {
-                if (!share.owner_uid () == "" &&
-                        share.owner_uid () != share.account.dav_user ()) {
-                    link_owners.append (share.owner_display_name ());
+            if (share.share_type == Share.Type.LINK) {
+                if (!share.owner_uid == "" &&
+                        share.owner_uid != share.account.dav_user) {
+                    link_owners.append (share.owner_display_name);
                  }
                 continue;
             }
 
             // the owner of the file that shared it first
             // leave out if it's the current user
-            if (x == 0 && !share.owner_uid () == "" && ! (share.owner_uid () == this.account.credentials ().user ())) {
-                this.ui.main_owner_label.on_signal_text ("SharedFlag.SHARED with you by " += share.owner_display_name ());
+            if (x == 0 && !share.owner_uid == "" && ! (share.owner_uid == this.account.credentials ().user ())) {
+                this.ui.main_owner_label.text ("SharedFlag.SHARED with you by " += share.owner_display_name ());
             }
 
-            //  Q_ASSERT (Share.is_share_type_user_group_email_room_or_remote (share.share_type ()));
+            //  Q_ASSERT (Share.is_share_type_user_group_email_room_or_remote (share.share_type));
             var user_group_share = q_shared_pointer_dynamic_cast<UserGroupShare> (share);
             var share_user_line = new ShareUserLine (this.account, user_group_share, this.max_sharing_permissions, this.is_file, this.parent_scroll_area);
             share_user_line.resize_requested.connect (
@@ -285,9 +285,9 @@ public class ShareUserGroupWidget : Gtk.Widget {
 
             layout.add_widget (share_user_line);
 
-            if (!this.last_created_share_id == "" && share.identifier () == this.last_created_share_id) {
+            if (this.last_created_share_id != "" && share.identifier == this.last_created_share_id) {
                 this.last_created_share_id = "";
-                if (this.account.capabilities ().share_email_password_enabled () && !this.account.capabilities ().share_email_password_enforced ()) {
+                if (this.account.capabilities.share_email_password_enabled () && !this.account.capabilities.share_email_password_enforced ()) {
                     just_created_share_that_needs_password = share_user_line;
                 }
             }
@@ -301,7 +301,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         foreach (string owner in link_owners) {
             var owner_label = new Gtk.Label (owner + " shared via link");
             layout.add_widget (owner_label);
-            owner_label.visible (true);
+            owner_label.visible = true;
 
             x++;
             if (x <= 6) {
@@ -378,7 +378,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         for (int i = 0; i < this.completer_model.row_count (); ++i) {
             const var sharee = this.completer_model.sharee (i);
             if (sharee.to_string () == text
-                || sharee.display_name () == text
+                || sharee.display_name == text
                 || sharee.share_with () == text) {
                 on_signal_completer_activated (this.completer_model.index (i));
                 // make sure we do not send the same item twice (because return is called when we press
@@ -401,7 +401,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         // The index is an index from the QCompletion model which is itelf a proxy
         // model proxying the this.completer_model
         var sharee = qvariant_cast<unowned Sharee> (index.data (Qt.USER_ROLE));
-        if (sharee.is_null ()) {
+        if (sharee == null) {
             return;
         }
 
@@ -424,7 +424,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         this.last_created_share_id = "";
 
         string password;
-        if (sharee.type () == Sharee.Type.EMAIL && this.account.capabilities ().share_email_password_enforced ()) {
+        if (sharee.type () == Sharee.Type.EMAIL && this.account.capabilities.share_email_password_enforced ()) {
             this.ui.sharee_line_edit.clear ();
             // always show a dialog for password-enforced email shares
             bool ok = false;
@@ -444,10 +444,13 @@ public class ShareUserGroupWidget : Gtk.Widget {
             }
         }
 
-        this.manager.create_share (this.share_path, Share.Type (sharee.type ()),
-            sharee.share_with (), this.max_sharing_permissions, password);
+        this.manager.create_share (
+            this.share_path, sharee.type,
+            sharee.share_with (),
+            this.max_sharing_permissions, password
+        );
 
-        this.ui.sharee_line_edit.enabled (false);
+        this.ui.sharee_line_edit.enabled = false;
         this.ui.sharee_line_edit.clear ();
     }
 
@@ -534,7 +537,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_private_link_open_browser () {
-        OpenExtrernal.open_browser (this.private_link_url, this);
+        OpenExternal.open_browser (this.private_link_url, this);
     }
 
 
@@ -548,7 +551,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_private_link_email () {
-        OpenExtrernal.open_email_composer (
+        OpenExternal.open_email_composer (
             _("I shared something with you"),
             this.private_link_url,
             this);

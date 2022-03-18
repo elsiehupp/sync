@@ -44,7 +44,7 @@ public class SslButton : QToolButton {
     /***********************************************************
     ***********************************************************/
     public void update_account_state (AccountState account_state) {
-        if (!account_state || !account_state.is_connected ()) {
+        if (!account_state || !account_state.is_connected) {
             visible (false);
             return;
         } else {
@@ -103,14 +103,14 @@ public class SslButton : QToolButton {
 
             const var system_certificates = QSslConfiguration.system_ca_certificates ();
 
-            GLib.List<QSslCertificate> tmp_chain;
+            GLib.List<QSslCertificate> temporary_chain;
             foreach (QSslCertificate cert in chain) {
-                tmp_chain.append (cert);
+                temporary_chain.append (cert);
                 if (system_certificates.contains (cert)) {
                     break;
                 }
             }
-            chain = tmp_chain;
+            chain = temporary_chain;
 
             // find trust anchor (informational only, verification is done by QSslSocket!)
             foreach (QSslCertificate root_ca in system_certificates) {
@@ -156,9 +156,9 @@ public class SslButton : QToolButton {
         string sha1 = Utility.format_fingerprint (cert.digest (QCryptographicHash.Sha1).to_hex (), false);
         string sha265hash = cert.digest (QCryptographicHash.Sha256).to_hex ();
         string sha256escaped =
-            Utility.escape (Utility.format_fingerprint (sha265hash.left (sha265hash.length () / 2), false))
+            Utility.escape (Utility.format_fingerprint (sha265hash.left (sha265hash.length / 2), false))
             + "<br/>"
-            + Utility.escape (Utility.format_fingerprint (sha265hash.mid (sha265hash.length () / 2), false));
+            + Utility.escape (Utility.format_fingerprint (sha265hash.mid (sha265hash.length / 2), false));
         string serial = string.from_utf8 (cert.serial_number ());
         string effective_date = cert.effective_date ().date ().to_string ();
         string expiry_date = cert.expiry_date ().date ().to_string ();

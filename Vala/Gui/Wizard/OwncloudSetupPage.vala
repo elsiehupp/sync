@@ -94,8 +94,10 @@ public class OwncloudSetupPage : QWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public bool is_complete () {
-        return !this.ui.le_url.text () == "" && !this.checking;
+    public bool is_complete {
+        public get {
+            return this.ui.le_url.text () != "" && !this.checking;
+        }
     }
 
 
@@ -142,7 +144,7 @@ public class OwncloudSetupPage : QWizardPage {
     public bool validate_page () {
         if (!this.auth_type_known) {
             on_signal_url_edit_finished ();
-            string u = url ();
+            string u = this.url;
             GLib.Uri qurl = new GLib.Uri (u);
             if (!qurl.is_valid () || qurl.host () == "") {
                 on_signal_error_string (_("Server address does not seem to be valid"), false);
@@ -168,29 +170,31 @@ public class OwncloudSetupPage : QWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public int next_id () {
-        switch (this.auth_type) {
-        case DetermineAuthTypeJob.AuthType.BASIC:
-            return WizardCommon.Pages.PAGE_HTTP_CREDS;
-        case DetermineAuthTypeJob.AuthType.OAUTH:
-            return WizardCommon.Pages.PAGE_OAUTH_CREDS;
-        case DetermineAuthTypeJob.AuthType.LOGIN_FLOW_V2:
-            return WizardCommon.Pages.PAGE_FLOW2AUTH_CREDS;
-    //  #ifdef WITH_WEBENGINE
-        case DetermineAuthTypeJob.WEB_VIEW_FLOW:
-            return WizardCommon.Pages.PAGE_WEB_VIEW;
-    //  #endif WITH_WEBENGINE
-        case DetermineAuthTypeJob.NO_AUTH_TYPE:
-            return WizardCommon.Pages.PAGE_HTTP_CREDS;
+    public int next_id {
+        public get {
+            switch (this.auth_type) {
+            case DetermineAuthTypeJob.AuthType.BASIC:
+                return WizardCommon.Pages.PAGE_HTTP_CREDS;
+            case DetermineAuthTypeJob.AuthType.OAUTH:
+                return WizardCommon.Pages.PAGE_OAUTH_CREDS;
+            case DetermineAuthTypeJob.AuthType.LOGIN_FLOW_V2:
+                return WizardCommon.Pages.PAGE_FLOW2AUTH_CREDS;
+        //  #ifdef WITH_WEBENGINE
+            case DetermineAuthTypeJob.WEB_VIEW_FLOW:
+                return WizardCommon.Pages.PAGE_WEB_VIEW;
+        //  #endif WITH_WEBENGINE
+            case DetermineAuthTypeJob.NO_AUTH_TYPE:
+                return WizardCommon.Pages.PAGE_HTTP_CREDS;
+            }
+            GLib.assert_not_reached ();
         }
-        GLib.assert_not_reached ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void server_url (string new_url) {
-        this.oc_wizard.registration (false);
+        this.oc_wizard.registration = false;
         this.oc_url = new_url;
         if (this.oc_url == "") {
             this.ui.le_url.clear ();
@@ -208,7 +212,7 @@ public class OwncloudSetupPage : QWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public string url () {
+    public string this.url {
         string url = this.ui.le_url.full_text ().simplified ();
         return url;
     }
@@ -296,7 +300,7 @@ public class OwncloudSetupPage : QWizardPage {
     Called during the validation of the client certificate.
     ***********************************************************/
     public void on_signal_certificate_accepted () {
-        GLib.File cert_file = new GLib.File (add_certificate_dialog.certificate_path ());
+        GLib.File cert_file = new GLib.File (add_certificate_dialog.certificate_path);
         cert_file.open (GLib.File.ReadOnly);
         string cert_data = cert_file.read_all ();
         string cert_password = add_certificate_dialog.certificate_password ().to_local8Bit ();
@@ -346,14 +350,14 @@ public class OwncloudSetupPage : QWizardPage {
             new_url.chop (9);
         }
         if (this.oc_wizard && this.oc_wizard.account) {
-            string web_dav_path = this.oc_wizard.account.dav_path ();
+            string web_dav_path = this.oc_wizard.account.dav_path;
             if (url.ends_with (web_dav_path)) {
-                new_url.chop (web_dav_path.length ());
+                new_url.chop (web_dav_path.length);
             }
             if (web_dav_path.ends_with ('/')) {
                 web_dav_path.chop (1); // cut off the slash
                 if (url.ends_with (web_dav_path)) {
-                    new_url.chop (web_dav_path.length ());
+                    new_url.chop (web_dav_path.length);
                 }
             }
         }
@@ -384,7 +388,7 @@ public class OwncloudSetupPage : QWizardPage {
 
         Theme theme = Theme.instance;
         GLib.Variant variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_TOP);
-        if (!variant.is_null ()) {
+        if (!variant == null) {
             WizardCommon.set_up_custom_media (variant, this.ui.top_label);
         }
 

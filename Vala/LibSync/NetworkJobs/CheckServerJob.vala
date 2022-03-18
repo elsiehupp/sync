@@ -70,7 +70,7 @@ public class CheckServerJob : AbstractNetworkJob {
         base (account, STATUS_PHP_C, parent);
         this.subdir_fallback = false;
         this.permanent_redirects = 0;
-        ignore_credential_failure (true);
+        this.ignore_credential_failure = true;
         this.signal_redirected.connect (
             this.on_signal_redirected
         );
@@ -81,7 +81,7 @@ public class CheckServerJob : AbstractNetworkJob {
     ***********************************************************/
     public new void start () {
         this.server_url = account.url;
-        send_request ("GET", Utility.concat_url_path (this.server_url, path ()));
+        send_request ("GET", Utility.concat_url_path (this.server_url, this.path));
         this.input_stream.meta_data_changed.connect (
             this.on_signal_metadata_changed
         );
@@ -131,7 +131,7 @@ public class CheckServerJob : AbstractNetworkJob {
     private bool on_signal_finished () {
         if (this.input_stream.request ().url.scheme () == "https"
             && this.input_stream.ssl_configuration ().session_ticket () == ""
-            && this.input_stream.error () == Soup.Reply.NoError) {
+            && this.input_stream.error == Soup.Reply.NoError) {
             GLib.warning ("No SSL session identifier / session ticket is used, this might impact sync performance negatively.");
         }
 
@@ -139,10 +139,10 @@ public class CheckServerJob : AbstractNetworkJob {
 
         // The server installs to /owncloud. Let's try that if the file wasn't found
         // at the original location
-        if ((this.input_stream.error () == Soup.Reply.ContentNotFoundError) && (!this.subdir_fallback)) {
+        if ((this.input_stream.error == Soup.Reply.ContentNotFoundError) && (!this.subdir_fallback)) {
             this.subdir_fallback = true;
-            path (NEXTCLOUD_DIR_C + STATUS_PHP_C);
-            start ();
+            this.path = NEXTCLOUD_DIR_C + STATUS_PHP_C;
+            this.start ();
             GLib.info ("Retrying with " + this.input_stream.url);
             return false;
         }
@@ -156,11 +156,11 @@ public class CheckServerJob : AbstractNetworkJob {
             QJsonParseError error;
             var status = QJsonDocument.from_json (body, error);
             // empty or invalid response
-            if (error.error != QJsonParseError.NoError || status.is_null ()) {
-                GLib.warning ("status.php from server is not valid JSON!" + body + this.input_stream.request ().url + error.error_string ());
+            if (error.error != QJsonParseError.NoError || status == null) {
+                GLib.warning ("status.php from server is not valid JSON!" + body + this.input_stream.request ().url + error.error_string);
             }
 
-            GLib.info ("status.php returns: " + status + " " + this.input_stream.error () + " Reply: " + this.input_stream);
+            GLib.info ("status.php returns: " + status + " " + this.input_stream.error + " Reply: " + this.input_stream);
             if (status.object ().contains ("installed")) {
                 /* emit */ instance_found (this.server_url, status.object ());
             } else {
@@ -175,7 +175,7 @@ public class CheckServerJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_metadata_changed () {
-        account.ssl_configuration (this.input_stream.ssl_configuration ());
+        this.account.ssl_configuration = this.input_stream.ssl_configuration ();
         merge_ssl_configuration_for_ssl_button (this.input_stream.ssl_configuration (), account);
     }
 
@@ -194,7 +194,7 @@ public class CheckServerJob : AbstractNetworkJob {
         slash_status_php.append (STATUS_PHP_C);
 
         int http_code = input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-        string path = target_url.path ();
+        string path = target_url.path;
         if ( (http_code == 301 || http_code == 308) // permanent redirection
             && redirect_count == this.permanent_redirects // don't apply permanent redirects after a temporary one
             && path.has_suffix (slash_status_php)) {
@@ -209,13 +209,13 @@ public class CheckServerJob : AbstractNetworkJob {
 
 
     private static void merge_ssl_configuration_for_ssl_button (QSslConfiguration config, Account account) {
-        if (config.peer_certificate_chain ().length () > 0) {
+        if (config.peer_certificate_chain ().length > 0) {
             account.peer_certificate_chain = config.peer_certificate_chain ();
         }
-        if (!config.session_cipher ().is_null ()) {
+        if (!config.session_cipher () == null) {
             account.session_cipher = config.session_cipher ();
         }
-        if (config.session_ticket ().length () > 0) {
+        if (config.session_ticket ().length > 0) {
             account.session_ticket = config.session_ticket ();
         }
     }

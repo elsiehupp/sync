@@ -115,22 +115,22 @@ public class RemoteWipe : GLib.Object {
         bool wipe = false;
 
         // check for errors
-        if (this.network_reply_check.error () != Soup.Reply.NoError ||
+        if (this.network_reply_check.error != Soup.Reply.NoError ||
                 json_parse_error.error != QJsonParseError.NoError) {
             string error_reason;
             string error_from_json = json["error"].to_string ();
             if (!error_from_json == "") {
                 GLib.warning ("Error returned from the server : <em>%1<em>"
                     .printf (error_from_json.to_html_escaped ()));
-            } else if (this.network_reply_check.error () != Soup.Reply.NoError) {
+            } else if (this.network_reply_check.error != Soup.Reply.NoError) {
                 GLib.warning (
                     "There was an error accessing the 'token' endpoint: <br><em>%1</em>"
-                        .printf (this.network_reply_check.error_string ().to_html_escaped ())
+                        .printf (this.network_reply_check.error_string.to_html_escaped ())
                     );
             } else if (json_parse_error.error != QJsonParseError.NoError) {
                 GLib.warning (
                     "Could not parse the JSON returned from the server: <br><em>%1</em>"
-                        .printf (json_parse_error.error_string ())
+                        .printf (json_parse_error.error_string)
                     );
             } else {
                 GLib.warning ("The reply from the server did not contain all expected fields");
@@ -142,7 +142,7 @@ public class RemoteWipe : GLib.Object {
         }
 
         var manager = AccountManager.instance;
-        var account_state = manager.account (this.account.display_name ());
+        var account_state = manager.account (this.account.display_name);
 
         if (wipe) {
             /* IMPORTANT - remove later - FIXME MS@2019-12-07 -.
@@ -203,19 +203,19 @@ public class RemoteWipe : GLib.Object {
         var json_data = this.network_reply_success.read_all ();
         QJsonParseError json_parse_error;
         QJsonObject json = QJsonDocument.from_json (json_data, json_parse_error).object ();
-        if (this.network_reply_success.error () != Soup.Reply.NoError ||
+        if (this.network_reply_success.error != Soup.Reply.NoError ||
                 json_parse_error.error != QJsonParseError.NoError) {
             string error_reason;
             string error_from_json = json["error"].to_string ();
             if (!error_from_json == "") {
                 GLib.warning ("Error returned from the server: <em>%1</em>"
                     .printf (error_from_json.to_html_escaped ()));
-            } else if (this.network_reply_success.error () != Soup.Reply.NoError) {
+            } else if (this.network_reply_success.error != Soup.Reply.NoError) {
                 GLib.warning ("There was an error accessing the 'on_signal_success' endpoint: <br><em>%1</em>"
-                    .printf (this.network_reply_success.error_string ().to_html_escaped ()));
+                    .printf (this.network_reply_success.error_string.to_html_escaped ()));
             } else if (json_parse_error.error != QJsonParseError.NoError) {
                 GLib.warning ("Could not parse the JSON returned from the server: <br><em>%1</em>"
-                    .printf (json_parse_error.error_string ()));
+                    .printf (json_parse_error.error_string));
             } else {
                 GLib.warning ("The reply from the server did not contain all expected fields.");
             }

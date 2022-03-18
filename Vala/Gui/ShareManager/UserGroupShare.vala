@@ -9,7 +9,7 @@ namespace Ui {
 
 public class UserGroupShare : Share {
 
-    string note {
+    public string note {
         public get {
             return this.note;
         }
@@ -21,12 +21,12 @@ public class UserGroupShare : Share {
             ocs_share_job.signal_error.connect (
                 this.signal_note_error
             );
-            ocs_share_job.note (identifier (), value);
+            ocs_share_job.note (identifier, value);
         }
     }
 
 
-    QDate expire_date {
+    public QDate expire_date {
         public get {
             return this.expire_date;
         }
@@ -43,7 +43,7 @@ public class UserGroupShare : Share {
             ocs_share_job.signal_error.connect (
                 this.on_signal_ocs_error
             );
-            ocs_share_job.expire_date (identifier (), value);
+            ocs_share_job.expire_date (identifier, value);
         }
     }
 
@@ -56,18 +56,18 @@ public class UserGroupShare : Share {
     /***********************************************************
     ***********************************************************/
     public UserGroupShare (
-        unowned Account account,
+        Account account,
         string identifier,
         string owner,
         string owner_display_name,
         string path,
         Share.Type share_type,
-        bool is_password_set,
+        bool password_is_set,
         Permissions permissions,
         unowned Sharee share_with,
         QDate expire_date,
         string note) {
-        base (account, identifier, owner, owner_display_name, path, share_type, is_password_set, permissions, share_with);
+        base (account, identifier, owner, owner_display_name, path, share_type, password_is_set, permissions, share_with);
         this.note = note;
         this.expire_date = expire_date;
         //  Q_ASSERT (Share.is_share_type_user_group_email_room_or_remote (share_type));

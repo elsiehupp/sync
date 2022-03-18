@@ -190,10 +190,13 @@ public class SyncResult : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public string error_string () {
-        if (this.errors == "")
-            return "";
-        return this.errors.first ();
+    public string error_string {
+        public get {
+            if (this.errors == "") {
+                return "";
+            }
+            return this.errors.first ();
+        }
     }
 
 
@@ -206,44 +209,50 @@ public class SyncResult : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public string status_string () {
-        switch (status ()) {
-        case Undefined:
-            return "Undefined";
-        case NotYetStarted:
-            return "Not yet Started";
-        case Sync_running:
-            return "Sync Running";
-        case Success:
-            return "Success";
-        case Error:
-            return "Error";
-        case Setup_error:
-            return "Setup_error";
-        case Sync_prepare:
-            return "Sync_prepare";
-        case Problem:
-            return "Success, some files were ignored.";
-        case Sync_abort_requested:
-            return "Sync Request aborted by user";
-        case Paused:
-            return "Sync Paused";
+    public string status_string {
+        public get {
+            switch (this.status) {
+            case Status.UNDEFINED:
+                return "Undefined";
+            case Status.NOT_YET_STARTED:
+                return "Not yet Started";
+            case Status.SYNC_RUNNING:
+                return "Sync Running";
+            case Status.SUCCESS:
+                return "Success";
+            case Status.ERROR:
+                return "Error";
+            case Status.SETUP_ERROR:
+                return "Setup_error";
+            case Status.SYNC_PREPARE:
+                return "Sync_prepare";
+            case Status.PROBLEM:
+                return "Success, some files were ignored.";
+            case Status.SYNC_ABORT_REQUESTED:
+                return "Sync Request aborted by user";
+            case Status.PAUSED:
+                return "Sync Paused";
+            }
+            return "";
         }
-        return "";
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public bool has_unresolved_conflicts () {
-        return this.num_new_conflict_items + this.num_old_conflict_items > 0;
+    public bool has_unresolved_conflicts {
+        public get {
+            return this.num_new_conflict_items + this.num_old_conflict_items > 0;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public bool has_locked_files () {
-        return this.num_locked_items > 0;
+    public bool has_locked_files {
+        public get {
+            return this.num_locked_items > 0;
+        }
     }
 
 
@@ -267,16 +276,18 @@ public class SyncResult : GLib.Object {
             this.found_files_not_synced = true;
         }
 
-        if (item.is_directory () && (item.instruction == SyncInstructions.NEW
-                                      || item.instruction == SyncInstructions.TYPE_CHANGE
-                                      || item.instruction == SyncInstructions.REMOVE
-                                      || item.instruction == SyncInstructions.RENAME)) {
+        if (item.is_directory () && (
+            item.instruction == CSync.SyncInstructions.NEW
+            || item.instruction == CSync.SyncInstructions.TYPE_CHANGE
+            || item.instruction == CSync.SyncInstructions.REMOVE
+            || item.instruction == CSync.SyncInstructions.RENAME
+        )) {
             this.folder_structure_was_changed = true;
         }
 
         if (item.status == SyncFileItem.Status.FILE_LOCKED) {
             this.num_locked_items++;
-            if (!this.first_item_locked) {
+            if (this.first_item_locked == null) {
                 this.first_item_locked = item;
             }
         }
@@ -284,13 +295,13 @@ public class SyncResult : GLib.Object {
         // Process the item to the gui
         if (item.status == SyncFileItem.Status.FATAL_ERROR || item.status == SyncFileItem.Status.NORMAL_ERROR) {
             // : this displays an error string (%2) for a file %1
-            append_error_string (GLib.Object._("%1 : %2").printf (item.file, item.error_string));
+            append_error_string (_("%1 : %2").printf (item.file, item.error_string));
             this.num_error_items++;
-            if (!this.first_item_error) {
+            if (this.first_item_error == null) {
                 this.first_item_error = item;
             }
         } else if (item.status == SyncFileItem.Status.CONFLICT) {
-            if (item.instruction == SyncInstructions.CONFLICT) {
+            if (item.instruction == CSync.CSync.SyncInstructions.CONFLICT) {
                 this.num_new_conflict_items++;
                 if (!this.first_new_conflict_item) {
                     this.first_new_conflict_item = item;
@@ -301,23 +312,23 @@ public class SyncResult : GLib.Object {
         } else {
             if (!item.has_error_status () && item.status != SyncFileItem.Status.FILE_IGNORED && item.direction == SyncFileItem.Direction.DOWN) {
                 switch (item.instruction) {
-                case SyncInstructions.NEW:
-                case SyncInstructions.TYPE_CHANGE:
+                case CSync.SyncInstructions.NEW:
+                case CSync.SyncInstructions.TYPE_CHANGE:
                     this.num_new_items++;
                     if (!this.first_item_new)
                         this.first_item_new = item;
                     break;
-                case SyncInstructions.REMOVE:
+                case CSync.SyncInstructions.REMOVE:
                     this.num_removed_items++;
                     if (!this.first_item_deleted)
                         this.first_item_deleted = item;
                     break;
-                case SyncInstructions.SYNC:
+                case CSync.SyncInstructions.SYNC:
                     this.num_updated_items++;
                     if (!this.first_item_updated)
                         this.first_item_updated = item;
                     break;
-                case SyncInstructions.RENAME:
+                case CSync.SyncInstructions.RENAME:
                     if (!this.first_item_renamed) {
                         this.first_item_renamed = item;
                     }
@@ -327,7 +338,7 @@ public class SyncResult : GLib.Object {
                     // nothing.
                     break;
                 }
-            } else if (item.instruction == SyncInstructions.IGNORE) {
+            } else if (item.instruction == CSync.SyncInstructions.IGNORE) {
                 this.found_files_not_synced = true;
             }
         }

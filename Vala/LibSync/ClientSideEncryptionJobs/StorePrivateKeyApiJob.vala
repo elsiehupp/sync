@@ -26,14 +26,14 @@ public class StorePrivateKeyApiJob : AbstractNetworkJob {
     @brief csr - the CSR with the public key.
     This function needs to be called before start () obviously.
     ***********************************************************/
-    Soup.Buffer private_key {
+    public Soup.Buffer private_key {
         private get {
             return this.private_key;
         }
         public set {
             string data = "private_key=";
             data += GLib.Uri.to_percent_encoding (value);
-            this.private_key.data (data);
+            this.private_key.data = data;
         }
     }
 
@@ -60,7 +60,7 @@ public class StorePrivateKeyApiJob : AbstractNetworkJob {
         request.raw_header ("OCS-APIREQUEST", "true");
         QUrlQuery query;
         query.add_query_item ("format", "json");
-        GLib.Uri url = Utility.concat_url_path (account.url, path ());
+        GLib.Uri url = Utility.concat_url_path (account.url, this.path);
         url.query (query);
 
         GLib.info ("Sending the private key" + this.private_key);
@@ -74,7 +74,7 @@ public class StorePrivateKeyApiJob : AbstractNetworkJob {
     protected bool on_signal_finished () {
         int return_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (return_code != 200)
-            GLib.info ("Sending private key ended with "  + path () + error_string () + return_code);
+            GLib.info ("Sending private key ended with "  + this.path + this.error_string + return_code);
 
         QJsonParseError error;
         var json = QJsonDocument.from_json (this.reply.read_all (), error);

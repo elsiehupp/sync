@@ -85,7 +85,7 @@ public class ProppatchJob : AbstractNetworkJob {
         var buf = new Soup.Buffer (this);
         buf.data (xml);
         buf.open (QIODevice.ReadOnly);
-        send_request ("PROPPATCH", make_dav_url (path ()), request, buf);
+        send_request ("PROPPATCH", make_dav_url (path), request, buf);
         AbstractNetworkJob.start ();
     }
 
@@ -99,7 +99,7 @@ public class ProppatchJob : AbstractNetworkJob {
         int http_result_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
 
         if (http_result_code == 207) {
-            /* emit */ success ();
+            /* emit */ signal_success ();
         } else {
             GLib.warning ("*not* successful, http result code is" + http_result_code
                 + (http_result_code == 302 ? this.reply.header (Soup.Request.LocationHeader).to_string (): ""));

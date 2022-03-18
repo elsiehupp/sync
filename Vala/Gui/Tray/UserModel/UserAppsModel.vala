@@ -61,7 +61,7 @@ public class UserAppsModel : QAbstractListModel {
             const var talk_app = UserModel.instance.is_current_user ().talk_app ();
             foreach (AccountApp app in UserModel.instance.app_list) {
                 // Filter out Talk because we have a dedicated button for it
-                if (talk_app && app.identifier () == talk_app.identifier ())
+                if (talk_app && app.identifier == talk_app.identifier)
                     continue;
 
                 begin_insert_rows (QModelIndex (), row_count (), row_count ());
@@ -101,7 +101,7 @@ public class UserAppsModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     public void on_signal_open_app_url (GLib.Uri url) {
-        OpenExtrernal.open_browser (url);
+        OpenExternal.open_browser (url);
     }
 
 } // class UserAppsModel

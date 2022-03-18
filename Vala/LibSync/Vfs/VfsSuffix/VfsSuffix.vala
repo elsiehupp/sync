@@ -93,7 +93,7 @@ public class VfsSuffix : AbstractVfs {
         }
 
         if (!file.open (GLib.File.ReadWrite | GLib.File.Truncate))
-            return file.error_string ();
+            return file.error_string;
 
         file.write (" ");
         file.close ();
@@ -116,7 +116,7 @@ public class VfsSuffix : AbstractVfs {
         }
 
         // Move the item's pin state
-        var pin = this.setup_params.journal.internal_pin_states ().raw_for_path (item.file.to_utf8 ());
+        var pin = this.setup_params.journal.internal_pin_states.raw_for_path (item.file.to_utf8 ());
         if (pin && *pin != PinState.PinState.INHERITED) {
             pin_state (item.rename_target, *pin);
             pin_state (item.file, PinState.PinState.INHERITED);

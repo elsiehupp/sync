@@ -56,11 +56,16 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public AbstractCredentials credentials () {
-        var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
-        //  Q_ASSERT (oc_wizard);
-        return new HttpCredentialsGui (this.user, this.token, this.refresh_token,
-            oc_wizard.client_cert_bundle, oc_wizard.client_cert_password);
+    public AbstractCredentials credentials {
+        public get {
+            OwncloudWizard oc_wizard = (OwncloudWizard) wizard ();
+            //  Q_ASSERT (oc_wizard);
+            return new HttpCredentialsGui (
+                this.user, this.token, this.refresh_token,
+                oc_wizard.client_cert_bundle,
+                oc_wizard.client_cert_password
+            );
+        }
     }
 
 
@@ -92,8 +97,10 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public int next_id () {
-        return WizardCommon.Pages.PAGE_ADVANCED_SETUP;
+    public int next_id {
+        public get {
+            return WizardCommon.Pages.PAGE_ADVANCED_SETUP;
+        }
     }
 
 
@@ -105,9 +112,12 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
 
 
     /***********************************************************
+    We can never go forward manually
     ***********************************************************/
-    public bool is_complete () {
-        return false; /* We can never go forward manually */
+    public bool is_complete {
+        public get {
+            return false;
+        }
     }
 
 

@@ -175,7 +175,7 @@ public class FolderMetadata : GLib.Object {
         this.metadata_keys.insert (0, new_metadata_pass);
 
         string public_key = this.account.e2e.public_key.to_pem ().to_base64 ();
-        string display_name = this.account.display_name ();
+        string display_name = this.account.display_name;
 
         this.sharing.append ({display_name, public_key});
     }

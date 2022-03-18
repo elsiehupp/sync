@@ -38,8 +38,10 @@ public class OwncloudDolphinPluginHelper : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public bool is_connected () {
-        return this.socket.state () == QLocalSocket.ConnectedState;
+    public bool is_connected {
+        public get {
+            return this.socket.state == QLocalSocket.ConnectedState;
+        }
     }
     
 
@@ -167,7 +169,7 @@ public class OwncloudDolphinPluginHelper : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected void try_to_connect () {
-        if (this.socket.state () != QLocalSocket.UnconnectedState) {
+        if (this.socket.state != QLocalSocket.UnconnectedState) {
             return;
         }
 

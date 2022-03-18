@@ -155,7 +155,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
 
         var account = this.propagator.account;
 
-        if (!account.capabilities ().client_side_encryption_available () ||
+        if (!account.capabilities.client_side_encryption_available () ||
             !parent_rec.is_valid () ||
             !parent_rec.is_e2e_encrypted) {
             up_unencrypted_file ();
@@ -217,7 +217,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
 
         // Check if we believe that the upload will fail due to remote quota limits
         const int64 quota_guess = this.propagator.folder_quota.value (
-            GLib.File.new_for_path (this.file_to_upload.file).path (), std.numeric_limits<int64>.max ());
+            GLib.File.new_for_path (this.file_to_upload.file).path, std.numeric_limits<int64>.max ());
         if (this.file_to_upload.size > quota_guess) {
             // Necessary for blocklisting logic
             this.item.http_error_code = 507;
@@ -286,7 +286,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
             return;
         }
 
-        const string checksum_type = this.propagator.account.capabilities ().preferred_upload_checksum_type ();
+        const string checksum_type = this.propagator.account.capabilities.preferred_upload_checksum_type ();
 
         // Maybe the discovery already computed the checksum?
         // Should I compute the checksum of the original (this.item.file)
@@ -320,7 +320,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
 
         // Reuse the content checksum as the transmission checksum if possible
         var supported_transmission_checksums =
-            this.propagator.account.capabilities ().supported_checksum_types ();
+            this.propagator.account.capabilities.supported_checksum_types ();
         if (supported_transmission_checksums.contains (content_checksum_type)) {
             on_signal_compute_checksum_finished (content_checksum_type, content_checksum);
             return;
@@ -329,7 +329,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         // Compute the transmission checksum.
         var compute_checksum = new ComputeChecksum (this);
         if (upload_checksum_enabled ()) {
-            compute_checksum.checksum_type (this.propagator.account.capabilities ().upload_checksum_type ());
+            compute_checksum.checksum_type (this.propagator.account.capabilities.upload_checksum_type ());
         } else {
             compute_checksum.checksum_type ("");
         }
@@ -448,7 +448,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
     public void start_poll_job (string path) {
         var poll_job = new PollJob (
             this.propagator.account, path, this.item,
-            this.propagator.journal, this.propagator.local_path (), this
+            this.propagator.journal, this.propagator.local_path, this
         );
         poll_job.signal_finished.connect (
             this.on_signal_poll_job_finished
@@ -509,14 +509,14 @@ public class PropagateUploadFileCommon : PropagateItemJob {
 
     void on_signal_finalize () {
         // Update the quota, if known
-        var quota_it = this.propagator.folder_quota.find (GLib.File.new_for_path (this.item.file).path ());
+        var quota_it = this.propagator.folder_quota.find (GLib.File.new_for_path (this.item.file).path);
         if (quota_it != this.propagator.folder_quota.end ())
             quota_it.value () -= this.file_to_upload.size;
 
         // Update the database entry
         var result = this.propagator.update_metadata (*this.item);
         if (!result) {
-            on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error ()));
+            on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error));
             return;
         } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
             on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file %1 is currently in use").printf (this.item.file));
@@ -525,8 +525,8 @@ public class PropagateUploadFileCommon : PropagateItemJob {
 
         // Files that were new on the remote shouldn't have online-only pin state
         // even if their parent folder is online-only.
-        if (this.item.instruction == SyncInstructions.NEW
-            || this.item.instruction == SyncInstructions.TYPE_CHANGE) {
+        if (this.item.instruction == CSync.SyncInstructions.NEW
+            || this.item.instruction == CSync.SyncInstructions.TYPE_CHANGE) {
             var vfs = this.propagator.sync_options.vfs;
             var pin = vfs.pin_state (this.item.file);
             if (pin && *pin == Vfs.ItemAvailability.ONLINE_ONLY) {
@@ -628,7 +628,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
     ***********************************************************/
     protected void check_resetting_errors () {
         if (this.item.http_error_code == 412
-            || this.propagator.account.capabilities ().http_error_codes_that_reset_failing_chunked_uploads ().contains (this.item.http_error_code)) {
+            || this.propagator.account.capabilities.http_error_codes_that_reset_failing_chunked_uploads ().contains (this.item.http_error_code)) {
             var upload_info = this.propagator.journal.get_upload_info (this.item.file);
             upload_info.error_count += 1;
             if (upload_info.error_count > 3) {
@@ -669,7 +669,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         // Ensure errors that should eventually reset the chunked upload are tracked.
         check_resetting_errors ();
 
-        SyncFileItem.Status status = classify_error (abstract_job.input_stream ().error (), this.item.http_error_code,
+        SyncFileItem.Status status = classify_error (abstract_job.input_stream ().error, this.item.http_error_code,
             this.propagator.another_sync_needed, reply_content);
 
         // Insufficient remote storage.
@@ -678,7 +678,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
             // store the quota for the real local file using the information
             // on the file to upload, that could have been modified by
             // filters or something.
-            var path = GLib.File.new_for_path (this.item.file).path ();
+            var path = GLib.File.new_for_path (this.item.file).path;
             var quota_it = this.propagator.folder_quota.find (path);
             if (quota_it != this.propagator.folder_quota.end ()) {
                 quota_it.value () = q_min (quota_it.value (), this.file_to_upload.size - 1);
@@ -743,8 +743,8 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         }
 
         if (!this.item.etag == "" && this.item.etag != "empty_etag"
-            && this.item.instruction != SyncInstructions.NEW // On new files never send a If-Match
-            && this.item.instruction != SyncInstructions.TYPE_CHANGE
+            && this.item.instruction != CSync.SyncInstructions.NEW // On new files never send a If-Match
+            && this.item.instruction != CSync.SyncInstructions.TYPE_CHANGE
             && !this.delete_existing) {
             // We add quotes because the owncloud server always adds quotes around the etag, and
             //  csync_owncloud.c's owncloud_file_id always strips the quotes.

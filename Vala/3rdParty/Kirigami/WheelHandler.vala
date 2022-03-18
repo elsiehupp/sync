@@ -81,12 +81,12 @@ public class WheelHandler : GLib.Object {
         }
 
         if (m_target) {
-            GlobalWheelFilter.self ().remove_item_handler_association (m_target, this);
+            GlobalWheelFilter.instance.remove_item_handler_association (m_target, this);
         }
 
         m_target = target;
 
-        GlobalWheelFilter.self ().set_item_handler_association (target, this);
+        GlobalWheelFilter.instance.set_item_handler_association (target, this);
 
         /* emit */ signal_target_changed ();
     }

@@ -59,7 +59,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
                 return;
             }
 
-            user_status_online_status (value.state ());
+            user_status_online_status (value.state);
             user_status_message (value);
         }
     }
@@ -71,8 +71,8 @@ public class OcsUserStatusConnector : UserStatusConnector {
         base (parent);
         this.account = account;
         GLib.assert (this.account);
-        this.user_status_supported = this.account.capabilities ().user_status ();
-        this.user_status_emojis_supported = this.account.capabilities ().user_status_supports_emoji ();
+        this.user_status_supported = this.account.capabilities.user_status ();
+        this.user_status_emojis_supported = this.account.capabilities.user_status_supports_emoji ();
     }
 
 
@@ -286,7 +286,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
         this.message_job.verb (JsonApiJob.Verb.PUT);
         // Set body
         QJsonObject data_object;
-        data_object.insert ("message_id", user_status.identifier ());
+        data_object.insert ("message_id", user_status.identifier);
         if (user_status.clear_at ()) {
             data_object.insert ("clear_at", static_cast<int> (clear_at_to_timestamp (user_status.clear_at ())));
         } else {
@@ -381,7 +381,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
 
     private static Optional<ClearAt> json_extract_clear_at (QJsonObject json_object) {
         Optional<ClearAt> clear_at = new JsonApiJob ();
-        if (json_object.contains ("clear_at") && !json_object.value ("clear_at").is_null ()) {
+        if (json_object.contains ("clear_at") && !json_object.value ("clear_at") == null) {
             ClearAt clear_at_value;
             clear_at_value.type = ClearAtType.Timestamp;
             clear_at_value.timestamp = json_object.value ("clear_at").to_int ();
@@ -480,7 +480,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
     private static Optional<ClearAt> json_to_clear_at (QJsonObject json_object) {
         Optional<ClearAt> clear_at;
 
-        if (json_object.value ("clear_at").is_object () && !json_object.value ("clear_at").is_null ()) {
+        if (json_object.value ("clear_at").is_object () && !json_object.value ("clear_at") == null) {
             ClearAt clear_at_value;
             var clear_at_object = json_object.value ("clear_at").to_object ();
             var type_value = clear_at_object.value ("type").to_string () + " period";

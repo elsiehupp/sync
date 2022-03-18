@@ -34,7 +34,7 @@ public class PutMultiFileJob : AbstractNetworkJob {
 
     new string error_string {
         public get {
-            this.error_string == "" ? AbstractNetworkJob.error_string () : this.error_string;
+            this.error_string == "" ? AbstractNetworkJob.error_string : this.error_string;
         }
         protected set {
             this.error_string = value;
@@ -86,8 +86,8 @@ public class PutMultiFileJob : AbstractNetworkJob {
 
         send_request ("POST", this.url, request, this.body);
 
-        if (this.reply.error () != Soup.Reply.NoError) {
-            GLib.warning (" Network error: " + this.reply.error_string ());
+        if (this.reply.error != Soup.Reply.NoError) {
+            GLib.warning (" Network error: " + this.reply.error_string);
         }
 
         this.reply.signal_upload_progress.connect (
@@ -108,7 +108,7 @@ public class PutMultiFileJob : AbstractNetworkJob {
             one_device.device.close ();
         }
 
-        GLib.info ("POST of" + this.reply.request ().url.to_string () + path () + " finished with status "
+        GLib.info ("POST of" + this.reply.request ().url.to_string () + this.path + " finished with status "
                 + reply_status_string ()
                 + this.reply.attribute (Soup.Request.HttpStatusCodeAttribute)
                 + this.reply.attribute (Soup.Request.HttpReasonPhraseAttribute));
@@ -121,7 +121,7 @@ public class PutMultiFileJob : AbstractNetworkJob {
     /***********************************************************
     FIXME: GLib.TimeSpan is microseconds, not milliseconds!
     ***********************************************************/
-    public GLib.TimeSpan ms_since_start () {
+    public GLib.TimeSpan ms_since_start {
         return this.request_timer.elapsed ();
     }
 

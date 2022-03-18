@@ -167,7 +167,7 @@ public class SettingsDialog : Gtk.Dialog {
         this.action_group_widgets.insert (general_action, general_settings);
         this.action_group_widgets.insert (network_action, network_settings);
 
-        foreach (var account_instance in AccountManager.instance.accounts ()) {
+        foreach (var account_instance in AccountManager.instance.accounts) {
             signal_account_added (account_instance);
         }
 
@@ -245,7 +245,7 @@ public class SettingsDialog : Gtk.Dialog {
             QAction action = this.action_for_account[account];
             if (action) {
                 Gtk.Image pix = account.avatar ();
-                if (!pix.is_null ()) {
+                if (!pix == null) {
                     action.icon (Gdk.Pixbuf.from_image (AvatarJob.make_circular_avatar (pix)));
                 }
             }
@@ -260,7 +260,7 @@ public class SettingsDialog : Gtk.Dialog {
         if (account && this.action_for_account.contains (account)) {
             QAction action = this.action_for_account[account];
             if (action) {
-                string display_name = account.display_name ();
+                string display_name = account.display_name;
                 action.on_signal_text (display_name);
                 var height = this.tool_bar.size_hint ().height ();
                 action.icon_text (short_display_name_for_settings (account, static_cast<int> (height * BUTTON_SIZE_RATIO)));
@@ -320,8 +320,8 @@ public class SettingsDialog : Gtk.Dialog {
 
         QAction account_action = null;
         Gtk.Image avatar = account_state.account.avatar ();
-        const string action_text = branding_single_account ? _("Account") : account_state.account.display_name ();
-        if (avatar.is_null ()) {
+        const string action_text = branding_single_account ? _("Account") : account_state.account.display_name;
+        if (avatar == null) {
             account_action = create_color_aware_action (":/client/theme/account.svg",
                 action_text);
         } else {
@@ -330,14 +330,14 @@ public class SettingsDialog : Gtk.Dialog {
         }
 
         if (!branding_single_account) {
-            account_action.tool_tip (account_state.account.display_name ());
+            account_action.tool_tip (account_state.account.display_name);
             account_action.icon_text (short_display_name_for_settings (account_state.account, static_cast<int> (height * BUTTON_SIZE_RATIO)));
         }
 
         this.tool_bar.insert_action (this.tool_bar.actions ().at (0), account_action);
         var account_settings = new AccountSettings (account_state, this);
         string object_name = "account_settings_";
-        object_name += account_state.account.display_name ();
+        object_name += account_state.account.display_name;
         account_settings.object_name (object_name);
         this.ui.stack.insert_widget (0 , account_settings);
 
@@ -398,7 +398,7 @@ public class SettingsDialog : Gtk.Dialog {
         // Hide when the last account is deleted. We want to enter the same
         // state we'd be in the client was started up without an account
         // configured.
-        if (AccountManager.instance.accounts () == "") {
+        if (AccountManager.instance.accounts == "") {
             hide ();
         }
     }

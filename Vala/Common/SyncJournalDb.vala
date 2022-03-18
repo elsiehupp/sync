@@ -36,38 +36,40 @@ public class SyncJournalDb : GLib.Object {
     Return value for has_hydrated_or_dehydrated_files ()
     ***********************************************************/
     public class HasHydratedDehydrated {
-        bool has_hydrated = false;
-        bool has_dehydrated = false;
+        public bool has_hydrated = false;
+        public bool has_dehydrated = false;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public class DownloadInfo {
-        string tmpfile;
-        string etag;
-        int error_count = 0;
-        bool valid = false;
+        public string temporaryfile;
+        public string etag;
+        public int error_count = 0;
+        public bool valid = false;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public class UploadInfo {
-        int chunk = 0;
-        uint32 transferid = 0;
-        int64 size = 0;
-        int64 modtime = 0;
-        int error_count = 0;
-        bool valid = false;
-        string content_checksum;
+        public int chunk = 0;
+        public uint32 transferid = 0;
+        public int64 size = 0;
+        public int64 modtime = 0;
+        public int error_count = 0;
+        public bool valid = false;
+        public string content_checksum;
         /***********************************************************
         Returns true if this entry refers to a chunked upload that can be continued.
         (As opposed to a small file transfer which is stored in the database so we can detect the case
         when the upload succeeded, but the connection was dropped before we got the answer)
         ***********************************************************/
-        bool is_chunked () {
-            return this.transferid != 0;
+        public bool is_chunked {
+            public get {
+                return this.transferid != 0;
+            }
         }
     }
 
@@ -75,17 +77,32 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public class PollInfo {
-        string file; // The relative path of a file
-        string url; // the poll url. (This pollinfo is invalid if this.url is empty)
-        int64 modtime; // The modtime of the file being uploaded
-        int64 file_size;
+
+        /***********************************************************
+        The relative path of a file
+        ***********************************************************/
+        public string file;
+
+        /***********************************************************
+        The poll url. (This pollinfo is invalid if this.url is empty)
+        ***********************************************************/
+        public string url;
+
+        /***********************************************************
+        The modtime of the file being uploaded
+        ***********************************************************/
+        public int64 modtime;
+
+        /***********************************************************
+        ***********************************************************/
+        public int64 file_size;
     }
 
 
     /***********************************************************
     Grouping for all functions relating to pin states,
 
-    Use internal_pin_states () to get at them.
+    Use internal_pin_states to get at them.
 
     OCSYNC_EXPORT
     ***********************************************************/
@@ -144,7 +161,7 @@ public class SyncJournalDb : GLib.Object {
 
         Returns none on database error.
         ***********************************************************/
-        Optional<PinState> effective_for_path (string path) {
+        public Optional<PinState> effective_for_path (string path) {
             QMutexLocker lock = new QMutexLocker (this.database.mutex);
             if (!this.database.check_connect ())
                 return {};
@@ -174,7 +191,7 @@ public class SyncJournalDb : GLib.Object {
     
 
         /***********************************************************
-        Like effective_for_path () but also considers subitem pin states.
+        Like effective_for_path but also considers subitem pin states.
 
         If the path's pin state and all subitem's pin states are identical
         then that pin state will be returned.
@@ -186,7 +203,7 @@ public class SyncJournalDb : GLib.Object {
         It's valid to use the root path "".
         Returns none on database error.
         ***********************************************************/
-        Optional<PinState> effective_for_path_recursive (string path) {
+        public Optional<PinState> effective_for_path_recursive (string path) {
             // Get the item's effective pin state. We'll compare subitem's pin states
             // against this.
             PreparedSqlQuery base_pin = effective_for_path (path);
@@ -230,7 +247,7 @@ public class SyncJournalDb : GLib.Object {
         The path should not have a trailing slash.
         It's valid to use the root path "".
         ***********************************************************/
-        void for_path (string path, PinState state) {
+        public void for_path (string path, PinState state) {
             QMutexLocker lock = new QMutexLocker (this.database.mutex);
             if (!this.database.check_connect ())
                 return;
@@ -258,7 +275,7 @@ public class SyncJournalDb : GLib.Object {
         The path should not have a trailing slash.
         The path "" wipes every entry.
         ***********************************************************/
-        void wipe_for_path_and_below (string path) {
+        public void wipe_for_path_and_below (string path) {
             QMutexLocker lock = new QMutexLocker (this.database.mutex);
             if (!this.database.check_connect ())
                 return;
@@ -409,7 +426,7 @@ public class SyncJournalDb : GLib.Object {
         }
 
         // Error during creation, just keep the original and throw errors later
-        GLib.warning ("Could not find a writable database path" + file.filename () + file.error_string ());
+        GLib.warning ("Could not find a writable database path" + file.filename () + file.error_string);
         return journal_path;
     }
 
@@ -527,7 +544,7 @@ public class SyncJournalDb : GLib.Object {
 
             var next = query.next ();
             if (!next.ok) {
-                string err = query.error ();
+                string err = query.error;
                 GLib.warning ("No journal entry found for" + filename + "Error:" + err);
                 close ();
                 return false;
@@ -576,7 +593,7 @@ public class SyncJournalDb : GLib.Object {
 
             var next = query.next ();
             if (!next.ok) {
-                string err = query.error ();
+                string err = query.error;
                 GLib.warning ("No journal entry found for mangled name" + mangled_name + "Error: " + err);
                 close ();
                 return false;
@@ -770,7 +787,7 @@ public class SyncJournalDb : GLib.Object {
             SyncJournalFileRecord record;
             fill_file_record_from_get_query (record, *query);
             if (!record.path.starts_with (path) || record.path.index_of ("/", path.size () + 1) > 0) {
-                GLib.warning ("hash collision" + path + record.path ());
+                GLib.warning ("hash collision" + path + record.path);
                 continue;
             }
             row_callback (record);
@@ -807,7 +824,7 @@ public class SyncJournalDb : GLib.Object {
 
         const int64 phash = get_pHash (record.path);
         if (check_connect ()) {
-            int plen = record.path.length ();
+            int plen = record.path.length;
 
             string etag = record.etag;
             string file_id = record.file_id;
@@ -824,7 +841,7 @@ public class SyncJournalDb : GLib.Object {
                 + "VALUES (?1 , ?2, ?3 , ?4 , ?5 , ?6 , ?7,  ?8 , ?9 , ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18);",
                 this.database);
             if (!query) {
-                return query.error ();
+                return query.error;
             }
 
             query.bind_value (1, phash);
@@ -847,7 +864,7 @@ public class SyncJournalDb : GLib.Object {
             query.bind_value (18, record.is_e2e_encrypted);
 
             if (!query.exec ()) {
-                return query.error ();
+                return query.error;
             }
 
             // Can't be true anymore.
@@ -1095,7 +1112,7 @@ public class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public string database_file_path () {
+    public string database_file_path {
         return this.database_file;
     }
 
@@ -1104,7 +1121,7 @@ public class SyncJournalDb : GLib.Object {
     ***********************************************************/
     public static int64 get_pHash (string file) {
         int64 h = 0;
-        int len = file.length ();
+        int len = file.length;
 
         h = c_jhash64 ( (uint8 *)file, len, 0);
         return h;
@@ -1229,25 +1246,25 @@ public class SyncJournalDb : GLib.Object {
     public DownloadInfo get_download_info (string file) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
 
-        DownloadInfo res;
+        DownloadInfo download_info;
 
         if (check_connect ()) {
-            PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_DOWNLOAD_INFO_QUERY, "SELECT tmpfile, etag, errorcount FROM downloadinfo WHERE path=?1", this.database);
+            PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_DOWNLOAD_INFO_QUERY, "SELECT temporaryfile, etag, errorcount FROM downloadinfo WHERE path=?1", this.database);
             if (!query) {
-                return res;
+                return download_info;
             }
 
             query.bind_value (1, file);
 
             if (!query.exec ()) {
-                return res;
+                return download_info;
             }
 
             if (query.next ().has_data) {
-                to_download_info (*query, res);
+                to_download_info (*query, download_info);
             }
         }
-        return res;
+        return download_info;
     }
 
 
@@ -1264,14 +1281,14 @@ public class SyncJournalDb : GLib.Object {
             PreparedSqlQuery query = this.query_manager.get (
                 PreparedSqlQueryManager.Key.SET_DOWNLOAD_INFO_QUERY,
                 "INSERT OR REPLACE INTO downloadinfo "
-                + " (path, tmpfile, etag, errorcount) "
+                + " (path, temporaryfile, etag, errorcount) "
                 + "VALUES ( ?1 , ?2, ?3, ?4 )",
                 this.database);
             if (!query) {
                 return;
             }
             query.bind_value (1, file);
-            query.bind_value (2, i.tmpfile);
+            query.bind_value (2, i.temporaryfile);
             query.bind_value (3, i.etag);
             query.bind_value (4, i.error_count);
             query.exec ();
@@ -1285,12 +1302,12 @@ public class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    static void to_download_info (SqlQuery query, SyncJournalDb.DownloadInfo res) {
+    static void to_download_info (SqlQuery query, SyncJournalDb.DownloadInfo download_info) {
         bool ok = true;
-        res.tmpfile = query.string_value (0);
-        res.etag = query.byte_array_value (1);
-        res.error_count = query.int_value (2);
-        res.valid = ok;
+        download_info.temporaryfile = query.string_value (0);
+        download_info.etag = query.byte_array_value (1);
+        download_info.error_count = query.int_value (2);
+        download_info.valid = ok;
     }
 
 
@@ -1306,7 +1323,7 @@ public class SyncJournalDb : GLib.Object {
 
         SqlQuery query = new SqlQuery (this.database);
         // The selected values must* match the ones expected by to_download_info ().
-        query.prepare ("SELECT tmpfile, etag, errorcount, path FROM downloadinfo");
+        query.prepare ("SELECT temporaryfile, etag, errorcount, path FROM downloadinfo");
 
         if (!query.exec ()) {
             return empty_result;
@@ -1360,7 +1377,7 @@ public class SyncJournalDb : GLib.Object {
     public UploadInfo get_upload_info (string file) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
 
-        UploadInfo res;
+        UploadInfo upload_info;
 
         if (check_connect ()) {
             PreparedSqlQuery query = this.query_manager.get (
@@ -1369,26 +1386,26 @@ public class SyncJournalDb : GLib.Object {
                 + "uploadinfo WHERE path=?1",
                 this.database);
             if (!query) {
-                return res;
+                return upload_info;
             }
             query.bind_value (1, file);
 
             if (!query.exec ()) {
-                return res;
+                return upload_info;
             }
 
             if (query.next ().has_data) {
                 bool ok = true;
-                res.chunk = query.int_value (0);
-                res.transferid = query.int64_value (1);
-                res.error_count = query.int_value (2);
-                res.size = query.int64_value (3);
-                res.modtime = query.int64_value (4);
-                res.content_checksum = query.byte_array_value (5);
-                res.valid = ok;
+                upload_info.chunk = query.int_value (0);
+                upload_info.transferid = query.int64_value (1);
+                upload_info.error_count = query.int_value (2);
+                upload_info.size = query.int64_value (3);
+                upload_info.modtime = query.int64_value (4);
+                upload_info.content_checksum = query.byte_array_value (5);
+                upload_info.valid = ok;
             }
         }
-        return res;
+        return upload_info;
     }
 
 
@@ -1572,23 +1589,23 @@ public class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void poll_info (PollInfo info) {
+    public void poll_info (PollInfo poll_info) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
         if (!check_connect ()) {
             return;
         }
 
-        if (info.url == "") {
-            GLib.debug ("Deleting Poll job" + info.file);
+        if (poll_info.url == "") {
+            GLib.debug ("Deleting Poll job" + poll_info.file);
             SqlQuery query = new SqlQuery ("DELETE FROM async_poll WHERE path=?", this.database);
-            query.bind_value (1, info.file);
+            query.bind_value (1, poll_info.file);
             query.exec ();
         } else {
             SqlQuery query = new SqlQuery ("INSERT OR REPLACE INTO async_poll (path, modtime, filesize, pollpath) VALUES ( ? , ? , ? , ? )", this.database);
-            query.bind_value (1, info.file);
-            query.bind_value (2, info.modtime);
-            query.bind_value (3, info.file_size);
-            query.bind_value (4, info.url);
+            query.bind_value (1, poll_info.file);
+            query.bind_value (2, poll_info.modtime);
+            query.bind_value (3, poll_info.file_size);
+            query.bind_value (4, poll_info.url);
             query.exec ();
         }
     }
@@ -1599,26 +1616,26 @@ public class SyncJournalDb : GLib.Object {
     public GLib.List<PollInfo> get_poll_infos () {
         QMutexLocker locker = new QMutexLocker (this.mutex);
 
-        GLib.List<SyncJournalDb.PollInfo> res;
+        GLib.List<SyncJournalDb.PollInfo> poll_info_list;
 
         if (!check_connect ())
-            return res;
+            return poll_info_list;
 
         SqlQuery query = new SqlQuery ("SELECT path, modtime, filesize, pollpath FROM async_poll", this.database);
 
         if (!query.exec ()) {
-            return res;
+            return poll_info_list;
         }
 
         while (query.next ().has_data) {
-            PollInfo info;
-            info.file = query.string_value (0);
-            info.modtime = query.int64_value (1);
-            info.file_size = query.int64_value (2);
-            info.url = query.string_value (3);
-            res.append (info);
+            PollInfo poll_info;
+            poll_info.file = query.string_value (0);
+            poll_info.modtime = query.int64_value (1);
+            poll_info.file_size = query.int64_value (2);
+            poll_info.url = query.string_value (3);
+            poll_info_list.append (poll_info);
         }
-        return res;
+        return poll_info_list;
     }
 
 
@@ -1705,7 +1722,7 @@ public class SyncJournalDb : GLib.Object {
         SqlQuery del_query = new SqlQuery ("DELETE FROM selectivesync WHERE type == ?1", this.database);
         del_query.bind_value (1, int (type));
         if (!del_query.exec ()) {
-            GLib.warning ("SQL error when deleting selective sync list" + list + del_query.error ());
+            GLib.warning ("SQL error when deleting selective sync list" + list + del_query.error);
         }
 
         SqlQuery ins_query = new SqlQuery ("INSERT INTO selectivesync VALUES (?1, ?2)", this.database);
@@ -1714,7 +1731,7 @@ public class SyncJournalDb : GLib.Object {
             ins_query.bind_value (1, path);
             ins_query.bind_value (2, int (type));
             if (!ins_query.exec ()) {
-                GLib.warning ("SQL error when inserting into selective sync" + type + path + del_query.error ());
+                GLib.warning ("SQL error when inserting into selective sync" + type + path + del_query.error);
             }
         }
 
@@ -1836,9 +1853,11 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     Returns whether the database is currently openend.
     ***********************************************************/
-    public bool is_open () {
-        QMutexLocker lock = new QMutexLocker (this.mutex);
-        return this.database.is_open ();
+    public bool is_open {
+        public get {
+            QMutexLocker lock = new QMutexLocker (this.mutex);
+            return this.database.is_open;
+        }
     }
 
 
@@ -2098,8 +2117,10 @@ public class SyncJournalDb : GLib.Object {
     Important: Not all vfs plugins store the pin states in the database,
     prefer to use Vfs.pin_state () etc.
     ***********************************************************/
-    public PinStateInterface internal_pin_states () {
-        return {this};
+    public PinStateInterface internal_pin_states {
+        public get {
+            return {this};
+        }
     }
 
 
@@ -2396,7 +2417,7 @@ public class SyncJournalDb : GLib.Object {
     ***********************************************************/
     private bool sql_fail (string log, SqlQuery query) {
         commit_transaction ();
-        GLib.warning ("SQL Error" + log + query.error ());
+        GLib.warning ("SQL Error" + log + query.error);
         this.database.close ();
         //  ASSERT (false);
         return false;
@@ -2408,7 +2429,7 @@ public class SyncJournalDb : GLib.Object {
     private void start_transaction () {
         if (this.transaction == 0) {
             if (!this.database.transaction ()) {
-                GLib.warning ("ERROR starting transaction:" + this.database.error ());
+                GLib.warning ("ERROR starting transaction:" + this.database.error);
                 return;
             }
             this.transaction = 1;
@@ -2423,7 +2444,7 @@ public class SyncJournalDb : GLib.Object {
     private void commit_transaction () {
         if (this.transaction == 1) {
             if (!this.database.commit ()) {
-                GLib.warning ("ERROR committing to the database:" + this.database.error ());
+                GLib.warning ("ERROR committing to the database:" + this.database.error);
                 return;
             }
             this.transaction = 0;
@@ -2443,7 +2464,7 @@ public class SyncJournalDb : GLib.Object {
             }
         }
 
-        if (this.database.is_open ()) {
+        if (this.database.is_open) {
             // Unfortunately the sqlite is_open check can return true even when the underlying storage
             // has become unavailable - and then some operations may cause crashes. See #6049
             if (!GLib.File.exists (this.database_file)) {
@@ -2461,7 +2482,7 @@ public class SyncJournalDb : GLib.Object {
 
         // The database file is created by this call (SQLITE_OPEN_CREATE)
         if (!this.database.open_or_create_read_write (this.database_file)) {
-            string error = this.database.error ();
+            string error = this.database.error;
             GLib.warning ("Error opening the database:" + error);
             return false;
         }
@@ -2604,7 +2625,7 @@ public class SyncJournalDb : GLib.Object {
 
         create_query.prepare ("CREATE TABLE IF NOT EXISTS downloadinfo ("
                              + "path VARCHAR (4096),"
-                             + "tmpfile VARCHAR (4096),"
+                             + "temporaryfile VARCHAR (4096),"
                              + "etag VARCHAR (32),"
                              + "errorcount INTEGER,"
                              + "PRIMARY KEY (path)"
@@ -2809,10 +2830,10 @@ public class SyncJournalDb : GLib.Object {
         this.metadata_table_is_empty = (get_file_record_count () == 0);
 
         // Hide 'em all!
-        FileSystem.file_hidden (database_file_path (), true);
-        FileSystem.file_hidden (database_file_path () + "-wal", true);
-        FileSystem.file_hidden (database_file_path () + "-shm", true);
-        FileSystem.file_hidden (database_file_path () + "-journal", true);
+        FileSystem.file_hidden (database_file_path, true);
+        FileSystem.file_hidden (database_file_path + "-wal", true);
+        FileSystem.file_hidden (database_file_path + "-shm", true);
+        FileSystem.file_hidden (database_file_path + "-journal", true);
 
         return rc;
     }
@@ -2936,7 +2957,7 @@ public class SyncJournalDb : GLib.Object {
     //      SyncJournalDb.DownloadInfo rhs) {
     //      return lhs.error_count == rhs.error_count
     //          && lhs.etag == rhs.etag
-    //          && lhs.tmpfile == rhs.tmpfile
+    //          && lhs.temporaryfile == rhs.temporaryfile
     //          && lhs.valid == rhs.valid;
     //  }
 

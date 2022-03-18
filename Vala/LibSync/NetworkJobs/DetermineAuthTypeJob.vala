@@ -110,9 +110,9 @@ public class DetermineAuthTypeJob : GLib.Object {
 
 
     private void on_signal_get_request_finished (Soup.Request get_request) {
-        var reply = get_request.reply ();
+        var reply = get_request.input_stream;
         var www_authenticate_header = reply.raw_header ("WWW-Authenticate");
-        if (reply.error () == Soup.Reply.AuthenticationRequiredError
+        if (reply.error == Soup.Reply.AuthenticationRequiredError
             && (www_authenticate_header.starts_with ("Basic") || www_authenticate_header.starts_with ("Bearer"))) {
             this.result_get = Basic;
         } else {
@@ -182,13 +182,13 @@ public class DetermineAuthTypeJob : GLib.Object {
 
     // #ifdef WITH_WEBENGINE
         // WEB_VIEW_FLOW > OAuth > Basic
-        if (this.account.server_version_int () >= Account.make_server_version (12, 0, 0)) {
+        if (this.account.server_version_int >= Account.make_server_version (12, 0, 0)) {
             result = WEB_VIEW_FLOW;
         }
     // #endif // WITH_WEBENGINE
 
         // LoginFlowV2 > WEB_VIEW_FLOW > OAuth > Basic
-        if (this.account.server_version_int () >= Account.make_server_version (16, 0, 0)) {
+        if (this.account.server_version_int >= Account.make_server_version (16, 0, 0)) {
             result = LoginFlowV2;
         }
 

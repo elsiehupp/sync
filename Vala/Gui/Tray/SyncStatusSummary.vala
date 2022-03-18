@@ -139,7 +139,7 @@ public class SyncStatusSummary : GLib.Object {
         const var status = sync_result.status ();
 
         if (status == SyncResult.Status.SUCCESS || status == SyncResult.Status.PROBLEM) {
-            if (sync_result.has_unresolved_conflicts ()) {
+            if (sync_result.has_unresolved_conflicts) {
                 return SyncResult.Status.PROBLEM;
             }
             return SyncResult.Status.SUCCESS;
@@ -153,14 +153,14 @@ public class SyncStatusSummary : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_load () {
-        const var current_user = UserModel.instance.is_current_user ();
+        var current_user = UserModel.instance.is_current_user ();
         if (!current_user) {
             return;
         }
-        account_state (current_user.account_state ());
-        clear_folder_errors ();
-        connect_to_folders_progress (FolderMan.instance.map ());
-        init_sync_state ();
+        this.account_state = current_user.account_state;
+        this.clear_folder_errors ();
+        this.connect_to_folders_progress (FolderMan.instance.map ());
+        this.init_sync_state ();
     }
 
 
@@ -168,7 +168,7 @@ public class SyncStatusSummary : GLib.Object {
     ***********************************************************/
     private void connect_to_folders_progress (Folder.Map map) {
         foreach (Folder folder in folder_map) {
-            if (folder.account_state () == this.account_state) {
+            if (folder.account_state == this.account_state) {
                 folder.signal_progress_info.connect (
                     this.on_signal_folder_progress_info // Qt.UniqueConnection
                 );
@@ -200,24 +200,24 @@ public class SyncStatusSummary : GLib.Object {
         const int64 total_size = q_max (completed_size, progress.total_size ());
         const int64 total_file_count = q_max (current_file, progress.total_files ());
 
-        sync_progress (calculate_overall_percent (total_file_count, completed_file, total_size, completed_size));
+        this.sync_progress = calculate_overall_percent (total_file_count, completed_file, total_size, completed_size);
 
         if (total_size > 0) {
-            const var completed_size_string = Utility.octets_to_string (completed_size);
-            const var total_size_string = Utility.octets_to_string (total_size);
+            string completed_size_string = Utility.octets_to_string (completed_size);
+            string total_size_string = Utility.octets_to_string (total_size);
 
             if (progress.trust_eta ()) {
-                sync_status_detail_string (
+                this.sync_status_detail_string =
                     _("%1 of %2 · %3 left")
                         .printf (completed_size_string, total_size_string)
-                        .printf (Utility.duration_to_descriptive_string1 (progress.total_progress ().estimated_eta)));
+                        .printf (Utility.duration_to_descriptive_string1 (progress.total_progress ().estimated_eta));
             } else {
-                sync_status_detail_string (_("%1 of %2").printf (completed_size_string, total_size_string));
+                this.sync_status_detail_string = _("%1 of %2").printf (completed_size_string, total_size_string);
             }
         }
 
         if (total_file_count > 0) {
-            sync_status_string (_("Syncing file %1 of %2").printf (current_file).printf (total_file_count));
+            this.sync_status_string = _("Syncing file %1 of %2").printf (current_file).printf (total_file_count);
         }
     }
 
@@ -229,7 +229,7 @@ public class SyncStatusSummary : GLib.Object {
             return;
         }
 
-        if (!this.account_state || folder.account_state () != this.account_state) {
+        if (!this.account_state || folder.account_state != this.account_state) {
             return;
         }
 
@@ -247,15 +247,15 @@ public class SyncStatusSummary : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void sync_state_for_folder (Folder folder) {
-        if (this.account_state && !this.account_state.is_connected ()) {
-            is_syncing (false);
-            sync_status_string (_("Offline"));
-            sync_status_detail_string ("");
-            sync_icon (Theme.folder_offline);
+        if (this.account_state && !this.account_state.is_connected) {
+            this.is_syncing = false;
+            this.sync_status_string = _("Offline");
+            this.sync_status_detail_string = "";
+            this.sync_icon = Theme.folder_offline;
             return;
         }
 
-        const var state = determine_sync_status (folder.sync_result ());
+        const var state = determine_sync_status (folder.sync_result);
 
         switch (state) {
         case SyncResult.Status.SUCCESS:
@@ -341,14 +341,14 @@ public class SyncStatusSummary : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void sync_state_to_connected_state () {
-        is_syncing (false);
-        sync_status_detail_string ("");
-        if (this.account_state && !this.account_state.is_connected ()) {
-            sync_status_string (_("Offline"));
-            sync_icon (Theme.folder_offline);
+        this.is_syncing = false;
+        this.sync_status_detail_string = "";
+        if (this.account_state && !this.account_state.is_connected) {
+            this.sync_status_string = _("Offline");
+            this.sync_icon = Theme.folder_offline;
         } else {
-            sync_status_string (_("All synced!"));
-            sync_icon (Theme.sync_status_ok);
+            this.sync_status_string = _("All synced!");
+            this.sync_icon = Theme.sync_status_ok;
         }
     }
 

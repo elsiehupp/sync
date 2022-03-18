@@ -131,10 +131,10 @@ public class UserStatusSelectorModel : GLib.Object {
 
     UserStatus.OnlineStatus online_status {
         public get {
-            return this.user_status.state ();
+            return this.user_status.state;
         }
         public set {
-            if (value == this.user_status.state ()) {
+            if (value == this.user_status.state) {
                 return;
             }
     
@@ -253,7 +253,7 @@ public class UserStatusSelectorModel : GLib.Object {
 
         this.user_status.message_predefined (true);
         const var predefined_status = this.predefined_statuses[index];
-        this.user_status.id (predefined_status.identifier ());
+        this.user_status.id (predefined_status.identifier);
         this.user_status.message (predefined_status.message ());
         this.user_status.icon (predefined_status.icon ());
         this.user_status.clear_at (predefined_status.clear_at ());
@@ -357,12 +357,12 @@ public class UserStatusSelectorModel : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_user_status_fetched (UserStatus user_status) {
-        if (user_status.state () != UserStatus.OnlineStatus.Offline) {
-            this.user_status.state (user_status.state ());
+        if (user_status.state != UserStatus.OnlineStatus.Offline) {
+            this.user_status.state (user_status.state);
         }
         this.user_status.message (user_status.message ());
         this.user_status.message_predefined (user_status.message_predefined ());
-        this.user_status.id (user_status.identifier ());
+        this.user_status.id (user_status.identifier);
         this.user_status.clear_at (user_status.clear_at ());
 
         if (!user_status.icon () == "") {

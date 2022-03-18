@@ -75,7 +75,7 @@ public class HttpCredentialsGui : HttpCredentials {
     /***********************************************************
     ***********************************************************/
     static string request_app_password_text (Account account) {
-        int version = account.server_version_int ();
+        int version = account.server_version_int;
         var url = account.url.to_string ();
         if (url.ends_with ('/'))
             url.chop (1);
@@ -133,7 +133,7 @@ public class HttpCredentialsGui : HttpCredentials {
                          + "Account: %3<br>")
                         .printf (Utility.escape (Theme.app_name_gui),
                             Utility.escape (this.user),
-                            Utility.escape (this.account.display_name ()));
+                            Utility.escape (this.account.display_name));
 
         string req_txt = request_app_password_text (this.account);
         if (!req_txt == "") {
@@ -198,7 +198,7 @@ public class HttpCredentialsGui : HttpCredentials {
         if (type == DetermineAuthTypeJob.AuthType.OAUTH) {
 
             this.async_auth.on_signal_reset (new OAuth (this.account, this));
-            this.async_auth.expected_user = this.account.dav_user ();
+            this.async_auth.expected_user = this.account.dav_user;
             this.async_auth.signal_result.connect (
                 this.on_signal_async_auth_result
             );

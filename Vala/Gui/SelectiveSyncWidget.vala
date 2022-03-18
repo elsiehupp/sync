@@ -193,7 +193,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
         var root = static_cast<SelectiveSyncTreeViewItem> (this.folder_tree.top_level_item (0));
 
         GLib.Uri url = this.account.dav_url ();
-        string path_to_remove = url.path ();
+        string path_to_remove = url.path;
         if (!path_to_remove.ends_with ('/')) {
             path_to_remove.append ('/');
         }
@@ -205,7 +205,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
         QMutableListIterator<string> it (list);
         while (it.has_next ()) {
             it.next ();
-            if (this.excluded_files.is_excluded (it.value (), path_to_remove, FolderMan.instance.ignore_hidden_files ()))
+            if (this.excluded_files.is_excluded (it.value (), path_to_remove, FolderMan.instance.ignore_hidden_files))
                 it.remove ();
         }
 
@@ -367,7 +367,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_lscol_finished_with_error (Soup.Reply r) {
-        if (r.error () == Soup.Reply.ContentNotFoundError) {
+        if (r.error == Soup.Reply.ContentNotFoundError) {
             this.loading.on_signal_text (_("No subfolders currently on the server."));
         } else {
             this.loading.on_signal_text (_("An error occurred while loading the list of sub folders."));
@@ -384,7 +384,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
             return;
         }
 
-        const var webdav_folder = GLib.Uri (this.account.dav_url ()).path ();
+        const var webdav_folder = GLib.Uri (this.account.dav_url ()).path;
         //  Q_ASSERT (path.starts_with (webdav_folder));
         // This dialog use the postfix / convention for folder paths
         this.encrypted_paths + path.mid (webdav_folder.size ()) + '/';
@@ -399,7 +399,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
         var lscol_job = new LscolJob (this.account, this.folder_path, this);
         var props = GLib.List<string> ("resourcetype"
                                          + "http://owncloud.org/ns:size";
-        if (this.account.capabilities ().client_side_encryption_available ()) {
+        if (this.account.capabilities.client_side_encryption_available ()) {
             props + "http://nextcloud.org/ns:is-encrypted";
         }
         lscol_job.properties (props);

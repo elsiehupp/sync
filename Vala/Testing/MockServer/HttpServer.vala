@@ -57,7 +57,7 @@ public class HttpServer : QTcpServer {
 
                 QtServiceBase.instance.log_message ("Wrote to client");
 
-                if (socket.state () == QTcpSocket.UnconnectedState) {
+                if (socket.state == QTcpSocket.UnconnectedState) {
                     delete socket;
                     QtServiceBase.instance.log_message ("Connection closed");
                 }

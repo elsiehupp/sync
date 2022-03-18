@@ -124,7 +124,7 @@ public class JsonApiJob : AbstractNetworkJob {
         add_raw_header ("OCS-APIREQUEST", "true");
         var query = this.additional_params;
         query.add_query_item ("format", "json");
-        GLib.Uri url = Utility.concat_url_path (account.url, path (), query);
+        GLib.Uri url = Utility.concat_url_path (account.url, this.path, query);
         const string http_verb = this.verb.to_string ();
         if (!this.body == "") {
             send_request (http_verb, url, this.request, this.body);
@@ -143,8 +143,8 @@ public class JsonApiJob : AbstractNetworkJob {
 
         int status_code = 0;
         int http_status_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-        if (this.reply.error () != Soup.Reply.NoError) {
-            GLib.warning ("Network error: " + path () + error_string () + this.reply.attribute (Soup.Request.HttpStatusCodeAttribute));
+        if (this.reply.error != Soup.Reply.NoError) {
+            GLib.warning ("Network error: " + this.path + this.error_string + this.reply.attribute (Soup.Request.HttpStatusCodeAttribute));
             status_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             /* emit */ signal_json_received (QJsonDocument (), status_code);
             return true;
@@ -182,8 +182,8 @@ public class JsonApiJob : AbstractNetworkJob {
         QJsonParseError error;
         var json = QJsonDocument.from_json (json_str.to_utf8 (), error);
         // empty or invalid response and status code is != 304 because json_str is expected to be empty
-        if ( (error.error != QJsonParseError.NoError || json.is_null ()) && http_status_code != NOT_MODIFIED_STATUS_CODE) {
-            GLib.warning ("Invalid JSON! " + json_str + error.error_string ());
+        if ( (error.error != QJsonParseError.NoError || json == null) && http_status_code != NOT_MODIFIED_STATUS_CODE) {
+            GLib.warning ("Invalid JSON! " + json_str + error.error_string);
             /* emit */ signal_json_received (json, status_code);
             return true;
         }

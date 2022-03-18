@@ -47,16 +47,16 @@ public class WizardCommon {
             return;
 
         Gdk.Pixbuf pix = variant.value<Gdk.Pixbuf> ();
-        if (!pix.is_null ()) {
+        if (!pix == null) {
             label.pixmap (pix);
             label.alignment (Qt.AlignTop | Qt.Align_right);
-            label.visible (true);
+            label.visible = true;
         } else {
             string string_value = variant.to_string ();
             if (!string_value == "") {
                 label.on_signal_text (string_value);
                 label.text_format (Qt.RichText);
-                label.visible (true);
+                label.visible = true;
                 label.open_external_links (true);
             }
         }
@@ -88,7 +88,7 @@ public class WizardCommon {
         var size_policy = error_label.size_policy ();
         size_policy.retain_size_when_hidden (true);
         error_label.size_policy (size_policy);
-        error_label.visible (false);
+        error_label.visible = false;
     }
 
 

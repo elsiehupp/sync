@@ -30,7 +30,7 @@ quota is not updated fast enough when changed on the server.
 If the fetch job is not finished within 30 seconds, it is cancelled and another
 
 Constructor notes:
- - allow_disconnected_account_state : set to true if you want to ignore AccountState's is_connected () state,
+ - allow_disconnected_account_state : set to true if you want to ignore AccountState's is_connected state,
    this is used by ConnectionValidator (prior having a valid AccountState).
  - fetch_avatar_image : set to false if you don't want to fetch the avatar image
 
@@ -64,8 +64,8 @@ public class UserInfo : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    int64 last_quota_total_bytes { public get; private set; }
-    int64 last_quota_used_bytes { public get; private set; }
+    public int64 last_quota_total_bytes { public get; private set; }
+    public int64 last_quota_used_bytes { public get; private set; }
 
     private GLib.Timeout job_restart_timer;
 
@@ -82,7 +82,7 @@ public class UserInfo : GLib.Object {
     the quota immediately if the last time the quota was
     requested was more than the interval
     ***********************************************************/
-    bool active {
+    public bool active {
         private get {
             return this.active;
         }
@@ -169,7 +169,7 @@ public class UserInfo : GLib.Object {
         int64 used = obj_quota.value ("used").to_double ();
         int64 total = obj_quota.value ("quota").to_double ();
 
-        if (this.last_info_received.is_null () || this.last_quota_used_bytes != used || this.last_quota_total_bytes != total) {
+        if (this.last_info_received == null || this.last_quota_used_bytes != used || this.last_quota_total_bytes != total) {
             this.last_quota_used_bytes = used;
             this.last_quota_total_bytes = total;
             /* emit */ quota_updated (this.last_quota_total_bytes, this.last_quota_used_bytes);
@@ -180,7 +180,7 @@ public class UserInfo : GLib.Object {
 
         // Avatar Image
         if (this.fetch_avatar_image) {
-            var avatar_job = new AvatarJob (account, account.dav_user (), 128, this);
+            var avatar_job = new AvatarJob (account, account.dav_user, 128, this);
             avatar_job.on_signal_timeout (20 * 1000);
             avatar_job.avatar_pixmap.connect (
                 this.on_signal_avatar_image
@@ -199,7 +199,7 @@ public class UserInfo : GLib.Object {
             // Obviously assumes there will never be more than thousand of hours between last info
             // received and now, hence why we static_cast
             var elapsed = static_cast<int> (this.last_info_received.msecs_to (GLib.DateTime.current_date_time ()));
-            if (this.last_info_received.is_null () || elapsed >= DEFAULT_INTERVAL_T) {
+            if (this.last_info_received == null || elapsed >= DEFAULT_INTERVAL_T) {
                 on_signal_fetch_info ();
             } else {
                 this.job_restart_timer.on_signal_start (DEFAULT_INTERVAL_T - elapsed);
@@ -235,7 +235,7 @@ public class UserInfo : GLib.Object {
             return false;
         }
         unowned Account account = this.account_state.account;
-        return (this.account_state.is_connected () || this.allow_disconnected_account_state)
+        return (this.account_state.is_connected || this.allow_disconnected_account_state)
             && account.credentials ()
             && account.credentials ().ready ();
     }

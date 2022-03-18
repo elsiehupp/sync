@@ -99,7 +99,6 @@ public class WebFlowCredentialsDialog : Gtk.Dialog {
         WizardCommon.init_error_label (this.error_label);
 
         this.layout.add_layout (this.container_layout);
-        layout (this.layout);
 
         customize_style ();
     }

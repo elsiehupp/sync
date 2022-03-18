@@ -56,7 +56,7 @@ public class Folder : GLib.Object {
     /***********************************************************
     The account the folder is configured on.
     ***********************************************************/
-    unowned AccountState account_state { public get; private set; }
+    public unowned AccountState account_state { public get; private set; }
 
     private FolderDefinition definition;
 
@@ -69,7 +69,7 @@ public class Folder : GLib.Object {
     /***********************************************************
     The last sync result with error message and status
     ***********************************************************/
-    SyncResult sync_result { public get; private set; }
+    public SyncResult sync_result { public get; private set; }
 
     private QScopedPointer<SyncEngine> engine;
     private QPointer<RequestEtagJob> request_etag_job;
@@ -118,7 +118,7 @@ public class Folder : GLib.Object {
     Migration: When this flag is true, this folder will save to
     the backwards-compatible 'Folders' section in the config file.
     ***********************************************************/
-    bool save_backwards_compatible { public get; private set; }
+    public bool save_backwards_compatible { public get; private set; }
 
     /***********************************************************
     Whether the folder should be saved in that settings group
@@ -134,7 +134,7 @@ public class Folder : GLib.Object {
     Behavior should be that this defaults to false but is always true when toggled
     void set -> this.save_in_folders_with_placeholders = true;
     ***********************************************************/
-    bool save_in_folders_with_placeholders { public get; private set; }
+    public bool save_in_folders_with_placeholders { public get; private set; }
 
     /***********************************************************
     virtual files of some kind are enabled
@@ -144,21 +144,21 @@ public class Folder : GLib.Object {
     automatic virtual file. But when it's on, the shell context
     menu will allow users to make existing files virtual.
     ***********************************************************/
-    bool virtual_files_enabled {
+    public bool virtual_files_enabled {
         public get {
             return this.definition.virtual_files_mode != Vfs.Off && !is_vfs_on_signal_off_switch_pending ();
         }
         public set {
             AbstractVfs.Mode new_mode = this.definition.virtual_files_mode;
             if (value && this.definition.virtual_files_mode == Vfs.Off) {
-                new_mode = best_available_vfs_mode ();
+                new_mode = this.best_available_vfs_mode;
             } else if (!value && this.definition.virtual_files_mode != Vfs.Off) {
                 new_mode = Vfs.Off;
             }
         
             if (new_mode != this.definition.virtual_files_mode) {
                 // TODO: Must wait for current sync to finish!
-                SyncEngine.wipe_virtual_files (path (), this.journal, this.vfs);
+                SyncEngine.wipe_virtual_files (path, this.journal, this.vfs);
         
                 this.vfs.stop ();
                 this.vfs.unregister_folder ();
@@ -210,11 +210,11 @@ public class Folder : GLib.Object {
     /***********************************************************
     The vfs mode instance (created by plugin) to use. Never null.
     ***********************************************************/
-    unowned Vfs vfs { public get; private set; }
+    public unowned Vfs vfs { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
-    QUuid navigation_pane_clsid {
+    public QUuid navigation_pane_clsid {
         public get {
             return this.definition.navigation_pane_clsid;
         }
@@ -228,7 +228,7 @@ public class Folder : GLib.Object {
     /***********************************************************
     Switch sync on or off
     ***********************************************************/
-    bool sync_paused {
+    public bool sync_paused {
         public set {
             if (value == this.definition.paused) {
                 return;
@@ -261,7 +261,7 @@ public class Folder : GLib.Object {
         this.last_sync_duration = 0;
         this.consecutive_failing_syncs = 0;
         this.consecutive_follow_up_syncs = 0;
-        this.journal = this.definition.absolute_journal_path ();
+        this.journal = this.definition.absolute_journal_path;
         this.file_log = new SyncRunFileLog ();
         this.vfs = vfs.release ();
         this.save_backwards_compatible = false;
@@ -276,11 +276,11 @@ public class Folder : GLib.Object {
         this.sync_result.status (status);
     
         // check if the local path exists
-        check_local_path ();
+        check_local_path;
     
         this.sync_result.folder (this.definition.alias);
     
-        this.engine.on_signal_reset (new SyncEngine (this.account_state.account, path (), remote_path (), this.journal));
+        this.engine.on_signal_reset (new SyncEngine (this.account_state.account, this.path, remote_path, this.journal));
         // pass the setting if hidden files are to be ignored, will be read in csync_update
         this.engine.ignore_hidden_files (this.definition.ignore_hidden_files);
     
@@ -350,7 +350,7 @@ public class Folder : GLib.Object {
                 var winvfs = create_vfs_from_plugin (Vfs.WindowsCfApi);
                 if (winvfs) {
                     // Wipe the existing suffix files from fs and journal
-                    SyncEngine.wipe_virtual_files (path (), this.journal, this.vfs);
+                    SyncEngine.wipe_virtual_files (path, this.journal, this.vfs);
     
                     // Then switch to winvfs mode
                     this.vfs.on_signal_reset (winvfs.release ());
@@ -383,15 +383,15 @@ public class Folder : GLib.Object {
         //  ENFORCE (this.vfs.mode () == this.definition.virtual_files_mode);
 
         Vfs.SetupParameters vfs_params;
-        vfs_params.filesystem_path = path ();
+        vfs_params.filesystem_path = this.path;
         vfs_params.display_name = short_gui_remote_path_or_app_name ();
         vfs_params.alias = alias ();
-        vfs_params.remote_path = remote_path_trailing_slash ();
+        vfs_params.remote_path = remote_path_trailing_slash;
         vfs_params.account = this.account_state.account;
         vfs_params.journal = this.journal;
         vfs_params.provider_name = Theme.app_name_gui;
         vfs_params.provider_version = Theme.version;
-        vfs_params.multiple_accounts_registered = AccountManager.instance.accounts ().size () > 1;
+        vfs_params.multiple_accounts_registered = AccountManager.instance.accounts.size () > 1;
 
         this.vfs.signal_begin_hydrating.connect (
             this.on_signal_hydration_starts
@@ -408,7 +408,7 @@ public class Folder : GLib.Object {
 
         // Immediately mark the sqlite temporaries as excluded. They get recreated
         // on database-open and need to get marked again every time.
-        string state_database_file = this.journal.database_file_path ();
+        string state_database_file = this.journal.database_file_path;
         this.journal.open ();
         this.vfs.on_signal_file_status_changed (state_database_file + "-wal", SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED);
         this.vfs.on_signal_file_status_changed (state_database_file + "-shm", SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED);
@@ -428,8 +428,8 @@ public class Folder : GLib.Object {
     path instead
     ***********************************************************/
     public string short_gui_remote_path_or_app_name () {
-        if (remote_path ().length () > 0 && remote_path () != "/") {
-            string a = GLib.File (remote_path ()).filename ();
+        if (this.remote_path.length > 0 && this.remote_path != "/") {
+            string a = new GLib.File (this.remote_path).filename ();
             if (a.starts_with ('/')) {
                 a = a.remove (0, 1);
             }
@@ -443,16 +443,16 @@ public class Folder : GLib.Object {
     /***********************************************************
     Short local path to display on the GUI (native separators)
     ***********************************************************/
-    public string short_gui_local_path () {
+    public string short_gui_local_path {
         string p = this.definition.local_path;
-        string home = GLib.Dir.home_path ();
+        string home = GLib.Dir.home_path;
         if (!home.ends_with ('/')) {
             home.append ('/');
         }
         if (p.starts_with (home)) {
-            p = p.mid (home.length ());
+            p = p.mid (home.length);
         }
-        if (p.length () > 1 && p.ends_with ('/')) {
+        if (p.length > 1 && p.ends_with ('/')) {
             p.chop (1);
         }
         return GLib.Dir.to_native_separators (p);
@@ -462,22 +462,22 @@ public class Folder : GLib.Object {
     /***********************************************************
     Canonical local folder path, always ends with '/'
     ***********************************************************/
-    public string path () {
+    public string this.path {
         return this.canonical_local_path;
     }
 
 
     /***********************************************************
-    Cleaned canonical folder path, like path () but never ends
+    Cleaned canonical folder path, like this.path but never ends
     with a '/'.
 
-    Wrapper for GLib.Dir.clean_path (path ()) except for "Z:/",
+    Wrapper for GLib.Dir.clean_path (path) except for "Z:/",
     where it returns "Z:" instead of "Z:/".
     ***********************************************************/
-    public string clean_path () {
+    public string clean_path {
         string cleaned_path = GLib.Dir.clean_path (this.canonical_local_path);
     
-        if (cleaned_path.length () == 3 && cleaned_path.ends_with (":/"))
+        if (cleaned_path.length == 3 && cleaned_path.ends_with (":/"))
             cleaned_path.remove (2, 1);
     
         return cleaned_path;
@@ -487,19 +487,24 @@ public class Folder : GLib.Object {
     /***********************************************************
     Remote folder path, usually without trailing '/', exception "/"
     ***********************************************************/
-    public string remote_path () {
-        return this.definition.target_path;
+    public string remote_path {
+        public get {
+            return this.definition.target_path;
+        }
     }
 
 
     /***********************************************************
     Remote folder path, always with a trailing '/'
     ***********************************************************/
-    public string remote_path_trailing_slash () {
-        string result = remote_path ();
-        if (!result.ends_with ('/'))
-            result.append ('/');
-        return result;
+    public string remote_path_trailing_slash {
+        public get {
+            string result = remote_path;
+            if (!result.ends_with ('/')) {
+                result.append ('/');
+            }
+            return result;
+        }
     }
 
 
@@ -507,7 +512,7 @@ public class Folder : GLib.Object {
     Remote folder path with server url
     ***********************************************************/
     public GLib.Uri remote_url () {
-        return Utility.concat_url_path (this.account_state.account.dav_url (), remote_path ());
+        return Utility.concat_url_path (this.account_state.account.dav_url (), remote_path);
     }
 
 
@@ -515,7 +520,7 @@ public class Folder : GLib.Object {
     Returns true when the folder may sync.
     ***********************************************************/
     public bool can_sync () {
-        return !sync_paused () && account_state ().is_connected ();
+        return !sync_paused && account_state.is_connected;
     }
 
 
@@ -557,11 +562,11 @@ public class Folder : GLib.Object {
         on_signal_discard_download_progress ();
     
         // Unregister the socket API so it does not keep the .sync_journal file open
-        FolderMan.instance.socket_api ().on_signal_unregister_path (alias ());
+        FolderMan.instance.socket_api.on_signal_unregister_path (alias ());
         this.journal.close (); // close the sync journal
     
         // Remove database and temporaries
-        string state_database_file = this.engine.journal ().database_file_path ();
+        string state_database_file = this.engine.journal.database_file_path;
     
         GLib.File file = GLib.File.new_for_path (state_database_file);
         if (file.exists ()) {
@@ -575,7 +580,7 @@ public class Folder : GLib.Object {
         }
     
         // Also remove other database related files
-        GLib.File.remove (state_database_file + ".ctmp");
+        GLib.File.remove (state_database_file + ".ctemporary");
         GLib.File.remove (state_database_file + "-shm");
         GLib.File.remove (state_database_file + "-wal");
         GLib.File.remove (state_database_file + "-journal");
@@ -681,12 +686,12 @@ public class Folder : GLib.Object {
         // True if the folder path appears in only one account
         int accounts = 1;
         foreach (var Folder in FolderMan.instance.map ()){
-            if (other != this && other.clean_path () == this.clean_path ()) {
+            if (other != this && other.clean_path == this.clean_path) {
                 accounts++;
             }
         }
 
-        if (virtual_files_enabled () || this.save_in_folders_with_placeholders) {
+        if (this.virtual_files_enabled || this.save_in_folders_with_placeholders) {
             // If virtual files are enabled or even were enabled at some point,
             // save the folder to a group that will not be read by older (<2.5.0) clients.
             // The name is from when virtual files were called placeholders.
@@ -733,7 +738,7 @@ public class Folder : GLib.Object {
     Returns whether a file inside this folder should be excluded.
     ***********************************************************/
     public bool is_file_excluded_absolute (string full_path) {
-        return this.engine.excluded_files ().is_excluded (full_path, path (), this.definition.ignore_hidden_files);
+        return this.engine.excluded_files ().is_excluded (full_path, this.path, this.definition.ignore_hidden_files);
     }
 
 
@@ -741,7 +746,7 @@ public class Folder : GLib.Object {
     Returns whether a file inside this folder should be excluded.
     ***********************************************************/
     public bool is_file_excluded_relative (string relative_path) {
-        return this.engine.excluded_files ().is_excluded (path () + relative_path, path (), this.definition.ignore_hidden_files);
+        return this.engine.excluded_files ().is_excluded (path + relative_path, this.path, this.definition.ignore_hidden_files);
     }
 
 
@@ -771,7 +776,7 @@ public class Folder : GLib.Object {
     public void register_folder_watcher () {
         if (this.folder_watcher)
             return;
-        if (!GLib.Dir (path ()).exists ())
+        if (!GLib.Dir (path).exists ())
             return;
     
         this.folder_watcher.on_signal_reset (new FolderWatcher (this));
@@ -784,8 +789,8 @@ public class Folder : GLib.Object {
         this.folder_watcher.signal_became_unreliable.connect (
             this.on_signal_watcher_unreliable
         );
-        this.folder_watcher.init (path ());
-        this.folder_watcher.start_notificaton_test (path () + ".owncloudsync.log");
+        this.folder_watcher.init (path);
+        this.folder_watcher.start_notificaton_test (path + ".owncloudsync.log");
     }
 
 
@@ -826,7 +831,7 @@ public class Folder : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void switch_to_virtual_files () {
-        SyncEngine.switch_to_virtual_files (path (), this.journal, this.vfs);
+        SyncEngine.switch_to_virtual_files (path, this.journal, this.vfs);
         this.has_switched_to_vfs = true;
     }
 
@@ -844,15 +849,17 @@ public class Folder : GLib.Object {
     /***********************************************************
     Whether this folder should show selective sync ui
     ***********************************************************/
-    public bool supports_selective_sync () {
-        return !virtual_files_enabled () && !is_vfs_on_signal_off_switch_pending ();
+    public bool supports_selective_sync {
+        public get {
+            return !this.virtual_files_enabled && !is_vfs_on_signal_off_switch_pending ();
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public string file_from_local_path (string local_path) {
-        return local_path.mid (clean_path ().length () + 1);
+        return local_path.mid (clean_path.length + 1);
     }
 
 
@@ -912,15 +919,15 @@ public class Folder : GLib.Object {
               + "If this was an accident and you decide to keep your files, they will be re-synced from the server.");
         var message_box = new Gtk.MessageBox (
             Gtk.MessageBox.Warning, _("Remove All Files?"),
-            message.printf (short_gui_local_path ()),
+            message.printf (short_gui_local_path),
             Gtk.MessageBox.NoButton
         );
         message_box.attribute (Qt.WA_DeleteOnClose);
         message_box.window_flags (message_box.window_flags () | Qt.Window_stays_on_signal_top_hint);
         message_box.add_button (_("Remove all files"), Gtk.MessageBox.DestructiveRole);
         QPushButton keep_button = message_box.add_button (_("Keep files"), Gtk.MessageBox.AcceptRole);
-        bool old_paused = sync_paused ();
-        sync_paused (true);
+        bool old_paused = sync_paused;
+        this.sync_paused = true;
         message_box.signal_finished.connect (
             this.on_signal_message_box_finished
         );
@@ -937,12 +944,12 @@ public class Folder : GLib.Object {
         const bool cancel = message_box.clicked_button () == keep_button;
         callback (cancel);
         if (cancel) {
-            FileSystem.folder_minimum_permissions (path ());
+            FileSystem.folder_minimum_permissions (path);
             journal_database ().clear_file_table ();
             this.last_etag.clear ();
             on_signal_schedule_this_folder ();
         }
-        sync_paused (old_paused);
+        this.sync_paused = old_paused;
     }
 
 
@@ -969,7 +976,7 @@ public class Folder : GLib.Object {
             + Theme.version.to_string ()
         );
     
-        this.file_log.on_signal_start (path ());
+        this.file_log.on_signal_start (path);
     
         if (!reload_excludes ()) {
             on_signal_sync_error (_("Could not read system exclude file"));
@@ -1046,7 +1053,7 @@ public class Folder : GLib.Object {
         const GLib.List<SyncJournalDb.DownloadInfo> deleted_infos =
             this.journal.and_delete_stale_download_infos (keep_nothing);
         foreach (var deleted_info in deleted_infos) {
-            const string temporary_path = folderpath.file_path (deleted_info.tmpfile);
+            const string temporary_path = folderpath.file_path (deleted_info.temporaryfile);
             GLib.info ("Deleting temporary file: " + temporary_path);
             FileSystem.remove (temporary_path);
         }
@@ -1082,12 +1089,12 @@ public class Folder : GLib.Object {
     trigger a new sync run to be scheduled.
     ***********************************************************/
     public void on_signal_watched_path_changed (string path, ChangeReason reason) {
-        if (!path.starts_with (this.path ())) {
+        if (!path.starts_with (this.path)) {
             GLib.debug ("Changed path is not contained in folder, ignoring: " + path);
             return;
         }
     
-        var relative_path = path.mid_ref (this.path ().size ());
+        var relative_path = path.mid_ref (this.path.size ());
     
         // Add to list of locally modified paths
         //
@@ -1339,7 +1346,7 @@ public class Folder : GLib.Object {
     ***********************************************************/
     private 
     void Folder.on_signal_item_completed (SyncFileItemPtr item) {
-        if (item.instruction == SyncInstructions.NONE || item.instruction == SyncInstructions.UPDATE_METADATA) {
+        if (item.instruction == CSync.SyncInstructions.NONE || item.instruction == CSync.SyncInstructions.UPDATE_METADATA) {
             // We only care about the updates that deserve to be shown in the UI
             return;
         }
@@ -1364,14 +1371,14 @@ public class Folder : GLib.Object {
         }
     
         if (!can_sync ()) {
-            GLib.info ("Not syncing: " + remote_url ().to_string () + this.definition.paused + AccountState.state_string (this.account_state.state ()));
+            GLib.info ("Not syncing: " + remote_url ().to_string () + this.definition.paused + AccountState.state_string (this.account_state.state));
             return;
         }
     
         // Do the ordinary etag check for the root folder and schedule a
         // sync if it's different.
     
-        this.request_etag_job = new RequestEtagJob (account, remote_path (), this);
+        this.request_etag_job = new RequestEtagJob (account, remote_path, this);
         this.request_etag_job.on_signal_timeout (60 * 1000);
         // check if the etag is different when retrieved
         this.request_etag_job.signal_etag_retrieved.connect (
@@ -1386,7 +1393,7 @@ public class Folder : GLib.Object {
     ***********************************************************/
     private void on_signal_etag_retrieved (string value1, GLib.DateTime tp) {
         // re-enable sync if it was disabled because network was down
-        FolderMan.instance.sync_enabled (true);
+        FolderMan.instance.sync_enabled = true;
     
         if (this.last_etag != etag) {
             GLib.info ("Compare etag with previous etag: last: " + this.last_etag + ", received: " + etag + ". CHANGED");
@@ -1402,7 +1409,7 @@ public class Folder : GLib.Object {
     ***********************************************************/
     private void on_signal_etag_retrieved_from_sync_engine (string etag, GLib.DateTime time) {
         GLib.info ("Root etag from during sync: " + etag);
-        account_state ().tag_last_successful_etag_request (time);
+        account_state.tag_last_successful_etag_request (time);
         this.last_etag = etag;
     }
 
@@ -1528,10 +1535,10 @@ public class Folder : GLib.Object {
         const string message = file_info.is_dir ()
             ? _("The folder %1 was created but was excluded from synchronization previously. "
                 + "Data inside it will not be synchronized.")
-                  .printf (file_info.file_path ())
+                  .printf (file_info.file_path)
             : _("The file %1 was created but was excluded from synchronization previously. "
                 + "It will not be synchronized.")
-                  .printf (file_info.file_path ());
+                  .printf (file_info.file_path);
     
         Logger.instance.post_optional_gui_log (Theme.app_name_gui, message);
     }
@@ -1541,7 +1548,7 @@ public class Folder : GLib.Object {
     Warn users about an unreliable folder watcher
     ***********************************************************/
     private void on_signal_watcher_unreliable (string message) {
-        GLib.warning ("Folder watcher for " + path () + " became unreliable: " + message);
+        GLib.warning ("Folder watcher for " + this.path + " became unreliable: " + message);
         var full_message =
             _("Changes in synchronized folders could not be tracked reliably.\n"
             + "\n"
@@ -1638,15 +1645,15 @@ public class Folder : GLib.Object {
             create_gui_log (this.sync_result.first_item_locked ().file, LogStatus.FILE_LOCKED, locked_count);
         }
     
-        GLib.info ("Folder " + this.sync_result.folder () + " sync result: " + this.sync_result.status ());
+        GLib.info ("Folder " + this.sync_result.folder + " sync result: " + this.sync_result.status ());
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void check_local_path () {
+    private void check_local_path {
         const GLib.FileInfo file_info = new GLib.FileInfo (this.definition.local_path);
-        this.canonical_local_path = file_info.canonical_file_path ();
+        this.canonical_local_path = file_info.canonical_file_path;
         if (this.canonical_local_path == "") {
             GLib.warning ("Broken symlink: " + this.definition.local_path);
             this.canonical_local_path = this.definition.local_path;

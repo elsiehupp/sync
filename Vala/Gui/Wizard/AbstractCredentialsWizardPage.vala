@@ -34,7 +34,7 @@ public class AbstractCredentialsWizardPage : QWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public virtual AbstractCredentials credentials ();
+    public abstract AbstractCredentials credentials;
 
 } // class AbstractCredentialsWizardPage
 

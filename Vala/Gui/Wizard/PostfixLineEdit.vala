@@ -52,7 +52,7 @@ public class PostfixLineEdit : QLineEdit {
         public set {
             string prefix_string = value;
             if (prefix_string.ends_with (postfix ())) {
-                prefix_string.chop (postfix ().length ());
+                prefix_string.chop (postfix ().length);
             }
             on_signal_text (prefix_string);
         }
@@ -76,7 +76,7 @@ public class PostfixLineEdit : QLineEdit {
         int on_signal_start = rect ().right () - q_round (font_metrics.width (this.postfix));
         QStyle_option_frame panel;
         init_style_option (panel);
-        QRect r = style ().sub_element_rect (QStyle.SE_Line_edit_contents, panel, this);
+        QRect r = this.style.sub_element_rect (QStyle.SE_Line_edit_contents, panel, this);
         r.top (r.top () + HORIZONTAL_MARGIN - 1);
         QRect postfix_rect = new QRect (r);
 

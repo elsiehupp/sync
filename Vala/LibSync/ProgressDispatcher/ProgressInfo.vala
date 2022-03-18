@@ -51,28 +51,28 @@ public class ProgressInfo : GLib.Object {
     
         static string as_action_string (SyncFileItem item) {
             switch (item.instruction) {
-            case SyncInstructions.CONFLICT:
-            case SyncInstructions.SYNC:
-            case SyncInstructions.NEW:
-            case SyncInstructions.TYPE_CHANGE:
+            case CSync.SyncInstructions.CONFLICT:
+            case CSync.SyncInstructions.SYNC:
+            case CSync.SyncInstructions.NEW:
+            case CSync.SyncInstructions.TYPE_CHANGE:
                 if (item.direction != SyncFileItem.Direction.UP)
                     return _("progress", "downloading");
                 else
                     return _("progress", "uploading");
-            case SyncInstructions.REMOVE:
+            case CSync.SyncInstructions.REMOVE:
                 return _("progress", "deleting");
-            case SyncInstructions.EVAL_RENAME:
-            case SyncInstructions.RENAME:
+            case CSync.SyncInstructions.EVAL_RENAME:
+            case CSync.SyncInstructions.RENAME:
                 return _("progress", "moving");
-            case SyncInstructions.IGNORE:
+            case CSync.SyncInstructions.IGNORE:
                 return _("progress", "ignoring");
-            case SyncInstructions.STAT_ERROR:
-            case SyncInstructions.ERROR:
+            case CSync.SyncInstructions.STAT_ERROR:
+            case CSync.SyncInstructions.ERROR:
                 return _("progress", "error");
-            case SyncInstructions.UPDATE_METADATA:
+            case CSync.SyncInstructions.UPDATE_METADATA:
                 return _("progress", "updating local metadata");
-            case SyncInstructions.NONE:
-            case SyncInstructions.EVAL:
+            case CSync.SyncInstructions.NONE:
+            case CSync.SyncInstructions.EVAL:
                 break;
             }
             return "";
@@ -81,9 +81,9 @@ public class ProgressInfo : GLib.Object {
 
         static string as_result_string (SyncFileItem item) {
             switch (item.instruction) {
-            case SyncInstructions.SYNC:
-            case SyncInstructions.NEW:
-            case SyncInstructions.TYPE_CHANGE:
+            case CSync.SyncInstructions.SYNC:
+            case CSync.SyncInstructions.NEW:
+            case CSync.SyncInstructions.TYPE_CHANGE:
                 if (item.direction != SyncFileItem.Direction.UP) {
                     if (item.type == ItemType.VIRTUAL_FILE) {
                         return _("progress", "Virtual file created");
@@ -95,23 +95,23 @@ public class ProgressInfo : GLib.Object {
                 } else {
                     return _("progress", "Uploaded");
                 }
-            case SyncInstructions.CONFLICT:
+            case CSync.SyncInstructions.CONFLICT:
                 return _("progress", "Server version downloaded, copied changed local file into conflict file");
-            case SyncInstructions.REMOVE:
+            case CSync.SyncInstructions.REMOVE:
                 return _("progress", "Deleted");
-            case SyncInstructions.EVAL_RENAME:
-            case SyncInstructions.RENAME:
+            case CSync.SyncInstructions.EVAL_RENAME:
+            case CSync.SyncInstructions.RENAME:
                 return _("progress", "Moved to %1").printf (item.rename_target);
-            case SyncInstructions.IGNORE:
+            case CSync.SyncInstructions.IGNORE:
                 return _("progress", "Ignored");
-            case SyncInstructions.STAT_ERROR:
+            case CSync.SyncInstructions.STAT_ERROR:
                 return _("progress", "Filesystem access error");
-            case SyncInstructions.ERROR:
+            case CSync.SyncInstructions.ERROR:
                 return _("progress", "Error");
-            case SyncInstructions.UPDATE_METADATA:
+            case CSync.SyncInstructions.UPDATE_METADATA:
                 return _("progress", "Updated local metadata");
-            case SyncInstructions.NONE:
-            case SyncInstructions.EVAL:
+            case CSync.SyncInstructions.NONE:
+            case CSync.SyncInstructions.EVAL:
                 return _("progress", "Unknown");
             }
             return _("progress", "Unknown");
@@ -159,7 +159,7 @@ public class ProgressInfo : GLib.Object {
         /***********************************************************
         Updated by update ()
         ***********************************************************/
-        private double progress_per_sec = 0;
+        public double progress_per_sec = 0;
 
         /***********************************************************
         Updated by update ()
@@ -175,7 +175,7 @@ public class ProgressInfo : GLib.Object {
         /***********************************************************
         Set and updated by ProgressInfo
         ***********************************************************/
-        int64 completed {
+        public int64 completed {
             public get {
                 return this.completed; // = 0
             }
@@ -192,29 +192,31 @@ public class ProgressInfo : GLib.Object {
         /***********************************************************
         Set and updated by ProgressInfo
         ***********************************************************/
-        private int64 total = 0;
-
-        //  private friend class ProgressInfo;
+        public int64 total = 0;
 
         /***********************************************************
         Returns the estimates about progress per second and eta.
         ***********************************************************/
-        Estimates estimates () {
-            Estimates est;
-            est.estimated_bandwidth = this.progress_per_sec;
-            if (this.progress_per_sec != 0) {
-                est.estimated_eta = q_round64 (static_cast<double> (this.total - this.completed) / this.progress_per_sec) * 1000;
-            } else {
-                est.estimated_eta = 0; // looks better than int64 max
+        public Estimates estimates {
+            public get {
+                Estimates est;
+                est.estimated_bandwidth = (int64)this.progress_per_sec;
+                if (this.progress_per_sec != 0) {
+                    est.estimated_eta = q_round64 (static_cast<double> (this.total - this.completed) / this.progress_per_sec) * 1000;
+                } else {
+                    est.estimated_eta = 0; // looks better than int64 max
+                }
+                return est;
             }
-            return est;
         }
 
 
         /***********************************************************
         ***********************************************************/
-        int64 remaining () {
-            return this.total - this.completed;
+        public int64 remaining {
+            public get {
+                return this.total - this.completed;
+            }
         }
 
 
@@ -222,7 +224,7 @@ public class ProgressInfo : GLib.Object {
         Update the exponential moving average estimate of
         this.progress_per_sec.
         ***********************************************************/
-        private void update () {
+        public void update () {
             // A good way to think about the smoothing factor:
             // If we make progress P per sec and then stop making progress at all,
             // after N calls to this function (and thus seconds) the this.progress_per_sec
@@ -303,7 +305,7 @@ public class ProgressInfo : GLib.Object {
         this.update_estimates_timer.timeout.connect (
             this.on_signal_update_estimates_timer_timeout
         );
-        reset ();
+        this.reset ();
     }
 
 
@@ -311,7 +313,7 @@ public class ProgressInfo : GLib.Object {
     Resets for a new sync run.
     ***********************************************************/
     public void reset () {
-        this.status = Starting;
+        this.status = Status.STARTING;
 
         this.current_items.clear ();
         this.current_discovered_remote_folder.clear ();
@@ -412,10 +414,10 @@ public class ProgressInfo : GLib.Object {
     ***********************************************************/
     public static inline bool is_size_dependent (SyncFileItem item) {
         return !item.is_directory ()
-            && (item.instruction == SyncInstructions.CONFLICT
-                || item.instruction == SyncInstructions.SYNC
-                || item.instruction == SyncInstructions.NEW
-                || item.instruction == SyncInstructions.TYPE_CHANGE)
+            && (item.instruction == CSync.SyncInstructions.CONFLICT
+                || item.instruction == CSync.SyncInstructions.SYNC
+                || item.instruction == CSync.SyncInstructions.NEW
+                || item.instruction == CSync.SyncInstructions.TYPE_CHANGE)
             && ! (item.type == ItemType.VIRTUAL_FILE
                  || item.type == ItemType.VIRTUAL_FILE_DEHYDRATION);
     }
@@ -429,11 +431,11 @@ public class ProgressInfo : GLib.Object {
         }
 
         this.current_items.remove (item.file);
-        this.file_progress.completed (this.file_progress.completed + item.affected_items);
+        this.file_progress.completed = this.file_progress.completed + item.affected_items;
         if (ProgressInfo.is_size_dependent (item)) {
             this.total_size_of_completed_jobs += item.size;
         }
-        recompute_completed_size ();
+        this.recompute_completed_size ();
         this.last_completed_item = item;
     }
 
@@ -441,14 +443,14 @@ public class ProgressInfo : GLib.Object {
     /***********************************************************
     ***********************************************************/
     void progress_item (SyncFileItem item, int64 completed) {
-        if (!should_count_progress (item)) {
+        if (!this.should_count_progress (item)) {
             return;
         }
 
         this.current_items[item.file].item = item;
         this.current_items[item.file].progress.total = item.size;
-        this.current_items[item.file].progress.completed (completed);
-        recompute_completed_size ();
+        this.current_items[item.file].progress.completed = completed;
+        this.recompute_completed_size ();
 
         // This seems dubious!
         this.last_completed_item = SyncFileItem ();
@@ -459,12 +461,12 @@ public class ProgressInfo : GLib.Object {
     Get the total completion estimate
     ***********************************************************/
     Estimates total_progress () {
-        Estimates file = this.file_progress.estimates ();
+        Estimates file = this.file_progress.estimates;
         if (this.size_progress.total == 0) {
             return file;
         }
 
-        Estimates size = this.size_progress.estimates ();
+        Estimates size = this.size_progress.estimates;
 
         // Ideally the remaining time would be modeled as:
         //   remaning_file_sizes / transfer_speed
@@ -511,8 +513,8 @@ public class ProgressInfo : GLib.Object {
                                         1.0);
 
         double be_optimistic = near_max_fps * slow_transfer;
-        size.estimated_eta = uint64 ( (1.0 - be_optimistic) * size.estimated_eta
-            + be_optimistic * optimistic_eta ());
+        size.estimated_eta = (uint64) ( (1.0 - be_optimistic) * size.estimated_eta
+            + be_optimistic * optimistic_eta);
 
         return size;
     }
@@ -524,13 +526,15 @@ public class ProgressInfo : GLib.Object {
     This value is based on the highest observed transfer bandwidth
     and files-per-second speed.
     ***********************************************************/
-    uint64 optimistic_eta () {
-        // This assumes files and transfers finish as quickly as possible
-        // *but* note that max_per_second could be serious underestimate
-        // (if we never got to fully excercise transfer or files/second)
-
-        return this.file_progress.remaining () / this.max_files_per_second * 1000
-            + this.size_progress.remaining () / this.max_bytes_per_second * 1000;
+    uint64 optimistic_eta {
+        private get {
+            // This assumes files and transfers finish as quickly as possible
+            // *but* note that max_per_second could be serious underestimate
+            // (if we never got to fully excercise transfer or files/second)
+    
+            return this.file_progress.remaining / this.max_files_per_second * 1000
+                + this.size_progress.remaining / this.max_bytes_per_second * 1000;
+        }
     }
 
 
@@ -541,7 +545,7 @@ public class ProgressInfo : GLib.Object {
     See #5046.
     ***********************************************************/
     bool trust_eta () {
-        return total_progress ().estimated_eta < 100 * optimistic_eta ();
+        return total_progress ().estimated_eta < 100 * optimistic_eta;
     }
 
 
@@ -549,7 +553,7 @@ public class ProgressInfo : GLib.Object {
     Get the current file completion estimate structure
     ***********************************************************/
     Estimates file_progress_for_item (SyncFileItem item) {
-        return this.current_items[item.file].progress.estimates ();
+        return this.current_items[item.file].progress.estimates;
     }
 
 
@@ -580,12 +584,13 @@ public class ProgressInfo : GLib.Object {
     progress of active ones.
     ***********************************************************/
     private void recompute_completed_size () {
-        int64 r = this.total_size_of_completed_jobs;
-        foreach (ProgressItem i in this.current_items) {
-            if (is_size_dependent (i.item))
-                r += i.progress.completed;
+        int64 recomputed_size = this.total_size_of_completed_jobs;
+        foreach (ProgressItem progress_item in this.current_items) {
+            if (is_size_dependent (progress_item.item)) {
+                recomputed_size += progress_item.progress.completed;
+            }
         }
-        this.size_progress.completed (r);
+        this.size_progress.completed = recomputed_size;
     }
 
 

@@ -30,7 +30,7 @@ public class LockEncryptFolderApiJob : AbstractNetworkJob {
         request.raw_header ("OCS-APIREQUEST", "true");
         QUrlQuery query;
         query.add_query_item ("format", "json");
-        GLib.Uri url = Utility.concat_url_path (account.url, path ());
+        GLib.Uri url = Utility.concat_url_path (account.url, this.path);
         url.query (query);
 
         GLib.info ("Locking the folder with identifier " + this.file_identifier.to_string () + " as encrypted.");
@@ -41,8 +41,8 @@ public class LockEncryptFolderApiJob : AbstractNetworkJob {
     protected bool on_signal_finished () {
         int return_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (return_code != 200) {
-            GLib.info ("Error locking file " + path () + error_string () + return_code);
-            /* emit */ error (this.file_identifier, return_code);
+            GLib.info ("Error locking file " + this.path + this.error_string + return_code);
+            /* emit */ signal_error (this.file_identifier, return_code);
             return true;
         }
 
@@ -53,7 +53,7 @@ public class LockEncryptFolderApiJob : AbstractNetworkJob {
         GLib.info ("Got json: " + token);
 
         // TODO: Parse the token and submit.
-        /* emit */ success (this.file_identifier, token);
+        /* emit */ signal_success (this.file_identifier, token);
         return true;
     }
 

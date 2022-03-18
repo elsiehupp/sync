@@ -35,8 +35,10 @@ public class WelcomePage : QWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public int next_id () {
-        return this.next_page;
+    public int next_id {
+        public get {
+            return this.next_page;
+        }
     }
 
 
@@ -152,7 +154,7 @@ public class WelcomePage : QWizardPage {
         this.oc_wizard.next ();
     //  #else // WITH_WEBENGINE
         this.oc_wizard.registration (true);
-        OpenExtrernal.open_browser ("https://nextcloud.com/register");
+        OpenExternal.open_browser ("https://nextcloud.com/register");
     //  #endif // WITH_WEBENGINE
     }
 

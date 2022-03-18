@@ -105,7 +105,7 @@ public class SyncFileStatusTracker : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_path_touched (string filename) {
-        string folder_path = this.sync_engine.local_path ();
+        string folder_path = this.sync_engine.local_path;
 
         //  ASSERT (filename.starts_with (folder_path));
         string local_path = filename.mid (folder_path.size ());
@@ -144,10 +144,10 @@ public class SyncFileStatusTracker : GLib.Object {
             }
 
             SharedFlag shared_flag = item.remote_perm.has_permission (RemotePermissions.Permissions.IS_SHARED) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED;
-            if (item.instruction != SyncInstructions.NONE
-                && item.instruction != SyncInstructions.UPDATE_METADATA
-                && item.instruction != SyncInstructions.IGNORE
-                && item.instruction != SyncInstructions.ERROR) {
+            if (item.instruction != CSync.SyncInstructions.NONE
+                && item.instruction != CSync.SyncInstructions.UPDATE_METADATA
+                && item.instruction != CSync.SyncInstructions.IGNORE
+                && item.instruction != CSync.SyncInstructions.ERROR) {
                 // Mark this path as syncing for instructions that will result in propagation.
                 inc_sync_count_and_emit_status_changed (item.destination (), shared_flag);
             } else {
@@ -192,10 +192,10 @@ public class SyncFileStatusTracker : GLib.Object {
         }
 
         SharedFlag shared_flag = item.remote_perm.has_permission (RemotePermissions.Permissions.IS_SHARED) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED;
-        if (item.instruction != SyncInstructions.NONE
-            && item.instruction != SyncInstructions.UPDATE_METADATA
-            && item.instruction != SyncInstructions.IGNORE
-            && item.instruction != SyncInstructions.ERROR) {
+        if (item.instruction != CSync.SyncInstructions.NONE
+            && item.instruction != CSync.SyncInstructions.UPDATE_METADATA
+            && item.instruction != CSync.SyncInstructions.IGNORE
+            && item.instruction != CSync.SyncInstructions.ERROR) {
             // dec_sync_count calls must* be symetric with inc_sync_count calls in on_signal_about_to_propagate
             dec_sync_count_and_emit_status_changed (item.destination (), shared_flag);
         } else {
@@ -295,11 +295,11 @@ public class SyncFileStatusTracker : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private string get_system_destination (string relative_path) {
-        string system_path = this.sync_engine.local_path () + relative_path;
-        // SyncEngine.local_path () has a trailing slash, make sure to remove it if the
+        string system_path = this.sync_engine.local_path + relative_path;
+        // SyncEngine.local_path has a trailing slash, make sure to remove it if the
         // destination is empty.
         if (system_path.has_suffix ("/")) {
-            system_path.truncate (system_path.length () - 1);
+            system_path.truncate (system_path.length - 1);
         }
         return system_path;
     }
@@ -370,9 +370,11 @@ public class SyncFileStatusTracker : GLib.Object {
         // it's an acceptable compromize to treat all exclude types the same.
         // Update : This extra check shouldn't hurt even though silently excluded files
         // are now available via on_signal_add_silently_excluded ().
-        if (this.sync_engine.excluded_files ().is_excluded (this.sync_engine.local_path () + relative_path,
-                this.sync_engine.local_path (),
-                this.sync_engine.ignore_hidden_files ())) {
+        if (this.sync_engine.excluded_files.is_excluded (
+            this.sync_engine.local_path + relative_path,
+            this.sync_engine.local_path,
+            this.sync_engine.ignore_hidden_files
+        )) {
             return SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED;
         }
 
@@ -380,13 +382,13 @@ public class SyncFileStatusTracker : GLib.Object {
             return SyncFileStatus.SyncFileStatusTag.STATUS_SYNC;
 
         // First look it up in the database to know if it's shared
-        SyncJournalFileRecord record;
-        if (this.sync_engine.journal ().get_file_record (relative_path, record) && record.is_valid ()) {
-            return resolve_sync_and_error_status (relative_path, record.remote_perm.has_permission (RemotePermissions.Permissions.IS_SHARED) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED);
+        SyncJournalFileRecord sync_journal_file_record;
+        if (this.sync_engine.journal.get_file_record (relative_path, sync_journal_file_record) && sync_journal_file_record.is_valid ()) {
+            return this.resolve_sync_and_error_status (relative_path, sync_journal_file_record.remote_perm.has_permission (RemotePermissions.Permissions.IS_SHARED) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED);
         }
 
         // Must be a new file not yet in the database, check if it's syncing or has an error.
-        return resolve_sync_and_error_status (relative_path, SharedFlag.NOT_SHARED, PathKnownFlag.PATH_UNKNOWN);
+        return this.resolve_sync_and_error_status (relative_path, SharedFlag.NOT_SHARED, PathKnownFlag.PATH_UNKNOWN);
     }
 
 
@@ -416,7 +418,7 @@ public class SyncFileStatusTracker : GLib.Object {
     ***********************************************************/
     private static bool has_error_status (SyncFileItem item) {
         var status = item.status;
-        return item.instruction == SyncInstructions.ERROR
+        return item.instruction == CSync.SyncInstructions.ERROR
             || status == SyncFileItem.Status.NORMAL_ERROR
             || status == SyncFileItem.Status.FATAL_ERROR
             || status == SyncFileItem.Status.DETAIL_ERROR
@@ -429,7 +431,7 @@ public class SyncFileStatusTracker : GLib.Object {
     ***********************************************************/
     private static bool has_excluded_status (SyncFileItem item) {
         var status = item.status;
-        return item.instruction == SyncInstructions.IGNORE
+        return item.instruction == CSync.SyncInstructions.IGNORE
             || status == SyncFileItem.Status.FILE_IGNORED
             || status == SyncFileItem.Status.CONFLICT
             || status == SyncFileItem.Status.RESTORATION

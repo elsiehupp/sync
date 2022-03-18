@@ -201,7 +201,7 @@ public class KMessageWidgetPrivate {
             + "border-radius : 4px;"
             + "border: 2px solid %2;".printf (border.name ())
             // DefaultFrameWidth returns the size of the external margin + border width. We know our border is 1px, so we subtract this from the frame normal QStyle FrameWidth to get our margin
-            + "margin: %3px;".printf (widget.style ().pixel_metric (QStyle.PM_DefaultFrameWidth, null, widget) - 1)
+            + "margin: %3px;".printf (widget.this.style.pixel_metric (QStyle.PM_DefaultFrameWidth, null, widget) - 1)
             + "}"
             + ".Gtk.Label { color : %4; }".printf (text_color.name ())
         );

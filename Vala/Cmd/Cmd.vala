@@ -156,7 +156,7 @@ public class Cmd : GLib.Object {
             GLib.error ("Source directory '" + options.source_dir + "' does not exist.");
             exit (1);
         }
-        options.source_dir = file_info.absolute_file_path ();
+        options.source_dir = file_info.absolute_file_path;
 
         QStringListIterator it = new QStringListIterator (args);
         // skip file name;
@@ -217,7 +217,7 @@ public class Cmd : GLib.Object {
     ***********************************************************/
     private void selective_sync_fixup (SyncJournalDb journal, string[] new_list) {
         SqlDatabase database;
-        if (!database.open_or_create_read_write (journal.database_file_path ())) {
+        if (!database.open_or_create_read_write (journal.database_file_path)) {
             return;
         }
 
@@ -324,7 +324,7 @@ public class Cmd : GLib.Object {
 
         const string folder = options.remote_path;
 
-        if (!options.proxy.is_null ()) {
+        if (!options.proxy == null) {
             string host;
             int port = 0;
             bool ok = false;
@@ -370,7 +370,7 @@ public class Cmd : GLib.Object {
         json_api_job.on_signal_start ();
         loop.exec ();
 
-        if (json_api_job.reply ().error () != Soup.Reply.NoError) {
+        if (json_api_job.input_stream.error != Soup.Reply.NoError) {
             GLib.print ("Error connecting to server");
             return EXIT_FAILURE;
         }
@@ -420,51 +420,44 @@ public class Cmd : GLib.Object {
         SyncOptions opt;
         opt.fill_from_environment_variables ();
         opt.verify_chunk_sizes ();
-        SyncEngine engine = new SyncEngine (account, options.source_dir, folder, database);
-        engine.ignore_hidden_files (options.ignore_hidden_files);
-        engine.network_limits (options.uplimit, options.downlimit);
-        GLib.Object.connect (
-            engine,
-            SyncEngine.signal_finished,
-            Cmd.on_signal_sync_engine_finished
+        SyncEngine sync_engine = new SyncEngine (account, options.source_dir, folder, database);
+        sync_engine.ignore_hidden_files (options.ignore_hidden_files);
+        sync_engine.network_limits (options.uplimit, options.downlimit);
+        sync_engine.signal_finished.connect (
+            cmd.on_signal_sync_engine_finished
         );
-        GLib.Object.connect (
-            engine,
-            SyncEngine.signal_transmission_progress,
-            cmd,
-            Cmd.on_signal_transmission_progress
+        sync_engine.signal_transmission_progress.connect (
+            cmd.on_signal_transmission_progress
         );
-        GLib.Object.connect (
-            engine,
-            SyncEngine.signal_sync_error,
-            Cmd.on_signal_sync_error
+        sync_engine.signal_sync_error.connect (
+            cmd.on_signal_sync_error
         );
 
         // Exclude lists
 
-        bool has_user_exclude_file = !options.exclude == "";
+        bool has_user_exclude_file = options.exclude != "";
         string system_exclude_file = ConfigFile.exclude_file_from_system ();
 
         // Always try to load the user-provided exclude list if one is specified
         if (has_user_exclude_file) {
-            engine.excluded_files ().add_exclude_file_path (options.exclude);
+            sync_engine.excluded_files ().add_exclude_file_path (options.exclude);
         }
         // Load the system list if available, or if there's no user-provided list
         if (!has_user_exclude_file || GLib.File.exists (system_exclude_file)) {
-            engine.excluded_files ().add_exclude_file_path (system_exclude_file);
+            sync_engine.excluded_files ().add_exclude_file_path (system_exclude_file);
         }
 
-        if (!engine.excluded_files ().on_signal_reload_exclude_files ()) {
-            q_fatal ("Cannot load system exclude list or list supplied via --exclude");
+        if (!sync_engine.excluded_files ().on_signal_reload_exclude_files ()) {
+            GLib.fatal ("Cannot load system exclude list or list supplied via --exclude");
             return EXIT_FAILURE;
         }
 
         // Have to be done async, else, an error before exec () does not terminate the event loop.
-        QMetaObject.invoke_method (&engine, "on_signal_start_sync", Qt.QueuedConnection);
+        QMetaObject.invoke_method (&sync_engine, "on_signal_start_sync", Qt.QueuedConnection);
 
         int result_code = app.exec ();
 
-        if (engine.is_another_sync_needed () != AnotherSyncNeeded.NO_FOLLOW_UP_SYNC) {
+        if (sync_engine.is_another_sync_needed () != AnotherSyncNeeded.NO_FOLLOW_UP_SYNC) {
             if (restart_count < options.restart_times) {
                 restart_count++;
                 GLib.debug ("Another sync is needed; starting try number " + restart_count.to_string ());

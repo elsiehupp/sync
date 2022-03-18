@@ -15,11 +15,12 @@ public class PUTFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    QIODevice device { public get; private set; }
+    public QIODevice device { public get; private set; }
     private GLib.HashTable<string, string> headers;
+
     new string error_string {
         public get {
-            this.error_string == "" ? AbstractNetworkJob.error_string () : this.error_string;
+            this.error_string == "" ? AbstractNetworkJob.error_string : this.error_string;
         }
         protected set {
             this.error_string = value;
@@ -65,7 +66,7 @@ public class PUTFileJob : AbstractNetworkJob {
 
     ~PUTFileJob () {
         // Make sure that we destroy the GLib.InputStream before our this.device of which it keeps an internal pointer.
-        input_stream (null);
+        this.input_stream = null;
     }
 
     /***********************************************************
@@ -81,11 +82,11 @@ public class PUTFileJob : AbstractNetworkJob {
         if (this.url.is_valid ()) {
             send_request ("PUT", this.url, request, this.device);
         } else {
-            send_request ("PUT", make_dav_url (path ()), request, this.device);
+            send_request ("PUT", make_dav_url (path), request, this.device);
         }
 
-        if (this.input_stream.error () != Soup.Reply.NoError) {
-            GLib.warning (" Network error: " + this.input_stream.error_string ());
+        if (this.input_stream.error != Soup.Reply.NoError) {
+            GLib.warning (" Network error: " + this.input_stream.error_string);
         }
 
         this.input_stream.signal_upload_progress.connect (
@@ -116,8 +117,10 @@ public class PUTFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.TimeSpan ms_since_start () {
-        return GLib.TimeSpan (this.request_timer.elapsed ());
+    public GLib.TimeSpan ms_since_start {
+        public get {
+            return new GLib.TimeSpan (this.request_timer.elapsed ());
+        }
     }
 
 } // class PUTFileJob

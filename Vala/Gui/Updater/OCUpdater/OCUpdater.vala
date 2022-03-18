@@ -98,7 +98,7 @@ public class OCUpdater : Updater {
             // or once for system based updates.
             if (this.state == OCUpdater.DownloadState.DOWNLOAD_COMPLETE || (old_state != OCUpdater.DownloadState.UIPLOAD_ONLY_AVAILABLE_THROUGH_SYSTEM
                                                              && this.state == OCUpdater.DownloadState.UIPLOAD_ONLY_AVAILABLE_THROUGH_SYSTEM)) {
-                /* emit */ signal_new_update_available (_("Update Check"), status_string ());
+                /* emit */ signal_new_update_available (_("Update Check"), status_string);
             }
         }
     }
@@ -241,11 +241,11 @@ public class OCUpdater : Updater {
             // script because owncloud.exe will be shut down for installation.
             // | Out-Null forces powershell to wait for msiexec to finish.
 
-            string msi_log_file = config.config_path () + "msi.log";
+            string msi_log_file = config.config_path + "msi.log";
             string command = "&{msiexec /promptrestart /passive /i '%1' /L*V '%2'| Out-Null ; &'%3'}"
                 .printf (prepare_path_for_powershell (update_file))
                 .printf (prepare_path_for_powershell (msi_log_file))
-                .printf (prepare_path_for_powershell (Gtk.Application.application_file_path ()));
+                .printf (prepare_path_for_powershell (Gtk.Application.application_file_path));
 
             QProcess.start_detached ("powershell.exe", { "-Command", command });
         }
@@ -299,8 +299,8 @@ public class OCUpdater : Updater {
         this.timeout_watchdog.stop ();
         var reply = (Soup.Reply) sender ();
         reply.delete_later ();
-        if (reply.error () != Soup.Reply.NoError) {
-            GLib.warning ("Failed to reach version check url: " + reply.error_string ());
+        if (reply.error != Soup.Reply.NoError) {
+            GLib.warning ("Failed to reach version check url: " + reply.error_string);
             download_state (DownloadState.DOWNLOAD_TIMED_OUT);
             return;
         }

@@ -212,7 +212,7 @@ public class Application : Gtk.Application {
             //  QT_WARNING_POP
             application_name (this.theme.app_name);
             if (GLib.FileInfo (old_dir).is_dir ()) {
-                var configuration_directory = ConfigFile ().config_path ();
+                var configuration_directory = ConfigFile ().config_path;
                 if (configuration_directory.ends_with ('/')) {
                     // macOS 10.11.x does not like trailing slash for rename/move.
                     configuration_directory.chop (1);
@@ -252,7 +252,7 @@ public class Application : Gtk.Application {
     //  #if defined (WITH_CRASHREPORTER)
         if (ConfigFile ().crash_reporter ()) {
             var reporter = CRASHREPORTER_EXECUTABLE;
-            this.crash_handler.on_signal_reset (new CrashReporter.Handler (GLib.Dir.temp_path (), true, reporter));
+            this.crash_handler.on_signal_reset (new CrashReporter.Handler (GLib.Dir.temp_path, true, reporter));
         }
     //  #endif
 
@@ -269,7 +269,7 @@ public class Application : Gtk.Application {
             AbstractNetworkJob.http_timeout = config.timeout ();
 
         // Check vfs plugins
-        if (Theme.show_virtual_files_option && best_available_vfs_mode () == Vfs.Off) {
+        if (Theme.show_virtual_files_option && this.best_available_vfs_mode == Vfs.Off) {
             GLib.warning ("Theme wants to show vfs mode, but no vfs plugins are available.");
         }
         if (is_vfs_plugin_available (Vfs.WindowsCfApi))
@@ -302,7 +302,7 @@ public class Application : Gtk.Application {
             }
         }
 
-        FolderMan.instance.sync_enabled (true);
+        FolderMan.instance.sync_enabled = true;
 
         quit_on_signal_last_window_closed (false);
 
@@ -330,7 +330,7 @@ public class Application : Gtk.Application {
         AccountManager.instance.signal_account_removed.connect (
             this.on_signal_account_state_removed
         );
-        foreach (var account_instance in AccountManager.instance.accounts ()) {
+        foreach (var account_instance in AccountManager.instance.accounts) {
             on_signal_account_state_added (account_instance);
         }
 
@@ -427,7 +427,7 @@ public class Application : Gtk.Application {
     ***********************************************************/
     public void show_hint (string error_hint) {
         std.cerr += error_hint + std.endl;
-        std.cerr += "Try '" + Application.GLib.FileInfo (Gtk.Application.application_file_path ()).filename ().to_std_string () + " --help' for more information" + std.endl;
+        std.cerr += "Try '" + Application.GLib.FileInfo (Gtk.Application.application_file_path).filename ().to_std_string () + " --help' for more information" + std.endl;
         std.exit (1);
     }
 
@@ -478,7 +478,7 @@ public class Application : Gtk.Application {
         FolderMan folder_man = FolderMan.instance;
 
         // During the wizard, scheduling of new syncs is disabled
-        folder_man.sync_enabled (true);
+        folder_man.sync_enabled = true;
 
         if (res == Gtk.Dialog.Accepted) {
             // Check connectivity of the newly created account
@@ -487,7 +487,7 @@ public class Application : Gtk.Application {
 
             // If one account is configured : enable autostart
     //  #ifndef QT_DEBUG
-            bool should_auto_start = AccountManager.instance.accounts ().size () == 1;
+            bool should_auto_start = AccountManager.instance.accounts.size () == 1;
     //  #else
             bool should_auto_start = false;
     //  #endif
@@ -524,7 +524,7 @@ public class Application : Gtk.Application {
             // TODO: show a Gtk.MessageBox for errors
             return;
         }
-        string relative_path = GLib.Dir.clean_path (filename).mid (folder.clean_path ().length () + 1);
+        string relative_path = GLib.Dir.clean_path (filename).mid (folder.clean_path.length + 1);
         folder.on_signal_implicitly_hydrate_file (relative_path);
         string normal_name = filename.left (filename.size () - virtual_file_ext.size ());
         QMetaObject.Connection.create () = connect (
@@ -643,7 +643,7 @@ public class Application : Gtk.Application {
         foreach (string lang in ui_languages) {
             lang.replace ('-', '_'); // work around QTBUG-25973
             lang = subst_lang (lang);
-            const string tr_path = application_tr_path ();
+            const string tr_path = application_tr_path;
             const string tr_file = "client_" + lang;
             if (translator.on_signal_load (tr_file, tr_path) || lang.starts_with ("en")) {
                 // Permissive approach : Qt and keychain translations
@@ -675,7 +675,7 @@ public class Application : Gtk.Application {
                     install_translator (qtkeychain_translator);
                 break;
             }
-            if (property ("ui_lang").is_null ())
+            if (property ("ui_lang") == null)
                 property ("ui_lang", "C");
         }
     }
@@ -742,8 +742,8 @@ public class Application : Gtk.Application {
             }
 
             // Show the main dialog only if there is at least one account configured
-            if (!AccountManager.instance.accounts () == "") {
-                show_main_dialog ();
+            if (!AccountManager.instance.accounts == "") {
+                this.show_main_dialog ();
             } else {
                 this.gui.on_signal_new_account_wizard ();
             }
@@ -754,8 +754,8 @@ public class Application : Gtk.Application {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_check_connection () {
-        foreach (var account_state in AccountManager.instance.accounts ()) {
-            AccountState.State state = account_state.state ();
+        foreach (var account_state in AccountManager.instance.accounts) {
+            AccountState.State state = account_state.state;
 
             // Don't check if we're manually signed out or
             // when the error is permanent.
@@ -769,7 +769,7 @@ public class Application : Gtk.Application {
             }
         }
 
-        if (AccountManager.instance.accounts () == "") {
+        if (AccountManager.instance.accounts == "") {
             // let gui open the setup wizard
             this.gui.on_signal_open_settings_dialog ();
 
@@ -826,14 +826,16 @@ public class Application : Gtk.Application {
                 this.gui, OwncloudGui.on_signal_tray_message_if_server_unsupported);
         }
         if (this.folder_manager) {
-            disconnect (account_state, AccountState.signal_state_changed,
-                this.folder_manager, FolderMan.on_signal_account_state_changed);
-            disconnect (account_state.account, Account.server_version_changed,
-                this.folder_manager, FolderMan.on_signal_server_version_changed);
+            account_state.signal_state_changed.disconnect (
+                this.folder_manager.on_signal_account_state_changed
+            );
+            account_state.account.signal_server_version_changed.disconnect (
+                this.folder_manager.on_signal_server_version_changed
+            );
         }
 
         // if there is no more account, show the wizard.
-        if (this.gui && AccountManager.instance.accounts () == "") {
+        if (this.gui && AccountManager.instance.accounts == "") {
             // allow to add a new account if there is non any more. Always think
             // about single account theming!
             OwncloudSetupWizard.run_wizard (this, SLOT (on_signal_owncloud_wizard_done (int)));
@@ -848,7 +850,7 @@ public class Application : Gtk.Application {
     timer, one by network configuration changes?
     ***********************************************************/
     protected void on_signal_system_online_configuration_changed (QNetworkConfiguration cnf) {
-        if (cnf.state () & QNetworkConfiguration.Active) {
+        if (cnf.state & QNetworkConfiguration.Active) {
             QMetaObject.invoke_method (this, "on_signal_check_connection", Qt.QueuedConnection);
         }
     }
@@ -937,8 +939,8 @@ public class Application : Gtk.Application {
 
     /***********************************************************
     ***********************************************************/
-    private static string application_tr_path () {
-        string dev_tr_path = Gtk.Application.application_dir_path () + "/../src/gui/";
+    private static string application_tr_path {
+        string dev_tr_path = Gtk.Application.application_dir_path + "/../src/gui/";
         if (GLib.Dir (dev_tr_path).exists ()) {
             // might miss Qt, QtKeyChain, etc.
             GLib.warning ("Running from build location! Translations may be incomplete!");

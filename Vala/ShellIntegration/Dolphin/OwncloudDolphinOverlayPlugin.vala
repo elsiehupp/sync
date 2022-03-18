@@ -31,14 +31,14 @@ public class OwncloudDolphinPlugin : KOverlayIconPlugin {
     ***********************************************************/
     public override string[] getOverlays (GLib.Uri url) {
         var helper = OwncloudDolphinPluginHelper.instance;
-        if (!helper.is_connected ()) {
+        if (!helper.is_connected) {
             return { };
         }
         if (!url.isLocalFile ()) {
             return { };
         }
         GLib.Dir local_path = new GLib.Dir (url.to_local_file ());
-        const string local_file = local_path.canonical_path ().toUtf8 ();
+        const string local_file = local_path.canonical_path.toUtf8 ();
 
         helper.send_command ("RETRIEVE_FILE_STATUS:" + local_file + "\n");
 

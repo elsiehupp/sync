@@ -24,7 +24,7 @@ public class ConflictSolver : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private Gtk.Widget parent_widget;
-    string local_version_filename {
+    public string local_version_filename {
         public get {
             return this.local_version_filename;
         }
@@ -32,7 +32,7 @@ public class ConflictSolver : GLib.Object {
             this.local_version_filename = value;
         }
     }
-    string remote_version_filename {
+    public string remote_version_filename {
         public get {
             return this.remote_version_filename;
         }
@@ -115,7 +115,7 @@ public class ConflictSolver : GLib.Object {
         if (info.is_dir ()) {
             return FileSystem.remove_recursively (this.local_version_filename);
         } else {
-            return GLib.File (this.local_version_filename).remove ();
+            return new GLib.File (this.local_version_filename).remove ();
         }
     }
 

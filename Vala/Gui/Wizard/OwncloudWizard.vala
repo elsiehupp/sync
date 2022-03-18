@@ -34,7 +34,7 @@ public class OwncloudWizard : QWizard {
 
     /***********************************************************
     ***********************************************************/
-    unowned Account account { public get; public set; }
+    public unowned Account account { public get; public set; }
     private WelcomePage welcome_page;
     private OwncloudSetupPage setup_page;
     private OwncloudHttpCredsPage http_creds_page;
@@ -47,7 +47,7 @@ public class OwncloudWizard : QWizard {
 
     string[] setup_log;
 
-    string oc_url {
+    public string oc_url {
         public get {
             return field ("OCUrl").to_string ().simplified ();
         }
@@ -56,7 +56,7 @@ public class OwncloudWizard : QWizard {
         }
     }
 
-    bool registration {
+    public bool registration {
         public get {
             return this.registration;
         }
@@ -268,12 +268,13 @@ public class OwncloudWizard : QWizard {
 
     /***********************************************************
     ***********************************************************/
-    public AbstractCredentials credentials () {
-        if (this.credentials_page) {
-            return this.credentials_page.credentials ();
+    public AbstractCredentials credentials {
+        public get {
+            if (this.credentials_page) {
+                return this.credentials_page.credentials;
+            }
+            return null;
         }
-
-        return null;
     }
 
 
@@ -308,7 +309,7 @@ public class OwncloudWizard : QWizard {
     chosen.
     ***********************************************************/
     public static void ask_experimental_virtual_files_feature (Gtk.Widget receiver, CallBack callback) {
-        const var best_vfs_mode = best_available_vfs_mode ();
+        const var best_vfs_mode = this.best_available_vfs_mode;
         Gtk.MessageBox message_box = null;
         QPushButton accept_button = null;
         switch (best_vfs_mode) {
@@ -477,7 +478,7 @@ public class OwncloudWizard : QWizard {
         }
 
         OwncloudGui.raise_dialog (this);
-        if (next_id () == -1) {
+        if (next_id == -1) {
             disconnect (this, Gtk.Dialog.signal_finished, this, OwncloudWizard.basic_setup_finished);
             /* emit */ basic_setup_finished (Gtk.Dialog.Accepted);
         } else {

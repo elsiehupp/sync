@@ -13,7 +13,7 @@ public class ItemCompletedSpy : QSignalSpy {
     }
 
 
-    SyncFileItemPtr find_item (string path) {
+    public SyncFileItemPtr find_item (string path) {
         foreach (GLib.List<GLib.Variant> args in *this) {
             var item = args[0].value<SyncFileItemPtr> ();
             if (item.destination () == path)
@@ -23,7 +23,7 @@ public class ItemCompletedSpy : QSignalSpy {
     }
 
 
-    SyncFileItemPtr find_item_with_expected_rank (string path, int rank) {
+    public SyncFileItemPtr find_item_with_expected_rank (string path, int rank) {
         GLib.assert_true (size () > rank);
         GLib.assert_true (! (*this)[rank] == "");
 

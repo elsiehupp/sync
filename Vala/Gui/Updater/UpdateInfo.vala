@@ -36,16 +36,16 @@ public class UpdateInfo {
         //  UpdateInfo this = UpdateInfo ();
 
         QDomNode n;
-        for (n = element.first_child (); !n.is_null (); n = n.next_sibling ()) {
+        for (n = element.first_child (); !n == null; n = n.next_sibling ()) {
             QDomElement child_element = n.to_element ();
             if (child_element.tag_name () == "version") {
-                this.version (child_element.text ());
+                this.version = child_element.text ();
             } else if (child_element.tag_name () == "versionstring") {
-                this.version_string (child_element.text ());
+                this.version_string = child_element.text ();
             } else if (child_element.tag_name () == "web") {
-                this.web (child_element.text ());
+                this.web = child_element.text ();
             } else if (child_element.tag_name () == "downloadurl") {
-                this.download_url (child_element.text ());
+                this.download_url = child_element.text ();
             }
         }
 

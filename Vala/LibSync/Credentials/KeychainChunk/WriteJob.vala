@@ -65,8 +65,8 @@ public class WriteJob : KeychainChunk.Job {
         );
         wait_loop.exec ();
 
-        if (error () != NoError) {
-            GLib.warning ("WritePasswordJob failed with" + error_string ());
+        if (this.error != NoError) {
+            GLib.warning ("WritePasswordJob failed with" + this.error_string);
             return false;
         }
 
@@ -81,11 +81,11 @@ public class WriteJob : KeychainChunk.Job {
 
         // Errors? (write_job can be null here, see : WriteJob.start)
         if (write_job) {
-            this.error = write_job.error ();
-            this.error_string = write_job.error_string ();
+            this.error = write_job.error;
+            this.error_string = write_job.error_string;
 
-            if (write_job.error () != NoError) {
-                GLib.warning ("Error while writing " + write_job.key () + " chunk " + write_job.error_string ());
+            if (write_job.error != NoError) {
+                GLib.warning ("Error while writing " + write_job.key () + " chunk " + write_job.error_string);
                 this.chunk_buffer.clear ();
             }
         }
@@ -116,10 +116,10 @@ public class WriteJob : KeychainChunk.Job {
             }
 
             const string key_with_index = this.key + (index > 0) ? "." + index.to_string () : "";
-            const string kck = this.account ? AbstractCredentials.keychain_key (
+            const string keychain_key = this.account ? AbstractCredentials.keychain_key (
                     this.account.url.to_string (),
                     key_with_index,
-                    this.account.identifier ()
+                    this.account.identifier
                 ) : key_with_index;
 
             var qkeychain_write_password_job = new QKeychain.WritePasswordJob (this.service_name, this);
@@ -131,7 +131,7 @@ public class WriteJob : KeychainChunk.Job {
                 this.on_signal_write_job_done
             );
             // only add the key's (sub)"index" after the first element, to stay compatible with older versions and non-Windows
-            qkeychain_write_password_job.key (kck);
+            qkeychain_write_password_job.key (keychain_key);
             qkeychain_write_password_job.binary_data (chunk);
             qkeychain_write_password_job.start ();
 

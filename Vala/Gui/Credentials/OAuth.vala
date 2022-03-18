@@ -153,7 +153,7 @@ public class OAuth : GLib.Object {
         string user = json["user_id"].to_string ();
         GLib.Uri message_url = json["message_url"].to_string ();
 
-        if (reply.error () != Soup.Reply.NoError || json_parse_error.error != QJsonParseError.NoError
+        if (reply.error != Soup.Reply.NoError || json_parse_error.error != QJsonParseError.NoError
             || json_data == "" || json == "" || refresh_token == "" || access_token == ""
             || json["token_type"].to_string () != "Bearer") {
             string error_reason;
@@ -161,9 +161,9 @@ public class OAuth : GLib.Object {
             if (!error_from_json == "") {
                 error_reason = _("Error returned from the server : <em>%1</em>")
                                   .printf (error_from_json.to_html_escaped ());
-            } else if (reply.error () != Soup.Reply.NoError) {
+            } else if (reply.error != Soup.Reply.NoError) {
                 error_reason = _("There was an error accessing the \"token\" endpoint : <br><em>%1</em>")
-                                  .printf (reply.error_string ().to_html_escaped ());
+                                  .printf (reply.error_string.to_html_escaped ());
             } else if (json_data == "") {
                 // Can happen if a funky load balancer strips away POST data, e.g. BigIP APM my.policy
                 error_reason = _("Empty JSON from OAuth2 redirect");
@@ -172,7 +172,7 @@ public class OAuth : GLib.Object {
                 // soon as you access json["whatever"] the debug output json will claim to have "whatever":null
             } else if (json_parse_error.error != QJsonParseError.NoError) {
                 error_reason = _("Could not parse the JSON returned from the server : <br><em>%1</em>")
-                                  .printf (json_parse_error.error_string ());
+                                  .printf (json_parse_error.error_string);
             } else {
                 error_reason = _("The reply from the server did not contain all expected fields");
             }
@@ -182,7 +182,7 @@ public class OAuth : GLib.Object {
             /* emit */ signal_result (Error);
             return;
         }
-        if (!this.expected_user.is_null () && user != this.expected_user) {
+        if (!this.expected_user == null && user != this.expected_user) {
             // Connected with the wrong user
             string message = _("<h1>Wrong user</h1>"
                              + "<p>You logged-in with user <em>%1</em>, but must log in with user <em>%2</em>.<br>"
@@ -208,7 +208,9 @@ public class OAuth : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool open_browser () {
-        if (!OpenExtrernal.open_browser (authorisation_link ())) {
+        try {
+            OpenExternal.open_browser (authorisation_link ());
+        } catch {
             // We cannot open the browser, then we claim we don't support OAuth.
             /* emit */ signal_result (Result.NOT_SUPPORTED, "");
             return false;
@@ -259,7 +261,7 @@ public class OAuth : GLib.Object {
                 "http://localhost:" + this.server.server_port ().to_string ()
             }
         });
-        if (!this.expected_user.is_null ())
+        if (!this.expected_user == null)
             query.add_query_item ("user", this.expected_user);
         GLib.Uri url = Utility.concat_url_path (this.account.url, "/index.php/apps/oauth2/authorize", query);
         return url;

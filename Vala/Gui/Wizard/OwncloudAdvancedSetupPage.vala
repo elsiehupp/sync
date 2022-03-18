@@ -31,7 +31,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     private bool local_folder_valid = false;
     private QProgressIndicator progress_indicator;
     private string remote_folder;
-    string[] selective_sync_blocklist { public get; private set; }
+    public string[] selective_sync_blocklist { public get; private set; }
     private int64 r_size = -1;
     private int64 r_selected_size = -1;
     private OwncloudWizard oc_wizard;
@@ -102,7 +102,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
             this.ui.conf_trailling_size_label.hide ();
         }
 
-        this.ui.r_virtual_file_sync.on_signal_text (_("Use virtual files instead of downloading content immediately %1").printf (best_available_vfs_mode () == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
+        this.ui.r_virtual_file_sync.on_signal_text (_("Use virtual files instead of downloading content immediately %1").printf (this.best_available_vfs_mode == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
     }
 
 
@@ -116,8 +116,10 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    public bool is_complete () {
-        return !this.checking && this.local_folder_valid;
+    public bool is_complete {
+        public get {
+            return !this.checking && this.local_folder_valid;
+        }
     }
 
 
@@ -126,7 +128,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     public void initialize_page () {
         WizardCommon.init_error_label (this.ui.error_label);
 
-        if (!Theme.show_virtual_files_option || best_available_vfs_mode () == Vfs.Off) {
+        if (!Theme.show_virtual_files_option || this.best_available_vfs_mode == Vfs.Off) {
             // If the layout were wrapped in a widget, the var-grouping of the
             // radio buttons no longer works and there are surprising margins.
             // Just manually hide the button and remove the layout.
@@ -184,10 +186,12 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
 
 
     /***********************************************************
+    Tells the caller that this is the last dialog page
     ***********************************************************/
-    public int next_id () {
-        // tells the caller that this is the last dialog page
-        return -1;
+    public int next_id {
+        public get {
+            return -1;
+        }
     }
 
 
@@ -197,7 +201,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         if (use_virtual_file_sync ()) {
             const var availability = Vfs.check_availability (local_folder ());
             if (!availability) {
-                var message = new Gtk.MessageBox (Gtk.MessageBox.Warning, _("Virtual files are not available for the selected folder"), availability.error (), Gtk.MessageBox.Ok, this);
+                var message = new Gtk.MessageBox (Gtk.MessageBox.Warning, _("Virtual files are not available for the selected folder"), availability.error, Gtk.MessageBox.Ok, this);
                 message.attribute (Qt.WA_DeleteOnClose);
                 message.open ();
                 return false;
@@ -299,7 +303,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void on_signal_select_folder () {
-        string directory = QFileDialog.existing_directory (null, _("Local Sync Folder"), GLib.Dir.home_path ());
+        string directory = QFileDialog.existing_directory (null, _("Local Sync Folder"), GLib.Dir.home_path);
         if (!directory == "") {
             // TODO: remove when UX decision is made
             refresh_virtual_files_availibility (directory);
@@ -441,7 +445,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
 
         Theme theme = Theme.instance;
         GLib.Variant variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_TOP);
-        if (!variant.is_null ()) {
+        if (!variant == null) {
             WizardCommon.set_up_custom_media (variant, this.ui.top_label);
         }
 
@@ -553,8 +557,8 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     ***********************************************************/
     private int64 available_local_space () {
         string local_dir = local_folder ();
-        string path = !GLib.Dir (local_dir).exists () && local_dir.contains (GLib.Dir.home_path ()) ?
-                    GLib.Dir.home_path () : local_dir;
+        string path = !GLib.Dir (local_dir).exists () && local_dir.contains (GLib.Dir.home_path) ?
+                    GLib.Dir.home_path : local_dir;
         QStorageInfo storage = new QStorageInfo (GLib.Dir.to_native_separators (path));
 
         return storage.bytes_available ();
@@ -600,7 +604,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void local_folder_push_button_path (string path) {
-        const var home_dir = GLib.Dir.home_path ().ends_with ('/') ? GLib.Dir.home_path () : GLib.Dir.home_path () + '/';
+        const var home_dir = GLib.Dir.home_path.ends_with ('/') ? GLib.Dir.home_path : GLib.Dir.home_path + '/';
 
         if (!path.starts_with (home_dir)) {
             this.ui.pb_select_local_folder.on_signal_text (GLib.Dir.to_native_separators (path));
@@ -669,7 +673,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         if (Theme.is_hidpi ()) {
             avatar_size *= 2;
         }
-        const AvatarJob avatar_job = new AvatarJob (account, account.dav_user (), avatar_size, this);
+        const AvatarJob avatar_job = new AvatarJob (account, account.dav_user, avatar_size, this);
         avatar_job.on_signal_timeout (20 * 1000);
         avatar_job.signal_avatar_pixmap.connect (
             this.on_avatar_job_avatar_pixmap
@@ -681,7 +685,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void on_avatar_job_avatar_pixmap (Gtk.Image avatar_image) {
-        if (avatar_image.is_null ()) {
+        if (avatar_image == null) {
             return;
         }
         const var avatar_pixmap = Gdk.Pixbuf.from_image (AvatarJob.make_circular_avatar (avatar_image));
@@ -714,7 +718,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
             radio_checked (this.ui.r_sync_everything);
             this.ui.r_virtual_file_sync.enabled (false);
         } else {
-            this.ui.r_virtual_file_sync.on_signal_text (_("Use virtual files instead of downloading content immediately %1").printf (best_available_vfs_mode () == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
+            this.ui.r_virtual_file_sync.on_signal_text (_("Use virtual files instead of downloading content immediately %1").printf (this.best_available_vfs_mode == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
             this.ui.r_virtual_file_sync.enabled (true);
         }
         //

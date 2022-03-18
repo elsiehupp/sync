@@ -111,7 +111,7 @@ public class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_account_state_changed () {
-        if (is_connected ()) {
+        if (is_connected) {
             on_signal_refresh_immediately ();
         }
     }
@@ -138,21 +138,25 @@ public class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public bool is_connected () {
-        return (this.account_state.connection_status () == AccountState.ConnectionValidator.Status.Connected);
+    public bool is_connected {
+        public get {
+            return (this.account_state.connection_status == AccountState.ConnectionValidator.Status.Connected);
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public Folder folder () {
-        foreach (Folder folder in FolderMan.instance.map ()) {
-            if (folder.account_state () == this.account_state) {
-                return folder;
+    public Folder folder {
+        public get {
+            foreach (Folder folder in FolderMan.instance.map ()) {
+                if (folder.account_state == this.account_state) {
+                    return folder;
+                }
             }
+    
+            return null;
         }
-
-        return null;
     }
 
 
@@ -181,8 +185,8 @@ public class User : GLib.Object {
     public bool check_push_notifications_are_ready () {
         const var push_notifications = this.account_state.account.push_notifications ();
 
-        const var push_activities_available = this.account_state.account.capabilities ().available_push_notifications () & PushNotificationType.ACTIVITIES;
-        const var push_notifications_available = this.account_state.account.capabilities ().available_push_notifications () & PushNotificationType.NOTIFICATIONS;
+        const var push_activities_available = this.account_state.account.capabilities.available_push_notifications () & PushNotificationType.ACTIVITIES;
+        const var push_notifications_available = this.account_state.account.capabilities.available_push_notifications () & PushNotificationType.NOTIFICATIONS;
 
         const var push_activities_and_notifications_available = push_activities_available && push_notifications_available;
 
@@ -201,10 +205,10 @@ public class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void open_local_folder () {
-        const var folder = folder ();
+        const var folder = folder;
 
         if (folder) {
-            QDesktopServices.open_url (GLib.Uri.from_local_file (folder.path ()));
+            QDesktopServices.open_url (GLib.Uri.from_local_file (folder.path));
         }
     }
 
@@ -212,7 +216,7 @@ public class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool has_local_folder () {
-        return folder () != null;
+        return folder != null;
     }
 
 
@@ -234,7 +238,7 @@ public class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool has_activities () {
-        return this.account_state.account.capabilities ().has_activities ();
+        return this.account_state.account.capabilities.has_activities ();
     }
 
 
@@ -271,53 +275,65 @@ public class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public string avatar_url () {
-        if (avatar ().is_null ()) {
+        if (avatar () == null) {
             return "";
         }
 
-        return "image://avatars/" + this.account_state.account.identifier ();
+        return "image://avatars/" + this.account_state.account.identifier;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public bool are_desktop_notifications_allowed () {
-        return this.account_state.are_desktop_notifications_allowed ();
+    public bool are_desktop_notifications_allowed {
+        public get {
+            return this.account_state.are_desktop_notifications_allowed;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public UserStatus.OnlineStatus status () {
-        return this.account_state.account.user_status_connector ().user_status ().state ();
+        public get {
+            return this.account_state.account.user_status_connector ().user_status ().state;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public string status_message () {
-        return this.account_state.account.user_status_connector ().user_status ().message ();
+    public string status_message {
+        public get {
+            return this.account_state.account.user_status_connector ().user_status ().message ();
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public GLib.Uri status_icon () {
-        return this.account_state.account.user_status_connector ().user_status ().state_icon ();
+    public GLib.Uri status_icon {
+        public get {
+            return this.account_state.account.user_status_connector ().user_status ().state_icon ();
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public string status_emoji () {
-        return this.account_state.account.user_status_connector ().user_status ().icon ();
+    public string status_emoji {
+        public get {
+            return this.account_state.account.user_status_connector ().user_status ().icon ();
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public bool server_has_user_status () {
-        return this.account_state.account.capabilities ().user_status ();
+    public bool server_has_user_status {
+        public get {
+            return this.account_state.account.capabilities.user_status ();
+        }
     }
 
 
@@ -329,17 +345,17 @@ public class User : GLib.Object {
         activity.status = item.status;
         activity.date_time = GLib.DateTime.current_date_time ();
         activity.message = item.original_file;
-        activity.link = folder.account_state ().account.url;
-        activity.acc_name = folder.account_state ().account.display_name ();
+        activity.link = folder.account_state.account.url;
+        activity.acc_name = folder.account_state.account.display_name;
         activity.file = item.file;
         activity.folder = folder.alias ();
         activity.file_action = "";
 
-        if (item.instruction == SyncInstructions.REMOVE) {
+        if (item.instruction == CSync.SyncInstructions.REMOVE) {
             activity.file_action = "file_deleted";
-        } else if (item.instruction == SyncInstructions.NEW) {
+        } else if (item.instruction == CSync.SyncInstructions.NEW) {
             activity.file_action = "file_created";
-        } else if (item.instruction == SyncInstructions.RENAME) {
+        } else if (item.instruction == CSync.SyncInstructions.RENAME) {
             activity.file_action = "file_renamed";
         } else {
             activity.file_action = "file_changed";
@@ -399,23 +415,23 @@ public class User : GLib.Object {
         if (!folder_instance)
             return;
 
-        if (folder_instance.account_state () == this.account_state) {
-            GLib.warning ("Item " + folder_instance.short_gui_local_path () + " retrieved resulted in " + message);
+        if (folder_instance.account_state == this.account_state) {
+            GLib.warning ("Item " + folder_instance.short_gui_local_path + " retrieved resulted in " + message);
 
             Activity activity;
             activity.type = Activity.Type.SYNC_RESULT;
             activity.status = SyncResult.Status.ERROR;
             activity.date_time = GLib.DateTime.from_string (GLib.DateTime.current_date_time ().to_string (), Qt.ISODate);
             activity.subject = message;
-            activity.message = folder_instance.short_gui_local_path ();
-            activity.link = folder_instance.short_gui_local_path ();
-            activity.acc_name = folder_instance.account_state ().account.display_name ();
+            activity.message = folder_instance.short_gui_local_path;
+            activity.link = folder_instance.short_gui_local_path;
+            activity.acc_name = folder_instance.account_state.account.display_name;
             activity.folder = folder_alias;
 
             if (category == ErrorCategory.INSUFFICIENT_REMOTE_STORAGE) {
                 ActivityLink link;
                 link.label = _("Retry all uploads");
-                link.link = folder_instance.path ();
+                link.link = folder_instance.path;
                 link.verb = "";
                 link.primary = true;
                 activity.links.append (link);
@@ -435,8 +451,8 @@ public class User : GLib.Object {
             return;
         }
 
-        if (folder_instance.account_state () == this.account_state) {
-            GLib.warning ("Item " + folder_instance.short_gui_local_path () + " retrieved resulted in " + error_message);
+        if (folder_instance.account_state == this.account_state) {
+            GLib.warning ("Item " + folder_instance.short_gui_local_path + " retrieved resulted in " + error_message);
 
             Activity activity;
             activity.type = Activity.Type.SYNC_FILE_ITEM;
@@ -444,10 +460,10 @@ public class User : GLib.Object {
             const var current_date_time = GLib.DateTime.current_date_time ();
             activity.date_time = GLib.DateTime.from_string (current_date_time.to_string (), Qt.ISODate);
             activity.expire_at_msecs = current_date_time.add_m_secs (ACTIVITY_DEFAULT_EXPIRATION_TIME_MSECS).to_m_secs_since_epoch ();
-            activity.subject = !subject == "" ? subject : folder_instance.short_gui_local_path ();
+            activity.subject = !subject == "" ? subject : folder_instance.short_gui_local_path;
             activity.message = error_message;
-            activity.link = folder_instance.short_gui_local_path ();
-            activity.acc_name = folder_instance.account_state ().account.display_name ();
+            activity.link = folder_instance.short_gui_local_path;
+            activity.acc_name = folder_instance.account_state.account.display_name;
             activity.folder = folder_alias;
 
             // add 'other errors' to activity list
@@ -526,27 +542,27 @@ public class User : GLib.Object {
                     continue;
                 }
 
-                if (activity.status == SyncFileItem.Status.CONFLICT && !GLib.FileInfo (f.path () + activity.file).exists ()) {
+                if (activity.status == SyncFileItem.Status.CONFLICT && !GLib.FileInfo (f.path + activity.file).exists ()) {
                     this.activity_model.remove_activity_from_activity_list (activity);
                     continue;
                 }
 
-                if (activity.status == SyncFileItem.Status.FILE_LOCKED && !GLib.FileInfo (f.path () + activity.file).exists ()) {
+                if (activity.status == SyncFileItem.Status.FILE_LOCKED && !GLib.FileInfo (f.path + activity.file).exists ()) {
                     this.activity_model.remove_activity_from_activity_list (activity);
                     continue;
                 }
 
-                if (activity.status == SyncFileItem.Status.FILE_IGNORED && !GLib.FileInfo (f.path () + activity.file).exists ()) {
+                if (activity.status == SyncFileItem.Status.FILE_IGNORED && !GLib.FileInfo (f.path + activity.file).exists ()) {
                     this.activity_model.remove_activity_from_activity_list (activity);
                     continue;
                 }
 
-                if (!GLib.FileInfo (f.path () + activity.file).exists ()) {
+                if (!GLib.FileInfo (f.path + activity.file).exists ()) {
                     this.activity_model.remove_activity_from_activity_list (activity);
                     continue;
                 }
 
-                var path = GLib.FileInfo (activity.file).directory ().path ().to_utf8 ();
+                var path = GLib.FileInfo (activity.file).directory ().path.to_utf8 ();
                 if (path == ".")
                     path.clear ();
 
@@ -631,7 +647,7 @@ public class User : GLib.Object {
                 GLib.info ("Activity in blocklist; skipping.");
                 continue;
             }
-            const var message = AccountManager.instance.accounts ().count () == 1 ? "" : activity.acc_name;
+            const var message = AccountManager.instance.accounts.count () == 1 ? "" : activity.acc_name;
             show_desktop_notification (activity.subject, message);
             this.activity_model.add_notification_to_activity_list (activity);
         }
@@ -685,7 +701,7 @@ public class User : GLib.Object {
             GLib.debug ("Do not check as last check is only secs ago: " + timer.elapsed () / 1000);
             return;
         }
-        if (this.account_state && this.account_state.is_connected ()) {
+        if (this.account_state && this.account_state.is_connected) {
             if (!timer.is_valid ()) {
                 on_signal_refresh_activities ();
             }
@@ -698,7 +714,7 @@ public class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_refresh_user_status () {
-        if (this.account_state && this.account_state.is_connected ()) {
+        if (this.account_state && this.account_state.is_connected) {
             this.account_state.account.user_status_connector ().fetch_user_status ();
         }
     }
@@ -707,7 +723,7 @@ public class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_refresh_immediately () {
-        if (this.account_state && this.account_state.is_connected ()) {
+        if (this.account_state && this.account_state.is_connected) {
             on_signal_refresh_activities ();
         }
         on_signal_refresh_notifications ();
@@ -763,7 +779,7 @@ public class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_received_push_notification (Account account) {
-        if (account.identifier () == this.account_state.account.identifier ()) {
+        if (account.identifier == this.account_state.account.identifier) {
             on_signal_refresh_notifications ();
         }
     }
@@ -772,7 +788,7 @@ public class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_received_push_activity (Account account) {
-        if (account.identifier () == this.account_state.account.identifier ()) {
+        if (account.identifier == this.account_state.account.identifier) {
             on_signal_refresh_activities ();
         }
     }
@@ -812,7 +828,7 @@ public class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private bool is_activity_of_current_account (Folder folder) {
-        return folder.account_state () == this.account_state;
+        return folder.account_state == this.account_state;
     }
 
 
@@ -829,7 +845,7 @@ public class User : GLib.Object {
     ***********************************************************/
     private void show_desktop_notification (string title, string message) {
         ConfigFile config;
-        if (!config.optional_server_notifications () || !are_desktop_notifications_allowed ()) {
+        if (!config.optional_server_notifications () || !are_desktop_notifications_allowed) {
             return;
         }
 

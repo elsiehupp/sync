@@ -47,7 +47,7 @@ public class UpdateMetadataApiJob : AbstractNetworkJob {
         url_query.add_query_item ("format", "json");
         url_query.add_query_item ("e2e-token", this.token);
 
-        GLib.Uri url = Utility.concat_url_path (account.url, path ());
+        GLib.Uri url = Utility.concat_url_path (account.url, this.path);
         url.query (url_query);
 
         QUrlQuery parameters;
@@ -67,12 +67,12 @@ public class UpdateMetadataApiJob : AbstractNetworkJob {
     protected bool on_signal_finished () {
         int return_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             if (return_code != 200) {
-                GLib.info ("Error updating the metadata " + path () + error_string () + return_code);
-                /* emit */ error (this.file_identifier, return_code);
+                GLib.info ("Error updating the metadata " + this.path + this.error_string + return_code);
+                /* emit */ signal_error (this.file_identifier, return_code);
             }
 
             GLib.info ("Metadata submited to the server successfully.");
-            /* emit */ success (this.file_identifier);
+            /* emit */ signal_success (this.file_identifier);
         return true;
     }
 

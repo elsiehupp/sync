@@ -52,7 +52,7 @@ public class ShareUserLine : Gtk.Widget {
         this.account = account;
         this.share = share;
         this.is_file = is_file;
-        this.profile_page_menu (account, share.share_with ().share_with ());
+        this.profile_page_menu = new ProfilePageMenu (account, share.share_with.share_with);
         //  Q_ASSERT (this.share);
         this.ui.up_ui (this);
 
@@ -107,7 +107,7 @@ public class ShareUserLine : Gtk.Widget {
 
         show_note_options (false);
 
-        const bool is_note_supported = this.share.share_type () != Share.Type.Share.Type.EMAIL && this.share.share_type () != Share.Type.Share.Type.ROOM;
+        const bool is_note_supported = this.share.share_type != Share.Type.Share.Type.EMAIL && this.share.share_type != Share.Type.Share.Type.ROOM;
 
         if (is_note_supported) {
             this.note_link_action = new QAction (_("Note to recipient"));
@@ -116,7 +116,7 @@ public class ShareUserLine : Gtk.Widget {
             this.note_link_action.triggered.connect (
                 this.toggle_note_options
             );
-            if (!this.share.note () == "") {
+            if (!this.share.note == "") {
                 this.note_link_action.checked (true);
                 show_note_options (true);
             }
@@ -124,7 +124,7 @@ public class ShareUserLine : Gtk.Widget {
 
         show_expire_date_options (false);
 
-        const bool is_expiration_date_supported = this.share.share_type () != Share.Type.Share.Type.EMAIL;
+        const bool is_expiration_date_supported = this.share.share_type != Share.Type.Share.Type.EMAIL;
 
         if (is_expiration_date_supported) {
             // email shares do not support expiration dates
@@ -135,7 +135,7 @@ public class ShareUserLine : Gtk.Widget {
                 this.toggle_expire_date_options
             );
             const var on_signal_expire_date = this.share.on_signal_expire_date ().is_valid () ? share.on_signal_expire_date () : QDate ();
-            if (!on_signal_expire_date.is_null ()) {
+            if (!on_signal_expire_date == null) {
                 this.expiration_date_link_action.checked (true);
                 show_expire_date_options (true, on_signal_expire_date);
             }
@@ -182,12 +182,12 @@ public class ShareUserLine : Gtk.Widget {
         }
 
         // Adds action to display password widget (check box)
-        if (this.share.share_type () == Share.Type.EMAIL && (this.share.is_password_set () || this.account.capabilities ().share_email_password_enabled ())) {
+        if (this.share.share_type == Share.Type.EMAIL && (this.share.password_is_set || this.account.capabilities.share_email_password_enabled ())) {
             this.password_protect_link_action = new QAction (_("Password protect"), this);
             this.password_protect_link_action.checkable (true);
-            this.password_protect_link_action.checked (this.share.is_password_set ());
+            this.password_protect_link_action.checked (this.share.password_is_set);
             // checkbox can be checked/unchedkec if the password is not yet set or if it's not enforced
-            this.password_protect_link_action.enabled (!this.share.is_password_set () || !this.account.capabilities ().share_email_password_enforced ());
+            this.password_protect_link_action.enabled (!this.share.password_is_set || !this.account.capabilities.share_email_password_enforced ());
 
             menu.add_action (this.password_protect_link_action);
             this.password_protect_link_action.triggered.connect (
@@ -221,8 +221,8 @@ public class ShareUserLine : Gtk.Widget {
         https://github.com/owncloud/core/issues/22122#issuecomment-185637344
         https://github.com/owncloud/client/issues/4996
             */
-        if (share.share_type () == Share.Type.REMOTE
-            && share.account.server_version_int () < Account.make_server_version (9, 1, 0)) {
+        if (share.share_type == Share.Type.REMOTE
+            && share.account.server_version_int < Account.make_server_version (9, 1, 0)) {
             this.permission_reshare.visible (false);
             this.ui.permission_tool_button.visible (false);
         }
@@ -234,7 +234,7 @@ public class ShareUserLine : Gtk.Widget {
             this.on_signal_share_deleted
         );
 
-        if (!share.account.capabilities ().share_resharing ()) {
+        if (!share.account.capabilities.share_resharing ()) {
             this.permission_reshare.visible (false);
         }
 
@@ -304,14 +304,14 @@ public class ShareUserLine : Gtk.Widget {
             }
         }
 
-        this.share.permissions (permissions);
+        this.share.permissions = permissions;
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_signal_edit_permissions_changed () {
-        enabled (false);
+        this.enabled = false;
 
         // Can never manually be set to "partial".
         // This works because the state cycle for clicking is
@@ -348,7 +348,7 @@ public class ShareUserLine : Gtk.Widget {
             permissions |= Share_permission_share;
         }
 
-        this.share.permissions (permissions);
+        this.share.x;
     }
 
 
@@ -359,7 +359,7 @@ public class ShareUserLine : Gtk.Widget {
             this.ui.error_label.hide ();
             this.ui.error_label.clear ();
 
-            if (!this.share.is_password_set ()) {
+            if (!this.share.password_is_set) {
                 this.ui.line_edit_password.clear ();
                 on_signal_refresh_password_options ();
             } else {
@@ -396,7 +396,7 @@ public class ShareUserLine : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_refresh_password_options () {
-        const bool is_password_enabled = this.share.share_type () == Share.Type.EMAIL && this.password_protect_link_action.is_checked ();
+        const bool is_password_enabled = this.share.share_type == Share.Type.EMAIL && this.password_protect_link_action.is_checked ();
 
         this.ui.password_label.visible (is_password_enabled);
         this.ui.line_edit_password.enabled (is_password_enabled);
@@ -410,7 +410,7 @@ public class ShareUserLine : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_refresh_password_line_edit_placeholder () {
-        if (this.share.is_password_set ()) {
+        if (this.share.password_is_set) {
             this.ui.line_edit_password.placeholder_text (string.from_utf8 (PASSWORD_IS_PLACEHOLDER));
         } else {
             this.ui.line_edit_password.placeholder_text ("");
@@ -427,7 +427,7 @@ public class ShareUserLine : Gtk.Widget {
 
         this.ui.line_edit_password.on_signal_text ("");
 
-        this.password_protect_link_action.enabled (!this.share.is_password_set () || !this.account.capabilities ().share_email_password_enforced ());
+        this.password_protect_link_action.enabled (!this.share.password_is_set || !this.account.capabilities.share_email_password_enforced ());
 
         on_signal_refresh_password_line_edit_placeholder ();
 
@@ -466,7 +466,7 @@ public class ShareUserLine : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_avatar_loaded (Gtk.Image avatar) {
-        if (avatar.is_null ()) {
+        if (avatar == null) {
             return;
         }
 
@@ -512,7 +512,7 @@ public class ShareUserLine : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_avatar_context_menu (QPoint global_position) {
-        if (this.share.share_type () == Share.Type.USER) {
+        if (this.share.share_type == Share.Type.USER) {
             this.profile_page_menu.exec (global_position);
         }
     }
@@ -544,7 +544,7 @@ public class ShareUserLine : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void display_permissions () {
-        var perm = this.share.permissions ();
+        var perm = this.share.permissions;
 
         //  folders edit = CREATE, READ, UPDATE, DELETE
         //  files edit = READ + UPDATE
@@ -593,10 +593,10 @@ public class ShareUserLine : Gtk.Widget {
 
         Currently only regular users can have avatars.
         ***********************************************************/
-        if (this.share.share_with ().type () == Sharee.Type.USER) {
-            var avatar_line = new AvatarJob (
+        if (this.share.share_with.type == Sharee.Type.USER) {
+            AvatarJob avatar_line = new AvatarJob (
                 this.share.account,
-                this.share.share_with ().share_with (),
+                this.share.share_with.share_with,
                 avatar_size,
                 this
             );
@@ -629,13 +629,13 @@ public class ShareUserLine : Gtk.Widget {
 
         const var pixmap = pixmap_for_sharee_type (this.share.share_with ().type (), background_color);
 
-        if (!pixmap.is_null ()) {
+        if (!pixmap == null) {
             this.ui.avatar.pixmap (pixmap);
         } else {
-            GLib.debug ("pixmap is null for share type: " + this.share.share_with ().type ());
+            GLib.debug ("pixmap is null for share type: " + this.share.share_with.type);
 
             // The avatar label is the first character of the user name.
-            this.ui.avatar.on_signal_text (this.share.share_with ().display_name ().at (0).to_upper ());
+            this.ui.avatar.on_signal_text (this.share.share_with ().display_name.at (0).to_upper ());
         }
     }
 
@@ -687,7 +687,7 @@ public class ShareUserLine : Gtk.Widget {
         this.ui.note_confirm_button.visible (show);
 
         if (show) {
-            const var note = this.share.note ();
+            const var note = this.share.note;
             this.ui.note_text_edit.on_signal_text (note);
             this.ui.note_text_edit.focus ();
         }
@@ -698,37 +698,37 @@ public class ShareUserLine : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private void toggle_note_options (bool enable);
-    void ShareUserLine.toggle_note_options (bool enable) {
+    private void toggle_note_options (bool enable) {
         show_note_options (enable);
 
         if (!enable) {
             // Delete note
-            this.share.note ("");
+            this.share.note = "";
         }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_note_confirm_button_clicked ();
-    void ShareUserLine.on_signal_note_confirm_button_clicked () {
-        note (this.ui.note_text_edit.to_plain_text ());
+    private void on_signal_note_confirm_button_clicked () {
+        this.note = this.ui.note_text_edit.to_plain_text ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void disable_progess_indicator_animation () {
-        enable_progess_indicator_animation (false);
+        this.enable_progess_indicator_animation false;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void note (string note) {
-        enable_progess_indicator_animation (true);
-        this.share.note (note);
+    private string note {
+        private set {
+            this.enable_progess_indicator_animation = true;
+            this.share.note = value;
+        }
     }
 
 
@@ -754,8 +754,8 @@ public class ShareUserLine : Gtk.Widget {
             this.ui.calendar.date (initial_date.is_valid () ? initial_date : this.ui.calendar.minimum_date ());
             this.ui.calendar.focus ();
 
-            if (enforce_expiration_date_for_share (this.share.share_type ())) {
-                this.ui.calendar.maximum_date (max_expiration_date_for_share (this.share.share_type (), this.ui.calendar.maximum_date ()));
+            if (enforce_expiration_date_for_share (this.share.share_type)) {
+                this.ui.calendar.maximum_date (max_expiration_date_for_share (this.share.share_type, this.ui.calendar.maximum_date ()));
                 this.expiration_date_link_action.checked (true);
                 this.expiration_date_link_action.enabled (false);
             }
@@ -807,11 +807,11 @@ public class ShareUserLine : Gtk.Widget {
     private QDate max_expiration_date_for_share (Share.Type type, QDate fallback_date) {
         var days_to_expire = 0;
         if (type == Share.Type.Share.Type.REMOTE) {
-            days_to_expire = this.account.capabilities ().share_remote_expire_date_days ();
+            days_to_expire = this.account.capabilities.share_remote_expire_date_days ();
         } else if (type == Share.Type.Share.Type.EMAIL) {
-           days_to_expire = this.account.capabilities ().share_public_link_expire_date_days ();
+           days_to_expire = this.account.capabilities.share_public_link_expire_date_days ();
         } else {
-            days_to_expire = this.account.capabilities ().share_internal_expire_date_days ();
+            days_to_expire = this.account.capabilities.share_internal_expire_date_days ();
         }
 
         if (days_to_expire > 0) {
@@ -826,12 +826,12 @@ public class ShareUserLine : Gtk.Widget {
     ***********************************************************/
     private bool enforce_expiration_date_for_share (Share.Type type) {
         if (type == Share.Type.Share.Type.REMOTE) {
-            return this.account.capabilities ().share_remote_enforce_expire_date ();
+            return this.account.capabilities.share_remote_enforce_expire_date ();
         } else if (type == Share.Type.Share.Type.EMAIL) {
-            return this.account.capabilities ().share_public_link_enforce_expire_date ();
+            return this.account.capabilities.share_public_link_enforce_expire_date ();
         }
 
-        return this.account.capabilities ().share_internal_enforce_expire_date ();
+        return this.account.capabilities.share_internal_enforce_expire_date ();
     }
 
 
@@ -851,7 +851,8 @@ public class ShareUserLine : Gtk.Widget {
             break;
         }
 
-        return calculate_background_based_on_signal_text ();
+        calculate_background_based_on_signal_text ();
+        return;
     }
 
 
@@ -861,7 +862,7 @@ public class ShareUserLine : Gtk.Widget {
         const QCryptographicHash hash = QCryptographicHash.hash (this.ui.shared_with.text ().to_utf8 (), QCryptographicHash.Md5);
         //  Q_ASSERT (hash.size () > 0);
         if (hash.size () == 0) {
-            GLib.warning ("Failed to calculate hash color for share: " + this.share.path ());
+            GLib.warning ("Failed to calculate hash color for share: " + this.share.path);
             return new Gtk.Color ();
         }
         const double hue = (uint8) (hash[0]) / 255.0;

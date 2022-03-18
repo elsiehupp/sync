@@ -43,7 +43,7 @@ public class SyncRunFileLog : GLib.Object {
             GLib.Dir ().mkdir (logpath);
         }
 
-        int length = folder_path.split ("/").length ();
+        int length = folder_path.split ("/").length;
         string filename_single = folder_path.split ("/").at (length - 2);
         string filename = logpath + "/" + filename_single + "this.sync.log";
 
@@ -108,7 +108,7 @@ public class SyncRunFileLog : GLib.Object {
     public void log_item (SyncFileItem item) {
         // don't log the directory items that are in the list
         if (item.direction == SyncFileItem.Direction.NONE
-            || item.instruction == SyncInstructions.IGNORE) {
+            || item.instruction == CSync.SyncInstructions.IGNORE) {
             return;
         }
         string ts = item.response_time_stamp;
@@ -123,7 +123,7 @@ public class SyncRunFileLog : GLib.Object {
         const char L = '|';
         this.out + ts + L;
         this.out + L;
-        if (item.instruction != SyncInstructions.RENAME) {
+        if (item.instruction != CSync.SyncInstructions.RENAME) {
             this.out + item.destination () + L;
         } else {
             this.out + item.file + " . " + item.rename_target + L;

@@ -48,7 +48,7 @@ public class FolderWatcher : GLib.Object {
     For example, this can happen on linux if the inotify user limit from
     /proc/sys/fs/inotify/max_user_watches is exceeded.
     ***********************************************************/
-    bool is_reliable { public get; private set; }
+    public bool is_reliable { public get; private set; }
 
     /***********************************************************
     Path of the expected test notification
@@ -236,7 +236,7 @@ public class FolderWatcher : GLib.Object {
     private void append_sub_paths (GLib.Dir directory, string[] sub_paths) {
         string[] new_sub_paths = directory.entry_list (GLib.Dir.NoDotAndDotDot | GLib.Dir.Dirs | GLib.Dir.Files);
         for (int i = 0; i < new_sub_paths.size (); i++) {
-            string path = directory.path () + "/" + new_sub_paths[i];
+            string path = directory.path + "/" + new_sub_paths[i];
             GLib.FileInfo file_info = new GLib.FileInfo (path);
             sub_paths.append (path);
             if (file_info.is_dir ()) {
