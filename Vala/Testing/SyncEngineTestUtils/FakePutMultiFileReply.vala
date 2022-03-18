@@ -37,7 +37,7 @@ public class FakePutMultiFileReply : FakeReply {
 
         var string_put_payload = put_payload;
         const int boundary_position = "multipart/related; boundary=".size ();
-        const string boundary_value = "--" + content_type.mid (boundary_position, content_type.length () - boundary_position - 1) + "\r\n";
+        const string boundary_value = "--" + content_type.mid (boundary_position, content_type.length - boundary_position - 1) + "\r\n";
         var string_put_payload_reference = string_put_payload.left (string_put_payload.size () - 2 - boundary_value.size ());
         var all_parts = string_put_payload_reference.split (boundary_value, Qt.SkipEmptyParts);
         foreach (var one_part in all_parts) {
@@ -85,14 +85,14 @@ public class FakePutMultiFileReply : FakeReply {
             QJsonObject file_info_reply;
             file_info_reply.insert ("error", "false");
             file_info_reply.insert ("OC-OperationStatus", file_info.operation_status);
-            file_info_reply.insert ("X-File-Path", file_info.path ());
+            file_info_reply.insert ("X-File-Path", file_info.path);
             file_info_reply.insert ("OC-ETag", file_info.etag);
             file_info_reply.insert ("ETag", file_info.etag);
             file_info_reply.insert ("etag", file_info.etag);
             file_info_reply.insert ("OC-FileID", file_info.file_identifier);
             file_info_reply.insert ("X-OC-MTime", "accepted"); // Prevents GLib.assert_true (!this.running_now) since we'll call PropagateItemJob.done twice in that case.
             /* emit */ upload_progress (file_info.size, total_size);
-            all_file_info_reply.insert (char ('/') + file_info.path (), file_info_reply);
+            all_file_info_reply.insert (char ('/') + file_info.path, file_info_reply);
         }
         reply.set_object (all_file_info_reply);
         this.payload = reply.to_json ();

@@ -80,7 +80,7 @@ public class FolderDefinition {
         }
 
         // Happens only on Windows when the explorer integration is enabled.
-        if (!folder.navigation_pane_clsid.is_null ()) {
+        if (!folder.navigation_pane_clsid == null) {
             settings.value ("navigation_pane_clsid", folder.navigation_pane_clsid);
         } else {
             settings.remove ("navigation_pane_clsid");
@@ -172,8 +172,8 @@ public class FolderDefinition {
     /***********************************************************
     journal_path relative to local_path.
     ***********************************************************/
-    public string absolute_journal_path ();
-    string FolderDefinition.absolute_journal_path () {
+    public string absolute_journal_path;
+    string FolderDefinition.absolute_journal_path {
         return GLib.Dir (local_path).file_path (journal_path);
     }
 

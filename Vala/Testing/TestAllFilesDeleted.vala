@@ -47,7 +47,7 @@ public class TestAllFilesDeleted : GLib.Object {
         //Just set a blocklist so we can check it is still there. This directory does not exists but
         // that does not matter for our purposes.
         string[] selective_sync_blocklist = { "Q/" };
-        fake_folder.sync_engine.journal ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
+        fake_folder.sync_engine.journal.set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
                                                                 selective_sync_blocklist);
 
         var initial_state = fake_folder.current_local_state ();
@@ -56,7 +56,7 @@ public class TestAllFilesDeleted : GLib.Object {
             this.on_signal_about_to_remove_all_files_all_files_deleted_keep
         );
 
-        var modifier = delete_on_remote ? fake_folder.remote_modifier () : fake_folder.local_modifier ();
+        var modifier = delete_on_remote ? fake_folder.remote_modifier () : fake_folder.local_modifier;
         foreach (var state in fake_folder.current_remote_state ().children.keys ()) {
             modifier.remove (state);
         }
@@ -78,7 +78,7 @@ public class TestAllFilesDeleted : GLib.Object {
         // The selective sync blocklist should be not have been deleted.
         bool ok = true;
         GLib.assert_true (
-            fake_folder.sync_engine.journal ().get_gelective_sync_list (
+            fake_folder.sync_engine.journal.get_gelective_sync_list (
                 SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
                 ok
             ) ==
@@ -98,7 +98,7 @@ public class TestAllFilesDeleted : GLib.Object {
             delete_on_remote ? SyncFileItem.Direction.DOWN : SyncFileItem.Direction.UP
         );
         callback (true);
-        fake_folder.sync_engine.journal ().clear_file_table (); // That's what Folder is doing
+        fake_folder.sync_engine.journal.clear_file_table (); // That's what Folder is doing
     }
 
 
@@ -124,7 +124,7 @@ public class TestAllFilesDeleted : GLib.Object {
             this.on_signal_about_to_remove_all_files_all_files_deleted_delete
         );
 
-        var modifier = delete_on_remote ? fake_folder.remote_modifier () : fake_folder.local_modifier ();
+        var modifier = delete_on_remote ? fake_folder.remote_modifier () : fake_folder.local_modifier;
         foreach (var s in fake_folder.current_remote_state ().children.keys ())
             modifier.remove (s);
 
@@ -194,7 +194,7 @@ public class TestAllFilesDeleted : GLib.Object {
         foreach (var s in fake_folder.current_remote_state ().children.keys ()) {
             fake_folder.sync_journal ().avoid_renames_on_next_sync (s); // clears all the fileid and inodes.
         }
-        fake_folder.local_modifier ().remove ("A/a1");
+        fake_folder.local_modifier.remove ("A/a1");
         var expected_state = fake_folder.current_local_state ();
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (
@@ -237,9 +237,9 @@ public class TestAllFilesDeleted : GLib.Object {
         );
 
         // Some small changes
-        fake_folder.local_modifier ().mkdir ("Q");
-        fake_folder.local_modifier ().insert ("Q/q1");
-        fake_folder.local_modifier ().append_byte ("B/b1");
+        fake_folder.local_modifier.mkdir ("Q");
+        fake_folder.local_modifier.insert ("Q/q1");
+        fake_folder.local_modifier.append_byte ("B/b1");
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (
             about_to_remove_all_files_called ==
@@ -247,7 +247,7 @@ public class TestAllFilesDeleted : GLib.Object {
         );
 
         // Do some change localy
-        fake_folder.local_modifier ().append_byte ("A/a1");
+        fake_folder.local_modifier.append_byte ("A/a1");
 
         // reset the server.
         fake_folder.remote_modifier () = FileInfo.A12_B12_C12_S12 ();
@@ -384,7 +384,7 @@ public class TestAllFilesDeleted : GLib.Object {
             conflict.content_char ==
             'W'
         );
-        fake_folder.local_modifier ().remove (conflict.path ());
+        fake_folder.local_modifier.remove (conflict.path);
         // b1 was restored (re-uploaded)
         GLib.assert_true (current_state.find ("B/b1"));
 
@@ -402,7 +402,7 @@ public class TestAllFilesDeleted : GLib.Object {
             conflict.content_char ==
             'W'
         );
-        fake_folder.local_modifier ().remove (conflict.path ());
+        fake_folder.local_modifier.remove (conflict.path);
 
         // We actually do not remove files that technically should have been removed (we don't want data-loss)
         GLib.assert_true (current_state.find ("C/c3_removed"));
@@ -421,7 +421,7 @@ public class TestAllFilesDeleted : GLib.Object {
         if (verb == "PROPFIND") {
             var data = stream.read_all ();
             if (data.contains ("data-fingerprint")) {
-                if (request.url.path ().ends_with ("dav/files/admin/")) {
+                if (request.url.path.ends_with ("dav/files/admin/")) {
                     ++fingerprint_requests;
                 } else {
                     fingerprint_requests = -10000; // fingerprint queried on incorrect path
@@ -445,13 +445,13 @@ public class TestAllFilesDeleted : GLib.Object {
         );
 
         // add a single file
-        fake_folder.local_modifier ().insert ("hello.txt");
+        fake_folder.local_modifier.insert ("hello.txt");
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (about_to_remove_all_files_called == 0);
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // rename it
-        fake_folder.local_modifier ().rename ("hello.txt", "goodbye.txt");
+        fake_folder.local_modifier.rename ("hello.txt", "goodbye.txt");
 
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (about_to_remove_all_files_called == 0);
@@ -483,7 +483,7 @@ public class TestAllFilesDeleted : GLib.Object {
         GLib.assert_true (about_to_remove_all_files_called == 0);
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
-        fake_folder.sync_engine.journal ().set_selective_sync_list (
+        fake_folder.sync_engine.journal.set_selective_sync_list (
             SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
             {
                 "A/", "B/", "C/", "S/"

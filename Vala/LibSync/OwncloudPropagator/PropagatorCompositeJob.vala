@@ -45,7 +45,7 @@ public class PropagatorCompositeJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     public void append_job (PropagatorJob propagator_job) {
-        propagator_job.associated_composite (this);
+        propagator_job.associated_composite = this;
         this.jobs_to_do.append (propagator_job);
     }
 

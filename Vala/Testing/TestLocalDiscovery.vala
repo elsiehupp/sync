@@ -27,10 +27,10 @@ public class TestLocalDiscovery : GLib.Object {
         );
 
         // More subdirectories are useful for testing
-        fake_folder.local_modifier ().mkdir ("A/X");
-        fake_folder.local_modifier ().mkdir ("A/Y");
-        fake_folder.local_modifier ().insert ("A/X/x1");
-        fake_folder.local_modifier ().insert ("A/Y/y1");
+        fake_folder.local_modifier.mkdir ("A/X");
+        fake_folder.local_modifier.mkdir ("A/Y");
+        fake_folder.local_modifier.insert ("A/X/x1");
+        fake_folder.local_modifier.insert ("A/Y/y1");
         tracker.add_touched_path ("A/X");
 
         tracker.start_sync_full_discovery ();
@@ -40,10 +40,10 @@ public class TestLocalDiscovery : GLib.Object {
         GLib.assert_true (tracker.local_discovery_paths ().empty ());
 
         // Test begins
-        fake_folder.local_modifier ().insert ("A/a3");
-        fake_folder.local_modifier ().insert ("A/X/x2");
-        fake_folder.local_modifier ().insert ("A/Y/y2");
-        fake_folder.local_modifier ().insert ("B/b3");
+        fake_folder.local_modifier.insert ("A/a3");
+        fake_folder.local_modifier.insert ("A/X/x2");
+        fake_folder.local_modifier.insert ("A/Y/y2");
+        fake_folder.local_modifier.insert ("B/b3");
         fake_folder.remote_modifier ().insert ("C/c3");
         fake_folder.remote_modifier ().append_byte ("C/c1");
         tracker.add_touched_path ("A/X");
@@ -129,10 +129,10 @@ public class TestLocalDiscovery : GLib.Object {
 
         tracker.add_touched_path ("A/spurious");
 
-        fake_folder.local_modifier ().insert ("A/a3");
+        fake_folder.local_modifier.insert ("A/a3");
         tracker.add_touched_path ("A/a3");
 
-        fake_folder.local_modifier ().insert ("A/a4");
+        fake_folder.local_modifier.insert ("A/a4");
         fake_folder.server_error_paths ().append ("A/a4");
         // We're not adding a4 as touched, it's in the same folder as a3 and will be seen.
         // And due to the error it should be added to the explicit list while a3 gets removed.
@@ -178,9 +178,9 @@ public class TestLocalDiscovery : GLib.Object {
     private void test_directory_and_sub_directory () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
-        fake_folder.local_modifier ().mkdir ("A/new_directory");
-        fake_folder.local_modifier ().mkdir ("A/new_directory/sub_directory");
-        fake_folder.local_modifier ().insert ("A/new_directory/sub_directory/file", 10);
+        fake_folder.local_modifier.mkdir ("A/new_directory");
+        fake_folder.local_modifier.mkdir ("A/new_directory/sub_directory");
+        fake_folder.local_modifier.insert ("A/new_directory/sub_directory/file", 10);
 
         var expected_state = fake_folder.current_local_state ();
 
@@ -204,10 +204,10 @@ public class TestLocalDiscovery : GLib.Object {
 
         fake_folder.sync_engine.account.set_capabilities (
             { { "files", new QVariantMap ( { "blocklisted_files", new QVariantList ( ".foo", "bar" ) } ) } });
-        fake_folder.local_modifier ().insert ("C/.foo");
-        fake_folder.local_modifier ().insert ("C/bar");
-        fake_folder.local_modifier ().insert ("C/moo");
-        fake_folder.local_modifier ().insert ("C/.moo");
+        fake_folder.local_modifier.insert ("C/.foo");
+        fake_folder.local_modifier.insert ("C/bar");
+        fake_folder.local_modifier.insert ("C/moo");
+        fake_folder.local_modifier.insert ("C/.moo");
 
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_remote_state ().find ("C/moo"));
@@ -229,12 +229,12 @@ public class TestLocalDiscovery : GLib.Object {
         const string file_with_spaces_5 = "A/ bar  ";
         const string file_with_spaces_6 = "A/bla ";
 
-        fake_folder.local_modifier ().insert (file_with_spaces_1);
-        fake_folder.local_modifier ().insert (file_with_spaces_2);
-        fake_folder.local_modifier ().insert (file_with_spaces_3);
-        fake_folder.local_modifier ().insert (file_with_spaces_4);
-        fake_folder.local_modifier ().insert (file_with_spaces_5);
-        fake_folder.local_modifier ().insert (file_with_spaces_6);
+        fake_folder.local_modifier.insert (file_with_spaces_1);
+        fake_folder.local_modifier.insert (file_with_spaces_2);
+        fake_folder.local_modifier.insert (file_with_spaces_3);
+        fake_folder.local_modifier.insert (file_with_spaces_4);
+        fake_folder.local_modifier.insert (file_with_spaces_5);
+        fake_folder.local_modifier.insert (file_with_spaces_6);
 
         GLib.assert_true (fake_folder.sync_once ());
 
@@ -278,9 +278,9 @@ public class TestLocalDiscovery : GLib.Object {
         const string file_with_spaces = " foo";
         const string file_trimmed = "foo";
 
-        fake_folder.local_modifier ().insert (file_trimmed);
+        fake_folder.local_modifier.insert (file_trimmed);
         GLib.assert_true (fake_folder.sync_once ());
-        fake_folder.local_modifier ().insert (file_with_spaces);
+        fake_folder.local_modifier.insert (file_with_spaces);
         GLib.assert_true (!fake_folder.sync_once ());
 
         GLib.assert_true (fake_folder.current_remote_state ().find (file_trimmed));
@@ -298,8 +298,8 @@ public class TestLocalDiscovery : GLib.Object {
         const string file_with_spaces = " foo";
         const string file_trimmed = "foo";
 
-        fake_folder.local_modifier ().insert (file_trimmed);
-        fake_folder.local_modifier ().insert (file_with_spaces);
+        fake_folder.local_modifier.insert (file_trimmed);
+        fake_folder.local_modifier.insert (file_with_spaces);
         GLib.assert_true (!fake_folder.sync_once ());
 
         GLib.assert_true (fake_folder.current_remote_state ().find (file_trimmed));

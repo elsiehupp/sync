@@ -163,7 +163,7 @@ public class ComputeChecksum : ComputeChecksumBase {
     public static string compute_now_on_signal_file (string file_path, string checksum_type) {
         GLib.File file = GLib.File.new_for_path (file_path);
         if (!file.open (QIODevice.ReadOnly)) {
-            GLib.warning ("Could not open file " + file_path + " for reading and computing checksum " + file.error_string ());
+            GLib.warning ("Could not open file " + file_path + " for reading and computing checksum " + file.error_string);
             return "";
         }
 
@@ -178,7 +178,7 @@ public class ComputeChecksum : ComputeChecksumBase {
     ***********************************************************/
     private void on_signal_calculation_done () {
         string checksum = this.watcher.future ().result ();
-        if (!checksum.is_null ()) {
+        if (!checksum == null) {
             /* emit */ done (this.checksum_type, checksum);
         } else {
             /* emit */ done ("", "");
@@ -210,10 +210,10 @@ public class ComputeChecksum : ComputeChecksumBase {
             var file = qobject_cast<GLib.File> (shared_device);
             if (file) {
                 GLib.warning ("Could not open file " + file.filename ()
-                        + " for reading to compute a checksum " + file.error_string ());
+                        + " for reading to compute a checksum " + file.error_string);
             } else {
                 GLib.warning ("Could not open device " + shared_device
-                        + " for reading to compute a checksum " + shared_device.error_string ());
+                        + " for reading to compute a checksum " + shared_device.error_string);
             }
             return "";
         }

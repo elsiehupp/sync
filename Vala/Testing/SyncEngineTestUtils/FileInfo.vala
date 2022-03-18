@@ -121,7 +121,7 @@ public class FileInfo : FileModifier {
     ***********************************************************/
     public void add_child (FileInfo info) {
         var dest = this.children[info.name] = info;
-        dest.parent_path = path ();
+        dest.parent_path = this.path;
         dest.fixup_parent_path_recursively ();
     }
 
@@ -183,7 +183,7 @@ public class FileInfo : FileModifier {
         FileInfo parent = find_invalidating_etags (path_components.parent_directory_components ());
         GLib.assert_true (parent);
         FileInfo file_info = parent.children.take (path_components.filename ());
-        file_info.parent_path = directory.path ();
+        file_info.parent_path = directory.path;
         file_info.name = new_path_components.filename ();
         file_info.fixup_parent_path_recursively ();
         directory.children.insert (new_path_components.filename (), std.move (file_info));
@@ -229,7 +229,7 @@ public class FileInfo : FileModifier {
         FileInfo parent = find_invalidating_etags (path_components.parent_directory_components ());
         GLib.assert_true (parent);
         FileInfo child = parent.children[path_components.filename ()] = FileInfo ( path_components.filename ());
-        child.parent_path = parent.path ();
+        child.parent_path = parent.path;
         child.etag = generate_etag ();
         return child;
     }
@@ -242,7 +242,7 @@ public class FileInfo : FileModifier {
         FileInfo parent = find_invalidating_etags (path_components.parent_directory_components ());
         GLib.assert_true (parent);
         FileInfo child = parent.children[path_components.filename ()] = new FileInfo (path_components.filename (), size);
-        child.parent_path = parent.path ();
+        child.parent_path = parent.path;
         child.content_char = content_char;
         child.etag = generate_etag ();
         return child;
@@ -251,14 +251,14 @@ public class FileInfo : FileModifier {
 
     /***********************************************************
     ***********************************************************/
-    public string path () {
+    public string this.path {
         return (parent_path == "" ? "" : (parent_path + "/")) + name;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public string absolute_path () {
+    public string absolute_path {
         if (parent_path.ends_with ('/')) {
             return parent_path + name;
         } else {
@@ -270,7 +270,7 @@ public class FileInfo : FileModifier {
     /***********************************************************
     ***********************************************************/
     public void fixup_parent_path_recursively () {
-        var p = path ();
+        var p = this.path;
         for (var it = children.begin (); it != children.end (); ++it) {
             GLib.assert_true (it.key () == it.name);
             it.parent_path = p;
@@ -325,7 +325,7 @@ public class FileInfo : FileModifier {
     ***********************************************************/
     FileInfo find_conflict (FileInfo directory, string filename) {
         GLib.FileInfo info = new GLib.FileInfo (filename);
-        const FileInfo parent_directory = directory.find (info.path ());
+        const FileInfo parent_directory = directory.find (info.path);
         if (!parent_directory)
             return null;
         string on_signal_start = info.base_name () + " (conflicted copy";

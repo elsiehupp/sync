@@ -139,7 +139,7 @@ public class CookieJar : Soup.CookieJar {
     //          string value;
     //          stream >> value;
     //          GLib.List<Soup.Cookie> new_cookies = Soup.Cookie.parse_cookies (value);
-    //          if (new_cookies.count () == 0 && value.length () != 0) {
+    //          if (new_cookies.count () == 0 && value.length != 0) {
     //              GLib.warning ("CookieJar : Unable to parse saved cookie:" + value;
     //          }
     //          for (int j = 0; j < new_cookies.count (); ++j)

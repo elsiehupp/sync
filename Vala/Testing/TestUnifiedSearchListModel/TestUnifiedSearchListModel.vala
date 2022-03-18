@@ -63,7 +63,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
         var format = url_query.query_item_value ("format");
         var cursor = url_query.query_item_value ("cursor").to_int ();
         var search_term = url_query.query_item_value ("term");
-        var path = request.url.path ();
+        var path = request.url.path;
 
         if (!request.url.to_string ().starts_with (account_state.account.url.to_string ())) {
             reply = new FakeErrorReply (operation, request, this, 404, FAKE_404_RESPONSE);
@@ -377,7 +377,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
 
         GLib.assert_true (error_string_changed.count () > 0);
 
-        GLib.assert_true (!model.error_string () == "");
+        GLib.assert_true (!model.error_string == "");
     }
 
 

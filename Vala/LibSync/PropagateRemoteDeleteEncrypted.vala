@@ -25,7 +25,7 @@ public class PropagateRemoteCeleteEncrypted : AbstractPropagateRemoteDeleteEncry
         GLib.assert (!this.item.encrypted_filename == "");
 
         const GLib.FileInfo info = GLib.File.new_for_path (this.item.encrypted_filename);
-        start_lscol_job (info.path ());
+        start_lscol_job (info.path);
     }
 
 

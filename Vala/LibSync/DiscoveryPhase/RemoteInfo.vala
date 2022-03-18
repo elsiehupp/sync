@@ -4,8 +4,6 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-using CSync;
-
 namespace Occ {
 namespace LibSync {
 
@@ -33,7 +31,7 @@ public class RemoteInfo : Glib.Object {
 
 
     bool is_valid () {
-        return !name.is_null ();
+        return !name == null;
     }
 
 } // class RemoteInfo

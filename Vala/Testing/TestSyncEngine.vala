@@ -14,12 +14,12 @@ namespace Testing {
 bool item_did_complete (ItemCompletedSpy spy, string path) {
     var item = spy.find_item (path);
     if (item) {
-        return item.instruction != SyncInstructions.NONE && item.instruction != SyncInstructions.UPDATE_METADATA;
+        return item.instruction != CSync.SyncInstructions.NONE && item.instruction != CSync.SyncInstructions.UPDATE_METADATA;
     }
     return false;
 }
 
-bool item_instruction (ItemCompletedSpy spy, string path, SyncInstructions instr) {
+bool item_instruction (ItemCompletedSpy spy, string path, CSync.SyncInstructions instr) {
     var item = spy.find_item (path);
     return item.instruction == instr;
 }
@@ -70,7 +70,7 @@ public class TestSyncEngine : GLib.Object {
     private void test_file_upload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
-        fake_folder.local_modifier ().insert ("A/a0");
+        fake_folder.local_modifier.insert ("A/a0");
         fake_folder.sync_once ();
         GLib.assert_true (item_did_complete_successfully (complete_spy, "A/a0"));
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
@@ -98,9 +98,9 @@ public class TestSyncEngine : GLib.Object {
     private void test_dir_upload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
-        fake_folder.local_modifier ().mkdir ("Y");
-        fake_folder.local_modifier ().mkdir ("Z");
-        fake_folder.local_modifier ().insert ("Z/d0");
+        fake_folder.local_modifier.mkdir ("Y");
+        fake_folder.local_modifier.mkdir ("Z");
+        fake_folder.local_modifier.insert ("Z/d0");
         fake_folder.sync_once ();
         GLib.assert_true (item_did_complete_successfully (complete_spy, "Y"));
         GLib.assert_true (item_did_complete_successfully (complete_spy, "Z"));
@@ -126,14 +126,14 @@ public class TestSyncEngine : GLib.Object {
         );
 
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
-        fake_folder.local_modifier ().mkdir ("Y");
-        fake_folder.local_modifier ().insert ("Y/d0");
-        fake_folder.local_modifier ().mkdir ("Z");
-        fake_folder.local_modifier ().insert ("Z/d0");
-        fake_folder.local_modifier ().insert ("A/a0");
-        fake_folder.local_modifier ().insert ("B/b0");
-        fake_folder.local_modifier ().insert ("r0");
-        fake_folder.local_modifier ().insert ("r1");
+        fake_folder.local_modifier.mkdir ("Y");
+        fake_folder.local_modifier.insert ("Y/d0");
+        fake_folder.local_modifier.mkdir ("Z");
+        fake_folder.local_modifier.insert ("Z/d0");
+        fake_folder.local_modifier.insert ("A/a0");
+        fake_folder.local_modifier.insert ("B/b0");
+        fake_folder.local_modifier.insert ("r0");
+        fake_folder.local_modifier.insert ("r1");
         fake_folder.sync_once ();
         GLib.assert_true (item_did_complete_successfully_with_expected_rank (complete_spy, "Y", 0));
         GLib.assert_true (item_did_complete_successfully_with_expected_rank (complete_spy, "Z", 1));
@@ -170,7 +170,7 @@ public class TestSyncEngine : GLib.Object {
     private void test_remote_delete () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
-        fake_folder.local_modifier ().remove ("A/a1");
+        fake_folder.local_modifier.remove ("A/a1");
         fake_folder.sync_once ();
         GLib.assert_true (item_did_complete_successfully (complete_spy, "A/a1"));
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
@@ -181,10 +181,10 @@ public class TestSyncEngine : GLib.Object {
     ***********************************************************/
     private void test_eml_local_checksum () {
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
-        fake_folder.local_modifier ().insert ("a1.eml", 64, 'A');
-        fake_folder.local_modifier ().insert ("a2.eml", 64, 'A');
-        fake_folder.local_modifier ().insert ("a3.eml", 64, 'A');
-        fake_folder.local_modifier ().insert ("b3.txt", 64, 'A');
+        fake_folder.local_modifier.insert ("a1.eml", 64, 'A');
+        fake_folder.local_modifier.insert ("a2.eml", 64, 'A');
+        fake_folder.local_modifier.insert ("a3.eml", 64, 'A');
+        fake_folder.local_modifier.insert ("b3.txt", 64, 'A');
         // Upload and calculate the checksums
         // fake_folder.sync_once ();
         fake_folder.sync_once ();
@@ -198,11 +198,11 @@ public class TestSyncEngine : GLib.Object {
 
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
         // Touch the file without changing the content, shouldn't upload
-        fake_folder.local_modifier ().set_contents ("a1.eml", 'A');
+        fake_folder.local_modifier.set_contents ("a1.eml", 'A');
         // Change the content/size
-        fake_folder.local_modifier ().set_contents ("a2.eml", 'B');
-        fake_folder.local_modifier ().append_byte ("a3.eml");
-        fake_folder.local_modifier ().append_byte ("b3.txt");
+        fake_folder.local_modifier.set_contents ("a2.eml", 'B');
+        fake_folder.local_modifier.append_byte ("a3.eml");
+        fake_folder.local_modifier.append_byte ("b3.txt");
         fake_folder.sync_once ();
 
         GLib.assert_true (get_database_checksum ("a1.eml") == reference_checksum);
@@ -284,17 +284,17 @@ public class TestSyncEngine : GLib.Object {
         var expected_server_state = fake_folder.current_remote_state ();
 
         // Remove sub_folder_a with selective_sync:
-        fake_folder.sync_engine.journal ().set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, {"parent_folder/sub_folder_a/"});
-        fake_folder.sync_engine.journal ().schedule_path_for_remote_discovery ("parent_folder/sub_folder_a/");
+        fake_folder.sync_engine.journal.set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, {"parent_folder/sub_folder_a/"});
+        fake_folder.sync_engine.journal.schedule_path_for_remote_discovery ("parent_folder/sub_folder_a/");
         GLib.assert_true (get_etag ("parent_folder") == "this.invalid_");
         GLib.assert_true (get_etag ("parent_folder/sub_folder_a") == "this.invalid_");
         GLib.assert_true (get_etag ("parent_folder/sub_folder_a/subsub_folder") != "this.invalid_");
 
         // But touch local file before the next sync, such that the local folder
         // can't be removed
-        fake_folder.local_modifier ().set_contents ("parent_folder/sub_folder_a/file_b.txt", 'n');
-        fake_folder.local_modifier ().set_contents ("parent_folder/sub_folder_a/subsub_folder/file_d.txt", 'n');
-        fake_folder.local_modifier ().set_contents ("parent_folder/sub_folder_a/another_folder/subsub_folder/file_f.txt", 'n');
+        fake_folder.local_modifier.set_contents ("parent_folder/sub_folder_a/file_b.txt", 'n');
+        fake_folder.local_modifier.set_contents ("parent_folder/sub_folder_a/subsub_folder/file_d.txt", 'n');
+        fake_folder.local_modifier.set_contents ("parent_folder/sub_folder_a/another_folder/subsub_folder/file_f.txt", 'n');
 
         // Several follow-up syncs don't change the state at all,
         // in particular the remote state doesn't change and file_b.txt
@@ -337,9 +337,9 @@ public class TestSyncEngine : GLib.Object {
             SIGNAL (on_signal_finished (bool))
         );
         fake_folder.server_error_paths ().append ("NewFolder");
-        fake_folder.local_modifier ().mkdir ("NewFolder");
+        fake_folder.local_modifier.mkdir ("NewFolder");
         // This should be aborted and would otherwise fail in FileInfo.create.
-        fake_folder.local_modifier ().insert ("NewFolder/NewFile");
+        fake_folder.local_modifier.insert ("NewFolder/NewFile");
         fake_folder.sync_once ();
         GLib.assert_true (finished_spy.size () == 1);
         GLib.assert_true (finished_spy.first ().first ().to_bool () == false);
@@ -469,8 +469,8 @@ public class TestSyncEngine : GLib.Object {
         var mtime = GLib.DateTime.current_date_time_utc ().add_days (-4);
         mtime.set_msecs_since_epoch (mtime.to_m_secs_since_epoch () / 1000 * 1000);
 
-        fake_folder.local_modifier ().set_contents ("A/a1", 'C');
-        fake_folder.local_modifier ().set_modification_time ("A/a1", mtime);
+        fake_folder.local_modifier.set_contents ("A/a1", 'C');
+        fake_folder.local_modifier.set_modification_time ("A/a1", mtime);
         fake_folder.remote_modifier ().set_contents ("A/a1", 'C');
         if (!same_mtime)
             mtime = mtime.add_days (1);
@@ -480,7 +480,7 @@ public class TestSyncEngine : GLib.Object {
         GLib.assert_true (n_get == expected_get);
 
         // check that mtime in journal and filesystem agree
-        string a1path = fake_folder.local_path () + "A/a1";
+        string a1path = fake_folder.local_path + "A/a1";
         SyncJournalFileRecord a1record;
         fake_folder.sync_journal ().get_file_record ("A/a1", a1record);
         GLib.assert_true (a1record.modtime == (int64)FileSystem.get_mod_time (a1path));
@@ -521,15 +521,15 @@ public class TestSyncEngine : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (initial_file_info);
 
         // upload a
-        fake_folder.local_modifier ().append_byte ("A/a1");
-        fake_folder.local_modifier ().set_modification_time ("A/a1", changed_mtime);
+        fake_folder.local_modifier.append_byte ("A/a1");
+        fake_folder.local_modifier.set_modification_time ("A/a1", changed_mtime);
         // download b
         fake_folder.remote_modifier ().append_byte ("B/b1");
         fake_folder.remote_modifier ().set_modification_time ("B/b1", changed_mtime);
         // conflict c
-        fake_folder.local_modifier ().append_byte ("C/c1");
-        fake_folder.local_modifier ().append_byte ("C/c1");
-        fake_folder.local_modifier ().set_modification_time ("C/c1", changed_mtime);
+        fake_folder.local_modifier.append_byte ("C/c1");
+        fake_folder.local_modifier.append_byte ("C/c1");
+        fake_folder.local_modifier.set_modification_time ("C/c1", changed_mtime);
         fake_folder.remote_modifier ().append_byte ("C/c1");
         fake_folder.remote_modifier ().set_modification_time ("C/c1", changed_mtime2);
 
@@ -557,7 +557,7 @@ public class TestSyncEngine : GLib.Object {
 
         // a1 : should have local size and modtime
         GLib.assert_true (a1);
-        GLib.assert_true (a1.instruction == SyncInstructions.SYNC);
+        GLib.assert_true (a1.instruction == CSync.SyncInstructions.SYNC);
         GLib.assert_true (a1.direction == SyncFileItem.Direction.UP);
         GLib.assert_true (a1.size == (int64) 5);
 
@@ -567,7 +567,7 @@ public class TestSyncEngine : GLib.Object {
 
         // b2 : should have remote size and modtime
         GLib.assert_true (b1);
-        GLib.assert_true (b1.instruction == SyncInstructions.SYNC);
+        GLib.assert_true (b1.instruction == CSync.SyncInstructions.SYNC);
         GLib.assert_true (b1.direction == SyncFileItem.Direction.DOWN);
         GLib.assert_true (b1.size == (int64) 17);
         GLib.assert_true (Utility.date_time_from_time_t (b1.modtime) == changed_mtime);
@@ -576,7 +576,7 @@ public class TestSyncEngine : GLib.Object {
 
         // c1 : conflicts are downloads, so remote size and modtime
         GLib.assert_true (c1);
-        GLib.assert_true (c1.instruction == SyncInstructions.CONFLICT);
+        GLib.assert_true (c1.instruction == CSync.SyncInstructions.CONFLICT);
         GLib.assert_true (c1.direction == SyncFileItem.Direction.NONE);
         GLib.assert_true (c1.size == (int64) 25);
         GLib.assert_true (Utility.date_time_from_time_t (c1.modtime) == changed_mtime2);
@@ -603,22 +603,22 @@ public class TestSyncEngine : GLib.Object {
         GLib.Object parent;
         fake_folder.set_server_override (this.override_delegate_insufficient_remote_storage);
 
-        fake_folder.local_modifier ().insert ("A/big", 800);
+        fake_folder.local_modifier.insert ("A/big", 800);
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (number_of_put == 1);
         GLib.assert_true (n507 == 0);
 
         number_of_put = 0;
-        fake_folder.local_modifier ().insert ("A/big1", 500); // ok
-        fake_folder.local_modifier ().insert ("A/big2", 1200); // 507 (quota guess now 1199)
-        fake_folder.local_modifier ().insert ("A/big3", 1200); // skipped
-        fake_folder.local_modifier ().insert ("A/big4", 1500); // skipped
-        fake_folder.local_modifier ().insert ("A/big5", 1100); // 507 (quota guess now 1099)
-        fake_folder.local_modifier ().insert ("A/big6", 900); // ok (quota guess now 199)
-        fake_folder.local_modifier ().insert ("A/big7", 200); // skipped
-        fake_folder.local_modifier ().insert ("A/big8", 199); // ok (quota guess now 0)
+        fake_folder.local_modifier.insert ("A/big1", 500); // ok
+        fake_folder.local_modifier.insert ("A/big2", 1200); // 507 (quota guess now 1199)
+        fake_folder.local_modifier.insert ("A/big3", 1200); // skipped
+        fake_folder.local_modifier.insert ("A/big4", 1500); // skipped
+        fake_folder.local_modifier.insert ("A/big5", 1100); // 507 (quota guess now 1099)
+        fake_folder.local_modifier.insert ("A/big6", 900); // ok (quota guess now 199)
+        fake_folder.local_modifier.insert ("A/big7", 200); // skipped
+        fake_folder.local_modifier.insert ("A/big8", 199); // ok (quota guess now 0)
 
-        fake_folder.local_modifier ().insert ("B/big8", 1150); // 507
+        fake_folder.local_modifier.insert ("B/big8", 1150); // 507
         GLib.assert_true (!fake_folder.sync_once ());
         GLib.assert_true (number_of_put == 6);
         GLib.assert_true (n507 == 3);
@@ -701,9 +701,9 @@ public class TestSyncEngine : GLib.Object {
     private Soup.Reply override_delegate_checksum_validation (Soup.Operation operation, Soup.Request request, QIODevice device) {
         if (operation == Soup.GetOperation) {
             var reply = new FakeGetReply (fake_folder.remote_modifier (), operation, request, parent);
-            if (!checksum_value.is_null ())
+            if (!checksum_value == null)
                 reply.set_raw_header ("OC-Checksum", checksum_value);
-            if (!content_md5_value.is_null ())
+            if (!content_md5_value == null)
                 reply.set_raw_header ("Content-MD5", content_md5_value);
             return reply;
         }
@@ -719,13 +719,13 @@ public class TestSyncEngine : GLib.Object {
 
         // For current servers, no characters are forbidden
         fake_folder.sync_engine.account.set_server_version ("10.0.0");
-        fake_folder.local_modifier ().insert ("A/\\:?*\"<>|.txt");
+        fake_folder.local_modifier.insert ("A/\\:?*\"<>|.txt");
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // For legacy servers, some characters were forbidden by the client
         fake_folder.sync_engine.account.set_server_version ("8.0.0");
-        fake_folder.local_modifier ().insert ("B/\\:?*\"<>|.txt");
+        fake_folder.local_modifier.insert ("B/\\:?*\"<>|.txt");
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (!fake_folder.current_remote_state ().find ("B/\\:?*\"<>|.txt"));
 
@@ -737,7 +737,7 @@ public class TestSyncEngine : GLib.Object {
         // Check that new servers also accept the capability
         fake_folder.sync_engine.account.set_server_version ("10.0.0");
         fake_folder.sync_engine.account.set_capabilities ({ { "dav", new QVariantMap ( { "invalid_filename_regex", "my[fgh]ile" } ) } });
-        fake_folder.local_modifier ().insert ("C/myfile.txt");
+        fake_folder.local_modifier.insert ("C/myfile.txt");
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (!fake_folder.current_remote_state ().find ("C/myfile.txt"));
     }
@@ -752,7 +752,7 @@ public class TestSyncEngine : GLib.Object {
 
         fake_folder.sync_engine.set_ignore_hidden_files (true);
         fake_folder.remote_modifier ().insert ("A/.hidden");
-        fake_folder.local_modifier ().insert ("B/.hidden");
+        fake_folder.local_modifier.insert ("B/.hidden");
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (!local_file_exists ("A/.hidden"));
         GLib.assert_true (!fake_folder.current_remote_state ().find ("B/.hidden"));
@@ -770,7 +770,7 @@ public class TestSyncEngine : GLib.Object {
     it should rightfully skip things like download temporaries
     ***********************************************************/
     private static FileInfo local_file_exists (FakeFolder fake_folder, string name) {
-        return new FileInfo (fake_folder.local_path () + name).exists ();
+        return new FileInfo (fake_folder.local_path + name).exists ();
     }
 
 
@@ -841,7 +841,7 @@ public class TestSyncEngine : GLib.Object {
         int number_of_put = 0;
         fake_folder.set_server_override (this.override_delegate);
 
-        fake_folder.local_modifier ().insert ("file", 100, 'W');
+        fake_folder.local_modifier.insert ("file", 100, 'W');
         GLib.Timeout.single_shot (100, fake_folder.sync_engine, () => { fake_folder.sync_engine.on_signal_abort (); });
         GLib.assert_true (!fake_folder.sync_once ());
 
@@ -863,20 +863,20 @@ public class TestSyncEngine : GLib.Object {
     private void test_propagate_permissions () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         var perm = QFileDevice.Permission (0x7704); // user/owner : rwx, group : r, other : -
-        GLib.File.set_permissions (fake_folder.local_path () + "A/a1", perm);
-        GLib.File.set_permissions (fake_folder.local_path () + "A/a2", perm);
+        GLib.File.set_permissions (fake_folder.local_path + "A/a1", perm);
+        GLib.File.set_permissions (fake_folder.local_path + "A/a2", perm);
         fake_folder.sync_once (); // get the metadata-only change out of the way
         fake_folder.remote_modifier ().append_byte ("A/a1");
         fake_folder.remote_modifier ().append_byte ("A/a2");
-        fake_folder.local_modifier ().append_byte ("A/a2");
-        fake_folder.local_modifier ().append_byte ("A/a2");
+        fake_folder.local_modifier.append_byte ("A/a2");
+        fake_folder.local_modifier.append_byte ("A/a2");
         fake_folder.sync_once (); // perms should be preserved
-        GLib.assert_true (new FileInfo (fake_folder.local_path () + "A/a1").permissions () == perm);
-        GLib.assert_true (new FileInfo (fake_folder.local_path () + "A/a2").permissions () == perm);
+        GLib.assert_true (new FileInfo (fake_folder.local_path + "A/a1").permissions () == perm);
+        GLib.assert_true (new FileInfo (fake_folder.local_path + "A/a2").permissions () == perm);
 
         var conflict_name = fake_folder.sync_journal ().conflict_record (fake_folder.sync_journal ().conflict_record_paths ().first ()).path;
         GLib.assert_true (conflict_name.contains ("A/a2"));
-        GLib.assert_true (new FileInfo (fake_folder.local_path () + conflict_name).permissions () == perm);
+        GLib.assert_true (new FileInfo (fake_folder.local_path + conflict_name).permissions () == perm);
     }
 
 
@@ -909,7 +909,7 @@ public class TestSyncEngine : GLib.Object {
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
-        GLib.assert_true (new FileInfo (fake_folder.local_path () + "foo").last_modified () == datetime);
+        GLib.assert_true (new FileInfo (fake_folder.local_path + "foo").last_modified () == datetime);
     }
 
 
@@ -930,22 +930,22 @@ public class TestSyncEngine : GLib.Object {
         int number_of_post = 0;
         fake_folder.set_server_override (this.override_delegate_with_bulk_upload);
 
-        fake_folder.local_modifier ().insert ("A/big", 1);
+        fake_folder.local_modifier.insert ("A/big", 1);
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (number_of_put == 0);
         GLib.assert_true (number_of_post == 1);
         number_of_put = 0;
         number_of_post = 0;
 
-        fake_folder.local_modifier ().insert ("A/big1", 1); // ok
-        fake_folder.local_modifier ().insert ("A/big2", 1); // ko
-        fake_folder.local_modifier ().insert ("A/big3", 1); // ko
-        fake_folder.local_modifier ().insert ("A/big4", 1); // ko
-        fake_folder.local_modifier ().insert ("A/big5", 1); // ko
-        fake_folder.local_modifier ().insert ("A/big6", 1); // ok
-        fake_folder.local_modifier ().insert ("A/big7", 1); // ko
-        fake_folder.local_modifier ().insert ("A/big8", 1); // ok
-        fake_folder.local_modifier ().insert ("B/big8", 1); // ko
+        fake_folder.local_modifier.insert ("A/big1", 1); // ok
+        fake_folder.local_modifier.insert ("A/big2", 1); // ko
+        fake_folder.local_modifier.insert ("A/big3", 1); // ko
+        fake_folder.local_modifier.insert ("A/big4", 1); // ko
+        fake_folder.local_modifier.insert ("A/big5", 1); // ko
+        fake_folder.local_modifier.insert ("A/big6", 1); // ok
+        fake_folder.local_modifier.insert ("A/big7", 1); // ko
+        fake_folder.local_modifier.insert ("A/big8", 1); // ok
+        fake_folder.local_modifier.insert ("B/big8", 1); // ko
 
         GLib.assert_true (!fake_folder.sync_once ());
         GLib.assert_true (number_of_put == 0);

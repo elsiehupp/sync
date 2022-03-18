@@ -20,18 +20,18 @@ public class TestFolderMan : GLib.Object {
     ***********************************************************/
     private void test_check_path_validity_for_new_folder () {
         QTemporaryDir directory;
-        ConfigFile.set_configuration_directory (directory.path ()); // we don't want to pollute the user's config file
+        ConfigFile.set_configuration_directory (directory.path); // we don't want to pollute the user's config file
         GLib.assert_true (directory.is_valid ());
-        GLib.Dir dir2 = new GLib.Dir (directory.path ());
+        GLib.Dir dir2 = new GLib.Dir (directory.path);
         GLib.assert_true (dir2.mkpath ("sub/own_cloud1/folder/file"));
         GLib.assert_true (dir2.mkpath ("own_cloud2"));
         GLib.assert_true (dir2.mkpath ("sub/free"));
         GLib.assert_true (dir2.mkpath ("free2/sub")); {
-            GLib.File file = new GLib.File (directory.path () + "/sub/file.txt");
+            GLib.File file = new GLib.File (directory.path + "/sub/file.txt");
             file.open (GLib.File.WriteOnly);
             file.write ("hello");
         }
-        string directory_path = dir2.canonical_path ();
+        string directory_path = dir2.canonical_path;
 
         Account account = Account.create ();
         GLib.Uri url = new GLib.Uri ("http://example.de");
@@ -62,7 +62,7 @@ public class TestFolderMan : GLib.Object {
         // GLib.assert_true (folder_manager.check_path_validity_for_new_folder (directory_path + "/sub/bliblablu/some/more") == "");
 
         // A file . Error
-        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/sub/file.txt").is_null ());
+        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/sub/file.txt") == null);
 
         // There are folders configured in those folders, url needs to be taken into account : . ERROR
         GLib.Uri url2 = new GLib.Uri (url);
@@ -70,8 +70,8 @@ public class TestFolderMan : GLib.Object {
         url2.set_user_name (user);
 
         // The following both fail because they refer to the same account (user and url)
-        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/sub/own_cloud1", url2).is_null ());
-        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/own_cloud2/", url2).is_null ());
+        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/sub/own_cloud1", url2) == null);
+        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/own_cloud2/", url2) == null);
 
         // Now it will work because the account is different
         GLib.Uri url3 = new GLib.Uri ("http://anotherexample.org");
@@ -79,9 +79,9 @@ public class TestFolderMan : GLib.Object {
         GLib.assert_true (folder_manager.check_path_validity_for_new_folder (directory_path + "/sub/own_cloud1", url3) == "");
         GLib.assert_true (folder_manager.check_path_validity_for_new_folder (directory_path + "/own_cloud2/", url3) == "");
 
-        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path).is_null ());
-        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/sub/own_cloud1/folder").is_null ());
-        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/sub/own_cloud1/folder/file").is_null ());
+        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path) == null);
+        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/sub/own_cloud1/folder") == null);
+        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/sub/own_cloud1/folder/file") == null);
 
         // make a bunch of links
         GLib.assert_true (GLib.File.link (directory_path + "/sub/free", directory_path + "/link1"));
@@ -90,41 +90,41 @@ public class TestFolderMan : GLib.Object {
         GLib.assert_true (GLib.File.link (directory_path + "/sub/own_cloud1/folder", directory_path + "/link4"));
 
         // Ok
-        GLib.assert_true (folder_manager.check_path_validity_for_new_folder (directory_path + "/link1").is_null ());
-        GLib.assert_true (folder_manager.check_path_validity_for_new_folder (directory_path + "/link2/free").is_null ());
+        GLib.assert_true (folder_manager.check_path_validity_for_new_folder (directory_path + "/link1") == null);
+        GLib.assert_true (folder_manager.check_path_validity_for_new_folder (directory_path + "/link2/free") == null);
 
         // Not Ok
-        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/link2").is_null ());
+        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/link2") == null);
 
         // link 3 points to an existing sync folder. To make it fail, the account must be the same
-        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/link3", url2).is_null ());
+        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/link3", url2) == null);
         // while with a different account, this is fine
         GLib.assert_true (folder_manager.check_path_validity_for_new_folder (directory_path + "/link3", url3) == "");
 
-        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/link4").is_null ());
-        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/link3/folder").is_null ());
+        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/link4") == null);
+        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/link3/folder") == null);
 
         // test some non existing sub path (error)
-        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/sub/own_cloud1/some/sub/path").is_null ());
-        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/own_cloud2/blublu").is_null ());
-        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/sub/own_cloud1/folder/g/h").is_null ());
-        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/link3/folder/neu_folder").is_null ());
+        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/sub/own_cloud1/some/sub/path") == null);
+        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/own_cloud2/blublu") == null);
+        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/sub/own_cloud1/folder/g/h") == null);
+        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/link3/folder/neu_folder") == null);
 
         // Subfolder of links
-        GLib.assert_true (folder_manager.check_path_validity_for_new_folder (directory_path + "/link1/subfolder").is_null ());
-        GLib.assert_true (folder_manager.check_path_validity_for_new_folder (directory_path + "/link2/free/subfolder").is_null ());
+        GLib.assert_true (folder_manager.check_path_validity_for_new_folder (directory_path + "/link1/subfolder") == null);
+        GLib.assert_true (folder_manager.check_path_validity_for_new_folder (directory_path + "/link2/free/subfolder") == null);
 
         // Should not have the rights
-        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder ("/").is_null ());
-        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder ("/usr/bin/somefolder").is_null ());
+        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder ("/") == null);
+        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder ("/usr/bin/somefolder") == null);
 
         // Invalid paths
-        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder ("").is_null ());
+        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder ("") == null);
 
         // REMOVE own_cloud2 from the filesystem, but keep a folder sync'ed to it.
         GLib.Dir (directory_path + "/own_cloud2/").remove_recursively ();
-        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/own_cloud2/blublu").is_null ());
-        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/own_cloud2/sub/subsub/sub").is_null ());
+        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/own_cloud2/blublu") == null);
+        GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/own_cloud2/sub/subsub/sub") == null);
     }
 
 
@@ -134,16 +134,16 @@ public class TestFolderMan : GLib.Object {
         // SETUP
 
         QTemporaryDir directory;
-        ConfigFile.set_configuration_directory (directory.path ()); // we don't want to pollute the user's config file
+        ConfigFile.set_configuration_directory (directory.path); // we don't want to pollute the user's config file
         GLib.assert_true (directory.is_valid ());
-        GLib.Dir dir2 = new GLib.Dir (directory.path ());
+        GLib.Dir dir2 = new GLib.Dir (directory.path);
         GLib.assert_true (dir2.mkpath ("sub/own_cloud1/folder/file"));
         GLib.assert_true (dir2.mkpath ("own_cloud"));
         GLib.assert_true (dir2.mkpath ("own_cloud2"));
         GLib.assert_true (dir2.mkpath ("own_cloud2/foo"));
         GLib.assert_true (dir2.mkpath ("sub/free"));
         GLib.assert_true (dir2.mkpath ("free2/sub"));
-        string directory_path = dir2.canonical_path ();
+        string directory_path = dir2.canonical_path;
 
         Account account = Account.create ();
         GLib.Uri url = new GLib.Uri ("http://example.de");

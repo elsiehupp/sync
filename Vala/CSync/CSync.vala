@@ -32,7 +32,7 @@ Copyright (c) 2012-2013 by Klaas Freitag <freitag@owncloud.co
 //  const int BITFIELD (size) : size
 //  #endif
 
-namespace CSyncEnums {
+namespace CSync {
 
 enum CsyncStatus {
     OK               = 0,
@@ -187,3 +187,5 @@ class CSyncFileStatS : CSyncFileStatT {
         is_e2e_encrypted = false;
     }
 }
+
+} // namespace CSync

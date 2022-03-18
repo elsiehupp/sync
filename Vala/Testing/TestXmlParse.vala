@@ -449,7 +449,7 @@ public class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_parser_denormalized_path () {
+    private void on_signal_test_parser_denormalized_path {
         const string test_xml = "<?xml version='1.0' encoding='utf-8'?>"
             + "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             + "<d:response>"

@@ -31,7 +31,7 @@ public class TestBlocklist : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
 
-        var modifier = remote ? fake_folder.remote_modifier () : fake_folder.local_modifier ();
+        var modifier = remote ? fake_folder.remote_modifier () : fake_folder.local_modifier;
 
         int counter = 0;
         const string test_filename = "A/new";
@@ -48,7 +48,7 @@ public class TestBlocklist : GLib.Object {
             var it = complete_spy.find_item (test_filename);
             GLib.assert_true (it);
             GLib.assert_true (it.status == SyncFileItem.Status.NORMAL_ERROR); // initial error visible
-            GLib.assert_true (it.instruction == SyncInstructions.NEW);
+            GLib.assert_true (it.instruction == CSync.SyncInstructions.NEW);
 
             var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
             GLib.assert_true (entry.is_valid ());
@@ -69,7 +69,7 @@ public class TestBlocklist : GLib.Object {
             var it = complete_spy.find_item (test_filename);
             GLib.assert_true (it);
             GLib.assert_true (it.status == SyncFileItem.Status.BLOCKLISTED_ERROR);
-            GLib.assert_true (it.instruction == SyncInstructions.IGNORE); // no retry happened!
+            GLib.assert_true (it.instruction == CSync.SyncInstructions.IGNORE); // no retry happened!
 
             var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
             GLib.assert_true (entry.is_valid ());
@@ -94,7 +94,7 @@ public class TestBlocklist : GLib.Object {
         var it = complete_spy.find_item (test_filename);
         GLib.assert_true (it);
         GLib.assert_true (it.status == SyncFileItem.Status.BLOCKLISTED_ERROR); // blocklisted as it's just a retry
-        GLib.assert_true (it.instruction == SyncInstructions.NEW); // retry!
+        GLib.assert_true (it.instruction == CSync.SyncInstructions.NEW); // retry!
 
         var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
         GLib.assert_true (entry.is_valid ());
@@ -115,7 +115,7 @@ public class TestBlocklist : GLib.Object {
             var it = complete_spy.find_item (test_filename);
             GLib.assert_true (it);
             GLib.assert_true (it.status == SyncFileItem.Status.BLOCKLISTED_ERROR);
-            GLib.assert_true (it.instruction == SyncInstructions.NEW); // retry!
+            GLib.assert_true (it.instruction == CSync.SyncInstructions.NEW); // retry!
 
             var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
             GLib.assert_true (entry.is_valid ());
@@ -141,7 +141,7 @@ public class TestBlocklist : GLib.Object {
             var it = complete_spy.find_item (test_filename);
             GLib.assert_true (it);
             GLib.assert_true (it.status == SyncFileItem.Status.SUCCESS);
-            GLib.assert_true (it.instruction == SyncInstructions.NEW);
+            GLib.assert_true (it.instruction == CSync.SyncInstructions.NEW);
 
             var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
             GLib.assert_true (!entry.is_valid ());
@@ -163,7 +163,7 @@ public class TestBlocklist : GLib.Object {
 
 
     private Soup.Reply override_delegate (Soup.Operation operation, Soup.Request request, QIODevice device) {
-        if (request.url.path ().ends_with (test_filename)) {
+        if (request.url.path.ends_with (test_filename)) {
             request_identifier = request.raw_header ("X-Request-ID");
         }
         if (!remote && operation == Soup.PutOperation) {

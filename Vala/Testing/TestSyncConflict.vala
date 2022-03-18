@@ -19,9 +19,9 @@ public class TestSyncConflict : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
-        fake_folder.local_modifier ().set_contents ("A/a1", 'L');
+        fake_folder.local_modifier.set_contents ("A/a1", 'L');
         fake_folder.remote_modifier ().set_contents ("A/a1", 'R');
-        fake_folder.local_modifier ().append_byte ("A/a2");
+        fake_folder.local_modifier.append_byte ("A/a2");
         fake_folder.remote_modifier ().append_byte ("A/a2");
         fake_folder.remote_modifier ().append_byte ("A/a2");
         GLib.assert_true (fake_folder.sync_once ());
@@ -31,8 +31,8 @@ public class TestSyncConflict : GLib.Object {
             GLib.assert_true (!name.contains (fake_folder.sync_engine.account.dav_display_name ()));
         }
 
-        GLib.assert_true (expect_and_wipe_conflict (fake_folder.local_modifier (), fake_folder.current_local_state (), "A/a1"));
-        GLib.assert_true (expect_and_wipe_conflict (fake_folder.local_modifier (), fake_folder.current_local_state (), "A/a2"));
+        GLib.assert_true (expect_and_wipe_conflict (fake_folder.local_modifier, fake_folder.current_local_state (), "A/a1"));
+        GLib.assert_true (expect_and_wipe_conflict (fake_folder.local_modifier, fake_folder.current_local_state (), "A/a2"));
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
@@ -47,9 +47,9 @@ public class TestSyncConflict : GLib.Object {
         GLib.HashTable<string, string> conflict_map;
         fake_folder.set_server_override (this.override_delegate_upload_after_download);
 
-        fake_folder.local_modifier ().set_contents ("A/a1", 'L');
+        fake_folder.local_modifier.set_contents ("A/a1", 'L');
         fake_folder.remote_modifier ().set_contents ("A/a1", 'R');
-        fake_folder.local_modifier ().append_byte ("A/a2");
+        fake_folder.local_modifier.append_byte ("A/a2");
         fake_folder.remote_modifier ().append_byte ("A/a2");
         fake_folder.remote_modifier ().append_byte ("A/a2");
         GLib.assert_true (fake_folder.sync_once ());
@@ -105,7 +105,7 @@ public class TestSyncConflict : GLib.Object {
         // To do that we need to create a mock conflict record.
         var a1FileId = fake_folder.remote_modifier ().find ("A/a1").file_identifier;
         string conflict_name = "A/a1 (conflicted copy me 1234)";
-        fake_folder.local_modifier ().insert (conflict_name, 64, 'L');
+        fake_folder.local_modifier.insert (conflict_name, 64, 'L');
         ConflictRecord conflict_record;
         conflict_record.path = conflict_name;
         conflict_record.base_file_id = a1FileId;
@@ -120,7 +120,7 @@ public class TestSyncConflict : GLib.Object {
 
         // Now the user can locally alter the conflict file and it will be uploaded
         // as usual.
-        fake_folder.local_modifier ().set_contents (conflict_name, 'P');
+        fake_folder.local_modifier.set_contents (conflict_name, 'P');
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (conflict_map.size () == 1);
         GLib.assert_true (conflict_map[a1FileId] == conflict_name);
@@ -137,7 +137,7 @@ public class TestSyncConflict : GLib.Object {
         var a1ConflictFileId = fake_folder.remote_modifier ().find (conflict_name).file_identifier;
         fake_folder.remote_modifier ().append_byte (conflict_name);
         fake_folder.remote_modifier ().append_byte (conflict_name);
-        fake_folder.local_modifier ().append_byte (conflict_name);
+        fake_folder.local_modifier.append_byte (conflict_name);
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         GLib.assert_true (conflict_map.size () == 1);
@@ -234,7 +234,7 @@ public class TestSyncConflict : GLib.Object {
         GLib.assert_true (fake_folder.sync_journal ().conflict_record ("A/a2").is_valid ());
 
         // When the file is removed, the record is removed too
-        fake_folder.local_modifier ().remove ("A/a2");
+        fake_folder.local_modifier.remove ("A/a2");
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         GLib.assert_true (fake_folder.sync_journal ().conflict_record ("A/a1").is_valid ());
@@ -251,11 +251,11 @@ public class TestSyncConflict : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // Create two conflicts
-        fake_folder.local_modifier ().append_byte ("A/a1");
-        fake_folder.local_modifier ().append_byte ("A/a1");
+        fake_folder.local_modifier.append_byte ("A/a1");
+        fake_folder.local_modifier.append_byte ("A/a1");
         fake_folder.remote_modifier ().append_byte ("A/a1");
-        fake_folder.local_modifier ().append_byte ("A/a2");
-        fake_folder.local_modifier ().append_byte ("A/a2");
+        fake_folder.local_modifier.append_byte ("A/a2");
+        fake_folder.local_modifier.append_byte ("A/a2");
         fake_folder.remote_modifier ().append_byte ("A/a2");
         GLib.assert_true (fake_folder.sync_once ());
 
@@ -277,7 +277,7 @@ public class TestSyncConflict : GLib.Object {
         GLib.assert_true (fake_folder.sync_journal ().conflict_record (a2conflict).is_valid ());
 
         // When the file is removed, the record is removed too
-        fake_folder.local_modifier ().remove (a2conflict);
+        fake_folder.local_modifier.remove (a2conflict);
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.sync_journal ().conflict_record (a1conflict).is_valid ());
         GLib.assert_true (!fake_folder.sync_journal ().conflict_record (a2conflict).is_valid ());
@@ -378,19 +378,19 @@ public class TestSyncConflict : GLib.Object {
         clean_up ();
 
         // 1) a NEW/NEW conflict
-        fake_folder.local_modifier ().mkdir ("Z");
-        fake_folder.local_modifier ().mkdir ("Z/subdir");
-        fake_folder.local_modifier ().insert ("Z/foo");
+        fake_folder.local_modifier.mkdir ("Z");
+        fake_folder.local_modifier.mkdir ("Z/subdir");
+        fake_folder.local_modifier.insert ("Z/foo");
         fake_folder.remote_modifier ().insert ("Z", 63);
 
         // 2) local file becomes a directory; remote file changes
-        fake_folder.local_modifier ().remove ("A/a1");
-        fake_folder.local_modifier ().mkdir ("A/a1");
-        fake_folder.local_modifier ().insert ("A/a1/bar");
+        fake_folder.local_modifier.remove ("A/a1");
+        fake_folder.local_modifier.mkdir ("A/a1");
+        fake_folder.local_modifier.insert ("A/a1/bar");
         fake_folder.remote_modifier ().append_byte ("A/a1");
 
         // 3) local directory gets a new file; remote directory becomes a file
-        fake_folder.local_modifier ().insert ("B/zzz");
+        fake_folder.local_modifier.insert ("B/zzz");
         fake_folder.remote_modifier ().remove ("B");
         fake_folder.remote_modifier ().insert ("B", 31);
 
@@ -410,24 +410,24 @@ public class TestSyncConflict : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state ().find ("Z").size == 63);
         GLib.assert_true (conflicts[2].contains ("Z"));
         GLib.assert_true (conflicts[2] == conflict_records[2]);
-        GLib.assert_true (GLib.FileInfo (fake_folder.local_path () + conflicts[2]).is_directory ());
-        GLib.assert_true (GLib.File.exists (fake_folder.local_path () + conflicts[2] + "/foo"));
+        GLib.assert_true (GLib.FileInfo (fake_folder.local_path + conflicts[2]).is_directory ());
+        GLib.assert_true (GLib.File.exists (fake_folder.local_path + conflicts[2] + "/foo"));
 
         // 2)
         GLib.assert_true (item_conflict (complete_spy, "A/a1"));
         GLib.assert_true (fake_folder.current_local_state ().find ("A/a1").size == 5);
         GLib.assert_true (conflicts[0].contains ("A/a1"));
         GLib.assert_true (conflicts[0] == conflict_records[0]);
-        GLib.assert_true (GLib.FileInfo (fake_folder.local_path () + conflicts[0]).is_directory ());
-        GLib.assert_true (GLib.File.exists (fake_folder.local_path () + conflicts[0] + "/bar"));
+        GLib.assert_true (GLib.FileInfo (fake_folder.local_path + conflicts[0]).is_directory ());
+        GLib.assert_true (GLib.File.exists (fake_folder.local_path + conflicts[0] + "/bar"));
 
         // 3)
         GLib.assert_true (item_conflict (complete_spy, "B"));
         GLib.assert_true (fake_folder.current_local_state ().find ("B").size == 31);
         GLib.assert_true (conflicts[1].contains ("B"));
         GLib.assert_true (conflicts[1] == conflict_records[1]);
-        GLib.assert_true (GLib.FileInfo (fake_folder.local_path () + conflicts[1]).is_directory ());
-        GLib.assert_true (GLib.File.exists (fake_folder.local_path () + conflicts[1] + "/zzz"));
+        GLib.assert_true (GLib.FileInfo (fake_folder.local_path + conflicts[1]).is_directory ());
+        GLib.assert_true (GLib.File.exists (fake_folder.local_path + conflicts[1] + "/zzz"));
 
         // The contents of the conflict directories will only be uploaded after
         // another sync.
@@ -435,12 +435,12 @@ public class TestSyncConflict : GLib.Object {
         clean_up ();
         GLib.assert_true (fake_folder.sync_once ());
 
-        GLib.assert_true (item_successful (complete_spy, conflicts[0], SyncInstructions.NEW));
-        GLib.assert_true (item_successful (complete_spy, conflicts[0] + "/bar", SyncInstructions.NEW));
-        GLib.assert_true (item_successful (complete_spy, conflicts[1], SyncInstructions.NEW));
-        GLib.assert_true (item_successful (complete_spy, conflicts[1] + "/zzz", SyncInstructions.NEW));
-        GLib.assert_true (item_successful (complete_spy, conflicts[2], SyncInstructions.NEW));
-        GLib.assert_true (item_successful (complete_spy, conflicts[2] + "/foo", SyncInstructions.NEW));
+        GLib.assert_true (item_successful (complete_spy, conflicts[0], CSync.SyncInstructions.NEW));
+        GLib.assert_true (item_successful (complete_spy, conflicts[0] + "/bar", CSync.SyncInstructions.NEW));
+        GLib.assert_true (item_successful (complete_spy, conflicts[1], CSync.SyncInstructions.NEW));
+        GLib.assert_true (item_successful (complete_spy, conflicts[1] + "/zzz", CSync.SyncInstructions.NEW));
+        GLib.assert_true (item_successful (complete_spy, conflicts[2], CSync.SyncInstructions.NEW));
+        GLib.assert_true (item_successful (complete_spy, conflicts[2] + "/foo", CSync.SyncInstructions.NEW));
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
@@ -461,15 +461,15 @@ public class TestSyncConflict : GLib.Object {
         fake_folder.remote_modifier ().mkdir ("Z");
         fake_folder.remote_modifier ().mkdir ("Z/subdir");
         fake_folder.remote_modifier ().insert ("Z/foo");
-        fake_folder.local_modifier ().insert ("Z");
+        fake_folder.local_modifier.insert ("Z");
 
         // 2) local directory becomes file : remote directory adds file
-        fake_folder.local_modifier ().remove ("A");
-        fake_folder.local_modifier ().insert ("A", 63);
+        fake_folder.local_modifier.remove ("A");
+        fake_folder.local_modifier.insert ("A", 63);
         fake_folder.remote_modifier ().insert ("A/bar");
 
         // 3) local file changes; remote file becomes directory
-        fake_folder.local_modifier ().append_byte ("B/b1");
+        fake_folder.local_modifier.append_byte ("B/b1");
         fake_folder.remote_modifier ().remove ("B/b1");
         fake_folder.remote_modifier ().mkdir ("B/b1");
         fake_folder.remote_modifier ().insert ("B/b1/zzz");
@@ -513,17 +513,17 @@ public class TestSyncConflict : GLib.Object {
         // the remote becomes a file, but a file inside the directory has moved away!
         fake_folder.remote_modifier ().remove ("A");
         fake_folder.remote_modifier ().insert ("A");
-        fake_folder.local_modifier ().rename ("A/a1", "a1");
+        fake_folder.local_modifier.rename ("A/a1", "a1");
 
         // same, but with a new file inside the directory locally
         fake_folder.remote_modifier ().remove ("B");
         fake_folder.remote_modifier ().insert ("B");
-        fake_folder.local_modifier ().rename ("B/b1", "b1");
-        fake_folder.local_modifier ().insert ("B/new");
+        fake_folder.local_modifier.rename ("B/b1", "b1");
+        fake_folder.local_modifier.insert ("B/new");
 
         GLib.assert_true (fake_folder.sync_once ());
 
-        GLib.assert_true (item_successful (complete_spy, "A", SyncInstructions.TYPE_CHANGE));
+        GLib.assert_true (item_successful (complete_spy, "A", CSync.SyncInstructions.TYPE_CHANGE));
         GLib.assert_true (item_conflict (complete_spy, "B"));
 
         var conflicts = find_conflicts (fake_folder.current_local_state ());
@@ -532,7 +532,7 @@ public class TestSyncConflict : GLib.Object {
         GLib.assert_true (conflicts[0].contains ("A (conflicted copy"));
         GLib.assert_true (conflicts[1].contains ("B (conflicted copy"));
         foreach (var conflict in conflicts) {
-            GLib.Dir (fake_folder.local_path () + conflict).remove_recursively ();
+            GLib.Dir (fake_folder.local_path + conflict).remove_recursively ();
         }
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
@@ -549,23 +549,23 @@ public class TestSyncConflict : GLib.Object {
         // directory becomes file
         fake_folder.remote_modifier ().remove ("A");
         fake_folder.remote_modifier ().insert ("A");
-        fake_folder.local_modifier ().remove ("B");
-        fake_folder.local_modifier ().insert ("B");
+        fake_folder.local_modifier.remove ("B");
+        fake_folder.local_modifier.insert ("B");
 
         // file becomes directory
         fake_folder.remote_modifier ().remove ("C/c1");
         fake_folder.remote_modifier ().mkdir ("C/c1");
         fake_folder.remote_modifier ().insert ("C/c1/foo");
-        fake_folder.local_modifier ().remove ("C/c2");
-        fake_folder.local_modifier ().mkdir ("C/c2");
-        fake_folder.local_modifier ().insert ("C/c2/bar");
+        fake_folder.local_modifier.remove ("C/c2");
+        fake_folder.local_modifier.mkdir ("C/c2");
+        fake_folder.local_modifier.insert ("C/c2/bar");
 
         GLib.assert_true (fake_folder.sync_once ());
 
-        GLib.assert_true (item_successful (complete_spy, "A", SyncInstructions.TYPE_CHANGE));
-        GLib.assert_true (item_successful (complete_spy, "B", SyncInstructions.TYPE_CHANGE));
-        GLib.assert_true (item_successful (complete_spy, "C/c1", SyncInstructions.TYPE_CHANGE));
-        GLib.assert_true (item_successful (complete_spy, "C/c2", SyncInstructions.TYPE_CHANGE));
+        GLib.assert_true (item_successful (complete_spy, "A", CSync.SyncInstructions.TYPE_CHANGE));
+        GLib.assert_true (item_successful (complete_spy, "B", CSync.SyncInstructions.TYPE_CHANGE));
+        GLib.assert_true (item_successful (complete_spy, "C/c1", CSync.SyncInstructions.TYPE_CHANGE));
+        GLib.assert_true (item_successful (complete_spy, "C/c2", CSync.SyncInstructions.TYPE_CHANGE));
 
         // A becomes a conflict because we don't delete folders with files
         // inside of them!
@@ -573,7 +573,7 @@ public class TestSyncConflict : GLib.Object {
         GLib.assert_true (conflicts.size () == 1);
         GLib.assert_true (conflicts[0].contains ("A (conflicted copy"));
         foreach (var conflict in conflicts) {
-            GLib.Dir (fake_folder.local_path () + conflict).remove_recursively ();
+            GLib.Dir (fake_folder.local_path + conflict).remove_recursively ();
         }
 
         GLib.assert_true (fake_folder.sync_engine.is_another_sync_needed () == ImmediateFollowUp);
@@ -589,9 +589,9 @@ public class TestSyncConflict : GLib.Object {
     private void test_remove_remove () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.remote_modifier ().remove ("A");
-        fake_folder.local_modifier ().remove ("A");
+        fake_folder.local_modifier.remove ("A");
         fake_folder.remote_modifier ().remove ("B/b1");
-        fake_folder.local_modifier ().remove ("B/b1");
+        fake_folder.local_modifier.remove ("B/b1");
 
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         var expected_state = fake_folder.current_local_state ();
@@ -609,7 +609,7 @@ public class TestSyncConflict : GLib.Object {
     }
 
 
-    private static bool item_successful (ItemCompletedSpy spy, string path, SyncInstructions instr) {
+    private static bool item_successful (ItemCompletedSpy spy, string path, CSync.SyncInstructions instr) {
         var item = spy.find_item (path);
         return item.status == SyncFileItem.Status.SUCCESS && item.instruction == instr;
     }
@@ -617,12 +617,12 @@ public class TestSyncConflict : GLib.Object {
 
     private static bool item_conflict (ItemCompletedSpy spy, string path) {
         var item = spy.find_item (path);
-        return item.status == SyncFileItem.Status.CONFLICT && item.instruction == SyncInstructions.CONFLICT;
+        return item.status == SyncFileItem.Status.CONFLICT && item.instruction == CSync.SyncInstructions.CONFLICT;
     }
 
 
     private static bool item_successful_move (ItemCompletedSpy spy, string path) {
-        return item_successful (spy, path, SyncInstructions.RENAME);
+        return item_successful (spy, path, CSync.SyncInstructions.RENAME);
     }
 
 
@@ -630,7 +630,7 @@ public class TestSyncConflict : GLib.Object {
         string[] conflicts;
         foreach (var item in directory.children) {
             if (item.name.contains (" (conflicted copy")) {
-                conflicts.append (item.path ());
+                conflicts.append (item.path);
             }
         }
         return conflicts;
@@ -645,7 +645,7 @@ public class TestSyncConflict : GLib.Object {
         }
         foreach (var item in base_path.children) {
             if (item.name.starts_with (path_components.filename ()) && item.name.contains (" (conflicted copy")) {
-                local.remove (item.path ());
+                local.remove (item.path);
                 return true;
             }
         }

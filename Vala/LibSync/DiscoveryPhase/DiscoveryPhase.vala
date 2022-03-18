@@ -16,8 +16,6 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 //  #include <QRunnable>
 //  #include <deque>
 
-using CSync;
-
 namespace Occ {
 namespace LibSync {
 
@@ -360,25 +358,25 @@ public class DiscoveryPhase : GLib.Object {
         string old_etag;
         var it = this.deleted_item.find (original_path);
         if (it != this.deleted_item.end ()) {
-            const SyncInstructions instruction = (*it).instruction;
-            if (instruction == SyncInstructions.IGNORE && (*it).type == ItemType.VIRTUAL_FILE) {
+            const CSync.SyncInstructions instruction = (*it).instruction;
+            if (instruction == CSync.SyncInstructions.IGNORE && (*it).type == ItemType.VIRTUAL_FILE) {
                 // re-creation of virtual files count as a delete
-                // a file might be in an error state and thus gets marked as SyncInstructions.IGNORE
-                // after it was initially marked as SyncInstructions.REMOVE
+                // a file might be in an error state and thus gets marked as CSync.SyncInstructions.IGNORE
+                // after it was initially marked as CSync.SyncInstructions.REMOVE
                 // return true, to not trigger any additional actions on that file that could elad to dataloss
                 result = true;
                 old_etag = (*it).etag;
             } else {
-                if (! (instruction == SyncInstructions.REMOVE
+                if (! (instruction == CSync.SyncInstructions.REMOVE
                         // re-creation of virtual files count as a delete
-                        || ( (*it).type == ItemType.VIRTUAL_FILE && instruction == SyncInstructions.NEW)
-                        || ( (*it).is_restoration && instruction == SyncInstructions.NEW))) {
+                        || ( (*it).type == ItemType.VIRTUAL_FILE && instruction == CSync.SyncInstructions.NEW)
+                        || ( (*it).is_restoration && instruction == CSync.SyncInstructions.NEW))) {
                     GLib.warning ("ENFORCE (FAILING) " + original_path);
-                    GLib.warning ("instruction == SyncInstructions.REMOVE " + (instruction == SyncInstructions.REMOVE));
-                    GLib.warning (" ( (*it).type == ItemType.VIRTUAL_FILE && instruction == SyncInstructions.NEW)"
-                                           + ( (*it).type == ItemType.VIRTUAL_FILE && instruction == SyncInstructions.NEW));
-                    GLib.warning (" ( (*it).is_restoration && instruction == SyncInstructions.NEW))"
-                                           + ( (*it).is_restoration && instruction == SyncInstructions.NEW));
+                    GLib.warning ("instruction == CSync.SyncInstructions.REMOVE " + (instruction == CSync.SyncInstructions.REMOVE));
+                    GLib.warning (" ( (*it).type == ItemType.VIRTUAL_FILE && instruction == CSync.SyncInstructions.NEW)"
+                                           + ( (*it).type == ItemType.VIRTUAL_FILE && instruction == CSync.SyncInstructions.NEW));
+                    GLib.warning (" ( (*it).is_restoration && instruction == CSync.SyncInstructions.NEW))"
+                                           + ( (*it).is_restoration && instruction == CSync.SyncInstructions.NEW));
                     GLib.warning ("instruction" + instruction);
                     GLib.warning (" (*it).type" + (*it).type);
                     GLib.warning (" (*it).is_restoration " + (*it).is_restoration);
@@ -386,7 +384,7 @@ public class DiscoveryPhase : GLib.Object {
                     add_error_to_gui (SyncFileItem.Status.FatalError, _("Error while canceling delete of a file"), original_path);
                     /* emit */ signal_fatal_error (_("Error while canceling delete of %1").printf (original_path));
                 }
-                (*it).instruction = SyncInstructions.NONE;
+                (*it).instruction = CSync.SyncInstructions.NONE;
                 result = true;
                 old_etag = (*it).etag;
             }
@@ -516,7 +514,7 @@ public class DiscoveryPhase : GLib.Object {
                 result.checksum_header = find_best_checksum (value.to_utf8 ());
             } else if (property == "share-types" && !value == "") {
                 // Since GLib.HashTable is sorted, "share-types" is always after "permissions".
-                if (result.remote_perm.is_null ()) {
+                if (result.remote_perm == null) {
                     GLib.warning ("Server returned a share type but no permissions?");
                 } else {
                     // S means shared with me.

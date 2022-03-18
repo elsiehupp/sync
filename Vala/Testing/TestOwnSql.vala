@@ -22,9 +22,9 @@ public class TestOwnSql : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void test_open_database () {
-        GLib.FileInfo file_info = new GLib.FileInfo ( this.temporary_directory.path () + "/testdatabase.sqlite" );
+        GLib.FileInfo file_info = new GLib.FileInfo ( this.temporary_directory.path + "/testdatabase.sqlite" );
         GLib.assert_true ( !file_info.exists () ); // must not exist
-        this.database.open_or_create_read_write (file_info.file_path ());
+        this.database.open_or_create_read_write (file_info.file_path);
         file_info.refresh ();
         GLib.assert_true (file_info.exists ());
     }

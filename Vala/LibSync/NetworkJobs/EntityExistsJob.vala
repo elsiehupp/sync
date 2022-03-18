@@ -26,7 +26,7 @@ public class EntityExistsJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public new void start () {
-        send_request ("HEAD", make_account_url (path ()));
+        send_request ("HEAD", make_account_url (path));
         AbstractNetworkJob.start ();
     }
 

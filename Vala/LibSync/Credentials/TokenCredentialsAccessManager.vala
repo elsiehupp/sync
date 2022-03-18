@@ -26,7 +26,7 @@ public class TokenCredentialsAccessManager : AccessManager {
 
         // A pre-authenticated cookie
         string token = this.credentials.token.to_utf8 ();
-        if (token.length () > 0) {
+        if (token.length > 0) {
             raw_cookie (token, request.url);
         }
 

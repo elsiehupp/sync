@@ -4,8 +4,6 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-using CSync;
-
 namespace Occ {
 namespace LibSync {
 
@@ -115,11 +113,11 @@ public class DiscoverySingleDirectoryJob : GLib.Object {
         props.append ("http://owncloud.org/ns:checksums");
         if (this.is_root_path)
             props.append ("http://owncloud.org/ns:data-fingerprint");
-        if (this.account.server_version_int () >= Account.make_server_version (10, 0, 0)) {
+        if (this.account.server_version_int >= Account.make_server_version (10, 0, 0)) {
             // Server older than 10.0 have performances issue if we ask for the share-types on every PROPFIND
             props.append ("http://owncloud.org/ns:share-types");
         }
-        if (this.account.capabilities ().client_side_encryption_available ()) {
+        if (this.account.capabilities.client_side_encryption_available ()) {
             props.append ("http://nextcloud.org/ns:is-encrypted");
         }
 
@@ -143,8 +141,8 @@ public class DiscoverySingleDirectoryJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public new void abort () {
-        if (this.lscol_job && this.lscol_job.reply ()) {
-            this.lscol_job.reply ().abort ();
+        if (this.lscol_job && this.lscol_job.input_stream) {
+            this.lscol_job.input_stream.abort ();
         }
     }
 

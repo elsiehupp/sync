@@ -34,7 +34,7 @@ public class TestExcludedFiles : GLib.Object {
         excluded_files.add_manual_exclude ("пятницы.*");
         excluded_files.add_manual_exclude ("*/*.out");
         excluded_files.add_manual_exclude ("latex*/*.run.xml");
-        excluded_files.add_manual_exclude ("latex/*/*.tex.tmp");
+        excluded_files.add_manual_exclude ("latex/*/*.tex.temporary");
     
         GLib.assert_true (excluded_files.reload_exclude_files ());
     }
@@ -81,10 +81,10 @@ public class TestExcludedFiles : GLib.Object {
 
     private void check_csync_exclude_add () {
         up ();
-        excluded_files.add_manual_exclude ("/tmp/check_csync1/*");
-        GLib.assert_true (check_file_full ("/tmp/check_csync1/foo") == CSync.ExcludedFiles.Type.LIST);
-        GLib.assert_true (check_file_full ("/tmp/check_csync2/foo") == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
-        GLib.assert_true (excluded_files.all_excludes["/"].contains ("/tmp/check_csync1/*"));
+        excluded_files.add_manual_exclude ("/temporary/check_csync1/*");
+        GLib.assert_true (check_file_full ("/temporary/check_csync1/foo") == CSync.ExcludedFiles.Type.LIST);
+        GLib.assert_true (check_file_full ("/temporary/check_csync2/foo") == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
+        GLib.assert_true (excluded_files.all_excludes["/"].contains ("/temporary/check_csync1/*"));
 
         GLib.assert_true (excluded_files.full_regex_file["/"].pattern ().contains ("csync1"));
         GLib.assert_true (excluded_files.full_traversal_regex_file["/"].pattern ().contains ("csync1"));
@@ -98,18 +98,18 @@ public class TestExcludedFiles : GLib.Object {
 
     private void check_csync_exclude_add_per_dir () {
         up ();
-        excluded_files.add_manual_exclude ("*", "/tmp/check_csync1/");
-        GLib.assert_true (check_file_full ("/tmp/check_csync1/foo") == CSync.ExcludedFiles.Type.LIST);
-        GLib.assert_true (check_file_full ("/tmp/check_csync2/foo") == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
-        GLib.assert_true (excluded_files.all_excludes["/tmp/check_csync1/"].contains ("*"));
+        excluded_files.add_manual_exclude ("*", "/temporary/check_csync1/");
+        GLib.assert_true (check_file_full ("/temporary/check_csync1/foo") == CSync.ExcludedFiles.Type.LIST);
+        GLib.assert_true (check_file_full ("/temporary/check_csync2/foo") == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
+        GLib.assert_true (excluded_files.all_excludes["/temporary/check_csync1/"].contains ("*"));
 
         excluded_files.add_manual_exclude ("foo");
         GLib.assert_true (excluded_files.full_regex_file["/"].pattern ().contains ("foo"));
 
-        excluded_files.add_manual_exclude ("foo/bar", "/tmp/check_csync1/");
-        GLib.assert_true (excluded_files.full_regex_file["/tmp/check_csync1/"].pattern ().contains ("bar"));
-        GLib.assert_true (excluded_files.full_traversal_regex_file["/tmp/check_csync1/"].pattern ().contains ("bar"));
-        GLib.assert_true (!excluded_files.bname_traversal_regex_file["/tmp/check_csync1/"].pattern ().contains ("foo"));
+        excluded_files.add_manual_exclude ("foo/bar", "/temporary/check_csync1/");
+        GLib.assert_true (excluded_files.full_regex_file["/temporary/check_csync1/"].pattern ().contains ("bar"));
+        GLib.assert_true (excluded_files.full_traversal_regex_file["/temporary/check_csync1/"].pattern ().contains ("bar"));
+        GLib.assert_true (!excluded_files.bname_traversal_regex_file["/temporary/check_csync1/"].pattern ().contains ("foo"));
     }
 
     private void check_csync_excluded () {
@@ -142,17 +142,17 @@ public class TestExcludedFiles : GLib.Object {
 
         /* csync-journal is ignored in general silently. */
         GLib.assert_true (check_file_full (".csync_journal.db") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
-        GLib.assert_true (check_file_full (".csync_journal.db.ctmp") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
+        GLib.assert_true (check_file_full (".csync_journal.db.ctemporary") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
         GLib.assert_true (check_file_full ("subdir/.csync_journal.db") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
 
         /* also the new form of the database name */
         GLib.assert_true (check_file_full (".sync_5bdd60bdfcfa.db") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
-        GLib.assert_true (check_file_full (".sync_5bdd60bdfcfa.db.ctmp") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
+        GLib.assert_true (check_file_full (".sync_5bdd60bdfcfa.db.ctemporary") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
         GLib.assert_true (check_file_full (".sync_5bdd60bdfcfa.db-shm") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
         GLib.assert_true (check_file_full ("subdir/.sync_5bdd60bdfcfa.db") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
 
         GLib.assert_true (check_file_full (".sync_5bdd60bdfcfa.db") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
-        GLib.assert_true (check_file_full (".sync_5bdd60bdfcfa.db.ctmp") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
+        GLib.assert_true (check_file_full (".sync_5bdd60bdfcfa.db.ctemporary") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
         GLib.assert_true (check_file_full (".sync_5bdd60bdfcfa.db-shm") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
         GLib.assert_true (check_file_full ("subdir/.sync_5bdd60bdfcfa.db") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
 
@@ -171,13 +171,13 @@ public class TestExcludedFiles : GLib.Object {
 
         /* path wildcards */
         GLib.assert_true (check_file_full ("foobar/my_manuscript.out") == CSync.ExcludedFiles.Type.LIST);
-        GLib.assert_true (check_file_full ("latex_tmp/my_manuscript.run.xml") == CSync.ExcludedFiles.Type.LIST);
+        GLib.assert_true (check_file_full ("latex_temporary/my_manuscript.run.xml") == CSync.ExcludedFiles.Type.LIST);
 
-        GLib.assert_true (check_file_full ("word_tmp/my_manuscript.run.xml") == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
+        GLib.assert_true (check_file_full ("word_temporary/my_manuscript.run.xml") == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
 
-        GLib.assert_true (check_file_full ("latex/my_manuscript.tex.tmp") == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
+        GLib.assert_true (check_file_full ("latex/my_manuscript.tex.temporary") == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
 
-        GLib.assert_true (check_file_full ("latex/songbook/my_manuscript.tex.tmp") == CSync.ExcludedFiles.Type.LIST);
+        GLib.assert_true (check_file_full ("latex/songbook/my_manuscript.tex.temporary") == CSync.ExcludedFiles.Type.LIST);
 
         /* ? character */
         excluded_files.add_manual_exclude ("bond00?");
@@ -253,9 +253,9 @@ public class TestExcludedFiles : GLib.Object {
         GLib.assert_true (check_file_traversal ("/") == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
 
         /* path wildcards */
-        excluded_files.add_manual_exclude ("*/*.tex.tmp", "/latex/");
-        GLib.assert_true (check_file_traversal ("latex/my_manuscript.tex.tmp") == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
-        GLib.assert_true (check_file_traversal ("latex/songbook/my_manuscript.tex.tmp") == CSync.ExcludedFiles.Type.LIST);
+        excluded_files.add_manual_exclude ("*/*.tex.temporary", "/latex/");
+        GLib.assert_true (check_file_traversal ("latex/my_manuscript.tex.temporary") == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
+        GLib.assert_true (check_file_traversal ("latex/songbook/my_manuscript.tex.temporary") == CSync.ExcludedFiles.Type.LIST);
     }
 
     private void check_csync_excluded_traversal () {
@@ -283,18 +283,18 @@ public class TestExcludedFiles : GLib.Object {
 
         /* csync-journal is ignored in general silently. */
         GLib.assert_true (check_file_traversal (".csync_journal.db") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
-        GLib.assert_true (check_file_traversal (".csync_journal.db.ctmp") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
+        GLib.assert_true (check_file_traversal (".csync_journal.db.ctemporary") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
         GLib.assert_true (check_file_traversal ("subdir/.csync_journal.db") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
         GLib.assert_true (check_file_traversal ("/two/subdir/.csync_journal.db") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
 
         /* also the new form of the database name */
         GLib.assert_true (check_file_traversal (".sync_5bdd60bdfcfa.db") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
-        GLib.assert_true (check_file_traversal (".sync_5bdd60bdfcfa.db.ctmp") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
+        GLib.assert_true (check_file_traversal (".sync_5bdd60bdfcfa.db.ctemporary") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
         GLib.assert_true (check_file_traversal (".sync_5bdd60bdfcfa.db-shm") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
         GLib.assert_true (check_file_traversal ("subdir/.sync_5bdd60bdfcfa.db") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
 
         GLib.assert_true (check_file_traversal (".sync_5bdd60bdfcfa.db") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
-        GLib.assert_true (check_file_traversal (".sync_5bdd60bdfcfa.db.ctmp") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
+        GLib.assert_true (check_file_traversal (".sync_5bdd60bdfcfa.db.ctemporary") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
         GLib.assert_true (check_file_traversal (".sync_5bdd60bdfcfa.db-shm") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
         GLib.assert_true (check_file_traversal ("subdir/.sync_5bdd60bdfcfa.db") == CSync.ExcludedFiles.Type.EXCLUDE_SILENT);
 
@@ -317,10 +317,10 @@ public class TestExcludedFiles : GLib.Object {
 
         /* path wildcards */
         GLib.assert_true (check_file_traversal ("foobar/my_manuscript.out") == CSync.ExcludedFiles.Type.LIST);
-        GLib.assert_true (check_file_traversal ("latex_tmp/my_manuscript.run.xml") == CSync.ExcludedFiles.Type.LIST);
-        GLib.assert_true (check_file_traversal ("word_tmp/my_manuscript.run.xml") == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
-        GLib.assert_true (check_file_traversal ("latex/my_manuscript.tex.tmp") == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
-        GLib.assert_true (check_file_traversal ("latex/songbook/my_manuscript.tex.tmp") == CSync.ExcludedFiles.Type.LIST);
+        GLib.assert_true (check_file_traversal ("latex_temporary/my_manuscript.run.xml") == CSync.ExcludedFiles.Type.LIST);
+        GLib.assert_true (check_file_traversal ("word_temporary/my_manuscript.run.xml") == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
+        GLib.assert_true (check_file_traversal ("latex/my_manuscript.tex.temporary") == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
+        GLib.assert_true (check_file_traversal ("latex/songbook/my_manuscript.tex.temporary") == CSync.ExcludedFiles.Type.LIST);
 
         /* From here the actual traversal tests */
 

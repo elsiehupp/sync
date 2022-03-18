@@ -9,7 +9,7 @@
 
 using Occ;
 namespace Occ {
-string create_download_tmp_filename (string previous);
+string create_download_temporary_filename (string previous);
 }
 
 namespace Testing {
@@ -26,39 +26,39 @@ public class TestNextcloudPropagator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_tmp_download_file_name_generation () {
+    private void test_temporary_download_file_name_generation () {
         string fn;
         // without directory
         for (int i = 1; i <= 1000; i++) {
             fn+="F";
-            string tmp_file_name = create_download_tmp_filename (fn);
-            if (tmp_file_name.contains ('/')) {
-                tmp_file_name = tmp_file_name.mid (tmp_file_name.last_index_of ('/')+1);
+            string temporary_file_name = create_download_temporary_filename (fn);
+            if (temporary_file_name.contains ('/')) {
+                temporary_file_name = temporary_file_name.mid (temporary_file_name.last_index_of ('/')+1);
             }
-            GLib.assert_true ( tmp_file_name.length () > 0);
-            GLib.assert_true ( tmp_file_name.length () <= 254);
+            GLib.assert_true ( temporary_file_name.length > 0);
+            GLib.assert_true ( temporary_file_name.length <= 254);
         }
         // with absolute directory
         fn = "/Users/guruz/own_cloud/rocks/GPL";
         for (int i = 1; i < 1000; i++) {
             fn+="F";
-            string tmp_file_name = create_download_tmp_filename (fn);
-            if (tmp_file_name.contains ('/')) {
-                tmp_file_name = tmp_file_name.mid (tmp_file_name.last_index_of ('/')+1);
+            string temporary_file_name = create_download_temporary_filename (fn);
+            if (temporary_file_name.contains ('/')) {
+                temporary_file_name = temporary_file_name.mid (temporary_file_name.last_index_of ('/')+1);
             }
-            GLib.assert_true ( tmp_file_name.length () > 0);
-            GLib.assert_true ( tmp_file_name.length () <= 254);
+            GLib.assert_true ( temporary_file_name.length > 0);
+            GLib.assert_true ( temporary_file_name.length <= 254);
         }
         // with relative directory
         fn = "rocks/GPL";
         for (int i = 1; i < 1000; i++) {
             fn+="F";
-            string tmp_file_name = create_download_tmp_filename (fn);
-            if (tmp_file_name.contains ('/')) {
-                tmp_file_name = tmp_file_name.mid (tmp_file_name.last_index_of ('/')+1);
+            string temporary_file_name = create_download_temporary_filename (fn);
+            if (temporary_file_name.contains ('/')) {
+                temporary_file_name = temporary_file_name.mid (temporary_file_name.last_index_of ('/')+1);
             }
-            GLib.assert_true ( tmp_file_name.length () > 0);
-            GLib.assert_true ( tmp_file_name.length () <= 254);
+            GLib.assert_true ( temporary_file_name.length > 0);
+            GLib.assert_true ( temporary_file_name.length <= 254);
         }
     }
 

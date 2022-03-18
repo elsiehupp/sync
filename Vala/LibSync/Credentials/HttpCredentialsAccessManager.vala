@@ -40,7 +40,7 @@ public class HttpCredentialsAccessManager : AccessManager {
             }
         }
 
-        if (this.credentials && !this.credentials.client_ssl_key.is_null () && !this.credentials.client_ssl_certificate.is_null ()) {
+        if (this.credentials && !this.credentials.client_ssl_key == null && !this.credentials.client_ssl_certificate == null) {
             // SSL configuration
             QSslConfiguration ssl_configuration = request.ssl_configuration ();
             ssl_configuration.local_certificate (this.credentials.client_ssl_certificate);

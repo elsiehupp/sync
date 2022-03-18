@@ -86,7 +86,7 @@ public class OAuthTestCase : GLib.Object {
     public virtual void on_signal_open_browser_hook (GLib.Uri url) {
         GLib.assert_true (state == StartState);
         state = BrowserOpened;
-        GLib.assert_true (url.path () == s_oauth_test_server.path () + "/index.php/apps/oauth2/authorize");
+        GLib.assert_true (url.path == s_oauth_test_server.path + "/index.php/apps/oauth2/authorize");
         GLib.assert_true (url.to_string ().starts_with (s_oauth_test_server.to_string ()));
         QUrlQuery query = new QUrlQuery (url);
         GLib.assert_true (query.query_item_value ("response_type") == "code");
@@ -126,7 +126,7 @@ public class OAuthTestCase : GLib.Object {
         state = TokenAsked;
         //  ASSERT (operation == Soup.PostOperation);
         //  ASSERT (request.url.to_string ().starts_with (s_oauth_test_server.to_string ()));
-        //  ASSERT (request.url.path () == s_oauth_test_server.path () + "/index.php/apps/oauth2/api/v1/token");
+        //  ASSERT (request.url.path == s_oauth_test_server.path + "/index.php/apps/oauth2/api/v1/token");
         std.unique_ptr<QBuffer> payload = new std.unique_ptr<QBuffer> (new QBuffer ());
         payload.set_data (token_reply_payload ());
         return new FakePostReply (operation, request, std.move (payload), fake_access_manager);

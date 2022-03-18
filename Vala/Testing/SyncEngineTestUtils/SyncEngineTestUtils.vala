@@ -31,13 +31,13 @@ public class SyncEngineTestUtils {
     const GLib.Uri s_upload_url = "owncloud://somehost/owncloud/remote.php/dav/uploads/admin/";
 
     inline string get_file_path_from_url (GLib.Uri url) {
-        string path = url.path ();
-        if (path.starts_with (s_root_url_2.path ()))
-            return path.mid (s_root_url_2.path ().length ());
-        if (path.starts_with (s_upload_url.path ()))
-            return path.mid (s_upload_url.path ().length ());
-        if (path.starts_with (s_root_url.path ()))
-            return path.mid (s_root_url.path ().length ());
+        string path = url.path;
+        if (path.starts_with (s_root_url_2.path))
+            return path.mid (s_root_url_2.path.length);
+        if (path.starts_with (s_upload_url.path))
+            return path.mid (s_upload_url.path.length);
+        if (path.starts_with (s_root_url.path))
+            return path.mid (s_root_url.path.length);
         return {};
     }
 
@@ -63,12 +63,12 @@ public class SyncEngineTestUtils {
 
     inline void add_files (string[] dest, FileInfo file_info) {
         if (file_info.is_directory) {
-            dest += "%1 - directory".printf (file_info.path ());
+            dest += "%1 - directory".printf (file_info.path);
             foreach (FileInfo file_info in file_info.children) {
                 add_files (dest, file_info);
             }
         } else {
-            dest += "%1 - %2 %3-bytes".printf (file_info.path ()).printf (file_info.size).printf (file_info.content_char);
+            dest += "%1 - %2 %3-bytes".printf (file_info.path).printf (file_info.size).printf (file_info.content_char);
         }
     }
 

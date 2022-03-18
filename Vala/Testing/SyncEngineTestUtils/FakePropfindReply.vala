@@ -22,13 +22,13 @@ public class FakePropfindReply : FakeReply {
         open (QIODevice.ReadOnly);
 
         string filename = get_file_path_from_url (request.url);
-        GLib.assert_true (!filename.is_null ()); // for root, it should be empty
+        GLib.assert_true (!filename == null); // for root, it should be empty
         const FileInfo file_info = remote_root_file_info.find (filename);
         if (!file_info) {
             QMetaObject.invoke_method (this, "respond_404", Qt.QueuedConnection);
             return;
         }
-        const string prefix = request.url.path ().left (request.url.path ().size () - filename.size ());
+        const string prefix = request.url.path.left (request.url.path.size () - filename.size ());
 
         // Don't care about the request and just return a full propfind
         const string dav_uri = "DAV:";
@@ -55,11 +55,11 @@ public class FakePropfindReply : FakeReply {
     private void write_file_response (FileInfo file_info) {
         xml.write_start_element (dav_uri, "response");
 
-        var url = GLib.Uri.to_percent_encoding (file_info.absolute_path (), "/");
+        var url = GLib.Uri.to_percent_encoding (file_info.absolute_path, "/");
         if (!url.ends_with (char ('/'))) {
             url.append (char ('/'));
         }
-        const string href = Utility.concat_url_path (prefix, url).path ();
+        const string href = Utility.concat_url_path (prefix, url).path;
         xml.write_text_element (dav_uri, "href", href);
         xml.write_start_element (dav_uri, "propstat");
         xml.write_start_element (dav_uri, "prop");
@@ -77,7 +77,7 @@ public class FakePropfindReply : FakeReply {
         xml.write_text_element (dav_uri, "getlastmodified", string_date);
         xml.write_text_element (dav_uri, "getcontentlength", file_info.size.to_string ());
         xml.write_text_element (dav_uri, "getetag", "\"%1\"".printf (file_info.etag));
-        xml.write_text_element (oc_uri, "permissions", !file_info.permissions.is_null () ? file_info.permissions.to_string () : file_info.is_shared ? "SRDNVCKW": "RDNVCKW");
+        xml.write_text_element (oc_uri, "permissions", !file_info.permissions == null ? file_info.permissions.to_string () : file_info.is_shared ? "SRDNVCKW": "RDNVCKW");
         xml.write_text_element (oc_uri, "identifier", file_info.file_identifier);
         xml.write_text_element (oc_uri, "checksums", file_info.checksums);
         buffer.write (file_info.extra_dav_properties);

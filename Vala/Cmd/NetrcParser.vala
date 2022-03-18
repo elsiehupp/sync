@@ -34,7 +34,7 @@ public class NetrcParser {
     public NetrcParser (string file = "") {
         this.netrc_location = file;
         if (this.netrc_location == "") {
-            this.netrc_location = GLib.Dir.home_path () + "/.netrc";
+            this.netrc_location = GLib.Dir.home_path + "/.netrc";
         }
     }
 

@@ -18,11 +18,13 @@ Copyright (c) 2008-2013 by Andreas Schneider <asn@cryptomilk.
 //  #include <QRegularExpression>
 //  #include <functional>
 
+namespace CSync {
+
 /***********************************************************
 Manages file/directory exclusion.
 
 Most commonly exclude patterns are loaded from file
-add_exclude_file_path () and on_signal_reload_exclude_files ().
+add_exclude_file_path and on_signal_reload_exclude_files ().
 
 Excluded files are primarily relevant for sync runs, and for
 file watcher filtering.
@@ -252,7 +254,7 @@ public class ExcludedFiles : GLib.Object {
                 }
 
                 // Get the parent path
-                path = file_info.absolute_path ();
+                path = file_info.absolute_path;
             }
         }
 
@@ -973,14 +975,14 @@ public class ExcludedFiles : GLib.Object {
         }
 
         // check the strlen and ignore the file if its name is longer than 254 chars.
-        // whenever changing this also check create_download_tmp_filename
+        // whenever changing this also check create_download_temporary_filename
         if (blen > 254) {
             return CSync.ExcludedFiles.Type.LONG_FILENAME;
         }
 
         /* Do not sync desktop.ini files anywhere in the tree. */
         const var desktop_ini_file = "desktop.ini";
-        if (blen == static_cast<qsizetype> (desktop_ini_file.length ()) && bname.compare (desktop_ini_file, Qt.CaseInsensitive) == 0) {
+        if (blen == static_cast<qsizetype> (desktop_ini_file.length) && bname.compare (desktop_ini_file, Qt.CaseInsensitive) == 0) {
             return CSync.ExcludedFiles.Type.EXCLUDE_SILENT;
         }
 

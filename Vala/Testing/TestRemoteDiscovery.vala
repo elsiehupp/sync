@@ -77,9 +77,9 @@ public class TestRemoteDiscovery : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         // Do Some change as well
-        fake_folder.local_modifier ().insert ("A/z1");
-        fake_folder.local_modifier ().insert ("B/z1");
-        fake_folder.local_modifier ().insert ("C/z1");
+        fake_folder.local_modifier.insert ("A/z1");
+        fake_folder.local_modifier.insert ("B/z1");
+        fake_folder.local_modifier.insert ("C/z1");
         fake_folder.remote_modifier ().insert ("A/z2");
         fake_folder.remote_modifier ().insert ("B/z2");
         fake_folder.remote_modifier ().insert ("C/z2");
@@ -108,13 +108,13 @@ public class TestRemoteDiscovery : GLib.Object {
             GLib.assert_true (error_spy.size () == 1);
             GLib.assert_true (error_spy[0][0].to_string () == fatal_error_prefix + expected_error_string);
         } else {
-            GLib.assert_true (complete_spy.find_item ("B").instruction == SyncInstructions.IGNORE);
+            GLib.assert_true (complete_spy.find_item ("B").instruction == CSync.SyncInstructions.IGNORE);
             GLib.assert_true (complete_spy.find_item ("B").error_string.contains (expected_error_string));
 
             // The other folder should have been sync'ed as the sync just ignored the faulty directory
             GLib.assert_true (fake_folder.current_remote_state ().children["A"] == fake_folder.current_local_state ().children["A"]);
             GLib.assert_true (fake_folder.current_remote_state ().children["C"] == fake_folder.current_local_state ().children["C"]);
-            GLib.assert_true (complete_spy.find_item ("A/z1").instruction == SyncInstructions.NEW);
+            GLib.assert_true (complete_spy.find_item ("A/z1").instruction == CSync.SyncInstructions.NEW);
         }
 
         //
@@ -130,7 +130,7 @@ public class TestRemoteDiscovery : GLib.Object {
 
 
     private Soup.Reply override_delegate_remote_error (Soup.Operation operation, Soup.Request request, QIODevice device) {
-        if (request.attribute (Soup.Request.CustomVerbAttribute) == "PROPFIND" && request.url.path ().ends_with (error_folder)) {
+        if (request.attribute (Soup.Request.CustomVerbAttribute) == "PROPFIND" && request.url.path.ends_with (error_folder)) {
             if (error_kind == InvalidXML) {
                 return new FakeBrokenXmlPropfindReply (fake_folder.remote_modifier (), operation, request, this);
             } else if (error_kind == Timeout) {
@@ -160,11 +160,11 @@ public class TestRemoteDiscovery : GLib.Object {
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
         GLib.assert_true (!fake_folder.sync_once ());
 
-        GLib.assert_true (complete_spy.find_item ("good").instruction == SyncInstructions.NEW);
-        GLib.assert_true (complete_spy.find_item ("noetag").instruction == SyncInstructions.ERROR);
-        GLib.assert_true (complete_spy.find_item ("nofileid").instruction == SyncInstructions.ERROR);
-        GLib.assert_true (complete_spy.find_item ("nopermissions").instruction == SyncInstructions.NEW);
-        GLib.assert_true (complete_spy.find_item ("nopermissions/A").instruction == SyncInstructions.ERROR);
+        GLib.assert_true (complete_spy.find_item ("good").instruction == CSync.SyncInstructions.NEW);
+        GLib.assert_true (complete_spy.find_item ("noetag").instruction == CSync.SyncInstructions.ERROR);
+        GLib.assert_true (complete_spy.find_item ("nofileid").instruction == CSync.SyncInstructions.ERROR);
+        GLib.assert_true (complete_spy.find_item ("nopermissions").instruction == CSync.SyncInstructions.NEW);
+        GLib.assert_true (complete_spy.find_item ("nopermissions/A").instruction == CSync.SyncInstructions.ERROR);
         GLib.assert_true (complete_spy.find_item ("noetag").error_string.contains ("ETag"));
         GLib.assert_true (complete_spy.find_item ("nofileid").error_string.contains ("file identifier"));
         GLib.assert_true (complete_spy.find_item ("nopermissions/A").error_string.contains ("permission"));
@@ -172,7 +172,7 @@ public class TestRemoteDiscovery : GLib.Object {
 
 
     private Soup.Reply override_delegate_missing_data (Soup.Operation operation, Soup.Request request, QIODevice device) {
-        if (request.attribute (Soup.Request.CustomVerbAttribute) == "PROPFIND" && request.url.path ().ends_with ("nopermissions"))
+        if (request.attribute (Soup.Request.CustomVerbAttribute) == "PROPFIND" && request.url.path.ends_with ("nopermissions"))
             return new MissingPermissionsPropfindReply (fake_folder.remote_modifier (), operation, request, this);
         return null;
     }

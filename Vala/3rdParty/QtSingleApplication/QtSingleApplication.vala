@@ -55,7 +55,7 @@ public class SingleApplication : Gtk.Application {
         if (!created) {
             if (!instances.attach ()) {
                 GLib.warning () << "Failed to initialize instances shared memory: "
-                           << instances.error_string ();
+                           << instances.error_string;
                 delete instances;
                 instances = null;
                 return;

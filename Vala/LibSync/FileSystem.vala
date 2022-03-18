@@ -179,16 +179,16 @@ public class FileSystem : GLib.Object {
                 remove_ok = remove_recursively (path + "/" + dir_iterator.filename (), signal_delegate, errors); // recursive
             } else {
                 string remove_error;
-                remove_ok = FileSystem.remove (dir_iterator.file_path (), remove_error);
+                remove_ok = FileSystem.remove (dir_iterator.file_path, remove_error);
                 if (remove_ok) {
                     if (signal_delegate)
-                        signal_delegate (dir_iterator.file_path (), false);
+                        signal_delegate (dir_iterator.file_path, false);
                 } else {
                     if (errors) {
                         errors.append (_("FileSystem", "Error removing \"%1\" : %2")
-                                            .printf (GLib.Dir.to_native_separators (dir_iterator.file_path ()), remove_error));
+                                            .printf (GLib.Dir.to_native_separators (dir_iterator.file_path), remove_error));
                     }
-                    GLib.warning ("Error removing " + dir_iterator.file_path () + " : " + remove_error);
+                    GLib.warning ("Error removing " + dir_iterator.file_path + " : " + remove_error);
                 }
             }
             if (!remove_ok) {

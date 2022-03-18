@@ -132,7 +132,7 @@ public class ConfigFile : GLib.Object {
                 file_info.file (dir_path);
             }
             if (file_info.exists () && file_info.query_info ().get_file_type () == FileType.DIRECTORY) {
-                dir_path = file_info.absolute_file_path ();
+                dir_path = file_info.absolute_file_path;
                 GLib.info ("Using custom config directory " + dir_path);
                 ConfigFile.conf_dir = dir_path;
                 return true;
@@ -192,15 +192,15 @@ public class ConfigFile : GLib.Object {
 
         switch (scope) {
         case USER_SCOPE:
-            file_info.file (config_path (), EXCL_FILE);
+            file_info.file (config_path, EXCL_FILE);
 
             if (!file_info.is_readable ()) {
-                file_info.file (config_path (), "exclude.lst");
+                file_info.file (config_path, "exclude.lst");
             }
             if (!file_info.is_readable ()) {
-                file_info.file (config_path (), EXCL_FILE);
+                file_info.file (config_path, EXCL_FILE);
             }
-            return file_info.absolute_file_path ();
+            return file_info.absolute_file_path;
         case SYSTEM_SCOPE:
             return ConfigFile.exclude_file_from_system ();
         }
@@ -220,12 +220,12 @@ public class ConfigFile : GLib.Object {
         if (!file_info.exists ()) {
             // Prefer to return the preferred path! Only use the fallback location
             // if the other path does not exist and the fallback is valid.
-            GLib.FileInfo next_to_binary = GLib.File.new_for_path (Gtk.Application.application_dir_path (), EXCL_FILE);
+            GLib.FileInfo next_to_binary = GLib.File.new_for_path (Gtk.Application.application_dir_path, EXCL_FILE);
             if (next_to_binary.exists ()) {
                 file_info = next_to_binary;
             } else {
                 // For AppImage, the file might reside under a temporary mount path
-                GLib.Dir d = new GLib.Dir (Gtk.Application.application_dir_path ()); // supposed to be /tmp/mount.xyz/usr/bin
+                GLib.Dir d = new GLib.Dir (Gtk.Application.application_dir_path); // supposed to be /temporary/mount.xyz/usr/bin
                 d.cd_up (); // go out of bin
                 d.cd_up (); // go out of usr
                 if (!d.is_root ()) { // it is really a mountpoint
@@ -239,7 +239,7 @@ public class ConfigFile : GLib.Object {
             }
         }
 
-        return file_info.absolute_file_path ();
+        return file_info.absolute_file_path;
     }
 
 
@@ -462,7 +462,7 @@ public class ConfigFile : GLib.Object {
 
     string log_directory {
         public get {
-            string default_log_dir = config_path () + "/logs";
+            string default_log_dir = config_path + "/logs";
             GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
             return settings.value (LOG_DIR_C, default_log_dir).to_string ();
         }
@@ -921,7 +921,7 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     public void save_geometry (Gtk.Widget w) {
     // #ifndef TOKEN_AUTH_ONLY
-        //  ASSERT (!w.object_name ().is_null ());
+        //  ASSERT (!w.object_name () == null);
         GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         settings.begin_group (w.object_name ());
         settings.value (GEOMETRY_C, w.save_geometry ());
@@ -962,7 +962,7 @@ public class ConfigFile : GLib.Object {
     // #ifndef TOKEN_AUTH_ONLY
         if (!header)
             return;
-        //  ASSERT (!header.object_name ().is_null ());
+        //  ASSERT (!header.object_name () == null);
 
         GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         settings.begin_group (header.object_name ());
@@ -1110,7 +1110,7 @@ public class ConfigFile : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public string certificate_path () {
+    public string certificate_path {
         return retrieve_data ("", CERT_PATH).to_string ();
     }
 

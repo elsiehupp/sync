@@ -27,9 +27,9 @@ public class TestIconUtils : GLib.Object {
 
         GLib.assert_true (!black_images == "");
 
-        GLib.assert_true (!Ui.IconUtils.draw_svg_with_custom_fill_color (black_svg_dir_path + "/" + black_images.at (0), QColorConstants.Svg.red).is_null ());
+        GLib.assert_true (!Ui.IconUtils.draw_svg_with_custom_fill_color (black_svg_dir_path + "/" + black_images.at (0), QColorConstants.Svg.red) == null);
 
-        GLib.assert_true (!Ui.IconUtils.draw_svg_with_custom_fill_color (black_svg_dir_path + "/" + black_images.at (0), QColorConstants.Svg.green).is_null ());
+        GLib.assert_true (!Ui.IconUtils.draw_svg_with_custom_fill_color (black_svg_dir_path + "/" + black_images.at (0), QColorConstants.Svg.green) == null);
 
         const string white_svg_dir_path = Theme.THEME_PREFIX + "white";
         const GLib.Dir white_svg_dir = new GLib.Dir (white_svg_dir_path);
@@ -37,7 +37,7 @@ public class TestIconUtils : GLib.Object {
 
         GLib.assert_true (!white_images == "");
 
-        GLib.assert_true (!Ui.IconUtils.draw_svg_with_custom_fill_color (white_svg_dir_path + "/" + white_images.at (0), QColorConstants.Svg.blue).is_null ());
+        GLib.assert_true (!Ui.IconUtils.draw_svg_with_custom_fill_color (white_svg_dir_path + "/" + white_images.at (0), QColorConstants.Svg.blue) == null);
     }
 
 
@@ -49,16 +49,16 @@ public class TestIconUtils : GLib.Object {
 
         GLib.assert_true (!black_images == "");
 
-        GLib.assert_true (!Ui.IconUtils.create_svg_image_with_custom_color (black_images.at (0), QColorConstants.Svg.red).is_null ());
+        GLib.assert_true (!Ui.IconUtils.create_svg_image_with_custom_color (black_images.at (0), QColorConstants.Svg.red) == null);
 
-        GLib.assert_true (!Ui.IconUtils.create_svg_image_with_custom_color (black_images.at (0), QColorConstants.Svg.green).is_null ());
+        GLib.assert_true (!Ui.IconUtils.create_svg_image_with_custom_color (black_images.at (0), QColorConstants.Svg.green) == null);
 
         const GLib.Dir white_svg_dir = new GLib.Dir (Theme.THEME_PREFIX + "white");
         const string[] white_images = white_svg_dir.entry_list ("*.svg");
 
         GLib.assert_true (!white_images == "");
 
-        GLib.assert_true (!Ui.IconUtils.create_svg_image_with_custom_color (white_images.at (0), QColorConstants.Svg.blue).is_null ());
+        GLib.assert_true (!Ui.IconUtils.create_svg_image_with_custom_color (white_images.at (0), QColorConstants.Svg.blue) == null);
     }
 
 
@@ -73,11 +73,11 @@ public class TestIconUtils : GLib.Object {
 
         GLib.assert_true (!black_images == "");
 
-        GLib.assert_true (!Ui.IconUtils.pixmap_for_background (white_images.at (0), Gtk.Color ("blue")).is_null ());
+        GLib.assert_true (!Ui.IconUtils.pixmap_for_background (white_images.at (0), Gtk.Color ("blue")) == null);
 
         GLib.assert_true (!white_images == "");
 
-        GLib.assert_true (!Ui.IconUtils.pixmap_for_background (black_images.at (0), Gtk.Color ("yellow")).is_null ());
+        GLib.assert_true (!Ui.IconUtils.pixmap_for_background (black_images.at (0), Gtk.Color ("yellow")) == null);
     }
 
 } // class TestIconUtils

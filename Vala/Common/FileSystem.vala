@@ -122,7 +122,7 @@ public class FileSystem {
         // if the filename is different from the filename in file_info, the file_info is
         // not valid. There needs to be one initialised here. Otherwise the incoming
         // file_info is re-used.
-        if (file_info.file_path () != filename) {
+        if (file_info.file_path != filename) {
             GLib.FileInfo my_f_i = new GLib.FileInfo (filename);
             re = my_f_i.exists ();
         }
@@ -148,7 +148,7 @@ public class FileSystem {
         GLib.File orig = GLib.File.new_for_path (origin_filename);
         success = orig.rename (destination_filename);
         if (!success) {
-            error = orig.error_string ();
+            error = orig.error_string;
         }
 
         if (!success) {
@@ -184,7 +184,7 @@ public class FileSystem {
         success = true;
         bool dest_exists = file_exists (destination_filename);
         if (dest_exists && !GLib.File.remove (destination_filename)) {
-            *error_string = orig.error_string ();
+            *error_string = orig.error_string;
             GLib.warning ("Target file could not be removed.");
             success = false;
         }
@@ -192,7 +192,7 @@ public class FileSystem {
             success = orig.rename (destination_filename);
         }
         if (!success) {
-            *error_string = orig.error_string ();
+            *error_string = orig.error_string;
             GLib.warning ("Renaming temp file to final failed: " + *error_string);
             return false;
         }
@@ -213,7 +213,7 @@ public class FileSystem {
         GLib.File file = GLib.File.new_for_path (filename);
         if (!file.remove ()) {
             if (error_string) {
-                *error_string = file.error_string ();
+                *error_string = file.error_string;
             }
             return false;
         }
@@ -232,7 +232,7 @@ public class FileSystem {
         string trash_path, trash_file_path, trash_info_path;
         string xdg_data_home = GLib.File.decode_name (qgetenv ("XDG_DATA_HOME"));
         if (xdg_data_home == "") {
-            trash_path = GLib.Dir.home_path () + "/.local/share/Trash/"; // trash path that should exist
+            trash_path = GLib.Dir.home_path + "/.local/share/Trash/"; // trash path that should exist
         } else {
             trash_path = xdg_data_home + "/Trash/";
         }
@@ -254,15 +254,15 @@ public class FileSystem {
             while (file.exists (path + string.number (suffix_number))) { //or to "filename.2" if "filename.1" exists, etc
                 suffix_number++;
             }
-            if (!file.rename (file_info.absolute_file_path (), path + string.number (suffix_number))) { // rename (file old path, file trash path)
+            if (!file.rename (file_info.absolute_file_path, path + string.number (suffix_number))) { // rename (file old path, file trash path)
                 *error_string = _("FileSystem", " (Could not move \"%1\" to \"%2\")")
-                                   .printf (file_info.absolute_file_path (), path + string.number (suffix_number));
+                                   .printf (file_info.absolute_file_path, path + string.number (suffix_number));
                 return false;
             }
         } else {
-            if (!file.rename (file_info.absolute_file_path (), trash_file_path + file_info.filename ())) { // rename (file old path, file trash path)
+            if (!file.rename (file_info.absolute_file_path, trash_file_path + file_info.filename ())) { // rename (file old path, file trash path)
                 *error_string = _("FileSystem", " (Could not move \"%1\" to \"%2\")")
-                                   .printf (file_info.absolute_file_path (), trash_file_path + file_info.filename ());
+                                   .printf (file_info.absolute_file_path, trash_file_path + file_info.filename ());
                 return false;
             }
         }
@@ -283,7 +283,7 @@ public class FileSystem {
 
         stream += "[Trash Info]\n"
                + "Path="
-               + GLib.Uri.to_percent_encoding (file_info.absolute_file_path (), "~this.-./")
+               + GLib.Uri.to_percent_encoding (file_info.absolute_file_path, "~this.-./")
                + "\n"
                + "DeletionDate="
                + GLib.DateTime.current_date_time ().to_string (Qt.ISODate)
@@ -312,11 +312,11 @@ public class FileSystem {
         error.clear ();
 
         if (!file.open (GLib.File.ReadOnly)) {
-            error = file.error_string ();
+            error = file.error_string;
             return false;
         }
         if (!file.seek (seek)) {
-            error = file.error_string ();
+            error = file.error_string;
             return false;
         }
         return true;

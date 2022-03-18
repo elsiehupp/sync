@@ -43,8 +43,8 @@ public class OpenFileManager {
         QSettings desktop_file = new QSettings (OpenFileManager.default_manager, QSettings.IniFormat);
         string exec = desktop_file.value ("Desktop Entry/Exec").to_string ();
 
-        string file_to_open = GLib.FileInfo (local_path).absolute_file_path ();
-        string path_to_open = GLib.FileInfo (local_path).absolute_path ();
+        string file_to_open = GLib.FileInfo (local_path).absolute_file_path;
+        string path_to_open = GLib.FileInfo (local_path).absolute_path;
         bool can_handle_file = false; // assume dumb font_metrics
 
         args = exec.split (' ');
@@ -121,7 +121,7 @@ public class OpenFileManager {
         // local location
         string xdg_data_home = GLib.File.decode_name (qgetenv ("XDG_DATA_HOME"));
         if (xdg_data_home == "") {
-            xdg_data_home = GLib.Dir.home_path () + "/.local/share";
+            xdg_data_home = GLib.Dir.home_path + "/.local/share";
         }
         dirs.prepend (xdg_data_home);
         return dirs;
@@ -158,7 +158,7 @@ public class OpenFileManager {
             foreach (string subdir in subdirectories) {
                 file_info.file (directory + subdir + filename);
                 if (file_info.exists ()) {
-                    return file_info.absolute_file_path ();
+                    return file_info.absolute_file_path;
                 }
             }
         }

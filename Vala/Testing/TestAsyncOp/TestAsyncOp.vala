@@ -41,14 +41,14 @@ public class TestAsyncOp : GLib.Object {
 
         fake_folder.set_server_override (this.override_delegate_async_upload_operations1);
 
-        fake_folder.local_modifier ().mkdir ("on_signal_success");
+        fake_folder.local_modifier.mkdir ("on_signal_success");
         insert_file ("on_signal_success/chunked_success", options.max_chunk_size * 3, success_callback);
         insert_file ("on_signal_success/single_success", 300, success_callback);
         insert_file ("on_signal_success/chunked_patience", options.max_chunk_size * 3,
             wait_and_chain (wait_and_chain (success_callback)));
         insert_file ("on_signal_success/single_patience", 300,
             wait_and_chain (wait_and_chain (success_callback)));
-        fake_folder.local_modifier ().mkdir ("err");
+        fake_folder.local_modifier.mkdir ("err");
         insert_file ("err/chunked_error", options.max_chunk_size * 3, error_callback);
         insert_file ("err/single_error", 300, error_callback);
         insert_file ("err/chunked_error2", options.max_chunk_size * 3, wait_and_chain (error_callback));
@@ -66,7 +66,7 @@ public class TestAsyncOp : GLib.Object {
         test_cases["err/single_error"] = new TestCase (success_callback);
         test_cases["err/single_error2"] = new TestCase (success_callback);
 
-        fake_folder.local_modifier ().mkdir ("waiting");
+        fake_folder.local_modifier.mkdir ("waiting");
         insert_file ("waiting/small", 300, wait_forever_callback);
         insert_file ("waiting/willNotConflict", 300, wait_forever_callback);
         insert_file (
@@ -180,13 +180,13 @@ public class TestAsyncOp : GLib.Object {
 
     // Create a testest_casease by creating a file of a given size locally and assigning it a callback
     private void insert_file (string file, int64 size, TestCase.PollRequestDelegate cb) {
-        fake_folder.local_modifier ().insert (file, size);
+        fake_folder.local_modifier.insert (file, size);
         test_cases[file] = () => { std.move (cb); };
     }
 
 
     private Soup.Reply override_delegate_async_upload_operations1 (Soup.Operation operation, Soup.Request request, QIODevice outgoing_data) {
-        var path = request.url.path ();
+        var path = request.url.path;
 
         if (operation == Soup.GetOperation && path.starts_with ("/async-poll/")) {
             var file = path.mid ("/async-poll/".size () - 1);
@@ -223,7 +223,7 @@ public class TestAsyncOp : GLib.Object {
 
 
     private Soup.Reply override_delegate_async_upload_operations2 (Soup.Operation operation, Soup.Request request, QIODevice device) {
-        var path = request.url.path ();
+        var path = request.url.path;
         if (operation == Soup.GetOperation && path.starts_with ("/async-poll/")) {
             var file = path.mid ("/async-poll/".size () - 1);
             GLib.assert_true (test_cases.contains (file));

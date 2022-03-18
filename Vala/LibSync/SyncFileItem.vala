@@ -8,8 +8,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QMetaType>
 //  #include <owncloudlib.h>
 
-using CSync;
-
 namespace Occ {
 namespace LibSync {
 
@@ -257,7 +255,7 @@ public class SyncFileItem : GLib.Object {
     /***********************************************************
     Variable used by the propagator
     ***********************************************************/
-    public SyncInstructions instruction = SyncInstructions.NONE;
+    public CSync.SyncInstructions instruction = CSync.SyncInstructions.NONE;
 
     /***********************************************************
     Variable used by the propagator
@@ -370,7 +368,7 @@ public class SyncFileItem : GLib.Object {
     ***********************************************************/
     public static unowned SyncFileItem from_sync_journal_file_record (SyncJournalFileRecord record) {
         var item = SyncFileItem.create ();
-        item.file = record.path ();
+        item.file = record.path;
         item.inode = record.inode;
         item.modtime = record.modtime;
         item.type = record.type;
@@ -450,7 +448,7 @@ public class SyncFileItem : GLib.Object {
     public bool show_in_protocol_tab () {
         return (!show_in_issues_tab () || this.status == Status.RESTORATION)
             // Don't show conflicts that were resolved as "not a conflict after all"
-            && ! (this.instruction == SyncInstructions.CONFLICT && this.status == Status.SUCCESS);
+            && ! (this.instruction == CSync.SyncInstructions.CONFLICT && this.status == Status.SUCCESS);
     }
 
 

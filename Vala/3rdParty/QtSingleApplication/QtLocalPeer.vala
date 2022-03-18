@@ -41,7 +41,7 @@ public class QtLocalPeer : GLib.Object {
         base (parent);
         this.identifier = app_id;
         if (identifier == "") {
-            identifier = Gtk.Application.application_file_path ();  //### On win, check if this returns .../argv[0] without casefolding; .\MYAPP == .\myapp on Win
+            identifier = Gtk.Application.application_file_path;  //### On win, check if this returns .../argv[0] without casefolding; .\MYAPP == .\myapp on Win
         }
 
         socket_name = app_session_id (identifier);
@@ -57,7 +57,7 @@ public class QtLocalPeer : GLib.Object {
         }
         bool res = server.listen (socket_name);
         if (!res) {
-            GLib.warning ("QtSingleCoreApplication : listen on local socket failed, %s", q_printable (server.error_string ()));
+            GLib.warning ("QtSingleCoreApplication : listen on local socket failed, %s", q_printable (server.error_string));
         }
         server.new_connection.connect (
             this.on_signal_receive_connection
@@ -153,7 +153,7 @@ public class QtLocalPeer : GLib.Object {
         } while (remaining && got >= 0 && socket.wait_for_ready_read (2000));
         //### error check : got<0
         if (got < 0) {
-            GLib.warning ("QtLocalPeer: Message reception failed " + socket.error_string ());
+            GLib.warning ("QtLocalPeer: Message reception failed " + socket.error_string);
             delete socket;
             return;
         }

@@ -90,7 +90,7 @@ public class VfsXAttr : AbstractVfs {
         }
 
         if (!file.open (GLib.File.ReadWrite | GLib.File.Truncate)) {
-            return file.error_string ();
+            return file.error_string;
         }
 
         file.write (" ");
@@ -161,7 +161,7 @@ public class VfsXAttr : AbstractVfs {
         var pin = () => {
             var absolute_path = string.from_utf8 (path);
             GLib.assert (absolute_path.starts_with (parameters ().filesystem_path.to_utf8 ()));
-            var folder_path = absolute_path.mid (parameters ().filesystem_path.length ());
+            var folder_path = absolute_path.mid (parameters ().filesystem_path.length);
             return pin_state (folder_path);
         };
 

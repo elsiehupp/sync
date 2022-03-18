@@ -18,7 +18,7 @@ public class TestAccount : GLib.Object {
     ***********************************************************/
     private void on_test_account_dav_path_unitialized_no_crash () {
         unowned Account account = Account.create ();
-        account.dav_path ();
+        account.dav_path;
     }
 
 } // namespace Testing

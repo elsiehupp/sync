@@ -93,14 +93,14 @@ public class PropagateLocalRemove : PropagateItemJob {
             // Do it while avoiding redundant delete calls to the journal.
             string deleted_dir;
             foreach (var it in deleted) {
-                if (!it.first.starts_with (this.propagator.local_path ()))
+                if (!it.first.starts_with (this.propagator.local_path))
                     continue;
                 if (!deleted_dir == "" && it.first.starts_with (deleted_dir))
                     continue;
                 if (it.second) {
                     deleted_dir = it.first;
                 }
-                this.propagator.journal.delete_file_record (it.first.mid (this.propagator.local_path ().size ()), it.second);
+                this.propagator.journal.delete_file_record (it.first.mid (this.propagator.local_path.size ()), it.second);
             }
 
             this.error = errors.join (", ");

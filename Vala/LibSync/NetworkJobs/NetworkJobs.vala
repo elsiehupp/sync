@@ -47,8 +47,8 @@ string parse_etag (char header) {
     // https://github.com/owncloud/client/issues/1195
     arr.replace ("-gzip", "");
 
-    if (arr.length () >= 2 && arr.starts_with ('"') && arr.has_suffix ('"')) {
-        arr = arr.mid (1, arr.length () - 2);
+    if (arr.length >= 2 && arr.starts_with ('"') && arr.has_suffix ('"')) {
+        arr = arr.mid (1, arr.length - 2);
     }
     return arr;
 }

@@ -42,7 +42,7 @@ public class AddCertificateDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public string certificate_path () {
+    public string certificate_path {
         return ui.line_edit_certificate_path.text ();
     }
 

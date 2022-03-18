@@ -15,8 +15,8 @@ public class TestCookies : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void test_cookies () {
-        QTemporaryDir tmp;
-        const string nonexisting_path = tmp.file_path ("some_nonexisting_directory/test.db");
+        QTemporaryDir temporary;
+        const string nonexisting_path = temporary.file_path ("some_nonexisting_directory/test.db");
         QNetworkCookie cookie_a = new QNetworkCookie ("foo", "bar");
         // tomorrow rounded
         cookie_a.set_expiration_date (GLib.DateTime.current_date_time_utc ().add_days (1).date ().start_of_day ());
@@ -24,7 +24,7 @@ public class TestCookies : GLib.Object {
         CookieJar jar;
         jar.set_all_cookies (cookies);
         GLib.assert_true (cookies == jar.all_cookies ());
-        GLib.assert_true (jar.save (tmp.file_path ("test.db")));
+        GLib.assert_true (jar.save (temporary.file_path ("test.db")));
         // ensure we are able to create a cookie jar in a non exisitning folder (mkdir)
         GLib.assert_true (jar.save (nonexisting_path));
 

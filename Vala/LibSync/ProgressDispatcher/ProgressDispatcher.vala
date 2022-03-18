@@ -111,10 +111,10 @@ public class ProgressDispatcher : GLib.Object {
         var instruction = item.instruction;
 
         // Skip any ignored, error or non-propagated files and directories.
-        if (instruction == SyncInstructions.NONE
-            || instruction == SyncInstructions.UPDATE_METADATA
-            || instruction == SyncInstructions.IGNORE
-            || instruction == SyncInstructions.ERROR) {
+        if (instruction == CSync.SyncInstructions.NONE
+            || instruction == CSync.SyncInstructions.UPDATE_METADATA
+            || instruction == CSync.SyncInstructions.IGNORE
+            || instruction == CSync.SyncInstructions.ERROR) {
             return false;
         }
 

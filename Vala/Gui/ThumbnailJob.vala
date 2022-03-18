@@ -28,7 +28,7 @@ public class ThumbnailJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public override void on_signal_start () {
-        send_request ("GET", make_account_url (path ()));
+        send_request ("GET", make_account_url (path));
         AbstractNetworkJob.on_signal_start ();
     }
 

@@ -30,7 +30,7 @@ public class FakeChunkMoveReply : FakeReply {
         string source = get_file_path_from_url (request.url);
         GLib.assert_true (!source == "");
         GLib.assert_true (source.ends_with ("/.file"));
-        source = source.left (source.length () - (int) (qstrlen ("/.file")));
+        source = source.left (source.length - (int) (qstrlen ("/.file")));
 
         var source_folder = uploads_file_info.find (source);
         GLib.assert_true (source_folder);

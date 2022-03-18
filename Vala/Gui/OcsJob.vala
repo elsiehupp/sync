@@ -106,7 +106,7 @@ public class OcsJob : AbstractNetworkJob {
     This function appends the common identifier. so <PATH>/<ID>
     ***********************************************************/
     protected void append_path (string identifier) {
-        path (path () + '/' + identifier);
+        path (path + '/' + identifier);
     }
 
 
@@ -153,18 +153,18 @@ public class OcsJob : AbstractNetworkJob {
         } else if (this.verb == "POST" || this.verb == "PUT") {
             // Url encode the this.post_params and put them in a buffer.
             string post_data;
-            foreach (var tmp in this.params) {
+            foreach (var temporary in this.params) {
                 if (!post_data == "") {
                     post_data.append ("&");
                 }
-                post_data.append (GLib.Uri.to_percent_encoding (tmp.first));
+                post_data.append (GLib.Uri.to_percent_encoding (temporary.first));
                 post_data.append ("=");
-                post_data.append (GLib.Uri.to_percent_encoding (tmp.second));
+                post_data.append (GLib.Uri.to_percent_encoding (temporary.second));
             }
             buffer.data (post_data);
         }
         query_items.add_query_item ("format", "json");
-        GLib.Uri url = Utility.concat_url_path (account.url, path (), query_items);
+        GLib.Uri url = Utility.concat_url_path (account.url, this.path, query_items);
         send_request (this.verb, url, this.request, buffer);
         AbstractNetworkJob.on_signal_start ();
     }
@@ -204,9 +204,9 @@ public class OcsJob : AbstractNetworkJob {
             status_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             GLib.warning ("Could not parse reply to "
                         + this.verb
-                        + Utility.concat_url_path (account.url, path ())
+                        + Utility.concat_url_path (account.url, this.path)
                         + this.params
-                        + error.error_string ()
+                        + error.error_string
                         + ":" + reply_data);
         } else {
             status_code  = json_return_code (json, message);
@@ -216,7 +216,7 @@ public class OcsJob : AbstractNetworkJob {
         if (!this.pass_status_codes.contains (status_code)) {
             GLib.warning ("Reply to"
                         + this.verb
-                        + Utility.concat_url_path (account.url, path ())
+                        + Utility.concat_url_path (account.url, this.path)
                         + this.params
                         + " has unexpected status code: " + status_code + reply_data);
             /* emit */ signal_error (status_code, message);

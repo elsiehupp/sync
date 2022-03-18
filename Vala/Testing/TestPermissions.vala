@@ -46,8 +46,8 @@ public class TestPermissions : GLib.Object {
 
         //1. remove the file than cannot be removed
         //  (they should be recovered)
-        fake_folder.local_modifier ().remove ("normal_directory_PERM_CKDNV_/cannot_be_removed_PERM_WVN_.data");
-        fake_folder.local_modifier ().remove ("readonly_directory_PERM_M_/cannot_be_removed_PERM_WVN_.data");
+        fake_folder.local_modifier.remove ("normal_directory_PERM_CKDNV_/cannot_be_removed_PERM_WVN_.data");
+        fake_folder.local_modifier.remove ("readonly_directory_PERM_M_/cannot_be_removed_PERM_WVN_.data");
 
         //2. remove the file that can be removed
         //  (they should properly be gone)
@@ -61,12 +61,12 @@ public class TestPermissions : GLib.Object {
 
         //4. Edit other files
         //  (they should be uploaded)
-        fake_folder.local_modifier ().append_byte ("normal_directory_PERM_CKDNV_/can_be_modified_PERM_W_.data");
-        fake_folder.local_modifier ().append_byte ("readonly_directory_PERM_M_/can_be_modified_PERM_W_.data");
+        fake_folder.local_modifier.append_byte ("normal_directory_PERM_CKDNV_/can_be_modified_PERM_W_.data");
+        fake_folder.local_modifier.append_byte ("readonly_directory_PERM_M_/can_be_modified_PERM_W_.data");
 
         //5. Create a new file in a read write folder
         // (should be uploaded)
-        fake_folder.local_modifier ().insert ("normal_directory_PERM_CKDNV_/new_file_PERM_WDNV_.data", 106 );
+        fake_folder.local_modifier.insert ("normal_directory_PERM_CKDNV_/new_file_PERM_WDNV_.data", 106 );
         apply_permissions_from_name (fake_folder.remote_modifier ());
 
         //do the sync
@@ -96,8 +96,8 @@ public class TestPermissions : GLib.Object {
         GLib.assert_true (c2);
         GLib.assert_true (c2.size == cannot_be_modified_size + 1);
         // remove the conflicts for the next state comparison
-        fake_folder.local_modifier ().remove (c1.path ());
-        fake_folder.local_modifier ().remove (c2.path ());
+        fake_folder.local_modifier.remove (c1.path);
+        fake_folder.local_modifier.remove (c2.path);
 
         //4. File should be updated, that's tested by assert_local_and_remote_dir
         GLib.assert_true (current_local_state.find ("normal_directory_PERM_CKDNV_/can_be_modified_PERM_W_.data").size == can_be_modified_size + 1);
@@ -114,7 +114,7 @@ public class TestPermissions : GLib.Object {
 
         //6. Create a new file in a read only folder
         // (they should not be uploaded)
-        fake_folder.local_modifier ().insert ("readonly_directory_PERM_M_/new_file_PERM_WDNV_.data", 105 );
+        fake_folder.local_modifier.insert ("readonly_directory_PERM_M_/new_file_PERM_WDNV_.data", 105 );
 
         apply_permissions_from_name (fake_folder.remote_modifier ());
         // error : can't upload to read_only
@@ -128,14 +128,14 @@ public class TestPermissions : GLib.Object {
         GLib.assert_true (current_local_state.find ("readonly_directory_PERM_M_/new_file_PERM_WDNV_.data"));
         GLib.assert_true (!fake_folder.current_remote_state ().find ("readonly_directory_PERM_M_/new_file_PERM_WDNV_.data"));
         // remove it so next test succeed.
-        fake_folder.local_modifier ().remove ("readonly_directory_PERM_M_/new_file_PERM_WDNV_.data");
+        fake_folder.local_modifier.remove ("readonly_directory_PERM_M_/new_file_PERM_WDNV_.data");
         // Both side should still be the same
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         //######################################################################
         GLib.info ( "remove the read only directory" );
         // . It must be recovered
-        fake_folder.local_modifier ().remove ("readonly_directory_PERM_M_");
+        fake_folder.local_modifier.remove ("readonly_directory_PERM_M_");
         apply_permissions_from_name (fake_folder.remote_modifier ());
         GLib.assert_true (fake_folder.sync_once ());
         assert_csync_journal_ok (fake_folder.sync_journal ());
@@ -158,7 +158,7 @@ public class TestPermissions : GLib.Object {
 
         //Missing directory should be restored
         //new directory should be uploaded
-        fake_folder.local_modifier ().rename ("readonly_directory_PERM_M_/subdir_PERM_CK_", "normal_directory_PERM_CKDNV_/subdir_PERM_CKDNV_");
+        fake_folder.local_modifier.rename ("readonly_directory_PERM_M_/subdir_PERM_CK_", "normal_directory_PERM_CKDNV_/subdir_PERM_CKDNV_");
         apply_permissions_from_name (fake_folder.remote_modifier ());
         GLib.assert_true (fake_folder.sync_once ());
         current_local_state = fake_folder.current_local_state ();
@@ -194,10 +194,10 @@ public class TestPermissions : GLib.Object {
         //1. rename a directory in a read only folder
         //Missing directory should be restored
         //new directory should stay but not be uploaded
-        fake_folder.local_modifier ().rename ("readonly_directory_PERM_M_/subdir_PERM_CK_", "readonly_directory_PERM_M_/newname_PERM_CK_"  );
+        fake_folder.local_modifier.rename ("readonly_directory_PERM_M_/subdir_PERM_CK_", "readonly_directory_PERM_M_/newname_PERM_CK_"  );
 
         //2. move a directory from read to read only  (move the directory from previous step)
-        fake_folder.local_modifier ().rename ("normal_directory_PERM_CKDNV_/subdir_PERM_CKDNV_", "readonly_directory_PERM_M_/moved_PERM_CK_" );
+        fake_folder.local_modifier.rename ("normal_directory_PERM_CKDNV_/subdir_PERM_CKDNV_", "readonly_directory_PERM_M_/moved_PERM_CK_" );
 
         // error : can't upload to read_only!
         GLib.assert_true (!fake_folder.sync_once ());
@@ -211,7 +211,7 @@ public class TestPermissions : GLib.Object {
         // new still exist
         GLib.assert_true (current_local_state.find ("readonly_directory_PERM_M_/newname_PERM_CK_/subsubdir_PERM_CKDNV_/normal_file_PERM_WVND_.data" ));
         // but is not on server : so remove it localy for the future comarison
-        fake_folder.local_modifier ().remove ("readonly_directory_PERM_M_/newname_PERM_CK_");
+        fake_folder.local_modifier.remove ("readonly_directory_PERM_M_/newname_PERM_CK_");
 
         //2.
         // old removed
@@ -221,7 +221,7 @@ public class TestPermissions : GLib.Object {
         // new still there
         GLib.assert_true (current_local_state.find ("readonly_directory_PERM_M_/moved_PERM_CK_/subsubdir_PERM_CKDNV_/normal_file_PERM_WVND_.data" ));
         //but not on server
-        fake_folder.local_modifier ().remove ("readonly_directory_PERM_M_/moved_PERM_CK_");
+        fake_folder.local_modifier.remove ("readonly_directory_PERM_M_/moved_PERM_CK_");
         fake_folder.remote_modifier ().remove ("normal_directory_PERM_CKDNV_/subdir_PERM_CKDNV_");
 
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
@@ -234,7 +234,7 @@ public class TestPermissions : GLib.Object {
         GLib.assert_true (fake_folder.sync_once ());
 
         edit_read_only ("readonly_directory_PERM_M_/cannot_be_modified_PERM_DVN_.data");
-        fake_folder.local_modifier ().set_contents ("readonly_directory_PERM_M_/cannot_be_modified_PERM_DVN_.data", 's');
+        fake_folder.local_modifier.set_contents ("readonly_directory_PERM_M_/cannot_be_modified_PERM_DVN_.data", 's');
         //do the sync
         apply_permissions_from_name (fake_folder.remote_modifier ());
         GLib.assert_true (fake_folder.sync_once ());
@@ -242,7 +242,7 @@ public class TestPermissions : GLib.Object {
 
         QThread.sleep (1); // make sure changes have different mtime
         edit_read_only ("readonly_directory_PERM_M_/cannot_be_modified_PERM_DVN_.data");
-        fake_folder.local_modifier ().set_contents ("readonly_directory_PERM_M_/cannot_be_modified_PERM_DVN_.data", 'd');
+        fake_folder.local_modifier.set_contents ("readonly_directory_PERM_M_/cannot_be_modified_PERM_DVN_.data", 'd');
 
         //do the sync
         apply_permissions_from_name (fake_folder.remote_modifier ());
@@ -255,7 +255,7 @@ public class TestPermissions : GLib.Object {
         var i = find_conflict (current_local_state, "readonly_directory_PERM_M_/cannot_be_modified_PERM_DVN_.data");
         while (i) {
             GLib.assert_true ( (i.content_char == 's') || (i.content_char == 'd'));
-            fake_folder.local_modifier ().remove (i.path ());
+            fake_folder.local_modifier.remove (i.path);
             current_local_state = fake_folder.current_local_state ();
             count++;
             i = find_conflict (current_local_state, "readonly_directory_PERM_M_/cannot_be_modified_PERM_DVN_.data");
@@ -276,16 +276,16 @@ public class TestPermissions : GLib.Object {
 
 
     private void remove_read_only (FakeFolder fake_folder, string file) {
-        GLib.assert_true (!GLib.FileInfo (fake_folder.local_path () + file).permission (GLib.File.WriteOwner));
-        GLib.File (fake_folder.local_path () + file).set_permissions (GLib.File.WriteOwner | GLib.File.ReadOwner);
-        fake_folder.local_modifier ().remove (file);
+        GLib.assert_true (!GLib.FileInfo (fake_folder.local_path + file).permission (GLib.File.WriteOwner));
+        GLib.File (fake_folder.local_path + file).set_permissions (GLib.File.WriteOwner | GLib.File.ReadOwner);
+        fake_folder.local_modifier.remove (file);
     }
 
 
     private void edit_read_only (FakeFolder fake_folder, string file)  {
-        GLib.assert_true (!GLib.FileInfo (fake_folder.local_path () + file).permission (GLib.File.WriteOwner));
-        GLib.File (fake_folder.local_path () + file).set_permissions (GLib.File.WriteOwner | GLib.File.ReadOwner);
-        fake_folder.local_modifier ().append_byte (file);
+        GLib.assert_true (!GLib.FileInfo (fake_folder.local_path + file).permission (GLib.File.WriteOwner));
+        GLib.File (fake_folder.local_path + file).set_permissions (GLib.File.WriteOwner | GLib.File.ReadOwner);
+        fake_folder.local_modifier.append_byte (file);
     }
 
 
@@ -309,7 +309,7 @@ public class TestPermissions : GLib.Object {
         sync_opts.parallel_network_jobs = 1;
         fake_folder.sync_engine.set_sync_options (sync_opts);
 
-        var lm = fake_folder.local_modifier ();
+        var lm = fake_folder.local_modifier;
         var rm = fake_folder.remote_modifier ();
         rm.mkdir ("allowed");
         rm.mkdir ("norename");
@@ -365,51 +365,51 @@ public class TestPermissions : GLib.Object {
         GLib.assert_true (!fake_folder.sync_once ());
 
         // if renaming doesn't work, just delete+create
-        GLib.assert_true (item_instruction (complete_spy, "norename/file", SyncInstructions.REMOVE));
-        GLib.assert_true (item_instruction (complete_spy, "norename/sub", SyncInstructions.NONE));
-        GLib.assert_true (discovery_instruction (discovery, "norename/sub", SyncInstructions.REMOVE));
-        GLib.assert_true (item_instruction (complete_spy, "norename/file_renamed", SyncInstructions.NEW));
-        GLib.assert_true (item_instruction (complete_spy, "norename/sub_renamed", SyncInstructions.NEW));
+        GLib.assert_true (item_instruction (complete_spy, "norename/file", CSync.SyncInstructions.REMOVE));
+        GLib.assert_true (item_instruction (complete_spy, "norename/sub", CSync.SyncInstructions.NONE));
+        GLib.assert_true (discovery_instruction (discovery, "norename/sub", CSync.SyncInstructions.REMOVE));
+        GLib.assert_true (item_instruction (complete_spy, "norename/file_renamed", CSync.SyncInstructions.NEW));
+        GLib.assert_true (item_instruction (complete_spy, "norename/sub_renamed", CSync.SyncInstructions.NEW));
         // the contents can this.move_
-        GLib.assert_true (item_instruction (complete_spy, "norename/sub_renamed/file", SyncInstructions.RENAME));
+        GLib.assert_true (item_instruction (complete_spy, "norename/sub_renamed/file", CSync.SyncInstructions.RENAME));
 
         // simiilarly forbidding moves becomes delete+create
-        GLib.assert_true (item_instruction (complete_spy, "nomove/file", SyncInstructions.REMOVE));
-        GLib.assert_true (item_instruction (complete_spy, "nomove/sub", SyncInstructions.NONE));
-        GLib.assert_true (discovery_instruction (discovery, "nomove/sub", SyncInstructions.REMOVE));
+        GLib.assert_true (item_instruction (complete_spy, "nomove/file", CSync.SyncInstructions.REMOVE));
+        GLib.assert_true (item_instruction (complete_spy, "nomove/sub", CSync.SyncInstructions.NONE));
+        GLib.assert_true (discovery_instruction (discovery, "nomove/sub", CSync.SyncInstructions.REMOVE));
         // nomove/sub/file is removed as part of the directory
-        GLib.assert_true (item_instruction (complete_spy, "allowed/file_moved", SyncInstructions.NEW));
-        GLib.assert_true (item_instruction (complete_spy, "allowed/sub_moved", SyncInstructions.NEW));
-        GLib.assert_true (item_instruction (complete_spy, "allowed/sub_moved/file", SyncInstructions.NEW));
+        GLib.assert_true (item_instruction (complete_spy, "allowed/file_moved", CSync.SyncInstructions.NEW));
+        GLib.assert_true (item_instruction (complete_spy, "allowed/sub_moved", CSync.SyncInstructions.NEW));
+        GLib.assert_true (item_instruction (complete_spy, "allowed/sub_moved/file", CSync.SyncInstructions.NEW));
 
         // when moving to an invalid target, the targets should be an error
-        GLib.assert_true (item_instruction (complete_spy, "nocreatefile/file", SyncInstructions.ERROR));
-        GLib.assert_true (item_instruction (complete_spy, "nocreatefile/zfile", SyncInstructions.ERROR));
-        GLib.assert_true (item_instruction (complete_spy, "nocreatefile/sub", SyncInstructions.RENAME)); // TODO : What does a real server say?
-        GLib.assert_true (item_instruction (complete_spy, "nocreatedir/sub2", SyncInstructions.ERROR));
-        GLib.assert_true (item_instruction (complete_spy, "nocreatedir/zsub2", SyncInstructions.ERROR));
+        GLib.assert_true (item_instruction (complete_spy, "nocreatefile/file", CSync.SyncInstructions.ERROR));
+        GLib.assert_true (item_instruction (complete_spy, "nocreatefile/zfile", CSync.SyncInstructions.ERROR));
+        GLib.assert_true (item_instruction (complete_spy, "nocreatefile/sub", CSync.SyncInstructions.RENAME)); // TODO : What does a real server say?
+        GLib.assert_true (item_instruction (complete_spy, "nocreatedir/sub2", CSync.SyncInstructions.ERROR));
+        GLib.assert_true (item_instruction (complete_spy, "nocreatedir/zsub2", CSync.SyncInstructions.ERROR));
 
         // and the sources of the invalid moves should be restored, not deleted
         // (depending on the order of discovery a follow-up sync is needed)
-        GLib.assert_true (item_instruction (complete_spy, "allowed/file", SyncInstructions.NONE));
-        GLib.assert_true (item_instruction (complete_spy, "allowed/sub2", SyncInstructions.NONE));
-        GLib.assert_true (item_instruction (complete_spy, "zallowed/file", SyncInstructions.NEW));
-        GLib.assert_true (item_instruction (complete_spy, "zallowed/sub2", SyncInstructions.NEW));
-        GLib.assert_true (item_instruction (complete_spy, "zallowed/sub2/file", SyncInstructions.NEW));
+        GLib.assert_true (item_instruction (complete_spy, "allowed/file", CSync.SyncInstructions.NONE));
+        GLib.assert_true (item_instruction (complete_spy, "allowed/sub2", CSync.SyncInstructions.NONE));
+        GLib.assert_true (item_instruction (complete_spy, "zallowed/file", CSync.SyncInstructions.NEW));
+        GLib.assert_true (item_instruction (complete_spy, "zallowed/sub2", CSync.SyncInstructions.NEW));
+        GLib.assert_true (item_instruction (complete_spy, "zallowed/sub2/file", CSync.SyncInstructions.NEW));
         GLib.assert_true (fake_folder.sync_engine.is_another_sync_needed () == ImmediateFollowUp);
 
         // A follow-up sync will restore allowed/file and allowed/sub2 and maintain the nocreatedir/file errors
         complete_spy.clear ();
         GLib.assert_true (!fake_folder.sync_once ());
 
-        GLib.assert_true (item_instruction (complete_spy, "nocreatefile/file", SyncInstructions.ERROR));
-        GLib.assert_true (item_instruction (complete_spy, "nocreatefile/zfile", SyncInstructions.ERROR));
-        GLib.assert_true (item_instruction (complete_spy, "nocreatedir/sub2", SyncInstructions.ERROR));
-        GLib.assert_true (item_instruction (complete_spy, "nocreatedir/zsub2", SyncInstructions.ERROR));
+        GLib.assert_true (item_instruction (complete_spy, "nocreatefile/file", CSync.SyncInstructions.ERROR));
+        GLib.assert_true (item_instruction (complete_spy, "nocreatefile/zfile", CSync.SyncInstructions.ERROR));
+        GLib.assert_true (item_instruction (complete_spy, "nocreatedir/sub2", CSync.SyncInstructions.ERROR));
+        GLib.assert_true (item_instruction (complete_spy, "nocreatedir/zsub2", CSync.SyncInstructions.ERROR));
 
-        GLib.assert_true (item_instruction (complete_spy, "allowed/file", SyncInstructions.NEW));
-        GLib.assert_true (item_instruction (complete_spy, "allowed/sub2", SyncInstructions.NEW));
-        GLib.assert_true (item_instruction (complete_spy, "allowed/sub2/file", SyncInstructions.NEW));
+        GLib.assert_true (item_instruction (complete_spy, "allowed/file", CSync.SyncInstructions.NEW));
+        GLib.assert_true (item_instruction (complete_spy, "allowed/sub2", CSync.SyncInstructions.NEW));
+        GLib.assert_true (item_instruction (complete_spy, "allowed/sub2/file", CSync.SyncInstructions.NEW));
 
         var cls = fake_folder.current_local_state ();
         GLib.assert_true (cls.find ("allowed/file"));
@@ -436,7 +436,7 @@ public class TestPermissions : GLib.Object {
         sync_opts.parallel_network_jobs = 1;
         fake_folder.sync_engine.set_sync_options (sync_opts);
 
-        var lm = fake_folder.local_modifier ();
+        var lm = fake_folder.local_modifier;
         var rm = fake_folder.remote_modifier ();
         rm.mkdir ("changeonly");
         rm.mkdir ("changeonly/sub1");
@@ -487,7 +487,7 @@ public class TestPermissions : GLib.Object {
         journal.close ();
     
         SqlDatabase database;
-        GLib.assert_true (database.open_read_only (journal.database_file_path ()));
+        GLib.assert_true (database.open_read_only (journal.database_file_path));
         SqlQuery q = new SqlQuery ("SELECT count (*) from metadata where length (file_identifier) == 0", database);
         GLib.assert_true (q.exec ());
         GLib.assert_true (q.next ().has_data);
@@ -503,12 +503,12 @@ public class TestPermissions : GLib.Object {
         return new SyncFileItemPtr (new SyncFileItem ());
     }
     
-    bool item_instruction (ItemCompletedSpy spy, string path, SyncInstructions instr) {
+    bool item_instruction (ItemCompletedSpy spy, string path, CSync.SyncInstructions instr) {
         var item = spy.find_item (path);
         return item.instruction == instr;
     }
     
-    bool discovery_instruction (SyncFileItemVector spy, string path, SyncInstructions instr) {
+    bool discovery_instruction (SyncFileItemVector spy, string path, CSync.SyncInstructions instr) {
         var item = find_discovery_item (spy, path);
         return item.instruction == instr;
     }

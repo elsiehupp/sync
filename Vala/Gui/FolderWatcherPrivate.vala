@@ -138,7 +138,7 @@ public class FolderWatcherPrivate : GLib.Object {
         GLib.debug (" (+) Watcher: " + path);
 
         GLib.Dir in_path = new GLib.Dir (path);
-        inotify_register_path (in_path.absolute_path ());
+        inotify_register_path (in_path.absolute_path);
 
         string[] all_subfolders;
         if (!find_folders_below (GLib.Dir (path), all_subfolders)) {
@@ -148,15 +148,15 @@ public class FolderWatcherPrivate : GLib.Object {
         while (subfolders_it.has_next ()) {
             string subfolder = subfolders_it.next ();
             GLib.Dir folder = new GLib.Dir (subfolder);
-            if (folder.exists () && !this.path_to_watch.contains (folder.absolute_path ())) {
+            if (folder.exists () && !this.path_to_watch.contains (folder.absolute_path)) {
                 subdirectories++;
                 if (this.parent.path_is_ignored (subfolder)) {
-                    GLib.debug ("* Not adding " + folder.path ());
+                    GLib.debug ("* Not adding " + folder.path);
                     continue;
                 }
-                inotify_register_path (folder.absolute_path ());
+                inotify_register_path (folder.absolute_path);
             } else {
-                GLib.debug ("    `. discarded: " + folder.path ());
+                GLib.debug ("    `. discarded: " + folder.path);
             }
         }
 
@@ -172,7 +172,7 @@ public class FolderWatcherPrivate : GLib.Object {
     protected bool find_folders_below (GLib.Dir directory, string[] full_list) {
         bool ok = true;
         if (! (directory.exists () && directory.is_readable ())) {
-            GLib.debug ("Non existing path coming in: " + directory.absolute_path ());
+            GLib.debug ("Non existing path coming in: " + directory.absolute_path);
             ok = false;
         } else {
             string[] name_filter;
@@ -184,7 +184,7 @@ public class FolderWatcherPrivate : GLib.Object {
             //  string[].ConstIterator ConstIterator;
             //  for (ConstIterator = pathes.const_begin (); ConstIterator != pathes.const_end ();
             //       ++ConstIterator) {
-            //      const string full_path (directory.path () + "/" + (*ConstIterator));
+            //      const string full_path (directory.path + "/" + (*ConstIterator));
             //      full_list.append (full_path);
             //      ok = find_folders_below (GLib.Dir (full_path), full_list);
             //  }

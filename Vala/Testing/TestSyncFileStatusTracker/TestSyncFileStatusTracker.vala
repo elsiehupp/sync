@@ -13,7 +13,7 @@ namespace Testing {
 public class TestSyncFileStatusTracker : GLib.Object {
 
     void verify_that_push_matches_pull (FakeFolder fake_folder, StatusPushSpy status_spy) {
-        string root = fake_folder.local_path ();
+        string root = fake_folder.local_path;
         QDirIterator it = new QDirIterator (root, GLib.Dir.AllEntries | GLib.Dir.NoDotAndDotDot, QDirIterator.Subdirectories);
         while (it.has_next ()) {
             string file_path = it.next ().mid (root.size ());
@@ -29,7 +29,7 @@ public class TestSyncFileStatusTracker : GLib.Object {
     ***********************************************************/
     private void parents_get_sync_status_upload_download () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.local_modifier ().append_byte ("B/b1");
+        fake_folder.local_modifier.append_byte ("B/b1");
         fake_folder.remote_modifier ().append_byte ("C/c1");
         StatusPushSpy status_spy = new StatusPushSpy (fake_folder.sync_engine);
 
@@ -63,7 +63,7 @@ public class TestSyncFileStatusTracker : GLib.Object {
     ***********************************************************/
     private void parents_get_sync_status_new_file_upload_download () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.local_modifier ().insert ("B/b0");
+        fake_folder.local_modifier.insert ("B/b0");
         fake_folder.remote_modifier ().insert ("C/c0");
         StatusPushSpy status_spy = new StatusPushSpy (fake_folder.sync_engine);
 
@@ -128,8 +128,8 @@ public class TestSyncFileStatusTracker : GLib.Object {
     ***********************************************************/
     private void parents_get_sync_status_new_dir_upload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.local_modifier ().mkdir ("D");
-        fake_folder.local_modifier ().insert ("D/d0");
+        fake_folder.local_modifier.mkdir ("D");
+        fake_folder.local_modifier.insert ("D/d0");
         StatusPushSpy status_spy = new StatusPushSpy (fake_folder.sync_engine);
 
         fake_folder.schedule_sync ();
@@ -160,7 +160,7 @@ public class TestSyncFileStatusTracker : GLib.Object {
     private void parents_get_sync_status_delete_up_down () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.remote_modifier ().remove ("B/b1");
-        fake_folder.local_modifier ().remove ("C/c1");
+        fake_folder.local_modifier.remove ("C/c1");
         StatusPushSpy status_spy = new StatusPushSpy (fake_folder.sync_engine);
 
         fake_folder.schedule_sync ();
@@ -192,8 +192,8 @@ public class TestSyncFileStatusTracker : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine.excluded_files ().add_manual_exclude ("A/a1");
         fake_folder.sync_engine.excluded_files ().add_manual_exclude ("B");
-        fake_folder.local_modifier ().append_byte ("A/a1");
-        fake_folder.local_modifier ().append_byte ("B/b1");
+        fake_folder.local_modifier.append_byte ("A/a1");
+        fake_folder.local_modifier.append_byte ("B/b1");
         StatusPushSpy status_spy = new StatusPushSpy (fake_folder.sync_engine);
 
         fake_folder.schedule_sync ();
@@ -245,7 +245,7 @@ public class TestSyncFileStatusTracker : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine.excluded_files ().add_manual_exclude ("B");
         fake_folder.server_error_paths ().append ("A/a1");
-        fake_folder.local_modifier ().append_byte ("A/a1");
+        fake_folder.local_modifier.append_byte ("A/a1");
 
         fake_folder.sync_once ();
         GLib.assert_true (fake_folder.sync_engine.sync_file_status_tracker.file_status ("") == SyncFileStatus.StatusWarning);
@@ -266,8 +266,8 @@ public class TestSyncFileStatusTracker : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.server_error_paths ().append ("A/a1");
         fake_folder.server_error_paths ().append ("B/b0");
-        fake_folder.local_modifier ().append_byte ("A/a1");
-        fake_folder.local_modifier ().insert ("B/b0");
+        fake_folder.local_modifier.append_byte ("A/a1");
+        fake_folder.local_modifier.insert ("B/b0");
         StatusPushSpy status_spy = new StatusPushSpy (fake_folder.sync_engine);
 
         fake_folder.schedule_sync ();
@@ -313,7 +313,7 @@ public class TestSyncFileStatusTracker : GLib.Object {
         status_spy.clear ();
 
         // Start a third sync, this time together with a real file to sync
-        fake_folder.local_modifier ().append_byte ("C/c1");
+        fake_folder.local_modifier.append_byte ("C/c1");
         fake_folder.schedule_sync ();
         fake_folder.exec_until_before_propagation ();
         verify_that_push_matches_pull (fake_folder, status_spy);
@@ -340,8 +340,8 @@ public class TestSyncFileStatusTracker : GLib.Object {
         status_spy.clear ();
 
         // Another sync after clearing the blocklist entry, everything should return to order.
-        fake_folder.sync_engine.journal ().wipe_error_blocklist_entry ("A/a1");
-        fake_folder.sync_engine.journal ().wipe_error_blocklist_entry ("B/b0");
+        fake_folder.sync_engine.journal.wipe_error_blocklist_entry ("A/a1");
+        fake_folder.sync_engine.journal.wipe_error_blocklist_entry ("B/b0");
         fake_folder.schedule_sync ();
         fake_folder.exec_until_before_propagation ();
         verify_that_push_matches_pull (fake_folder, status_spy);
@@ -365,7 +365,7 @@ public class TestSyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void parents_get_warning_status_for_error__sibling_starts_with_path () {
+    private void parents_get_warning_status_for_error__sibling_starts_with_path {
         // A is a parent of A/a1, but A/a is not even if it's a substring of A/a1
         FakeFolder fake_folder = new FakeFolder (
             {
@@ -384,7 +384,7 @@ public class TestSyncFileStatusTracker : GLib.Object {
             }
         );
         fake_folder.server_error_paths ().append ("A/a1");
-        fake_folder.local_modifier ().append_byte ("A/a1");
+        fake_folder.local_modifier.append_byte ("A/a1");
 
         fake_folder.schedule_sync ();
         fake_folder.exec_until_before_propagation ();
@@ -411,7 +411,7 @@ public class TestSyncFileStatusTracker : GLib.Object {
     ***********************************************************/
     private void child_ok_emitted_before_parent () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.local_modifier ().append_byte ("B/b1");
+        fake_folder.local_modifier.append_byte ("B/b1");
         fake_folder.remote_modifier ().append_byte ("C/c1");
         StatusPushSpy status_spy = new StatusPushSpy (fake_folder.sync_engine);
 
@@ -475,8 +475,8 @@ public class TestSyncFileStatusTracker : GLib.Object {
     private void rename_error () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.server_error_paths ().append ("A/a1");
-        fake_folder.local_modifier ().rename ("A/a1", "A/a1m");
-        fake_folder.local_modifier ().rename ("B/b1", "B/b1m");
+        fake_folder.local_modifier.rename ("A/a1", "A/a1m");
+        fake_folder.local_modifier.rename ("B/b1", "B/b1m");
         StatusPushSpy status_spy = new StatusPushSpy (fake_folder.sync_engine);
 
         fake_folder.schedule_sync ();

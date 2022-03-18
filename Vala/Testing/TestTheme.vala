@@ -46,7 +46,7 @@ public class TestTheme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_hidpi_filename_hidpi_device_return_hidpi_icon_path () {
+    private void on_signal_test_hidpi_filename_hidpi_device_return_hidpi_icon_path {
         FakePaintDevice paint_device;
         paint_device.set_hidpi (true);
         const Gtk.Color background_color = new Gtk.Color ("#000000");

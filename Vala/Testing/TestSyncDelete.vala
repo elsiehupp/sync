@@ -20,10 +20,10 @@ public class TestSyncDelete : GLib.Object {
 
         // Remove a directory on the server with new files on the client
         fake_folder.remote_modifier ().remove ("A");
-        fake_folder.local_modifier ().insert ("A/hello.txt");
+        fake_folder.local_modifier.insert ("A/hello.txt");
 
         // Symetry
-        fake_folder.local_modifier ().remove ("B");
+        fake_folder.local_modifier.remove ("B");
         fake_folder.remote_modifier ().insert ("B/hello.txt");
 
         GLib.assert_true (fake_folder.sync_once ());
@@ -45,13 +45,13 @@ public class TestSyncDelete : GLib.Object {
     private void issue1329 () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
-        fake_folder.local_modifier ().remove ("B");
+        fake_folder.local_modifier.remove ("B");
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // Add a directory that was just removed in the previous sync:
-        fake_folder.local_modifier ().mkdir ("B");
-        fake_folder.local_modifier ().insert ("B/b1");
+        fake_folder.local_modifier.mkdir ("B");
+        fake_folder.local_modifier.insert ("B/b1");
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_remote_state ().find ("B/b1"));
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());

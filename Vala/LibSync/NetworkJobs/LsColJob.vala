@@ -13,7 +13,7 @@ public class LscolJob : AbstractNetworkJob {
     public GLib.HashTable<string, ExtraFolderInfo> folder_infos;
 
     /***********************************************************
-    Used instead of path () if the url is specified in the constructor
+    Used instead of this.path if the url is specified in the constructor
     ***********************************************************/
     private GLib.Uri url;
 
@@ -85,7 +85,7 @@ public class LscolJob : AbstractNetworkJob {
         if (this.url.is_valid ()) {
             send_request ("PROPFIND", this.url, request, buf);
         } else {
-            send_request ("PROPFIND", make_dav_url (path ()), request, buf);
+            send_request ("PROPFIND", make_dav_url (path), request, buf);
         }
         AbstractNetworkJob.start ();
     }
@@ -118,7 +118,7 @@ public class LscolJob : AbstractNetworkJob {
                 this.on_signal_finished_without_error
             );
 
-            string expected_path = this.input_stream.request ().url.path (); // something like "/owncloud/remote.php/dav/folder"
+            string expected_path = this.input_stream.request ().url.path; // something like "/owncloud/remote.php/dav/folder"
             if (!lscol_xml_parser.parse (this.input_stream.read_all (), this.folder_infos, expected_path)) {
                 // XML parse error
                 /* emit */ signal_finished_with_error (this.input_stream);

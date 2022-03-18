@@ -28,9 +28,9 @@ int main (int argc, char argv[]) {
     reporter.window_title (CRASHREPORTER_PRODUCT_NAME);
     reporter.on_signal_text ("<html><head/><body><p><span style=\" font-weight:600;\">Sorry!</span> " + CRASHREPORTER_PRODUCT_NAME + " crashed. Please tell us about it! " + CRASHREPORTER_PRODUCT_NAME + " has created an error report for you that can help improve the stability in the future. You can now send this report directly to the " + CRASHREPORTER_PRODUCT_NAME + " developers.</p></body></html>");
 
-    const GLib.FileInfo crash_log = new GLib.FileInfo (GLib.Dir.temp_path () + "/" + CRASHREPORTER_PRODUCT_NAME + "-crash.log");
+    const GLib.FileInfo crash_log = new GLib.FileInfo (GLib.Dir.temp_path + "/" + CRASHREPORTER_PRODUCT_NAME + "-crash.log");
     if (crash_log.exists ()) {
-        GLib.File in_file = new GLib.File (crash_log.file_path ());
+        GLib.File in_file = new GLib.File (crash_log.file_path);
         if (in_file.open (GLib.File.ReadOnly)) {
             reporter.comment (in_file.read_all ());
         }

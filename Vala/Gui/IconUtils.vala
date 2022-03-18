@@ -75,7 +75,7 @@ public class IconUtils {
             result = new Gtk.Image (
                 Theme.THEME_PREFIX + custom_color_name + "/" + filename
             );
-            if (!result.is_null ()) {
+            if (!result == null) {
                 return result;
             }
         }
@@ -92,8 +92,8 @@ public class IconUtils {
 
         result = draw_svg_with_custom_fill_color (source_svg, custom_color, original_size, requested_size);
 
-        //  Q_ASSERT (!result.is_null ());
-        if (result.is_null ()) {
+        //  Q_ASSERT (!result == null);
+        if (result == null) {
             GLib.warning ("Failed to load pixmap for " + filename);
         }
 
@@ -137,7 +137,7 @@ public class IconUtils {
 
         cached_pixmap = Gdk.Pixbuf.from_image (create_svg_image_with_custom_color (filename, custom_color, original_size, requested_size));
 
-        if (!cached_pixmap.is_null ()) {
+        if (!cached_pixmap == null) {
             QPixmapCache.insert (cache_key, cached_pixmap);
         }
 

@@ -85,11 +85,11 @@ public class SslErrorDialog : Gtk.Dialog {
             if (trusted_certificates.contains (error.certificate ()) || this.unknown_certificates.contains (error.certificate ())) {
                 continue;
             }
-            error_strings += error.error_string ();
-            if (!error.certificate ().is_null ()) {
+            error_strings += error.error_string;
+            if (!error.certificate () == null) {
                 this.unknown_certificates.append (error.certificate ());
             } else {
-                additional_error_strings.append (error.error_string ());
+                additional_error_strings.append (error.error_string);
             }
         }
 
@@ -112,7 +112,7 @@ public class SslErrorDialog : Gtk.Dialog {
             // add the errors for this cert
             foreach (QSslError err in errors) {
                 if (err.certificate () == cert) {
-                    message += QL ("<p>") + err.error_string () + QL ("</p>");
+                    message += QL ("<p>") + err.error_string + QL ("</p>");
                 }
             }
             message += QL ("</div>");

@@ -107,8 +107,8 @@ public class LocalDiscoveryTracker : GLib.Object {
             || item.status == SyncFileItem.Status.RESTORATION
             || item.status == SyncFileItem.Status.CONFLICT
             || (item.status == SyncFileItem.Status.NO_STATUS
-                && (item.instruction == SyncInstructions.NONE
-                        || item.instruction == SyncInstructions.UPDATE_METADATA))) {
+                && (item.instruction == CSync.SyncInstructions.NONE
+                        || item.instruction == CSync.SyncInstructions.UPDATE_METADATA))) {
             if (this.previous_local_discovery_paths.erase (item.file.to_utf8 ()))
                 GLib.debug ("Wiped successful item " + item.file);
             if (!item.rename_target == "" && this.previous_local_discovery_paths.erase (item.rename_target.to_utf8 ()))

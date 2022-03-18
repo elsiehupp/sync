@@ -45,7 +45,7 @@ public class TestSyncFileItem : GLib.Object {
         SyncFileItem moved_item1;
         moved_item1.file = "folder/source/file.f";
         moved_item1.rename_target = "folder/destination/file.f";
-        moved_item1.instruction = SyncInstructions.RENAME;
+        moved_item1.instruction = CSync.SyncInstructions.RENAME;
 
         QTest.new_row ("move1") + create_item ("folder/destination") + moved_item1 << create_item ("folder/destination-2");
         QTest.new_row ("move2") + create_item ("folder/destination/1") + moved_item1 << create_item ("folder/source");

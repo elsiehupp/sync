@@ -58,7 +58,7 @@ public class ToolTipUpdater : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_data_changed (QModelIndex top_left, QModelIndex bottom_right, GLib.List<int> roles) {
-        if (!QToolTip.is_visible () || !roles.contains (Qt.ToolTipRole) || this.tool_tip_pos.is_null ()) {
+        if (!QToolTip.is_visible () || !roles.contains (Qt.ToolTipRole) || this.tool_tip_pos == null) {
             return;
         }
 

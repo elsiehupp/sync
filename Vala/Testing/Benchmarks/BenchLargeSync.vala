@@ -35,7 +35,7 @@ public class BenchLargeSync : GLib.Object {
     int main (int argc, char *argv) {
         Gtk.Application app = new Gtk.Application (argc, argv);
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        //  add_a_bunch_of_files<10, 8, 4> (0, "", fake_folder.local_modifier ());
+        //  add_a_bunch_of_files<10, 8, 4> (0, "", fake_folder.local_modifier);
 
         GLib.debug ("NUMFILES " + number_of_files.to_string ());
         GLib.debug ("NUMDIRS " + number_of_directories.to_string ());

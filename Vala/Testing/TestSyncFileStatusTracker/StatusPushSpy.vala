@@ -23,7 +23,7 @@ public class StatusPushSpy : QSignalSpy {
     /***********************************************************
     ***********************************************************/
     public SyncFileStatus status_of (string relative_path) {
-        GLib.FileInfo file_info = new GLib.FileInfo (this.sync_engine.local_path (), relative_path);
+        GLib.FileInfo file_info = new GLib.FileInfo (this.sync_engine.local_path, relative_path);
         // Start from the end to get the latest status
         for (int i = size () - 1; i >= 0; --i) {
             if (GLib.FileInfo (at (i)[0].to_string ()) == file_info)
@@ -36,8 +36,8 @@ public class StatusPushSpy : QSignalSpy {
     /***********************************************************
     ***********************************************************/
     public bool status_emitted_before (string first_path, string second_path) {
-        GLib.FileInfo first_file = new GLib.FileInfo (this.sync_engine.local_path (), first_path);
-        GLib.FileInfo second_file = new GLib.FileInfo (this.sync_engine.local_path (), second_path);
+        GLib.FileInfo first_file = new GLib.FileInfo (this.sync_engine.local_path, first_path);
+        GLib.FileInfo second_file = new GLib.FileInfo (this.sync_engine.local_path, second_path);
         // Start from the end to get the latest status
         int i = size () - 1;
         for (; i >= 0; --i) {

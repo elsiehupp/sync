@@ -17,39 +17,6 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ***********************************************************/
-
-
-//    struct CSyncVioHandleT;
-namespace Occ {
-}
-
-// OCSYNC_EXPORT
-CSyncVioHandleT csync_vio_local_opendir (string name);
-
-// OCSYNC_EXPORT
-int csync_vio_local_closedir (CSyncVioHandleT dhandle);
-
-// OCSYNC_EXPORT
-std.unique_ptr<CSyncFileStatT> csync_vio_local_readdir (CSyncVioHandleT dhandle, Vfs vfs);
-
-// OCSYNC_EXPORT
-int csync_vio_local_stat (string uri, CSyncFileStatT buf);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /***********************************************************
 libcsync -- a library to sync a directory with another
 
@@ -82,132 +49,150 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 //    #include <QtCore/GLib.File>
 
 
+//    struct CSyncVioHandleT;
+namespace CSync {
+
 /***********************************************************
 directory functions
 ***********************************************************/
+public class CSyncVioHandleT {
+    public DIR *dh;
+    public string path;
 
-struct CSyncVioHandleT {
-    DIR *dh;
-    string path;
-}
 
-static int this.csync_vio_local_stat_mb (char wuri, CSyncFileStatT buf);
+    // OCSYNC_EXPORT
+    CSyncVioHandleT csync_vio_local_opendir (string name);
 
-CSyncVioHandleT csync_vio_local_opendir (string name) {
-        QScopedPointer<CSyncVioHandleT> handle = new CSyncVioHandleT ();
+    // OCSYNC_EXPORT
+    int csync_vio_local_closedir (CSyncVioHandleT dhandle);
 
-        var dirname = GLib.File.encode_name (name);
+    // OCSYNC_EXPORT
+    std.unique_ptr<CSyncFileStatT> csync_vio_local_readdir (CSyncVioHandleT dhandle, Vfs vfs);
 
-        handle.dh = opendir (dirname.const_data ());
-        if (!handle.dh) {
-            return null;
-        }
+    // OCSYNC_EXPORT
+    int csync_vio_local_stat (string uri, CSyncFileStatT buf);
 
-        handle.path = dirname;
-        return handle.take ();
-}
+    static int this.csync_vio_local_stat_mb (char wuri, CSyncFileStatT buf);
 
-int csync_vio_local_closedir (CSyncVioHandleT dhandle) {
-        //    Q_ASSERT (dhandle);
-        var rc = closedir (dhandle.dh);
-        delete dhandle;
-        return rc;
-}
+    CSyncVioHandleT csync_vio_local_opendir (string name) {
+            QScopedPointer<CSyncVioHandleT> handle = new CSyncVioHandleT ();
 
-std.unique_ptr<CSyncFileStatT> csync_vio_local_readdir (CSyncVioHandleT handle, Vfs vfs) {
+            var dirname = GLib.File.encode_name (name);
 
-    dirent dirent = null;
-    std.unique_ptr<CSyncFileStatT> file_stat;
-
-    do {
-            dirent = readdir (handle.dh);
-            if (!dirent)
-                    return {};
-    } while (qstrcmp (dirent.d_name, ".") == 0 || qstrcmp (dirent.d_name, "..") == 0);
-
-    file_stat = std.make_unique<CSyncFileStatT> ();
-    file_stat.path = GLib.File.decode_name (dirent.d_name).to_utf8 ();
-    string full_path = handle.path % '/' % "" % (char) dirent.d_name;
-    if (file_stat.path.is_null ()) {
-            file_stat.original_path = full_path;
-            GLib.warning ("Invalid characters in file/directory name, please rename: " + dirent.d_name + handle.path);
-    }
-
-    /* Check for availability of d_type, see manpage. */
-//  #if defined (this.DIRENT_HAVE_D_TYPE) || defined (__APPLE__)
-    switch (dirent.d_type) {
-        case DT_FIFO:
-        case DT_SOCK:
-        case DT_CHR:
-        case DT_BLK:
-            break;
-        case DT_DIR:
-        case DT_REG:
-            if (dirent.d_type == DT_DIR) {
-                file_stat.type = ItemType.DIRECTORY;
-            } else {
-                file_stat.type = ItemType.FILE;
+            handle.dh = opendir (dirname.const_data ());
+            if (!handle.dh) {
+                return null;
             }
-            break;
-        default:
-            break;
-    }
-//    #endif
 
-    if (file_stat.path.is_null ())
-            return file_stat;
-
-    if (this.csync_vio_local_stat_mb (full_path.const_data (), file_stat.get ()) < 0) {
-            // Will get excluded by this.csync_detect_update.
-            file_stat.type = ItemType.SKIP;
+            handle.path = dirname;
+            return handle.take ();
     }
 
-    // Override type for virtual files if desired
-    if (vfs) {
-            // Directly modifies file_stat.type.
-            // We can ignore the return value since we're done here anyway.
-            const var result = vfs.stat_type_virtual_file (file_stat.get (), handle.path);
-            //    Q_UNUSED (result)
+    int csync_vio_local_closedir (CSyncVioHandleT dhandle) {
+            //    Q_ASSERT (dhandle);
+            var rc = closedir (dhandle.dh);
+            delete dhandle;
+            return rc;
     }
 
-    return file_stat;
-}
+    std.unique_ptr<CSyncFileStatT> csync_vio_local_readdir (CSyncVioHandleT handle, Vfs vfs) {
 
-int csync_vio_local_stat (string uri, CSyncFileStatT buf) {
-        return this.csync_vio_local_stat_mb (GLib.File.encode_name (uri).const_data (), buf);
-}
+        dirent dirent = null;
+        std.unique_ptr<CSyncFileStatT> file_stat;
 
-static int this.csync_vio_local_stat_mb (char wuri, CSyncFileStatT buf) {
-        stat sb;
+        do {
+                dirent = readdir (handle.dh);
+                if (!dirent)
+                        return {};
+        } while (qstrcmp (dirent.d_name, ".") == 0 || qstrcmp (dirent.d_name, "..") == 0);
 
-        if (stat (wuri, sb) < 0) {
-                return -1;
+        file_stat = std.make_unique<CSyncFileStatT> ();
+        file_stat.path = GLib.File.decode_name (dirent.d_name).to_utf8 ();
+        string full_path = handle.path % '/' % "" % (char) dirent.d_name;
+        if (file_stat.path == null) {
+                file_stat.original_path = full_path;
+                GLib.warning ("Invalid characters in file/directory name, please rename: " + dirent.d_name + handle.path);
         }
 
-        switch (sb.st_mode & S_IFMT) {
-        case S_IFDIR:
-            buf.type = ItemType.DIRECTORY;
-            break;
-        case S_IFREG:
-            buf.type = ItemType.FILE;
-            break;
-        case S_IFLNK:
-        case S_IFSOCK:
-            buf.type = ItemType.SOFT_LINK;
-            break;
-        default:
-            buf.type = ItemType.SKIP;
-            break;
+        /* Check for availability of d_type, see manpage. */
+    //  #if defined (this.DIRENT_HAVE_D_TYPE) || defined (__APPLE__)
+        switch (dirent.d_type) {
+            case DT_FIFO:
+            case DT_SOCK:
+            case DT_CHR:
+            case DT_BLK:
+                break;
+            case DT_DIR:
+            case DT_REG:
+                if (dirent.d_type == DT_DIR) {
+                    file_stat.type = ItemType.DIRECTORY;
+                } else {
+                    file_stat.type = ItemType.FILE;
+                }
+                break;
+            default:
+                break;
+        }
+    //    #endif
+
+        if (file_stat.path == null)
+                return file_stat;
+
+        if (this.csync_vio_local_stat_mb (full_path.const_data (), file_stat.get ()) < 0) {
+                // Will get excluded by this.csync_detect_update.
+                file_stat.type = ItemType.SKIP;
+        }
+
+        // Override type for virtual files if desired
+        if (vfs) {
+                // Directly modifies file_stat.type.
+                // We can ignore the return value since we're done here anyway.
+                const var result = vfs.stat_type_virtual_file (file_stat.get (), handle.path);
+                //    Q_UNUSED (result)
+        }
+
+        return file_stat;
     }
 
-//  #ifdef __APPLE__
-    if (sb.st_flags & UF_HIDDEN) {
-            buf.is_hidden = true;
+    int csync_vio_local_stat (string uri, CSyncFileStatT buf) {
+            return this.csync_vio_local_stat_mb (GLib.File.encode_name (uri).const_data (), buf);
     }
-//    #endif
 
-    buf.inode = sb.st_ino;
-    buf.modtime = sb.st_mtime;
-    buf.size = sb.st_size;
-    return 0;
-}
+    static int this.csync_vio_local_stat_mb (char wuri, CSyncFileStatT buf) {
+            stat sb;
+
+            if (stat (wuri, sb) < 0) {
+                    return -1;
+            }
+
+            switch (sb.st_mode & S_IFMT) {
+            case S_IFDIR:
+                buf.type = ItemType.DIRECTORY;
+                break;
+            case S_IFREG:
+                buf.type = ItemType.FILE;
+                break;
+            case S_IFLNK:
+            case S_IFSOCK:
+                buf.type = ItemType.SOFT_LINK;
+                break;
+            default:
+                buf.type = ItemType.SKIP;
+                break;
+        }
+
+    //  #ifdef __APPLE__
+        if (sb.st_flags & UF_HIDDEN) {
+                buf.is_hidden = true;
+        }
+    //    #endif
+
+        buf.inode = sb.st_ino;
+        buf.modtime = sb.st_mtime;
+        buf.size = sb.st_size;
+        return 0;
+    }
+
+} // class CSyncVioHandleT
+
+} // namespace CSync

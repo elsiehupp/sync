@@ -537,10 +537,10 @@ public class EncryptionHelper : GLib.Object {
         string key, string initialization_vector,
         GLib.File input, GLib.File output, string return_tag) {
         if (!input.open (QIODevice.ReadOnly)) {
-            GLib.debug ("Could not open input file for reading " + input.error_string ());
+            GLib.debug ("Could not open input file for reading " + input.error_string);
         }
         if (!output.open (QIODevice.WriteOnly)) {
-            GLib.debug ("Could not oppen output file for writing " + output.error_string ());
+            GLib.debug ("Could not oppen output file for writing " + output.error_string);
         }
 
         // Init

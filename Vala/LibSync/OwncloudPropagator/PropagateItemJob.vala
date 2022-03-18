@@ -74,7 +74,7 @@ public class PropagateItemJob : PropagatorJob {
     /***********************************************************
     ***********************************************************/
     protected bool has_encrypted_ancestor () {
-        if (!this.propagator.account.capabilities ().client_side_encryption_available ()) {
+        if (!this.propagator.account.capabilities.client_side_encryption_available ()) {
             return false;
         }
 

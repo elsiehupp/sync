@@ -9,8 +9,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <Soup.ProxyResolverDefault>
 //  #include <QRunnable>
 
-using CSync;
-
 namespace Occ {
 namespace LibSync {
 

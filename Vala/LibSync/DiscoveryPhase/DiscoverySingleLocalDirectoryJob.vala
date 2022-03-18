@@ -4,8 +4,6 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-using CSync;
-
 namespace Occ {
 namespace LibSync {
 
@@ -88,7 +86,7 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, QRunnable*/ {
                 //item.file = this.current_folder.target + i.name;
                 // FIXME ^^ do we really need to use this.target or is local fine?
                 item.file = this.local_path + i.name;
-                item.instruction = SyncInstructions.IGNORE;
+                item.instruction = CSync.SyncInstructions.IGNORE;
                 item.status = SyncFileItem.Status.NORMAL_ERROR;
                 item.error_string = _("Filename encoding is not valid");
                 /* emit */ signal_item_discovered (item);

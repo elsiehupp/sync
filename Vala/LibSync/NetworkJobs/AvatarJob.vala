@@ -35,7 +35,7 @@ public class AvatarJob : AbstractNetworkJob {
     ***********************************************************/
     public AvatarJob.for_account (Account account, string user_id, int size, GLib.Object parent = new GLib.Object ()) {
         base (account, "", parent);
-        if (account.server_version_int () >= Account.make_server_version (10, 0, 0)) {
+        if (account.server_version_int >= Account.make_server_version (10, 0, 0)) {
             this.avatar_url = Utility.concat_url_path (account.url, "remote.php/dav/avatars/%1/%2.png".printf (user_id, string.number (size)));
         } else {
             this.avatar_url = Utility.concat_url_path (account.url, "index.php/avatar/%1/%2".printf (user_id, string.number (size)));
@@ -57,7 +57,7 @@ public class AvatarJob : AbstractNetworkJob {
     default
     ***********************************************************/
     public static Gtk.Image make_circular_avatar (Gtk.Image base_avatar) {
-        if (base_avatar.is_null ()) {
+        if (base_avatar == null) {
             return {};
         }
 

@@ -35,11 +35,11 @@ public class TestDatabaseError : GLib.Object {
             fake_folder.remote_modifier ().mkdir ("D");
             fake_folder.remote_modifier ().mkdir ("D/subdir");
             fake_folder.remote_modifier ().insert ("D/subdir/file");
-            fake_folder.local_modifier ().insert ("B/b0");
-            fake_folder.local_modifier ().append_byte ("B/b1");
+            fake_folder.local_modifier.insert ("B/b0");
+            fake_folder.local_modifier.append_byte ("B/b1");
             fake_folder.remote_modifier ().remove ("B/b2");
-            fake_folder.local_modifier ().mkdir ("NewDir");
-            fake_folder.local_modifier ().rename ("C", "NewDir/C");
+            fake_folder.local_modifier.mkdir ("NewDir");
+            fake_folder.local_modifier.rename ("C", "NewDir/C");
 
             // Set the counter
             fake_folder.sync_journal ().autotest_fail_counter = count;

@@ -72,7 +72,7 @@ public class PropfindJob : AbstractNetworkJob {
         var buf = new Soup.Buffer (this);
         buf.data (xml);
         buf.open (QIODevice.ReadOnly);
-        send_request ("PROPFIND", make_dav_url (path ()), request, buf);
+        send_request ("PROPFIND", make_dav_url (path), request, buf);
 
         AbstractNetworkJob.start ();
     }
@@ -111,7 +111,7 @@ public class PropfindJob : AbstractNetworkJob {
                 }
             }
             if (reader.has_error ()) {
-                GLib.warning ("XML parser error: " + reader.error_string ());
+                GLib.warning ("XML parser error: " + reader.error_string);
                 /* emit */ signal_finished_with_error (this.reply);
             } else {
                 /* emit */ signal_result (items);

@@ -33,7 +33,7 @@ public class CheckVioExt {
     const int WD_BUFFER_SIZE = 255;
 
     string csync_test_dir () {
-        return GLib.Dir.temporary_path () + "/csync_test";
+        return GLib.Dir.temporary_path + "/csync_test";
     }
 
     int oc_mkdir (string path) {
@@ -51,9 +51,9 @@ public class CheckVioExt {
     /***********************************************************
     remove the complete test directory */
     static int wipe_testdir () {
-        GLib.Dir tmp = new GLib.Dir (csync_test_dir ());
-        if (tmp.exists ()) {
-            return tmp.remove_recursively () ? 0 : 1;
+        GLib.Dir temporary = new GLib.Dir (csync_test_dir ());
+        if (temporary.exists ()) {
+            return temporary.remove_recursively () ? 0 : 1;
         }
         return 0;
     }
@@ -174,7 +174,7 @@ public class CheckVioExt {
             subdir_out = (is_dir ? "<DIR> ":"      ") + subdir;
 
             if ( is_dir ) {
-                if ( sv.result.is_null () ) {
+                if ( sv.result == null ) {
                 sv.result = subdir_out;
                 } else {
                 sv.result += subdir_out;

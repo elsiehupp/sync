@@ -19,7 +19,7 @@ public class TestInotifyWatcher : FolderWatcherPrivate {
     /***********************************************************
     ***********************************************************/
     private void on_signal_init_test_case () {
-        this.root = GLib.Dir.temporary_path () + "/" + "test_" + string.number (Utility.rand ());
+        this.root = GLib.Dir.temporary_path + "/" + "test_" + string.number (Utility.rand ());
         GLib.debug ("creating test directory tree in " + this.root);
         GLib.Dir root_directory = new GLib.Dir (this.root);
 
@@ -31,7 +31,7 @@ public class TestInotifyWatcher : FolderWatcherPrivate {
     }
 
     // Test the recursive path listing function find_folders_below
-    private void test_directories_below_path () {
+    private void test_directories_below_path {
         string[] dirs;
 
         bool ok = find_folders_below (GLib.Dir (this.root), dirs);
@@ -62,7 +62,7 @@ public class TestInotifyWatcher : FolderWatcherPrivate {
     /***********************************************************
     ***********************************************************/
     private void on_signal_cleanup_test_case () {
-        if (this.root.starts_with (GLib.Dir.temporary_path ())) {
+        if (this.root.starts_with (GLib.Dir.temporary_path)) {
            system ("rm -rf %1".printf (this.root).to_local_8_bit ());
         }
     }

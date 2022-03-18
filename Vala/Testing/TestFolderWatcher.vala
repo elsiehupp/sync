@@ -41,8 +41,8 @@ public class TestFolderWatcher : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public TestFolderWatcher () {
-        GLib.Dir root_directory = new GLib.Dir (this.root.path ());
-        this.root_path = root_directory.canonical_path ();
+        GLib.Dir root_directory = new GLib.Dir (this.root.path);
+        this.root_path = root_directory.canonical_path;
         GLib.debug ("creating test directory tree in " + this.root_path);
 
         root_directory.mkpath ("a1/b1/c1");

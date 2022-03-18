@@ -67,12 +67,12 @@ public class TestChecksumValidator : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_init_test_case () {
-        this.testfile = this.root.path () + "/cs_file";
+        this.testfile = this.root.path + "/cs_file";
         Utility.write_random_file ( this.testfile);
     }
 
     private void test_md5_calc () {
-        string file = this.root.path () + "/file_a.bin";
+        string file = this.root.path + "/file_a.bin";
         GLib.assert_true (Utility.write_random_file (file));
         GLib.FileInfo file_info = new GLib.FileInfo (file);
         GLib.assert_true (file_info.exists ());
@@ -92,7 +92,7 @@ public class TestChecksumValidator : GLib.Object {
     }
 
     private void test_sha1_calc () {
-        string file = this.root.path () + "/file_b.bin";
+        string file = this.root.path + "/file_b.bin";
         Utility.write_random_file (file);
         GLib.FileInfo file_info = new GLib.FileInfo (file);
         GLib.assert_true (file_info.exists ());

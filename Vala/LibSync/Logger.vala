@@ -97,13 +97,13 @@ public class Logger : GLib.Object {
         }
         public set {
             this.log_rules = value;
-            string tmp;
-            QTextStream output = new QTextStream (tmp);
+            string temporary;
+            QTextStream output = new QTextStream (temporary);
             foreach (var p in value) {
                 output += p + '\n';
             }
-            GLib.debug (tmp);
-            QLoggingCategory.filter_rules (tmp);
+            GLib.debug (temporary);
+            QLoggingCategory.filter_rules (temporary);
         }
     }
 
@@ -224,7 +224,7 @@ public class Logger : GLib.Object {
     /***********************************************************
     Returns where the automatic logdir would be
     ***********************************************************/
-    public string temporary_folder_log_dir_path () {
+    public string temporary_folder_log_dir_path {
         return GLib.Dir.temp ().file_path (APPLICATION_SHORTNAME + "-logdir");
     }
 
@@ -239,7 +239,7 @@ public class Logger : GLib.Object {
     Used in conjunction with ConfigFile.automatic_log_dir
     ***********************************************************/
     public void setup_temporary_folder_log_dir () {
-        var directory = temporary_folder_log_dir_path ();
+        var directory = temporary_folder_log_dir_path;
         if (!GLib.Dir ().mkpath (directory)) {
             return;
         }
@@ -361,7 +361,7 @@ public class Logger : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void dump_crash_log () {
-        GLib.File log_file = GLib.File.new_for_path (GLib.Dir.temp_path () + "/" + APPLICATION_NAME + "-crash.log");
+        GLib.File log_file = GLib.File.new_for_path (GLib.Dir.temp_path + "/" + APPLICATION_NAME + "-crash.log");
         if (log_file_object.open (GLib.File.WriteOnly)) {
             QTextStream output = new QTextStream (&log_file);
             for (int i = 1; i <= CRASH_LOG_SIZE; ++i) {

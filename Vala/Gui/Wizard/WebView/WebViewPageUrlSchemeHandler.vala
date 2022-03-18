@@ -19,7 +19,7 @@ public class WebViewPageUrlSchemeHandler : QWebEngineUrlSchemeHandler {
     public void request_started (QWebEngineUrlRequestJob request) {
         GLib.Uri url = request.request_url ();
 
-        string path = url.path ().mid (1); // get undecoded path
+        string path = url.path.mid (1); // get undecoded path
         const string[] parts = path.split ("&");
 
         string server;

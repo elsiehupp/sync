@@ -24,7 +24,7 @@ public class DiskFileModifier : FileModifier {
         if (file_info.is_file ()) {
             GLib.assert_true (this.root_directory.remove (relative_path));
         } else {
-            GLib.assert_true (GLib.Dir ( file_info.file_path () ).remove_recursively ());
+            GLib.assert_true (GLib.Dir ( file_info.file_path ).remove_recursively ());
         }
     }
 
