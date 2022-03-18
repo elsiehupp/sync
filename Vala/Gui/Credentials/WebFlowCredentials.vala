@@ -5,7 +5,7 @@
 //  #include <QAuthenticator>
 //  #include <QNetworkAccessManager>
 //  #include <QPointe
-//  #include <QTimer>
+//  #include <GLib.Timeout>
 //  #include <Gtk.Dialog>
 //  #include <QVBoxLayout>
 
@@ -86,22 +86,16 @@ public class WebFlowCredentials : AbstractCredentials {
     ***********************************************************/
     public override QNetworkAccessManager create_qnam () {
         GLib.info ("Getting QNAM");
-        AccessManager qnam = new WebFlowCredentialsAccessManager (this);
+        AccessManager access_manager = new WebFlowCredentialsAccessManager (this);
 
-        connect (
-            qnam,
-            AccessManager.authentication_required,
-            this,
-            WebFlowCredentials.on_signal_authentication
+        access_manager.signal_authentication_required.connect (
+            this.on_signal_authentication
         );
-        connect (
-            qnam,
-            AccessManager.on_signal_finished,
-            this,
-            WebFlowCredentials.on_signal_finished
+        access_manager.signal_finished.connect (
+            this.on_signal_finished
         );
 
-        return qnam;
+        return access_manager;
     }
 
 
@@ -152,9 +146,9 @@ public class WebFlowCredentials : AbstractCredentials {
                 this.client_ssl_certificate.to_pem (),
                 this
             );
-            connect (
-                kechain_chunk_write_job, KeychainChunk.WriteJob.signal_finished,
-                this, WebFlowCredentials.on_signal_write_client_cert_pem_job_done);
+            kechain_chunk_write_job.signal_finished.connect (
+                this.on_signal_write_client_cert_pem_job_done
+            );
             kechain_chunk_write_job.on_signal_start ();
         } else {
             // no cert, just write credentials
@@ -171,10 +165,10 @@ public class WebFlowCredentials : AbstractCredentials {
 
         // let QNAM forget about the password
         // This needs to be done later in the event loop because we might be called (directly or
-        // indirectly) from QNetworkAccessManagerPrivate.authentication_required, which itself
+        // indirectly) from QNetworkAccessManagerPrivate.signal_authentication_required, which itself
         // is a called from a BlockingQueuedConnection from the Qt HTTP thread. And clearing the
         // cache needs to synchronize again with the HTTP thread.
-        QTimer.single_shot (0, this.account, Account.on_signal_clear_qnam_cache);
+        GLib.Timeout.single_shot (0, this.account, Account.on_signal_clear_qnam_cache);
     }
 
 
@@ -243,10 +237,8 @@ public class WebFlowCredentials : AbstractCredentials {
         // Determine if the old flow has to be used (GS for now)
         // Do a DetermineAuthTypeJob to make sure that the server is still using Flow2
         var determine_auth_type_job = new DetermineAuthTypeJob (this.account.shared_from_this (), this);
-        connect (
-            determine_auth_type_job,
-            DetermineAuthTypeJob.auth_type,
-            on_signal_determine_auth_type
+        determine_auth_type_job.auth_type.connect (
+            this.on_signal_determine_auth_type
         );
         determine_auth_type_job.on_signal_start ();
 
@@ -279,13 +271,11 @@ public class WebFlowCredentials : AbstractCredentials {
 
         this.ask_dialog.show ();
 
-        connect (
-            this.ask_dialog, WebFlowCredentialsDialog.signal_url_catched,
-            this, WebFlowCredentials.on_signal_ask_from_user_credentials_provided
+        this.ask_dialog.signal_url_catched.connect (
+            this.on_signal_ask_from_user_credentials_provided
         );
-        connect (
-            this.ask_dialog, WebFlowCredentialsDialog.signal_close,
-            this, WebFlowCredentials.on_signal_ask_from_user_cancelled
+        this.ask_dialog.signal_close.connect (
+            this.on_signal_ask_from_user_cancelled
         );
     }
 
@@ -321,9 +311,8 @@ public class WebFlowCredentials : AbstractCredentials {
             this.keychain_migration,
             this
         );
-        connect (
-            keychain_chunk_read_job, KeychainChunk.ReadJob.on_signal_finished,
-            this, WebFlowCredentials.on_signal_read_client_key_pem_job_done
+        keychain_chunk_read_job.on_signal_finished.connect (
+            this.on_signal_read_client_key_pem_job_done
         );
         keychain_chunk_read_job.on_signal_start ();
     }
@@ -394,9 +383,8 @@ public class WebFlowCredentials : AbstractCredentials {
     //  #endif
         read_password_job.insecure_fallback (false);
         read_password_job.key (kck);
-        connect (
-            read_password_job, Job.signal_finished,
-            this, WebFlowCredentials.on_signal_read_password_job_finished
+        read_password_job.signal_finished.connect (
+            this.on_signal_read_password_job_finished
         );
         read_password_job.on_signal_start ();
     }
@@ -450,9 +438,8 @@ public class WebFlowCredentials : AbstractCredentials {
                 this.client_ssl_key.to_pem (),
                 this
             );
-            connect (
-                keychain_chunk_write_job, KeychainChunk.WriteJob.on_signal_finished,
-                this, WebFlowCredentials.on_signal_write_client_key_pem_job_done
+            keychain_chunk_write_job.signal_finished.connect (
+                this.on_signal_write_client_key_pem_job_done
             );
             keychain_chunk_write_job.on_signal_start ();
         } else {
@@ -503,9 +490,8 @@ public class WebFlowCredentials : AbstractCredentials {
         add_settings_to_job (this.account, write_password_job);
     //  #endif
         write_password_job.insecure_fallback (false);
-        connect (
-            write_password_job, Job.on_signal_finished,
-            this, WebFlowCredentials.on_signal_write_job_done
+        write_password_job.signal_finished.connect (
+            this.on_signal_write_job_done
         );
         write_password_job.key (keychain_key (this.account.url.to_string (), this.user, this.account.identifier ()));
         write_password_job.text_data (this.password);
@@ -541,11 +527,8 @@ public class WebFlowCredentials : AbstractCredentials {
                 this.keychain_migration,
                 this
             );
-            connect (
-                keychain_chunk_read_job,
-                KeychainChunk.ReadJob.on_signal_finished,
-                this,
-                WebFlowCredentials.on_signal_read_client_ca_certificates_pem_job_done
+            keychain_chunk_read_job.signal_finished.connect (
+                this.on_signal_read_client_ca_certificates_pem_job_done
             );
             keychain_chunk_read_job.on_signal_start ();
         } else {
@@ -582,9 +565,8 @@ public class WebFlowCredentials : AbstractCredentials {
                 cert.to_pem (),
                 this
             );
-            connect (
-                keychain_chunk_write_job, KeychainChunk.WriteJob.on_signal_finished,
-                this, WebFlowCredentials.on_signal_write_client_ca_certificates_pem_job_done
+            keychain_chunk_write_job.signal_finished.connect (
+                this.on_signal_write_client_ca_certificates_pem_job_done
             );
             keychain_chunk_write_job.on_signal_start ();
         } else {
@@ -608,10 +590,10 @@ public class WebFlowCredentials : AbstractCredentials {
             this.account,
             this.user + CLIENT_CERTIFICATE_PEM_C,
             this.keychain_migration,
-            this);
-        connect (
-            keychain_chunk_read_job, KeychainChunk.ReadJob.on_signal_finished,
-            this, WebFlowCredentials.on_signal_read_client_cert_pem_job_done
+            this
+        );
+        keychain_chunk_read_job.on_signal_finished.connect (
+            this.on_signal_read_client_cert_pem_job_done
         );
         keychain_chunk_read_job.on_signal_start ();
     }

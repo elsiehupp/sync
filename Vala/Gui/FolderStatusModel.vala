@@ -712,7 +712,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
         // Show 'fetching data...' hint after a while.
         this.fetching_items[persistent_index].on_signal_start ();
-        QTimer.single_shot (1000, this, FolderStatusModel.on_signal_show_fetch_progress);
+        GLib.Timeout.single_shot (1000, this, FolderStatusModel.on_signal_show_fetch_progress);
     }
 
 

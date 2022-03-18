@@ -6,7 +6,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <QTimer>
 //  #include <GLib.Dir>
 //  #include <QSettings>
 //  #include <Gtk.MessageBox>
@@ -106,7 +105,7 @@ public class Folder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private QTimer schedule_self_timer;
+    private GLib.Timeout schedule_self_timer;
 
     /***********************************************************
     When the same local path is synced to multiple accounts,
@@ -1284,7 +1283,7 @@ public class Folder : GLib.Object {
         // file system change notifications are ignored for that folder. And it takes
         // some time under certain conditions to make the file system notifications
         // all come in.
-        QTimer.single_shot (200, this, Folder.on_signal_emit_finished_delayed);
+        GLib.Timeout.single_shot (200, this, Folder.on_signal_emit_finished_delayed);
     
         this.last_sync_duration = std.chrono.milliseconds (this.time_since_last_sync_start.elapsed ());
         this.time_since_last_sync_done.on_signal_start ();

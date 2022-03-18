@@ -19,7 +19,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QToolTip>
 //  #include <Gtk.Widget>
 //  #include <QPointer>
-//  #include <QTimer>
 
 namespace Occ {
 namespace Ui {

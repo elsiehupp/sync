@@ -52,40 +52,27 @@ public class OwncloudSetupWizard : GLib.Object {
         this.oc_wizard = new OwncloudWizard ();
         this.remote_folder ();
 
-        connect (
-            this.oc_wizard,
-            OwncloudWizard.determine_auth_type,
-            this,
-            OwncloudSetupWizard.on_signal_check_server);
-        connect (
-            this.oc_wizard,
-            OwncloudWizard.connect_to_oc_url,
-            this,
-            OwncloudSetupWizard.on_signal_connect_to_oc_url);
-        connect (
-            this.oc_wizard,
-            OwncloudWizard.create_local_and_remote_folders,
-            this,
-            OwncloudSetupWizard.on_signal_create_local_and_remote_folders);
+        this.oc_wizard.determine_auth_type.connect (
+            this.on_signal_check_server
+        );
+        this.oc_wizard.connect_to_oc_url.connect (
+            this.on_signal_connect_to_oc_url
+        );
+        this.oc_wizard.create_local_and_remote_folders.connect (
+            this.on_signal_create_local_and_remote_folders
+        );
         /* basic_setup_finished might be called from a reply from the network.
            on_signal_assistant_finished might destroy the temporary QNetworkAccessManager.
            Therefore Qt.QueuedConnection is required */
-        connect (
-            this.oc_wizard,
-            OwncloudWizard.basic_setup_finished,
-            this,
-            OwncloudSetupWizard.on_signal_assistant_finished,
-            Qt.QueuedConnection);
-        connect (
-            this.oc_wizard,
-            Gtk.Dialog.on_signal_finished,
-            this,
-            GLib.Object.delete_later);
-        connect (
-            this.oc_wizard,
-            OwncloudWizard.skip_folder_configuration,
-            this,
-            OwncloudSetupWizard.on_signal_skip_folder_configuration);
+        this.oc_wizard.basic_setup_finished.connect (
+            this.on_signal_assistant_finished // Qt.QueuedConnection
+        );
+        this.oc_wizard.on_signal_finished.connect (
+            this.delete_later
+        );
+        this.oc_wizard.skip_folder_configuration.connect (
+            this.on_signal_skip_folder_configuration
+        );
     }
 
 
@@ -96,19 +83,21 @@ public class OwncloudSetupWizard : GLib.Object {
     }
 
 
+    delegate void WizardDoneDelegate ();
+
+
     /***********************************************************
     Run the wizard
     ***********************************************************/
-    public static void run_wizard (GLib.Object object, char amember, Gtk.Widget parent = new Gtk.Widget ()) {
+    public static void run_wizard (GLib.Object object, WizardDoneDelegate wizard_done_delegate, Gtk.Widget parent = new Gtk.Widget ()) {
         if (setup_wizard != null) {
             bring_wizard_to_front_if_visible ();
             return;
         }
 
         setup_wizard = new OwncloudSetupWizard (parent);
-        connect (
-            setup_wizard, signal_own_cloud_wizard_done (int),
-            object, amember
+        setup_wizard.signal_own_cloud_wizard_done.connect (
+            object.wizard_done_delegate
         );
         FolderMan.instance.sync_enabled (false);
         setup_wizard.start_wizard ();
@@ -194,17 +183,14 @@ public class OwncloudSetupWizard : GLib.Object {
         // Step 1: Check url/status.php
         var check_server_job = new CheckServerJob (account, this);
         check_server_job.ignore_credential_failure (true);
-        connect (
-            check_server_job, CheckServerJob.instance_found,
-            this, OwncloudSetupWizard.on_signal_found_server
+        check_server_job.instance_found.connect (
+            this.on_signal_found_server
         );
-        connect (
-            check_server_job, CheckServerJob.instance_not_found,
-            this, OwncloudSetupWizard.on_signal_find_server_behind_redirect
+        check_server_job.instance_not_found.connect (
+            this.on_signal_find_server_behind_redirect
         );
-        connect (
-            check_server_job, CheckServerJob.timeout,
-            this, OwncloudSetupWizard.on_signal_no_server_found_timeout
+        check_server_job.timeout.connect (
+            this.on_signal_no_server_found_timeout
         );
         check_server_job.on_signal_timeout ( (account.url.scheme () == "https") ? 30 * 1000 : 10 * 1000);
         check_server_job.on_signal_start ();
@@ -228,18 +214,12 @@ public class OwncloudSetupWizard : GLib.Object {
         // Grab the chain of permanent redirects and adjust the account url
         // accordingly
         var permanent_redirects = std.make_shared<int> (0);
-        connect (
-            redirect_check_job,
-            AbstractNetworkJob.redirected,
-            this,
+        redirect_check_job.redirected.connect (
             this.on_redirect_check_job
         );
 
         // Step 3: When done, on_signal_start checking status.php.
-        connect (
-            redirect_check_job,
-            SimpleNetworkJob.finished_signal,
-            this,
+        redirect_check_job.signal_finished.connect (
             this.on_redirect_check_job_finished
         );
     }
@@ -258,17 +238,14 @@ public class OwncloudSetupWizard : GLib.Object {
     private void on_redirect_check_job_finished (unowned Account account) {
         var check_server_job = new CheckServerJob (account, this);
         check_server_job.ignore_credential_failure (true);
-        connect (
-            check_server_job, CheckServerJob.instance_found,
-            this, OwncloudSetupWizard.on_signal_found_server
+        check_server_job.instance_found.connect (
+            this.on_signal_found_server
         );
-        connect (
-            check_server_job, CheckServerJob.instance_not_found,
-            this, OwncloudSetupWizard.on_signal_no_server_found
+        check_server_job.instance_not_found.connect (
+            this.on_signal_no_server_found
         );
-        connect (
-            check_server_job, CheckServerJob.timeout,
-            this, OwncloudSetupWizard.on_signal_no_server_found_timeout
+        check_server_job.timeout.connect (
+            this.on_signal_no_server_found_timeout
         );
         check_server_job.on_signal_timeout ( (account.url.scheme () == "https") ? 30 * 1000 : 10 * 1000);
         check_server_job.on_signal_start ();
@@ -340,9 +317,8 @@ public class OwncloudSetupWizard : GLib.Object {
     ***********************************************************/
     private void on_signal_determine_auth_type () {
         var determine_auth_type_job = new DetermineAuthTypeJob (this.oc_wizard.account, this);
-        connect (
-            determine_auth_type_job, DetermineAuthTypeJob.auth_type,
-            this.oc_wizard, OwncloudWizard.on_signal_auth_type
+        determine_auth_type_job.auth_type.connect (
+            this.oc_wizard.on_signal_auth_type
         );
         determine_auth_type_job.on_signal_start ();
     }
@@ -356,10 +332,7 @@ public class OwncloudSetupWizard : GLib.Object {
         this.oc_wizard.account.credentials (creds);
 
         const var fetch_user_name_job = new JsonApiJob (this.oc_wizard.account.shared_from_this (), "/ocs/v1.php/cloud/user");
-        connect (
-            fetch_user_name_job,
-            JsonApiJob.json_received,
-            this,
+        fetch_user_name_job.json_received.connect (
             this.on_fetch_user_name_job_json_received
         );
         fetch_user_name_job.on_signal_start ();
@@ -457,9 +430,8 @@ public class OwncloudSetupWizard : GLib.Object {
             ***********************************************************/
 
             var entity_exists_job = new EntityExistsJob (this.oc_wizard.account, new_url_path, this);
-            connect (
-                entity_exists_job, EntityExistsJob.exists,
-                this, OwncloudSetupWizard.on_signal_remote_folder_exists
+            entity_exists_job.exists.connect (
+                this.on_signal_remote_folder_exists
             );
             entity_exists_job.on_signal_start ();
         } else {
@@ -743,17 +715,11 @@ public class OwncloudSetupWizard : GLib.Object {
         // so don't automatically follow redirects.
         propfind_job.follow_redirects (false);
         propfind_job.properties (new GLib.List<string> ("getlastmodified"));
-        connect (
-            propfind_job,
-            PropfindJob.result,
-            this.oc_wizard,
-            OwncloudWizard.on_signal_successful_step
+        propfind_job.result.connect (
+            this.oc_wizard.on_signal_successful_step
         );
-        connect (
-            propfind_job,
-            PropfindJob.signal_finished_with_error,
-            this,
-            OwncloudSetupWizard.on_signal_auth_error
+        propfind_job.signal_finished_with_error.connect (
+            this.on_signal_auth_error
         );
         propfind_job.on_signal_start ();
     }
@@ -768,16 +734,10 @@ public class OwncloudSetupWizard : GLib.Object {
         );
 
         var mk_col_job = new MkColJob (this.oc_wizard.account, this.remote_folder, this);
-        connect (
-            mk_col_job,
-            MkColJob.signal_finished_with_error,
-            this,
-            OwncloudSetupWizard.on_signal_create_remote_folder_finished
+        mk_col_job.signal_finished_with_error.connect (
+            this.on_signal_create_remote_folder_finished
         );
-        connect (
-            mk_col_job,
-            MkColJob.finished_without_error,
-            this,
+        mk_col_job.finished_without_error.connect (
             this.on_signal_mkcol_job_finished_without_error
         );
         mk_col_job.on_signal_start ();

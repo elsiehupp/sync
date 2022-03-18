@@ -68,7 +68,7 @@ public class PropagateDownloadFile : PropagateItemJob {
     ***********************************************************/
     private int64 resume_start;
     private int64 download_progress;
-    private QPointer<GETFileJob> job;
+    private QPointer<GETFileJob> get_file_job;
     private GLib.File tmp_file;
 
     /***********************************************************
@@ -318,7 +318,7 @@ public class PropagateDownloadFile : PropagateItemJob {
 
         if (this.item.direct_download_url == "") {
             // Normal job, download from o_c instance
-            this.job = new GETFileJob (propagator ().account,
+            this.get_file_job = new GETFileJob (propagator ().account,
                 propagator ().full_remote_path (this.is_encrypted ? this.item.encrypted_filename : this.item.file),
                 this.tmp_file, headers, expected_etag_for_resume, this.resume_start, this);
         } else {
@@ -330,15 +330,21 @@ public class PropagateDownloadFile : PropagateItemJob {
             }
 
             GLib.Uri url = GLib.Uri.from_user_input (this.item.direct_download_url);
-            this.job = new GETFileJob (propagator ().account,
+            this.get_file_job = new GETFileJob (propagator ().account,
                 url,
                 this.tmp_file, headers, expected_etag_for_resume, this.resume_start, this);
         }
-        this.job.bandwidth_manager (&propagator ().bandwidth_manager);
-        connect (this.job, GETFileJob.signal_finished, this, PropagateDownloadFile.on_signal_get_finished);
-        connect (this.job, GETFileJob.download_progress, this, PropagateDownloadFile.on_signal_download_progress);
+        this.get_file_job.bandwidth_manager (&propagator ().bandwidth_manager);
+        connect (
+            this.get_file_job, GETFileJob.signal_finished,
+            this, PropagateDownloadFile.on_signal_get_finished
+        );
+        connect (
+            this.get_file_job, GETFileJob.download_progress,
+            this, PropagateDownloadFile.on_signal_download_progress
+        );
         propagator ().active_job_list.append (this);
-        this.job.start ();
+        this.get_file_job.start ();
     }
 
 
@@ -348,17 +354,17 @@ public class PropagateDownloadFile : PropagateItemJob {
     private void on_signal_get_finished () {
         propagator ().active_job_list.remove_one (this);
 
-        GETFileJob job = this.job;
-        //  ASSERT (job);
+        GETFileJob get_file_job = this.get_file_job;
+        //  ASSERT (get_file_job);
 
-        this.item.http_error_code = job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-        this.item.request_id = job.request_id ();
+        this.item.http_error_code = get_file_job.reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        this.item.request_id = get_file_job.request_id ();
 
-        Soup.Reply.NetworkError err = job.reply ().error ();
+        Soup.Reply.NetworkError err = get_file_job.reply ().error ();
         if (err != Soup.Reply.NoError) {
             // If we sent a 'Range' header and get 416 back, we want to retry
             // without the header.
-            const bool bad_range_header = job.resume_start () > 0 && this.item.http_error_code == 416;
+            const bool bad_range_header = get_file_job.resume_start () > 0 && this.item.http_error_code == 416;
             if (bad_range_header) {
                 GLib.warning ("Server replied 416 to our range request, trying again without.");
                 propagator ().another_sync_needed = true;
@@ -395,17 +401,17 @@ public class PropagateDownloadFile : PropagateItemJob {
             // This gives a custom QNAM (by the user of libowncloudsync) to abort () a GLib.InputStream in its meta_data_changed () slot and
             // set a custom error string to make this a soft error. In contrast to the default hard error this won't bring down
             // the whole sync and allows for a custom error message.
-            GLib.InputStream reply = job.reply ();
+            GLib.InputStream reply = get_file_job.reply ();
             if (err == Soup.Reply.OperationCanceledError && reply.property (OWNCLOUD_CUSTOM_SOFT_ERROR_STRING_C).is_valid ()) {
-                job.on_signal_error_string (reply.property (OWNCLOUD_CUSTOM_SOFT_ERROR_STRING_C).to_string ());
-                job.error_status (SyncFileItem.Status.SOFT_ERROR);
+                get_file_job.on_signal_error_string (reply.property (OWNCLOUD_CUSTOM_SOFT_ERROR_STRING_C).to_string ());
+                get_file_job.error_status (SyncFileItem.Status.SOFT_ERROR);
             } else if (bad_range_header) {
                 // Can't do this in classify_error () because 416 without a
                 // Range header should result in NormalError.
-                job.error_status (SyncFileItem.Status.SOFT_ERROR);
+                get_file_job.error_status (SyncFileItem.Status.SOFT_ERROR);
             } else if (file_not_found) {
-                job.on_signal_error_string (_("File was deleted from server"));
-                job.error_status (SyncFileItem.Status.SOFT_ERROR);
+                get_file_job.on_signal_error_string (_("File was deleted from server"));
+                get_file_job.error_status (SyncFileItem.Status.SOFT_ERROR);
 
                 // As a precaution against bugs that cause our database and the
                 // reality on the server to diverge, rediscover this folder on the
@@ -414,9 +420,9 @@ public class PropagateDownloadFile : PropagateItemJob {
             }
 
             string error_body;
-            string error_string = this.item.http_error_code >= 400 ? job.error_string_parsing_body (&error_body)
-                                                            : job.error_string ();
-            SyncFileItem.Status status = job.error_status ();
+            string error_string = this.item.http_error_code >= 400 ? get_file_job.error_string_parsing_body (&error_body)
+                                                            : get_file_job.error_string ();
+            SyncFileItem.Status status = get_file_job.error_status ();
             if (status == SyncFileItem.Status.NO_STATUS) {
                 status = classify_error (err, this.item.http_error_code,
                     propagator ().another_sync_needed, error_body);
@@ -426,17 +432,17 @@ public class PropagateDownloadFile : PropagateItemJob {
             return;
         }
 
-        this.item.response_time_stamp = job.response_timestamp ();
+        this.item.response_time_stamp = get_file_job.response_timestamp ();
 
-        if (!job.etag () == "") {
+        if (!get_file_job.etag () == "") {
             // The etag will be empty if we used a direct download URL.
             // (If it was really empty by the server, the GETFileJob will have errored
-            this.item.etag = parse_etag (job.etag ());
+            this.item.etag = parse_etag (get_file_job.etag ());
         }
-        if (job.last_modified ()) {
+        if (get_file_job.last_modified ()) {
             // It is possible that the file was modified on the server since we did the discovery phase
             // so make sure we have the up-to-date time
-            this.item.modtime = job.last_modified ();
+            this.item.modtime = get_file_job.last_modified ();
             GLib.assert (this.item.modtime > 0);
             if (this.item.modtime <= 0) {
                 GLib.warning ("Invalid modified time: " + this.item.file + this.item.modtime);
@@ -451,16 +457,16 @@ public class PropagateDownloadFile : PropagateItemJob {
         truncated, as described here : https://github.com/owncloud/mirall/issues/2528
         ***********************************************************/
         string size_header = "Content-Length";
-        int64 body_size = job.reply ().raw_header (size_header).to_long_long ();
-        bool has_size_header = !job.reply ().raw_header (size_header) == "";
+        int64 body_size = get_file_job.reply ().raw_header (size_header).to_long_long ();
+        bool has_size_header = !get_file_job.reply ().raw_header (size_header) == "";
 
         // Qt removes the content-length header for transparently decompressed HTTP1 replies
         // but not for HTTP2 or SPDY replies. For these it remains and contains the size
         // of the compressed data. See QTBUG-73364.
-        var content_encoding = job.reply ().raw_header ("content-encoding").down ();
+        var content_encoding = get_file_job.reply ().raw_header ("content-encoding").down ();
         if ( (content_encoding == "gzip" || content_encoding == "deflate")
-            && (job.reply ().attribute (Soup.Request.HTTP2WasUsedAttribute).to_bool ()
-            || job.reply ().attribute (Soup.Request.Spdy_was_used_attribute).to_bool ())) {
+            && (get_file_job.reply ().attribute (Soup.Request.HTTP2WasUsedAttribute).to_bool ()
+            || get_file_job.reply ().attribute (Soup.Request.Spdy_was_used_attribute).to_bool ())) {
             body_size = 0;
             has_size_header = false;
         }
@@ -468,14 +474,14 @@ public class PropagateDownloadFile : PropagateItemJob {
         if (has_size_header && this.tmp_file.size () > 0 && body_size == 0) {
             // Strange bug with broken webserver or webfirewall https://github.com/owncloud/client/issues/3373#issuecomment-122672322
             // This happened when trying to resume a file. The Content-Range header was files, Content-Length was == 0
-            GLib.debug (body_size + this.item.size + this.tmp_file.size () + job.resume_start ());
+            GLib.debug (body_size + this.item.size + this.tmp_file.size () + get_file_job.resume_start ());
             FileSystem.remove (this.tmp_file.filename ());
             on_signal_done (SyncFileItem.Status.SOFT_ERROR, "Broken webserver returning empty content length for non-empty file on resume");
             return;
         }
 
-        if (body_size > 0 && body_size != this.tmp_file.size () - job.resume_start ()) {
-            GLib.debug (body_size + this.tmp_file.size () + job.resume_start ());
+        if (body_size > 0 && body_size != this.tmp_file.size () - get_file_job.resume_start ()) {
+            GLib.debug (body_size + this.tmp_file.size () + get_file_job.resume_start ());
             propagator ().another_sync_needed = true;
             on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file could not be downloaded completely."));
             return;
@@ -493,15 +499,15 @@ public class PropagateDownloadFile : PropagateItemJob {
         // If we download conflict files but the server doesn't send conflict
         // headers, the record will be established by SyncEngine.conflict_record_maintenance.
         // (we can't reliably determine the file identifier of the base file here,
-        // it might still be downloaded in a parallel job and not exist in
+        // it might still be downloaded in a parallel get_file_job and not exist in
         // the database yet!)
-        if (job.reply ().raw_header ("OC-Conflict") == "1") {
+        if (get_file_job.reply ().raw_header ("OC-Conflict") == "1") {
             this.conflict_record.path = this.item.file.to_utf8 ();
-            this.conflict_record.initial_base_path = job.reply ().raw_header ("OC-ConflictInitialBasePath");
-            this.conflict_record.base_file_id = job.reply ().raw_header ("OC-ConflictBaseFileId");
-            this.conflict_record.base_etag = job.reply ().raw_header ("OC-ConflictBaseEtag");
+            this.conflict_record.initial_base_path = get_file_job.reply ().raw_header ("OC-ConflictInitialBasePath");
+            this.conflict_record.base_file_id = get_file_job.reply ().raw_header ("OC-ConflictBaseFileId");
+            this.conflict_record.base_etag = get_file_job.reply ().raw_header ("OC-ConflictBaseEtag");
 
-            var mtime_header = job.reply ().raw_header ("OC-ConflictBaseMtime");
+            var mtime_header = get_file_job.reply ().raw_header ("OC-ConflictBaseMtime");
             if (!mtime_header == "")
                 this.conflict_record.base_modtime = mtime_header.to_long_long ();
 
@@ -514,12 +520,16 @@ public class PropagateDownloadFile : PropagateItemJob {
         // will also emit the signal_validated () signal to continue the flow in slot on_signal_transmission_checksum_validated ()
         // as this is (still) also correct.
         var validator = new ValidateChecksumHeader (this);
-        connect (validator, ValidateChecksumHeader.signal_validated,
-            this, PropagateDownloadFile.on_signal_transmission_checksum_validated);
-        connect (validator, ValidateChecksumHeader.signal_validation_failed,
-            this, PropagateDownloadFile.on_signal_checksum_fail);
-        var checksum_header = find_best_checksum (job.reply ().raw_header (CHECK_SUM_HEADER_C));
-        var content_md5Header = job.reply ().raw_header (CONTENT_MD5_HEADER_C);
+        connect (
+            validator, ValidateChecksumHeader.signal_validated,
+            this, PropagateDownloadFile.on_signal_transmission_checksum_validated
+        );
+        connect (
+            validator, ValidateChecksumHeader.signal_validation_failed,
+            this, PropagateDownloadFile.on_signal_checksum_fail
+        );
+        var checksum_header = find_best_checksum (get_file_job.reply ().raw_header (CHECK_SUM_HEADER_C));
+        var content_md5Header = get_file_job.reply ().raw_header (CONTENT_MD5_HEADER_C);
         if (checksum_header == "" && !content_md5Header == "")
             checksum_header = "MD5:" + content_md5Header;
         validator.start (this.tmp_file.filename (), checksum_header);
@@ -544,8 +554,10 @@ public class PropagateDownloadFile : PropagateItemJob {
         var compute_checksum = new ComputeChecksum (this);
         compute_checksum.checksum_type (the_content_checksum_type);
 
-        connect (compute_checksum, ComputeChecksum.done,
-            this, PropagateDownloadFile.on_signal_content_checksum_computed);
+        connect (
+            compute_checksum, ComputeChecksum.done,
+            this, PropagateDownloadFile.on_signal_content_checksum_computed
+        );
         compute_checksum.start (this.tmp_file.filename ());
     }
 
@@ -759,8 +771,8 @@ public class PropagateDownloadFile : PropagateItemJob {
     /***********************************************************
     ***********************************************************/
     public new void abort (PropagatorJob.AbortType abort_type)  {
-        if (this.job && this.job.reply ())
-            this.job.reply ().abort ();
+        if (this.get_file_job && this.get_file_job.reply ())
+            this.get_file_job.reply ().abort ();
 
         if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
             /* emit */ signal_abort_finished ();
@@ -771,7 +783,7 @@ public class PropagateDownloadFile : PropagateItemJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_download_progress (int64 received, int64 value) {
-        if (!this.job)
+        if (!this.get_file_job)
             return;
         this.download_progress = received;
         propagator ().report_progress (*this.item, this.resume_start + received);
@@ -872,8 +884,10 @@ public class PropagateDownloadFile : PropagateItemJob {
             GLib.debug (this.item.file + " may not need download; computing checksum.");
             var compute_checksum = new ComputeChecksum (this);
             compute_checksum.checksum_type (parse_checksum_header_type (this.item.checksum_header));
-            connect (compute_checksum, ComputeChecksum.done,
-                this, PropagateDownloadFile.on_signal_conflict_checksum_computed);
+            connect (
+                compute_checksum, ComputeChecksum.done,
+                this, PropagateDownloadFile.on_signal_conflict_checksum_computed
+            );
             propagator ().active_job_list.append (this);
             compute_checksum.start (propagator ().full_local_path (this.item.file));
             return;

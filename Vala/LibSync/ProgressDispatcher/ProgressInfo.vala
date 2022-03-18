@@ -256,7 +256,7 @@ public class ProgressInfo : GLib.Object {
     Triggers the update () slot every second once propagation
     started.
     ***********************************************************/
-    private QTimer update_estimates_timer;
+    private GLib.Timeout update_estimates_timer;
 
     /***********************************************************
     ***********************************************************/
@@ -300,7 +300,10 @@ public class ProgressInfo : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public ProgressInfo () {
-        connect (&this.update_estimates_timer, QTimer.timeout, this, ProgressInfo.on_signal_update_estimates);
+        connect (
+            this.update_estimates_timer, GLib.Timeout.timeout,
+            this, ProgressInfo.on_signal_update_estimates
+        );
         reset ();
     }
 

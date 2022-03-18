@@ -13,7 +13,7 @@ Copyright (C) 2014 by Olivier Goffart <ogoffart@woboq.com
 //  #include <QtWidgets/QAction>
 //  #include <QtWidgets/QMenu>
 //  #include <QtCore/GLib.Dir>
-//  #include <QtCore/QTimer>
+//  #include <QtCore/GLib.Timeout>
 //  #include <QtCore/QEventLoop>
 
 public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
@@ -62,7 +62,7 @@ public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
             this,
             on_signal_helper_commad_received
         );
-        QTimer.singleShot (100, loop, SLOT (quit ())); // add a timeout to be sure we don't freeze dolphin
+        GLib.Timeout.singleShot (100, loop, SLOT (quit ())); // add a timeout to be sure we don't freeze dolphin
         helper.send_command ("GET_MENU_ITEMS:" + files + "\n");
         loop.exec (QEventLoop.ExcludeUserInputEvents);
         disconnect (con);

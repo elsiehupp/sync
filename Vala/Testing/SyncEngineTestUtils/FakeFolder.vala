@@ -83,7 +83,7 @@ public class FakeFolder : GLib.Object {
 
 
     void on_signal_sync_engine_about_to_remove_all_files (Occ.SyncFileItem.Direction direction, Callback callback) {
-        QTimer.single_shot (
+        GLib.Timeout.single_shot (
             1 * 1000,
             this.sync_engine.get (),
             this.on_timer_finished

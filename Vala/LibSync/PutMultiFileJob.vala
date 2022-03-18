@@ -58,8 +58,10 @@ public class PutMultiFileJob : AbstractNetworkJob {
         this.body.content_type (QHttpMultiPart.Related_type);
         foreach (var single_device in this.devices) {
             single_device.device.parent (this);
-            connect (this, PutMultiFileJob.signal_upload_progress,
-                    single_device.device, UploadDevice.on_signal_job_upload_progress);
+            connect (
+                this, PutMultiFileJob.signal_upload_progress,
+                single_device.device, UploadDevice.on_signal_job_upload_progress
+            );
         }
     }
 
@@ -85,12 +87,18 @@ public class PutMultiFileJob : AbstractNetworkJob {
 
         send_request ("POST", this.url, request, this.body);
 
-        if (reply ().error () != Soup.Reply.NoError) {
-            GLib.warning (" Network error: " + reply ().error_string ());
+        if (this.reply.error () != Soup.Reply.NoError) {
+            GLib.warning (" Network error: " + this.reply.error_string ());
         }
 
-        connect (reply (), Soup.Reply.signal_upload_progress, this, PutMultiFileJob.signal_upload_progress);
-        connect (this, AbstractNetworkJob.signal_network_activity, account, Account.signal_propagator_network_activity);
+        connect (
+            this.reply, Soup.Reply.signal_upload_progress,
+            this, PutMultiFileJob.signal_upload_progress
+        );
+        connect (
+            this, AbstractNetworkJob.signal_network_activity,
+            account, Account.signal_propagator_network_activity
+        );
         this.request_timer.start ();
         AbstractNetworkJob.start ();
     }
@@ -103,10 +111,10 @@ public class PutMultiFileJob : AbstractNetworkJob {
             one_device.device.close ();
         }
 
-        GLib.info ("POST of" + reply ().request ().url.to_string () + path () + " finished with status "
+        GLib.info ("POST of" + this.reply.request ().url.to_string () + path () + " finished with status "
                 + reply_status_string ()
-                + reply ().attribute (Soup.Request.HttpStatusCodeAttribute)
-                + reply ().attribute (Soup.Request.HttpReasonPhraseAttribute));
+                + this.reply.attribute (Soup.Request.HttpStatusCodeAttribute)
+                + this.reply.attribute (Soup.Request.HttpReasonPhraseAttribute));
 
         /* emit */ signal_finished ();
         return true;

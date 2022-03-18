@@ -30,9 +30,8 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
         this.account = account;
         this.ui.up_ui (this);
         register_field ("source_folder*", this.ui.local_folder_line_edit);
-        connect (
-            this.ui.local_folder_choose_btn, QAbstractButton.clicked,
-            this, FolderWizardLocalPath.on_signal_choose_local_folder
+        this.ui.local_folder_choose_btn.clicked.connect (
+            this.on_signal_choose_local_folder
         );
         this.ui.local_folder_choose_btn.tool_tip (_("Click to select a local folder to sync."));
 

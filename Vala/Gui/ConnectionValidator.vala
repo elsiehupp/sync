@@ -271,7 +271,7 @@ public class ConnectionValidator : GLib.Object {
         }
 
         // now check the authentication
-        QTimer.single_shot (0, this, ConnectionValidator.on_signal_check_authentication);
+        GLib.Timeout.single_shot (0, this, ConnectionValidator.on_signal_check_authentication);
     }
 
 

@@ -8,13 +8,11 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 //  #include <QDesktopServices>
 //  #include <Gtk.Application>
 //  #include <QClipboard>
-//  #include <QTimer>
 //  #include <QBuffer>
 //  #include <QJsonObject>
 //  #include <QJsonDocument>
 
 //  #include <QPointer>
-//  #include <QTimer>
 
 namespace Occ {
 namespace Ui {
@@ -59,7 +57,7 @@ public class Flow2Auth : GLib.Object {
     private GLib.Uri login_url;
     private string poll_token;
     private string poll_endpoint;
-    private QTimer poll_timer;
+    private GLib.Timeout poll_timer;
     private int64 seconds_left;
     private int64 seconds_interval;
     private bool is_busy;
@@ -89,9 +87,8 @@ public class Flow2Auth : GLib.Object {
         this.is_busy = false;
         this.has_token = false;
         this.poll_timer.interval (1000);
-        connect (
-            this.poll_timer, QTimer.timeout,
-            this, Flow2Auth.on_signal_poll_timer_timeout
+        this.poll_timer.timeout.connect (
+            this.on_signal_poll_timer_timeout
         );
     }
 
@@ -126,14 +123,11 @@ public class Flow2Auth : GLib.Object {
         req.header (Soup.Request.ContentLengthHeader, "0");
         req.header (Soup.Request.UserAgentHeader, Utility.friendly_user_agent_string ());
 
-        var job = this.account.send_request ("POST", url, req);
-        job.on_signal_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
+        var simple_network_job = this.account.send_request ("POST", url, req);
+        simple_network_job.on_signal_timeout (q_min (30 * 1000ll, simple_network_job.timeout_msec ()));
 
-        connect (
-            job,
-            SimpleNetworkJob.finished_signal,
-            this,
-            on_network_job_finished
+        simple_network_job.signal_finished.connect (
+            this.on_network_job_finished
         );
     }
 
@@ -164,13 +158,13 @@ public class Flow2Auth : GLib.Object {
             string error_from_json = json["error"].to_string ();
             if (!error_from_json == "") {
                 error_reason = _("Error returned from the server : <em>%1</em>")
-                                  .printf (error_from_json.to_html_escaped ());
+                    .printf (error_from_json.to_html_escaped ());
             } else if (reply.error () != Soup.Reply.NoError) {
                 error_reason = _("There was an error accessing the \"token\" endpoint : <br><em>%1</em>")
-                                  .printf (reply.error_string ().to_html_escaped ());
+                    .printf (reply.error_string ().to_html_escaped ());
             } else if (json_parse_error.error != QJsonParseError.NoError) {
                 error_reason = _("Could not parse the JSON returned from the server : <br><em>%1</em>")
-                                  .printf (json_parse_error.error_string ());
+                    .printf (json_parse_error.error_string ());
             } else {
                 error_reason = _("The reply from the server did not contain all expected fields");
             }
@@ -252,8 +246,9 @@ public class Flow2Auth : GLib.Object {
     ***********************************************************/
     public void on_signal_poll_now () {
         // poll now if we're not already doing so
-        if (this.is_busy || !this.has_token)
+        if (this.is_busy || !this.has_token) {
             return;
+        }
 
         this.seconds_left = 1;
         on_signal_poll_timer_timeout ();
@@ -284,21 +279,18 @@ public class Flow2Auth : GLib.Object {
         QUrlQuery arguments = new QUrlQuery ("token=%1".printf (this.poll_token));
         request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
 
-        var job = this.account.send_request ("POST", this.poll_endpoint, req, request_body);
-        job.on_signal_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
+        var simple_network_job = this.account.send_request ("POST", this.poll_endpoint, req, request_body);
+        simple_network_job.on_signal_timeout (q_min (30 * 1000ll, simple_network_job.timeout_msec ()));
 
-        connect (
-            job,
-            SimpleNetworkJob.finished_signal,
-            this,
-            on_signal_simple_finished
+        simple_network_job.signal_finished.connect (
+            this.on_signal_simple_network_job_finished
         );
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_simple_finished (Soup.Reply reply) {
+    private void on_signal_simple_network_job_finished (Soup.Reply reply) {
         var json_data = reply.read_all ();
         QJsonParseError json_parse_error;
         QJsonObject json = QJsonDocument.from_json (json_data, json_parse_error).object ();

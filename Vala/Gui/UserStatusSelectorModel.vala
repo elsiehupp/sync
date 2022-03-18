@@ -305,35 +305,20 @@ public class UserStatusSelectorModel : GLib.Object {
             return;
         }
 
-        connect (
-            this.user_status_connector.get (),
-            UserStatusConnector.signal_user_status_fetched,
-            this,
-            UserStatusSelectorModel.on_signal_user_status_fetched
+        this.user_status_connector.get ().signal_user_status_fetched.connect (
+            this.on_signal_user_status_fetched
         );
-        connect (
-            this.user_status_connector.get (),
-            UserStatusConnector.signal_predefined_statuses_fetched,
-            this,
-            UserStatusSelectorModel.on_signal_predefined_statuses_fetched
+        this.user_status_connector.get ().signal_predefined_statuses_fetched.connect (
+            this.on_signal_predefined_statuses_fetched
         );
-        connect (
-            this.user_status_connector.get (),
-            UserStatusConnector.error,
-            this,
-            UserStatusSelectorModel.on_signal_error
+        this.user_status_connector.get ().error.connect (
+            this.on_signal_error
         );
-        connect (
-            this.user_status_connector.get (),
-            UserStatusConnector.signal_user_status_set,
-            this,
-            UserStatusSelectorModel.on_signal_user_status_set
+        this.user_status_connector.get ().signal_user_status_set.connect (
+            this.on_signal_user_status_set
         );
-        connect (
-            this.user_status_connector.get (),
-            UserStatusConnector.message_cleared,
-            this,
-            UserStatusSelectorModel.on_signal_message_cleared
+        this.user_status_connector.get ().message_cleared.connect (
+            this.on_signal_message_cleared
         );
 
         this.user_status_connector.fetch_user_status ();

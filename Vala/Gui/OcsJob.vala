@@ -192,16 +192,16 @@ public class OcsJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private override bool on_signal_finished () {
-        const string reply_data = reply ().read_all ();
+        const string reply_data = this.reply.read_all ();
 
         QJsonParseError error;
         string message;
         int status_code = 0;
         var json = QJsonDocument.from_json (reply_data, error);
 
-        // when it is null we might have a 304 so get status code from reply () and gives a warning...
+        // when it is null we might have a 304 so get status code from this.reply and gives a warning...
         if (error.error != QJsonParseError.NoError) {
-            status_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+            status_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             GLib.warning ("Could not parse reply to "
                         + this.verb
                         + Utility.concat_url_path (account.url, path ())
@@ -223,8 +223,8 @@ public class OcsJob : AbstractNetworkJob {
 
         } else {
             // save new ETag value
-            if (reply ().raw_header_list ().contains ("ETag"))
-                /* emit */ etag_response_header_received (reply ().raw_header ("ETag"), status_code);
+            if (this.reply.raw_header_list ().contains ("ETag"))
+                /* emit */ etag_response_header_received (this.reply.raw_header ("ETag"), status_code);
 
             /* emit */ signal_job_finished (json, status_code);
         }

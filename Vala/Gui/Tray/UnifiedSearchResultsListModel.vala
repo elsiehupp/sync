@@ -100,7 +100,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private QTimer unified_search_text_editing_finished_timer;
+    private GLib.Timeout unified_search_text_editing_finished_timer;
 
     /***********************************************************
     ***********************************************************/
@@ -525,7 +525,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
         clear_current_fetch_more_in_progress_provider_id ();
 
-        disconnect (this.unified_search_text_editing_finished_timer, QTimer.timeout, this,
+        disconnect (this.unified_search_text_editing_finished_timer, GLib.Timeout.timeout, this,
             &UnifiedSearchResultsListModel.on_signal_search_term_editing_finished);
 
         if (this.unified_search_text_editing_finished_timer.is_active ()) {
@@ -535,7 +535,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
         if (!this.search_term == "") {
             this.unified_search_text_editing_finished_timer.interval (SEARCH_TERM_EDITING_FINISHED_SEARCH_START_DELAY);
             connect (
-                this.unified_search_text_editing_finished_timer, QTimer.timeout,
+                this.unified_search_text_editing_finished_timer, GLib.Timeout.timeout,
                 this, UnifiedSearchResultsListModel.on_signal_search_term_editing_finished
             );
             this.unified_search_text_editing_finished_timer.on_signal_start ();
@@ -553,7 +553,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
     ***********************************************************/
     private void on_signal_search_term_editing_finished () {
         disconnect (
-            this.unified_search_text_editing_finished_timer, QTimer.timeout,
+            this.unified_search_text_editing_finished_timer, GLib.Timeout.timeout,
             this, UnifiedSearchResultsListModel.on_signal_search_term_editing_finished);
 
         if (!this.account_state || !this.account_state.account) {

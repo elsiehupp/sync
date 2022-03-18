@@ -38,29 +38,17 @@ public class RemoteWipe : GLib.Object {
         this.network_manager = null;
         this.network_reply_check = null;
         this.network_reply_success = null;
-        connect (
-            AccountManager.instance,
-            AccountManager.on_signal_account_removed,
-            this,
+        AccountManager.instance.signal_account_removed.connect (
             this.on_signal_account_removed
         );
-        connect (
-            this,
-            RemoteWipe.signal_authorized,
-            FolderMan.instance,
-            FolderMan.on_signal_wipe_folder_for_account
+        this.signal_authorized.connect (
+            FolderMan.instance.on_signal_wipe_folder_for_account
         );
-        connect (
-            FolderMan.instance,
-            FolderMan.signal_wipe_done,
-            this,
-            RemoteWipe.on_signal_notify_server_success_job
+        FolderMan.instance.signal_wipe_done.connect (
+            this.on_signal_notify_server_success_job
         );
-        connect (
-            this.account,
-            Account.app_password_retrieved,
-            this,
-            RemoteWipe.on_signal_start_check_job_with_app_password
+        this.account.app_password_retrieved.connect (
+            this.on_signal_start_check_job_with_app_password
         );
     }
 
@@ -107,17 +95,11 @@ public class RemoteWipe : GLib.Object {
         QUrlQuery arguments = new QUrlQuery ("token=%1".printf (this.app_password));
         request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
         this.network_reply_check = this.network_manager.post (request, request_body);
-        connect (
-            this.network_manager,
-            ssl_errors, // (Soup.Reply reply, GLib.List<QSslError> error_list),
-            this.account,
-            on_signal_handle_ssl_errors // (Soup.Reply reply, GLib.List<QSslError> error_list)
+        this.network_manager.ssl_errors.connect ( // (Soup.Reply reply, GLib.List<QSslError> error_list),
+            this.account.on_signal_handle_ssl_errors // (Soup.Reply reply, GLib.List<QSslError> error_list)
         );
-        connect (
-            this.network_reply_check,
-            Soup.Reply.on_signal_finished,
-            this,
-            RemoteWipe.on_signal_check_job_slot
+        this.network_reply_check.signal_finished.connect (
+            this.on_signal_check_job_slot
         );
     }
 
@@ -210,11 +192,9 @@ public class RemoteWipe : GLib.Object {
             QUrlQuery arguments = new QUrlQuery ("token=%1".printf (this.app_password));
             request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
             this.network_reply_success = this.network_manager.post (request, request_body);
-            connect (
-                this.network_reply_success,
-                Soup.Reply.on_signal_finished,
-                this,
-                RemoteWipe.on_signal_notify_server_success_job_slot);
+            this.network_reply_success.on_signal_finished.connect (
+                this.on_signal_notify_server_success_job_slot
+            );
         }
     }
 

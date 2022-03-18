@@ -9,7 +9,6 @@ Copyright (C) 2014 by Olivier Goffart <ogoffart@woboq.com
 //  #include <QtNetwork/QLocalSocket>
 //  #include <KIOCore/kfileitem.h>
 //  #include <GLib.Dir>
-//  #include <QTimer>
 
 public class OwncloudDolphinPlugin : KOverlayIconPlugin {
 
@@ -22,8 +21,10 @@ public class OwncloudDolphinPlugin : KOverlayIconPlugin {
     ***********************************************************/
     public OwncloudDolphinPlugin () {
         var helper = OwncloudDolphinPluginHelper.instance;
-        GLib.Object.connect (helper, &OwncloudDolphinPluginHelper.signal_command_received,
-                         this, &OwncloudDolphinPlugin.slotCommandRecieved);
+        connect (
+            helper, OwncloudDolphinPluginHelper.signal_command_received,
+            this, OwncloudDolphinPlugin.slotCommandRecieved
+        );
     }
 
 

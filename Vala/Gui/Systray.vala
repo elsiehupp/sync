@@ -165,24 +165,18 @@ public class Systray : QSystemTrayIcon {
         context_menu.add_action (_("Exit %1").printf (Theme.app_name_gui), this, Systray.signal_shutdown);
         context_menu (context_menu);
 
-        connect (
-            context_menu,
-            QMenu.about_to_show,
+        context_menu.about_to_show.connect (
             on_signal_context_menu_about_to_show
         );
 
-        connect (
-            UserModel.instance, UserModel.signal_new_user_selected,
-            this, Systray.on_signal_new_user_selected
+        UserModel.instance.signal_new_user_selected.connect (
+            this.on_signal_new_user_selected
         );
-        connect (
-            UserModel.instance, UserModel.signal_add_account,
-            this, Systray.signal_open_account_wizard
+        UserModel.instance.signal_add_account.connect (
+            this.signal_open_account_wizard
         );
-
-        connect (
-            AccountManager.instance, AccountManager.signal_account_added,
-            this, Systray.show_window
+        AccountManager.instance.signal_account_added.connect (
+            this.show_window
         );
     }
 

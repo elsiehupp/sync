@@ -40,19 +40,19 @@ public class DeleteApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private bool on_signal_finished () {
-        GLib.info ("JsonApiJob of" + reply ().request ().url
-            + " finished with status " + reply ().error ()
-            + (reply ().error () == Soup.Reply.NoError ? "" : error_string ()));
+        GLib.info ("JsonApiJob of" + this.reply.request ().url
+            + " finished with status " + this.reply.error ()
+            + (this.reply.error () == Soup.Reply.NoError ? "" : error_string ()));
 
-        int http_status = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        int http_status = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
 
-        if (reply ().error () != Soup.Reply.NoError) {
+        if (this.reply.error () != Soup.Reply.NoError) {
             GLib.warning ("Network error: " + path () + error_string () + http_status);
             /* emit */ signal_result (http_status);
             return true;
         }
 
-        var reply_data = string.from_utf8 (reply ().read_all ());
+        var reply_data = string.from_utf8 (this.reply.read_all ());
         GLib.info ("TMX Delete Job " + reply_data);
         /* emit */ signal_result (http_status);
         return true;

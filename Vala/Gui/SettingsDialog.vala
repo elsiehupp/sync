@@ -76,7 +76,7 @@ public class SettingsDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private QAction_group action_group;
+    private GLib.ActionGroup action_group;
 
     /***********************************************************
     Maps the actions from the action group to the corresponding
@@ -118,9 +118,8 @@ public class SettingsDialog : Gtk.Dialog {
         // People perceive this as a Window, so also make Ctrl+W work
         var close_window_action = new QAction (this);
         close_window_action.shortcut (QKeySequence ("Ctrl+W"));
-        connect (
-            close_window_action, QAction.triggered,
-            this, SettingsDialog.accept
+        close_window_action.triggered.connect (
+            this.accept
         );
         add_action (close_window_action);
 
@@ -129,20 +128,17 @@ public class SettingsDialog : Gtk.Dialog {
         // : This name refers to the application name e.g Nextcloud
         window_title (_("%1 Settings").printf (Theme.app_name_gui));
 
-        connect (
-            AccountManager.instance, AccountManager.signal_account_added,
-            this, SettingsDialog.signal_account_added
+        AccountManager.instance.signal_account_added.connect (
+            this.signal_account_added
         );
-        connect (
-            AccountManager.instance, AccountManager.on_signal_account_removed,
-            this, SettingsDialog.on_signal_account_removed
+        AccountManager.instance.on_signal_account_removed.connect (
+            this.on_signal_account_removed
         );
 
-        this.action_group = new QAction_group (this);
+        this.action_group = new GLib.ActionGroup (this);
         this.action_group.exclusive (true);
-        connect (
-            this.action_group, QAction_group.triggered,
-            this, SettingsDialog.on_signal_switch_page
+        this.action_group.triggered.connect (
+            this.on_signal_switch_page
         );
 
         // Adds space between users + activities and general + network actions
@@ -158,9 +154,8 @@ public class SettingsDialog : Gtk.Dialog {
         this.ui.stack.add_widget (general_settings);
 
         // Connect signal_style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
-        connect (
-            this, SettingsDialog.signal_style_changed,
-            general_settings, GeneralSettings.on_signal_style_changed
+        this.signal_style_changed.connect (
+            general_settings.on_signal_style_changed
         );
 
         QAction network_action = create_color_aware_action (":/client/theme/network.svg", _("Network"));
@@ -176,27 +171,24 @@ public class SettingsDialog : Gtk.Dialog {
             signal_account_added (account_instance);
         }
 
-        QTimer.single_shot (1, this, SettingsDialog.show_first_page);
+        GLib.Timeout.single_shot (1, this, SettingsDialog.show_first_page);
 
         var show_log_window = new QAction (this);
         show_log_window.shortcut (QKeySequence ("F12"));
-        connect (
-            show_log_window, QAction.triggered,
-            gui, OwncloudGui.on_signal_toggle_log_browser
+        show_log_window.triggered.connect (
+            gui.on_signal_toggle_log_browser
         );
         add_action (show_log_window);
 
         var show_log_window2 = new QAction (this);
         show_log_window2.shortcut (QKeySequence (Qt.CTRL + Qt.Key_L));
-        connect (
-            show_log_window2, QAction.triggered, gui,
-            OwncloudGui.on_signal_toggle_log_browser
+        show_log_window2.triggered.connect (
+            gui.on_signal_toggle_log_browser
         );
         add_action (show_log_window2);
 
-        connect (
-            this, SettingsDialog.on_signal_activate,
-            gui, OwncloudGui.on_signal_settings_dialog_activated
+        this.on_signal_activate.connect (
+            gui.on_signal_settings_dialog_activated
         );
 
         customize_style ();
@@ -322,13 +314,13 @@ public class SettingsDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private void signal_account_added (AccountState s) {
+    private void signal_account_added (AccountState account_state) {
         var height = this.tool_bar.size_hint ().height ();
         bool branding_single_account = !Theme.multi_account;
 
         QAction account_action = null;
-        Gtk.Image avatar = s.account.avatar ();
-        const string action_text = branding_single_account ? _("Account") : s.account.display_name ();
+        Gtk.Image avatar = account_state.account.avatar ();
+        const string action_text = branding_single_account ? _("Account") : account_state.account.display_name ();
         if (avatar.is_null ()) {
             account_action = create_color_aware_action (":/client/theme/account.svg",
                 action_text);
@@ -338,60 +330,54 @@ public class SettingsDialog : Gtk.Dialog {
         }
 
         if (!branding_single_account) {
-            account_action.tool_tip (s.account.display_name ());
-            account_action.icon_text (short_display_name_for_settings (s.account, static_cast<int> (height * BUTTON_SIZE_RATIO)));
+            account_action.tool_tip (account_state.account.display_name ());
+            account_action.icon_text (short_display_name_for_settings (account_state.account, static_cast<int> (height * BUTTON_SIZE_RATIO)));
         }
 
         this.tool_bar.insert_action (this.tool_bar.actions ().at (0), account_action);
-        var account_settings = new AccountSettings (s, this);
+        var account_settings = new AccountSettings (account_state, this);
         string object_name = "account_settings_";
-        object_name += s.account.display_name ();
+        object_name += account_state.account.display_name ();
         account_settings.object_name (object_name);
         this.ui.stack.insert_widget (0 , account_settings);
 
         this.action_group.add_action (account_action);
         this.action_group_widgets.insert (account_action, account_settings);
-        this.action_for_account.insert (s.account, account_action);
+        this.action_for_account.insert (account_state.account, account_action);
         account_action.trigger ();
 
-        connect (
-            account_settings, AccountSettings.signal_folder_changed,
-            this.gui, OwncloudGui.on_signal_folders_changed
+        account_settings.signal_folder_changed.connect (
+            this.gui.on_signal_folders_changed
         );
-        connect (
-            account_settings, AccountSettings.signal_open_folder_alias,
-            this.gui, OwncloudGui.on_signal_folder_open_action
+        account_settings.signal_open_folder_alias.connect (
+            this.gui.on_signal_folder_open_action
         );
-        connect (
-            account_settings, AccountSettings.on_signal_show_issues_list,
-            this, SettingsDialog.on_signal_show_issues_list
+        account_settings.signal_show_issues_list.connect (
+            this.on_signal_show_issues_list
         );
-        connect (
-            s.account, Account.account_changed_avatar,
-            this, SettingsDialog.on_signal_account_avatar_changed
+        account_state.account.account_changed_avatar.connect (
+            this.on_signal_account_avatar_changed
         );
-        connect (
-            s.account, Account.account_changed_display_name,
-            this, SettingsDialog.on_signal_account_display_name_changed
+        account_state.account.account_changed_display_name.connect (
+            this.on_signal_account_display_name_changed
         );
 
         // Connect signal_style_changed event, to adapt (Dark-/Light-Mode switching)
-        connect (
-            this, SettingsDialog.signal_style_changed,
-            account_settings, AccountSettings.on_signal_style_changed
+        this.signal_style_changed.connect (
+            account_settings.on_signal_style_changed
         );
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_account_removed (AccountState s) {
+    private void on_signal_account_removed (AccountState account_state) {
         for (var it = this.action_group_widgets.begin (); it != this.action_group_widgets.end (); ++it) {
             var as = qobject_cast<AccountSettings> (*it);
             if (!as) {
                 continue;
             }
-            if (as.on_signal_accounts_state () == s) {
+            if (as.on_signal_accounts_state () == account_state) {
                 this.tool_bar.remove_action (it.key ());
 
                 if (this.ui.stack.current_widget () == it.value ()) {
@@ -405,8 +391,8 @@ public class SettingsDialog : Gtk.Dialog {
             }
         }
 
-        if (this.action_for_account.contains (s.account)) {
-            this.action_for_account.remove (s.account);
+        if (this.action_for_account.contains (account_state.account)) {
+            this.action_for_account.remove (account_state.account);
         }
 
         // Hide when the last account is deleted. We want to enter the same

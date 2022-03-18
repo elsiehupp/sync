@@ -45,11 +45,9 @@ public class OcsShareJob : OcsJob {
     public OcsShareJob (unowned Account account) {
         base (account);
         path ("ocs/v2.php/apps/files_sharing/api/v1/shares");
-        connect (
-            this,
-            OcsJob.signal_job_finished,
-            this,
-            OcsShareJob.on_signal_job_finished);
+        this.signal_job_finished.connect (
+            this.on_signal_job_finished
+        );
     }
 
 

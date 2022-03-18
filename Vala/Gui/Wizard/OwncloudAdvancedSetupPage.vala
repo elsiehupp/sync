@@ -7,7 +7,6 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
 //  #include <GLib.Dir>
 //  #include <QFileDialog>
-//  #include <QTimer>
 //  #include <QStorageInfo>
 //  #include <Gtk.MessageBox>
 //  #include <QJsonObject>
@@ -163,7 +162,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         update_status ();
 
         // ensure "next" gets the focus, not ob_select_local_folder
-        QTimer.single_shot (0, wizard ().button (QWizard.FinishButton), Gtk.Widget.focus);
+        GLib.Timeout.single_shot (0, wizard ().button (QWizard.FinishButton), Gtk.Widget.focus);
 
         var acc = static_cast<OwncloudWizard> (wizard ()).account;
         var quota_job = new PropfindJob (acc, this.remote_folder, this);
@@ -182,7 +181,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
                 "/"
             };
             radio_checked (this.ui.r_selective_sync);
-            QTimer.single_shot (0, this, OwncloudAdvancedSetupPage.on_signal_selective_sync_clicked);
+            GLib.Timeout.single_shot (0, this, OwncloudAdvancedSetupPage.on_signal_selective_sync_clicked);
         }
 
         ConfigFile config_file;

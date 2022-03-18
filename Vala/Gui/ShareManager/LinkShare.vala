@@ -58,7 +58,7 @@ public class LinkShare : Share {
         Set the note of the link share.
         ***********************************************************/
         public set {
-            create_share_job (LinkShare.on_signal_note_set).note (identifier (), value);
+            create_share_job (LinkShare.on_signal_link_share_note_set).note (identifier (), value);
         }
     }
 
@@ -106,7 +106,7 @@ public class LinkShare : Share {
         Set the label of the share link.
         ***********************************************************/
         public set {
-            create_share_job (LinkShare.on_signal_label_set).label (identifier (), value);
+            create_share_job (LinkShare.on_signal_link_share_label_set).label (identifier (), value);
         }
     }
 
@@ -169,28 +169,27 @@ public class LinkShare : Share {
     }
 
 
+    delegate void OnSignalOcsShareJobFinished
+
+
     /***********************************************************
     Create OcsShareJob and connect to signal/slots
-
-    public template <typename Link_share_slot>
     ***********************************************************/
-    public OcsShareJob create_share_job (Link_share_slot on_signal_function) {
-        var job = new OcsShareJob (this.account);
-        connect (
-            job, OcsShareJob.share_job_finished,
-            this, on_signal_function
+    public OcsShareJob create_share_job (OnSignalOcsShareJobFinished on_signal_ocs_share_job_finished) {
+        var ocs_share_job = new OcsShareJob (this.account);
+        ocs_share_job.signal_share_job_finished.connect (
+            this.on_signal_ocs_share_job_finished
         );
-        connect (
-            job, OcsJob.ocs_error, this,
-            LinkShare.on_signal_ocs_error
+        ocs_share_job.ocs_error.connect (
+            this.on_signal_ocs_share_job_error
         );
-        return job;
+        return ocs_share_job;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_note_set (QJsonDocument reply, GLib.Variant value) {
+    private void on_signal_link_share_note_set (QJsonDocument reply, GLib.Variant value) {
         this.note = note.to_string ();
         /* emit */ signal_note_set ();
     }
@@ -224,7 +223,7 @@ public class LinkShare : Share {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_label_set (QJsonDocument reply, GLib.Variant value) {
+    private void on_signal_link_share_label_set (QJsonDocument reply, GLib.Variant value) {
         if (this.label != label.to_string ()) {
             this.label = label.to_string ();
             /* emit */ signal_label_set ();

@@ -137,29 +137,17 @@ public class CloudProviderWrapper : GLib.Object {
         action_group = action_group ();
         cloud_providers_account_exporter_action_group (this.cloud_provider_account, action_group);
 
-        connect (
-            ProgressDispatcher.instance,
-            signal_progress_info (string, ProgressInfo),
-            this,
-            on_signal_update_progress (string, ProgressInfo)
+        ProgressDispatcher.instance.signal_progress_info.connect (
+            this.on_signal_update_progress
         );
-        connect (
-            this.folder,
-            signal_sync_started (),
-            this,
-            on_signal_sync_started ()
+        this.folder.signal_sync_started.connect (
+            this.on_signal_sync_started
         );
-        connect (
-            this.folder,
-            signal_sync_finished (SyncResult),
-            this,
-            on_signal_sync_finished (SyncResult)
+        this.folder.signal_sync_finished.connect (
+            this.on_signal_sync_finished
         );
-        connect (
-            this.folder,
-            signal_sync_paused_changed (Folder, bool),
-            this,
-            on_signal_sync_paused_changed (Folder, bool)
+        this.folder.signal_sync_paused_changed.connect (
+            this.on_signal_sync_paused_changed
         );
 
         this.paused = this.folder.sync_paused ();

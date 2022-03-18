@@ -12,7 +12,7 @@ public class UpdaterScheduler : GLib.Object {
     /***********************************************************
     Timer for the regular update check
     ***********************************************************/
-    private QTimer update_check_timer;
+    private GLib.Timeout update_check_timer;
 
     internal signal void signal_updater_announcement (string title, string message);
     internal signal void signal_request_restart ();
@@ -23,7 +23,7 @@ public class UpdaterScheduler : GLib.Object {
         base (parent);
         connect (
             this.update_check_timer,
-            QTimer.timeout,
+            GLib.Timeout.timeout,
             this,
             UpdaterScheduler.on_signal_timer_fired
         );
@@ -46,7 +46,7 @@ public class UpdaterScheduler : GLib.Object {
         }
 
         // at startup, do a check in any case.
-        QTimer.single_shot (3000, this, UpdaterScheduler.on_signal_timer_fired);
+        GLib.Timeout.single_shot (3000, this, UpdaterScheduler.on_signal_timer_fired);
 
         ConfigFile config;
         var check_interval = config.update_check_interval ();

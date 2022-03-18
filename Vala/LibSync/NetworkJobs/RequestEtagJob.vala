@@ -41,8 +41,8 @@ public class RequestEtagJob : AbstractNetworkJob {
         // assumes ownership
         send_request ("PROPFIND", make_dav_url (path ()), request, buf);
 
-        if (reply ().error () != Soup.Reply.NoError) {
-            GLib.warning ("Request network error: " + reply ().error_string ());
+        if (this.reply.error () != Soup.Reply.NoError) {
+            GLib.warning ("Request network error: " + this.reply.error_string ());
         }
         AbstractNetworkJob.start ();
     }
@@ -51,13 +51,13 @@ public class RequestEtagJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private bool on_signal_finished () {
-        GLib.info ("Request Etag of" + reply ().request ().url
+        GLib.info ("Request Etag of" + this.reply.request ().url
             + " finished with status " +  reply_status_string ());
 
-        var http_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        var http_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (http_code == 207) {
             // Parse DAV response
-            QXmlStreamReader reader = new QXmlStreamReader (reply ());
+            QXmlStreamReader reader = new QXmlStreamReader (this.reply);
             reader.add_extra_namespace_declaration (QXmlStreamNamespaceDeclaration ("d", "DAV:"));
             string etag;
             while (!reader.at_end ()) {

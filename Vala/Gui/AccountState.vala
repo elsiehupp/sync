@@ -5,7 +5,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 ***********************************************************/
 
 //  #include <QSettings>
-//  #include <QTimer>
 //  #include <qfontmetrics.h>
 //  #include <QJsonDocumen
 //  #include <QJsonObject
@@ -508,7 +507,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
                 GLib.info ("AccountState reconnection: delaying for "
                     + this.maintenance_to_connected_delay + "ms.");
                 this.time_since_maintenance_over.on_signal_start ();
-                QTimer.single_shot (this.maintenance_to_connected_delay + 100, this, AccountState.on_signal_check_connectivity);
+                GLib.Timeout.single_shot (this.maintenance_to_connected_delay + 100, this, AccountState.on_signal_check_connectivity);
                 return;
             } else if (this.time_since_maintenance_over.elapsed () < this.maintenance_to_connected_delay) {
                 GLib.info ("AccountState reconnection: only"

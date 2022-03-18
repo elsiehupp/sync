@@ -14,7 +14,7 @@ To be
 \code
 this.job = new StorePrivateKeyApiJob
 this.job.private_key
-connect (this.job.
+this.job.connect (
 this.job.start
 \encode
 
@@ -72,13 +72,13 @@ public class StorePrivateKeyApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     protected bool on_signal_finished () {
-        int return_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        int return_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (return_code != 200)
             GLib.info ("Sending private key ended with "  + path () + error_string () + return_code);
 
         QJsonParseError error;
-        var json = QJsonDocument.from_json (reply ().read_all (), error);
-        /* emit */ signal_json_received (json, reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ());
+        var json = QJsonDocument.from_json (this.reply.read_all (), error);
+        /* emit */ signal_json_received (json, this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ());
         return true;
     }
 

@@ -52,9 +52,8 @@ public class SelectiveSyncDialog : Gtk.Dialog {
             this.ok_button.enabled (false);
         }
         // Make sure we don't get crashes if the folder is destroyed while we are still open
-        connect (
-            this.folder, GLib.Object.destroyed,
-            this, GLib.Object.delete_later
+        this.folder.destroyed.connect (
+            this.delete_later
         );
     }
 
@@ -133,15 +132,13 @@ public class SelectiveSyncDialog : Gtk.Dialog {
         layout.add_widget (this.selective_sync);
         var button_box = new QDialogButtonBox (Qt.Horizontal);
         this.ok_button = button_box.add_button (QDialogButtonBox.Ok);
-        connect (
-            this.ok_button, QPushButton.clicked,
-            this, SelectiveSyncDialog.accept
+        this.ok_button.clicked.connect (
+            this.accept
         );
         QPushButton button = null;
         button = button_box.add_button (QDialogButtonBox.Cancel);
-        connect (
-            button, QAbstractButton.clicked,
-            this, Gtk.Dialog.reject
+        button.clicked.connect (
+            this.reject
         );
         layout.add_widget (button_box);
     }

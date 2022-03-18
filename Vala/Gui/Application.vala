@@ -24,7 +24,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QApplicat
 //  #include <QPointe
 //  #include <QQueue>
-//  #include <QTimer>
 //  #include <QElapsedTimer>
 //  #include <QNetworkConfigurationManager>
 
@@ -146,7 +145,7 @@ public class Application : Gtk.Application {
 
     /***********************************************************
     ***********************************************************/
-    private QTimer check_connection_timer;
+    private GLib.Timeout check_connection_timer;
 
     /***********************************************************
     #if defined (WITH_CRASHREPORTER)
@@ -243,7 +242,7 @@ public class Application : Gtk.Application {
             return;
 
         if (this.quit_instance) {
-            QTimer.single_shot (0, Gtk.Application, Gtk.Application.quit);
+            GLib.Timeout.single_shot (0, Gtk.Application, Gtk.Application.quit);
             return;
         }
 
@@ -298,7 +297,7 @@ public class Application : Gtk.Application {
                     + "file at %1. Please make sure the file can be accessed by your user.")
                         .printf (ConfigFile ().config_file ()),
                     _("Quit %1").printf (Theme.app_name_gui));
-                QTimer.single_shot (0, Gtk.Application, SLOT (quit ()));
+                GLib.Timeout.single_shot (0, Gtk.Application, SLOT (quit ()));
                 return;
             }
         }
@@ -350,7 +349,7 @@ public class Application : Gtk.Application {
         this.check_connection_timer.interval (ConnectionValidator.DEFAULT_CALLING_INTERVAL_MILLISECONDS); // check for connection every 32 seconds.
         this.check_connection_timer.on_signal_start ();
         // Also check immediately
-        QTimer.single_shot (0, this, Application.on_signal_check_connection);
+        GLib.Timeout.single_shot (0, this, Application.on_signal_check_connection);
 
         // Can't use online_state_changed because it is always true on modern systems because of many interfaces
         this.network_configuration_manager.configuration_changed.connect (
@@ -615,7 +614,7 @@ public class Application : Gtk.Application {
                 this.version_only = true;
             } else if (option.ends_with (APPLICATION_DOTVIRTUALFILE_SUFFIX)) {
                 // virtual file, open iterator after the Folder were created (if the app is not terminated)
-                QTimer.single_shot (
+                GLib.Timeout.single_shot (
                     0,
                     this,
                     this.on_signal_open_virtual_file (option)
@@ -919,7 +918,7 @@ public class Application : Gtk.Application {
 
             box.exec ();
             if (box.clicked_button () != continue_btn) {
-                QTimer.single_shot (0, Gtk.Application, SLOT (quit ()));
+                GLib.Timeout.single_shot (0, Gtk.Application, SLOT (quit ()));
                 return false;
             }
 

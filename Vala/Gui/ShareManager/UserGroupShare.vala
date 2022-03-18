@@ -15,17 +15,11 @@ public class UserGroupShare : Share {
         }
         public set {
             var ocs_share_job = new OcsShareJob (this.account);
-            connect (
-                ocs_share_job,
-                OcsShareJob.share_job_finished,
-                this,
-                UserGroupShare.on_signal_note_set
+            ocs_share_job.share_job_finished.connect (
+                this.on_signal_link_share_note_set
             );
-            connect (
-                ocs_share_job,
-                OcsJob.ocs_error,
-                this,
-                UserGroupShare.signal_note_error
+            ocs_share_job.ocs_error.connect (
+                this.signal_note_error
             );
             ocs_share_job.note (identifier (), value);
         }
@@ -43,13 +37,11 @@ public class UserGroupShare : Share {
             }
 
             var ocs_share_job = new OcsShareJob (this.account);
-            connect (
-                ocs_share_job, OcsShareJob.share_job_finished,
-                this, UserGroupShare.on_signal_expire_date_set
+            ocs_share_job.share_job_finished.connect (
+                this.on_signal_expire_date_set
             );
-            connect (
-                ocs_share_job, OcsJob.ocs_error, this,
-                UserGroupShare.on_signal_ocs_error
+            ocs_share_job.ocs_error.connect (
+                this.on_signal_ocs_error
             );
             ocs_share_job.expire_date (identifier (), value);
         }
@@ -85,7 +77,7 @@ public class UserGroupShare : Share {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_note_set (QJsonDocument reply, GLib.Variant note) {
+    public void on_signal_link_share_note_set (QJsonDocument reply, GLib.Variant note) {
         this.note = note.to_string ();
         /* emit */ signal_note_set ();
     }

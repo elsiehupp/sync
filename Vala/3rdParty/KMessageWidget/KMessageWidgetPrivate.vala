@@ -50,13 +50,11 @@ public class KMessageWidgetPrivate {
 
         // Note: when changing the value 500, also update KMessageWidgetTest
         time_line = new QTimeLine (500, widget);
-        connect (
-            time_line, value_changed (double),
-            widget, on_time_line_changed (double)
+        time_line.value_changed.connect (
+            widget.on_time_line_changed
         );
-        connect (
-            time_line, finished (),
-            widget, on_time_line_finished ()
+        time_line.finished.connect (
+            widget.on_time_line_finished
         );
 
         content = new Gdk.Frame (widget);
@@ -72,23 +70,20 @@ public class KMessageWidgetPrivate {
         text_label = new Gtk.Label (content);
         text_label.set_size_policy (QSizePolicy.Expanding, QSizePolicy.Fixed);
         text_label.set_text_interaction_flags (Qt.TextBrowserInteraction);
-        connect (
-            text_label, Gtk.Label.link_activated,
-            widget, KMessageWidget.link_activated
+        text_label.link_activated.connect (
+            widget.link_activated
         );
-        connect (
-            text_label, Gtk.Label.link_hovered,
-            widget, KMessageWidget.link_hovered
+        text_label.link_hovered.connect (
+            widget.link_hovered
         );
 
         var close_action = new QAction (widget);
-        close_action.on_set_text (KMessageWidget._("&Close"));
-        close_action.set_tool_tip (KMessageWidget._("Close message"));
+        close_action.on_set_text (_("&Close"));
+        close_action.set_tool_tip (_("Close message"));
         close_action.on_signal_set_icon (Gtk.Icon (":/client/theme/close.svg")); // ivan : NC customization
 
-        connect (
-            close_action, QAction.triggered,
-            widget, KMessageWidget.on_signal_animated_hide
+        close_action.triggered.connect (
+            widget.on_signal_animated_hide
         );
 
         close_button = new QToolButton (content);

@@ -17,9 +17,9 @@ public class FakeChunkMoveReply : FakeReply {
         open (QIODevice.ReadOnly);
         file_info = perform (uploads_file_info, remote_root_file_info, request);
         if (!file_info) {
-            QTimer.single_shot (0, this, &FakeChunkMoveReply.respond_precondition_failed);
+            GLib.Timeout.single_shot (0, this, &FakeChunkMoveReply.respond_precondition_failed);
         } else {
-            QTimer.single_shot (0, this, &FakeChunkMoveReply.respond);
+            GLib.Timeout.single_shot (0, this, &FakeChunkMoveReply.respond);
         }
     }
 

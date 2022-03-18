@@ -6,11 +6,9 @@ Copyright (C) by Michael Schuster <michael@schuster.ms>
 ***********************************************************/
 
 //  #include <theme.h>
-//  #include <QTimer>
 //  #include <QJsonDocument
 //  #include <QJsonObje
 //  #include <QPointer>
-//  #include <QTimer>
 
 namespace Occ {
 namespace Ui {
@@ -69,7 +67,7 @@ public class UserInfo : GLib.Object {
     int64 last_quota_total_bytes { public get; private set; }
     int64 last_quota_used_bytes { public get; private set; }
 
-    private QTimer job_restart_timer;
+    private GLib.Timeout job_restart_timer;
 
     /***********************************************************
     The time at which the user info and quota was received last
@@ -114,13 +112,11 @@ public class UserInfo : GLib.Object {
         this.last_quota_total_bytes = 0;
         this.last_quota_used_bytes = 0;
         this.active = false;
-        connect (
-            account_state, AccountState.signal_state_changed,
-            this, UserInfo.on_signal_account_state_changed
+        account_state.signal_state_changed.connect (
+            this.on_signal_account_state_changed
         );
-        connect (
-            this.job_restart_timer, QTimer.timeout,
-            this, UserInfo.on_signal_fetch_info
+        this.job_restart_timer.timeout.connect (
+            this.on_signal_fetch_info
         );
         this.job_restart_timer.single_shot (true);
     }
@@ -141,13 +137,11 @@ public class UserInfo : GLib.Object {
         unowned Account account = this.account_state.account;
         this.json_api_job = new JsonApiJob (account, "ocs/v1.php/cloud/user", this);
         this.json_api_job.on_signal_timeout (20 * 1000);
-        connect (
-            this.json_api_job, JsonApiJob.json_received,
-            this, UserInfo.on_signal_update_last_info
+        this.json_api_job.json_received.connect (
+            this.on_signal_update_last_info
         );
-        connect (
-            this.json_api_job, AbstractNetworkJob.network_error,
-            this, UserInfo.on_signal_request_failed
+        this.json_api_job.network_error.connect (
+            this.on_signal_request_failed
         );
         this.json_api_job.on_signal_start ();
     }
@@ -188,9 +182,8 @@ public class UserInfo : GLib.Object {
         if (this.fetch_avatar_image) {
             var avatar_job = new AvatarJob (account, account.dav_user (), 128, this);
             avatar_job.on_signal_timeout (20 * 1000);
-            connect (
-                avatar_job, AvatarJob.avatar_pixmap,
-                this, UserInfo.on_signal_avatar_image
+            avatar_job.avatar_pixmap.connect (
+                this.on_signal_avatar_image
             );
             avatar_job.on_signal_start ();
         }

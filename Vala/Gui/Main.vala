@@ -17,7 +17,6 @@ Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
 //  #if defined (BUILD_UPDATER)
 //  #endif
 
-//  #include <QTimer>
 //  #include <Gtk.MessageBox>
 //  #include <QDebug>
 //  #include <QQuick_style>
@@ -163,7 +162,7 @@ int main (int argc, char **argv) {
                 if (desktop_session != "ubuntu") {
                     GLib.info ("System tray still not available; showing window and trying again later.");
                     app.show_main_dialog ();
-                    QTimer.single_shot (10000, app, Application.on_signal_try_tray_again);
+                    GLib.Timeout.single_shot (10000, app, Application.on_signal_try_tray_again);
                 } else {
                     GLib.info ("System tray still not available; but assuming it's fine on 'ubuntu' desktop.");
                 }

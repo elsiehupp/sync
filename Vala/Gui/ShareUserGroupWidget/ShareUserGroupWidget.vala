@@ -29,7 +29,7 @@ Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
 //  #include <cstring>
 //  #include <Gtk.Dialog
 //  #include <Gtk.Wid
-//  #include <QTimer>
+//  #include <GLib.Timeout>
 //  #include <qpushbutton.h>
 //  #include <qscrollarea.h>
 
@@ -58,7 +58,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
     ***********************************************************/
     private QCompleter completer;
     private ShareeModel completer_model;
-    private QTimer completion_timer;
+    private GLib.Timeout completion_timer;
 
     /***********************************************************
     ***********************************************************/
@@ -108,15 +108,16 @@ public class ShareUserGroupWidget : Gtk.Widget {
 
         this.completer = new QCompleter (this);
         this.completer_model = new ShareeModel (this.account,
-            this.is_file ? "file" : "folder",
-            this.completer);
-        connect (
-            this.completer_model, ShareeModel.signal_sharees_ready,
-            this, ShareUserGroupWidget.on_signal_sharees_ready
+            this.is_file
+                ? "file"
+                : "folder",
+            this.completer
         );
-        connect (
-            this.completer_model, ShareeModel.signal_display_error_message,
-            this, ShareUserGroupWidget.on_signal_display_error
+        this.completer_model.signal_sharees_ready.connect (
+            this.on_signal_sharees_ready
+        );
+        this.completer_model.signal_display_error_message.connect (
+            this.on_signal_display_error
         );
 
         this.completer.model (this.completer_model);
@@ -128,35 +129,27 @@ public class ShareUserGroupWidget : Gtk.Widget {
         search_globally_action.icon (Gtk.Icon (":/client/theme/magnifying-glass.svg"));
         search_globally_action.tool_tip (_("Search globally"));
 
-        connect (
-            search_globally_action,
-            QAction.triggered,
-            this,
+        search_globally_action.triggered.connect (
             this.on_search_globally_action
         );
 
         this.ui.sharee_line_edit.add_action (search_globally_action, QLineEdit.Leading_position);
 
         this.manager = new ShareManager (this.account, this);
-        connect (
-            this.manager, ShareManager.on_signal_shares_fetched,
-            this, ShareUserGroupWidget.on_signal_shares_fetched
+        this.manager.signal_shares_fetched.connect (
+            this.on_signal_shares_fetched
         );
-        connect (
-            this.manager, ShareManager.signal_share_created,
-            this, ShareUserGroupWidget.on_signal_share_created
+        this.manager.signal_share_created.connect (
+            this.on_signal_share_created
         );
-        connect (
-            this.manager, ShareManager.on_signal_server_error,
-            this, ShareUserGroupWidget.on_signal_display_error
+        this.manager.signal_server_error.connect (
+            this.on_signal_display_error
         );
-        connect (
-            this.ui.sharee_line_edit, QLineEdit.return_pressed,
-            this, ShareUserGroupWidget.on_signal_line_edit_return
+        this.ui.sharee_line_edit.return_pressed.connect (
+            this.on_signal_line_edit_return
         );
-        connect (
-            this.ui.confirm_share, QAbstractButton.clicked,
-            this, ShareUserGroupWidget.on_signal_line_edit_return
+        this.ui.confirm_share.clicked.connect (
+            this.on_signal_line_edit_return
         );
         // TODO
         //  connect (
@@ -166,27 +159,20 @@ public class ShareUserGroupWidget : Gtk.Widget {
 
         // By making the next two Queued_connections we can override
         // the strings the completer sets on the line edit.
-        connect (
-            this.completer, SIGNAL (activated (QModelIndex)),
-            SLOT (on_signal_completer_activated (QModelIndex)),
-            Qt.QueuedConnection
+        this.completer.activated.connect (
+            this.on_signal_completer_activated // Qt.QueuedConnection
         );
-        connect (
-            this.completer, SIGNAL (highlighted (QModelIndex)),
-            SLOT (on_signal_completer_highlighted (QModelIndex)),
-            Qt.QueuedConnection
+        this.completer.highlighted.connect (
+            this.on_signal_completer_highlighted // Qt.QueuedConnection
         );
 
         // Queued connection so this signal is recieved after text_changed
-        connect (
-            this.ui.sharee_line_edit, QLineEdit.text_edited,
-            this, ShareUserGroupWidget.on_signal_line_edit_text_edited,
-            Qt.QueuedConnection
+        this.ui.sharee_line_edit.text_edited.connect (
+            this.on_signal_sharee_line_edit_text_edited // Qt.QueuedConnection
         );
         this.ui.sharee_line_edit.install_event_filter (this);
-        connect (
-            this.completion_timer, QTimer.timeout,
-            this, this.on_completion_timer
+        this.completion_timer.timeout.connect (
+            this.on_completion_timer_timeout
         );
         this.completion_timer.single_shot (true);
         this.completion_timer.interval (600);
@@ -208,7 +194,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
     }
 
 
-    private void on_completion_timer () {
+    private void on_completion_timer_timeout () {
         on_signal_search_for_sharees (ShareeModel.LookupMode.LOCAL_SEARCH);
     }
 
@@ -279,12 +265,10 @@ public class ShareUserGroupWidget : Gtk.Widget {
             //  Q_ASSERT (Share.is_share_type_user_group_email_room_or_remote (share.share_type ()));
             var user_group_share = q_shared_pointer_dynamic_cast<UserGroupShare> (share);
             var share_user_line = new ShareUserLine (this.account, user_group_share, this.max_sharing_permissions, this.is_file, this.parent_scroll_area);
-            connect (
-                share_user_line, ShareUserLine.resize_requested,
-                this, ShareUserGroupWidget.on_signal_adjust_scroll_widget_size
+            share_user_line.resize_requested.connect (
+                this.on_signal_adjust_scroll_widget_size
             );
-            connect (
-                share_user_line, ShareUserLine.visual_deletion_done,
+            share_user_line.visual_deletion_done.connect (
                 this, ShareUserGroupWidget.on_signal_get_shares
             );
             share_user_line.background_role (
@@ -295,9 +279,8 @@ public class ShareUserGroupWidget : Gtk.Widget {
 
             // Connect signal_style_changed events to our widget
             // so it can adapt (Dark-/Light-Mode switching)
-            connect (
-                this, ShareUserGroupWidget.signal_style_changed,
-                share_user_line, ShareUserLine.on_signal_style_changed
+            this.signal_style_changed.connect (
+                share_user_line.on_signal_style_changed
             );
 
             layout.add_widget (share_user_line);
@@ -375,7 +358,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_line_edit_text_edited (string text) {
+    private void on_signal_sharee_line_edit_text_edited (string text) {
         this.disable_completer_activated = false;
         // First text_changed is called first and we stopped the timer when the text is changed, programatically or not
         // Then we restart the timer here if the user touched a key

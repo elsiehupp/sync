@@ -82,7 +82,7 @@ public class TestDownload : GLib.Object {
         fake_folder.set_server_override (this.override_delegate_error_message);
 
         bool timed_out = false;
-        QTimer.single_shot (
+        GLib.Timeout.single_shot (
             10000,
             fake_folder.sync_engine,
             () => {

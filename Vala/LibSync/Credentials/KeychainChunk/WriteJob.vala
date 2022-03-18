@@ -60,7 +60,10 @@ public class WriteJob : KeychainChunk.Job {
         start ();
 
         QEventLoop wait_loop;
-        connect (this, WriteJob.on_signal_finished, wait_loop, QEventLoop.quit);
+        connect (
+            this, WriteJob.on_signal_finished,
+            wait_loop, QEventLoop.quit
+        );
         wait_loop.exec ();
 
         if (error () != NoError) {
@@ -120,16 +123,19 @@ public class WriteJob : KeychainChunk.Job {
                     this.account.identifier ()
                 ) : key_with_index;
 
-            var job = new QKeychain.WritePasswordJob (this.service_name, this);
+            var qkeychain_write_password_job = new QKeychain.WritePasswordJob (this.service_name, this);
     // #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
-            add_settings_to_job (this.account, job);
+            add_settings_to_job (this.account, qkeychain_write_password_job);
     // #endif
-            job.insecure_fallback (this.insecure_fallback);
-            connect (job, QKeychain.Job.on_signal_finished, this, KeychainChunk.WriteJob.on_signal_write_job_done);
+            qkeychain_write_password_job.insecure_fallback (this.insecure_fallback);
+            connect (
+                qkeychain_write_password_job, QKeychain.Job.on_signal_finished,
+                this, KeychainChunk.WriteJob.on_signal_write_job_done
+            );
             // only add the key's (sub)"index" after the first element, to stay compatible with older versions and non-Windows
-            job.key (kck);
-            job.binary_data (chunk);
-            job.start ();
+            qkeychain_write_password_job.key (kck);
+            qkeychain_write_password_job.binary_data (chunk);
+            qkeychain_write_password_job.start ();
 
             chunk.clear ();
         } else {

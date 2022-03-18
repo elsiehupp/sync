@@ -62,13 +62,11 @@ public class ShareeModel : QAbstractListModel {
         this.search = search;
         this.sharee_blocklist = blocklist;
         var ocs_sharee_job = new OcsShareeJob (this.account);
-        connect (
-            ocs_sharee_job, OcsShareeJob.signal_sharee_job_finished,
-            this, ShareeModel.on_signal_sharees_fetched
+        ocs_sharee_job.signal_sharee_job_finished.connect (
+            this.on_signal_sharees_fetched
         );
-        connect (
-            ocs_sharee_job, OcsJob.ocs_error,
-            this, ShareeModel.signal_display_error_message
+        ocs_sharee_job.ocs_error.connect (
+            this.signal_display_error_message
         );
         ocs_sharee_job.sharees (
             this.search, this.type, 1, 50,

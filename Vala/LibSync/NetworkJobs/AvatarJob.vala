@@ -83,12 +83,12 @@ public class AvatarJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private bool on_signal_finished () {
-        int http_result_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        int http_result_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
 
         Gtk.Image av_image;
 
         if (http_result_code == 200) {
-            string png_data = reply ().read_all ();
+            string png_data = this.reply.read_all ();
             if (png_data.size ()) {
                 if (av_image.load_from_data (png_data)) {
                     GLib.debug ("Retrieved Avatar pixmap!");

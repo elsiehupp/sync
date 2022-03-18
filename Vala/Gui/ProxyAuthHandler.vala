@@ -169,9 +169,8 @@ public class ProxyAuthHandler : GLib.Object {
         authenticator.password (this.password);
         if (sending_qnam) {
             this.gave_credentials_to.insert (sending_qnam);
-            connect (
-                sending_qnam, GLib.Object.destroyed,
-                this, ProxyAuthHandler.on_signal_sender_destroyed
+            sending_qnam.destroyed.connect (
+                this.on_signal_sender_destroyed
             );
         }
     }
@@ -312,7 +311,7 @@ public class ProxyAuthHandler : GLib.Object {
     //  private template<class T, typename PointerToMemberFunction>
     private void exec_await (
         T *sender,
-        PointerToMemberFunction signal,
+        PointerToMemberFunction some_signal,
         int counter,
         QEventLoop.ProcessEventsFlags flags = QEventLoop.AllEvents) {
         if (!sender) {
@@ -320,9 +319,8 @@ public class ProxyAuthHandler : GLib.Object {
         }
 
         QEventLoop wait_loop;
-        connect (
-            sender, signal,
-            wait_loop, QEventLoop.quit
+        sender.some_signal.connect (
+            wait_loop.quit
         );
 
         ++counter;

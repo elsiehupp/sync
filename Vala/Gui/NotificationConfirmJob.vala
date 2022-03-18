@@ -75,7 +75,7 @@ public class NotificationConfirmJob : AbstractNetworkJob {
     private override bool on_signal_finished () {
         int reply_code = 0;
         // FIXME: check for the reply code!
-        const string reply_str = reply ().read_all ();
+        const string reply_str = this.reply.read_all ();
 
         if (reply_str.contains ("<?xml version=\"1.0\"?>")) {
             const var rex_match = new QRegularExpression ("<statuscode> (\\d+)</statuscode>").match (reply_str);

@@ -57,33 +57,36 @@ public class CleanupPollsJob : GLib.Object {
         item.file = info.file;
         item.modtime = info.modtime;
         item.size = info.file_size;
-        var job = new PollJob (this.account, info.url, item, this.journal, this.local_path, this);
-        connect (job, PollJob.signal_finished, this, CleanupPollsJob.on_signal_poll_finished);
-        job.start ();
+        var poll_job = new PollJob (this.account, info.url, item, this.journal, this.local_path, this);
+        connect (
+            poll_job, PollJob.signal_finished,
+            this, CleanupPollsJob.on_signal_poll_finished
+        );
+        poll_job.start ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_signal_poll_finished () {
-        var job = qobject_cast<PollJob> (sender ());
-        //  ASSERT (job);
-        if (job.item.status == SyncFileItem.Status.FATAL_ERROR) {
-            /* emit */ aborted (job.item.error_string);
+        var poll_job = qobject_cast<PollJob> (sender ());
+        //  ASSERT (poll_job);
+        if (poll_job.item.status == SyncFileItem.Status.FATAL_ERROR) {
+            /* emit */ aborted (poll_job.item.error_string);
             delete_later ();
             return;
-        } else if (job.item.status != SyncFileItem.Status.SUCCESS) {
-            GLib.warning ("There was an error with file " + job.item.file + job.item.error_string);
+        } else if (poll_job.item.status != SyncFileItem.Status.SUCCESS) {
+            GLib.warning ("There was an error with file " + poll_job.item.file + poll_job.item.error_string);
         } else {
-            if (!OwncloudPropagator.static_update_metadata (*job.item, this.local_path, this.vfs, this.journal)) {
+            if (!OwncloudPropagator.static_update_metadata (*poll_job.item, this.local_path, this.vfs, this.journal)) {
                 GLib.warning ("Database error");
-                job.item.status = SyncFileItem.Status.FATAL_ERROR;
-                job.item.error_string = _("Error writing metadata to the database");
-                /* emit */ aborted (job.item.error_string);
+                poll_job.item.status = SyncFileItem.Status.FATAL_ERROR;
+                poll_job.item.error_string = _("Error writing metadata to the database");
+                /* emit */ aborted (poll_job.item.error_string);
                 delete_later ();
                 return;
             }
-            this.journal.upload_info (job.item.file, SyncJournalDb.UploadInfo ());
+            this.journal.upload_info (poll_job.item.file, SyncJournalDb.UploadInfo ());
         }
         // Continue with the next entry, or finish
         start ();

@@ -59,7 +59,7 @@ void FakeErrorReply.respond () {
     /* emit */ signal_meta_data_changed ();
     /* emit */ signal_ready_read ();
     // finishing can come strictly after signal_ready_read was called
-    QTimer.single_shot (5, this, &FakeErrorReply.on_signal_finished);
+    GLib.Timeout.single_shot (5, this, &FakeErrorReply.on_signal_finished);
 }
 
 void FakeErrorReply.on_signal_finished () {

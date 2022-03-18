@@ -45,19 +45,17 @@ public class SslErrorDialog : Gtk.Dialog {
         ok_button.enabled (false);
 
         this.ui.cb_trust_connect.enabled (!Theme.forbid_bad_ssl);
-        connect (
-            this.ui.cb_trust_connect, QAbstractButton.clicked,
-            ok_button, Gtk.Widget.enabled
+        this.ui.cb_trust_connect.clicked.connect (
+            ok_button.enabled
         );
 
         if (ok_button) {
             ok_button.default (true);
-            connect (
-                ok_button, QAbstractButton.clicked,
-                this, Gtk.Dialog.accept);
-            connect (
-                cancel_button, QAbstractButton.clicked,
-                this, Gtk.Dialog.reject
+            ok_button.clicked.connect (
+                this.accept
+            );
+            cancel_button.clicked.connect (
+                this.reject
             );
         }
     }

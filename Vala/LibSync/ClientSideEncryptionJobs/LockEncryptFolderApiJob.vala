@@ -39,7 +39,7 @@ public class LockEncryptFolderApiJob : AbstractNetworkJob {
     }
 
     protected bool on_signal_finished () {
-        int return_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        int return_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (return_code != 200) {
             GLib.info ("Error locking file " + path () + error_string () + return_code);
             /* emit */ error (this.file_identifier, return_code);
@@ -47,7 +47,7 @@ public class LockEncryptFolderApiJob : AbstractNetworkJob {
         }
 
         QJsonParseError error;
-        var json = QJsonDocument.from_json (reply ().read_all (), error);
+        var json = QJsonDocument.from_json (this.reply.read_all (), error);
         var object = json.object ().to_variant_map ();
         var token = object["ocs"].to_map ()["data"].to_map ()["e2e-token"].to_byte_array ();
         GLib.info ("Got json: " + token);

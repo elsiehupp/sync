@@ -197,8 +197,12 @@ public class FakeWebSocketServer : GLib.Object {
 
         var socket = this.web_socket_server.next_pending_connection ();
 
-        connect (socket, QWebSocket.text_message_received, this, FakeWebSocketServer.on_signal_process_next_message_internal);
-        connect (socket, QWebSocket.disconnected, this, FakeWebSocketServer.on_signal_socket_disconnected);
+        socket.text_message_received.connect (
+            this.on_signal_process_next_message_internal
+        );
+        socket.disconnected.connect (
+            this.on_signal_socket_disconnected
+        );
 
         this.clients + socket;
     }

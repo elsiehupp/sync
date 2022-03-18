@@ -28,10 +28,16 @@ public class HttpServer : QTcpServer {
     public void incoming_connection (int socket) {
         if (disabled)
             return;
-        QTcpSocket* s = new QTcpSocket (this);
-        connect (s, SIGNAL (signal_ready_read ()), this, SLOT (on_signal_read_client ()));
-        connect (s, SIGNAL (disconnected ()), this, SLOT (on_signal_discard_client ()));
-        s.set_socket_descriptor (socket);
+        QTcpSocket tcp_socket = new QTcpSocket (this);
+        connect (
+            tcp_socket, SIGNAL (signal_ready_read ()),
+            this, SLOT (on_signal_read_client ())
+        );
+        connect (
+            tcp_socket, SIGNAL (disconnected ()),
+            this, SLOT (on_signal_discard_client ())
+        );
+        tcp_socket.set_socket_descriptor (socket);
     }
 
 

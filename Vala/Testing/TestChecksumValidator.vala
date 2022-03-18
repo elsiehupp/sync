@@ -159,7 +159,10 @@ public class TestChecksumValidator : GLib.Object {
         vali.on_signal_start (this.testfile);
 
         QEventLoop loop;
-        connect (vali, SIGNAL (signal_done (string,string)), loop, SLOT (quit ()), Qt.QueuedConnection);
+        connect (
+            vali, SIGNAL (signal_done (string,string)),
+            loop, SLOT (quit ()), Qt.QueuedConnection
+        );
         loop.exec ();
 
         delete vali;

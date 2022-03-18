@@ -163,7 +163,10 @@ public class GETFileJob : AbstractNetworkJob {
             this.bandwidth_manager.on_signal_register_download_job (this);
         }
 
-        connect (this, AbstractNetworkJob.signal_network_activity, account, Account.signal_propagator_network_activity);
+        connect (
+            this, AbstractNetworkJob.signal_network_activity,
+            account, Account.signal_propagator_network_activity
+        );
 
         AbstractNetworkJob.start ();
     }
@@ -172,7 +175,7 @@ public class GETFileJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public bool on_signal_finished () {
-        if (this.save_body_to_file && reply ().bytes_available ()) {
+        if (this.save_body_to_file && this.input_stream.bytes_available ()) {
             return false;
         } else {
             if (this.bandwidth_manager) {
@@ -190,7 +193,7 @@ public class GETFileJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public void cancel () {
-        var network_reply = reply ();
+        var network_reply = this.input_stream;
         if (network_reply && network_reply.is_running ()) {
             network_reply.abort ();
         }
@@ -202,14 +205,25 @@ public class GETFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public void new_reply_hook (GLib.InputStream reply);
-    void GETFileJob.new_reply_hook (GLib.InputStream reply) {
-        reply.read_buffer_size (16 * 1024); // keep low so we can easier limit the bandwidth
+    public void new_reply_hook (GLib.InputStream input_stream) {
+        input_stream.read_buffer_size (16 * 1024); // keep low so we can easier limit the bandwidth
 
-        connect (reply, Soup.Reply.meta_data_changed, this, GETFileJob.on_signal_meta_data_changed);
-        connect (reply, QIODevice.ready_read, this, GETFileJob.on_signal_ready_read);
-        connect (reply, Soup.Reply.on_signal_finished, this, GETFileJob.on_signal_ready_read);
-        connect (reply, Soup.Reply.download_progress, this, GETFileJob.download_progress);
+        connect (
+            input_stream, Soup.Reply.meta_data_changed,
+            this, GETFileJob.on_signal_meta_data_changed
+        );
+        connect (
+            input_stream, QIODevice.ready_read,
+            this, GETFileJob.on_signal_ready_read
+        );
+        connect (
+            input_stream, Soup.Reply.on_signal_finished,
+            this, GETFileJob.on_signal_ready_read
+        );
+        connect (
+            input_stream, Soup.Reply.download_progress,
+            this, GETFileJob.download_progress
+        );
     }
 
 
@@ -274,12 +288,12 @@ public class GETFileJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public new void on_signal_timed_out () {
-        GLib.warning ("Timeout" + reply () ? reply ().request ().url : path ());
-        if (!reply ())
+        GLib.warning ("Timeout" + this.input_stream ? this.input_stream.request ().url : path ());
+        if (!this.input_stream)
             return;
         this.error_string = _("Connection Timeout");
         this.error_status = SyncFileItem.Status.FATAL_ERROR;
-        reply ().abort ();
+        this.input_stream.abort ();
     }
 
 
@@ -295,12 +309,12 @@ public class GETFileJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_ready_read () {
-        if (!reply ())
+        if (!this.input_stream)
             return;
-        int buffer_size = q_min (1024 * 8ll, reply ().bytes_available ());
+        int buffer_size = q_min (1024 * 8ll, this.input_stream.bytes_available ());
         string buffer = new string (buffer_size, Qt.Uninitialized);
 
-        while (reply ().bytes_available () > 0 && this.save_body_to_file) {
+        while (this.input_stream.bytes_available () > 0 && this.save_body_to_file) {
             if (this.bandwidth_choked) {
                 GLib.warning ("Download choked.");
                 break;
@@ -315,12 +329,12 @@ public class GETFileJob : AbstractNetworkJob {
                 this.bandwidth_quota -= to_read;
             }
 
-            const int64 read_bytes = reply ().read (buffer, to_read);
+            const int64 read_bytes = this.input_stream.read (buffer, to_read);
             if (read_bytes < 0) {
-                this.error_string = network_reply_error_string (*reply ());
+                this.error_string = network_reply_error_string (*this.input_stream);
                 this.error_status = SyncFileItem.Status.NORMAL_ERROR;
                 GLib.warning ("Error while reading from device: " + this.error_string);
-                reply ().abort ();
+                this.input_stream.abort ();
                 return;
             }
 
@@ -329,20 +343,20 @@ public class GETFileJob : AbstractNetworkJob {
                 this.error_string = this.device.error_string ();
                 this.error_status = SyncFileItem.Status.NORMAL_ERROR;
                 GLib.warning ("Error while writing to file " + written_bytes + read_bytes + this.error_string);
-                reply ().abort ();
+                this.input_stream.abort ();
                 return;
             }
         }
 
-        if (reply ().is_finished () && (reply ().bytes_available () == 0 || !this.save_body_to_file)) {
+        if (this.input_stream.is_finished () && (this.input_stream.bytes_available () == 0 || !this.save_body_to_file)) {
             GLib.debug ("Actually finished!");
             if (this.bandwidth_manager) {
                 this.bandwidth_manager.on_signal_unregister_download_job (this);
             }
             if (!this.has_emitted_finished_signal) {
-                GLib.info ("GET of " + reply ().request ().url.to_string ()
+                GLib.info ("GET of " + this.input_stream.request ().url.to_string ()
                           + " finished with status " + reply_status_string ()
-                          + reply ().raw_header ("Content-Range") + reply ().raw_header ("Content-Length"));
+                          + this.input_stream.raw_header ("Content-Range") + this.input_stream.raw_header ("Content-Length"));
 
                 /* emit */ signal_finished ();
             }
@@ -357,33 +371,33 @@ public class GETFileJob : AbstractNetworkJob {
     private void on_signal_meta_data_changed () {
         // For some reason setting the read buffer in GETFileJob.start doesn't seem to go
         // through the HTTP layer thread (?)
-        reply ().read_buffer_size (16 * 1024);
+        this.input_stream.read_buffer_size (16 * 1024);
 
-        int http_status = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        int http_status = this.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
 
         if (http_status == 301 || http_status == 302 || http_status == 303 || http_status == 307
             || http_status == 308 || http_status == 401) {
             // Redirects and auth failures (oauth token renew) are handled by AbstractNetworkJob and
             // will end up restarting the job. We do not want to process further data from the initial
             // request. new_reply_hook () will reestablish signal connections for the follow-up request.
-            bool ok = disconnect (reply (), Soup.Reply.on_signal_finished, this, GETFileJob.on_signal_ready_read)
-                && disconnect (reply (), Soup.Reply.ready_read, this, GETFileJob.on_signal_ready_read);
+            bool ok = disconnect (this.input_stream, Soup.Reply.on_signal_finished, this, GETFileJob.on_signal_ready_read)
+                && disconnect (this.input_stream, Soup.Reply.ready_read, this, GETFileJob.on_signal_ready_read);
             //  ASSERT (ok);
             return;
         }
 
-        // If the status code isn't 2xx, don't write the reply body to the file.
+        // If the status code isn't 2xx, don't write the input_stream body to the file.
         // For any error : handle it when the job is on_signal_finished, not here.
         if (http_status / 100 != 2) {
             // Disable the buffer limit, as we don't limit the bandwidth for error messages.
             // (We are only going to do a read_all () at the end.)
-            reply ().read_buffer_size (0);
+            this.input_stream.read_buffer_size (0);
             return;
         }
-        if (reply ().error () != Soup.Reply.NoError) {
+        if (this.input_stream.error () != Soup.Reply.NoError) {
             return;
         }
-        this.etag = get_etag_from_reply (reply ());
+        this.etag = get_etag_from_reply (this.input_stream);
 
         if (!this.direct_download_url == "" && !this.etag == "") {
             GLib.info ("Direct download used, ignoring server ETag " + this.etag);
@@ -391,33 +405,33 @@ public class GETFileJob : AbstractNetworkJob {
         } else if (!this.direct_download_url == "") {
             // All fine, ETag empty and direct_download_url used
         } else if (this.etag == "") {
-            GLib.warning ("No E-Tag reply by server, considering it invalid.");
+            GLib.warning ("No E-Tag input_stream by server, considering it invalid.");
             this.error_string = _("No E-Tag received from server, check Proxy/Gateway.");
             this.error_status = SyncFileItem.Status.NORMAL_ERROR;
-            reply ().abort ();
+            this.input_stream.abort ();
             return;
         } else if (!this.expected_etag_for_resume == "" && this.expected_etag_for_resume != this.etag) {
             GLib.warning ("We received a different E-Tag for resuming!"
                         + this.expected_etag_for_resume + " vs " + this.etag);
             this.error_string = _("We received a different E-Tag for resuming. Retrying next time.");
             this.error_status = SyncFileItem.Status.NORMAL_ERROR;
-            reply ().abort ();
+            this.input_stream.abort ();
             return;
         }
 
         bool ok = false;
-        this.content_length = reply ().header (Soup.Request.ContentLengthHeader).to_long_long (&ok);
+        this.content_length = this.input_stream.header (Soup.Request.ContentLengthHeader).to_long_long (&ok);
         if (ok && this.expected_content_length != -1 && this.content_length != this.expected_content_length) {
             GLib.warning ("We received a different content length than expected! "
                     + this.expected_content_length + " vs " + this.content_length);
             this.error_string = _("We received an unexpected download Content-Length.");
             this.error_status = SyncFileItem.Status.NORMAL_ERROR;
-            reply ().abort ();
+            this.input_stream.abort ();
             return;
         }
 
         int64 start = 0;
-        string ranges = reply ().raw_header ("Content-Range");
+        string ranges = this.input_stream.raw_header ("Content-Range");
         if (!ranges == "") {
             const QRegularExpression regular_expression = new QRegularExpression ("bytes (\\d+)-");
             var regular_expression_match = regular_expression.match (ranges);
@@ -433,19 +447,19 @@ public class GETFileJob : AbstractNetworkJob {
                 if (!this.device.open (QIODevice.WriteOnly)) {
                     this.error_string = this.device.error_string ();
                     this.error_status = SyncFileItem.Status.NORMAL_ERROR;
-                    reply ().abort ();
+                    this.input_stream.abort ();
                     return;
                 }
                 this.resume_start = 0;
             } else {
                 this.error_string = _("Server returned wrong content-range");
                 this.error_status = SyncFileItem.Status.NORMAL_ERROR;
-                reply ().abort ();
+                this.input_stream.abort ();
                 return;
             }
         }
 
-        var last_modified = reply ().header (Soup.Request.Last_modified_header);
+        var last_modified = this.input_stream.header (Soup.Request.Last_modified_header);
         if (!last_modified.is_null ()) {
             this.last_modified = Utility.q_date_time_to_time_t (last_modified.to_date_time ());
         }

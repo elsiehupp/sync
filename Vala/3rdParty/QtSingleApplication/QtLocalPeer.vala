@@ -59,9 +59,8 @@ public class QtLocalPeer : GLib.Object {
         if (!res) {
             GLib.warning ("QtSingleCoreApplication : listen on local socket failed, %s", q_printable (server.error_string ()));
         }
-        connect (
-            server, QLocalServer.new_connection,
-            this, QtLocalPeer.on_signal_receive_connection
+        server.new_connection.connect (
+            this.on_signal_receive_connection
         );
         return false;
     }

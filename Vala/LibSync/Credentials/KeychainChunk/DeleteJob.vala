@@ -49,14 +49,17 @@ public class DeleteJob : KeychainChunk.Job {
                 this.keychain_migration ? "" : this.account.identifier ()
             ) : this.key;
 
-        var job = new QKeychain.DeletePasswordJob (this.service_name, this);
+        var qkeychain_delete_password_job = new QKeychain.DeletePasswordJob (this.service_name, this);
     // #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
-        add_settings_to_job (this.account, job);
+        add_settings_to_job (this.account, qkeychain_delete_password_job);
     // #endif
-        job.insecure_fallback (this.insecure_fallback);
-        job.key (kck);
-        connect (job, QKeychain.Job.on_signal_finished, this, KeychainChunk.DeleteJob.on_signal_delete_job_done);
-        job.start ();
+        qkeychain_delete_password_job.insecure_fallback (this.insecure_fallback);
+        qkeychain_delete_password_job.key (kck);
+        connect (
+            qkeychain_delete_password_job, QKeychain.Job.on_signal_finished,
+            this, KeychainChunk.DeleteJob.on_signal_delete_job_done
+        );
+        qkeychain_delete_password_job.start ();
     }
 
 
@@ -70,7 +73,10 @@ public class DeleteJob : KeychainChunk.Job {
         start ();
 
         QEventLoop wait_loop;
-        connect (this, DeleteJob.on_signal_finished, wait_loop, QEventLoop.quit);
+        connect (
+            this, DeleteJob.on_signal_finished,
+            wait_loop, QEventLoop.quit
+        );
         wait_loop.exec ();
 
         if (error () == NoError) {

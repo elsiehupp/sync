@@ -16,7 +16,6 @@ implied, as to its usefulness for any purpose.
 //  #include <memory>
 
 //  #include <cookiejar.h>
-//  #include <QTimer>
 
 namespace Testing {
 

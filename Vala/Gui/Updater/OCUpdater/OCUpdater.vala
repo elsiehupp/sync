@@ -10,7 +10,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <Qt_widgets>
 //  #include <cstdio>
 //  #include <QTemporaryFile>
-//  #include <QTimer>
 
 namespace Occ {
 namespace Ui {
@@ -115,7 +114,7 @@ public class OCUpdater : Updater {
     /***********************************************************
     Timer to guard the timeout of an individual network request
     ***********************************************************/
-    private QTimer timeout_watchdog;
+    private GLib.Timeout timeout_watchdog;
 
     UpdateInfo update_info { protected get; private set; }
 
@@ -132,7 +131,7 @@ public class OCUpdater : Updater {
         this.update_url = url;
         this.state = Unknown;
         this.access_manager = new AccessManager (this);
-        this.timeout_watchdog = new QTimer (this);
+        this.timeout_watchdog = new GLib.Timeout (this);
     }
 
 
@@ -171,7 +170,7 @@ public class OCUpdater : Updater {
     public override void check_for_update () {
         Soup.Reply reply = this.access_manager.get (Soup.Request (this.update_url));
         connect (
-            this.timeout_watchdog, QTimer.timeout,
+            this.timeout_watchdog, GLib.Timeout.timeout,
             this, OCUpdater.on_signal_timed_out
         );
         this.timeout_watchdog.on_signal_start (30 * 1000);

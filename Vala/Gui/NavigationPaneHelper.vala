@@ -6,7 +6,6 @@ Copyright (C) by Jocelyn Turcotte <jturcotte@woboq.com>
 
 //  #include <GLib.Dir>
 //  #include <Gtk.Application>
-//  #include <QTimer>
 
 namespace Occ {
 namespace Ui {
@@ -35,7 +34,7 @@ public class NavigationPaneHelper : GLib.Object {
             schedule_update_cloud_storage_registry ();
         }
     }
-    private QTimer update_cloud_storage_registry_timer;
+    private GLib.Timeout update_cloud_storage_registry_timer;
 
     /***********************************************************
     ***********************************************************/

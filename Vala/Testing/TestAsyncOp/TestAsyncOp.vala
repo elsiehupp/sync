@@ -109,7 +109,7 @@ public class TestAsyncOp : GLib.Object {
 
 
     private FakePayloadReply big_wait_delegate (TestCase test_case, Soup.Request request) {
-        QTimer.single_shot (0, fake_folder.sync_engine, &SyncEngine.on_signal_abort);
+        GLib.Timeout.single_shot (0, fake_folder.sync_engine, &SyncEngine.on_signal_abort);
         return wait_and_chain (wait_forever_callback) (test_case, request);
     }
 

@@ -21,8 +21,8 @@ public class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private QTimer expired_activities_check_timer;
-    private QTimer notification_check_timer;
+    private GLib.Timeout expired_activities_check_timer;
+    private GLib.Timeout notification_check_timer;
     private GLib.HashTable<AccountState, QElapsedTimer> time_since_last_check;
 
     /***********************************************************
@@ -82,13 +82,13 @@ public class User : GLib.Object {
         );
         connect (
             this.notification_check_timer,
-            QTimer.timeout,
+            GLib.Timeout.timeout,
             this,
             User.on_signal_refresh
         );
         connect (
             this.expired_activities_check_timer,
-            QTimer.timeout,
+            GLib.Timeout.timeout,
             this,
             User.on_signal_check_expired_activities
         );

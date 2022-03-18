@@ -13,12 +13,10 @@ using Soup;
 //  #include <GLib.FileInfo>
 //  #include <GLib.Dir>
 //  #include <QLoggingCategory>
-//  #include <QTimer>
 //  #include <QTimerEvent>
 //  #include <QRegularExpression>
 //  #include <qmath.h>
 //  #include <QElapse
-//  #include <QTimer>
 //  #include <QPointer>
 //  #include <QIODevic
 //  #include <QMutex>
@@ -293,7 +291,10 @@ public class OwncloudPropagator : GLib.Object {
             this.root_job.dir_deletion_jobs.append_job (it);
         }
 
-        connect (this.root_job, PropagatorJob.on_signal_finished, this, OwncloudPropagator.on_signal_emit_finished);
+        connect (
+            this.root_job, PropagatorJob.on_signal_finished,
+            this, OwncloudPropagator.on_signal_emit_finished
+        );
 
         this.job_scheduled = false;
         schedule_next_job ();
@@ -562,7 +563,7 @@ public class OwncloudPropagator : GLib.Object {
             return; // don't schedule more than 1
         }
         this.job_scheduled = true;
-        QTimer.single_shot (3, this, OwncloudPropagator.on_signal_schedule_next_job_impl);
+        GLib.Timeout.single_shot (3, this, OwncloudPropagator.on_signal_schedule_next_job_impl);
     }
 
 
@@ -581,14 +582,17 @@ public class OwncloudPropagator : GLib.Object {
         }
         if (this.root_job) {
             // Connect to signal_abort_finished  which signals that abort has been asynchronously on_signal_finished
-            connect (this.root_job, PropagateDirectory.signal_abort_finished, this, OwncloudPropagator.on_signal_emit_finished);
+            connect (
+                this.root_job, PropagateDirectory.signal_abort_finished,
+                this, OwncloudPropagator.on_signal_emit_finished
+            );
 
             // Use Queued Connection because we're possibly already in an item's on_signal_finished stack
             QMetaObject.invoke_method (this.root_job, "abort", Qt.QueuedConnection,
                                       Q_ARG (PropagatorJob.AbortType, PropagatorJob.AbortType.ASYNCHRONOUS));
 
             // Give asynchronous abort 5000 msec to finish on its own
-            QTimer.single_shot (5000, this, SLOT (on_signal_abort_timeout ()));
+            GLib.Timeout.single_shot (5000, this, SLOT (on_signal_abort_timeout ()));
         } else {
             // No root job, call on_signal_emit_finished
             on_signal_emit_finished (SyncFileItem.Status.NORMAL_ERROR);

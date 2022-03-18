@@ -245,7 +245,7 @@ public class PropagateUploadEncrypted : GLib.Object {
     ***********************************************************/
     private void on_signal_folder_locked_error (string file_identifier, int http_error_code) {
         //  Q_UNUSED (http_error_code);
-        QTimer.single_shot (
+        GLib.Timeout.single_shot (
             5000,
             this,
             this.on_signal_timer_complete

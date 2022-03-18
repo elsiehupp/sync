@@ -12,7 +12,6 @@ Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
 //  #include <QJsonDocument
 //  #include <QJsonOb
 //  #include <memory>
-//  #include <QTimer>
 
 //  #ifndef OWNCLOUD_TEST
 //  #endif

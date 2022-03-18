@@ -132,7 +132,7 @@ public class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private QTimer push_notifications_reconnect_timer;
+    private GLib.Timeout push_notifications_reconnect_timer;
 
     /***********************************************************
     ***********************************************************/

@@ -37,11 +37,8 @@ public class ToolTipUpdater : GLib.Object {
     public ToolTipUpdater (QTreeView tree_view) {
         base (tree_view);
         this.tree_view = tree_view;
-        connect (
-            this.tree_view.model (),
-            QAbstractItemModel.on_signal_data_changed,
-            this,
-            ToolTipUpdater.on_signal_data_changed
+        this.tree_view.model ().signal_data_changed.connect (
+            this.on_signal_data_changed
         );
         this.tree_view.viewport ().install_event_filter (this);
     }

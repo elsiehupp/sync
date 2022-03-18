@@ -47,10 +47,10 @@ public class DeleteMetadataApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     protected bool on_signal_finished () {
-        int return_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        int return_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (return_code != 200) {
             GLib.info ("Error removing metadata for " + path () + error_string () + return_code);
-            GLib.info ("Full Error Log " + reply ().read_all ());
+            GLib.info ("Full Error Log " + this.reply.read_all ());
             /* emit */ error (this.file_identifier, return_code);
             return true;
         }

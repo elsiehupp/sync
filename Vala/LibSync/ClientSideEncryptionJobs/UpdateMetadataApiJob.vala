@@ -65,7 +65,7 @@ public class UpdateMetadataApiJob : AbstractNetworkJob {
 
 
     protected bool on_signal_finished () {
-        int return_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        int return_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             if (return_code != 200) {
                 GLib.info ("Error updating the metadata " + path () + error_string () + return_code);
                 /* emit */ error (this.file_identifier, return_code);

@@ -138,7 +138,7 @@ public class FolderMan : GLib.Object {
     /***********************************************************
     Starts regular etag query jobs
     ***********************************************************/
-    private QTimer etag_poll_timer;
+    private GLib.Timeout etag_poll_timer;
 
     /***********************************************************
     The currently running etag query
@@ -148,7 +148,7 @@ public class FolderMan : GLib.Object {
     /***********************************************************
     Occasionally schedules folders
     ***********************************************************/
-    private QTimer time_scheduler;
+    private GLib.Timeout time_scheduler;
 
     /***********************************************************
     Scheduled folders that should be synced as soon as possible
@@ -158,7 +158,7 @@ public class FolderMan : GLib.Object {
     /***********************************************************
     Picks the next scheduled folder and starts the sync
     ***********************************************************/
-    private QTimer start_scheduled_sync_timer;
+    private GLib.Timeout start_scheduled_sync_timer;
 
     /***********************************************************
     ***********************************************************/

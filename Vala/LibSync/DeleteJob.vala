@@ -57,8 +57,8 @@ public class DeleteJob : AbstractNetworkJob {
             send_request ("DELETE", make_dav_url (path ()), request);
         }
 
-        if (reply ().error () != Soup.Reply.NoError) {
-            GLib.warning ("Network error: " + reply ().error_string ());
+        if (this.reply.error () != Soup.Reply.NoError) {
+            GLib.warning ("Network error: " + this.reply.error_string ());
         }
         AbstractNetworkJob.start ();
     }
@@ -67,7 +67,7 @@ public class DeleteJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public bool on_signal_finished () {
-        GLib.info ("DELETE of " + reply ().request ().url
+        GLib.info ("DELETE of " + this.reply.request ().url
             + " finished with status " + reply_status_string ());
 
         /* emit */ signal_finished ();

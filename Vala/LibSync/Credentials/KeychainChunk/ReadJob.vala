@@ -59,14 +59,17 @@ public class ReadJob : KeychainChunk.Job {
                 this.keychain_migration ? "" : this.account.identifier ()
             ) : this.key;
 
-        var job = new QKeychain.ReadPasswordJob (this.service_name, this);
+        var qkeychain_read_password_job = new QKeychain.ReadPasswordJob (this.service_name, this);
     // #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
-        add_settings_to_job (this.account, job);
+        add_settings_to_job (this.account, qkeychain_read_password_job);
     // #endif
-        job.insecure_fallback (this.insecure_fallback);
-        job.key (kck);
-        connect (job, QKeychain.Job.on_signal_finished, this, KeychainChunk.ReadJob.on_signal_read_job_done);
-        job.start ();
+        qkeychain_read_password_job.insecure_fallback (this.insecure_fallback);
+        qkeychain_read_password_job.key (kck);
+        connect (
+            qkeychain_read_password_job, QKeychain.Job.on_signal_finished,
+            this, KeychainChunk.ReadJob.on_signal_read_job_done
+        );
+        qkeychain_read_password_job.start ();
     }
 
 
@@ -80,7 +83,10 @@ public class ReadJob : KeychainChunk.Job {
         start ();
 
         QEventLoop wait_loop;
-        connect (this, ReadJob.on_signal_finished, wait_loop, QEventLoop.quit);
+        connect (
+            this, ReadJob.on_signal_finished,
+            wait_loop, QEventLoop.quit
+        );
         wait_loop.exec ();
 
         if (error () == NoError) {
@@ -114,7 +120,7 @@ public class ReadJob : KeychainChunk.Job {
                     // (Issues #4274 and #6522)
                     // (For kwallet, the error is OtherError instead of NoBackendAvailable, maybe a bug in QtKeychain)
                     GLib.info ("Backend unavailable (yet?) Retrying in a few seconds. " + read_job.error_string ());
-                    QTimer.single_shot (10000, this, ReadJob.start);
+                    GLib.Timeout.single_shot (10000, this, ReadJob.start);
                     this.retry_on_signal_key_chain_error = false;
                     read_job.delete_later ();
                     return;

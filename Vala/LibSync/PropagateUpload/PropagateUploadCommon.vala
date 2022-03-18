@@ -239,15 +239,21 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         }
 
         GLib.debug ("Deleting the current.");
-        var job = new DeleteJob (
+        var delete_job = new DeleteJob (
             propagator ().account,
             propagator ().full_remote_path (this.file_to_upload.file),
             this
         );
-        this.jobs.append (job);
-        connect (job, DeleteJob.signal_finished, this, PropagateUploadFileCommon.on_signal_compute_content_checksum);
-        connect (job, GLib.Object.destroyed, this, PropagateUploadFileCommon.on_signal_job_destroyed);
-        job.start ();
+        this.jobs.append (delete_job);
+        connect (
+            delete_job, DeleteJob.signal_finished,
+            this, PropagateUploadFileCommon.on_signal_compute_content_checksum
+        );
+        connect (
+            delete_job, GLib.Object.destroyed,
+            this, PropagateUploadFileCommon.on_signal_job_destroyed
+        );
+        delete_job.start ();
     }
 
     /***********************************************************
@@ -304,10 +310,14 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         var compute_checksum = new ComputeChecksum (this);
         compute_checksum.checksum_type (checksum_type);
 
-        connect (compute_checksum, ComputeChecksum.done,
-            this, PropagateUploadFileCommon.on_signal_compute_transmission_checksum);
-        connect (compute_checksum, ComputeChecksum.done,
-            compute_checksum, GLib.Object.delete_later);
+        connect (
+            compute_checksum, ComputeChecksum.done,
+            this, PropagateUploadFileCommon.on_signal_compute_transmission_checksum
+        );
+        connect (
+            compute_checksum, ComputeChecksum.done,
+            compute_checksum, GLib.Object.delete_later
+        );
         compute_checksum.start (this.file_to_upload.path);
     }
 
@@ -334,10 +344,14 @@ public class PropagateUploadFileCommon : PropagateItemJob {
             compute_checksum.checksum_type ("");
         }
 
-        connect (compute_checksum, ComputeChecksum.done,
-            this, PropagateUploadFileCommon.on_signal_start_upload);
-        connect (compute_checksum, ComputeChecksum.done,
-            compute_checksum, GLib.Object.delete_later);
+        connect (
+            compute_checksum, ComputeChecksum.done,
+            this, PropagateUploadFileCommon.on_signal_start_upload
+        );
+        connect (
+            compute_checksum, ComputeChecksum.done,
+            compute_checksum, GLib.Object.delete_later
+        );
         compute_checksum.start (this.file_to_upload.path);
     }
 
@@ -447,9 +461,12 @@ public class PropagateUploadFileCommon : PropagateItemJob {
     /***********************************************************
     ***********************************************************/
     public void start_poll_job (string path) {
-        var job = new PollJob (propagator ().account, path, this.item,
+        var poll_job = new PollJob (propagator ().account, path, this.item,
             propagator ().journal, propagator ().local_path (), this);
-        connect (job, PollJob.signal_finished, this, PropagateUploadFileCommon.on_signal_poll_finished);
+        connect (
+            poll_job, PollJob.signal_finished,
+            this, PropagateUploadFileCommon.on_signal_poll_finished
+        );
         SyncJournalDb.PollInfo info;
         info.file = this.item.file;
         info.url = path;
@@ -462,7 +479,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         propagator ().journal.poll_info (info);
         propagator ().journal.commit ("add poll info");
         propagator ().active_job_list.append (this);
-        job.start ();
+        poll_job.start ();
     }
 
 
@@ -481,21 +498,21 @@ public class PropagateUploadFileCommon : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_job_destroyed (GLib.Object job) {
-        this.jobs.erase (std.remove (this.jobs.begin (), this.jobs.end (), job), this.jobs.end ());
+    public void on_signal_job_destroyed (GLib.Object abstract_job) {
+        this.jobs.erase (std.remove (this.jobs.begin (), this.jobs.end (), abstract_job), this.jobs.end ());
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_signal_poll_finished () {
-        var job = qobject_cast<PollJob> (sender ());
-        //  ASSERT (job);
+        var poll_job = qobject_cast<PollJob> (sender ());
+        //  ASSERT (poll_job);
 
         propagator ().active_job_list.remove_one (this);
 
-        if (job.item.status != SyncFileItem.Status.SUCCESS) {
-            on_signal_done (job.item.status, job.item.error_string);
+        if (poll_job.item.status != SyncFileItem.Status.SUCCESS) {
+            on_signal_done (poll_job.item.status, poll_job.item.error_string);
             return;
         }
 
@@ -563,7 +580,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
     }
 
 
-    private delegate bool MayAbortJob (AbstractNetworkJob job);
+    private delegate bool MayAbortJob (AbstractNetworkJob abstract_job);
 
     /***********************************************************
     Aborts all running network jobs, except for the ones that may_abort_job
@@ -582,9 +599,9 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         unowned int running_count = 0;
 
         // Abort all running jobs, except for explicitly excluded ones
-        foreach (AbstractNetworkJob job in this.jobs) {
-            var reply = job.reply ();
-            if (!reply || !reply.is_running ())
+        foreach (AbstractNetworkJob abstract_job in this.jobs) {
+            var input_stream = abstract_job.input_stream ();
+            if (!input_stream || !input_stream.is_running ())
                 continue;
 
             (*running_count)++;
@@ -594,15 +611,18 @@ public class PropagateUploadFileCommon : PropagateItemJob {
             // zero.
             // We may however finish before that if the un-abortable job completes
             // normally.
-            if (!may_abort_job (job))
+            if (!may_abort_job (abstract_job))
                 continue;
 
             // Abort the job
             if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
-                // Connect to on_signal_finished signal of job reply to asynchonously finish the abort
-                connect (reply, Soup.Reply.on_signal_finished, this, one_abort_finished);
+                // Connect to on_signal_finished signal of job input_stream to asynchonously finish the abort
+                connect (
+                    input_stream, Soup.Reply.on_signal_finished,
+                    this, one_abort_finished
+                );
             }
-            reply.abort ();
+            input_stream.abort ();
         }
 
         if (*running_count == 0 && abort_type == PropagatorJob.AbortType.ASYNCHRONOUS)
@@ -650,9 +670,9 @@ public class PropagateUploadFileCommon : PropagateItemJob {
     /***********************************************************
     Error handling functionality that is shared between jobs.
     ***********************************************************/
-    protected void common_error_handling (AbstractNetworkJob job) {
+    protected void common_error_handling (AbstractNetworkJob abstract_job) {
         string reply_content;
-        string error_string = job.error_string_parsing_body (reply_content);
+        string error_string = abstract_job.error_string_parsing_body (reply_content);
         GLib.debug (reply_content.to_string ()); // display the XML error in the debug
 
         if (this.item.http_error_code == 412) {
@@ -667,7 +687,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         // Ensure errors that should eventually reset the chunked upload are tracked.
         check_resetting_errors ();
 
-        SyncFileItem.Status status = classify_error (job.reply ().error (), this.item.http_error_code,
+        SyncFileItem.Status status = classify_error (abstract_job.input_stream ().error (), this.item.http_error_code,
             propagator ().another_sync_needed, reply_content);
 
         // Insufficient remote storage.
@@ -703,11 +723,11 @@ public class PropagateUploadFileCommon : PropagateItemJob {
 
     See #6527, enterprise#2480
     ***********************************************************/
-    protected static void adjust_last_job_timeout (AbstractNetworkJob job, int64 file_size) {
+    protected static void adjust_last_job_timeout (AbstractNetworkJob abstract_job, int64 file_size) {
         const double three_minutes = 3.0 * 60 * 1000;
 
-        job.on_signal_timeout (q_bound (
-            job.timeout_msec (),
+        abstract_job.on_signal_timeout (q_bound (
+            abstract_job.timeout_msec (),
             // Calculate 3 minutes for each gigabyte of data
             q_round64 (three_minutes * file_size / 1e9),
             // Maximum of 30 minutes

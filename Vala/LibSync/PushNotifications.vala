@@ -4,8 +4,7 @@ Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
 <GPLv3-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <QWeb_socket>
-//  #include <QTimer>
+//  #include <QWebSocket>
 
 namespace Occ {
 namespace LibSync {
@@ -18,9 +17,9 @@ public class PushNotifications : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private Account account = null;
-    private QWeb_socket web_socket;
+    private QWebSocket web_socket;
     private uint8 failed_authentication_attempts_count = 0;
-    private QTimer reconnect_timer = null;
+    private GLib.Timeout reconnect_timer = null;
 
     /***********************************************************
     Set the interval for reconnection attempts
@@ -38,8 +37,8 @@ public class PushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private QTimer ping_timer;
-    private QTimer ping_timed_out_timer;
+    private GLib.Timeout ping_timer;
+    private GLib.Timeout ping_timed_out_timer;
     private bool pong_received_from_web_socket_server = false;
 
 
@@ -85,36 +84,36 @@ public class PushNotifications : GLib.Object {
         this.account = account;
         this.reconnect_timer_interval = 20 * 1000;
         this.is_ready = false;
-        this.web_socket = new QWeb_socket ("", QWeb_socket_protocol.Version_latest, this);
+        this.web_socket = new QWebSocket ("", QWeb_socket_protocol.Version_latest, this);
         connect (
-            this.web_socket, QOverload<QAbstractSocket.SocketError>.of (&QWeb_socket.error),
+            this.web_socket, QOverload<QAbstractSocket.SocketError>.of (&QWebSocket.error),
             this, PushNotifications.on_signal_web_socket_error
         );
         connect (
-            this.web_socket, QWeb_socket.signal_ssl_errors,
+            this.web_socket, QWebSocket.signal_ssl_errors,
             this, PushNotifications.on_signal_web_socket_ssl_errors
         );
         connect (
-            this.web_socket, QWeb_socket.connected,
+            this.web_socket, QWebSocket.connected,
             this, PushNotifications.on_signal_web_socket_connected
         );
         connect (
-            this.web_socket, QWeb_socket.disconnected,
+            this.web_socket, QWebSocket.disconnected,
             this, PushNotifications.on_signal_web_socket_disconnected
         );
         connect (
-            this.web_socket, QWeb_socket.pong,
+            this.web_socket, QWebSocket.pong,
             this, PushNotifications.on_signal_web_socket_pong_received
         );
         connect (
-            this.ping_timer, QTimer.timeout, this,
+            this.ping_timer, GLib.Timeout.timeout, this,
             PushNotifications.ping_web_socket_server
         );
         this.ping_timer.single_shot (true);
         this.ping_timer.interval (PING_INTERVAL);
 
         connect (
-            this.ping_timed_out_timer, QTimer.timeout,
+            this.ping_timed_out_timer, GLib.Timeout.timeout,
             this, PushNotifications.on_signal_ping_timed_out
         );
         this.ping_timed_out_timer.single_shot (true);
@@ -160,7 +159,7 @@ public class PushNotifications : GLib.Object {
         GLib.info ("Connected to websocket for account " + this.account.url);
 
         connect (
-            this.web_socket, QWeb_socket.text_message_received,
+            this.web_socket, QWebSocket.text_message_received,
             this, PushNotifications.on_signal_web_socket_text_message_received,
             Qt.UniqueConnection
         );
@@ -253,8 +252,14 @@ public class PushNotifications : GLib.Object {
         var web_socket_url = capabilities.push_notifications_web_socket_url ();
 
         GLib.info ("Open connection to websocket on " + web_socket_url + " for account " + this.account.url);
-        connect (this.web_socket, QOverload<QAbstractSocket.SocketError>.of (&QWeb_socket.error), this, PushNotifications.on_signal_web_socket_error);
-        connect (this.web_socket, QWeb_socket.signal_ssl_errors, this, PushNotifications.on_signal_web_socket_ssl_errors);
+        connect (
+            this.web_socket, QOverload<QAbstractSocket.SocketError>.of (&QWebSocket.error),
+            this, PushNotifications.on_signal_web_socket_error
+        );
+        connect (
+            this.web_socket, QWebSocket.signal_ssl_errors,
+            this, PushNotifications.on_signal_web_socket_ssl_errors
+        );
         this.web_socket.open (web_socket_url);
     }
 
@@ -281,8 +286,8 @@ public class PushNotifications : GLib.Object {
             this.reconnect_timer.stop ();
         }
 
-        disconnect (this.web_socket, QOverload<QAbstractSocket.SocketError>.of (&QWeb_socket.error), this, PushNotifications.on_signal_web_socket_error);
-        disconnect (this.web_socket, QWeb_socket.signal_ssl_errors, this, PushNotifications.on_signal_web_socket_ssl_errors);
+        disconnect (this.web_socket, QOverload<QAbstractSocket.SocketError>.of (&QWebSocket.error), this, PushNotifications.on_signal_web_socket_error);
+        disconnect (this.web_socket, QWebSocket.signal_ssl_errors, this, PushNotifications.on_signal_web_socket_ssl_errors);
 
         this.web_socket.close ();
     }
@@ -311,14 +316,14 @@ public class PushNotifications : GLib.Object {
         }
 
         if (!this.reconnect_timer) {
-            this.reconnect_timer = new QTimer (this);
+            this.reconnect_timer = new GLib.Timeout (this);
         }
 
         this.reconnect_timer.interval (this.reconnect_timer_interval);
         this.reconnect_timer.single_shot (true);
         connect (
             this.reconnect_timer,
-            QTimer.timeout,
+            GLib.Timeout.timeout,
             this.on_reconnnect_timer_finished
         );
         this.reconnect_timer.start ();

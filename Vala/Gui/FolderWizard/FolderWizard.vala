@@ -19,7 +19,6 @@ Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
 //  #include <Gtk.MessageBox>
 //  #include <cstdlib>
 //  #include <QWizard>
-//  #include <QTimer>
 
 using Soup;
 
@@ -77,7 +76,7 @@ public class FolderWizard : QWizard {
     public override bool event_filter (GLib.Object watched, QEvent event) {
         if (event.type () == QEvent.Layout_request) {
             // Workaround QTBUG-3396: forces QWizard_private.update_layout ()
-            QTimer.single_shot (
+            GLib.Timeout.single_shot (
                 0,
                 this,
                 this.on_event_filter_timer

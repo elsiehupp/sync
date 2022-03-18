@@ -65,7 +65,7 @@ public class PUTFileJob : AbstractNetworkJob {
 
     ~PUTFileJob () {
         // Make sure that we destroy the GLib.InputStream before our this.device of which it keeps an internal pointer.
-        reply (null);
+        input_stream (null);
     }
 
     /***********************************************************
@@ -84,12 +84,18 @@ public class PUTFileJob : AbstractNetworkJob {
             send_request ("PUT", make_dav_url (path ()), request, this.device);
         }
 
-        if (reply ().error () != Soup.Reply.NoError) {
-            GLib.warning (" Network error: " + reply ().error_string ());
+        if (this.input_stream.error () != Soup.Reply.NoError) {
+            GLib.warning (" Network error: " + this.input_stream.error_string ());
         }
 
-        connect (reply (), Soup.Reply.signal_upload_progress, this, PUTFileJob.signal_upload_progress);
-        connect (this, AbstractNetworkJob.signal_network_activity, account, Account.signal_propagator_network_activity);
+        connect (
+            this.input_stream, Soup.Reply.signal_upload_progress,
+            this, PUTFileJob.signal_upload_progress
+        );
+        connect (
+            this, AbstractNetworkJob.signal_network_activity,
+            account, Account.signal_propagator_network_activity
+        );
         this.request_timer.start ();
         AbstractNetworkJob.start ();
     }
@@ -100,10 +106,10 @@ public class PUTFileJob : AbstractNetworkJob {
     public bool on_signal_finished () {
         this.device.close ();
 
-        GLib.info ("PUT of " + reply ().request ().url.to_string () + " finished with status "
+        GLib.info ("PUT of " + this.input_stream.request ().url.to_string () + " finished with status "
             + reply_status_string ()
-            + reply ().attribute (Soup.Request.HttpStatusCodeAttribute)
-            + reply ().attribute (Soup.Request.HttpReasonPhraseAttribute));
+            + this.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute)
+            + this.input_stream.attribute (Soup.Request.HttpReasonPhraseAttribute));
 
         /* emit */ signal_finished ();
         return true;

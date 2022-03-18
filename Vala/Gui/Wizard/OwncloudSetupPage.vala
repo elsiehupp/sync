@@ -7,7 +7,6 @@ Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
 
 //  #include <GLib.Dir>
 //  #include <QFileDialog>
-//  #include <QTimer>
 //  #include <QPushButton>
 //  #include <Gtk.MessageBox>
 //  #include <QSsl>

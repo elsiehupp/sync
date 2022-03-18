@@ -45,7 +45,11 @@ public class PollJob : AbstractNetworkJob {
         GLib.Uri final_url = GLib.Uri.from_user_input (account_url.scheme () + "://" + account_url.authority ()
             + (path ().starts_with ("/") ? "" : "/") + path ());
         send_request ("GET", final_url);
-        connect (reply (), Soup.Reply.download_progress, this, AbstractNetworkJob.reset_timeout, Qt.UniqueConnection);
+        connect (
+            this.input_stream, Soup.Reply.download_progress,
+            this, AbstractNetworkJob.reset_timeout,
+            Qt.UniqueConnection
+        );
         AbstractNetworkJob.start ();
     }
 
@@ -53,9 +57,9 @@ public class PollJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public bool on_signal_finished () {
-        Soup.Reply.NetworkError err = reply ().error ();
+        Soup.Reply.NetworkError err = this.input_stream.error ();
         if (err != Soup.Reply.NoError) {
-            this.item.http_error_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+            this.item.http_error_code = this.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             this.item.request_id = request_id ();
             this.item.status = classify_error (err, this.item.http_error_code);
             this.item.error_string = error_string ();
@@ -72,16 +76,16 @@ public class PollJob : AbstractNetworkJob {
                 /* emit */ signal_finished ();
                 return true;
             }
-            QTimer.single_shot (8 * 1000, this, PollJob.start);
+            GLib.Timeout.single_shot (8 * 1000, this, PollJob.start);
             return false;
         }
 
-        string json_data = reply ().read_all ().trimmed ();
+        string json_data = this.input_stream.read_all ().trimmed ();
         QJsonParseError json_parse_error;
         QJsonObject json = QJsonDocument.from_json (json_data, json_parse_error).object ();
-        GLib.info ("> " + json_data + " <" + reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int () + json + json_parse_error.error_string ());
+        GLib.info ("> " + json_data + " <" + this.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int () + json + json_parse_error.error_string ());
         if (json_parse_error.error != QJsonParseError.NoError) {
-            this.item.error_string = _("Invalid JSON reply from the poll URL");
+            this.item.error_string = _("Invalid JSON input_stream from the poll URL");
             this.item.status = SyncFileItem.Status.NORMAL_ERROR;
             /* emit */ signal_finished ();
             return true;
@@ -89,7 +93,7 @@ public class PollJob : AbstractNetworkJob {
 
         var status = json["status"].to_string ();
         if (status == "on_signal_init" || status == "started") {
-            QTimer.single_shot (5 * 1000, this, PollJob.start);
+            GLib.Timeout.single_shot (5 * 1000, this, PollJob.start);
             return false;
         }
 

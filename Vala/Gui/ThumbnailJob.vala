@@ -46,7 +46,7 @@ public class ThumbnailJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private override bool on_signal_finished () {
-        /* emit */ signal_job_finished (reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int (), reply ().read_all ());
+        /* emit */ signal_job_finished (this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int (), this.reply.read_all ());
         return true;
     }
 

@@ -13,7 +13,6 @@ Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
 //  #include <QXmlStrea
 //  #include <string[
 //  #include <GLib.List>
-//  #include <QTimer>
 //  #include <QMutex>
 //  #include <QCoreApplicati
 //  #include <QJsonDocumen

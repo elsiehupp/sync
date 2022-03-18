@@ -19,8 +19,14 @@ public class TestLocalDiscovery : GLib.Object {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         LocalDiscoveryTracker tracker;
-        connect (&fake_folder.sync_engine, &SyncEngine.signal_item_completed, tracker, &LocalDiscoveryTracker.slot_item_completed);
-        connect (&fake_folder.sync_engine, &SyncEngine.on_signal_finished, tracker, &LocalDiscoveryTracker.slot_sync_finished);
+        connect (
+            fake_folder.sync_engine, SyncEngine.signal_item_completed,
+            tracker, LocalDiscoveryTracker.slot_item_completed
+        );
+        connect (
+            fake_folder.sync_engine, SyncEngine.on_signal_finished,
+            tracker, LocalDiscoveryTracker.slot_sync_finished
+        );
 
         // More subdirectories are useful for testing
         fake_folder.local_modifier ().mkdir ("A/X");

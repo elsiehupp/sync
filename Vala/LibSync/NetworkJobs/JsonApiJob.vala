@@ -17,7 +17,7 @@ https://github.com/ow
 To be used like this:
 \code
 this.job = new JsonApiJob (account, "o
-connect (j
+connect 
 The received GLib.HashTable<string, GLib.Variant> is null in case of error
 \encode
 
@@ -138,19 +138,19 @@ public class JsonApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     protected bool on_signal_finished () {
-        GLib.info ("JsonApiJob of" + reply ().request ().url
+        GLib.info ("JsonApiJob of" + this.reply.request ().url
             + " finished with status " + reply_status_string ());
 
         int status_code = 0;
-        int http_status_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-        if (reply ().error () != Soup.Reply.NoError) {
-            GLib.warning ("Network error: " + path () + error_string () + reply ().attribute (Soup.Request.HttpStatusCodeAttribute));
-            status_code = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        int http_status_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        if (this.reply.error () != Soup.Reply.NoError) {
+            GLib.warning ("Network error: " + path () + error_string () + this.reply.attribute (Soup.Request.HttpStatusCodeAttribute));
+            status_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             /* emit */ signal_json_received (QJsonDocument (), status_code);
             return true;
         }
 
-        string json_str = string.from_utf8 (reply ().read_all ());
+        string json_str = string.from_utf8 (this.reply.read_all ());
         if (json_str.contains ("<?xml version=\"1.0\"?>")) {
             const QRegularExpression regular_expression = new QRegularExpression ("<statuscode> (\\d+)</statuscode>");
             var rex_match = regular_expression.match (json_str);
@@ -171,10 +171,10 @@ public class JsonApiJob : AbstractNetworkJob {
         }
 
         // save new ETag value
-        if (reply ().raw_header_list ().contains ("ETag"))
-            /* emit */ etag_response_header_received (reply ().raw_header ("ETag"), status_code);
+        if (this.reply.raw_header_list ().contains ("ETag"))
+            /* emit */ etag_response_header_received (this.reply.raw_header ("ETag"), status_code);
 
-        var desktop_notifications_allowed = reply ().raw_header ("X-Nextcloud-User-Status");
+        var desktop_notifications_allowed = this.reply.raw_header ("X-Nextcloud-User-Status");
         if (!desktop_notifications_allowed == "") {
             /* emit */ allow_desktop_notifications_changed (desktop_notifications_allowed == "online");
         }

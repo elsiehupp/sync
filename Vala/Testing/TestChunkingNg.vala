@@ -312,7 +312,10 @@ public class TestChunkingNg : GLib.Object {
             GLib.assert_true (!fake_folder.sync_once ()); // error : on_signal_abort!
 
             // An EVAL/EVAL conflict is also UPDATE_METADATA when there's no checksums
-            connection = connect (&fake_folder.sync_engine, &SyncEngine.signal_about_to_propagate, check_etag_updated);
+            connection = connect (
+                fake_folder.sync_engine, SyncEngine.signal_about_to_propagate,
+                check_etag_updated
+            );
             GLib.assert_true (fake_folder.sync_once ());
             disconnect (connection);
             GLib.assert_true (n_get == 0);
@@ -357,7 +360,7 @@ public class TestChunkingNg : GLib.Object {
 
         private Soup.Reply override_delegate_abort_hard (Soup.Operation operation, Soup.Request request, QIODevice device) {
             if (request.attribute (Soup.Request.CustomVerbAttribute) == "MOVE") {
-                QTimer.single_shot (50, parent, () => { fake_folder.sync_engine.on_signal_abort (); });
+                GLib.Timeout.single_shot (50, parent, () => { fake_folder.sync_engine.on_signal_abort (); });
                 move_checksum_header = request.raw_header ("OC-Checksum");
                 return new DelayedReply<FakeChunkMoveReply> (response_delay, fake_folder.upload_state (), fake_folder.remote_modifier (), operation, request, parent);
             } else if (operation == Soup.GetOperation) {
@@ -394,7 +397,7 @@ public class TestChunkingNg : GLib.Object {
 
         private Soup.Reply override_delegate_abort_recoverable (Soup.Operation operation, Soup.Request request, QIODevice device) {
             if (request.attribute (Soup.Request.CustomVerbAttribute) == "MOVE") {
-                QTimer.single_shot (50, parent, () => { fake_folder.sync_engine.on_signal_abort (); });
+                GLib.Timeout.single_shot (50, parent, () => { fake_folder.sync_engine.on_signal_abort (); });
                 return new DelayedReply<FakeChunkMoveReply> (response_delay, fake_folder.upload_state (), fake_folder.remote_modifier (), operation, request, parent);
             }
             return null;

@@ -161,7 +161,7 @@ public class SyncEngine : GLib.Object {
     /***********************************************************
     For clearing the touched_files variable after sync on_signal_finished
     ***********************************************************/
-    private QTimer clear_touched_files_timer;
+    private GLib.Timeout clear_touched_files_timer;
 
 
     /***********************************************************
@@ -303,7 +303,7 @@ public class SyncEngine : GLib.Object {
         this.clear_touched_files_timer.interval (30 * 1000);
         connect (
             this.clear_touched_files_timer,
-            QTimer.timeout,
+            GLib.Timeout.timeout,
             this,
             this.on_signal_clear_touched_files
         );
@@ -333,11 +333,17 @@ public class SyncEngine : GLib.Object {
             GLib.List<SyncJournalDb.PollInfo> poll_infos = this.journal.get_poll_infos ();
             if (!poll_infos == "") {
                 GLib.info ("Finish Poll jobs before starting a sync");
-                var job = new CleanupPollsJob (poll_infos, this.account,
+                var cleanup_polls_job = new CleanupPollsJob (poll_infos, this.account,
                     this.journal, this.local_path, this.sync_options.vfs, this);
-                connect (job, CleanupPollsJob.on_signal_finished, this, SyncEngine.on_signal_start_sync);
-                connect (job, CleanupPollsJob.aborted, this, SyncEngine.on_signal_clean_polls_job_aborted);
-                job.start ();
+                connect (
+                    cleanup_polls_job, CleanupPollsJob.on_signal_finished,
+                    this, SyncEngine.on_signal_start_sync
+                );
+                connect (
+                    cleanup_polls_job, CleanupPollsJob.aborted,
+                    this, SyncEngine.on_signal_clean_polls_job_aborted
+                );
+                cleanup_polls_job.start ();
                 return;
             }
         }

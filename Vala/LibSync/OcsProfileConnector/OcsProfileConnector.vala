@@ -40,9 +40,11 @@ public class OcsProfileConnector : GLib.Object {
             return;
         }
         const string url = "/ocs/v2.php/hovercard/v1/%1".printf (user_id);
-        var job = new JsonApiJob (this.account, url, this);
-        JsonApiJob.signal_json_received.connect (job, this, OcsProfileConnector.on_signal_hovercard_fetched);
-        job.start ();
+        var json_api_job = new JsonApiJob (this.account, url, this);
+        json_api_job.signal_json_received.connect (
+            this.on_signal_hovercard_fetched
+        );
+        json_api_job.start ();
     }
 
 

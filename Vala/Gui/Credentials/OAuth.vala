@@ -5,7 +5,6 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 ***********************************************************/
 
 //  #include <QDesktopServices>
-//  #include <QTimer>
 //  #include <QBuffer>
 //  #include <QJsonObject>
 //  #include <QJsonDocument>
@@ -77,14 +76,12 @@ public class OAuth : GLib.Object {
             return;
         }
 
-        if (!open_browser ())
+        if (!open_browser ()) {
             return;
+        }
 
-        connect (
-            this.server,
-            QTcpServer.new_connection,
-            this,
-            on_signal_new_connection
+        this.server.new_connection.connect (
+            this.on_signal_new_connection
         );
     }
 
@@ -92,19 +89,13 @@ public class OAuth : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_new_connection () {
-        QPointer<QTcpSocket> socket = this.server.next_pending_connection ();
+        QTcpSocket socket = this.server.next_pending_connection ();
         while (socket) {
-            connect (
-                socket,
-                QTcpSocket.disconnected,
-                socket,
-                QTcpSocket.delete_later
+            socket.disconnected.connect (
+                socket.delete_later
             );
-            connect (
-                socket,
-                QIODevice.ready_read,
-                this,
-                on_signal_ready_read
+            socket.ready_read.connect (
+                this.on_signal_ready_read
             );
         }
     }
@@ -143,13 +134,10 @@ public class OAuth : GLib.Object {
                 .printf (code, string.number (this.server.server_port ())));
         request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
 
-        var job = this.account.send_request ("POST", request_token, req, request_body);
-        job.on_signal_timeout (q_min (30 * 1000ll, job.timeout_msec ()));
-        connect (
-            job,
-            SimpleNetworkJob.finished_signal,
-            this,
-            on_signal_simple_network_job_finished
+        var simple_network_job = this.account.send_request ("POST", request_token, req, request_body);
+        simple_network_job.on_signal_timeout (q_min (30 * 1000ll, simple_network_job.timeout_msec ()));
+        simple_network_job.signal_finished.connect (
+            this.on_signal_simple_network_job_finished
         );
     }
 

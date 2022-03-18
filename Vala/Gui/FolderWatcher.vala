@@ -12,7 +12,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <GLib.Dir>
 //  #include <QMutexLoc
 //  #include <string[]
-//  #include <QTimer>
 //  #include <GLib.List
 //  #include <QLoggingCatego
 //  #include <QElapsedTimer>
@@ -206,7 +205,7 @@ public class FolderWatcher : GLib.Object {
     ***********************************************************/
     private void on_signal_start_notification_test_when_ready () {
         if (!this.d.ready) {
-            QTimer.single_shot (1000, this, FolderWatcher.on_signal_start_notification_test_when_ready);
+            GLib.Timeout.single_shot (1000, this, FolderWatcher.on_signal_start_notification_test_when_ready);
             return;
         }
 
@@ -219,7 +218,7 @@ public class FolderWatcher : GLib.Object {
             f.open (QIODevice.WriteOnly | QIODevice.Append);
         }
 
-        QTimer.single_shot (5000, this, on_timer);
+        GLib.Timeout.single_shot (5000, this, on_timer);
     }
 
 

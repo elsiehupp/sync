@@ -52,10 +52,8 @@ public class CloudProviderManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void register_signals () {
-        connect (
-            Occ.FolderMan.instance,
-            signal_folder_list_changed,
-            on_signal_folder_list_changed
+        FolderMan.instance.signal_folder_list_changed.connect (
+            this.on_signal_folder_list_changed
         );
         on_signal_folder_list_changed (folder_manager.map ());
     }

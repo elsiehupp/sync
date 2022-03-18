@@ -8,13 +8,13 @@ namespace Occ {
 namespace LibSync {
 
 /***********************************************************
-@brief Job to sigh the CSR that return JSON
+@brief Job to sign the CSR that return JSON
 
 To be
 \code
 this.job = new SignPubli
 this.job.csr ( csr
-connect (this.job.
+this.job.connect (
 this.job.start
 \encode
 
@@ -73,11 +73,11 @@ public class SignPublicKeyApiJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     protected bool on_signal_finished () {
-        GLib.info ("Sending CSR ended with " + path () + error_string () + reply ().attribute (Soup.Request.HttpStatusCodeAttribute));
+        GLib.info ("Sending CSR ended with " + path () + error_string () + this.reply.attribute (Soup.Request.HttpStatusCodeAttribute));
 
         QJsonParseError error;
-        var json = QJsonDocument.from_json (reply ().read_all (), error);
-        /* emit */ signal_json_received (json, reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ());
+        var json = QJsonDocument.from_json (this.reply.read_all (), error);
+        /* emit */ signal_json_received (json, this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ());
         return true;
     }
 

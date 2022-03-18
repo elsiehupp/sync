@@ -71,8 +71,10 @@ public class CheckServerJob : AbstractNetworkJob {
         this.subdir_fallback = false;
         this.permanent_redirects = 0;
         ignore_credential_failure (true);
-        connect (this, AbstractNetworkJob.redirected,
-            this, CheckServerJob.on_signal_redirected);
+        connect (
+            this, AbstractNetworkJob.redirected,
+            this, CheckServerJob.on_signal_redirected
+        );
     }
 
 
@@ -81,8 +83,14 @@ public class CheckServerJob : AbstractNetworkJob {
     public new void start () {
         this.server_url = account.url;
         send_request ("GET", Utility.concat_url_path (this.server_url, path ()));
-        connect (reply (), Soup.Reply.meta_data_changed, this, CheckServerJob.on_signal_metadata_changed);
-        connect (reply (), Soup.Reply.encrypted, this, CheckServerJob.on_signal_encrypted);
+        connect (
+            this.reply, Soup.Reply.meta_data_changed,
+            this, CheckServerJob.on_signal_metadata_changed
+        );
+        connect (
+            this.reply, Soup.Reply.encrypted,
+            this, CheckServerJob.on_signal_encrypted
+        );
         AbstractNetworkJob.start ();
     }
 
@@ -91,9 +99,9 @@ public class CheckServerJob : AbstractNetworkJob {
     ***********************************************************/
     public new void on_signal_timed_out () {
         GLib.warning ("TIMEOUT");
-        if (reply () && reply ().is_running ()) {
-            /* emit */ timeout (reply ().url);
-        } else if (!reply ()) {
+        if (this.reply && this.reply.is_running ()) {
+            /* emit */ timeout (this.reply.url);
+        } else if (!this.reply) {
             GLib.warning ("Timeout even there was no reply?");
         }
         delete_later ();
@@ -124,43 +132,43 @@ public class CheckServerJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private bool on_signal_finished () {
-        if (reply ().request ().url.scheme () == "https"
-            && reply ().ssl_configuration ().session_ticket () == ""
-            && reply ().error () == Soup.Reply.NoError) {
+        if (this.reply.request ().url.scheme () == "https"
+            && this.reply.ssl_configuration ().session_ticket () == ""
+            && this.reply.error () == Soup.Reply.NoError) {
             GLib.warning ("No SSL session identifier / session ticket is used, this might impact sync performance negatively.");
         }
 
-        merge_ssl_configuration_for_ssl_button (reply ().ssl_configuration (), account);
+        merge_ssl_configuration_for_ssl_button (this.reply.ssl_configuration (), account);
 
         // The server installs to /owncloud. Let's try that if the file wasn't found
         // at the original location
-        if ((reply ().error () == Soup.Reply.ContentNotFoundError) && (!this.subdir_fallback)) {
+        if ((this.reply.error () == Soup.Reply.ContentNotFoundError) && (!this.subdir_fallback)) {
             this.subdir_fallback = true;
             path (NEXTCLOUD_DIR_C + STATUS_PHP_C);
             start ();
-            GLib.info ("Retrying with " + reply ().url);
+            GLib.info ("Retrying with " + this.reply.url);
             return false;
         }
 
-        string body = reply ().peek (4 * 1024);
-        int http_status = reply ().attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        string body = this.reply.peek (4 * 1024);
+        int http_status = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (body == "" || http_status != 200) {
             GLib.warning ("Error: status.php replied " + http_status + body);
-            /* emit */ instance_not_found (reply ());
+            /* emit */ instance_not_found (this.reply);
         } else {
             QJsonParseError error;
             var status = QJsonDocument.from_json (body, error);
             // empty or invalid response
             if (error.error != QJsonParseError.NoError || status.is_null ()) {
-                GLib.warning ("status.php from server is not valid JSON!" + body + reply ().request ().url + error.error_string ());
+                GLib.warning ("status.php from server is not valid JSON!" + body + this.reply.request ().url + error.error_string ());
             }
 
-            GLib.info ("status.php returns: " + status + " " + reply ().error () + " Reply: " + reply ());
+            GLib.info ("status.php returns: " + status + " " + this.reply.error () + " Reply: " + this.reply);
             if (status.object ().contains ("installed")) {
                 /* emit */ instance_found (this.server_url, status.object ());
             } else {
-                GLib.warning ("No proper answer on " + reply ().url);
-                /* emit */ instance_not_found (reply ());
+                GLib.warning ("No proper answer on " + this.reply.url);
+                /* emit */ instance_not_found (this.reply);
             }
         }
         return true;
@@ -170,15 +178,15 @@ public class CheckServerJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_metadata_changed () {
-        account.ssl_configuration (reply ().ssl_configuration ());
-        merge_ssl_configuration_for_ssl_button (reply ().ssl_configuration (), account);
+        account.ssl_configuration (this.reply.ssl_configuration ());
+        merge_ssl_configuration_for_ssl_button (this.reply.ssl_configuration (), account);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_signal_encrypted () {
-        merge_ssl_configuration_for_ssl_button (reply ().ssl_configuration (), account);
+        merge_ssl_configuration_for_ssl_button (this.reply.ssl_configuration (), account);
     }
 
 

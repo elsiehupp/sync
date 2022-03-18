@@ -5,8 +5,7 @@ Copyright (C) by Markus Goetz <markus@woboq.com>
 ***********************************************************/
 
 //  #include <QLoggingCategory>
-//  #include <QTimer>
-//  #include <QTimer>
+//  #include <GLib.Timeout>
 //  #include <QIODevice>
 //  #include <list>
 
@@ -22,7 +21,7 @@ public class BandwidthManager : GLib.Object {
     /***********************************************************
     For switching between absolute and relative bw limiting
     ***********************************************************/
-    private QTimer switching_timer;
+    private GLib.Timeout switching_timer;
 
     /***********************************************************
     FIXME this timer and this variable should be replaced by the
@@ -33,7 +32,7 @@ public class BandwidthManager : GLib.Object {
     /***********************************************************
     For absolute up/down bw limiting
     ***********************************************************/
-    private QTimer absolute_limit_timer;
+    private GLib.Timeout absolute_limit_timer;
 
     /***********************************************************
     FIXME merge these two lists
@@ -43,13 +42,13 @@ public class BandwidthManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private QTimer relative_upload_measuring_timer;
+    private GLib.Timeout relative_upload_measuring_timer;
 
     /***********************************************************
     For relative bandwidth limiting, we need to wait this amount
     before measuring again
     ***********************************************************/
-    private QTimer relative_upload_delay_timer;
+    private GLib.Timeout relative_upload_delay_timer;
 
     /***********************************************************
     The device measured
@@ -65,13 +64,13 @@ public class BandwidthManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private GLib.List<GETFileJob> download_job_list;
-    private QTimer relative_download_measuring_timer;
+    private GLib.Timeout relative_download_measuring_timer;
 
     /***********************************************************
     For relative bandwidth limiting, we need to wait this amount
     before measuring again
     ***********************************************************/
-    private QTimer relative_download_delay_timer;
+    private GLib.Timeout relative_download_delay_timer;
 
     /***********************************************************
     The device measured
@@ -115,7 +114,7 @@ public class BandwidthManager : GLib.Object {
         this.current_download_limit = this.propagator.download_limit;
 
         connect (
-            this.switching_timer, QTimer.timeout,
+            this.switching_timer, GLib.Timeout.timeout,
             this, BandwidthManager.on_signal_switching_timer_expired
         );
         this.switching_timer.interval (10 * 1000);
@@ -124,7 +123,7 @@ public class BandwidthManager : GLib.Object {
 
         // absolute uploads/downloads
         connect (
-            this.absolute_limit_timer, QTimer.timeout,
+            this.absolute_limit_timer, GLib.Timeout.timeout,
             this, BandwidthManager.on_signal_absolute_limit_timer_expired
         );
         this.absolute_limit_timer.interval (1000);
@@ -132,28 +131,28 @@ public class BandwidthManager : GLib.Object {
 
         // Relative uploads
         connect (
-            this.relative_upload_measuring_timer, QTimer.timeout,
+            this.relative_upload_measuring_timer, GLib.Timeout.timeout,
             this, BandwidthManager.on_signal_relative_upload_measuring_timer_expired
         );
         this.relative_upload_measuring_timer.interval (relative_limit_measuring_timer_interval_msec);
         this.relative_upload_measuring_timer.start ();
         this.relative_upload_measuring_timer.single_shot (true); // will be restarted from the delay timer
         connect (
-            this.relative_upload_delay_timer, QTimer.timeout,
+            this.relative_upload_delay_timer, GLib.Timeout.timeout,
             this, BandwidthManager.on_signal_relative_upload_delay_timer_expired
         );
         this.relative_upload_delay_timer.single_shot (true); // will be restarted from the measuring timer
 
         // Relative downloads
         connect (
-            this.relative_download_measuring_timer, QTimer.timeout,
+            this.relative_download_measuring_timer, GLib.Timeout.timeout,
             this, BandwidthManager.on_signal_relative_download_measuring_timer_expired
         );
         this.relative_download_measuring_timer.interval (relative_limit_measuring_timer_interval_msec);
         this.relative_download_measuring_timer.start ();
         this.relative_download_measuring_timer.single_shot (true); // will be restarted from the delay timer
         connect (
-            this.relative_download_delay_timer, QTimer.timeout,
+            this.relative_download_delay_timer, GLib.Timeout.timeout,
             this, BandwidthManager.on_signal_relative_download_delay_timer_expired
         );
         this.relative_download_delay_timer.single_shot (true); // will be restarted from the measuring timer

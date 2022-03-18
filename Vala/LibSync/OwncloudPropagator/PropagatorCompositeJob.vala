@@ -138,12 +138,14 @@ public class PropagatorCompositeJob : PropagatorJob {
     public new void abort (PropagatorJob.AbortType abort_type) {
         if (!this.running_jobs.empty ()) {
             this.aborts_count = this.running_jobs.size ();
-            foreach (PropagatorJob j in this.running_jobs) {
+            foreach (PropagatorJob propagator_job in this.running_jobs) {
                 if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
-                    connect (j, PropagatorJob.signal_abort_finished,
-                            this, PropagatorCompositeJob.on_signal_sub_job_abort_finished);
+                    connect (
+                        propagator_job, PropagatorJob.signal_abort_finished,
+                        this, PropagatorCompositeJob.on_signal_sub_job_abort_finished
+                    );
                 }
-                j.abort (abort_type);
+                propagator_job.abort (abort_type);
             }
         } else if (abort_type == PropagatorJob.AbortType.ASYNCHRONOUS) {
             /* emit */ signal_abort_finished ();
@@ -177,11 +179,14 @@ public class PropagatorCompositeJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    private bool on_signal_possibly_run_next_job (PropagatorJob next) {
-        if (next.state == NotYetStarted) {
-            connect (next, PropagatorJob.on_signal_finished, this, PropagatorCompositeJob.on_signal_sub_job_finished);
+    private bool on_signal_possibly_run_next_job (PropagatorJob next_propagator_job) {
+        if (next_propagator_job.state == NotYetStarted) {
+            connect (
+                next_propagator_job, PropagatorJob.on_signal_finished,
+                this, PropagatorCompositeJob.on_signal_sub_job_finished
+            );
         }
-        return next.on_signal_schedule_self_or_child ();
+        return next_propagator_job.on_signal_schedule_self_or_child ();
     }
 
 

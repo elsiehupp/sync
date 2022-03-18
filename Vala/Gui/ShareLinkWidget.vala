@@ -67,7 +67,7 @@ public class ShareLinkWidget : Gtk.Widget {
 
     internal signal void create_link_share ();
     internal signal void delete_link_share ();
-    internal signal void resize_requested ();
+    internal signal void on_signal_resize_requested ();
     internal signal void visual_deletion_done ();
     internal signal void create_password (string password);
     internal signal void create_password_processed ();
@@ -108,25 +108,20 @@ public class ShareLinkWidget : Gtk.Widget {
         GLib.FileInfo file_info = new GLib.FileInfo (local_path);
         this.is_file = file_info.is_file ();
 
-        connect (
-            this.ui.enable_share_link, QPushButton.clicked,
-            this, ShareLinkWidget.on_signal_create_share_link
+        this.ui.enable_share_link.clicked.connect (
+            this.on_signal_create_share_link
         );
-        connect (
-            this.ui.line_edit_password, QLineEdit.return_pressed,
-            this, ShareLinkWidget.on_signal_create_password
+        this.ui.line_edit_password.return_pressed.connect (
+            this.on_signal_create_password
         );
-        connect (
-            this.ui.confirm_password, QAbstractButton.clicked,
-            this, ShareLinkWidget.on_signal_create_password
+        this.ui.confirm_password.clicked.connect (
+            this.on_signal_create_password
         );
-        connect (
-            this.ui.confirm_note, QAbstractButton.clicked,
-            this, ShareLinkWidget.on_signal_create_note
+        this.ui.confirm_note.clicked.connect (
+            this.on_signal_create_note
         );
-        connect (
-            this.ui.confirm_expiration_date, QAbstractButton.clicked,
-            this, ShareLinkWidget.on_signal_expire_date
+        this.ui.confirm_expiration_date.clicked.connect (
+            this.on_signal_expire_date
         );
 
         this.ui.error_label.hide ();
@@ -178,21 +173,17 @@ public class ShareLinkWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public void set_up_ui_options () {
-        connect (
-            this.link_share, LinkShare.signal_note_set,
-            this, ShareLinkWidget.on_signal_note_set
+        this.link_share.signal_note_set.connect (
+            this.on_signal_link_share_note_set
         );
-        connect (
-            this.link_share, LinkShare.signal_password_set,
-            this, ShareLinkWidget.on_signal_password_set
+        this.link_share.signal_password_set.connect (
+            this.on_signal_link_share_password_set
         );
-        connect (
-            this.link_share, LinkShare.signal_password_error,
-            this, ShareLinkWidget.on_signal_password_error
+        this.link_share.signal_password_error.connect (
+            this.on_signal_link_share_password_error
         );
-        connect (
-            this.link_share, LinkShare.signal_label_set,
-            this, ShareLinkWidget.on_signal_label_set
+        this.link_share.signal_label_set.connect (
+            this.on_signal_link_share_label_set
         );
 
         // Prepare permissions check and create group action
@@ -201,7 +192,7 @@ public class ShareLinkWidget : Gtk.Widget {
             : QDate ();
         const SharePermissions perm = this.link_share.permissions ();
         var checked = false;
-        var permissions_group = new QAction_group (this);
+        var permissions_group = new GLib.ActionGroup (this);
 
         // Prepare sharing menu
         this.link_context_menu = new QMenu (this);
@@ -245,18 +236,16 @@ public class ShareLinkWidget : Gtk.Widget {
         this.share_link_layout.add_widget (this.share_link_label);
 
         this.share_link_edit = new QLineEdit (this);
-        connect (
-            this.share_link_edit, QLineEdit.return_pressed,
-            this, ShareLinkWidget.on_signal_create_label
+        this.share_link_edit.return_pressed.connect (
+            this.on_signal_create_label
         );
         this.share_link_edit.placeholder_text (_("Link name"));
         this.share_link_edit.on_signal_text (this.link_share.label ());
         this.share_link_layout.add_widget (this.share_link_edit);
 
         this.share_link_button = new QToolButton (this);
-        connect (
-            this.share_link_button, QToolButton.clicked,
-            this, ShareLinkWidget.on_signal_create_label
+        this.share_link_button.clicked.connect (
+            this.on_signal_create_label
         );
         this.share_link_button.icon (Gtk.Icon (":/client/theme/confirm.svg"));
         this.share_link_button.tool_button_style (Qt.Tool_button_icon_only);
@@ -320,13 +309,11 @@ public class ShareLinkWidget : Gtk.Widget {
             this.expiration_date_link_action.checked (true);
             toggle_expire_date_options ();
         }
-        connect (
-            this.ui.calendar, QDateTimeEdit.date_changed,
-            this, ShareLinkWidget.on_signal_expire_date
+        this.ui.calendar.date_changed.connect (
+            this.on_signal_expire_date
         );
-        connect (
-            this.link_share, LinkShare.signal_expire_date_set,
-            this, ShareLinkWidget.on_signal_expire_date_set
+        this.link_share.signal_expire_date_set.connect (
+            this.on_signal_expire_date_set
         );
 
         // If expiredate is enforced do not allow disable and set max days
@@ -348,17 +335,14 @@ public class ShareLinkWidget : Gtk.Widget {
             _("Add another link"));
 
         this.ui.enable_share_link.icon (Gtk.Icon (":/client/theme/copy.svg"));
-        disconnect (
-            this.ui.enable_share_link, QPushButton.clicked,
-            this, ShareLinkWidget.on_signal_create_share_link
+        this.ui.enable_share_link.clicked.disconnect (
+            this.on_signal_create_share_link
         );
-        connect (
-            this.ui.enable_share_link, QPushButton.clicked,
-            this, ShareLinkWidget.on_signal_copy_link_share
+        this.ui.enable_share_link.clicked.connect (
+            this.on_signal_copy_link_share
         );
-        connect (
-            this.link_context_menu, QMenu.triggered,
-            this, ShareLinkWidget.on_signal_link_context_menu_action_triggered
+        this.link_context_menu.triggered.connect (
+            this.on_signal_link_context_menu_action_triggered
         );
 
         this.ui.share_link_tool_button.menu (this.link_context_menu);
@@ -412,7 +396,7 @@ public class ShareLinkWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public 
-    void ShareLinkWidget.on_signal_note_set () {
+    void ShareLinkWidget.on_signal_link_share_note_set () {
         toggle_button_animation (this.ui.confirm_note, this.ui.note_progress_indicator, this.note_link_action);
     }
 
@@ -520,8 +504,8 @@ public class ShareLinkWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_password_set ();
-    void ShareLinkWidget.on_signal_password_set () {
+    private void on_signal_link_share_password_set ();
+    void ShareLinkWidget.on_signal_link_share_password_set () {
         toggle_button_animation (this.ui.confirm_password, this.ui.password_progress_indicator, this.password_protect_link_action);
 
         this.ui.line_edit_password.on_signal_text ({});
@@ -539,8 +523,8 @@ public class ShareLinkWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_password_error (int code, string message);
-    void ShareLinkWidget.on_signal_password_error (int code, string message) {
+    private void on_signal_link_share_password_error (int code, string message);
+    void ShareLinkWidget.on_signal_link_share_password_error (int code, string message) {
         toggle_button_animation (this.ui.confirm_password, this.ui.password_progress_indicator, this.password_protect_link_action);
 
         on_signal_server_error (code, message);
@@ -607,11 +591,8 @@ public class ShareLinkWidget : Gtk.Widget {
     destroyed. #4189
     ***********************************************************/
     private void on_signal_delete_animation_finished () {
-        connect (
-            this,
-            GLib.Object.destroyed,
-            parent_widget (),
-            repaint ()
+        this.destroyed.connect (
+            parent_widget ().repaint
         );
     }
 
@@ -619,7 +600,7 @@ public class ShareLinkWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_animation_finished () {
-        /* emit */ resize_requested ();
+        /* emit */ on_signal_resize_requested ();
         delete_later ();
     }
 
@@ -640,7 +621,7 @@ public class ShareLinkWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_label_set () {
+    private void on_signal_link_share_label_set () {
         toggle_button_animation (this.share_link_button, this.share_link_progress_indicator, this.share_link_widget_action);
         display_share_link_label ();
     }
@@ -735,11 +716,9 @@ public class ShareLinkWidget : Gtk.Widget {
             message_box.add_button (_("Delete"), Gtk.MessageBox.YesRole);
         message_box.add_button (_("Cancel"), Gtk.MessageBox.NoRole);
 
-        connect (
-            message_box,
-            Gtk.MessageBox.signal_finished,
-            this,
-            this.on_message_box_signal_finished);
+        message_box.signal_finished.connect (
+            this.on_message_box_signal_finished
+        );
         message_box.open ();
     }
 
@@ -778,19 +757,16 @@ public class ShareLinkWidget : Gtk.Widget {
         maximum_height_animation.start_value (start_index);
         maximum_height_animation.end_value (end);
 
-        connect (
-            maximum_height_animation, QAbstractAnimation.on_signal_finished,
-            this, ShareLinkWidget.on_signal_animation_finished
+        maximum_height_animation.signal_finished.connect (
+            this.on_signal_animation_finished
         );
         if (end < start_index) { // that is to remove the widget, not to show it
-            connect (
-                maximum_height_animation, QAbstractAnimation.on_signal_finished,
-                this, ShareLinkWidget.on_signal_delete_animation_finished
+            maximum_height_animation.signal_finished.connect (
+                this.on_signal_delete_animation_finished
             );
         }
-        connect (
-            maximum_height_animation, QVariantAnimation.value_changed,
-            this, ShareLinkWidget.resize_requested
+        maximum_height_animation.value_changed.connect (
+            this.on_signal_resize_requested
         );
 
         maximum_height_animation.on_signal_start ();

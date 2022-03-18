@@ -58,7 +58,7 @@ public class ShareManager : GLib.Object {
     @param name The name of the created share, may be empty
     @param password The password of the share, may be
 
-    On on_signal_success the signal on_signal_link_share_created is emitted
+    On success the signal on_signal_create_link_share_job_finished is emitted
     For older server the on_signal_link_share_requires_password signal is emitted when it seems appropiate
     In case of a server error the on_signal_server_error signal is emitted
     ***********************************************************/
@@ -66,20 +66,14 @@ public class ShareManager : GLib.Object {
         string path,
         string name,
         string password) {
-        var ocs_share_job = new OcsShareJob (this.account);
-        connect (
-            ocs_share_job,
-            OcsShareJob.share_job_finished,
-            this,
-            ShareManager.on_signal_link_share_created
+        var create_link_share_job = new OcsShareJob (this.account);
+        create_link_share_job.signal_finished.connect (
+            this.on_signal_create_link_share_job_finished
         );
-        connect (
-            ocs_share_job,
-            OcsJob.ocs_error,
-            this,
-            ShareManager.on_signal_ocs_error
+        create_link_share_job.ocs_error.connect (
+            this.on_signal_ocs_share_job_error
         );
-        ocs_share_job.create_link_share (path, name, password);
+        create_link_share_job.create_link_share (path, name, password);
     }
 
 
@@ -99,17 +93,11 @@ public class ShareManager : GLib.Object {
         Share.Permissions permissions,
         string password = "") {
         var ocs_share_job = new OcsShareJob (this.account);
-        connect (
-            ocs_share_job,
-            OcsJob.ocs_error,
-            this,
-            ShareManager.on_signal_ocs_error
+        ocs_share_job.ocs_error.connect (
+            this.on_signal_ocs_share_job_error
         );
-        connect (
-            ocs_share_job,
-            OcsShareJob.share_job_finished,
-            this,
-            this.on_signal_share_job_finished
+        ocs_share_job.signal_finished.connect (
+            this.on_signal_create_share_job_finished
         );
         ocs_share_job.shared_with_me ();
     }
@@ -125,17 +113,11 @@ public class ShareManager : GLib.Object {
     ***********************************************************/
     public void fetch_shares (string path) {
         var ocs_share_job = new OcsShareJob (this.account);
-        connect (
-            ocs_share_job,
-            OcsShareJob.share_job_finished,
-            this,
-            ShareManager.on_signal_shares_fetched
+        ocs_share_job.signal_finished.connect (
+            this.on_signal_shares_fetched
         );
-        connect (
-            ocs_share_job,
-            OcsJob.ocs_error,
-            this,
-            ShareManager.on_signal_ocs_error
+        ocs_share_job.ocs_error.connect (
+            this.on_signal_ocs_share_job_error
         );
         ocs_share_job.on_signal_get_shares (path);
     }
@@ -143,7 +125,7 @@ public class ShareManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_share_job_finished (QJsonDocument reply) {
+    private void on_signal_create_share_job_finished (QJsonDocument reply) {
         // Find existing share permissions (if this was shared with us)
         Share.Permissions existing_permissions = Share_permission_default;
         foreach (QJsonValue element in reply.object ()["ocs"].to_object ()["data"].to_array ()) {
@@ -164,17 +146,11 @@ public class ShareManager : GLib.Object {
         }
 
         var ocs_share_job = new OcsShareJob (this.account);
-        connect (
-            ocs_share_job,
-            OcsShareJob.share_job_finished,
-            this,
-            ShareManager.on_signal_share_created
+        ocs_share_job.signal_finished.connect (
+            this.on_signal_share_created
         );
-        connect (
-            ocs_share_job,
-            OcsJob.ocs_error,
-            this,
-            ShareManager.on_signal_ocs_error
+        ocs_share_job.ocs_error.connect (
+            this.on_signal_ocs_share_job_error
         );
         ocs_share_job.create_share (
             path,
@@ -219,7 +195,7 @@ public class ShareManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_link_share_created (QJsonDocument reply) {
+    private void on_signal_create_link_share_job_finished (QJsonDocument reply) {
         string message;
         int code = OcsShareJob.json_return_code (reply, message);
 
@@ -258,7 +234,7 @@ public class ShareManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_ocs_error (int status_code, string message) {
+    private void on_signal_ocs_share_job_error (int status_code, string message) {
         /* emit */ server_error (status_code, message);
     }
 

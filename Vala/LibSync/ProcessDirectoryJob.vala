@@ -557,7 +557,7 @@ public class ProcessDirectoryJob : GLib.Object {
             }
             process_file (std.move (path), e.local_entry, e.server_entry, e.database_entry);
         }
-        QTimer.single_shot (0, this.discovery_data, DiscoveryPhase.schedule_more_jobs);
+        GLib.Timeout.single_shot (0, this.discovery_data, DiscoveryPhase.schedule_more_jobs);
     }
 
 
@@ -993,7 +993,7 @@ public class ProcessDirectoryJob : GLib.Object {
         if (!result) {
             process_file_analyze_local_info (item, path, local_entry, server_entry, database_entry, this.query_server);
         }
-        QTimer.single_shot (0, this.discovery_data, DiscoveryPhase.schedule_more_jobs);
+        GLib.Timeout.single_shot (0, this.discovery_data, DiscoveryPhase.schedule_more_jobs);
     }
 
 
@@ -1026,7 +1026,7 @@ public class ProcessDirectoryJob : GLib.Object {
 
     private void on_signal_request_etag_job_finished_with_result (HttpResult<string> etag) /*mutable*/ {
         this.pending_async_jobs--;
-        QTimer.single_shot (0, this.discovery_data, DiscoveryPhase.schedule_more_jobs);
+        GLib.Timeout.single_shot (0, this.discovery_data, DiscoveryPhase.schedule_more_jobs);
         if (etag || etag.error ().code != 404 ||
             // Somehow another item claimed this original path, consider as if it existed
             this.discovery_data.is_renamed (original_path)) {
@@ -1468,7 +1468,7 @@ public class ProcessDirectoryJob : GLib.Object {
         }
         process_file_finalize (item, path, item.is_directory (), NORMAL_QUERY, recurse_query_server);
         this.pending_async_jobs--;
-        QTimer.single_shot (0, this.discovery_data, DiscoveryPhase.schedule_more_jobs);
+        GLib.Timeout.single_shot (0, this.discovery_data, DiscoveryPhase.schedule_more_jobs);
     }
 
 
@@ -1970,7 +1970,7 @@ public class ProcessDirectoryJob : GLib.Object {
         int count = this.running_jobs.remove_all (process_directory_job);
         //  ASSERT (count == 1);
         process_directory_job.delete_later ();
-        QTimer.single_shot (0, this.discovery_data, DiscoveryPhase.schedule_more_jobs);
+        GLib.Timeout.single_shot (0, this.discovery_data, DiscoveryPhase.schedule_more_jobs);
     }
 
 

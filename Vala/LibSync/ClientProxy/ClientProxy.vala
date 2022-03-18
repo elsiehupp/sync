@@ -41,11 +41,17 @@ public class ClientProxy : GLib.Object {
     }
 
 
+    delegate void DestinationDelegate ();
+
+
     /***********************************************************
     ***********************************************************/
-    public void lookup_system_proxy_async (GLib.Uri url, GLib.Object dst, char slot) {
-        var runnable = new SystemProxyRunnable (url);
-        GLib.Object.connect (runnable, SIGNAL (system_proxy_looked_up (Soup.ProxyResolverDefault)), dst, slot);
+    public void lookup_system_proxy_async (GLib.Uri url, GLib.Object destination, DestinationDelegate destination_delegate) {
+        SystemProxyRunnable runnable = new SystemProxyRunnable (url);
+        connect (
+            runnable, SIGNAL (system_proxy_looked_up (Soup.ProxyResolverDefault)),
+            destination, destination_delegate
+        );
         QThreadPool.global_instance.start (runnable); // takes ownership and deletes
     }
 

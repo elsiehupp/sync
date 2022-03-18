@@ -34,7 +34,7 @@ public class EntityExistsJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private bool on_signal_finished () {
-        /* emit */ exists (reply ());
+        /* emit */ exists (this.reply);
         return true;
     }
 

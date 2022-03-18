@@ -7,7 +7,6 @@ Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
 
 //  #include <QInputDialog>
 //  #include <QDesktopServices>
-//  #include <QTimer>
 //  #include <QBuffer>
 //  #include <Gtk.MessageBox>
 
@@ -60,7 +59,7 @@ public class HttpCredentialsGui : HttpCredentials {
         // which (indirectly, through HttpCredentials.invalidate_token) schedules
         // a cache wipe of the qnam. We can only execute a network job again once
         // the cache has been cleared, otherwise we'd interfere with the job.
-        QTimer.single_shot (100, this, HttpCredentialsGui.on_signal_ask_from_user_async);
+        GLib.Timeout.single_shot (100, this, HttpCredentialsGui.on_signal_ask_from_user_async);
     }
 
 

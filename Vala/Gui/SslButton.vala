@@ -34,10 +34,8 @@ public class SslButton : QToolButton {
         auto_raise (true);
 
         this.menu = new QMenu (this);
-        connect (
-            this.menu,
-            QMenu.about_to_show,
-            this,SslButton.on_signal_update_menu
+        this.menu.about_to_show.connect (
+            this.on_signal_update_menu
         );
         menu (this.menu);
     }

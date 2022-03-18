@@ -9,7 +9,6 @@ Copyright (C) by Klaas Freitag <freitag@owncloud.com>
 //  #include <QTime>
 //  #include <QQueue>
 //  #include <QElapsedTimer>
-//  #include <QTimer>
 
 namespace Occ {
 namespace LibSync {

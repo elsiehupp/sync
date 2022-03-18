@@ -57,13 +57,11 @@ public class SelectiveSyncWidget : Gtk.Widget {
 
         layout.add_widget (this.folder_tree);
 
-        connect (
-            this.folder_tree, QTreeWidget.item_expanded,
-            this, SelectiveSyncWidget.on_signal_item_expanded
+        this.folder_tree.item_expanded.connect (
+            this.on_signal_item_expanded
         );
-        connect (
-            this.folder_tree, QTreeWidget.item_changed,
-            this, SelectiveSyncWidget.on_signal_item_changed
+        this.folder_tree.item_changed.connect (
+            this.on_signal_item_changed
         );
         this.folder_tree.sorting_enabled (true);
         this.folder_tree.sort_by_column (0, Qt.AscendingOrder);
@@ -299,9 +297,8 @@ public class SelectiveSyncWidget : Gtk.Widget {
                 "http://owncloud.org/ns:size"
             }
         );
-        connect (
-            ls_col_job, LsColJob.signal_directory_listing_subfolders,
-            this, SelectiveSyncWidget.on_signal_update_directories
+        ls_col_job.signal_directory_listing_subfolders.connect (
+            this.on_signal_update_directories
         );
         ls_col_job.on_signal_start ();
     }
@@ -406,17 +403,14 @@ public class SelectiveSyncWidget : Gtk.Widget {
             props + "http://nextcloud.org/ns:is-encrypted";
         }
         ls_col_job.properties (props);
-        connect (
-            ls_col_job, LsColJob.signal_directory_listing_subfolders,
-            this, SelectiveSyncWidget.on_signal_update_directories
+        ls_col_job.signal_directory_listing_subfolders.connect (
+            this.on_signal_update_directories
         );
-        connect (
-            ls_col_job, LsColJob.signal_finished_with_error,
-            this, SelectiveSyncWidget.on_signal_lscol_finished_with_error
+        ls_col_job.signal_finished_with_error.connect (
+            this.on_signal_lscol_finished_with_error
         );
-        connect (
-            ls_col_job, LsColJob.signal_directory_listing_iterated,
-            this, SelectiveSyncWidget.on_signal_gather_encrypted_paths
+        ls_col_job.signal_directory_listing_iterated.connect (
+            this.on_signal_gather_encrypted_paths
         );
         ls_col_job.on_signal_start ();
         this.folder_tree.clear ();

@@ -248,13 +248,13 @@ public class ShareUserLine : Gtk.Widget {
                 this.share,
                 Share.signal_password_set,
                 this,
-                ShareUserLine.on_signal_password_set
+                ShareUserLine.on_signal_link_share_password_set
             );
             connect (
                 this.share,
                 Share.signal_password_error,
                 this,
-                ShareUserLine.on_signal_password_error
+                ShareUserLine.on_signal_link_share_password_error
             );
         }
 
@@ -486,7 +486,7 @@ public class ShareUserLine : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_password_set () {
+    private void on_signal_link_share_password_set () {
         toggle_password_progress_animation (false);
         this.ui.line_edit_password.enabled (true);
         this.ui.confirm_password.enabled (true);
@@ -592,7 +592,7 @@ public class ShareUserLine : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_password_error (int status_code, string message) {
+    private void on_signal_link_share_password_error (int status_code, string message) {
         GLib.warning ("Error from server " + status_code + message);
 
         toggle_password_progress_animation (false);

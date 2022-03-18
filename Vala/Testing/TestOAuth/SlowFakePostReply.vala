@@ -15,7 +15,7 @@ public class SlowFakePostReply : FakePostReply {
     ***********************************************************/
     public override void respond () {
         // override of FakePostReply.respond, will call the real one with a delay.
-        QTimer.single_shot (
+        GLib.Timeout.single_shot (
             100,
             this,
             () => {
