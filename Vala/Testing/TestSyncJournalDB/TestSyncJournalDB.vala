@@ -46,7 +46,7 @@ public class TestSyncJournalDB : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_file_record () {
+    private test_file_record () {
         SyncJournalFileRecord record;
         GLib.assert_true (this.database.get_file_record ("nonexistant", record));
         GLib.assert_true (!record.is_valid ());
@@ -96,7 +96,7 @@ public class TestSyncJournalDB : GLib.Object {
     /***********************************************************
     Try with and without a checksum
     ***********************************************************/
-    private void test_file_record_checksum () {
+    private test_file_record_checksum () {
         SyncJournalFileRecord record;
         record.path = "foo-checksum";
         record.remote_perm = RemotePermissions.from_database_value (" ");
@@ -132,7 +132,7 @@ public class TestSyncJournalDB : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_download_info () {
+    private test_download_info () {
         SyncJournalDb.DownloadInfo record = this.database.get_download_info ("nonexistant");
         GLib.assert_true (!record.valid);
 
@@ -153,7 +153,7 @@ public class TestSyncJournalDB : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_upload_info () {
+    private test_upload_info () {
         SyncJournalDb.UploadInfo record = this.database.get_upload_info ("nonexistant");
         GLib.assert_true (!record.valid);
 
@@ -176,7 +176,7 @@ public class TestSyncJournalDB : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_numeric_id () {
+    private test_numeric_id () {
         SyncJournalFileRecord record;
 
         // Typical 8-digit padded identifier
@@ -191,7 +191,7 @@ public class TestSyncJournalDB : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_conflict_record () {
+    private test_conflict_record () {
         ConflictRecord record;
         record.path = "abc";
         record.base_file_id = "def";
@@ -215,7 +215,7 @@ public class TestSyncJournalDB : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_avoid_read_from_database_on_next_sync () {
+    private test_avoid_read_from_database_on_next_sync () {
         var invalid_etag = "this.invalid_";
         var initial_etag = "etag";
 
@@ -287,7 +287,7 @@ public class TestSyncJournalDB : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_recursive_delete () {
+    private test_recursive_delete () {
 
         string[] elements = {
             "foo",
@@ -345,7 +345,7 @@ public class TestSyncJournalDB : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_pin_state () {
+    private test_pin_state () {
         this.database.internal_pin_states.wipe_for_path_and_below ("");
         var list = this.database.internal_pin_states.raw_list ();
         GLib.assert_true (list.size () == 0);

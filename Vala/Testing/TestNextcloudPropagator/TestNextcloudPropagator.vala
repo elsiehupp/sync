@@ -1,7 +1,7 @@
 /***********************************************************
-   This software is in the public domain, furnished "as is", without technical
-   support, and with no warranty, express or implied, as to its usefulness for
-   any purpose.
+This software is in the public domain, furnished "as is",
+without technical support, and with no warranty, express or
+implied, as to its usefulness for any purpose.
 ***********************************************************/
 
 //  #include <QDebug>
@@ -16,7 +16,7 @@ public class TestNextcloudPropagator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_update_error_from_session () {
+    private test_update_error_from_session () {
         //OwncloudPropagator propagator (null, "test1", "test2", new ProgressDatabase);
         GLib.assert_true ( true );
     }
@@ -24,7 +24,7 @@ public class TestNextcloudPropagator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_temporary_download_file_name_generation () {
+    private test_temporary_download_file_name_generation () {
         string fn;
         // without directory
         for (int i = 1; i <= 1000; i++) {
@@ -63,7 +63,7 @@ public class TestNextcloudPropagator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_parse_etag () {
+    private test_parse_etag () {
         //  using Test = QPair<const char*, char>;
         GLib.HashTable<string, string> tests = new GLib.HashTable<string, string> ();
         tests.append ("\"abcd\"", "abcd");

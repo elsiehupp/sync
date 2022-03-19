@@ -4,7 +4,6 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-
 namespace Occ {
 namespace Testing {
 
@@ -13,6 +12,7 @@ public class TestSyncFileItem : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_init_test_case () {
+        return
     }
 
 
@@ -21,7 +21,8 @@ public class TestSyncFileItem : GLib.Object {
     private void on_signal_cleanup_test_case () {}
 
 
-    //  private
+    /***********************************************************
+    ***********************************************************/
     private SyncFileItem create_item (string file ) {
         SyncFileItem i;
         i.file = file;
@@ -31,7 +32,7 @@ public class TestSyncFileItem : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_comparator_data () {
+    private test_comparator_data () {
         QTest.add_column<SyncFileItem> ("a");
         QTest.add_column<SyncFileItem> ("b");
         QTest.add_column<SyncFileItem> ("c");
@@ -53,7 +54,7 @@ public class TestSyncFileItem : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_comparator () {
+    private test_comparator () {
         QFETCH ( SyncFileItem , a );
         QFETCH ( SyncFileItem , b );
         QFETCH ( SyncFileItem , c );

@@ -13,7 +13,7 @@ public class TestSyncDelete : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_delete_directory_with_new_file () {
+    private test_delete_directory_with_new_file () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         // Remove a directory on the server with new files on the client

@@ -4,8 +4,6 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-//  #include <syncengine.h>
-
 namespace Occ {
 namespace Testing {
 
@@ -77,7 +75,7 @@ public class TestSyncMove : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_move_custom_remote_root () {
+    private test_move_custom_remote_root () {
         FileInfo sub_folder = new FileInfo (
             "AS", {
                 {
@@ -125,7 +123,7 @@ public class TestSyncMove : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_remote_change_in_moved_folder () {
+    private test_remote_change_in_moved_folder () {
         // issue #5192
         FakeFolder fake_folder = new FakeFolder (
             new FileInfo (
@@ -163,7 +161,7 @@ public class TestSyncMove : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_selective_sync_moved_folder () {
+    private test_selective_sync_moved_folder () {
         // issue #5224
         FakeFolder fake_folder = new FakeFolder (
             new FileInfo (
@@ -241,7 +239,7 @@ public class TestSyncMove : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_local_move_detection () {
+    private test_local_move_detection () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         int number_of_put = 0;
@@ -320,6 +318,8 @@ public class TestSyncMove : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private Soup.Reply override_delegate_local_move_detection (Soup.Operation operation, Soup.Request request, QIODevice device) {
         if (operation == Soup.PutOperation)
             ++number_of_put;
@@ -331,7 +331,7 @@ public class TestSyncMove : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_duplicate_file_id_data () {
+    private test_duplicate_file_id_data () {
         QTest.add_column<string> ("prefix");
 
         // There have been bugs related to how the original
@@ -341,11 +341,13 @@ public class TestSyncMove : GLib.Object {
         QTest.new_row ("second ordering") + "0"; // "0" < "A"
     }
 
+    /***********************************************************
+    ***********************************************************/
     // If the same folder is shared in two different ways with the same
     // user, the target user will see duplicate file ids. We need to make
     // sure the move detection and sync still do the right thing in that
     // case.
-    private void test_duplicate_file_id () {
+    private test_duplicate_file_id () {
         QFETCH (string, prefix);
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
@@ -410,7 +412,7 @@ public class TestSyncMove : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_move_propagation () {
+    private test_move_propagation () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         var local = fake_folder.local_modifier;
         var remote = fake_folder.remote_modifier ();
@@ -664,8 +666,10 @@ public class TestSyncMove : GLib.Object {
         GLib.assert_true (counter.number_of_delete == 0);
     }
 
+    /***********************************************************
+    ***********************************************************/
     // These renames can be troublesome on windows
-    private void test_rename_case_only () {
+    private test_rename_case_only () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         var local = fake_folder.local_modifier;
         var remote = fake_folder.remote_modifier ();
@@ -685,8 +689,10 @@ public class TestSyncMove : GLib.Object {
         GLib.assert_true (counter.number_of_delete == 0);
     }
 
+    /***********************************************************
+    ***********************************************************/
     // Check interaction of moves with file type changes
-    private void test_move_and_type_change () {
+    private test_move_and_type_change () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         var local = fake_folder.local_modifier;
         var remote = fake_folder.remote_modifier ();
@@ -705,9 +711,11 @@ public class TestSyncMove : GLib.Object {
         }
     }
 
+    /***********************************************************
+    ***********************************************************/
     // https://github.com/owncloud/client/issues/6629#issuecomment-402450691
     // When a file is moved and the server mtime was not in sync, the local mtime should be kept
-    private void test_move_and_m_time_change () {
+    private test_move_and_m_time_change () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         OperationCounter counter;
         fake_folder.set_server_override (counter.functor ());
@@ -736,8 +744,10 @@ public class TestSyncMove : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
+    /***********************************************************
+    ***********************************************************/
     // Test for https://github.com/owncloud/client/issues/6694
-    private void test_invert_folder_hierarchy () {
+    private test_invert_folder_hierarchy () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.remote_modifier ().mkdir ("A/Empty");
         fake_folder.remote_modifier ().mkdir ("A/Empty/Foo");
@@ -798,7 +808,7 @@ public class TestSyncMove : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_deep_hierarchy_data () {
+    private test_deep_hierarchy_data () {
         QTest.add_column<bool> ("local");
         QTest.new_row ("remote") + false;
         QTest.new_row ("local") + true;
@@ -807,7 +817,7 @@ public class TestSyncMove : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_deep_hierarchy () {
+    private test_deep_hierarchy () {
         QFETCH (bool, local);
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         var modifier = local ? fake_folder.local_modifier : fake_folder.remote_modifier ();
@@ -923,7 +933,7 @@ public class TestSyncMove : GLib.Object {
     /***********************************************************
     Test that deletes don't run before renames
     ***********************************************************/
-    private void test_rename_parallelism () {
+    private test_rename_parallelism () {
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
         fake_folder.remote_modifier ().mkdir ("A");
         fake_folder.remote_modifier ().insert ("A/file");
@@ -941,7 +951,7 @@ public class TestSyncMove : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_moved_with_error_data () {
+    private test_moved_with_error_data () {
         QTest.add_column<AbstractVfs.Mode> ("vfs_mode");
 
         QTest.new_row ("Vfs.Off") + Vfs.Off;
@@ -951,7 +961,7 @@ public class TestSyncMove : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_moved_with_error () {
+    private test_moved_with_error () {
         QFETCH (AbstractVfs.Mode, vfs_mode);
         const string src = "folder/folder_a/file.txt";
         const string dest = "folder/folder_b/file.txt";
@@ -1017,6 +1027,8 @@ public class TestSyncMove : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private static string get_name (AbstractVfs.Mode vfs_mode, string s) {
         if (vfs_mode == Vfs.WithSuffix) {
             return s + APPLICATION_DOTVIRTUALFILE_SUFFIX;

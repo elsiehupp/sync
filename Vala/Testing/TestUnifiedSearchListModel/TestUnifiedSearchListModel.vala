@@ -4,11 +4,6 @@ Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/
 
-//  #include <QAbstractItemModelTester>
-//  #include <QDesktopServices>
-//  #include <QSignalSpy>
-//  #include <QTest>
-
 namespace Occ {
 namespace Testing {
 
@@ -56,6 +51,8 @@ public class TestUnifiedSearchListmodel : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private Soup.Reply init_test_case_override_delegate (Soup.Operation operation, Soup.Request request, QIODevice device) {
 
         Soup.Reply reply = null;
@@ -99,7 +96,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_search_term_start_stop_search () {
+    private TestSearchTermStartStopSearch () {
         // make sure the model is empty
         model.set_search_term ("");
         GLib.assert_true (model.row_count () == 0);
@@ -134,7 +131,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_search_term_results_found () {
+    private TestSearchTermResultsFound () {
         // make sure the model is empty
         model.set_search_term ("");
         GLib.assert_true (model.row_count () == 0);
@@ -162,7 +159,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_search_term_results_not_found () {
+    private TestSearchTermResultsNotFound () {
         // make sure the model is empty
         model.set_search_term ("");
         GLib.assert_true (model.row_count () == 0);
@@ -190,7 +187,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_fetch_more_clicked () {
+    private TestFetchMoreClicked () {
         // make sure the model is empty
         model.set_search_term ("");
         GLib.assert_true (model.row_count () == 0);
@@ -292,7 +289,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_search_term_result_tickled () {
+    private TestSearchTermResultTickled () {
         // make sure the model is empty
         model.set_search_term ("");
         GLib.assert_true (model.row_count () == 0);
@@ -352,7 +349,7 @@ public class TestUnifiedSearchListmodel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_search_term_results_error () {
+    private TestSearchTermResultsError () {
         // make sure the model is empty
         model.set_search_term ("");
         GLib.assert_true (model.row_count () == 0);

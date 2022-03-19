@@ -35,6 +35,8 @@ public class MissingPermissionsPropfindReply : FakePropfindReply {
 }
 
 enum ErrorKind {
+    /***********************************************************
+    ***********************************************************/
     // Lower code are corresponding to HTML error code
     InvalidXML = 1000,
     Timeout,
@@ -46,7 +48,7 @@ public class TestRemoteDiscovery : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_remote_discovery_error_data () {
+    private test_remote_discovery_error_data () {
         //  QRegisterMetaType<ErrorCategory> ();
         QTest.add_column<int> ("error_kind");
         QTest.add_column<string> ("expected_error_string");
@@ -66,8 +68,10 @@ public class TestRemoteDiscovery : GLib.Object {
         QTest.new_row ("Timeout") + +Timeout + "Operation canceled" + false;
     }
 
+    /***********************************************************
+    ***********************************************************/
     // Check what happens when there is an error.
-    private void test_remote_discovery_error () {
+    private test_remote_discovery_error () {
         QFETCH (int, error_kind);
         QFETCH (string, expected_error_string);
         QFETCH (bool, sync_succeeds);
@@ -127,6 +131,8 @@ public class TestRemoteDiscovery : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private Soup.Reply override_delegate_remote_error (Soup.Operation operation, Soup.Request request, QIODevice device) {
         if (request.attribute (Soup.Request.CustomVerbAttribute) == "PROPFIND" && request.url.path.ends_with (error_folder)) {
             if (error_kind == InvalidXML) {
@@ -143,7 +149,7 @@ public class TestRemoteDiscovery : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_missing_data () {
+    private test_missing_data () {
         FakeFolder fake_folder = new FakeFolder ( FileInfo ());
         fake_folder.remote_modifier ().insert ("good");
         fake_folder.remote_modifier ().insert ("noetag");
@@ -169,6 +175,8 @@ public class TestRemoteDiscovery : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private Soup.Reply override_delegate_missing_data (Soup.Operation operation, Soup.Request request, QIODevice device) {
         if (request.attribute (Soup.Request.CustomVerbAttribute) == "PROPFIND" && request.url.path.ends_with ("nopermissions"))
             return new MissingPermissionsPropfindReply (fake_folder.remote_modifier (), operation, request, this);

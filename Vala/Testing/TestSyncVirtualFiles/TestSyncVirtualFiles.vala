@@ -4,8 +4,6 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-//  #include <syncengine.h>
-
 namespace Occ {
 namespace Testing {
 
@@ -15,7 +13,7 @@ public class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_virtual_file_lifecycle_data () {
+    private TestVirtualFileLifecycleData () {
         QTest.add_column<bool> ("do_local_discovery");
 
         QTest.new_row ("full local discovery") + true;
@@ -25,7 +23,7 @@ public class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_virtual_file_lifecycle () {
+    private TestVirtualFileLifecycle () {
         QFETCH (bool, do_local_discovery);
 
         FakeFolder fake_folder = new FakeFolder (FileInfo ());
@@ -144,6 +142,8 @@ public class TestSyncVirtualFiles : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private static void clean_up_test_virtual_file_lifecycle (ItemCompletedSpy complete_spy, bool do_local_discovery, FakeFolder fake_folder) {
         complete_spy.clear ();
         if (!do_local_discovery) {
@@ -154,7 +154,7 @@ public class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static void on_signal_test_virtual_file_conflict () {
+    private static TestVirtualFileConflict () {
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
         set_up_vfs (fake_folder);
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
@@ -222,6 +222,8 @@ public class TestSyncVirtualFiles : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private static void clean_up_test_virtual_file_conflict (ItemCompletedSpy complete_spy) {
         complete_spy.clear ();
     }
@@ -229,7 +231,7 @@ public class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_with_normal_sync () {
+    private TestWithNormalSync () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         set_up_vfs (fake_folder);
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
@@ -269,7 +271,7 @@ public class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_virtual_file_download () {
+    private TestVirtualFileDownload () {
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
         set_up_vfs (fake_folder);
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
@@ -381,6 +383,8 @@ public class TestSyncVirtualFiles : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private static void clean_up_test_virtual_file_download (ItemCompletedSpy complete_spy) {
         complete_spy.clear ();
     }
@@ -388,7 +392,7 @@ public class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_virtual_file_download_resume () {
+    private TestVirtualFileDownloadResume () {
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
         set_up_vfs (fake_folder);
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
@@ -425,6 +429,8 @@ public class TestSyncVirtualFiles : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private static void clean_up_test_virtual_file_download_resume (ItemCompletedSpy complete_spy, FakeFolder fake_folder) {
         complete_spy.clear ();
         fake_folder.sync_journal ().wipe_error_blocklist ();
@@ -433,7 +439,7 @@ public class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_new_files_not_virtual () {
+    private TestNewFilesNotVirtual () {
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
         set_up_vfs (fake_folder);
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
@@ -455,7 +461,7 @@ public class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static void on_signal_test_download_recursive () {
+    private static TestDownloadRecursive () {
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
         set_up_vfs (fake_folder);
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
@@ -553,7 +559,7 @@ public class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_rename_to_virtual () {
+    private TestRenameToVirtual () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         set_up_vfs (fake_folder);
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
@@ -591,6 +597,8 @@ public class TestSyncVirtualFiles : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private static void clean_up_test_rename_to_virtual (ItemCompletedSpy complete_spy) {
         complete_spy.clear ();
     }
@@ -598,7 +606,7 @@ public class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_rename_virtual () {
+    private TestRenameVirtual () {
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
         set_up_vfs (fake_folder);
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
@@ -651,6 +659,8 @@ public class TestSyncVirtualFiles : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private static void clean_up_test_rename_virtual (ItemCompletedSpy complete_spy ) {
         complete_spy.clear ();
     }
@@ -658,7 +668,7 @@ public class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_rename_virtual2 () {
+    private TestRenameVirtual2 () {
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
         set_up_vfs (fake_folder);
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
@@ -742,13 +752,17 @@ public class TestSyncVirtualFiles : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private static void clean_up_test_rename_virtual2 (ItemCompletedSpy complete_spy) {
         complete_spy.clear ();
     }
 
 
-    // Dehydration via sync works
-    private void on_signal_test_sync_dehydration () {
+    /***********************************************************
+    Dehydration via sync works
+    ***********************************************************/
+    private TestSyncDehydration () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         set_up_vfs (fake_folder);
 
@@ -826,19 +840,25 @@ public class TestSyncVirtualFiles : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private static void clean_up_test_sync_dehydration (ItemCompletedSpy complete_spy) {
         complete_spy.clear ();
     }
 
 
-    private bool is_dehydrated (FakeFolder fake_folder, string path) {
+    /***********************************************************
+    ***********************************************************/
+    private static bool is_dehydrated (FakeFolder fake_folder, string path) {
         string placeholder = path + DVSUFFIX;
         return !fake_folder.current_local_state ().find (path)
             && fake_folder.current_local_state ().find (placeholder);
     }
 
 
-    private bool has_dehydrated_database_entries (FakeFolder fake_folder, string path) {
+    /***********************************************************
+    ***********************************************************/
+    private static bool has_dehydrated_database_entries (FakeFolder fake_folder, string path) {
         SyncJournalFileRecord normal;
         SyncJournalFileRecord suffix;
         fake_folder.sync_journal ().get_file_record (path, normal);
@@ -849,7 +869,7 @@ public class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_wipe_virtual_suffix_files () {
+    private TestWipeVirtualSuffixFiles () {
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
         set_up_vfs (fake_folder);
 
@@ -896,7 +916,7 @@ public class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_new_virtuals () {
+    private TestNewVirtuals () {
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
         set_up_vfs (fake_folder);
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
@@ -974,9 +994,11 @@ public class TestSyncVirtualFiles : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     // Check what happens if vfs-suffixed files exist on the server or locally
     // while the file is hydrated
-    private void on_signal_test_suffix_files_while_local_hydrated () {
+    private TestSuffixFilesWhileLocalHydrated () {
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
 
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
@@ -1094,13 +1116,17 @@ public class TestSyncVirtualFiles : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private static void clean_up_test_suffix_files_while_local_hydrated (ItemCompletedSpy complete_spy) {
         complete_spy.clear ();
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     // Check what happens if vfs-suffixed files exist on the server or in the database
-    private void on_signal_test_extra_files_local_dehydrated () {
+    private TestExtraFilesWhileLocalHydrated () {
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
         set_up_vfs (fake_folder);
 
@@ -1154,6 +1180,8 @@ public class TestSyncVirtualFiles : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private static void clean_up_test_extra_files_local_dehydrated (ItemCompletedSpy complete_spy) {
         complete_spy.clear ();
     }
@@ -1161,7 +1189,7 @@ public class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_availability () {
+    private TestSyncVirtualFilesAvailability () {
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
         Vfs vfs = set_up_vfs (fake_folder);
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
@@ -1225,7 +1253,7 @@ public class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_pin_state_locals () {
+    private TetPinStateLocals () {
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
         Vfs vfs = set_up_vfs (fake_folder);
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
@@ -1305,7 +1333,7 @@ public class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_incompatible_pins () {
+    private TestIncompatiblePins () {
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
         Vfs vfs = set_up_vfs (fake_folder);
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
@@ -1342,7 +1370,7 @@ public class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_place_holder_exist () {
+    private test_place_holder_exist () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.remote_modifier ().insert ("A/a1" + DVSUFFIX, 111);
         fake_folder.remote_modifier ().insert ("A/hello" + DVSUFFIX, 222);
@@ -1400,17 +1428,23 @@ public class TestSyncVirtualFiles : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private static void clean_up_test_place_holder_exist (ItemCompletedSpy complete_spy) {
         complete_spy.clear ();
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private static bool item_instruction (ItemCompletedSpy spy, string path, CSync.SyncInstructions instr) {
         var item = spy.find_item (path);
         return item.instruction == instr;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private static SyncJournalFileRecord database_record (FakeFolder folder, string path) {
         SyncJournalFileRecord record;
         folder.sync_journal ().get_file_record (path, record);
@@ -1418,6 +1452,8 @@ public class TestSyncVirtualFiles : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private static void trigger_download (FakeFolder folder, string path) {
         var journal = folder.sync_journal ();
         SyncJournalFileRecord record;
@@ -1430,6 +1466,8 @@ public class TestSyncVirtualFiles : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private static void mark_for_dehydration (FakeFolder folder, string path) {
         var journal = folder.sync_journal ();
         SyncJournalFileRecord record;
@@ -1442,6 +1480,8 @@ public class TestSyncVirtualFiles : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private static Vfs set_up_vfs (FakeFolder folder) {
         var suffix_vfs = unowned<Vfs> (create_vfs_from_plugin (Vfs.WithSuffix).release ());
         folder.switch_to_vfs (suffix_vfs);

@@ -4,16 +4,16 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-//  #include <syncengine.h>
-//  #include <common/syncjournaldatabase.h>
-
 namespace Occ {
 namespace Testing {
 
+/***********************************************************
+Verify that the chunked transfer eventually gets reset with
+the new chunking
+***********************************************************/
 public class TestUploadReset : GLib.Object {
 
-    // Verify that the chunked transfer eventually gets reset with the new chunking
-    private void on_signal_test_file_upload_ng () {
+    private TestFileUploadNg () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         fake_folder.sync_engine.account.set_capabilities ({

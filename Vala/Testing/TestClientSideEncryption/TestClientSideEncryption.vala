@@ -1,13 +1,8 @@
 /***********************************************************
-   This software is in the public domain, furnished "as is", without technical
-   support, and with no warranty, express or implied, as to its usefulness for
-   any purpose.
+This software is in the public domain, furnished "as is",
+without technical support, and with no warranty, express or
+implied, as to its usefulness for any purpose.
 ***********************************************************/
-
-//  #include <QTemporaryFile>
-//  #include <QRandomGenerator>
-
-//  #include <common/constants.h>
 
 namespace Occ {
 namespace Testing {
@@ -146,7 +141,7 @@ public class TestClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_streaming_decryptor_data () {
+    private test_streaming_decryptor_data () {
         QTest.add_column<int> ("total_bytes");
         QTest.add_column<int> ("bytes_to_read");
 
@@ -159,7 +154,7 @@ public class TestClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_streaming_decryptor () {
+    private test_streaming_decryptor () {
         QFETCH (int, total_bytes);
 
         QTemporaryFile dummy_input_file;

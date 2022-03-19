@@ -1,9 +1,8 @@
 /***********************************************************
-   This software is in the public domain, furnished "as is", without technical
-   support, and with no warranty, express or implied, as to its usefulness for
-   any purpose.
+This software is in the public domain, furnished "as is",
+without technical support, and with no warranty, express or
+implied, as to its usefulness for any purpose.
 ***********************************************************/
-
 
 namespace Occ {
 namespace Testing {
@@ -12,7 +11,7 @@ public class TestUpdater : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_version_to_int () {
+    private TestVersionToInt () {
         int64 low_version = Updater.Helper.version_to_int (1,2,80,3000);
         GLib.assert_true (Updater.Helper.string_version_to_int ("1.2.80.3000") == low_version);
 
@@ -23,7 +22,7 @@ public class TestUpdater : GLib.Object {
         GLib.assert_true (current_version < high_version);
     }
 
-}
+} // class TestUpdater
 
 } // namespace Testing
 } // namespace Occ

@@ -4,8 +4,6 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-//  #include <syncengine.h>
-
 namespace Occ {
 namespace Testing {
 
@@ -263,6 +261,8 @@ public class TestPermissions : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     // Create some files
     private void insert_in (FakeFolder fake_folder, string directory, int cannot_be_modified_size) {
         fake_folder.remote_modifier ().insert (directory + "normal_file_PERM_WVND_.data", 100 );
@@ -273,6 +273,8 @@ public class TestPermissions : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private void remove_read_only (FakeFolder fake_folder, string file) {
         GLib.assert_true (!GLib.FileInfo (fake_folder.local_path + file).permission (GLib.File.WriteOwner));
         GLib.File (fake_folder.local_path + file).set_permissions (GLib.File.WriteOwner | GLib.File.ReadOwner);
@@ -280,6 +282,8 @@ public class TestPermissions : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private void edit_read_only (FakeFolder fake_folder, string file)  {
         GLib.assert_true (!GLib.FileInfo (fake_folder.local_path + file).permission (GLib.File.WriteOwner));
         GLib.File (fake_folder.local_path + file).set_permissions (GLib.File.WriteOwner | GLib.File.ReadOwner);
@@ -296,8 +300,10 @@ public class TestPermissions : GLib.Object {
         }
     }
 
+    /***********************************************************
+    ***********************************************************/
     // What happens if the source can't be moved or the target can't be created?
-    private void test_forbidden_moves () {
+    private test_forbidden_moves () {
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
 
         // Some of this test depends on the order of discovery. With threading
@@ -418,13 +424,17 @@ public class TestPermissions : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_signal_sync_engine_about_to_propagate (SyncFileItemVector *discovery, SyncFileItemVector v) {
         discovery = *v;
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     // Test for issue #7293
-    private void test_allowed_move_forbidden_delete () {
+    private test_allowed_move_forbidden_delete () {
          FakeFolder fake_folder = new FakeFolder (new FileInfo ());
 
         // Some of this test depends on the order of discovery. With threading
@@ -466,6 +476,8 @@ public class TestPermissions : GLib.Object {
         GLib.assert_true (fake_folder.current_remote_state () == expected_state);
     }
 
+    /***********************************************************
+    ***********************************************************/
     static void apply_permissions_from_name (FileInfo info) {
         QRegularExpression regular_expression = new QRegularExpression ("this.PERM_ ([^this.]*)this.[^/]*$");
         var m = regular_expression.match (info.name);
@@ -478,6 +490,8 @@ public class TestPermissions : GLib.Object {
         }
     }
     
+    /***********************************************************
+    ***********************************************************/
     // Check if the expected rows in the DB are non-empty. Note that in some cases they might be, then we cannot use this function
     // https://github.com/owncloud/client/issues/2038
     static void assert_csync_journal_ok (SyncJournalDb journal) {
@@ -492,6 +506,8 @@ public class TestPermissions : GLib.Object {
         GLib.assert_true (q.int_value (0) == 0);
     }
     
+    /***********************************************************
+    ***********************************************************/
     SyncFileItemPtr find_discovery_item (SyncFileItemVector spy, string path) {
         foreach (var item in spy) {
             if (item.destination () == path) {
@@ -501,16 +517,21 @@ public class TestPermissions : GLib.Object {
         return new SyncFileItemPtr (new SyncFileItem ());
     }
     
+    /***********************************************************
+    ***********************************************************/
     bool item_instruction (ItemCompletedSpy spy, string path, CSync.SyncInstructions instr) {
         var item = spy.find_item (path);
         return item.instruction == instr;
     }
     
+    /***********************************************************
+    ***********************************************************/
     bool discovery_instruction (SyncFileItemVector spy, string path, CSync.SyncInstructions instr) {
         var item = find_discovery_item (spy, path);
         return item.instruction == instr;
     }
 
 } // class TestPermissions
+
 } // namespace Testing
 } // namespace Occ

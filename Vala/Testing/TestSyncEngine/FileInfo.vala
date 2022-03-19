@@ -23,6 +23,8 @@ public class FileInfo : FileModifier {
     public int64 size = 0;
     public char content_char = 'W';
 
+    /***********************************************************
+    ***********************************************************/
     // Sorted by name to be able to compare trees
     public GLib.HashTable<string, FileInfo> children;
     public string parent_path;
@@ -38,6 +40,8 @@ public class FileInfo : FileModifier {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public FileInfo (string name, int64 size) {
         this.name = name;
         this.is_directory = false;
@@ -45,6 +49,8 @@ public class FileInfo : FileModifier {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public FileInfo (string name, int64 size, char content_char) {
         this.name = name;
         this.is_directory = false;
@@ -53,6 +59,8 @@ public class FileInfo : FileModifier {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     public FileInfo (string name, std.initializer_list<FileInfo> children) {
         this.name = name;
         foreach (var source in children) {
@@ -339,5 +347,6 @@ public class FileInfo : FileModifier {
     }
 
 } // class FileInfo
+
 } // namespace Testing
 } // namespace Occ

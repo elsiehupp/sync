@@ -9,7 +9,8 @@ namespace Testing {
 
 /***********************************************************
 @brief The FakeSearchResultsStorage
-emulates the real server storage that contains all the results that UnifiedSearchListmodel will search for
+emulates the real server storage that contains all the
+results that UnifiedSearchListmodel will search for
 ***********************************************************/
 public class FakeSearchResultsStorage {
 
@@ -142,6 +143,8 @@ public class FakeSearchResultsStorage {
         );
     }
 
+    /***********************************************************
+    ***********************************************************/
     // on_signal_init the map of fake search results for each provider
     public void init_search_results_data () {
         foreach (var fake_provider in fake_providers_init_info) {

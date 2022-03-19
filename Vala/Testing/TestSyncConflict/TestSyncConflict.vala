@@ -13,7 +13,7 @@ public class TestSyncConflict : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_no_upload () {
+    private test_no_upload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
@@ -37,7 +37,7 @@ public class TestSyncConflict : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_upload_after_download () {
+    private test_upload_after_download () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine.account.set_capabilities ({ { "upload_conflict_files", true } });
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
@@ -90,7 +90,7 @@ public class TestSyncConflict : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_separate_upload () {
+    private test_separate_upload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine.account.set_capabilities ({ { "upload_conflict_files", true } });
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
@@ -165,7 +165,7 @@ public class TestSyncConflict : GLib.Object {
     What happens if we download a conflict file? Is the metadata
     set up correctly?
     ***********************************************************/
-    private void test_downloading_conflict_file () {
+    private test_downloading_conflict_file () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine.account.set_capabilities ({ { "upload_conflict_files", true } });
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
@@ -213,7 +213,7 @@ public class TestSyncConflict : GLib.Object {
     /***********************************************************
     Check that conflict records are removed when the file is gone
     ***********************************************************/
-    private void test_conflict_record_removal1 () {
+    private test_conflict_record_removal1 () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine.account.set_capabilities ({ { "upload_donflict_files", true } });
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
@@ -243,7 +243,7 @@ public class TestSyncConflict : GLib.Object {
     /***********************************************************
     Same test, but with upload_conflict_files == false
     ***********************************************************/
-    private void test_conflict_record_removal2 () {
+    private test_conflict_record_removal2 () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine.account.set_capabilities ({ { "upload_conflict_files", false } });
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
@@ -284,7 +284,7 @@ public class TestSyncConflict : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_conflict_file_base_name_data () {
+    private test_conflict_file_base_name_data () {
         QTest.add_column<string> ("input");
         QTest.add_column<string> ("output");
 
@@ -359,7 +359,7 @@ public class TestSyncConflict : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_conflict_file_base_name () {
+    private test_conflict_file_base_name () {
         QFETCH (string, input);
         QFETCH (string, output);
         GLib.assert_true (Utility.conflict_file_base_name_from_pattern (input) == output);
@@ -368,7 +368,7 @@ public class TestSyncConflict : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_local_dir_remote_file_conflict () {
+    private test_local_dir_remote_file_conflict () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine.account.set_capabilities ({ { "upload_conflict_files", true } });
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
@@ -450,7 +450,7 @@ public class TestSyncConflict : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_local_file_remote_dir_conflict () {
+    private test_local_file_remote_dir_conflict () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine.account.set_capabilities ({ { "upload_conflict_files", true } });
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
@@ -504,7 +504,7 @@ public class TestSyncConflict : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_type_conflict_with_move () {
+    private test_type_conflict_with_move () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
 
@@ -540,7 +540,7 @@ public class TestSyncConflict : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_type_change () {
+    private test_type_change () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
 
@@ -584,7 +584,7 @@ public class TestSyncConflict : GLib.Object {
     Test what happens if we remove entries both on the server,
     and locally
     ***********************************************************/
-    private void test_remove_remove () {
+    private test_remove_remove () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.remote_modifier ().remove ("A");
         fake_folder.local_modifier.remove ("A");

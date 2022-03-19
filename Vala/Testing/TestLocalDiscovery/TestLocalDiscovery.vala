@@ -16,7 +16,7 @@ public class TestLocalDiscovery : GLib.Object {
     Check correct behavior when local discovery is partially
     drawn from the database.
     ***********************************************************/
-    private void test_local_discovery_style () {
+    private test_local_discovery_style () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         LocalDiscoveryTracker tracker;
@@ -71,7 +71,7 @@ public class TestLocalDiscovery : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_local_discovery_decision () {
+    private test_local_discovery_decision () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         var engine = fake_folder.sync_engine;
 
@@ -117,7 +117,7 @@ public class TestLocalDiscovery : GLib.Object {
     Check whether item on_signal_success and item failure
     adjusts the tracker correctly.
     ***********************************************************/
-    private void test_tracker_item_completion () {
+    private test_tracker_item_completion () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         LocalDiscoveryTracker tracker;
@@ -178,7 +178,7 @@ public class TestLocalDiscovery : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_directory_and_sub_directory () {
+    private test_directory_and_sub_directory () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         fake_folder.local_modifier.mkdir ("A/new_directory");
@@ -201,7 +201,7 @@ public class TestLocalDiscovery : GLib.Object {
     /***********************************************************
     Tests the behavior of invalid filename detection
     ***********************************************************/
-    private void test_server_blocklist () {
+    private test_server_blocklist () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
@@ -222,7 +222,7 @@ public class TestLocalDiscovery : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_create_file_with_trailing_spaces_local_and_remote_trimmed_do_not_exist_rename_and_upload_file () {
+    private test_create_file_with_trailing_spaces_local_and_remote_trimmed_do_not_exist_rename_and_upload_file () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         const string file_with_spaces_1 = " foo";
@@ -275,7 +275,7 @@ public class TestLocalDiscovery : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_create_file_with_trailing_spaces_local_trimmed_does_exist_dont_rename_and_upload_file () {
+    private test_create_file_with_trailing_spaces_local_trimmed_does_exist_dont_rename_and_upload_file () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         const string file_with_spaces = " foo";
@@ -295,7 +295,7 @@ public class TestLocalDiscovery : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_create_file_with_trailing_spaces_local_trimmed_also_created_dont_rename_and_upload_file () {
+    private test_create_file_with_trailing_spaces_local_trimmed_also_created_dont_rename_and_upload_file () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         const string file_with_spaces = " foo";

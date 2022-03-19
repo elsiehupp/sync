@@ -21,7 +21,7 @@ public class TestIconUtils : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_draw_svg_with_custom_fill_color () {
+    private test_draw_svg_with_custom_fill_color () {
         const string black_svg_dir_path = Theme.THEME_PREFIX + "black";
         const GLib.Dir black_svg_dir = new GLib.Dir (black_svg_dir_path);
         const string[] black_images = black_svg_dir.entry_list ("*.svg");
@@ -44,7 +44,7 @@ public class TestIconUtils : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_create_svg_pixmap_with_custom_color () {
+    private test_create_svg_pixmap_with_custom_color () {
         const GLib.Dir black_svg_dir = new GLib.Dir (Theme.THEME_PREFIX + "black");
         const string[] black_images = black_svg_dir.entry_list ("*.svg");
 
@@ -65,7 +65,7 @@ public class TestIconUtils : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_pixmap_for_background () {
+    private test_pixmap_for_background () {
         const GLib.Dir black_svg_dir = new GLib.Dir (Theme.THEME_PREFIX + "black");
         const string[] black_images = black_svg_dir.entry_list ("*.svg");
 

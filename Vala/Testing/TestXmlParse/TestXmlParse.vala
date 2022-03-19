@@ -57,8 +57,8 @@ public class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_parser1 () {
-        const string test_xml = "<?xml version='1.0' encoding='utf-8'?>"
+    private void TestParser1 () {
+        const string xml_string = "<?xml version='1.0' encoding='utf-8'?>"
             + "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             + "<d:response>"
             + "<d:href>/oc/remote.php/dav/sharefolder/</d:href>"
@@ -120,7 +120,7 @@ public class TestXmlParse : GLib.Object {
         );
 
         GLib.HashTable <string, ExtraFolderInfo> sizes;
-        GLib.assert_true (lscol_xml_parser.parse (test_xml, sizes, "/oc/remote.php/dav/sharefolder" ));
+        GLib.assert_true (lscol_xml_parser.parse (xml_string, sizes, "/oc/remote.php/dav/sharefolder" ));
 
         GLib.assert_true (this.success);
         GLib.assert_true (sizes.size () == 1); // Quota info in the XML
@@ -136,8 +136,8 @@ public class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_parser_broken_xml () {
-        const string test_xml = "X<?xml version='1.0' encoding='utf-8'?>"
+    private void TestParserBrokenXml () {
+        const string xml_string = "X<?xml version='1.0' encoding='utf-8'?>"
             + "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             + "<d:response>"
             + "<d:href>/oc/remote.php/dav/sharefolder/</d:href>"
@@ -199,7 +199,7 @@ public class TestXmlParse : GLib.Object {
         );
 
         GLib.HashTable <string, ExtraFolderInfo> sizes;
-        GLib.assert_true (false == lscol_xml_parser.parse ( test_xml, sizes, "/oc/remote.php/dav/sharefolder" )); // verify false
+        GLib.assert_true (false == lscol_xml_parser.parse ( xml_string, sizes, "/oc/remote.php/dav/sharefolder" )); // verify false
 
         GLib.assert_true (!this.success);
         GLib.assert_true (sizes.size () == 0 ); // No quota info in the XML
@@ -212,8 +212,8 @@ public class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_parser_empty_xml_no_dav () {
-        const string test_xml = "<html><body>I am under construction</body></html>";
+    private void TestParserEmptyXmlNoDav () {
+        const string xml_string = "<html><body>I am under construction</body></html>";
 
         LscolXMLParser lscol_xml_parser;
 
@@ -228,7 +228,7 @@ public class TestXmlParse : GLib.Object {
         );
 
         GLib.HashTable <string, ExtraFolderInfo> sizes;
-        GLib.assert_true (false == lscol_xml_parser.parse ( test_xml, sizes, "/oc/remote.php/dav/sharefolder" )); // verify false
+        GLib.assert_true (false == lscol_xml_parser.parse ( xml_string, sizes, "/oc/remote.php/dav/sharefolder" )); // verify false
 
         GLib.assert_true (!this.success);
         GLib.assert_true (sizes.size () == 0 ); // No quota info in the XML
@@ -240,8 +240,8 @@ public class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_parser_empty_xml () {
-        const string test_xml = "";
+    private void TestParserEmptyXml () {
+        const string xml_string = "";
 
         LscolXMLParser lscol_xml_parser;
 
@@ -256,7 +256,7 @@ public class TestXmlParse : GLib.Object {
         );
 
         GLib.HashTable <string, ExtraFolderInfo> sizes;
-        GLib.assert_true (false == lscol_xml_parser.parse ( test_xml, sizes, "/oc/remote.php/dav/sharefolder" )); // verify false
+        GLib.assert_true (false == lscol_xml_parser.parse ( xml_string, sizes, "/oc/remote.php/dav/sharefolder" )); // verify false
 
         GLib.assert_true (!this.success);
         GLib.assert_true (sizes.size () == 0 ); // No quota info in the XML
@@ -268,8 +268,8 @@ public class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_parser_truncated_xml () {
-        const string test_xml = "<?xml version='1.0' encoding='utf-8'?>"
+    private void TestParserTruncatedXml () {
+        const string xml_string = "<?xml version='1.0' encoding='utf-8'?>"
             + "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             + "<d:response>"
             + "<d:href>/oc/remote.php/dav/sharefolder/</d:href>"
@@ -300,15 +300,15 @@ public class TestXmlParse : GLib.Object {
         );
 
         GLib.HashTable <string, ExtraFolderInfo> sizes;
-        GLib.assert_true (!lscol_xml_parser.parse ( test_xml, sizes, "/oc/remote.php/dav/sharefolder" ));
+        GLib.assert_true (!lscol_xml_parser.parse ( xml_string, sizes, "/oc/remote.php/dav/sharefolder" ));
         GLib.assert_true (!this.success);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_parser_bogus_href1 () {
-        const string test_xml = "<?xml version='1.0' encoding='utf-8'?>"
+    private void TestParserBogusHref1 () {
+        const string xml_string = "<?xml version='1.0' encoding='utf-8'?>"
             + "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             + "<d:response>"
             + "<d:href>http://127.0.0.1:81/oc/remote.php/dav/sharefolder/</d:href>"
@@ -370,15 +370,15 @@ public class TestXmlParse : GLib.Object {
         );
 
         GLib.HashTable <string, ExtraFolderInfo> sizes;
-        GLib.assert_true (false == lscol_xml_parser.parse ( test_xml, sizes, "/oc/remote.php/dav/sharefolder" ));
+        GLib.assert_true (false == lscol_xml_parser.parse ( xml_string, sizes, "/oc/remote.php/dav/sharefolder" ));
         GLib.assert_true (!this.success);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_parser_bogus_href2 () {
-        const string test_xml = "<?xml version='1.0' encoding='utf-8'?>"
+    private void TestParserBogusHref2 () {
+        const string xml_string = "<?xml version='1.0' encoding='utf-8'?>"
             + "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             + "<d:response>"
             + "<d:href>/sharefolder</d:href>"
@@ -440,15 +440,15 @@ public class TestXmlParse : GLib.Object {
         );
 
         GLib.HashTable <string, ExtraFolderInfo> sizes;
-        GLib.assert_true (false == lscol_xml_parser.parse ( test_xml, sizes, "/oc/remote.php/dav/sharefolder" ));
+        GLib.assert_true (false == lscol_xml_parser.parse ( xml_string, sizes, "/oc/remote.php/dav/sharefolder" ));
         GLib.assert_true (!this.success);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_parser_denormalized_path {
-        const string test_xml = "<?xml version='1.0' encoding='utf-8'?>"
+    private void TestParserDenormalizedPath {
+        const string xml_string = "<?xml version='1.0' encoding='utf-8'?>"
             + "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             + "<d:response>"
             + "<d:href>/oc/remote.php/dav/sharefolder/</d:href>"
@@ -510,7 +510,7 @@ public class TestXmlParse : GLib.Object {
         );
 
         GLib.HashTable <string, ExtraFolderInfo> sizes;
-        GLib.assert_true (lscol_xml_parser.parse ( test_xml, sizes, "/oc/remote.php/dav/sharefolder" ));
+        GLib.assert_true (lscol_xml_parser.parse ( xml_string, sizes, "/oc/remote.php/dav/sharefolder" ));
 
         GLib.assert_true (this.success);
         GLib.assert_true (sizes.size () == 1); // Quota info in the XML
@@ -526,8 +526,8 @@ public class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_parser_denormalized_path_outside_namespace () {
-        const string test_xml = "<?xml version='1.0' encoding='utf-8'?>"
+    private void TestParserDenormalizedPathOutsideNAmespace () {
+        const string xml_string = "<?xml version='1.0' encoding='utf-8'?>"
             + "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             + "<d:response>"
             + "<d:href>/oc/remote.php/dav/sharefolder/</d:href>"
@@ -589,7 +589,7 @@ public class TestXmlParse : GLib.Object {
         );
 
         GLib.HashTable <string, ExtraFolderInfo> sizes;
-        GLib.assert_true (!lscol_xml_parser.parse ( test_xml, sizes, "/oc/remote.php/dav/sharefolder" ));
+        GLib.assert_true (!lscol_xml_parser.parse ( xml_string, sizes, "/oc/remote.php/dav/sharefolder" ));
 
         GLib.assert_true (!this.success);
     }
@@ -597,8 +597,8 @@ public class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_href_url_encoding () {
-        const string test_xml = "<?xml version='1.0' encoding='utf-8'?>"
+    private void TestHrefUrlEncoding () {
+        const string xml_string = "<?xml version='1.0' encoding='utf-8'?>"
             + "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             + "<d:response>"
             + "<d:href>/%C3%A4</d:href>" // a-umlaut utf8
@@ -662,7 +662,7 @@ public class TestXmlParse : GLib.Object {
         GLib.HashTable <string, ExtraFolderInfo> sizes;
         GLib.assert_true (
             lscol_xml_parser.parse (
-                test_xml,
+                xml_string,
                 sizes,
                 "/ä"
             )

@@ -4,8 +4,6 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-//  #include <QTemporaryDir>
-
 namespace Occ {
 namespace Testing {
 
@@ -13,14 +11,20 @@ public class TestExcludedFiles : GLib.Object {
 
     const string EXCLUDE_LIST_FILE = SOURCEDIR + "/../../sync-exclude.lst";
     
+    /***********************************************************
+    ***********************************************************/
     // The tests were converted from the old CMocka framework, that's why there is a global
     static ExcludedFiles excluded_files;
     
+    /***********************************************************
+    ***********************************************************/
     static void up () {
         excluded_files.on_signal_reset (new ExcludedFiles ());
         excluded_files.set_wildcards_match_slash (false);
     }
     
+    /***********************************************************
+    ***********************************************************/
     static void setup_init () {
         up ();
     
@@ -37,23 +41,33 @@ public class TestExcludedFiles : GLib.Object {
         GLib.assert_true (excluded_files.reload_exclude_files ());
     }
 
+    /***********************************************************
+    ***********************************************************/
     static ExcludedFiles check_file_full (string path) {
         return excluded_files.full_pattern_match (path, ItemType.FILE);
     }
 
+    /***********************************************************
+    ***********************************************************/
     static ExcludedFiles check_dir_full (string path) {
         return excluded_files.full_pattern_match (path, ItemType.DIRECTORY);
     }
 
+    /***********************************************************
+    ***********************************************************/
     static ExcludedFiles check_file_traversal (string path) {
         return excluded_files.traversal_pattern_match (path, ItemType.FILE);
     }
 
+    /***********************************************************
+    ***********************************************************/
     static ExcludedFiles check_dir_traversal (string path) {
         return excluded_files.traversal_pattern_match (path, ItemType.DIRECTORY);
     }
 
-    private void test_fun () {
+    /***********************************************************
+    ***********************************************************/
+    private test_fun () {
         ExcludedFiles excluded;
         bool exclude_hidden = true;
         bool keep_hidden = false;
@@ -77,6 +91,8 @@ public class TestExcludedFiles : GLib.Object {
         GLib.assert_true (excluded.is_excluded ("/a/#b#", "/a", keep_hidden));
     }
 
+    /***********************************************************
+    ***********************************************************/
     private void check_csync_exclude_add () {
         up ();
         excluded_files.add_manual_exclude ("/temporary/check_csync1/*");
@@ -94,6 +110,8 @@ public class TestExcludedFiles : GLib.Object {
         GLib.assert_true (!excluded_files.full_traversal_regex_file["/"].pattern ().contains ("foo"));
     }
 
+    /***********************************************************
+    ***********************************************************/
     private void check_csync_exclude_add_per_dir () {
         up ();
         excluded_files.add_manual_exclude ("*", "/temporary/check_csync1/");
@@ -110,6 +128,8 @@ public class TestExcludedFiles : GLib.Object {
         GLib.assert_true (!excluded_files.bname_traversal_regex_file["/temporary/check_csync1/"].pattern ().contains ("foo"));
     }
 
+    /***********************************************************
+    ***********************************************************/
     private void check_csync_excluded () {
         setup_init ();
         GLib.assert_true (check_file_full ("") == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
@@ -208,6 +228,8 @@ public class TestExcludedFiles : GLib.Object {
         GLib.assert_true (check_file_full ("c [d]") == CSync.ExcludedFiles.Type.LIST);
     }
 
+    /***********************************************************
+    ***********************************************************/
     private void check_csync_excluded_per_dir () {
         var temporary_directory = QStandardPaths.writable_location (QStandardPaths.TempLocation);
         excluded_files.on_signal_reset (new ExcludedFiles (temporary_directory + "/"));
@@ -246,6 +268,8 @@ public class TestExcludedFiles : GLib.Object {
         GLib.assert_true (check_file_full (oo_directory + "/baz") == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
     }
 
+    /***********************************************************
+    ***********************************************************/
     private void check_csync_excluded_traversal_per_dir () {
         setup_init ();
         GLib.assert_true (check_file_traversal ("/") == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
@@ -256,6 +280,8 @@ public class TestExcludedFiles : GLib.Object {
         GLib.assert_true (check_file_traversal ("latex/songbook/my_manuscript.tex.temporary") == CSync.ExcludedFiles.Type.LIST);
     }
 
+    /***********************************************************
+    ***********************************************************/
     private void check_csync_excluded_traversal () {
         setup_init ();
         GLib.assert_true (check_file_traversal ("") == CSync.ExcludedFiles.Type.NOT_EXCLUDED);
@@ -393,6 +419,8 @@ public class TestExcludedFiles : GLib.Object {
         GLib.assert_true (check_file_traversal ("c [d]") == CSync.ExcludedFiles.Type.LIST);
     }
 
+    /***********************************************************
+    ***********************************************************/
     private void check_csync_dir_only () {
         up ();
         excluded_files.add_manual_exclude ("filedir");
@@ -418,6 +446,8 @@ public class TestExcludedFiles : GLib.Object {
         GLib.assert_true (check_file_full ("directory/foo") == CSync.ExcludedFiles.Type.LIST);
     }
 
+    /***********************************************************
+    ***********************************************************/
     private void check_csync_pathes () {
         setup_init ();
         excluded_files.add_manual_exclude ("/exclude");
@@ -453,6 +483,8 @@ public class TestExcludedFiles : GLib.Object {
         GLib.assert_true (check_dir_full ("/excludepath/withsubdir/foo") == CSync.ExcludedFiles.Type.LIST);
     }
 
+    /***********************************************************
+    ***********************************************************/
     private void check_csync_wildcards () {
         up ();
         excluded_files.add_manual_exclude ("a/foo*bar");
@@ -495,6 +527,8 @@ public class TestExcludedFiles : GLib.Object {
         GLib.assert_true (check_file_traversal ("e/foo/bar_a") == CSync.ExcludedFiles.Type.LIST);
     }
 
+    /***********************************************************
+    ***********************************************************/
     private void check_csync_regex_translation () {
         up ();
         string storage;
@@ -512,12 +546,16 @@ public class TestExcludedFiles : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private string translate_to_regexp_syntax (string pattern) {
         string storage = ExcludedFiles.convert_to_regexp_syntax (pattern, false);
         return storage.const_data ();
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private void check_csync_bname_trigger () {
         up ();
         bool wildcards_match_slash = false;
@@ -546,12 +584,16 @@ public class TestExcludedFiles : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private string translate_to_bname_trigger (bool wildcards_match_slash, string pattern) {
         var storage = ExcludedFiles.extract_bname_trigger (pattern, wildcards_match_slash);
         return storage.const_data ();
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private void check_csync_is_windows_reserved_word () {
 
         GLib.assert_true (csync_is_windows_reserved_word ("CON"));
@@ -588,6 +630,8 @@ public class TestExcludedFiles : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private bool csync_is_windows_reserved_word (string fn) {
         string s = fn;
         //  extern bool csync_is_windows_reserved_word (QStringRef filename);
@@ -595,6 +639,8 @@ public class TestExcludedFiles : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     /* QT_ENABLE_REGEXP_JIT=0 to get slower results :-) */
     private void check_csync_excluded_performance1 () {
         setup_init ();
@@ -677,7 +723,7 @@ public class TestExcludedFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_add_exclude_file_path_add_same_file_path_list_size_does_not_increase () {
+    private test_add_exclude_file_path_add_same_file_path_list_size_does_not_increase () {
         excluded_files.on_signal_reset (new ExcludedFiles ());
         var file_path = "exclude/.sync-exclude.lst";
 
@@ -690,7 +736,7 @@ public class TestExcludedFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_add_exclude_file_path_add_different_file_paths_list_size_increase () {
+    private test_add_exclude_file_path_add_different_file_paths_list_size_increase () {
         excluded_files.on_signal_reset (new ExcludedFiles ());
 
         var file_path1 = "exclude1/.sync-exclude.lst";
@@ -705,7 +751,7 @@ public class TestExcludedFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_add_exclude_file_path_add_default_exclude_file_return_correct_map () {
+    private test_add_exclude_file_path_add_default_exclude_file_return_correct_map () {
         const string base_path = "sync_folder/";
         const string folder1 = "sync_folder/folder1/";
         const string folder2 = folder1 + "folder2/";
@@ -728,7 +774,7 @@ public class TestExcludedFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_reload_exclude_files_file_does_not_exist_return_false () {
+    private test_reload_exclude_files_file_does_not_exist_return_false () {
         excluded_files.on_signal_reset (new ExcludedFiles ());
         const string non_existing_file = "directory/.sync-exclude.lst";
         excluded_files.add_exclude_file_path (non_existing_file);
@@ -739,7 +785,7 @@ public class TestExcludedFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_reload_exclude_files_file_exists_return_true () {
+    private test_reload_exclude_files_file_exists_return_true () {
         var temporary_directory = QStandardPaths.writable_location (QStandardPaths.TempLocation);
         excluded_files.on_signal_reset (new ExcludedFiles (temporary_directory + "/"));
 
@@ -757,5 +803,6 @@ public class TestExcludedFiles : GLib.Object {
     }
 
 } // class TestExcludedFiles
+
 } // namespace Testing
 } // namespace Occ

@@ -1,16 +1,8 @@
 /***********************************************************
-   This software is in the public domain, furnished "as is", without technical
-   support, and with no warranty, express or implied, as to its usefulness for
-   any purpose.
+This software is in the public domain, furnished "as is",
+without technical support, and with no warranty, express or
+implied, as to its usefulness for any purpose.
 ***********************************************************/
-
-//  #include <QTemporaryDir>
-
-using Utility;
-
-//  namespace Occ {
-//  OCSYNC_EXPORT extern bool filesystem_case_preserving_override;
-//  }
 
 namespace Occ {
 namespace Testing {
@@ -26,7 +18,7 @@ public class TestUtility : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_format_fingerprint () {
+    private TestFormatFingerprint () {
         QVERIFY2 (format_fingerprint ("68ac906495480a3404beee4874ed853a037a7a8f")
                  == "68:ac:90:64:95:48:0a:34:04:be:ee:48:74:ed:85:3a:03:7a:7a:8f",
 		"Utility.format_fingerprint () is broken");
@@ -35,7 +27,7 @@ public class TestUtility : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_octets_to_string () {
+    private TestOctetsToString () {
         QLocale.set_default (QLocale ("en"));
         GLib.assert_true (octets_to_string (999) == "999 B");
         GLib.assert_true (octets_to_string (1024) == "1 KB");
@@ -61,10 +53,10 @@ public class TestUtility : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_launch_on_signal_startup () {
+    private TestLaunchOnStartup () {
         string postfix = Utility.rand ().to_string ();
 
-        const string app_name = "on_signal_test_launch_on_signal_startup.%1".printf (postfix);
+        const string app_name = "TestLaunchOnStartup.%1".printf (postfix);
         const string gui_name = "LaunchOnStartup GUI Name";
 
         GLib.assert_true (has_launch_on_startup (app_name) == false);
@@ -77,7 +69,7 @@ public class TestUtility : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_duration_to_descriptive_string () {
+    private TestDurationToDescriptiveString () {
         QLocale.set_default (QLocale ("C"));
         //Note: in order for the plural to work we would need to load the english translation
 
@@ -121,7 +113,7 @@ public class TestUtility : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_version_of_installed_binary () {
+    private TestVersionOfInstalledBinary () {
         if (is_linux ()) {
             // pass the command client from our build directory
             // this is a bit inaccurate as it does not test the "real thing"
@@ -141,7 +133,7 @@ public class TestUtility : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_time_ago () {
+    private TestTimeAgo () {
         // Both times in same timezone
         GLib.DateTime d1 = GLib.DateTime.from_string ("2015-01-24T09:20:30+01:00", Qt.ISODate);
         GLib.DateTime d2 = GLib.DateTime.from_string ("2015-01-23T09:20:30+01:00", Qt.ISODate);
@@ -168,7 +160,7 @@ public class TestUtility : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_fs_case_preserving () {
+    private TestFilesystemCasePreserving () {
         GLib.assert_true (is_mac () || is_windows () ? filesystem_case_preserving () : ! filesystem_case_preserving ());
         QScopedValueRollback<bool> scope = new QScopedValueRollback<bool> (filesystem_case_preserving_override);
         filesystem_case_preserving_override = true;
@@ -180,13 +172,13 @@ public class TestUtility : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_filenames_equal () {
+    private TestFilenamesEqual () {
         QTemporaryDir directory;
         GLib.assert_true (directory.is_valid ());
         GLib.Dir dir2 = new GLib.Dir (directory.path);
         GLib.assert_true (dir2.mkpath ("test"));
         if ( !filesystem_case_preserving () ) {
-        GLib.assert_true (dir2.mkpath ("TEST"));
+        GLib.assert_true (dir2.mkpath ("test_string"));
         }
         GLib.assert_true (dir2.mkpath ("test/TESTI"));
         GLib.assert_true (dir2.mkpath ("TESTI"));
@@ -200,7 +192,7 @@ public class TestUtility : GLib.Object {
         GLib.assert_true (file_names_equal (a+"/test/TESTI", b+"/test/../test/TESTI")); // both exist
 
         QScopedValueRollback<bool> scope = new QScopedValueRollback<bool> (filesystem_case_preserving_override, true);
-        GLib.assert_true (file_names_equal (a+"/test", b+"/TEST")); // both exist
+        GLib.assert_true (file_names_equal (a+"/test", b+"/test_string")); // both exist
 
         GLib.assert_true (!file_names_equal (a+"/test", b+"/test/TESTI")); // both are different
 
@@ -210,7 +202,7 @@ public class TestUtility : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_sanitize_for_filename_data () {
+    private TestSanitizeForFilenameData () {
         QTest.add_column<string> ("input");
         QTest.add_column<string> ("output");
 
@@ -228,36 +220,36 @@ public class TestUtility : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_sanitize_for_filename () {
+    private TestSanitizeForFilename () {
         QFETCH (string, input);
         QFETCH (string, output);
         GLib.assert_true (sanitize_for_filename (input), output);
     }
 
-    void test_normalize_etag () {
+    TestNormalizeEtag () {
         string string_value;
     }
 
-    int CHECK_NORMALIZE_ETAG (string TEST, string EXPECT) {
-        string_value = Utility.normalize_etag (TEST);
-        GLib.assert_true (string_value.const_data (), EXPECT);
+    int check_normalize_etag (string test_string, string expect_string) {
+        string_value = Utility.normalize_etag (test_string);
+        GLib.assert_true (string_value.const_data (), expect_string);
 
-        CHECK_NORMALIZE_ETAG ("foo", "foo");
-        CHECK_NORMALIZE_ETAG ("\"foo\"", "foo");
-        CHECK_NORMALIZE_ETAG ("\"nar123\"", "nar123");
-        CHECK_NORMALIZE_ETAG ("", "");
-        CHECK_NORMALIZE_ETAG ("\"\"", "");
+        check_normalize_etag ("foo", "foo");
+        check_normalize_etag ("\"foo\"", "foo");
+        check_normalize_etag ("\"nar123\"", "nar123");
+        check_normalize_etag ("", "");
+        check_normalize_etag ("\"\"", "");
 
         /* Test with -gzip (all combinaison) */
-        CHECK_NORMALIZE_ETAG ("foo-gzip", "foo");
-        CHECK_NORMALIZE_ETAG ("\"foo\"-gzip", "foo");
-        CHECK_NORMALIZE_ETAG ("\"foo-gzip\"", "foo");
+        check_normalize_etag ("foo-gzip", "foo");
+        check_normalize_etag ("\"foo\"-gzip", "foo");
+        check_normalize_etag ("\"foo-gzip\"", "foo");
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_test_is_path_windows_drive_partition_root () {
+    private TestIsPathWindowsDrivePartitionRoot () {
         // should always return false on non-Windows
         GLib.assert_true (!is_path_windows_drive_partition_root ("c:"));
         GLib.assert_true (!is_path_windows_drive_partition_root ("c:/"));

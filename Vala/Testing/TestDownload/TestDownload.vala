@@ -16,7 +16,7 @@ public class TestDownload : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_resume () {
+    private test_resume () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine.set_ignore_hidden_files (true);
         QSignalSpy complete_spy = new QSignalSpy (
@@ -62,7 +62,7 @@ public class TestDownload : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_error_message () {
+    private test_error_message () {
         // This test's main goal is to test that the error string from the server is shown in the UI
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
@@ -109,7 +109,7 @@ public class TestDownload : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_server_maintenence () {
+    private test_server_maintenence () {
         // Server in maintenance must on_signal_abort the sync.
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
@@ -152,7 +152,7 @@ public class TestDownload : GLib.Object {
 
     Test for https://github.com/owncloud/client/issues/7015
     ***********************************************************/
-    private void test_move_fails_in_a_conflict () {
+    private test_move_fails_in_a_conflict () {
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine.set_ignore_hidden_files (true);
@@ -223,7 +223,7 @@ public class TestDownload : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_http2_resend () {
+    private test_http2_resend () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.remote_modifier ().insert ("A/resendme", 300);
 

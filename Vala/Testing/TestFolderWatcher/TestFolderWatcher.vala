@@ -85,7 +85,7 @@ public class TestFolderWatcher : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_a_create () { // create a new file
+    private test_a_create () { // create a new file
         string file = this.root_path + "/foo.txt";
         string command = "echo \"xyz\" > %1".printf (file);
         GLib.debug ("Command: " + command);
@@ -97,7 +97,7 @@ public class TestFolderWatcher : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_a_touch () { // touch an existing file.
+    private test_a_touch () { // touch an existing file.
         string file = this.root_path + "/a1/random.bin";
         touch (file);
         GLib.assert_true (wait_for_path_changed (file));
@@ -106,7 +106,7 @@ public class TestFolderWatcher : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_move3_level_dir_with_file () {
+    private test_move3_level_dir_with_file () {
         string file = this.root_path + "/a0/b/c/empty.txt";
         mkdir (this.root_path + "/a0");
         mkdir (this.root_path + "/a0/b");
@@ -119,7 +119,7 @@ public class TestFolderWatcher : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_create_a_dir () {
+    private test_create_a_dir () {
         string file = this.root_path + "/a1/b1/new_dir";
         mkdir (file);
         GLib.assert_true (wait_for_path_changed (file));
@@ -133,7 +133,7 @@ public class TestFolderWatcher : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_remove_a_dir () {
+    private test_remove_a_dir () {
         string file = this.root_path + "/a1/b3/c3";
         rmdir (file);
         GLib.assert_true (wait_for_path_changed (file));
@@ -142,7 +142,7 @@ public class TestFolderWatcher : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_remove_a_file () {
+    private test_remove_a_file () {
         string file = this.root_path + "/a1/b2/todelete.bin";
         GLib.assert_true (GLib.File.exists (file));
         rm (file);
@@ -154,7 +154,7 @@ public class TestFolderWatcher : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_rename_a_file () {
+    private test_rename_a_file () {
         string file1 = this.root_path + "/a2/renamefile";
         string file2 = this.root_path + "/a2/renamefile.renamed";
         GLib.assert_true (GLib.File.exists (file1));
@@ -168,7 +168,7 @@ public class TestFolderWatcher : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_move_a_file () {
+    private test_move_a_file () {
         string old_file = this.root_path + "/a1/movefile";
         string new_file = this.root_path + "/a2/movefile.renamed";
         GLib.assert_true (GLib.File.exists (old_file));
@@ -182,7 +182,7 @@ public class TestFolderWatcher : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_rename_directory_same_base () {
+    private test_rename_directory_same_base () {
         string old_file = this.root_path + "/a1/b1";
         string new_file = this.root_path + "/a1/brename";
         GLib.assert_true (GLib.File.exists (old_file));
@@ -206,7 +206,7 @@ public class TestFolderWatcher : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_rename_directory_different_base () {
+    private test_rename_directory_different_base () {
 
         string old_file = this.root_path + "/a1/brename";
         string new_file = this.root_path + "/bren";

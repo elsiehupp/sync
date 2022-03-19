@@ -1,10 +1,10 @@
 /***********************************************************
-   This software is in the public domain, furnished "as is", without technical
-      support, and with no warranty, express or implied, as to its usefulness for
-         any purpose.
-         */
+This software is in the public domain, furnished "as is",
+without technical support, and with no warranty, express or
+implied, as to its usefulness for any purpose.
+***********************************************************/
 
-//  #include <sqlite3.h>
+using Sqlite3;
 
 namespace Occ {
 namespace Testing {
@@ -19,7 +19,7 @@ public class TestOwnSql : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_open_database () {
+    private test_open_database () {
         GLib.FileInfo file_info = new GLib.FileInfo ( this.temporary_directory.path + "/testdatabase.sqlite" );
         GLib.assert_true ( !file_info.exists () ); // must not exist
         this.database.open_or_create_read_write (file_info.file_path);
@@ -30,7 +30,7 @@ public class TestOwnSql : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_create () {
+    private test_create () {
         const string sql = "CREATE TABLE addresses ( identifier INTEGER, name VARCHAR (4096), "
                          + "address VARCHAR (4096), entered INTEGER (8), PRIMARY KEY (identifier));";
 
@@ -42,7 +42,7 @@ public class TestOwnSql : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_is_select () {
+    private test_is_select () {
         SqlQuery query = new SqlQuery (this.database);
         query.prepare ("SELECT identifier FROM addresses;");
         GLib.assert_true (query.is_select ());
@@ -54,7 +54,7 @@ public class TestOwnSql : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_insert () {
+    private test_insert () {
         const string sql = "INSERT INTO addresses (identifier, name, address, entered) VALUES "
                          + " (1, 'Gonzo Alberto', 'Moriabata 24, Palermo', 1403100844);";
         SqlQuery query = new SqlQuery (this.database);
@@ -65,7 +65,7 @@ public class TestOwnSql : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_insert2 () {
+    private test_insert2 () {
         const string sql = "INSERT INTO addresses (identifier, name, address, entered) VALUES "
                          + " (?1, ?2, ?3, ?4);";
         SqlQuery query = new SqlQuery (this.database);
@@ -80,7 +80,7 @@ public class TestOwnSql : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_select () {
+    private test_select () {
         const string sql = "SELECT * FROM addresses;";
 
         SqlQuery query = new SqlQuery (this.database);
@@ -96,7 +96,7 @@ public class TestOwnSql : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_select2 () {
+    private test_select2 () {
         const string sql = "SELECT * FROM addresses WHERE identifier=?1";
         SqlQuery query = new SqlQuery (this.database);
         query.prepare (sql);
@@ -111,7 +111,7 @@ public class TestOwnSql : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_pragma () {
+    private test_pragma () {
         const string sql = "PRAGMA table_info (addresses)";
 
         SqlQuery query = new SqlQuery (this.database);
@@ -126,7 +126,7 @@ public class TestOwnSql : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_unicode () {
+    private test_unicode () {
         const string sql = "INSERT INTO addresses (identifier, name, address, entered) VALUES "
                          + " (?1, ?2, ?3, ?4);";
         SqlQuery query = new SqlQuery (this.database);
@@ -141,7 +141,7 @@ public class TestOwnSql : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_read_unicode () {
+    private test_read_unicode () {
         const string sql = "SELECT * FROM addresses WHERE identifier=3;";
         SqlQuery query = new SqlQuery (this.database);
         query.prepare (sql);
@@ -157,7 +157,7 @@ public class TestOwnSql : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_destructor () {
+    private test_destructor () {
         // This test make sure that the destructor of SqlQuery works even if the SqlDatabase
         // is destroyed before
         SqlDatabase database = new SqlDatabase ();

@@ -14,7 +14,7 @@ public class TestConcatUrl : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_folder () {
+    private test_folder () {
         QFETCH (string, base);
         QFETCH (string, concat);
         QFETCH (QueryItems, query);
@@ -31,7 +31,7 @@ public class TestConcatUrl : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_folder_data () {
+    private test_folder_data () {
         QTest.add_column<string> ("base");
         QTest.add_column<string> ("concat");
         QTest.add_column<QueryItems> ("query");

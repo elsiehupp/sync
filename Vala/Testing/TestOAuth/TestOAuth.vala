@@ -4,9 +4,6 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-//  #include <QtTest/QtTest>
-//  #include <QDesktopServices>
-
 namespace Occ {
 namespace Testing {
 
@@ -16,11 +13,13 @@ public class TestOAuth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_basic () {
+    private test_basic () {
         OAuthTestCase test;
         test.test ();
     }
 
+    /***********************************************************
+    ***********************************************************/
     class TestCloseBrowserDontCrash : OAuthTestCase {
 
         override Soup.Reply token_reply (Soup.Operation operation, Soup.Request request) {
@@ -44,13 +43,17 @@ public class TestOAuth : GLib.Object {
         }
     }
 
-    // Test for https://github.com/owncloud/client/pull/6057
-    private void test_close_browser_dont_crash () {
+    /***********************************************************
+    Test for https://github.com/owncloud/client/pull/6057
+    ***********************************************************/
+    private test_close_browser_dont_crash () {
         TestCloseBrowserDontCrash test;
         test.test ();
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     class TestRandomConnections : OAuthTestCase {
         override Soup.Reply create_browser_reply (Soup.Request request) {
             GLib.Timeout.single_shot (0, this, () => {
@@ -106,13 +109,15 @@ public class TestOAuth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_random_connections () {
+    private test_random_connections () {
         // Test that we can send random garbage to the litening socket and it does not prevent the connection
         TestRandomConnections test;
         test.test ();
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     struct TestTokenUrlHasRedirect : OAuthTestCase {
 
         int redirects_done = 0;
@@ -146,7 +151,7 @@ public class TestOAuth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_token_url_has_redirect () {
+    private test_token_url_has_redirect () {
         TestTokenUrlHasRedirect test;
         test.test ();
     }

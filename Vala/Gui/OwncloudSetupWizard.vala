@@ -705,7 +705,7 @@ public class OwncloudSetupWizard : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void test_owncloud_connect () {
+    private test_owncloud_connect () {
         unowned Account account = this.oc_wizard.account;
 
         var propfind_job = new PropfindJob (account, "/", this);

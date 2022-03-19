@@ -17,6 +17,8 @@ public class TestAsyncOp : GLib.Object {
     // the `perform` functor to what needs to be done to complete the transaction.
     // The testest_casease consist of the `poll_request` which will be called when the sync engine
     // calls the poll url.
+    /***********************************************************
+    ***********************************************************/
     class TestCase {
         public delegate Soup.Reply PollRequestDelegate (TestCase test_case, Soup.Request request);
         public PollRequestDelegate poll_request;
@@ -106,12 +108,16 @@ public class TestAsyncOp : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private FakePayloadReply big_wait_delegate (TestCase test_case, Soup.Request request) {
         GLib.Timeout.single_shot (0, fake_folder.sync_engine, &SyncEngine.on_signal_abort);
         return wait_and_chain (wait_forever_callback) (test_case, request);
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     // needs passthrough of [fake_folder, success_callback]
     private FakePayloadReply will_not_conflict_delegate (TestCase test_case, Soup.Request request) {
         var remote_modifier = fake_folder.remote_modifier (); // success_callback destroys the capture
@@ -124,6 +130,8 @@ public class TestAsyncOp : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     // Callback to be used to on_signal_finalize the transaction and return the on_signal_success
     private FakePayloadReply success_callback (TestCase test_case, Soup.Request request) {
         test_case.poll_request = FakePayloadReply.poll_request_delegate;
@@ -133,12 +141,16 @@ public class TestAsyncOp : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     // shall no longer be called
     private void poll_request_delegate (TestCase test_case, Soup.Request request) {
         std.abort ();
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     // Callback that never finishes
     private FakePayloadReply wait_forever_callback (TestCase test_case, Soup.Request request) {
         string body = "{\"status\":\"started\"}\n";
@@ -146,6 +158,8 @@ public class TestAsyncOp : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     // Callback that simulate an error.
     private FakePayloadReply error_callback (TestCase test_case, Soup.Request request) {
         test_case.poll_request = FakePayloadReply.error_callback_poll_request_delegate;
@@ -154,12 +168,16 @@ public class TestAsyncOp : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     // shall no longer be called;
     private FakePayloadReply error_callback_poll_request_delegate (TestCase test_case, Soup.Request request) {
         std.abort ();
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     // This lambda takes another functor as a parameter, and returns a callback that will
     // tell the client needs to poll again, and further call to the poll url will call the
     // given callback
@@ -168,6 +186,8 @@ public class TestAsyncOp : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     // needs passthrough of [chain]
     private FakePayloadReply wait_and_chain_delegate (TestCase test_case, Soup.Request request) {
         test_case.poll_request = chain;
@@ -176,6 +196,8 @@ public class TestAsyncOp : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     // Create a testest_casease by creating a file of a given size locally and assigning it a callback
     private void insert_file (string file, int64 size, TestCase.PollRequestDelegate cb) {
         fake_folder.local_modifier.insert (file, size);
@@ -183,6 +205,8 @@ public class TestAsyncOp : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private Soup.Reply override_delegate_async_upload_operations1 (Soup.Operation operation, Soup.Request request, QIODevice outgoing_data) {
         var path = request.url.path;
 
@@ -220,6 +244,8 @@ public class TestAsyncOp : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private Soup.Reply override_delegate_async_upload_operations2 (Soup.Operation operation, Soup.Request request, QIODevice device) {
         var path = request.url.path;
         if (operation == Soup.GetOperation && path.starts_with ("/async-poll/")) {
@@ -240,5 +266,6 @@ public class TestAsyncOp : GLib.Object {
     }
 
 } // class TestAsyncOp
+
 } // namespace Testing
 } // namespace Occ
