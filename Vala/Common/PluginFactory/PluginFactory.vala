@@ -1,13 +1,12 @@
-/***********************************************************
-@author Dominik Schmidt <dschmidt@owncloud.com>
-
-<LGPLv2.1-or-later-Boilerplate>
-***********************************************************/
-
 namespace Occ {
 
-// Q_DECLARE_INTERFACE (PluginFactory, "org.owncloud.PluginFactory")
+/***********************************************************
+@class PluginFactory
 
+@author Dominik Schmidt <dschmidt@owncloud.com>
+
+@copyright LGPLv2.1 or later
+***********************************************************/
 public abstract class PluginFactory {
 
     /***********************************************************

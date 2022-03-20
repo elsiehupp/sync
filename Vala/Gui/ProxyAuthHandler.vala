@@ -1,5 +1,6 @@
 /***********************************************************
-Copyright (C) 2015 by Christian Kamm <kamm@incasoftware.de>
+@author 2015 by Christian Kamm <kamm@incasoftware.de>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 

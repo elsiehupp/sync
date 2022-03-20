@@ -12,7 +12,7 @@ namespace Testing {
 emulates the real server storage that contains all the
 results that UnifiedSearchListmodel will search for
 ***********************************************************/
-public class FakeSearchResultsStorage {
+public class FakeSearchResultsStorage : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
@@ -34,9 +34,9 @@ public class FakeSearchResultsStorage {
     ***********************************************************/
     private QVariantMap meta_success;
 
-    class Provider {
+    public class Provider : GLib.Object {
 
-        public class SearchResult {
+        public class SearchResult : GLib.Object {
 
             public string thumbnail_url;
             public string title;

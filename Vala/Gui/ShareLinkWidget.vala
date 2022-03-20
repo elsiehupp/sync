@@ -1,6 +1,7 @@
 /***********************************************************
 @author Roeland Jago Douma <roeland@famdouma.nl>
-Copyright (C) 2015 by Klaas Freitag <freitag@owncloud.com>
+@author 2015 by Klaas Freitag <freitag@owncloud.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 

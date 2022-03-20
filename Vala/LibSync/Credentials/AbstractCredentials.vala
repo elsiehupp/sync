@@ -1,6 +1,7 @@
 /***********************************************************
 @author Krzesimir Nowak <krzesimir@endocode.com>
 @author Daniel Molkentin <danimo@owncloud.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 

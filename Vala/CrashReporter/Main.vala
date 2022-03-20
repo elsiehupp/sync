@@ -1,5 +1,6 @@
 /***********************************************************
 @author Dominik Schmidt <domme@tomahawk-player.org>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 

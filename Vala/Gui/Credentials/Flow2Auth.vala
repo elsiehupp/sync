@@ -1,6 +1,7 @@
 /***********************************************************
 @author Olivier Goffart <ogoffart@woboq.com>
 @author Michael Schuster <michael@schuster.ms>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 

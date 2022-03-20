@@ -1,5 +1,6 @@
 /***********************************************************
 @author Christian Kamm <mail@ckamm.de>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 
@@ -20,7 +21,7 @@ public errordomain OpenExternalError {
     OPEN_EXTERNAL_FAILED,
 }
 
-public class OpenExternal {
+public class OpenExternal : GLib.Object {
 
     /***********************************************************
     Open an url in the browser.

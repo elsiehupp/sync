@@ -1,29 +1,14 @@
-
 /***********************************************************
+@class KMessageWidgetPrivate
+
 This file is part of the KDE libraries
 
-Copyright (c) 2011 Aurélien Gâteau <agateau@kde.org>
-Copyright (c) 2014 Dominik Haumann <dhaumann@kde.org>
+@author 2011 Aurélien Gâteau <agateau@kde.org>
+@author 2014 Dominik Haumann <dhaumann@kde.org>
 
-<LGPLv2.1-or-later-Boilerplate>
+@copyright LGPLv2.1 or later
 ***********************************************************/
-
-//  #include <QAction>
-//  #include <Gtk.Application>
-//  #include <QEvent>
-//  #include <QGridLayout>
-//  #include <QHBoxLayout>
-//  #include <Gtk.Label>
-//  #include <QPainter>
-//  #include <QShowEvent>
-//  #include <QTimeLine>
-//  #include <QToolButton>
-//  #include <QStyle>
-
-/***********************************************************
-KMessageWidgetPrivate
-***********************************************************/
-public class KMessageWidgetPrivate {
+public class KMessageWidgetPrivate : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

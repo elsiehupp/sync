@@ -2,7 +2,7 @@
 @author Klaas Freitag <freitag@owncloud.com>
 @author Daniel Molkentin <danimo@owncloud.com>
 
-<LGPLv2.1-or-later-Boilerplate>
+@copyright LGPLv2.1 or later
 ***********************************************************/
 
 //  #include <QStandardPaths>
@@ -46,7 +46,7 @@ namespace Occ {
 \addtogroup libsync
  @{
 ***********************************************************/
-public class Utility {
+public class Utility : GLib.Object {
 
     /***********************************************************
     OCSYNC_EXPORT

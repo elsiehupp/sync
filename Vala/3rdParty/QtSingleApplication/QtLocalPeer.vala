@@ -1,30 +1,14 @@
+namespace SharedTools {
+
 /***********************************************************
-Copyright (C) 2014 Digia Plc and/or its subsidiary (-ies).
-Contact : http://www.qt-project.org/legal
+@class QtLocalPeer
+
+@author 2014 Digia Plc and/or its subsidiary (-ies).
 
 This file is part of Qt Creator.
 
-<LGPLv2.1-or-later-Boilerplate>
-
-In addition, as a special exception, Digia gives you certain additional
-rights.  These rights are described in the Digia Qt LGPL Exception
-version 1.1, included in the file LGPL_EXCEPTION.txt in this pACKage.
+@copyright LGPLv2.1 or later
 ***********************************************************/
-
-//  #include <QLocalServer>
-//  #include <QLocalSocket>
-//  #include <GLib.Dir>
-//  #include <Gtk.Application>
-//  #include <QDataStream>
-//  #include <QTime>
-
-//  #if defined (Q_OS_UNIX)
-//  #include <ctime>
-//  #include <unistd.h>
-//  #endif
-
-namespace SharedTools {
-
 public class QtLocalPeer : GLib.Object {
 
     const string ACK = "ack";

@@ -1,22 +1,25 @@
 /***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-
-<LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/
 
 
 namespace Occ {
 
 /***********************************************************
-Represents a conflict in the conflicts table.
+@class ConflictRecord
 
-In the following the "conflict file" is the file that has
-the conflict tag in the filename, and the base file is the
-file that it's a conflict for. So if "a/foo.txt" is the
-base file, its conflict file could be
+@brief Represents a conflict in the conflicts table.
+
+@details In the following the "conflict file" is the file
+that has the conflict tag in the filename, and the base file
+is the file that it's a conflict for. So if "a/foo.txt" is
+the base file, its conflict file could be
 "a/foo (conflicted copy 1234).txt".
+
+@author Klaas Freitag <freitag@owncloud.com>
+
+@copyright LGPLv2.1 or later
 ***********************************************************/
-public class ConflictRecord {
+public class ConflictRecord : GLib.Object {
 
     /***********************************************************
     Path to the file with the conflict tag in the name

@@ -1,6 +1,7 @@
 /***********************************************************
-Copyright (C) 2015 by Jeroen Hoek
-Copyright (C) 2015 by Olivier Goffart <ogoffart@owncloud.com>
+@author 2015 by Jeroen Hoek
+@author 2015 by Olivier Goffart <ogoffart@owncloud.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 

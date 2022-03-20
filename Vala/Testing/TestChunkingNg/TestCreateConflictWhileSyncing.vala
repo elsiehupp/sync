@@ -7,7 +7,7 @@ implied, as to its usefulness for any purpose.
 namespace Occ {
 namespace Testing {
 
-public class AbstractTestChunkingNg {
+public class AbstractTestChunkingNg : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

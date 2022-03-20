@@ -1,11 +1,16 @@
+namespace Occ {
+namespace Cmd {
+
 /***********************************************************
+@class class EchoDisabler
+
 @author Olivier Goffart <ogoffart@owncloud.com>
 @author Klaas Freitag <freitag@owncloud.com>
 @author Daniel Heule <daniel.heule@gmail.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
-
-public class EchoDisabler {
+public class EchoDisabler : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
@@ -24,4 +29,8 @@ public class EchoDisabler {
     /***********************************************************
     ***********************************************************/
     private termios tios;
-}
+
+} // class EchoDisabler
+
+} // namespace Cmd
+} // namespace Occ

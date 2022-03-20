@@ -1,6 +1,7 @@
 /***********************************************************
-Copyright (C) 2015 by nocteau
-Copyright (C) 2015 by Daniel Molkentin <danimo@owncloud.com>
+@author 2015 by nocteau
+@author 2015 by Daniel Molkentin <danimo@owncloud.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 

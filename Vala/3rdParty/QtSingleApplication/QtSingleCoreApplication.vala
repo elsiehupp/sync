@@ -1,21 +1,14 @@
+namespace SharedTools {
+
 /***********************************************************
-Copyright (C) 2014 Digia Plc and/or its subsidiary (-ies).
-Contact : http://www.qt-project.org/legal
+@class class QtSingleCoreApplication
+
+@author 2014 Digia Plc and/or its subsidiary (-ies).
 
 This file is part of Qt Creator.
 
-<LGPLv2.1-or-later-Boilerplate>
-
-In addition, as a special exception, Digia gives you
-certain additional rights.  These rights are described in
-the Digia Qt LGPL Exception version 1.1, included in the
-file LGPL_EXCEPTION.txt in this package.
+@copyright LGPLv2.1 or later
 ***********************************************************/
-
-//  #include <Gtk.Application>
-
-namespace SharedTools {
-
 public class QtSingleCoreApplication : Gtk.Application {
 
     /***********************************************************

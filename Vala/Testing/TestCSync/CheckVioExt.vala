@@ -1,7 +1,7 @@
 /***********************************************************
 libcsync -- a library to sync a directory with another
 
-Copyright (c) 2015-2013 by Klaas Freitag <freitag@owncloud.co
+@author 2015-2013 by Klaas Freitag <freitag@owncloud.co
 
 This library is free software; you can redistribute it and/o
 modify it under the terms of the GNU Lesser General Public
@@ -29,7 +29,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 namespace Occ {
 namespace Testing {
 
-public class CheckVioExt {
+public class CheckVioExt : GLib.Object {
 
     const int WD_BUFFER_SIZE = 255;
 

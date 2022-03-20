@@ -1,15 +1,15 @@
-/***********************************************************
-@author Dominik Schmidt <dschmidt@owncloud.com>
-
-<LGPLv2.1-or-later-Boilerplate>
-***********************************************************/
-
-
-
 namespace Occ {
 
-//  template<class PluginClass>
+/***********************************************************
+@class DefaultPluginFactory
+
+@author Dominik Schmidt <dschmidt@owncloud.com>
+
+@copyright LGPLv2.1 or later
+***********************************************************/
 public class DefaultPluginFactory : PluginFactory {
+
+    //  template<class PluginClass>
 
     /***********************************************************
     ***********************************************************/
@@ -17,3 +17,5 @@ public class DefaultPluginFactory : PluginFactory {
         return new PluginClass (parent);
     }
 }
+
+} // namespace Occ

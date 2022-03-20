@@ -12,7 +12,7 @@ TODO: In theory we should use GLib.assert_true instead of
 GLib.assert_true for testing, but this only works when
 directly called from a QTest :- (
 ***********************************************************/
-public class SyncEngineTestUtils {
+public class SyncEngineTestUtils : GLib.Object {
 
     const GLib.Uri s_root_url = "owncloud://somehost/owncloud/remote.php/dav/";
     const GLib.Uri s_root_url_2 = "owncloud://somehost/owncloud/remote.php/dav/files/admin/";

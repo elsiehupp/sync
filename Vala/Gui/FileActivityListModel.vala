@@ -1,5 +1,6 @@
 /***********************************************************
 @author Felix Weilbach <felix.weilbach@nextcloud.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 

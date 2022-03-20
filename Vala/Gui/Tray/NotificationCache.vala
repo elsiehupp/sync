@@ -2,7 +2,7 @@
 namespace Occ {
 namespace Ui {
 
-public class NotificationCache {
+public class NotificationCache : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

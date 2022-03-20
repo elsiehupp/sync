@@ -2,6 +2,7 @@
 @author Olivier Goffart <ogoffart@woboq.com>
 @author Klaas Freitag <freitag@owncloud.com>
 @author Daniel Molkentin <danimo@owncloud.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 
@@ -24,7 +25,7 @@ namespace Ui {
 @brief Open the file manager with the specified file pre-selected
 @ingroup gui
 ***********************************************************/
-public class OpenFileManager {
+public class OpenFileManager : GLib.Object {
 
     static string default_manager;
     static string name;

@@ -1,19 +1,12 @@
-/***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-
-<LGPLv2.1-or-later-Boilerplate>
-***********************************************************/
-
-using Sqlite3;
-struct Sqlite3Stmt;
-
 namespace Occ {
 
 /***********************************************************
-@brief The SqlQuery class
-@ingroup libsync
+@class SqlQuery
 
-There is basically 3 ways to initialize and use a query:
+@brief The SqlQuery class
+
+@details There are basically 3 ways to initialize and use a
+query: {
 
     SqlQuery q1;
     [...]
@@ -31,19 +24,27 @@ There is basically 3 ways to initialize and use a query:
     SqlQuery q3 ("...", database);
     q3.bind_value (...);
     q3.exec (...)
+}
 
+@author Klaas Freitag <freitag@owncloud.com>
+
+
+@copyright LGPLv2.1 or later
 ***********************************************************/
-public class SqlQuery {
+public class SqlQuery : GLib.Object {
+
+    using Sqlite3;
+
     // Q_DISABLE_COPY (SqlQuery)
 
     /***********************************************************
     ***********************************************************/
-    private SqlDatabase this.sqldatabase = null;
-    private Sqlite3 this.database = null;
-    private Sqlite3Stmt this.stmt = null;
-    private string this.error;
-    private int this.err_id;
-    private string this.sql;
+    private SqlDatabase sqldatabase = null;
+    private Sqlite3 database = null;
+    private Sqlite3Stmt stmt = null;
+    private string error;
+    private int err_id;
+    private string sql;
 
     /***********************************************************
     ***********************************************************/
@@ -56,20 +57,19 @@ public class SqlQuery {
 
     /***********************************************************
     ***********************************************************/
-    public SqlQuery (SqlDatabase database)
-        : this.sqldatabase (&database)
-        this.database (database.sqlite_database ()) {
+    public SqlQuery (SqlDatabase database) {
+        this.sqldatabase = database;
+        this.database = database.sqlite_database ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public SqlQuery (string sql, SqlDatabase database)
-        : this.sqldatabase (&database)
-        this.database (database.sqlite_database ()) {
+    public SqlQuery.with_string (string sql, SqlDatabase database) {
+        this.sqldatabase = database;
+        this.database = database.sqlite_database ();
         prepare (sql);
     }
-
 
 
     ~SqlQuery () {

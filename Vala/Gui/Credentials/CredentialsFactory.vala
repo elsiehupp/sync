@@ -1,5 +1,6 @@
 /***********************************************************
 @author Krzesimir Nowak <krzesimir@endocode.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 
@@ -12,7 +13,7 @@ namespace Ui {
 @brief The HttpCredentialsGui namespace
 @ingroup gui
 ***********************************************************/
-public class CredentialsFactory {
+public class CredentialsFactory : GLib.Object {
 
     public static AbstractCredentials create (string type) {
         // empty string might happen for old version of configuration

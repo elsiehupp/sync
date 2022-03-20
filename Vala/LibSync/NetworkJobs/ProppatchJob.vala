@@ -1,6 +1,7 @@
 /***********************************************************
 @author Klaas Freitag <freitag@owncloud.com>
 @author Daniel Molkentin <danimo@owncloud.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 

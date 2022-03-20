@@ -1,7 +1,7 @@
 /***********************************************************
 libcsync -- a library to sync a directory with another
 
-Copyright (c) 2008-2013 by Andreas Schneider <asn@cryptomilk.
+@author 2008-2013 by Andreas Schneider <asn@cryptomilk.
 
 This library is free software; you can redistribute it and/o
 modify it under the terms of the GNU Lesser General Public
@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 namespace Occ {
 namespace Testing {
 
-public class TestCommandLine {
+public class TestCommandLine : GLib.Object {
 
     const string ARGP_PROGRAM_VERSION = "csync test 0.2";
     const string ARGP_PROGRAM_BUG_ADDRESS = "<csync-devel@csync.org>";

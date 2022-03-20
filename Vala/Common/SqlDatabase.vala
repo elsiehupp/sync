@@ -1,24 +1,18 @@
-/***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-
-<LGPLv2.1-or-later-Boilerplate>
-***********************************************************/
-
-//  #include <QLoggingCategory>
-//  #include <GLib.FileInfo>
-//  #include <GLib.Dir>
-//  #include <QLoggingCategory>
-
-using Sqlite3;
-//  struct Sqlite3Stmt;
-
 namespace Occ {
 
 /***********************************************************
+@class SqlDatabase
+
 @brief The SqlDatabase class
-@ingroup libsync
+
+@author Klaas Freitag <freitag@owncloud.com>
+
+@copyright LGPLv2.1 or later
 ***********************************************************/
-public class SqlDatabase {
+public class SqlDatabase : GLib.Object {
+
+    using Sqlite3;
+
     // Q_DISABLE_COPY (SqlDatabase)
 
     /***********************************************************

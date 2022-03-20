@@ -1,9 +1,18 @@
-// #include <Qt_test>
+/***********************************************************
+@class TestTokenizer
 
+@author 2014 Daniel Molkentin <daniel@molkentin.de>
+
+This file is part of the Qt Library
+
+@copyright LGPLv2.1 only
+
+@copyright GPLv3.0 only
+***********************************************************/
 public class TestTokenizer : GLib.Object {
 
     const string SIMPLE = "A SIMPLE tokenizer test";
-    const string quoted = "\"Wait for me!\" he shouted";
+    const string QUOTED = "\"Wait for me!\" he shouted";
 
     /***********************************************************
     ***********************************************************/

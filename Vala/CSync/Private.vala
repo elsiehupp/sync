@@ -1,9 +1,9 @@
 /***********************************************************
 cynapses libc functions
 
-Copyright (c) 2008-2013 by Andreas Schneider <asn@cryptomilk.org>
-Copyright (c) 2012-2013 by Dominik Schmidt <dev@dominik-schmidt.de
-Copyright (c) 2012-2013 by Klaas Freitag <freitag@owncloud.co
+@author 2008-2013 by Andreas Schneider <asn@cryptomilk.org>
+@author 2012-2013 by Dominik Schmidt <dev@dominik-schmidt.de
+@author 2012-2013 by Klaas Freitag <freitag@owncloud.co
 
 <LGPL-2.1-or-Later-Boilerplate>
 ***********************************************************/

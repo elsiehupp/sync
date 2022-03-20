@@ -5,6 +5,7 @@ namespace Ui {
 @class SslErrorDialog
 
 @author Klaas Freitag <freitag@kde.org>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 public class SslErrorDialog : Gtk.Dialog {

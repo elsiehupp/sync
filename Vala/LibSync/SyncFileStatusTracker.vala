@@ -1,6 +1,7 @@
 /***********************************************************
 @author Klaas Freitag <freitag@owncloud.com>
 @author Jocelyn Turcotte <jturcotte@woboq.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 

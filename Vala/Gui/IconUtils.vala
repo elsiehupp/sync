@@ -1,5 +1,6 @@
 /***********************************************************
 @author Oleksandr Zolotov <alex@nextcloud.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 
@@ -14,7 +15,7 @@
 namespace Occ {
 namespace Ui {
 
-public class IconUtils {
+public class IconUtils : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

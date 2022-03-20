@@ -1,14 +1,15 @@
-/***********************************************************
-@author Olivier Goffart <ogoffart@woboq.com>
-@copyright GPLv3 or Later
-***********************************************************/
-
 namespace Occ {
 
 /***********************************************************
-A Result of type T, or an Error
+@class Result<T>
+
+@brief A Result of type T, or an Error
+
+@author Olivier Goffart <ogoffart@woboq.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
-public class Result<T> {
+public class Result<T> : GLib.Object {
 
     struct NoResultData {}
     struct OptionalNoErrorData {}

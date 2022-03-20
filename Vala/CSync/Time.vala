@@ -1,7 +1,7 @@
 /***********************************************************
 c_time - time functions
 
-Copyright (c) 2008-2013 by Andreas Schneider <asn@cryptomilk.
+@author 2008-2013 by Andreas Schneider <asn@cryptomilk.
 
 This library is free software; you can redistribute it and/o
 modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 /***********************************************************
 c_time - time functions
 
-Copyright (c) 2008-2013 by Andreas Schneider <asn@cryptomilk.
+@author 2008-2013 by Andreas Schneider <asn@cryptomilk.
 
 This library is free software; you can redistribute it and/o
 modify it under the terms of the GNU Lesser General Public
@@ -47,7 +47,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 namespace CSync {
 
-public class Time {
+public class Time : GLib.Object {
 
     //  #ifdef HAVE_UTIMES
     int c_utimes (string uri, timeval times) {

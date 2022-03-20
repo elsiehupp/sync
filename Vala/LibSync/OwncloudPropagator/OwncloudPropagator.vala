@@ -1,6 +1,7 @@
 /***********************************************************
 @author Olivier Goffart <ogoffart@owncloud.com>
 @author Klaas Freitag <freitag@owncloud.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 

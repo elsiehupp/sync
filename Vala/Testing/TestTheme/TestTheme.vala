@@ -1,5 +1,5 @@
 /***********************************************************
-Copyright (C) 2021 by Felix Weilbach
+@author 2021 by Felix Weilbach
     <felix.weilbach@nextcloud.com>
 
 <GPLv???-or-later-Boilerplate>

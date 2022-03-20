@@ -1,6 +1,7 @@
 /***********************************************************
 @author Christian Kamm <mail@ckamm.de>
 @author Dominik Schmidt <dschmidt@owncloud.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 

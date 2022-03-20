@@ -2,6 +2,7 @@
 @author Duncan Mac-Vicar P. <duncan@kde.org>
 @author Daniel Molkentin <danimo@owncloud.com>
 @author Klaas Freitag <freitag@owncloud.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 

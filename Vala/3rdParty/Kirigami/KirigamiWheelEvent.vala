@@ -1,11 +1,11 @@
 /***********************************************************
-SPDX-FileCopyrightText : 2019 Marco Martin <mart@kde.org>
+@class KirigamiWheelEvent
 
-LGPL-2.0-or-later
-***********************************************************/
+@brief Describes the mouse wheel event
 
-/***********************************************************
-Describes the mouse wheel event
+@author 2019 Marco Martin <mart@kde.org>
+
+@copyright LGPL 2.0 or later
 ***********************************************************/
 public class KirigamiWheelEvent : GLib.Object {
 

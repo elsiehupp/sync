@@ -1,11 +1,15 @@
+namespace Occ {
+namespace Cmd {
+
 /***********************************************************
+@class HttpCredentialsText
+
 @author Olivier Goffart <ogoffart@owncloud.com>
 @author Klaas Freitag <freitag@owncloud.com>
 @author Daniel Heule <daniel.heule@gmail.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
-
-//  #ifndef TOKEN_AUTH_ONLY
 public class HttpCredentialsText : HttpCredentials {
 
     /***********************************************************
@@ -44,5 +48,7 @@ public class HttpCredentialsText : HttpCredentials {
         return this.ssl_trusted;
     }
 
-}
-//  #endif /* TOKEN_AUTH_ONLY */
+} // class HttpCredentialsText
+
+} // namespace Cmd
+} // namespace Occ

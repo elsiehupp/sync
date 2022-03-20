@@ -1,6 +1,7 @@
 /***********************************************************
 @author Klaas Freitag <freitag@kde.org>
-Copyright (c) by Markus Goetz <guruz@owncloud.com>
+@author by Markus Goetz <guruz@owncloud.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 

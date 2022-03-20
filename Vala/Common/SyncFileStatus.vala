@@ -1,17 +1,15 @@
-/***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <QMetaType>
-
 namespace Occ {
 
 /***********************************************************
+@class SyncFileStatus
+
 @brief The SyncFileStatus class
-@ingroup libsync
+
+@author Klaas Freitag <freitag@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
-public class SyncFileStatus {
+public class SyncFileStatus : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

@@ -1,5 +1,6 @@
 /***********************************************************
 @author Daniel Molkentin <danimo@owncloud.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 
@@ -30,7 +31,7 @@ public abstract class Updater : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public class Helper {
+    public class Helper : GLib.Object {
         public static int64 string_version_to_int (string version) {
             if (version == "")
                 return 0;

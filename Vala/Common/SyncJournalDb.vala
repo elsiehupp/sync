@@ -1,26 +1,13 @@
-/***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-
-<LGPLv2.1-or-later-Boilerplate>
-***********************************************************/
-
-//  #include <QCryptographicHash>
-//  #include <QLoggingCategory>
-//  #include <QElapsedTimer>
-//  #include <GLib.Dir>
-//  #includee3;
-//  #include <cstring>
-
-//  #include <QMutex>
-//  #include <functional>
-
 namespace Occ {
 
 /***********************************************************
 @brief Class that handles the sync database
 
-This class is thread safe. All public functions lock the mutex.
-@ingroup libsync
+@details This class is thread safe. All public functions lock the mutex.
+
+@author Klaas Freitag <freitag@owncloud.com>
+
+@copyright LGPLv2.1 or later
 ***********************************************************/
 public class SyncJournalDb : GLib.Object {
 
@@ -35,7 +22,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     Return value for has_hydrated_or_dehydrated_files ()
     ***********************************************************/
-    public class HasHydratedDehydrated {
+    public class HasHydratedDehydrated : GLib.Object {
         public bool has_hydrated = false;
         public bool has_dehydrated = false;
     }
@@ -43,7 +30,7 @@ public class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public class DownloadInfo {
+    public class DownloadInfo : GLib.Object {
         public string temporaryfile;
         public string etag;
         public int error_count = 0;
@@ -53,7 +40,7 @@ public class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public class UploadInfo {
+    public class UploadInfo : GLib.Object {
         public int chunk = 0;
         public uint32 transferid = 0;
         public int64 size = 0;
@@ -76,7 +63,7 @@ public class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public class PollInfo {
+    public class PollInfo : GLib.Object {
 
         /***********************************************************
         The relative path of a file
@@ -106,7 +93,7 @@ public class SyncJournalDb : GLib.Object {
 
     OCSYNC_EXPORT
     ***********************************************************/
-    public class PinStateInterface {
+    public class PinStateInterface : GLib.Object {
 
         SyncJournalDb database;
 

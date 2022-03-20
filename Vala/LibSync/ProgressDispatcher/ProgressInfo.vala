@@ -1,5 +1,6 @@
 /***********************************************************
 @author Klaas Freitag <freitag@owncloud.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 
@@ -153,7 +154,7 @@ public class ProgressInfo : GLib.Object {
     Holds the current state of something making progress and maintains an
     estimate of the current progress per second.
     ***********************************************************/
-    public class Progress {
+    public class Progress : GLib.Object {
 
         /***********************************************************
         Updated by update ()

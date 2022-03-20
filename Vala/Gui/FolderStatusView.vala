@@ -1,5 +1,6 @@
 /***********************************************************
-Copyright (C) 2018 by J-P Nurmi <jpnurmi@gmail.com>
+@author 2018 by J-P Nurmi <jpnurmi@gmail.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 

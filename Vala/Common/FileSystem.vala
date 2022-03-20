@@ -1,32 +1,15 @@
-/***********************************************************
-@author Olivier Goffart <ogoffart@owncloud.com>
-
-<LGPLv2.1-or-later-Boilerplate>
-***********************************************************/
-
-//  #include <GLib.Dir>
-//  #include <Gtk.Application>
-//  #include <sys/stat.h>
-//  #include <sys/types.h>
-
-
-//  #include <ctime>
-//  #include <GLib.FileInfo>
-//  #include <QLoggingCategory>
-//  #include <ocsynclib.h>
-
-
 namespace Occ {
 
 /***********************************************************
- \addtogroup libsync
- @{
-***********************************************************/
+@class FileSystem
 
-/***********************************************************
 @brief This file contains file system helper
+
+@author Olivier Goffart <ogoffart@owncloud.com>
+
+@copyright LGPLv2.1 or later
 ***********************************************************/
-public class FileSystem {
+public class FileSystem : GLib.Object {
 
     static GLib.File.Permissions default_write_permissions;
 

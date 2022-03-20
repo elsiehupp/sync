@@ -1,4 +1,14 @@
+/***********************************************************
+@class QStringTokenizer
 
+@author 2014 Daniel Molkentin <daniel@molkentin.de>
+
+This file is part of the Qt Library
+
+@copyright LGPLv2.1 only
+
+@copyright GPLv3.0 only
+***********************************************************/
 public class QStringTokenizer : QTokenizer<string> {
 
     /***********************************************************

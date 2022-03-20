@@ -1,5 +1,6 @@
 /***********************************************************
 @author Hannah von Reth <hannah.vonreth@owncloud.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 
@@ -12,7 +13,7 @@ using Soup;
 namespace Occ {
 namespace LibSync {
 
-public class HttpLogger {
+public class HttpLogger : GLib.Object {
 
     const int64 PEEK_SIZE = 1024 * 1024;
 

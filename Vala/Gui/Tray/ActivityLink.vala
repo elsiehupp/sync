@@ -1,5 +1,6 @@
 /***********************************************************
 @author Klaas Freitag <freitag@owncloud.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 
@@ -15,7 +16,7 @@ namespace Ui {
 
 These are part of notifications which are mapped into activities.
 ***********************************************************/
-public class ActivityLink {
+public class ActivityLink : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

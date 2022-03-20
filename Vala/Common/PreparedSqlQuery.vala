@@ -1,14 +1,15 @@
-/***********************************************************
-@author Hannah von Reth <hannah.vonreth@owncloud.com>
-
-<LGPLv2.1-or-later-Boilerplate>
-***********************************************************/
-
-using Sqlite3;
-
 namespace Occ {
 
-public class PreparedSqlQuery {
+/***********************************************************
+@class PreparedSqlQuery
+
+@author Hannah von Reth <hannah.vonreth@owncloud.com>
+
+@copyright LGPLv2.1 or later
+***********************************************************/
+public class PreparedSqlQuery : GLib.Object {
+
+    using Sqlite3;
 
     /***********************************************************
     ***********************************************************/

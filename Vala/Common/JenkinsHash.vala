@@ -1,35 +1,23 @@
 /***********************************************************
 c_jhash.c Jenkins Hash
 
-Copyright (c) 1997 Bob Jenkins <bob_jenkins@burtleburtle.
+***********************************************************/
 
-lookup8.c, by Bob Jenkins, January 4 1997, Public Domain.
+/***********************************************************
+@class JenkinsHash
+
+@brief Interface of the cynapses jhash implementation
+
+@author 1997 Bob Jenkins <bob_jenkins@burtleburtle.
+
+@copyright lookup8.c, by Bob Jenkins, January 4 1997, Public Domain.
 hash (), hash2 (), hash3, and this.c_mix () are externally useful
 Routines to test the hash are included if SELF_TEST is defined.
 You can use this free for any purpose. It has no warranty.
 
 See http://burtleburtle.net/bob/hash/evahash.html
 ***********************************************************/
-
-/***********************************************************
-@file common/c_jhash.h
-
-@brief Interface of the cynapses jhash implementation
-
-@defgroup cyn_j_hash_internals cynapses libc jhash function
-@ingroup cyn_library_a_p_i
-
-@{
-***********************************************************/
-
-//  #include <stdint.h> // NOLINT
-//  #include <QtCore/qglobal.h>
-
-public class JenkinsHash {
-
-    //  #ifndef Q_FALLTHROUGH
-    //  const int Q_FALLTHROUGH () // Was added in Qt 5.8
-    //  #endif
+public class JenkinsHash : GLib.Object {
 
     /***********************************************************
     c_mix -- Mix 3 32-bit values reversibly.

@@ -1,13 +1,14 @@
-/***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-@copyright GPLv3 or Later
-***********************************************************/
-
 namespace Occ {
+namespace Cmd {
 
 /***********************************************************
+@class SimpleSslErrorHandler
+
 @brief The SimpleSslErrorHandler class
-@ingroup cmd
+
+@author Klaas Freitag <freitag@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class SimpleSslErrorHandler : AbstractSslErrorHandler {
 
@@ -28,6 +29,7 @@ public class SimpleSslErrorHandler : AbstractSslErrorHandler {
         return true;
     }
 
-}
+} // class SimpleSslErrorHandler
 
-}
+} // namespace Cmd
+} // namespace Occ

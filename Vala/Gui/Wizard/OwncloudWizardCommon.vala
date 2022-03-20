@@ -1,6 +1,7 @@
 /***********************************************************
 @author Klaas Freitag <freitag@owncloud.com>
 @author Krzesimir Nowak <krzesimir@endocode.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 
@@ -13,8 +14,7 @@
 namespace Occ {
 namespace Ui {
 
-public class WizardCommon {
-
+public class WizardCommon : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

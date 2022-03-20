@@ -1,8 +1,8 @@
 /***********************************************************
 libcsync -- a library to sync a directory with another
 
-Copyright (c) 2008-2013 by Andreas Schneider <asn@cryptomilk.org>
-Copyright (c) 2012-2013 by Klaas Freitag <freitag@owncloud.co
+@author 2008-2013 by Andreas Schneider <asn@cryptomilk.org>
+@author 2012-2013 by Klaas Freitag <freitag@owncloud.co
 
 <LGPL-2.1-or-Later-Boilerplate>
 ***********************************************************/

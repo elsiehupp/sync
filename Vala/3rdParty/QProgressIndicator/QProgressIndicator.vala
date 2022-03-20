@@ -1,35 +1,18 @@
 /***********************************************************
-The MIT License (MIT)
+@class QProgressIndicator
 
-Copyright (c) 2011 Morgan Leborgne
+@brief The QProgressIndicator class lets an application
+display a progress indicator to show that a lengthy task is
+under way.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+@details Progress indicators are indeterminate and do
+nothing more than spin to show that the application is busy.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+@author 2011 Morgan Leborgne
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-***********************************************************/
+@copyright The MIT License (MIT)
 
-//  #include <QPainter>
-
-/***********************************************************
-    \class QProgressIndicator
-    \brief The QProgressIndicator class lets an application display a progress indicator to show that a lengthy task is under way.
-
-    Progress indicators are indeterminate and do nothing more than spin to show that the application is busy.
-    \sa QProgressBar
+@see QProgressBar
 ***********************************************************/
 public class QProgressIndicator : Gtk.Widget {
 

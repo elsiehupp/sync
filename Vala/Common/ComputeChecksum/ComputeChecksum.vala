@@ -1,24 +1,9 @@
-/***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-
-<LGPLv2.1-or-later-Boilerplate>
-***********************************************************/
-
-//  #include <QLoggingCategory>
-//  #include <qtconcurrentrun.h>
-//  #include <QCryptographicHash>
-
-
-//  #include <QFutureWatcher>
-//  #include <memory>
-
-using ZLib;
 namespace Occ {
 
 /***********************************************************
-\file checksums
+@class ComputeChecksum
 
-\brief Computing and validating file checksums
+@brief Computing and validating file checksums
 
 Overview
 --------
@@ -70,14 +55,13 @@ Checksum Algorithms
 - SHA256
 - SHA3-256 (requires Qt 5.9)
 
-***********************************************************/
+@author Klaas Freitag <freitag@owncloud.com>
 
-
-/***********************************************************
-Computes the checksum of a file.
-\ingroup libsync
+@copyright LGPLv2.1 or later
 ***********************************************************/
 public class ComputeChecksum : ComputeChecksumBase {
+
+    using ZLib;
 
     /***********************************************************
     ***********************************************************/

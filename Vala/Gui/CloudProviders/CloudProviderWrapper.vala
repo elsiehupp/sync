@@ -1,6 +1,7 @@
 /***********************************************************
 @author Klaas Freitag <freitag@owncloud.com>
 @author Julius Härtl <jus@bitgrid.net>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 

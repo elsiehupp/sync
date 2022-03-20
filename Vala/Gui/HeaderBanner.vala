@@ -1,5 +1,6 @@
 /***********************************************************
 @author Michael Schuster <michael@schuster.ms>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 
@@ -11,7 +12,7 @@ https://code.qt.io/c
 
 Original license:
 
-Copyright (C) 2016 The
+@author 2016 The
 Contact : https://www.qt
 
 This file is part of the Qt_widgets module of the Qt Toolkit.
@@ -56,7 +57,7 @@ https://code.qt.io/c
 
 Original license:
 
-Copyright (C) 2016 The
+@author 2016 The
 Contact : https://www.qt
 
 This file is part of the Qt_widgets module of the Qt Toolkit.

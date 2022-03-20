@@ -1,5 +1,5 @@
 /*************************************************************
-Copyright (C) 2014 by Olivier Goffart <ogoffart@woboq.com
+@author 2014 by Olivier Goffart <ogoffart@woboq.com
 
 <GPLv2-or-later-Boilerplate>
 ******************************************************************************/

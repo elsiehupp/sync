@@ -2,6 +2,7 @@
 @author Duncan Mac-Vicar P. <duncan@kde.org>
 @author Daniel Molkentin <danimo@owncloud.com>
 @author Klaas Freitag <freitag@owncloud.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 
@@ -12,7 +13,7 @@ namespace Ui {
 @brief The FolderDefinition class
 @ingroup gui
 ***********************************************************/
-public class FolderDefinition {
+public class FolderDefinition : GLib.Object {
 
     /***********************************************************
     The name of the folder in the ui and internally

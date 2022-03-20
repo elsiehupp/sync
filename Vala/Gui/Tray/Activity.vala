@@ -1,5 +1,6 @@
 /***********************************************************
 @author Klaas Freitag <freitag@owncloud.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 
@@ -12,7 +13,7 @@ namespace Ui {
 
 contains all the information describing a single activity.
 ***********************************************************/
-public class Activity {
+public class Activity : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

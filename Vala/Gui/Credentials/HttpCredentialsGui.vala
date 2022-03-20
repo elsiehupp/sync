@@ -1,6 +1,7 @@
 /***********************************************************
 @author Klaas Freitag <freitag@kde.org>
 @author Olivier Goffart <ogoffart@woboq.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 

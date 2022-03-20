@@ -1,13 +1,15 @@
-/***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-
-<LGPLv2.1-or-later-Boilerplate>
-***********************************************************/
-
-using ZLib;
 namespace Occ {
 
+/***********************************************************
+@class ComputeChecksumBase
+
+@author Klaas Freitag <freitag@owncloud.com>
+
+@copyright LGPLv2.1 or later
+***********************************************************/
 abstract class ComputeChecksumBase : GLib.Object {
+
+    using ZLib;
 
     /***********************************************************
     Tags for checksum headers values.

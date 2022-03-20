@@ -1,7 +1,4 @@
 /***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-
-<LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/
 
 using ZLib;
@@ -9,8 +6,14 @@ using ZLib;
 namespace Occ {
 
 /***********************************************************
-Checks whether a file's checksum matches the expected value.
-@ingroup libsync
+@class ValidateChecksumHeader
+
+@brief Checks whether a file's checksum matches the expected
+value.
+
+@author Klaas Freitag <freitag@owncloud.com>
+
+@copyright LGPLv2.1 or later
 ***********************************************************/
 public class ValidateChecksumHeader : ComputeChecksumBase {
 

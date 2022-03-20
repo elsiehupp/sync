@@ -1,21 +1,16 @@
 /***********************************************************
-SPDX-FileCopyrightText : 2019 Marco Martin <mart@kde.org>
+@class WheelHandler
 
-SPDX-License-Identifier : LGPL-2.0-or-later
-***********************************************************/
+@details This class intercepts the mouse wheel events of its
+target, and gives them to the user code as a signal, which
+can be used for custom mouse wheel management code. The
+handler can block completely the wheel events from its
+target, and if it's a Flickable, it can automatically handle
+scrolling on it.
 
-//  #pragma once
+@author 2019 Marco Martin <mart@kde.org>
 
-//  #include <QtQml>
-//  #include <QPoint>
-//  #include <QQuickItem>
-//  #include <QWheelEvent>
-//  #include <QQuickItem>
-//  #include <QDebug>
-
-/***********************************************************
-This class intercepts the mouse wheel events of its target, and gives them to the user code as a signal, which can be used for custom mouse wheel management code.
-The handler can block completely the wheel events from its target, and if it's a Flickable, it can automatically handle scrolling on it
+@copyright LGPL 2.0 or later
 ***********************************************************/
 public class WheelHandler : GLib.Object {
 

@@ -10,7 +10,7 @@
 namespace Occ {
 namespace Ui {
 
-public class UpdateInfo {
+public class UpdateInfo : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

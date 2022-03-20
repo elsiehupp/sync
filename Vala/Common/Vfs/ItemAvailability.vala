@@ -1,6 +1,7 @@
 /***********************************************************
 @author Christian Kamm <mail@ckamm.de>
 @author Hannah von Reth <hannah.vonreth@owncloud.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 

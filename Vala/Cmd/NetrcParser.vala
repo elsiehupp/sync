@@ -1,22 +1,16 @@
+namespace Occ {
+namespace Cmd {
+
 /***********************************************************
+@class NetrcParser
+
+@brief Parser for netrc files
+
 @author Daniel Molkentin <danimo@owncloud.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
-
-//  #include <QPair>
-//  #include <GLib.Dir>
-//  #include <QTextStream>
-//  #include <qtokenizer.h>
-
-//  #include <QDebug>
-
-namespace Occ {
-
-/***********************************************************
-@brief Parser for netrc files
-@ingroup cmd
-***********************************************************/
-public class NetrcParser {
+public class NetrcParser : GLib.Object {
 
     const string DEFAULT_KEYWORD = "default";
     const string MACHINE_KEYWORD = "machine";
@@ -109,14 +103,8 @@ public class NetrcParser {
         machine.clear ();
         is_default = false;
     }
-}
 
+} // class NetrcParser
 
-
-
-
-
-
-
-    } // namespace Occ
-    
+} // namespace Cmd
+} // namespace Occ

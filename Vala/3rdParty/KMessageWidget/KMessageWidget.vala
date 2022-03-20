@@ -1,16 +1,4 @@
 /***********************************************************
-This file is part of the KDE libraries
-
-Copyright (c) 2011 Aurélien Gâteau <agateau@kde.org>
-Copyright (c) 2014 Dominik Haumann <dhaumann@kde.org>
-
-<LGPLv2.1-or-later-Boilerplate>
-***********************************************************/
-
-//  #include <Gdk.Frame>
-
-
-/***********************************************************
 @class KMessageWidget kmessagewidget.h KMessageWidget
 
 @short A widget to provide feedback or propose opportunistic inte
@@ -77,8 +65,15 @@ Example of acceptable uses:
 @li A music collection can propose ripping a CD which just got inserted
 @li A chat application may notify the user a "special friend" just connected
 
+This file is part of the KDE libraries
+
 @author  Aurélien Gâteau <agateau@kde.org>
 @since 4.7
+
+@author 2011 Aurélien Gâteau <agateau@kde.org>
+@author 2014 Dominik Haumann <dhaumann@kde.org>
+
+@copyright LGPLv2.1 or later
 ***********************************************************/
 public class KMessageWidget : Gdk.Frame {
 

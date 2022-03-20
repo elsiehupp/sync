@@ -1,5 +1,6 @@
 /***********************************************************
-Copyright (C) 2021 by Felix Weilbach <felix.weilbach@nextcloud.com>
+@author 2021 by Felix Weilbach <felix.weilbach@nextcloud.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 

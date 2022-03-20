@@ -1,24 +1,16 @@
-/***********************************************************
-@author Olivier Goffart <ogoffart@woboq.com>
-
-<LGPLv2.1-or-later-Boilerplate>
-***********************************************************/
-/***********************************************************
-@author Olivier Goffart <ogoffart@woboq.com>
-
-<LGPLv2.1-or-later-Boilerplate>
-***********************************************************/
-
-//  #include <cstring>
-//  #include <QMetaType>
-//  #include <QDebug>
-
 namespace Occ {
 
 /***********************************************************
-Class that store in a memory efficient way the remote permission
+@class RemotePermissions
+
+@brief Class that store in a memory efficient way the remote
+permission
+
+@author Olivier Goffart <ogoffart@woboq.com>
+
+@copyright LGPLv2.1 or later
 ***********************************************************/
-public class RemotePermissions {
+public class RemotePermissions : GLib.Object {
 
     // The first bit tells if the value is set or not
     // The remaining bits correspond to know if the value is set

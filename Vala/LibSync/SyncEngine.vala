@@ -1,6 +1,7 @@
 /***********************************************************
 @author Duncan Mac-Vicar P. <duncan@kde.org>
 @author Klaas Freitag <freitag@owncloud.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 

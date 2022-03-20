@@ -1,7 +1,7 @@
 /***********************************************************
 @author Klaas Freitag <freitag@owncloud.com>
 
-<LGPLv2.1-or-later-Boilerplate>
+@copyright LGPLv2.1 or later
 ***********************************************************/
 
 namespace Occ {
@@ -10,7 +10,7 @@ namespace Occ {
 @brief The SyncJournalFileRecord class
 @ingroup libsync
 ***********************************************************/
-public class SyncJournalFileRecord {
+public class SyncJournalFileRecord : GLib.Object {
 
     /***********************************************************
     ***********************************************************/

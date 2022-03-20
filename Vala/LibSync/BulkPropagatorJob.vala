@@ -1,5 +1,6 @@
 /***********************************************************
 Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 

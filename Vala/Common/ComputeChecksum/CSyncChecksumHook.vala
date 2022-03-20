@@ -1,18 +1,17 @@
-/***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-
-<LGPLv2.1-or-later-Boilerplate>
-***********************************************************/
-
-using ZLib;
-
 namespace Occ {
 
 /***********************************************************
-Hooks checksum computations into csync.
-@ingroup libsync
+@class CSyncChecksumHook
+
+@brief Hooks checksum computations into csync
+
+@author Klaas Freitag <freitag@owncloud.com>
+
+@copyright LGPLv2.1 or later
 ***********************************************************/
 public class CSyncChecksumHook : ComputeChecksumBase {
+
+    using ZLib;
 
     /***********************************************************
     Returns the checksum value for \a path that is comparable to \a other_checksum.

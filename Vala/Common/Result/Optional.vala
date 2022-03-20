@@ -1,13 +1,15 @@
-/***********************************************************
-@author Olivier Goffart <ogoffart@woboq.com>
-@copyright GPLv3 or Later
-***********************************************************/
-
-
 namespace Occ {
 
-//  template <typename T>
+/***********************************************************
+@class Optional
+
+@author Olivier Goffart <ogoffart@woboq.com>
+
+@copyright GPLv3 or Later
+***********************************************************/
 public class Optional : Result<T, OptionalNoErrorData> {
+
+    //  template <typename T>
 
     /***********************************************************
     ***********************************************************/

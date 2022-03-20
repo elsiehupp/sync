@@ -2,13 +2,14 @@
 @author Dominik Schmidt <dev@dominik-schmidt.de>
 @author Klaas Freitag <freitag@owncloud.com>
 @author Roeland Jago Douma <roeland@famdouma.nl>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {
 namespace Ui {
 
-public class SocketListener {
+public class SocketListener : GLib.Object {
 
     public QPointer<QIODevice> socket;
 

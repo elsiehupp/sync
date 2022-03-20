@@ -1,9 +1,10 @@
 /***********************************************************
-SPDX-FileCopyrightText : 2019 Marco Martin <mart@kde.org>
+@class GlobalWheelFilter
 
-LGPL-2.0-or-later
+@author 2019 Marco Martin <mart@kde.org>
+
+@copyright LGPL 2.0 or later
 ***********************************************************/
-
 public class GlobalWheelFilter : GLib.Object {
 
     protected GLib.HashTable<QQuickItem, WheelHandler> m_handlers_for_item;

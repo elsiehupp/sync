@@ -1,5 +1,6 @@
 /***********************************************************
-Copyright (C) 2014 by Daniel Molkentin <danimo@owncloud.com>
+@author 2014 by Daniel Molkentin <danimo@owncloud.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 

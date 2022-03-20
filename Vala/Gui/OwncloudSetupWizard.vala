@@ -2,6 +2,7 @@
 @author Klaas Freitag <freitag@kde.org>
 @author Klaas Freitag <freitag@owncloud.com>
 @author Krzesimir Nowak <krzesimir@endocode.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
 

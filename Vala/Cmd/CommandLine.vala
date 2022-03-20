@@ -1,34 +1,18 @@
+namespace Occ {
+namespace Cmd {
+
 /***********************************************************
+@class CommandLine
+
+@brief Helper class for command line client
+
 @author Olivier Goffart <ogoffart@owncloud.com>
 @author Klaas Freitag <freitag@owncloud.com>
 @author Daniel Heule <daniel.heule@gmail.com>
+
 @copyright GPLv3 or Later
 ***********************************************************/
-
-//  #include <iostream>
-//  #include <random>
-//  #include <qcoreapplication.h>
-//  #include <GLib.FileInfo>
-//  #include <QJsonDocument>
-//  #include <QJsonObject>
-//  #include <QNetworkProxy>
-//  #include <qdebug.h>
-
-//  #include "configfile.h" // ONLY ACCESS THE STATIC FUNCTIONS!
-//  #ifdef TOKEN_AUTH_ONLY
-//  # include "creds/tokencredentials.h"
-//  #else
-//  # include "creds/httpcredentials.h"
-//  #endif
-
-//  #include <termios.h>
-//  #include <unistd.h>
-
-/***********************************************************
-@brief Helper class for command line client
-@ingroup cmd
-***********************************************************/
-public class Cmd : GLib.Object {
+public class CommandLine : GLib.Object {
 
     private class CmdOptions : GLib.Object {
         public string source_dir;
@@ -62,7 +46,7 @@ public class Cmd : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public Cmd () {
+    public CommandLine () {
         base ();
     }
 
@@ -406,7 +390,7 @@ public class Cmd : GLib.Object {
             }
         }
 
-        Cmd cmd;
+        CommandLine cmd;
         string db_path = options.source_dir + SyncJournalDb.make_database_name (options.source_dir, credential_free_url, folder, user);
         SyncJournalDb database = new SyncJournalDb (db_path);
 
@@ -493,4 +477,7 @@ public class Cmd : GLib.Object {
         GLib.warning ("Sync error: " + error);
     }
 
-}
+} // class CommandLine
+
+} // namespace Cmd
+} // namespace Occ
