@@ -1,9 +1,8 @@
 /***********************************************************
-Copyright (C) by Dominik Schmidt <dev@dominik-schmidt.de>
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
-
-<GPLv3-or-later-Boilerplate>
+@author Dominik Schmidt <dev@dominik-schmidt.de>
+@author Klaas Freitag <freitag@owncloud.com>
+@author Roeland Jago Douma <roeland@famdouma.nl>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {

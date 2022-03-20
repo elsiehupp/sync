@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Michael Schuster <michael@schuster.ms>
-
-<GPLv3-or-later-Boilerplate>
+@author Michael Schuster <michael@schuster.ms>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {

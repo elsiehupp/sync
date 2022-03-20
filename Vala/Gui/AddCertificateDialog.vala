@@ -1,8 +1,7 @@
 /***********************************************************
 Copyright (C) 2015 by nocteau
 Copyright (C) 2015 by Daniel Molkentin <danimo@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <QFileDialog>
@@ -78,6 +77,6 @@ public class AddCertificateDialog : Gtk.Dialog {
     }
 
 } // class AddCertificateDialog
-    
+
 } // namespace Ui
 } // namespace Occ

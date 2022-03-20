@@ -1,7 +1,6 @@
 /***********************************************************
 Copyright (C) 2018 by J-P Nurmi <jpnurmi@gmail.com>
-
-<GPLv3-or-later-Boilerplate>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <QTreeView>

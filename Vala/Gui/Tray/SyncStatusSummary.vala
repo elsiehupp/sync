@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Felix Weilbach <felix.weilbach@nextcloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {
@@ -46,7 +45,7 @@ public class SyncStatusSummary : GLib.Object {
             if (this.sync_icon == value) {
                 return;
             }
-    
+
             this.sync_icon = value;
             /* emit */ signal_sync_icon_changed ();
         }
@@ -60,7 +59,7 @@ public class SyncStatusSummary : GLib.Object {
             if (value == this.is_syncing) {
                 return;
             }
-    
+
             this.is_syncing = value;
             /* emit */ signal_syncing_changed ();
         }
@@ -74,7 +73,7 @@ public class SyncStatusSummary : GLib.Object {
             if (this.sync_status_string == value) {
                 return;
             }
-    
+
             this.sync_status_string = value;
             /* emit */ signal_sync_status_string_changed ();
         }
@@ -88,7 +87,7 @@ public class SyncStatusSummary : GLib.Object {
             if (this.sync_status_detail_string == value) {
                 return;
             }
-    
+
             this.sync_status_detail_string = value;
             /* emit */ signal_sync_status_detail_string_changed ();
         }
@@ -102,7 +101,7 @@ public class SyncStatusSummary : GLib.Object {
             if (this.progress == value) {
                 return;
             }
-    
+
             this.progress = value;
             /* emit */ signal_sync_progress_changed ();
         }

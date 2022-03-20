@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Cédric Bellegarde <gnumdk@gmail.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Cédric Bellegarde <gnumdk@gmail.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <QCursor>
@@ -43,7 +42,7 @@ public class Systray : QSystemTrayIcon {
         public AccessManagerFactory () {
             base ();
         }
-    
+
         /***********************************************************
         ***********************************************************/
         public override QNetworkAccessManager create (GLib.Object parent) {
@@ -85,9 +84,9 @@ public class Systray : QSystemTrayIcon {
         }
         public set {
             this.tray_engine = value;
-    
+
             this.tray_engine.network_access_manager_factory (this.access_manager_factory);
-    
+
             this.tray_engine.add_import_path ("qrc:/qml/theme");
             this.tray_engine.add_ImageProvider ("avatars", new ImageProvider ());
             this.tray_engine.add_ImageProvider ("svgimage-custom-color", new Ui.SvgImageProvider ());

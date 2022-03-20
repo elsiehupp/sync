@@ -1,5 +1,5 @@
 /***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
+@author Olivier Goffart <ogoffart@owncloud.com>
 
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/

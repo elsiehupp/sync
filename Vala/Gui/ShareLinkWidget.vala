@@ -1,8 +1,7 @@
 /***********************************************************
-Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
+@author Roeland Jago Douma <roeland@famdouma.nl>
 Copyright (C) 2015 by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <QBuffer>
@@ -395,11 +394,9 @@ public class ShareLinkWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public 
-    void ShareLinkWidget.on_signal_link_share_note_set () {
+    public void on_signal_link_share_note_set () {
         toggle_button_animation (this.ui.confirm_note, this.ui.note_progress_indicator, this.note_link_action);
     }
-
 
 
     /***********************************************************

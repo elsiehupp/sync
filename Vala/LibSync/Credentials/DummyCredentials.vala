@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Krzesimir Nowak <krzesimir@endocode.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {
@@ -68,7 +67,7 @@ public class DummyCredentials : AbstractCredentials {
     public override void invalidate_token () {}
 
 
-    
+
     /***********************************************************
     ***********************************************************/
     public override void forget_sensitive_data () {}

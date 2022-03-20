@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
-
-<GPLv3-or-later-Boilerplate>
+@author Roeland Jago Douma <roeland@famdouma.nl>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <QBuffer>
@@ -53,7 +52,7 @@ public class OcsJob : AbstractNetworkJob {
     @param reply the reply
     ***********************************************************/
     internal signal void signal_job_finished (QJsonDocument reply, int status_code);
-    
+
 
     /***********************************************************
     ***********************************************************/

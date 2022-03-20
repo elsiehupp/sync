@@ -141,7 +141,7 @@ public class TestClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_streaming_decryptor_data () {
+    private TestStreamingDecryptorData () {
         QTest.add_column<int> ("total_bytes");
         QTest.add_column<int> ("bytes_to_read");
 
@@ -154,7 +154,7 @@ public class TestClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_streaming_decryptor () {
+    private TestStreamingDecryptor () {
         QFETCH (int, total_bytes);
 
         QTemporaryFile dummy_input_file;

@@ -1,6 +1,6 @@
 /***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
+@author Klaas Freitag <freitag@owncloud.com>
+@author Krzesimir Nowak <krzesimir@endocode.com>
 
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/

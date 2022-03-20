@@ -5,7 +5,7 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 
 namespace Occ {
-namespace Testing {   
+namespace Testing {
 
 public class TestAllFilesDeletedDelete : AbstractTestAllFilesDeleted {
 

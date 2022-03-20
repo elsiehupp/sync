@@ -4,16 +4,14 @@ without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
 
-//  #include <syncengine.h>
-
 namespace Occ {
 namespace Testing {
 
-public class TestSyncDelete : GLib.Object {
+public class TestSyncDeleteDeleteDirectoryWithNewFile : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_delete_directory_with_new_file () {
+    private TestSyncDeleteDeleteDirectoryWithNewFile () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         // Remove a directory on the server with new files on the client
@@ -37,25 +35,7 @@ public class TestSyncDelete : GLib.Object {
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
     }
 
-
-    /***********************************************************
-    ***********************************************************/
-    private void issue1329 () {
-        FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-
-        fake_folder.local_modifier.remove ("B");
-        GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
-
-        // Add a directory that was just removed in the previous sync:
-        fake_folder.local_modifier.mkdir ("B");
-        fake_folder.local_modifier.insert ("B/b1");
-        GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_true (fake_folder.current_remote_state ().find ("B/b1"));
-        GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
-    }
-
-}
+} // class TestSyncDeleteDeleteDirectoryWithNewFile
 
 } // namespace Testing
 } // namespace Occ

@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Olivier Goffart <ogoffart@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {
@@ -227,16 +226,10 @@ public class GETFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public 
-    void GETFileJob.choked (bool c) {
+    public void choked (bool c) {
         this.bandwidth_choked = c;
         QMetaObject.invoke_method (this, "on_signal_ready_read", Qt.QueuedConnection);
     }
-
-
-    /***********************************************************
-    ***********************************************************/
-    //  public 
 
 
     /***********************************************************
@@ -255,10 +248,6 @@ public class GETFileJob : AbstractNetworkJob {
         GLib.debug ("Got " + q + " bytes");
         QMetaObject.invoke_method (this, "on_signal_ready_read", Qt.QueuedConnection);
     }
-
-    /***********************************************************
-    ***********************************************************/
-    //  public 
 
 
     /***********************************************************

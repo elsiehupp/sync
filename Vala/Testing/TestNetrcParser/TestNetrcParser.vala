@@ -43,7 +43,7 @@ public class TestNetrcParser : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_valid_netrc () {
+    private TestValidNetrc () {
         NetrcParser parser = new NetrcParser (testfile_c);
         GLib.assert_true (parser.parse ());
         GLib.assert_true (parser.find ("foo") == new Pair<string, string> ("bar", "baz"));
@@ -55,7 +55,7 @@ public class TestNetrcParser : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_empty_netrc () {
+    private TestEmptyNetrc () {
         NetrcParser parser = new NetrcParser (testfile_empty_c);
         GLib.assert_true (!parser.parse ());
         GLib.assert_true (parser.find ("foo") == new Pair<string, string> ("", ""));
@@ -64,7 +64,7 @@ public class TestNetrcParser : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_valid_netrc_with_default () {
+    private TestValidNetrcWithDefault () {
         NetrcParser parser = new NetrcParser (testfile_with_default_c);
         GLib.assert_true (parser.parse ());
         GLib.assert_true (parser.find ("foo") == new Pair<string, string> ("bar", "baz"));
@@ -74,7 +74,7 @@ public class TestNetrcParser : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_invalid_netrc () {
+    private TestInvalidNetrc () {
         NetrcParser parser = new NetrcParser ("/invalid");
         GLib.assert_true (!parser.parse ());
     }

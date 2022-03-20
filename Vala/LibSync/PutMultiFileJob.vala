@@ -1,7 +1,6 @@
 /***********************************************************
 Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <QHttp_part>

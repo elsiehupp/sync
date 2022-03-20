@@ -104,8 +104,7 @@ public class SingleApplication : Gtk.Application {
 
     /***********************************************************
     ***********************************************************/
-    public 
-    bool SingleApplication.event (QEvent event) {
+    public bool event (QEvent event) {
         if (event.type () == QEvent.File_open) {
             var foe = static_cast<QFile_open_event> (event);
             /* emit */ signal_file_open_request (foe.file ());
@@ -117,16 +116,14 @@ public class SingleApplication : Gtk.Application {
 
     /***********************************************************
     ***********************************************************/
-    public 
-    string SingleApplication.application_id () {
+    public string application_id () {
         return app_id;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public 
-    bool SingleApplication.is_running (int64 pid) {
+    public bool is_running (int64 pid) {
         if (pid == -1) {
             pid = first_peer;
             if (pid == -1)

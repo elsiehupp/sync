@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Oleksandr Zolotov <alex@nextcloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <theme.h>

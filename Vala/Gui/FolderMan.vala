@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Klaas Freitag <freitag@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <pushnotifications.h>
@@ -208,7 +207,7 @@ public class FolderMan : GLib.Object {
         this.instance = this;
         this.sync_enabled = true;
         this.current_sync_folder = null;
-    
+
         this.socket_api = new SocketApi ();
 
         ConfigFile config;
@@ -219,7 +218,7 @@ public class FolderMan : GLib.Object {
             this.on_signal_etag_poll_timer_timeout
         );
         this.etag_poll_timer.on_signal_start ();
-    
+
         this.start_scheduled_sync_timer.single_shot (true);
         this.start_scheduled_sync_timer.timeout.connect (
             this.on_signal_start_scheduled_folder_sync
@@ -230,7 +229,7 @@ public class FolderMan : GLib.Object {
             this.on_signal_schedule_folder_by_time
         );
         this.time_scheduler.on_signal_start ();
-    
+
         AccountManager.instance.signal_remove_account_folders.connect (
             this.on_signal_remove_folders_for_account
         );
@@ -262,10 +261,10 @@ public class FolderMan : GLib.Object {
     ***********************************************************/
     public int set_up_folders () {
         unload_and_delete_all_folders ();
-    
+
         string[] skip_settings_keys;
         backward_migration_settings_keys (skip_settings_keys, skip_settings_keys);
-    
+
         var settings = ConfigFile.settings_with_group ("Accounts");
         const var accounts_with_settings = settings.child_groups ();
         if (accounts_with_settings == "") {
@@ -275,31 +274,31 @@ public class FolderMan : GLib.Object {
             }
             return r;
         }
-    
+
         GLib.info ("Setup folders from settings file.");
-    
+
         foreach (var account in AccountManager.instance.accounts) {
             const int identifier = account.account.identifier;
             if (!accounts_with_settings.contains (identifier)) {
                 continue;
             }
             settings.begin_group (identifier);
-    
+
             process (settings, skip_settings_keys, "Folders", true, false);
-    
+
             // See Folder.save_to_settings for details about why these exists.
             process (settings, skip_settings_keys, "Multifolders", false, false);
             process (settings, skip_settings_keys, "FoldersWithPlaceholders", false, true);
-    
+
             settings.end_group (); // <account>
         }
-    
+
         /* emit */ signal_folder_list_changed (this.folder_map);
-    
+
         foreach (var folder in this.folder_map) {
             folder.process_switched_to_virtual_files ();
         }
-    
+
         return this.folder_map.size ();
     }
 
@@ -326,14 +325,14 @@ public class FolderMan : GLib.Object {
         ConfigFile config;
         GLib.Dir storage_dir = new GLib.Dir (config.config_path);
         this.folder_config_path = config.config_path + "folders";
-    
+
         GLib.info ("Setup folders from " + this.folder_config_path + " (migration).");
-    
+
         GLib.Dir directory = new GLib.Dir (this.folder_config_path);
         //We need to include hidden files just in case the alias starts with '.'
         directory.filter (GLib.Dir.Files | GLib.Dir.Hidden);
         const var list = directory.entry_list ();
-    
+
         // Normally there should be only one account when migrating.
         AccountState account_state = AccountManager.instance.accounts.value (0);
         foreach (var alias in list) {
@@ -343,9 +342,9 @@ public class FolderMan : GLib.Object {
                 /* emit */ signal_folder_sync_state_change (folder);
             }
         }
-    
+
         /* emit */ signal_folder_list_changed (this.folder_map);
-    
+
         // return the number of valid folders.
         return this.folder_map.size ();
     }
@@ -357,7 +356,7 @@ public class FolderMan : GLib.Object {
     ***********************************************************/
     public static void backward_migration_settings_keys (string[] delete_keys, string[] ignore_keys) {
         var settings = ConfigFile.settings_with_group ("Accounts");
-    
+
         foreach (var account_id in settings.child_groups ()) {
             settings.begin_group (account_id);
             process_subgroup (settings, "Folders");
@@ -405,19 +404,19 @@ public class FolderMan : GLib.Object {
         // Choose a database filename
         var definition = folder_definition;
         definition.journal_path = definition.default_journal_path (account_state.account);
-    
+
         if (!ensure_journal_gone (definition.absolute_journal_path)) {
             return null;
         }
-    
+
         var vfs = create_vfs_from_plugin (folder_definition.virtual_files_mode);
         if (!vfs) {
             GLib.warning ("Could not load plugin for mode " + folder_definition.virtual_files_mode);
             return null;
         }
-    
+
         var folder = add_folder_internal (definition, account_state, std.move (vfs));
-    
+
         // Migration: The first account that's configured for a local folder shall
         // be saved in a backwards-compatible way.
         const var folder_list = FolderMan.instance.map ();
@@ -428,16 +427,16 @@ public class FolderMan : GLib.Object {
             }
         }
         const bool one_account_only = count < 2;
-    
+
         folder.save_backwards_compatible (one_account_only);
-    
+
         if (folder) {
             folder.save_backwards_compatible (one_account_only);
             folder.save_to_settings ();
             /* emit */ signal_folder_sync_state_change (folder);
             /* emit */ signal_folder_list_changed (this.folder_map);
         }
-    
+
         this.navigation_pane_helper.schedule_update_cloud_storage_registry ();
         return folder;
     }
@@ -451,25 +450,25 @@ public class FolderMan : GLib.Object {
             GLib.critical ("Can not remove null folder.");
             return;
         }
-    
+
         GLib.info ("Removing " + folder.alias ());
-    
+
         const bool currently_running = folder.is_sync_running ();
         if (currently_running) {
             // on_signal_abort the sync now
             folder.on_signal_terminate_sync ();
         }
-    
+
         if (this.scheduled_folders.remove_all (folder) > 0) {
             /* emit */ signal_schedule_queue_changed ();
         }
-    
+
         folder.sync_paused = true;
         folder.wipe_for_removal ();
-    
+
         // remove the folder configuration
         folder.remove_from_settings ();
-    
+
         unload_folder (folder);
         if (currently_running) {
             // We want to schedule the next folder once this is done
@@ -483,9 +482,9 @@ public class FolderMan : GLib.Object {
         } else {
             delete folder;
         }
-    
+
         this.navigation_pane_helper.schedule_update_cloud_storage_registry ();
-    
+
         /* emit */ signal_folder_list_changed (this.folder_map);
     }
 
@@ -510,13 +509,13 @@ public class FolderMan : GLib.Object {
     ***********************************************************/
     public string[] find_file_in_local_folders (string rel_path, unowned Account acc) {
         string[] re;
-    
+
         // We'll be comparing against Folder.remote_path which always starts with /
         string server_path = rel_path;
         if (!server_path.starts_with ('/')) {
             server_path.prepend ('/');
         }
-    
+
         foreach (Folder folder in this.map ().values ()) {
             if (acc && folder.account_state.account != acc) {
                 continue;
@@ -524,7 +523,7 @@ public class FolderMan : GLib.Object {
             if (!server_path.starts_with (folder.remote_path)) {
                 continue;
             }
-    
+
             string path = folder.clean_path + '/';
             path += server_path.mid_ref (folder.remote_path_trailing_slash.length);
             if (GLib.File.exists (path)) {
@@ -561,14 +560,14 @@ public class FolderMan : GLib.Object {
     ***********************************************************/
     public Folder set_up_folder_from_old_config_file (string file, AccountState account_state) {
         Folder folder = null;
-    
+
         GLib.info ("  ` . setting up: " + file);
         string escaped_alias = file;
         // check the unescaped variant (for the case when the filename comes out
         // of the directory listing). If the file does not exist, escape the
         // file and try again.
         GLib.FileInfo config_file = new GLib.FileInfo (this.folder_config_path, file);
-    
+
         if (!config_file.exists) {
             // try the escaped variant.
             escaped_alias = escape_alias (file);
@@ -578,49 +577,49 @@ public class FolderMan : GLib.Object {
             GLib.warning ("Cannot read folder definition for alias " + config_file.file_path);
             return folder;
         }
-    
+
         QSettings settings = new QSettings (this.folder_config_path + '/' + escaped_alias, QSettings.IniFormat);
         GLib.info ("    . file path: " + settings.filename ());
-    
+
         // Check if the filename is equal to the group setting. If not, use the group
         // name as an alias.
         string[] groups = settings.child_groups ();
-    
+
         if (!groups.contains (escaped_alias) && groups.count () > 0) {
             escaped_alias = groups.first ();
         }
-    
+
         settings.begin_group (escaped_alias); // read the group with the same name as the file which is the folder alias
-    
+
         string path = settings.value ("local_path").to_string ();
         string backend = settings.value ("backend").to_string ();
         string target_path = settings.value ("target_path").to_string ();
         bool paused = settings.value ("paused", false).to_bool ();
         // string connection = settings.value ("connection").to_string ();
         string alias = unescape_alias (escaped_alias);
-    
+
         if (backend == "" || backend != "owncloud") {
             GLib.warning ("obsolete configuration of type" + backend);
             return null;
         }
-    
+
         // cut off the leading slash, oc_url always has a trailing.
         if (target_path.starts_with ('/')) {
             target_path.remove (0, 1);
         }
-    
+
         if (!account_state) {
             GLib.critical ("can't create folder without an account.");
             return null;
         }
-    
+
         FolderDefinition folder_definition;
         folder_definition.alias = alias;
         folder_definition.local_path = path;
         folder_definition.target_path = target_path;
         folder_definition.paused = paused;
         folder_definition.ignore_hidden_files = ignore_hidden_files;
-    
+
         folder = add_folder_internal (folder_definition, account_state, std.make_unique<VfsOff> ());
         if (folder) {
             string[] block_list = settings.value ("block_list").to_string_list ();
@@ -631,7 +630,7 @@ public class FolderMan : GLib.Object {
                 // FIXME: If you remove this codepath, you need to provide another way to do
                 // this via theme.h or the normal FolderMan.set_up_folders
             }
-    
+
             folder.save_to_settings ();
         }
         GLib.info ("Migrated! " + folder);
@@ -670,17 +669,17 @@ public class FolderMan : GLib.Object {
         if (local_folder == "") {
             return false;
         }
-    
+
         GLib.FileInfo file_info = new GLib.FileInfo (local_folder);
         GLib.Dir parent_dir = new GLib.Dir (file_info.directory ());
         string folder_name = file_info.filename ();
-    
+
         // Adjust for case where local_folder ends with a /
         if (file_info.is_dir ()) {
             folder_name = parent_dir.dir_name ();
             parent_dir.cd_up ();
         }
-    
+
         if (file_info.exists ()) {
             // It exists, but is empty . just reuse it.
             if (file_info.is_dir () && file_info.directory ().count () == 0) {
@@ -697,7 +696,7 @@ public class FolderMan : GLib.Object {
                 folder.journal_database ().close ();
                 folder.on_signal_terminate_sync (); // Normally it should not be running, but viel hilft viel
             }
-    
+
             // Make a backup of the folder/file.
             string new_name = backup_name (parent_dir.absolute_file_path (folder_name));
             string rename_error;
@@ -708,12 +707,12 @@ public class FolderMan : GLib.Object {
                 return false;
             }
         }
-    
+
         if (!parent_dir.mkdir (file_info.absolute_file_path)) {
             GLib.warning ("start_from_scratch: Could not mkdir " + file_info.absolute_file_path);
             return false;
         }
-    
+
         return true;
     }
 
@@ -772,9 +771,9 @@ public class FolderMan : GLib.Object {
         SyncResult.Status status, bool unresolved_conflicts) {
         *status = SyncResult.Status.UNDEFINED;
         *unresolved_conflicts = false;
-    
+
         int count = folders.count ();
-    
+
         // if one folder: show the state of the one folder.
         // if more folders:
         //   if one of them has an error -> show error
@@ -808,14 +807,14 @@ public class FolderMan : GLib.Object {
             int abort_or_paused_seen = 0;
             int run_seen = 0;
             int various = 0;
-    
+
             foreach (Folder folder in folders) {
                 SyncResult folder_result = folder.sync_result;
                 if (folder.sync_paused) {
                     abort_or_paused_seen++;
                 } else {
                     SyncResult.Status sync_status = folder_result.status ();
-    
+
                     switch (sync_status) {
                     case SyncResult.Status.UNDEFINED:
                     case SyncResult.Status.NOT_YET_STARTED:
@@ -862,7 +861,7 @@ public class FolderMan : GLib.Object {
     ***********************************************************/
     public static string escape_alias (string alias) {
         string a = alias;
-    
+
         a.replace ('/', SLASH_TAG);
         a.replace ('\\', BSLASH_TAG);
         a.replace ('?', QMARK_TAG);
@@ -883,7 +882,7 @@ public class FolderMan : GLib.Object {
     ***********************************************************/
     public static string unescape_alias (string alias) {
         string a = alias;
-    
+
         a.replace (SLASH_TAG, "/");
         a.replace (BSLASH_TAG, "\\");
         a.replace (QMARK_TAG, "?");
@@ -896,7 +895,7 @@ public class FolderMan : GLib.Object {
         a.replace (GT_TAG, ">");
         a.replace (PAR_O_TAG, "[");
         a.replace (PAR_C_TAG, "]");
-    
+
         return a;
     }
 
@@ -906,7 +905,7 @@ public class FolderMan : GLib.Object {
     private bool push_notifications_files_ready (Account account) {
         const var push_notifications = account.push_notifications ();
         const var push_files_available = account.capabilities.available_push_notifications () & PushNotificationType.FILES;
-    
+
         return push_files_available && push_notifications && push_notifications.is_ready ();
     }
 
@@ -934,31 +933,31 @@ public class FolderMan : GLib.Object {
             GLib.debug (path + recursive_validity);
             return recursive_validity;
         }
-    
+
         // check if the local directory isn't used yet in another own_cloud sync
         Qt.CaseSensitivity case_sensitivity = Qt.CaseSensitive;
         if (Utility.fs_case_preserving ()) {
             case_sensitivity = Qt.CaseInsensitive;
         }
-    
+
         const string user_dir = GLib.Dir.clean_path (canonical_path (path)) + '/';
         for (var i = this.folder_map.const_begin (); i != this.folder_map.const_end (); ++i) {
             var folder = static_cast<Folder> (i.value ());
             string folder_dir = GLib.Dir.clean_path (canonical_path (folder.path)) + '/';
-    
+
             bool different_paths = string.compare (folder_dir, user_dir, case_sensitivity) != 0;
             if (different_paths && folder_dir.starts_with (user_dir, case_sensitivity)) {
                 return _("The local folder %1 already contains a folder used in a folder sync connection. "
                        + "Please pick another one!")
                             .printf (GLib.Dir.to_native_separators (path));
             }
-    
+
             if (different_paths && user_dir.starts_with (folder_dir, case_sensitivity)) {
                 return _("The local folder %1 is already contained in a folder used in a folder sync connection. "
                        + "Please pick another one!")
                             .printf (GLib.Dir.to_native_separators (path));
             }
-    
+
             // if both pathes are equal, the server url needs to be different
             // otherwise it would mean that a new connection from the same local folder
             // to the same account is added which is not wanted. The account must differ.
@@ -966,14 +965,14 @@ public class FolderMan : GLib.Object {
                 GLib.Uri folder_url = folder.account_state.account.url;
                 string user = folder.account_state.account.credentials ().user ();
                 folder_url.user_name (user);
-    
+
                 if (server_url == folder_url) {
                     return _("There is already a sync from the server to this local folder. "
                            + "Please pick another local folder!");
                 }
             }
         }
-    
+
         return "";
     }
 
@@ -989,7 +988,7 @@ public class FolderMan : GLib.Object {
     ***********************************************************/
     public string find_good_path_for_new_sync_folder (string base_path, GLib.Uri server_url) {
         string folder = base_path;
-    
+
         // If the parent folder is a sync folder or contained in one, we can't
         // possibly find a valid sync folder inside it.
         // Example: Someone syncs their home directory. Then ~/foobar is not
@@ -1000,7 +999,7 @@ public class FolderMan : GLib.Object {
             // so just keep it as-is.
             return base_path;
         }
-    
+
         int attempt = 1;
         while (true) {
             const bool is_good =
@@ -1009,16 +1008,16 @@ public class FolderMan : GLib.Object {
             if (is_good) {
                 break;
             }
-    
+
             // Count attempts and give up eventually
             attempt++;
             if (attempt > 100) {
                 return base_path;
             }
-    
+
             folder = base_path + string.number (attempt);
         }
-    
+
         return folder;
     }
 
@@ -1041,7 +1040,7 @@ public class FolderMan : GLib.Object {
         if (this.current_sync_folder) {
             return true;
         }
-    
+
         foreach (var folder in this.folder_map) {
             if (folder.is_sync_running ()) {
                 return true;
@@ -1056,7 +1055,7 @@ public class FolderMan : GLib.Object {
     ***********************************************************/
     public int unload_and_delete_all_folders () {
         int count = 0;
-    
+
         // clear the list of existing folders.
         foreach (Folder folder in this.folder_map) {
             unload_folder (folder);
@@ -1064,13 +1063,13 @@ public class FolderMan : GLib.Object {
             count++;
         }
         //  ASSERT (this.folder_map == "");
-    
+
         this.last_sync_folder = null;
         this.current_sync_folder = null;
         this.scheduled_folders.clear ();
         /* emit */ signal_folder_list_changed (this.folder_map);
         /* emit */ signal_schedule_queue_changed ();
-    
+
         return count;
     }
 
@@ -1089,9 +1088,9 @@ public class FolderMan : GLib.Object {
             return;
         }
         var alias = folder.alias ();
-    
+
         GLib.info ("Schedule folder " + alias + " to sync!");
-    
+
         if (!this.scheduled_folders.contains (folder)) {
             if (!folder.can_sync ()) {
                 GLib.info ("Folder is not ready to sync, not scheduled!");
@@ -1105,7 +1104,7 @@ public class FolderMan : GLib.Object {
         } else {
             GLib.info ("Sync for folder " + alias + " already scheduled, do not enqueue!");
         }
-    
+
         start_scheduled_sync_soon ();
     }
 
@@ -1116,19 +1115,19 @@ public class FolderMan : GLib.Object {
     public void schedule_folder_next (Folder folder) {
         var alias = folder.alias ();
         GLib.info ("Schedule folder " + alias + " to sync! Front-of-queue.");
-    
+
         if (!folder.can_sync ()) {
             GLib.info ("Folder is not ready to sync, not scheduled!");
             return;
         }
-    
+
         this.scheduled_folders.remove_all (folder);
-    
+
         folder.prepare_to_sync ();
         /* emit */ signal_folder_sync_state_change (folder);
         this.scheduled_folders.prepend (folder);
         /* emit */ signal_schedule_queue_changed ();
-    
+
         start_scheduled_sync_soon ();
     }
 
@@ -1183,10 +1182,10 @@ public class FolderMan : GLib.Object {
             return;
         }
         string account_name = account_state.account.display_name;
-    
+
         if (account_state.is_connected) {
             GLib.info ("Account " + account_name + " connected, scheduling its folders.");
-    
+
             foreach (Folder folder in this.folder_map.values ()) {
                 if (folder
                     && folder.can_sync ()
@@ -1197,7 +1196,7 @@ public class FolderMan : GLib.Object {
         } else {
             GLib.info ("Account " + account_name
                 + " disconnected or paused, terminating or descheduling sync folders.");
-    
+
             foreach (Folder folder in this.folder_map.values ()) {
                 if (folder
                     && folder.is_sync_running ()
@@ -1252,29 +1251,29 @@ public class FolderMan : GLib.Object {
                 folders_to_remove.append (folder);
             }
         }
-    
+
         bool on_signal_success = false;
         foreach (Folder folder in folders_to_remove) {
             if (!folder) {
                 GLib.critical ("Can not remove null folder.");
                 return;
             }
-    
+
             GLib.info ("Removing " + folder.alias ());
-    
+
             const bool currently_running = (this.current_sync_folder == folder);
             if (currently_running) {
                 // on_signal_abort the sync now
                 this.current_sync_folder.on_signal_terminate_sync ();
             }
-    
+
             if (this.scheduled_folders.remove_all (folder) > 0) {
                 /* emit */ signal_schedule_queue_changed ();
             }
-    
+
             // wipe database
             folder.wipe_for_removal ();
-    
+
             // wipe data
             GLib.Dir user_folder = new GLib.Dir (folder.path);
             if (user_folder.exists ()) {
@@ -1284,25 +1283,25 @@ public class FolderMan : GLib.Object {
                 } else {
                     GLib.info ("Wipe: Removed  file " + folder.path);
                 }
-    
+
             } else {
                 on_signal_success = true;
                 GLib.warning ("Folder does not exist, can not remove.");
             }
-    
+
             folder.sync_paused = true;
-    
+
             // remove the folder configuration
             folder.remove_from_settings ();
-    
+
             unload_folder (folder);
             if (currently_running) {
                 delete folder;
             }
-    
+
             this.navigation_pane_helper.schedule_update_cloud_storage_registry ();
         }
-    
+
         /* emit */ signal_folder_list_changed (this.folder_map);
         /* emit */ signal_wipe_done (account_state, on_signal_success);
     }
@@ -1315,7 +1314,7 @@ public class FolderMan : GLib.Object {
             GLib.critical ("on_signal_folder_sync_paused called with empty folder.");
             return;
         }
-    
+
         if (!paused) {
             this.disabled_folders.remove (folder);
             schedule_folder (folder);
@@ -1345,7 +1344,7 @@ public class FolderMan : GLib.Object {
         //  ASSERT (folder);
         if (!folder)
             return;
-    
+
         GLib.info (lc_folder_man, ">========== Sync started for folder [%s] of account [%s] with remote [%s]",
             q_printable (folder.short_gui_local_path),
             q_printable (folder.account_state.account.display_name),
@@ -1364,12 +1363,12 @@ public class FolderMan : GLib.Object {
         //  ASSERT (folder);
         if (!folder)
             return;
-    
+
         GLib.info (lc_folder_man, "<========== Sync on_signal_finished for folder [%s] of account [%s] with remote [%s]",
             q_printable (folder.short_gui_local_path),
             q_printable (folder.account_state.account.display_name),
             q_printable (folder.remote_url ().to_string ()));
-    
+
         if (folder == this.current_sync_folder) {
             this.last_sync_folder = this.current_sync_folder;
             this.current_sync_folder = null;
@@ -1393,7 +1392,7 @@ public class FolderMan : GLib.Object {
             }
             if (this.current_etag_job == null) {
                 //GLib.debug ("No more remote ETag check jobs to schedule.";
-    
+
                 // now it might be a good time to check for restarting...
                 if (!is_any_sync_running () && this.app_restart_required) {
                     restart_application ();
@@ -1433,17 +1432,17 @@ public class FolderMan : GLib.Object {
             }
             return;
         }
-    
+
         if (!this.sync_enabled) {
             GLib.info ("FolderMan: Syncing is disabled; no scheduling.");
             return;
         }
-    
+
         GLib.debug ("folder_queue size: " + this.scheduled_folders.count ());
         if (this.scheduled_folders == "") {
             return;
         }
-    
+
         // Find the first folder in the queue that can be synced.
         Folder folder = null;
         while (!this.scheduled_folders == "") {
@@ -1453,16 +1452,16 @@ public class FolderMan : GLib.Object {
                 break;
             }
         }
-    
+
         /* emit */ signal_schedule_queue_changed ();
-    
+
         // Start syncing this folder!
         if (folder) {
             // Safe to call several times, and necessary to try again if
             // the folder path didn't exist previously.
             folder.register_folder_watcher ();
             register_folder_with_socket_api (folder);
-    
+
             this.current_sync_folder = folder;
             folder.on_signal_start_sync ({});
         }
@@ -1475,7 +1474,7 @@ public class FolderMan : GLib.Object {
         GLib.info ("Etag poll timer timeout.");
         GLib.info ("Folders to sync: " + this.folder_map.size ());
         GLib.List<Folder> folders_to_run = new GLib.List<Folder> ();
-    
+
         // Some folders need not to be checked because they use the push notifications
         foreach (Folder folder in this.folder_map) {
             if (!push_notifications_files_ready (folder.account_state.account)) {
@@ -1484,7 +1483,7 @@ public class FolderMan : GLib.Object {
         }
 
         GLib.info ("Number of folders that don't use push notifications: " + folders_to_run.size ());
-    
+
         run_etag_jobs_if_possible (folders_to_run);
     }
 
@@ -1509,7 +1508,7 @@ public class FolderMan : GLib.Object {
                 folders_to_remove.append (folder);
             }
         }
-    
+
         foreach (Folder folder in folders_to_remove) {
             remove_folder (folder);
         }
@@ -1538,7 +1537,7 @@ public class FolderMan : GLib.Object {
                 "The server version is unsupported: "
                 + account.server_version ()
                 + "pausing all folders on the account.");
-    
+
             foreach (Folder folder in this.folder_map) {
                 if (folder.account_state.account == account) {
                     folder.sync_paused = true;
@@ -1576,9 +1575,9 @@ public class FolderMan : GLib.Object {
             if (!folder.can_sync () || folder.etag_job ()) {
                 continue;
             }
-    
+
             var msecs_since_sync = folder.msec_since_last_sync ();
-    
+
             // Possibly it's just time for a new sync run
             bool force_sync_interval_expired = msecs_since_sync > ConfigFile ().force_sync_interval ();
             if (force_sync_interval_expired) {
@@ -1586,11 +1585,11 @@ public class FolderMan : GLib.Object {
                     "Scheduling folder " + folder.alias ()
                     + " because it has been " + msecs_since_sync.count () + "ms "
                     + " since the last sync.");
-    
+
                 schedule_folder (folder);
                 continue;
             }
-    
+
             // Retry a couple of times after failure; or regularly if requested
             bool sync_again =
                 (folder.consecutive_failing_syncs () > 0 && folder.consecutive_failing_syncs () < 3)
@@ -1605,11 +1604,11 @@ public class FolderMan : GLib.Object {
                     + ", another_sync_needed " + folder.sync_engine.is_another_sync_needed ()
                     + ", last status: " + folder.sync_result.status_string
                     + ", time since last sync: " + msecs_since_sync.count ());
-    
+
                 schedule_folder (folder);
                 continue;
             }
-    
+
             // Do we want to retry failing syncs or another-sync-needed runs more often?
         }
     }
@@ -1620,7 +1619,7 @@ public class FolderMan : GLib.Object {
     private void on_signal_setup_push_notifications (Folder.Map folder_map) {
         foreach (Folder folder in folder_map) {
             const Account account = folder.account_state.account;
-    
+
             // See if the account already provides the PushNotifications object and if yes connect to it.
             // If we can't connect at this point, the signals will be connected in on_signal_push_notifications_ready ()
             // after the Push_notification object emitted the ready signal
@@ -1636,13 +1635,13 @@ public class FolderMan : GLib.Object {
     ***********************************************************/
     private void on_signal_process_files_push_notification (Account account) {
         GLib.info ("Got files push notification for account " + account);
-    
+
         foreach (Folder folder in this.folder_map) {
             // Just run on the folders that belong to this account
             if (folder.account_state.account != account) {
                 continue;
             }
-    
+
             GLib.info ("Schedule folder " + folder + " for sync.");
             schedule_folder (folder);
         }
@@ -1653,7 +1652,7 @@ public class FolderMan : GLib.Object {
     ***********************************************************/
     private void on_signal_connect_to_push_notifications (Account account) {
         const PushNotifications push_notifications = account.push_notifications ();
-    
+
         if (push_notifications_files_ready (account)) {
             GLib.info ("Push notifications ready.");
             push_notifications.files_changed.connect (
@@ -1677,20 +1676,20 @@ public class FolderMan : GLib.Object {
             // There is already a folder configured with this name and folder names need to be unique
             folder_definition.alias = alias + string.number (++count);
         }
-    
+
         var folder = new Folder (folder_definition, account_state, std.move (vfs), this);
-    
+
         if (this.navigation_pane_helper.show_in_explorer_navigation_pane && folder_definition.navigation_pane_clsid == null) {
             folder.navigation_pane_clsid (QUuid.create_uuid ());
             folder.save_to_settings ();
         }
-    
+
         GLib.info ("Adding folder to Folder Map " + folder + folder.alias ());
         this.folder_map[folder.alias ()] = folder;
         if (folder.sync_paused) {
             this.disabled_folders.insert (folder);
         }
-    
+
         // See matching disconnects in unload_folder ().
         folder.signal_sync_started.connect (
             this.on_signal_folder_sync_started
@@ -1713,7 +1712,7 @@ public class FolderMan : GLib.Object {
         folder.signal_watched_file_changed_externally.connect (
             folder.sync_engine.sync_file_status_tracker.on_signal_path_touched
         );
-    
+
         folder.register_folder_watcher ();
         register_folder_with_socket_api (folder);
         return folder;
@@ -1727,11 +1726,11 @@ public class FolderMan : GLib.Object {
         if (folder == null) {
             return;
         }
-    
+
         this.socket_api.on_signal_unregister_path (folder.alias ());
-    
+
         this.folder_map.remove (folder.alias ());
-    
+
         disconnect (
             folder,
             Folder.signal_sync_started,
@@ -1784,15 +1783,15 @@ public class FolderMan : GLib.Object {
         if (is_any_sync_running ()) {
             return;
         }
-    
+
         int64 ms_delay = 100; // 100ms minimum delay
         int64 ms_since_last_sync = 0;
-    
+
         // Require a pause based on the duration of the last sync run.
         Folder last_folder = this.last_sync_folder;
         if (last_folder) {
             ms_since_last_sync = last_folder.msec_since_last_sync ().count ();
-    
+
             //  1s   . 1.5s pause
             // 10s   . 5s pause
             //  1min . 12s pause
@@ -1800,15 +1799,15 @@ public class FolderMan : GLib.Object {
             int64 pause = q_sqrt (last_folder.msec_last_sync_duration ().count ()) / 20.0 * 1000.0;
             ms_delay = q_max (ms_delay, pause);
         }
-    
+
         // Delays beyond one minute seem too big, particularly since there
         // could be things later in the queue that shouldn't be punished by a
         // long delay!
         ms_delay = q_min (ms_delay, 60 * 1000ll);
-    
+
         // Time since the last sync run counts against the delay
         ms_delay = q_max (1ll, ms_delay - ms_since_last_sync);
-    
+
         GLib.info ("Starting the next scheduled sync in " + (ms_delay / 1000) + " seconds.");
         this.start_scheduled_sync_timer.on_signal_start (ms_delay);
     }
@@ -1821,11 +1820,11 @@ public class FolderMan : GLib.Object {
         if (full_path_name.ends_with ("/")) {
             full_path_name.chop (1);
         }
-    
+
         if (full_path_name == "") {
             return "";
         }
-    
+
         string new_name = full_path_name + _(" (backup)");
         GLib.FileInfo file_info = new GLib.FileInfo (new_name);
         int count = 2;
@@ -1835,7 +1834,7 @@ public class FolderMan : GLib.Object {
                 file_info.file (new_name);
             }
         } while (file_info.exists ());
-    
+
         return new_name;
     }
 
@@ -1848,7 +1847,7 @@ public class FolderMan : GLib.Object {
             return;
         if (!GLib.Dir (folder.path).exists ())
             return;
-    
+
         // register the folder with the socket API
         if (folder.can_sync ())
             this.socket_api.on_signal_register_path (folder.alias ());
@@ -1865,7 +1864,7 @@ public class FolderMan : GLib.Object {
             Gtk.Application.quit ();
             string[] args = Gtk.Application.arguments ();
             string prg = args.take_first ();
-    
+
             QProcess.start_detached (prg, args);
         } else {
             GLib.debug ("On this platform we do not restart.");
@@ -1886,28 +1885,28 @@ public class FolderMan : GLib.Object {
                 continue;
             }
             settings.end_group ();
-    
+
             FolderDefinition folder_definition;
             settings.begin_group (folder_alias);
             if (FolderDefinition.on_signal_load (settings, folder_alias, folder_definition)) {
                 var default_journal_path = folder_definition.default_journal_path (account.account);
-    
+
                 // Migration : Old settings don't have journal_path
                 if (folder_definition.journal_path == "") {
                     folder_definition.journal_path = default_journal_path;
                 }
-    
+
                 // Migration #2 : journal_path might be absolute (in DataAppDir most likely) move it back to the root of local tree
                 if (folder_definition.journal_path.at (0) != char ('.')) {
                     GLib.File old_journal = new GLib.File (folder_definition.journal_path);
                     GLib.File old_journal_shm = new GLib.File (folder_definition.journal_path + "-shm");
                     GLib.File old_journal_wal = new GLib.File (folder_definition.journal_path + "-wal");
-    
+
                     folder_definition.journal_path = default_journal_path;
-    
+
                     socket_api ().on_signal_unregister_path (folder_alias);
                     var settings = account.settings ();
-    
+
                     var journal_file_move_success = true;
                     // Due to database logic can't be sure which of these file exist.
                     if (old_journal.exists ()) {
@@ -1919,24 +1918,24 @@ public class FolderMan : GLib.Object {
                     if (old_journal_wal.exists ()) {
                         journal_file_move_success &= old_journal_wal.rename (folder_definition.local_path + "/" + folder_definition.journal_path + "-wal");
                     }
-    
+
                     if (!journal_file_move_success) {
                         GLib.warning ("Wasn't able to move 3.0 syncjournal database files to new location. One-time loss off sync settings possible.");
                     } else {
                         GLib.info ("Successfully migrated syncjournal database.");
                     }
-    
+
                     var vfs = create_vfs_from_plugin (folder_definition.virtual_files_mode);
                     if (!vfs && folder_definition.virtual_files_mode != Vfs.Off) {
                         GLib.warning ("Could not load plugin for mode " + folder_definition.virtual_files_mode);
                     }
-    
+
                     Folder folder = add_folder_internal (folder_definition, account, std.move (vfs));
                     folder.save_to_settings ();
-    
+
                     continue;
                 }
-    
+
                 // Migration : . files sometimes can't be created.
                 // So if the configured journal_path has a dot-underscore (".sync_*.db")
                 // but the current default doesn't have the underscore, switch to the
@@ -1946,23 +1945,23 @@ public class FolderMan : GLib.Object {
                     && !GLib.File.exists (folder_definition.absolute_journal_path)) {
                     folder_definition.journal_path = default_journal_path;
                 }
-    
+
                 // Migration : If an old database is found, move it to the new name.
                 if (backwards_compatible) {
                     SyncJournalDb.maybe_migrate_database (folder_definition.local_path, folder_definition.absolute_journal_path);
                 }
-    
+
                 const var switch_to_vfs = is_switch_to_vfs_needed (folder_definition);
                 if (switch_to_vfs) {
                     folder_definition.virtual_files_mode = this.best_available_vfs_mode;
                 }
-    
+
                 var vfs = create_vfs_from_plugin (folder_definition.virtual_files_mode);
                 if (!vfs) {
                     // TODO: Must do better error handling
                     q_fatal ("Could not load plugin");
                 }
-    
+
                 Folder folder = add_folder_internal (std.move (folder_definition), account, std.move (vfs));
                 if (folder) {
                     if (switch_to_vfs) {
@@ -1974,7 +1973,7 @@ public class FolderMan : GLib.Object {
                         GLib.info ("Migrate: From use_placeholders to Vfs.ItemAvailability.ONLINE_ONLY");
                         folder.root_pin_state (Vfs.ItemAvailability.ONLINE_ONLY);
                     }
-    
+
                     // Migration: Mark folders that shall be saved in a backwards-compatible way
                     if (backwards_compatible) {
                         folder.save_backwards_compatible (true);
@@ -1982,7 +1981,7 @@ public class FolderMan : GLib.Object {
                     if (folders_with_placeholders) {
                         folder.save_in_folders_with_placeholders ();
                     }
-    
+
                     schedule_folder (folder);
                     /* emit */ signal_folder_sync_state_change (folder);
                 }
@@ -2022,9 +2021,9 @@ public class FolderMan : GLib.Object {
     private void run_etag_job_if_possible (Folder folder) {
         const ConfigFile config = new ConfigFile ();
         const var polltime = config.remote_poll_interval ();
-    
+
         GLib.info ("Run etag job on folder " + folder);
-    
+
         if (!folder) {
             return;
         }
@@ -2051,7 +2050,7 @@ public class FolderMan : GLib.Object {
                 return;
             }
         }
-    
+
         QMetaObject.invoke_method (
             folder,
             "on_signal_run_etag_job",
@@ -2066,9 +2065,9 @@ public class FolderMan : GLib.Object {
         if (path == "") {
             return FolderMan._("No valid folder selected!");
         }
-    
+
         const GLib.FileInfo sel_file = new GLib.FileInfo (path);
-    
+
         if (!sel_file.exists ()) {
             string parent_path = sel_file.directory ().path;
             if (parent_path != path) {
@@ -2096,14 +2095,14 @@ public class FolderMan : GLib.Object {
         GLib.FileInfo sel_file = new GLib.FileInfo (path);
         if (!sel_file.exists ()) {
             const var parent_path = sel_file.directory ().path;
-    
+
             // It's possible for the parent_path to match the path
             // (possibly we've arrived at a non-existant drive root on Windows)
             // and recursing would be fatal.
             if (parent_path == path) {
                 return path;
             }
-    
+
             return canonical_path (parent_path) + '/' + sel_file.filename ();
         }
         return sel_file.canonical_file_path;

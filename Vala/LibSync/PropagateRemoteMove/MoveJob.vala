@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Olivier Goffart <ogoffart@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <GLib.Dir>

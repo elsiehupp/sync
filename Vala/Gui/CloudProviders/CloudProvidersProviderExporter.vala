@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Julius Härtl <jus@bitgrid.net>
-
-<GPLv3-or-later-Boilerplate>
+@author Julius Härtl <jus@bitgrid.net>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <cloudprovidersproviderexporter.h>

@@ -160,6 +160,7 @@ public class FakeQNAM : Soup {
         return reply;
     }
 
-} // class FakeQNAM 
+} // class FakeQNAM
+
 } // namespace Testing
 } // namespace Occ

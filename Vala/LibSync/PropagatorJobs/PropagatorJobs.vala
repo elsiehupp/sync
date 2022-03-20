@@ -1,8 +1,7 @@
 /***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Olivier Goffart <ogoffart@owncloud.com>
+@author Klaas Freitag <freitag@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <qfile.h>

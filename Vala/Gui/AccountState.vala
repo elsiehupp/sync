@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Daniel Molkentin <danimo@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <QSettings>
@@ -86,7 +85,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
                           + state_string (this.state) + "." + state_string (state));
                 State old_state = this.state;
                 this.state = state;
-    
+
                 if (this.state == State.SIGNED_OUT) {
                     this.connection_status = ConnectionValidator.Status.UNDEFINED;
                     this.connection_errors.clear ();
@@ -105,7 +104,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
                     /* emit */ signal_is_connected_changed ();
                 }
             }
-    
+
             // might not have changed but the underlying this.connection_errors might have
             /* emit */ signal_state_changed (this.state);
         }

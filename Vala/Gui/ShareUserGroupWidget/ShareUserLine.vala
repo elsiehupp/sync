@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Roeland Jago Douma <roeland@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {
@@ -67,7 +66,7 @@ public class ShareUserLine : Gtk.Widget {
                 max_sharing_permissions & Share_permission_create
                 && max_sharing_permissions & Share_permission_delete);
         }
-    
+
         this.ui.permissions_edit.enabled (enabled);
 
         this.ui.permissions_edit.clicked.connect (

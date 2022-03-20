@@ -1,9 +1,8 @@
 /***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-Copyright (C) by Daniel Heule <daniel.heule@gmail.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Olivier Goffart <ogoffart@owncloud.com>
+@author Klaas Freitag <freitag@owncloud.com>
+@author Daniel Heule <daniel.heule@gmail.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 public class EchoDisabler {

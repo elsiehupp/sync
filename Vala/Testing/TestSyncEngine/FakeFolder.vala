@@ -42,7 +42,7 @@ public class FakeFolder : GLib.Object {
         SyncEngine.minimum_file_age_for_upload = std.chrono.milliseconds (0);
         Logger.instance.set_log_file ("-");
         Logger.instance.add_log_rule ({ "sync.httplogger=true" });
-    
+
         GLib.Dir root_directory = new GLib.Dir (this.temporary_directory.path);
         GLib.debug ("FakeFolder operating on " + root_directory);
         if (local_file_info) {
@@ -50,27 +50,27 @@ public class FakeFolder : GLib.Object {
         } else {
             to_disk (root_directory, template_file_info);
         }
-    
+
         this.fake_access_manager = new FakeQNAM (template_file_info);
         this.account = Account.create ();
         this.account.set_url (GLib.Uri ("http://admin:admin@localhost/owncloud"));
         this.account.set_credentials (new FakeCredentials (this.fake_access_manager));
         this.account.set_dav_display_name ("fakename");
         this.account.set_server_version ("10.0.0");
-    
+
         this.journal_database = std.make_unique<SyncJournalDb> (local_path + ".sync_test.db");
         this.sync_engine = std.make_unique<SyncEngine> (this.account, local_path, remote_path, this.journal_database.get ());
         // Ignore temporary files from the download. (This is in the default exclude list, but we don't load it)
         this.sync_engine.excluded_files ().add_manual_exclude ("]*.~*");
-    
+
         // handle signal_about_to_remove_all_files with a timeout in case our test does not handle it
         this.sync_engine.signal_about_to_remove_all_files.connect (
             this.on_signal_sync_engine_about_to_remove_all_files
         );
-    
+
         // Ensure we have a valid VfsOff instance "running"
         switch_to_vfs (this.sync_engine.sync_options ().vfs);
-    
+
         // A new folder will update the local file state database on first sync.
         // To have a state matching what users will encounter, we have to a sync
         // using an identical local/remote file tree first.

@@ -1,7 +1,6 @@
 /***********************************************************
 Copyright (C) 2016 by Daniel Molkentin <danimo@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <QStyle>

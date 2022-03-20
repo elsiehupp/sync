@@ -1,5 +1,5 @@
 /***********************************************************
-Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
+@author Oleksandr Zolotov <alex@nextcloud.com>
 
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/
@@ -21,7 +21,7 @@ public class TestIconUtils : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_draw_svg_with_custom_fill_color () {
+    private TestDrawSvgWithCustomFillColor () {
         const string black_svg_dir_path = Theme.THEME_PREFIX + "black";
         const GLib.Dir black_svg_dir = new GLib.Dir (black_svg_dir_path);
         const string[] black_images = black_svg_dir.entry_list ("*.svg");
@@ -44,7 +44,7 @@ public class TestIconUtils : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_create_svg_pixmap_with_custom_color () {
+    private TestCreateSvgPixmapWithCustomColor () {
         const GLib.Dir black_svg_dir = new GLib.Dir (Theme.THEME_PREFIX + "black");
         const string[] black_images = black_svg_dir.entry_list ("*.svg");
 
@@ -65,7 +65,7 @@ public class TestIconUtils : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_pixmap_for_background () {
+    private TestPixmapForBackground () {
         const GLib.Dir black_svg_dir = new GLib.Dir (Theme.THEME_PREFIX + "black");
         const string[] black_images = black_svg_dir.entry_list ("*.svg");
 

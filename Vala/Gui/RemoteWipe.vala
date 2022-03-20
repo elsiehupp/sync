@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Camila Ayres <hello@camila.codes>
-
-<GPLv3-or-later-Boilerplate>
+@author Camila Ayres <hello@camila.codes>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <QJsonDocument>
@@ -30,7 +29,7 @@ public class RemoteWipe : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public RemoteWipe (unowned Account account, GLib.Object parent = new GLib.Object ()) {
+    public RemoteWipe (Account account, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.account = account;
         this.app_password = "";
@@ -53,6 +52,8 @@ public class RemoteWipe : GLib.Object {
     }
 
 
+    /***********************************************************
+    ***********************************************************/
     private void on_signal_account_removed (AccountState state) {
         this.account_removed = true;
     }
@@ -224,7 +225,7 @@ public class RemoteWipe : GLib.Object {
         this.network_reply_success.delete_later ();
     }
 
-} // class RemoteWipe 
+} // class RemoteWipe
 
 } // namespace Ui
 } // namespace Occ

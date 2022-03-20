@@ -7,7 +7,7 @@ public class TestNotificationCache : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_contains_does_not_contain_notification_returns_false () {
+    private TestContainsDoesNotContainNotificationReturnsFalse () {
         NotificationCache notification_cache;
 
         GLib.assert_true (!notification_cache.contains ({ "Title", { "Message" } }));
@@ -16,7 +16,7 @@ public class TestNotificationCache : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_contains_does_contain_notification_return_true () {
+    private TestContainsDoesContainNotificationReturnsTrue () {
         NotificationCache notification_cache;
         const NotificationCache.Notification notification = new NotificationCache.Notification ("Title", "message");
 
@@ -28,7 +28,7 @@ public class TestNotificationCache : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_clear_does_contain_notification_clear_cotifications () {
+    private TestClearDoesContainNotificationClearNotifications () {
         NotificationCache notification_cache;
         const NotificationCache.Notification notification = new NotificationCache.Notification ("Title", "message");
 

@@ -1,8 +1,7 @@
 /***********************************************************
-Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Duncan Mac-Vicar P. <duncan@kde.org>
+@author Klaas Freitag <freitag@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <unistd.h>
@@ -41,12 +40,12 @@ public class SyncEngine : GLib.Object {
 
     public enum AnotherSyncNeeded {
         NO_FOLLOW_UP_SYNC,
-    
+
         /***********************************************************
         Schedule this again immediately (limited amount of times)
         ***********************************************************/
         IMMEDIATE_FOLLOW_UP,
-    
+
         /***********************************************************
         Regularly schedule this folder again (around 1/minute, unlimited)
         ***********************************************************/
@@ -662,7 +661,7 @@ public class SyncEngine : GLib.Object {
         // - the folder itself "A/X" will be discovered
         // - subfolders like "A/X/Y" will be discovered (so data inside a new or renamed folder will be
         //   discovered in full)
-        // Check out Test_local_discovery.test_local_discovery_decision ()
+        // Check out Test_local_discovery.TestLocalDiscoveryDecision ()
 
         var it = this.local_discovery_paths.lower_bound (path);
         if (it == this.local_discovery_paths.end () || !it.starts_with (path)) {

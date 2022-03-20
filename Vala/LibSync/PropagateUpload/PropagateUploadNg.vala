@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Olivier Goffart <ogoffart@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <Soup.Session>
@@ -50,7 +49,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
     /***********************************************************
     Map chunk number with its size  from the PROPFIND on resume.
-    (Only used from on_signal_lscol_job_directory_listing_iterated or 
+    (Only used from on_signal_lscol_job_directory_listing_iterated or
     on_signal_lscol_job_finished because the LscolJob use
     signals to report data.)
     ***********************************************************/

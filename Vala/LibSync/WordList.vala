@@ -2068,7 +2068,7 @@ public class WordList : GLib.Object {
         }
         return random_words;
     }
-    
+
 
     public static string get_unified_string (string[] w_list) {
         string ret;

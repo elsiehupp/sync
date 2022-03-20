@@ -1,8 +1,7 @@
 /***********************************************************
-Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Krzesimir Nowak <krzesimir@endocode.com>
+@author Daniel Molkentin <danimo@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <QLoggingCategory>

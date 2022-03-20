@@ -77,7 +77,7 @@ Example of acceptable uses:
 @li A music collection can propose ripping a CD which just got inserted
 @li A chat application may notify the user a "special friend" just connected
 
-@author Aurélien Gâteau <agateau@kde.org>
+@author  Aurélien Gâteau <agateau@kde.org>
 @since 4.7
 ***********************************************************/
 public class KMessageWidget : Gdk.Frame {
@@ -87,7 +87,7 @@ public class KMessageWidget : Gdk.Frame {
     //  Q_PROPERTY (bool close_button_visible READ is_close_button_visible WRITE on_signal_set_close_button_visible)
     //  Q_PROPERTY (MessageType message_type READ message_type WRITE on_signal_set_message_type)
     //  Q_PROPERTY (Gtk.Icon icon READ icon WRITE on_signal_set_icon)
-    
+
     //  private Q_PRIVATE_SLOT (d, void on_time_line_changed (double))
     //  private Q_PRIVATE_SLOT (d, void on_time_line_finished ())
 

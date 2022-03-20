@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Hannah von Reth <hannah.vonreth@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <QRegularExpression>

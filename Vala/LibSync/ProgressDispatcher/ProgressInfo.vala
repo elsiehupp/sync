@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Klaas Freitag <freitag@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {
@@ -48,7 +47,7 @@ public class ProgressInfo : GLib.Object {
         ***********************************************************/
         DONE;
 
-    
+
         static string as_action_string (SyncFileItem item) {
             switch (item.instruction) {
             case CSync.SyncInstructions.CONFLICT:
@@ -531,7 +530,7 @@ public class ProgressInfo : GLib.Object {
             // This assumes files and transfers finish as quickly as possible
             // *but* note that max_per_second could be serious underestimate
             // (if we never got to fully excercise transfer or files/second)
-    
+
             return this.file_progress.remaining / this.max_files_per_second * 1000
                 + this.size_progress.remaining / this.max_bytes_per_second * 1000;
         }

@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
-
-<GPLv3-or-later-Boilerplate>
+@author Duncan Mac-Vicar P. <duncan@kde.org>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 using Soup;
@@ -68,14 +67,14 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
         public get {
             if (!this.ui.folder_tree_widget.current_item ())
                 return false;
-    
+
             string[] warn_strings;
             string directory = this.ui.folder_tree_widget.current_item ().data (0, Qt.USER_ROLE).to_string ();
             if (!directory.starts_with ('/')) {
                 directory.prepend ('/');
             }
             wizard ().property ("target_path", directory);
-    
+
             Folder.Map map = FolderMan.instance.map ();
             Folder.Map.ConstIterator i = map.const_begin ();
             for (i = map.const_begin (); i != map.const_end (); i++) {
@@ -92,7 +91,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
                     warn_strings.append (_("You are already syncing <i>%1</i>, which is a subfolder of <i>%2</i>.").printf (Utility.escape (cur_dir), Utility.escape (directory)));
                 }
             }
-    
+
             on_signal_show_warning (format_warnings (warn_strings));
             return true;
         }

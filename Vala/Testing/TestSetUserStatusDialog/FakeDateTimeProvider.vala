@@ -1,5 +1,5 @@
 /***********************************************************
-Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
+@author Felix Weilbach <felix.weilbach@nextcloud.com>
 
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/
@@ -65,7 +65,7 @@ public class FakeDateTimeProvider : DateTimeProvider {
         return fake_date_time;
     }
 
-}
+} // class FakeDateTimeProvider
 
 } // namespace Testing
 } // namespace Occ

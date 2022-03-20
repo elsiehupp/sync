@@ -1,7 +1,6 @@
 /***********************************************************
 Copyright (C) 2015 by Christian Kamm <kamm@incasoftware.de>
-
-<GPLv3-or-later-Boilerplate>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <Gtk.Dialog>

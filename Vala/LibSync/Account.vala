@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Daniel Molkentin <danimo@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <deletejob.h>
@@ -220,7 +219,7 @@ public class Account : GLib.Object {
             if (this.server_version == value) {
                 return;
             }
-    
+
             var old_server_version = this.server_version;
             this.server_version = value;
             /* emit */ signal_server_version_changed (this, old_server_version, value);

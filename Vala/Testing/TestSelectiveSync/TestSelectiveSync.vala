@@ -13,7 +13,7 @@ public class TestSelectiveSync : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_selective_sync_big_folders () {
+    private TestSelectiveSyncBigFolders () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         SyncOptions options;
         options.new_big_folder_size_limit = 20000; // 20 K

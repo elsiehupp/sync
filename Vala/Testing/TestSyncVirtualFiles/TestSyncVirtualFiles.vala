@@ -1370,7 +1370,7 @@ public class TestSyncVirtualFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_place_holder_exist () {
+    private TestPlaceholderExists () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.remote_modifier ().insert ("A/a1" + DVSUFFIX, 111);
         fake_folder.remote_modifier ().insert ("A/hello" + DVSUFFIX, 222);

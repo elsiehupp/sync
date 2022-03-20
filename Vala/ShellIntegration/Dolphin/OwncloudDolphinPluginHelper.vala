@@ -43,7 +43,7 @@ public class OwncloudDolphinPluginHelper : GLib.Object {
             return this.socket.state == QLocalSocket.ConnectedState;
         }
     }
-    
+
 
     /***********************************************************
     ***********************************************************/

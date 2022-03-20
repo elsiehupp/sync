@@ -16,7 +16,7 @@ public class TestDownload : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_resume () {
+    private TestResume () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine.set_ignore_hidden_files (true);
         QSignalSpy complete_spy = new QSignalSpy (
@@ -61,9 +61,10 @@ public class TestDownload : GLib.Object {
 
 
     /***********************************************************
+    This test's main goal is to test that the error string from
+    the server is shown in the UI.
     ***********************************************************/
-    private test_error_message () {
-        // This test's main goal is to test that the error string from the server is shown in the UI
+    private TestErrorMessage () {
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine.set_ignore_hidden_files (true);
@@ -108,9 +109,9 @@ public class TestDownload : GLib.Object {
 
 
     /***********************************************************
+    Server in maintenance must abort the sync.
     ***********************************************************/
-    private test_server_maintenence () {
-        // Server in maintenance must on_signal_abort the sync.
+    private TestServerMaintenance () {
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.remote_modifier ().insert ("A/broken");
@@ -149,10 +150,9 @@ public class TestDownload : GLib.Object {
     Note that there will be first a notification on the file and
     the conflict file before.
 
-
     Test for https://github.com/owncloud/client/issues/7015
     ***********************************************************/
-    private test_move_fails_in_a_conflict () {
+    private TestMoveFailsInAConflict () {
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine.set_ignore_hidden_files (true);
@@ -223,7 +223,7 @@ public class TestDownload : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_http2_resend () {
+    private TestHttp2Resend () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.remote_modifier ().insert ("A/resendme", 300);
 

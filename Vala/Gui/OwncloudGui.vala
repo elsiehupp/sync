@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Klaas Freitag <freitag@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #ifdef WITH_LIBCLOUDPROVIDERS
@@ -516,7 +515,7 @@ public class OwncloudGui : GLib.Object {
             Logger.instance.on_signal_enter_next_log_file ();
         }
     }
-        
+
 
 
     /***********************************************************

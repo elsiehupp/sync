@@ -51,5 +51,8 @@ public class StatusPushSpy : QSignalSpy {
         }
         return false;
     }
-}
-}
+
+} // class StatusPushSpy
+
+} // namespace Testing
+} // namespace Occ

@@ -57,7 +57,7 @@ public class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void TestParser1 () {
+    private TestParser1 () {
         const string xml_string = "<?xml version='1.0' encoding='utf-8'?>"
             + "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             + "<d:response>"
@@ -136,7 +136,7 @@ public class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void TestParserBrokenXml () {
+    private TestParserBrokenXml () {
         const string xml_string = "X<?xml version='1.0' encoding='utf-8'?>"
             + "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             + "<d:response>"
@@ -212,7 +212,7 @@ public class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void TestParserEmptyXmlNoDav () {
+    private TestParserEmptyXmlNoDav () {
         const string xml_string = "<html><body>I am under construction</body></html>";
 
         LscolXMLParser lscol_xml_parser;
@@ -240,7 +240,7 @@ public class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void TestParserEmptyXml () {
+    private TestParserEmptyXml () {
         const string xml_string = "";
 
         LscolXMLParser lscol_xml_parser;
@@ -268,7 +268,7 @@ public class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void TestParserTruncatedXml () {
+    private TestParserTruncatedXml () {
         const string xml_string = "<?xml version='1.0' encoding='utf-8'?>"
             + "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             + "<d:response>"
@@ -307,7 +307,7 @@ public class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void TestParserBogusHref1 () {
+    private TestParserBogusHref1 () {
         const string xml_string = "<?xml version='1.0' encoding='utf-8'?>"
             + "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             + "<d:response>"
@@ -377,7 +377,7 @@ public class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void TestParserBogusHref2 () {
+    private TestParserBogusHref2 () {
         const string xml_string = "<?xml version='1.0' encoding='utf-8'?>"
             + "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             + "<d:response>"
@@ -447,7 +447,7 @@ public class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void TestParserDenormalizedPath {
+    private TestParserDenormalizedPath {
         const string xml_string = "<?xml version='1.0' encoding='utf-8'?>"
             + "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             + "<d:response>"
@@ -526,7 +526,7 @@ public class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void TestParserDenormalizedPathOutsideNAmespace () {
+    private TestParserDenormalizedPathOutsideNAmespace () {
         const string xml_string = "<?xml version='1.0' encoding='utf-8'?>"
             + "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             + "<d:response>"
@@ -597,7 +597,7 @@ public class TestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void TestHrefUrlEncoding () {
+    private TestHrefUrlEncoding () {
         const string xml_string = "<?xml version='1.0' encoding='utf-8'?>"
             + "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             + "<d:response>"
@@ -677,6 +677,7 @@ public class TestXmlParse : GLib.Object {
         GLib.assert_true (this.subdirectories.size () == 1);
     }
 
-} // class TestXmlParse 
+} // class TestXmlParse
+
 } // namespace Testing
 } // namespace Occ

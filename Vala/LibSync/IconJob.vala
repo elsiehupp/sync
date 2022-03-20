@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Camila Ayres <hello@camila.codes>
-
-<GPLv3-or-later-Boilerplate>
+@author Camila Ayres <hello@camila.codes>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <Soup.Session>

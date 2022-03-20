@@ -1,22 +1,11 @@
-/***********************************************************
-Copyright (C) by Klaas Freitag <freitag@kde.org>
-
-<GPLv3-or-later-Boilerplate>
-***********************************************************/
-
-//  #include <QtGui>
-//  #include <QtNetwork>
-//  #include <Qt_widgets>
-//  #include <QtCore>
-//  #include <Gtk.Dialog>
-//  #include <QSslCertificate>
-
 namespace Occ {
 namespace Ui {
 
 /***********************************************************
-@brief The SslErrorDialog class
-@ingroup gui
+@class SslErrorDialog
+
+@author Klaas Freitag <freitag@kde.org>
+@copyright GPLv3 or Later
 ***********************************************************/
 public class SslErrorDialog : Gtk.Dialog {
 

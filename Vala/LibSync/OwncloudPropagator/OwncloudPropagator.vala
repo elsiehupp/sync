@@ -1,8 +1,7 @@
 /***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Olivier Goffart <ogoffart@owncloud.com>
+@author Klaas Freitag <freitag@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 
@@ -120,10 +119,6 @@ public class OwncloudPropagator : GLib.Object {
     Absolute path to the local directory. ends with "/"
     ***********************************************************/
     private const string local_dir;
-
-    /***********************************************************
-    ***********************************************************/
-    //  private 
 
     /***********************************************************
     ***********************************************************/
@@ -383,7 +378,7 @@ public class OwncloudPropagator : GLib.Object {
         }
     }
 
-    
+
     /***********************************************************
     the maximum number of jobs using bandwidth (uploads or
     downloads, in parallel)

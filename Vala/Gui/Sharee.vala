@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Roeland Jago Douma <roeland@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <QJsonObject>

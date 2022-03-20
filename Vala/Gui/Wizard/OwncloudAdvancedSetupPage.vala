@@ -1,8 +1,7 @@
 /***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Klaas Freitag <freitag@owncloud.com>
+@author Krzesimir Nowak <krzesimir@endocode.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <GLib.Dir>
@@ -341,7 +340,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         dialog.signal_finished.connect (
             this.on_signal_selective_sync_finished
         );
-    
+
         a.open ();
     }
 

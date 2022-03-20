@@ -1,8 +1,7 @@
 /***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-Copyright (C) by Jocelyn Turcotte <jturcotte@woboq.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Klaas Freitag <freitag@owncloud.com>
+@author Jocelyn Turcotte <jturcotte@woboq.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <QLoggingCategory>

@@ -1,5 +1,5 @@
 /***********************************************************
-Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
+@author Oleksandr Zolotov <alex@nextcloud.com>
 
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/
@@ -33,7 +33,7 @@ public class FakeSearchResultsStorage {
     /***********************************************************
     ***********************************************************/
     private QVariantMap meta_success;
-    
+
     class Provider {
 
         public class SearchResult {

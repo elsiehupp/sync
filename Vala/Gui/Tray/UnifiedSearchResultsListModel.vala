@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Oleksandr Zolotov <alex@nextcloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <algorithm>
@@ -401,7 +400,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
                 first++;
             }
         }
-        
+
         const int last = first + results.size () - 1;
 
         begin_insert_rows ({}, first, last);

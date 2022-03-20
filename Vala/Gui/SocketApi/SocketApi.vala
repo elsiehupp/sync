@@ -1,9 +1,8 @@
 /***********************************************************
-Copyright (C) by Dominik Schmidt <dev@dominik-schmidt.de>
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
-
-<GPLv3-or-later-Boilerplate>
+@author Dominik Schmidt <dev@dominik-schmidt.de>
+@author Klaas Freitag <freitag@owncloud.com>
+@author Roeland Jago Douma <roeland@famdouma.nl>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <functional>
@@ -521,15 +520,15 @@ public class SocketApi : GLib.Object {
         ***********************************************************/
         public static FileData file_data (string local_file) {
             FileData data;
-    
+
             data.local_path = GLib.Dir.clean_path (local_file);
             if (data.local_path.ends_with ('/'))
                 data.local_path.chop (1);
-    
+
             data.folder = FolderMan.instance.folder_for_path (data.local_path);
             if (!data.folder)
                 return data;
-    
+
             data.folder_relative_path = data.local_path.mid (data.folder.clean_path.length + 1);
             data.server_relative_path = GLib.Dir (data.folder.remote_path).file_path (data.folder_relative_path);
             string virtual_file_ext = APPLICATION_DOTVIRTUALFILE_SUFFIX;

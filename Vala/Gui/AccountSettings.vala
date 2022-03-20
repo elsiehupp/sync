@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Daniel Molkentin <danimo@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <cmath>
@@ -844,7 +843,7 @@ public class AccountSettings : Gtk.Widget {
 
         // It is unsafe to switch off vfs while a sync is running - wait if necessary.
         var connection = std.make_shared<QMetaObject.Connection> ();
-    
+
 
         if (folder.is_sync_running ()) {
             connection = connect (

@@ -1,7 +1,6 @@
 /***********************************************************
 Copyright (C) 2018 by J-P Nurmi <jpnurmi@gmail.com>
-
-<GPLv3-or-later-Boilerplate>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <Gtk.Application>
@@ -53,7 +52,7 @@ public class SlideShow : Gtk.Widget {
         public set {
             if (this.current_slide == value)
                 return;
-    
+
             if (!this.animation) {
                 this.animation = new QVariantAnimation (this);
                 this.animation.duration (SLIDE_DURATION);
@@ -65,7 +64,7 @@ public class SlideShow : Gtk.Widget {
             }
             this.animation.end_value (static_cast<double> (value));
             this.animation.on_signal_start (QAbstractAnimation.DeleteWhenStopped);
-    
+
             this.reverse = value < this.current_slide;
             this.current_slide = value;
             maybe_restart_timer ();

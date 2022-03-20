@@ -301,9 +301,10 @@ public class TestPermissions : GLib.Object {
     }
 
     /***********************************************************
+    What happens if the source can't be moved or the target
+    can't be created?
     ***********************************************************/
-    // What happens if the source can't be moved or the target can't be created?
-    private test_forbidden_moves () {
+    private TestForbiddenMoves () {
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
 
         // Some of this test depends on the order of discovery. With threading
@@ -432,9 +433,9 @@ public class TestPermissions : GLib.Object {
 
 
     /***********************************************************
+    Test for issue #7293
     ***********************************************************/
-    // Test for issue #7293
-    private test_allowed_move_forbidden_delete () {
+    private TestAllowedMoveForbiddenDelete () {
          FakeFolder fake_folder = new FakeFolder (new FileInfo ());
 
         // Some of this test depends on the order of discovery. With threading
@@ -484,12 +485,12 @@ public class TestPermissions : GLib.Object {
         if (m.has_match ()) {
             info.permissions = RemotePermissions.from_server_string (m.captured (1));
         }
-    
+
         foreach (FileInfo sub in info.children) {
             apply_permissions_from_name (sub);
         }
     }
-    
+
     /***********************************************************
     ***********************************************************/
     // Check if the expected rows in the DB are non-empty. Note that in some cases they might be, then we cannot use this function
@@ -497,7 +498,7 @@ public class TestPermissions : GLib.Object {
     static void assert_csync_journal_ok (SyncJournalDb journal) {
         // The DB is openend in locked mode : close to allow us to access.
         journal.close ();
-    
+
         SqlDatabase database;
         GLib.assert_true (database.open_read_only (journal.database_file_path));
         SqlQuery q = new SqlQuery ("SELECT count (*) from metadata where length (file_identifier) == 0", database);
@@ -505,7 +506,7 @@ public class TestPermissions : GLib.Object {
         GLib.assert_true (q.next ().has_data);
         GLib.assert_true (q.int_value (0) == 0);
     }
-    
+
     /***********************************************************
     ***********************************************************/
     SyncFileItemPtr find_discovery_item (SyncFileItemVector spy, string path) {
@@ -516,14 +517,14 @@ public class TestPermissions : GLib.Object {
         }
         return new SyncFileItemPtr (new SyncFileItem ());
     }
-    
+
     /***********************************************************
     ***********************************************************/
     bool item_instruction (ItemCompletedSpy spy, string path, CSync.SyncInstructions instr) {
         var item = spy.find_item (path);
         return item.instruction == instr;
     }
-    
+
     /***********************************************************
     ***********************************************************/
     bool discovery_instruction (SyncFileItemVector spy, string path, CSync.SyncInstructions instr) {

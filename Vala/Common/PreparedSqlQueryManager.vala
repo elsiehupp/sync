@@ -1,5 +1,5 @@
 /***********************************************************
-Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
+@author Hannah von Reth <hannah.vonreth@owncloud.com>
 
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/

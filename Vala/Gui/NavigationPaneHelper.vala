@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Jocelyn Turcotte <jturcotte@woboq.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Jocelyn Turcotte <jturcotte@woboq.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <GLib.Dir>
@@ -17,20 +16,20 @@ public class NavigationPaneHelper : GLib.Object {
     private FolderMan folder_man;
     public bool show_in_explorer_navigation_pane {
         public get {
-            
+
         }
         public set {
             if (this.show_in_explorer_navigation_pane == value) {
                 return;
             }
-    
+
             this.show_in_explorer_navigation_pane = value;
             // Re-generate a new CLSID when enabling, possibly throwing away the old one.
             // update_cloud_storage_registry will take care of removing any unknown CLSID our application owns from the registry.
             foreach (Folder folder in this.folder_man.map ()) {
                 folder.navigation_pane_clsid (value ? QUuid.create_uuid () : QUuid ());
             }
-    
+
             schedule_update_cloud_storage_registry ();
         }
     }

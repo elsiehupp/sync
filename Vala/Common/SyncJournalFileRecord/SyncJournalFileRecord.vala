@@ -1,5 +1,5 @@
 /***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+@author Klaas Freitag <freitag@owncloud.com>
 
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/

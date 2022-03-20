@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Roeland Jago Douma <rullzer@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Roeland Jago Douma <rullzer@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {
@@ -95,7 +94,7 @@ public class Share : GLib.Object {
         this.permissions = permissions;
         this.share_with = share_with;
     }
-    
+
 
     /***********************************************************
     Set the password for remote share

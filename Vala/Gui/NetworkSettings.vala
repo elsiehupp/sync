@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Daniel Molkentin <danimo@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <QNetworkProxy>

@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Olivier Goffart <ogoffart@woboq.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <theme.h>
@@ -455,7 +454,7 @@ public class AccountManager : GLib.Object {
                 return true;
             }
         }
-        
+
         return false;
     }
 

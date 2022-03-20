@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Klaas Freitag <freitag@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <QtCore>
@@ -437,7 +436,7 @@ public class Theme : GLib.Object {
 
     /***********************************************************
     Characteristics: bool if more than one sync folder is allowed
-    
+
     If this option returns true, the client only supports one
     folder to sync.
     The Add-Button is removed accordingly.
@@ -732,7 +731,7 @@ public class Theme : GLib.Object {
             if (!c.is_valid ()) {
                 return Gdk.Pixbuf ();
             }
-    
+
             QSize size = new QSize (750, 78);
             var screen = Gtk.Application.primary_screen ();
             if (screen) {
@@ -784,21 +783,21 @@ public class Theme : GLib.Object {
             // Shorten Qt's OS name: "macOS Mojave (10.14)" . "macOS"
             string[] os_string_list = Utility.platform_name ().split (' ');
             string os_name = os_string_list.at (0);
-    
+
             string dev_string;
             // : Example text: "<p>Nextcloud Desktop Client</p>"   (%1 is the application name)
             dev_string = _("<p>%1 Desktop Client</p>")
                     .printf (APPLICATION_NAME);
-    
+
             dev_string += _("<p>Version %1. For more information please click <a href='%2'>here</a>.</p>")
                     .printf (MIRALL_STRINGIFY (MIRALL_VERSION) + " (%1)".printf (os_name))
                     .printf (help_url);
-    
+
             dev_string += _("<p><small>Using files plugin : %1</small></p>")
                             .printf (AbstractVfs.Mode.to_string (this.best_available_vfs_mode));
             dev_string += "<br>%1"
                     .printf (QSysInfo.product_type () % '-' % QSysInfo.kernel_version ());
-    
+
             return dev_string;
         }
     }
@@ -813,12 +812,12 @@ public class Theme : GLib.Object {
             dev_string = _("<p>Version %1. For more information please click <a href='%2'>here</a>.</p>")
                     .printf (MIRALL_VERSION_STRING)
                     .printf (help_url);
-    
+
             dev_string += _("<p>This release was supplied by %1</p>")
                     .printf (APPLICATION_VENDOR);
-    
+
             dev_string += git_sha1;
-    
+
             return dev_string;
         }
     }
@@ -1065,11 +1064,11 @@ public class Theme : GLib.Object {
             help_text += "Git revision " + GIT_SHA1 + "\n";
         // #endif
             //  help_text += "Using Qt " + q_version () + ", built against Qt " + QT_VERSION_STR + "\n";
-    
+
             if (!Gtk.Application.platform_name () == "") {
                 help_text += "Using Qt platform plugin '" + Gtk.Application.platform_name () + "'\n";
             }
-    
+
             help_text += "Using '" + QSslSocket.ssl_library_version_string () + "'\n";
             help_text += "Running on " + Utility.platform_name () + ", " + QSysInfo.current_cpu_architecture () + "\n";
             return help_text;

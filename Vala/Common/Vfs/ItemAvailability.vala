@@ -1,8 +1,7 @@
 /***********************************************************
-Copyright (C) by Christian Kamm <mail@ckamm.de>
-Copyright (C) by Hannah von Reth <hannah.vonreth@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Christian Kamm <mail@ckamm.de>
+@author Hannah von Reth <hannah.vonreth@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 

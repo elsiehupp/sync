@@ -37,7 +37,7 @@ public class SetEncryptionFlagApiJob : AbstractNetworkJob {
     internal signal void signal_success (string file_identifier);
     internal signal void signal_error (string file_identifier, int http_return_code);
 
-    
+
     /***********************************************************
     ***********************************************************/
     public SetEncryptionFlagApiJob (Account account, string file_identifier, FlagAction flag_action = Set, GLib.Object parent = new GLib.Object ()) {

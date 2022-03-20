@@ -13,7 +13,7 @@ public class TestLateAbortHard : AbstractTestChunkingNg {
     Check what happens when we abort during the final MOVE and
     the final MOVE takes longer than the abort-delay.
     ***********************************************************/
-    private void TestLateAbortHard () {
+    private TestLateAbortHard () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine.account.set_capabilities ({ { "dav", new QVariantMap ( { "chunking", "1.0" } ) }, { "checksums", new QVariantMap ( { "supportedTypes", { "SHA1" } } ) } });
         int size = 15 * 1000 * 1000; // 15 MB

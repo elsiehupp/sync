@@ -1,8 +1,7 @@
 /***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-Copyright (C) by Krzesimir Nowak <krzesimir@endocode.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Klaas Freitag <freitag@owncloud.com>
+@author Krzesimir Nowak <krzesimir@endocode.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <Gdk.Pixbuf>

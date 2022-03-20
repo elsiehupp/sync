@@ -1,8 +1,7 @@
 /***********************************************************
-Copyright (C) by Christian Kamm <mail@ckamm.de>
-Copyright (C) by Dominik Schmidt <dschmidt@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Christian Kamm <mail@ckamm.de>
+@author Dominik Schmidt <dschmidt@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {
@@ -194,11 +193,11 @@ public class VfsOff : AbstractVfs {
             if (is_vfs_plugin_available (Mode.WINDOWS_CF_API)) {
                 return Mode.WINDOWS_CF_API;
             }
-    
+
             if (is_vfs_plugin_available (Mode.WITH_SUFFIX)) {
                 return Mode.WITH_SUFFIX;
             }
-    
+
             // For now the "suffix" backend has still precedence over the "xattr" backend.
             // Ultimately the order of those ifs will change when xattr will be more mature.
             // But what does "more mature" means here?
@@ -214,11 +213,11 @@ public class VfsOff : AbstractVfs {
             // When that time comes, it might still require detecting at runtime if that's indeed
             // supported in the user session or even per sync folder (in case user would pick a folder
             // which wouldn't support xattr for some reason)
-    
+
             if (is_vfs_plugin_available (Mode.XATTR)) {
                 return Mode.XATTR;
             }
-    
+
             return Mode.OFF;
         }
     }

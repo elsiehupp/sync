@@ -256,6 +256,7 @@ public class TestUtility : GLib.Object {
         GLib.assert_true (!is_path_windows_drive_partition_root ("c:\\"));
     }
 
-} // class TestUtility 
+} // class TestUtility
+
 } // namespace Testing
 } // namespace Occ

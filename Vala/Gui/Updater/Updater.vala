@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Daniel Molkentin <danimo@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <QUrlQuery>
@@ -16,7 +15,7 @@ public abstract class Updater : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static Updater instance { 
+    public static Updater instance {
         public get {
             if (Updater.instance == null) {
                 Updater.instance = Updater.updater;
@@ -40,13 +39,13 @@ public abstract class Updater : GLib.Object {
             sscanf (ba_version, "%d.%d.%d.%d", major, minor, patch, build);
             return version_to_int (major, minor, patch, build);
         }
-    
+
         public static int64 current_version_to_int () {
             return version_to_int (MIRALL_VERSION_MAJOR, MIRALL_VERSION_MINOR,
                 MIRALL_VERSION_PATCH, MIRALL_VERSION_BUILD);
         }
-    
-    
+
+
         public static int64 version_to_int (int64 major, int64 minor, int64 patch, int64 build) {
             return major << 56 | minor << 48 | patch << 40 | build;
         }
@@ -71,11 +70,11 @@ public abstract class Updater : GLib.Object {
             if (!update_base_url.is_valid () || update_base_url.host () == ".") {
                 return new GLib.Uri ();
             }
-    
+
             var url_query = this.query_params;
-    
+
             update_base_url.query (url_query);
-    
+
             return update_base_url;
         }
     }
@@ -116,7 +115,7 @@ public abstract class Updater : GLib.Object {
             GLib.debug ("Sys Info size: " + output.length);
             if (output.length > 1024)
                 output.clear (); // don't send too much.
-    
+
             return string.from_local8Bit (output.to_base64 ());
         }
     }
@@ -138,7 +137,7 @@ public abstract class Updater : GLib.Object {
             } else if (Utility.is_mac ()) {
                 platform = "macos";
             }
-    
+
             string sys_info = Updater.system_info;
             if (!sys_info == "") {
                 query.add_query_item ("client", sys_info);
@@ -151,20 +150,20 @@ public abstract class Updater : GLib.Object {
             query.add_query_item ("oem", theme.app_name);
             query.add_query_item ("build_arch", QSysInfo.build_cpu_architecture ());
             query.add_query_item ("current_arch", QSysInfo.current_cpu_architecture ());
-    
+
             string suffix = MIRALL_STRINGIFY (MIRALL_VERSION_SUFFIX);
             query.add_query_item ("versionsuffix", suffix);
-    
+
             var channel = ConfigFile ().update_channel;
             if (channel != "stable") {
                 query.add_query_item ("channel", channel);
             }
-    
+
             // update_segment (see configfile.h)
             ConfigFile config;
             var update_segment = config.update_segment ();
             query.add_query_item ("updatesegment", string.number (update_segment));
-    
+
             return query;
         }
     }
@@ -189,4 +188,4 @@ public abstract class Updater : GLib.Object {
 } // class Updater
 
 } // namespace Ui
-} // namespace Occ    
+} // namespace Occ

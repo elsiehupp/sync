@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Christian Kamm <mail@ckamm.de>
-
-<GPLv3-or-later-Boilerplate>
+@author Christian Kamm <mail@ckamm.de>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <QScopedPointer>

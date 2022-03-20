@@ -1,5 +1,5 @@
 /***********************************************************
-Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
+@author Felix Weilbach <felix.weilbach@nextcloud.com>
 
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/
@@ -15,7 +15,7 @@ public class TestPushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_try_reconnect_capabilites_report_push_notifications_available_reconnect_for_ever () {
+    private TestTryReconnectCapabilitiesReportPushNotificationsAvailableReconnectForever () {
         FakeWebSocketServer fake_server;
         var account = FakeWebSocketServer.create_account ();
         account.set_push_notifications_reconnect_interval (0);
@@ -31,7 +31,7 @@ public class TestPushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_setup_correct_credentials_authenticate_and_emit_ready () {
+    private TestSetUpCorrectCredentialsAuthenticateAndEmitReady () {
         FakeWebSocketServer fake_server;
         QSignalSpy files_changed_spy;
         QSignalSpy notifications_changed_spy;
@@ -79,7 +79,7 @@ public class TestPushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_on_web_socket_text_message_received_notify_file_message_emit_files_changed () {
+    private TestOnWebSocketTextMessageReceivedNotifyFileMessageEmitFilesChanged () {
         FakeWebSocketServer fake_server;
         var account = FakeWebSocketServer.create_account ();
         var socket = fake_server.authenticate_account (account);
@@ -96,7 +96,7 @@ public class TestPushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_on_web_socket_text_message_received_notify_activity_message_emit_notification () {
+    private TestOnWebSocketTextMessageReceivedNotifyActivityMessageEmitNotification () {
         FakeWebSocketServer fake_server;
         var account = FakeWebSocketServer.create_account ();
         var socket = fake_server.authenticate_account (account);
@@ -115,7 +115,7 @@ public class TestPushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_on_web_socket_text_message_received_notify_notification_message_emit_notification () {
+    private TestOnWebSocketTextMessageReceivedNotifyNotificationMessageEmitNotification () {
         FakeWebSocketServer fake_server;
         var account = FakeWebSocketServer.create_account ();
         var socket = fake_server.authenticate_account (account);
@@ -134,7 +134,7 @@ public class TestPushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_on_web_socket_text_message_received_invalid_credentials_message_reconnect_web_socket () {
+    private TestOnWebSocketTextMessageReceivedInvalidCredentialsMessageReconnectWebSocket () {
         FakeWebSocketServer fake_server;
         var account = FakeWebSocketServer.create_account ();
         // Need to set reconnect timer interval to zero for tests
@@ -159,7 +159,7 @@ public class TestPushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_on_web_socket_error_connection_lost_emit_connection_lost () {
+    private TestOnWebSocketErrorConnectionLostEmitConnectionLost () {
         FakeWebSocketServer fake_server;
         var account = FakeWebSocketServer.create_account ();
         QSignalSpy connection_lost_spy = new QSignalSpy (account.push_notifications (), &PushNotifications.connection_lost);
@@ -180,7 +180,7 @@ public class TestPushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_setup_max_connection_attempts_reached_disable_push_notifications () {
+    private TestSetUpMaxConnectionAttemptsReachedDisablePushNotifications () {
         FakeWebSocketServer fake_server;
         var account = FakeWebSocketServer.create_account ();
         QSignalSpy push_notifications_disabled_spy = new QSignalSpy (account, &Account.push_notifications_disabled);
@@ -193,7 +193,7 @@ public class TestPushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_on_web_socket_ssl_error_ssl_error_disable_push_notifications () {
+    private TestOnWebSocketSslErrorSslErrorDisablePushNotifications () {
         FakeWebSocketServer fake_server;
         var account = FakeWebSocketServer.create_account ();
         QSignalSpy push_notifications_disabled_spy = new QSignalSpy (account, &Account.push_notifications_disabled);
@@ -212,7 +212,7 @@ public class TestPushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_account_web_socket_connection_lost_emit_notifications_disabled () {
+    private TestAccountWebSocketConnectionLostEmitNotificationsDisabled () {
         FakeWebSocketServer fake_server;
         var account = FakeWebSocketServer.create_account ();
         // Need to set reconnect timer interval to zero for tests
@@ -241,7 +241,7 @@ public class TestPushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_account_web_socket_authentication_failed_emit_notifications_disabled () {
+    private TestAccountWebSocketAuthenticationFailedEmitNotificationsDisabled () {
         FakeWebSocketServer fake_server;
         var account = FakeWebSocketServer.create_account ();
         account.set_push_notifications_reconnect_interval (0);
@@ -259,7 +259,7 @@ public class TestPushNotifications : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_ping_timeout_ping_timed_out_reconnect () {
+    private TestPingTimeoutPingTimeoutReconnect () {
         FakeWebSocketServer fake_server;
         QSignalSpy files_changed_spy;
         QSignalSpy notifications_changed_spy;
@@ -315,23 +315,23 @@ public class TestPushNotifications : GLib.Object {
         }
     }
 
-    
+
     static bool verify_called_once_with_account (QSignalSpy spy, unowned Account account) {
         return_false_on_fail (spy.count () == 1);
         var account_from_spy = spy.at (0).at (0).value<Account> ();
         return_false_on_fail (account_from_spy == account);
-    
+
         return true;
     }
-    
+
     static bool fail_three_authentication_attempts (FakeWebSocketServer fake_server, unowned Account account) {
         return_false_on_fail (account);
         return_false_on_fail (account.push_notifications ());
-    
+
         account.push_notifications ().set_reconnect_timer_interval (0);
-    
+
         QSignalSpy authentication_failed_spy = new QSignalSpy (account.push_notifications (), &PushNotifications.authentication_failed);
-    
+
         // Let three authentication attempts fail
         for (uint8 i = 0; i < 3; ++i) {
             return_false_on_fail (fake_server.wait_for_text_messages ());
@@ -340,11 +340,11 @@ public class TestPushNotifications : GLib.Object {
             fake_server.clear_text_messages ();
             socket.send_text_message ("err : Invalid credentials");
         }
-    
+
         // Now the authentication_failed Signal should be emitted
         return_false_on_fail (authentication_failed_spy.wait ());
         return_false_on_fail (authentication_failed_spy.count () == 1);
-    
+
         return true;
     }
 

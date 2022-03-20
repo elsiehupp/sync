@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Olivier Goffart <ogoffart@woboq.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <QDebug>
@@ -99,18 +98,18 @@ public class ProcessDirectoryJob : GLib.Object {
         Path as in the DB (before the sync)
         ***********************************************************/
         string original;
-        
+
         /***********************************************************
         Path that will be the result after the sync (and will be in
         the DB)
         ***********************************************************/
         string target;
-        
+
         /***********************************************************
         Path on the server (before the sync)
         ***********************************************************/
         string server;
-        
+
         /***********************************************************
         Path locally (before the sync)
         ***********************************************************/
@@ -1452,8 +1451,8 @@ public class ProcessDirectoryJob : GLib.Object {
         var recurse_query_local = this.query_local == PARENT_NOT_CHANGED ? PARENT_NOT_CHANGED : local_entry.is_directory || item.instruction == CSync.SyncInstructions.RENAME ? NORMAL_QUERY : PARENT_DOES_NOT_EXIST;
         process_file_finalize (item, path, recurse, recurse_query_local, recurse_query_server);
     }
-    
-    
+
+
     private void on_signal_request_etag_job_finished_with_result (HttpResult<string> etag) /*mutable*/ {
         if (!etag || (etag != base_record.etag && !item.is_directory ()) || this.discovery_data.is_renamed (original_path)) {
             GLib.info ("Can't rename because the etag has changed or the directory is gone " + original_path);

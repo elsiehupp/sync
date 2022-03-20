@@ -12,7 +12,7 @@ public class TestVeryBigFiles : AbstractTestChunkingNg {
     /***********************************************************
     Test uploading large files (2.5GiB)
     ***********************************************************/
-    private void TestVeryBigFiles () {
+    private TestVeryBigFiles () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine.account.set_capabilities ({ { "dav", new QVariantMap ({ "chunking", "1.0" }) } });
         int64 size = 2.5 * 1024 * 1024 * 1024; // 2.5 GiB

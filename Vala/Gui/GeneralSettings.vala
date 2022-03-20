@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Daniel Molkentin <danimo@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <QFileDialog>
@@ -239,7 +238,7 @@ public class GeneralSettings : Gtk.Widget {
         customize_style ();
     }
 
-    
+
     private void on_signal_mono_icons_check_box_toggled () {
         this.save_misc_settings ();
     }

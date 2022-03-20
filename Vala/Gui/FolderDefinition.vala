@@ -1,9 +1,8 @@
 /***********************************************************
-Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Duncan Mac-Vicar P. <duncan@kde.org>
+@author Daniel Molkentin <danimo@owncloud.com>
+@author Klaas Freitag <freitag@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {

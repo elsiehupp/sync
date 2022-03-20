@@ -1,5 +1,5 @@
 /***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+@author Klaas Freitag <freitag@owncloud.com>
 
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/
@@ -30,7 +30,7 @@ abstract class ComputeChecksumBase : GLib.Object {
 
     Example: "ADLER32:1231 SHA1:ab124124 MD5:2131affa21"
         . "SHA1:ab124124"
-    
+
 
     OCSYNC_EXPORT
     ***********************************************************/
@@ -173,7 +173,7 @@ abstract class ComputeChecksumBase : GLib.Object {
         }
         return arr;
     }
-    
+
 
     /***********************************************************
     ***********************************************************/

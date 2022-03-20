@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Felix Weilbach <felix.weilbach@nextcloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <ocsuserstatusconnector.h>
@@ -65,7 +64,7 @@ public class UserStatusSelectorModel : GLib.Object {
     internal signal void clear_at_changed ();
     internal signal void predefined_statuses_changed ();
     internal signal void signal_finished ();
-        
+
 
     /***********************************************************
     ***********************************************************/
@@ -137,7 +136,7 @@ public class UserStatusSelectorModel : GLib.Object {
             if (value == this.user_status.state) {
                 return;
             }
-    
+
             this.user_status.state (value);
             /* emit */ online_status_changed ();
         }

@@ -1,8 +1,7 @@
 /***********************************************************
-Copyright (C) by Klaas Freitag <freitag@kde.org>
+@author Klaas Freitag <freitag@kde.org>
 Copyright (c) by Markus Goetz <guruz@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <QLoggingCategory>

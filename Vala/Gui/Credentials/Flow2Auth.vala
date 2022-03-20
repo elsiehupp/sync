@@ -1,8 +1,7 @@
 /***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
-Copyright (C) by Michael Schuster <michael@schuster.ms>
-
-<GPLv3-or-later-Boilerplate>
+@author Olivier Goffart <ogoffart@woboq.com>
+@author Michael Schuster <michael@schuster.ms>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <QDesktopServices>

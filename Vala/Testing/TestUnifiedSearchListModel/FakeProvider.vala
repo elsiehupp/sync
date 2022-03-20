@@ -1,5 +1,5 @@
 /***********************************************************
-Copyright (C) by Oleksandr Zolotov <alex@nextcloud.com>
+@author Oleksandr Zolotov <alex@nextcloud.com>
 
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/

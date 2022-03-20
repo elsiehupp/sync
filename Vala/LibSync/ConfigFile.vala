@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Klaas Freitag <freitag@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #ifndef TOKEN_AUTH_ONLY
@@ -79,24 +78,24 @@ public class ConfigFile : GLib.Object {
     private const string LOG_FLUSH_C = "log_flush";
     private const string SHOW_EXPERIMENTAL_OPTIONS_C = "show_experimental_options";
     private const string CLIENT_VERSION_C = "client_version";
-    
+
     private const string PROXY_HOST_C = "Proxy/host";
     private const string PROXY_TYPE_C = "Proxy/type";
     private const string PROXY_PORT_C = "Proxy/port";
     private const string PROXY_USER_C = "Proxy/user";
     private const string PROXY_PASS_C = "Proxy/pass";
     private const string PROXY_NEEDS_AUTH_C = "Proxy/needs_auth";
-    
+
     private const string USE_UPLOAD_LIMIT_C = "BWLimit/use_upload_limit";
     private const string USE_DOWNLOAD_LIMIT_C = "BWLimit/use_download_limit";
     private const string UPLOAD_LIMIT_C = "BWLimit/upload_limit";
     private const string DOWNLOAD_LIMIT_C = "BWLimit/download_limit";
-    
+
     private const string NEW_BIG_FOLDER_SIZE_LIMIT_C = "new_big_folder_size_limit";
     private const string USE_NEW_BIG_FOLDER_SIZE_LIMIT_C = "use_new_big_folder_size_limit";
     private const string CONFIRM_EXTERNAL_STORAGE_C = "confirm_external_storage";
     private const string MOVE_TO_TRASH_C = "move_to_trash";
-    
+
     private const string CERT_PATH = "http_certificate_path";
     private const string CERT_PASSWORD = "http_certificate_password";
 
@@ -471,11 +470,6 @@ public class ConfigFile : GLib.Object {
             settings.value (LOG_DIR_C, value);
         }
     }
-
-
-    /***********************************************************
-    ***********************************************************/
-    //  public 
 
     /***********************************************************
     ***********************************************************/

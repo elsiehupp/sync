@@ -13,7 +13,7 @@ public class TestOAuth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_basic () {
+    private TestBasic () {
         OAuthTestCase test;
         test.test ();
     }
@@ -46,7 +46,7 @@ public class TestOAuth : GLib.Object {
     /***********************************************************
     Test for https://github.com/owncloud/client/pull/6057
     ***********************************************************/
-    private test_close_browser_dont_crash () {
+    private TestCloseBrowserDontCrash () {
         TestCloseBrowserDontCrash test;
         test.test ();
     }
@@ -109,7 +109,7 @@ public class TestOAuth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_random_connections () {
+    private TestRandomConnections () {
         // Test that we can send random garbage to the litening socket and it does not prevent the connection
         TestRandomConnections test;
         test.test ();
@@ -151,7 +151,7 @@ public class TestOAuth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_token_url_has_redirect () {
+    private TestTokenUrlHasRedirect () {
         TestTokenUrlHasRedirect test;
         test.test ();
     }

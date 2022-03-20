@@ -12,7 +12,7 @@ public class TestResume3 : AbstractTestChunkingNg {
     /***********************************************************
     Test resuming when all chunks are already present.
     ***********************************************************/
-    private void TestResume3 () {
+    private TestResume3 () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine.account.set_capabilities ({ { "dav", new QVariantMap ({ "chunking", "1.0" }) } });
         int size = 30 * 1000 * 1000; // 30 MB

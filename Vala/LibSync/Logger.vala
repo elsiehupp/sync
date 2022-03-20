@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Klaas Freitag <freitag@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <GLib.Dir>
@@ -42,11 +41,11 @@ public class Logger : GLib.Object {
                 this.logstream.reset (null);
                 this.log_file_object.close ();
             }
-    
+
             if (value == "") {
                 return;
             }
-    
+
             bool open_succeeded = false;
             if (value == "-") {
                 open_succeeded = this.log_file_object.open (stdout, QIODevice.WriteOnly);
@@ -54,7 +53,7 @@ public class Logger : GLib.Object {
                 this.log_file_object.filename (value);
                 open_succeeded = this.log_file_object.open (QIODevice.WriteOnly);
             }
-    
+
             if (!open_succeeded) {
                 locker.unlock (); // Just in case post_gui_message has a GLib.debug ()
                 post_gui_message (_("Error"),
@@ -63,7 +62,7 @@ public class Logger : GLib.Object {
                         .printf (value));
                 return;
             }
-    
+
             this.logstream.reset (new QTextStream (&this.log_file));
             this.logstream.codec (QTextCodec.codec_for_name ("UTF-8"));
         }

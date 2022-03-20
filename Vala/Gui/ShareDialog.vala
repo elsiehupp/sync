@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Roeland Jago Douma <roeland@famdouma.nl>
-
-<GPLv3-or-later-Boilerplate>
+@author Roeland Jago Douma <roeland@famdouma.nl>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <GLib.FileInfo>

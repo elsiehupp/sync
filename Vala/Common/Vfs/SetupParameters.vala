@@ -1,8 +1,7 @@
 /***********************************************************
-Copyright (C) by Christian Kamm <mail@ckamm.de>
-Copyright (C) by Dominik Schmidt <dschmidt@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Christian Kamm <mail@ckamm.de>
+@author Dominik Schmidt <dschmidt@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {

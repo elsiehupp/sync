@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Olivier Goffart <ogoffart@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {
@@ -47,13 +46,12 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         /***********************************************************
         I'm still unsure if I should use a SyncFilePtr here.
         ***********************************************************/
-        string file; 
+        string file;
 
         /***********************************************************
         The full path on disk
         ***********************************************************/
         string path;
-
 
         int64 size;
     }
@@ -251,11 +249,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    //  public 
-
-    /***********************************************************
-    ***********************************************************/
-    public void call_unlock_folder ();
+    //  public void call_unlock_folder ();
 
 
     /***********************************************************

@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Duncan Mac-Vicar P. <duncan@kde.org>
-
-<GPLv3-or-later-Boilerplate>
+@author Duncan Mac-Vicar P. <duncan@kde.org>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 using Soup;

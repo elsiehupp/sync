@@ -1,10 +1,10 @@
 /***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
+@author Olivier Goffart <ogoffart@woboq.com>
 
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/
 /***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
+@author Olivier Goffart <ogoffart@woboq.com>
 
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/

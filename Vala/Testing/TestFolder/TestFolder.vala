@@ -12,7 +12,7 @@ public class TestFolder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_folder () {
+    private TestFolder () {
         QFETCH (string, folder);
         QFETCH (string, expected_folder);
         Folder f = new Folder ("alias", folder, "http://foo.bar.net");
@@ -23,7 +23,7 @@ public class TestFolder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_folder_data () {
+    private TestFolderData () {
         QTest.add_column<string> ("folder");
         QTest.add_column<string> ("expected_folder");
 

@@ -19,7 +19,7 @@ public class OAuthTestCase : GLib.Object {
         TokenAsked,
         CustomState
     }
-    
+
     public State state = StartState;
 
     /***********************************************************

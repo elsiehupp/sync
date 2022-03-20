@@ -27,7 +27,7 @@ public class UnlockEncryptFolderApiJob : AbstractNetworkJob {
         string file_identifier,
         string token,
         GLib.Object parent = new GLib.Object ()) {
-        
+
         base (account, E2EE_BASE_URL + "lock/" + file_identifier, parent);
         this.file_identifier = file_identifier;
         this.token = token;

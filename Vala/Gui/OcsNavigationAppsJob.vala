@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Camila Ayres <camila@nextcloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Camila Ayres <camila@nextcloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {

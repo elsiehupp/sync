@@ -1,5 +1,5 @@
 /***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+@author Klaas Freitag <freitag@owncloud.com>
 
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/
@@ -127,7 +127,7 @@ public class SyncJournalDb : GLib.Object {
             QMutexLocker lock = new QMutexLocker (this.database.mutex);
             if (!this.database.check_connect ())
                 return {};
-    
+
             PreparedSqlQuery query = this.database.query_manager.get (
                 PreparedSqlQueryManager.Key.GET_RAW_PIN_STATE_QUERY,
                 "SELECT pin_state FROM flags WHERE path == ?1;",
@@ -135,17 +135,17 @@ public class SyncJournalDb : GLib.Object {
             //  ASSERT (query)
             query.bind_value (1, path);
             query.exec ();
-    
+
             var next = query.next ();
             if (!next.ok)
                 return {};
             // no-entry means PinState.INHERITED
             if (!next.has_data)
                 return PinState.PinState.INHERITED;
-    
+
             return static_cast<PinState> (query.int_value (0));
         }
-    
+
 
         /***********************************************************
         Gets the PinState for the path after inheriting from parents.
@@ -165,7 +165,7 @@ public class SyncJournalDb : GLib.Object {
             QMutexLocker lock = new QMutexLocker (this.database.mutex);
             if (!this.database.check_connect ())
                 return {};
-    
+
             PreparedSqlQuery query = this.database.query_manager.get (
                 PreparedSqlQueryManager.Key.GET_EFFECTIVE_PIN_STATE_QUERY,
                 "SELECT pin_state FROM flags WHERE"
@@ -178,17 +178,17 @@ public class SyncJournalDb : GLib.Object {
             //  ASSERT (query)
             query.bind_value (1, path);
             query.exec ();
-    
+
             var next = query.next ();
             if (!next.ok)
                 return {};
             // If the root path has no setting, assume PinState.ALWAYS_LOCAL
             if (!next.has_data)
                 return PinState.PinState.ALWAYS_LOCAL;
-    
+
             return static_cast<PinState> (query.int_value (0));
         }
-    
+
 
         /***********************************************************
         Like effective_for_path but also considers subitem pin states.
@@ -209,11 +209,11 @@ public class SyncJournalDb : GLib.Object {
             PreparedSqlQuery base_pin = effective_for_path (path);
             if (!base_pin)
                 return {};
-    
+
             QMutexLocker lock = new QMutexLocker (this.database.mutex);
             if (!this.database.check_connect ())
                 return {};
-    
+
             // Find all the non-inherited pin states below the item
             PreparedSqlQuery query = this.database.query_manager.get (
                 PreparedSqlQueryManager.Key.GET_SUB_PINS_QUERY,
@@ -224,7 +224,7 @@ public class SyncJournalDb : GLib.Object {
             //  ASSERT (query)
             query.bind_value (1, path);
             query.exec ();
-    
+
             // Check if they are all identical
             while (true) {
                 var next = query.next ();
@@ -236,10 +236,10 @@ public class SyncJournalDb : GLib.Object {
                 if (sub_pin != *base_pin)
                     return PinState.PinState.INHERITED;
             }
-    
+
             return base_pin;
         }
-    
+
 
         /***********************************************************
         Sets a path's pin state.
@@ -251,7 +251,7 @@ public class SyncJournalDb : GLib.Object {
             QMutexLocker lock = new QMutexLocker (this.database.mutex);
             if (!this.database.check_connect ())
                 return;
-    
+
             PreparedSqlQuery query = this.database.query_manager.get (
                 PreparedSqlQueryManager.Key.SET_PIN_STATE_QUERY,
                 // If we had sqlite >=3.24.0 everywhere this could be an upsert,
@@ -266,7 +266,7 @@ public class SyncJournalDb : GLib.Object {
             query.bind_value (2, state);
             query.exec ();
         }
-    
+
 
         /***********************************************************
         Wipes pin states for a path and below.
@@ -279,7 +279,7 @@ public class SyncJournalDb : GLib.Object {
             QMutexLocker lock = new QMutexLocker (this.database.mutex);
             if (!this.database.check_connect ())
                 return;
-    
+
             PreparedSqlQuery query = this.database.query_manager.get (
                 PreparedSqlQueryManager.Key.WIPE_PIN_STATE_QUERY,
                 "DELETE FROM flags WHERE "
@@ -290,7 +290,7 @@ public class SyncJournalDb : GLib.Object {
             query.bind_value (1, path);
             query.exec ();
         }
-    
+
 
         /***********************************************************
         Returns list of all paths with their pin state as in the database.
@@ -301,10 +301,10 @@ public class SyncJournalDb : GLib.Object {
             QMutexLocker lock = new QMutexLocker (this.database.mutex);
             if (!this.database.check_connect ())
                 return {};
-    
+
             SqlQuery query = new SqlQuery ("SELECT path, pin_state FROM flags;", this.database.database);
             query.exec ();
-    
+
             GLib.List<QPair<string, PinState>> result;
             while (true) {
                 var next = query.next ();

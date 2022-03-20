@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Markus Goetz <markus@woboq.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Markus Goetz <markus@woboq.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <QLoggingCategory>

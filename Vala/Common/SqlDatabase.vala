@@ -1,5 +1,5 @@
 /***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
+@author Klaas Freitag <freitag@owncloud.com>
 
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/
@@ -71,7 +71,7 @@ public class SqlDatabase {
         close ();
     }
 
-    
+
     int sqlite_do (var A) {
         if (1) {
             this.err_id = (A);

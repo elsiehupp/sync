@@ -1,8 +1,7 @@
 /***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-Copyright (C) by Julius Härtl <jus@bitgrid.net>
-
-<GPLv3-or-later-Boilerplate>
+@author Klaas Freitag <freitag@owncloud.com>
+@author Julius Härtl <jus@bitgrid.net>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <cloudprovidersaccountexporter.h>

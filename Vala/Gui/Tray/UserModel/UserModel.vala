@@ -106,7 +106,7 @@ public class UserModel : QAbstractListModel {
             if (this.current_user_id < 0 || this.current_user_id >= this.users.size ()) {
                 return null;
             }
-    
+
             return this.users[this.current_user_id];
         }
     }
@@ -119,7 +119,7 @@ public class UserModel : QAbstractListModel {
             if (this.current_user_id < 0 || this.current_user_id >= this.users.size ()) {
                 return "";
             }
-    
+
             return this.users[this.current_user_id].server;
         }
     }
@@ -483,7 +483,7 @@ public class UserModel : QAbstractListModel {
             if (current_user_id < 0 || current_user_id >= this.users.size ()) {
                 return null;
             }
-    
+
             return this.users[current_user_id].activity_model ();
         }
     }
@@ -496,7 +496,7 @@ public class UserModel : QAbstractListModel {
             if (this.current_user_id < 0 || this.current_user_id >= this.users.size ()) {
                 return {};
             }
-    
+
             return this.users[this.current_user_id].app_list;
         }
     }

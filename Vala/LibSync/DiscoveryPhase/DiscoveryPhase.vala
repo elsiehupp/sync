@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Olivier Goffart <ogoffart@woboq.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <csync_exclude.h>
@@ -24,7 +23,7 @@ public class DiscoveryPhase : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public enum LocalDiscoveryStyle {
-    
+
         /***********************************************************
         Read all local data from the filesystem
         ***********************************************************/

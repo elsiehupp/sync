@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Roeland Jago Douma <roeland@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Roeland Jago Douma <roeland@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {
@@ -216,7 +215,7 @@ public class ShareeModel : QAbstractListModel {
         return this.sharees.at (at);
     }
 
-    
+
     /***********************************************************
     Helper function for new_sharees (could be a lambda when we can use them)
     ***********************************************************/

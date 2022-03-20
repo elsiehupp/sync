@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Klaas Freitag <freitag@kde.org>
-
-<GPLv3-or-later-Boilerplate>
+@author Klaas Freitag <freitag@kde.org>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <QAbstractItemModel>
@@ -44,13 +43,11 @@ public class FolderStatusModel : QAbstractItemModel {
         ***********************************************************/
         string name;
 
-
         /***********************************************************
         Sub-folder path that should always point to a local
         filesystem's folder
         ***********************************************************/
         string path;
-
 
         /***********************************************************
         Mangled name that needs to be used when making fetch
@@ -58,60 +55,49 @@ public class FolderStatusModel : QAbstractItemModel {
         ***********************************************************/
         string e2e_mangled_name;
 
-
         /***********************************************************
         ***********************************************************/
         GLib.List<int> path_index;
-
 
         /***********************************************************
         ***********************************************************/
         GLib.List<SubFolderInfo> subs;
 
-
         /***********************************************************
         ***********************************************************/
         int64 size = 0;
-
 
         /***********************************************************
         ***********************************************************/
         bool is_external = false;
 
-
         /***********************************************************
         ***********************************************************/
         bool is_encrypted = false;
-
 
         /***********************************************************
         If we did the LSCOL for this folder already
         ***********************************************************/
         bool fetched = false;
 
-
         /***********************************************************
         Currently running LscolJob
         ***********************************************************/
         LscolJob fetching_job;
-
 
         /***********************************************************
         If the last fetching job ended in an error
         ***********************************************************/
         bool has_error = false;
 
-
         /***********************************************************
         ***********************************************************/
         string last_error_string;
-
 
         /***********************************************************
         Whether a 'fetching in progress' label is shown.
         ***********************************************************/
         bool fetching_label = false;
-
 
         /***********************************************************
         Undecided folders are the big folders that the user has not
@@ -119,17 +105,14 @@ public class FolderStatusModel : QAbstractItemModel {
         ***********************************************************/
         bool is_undecided = false;
 
-
         /***********************************************************
         The file identifier for this folder on the server
         ***********************************************************/
         string file_id;
 
-
         /***********************************************************
         ***********************************************************/
         Qt.CheckState checked = Qt.Checked;
-
 
         /***********************************************************
         Whether this has a ItemType.FETCH_LABEL subrow
@@ -137,7 +120,6 @@ public class FolderStatusModel : QAbstractItemModel {
         bool has_label () {
             return this.has_error || this.fetching_label;
         }
-
 
         /***********************************************************
         Reset all subfolders and fetch status
@@ -199,14 +181,14 @@ public class FolderStatusModel : QAbstractItemModel {
             this.dirty = false;
             this.folders.clear ();
             this.account_state = value;
-    
+
             FolderMan.instance.signal_folder_sync_state_change.connect (
                 this.on_signal_folder_sync_state_change // Qt.UniqueConnection
             );
             FolderMan.instance.signal_schedule_queue_changed.connect (
                 this.on_signal_folder_schedule_queue_changed // Qt.UniqueConnection
             );
-    
+
             var folders = FolderMan.instance.map ();
             foreach (var folder in folders) {
                 if (!this.account_state) {
@@ -221,7 +203,7 @@ public class FolderStatusModel : QAbstractItemModel {
                 info.folder = folder;
                 info.checked = Qt.PartiallyChecked;
                 this.folders + info;
-    
+
                 folder.signal_progress_info.connect (
                     this.on_signal_folder_progress_info // Qt.UniqueConnection
                 );
@@ -229,15 +211,15 @@ public class FolderStatusModel : QAbstractItemModel {
                     this.on_signal_new_big_folder_discovered // Qt.UniqueConnection
                 );
             }
-    
+
             // Sort by header text
             std.sort (this.folders.begin (), this.folders.end (), sort_by_folder_header);
-    
+
             // Set the root this.path_index after the sorting
             for (int i = 0; i < this.folders.size (); ++i) {
                 this.folders[i].path_index + i;
             }
-    
+
             end_reset_model ();
             /* emit */ dirty_changed ();
         }
@@ -415,7 +397,7 @@ public class FolderStatusModel : QAbstractItemModel {
             return folder.sync_result.error_strings ();
         case DataRole.FOLDER_INFO_MESSAGE:
             return folder.virtual_files_enabled () && folder.vfs ().mode () != AbstractVfs.Mode.WindowsCfApi
-                ? { (_("Virtual file support is enabled."))} 
+                ? { (_("Virtual file support is enabled."))}
                 : { };
         case DataRole.SYNC_RUNNING:
             return folder.sync_result.status () == SyncResult.Status.SYNC_RUNNING;

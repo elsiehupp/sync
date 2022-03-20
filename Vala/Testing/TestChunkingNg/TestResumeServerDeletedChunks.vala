@@ -11,7 +11,7 @@ public class TestResumeServerDeletedChunks : AbstractTestChunkingNg {
 
     /***********************************************************
     ***********************************************************/
-    private void TestResumeServerDeletedChunks () {
+    private TestResumeServerDeletedChunks () {
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         fake_folder.sync_engine.account.set_capabilities ({ { "dav", new QVariantMap ({ "chunking", "1.0" }) } });

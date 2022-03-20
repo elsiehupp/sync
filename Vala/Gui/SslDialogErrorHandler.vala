@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Klaas Freitag <freitag@kde.org>
-
-<GPLv3-or-later-Boilerplate>
+@author Klaas Freitag <freitag@kde.org>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {

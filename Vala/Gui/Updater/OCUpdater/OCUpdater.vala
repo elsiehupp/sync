@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Klaas Freitag <freitag@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <QtCore>
@@ -93,7 +92,7 @@ public class OCUpdater : Updater {
             var old_state = this.state;
             this.state = value;
             /* emit */ signal_download_state_changed ();
-    
+
             // show the notification if the download is complete (on every check)
             // or once for system based updates.
             if (this.state == OCUpdater.DownloadState.DOWNLOAD_COMPLETE || (old_state != OCUpdater.DownloadState.UIPLOAD_ONLY_AVAILABLE_THROUGH_SYSTEM

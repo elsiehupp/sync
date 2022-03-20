@@ -1,5 +1,5 @@
 /***********************************************************
-Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
+@author Felix Weilbach <felix.weilbach@nextcloud.com>
 Copyright (C) 2021 by Felix Weilbach <felix.weilbach@nextcloud.com>
 
 <GPLv???-or-later-Boilerplate>
@@ -52,6 +52,7 @@ public class FakePaintDevice : QPaintDevice {
         }
     }
 
-} // class FakePaintDevice 
+} // class FakePaintDevice
+
 } // namespace Testing
 } // namespace Occ

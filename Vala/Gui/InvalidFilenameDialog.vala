@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Felix Weilbach <felix.weilbach@nextcloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <folder.h>

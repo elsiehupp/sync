@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Roeland Jago Douma <rullzer@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Roeland Jago Douma <rullzer@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {
@@ -72,7 +71,7 @@ public class LinkShare : Share {
         }
         /***********************************************************
         Set the expiration date
-    
+
         On on_signal_success the signal_expire_date_set signal is emitted
         In case of a server error the on_signal_server_error signal is emitted.
         ***********************************************************/

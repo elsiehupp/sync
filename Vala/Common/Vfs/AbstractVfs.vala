@@ -1,8 +1,7 @@
 /***********************************************************
-Copyright (C) by Christian Kamm <mail@ckamm.de>
-Copyright (C) by Dominik Schmidt <dschmidt@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Christian Kamm <mail@ckamm.de>
+@author Dominik Schmidt <dschmidt@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <QPluginLoader>
@@ -75,7 +74,7 @@ public abstract class AbstractVfs : GLib.Object {
             throw new InvalidParameterError.INVALID_VALUE (string_value + " is not a valid Vfs Mode");
         }
 
-    
+
         public static string to_plugin_name (Mode mode) throws InvalidParameterError {
             switch (mode) {
             case Mode.WITH_SUFFIX:

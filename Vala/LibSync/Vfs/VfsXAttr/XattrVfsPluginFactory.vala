@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Kevin Ottens <kevin.ottens@nextcloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Kevin Ottens <kevin.ottens@nextcloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {

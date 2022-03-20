@@ -11,18 +11,6 @@ public class TestSyncFileItem : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_init_test_case () {
-        return
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    private void on_signal_cleanup_test_case () {}
-
-
-    /***********************************************************
-    ***********************************************************/
     private SyncFileItem create_item (string file ) {
         SyncFileItem i;
         i.file = file;
@@ -32,7 +20,7 @@ public class TestSyncFileItem : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_comparator_data () {
+    private TestComparatorData () {
         QTest.add_column<SyncFileItem> ("a");
         QTest.add_column<SyncFileItem> ("b");
         QTest.add_column<SyncFileItem> ("c");
@@ -54,7 +42,7 @@ public class TestSyncFileItem : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_comparator () {
+    private TestComparator () {
         QFETCH ( SyncFileItem , a );
         QFETCH ( SyncFileItem , b );
         QFETCH ( SyncFileItem , c );

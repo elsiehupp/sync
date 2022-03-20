@@ -1,5 +1,5 @@
 /***********************************************************
-Copyright (C) by Dominik Schmidt <dschmidt@owncloud.com>
+@author Dominik Schmidt <dschmidt@owncloud.com>
 
 <LGPLv2.1-or-later-Boilerplate>
 ***********************************************************/

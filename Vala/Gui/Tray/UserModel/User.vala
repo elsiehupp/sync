@@ -154,7 +154,7 @@ public class User : GLib.Object {
                     return folder;
                 }
             }
-    
+
             return null;
         }
     }

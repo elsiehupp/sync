@@ -32,7 +32,7 @@ public class TestInotifyWatcher : FolderWatcherPrivate {
     /***********************************************************
     Test the recursive path listing function find_folders_below
     ***********************************************************/
-    private test_directories_below_path () {
+    private TestDirectoriesBelowPath () {
         string[] dirs;
 
         bool ok = find_folders_below (GLib.Dir (this.root), dirs);

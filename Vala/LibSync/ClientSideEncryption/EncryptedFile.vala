@@ -1,6 +1,6 @@
 namespace Occ {
 namespace LibSync {
-    
+
 /***********************************************************
 Generates the Metadata for the folder
 ***********************************************************/

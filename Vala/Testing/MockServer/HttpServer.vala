@@ -1,10 +1,10 @@
 /***********************************************************
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+@author Daniel Molkentin <danimo@owncloud.com>
 
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/
 /***********************************************************
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
+@author Daniel Molkentin <danimo@owncloud.com>
 
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/

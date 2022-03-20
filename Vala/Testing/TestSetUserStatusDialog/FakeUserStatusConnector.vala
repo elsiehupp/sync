@@ -1,5 +1,5 @@
 /***********************************************************
-Copyright (C) by Felix Weilbach <felix.weilbach@nextcloud.com>
+@author Felix Weilbach <felix.weilbach@nextcloud.com>
 
 <GPLv???-or-later-Boilerplate>
 ***********************************************************/
@@ -8,7 +8,6 @@ namespace Occ {
 namespace Testing {
 
 public class FakeUserStatusConnector : UserStatusConnector {
-
 
     /***********************************************************
     ***********************************************************/
@@ -105,14 +104,6 @@ public class FakeUserStatusConnector : UserStatusConnector {
     }
 
 
-    //  /***********************************************************
-    //  ***********************************************************/
-    //  public 
-
-    //  /***********************************************************
-    //  ***********************************************************/
-    //  public 
-
     /***********************************************************
     ***********************************************************/
     public void set_error_could_not_fetch_predefined_user_statuses (bool value) {
@@ -154,7 +145,7 @@ public class FakeUserStatusConnector : UserStatusConnector {
         this.could_not_clear_user_status_message = value;
     }
 
-}
+} // class FakeUserStatusConnector
 
 } // namespace Testing
 } // namespace Occ

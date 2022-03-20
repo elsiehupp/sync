@@ -10,34 +10,34 @@ namespace Testing {
 public class TestExcludedFiles : GLib.Object {
 
     const string EXCLUDE_LIST_FILE = SOURCEDIR + "/../../sync-exclude.lst";
-    
+
     /***********************************************************
     ***********************************************************/
     // The tests were converted from the old CMocka framework, that's why there is a global
     static ExcludedFiles excluded_files;
-    
+
     /***********************************************************
     ***********************************************************/
     static void up () {
         excluded_files.on_signal_reset (new ExcludedFiles ());
         excluded_files.set_wildcards_match_slash (false);
     }
-    
+
     /***********************************************************
     ***********************************************************/
     static void setup_init () {
         up ();
-    
+
         excluded_files.add_exclude_file_path (EXCLUDE_LIST_FILE);
         GLib.assert_true (excluded_files.reload_exclude_files ());
-    
+
         /* and add some unicode stuff */
         excluded_files.add_manual_exclude ("*.💩"); // is this source file utf8 encoded?
         excluded_files.add_manual_exclude ("пятницы.*");
         excluded_files.add_manual_exclude ("*/*.out");
         excluded_files.add_manual_exclude ("latex*/*.run.xml");
         excluded_files.add_manual_exclude ("latex/*/*.tex.temporary");
-    
+
         GLib.assert_true (excluded_files.reload_exclude_files ());
     }
 
@@ -67,7 +67,7 @@ public class TestExcludedFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_fun () {
+    private TestFun () {
         ExcludedFiles excluded;
         bool exclude_hidden = true;
         bool keep_hidden = false;
@@ -723,7 +723,7 @@ public class TestExcludedFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_add_exclude_file_path_add_same_file_path_list_size_does_not_increase () {
+    private TestAddExcludeFilePathAddSameFilePathListSizeDoesNotIncrease () {
         excluded_files.on_signal_reset (new ExcludedFiles ());
         var file_path = "exclude/.sync-exclude.lst";
 
@@ -736,7 +736,7 @@ public class TestExcludedFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_add_exclude_file_path_add_different_file_paths_list_size_increase () {
+    private TestAddExcludeFilePathAddDifferentFilePathsListSizeDoesIncrease () {
         excluded_files.on_signal_reset (new ExcludedFiles ());
 
         var file_path1 = "exclude1/.sync-exclude.lst";
@@ -751,7 +751,7 @@ public class TestExcludedFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_add_exclude_file_path_add_default_exclude_file_return_correct_map () {
+    private TestAddExcludeFilePathAddDefaultExcludeFileReturnCorrectMap () {
         const string base_path = "sync_folder/";
         const string folder1 = "sync_folder/folder1/";
         const string folder2 = folder1 + "folder2/";
@@ -774,7 +774,7 @@ public class TestExcludedFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_reload_exclude_files_file_does_not_exist_return_false () {
+    private TestReloadExcludeFilesFileDoesNotExistReturnFalse () {
         excluded_files.on_signal_reset (new ExcludedFiles ());
         const string non_existing_file = "directory/.sync-exclude.lst";
         excluded_files.add_exclude_file_path (non_existing_file);
@@ -785,7 +785,7 @@ public class TestExcludedFiles : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private test_reload_exclude_files_file_exists_return_true () {
+    private TestReloadExcludeFilesFileDoesExistReturnTrue () {
         var temporary_directory = QStandardPaths.writable_location (QStandardPaths.TempLocation);
         excluded_files.on_signal_reset (new ExcludedFiles (temporary_directory + "/"));
 

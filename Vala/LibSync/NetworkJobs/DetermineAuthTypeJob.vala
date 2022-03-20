@@ -1,8 +1,7 @@
 /***********************************************************
-Copyright (C) by Klaas Freitag <freitag@owncloud.com>
-Copyright (C) by Daniel Molkentin <danimo@owncloud.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Klaas Freitag <freitag@owncloud.com>
+@author Daniel Molkentin <danimo@owncloud.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {
@@ -21,7 +20,7 @@ public class DetermineAuthTypeJob : GLib.Object {
         Used only before we got a chance to probe the server
         ***********************************************************/
         NO_AUTH_TYPE,
-    
+
         /***********************************************************
         ***********************************************************/
 //  #ifdef WITH_WEBENGINE

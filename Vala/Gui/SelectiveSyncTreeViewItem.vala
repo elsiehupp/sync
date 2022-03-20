@@ -1,7 +1,6 @@
 /***********************************************************
-Copyright (C) by Olivier Goffart <ogoffart@woboq.com>
-
-<GPLv3-or-later-Boilerplate>
+@author Olivier Goffart <ogoffart@woboq.com>
+@copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {
@@ -32,15 +31,9 @@ public class SelectiveSyncTreeViewItem : QTreeWidgetItem {
 
     /***********************************************************
     ***********************************************************/
-    public 
-    }
+    //  public TreeWidgetItem (view, type) {
 
-
-    /***********************************************************
-    ***********************************************************/
-    public TreeWidgetItem (view, type) {
-
-    }
+    //  }
 
 
     /***********************************************************
@@ -53,9 +46,7 @@ public class SelectiveSyncTreeViewItem : QTreeWidgetItem {
     //      return QTreeWidgetItem.operator< (other);
     //  }
 
-}
-
-}
+} // class SelectiveSyncTreeViewItem
 
 } // namespace Testing
 } // namespace Occ
