@@ -1,16 +1,13 @@
-/***********************************************************
-@author Felix Weilbach <felix.weilbach@nextcloud.com>
-@author 2021 by Felix Weilbach <felix.weilbach@nextcloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-//  #include <QPaintDevice>
-//  #include <QTest>
-
 namespace Occ {
 namespace Testing {
 
+/***********************************************************
+@class FakePaintDevice
+
+@author 2021 Felix Weilbach <felix.weilbach@nextcloud.com>
+
+@copyright GPLv??? or later
+***********************************************************/
 public class FakePaintDevice : QPaintDevice {
 
     /***********************************************************

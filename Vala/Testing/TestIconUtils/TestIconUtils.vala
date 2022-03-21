@@ -1,7 +1,7 @@
 /***********************************************************
 @author Oleksandr Zolotov <alex@nextcloud.com>
 
-<GPLv???-or-later-Boilerplate>
+@copyright GPLv??? or later
 ***********************************************************/
 
 //  #include <QTest>

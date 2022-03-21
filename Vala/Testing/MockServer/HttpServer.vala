@@ -1,12 +1,12 @@
 /***********************************************************
 @author Daniel Molkentin <danimo@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+@copyright GPLv??? or later
 ***********************************************************/
 /***********************************************************
 @author Daniel Molkentin <danimo@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+@copyright GPLv??? or later
 ***********************************************************/
 
 //  #include <QTcpServer>

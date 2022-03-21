@@ -2,7 +2,7 @@
 @author Klaas Freitag <freitag@owncloud.com>
 @author Krzesimir Nowak <krzesimir@endocode.com>
 
-<GPLv???-or-later-Boilerplate>
+@copyright GPLv??? or later
 ***********************************************************/
 
 //  #include <GLib.Dir>

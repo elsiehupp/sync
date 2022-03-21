@@ -9,7 +9,7 @@ implied, as to its usefulness for any purpose.
 namespace Occ {
 namespace Testing {
 
-public class TestSelectiveSync : GLib.Object {
+public class TestSelectiveSyncBigFolders : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
@@ -85,7 +85,7 @@ public class TestSelectiveSync : GLib.Object {
         return null;
     }
 
-}
+} // class TestSelectiveSyncBigFolders
 
 } // namespace Testing
 } // namespace Occ

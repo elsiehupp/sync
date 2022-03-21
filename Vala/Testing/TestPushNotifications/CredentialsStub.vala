@@ -1,23 +1,17 @@
-/***********************************************************
-@author Felix Weilbach <felix.weilbach@nextcloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-//  #include <functional>
-//  #include <QWebSocketS
-//  #include <QWebSocket>
-//  #include <QSignalSpy>
-
 namespace Occ {
 namespace Testing {
 
+/***********************************************************
+@class CredentialsStub
+
+@author Felix Weilbach <felix.weilbach@nextcloud.com>
+
+@copyright GPLv??? or later
+***********************************************************/
 public class CredentialsStub : AbstractCredentials {
 
-    /***********************************************************
-    ***********************************************************/
-    private string user;
-    private string password;
+    public string user { public get; private set; }
+    public string password { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
@@ -29,22 +23,19 @@ public class CredentialsStub : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public string authentication_type () {
-        return "";
+    public string authentication_type {
+        public get {
+            return "";
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public string user () {
-        return this.user;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public string password () {
-        return this.password;
+    public bool ready {
+        public get {
+            return false;
+        }
     }
 
 
@@ -52,13 +43,6 @@ public class CredentialsStub : AbstractCredentials {
     ***********************************************************/
     public Soup create_access_manager () {
         return null;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public bool ready () {
-        return false;
     }
 
 
@@ -89,7 +73,7 @@ public class CredentialsStub : AbstractCredentials {
     ***********************************************************/
     public void forget_sensitive_data () { }
 
-}
+} // class CredentialsStub
 
 } // namespace Testing
 } // namespace Occ

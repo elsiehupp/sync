@@ -1,7 +1,7 @@
 /***********************************************************
 @author Daniel Molkentin <danimo@owncloud.com>
 
-<GPLv???-or-later-Boilerplate>
+@copyright GPLv??? or later
 ***********************************************************/
 
 namespace Occ {

@@ -1,18 +1,13 @@
-/***********************************************************
-@author Felix Weilbach <felix.weilbach@nextcloud.com>
-
-<GPLv???-or-later-Boilerplate>
-***********************************************************/
-
-//  #include <QLoggingCategory>
-//  #include <QSignalSpy>
-//  #include <QTest>
-//  #include <cstdint>
-//  #include <functional>
-
 namespace Occ {
 namespace Testing {
 
+/***********************************************************
+@class FakeWebSocketServer
+
+@author Felix Weilbach <felix.weilbach@nextcloud.com>
+
+@copyright GPLv??? or later
+***********************************************************/
 public class FakeWebSocketServer : GLib.Object {
 
 
@@ -24,9 +19,8 @@ public class FakeWebSocketServer : GLib.Object {
     ***********************************************************/
     private std.unique_ptr<QSignalSpy> process_text_message_spy;
 
-
-    void signal_closed ();
-    void signal_process_text_message (QWebSocket sender, string message);
+    internal signal void signal_closed ();
+    internal signal void signal_process_text_message (QWebSocket sender, string message);
 
     /***********************************************************
     ***********************************************************/
@@ -216,7 +210,7 @@ public class FakeWebSocketServer : GLib.Object {
         }
     }
 
-}
+} // class FakeWebSocketServer
 
 } // namespace Testing
 } // namespace Occ

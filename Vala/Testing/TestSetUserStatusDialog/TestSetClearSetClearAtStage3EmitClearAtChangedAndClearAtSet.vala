@@ -1,7 +1,7 @@
 /***********************************************************
 @author Felix Weilbach <felix.weilbach@nextcloud.com>
 
-<GPLv???-or-later-Boilerplate>
+@copyright GPLv??? or later
 ***********************************************************/
 
 namespace Occ {

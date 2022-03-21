@@ -7,7 +7,7 @@ implied, as to its usefulness for any purpose.
 namespace Occ {
 namespace Testing {
 
-public class TestUpdater : GLib.Object {
+public class TestVersionToInt : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
@@ -22,7 +22,7 @@ public class TestUpdater : GLib.Object {
         GLib.assert_true (current_version < high_version);
     }
 
-} // class TestUpdater
+} // class TestVersionToInt
 
 } // namespace Testing
 } // namespace Occ

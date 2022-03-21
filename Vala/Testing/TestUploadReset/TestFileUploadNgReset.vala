@@ -11,9 +11,9 @@ namespace Testing {
 Verify that the chunked transfer eventually gets reset with
 the new chunking
 ***********************************************************/
-public class TestUploadReset : GLib.Object {
+public class TestFileUploadNgReset : GLib.Object {
 
-    private TestFileUploadNg () {
+    private TestFileUploadNgReset () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
 
         fake_folder.sync_engine.account.set_capabilities ({
@@ -74,7 +74,7 @@ public class TestUploadReset : GLib.Object {
         GLib.assert_true (!upload_info.valid);
     }
 
-}
+} // class TestFileUploadNgReset
 
 } // namespace Testing
 } // namespace Occ
