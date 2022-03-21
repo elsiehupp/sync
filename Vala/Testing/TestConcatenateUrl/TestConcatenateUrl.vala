@@ -1,20 +1,20 @@
+namespace Occ {
+namespace Testing {
+
 /***********************************************************
+@class TestConcatenateUrl
+
 This software is in the public domain, furnished "as is",
 without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
-
-
-namespace Occ {
-namespace Testing {
-
-public class TestConcatUrl : GLib.Object {
+public class TestConcatenateUrl : GLib.Object {
 
     class QueryItems : GLib.List<QPair<string, string>> { }
 
     /***********************************************************
     ***********************************************************/
-    private TestFolder () {
+    private TestConcatenateUrl () {
         QFETCH (string, base);
         QFETCH (string, concat);
         QFETCH (QueryItems, query);
@@ -31,7 +31,7 @@ public class TestConcatUrl : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private TestFolderData () {
+    private TestConcatenateUrlData () {
         QTest.add_column<string> ("base");
         QTest.add_column<string> ("concat");
         QTest.add_column<QueryItems> ("query");
@@ -93,6 +93,7 @@ public class TestConcatUrl : GLib.Object {
         return query_items;
     }
 
-} // class TestConcatUrl
+} // class TestConcatenateUrl
+
 } // namespace Testing
 } // namespace Occ

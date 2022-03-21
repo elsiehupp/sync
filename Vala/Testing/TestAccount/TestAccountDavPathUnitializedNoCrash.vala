@@ -10,11 +10,11 @@ implied, as to its usefulness for any purpose.
 namespace Occ {
 namespace Testing {
 
-public class TestAccount : GLib.Object {
+public class TestAccountDavPathUnitializedNoCrash : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_test_account_dav_path_unitialized_no_crash () {
+    private void TestAccountDavPathUnitializedNoCrash () {
         unowned Account account = Account.create ();
         account.dav_path;
     }

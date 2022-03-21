@@ -1,21 +1,22 @@
+namespace Occ {
+namespace Testing {
+
 /***********************************************************
+@class TestDatabaseError
+
+@details This test will make many iteration, at each
+iteration, the iᵗʰ database access will fail. The test
+ensure that if there is a failure, the next sync recovers.
+And if there was no error, then everything was synchronized
+properly.
+
 This software is in the public domain, furnished "as is",
 without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
-
-//  #include <syncengine.h>
-
-namespace Occ {
-namespace Testing {
-
 public class TestDatabaseError : GLib.Object {
 
     /***********************************************************
-    This test will make many iteration, at each iteration, the
-    iᵗʰ database access will fail. The test ensure that if there
-    is a failure, the next sync recovers. And if there was no
-    error, then everything was sync'ed properly.
     ***********************************************************/
     private TestDatabaseError () {
 
@@ -72,5 +73,6 @@ public class TestDatabaseError : GLib.Object {
     }
 
 } // class TestDatabaseError
+
 } // namespace Testing
 } // namespace Occ

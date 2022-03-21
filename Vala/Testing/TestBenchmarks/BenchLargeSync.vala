@@ -14,7 +14,24 @@ public class BenchLargeSync : GLib.Object {
     int number_of_directories = 0;
     int number_of_files = 0;
 
-    void add_a_bunch_of_files (int files_per_directory, int directories_per_directory, int max_depth, int depth, string path, FileModifier file_info) {
+    private BenchLargeSync (int argc, char *argv) {
+        Gtk.Application app = new Gtk.Application (argc, argv);
+        FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
+        //  add_a_bunch_of_files<10, 8, 4> (0, "", fake_folder.local_modifier);
+
+        GLib.debug ("NUMFILES " + number_of_files.to_string ());
+        GLib.debug ("NUMDIRS " + number_of_directories.to_string ());
+        QElapsedTimer timer;
+        timer.start ();
+        bool result1 = fake_folder.sync_once ();
+        GLib.debug ("FIRST SYNC: " + result1 + timer.restart ());
+        bool result2 = fake_folder.sync_once ();
+        GLib.debug ("SECOND SYNC: " + result2 + timer.restart ());
+        GLib.assert_true (result1 && result2);
+    }
+
+
+    private void add_a_bunch_of_files (int files_per_directory, int directories_per_directory, int max_depth, int depth, string path, FileModifier file_info) {
         for (int file_number = 1; file_number <= files_per_directory; ++file_number) {
             string name = "file" + file_number.to_string ();
             file_info.insert (path == "" ? name : path + "/" + name);
@@ -31,21 +48,6 @@ public class BenchLargeSync : GLib.Object {
         }
     }
 
-    int main (int argc, char *argv) {
-        Gtk.Application app = new Gtk.Application (argc, argv);
-        FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        //  add_a_bunch_of_files<10, 8, 4> (0, "", fake_folder.local_modifier);
-
-        GLib.debug ("NUMFILES " + number_of_files.to_string ());
-        GLib.debug ("NUMDIRS " + number_of_directories.to_string ());
-        QElapsedTimer timer;
-        timer.start ();
-        bool result1 = fake_folder.sync_once ();
-        GLib.debug ("FIRST SYNC: " + result1 + timer.restart ());
-        bool result2 = fake_folder.sync_once ();
-        GLib.debug ("SECOND SYNC: " + result2 + timer.restart ());
-        return (result1 && result2) ? 0 : -1;
-    }
 
 } // public class BenchLargeSync
 } // namespace Testing

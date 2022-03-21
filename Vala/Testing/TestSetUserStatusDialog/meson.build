@@ -1,0 +1,57 @@
+srcs = files([
+    'FakeDateTimeProvider.vala',
+    'FakeUserStatusConnector.vala',
+    'TestClearAtClearAtAfterPeriod.vala',
+    'TestClearAtClearAtEndOf1.vala',
+    'TestClearAtClearAtEndOf3.vala',
+    'TestClearAtClearAtEndOf.vala',
+    'TestClearAtClearAtTimestamp2.vala',
+    'TestClearAtClearAtTimestamp3.vala',
+    'TestClearAtClearAtTimestamp4.vala',
+    'TestClearAtClearAtTimestamp5.vala',
+    'TestClearAtClearAtTimestamp6.vala',
+    'TestClearAtClearAtTimestamp7.vala',
+    'TestClearAtClearAtTimestamp8.vala',
+    'TestClearAtClearAtTimestamp.vala',
+    'TestClearAtStages.vala',
+    'TestClearUserStatus.vala',
+    'TestCtorFetchStatusAndPredefinedStatuses.vala',
+    'TestCtorFetchStatusButNoStatusSetShowSensibleDefaults.vala',
+    'TestCtorNoStatusSetShowSensibleDefaults.vala',
+    'TestErrorClearUserStatusClearErrorMessage.vala',
+    'TestErrorCouldNotClearMessageEmitError.vala',
+    'TestErrorCouldNotFetchPredefinedStatusesEmitError.vala',
+    'TestErrorCouldNotFetchUserStatusEmitError.vala',
+    'TestErrorCouldNotSetUserStatusEmitError.vala',
+    'TestErrorEmojisNotSupportedEmitError.vala',
+    'TestErrorSetUserStatusClearErrorMessage.vala',
+    'TestErrorUserStatusNotSupportedEmitError.vala',
+    'TestSetClearSetClearAtStage0EmitClearAtChangedAndClearAtSet.vala',
+    'TestSetClearSetClearAtStage1EmitClearAtChangedAndClearAtSet.vala',
+    'TestSetClearSetClearAtStage2EmitClearAtChangedAndClearAtSet.vala',
+    'TestSetClearSetClearAtStage3EmitClearAtChangedAndClearAtSet.vala',
+    'TestSetClearSetClearAtStage4EmitClearAtChangedAndClearAtSet.vala',
+    'TestSetClearSetClearAtStage5EmitClearAtChangedAndClearAtSet.vala',
+    'TestSetOnlineStatusEmitOnlineStatusChanged.vala',
+    'TestSetPredefinedStatusEmitUserStatusChangedAndSetUserStatus.vala',
+    'TestSetUserStatusEmojiPredefinedStatusWasSetUserStatusSetCorrect.vala',
+    'TestSetUserStatusMessagePredefinedStatusWasSetUserStatusSetCorrect.vala',
+    'TestSetUserStatusSetCustomMessageUserStatusSetCorrect.vala',
+])
+
+# Dependences
+deps = [
+    dependency('gio-2.0'),
+    # dependency('gtk+-3.0'),
+    # dependency('granite'),
+    # dependency('gee-0.8'),
+    # dependency('json-glib-1.0'),
+    # dependency('libsoup-2.4'),
+]
+
+executable(
+    meson.project_name(),
+    srcs,
+    dependencies: deps,
+    install: false
+)

@@ -1,3 +1,6 @@
+namespace Occ {
+namespace Testing {
+
 /***********************************************************
 libcsync -- a library to sync a directory with another
 
@@ -17,18 +20,6 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ***********************************************************/
-
-//  #include <sys/types.h>
-//  #include <sys/stat.h>
-//  #include <fcntl.h>
-//  #include <cstring>
-//  #include <cerrno>
-//  #include <cstdio>
-//  #include <GLib.Dir>
-
-namespace Occ {
-namespace Testing {
-
 public class CheckVioExt : GLib.Object {
 
     const int WD_BUFFER_SIZE = 255;

@@ -1,3 +1,6 @@
+namespace Occ {
+namespace Testing {
+
 /***********************************************************
 libcsync -- a library to sync a directory with another
 
@@ -17,13 +20,6 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ***********************************************************/
-
-//    #ifdef HAVE_ARGP_H
-//    #include <argp.h>
-
-namespace Occ {
-namespace Testing {
-
 public class TestCommandLine : GLib.Object {
 
     const string ARGP_PROGRAM_VERSION = "csync test 0.2";

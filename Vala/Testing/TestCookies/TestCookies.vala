@@ -32,7 +32,7 @@ public class TestCookies : GLib.Object {
 
     }
 
-}
+} // class TestCookies
 
 } // namespace Testing
 } // namespace Occ

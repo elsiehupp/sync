@@ -1,5 +1,3 @@
-# project('com.elsiehupp.NextcloudVala', 'c', 'vala', version: '1.0.0')
-
 subdir('MockServer')
 subdir('TestAccount')
 subdir('TestAllFilesDeleted')
@@ -29,6 +27,7 @@ subdir('TestNotificationCache')
 subdir('TestOAuth')
 subdir('TestOwnSql')
 subdir('TestPermissions')
+subdir('TestPlan.md')
 subdir('TestPushNotifications')
 subdir('TestRemoteDiscovery')
 subdir('TestRemoteWipe')
