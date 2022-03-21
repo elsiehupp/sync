@@ -1,39 +1,25 @@
-/***********************************************************
-@author Daniel Molkentin <danimo@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <cmath>
-//  #include <QDesktopServices>
-//  #include <QDial
-//  #include <GLib.Dir>
-//  #include <QListWidgetT
-//  #include <QMessage
-//  #include <QAction>
-//  #include <QVBoxLayou
-//  #include <QTreeView>
-//  #include <QKeySe
-//  #include <Gtk.Icon>
-//  #include <QJsonDocum
-//  #include <QToolTip>
-//  #include <Gtk.Widget>
-//  #include <QPointer>
-
 namespace Occ {
 namespace Ui {
 
 /***********************************************************
+@class AccountSettings
+
 @brief The AccountSettings class
-@ingroup gui
+
+@author Daniel Molkentin <danimo@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class AccountSettings : Gtk.Widget {
 
     /***********************************************************
-    Adjusts the mouse cursor based on the region it is on over the folder tree view.
+    @class MouseCursorChanger
 
-    Used to show that one can click the red error list box by changing the cursor
-    to the pointing hand.
+    Adjusts the mouse cursor based on the region it is on over
+    the folder tree view.
+
+    Used to show that one can click the red error list box by
+    changing the cursor to the pointing hand.
     ***********************************************************/
     class MouseCursorChanger : GLib.Object {
 

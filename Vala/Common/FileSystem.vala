@@ -16,7 +16,6 @@ public class FileSystem : GLib.Object {
     /***********************************************************
     @brief Mark the file as hidden  (only has effects on windows)
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static void file_hidden (string filename, bool hidden) {
         //  Q_UNUSED (filename);
@@ -30,7 +29,6 @@ public class FileSystem : GLib.Object {
     On linux this either revokes all 'w' permissions or
     restores permissions according to the umask.
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static void file_read_only (string filename, bool read_only) {
         GLib.File file = GLib.File.new_for_path (filename);
@@ -57,7 +55,6 @@ public class FileSystem : GLib.Object {
     This means that it will preserve explicitly set rw-r--r-- permissions even
     when the umask is 0002. (file_read_only () would adjust to rw-rw-r--)
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static void file_read_only_weak (string filename, bool read_only) {
         GLib.File file = GLib.File.new_for_path (filename);
@@ -75,7 +72,6 @@ public class FileSystem : GLib.Object {
     @brief Try to set permissions so that other users on the
     local machine can not go into the folder.
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static void folder_minimum_permissions (string filename) {
         //  Q_UNUSED (filename);
@@ -85,7 +81,6 @@ public class FileSystem : GLib.Object {
     /***********************************************************
     convert a "normal" windows path into a path that can be 32k chars long.
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static string long_win_path (string inpath) {
         return inpath;
@@ -98,7 +93,6 @@ public class FileSystem : GLib.Object {
     Use this over GLib.FileInfo.exists () and GLib.File.exists () to avoid bugs with lnk
     files, see above.
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static bool file_exists (string filename, GLib.FileInfo file_info = new GLib.FileInfo ()) {
         bool re = file_info.exists ();
@@ -120,7 +114,6 @@ public class FileSystem : GLib.Object {
     It behaves as GLib.File.rename () but handles .lnk files
     correctly on Windows.
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static bool rename (string origin_filename,
         string destination_filename,
@@ -152,7 +145,6 @@ public class FileSystem : GLib.Object {
     \a destination_filename, and overwrite the destination if
     it already exists, without extra checks.
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static bool unchecked_rename_replace (
         string origin_filename,
@@ -190,7 +182,6 @@ public class FileSystem : GLib.Object {
     Equivalent to GLib.File.remove (), except on Windows, where it will also
     successfully remove read-only files.
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static bool remove (string filename, string error_string = "") {
         GLib.File file = GLib.File.new_for_path (filename);
@@ -208,7 +199,6 @@ public class FileSystem : GLib.Object {
     Move the specified file or folder to the trash.
     (Only implemented on linux)
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static bool move_to_trash (string filename, string error_string) {
         // TODO : Qt 5.15 bool GLib.File.move_to_trash ()
@@ -286,7 +276,6 @@ public class FileSystem : GLib.Object {
     Warning : The resulting file may have an empty filename and be unsuitable for use
     with GLib.FileInfo! Calling seek () on the GLib.File with >32bit signed values will fail!
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static bool open_and_seek_file_shared_read (GLib.File file, string error_or_null, int64 seek) {
         string error_dummy;
@@ -309,7 +298,6 @@ public class FileSystem : GLib.Object {
     /***********************************************************
     Returns whether the file is a shortcut file (ends with .lnk)
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static bool is_lnk_file (string filename) {
         return filename.ends_with (".lnk");
@@ -319,7 +307,6 @@ public class FileSystem : GLib.Object {
     /***********************************************************
     Returns whether the file is an exclude file (contains patterns to exclude from sync)
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static bool is_exclude_file (string filename) {
         return filename.down () == ".sync-exclude.lst"

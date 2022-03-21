@@ -1,14 +1,14 @@
+namespace Occ {
+
 /***********************************************************
+@class VfsOff
+
+@brief Implementation of Vfs for Mode.OFF mode - does nothing
+
 @author Christian Kamm <mail@ckamm.de>
 @author Dominik Schmidt <dschmidt@owncloud.com>
 
 @copyright GPLv3 or Later
-***********************************************************/
-
-namespace Occ {
-
-/***********************************************************
-Implementation of Vfs for Mode.OFF mode - does nothing
 ***********************************************************/
 public class VfsOff : AbstractVfs {
 
@@ -139,7 +139,6 @@ public class VfsOff : AbstractVfs {
 
     /***********************************************************
     Check whether the plugin for the mode is available.
-    OCSYNC_EXPORT
     ***********************************************************/
     bool is_vfs_plugin_available (AbstractVfs.Mode mode) {
         // TODO: cache plugins available?
@@ -187,7 +186,6 @@ public class VfsOff : AbstractVfs {
 
     /***********************************************************
     Return the best available VFS mode.
-    OCSYNC_EXPORT
     ***********************************************************/
     override AbstractVfs.Mode best_available_vfs_mode {
         get {
@@ -226,7 +224,6 @@ public class VfsOff : AbstractVfs {
 
     /***********************************************************
     Create a VFS instance for the mode, returns null on failure.
-    OCSYNC_EXPORT
     ***********************************************************/
     AbstractVfs create_vfs_from_plugin (AbstractVfs.Mode mode) {
         if (mode == Mode.OFF) {

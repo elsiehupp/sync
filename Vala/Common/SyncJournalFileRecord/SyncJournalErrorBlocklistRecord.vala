@@ -1,11 +1,12 @@
+namespace Occ {
+
 /***********************************************************
+@class SyncJournalErrorBlocklistRecord
+
 @author Klaas Freitag <freitag@owncloud.com>
 
 @copyright LGPLv2.1 or later
 ***********************************************************/
-
-namespace Occ {
-
 public class SyncJournalErrorBlocklistRecord : GLib.Object {
 
     /***********************************************************

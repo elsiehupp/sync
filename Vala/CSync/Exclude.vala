@@ -1,10 +1,4 @@
-/***********************************************************
-libcsync -- a library to sync a directory with another
 
-@author 2008-2013 by Andreas Schneider <asn@cryptomilk.
-
-<LGPL-2.1-or-Later-Boilerplate>
-***********************************************************/
 
 //  #include <qglobal.h>
 
@@ -21,7 +15,9 @@ libcsync -- a library to sync a directory with another
 namespace CSync {
 
 /***********************************************************
-Manages file/directory exclusion.
+@class ExcludedFiles
+
+@brief Manages file/directory exclusion.
 
 Most commonly exclude patterns are loaded from file
 add_exclude_file_path and on_signal_reload_exclude_files ().
@@ -32,6 +28,12 @@ file watcher filtering.
 Excluded files and ignored files are the same thing. But the
 selective sync blocklist functionality is a different thing
 entirely.
+
+libcsync -- a library to sync a directory with another
+
+@author 2008-2013 by Andreas Schneider <asn@cryptomilk.org>
+
+@copyright LGPL 2.1 or later
 ***********************************************************/
 public class ExcludedFiles : GLib.Object {
 
@@ -867,7 +869,6 @@ public class ExcludedFiles : GLib.Object {
     /***********************************************************
     Expands C-like escape sequences (in place)
 
-    OCSYNC_EXPORT
     ***********************************************************/
     private static void csync_exclude_expand_escapes (string *input) {
         size_t o = 0;
@@ -910,7 +911,6 @@ public class ExcludedFiles : GLib.Object {
     @param filename filename
     @return true if file is reserved, false otherwise
 
-    OCSYNC_EXPORT
     ***********************************************************/
     private static bool csync_is_windows_reserved_word (QStringRef filename) {
         size_t len_filename = filename.size ();

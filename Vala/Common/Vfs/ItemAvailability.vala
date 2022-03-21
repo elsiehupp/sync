@@ -1,31 +1,34 @@
+namespace Occ {
+namespace Vfs {
+
 /***********************************************************
+@enum enum ItemAvailability
+
+A user-facing version of PinState.
+
+PinStates communicate availability intent for an item, but
+particular situations can get complex: An PinState.ALWAYS_LOCAL
+folder can have ItemAvailability.ONLINE_ONLY files or
+directories.
+
+For users this is condensed to a few useful cases.
+
+Note that this is only about intent*. The file could still
+be out of date, or not have been synced for other reasons,
+like errors.
+
+Note: The numerical values and ordering of this enum are
+relevant.
+
 @author Christian Kamm <mail@ckamm.de>
 @author Hannah von Reth <hannah.vonreth@owncloud.com>
 
 @copyright GPLv3 or Later
 ***********************************************************/
-
-
-namespace Occ {
-namespace Vfs {
-
-/***********************************************************
-A user-facing version of PinState.
-
-PinStates communicate availability intent for an item, but particular
-situations can get complex: An PinState.ALWAYS_LOCAL folder can have ItemAvailability.ONLINE_ONLY
-files or directories.
-
-For users this is condensed to a few useful cases.
-
-Note that this is only about intent*. The file could still be out of date,
-or not have been synced for other reasons, like errors.
-
-Note: The numerical values and ordering of this enum are relevant.
-***********************************************************/
-enum ItemAvailability {
+public enum ItemAvailability {
     /***********************************************************
-    The item and all its subitems are hydrated and pinned PinState.ALWAYS_LOCAL.
+    The item and all its subitems are hydrated and pinned
+    PinState.ALWAYS_LOCAL.
 
     This guarantees that all contents will be kept in sync.
     ***********************************************************/
@@ -34,8 +37,8 @@ enum ItemAvailability {
     /***********************************************************
     The item and all its subitems are hydrated.
 
-    This may change if the platform or client decide to dehydrate items
-    that have PinState.UNSPECIFIED pin state.
+    This may change if the platform or client decide to
+    dehydrate items that have PinState.UNSPECIFIED pin state.
 
     A folder with no file contents will have this availability.
     ***********************************************************/
@@ -44,13 +47,14 @@ enum ItemAvailability {
     /***********************************************************
     There are dehydrated and hydrated items.
 
-    This would happen if a dehydration happens to a PinState.UNSPECIFIED item that
-    used to be hydrated.
+    This would happen if a dehydration happens to a
+    PinState.UNSPECIFIED item that used to be hydrated.
     ***********************************************************/
     MIXED = 2,
 
     /***********************************************************
-    There are only dehydrated items but the pin state isn't all ItemAvailability.ONLINE_ONLY.
+    There are only dehydrated items but the pin state isn't all
+    ItemAvailability.ONLINE_ONLY.
     ***********************************************************/
     ALL_DEHYDRATED = 3,
 
@@ -86,7 +90,8 @@ enum ItemAvailability {
 
 
     /***********************************************************
-    Translated text for "free up local space" (and unpinning the item)
+    Translated text for "free up local space" (and unpinning the
+    item)
     ***********************************************************/
     public static string vfs_free_space_action_text () {
         return _("Free up local space");

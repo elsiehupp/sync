@@ -34,7 +34,6 @@ abstract class ComputeChecksumBase : GLib.Object {
         . "SHA1:ab124124"
 
 
-    OCSYNC_EXPORT
     ***********************************************************/
     string find_best_checksum (string checksums) {
         if (checksums == "") {
@@ -63,7 +62,6 @@ abstract class ComputeChecksumBase : GLib.Object {
 
     /***********************************************************
     Creates a checksum header from type and value.
-    OCSYNC_EXPORT
     ***********************************************************/
     string make_checksum_header (string checksum_type, string checksum) {
         if (checksum_type == "" || checksum == "") {
@@ -78,7 +76,6 @@ abstract class ComputeChecksumBase : GLib.Object {
 
     /***********************************************************
     Parses a checksum header
-    OCSYNC_EXPORT
     ***********************************************************/
     bool parse_checksum_header (string header, string type, string checksum) {
         if (header == "") {
@@ -100,7 +97,6 @@ abstract class ComputeChecksumBase : GLib.Object {
 
     /***********************************************************
     Convenience for getting the type from a checksum header, null if none
-    OCSYNC_EXPORT
     ***********************************************************/
     string parse_checksum_header_type (string header) {
         const var index = header.index_of (':');
@@ -113,7 +109,6 @@ abstract class ComputeChecksumBase : GLib.Object {
 
     /***********************************************************
     Checks OWNCLOUD_DISABLE_CHECKSUM_UPLOAD
-    OCSYNC_EXPORT
     ***********************************************************/
     bool upload_checksum_enabled () {
         ComputeChecksumBase.enabled = q_environment_variable_is_empty ("OWNCLOUD_DISABLE_CHECKSUM_UPLOAD");
@@ -128,7 +123,6 @@ abstract class ComputeChecksumBase : GLib.Object {
 
 
     /***********************************************************
-    OCSYNC_EXPORT
     ***********************************************************/
     string calc_md5 (QIODevice device) {
         return calc_crypto_hash (device, QCryptographicHash.Md5);
@@ -136,7 +130,6 @@ abstract class ComputeChecksumBase : GLib.Object {
 
 
     /***********************************************************
-    OCSYNC_EXPORT
     ***********************************************************/
     string calc_sha1 (QIODevice device) {
         return calc_crypto_hash (device, QCryptographicHash.Sha1);
@@ -144,7 +137,6 @@ abstract class ComputeChecksumBase : GLib.Object {
 
 
     /***********************************************************
-    OCSYNC_EXPORT
     ***********************************************************/
     string calc_adler32 (QIODevice device) {
         if (device.size () == 0) {

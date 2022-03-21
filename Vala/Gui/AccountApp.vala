@@ -1,12 +1,13 @@
+namespace Occ {
+namespace Ui {
+
 /***********************************************************
+@class AccountApp
+
 @author Daniel Molkentin <danimo@owncloud.com>
 
 @copyright GPLv3 or Later
 ***********************************************************/
-
-namespace Occ {
-namespace Ui {
-
 public class AccountApp : GLib.Object {
 
     /***********************************************************

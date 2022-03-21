@@ -1,26 +1,12 @@
-/***********************************************************
-@author Daniel Molkentin <danimo@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <QSettings>
-//  #include <qfontmetrics.h>
-//  #include <QJsonDocumen
-//  #include <QJsonObject
-//  #include <QJsonArray>
-//  #include <QNetworkR
-//  #include <QBuffer>
-//  #include <QElapsedTimer>
-//  #include <QPointer>
-//  #include <memory>
-
 namespace Occ {
 namespace Ui {
 
 /***********************************************************
-@brief Extra info about an own_cloud server account.
-@ingroup gui
+@brief Extra info about an OCS server account.
+
+@author Daniel Molkentin <danimo@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class AccountState : GLib.Object /*, QSharedData*/ {
 

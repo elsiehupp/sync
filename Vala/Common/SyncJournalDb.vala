@@ -91,7 +91,6 @@ public class SyncJournalDb : GLib.Object {
 
     Use internal_pin_states to get at them.
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public class PinStateInterface : GLib.Object {
 

@@ -1,8 +1,4 @@
 /***********************************************************
-@author Christian Kamm <mail@ckamm.de>
-@author Dominik Schmidt <dschmidt@owncloud.com>
-
-@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <QPluginLoader>
@@ -14,17 +10,26 @@
 namespace Occ {
 
 /***********************************************************
-Interface describing how to deal with virtual/placeholder files.
+@class AbstractVfs
 
-There are different ways of representing files locally that will only
-be filled with data (hydrated) on demand. One such way would be suffixed
-files, others could be FUSE based or use Windows CfApi.
+@details Interface describing how to deal with virtual/
+placeholder files.
 
-This interface intends to decouple the sync algorithm
-the details of how a particular VFS solution works.
+There are different ways of representing files locally that
+will only be filled with data (hydrated) on demand. One such
+way would be suffixed files, others could be FUSE based or
+use Windows CfApi.
 
-An instance is usually created through a plugin via the create_vfs_from_plugin ()
-function.
+This interface intends to decouple the sync algorithm the
+details of how a particular VFS solution works.
+
+An instance is usually created through a plugin via the
+create_vfs_from_plugin () function.
+
+@author Christian Kamm <mail@ckamm.de>
+@author Dominik Schmidt <dschmidt@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public abstract class AbstractVfs : GLib.Object {
 

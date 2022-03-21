@@ -1,55 +1,16 @@
+namespace Occ {
+
 /***********************************************************
+@class Utility
+
 @author Klaas Freitag <freitag@owncloud.com>
 @author Daniel Molkentin <danimo@owncloud.com>
 
 @copyright LGPLv2.1 or later
 ***********************************************************/
-
-//  #include <QStandardPaths>
-//  #include <QtGlobal>
-
-// Note: This file must compile without QtGui
-//  #include <Gtk.Application>
-//  #include <QSettings>
-//  #include <QTextStream>
-//  #include <GLib.Dir>
-//  #include <QProcess>
-//  #include <QThread>
-//  #include <QSysInfo>
-//  #include <QStandardPaths>
-//  #include <QCollator>
-//  #include <QSysInfo>
-//  #include <qrandom.h>
-
-//  #ifdef Q_OS_UNIX
-//  #include <sys/statvfs.h>
-//  #include <sys/types.h>
-//  #include <unistd.h>
-//  #endif
-
-//  #include <cmath>
-//  #include <cstdarg>
-//  #include <cstring>
-
-//  #include "utility_unix.cpp"
-
-//  #include <QElapsedTimer>
-//  #include <QLoggingCategory>
-//  #include <QUrlQuery>
-//  #include <functional>
-//  #include <memory>
-
-
-namespace Occ {
-
-/***********************************************************
-\addtogroup libsync
- @{
-***********************************************************/
 public class Utility : GLib.Object {
 
     /***********************************************************
-    OCSYNC_EXPORT
     ***********************************************************/
     public static int rand () {
         return QRandomGenerator.global ().bounded (0, RAND_MAX);
@@ -57,7 +18,6 @@ public class Utility : GLib.Object {
 
 
     /***********************************************************
-    OCSYNC_EXPORT
     ***********************************************************/
     public static void sleep (int sec) {
         QThread.sleep (sec);
@@ -65,7 +25,6 @@ public class Utility : GLib.Object {
 
 
     /***********************************************************
-    OCSYNC_EXPORT
     ***********************************************************/
     public static void usleep (int usec) {
         QThread.usleep (usec);
@@ -73,7 +32,6 @@ public class Utility : GLib.Object {
 
 
     /***********************************************************
-    OCSYNC_EXPORT
     ***********************************************************/
     public static string format_fingerprint (string fmhash, bool colon_separated = true) {
         string hash;
@@ -94,7 +52,6 @@ public class Utility : GLib.Object {
 
 
     /***********************************************************
-    OCSYNC_EXPORT
     ***********************************************************/
     public static void setup_fav_link (string folder) {
         setup_fav_link_private (folder);
@@ -119,7 +76,6 @@ public class Utility : GLib.Object {
 
 
     /***********************************************************
-    OCSYNC_EXPORT
     ***********************************************************/
     public static void remove_fav_link (string folder) {
         remove_fav_link_private (folder);
@@ -134,7 +90,6 @@ public class Utility : GLib.Object {
 
 
     /***********************************************************
-    OCSYNC_EXPORT
     ***********************************************************/
     public static bool write_random_file (string fname, int size = -1) {
         int max_size = 10 * 10 * 1024;
@@ -161,7 +116,6 @@ public class Utility : GLib.Object {
 
 
     /***********************************************************
-    OCSYNC_EXPORT
     ***********************************************************/
     public static string octets_to_string (int64 octets) {
         const int THE_FACTOR = 1024;
@@ -205,7 +159,6 @@ public class Utility : GLib.Object {
     }
 
     /***********************************************************
-    OCSYNC_EXPORT
     ***********************************************************/
     public static string user_agent_string () {
         return "Mozilla/5.0 (%1) mirall/%2 (%3, %4-%5 ClientArchitecture : %6 OsArchitecture : %7)"
@@ -221,7 +174,6 @@ public class Utility : GLib.Object {
 
 
     /***********************************************************
-    OCSYNC_EXPORT
     ***********************************************************/
     public static string friendly_user_agent_string () {
         const var pattern = "%1 (Desktop Client - %2)";
@@ -246,7 +198,6 @@ public class Utility : GLib.Object {
 
     Currently only implemented on Windows.
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static bool has_system_launch_on_signal_startup (string app_name) {
         //  Q_UNUSED (app_name)
@@ -266,7 +217,6 @@ public class Utility : GLib.Object {
 
 
     /***********************************************************
-    OCSYNC_EXPORT
     ***********************************************************/
     public static bool has_launch_on_signal_startup (string app_name) {
         return has_launch_on_signal_startup_private (app_name);
@@ -283,7 +233,6 @@ public class Utility : GLib.Object {
 
 
     /***********************************************************
-    OCSYNC_EXPORT
     ***********************************************************/
     public static void launch_on_signal_startup (string app_name, string gui_name, bool enable) {
         launch_on_signal_startup_private (app_name, gui_name, enable);
@@ -337,7 +286,6 @@ public class Utility : GLib.Object {
     Qt and WIN32) from size_t without compiler warnings about
     possible truncation
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static uint32 convert_size_to_uint (size_t convert_var) {
         if (convert_var > UINT_MAX) {
@@ -349,7 +297,6 @@ public class Utility : GLib.Object {
 
 
     /***********************************************************
-    OCSYNC_EXPORT
     ***********************************************************/
     public static int convert_size_to_int (size_t convert_var) {
         if (convert_var > INT_MAX) {
@@ -365,7 +312,6 @@ public class Utility : GLib.Object {
 
     \a path must point to a directory
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static int64 free_disk_space (string path) {
         struct StatVfs64;
@@ -385,7 +331,6 @@ public class Utility : GLib.Object {
     @param unit an optional unit that is appended if present.
     @return the formatted string.
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static string compact_format_double (double value, int prec, string unit = "") {
         QLocale locale = QLocale.system ();
@@ -406,7 +351,6 @@ public class Utility : GLib.Object {
     // porting methods
 
     /***********************************************************
-    OCSYNC_EXPORT
     ***********************************************************/
     public static string escape (string input) {
         return input.to_html_escaped ();
@@ -416,7 +360,6 @@ public class Utility : GLib.Object {
     conversion function GLib.DateTime from time_t
     (because the ones built in work on only unsigned 32bit)
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static GLib.DateTime q_date_time_from_time_t (int64 t) {
         return GLib.DateTime.from_m_secs_since_epoch (t * 1000);
@@ -424,7 +367,6 @@ public class Utility : GLib.Object {
 
 
     /***********************************************************
-    OCSYNC_EXPORT
     ***********************************************************/
     public static int64 q_date_time_to_time_t (GLib.DateTime t) {
         return t.to_m_secs_since_epoch () / 1000;
@@ -439,7 +381,6 @@ public class Utility : GLib.Object {
     duration_to_descriptive_string1 describ
     unit, like "5 minutes" or "2 days".
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static string duration_to_descriptive_string1 (uint64 msecs) {
         int p = 0;
@@ -459,7 +400,6 @@ public class Utility : GLib.Object {
     duration_to_descriptive_string2 uses two units where possible, so
     "5 minutes 43 seconds" or "1 month 3 days".
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static string duration_to_descriptive_string2 (uint64 msecs) {
         int p = 0;
@@ -494,7 +434,6 @@ public class Utility : GLib.Object {
 
     @return bool which is true for systems with dark systray.
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static bool has_dark_systray () {
         return has_dark_systray_private ();
@@ -551,7 +490,6 @@ public class Utility : GLib.Object {
 
 
     /***********************************************************
-    OCSYNC_EXPORT
     ***********************************************************/
     public static string platform_name () {
         return QSysInfo.pretty_product_name ();
@@ -561,7 +499,6 @@ public class Utility : GLib.Object {
     /***********************************************************
     er for --debug
 
-    OCSYNC_EXPORT
     ***********************************************************/
     //  public static void crash () {
     //      volatile int a = (int *)null;
@@ -571,7 +508,6 @@ public class Utility : GLib.Object {
     /***********************************************************
     This can be overriden from the tests
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static bool fs_case_preserving_override () {
         string env = qgetenv ("OWNCLOUD_TEST_CASE_PRESERVING");
@@ -587,7 +523,6 @@ public class Utility : GLib.Object {
     that means "test" means the same as "TEST" for filenames.
     if false, the two cases are two different files.
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static bool fs_case_preserving () {
         return fs_case_preserving_override;
@@ -599,7 +534,6 @@ public class Utility : GLib.Object {
     uses GLib.Dir.canonical_path to judge and cares for the
     system's case sensitivity.
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static bool filenames_equal (string fn1, string fn2) {
         const GLib.Dir fd1 = new GLib.Dir(fn1);
@@ -629,7 +563,6 @@ public class Utility : GLib.Object {
     This version only delivers output on linux, as Mac and Win get their
     restarting from the installer.
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static string version_of_installed_binary (string command = "") {
         string re;
@@ -654,7 +587,6 @@ public class Utility : GLib.Object {
 
 
     /***********************************************************
-    OCSYNC_EXPORT
     ***********************************************************/
     public static string filename_for_gui_use (string f_name) {
         if (is_mac ()) {
@@ -666,7 +598,6 @@ public class Utility : GLib.Object {
 
 
     /***********************************************************
-    OCSYNC_EXPORT
     ***********************************************************/
     public static string normalize_etag (string etag) {
         // strip "XXXX-gzip"
@@ -696,7 +627,6 @@ public class Utility : GLib.Object {
 
     If the second parameter is ommitted, the current time is used.
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static string time_ago_in_words (GLib.DateTime dt, GLib.DateTime from = GLib.DateTime ()) {
         GLib.DateTime now = GLib.DateTime.current_date_time_utc ();
@@ -804,7 +734,6 @@ public class Utility : GLib.Object {
     /***********************************************************
     @brief Sort a string[] in a way that's appropriate for filenames
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static void sort_filenames (string[] filenames) {
         QCollator collator;
@@ -817,7 +746,6 @@ public class Utility : GLib.Object {
     /***********************************************************
     Appends concat_path and query_items to the url
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static GLib.Uri concat_url_path (
         GLib.Uri url, string concat_path,
@@ -845,7 +773,6 @@ public class Utility : GLib.Object {
     Returns a new settings pre-set in a specific group.  The Settings will be created
     with the given parent. If no parent is specified, the caller must destroy the settings
 
-    OCSYNC_EXPORT
     ***********************************************************/
     // public static std.unique_ptr<QSettings> settings_with_group (string group, GLib.Object parent = new GLib.Object ());
 
@@ -863,7 +790,6 @@ public class Utility : GLib.Object {
     - windows reserved filenames ('CON' etc)
     will pass unchanged.
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static string sanitize_for_filename (string name) {
         const string invalid = " (/?<>:*|\")";
@@ -884,7 +810,6 @@ public class Utility : GLib.Object {
     Returns a file name based on \a fn that's suitable for a
     conflict.
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static string make_conflict_filename (
         string fn, GLib.DateTime dt, string user) {
@@ -913,7 +838,6 @@ public class Utility : GLib.Object {
     /***********************************************************
     Returns whether a file name indicates a conflict file
 
-    OCSYNC_EXPORT
     ***********************************************************/
     //  public static bool is_conflict_file (char name) {
     //      const string bname = std.strrchr (name, '/');
@@ -936,7 +860,6 @@ public class Utility : GLib.Object {
 
 
     /***********************************************************
-    OCSYNC_EXPORT
     ***********************************************************/
     public static bool is_conflict_file (string name) {
         var bname = name.mid_ref (name.last_index_of ('/') + 1);
@@ -963,7 +886,6 @@ public class Utility : GLib.Object {
     journal to determine a conflict's base file, see
     SyncJournal.conflict_file_base_name ()
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static string conflict_file_base_name_from_pattern (string conflict_name) {
         // This function must be able to deal with conflict files for conflict files.
@@ -999,7 +921,6 @@ public class Utility : GLib.Object {
     @brief Check whether the path is a root of a Windows drive
     partition ([c:/, d:/, e:/, etc.)
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static bool is_path_windows_drive_partition_root (string path) {
         //  Q_UNUSED (path)
@@ -1010,7 +931,6 @@ public class Utility : GLib.Object {
     /***********************************************************
     @brief Retrieves current logged-in user name from the OS
 
-    OCSYNC_EXPORT
     ***********************************************************/
     public static string get_current_user_name () {
         return {};

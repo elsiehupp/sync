@@ -1,18 +1,12 @@
 /***********************************************************
+@brief CSync public API
+
 libcsync -- a library to sync a directory with another
 
 @author 2008-2013 by Andreas Schneider <asn@cryptomilk.org>
 @author 2012-2013 by Klaas Freitag <freitag@owncloud.co
 
-<LGPL-2.1-or-Later-Boilerplate>
-***********************************************************/
-
-/***********************************************************
-@file csync.h
-
-@brief Application developer interface for c
-
-@defgroup csync_public_a_p_i csync public API
+@copyright LGPL 2.1 or later
 ***********************************************************/
 
 //  #include <sys/stat.h>

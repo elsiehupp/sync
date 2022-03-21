@@ -1,80 +1,24 @@
-/***********************************************************
-libcsync -- a library to sync a directory with another
-
-@author 2008-2013 by Andreas Schneider <asn@cryptomilk.
-
-This library is free software; you can redistribute it and/o
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later vers
-
-This library is distributed in the hope that it wi
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.    See the GNU
-Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
-***********************************************************/
-/***********************************************************
-libcsync -- a library to sync a directory with another
-
-@author 2008-2013 by Andreas Schneider <asn@cryptomilk.o
-@author 2013- by Klaas Freitag <freitag@owncloud.com>
-
-This library is free software; you can redistribute it and/o
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later vers
-
-This library is distributed in the hope that it wi
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.    See the GNU
-Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
-***********************************************************/
-
-//    #include <cerrno>
-//    #include <sys/types.h>
-//    #include <sys/stat.h>
-//    #include <fcntl.h>
-//    #include <dirent.h>
-//    #include <cstdio>
-//    #include <memory>
-//    #include <QtCore/QLoggingCategory>
-//    #include <QtCore/GLib.File>
-
-
-//    struct CSyncVioHandleT;
 namespace CSync {
 
 /***********************************************************
-directory functions
+@class CSyncVioHandleT
+
+@brief CSync directory functions
+
+libcsync -- a library to sync a directory with another
+
+@author 2008-2013 by Andreas Schneider <asn@cryptomilk.org>
+@author 2013- by Klaas Freitag <freitag@owncloud.com>
+
+@copyright LGPL 2.1 or later
 ***********************************************************/
 public class CSyncVioHandleT : GLib.Object {
+
     public DIR *dh;
     public string path;
 
-
     // OCSYNC_EXPORT
-    CSyncVioHandleT csync_vio_local_opendir (string name);
-
-    // OCSYNC_EXPORT
-    int csync_vio_local_closedir (CSyncVioHandleT dhandle);
-
-    // OCSYNC_EXPORT
-    std.unique_ptr<CSyncFileStatT> csync_vio_local_readdir (CSyncVioHandleT dhandle, Vfs vfs);
-
-    // OCSYNC_EXPORT
-    int csync_vio_local_stat (string uri, CSyncFileStatT buf);
-
-    static int this.csync_vio_local_stat_mb (char wuri, CSyncFileStatT buf);
-
-    CSyncVioHandleT csync_vio_local_opendir (string name) {
+    public CSyncVioHandleT csync_vio_local_opendir (string name) {
             QScopedPointer<CSyncVioHandleT> handle = new CSyncVioHandleT ();
 
             var dirname = GLib.File.encode_name (name);
@@ -88,17 +32,19 @@ public class CSyncVioHandleT : GLib.Object {
             return handle.take ();
     }
 
-    int csync_vio_local_closedir (CSyncVioHandleT dhandle) {
+
+    public int csync_vio_local_closedir (CSyncVioHandleT dhandle) {
             //    Q_ASSERT (dhandle);
             var rc = closedir (dhandle.dh);
             delete dhandle;
             return rc;
     }
 
-    std.unique_ptr<CSyncFileStatT> csync_vio_local_readdir (CSyncVioHandleT handle, Vfs vfs) {
+
+    public CSyncFileStatT csync_vio_local_readdir (CSyncVioHandleT dhandle, Vfs vfs) {
 
         dirent dirent = null;
-        std.unique_ptr<CSyncFileStatT> file_stat;
+        CSyncFileStatT file_stat;
 
         do {
                 dirent = readdir (handle.dh);
@@ -154,11 +100,12 @@ public class CSyncVioHandleT : GLib.Object {
         return file_stat;
     }
 
-    int csync_vio_local_stat (string uri, CSyncFileStatT buf) {
+
+    public int csync_vio_local_stat (string uri, CSyncFileStatT buf) {
             return this.csync_vio_local_stat_mb (GLib.File.encode_name (uri).const_data (), buf);
     }
 
-    static int this.csync_vio_local_stat_mb (char wuri, CSyncFileStatT buf) {
+    private static int csync_vio_local_stat_mb (char wuri, CSyncFileStatT buf) {
             stat sb;
 
             if (stat (wuri, sb) < 0) {
@@ -180,12 +127,6 @@ public class CSyncVioHandleT : GLib.Object {
                 buf.type = ItemType.SKIP;
                 break;
         }
-
-    //  #ifdef __APPLE__
-        if (sb.st_flags & UF_HIDDEN) {
-                buf.is_hidden = true;
-        }
-    //    #endif
 
         buf.inode = sb.st_ino;
         buf.modtime = sb.st_mtime;

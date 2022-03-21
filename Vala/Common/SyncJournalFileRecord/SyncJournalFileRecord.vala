@@ -1,14 +1,13 @@
-/***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-
-@copyright LGPLv2.1 or later
-***********************************************************/
-
 namespace Occ {
 
 /***********************************************************
+@class SyncJournalFileRecord
+
 @brief The SyncJournalFileRecord class
-@ingroup libsync
+
+@author Klaas Freitag <freitag@owncloud.com>
+
+@copyright LGPLv2.1 or later
 ***********************************************************/
 public class SyncJournalFileRecord : GLib.Object {
 

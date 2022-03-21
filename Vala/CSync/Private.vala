@@ -1,15 +1,13 @@
 /***********************************************************
+cross platform defines
+
 cynapses libc functions
 
 @author 2008-2013 by Andreas Schneider <asn@cryptomilk.org>
 @author 2012-2013 by Dominik Schmidt <dev@dominik-schmidt.de
 @author 2012-2013 by Klaas Freitag <freitag@owncloud.co
 
-<LGPL-2.1-or-Later-Boilerplate>
-***********************************************************/
-
-/***********************************************************
-cross platform defines
+@copyright LGPL 2.1 or later
 ***********************************************************/
 //  #include <sys/types.h>
 //  #include <sys/stat.h>

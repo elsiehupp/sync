@@ -1,31 +1,38 @@
 /***********************************************************
-@author Christian Kamm <mail@ckamm.de>
-@author Hannah von Reth <hannah.vonreth@owncloud.com>
-
-@copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {
 namespace Vfs {
 
 /***********************************************************
-Determines whether items should be available locally permanently or not
+@public enum PinState
 
-The idea is that files and folders can be marked with the user intent
+@details Determines whether items should be available
+locally permanently or not
+
+The idea is that files and folders can be marked with the
+user intent
 on availability.
 
 The PinState.INHERITED state is u
 parent path would do.
 
-The pin state of a directory usually only matters for the initial pin an
-hydration state of new remote files. It's perfectly possible for a
-PinState.ALWAYS_LOCAL directory to have only Vfs.ItemAvailability.ONLINE_ONLY items
-states is usually done recursively, so one'd need to set the folder to
+The pin state of a directory usually only matters for the
+initial pin a hydration state of new remote files. It's
+perfectly possible for a PinState.ALWAYS_LOCAL directory to
+have only Vfs.ItemAvailability.ONLINE_ONLY items states is
+usually done recursively, so one'd need to set the folder to
 pinned and then each contained item to unpinned)
 
-Note: This enum intentionally mimics CF_PIN_STATE of Windows cfapi.
+Note: This enum intentionally mimics CF_PIN_STATE of Windows
+cfapi.
+
+@author Christian Kamm <mail@ckamm.de>
+@author Hannah von Reth <hannah.vonreth@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
-enum PinState {
+public enum PinState {
     /***********************************************************
     The pin state is derived from the state of the parent folder.
 

@@ -1,16 +1,19 @@
 /***********************************************************
-@author Christian Kamm <mail@ckamm.de>
-@author Dominik Schmidt <dschmidt@owncloud.com>
-
-@copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {
 namespace Vfs {
 
 /***********************************************************
-Collection of parameters for initializing a Vfs instance.
-OCSYNC_EXPORT
+@struct SetupParameters
+
+@brife Collection of parameters for initializing a Vfs
+instance.
+
+@author Christian Kamm <mail@ckamm.de>
+@author Dominik Schmidt <dschmidt@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public struct SetupParameters {
     /***********************************************************

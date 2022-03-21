@@ -1,25 +1,14 @@
-/***********************************************************
-@author Olivier Goffart <ogoffart@woboq.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <theme.h>
-//  #include <creds/credentialsfactory.h>
-//  #include <creds/abstractcredentials.h>
-//  #include <cookiejar.h>
-//  #include <QSettings>
-//  #include <GLib.Dir>
-//  #include <QNetworkAccessManager>
-//  #include <Gtk.MessageBox>
-
-
 namespace Occ {
 namespace Ui {
 
 /***********************************************************
+@class AccountManager
+
 @brief The AccountManager class
-@ingroup gui
+
+@author Olivier Goffart <ogoffart@woboq.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class AccountManager : GLib.Object {
 

@@ -1,20 +1,15 @@
-/***********************************************************
-@author 2015 by nocteau
-@author 2015 by Daniel Molkentin <danimo@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <QFileDialog>
-//  #include <QLineEdit>
-//  #include <Gtk.Dialog>
-
 namespace Occ {
 namespace Ui {
 
 /***********************************************************
+@class AddCertificateDialog
+
 @brief The AddCertificateDialog class
-@ingroup gui
+
+@author 2015 by nocteau
+@author 2015 by Daniel Molkentin <danimo@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class AddCertificateDialog : Gtk.Dialog {
 
