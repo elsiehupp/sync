@@ -7,7 +7,7 @@ implied, as to its usefulness for any purpose.
 namespace Occ {
 namespace Testing {
 
-public abstract class TestChecksumValidation : AbstractTestSyncEngine {
+public class TestChecksumValidation : AbstractTestSyncEngine {
 
     /***********************************************************
     Checks whether downloads with bad checksums are accepted

@@ -52,7 +52,7 @@ public abstract class AbstractTestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_cleanup () {}
+    protected void clean_up () {}
 
 } // class TestXmlParse
 

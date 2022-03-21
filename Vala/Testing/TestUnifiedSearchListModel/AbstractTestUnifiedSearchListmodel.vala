@@ -97,7 +97,7 @@ public class AbstractTestUnifiedSearchListmodel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_cleanup_test_case () {
+    protected void clean_up () {
         FakeSearchResultsStorage.destroy ();
     }
 

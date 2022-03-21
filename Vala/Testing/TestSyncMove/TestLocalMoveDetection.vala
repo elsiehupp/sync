@@ -68,7 +68,7 @@ public class TestLocalMoveDetection : AbstractTestSyncMove {
         GLib.assert_true (number_of_delete == 3);
         GLib.assert_true (! (fake_folder.current_local_state () == remote_info));
 
-        // on_signal_cleanup, and upload a file that will have a checksum in the database
+        // clean_up, and upload a file that will have a checksum in the database
         fake_folder.local_modifier.remove ("C/c1m");
         fake_folder.local_modifier.insert ("C/c3");
         GLib.assert_true (fake_folder.sync_once ());

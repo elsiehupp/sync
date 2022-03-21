@@ -7,7 +7,7 @@ implied, as to its usefulness for any purpose.
 namespace Occ {
 namespace Testing {
 
-public abstract class TestFakeConflictData : AbstractTestSyncEngine {
+public class TestFakeConflictData : AbstractTestSyncEngine {
 
     /***********************************************************
     ***********************************************************/

@@ -8,7 +8,7 @@ This software is in the public domain, furnished "as is",
 without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
-public abstract class TestNormalizeEtag : AbstractTestUtility {
+public class TestNormalizeEtag : AbstractTestUtility {
 
     private TestNormalizeEtag () {
         string string_value;

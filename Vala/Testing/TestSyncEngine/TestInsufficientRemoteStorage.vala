@@ -7,7 +7,7 @@ implied, as to its usefulness for any purpose.
 namespace Occ {
 namespace Testing {
 
-public abstract class TestInsufficientRemoteStorage : AbstractTestSyncEngine {
+public class TestInsufficientRemoteStorage : AbstractTestSyncEngine {
 
     /***********************************************************
     Checks whether subsequent large uploads are skipped after a

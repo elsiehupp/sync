@@ -1,0 +1,32 @@
+namespace Occ {
+namespace Testing {
+
+/***********************************************************
+@class AbstractTestFolderMan
+
+This software is in the public domain, furnished "as is",
+without technical support, and with no warranty, express or
+implied, as to its usefulness for any purpose.
+***********************************************************/
+public class AbstractTestFolderMan : GLib.Object {
+
+    Account account
+    AccountState account_state;
+    FolderMan folder_manager;
+    GLib.Uri url
+
+    protected AbstractTestFolderMan () {
+        this.account = Account.create ();
+        this.url = new GLib.Uri ("http://example.de");
+        this.var credentials = new HttpCredentialsTest ("testuser", "secret");
+        this.account.set_credentials (this.credentials);
+        this.account.set_url (this.url);
+        this.url.set_user_name (this.credentials.user ());
+        this.account_state = new AccountState (this.account);
+        this.folder_manager = FolderMan.instance;
+    }
+
+} // class AbstractTestFolderMan
+
+} // namespace Testing
+} // namespace Occ

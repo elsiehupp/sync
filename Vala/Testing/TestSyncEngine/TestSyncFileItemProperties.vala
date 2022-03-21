@@ -7,7 +7,7 @@ implied, as to its usefulness for any purpose.
 namespace Occ {
 namespace Testing {
 
-public abstract class TestSyncFileItemProperties : AbstractTestSyncEngine {
+public class TestSyncFileItemProperties : AbstractTestSyncEngine {
 
     /***********************************************************
     Checks whether SyncFileItem instances have the expected

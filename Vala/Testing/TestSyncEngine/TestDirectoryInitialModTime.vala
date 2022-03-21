@@ -7,7 +7,7 @@ implied, as to its usefulness for any purpose.
 namespace Occ {
 namespace Testing {
 
-public abstract class TestDirectoryInitialModTime : AbstractTestSyncEngine {
+public class TestDirectoryInitialModTime : AbstractTestSyncEngine {
 
     /***********************************************************
     Check that server mtime is set on directories on initial

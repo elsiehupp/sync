@@ -7,7 +7,7 @@ implied, as to its usefulness for any purpose.
 namespace Occ {
 namespace Testing {
 
-public abstract class TestSharedStatus : AbstractTestSyncFileStatusTracker {
+public class TestSharedStatus : AbstractTestSyncFileStatusTracker {
 
     /***********************************************************
     ***********************************************************/

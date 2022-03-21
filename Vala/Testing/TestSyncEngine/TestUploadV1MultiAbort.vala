@@ -7,7 +7,7 @@ implied, as to its usefulness for any purpose.
 namespace Occ {
 namespace Testing {
 
-public abstract class TestUploadV1MultiAbort : AbstractTestSyncEngine {
+public class TestUploadV1MultiAbort : AbstractTestSyncEngine {
 
     /***********************************************************
     Aborting has had bugs when there are parallel upload jobs

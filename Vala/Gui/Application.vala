@@ -369,7 +369,7 @@ public class Application : Gtk.Application {
 
         // Cleanup at Quit.
         this.about_to_quit.connect (
-            this.on_signal_cleanup
+            this.clean_up
         );
 
         // Allow other classes to hook into signal_is_showing_settings_dialog () signals (re-auth widgets, for example)
@@ -787,7 +787,7 @@ public class Application : Gtk.Application {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_cleanup () {
+    protected void clean_up () {
         AccountManager.instance.save ();
         FolderMan.instance.unload_and_delete_all_folders ();
 

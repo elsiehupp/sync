@@ -8,7 +8,7 @@ This software is in the public domain, furnished "as is",
 without technical support, and with no warranty, express or
 implied, as to its usefulness for any purpose.
 ***********************************************************/
-public abstract class TestSyncDehydration : AbstractTestSyncXAttr {
+public class TestSyncDehydration : AbstractTestSyncXAttr {
 
     /***********************************************************
     Dehydration via sync works

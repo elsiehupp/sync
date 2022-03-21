@@ -69,7 +69,7 @@ public abstract class AbstractTestChecksumValidator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_cleanup_test_case () {
+    protected void clean_up () {
         return;
     }
 

@@ -7,7 +7,7 @@ implied, as to its usefulness for any purpose.
 namespace Occ {
 namespace Testing {
 
-public abstract class TestInvalidFilenameRegex : AbstractTestSyncEngine {
+public class TestInvalidFilenameRegex : AbstractTestSyncEngine {
 
     /***********************************************************
     Tests the behavior of invalid filename detection

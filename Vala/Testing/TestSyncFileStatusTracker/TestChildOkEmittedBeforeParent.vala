@@ -7,7 +7,7 @@ implied, as to its usefulness for any purpose.
 namespace Occ {
 namespace Testing {
 
-public abstract class TestChildOkEmittedBeforeParent : AbstractTestSyncFileStatusTracker {
+public class TestChildOkEmittedBeforeParent : AbstractTestSyncFileStatusTracker {
 
     /***********************************************************
     Even for status pushes immediately following each other,

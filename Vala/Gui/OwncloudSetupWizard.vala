@@ -809,7 +809,7 @@ public class OwncloudSetupWizard : GLib.Object {
 
         // Detach the account that is going to be saved from the
         // wizard to ensure it doesn't accidentally get modified
-        // later (such as from running on_signal_cleanup such as
+        // later (such as from running clean_up such as
         // AbstractCredentialsWizardPage.clean_up_page ())
         this.oc_wizard.account = AccountManager.create_account ();
 
