@@ -3,7 +3,6 @@
 //  #include <QJsonObject>
 //  #include <QJsonDocument>
 //  #include <QJsonArray>
-//  #include <QLoggingCategory>
 //  #include <Gtk.Icon>
 //  #include <QPainter>
 //  #include <Gtk.Image>

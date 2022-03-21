@@ -2,7 +2,6 @@
 ***********************************************************/
 
 //  #include <QPluginLoader>
-//  #include <QLoggingCategory>
 //  #includeonce
 //  #include <QScopedPointer>
 //  #include <memory>

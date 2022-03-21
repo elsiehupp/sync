@@ -1,17 +1,14 @@
-/***********************************************************
-@author Olivier Goffart <ogoffart@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <QLoggingCategory>
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class DeleteJob
+
 @brief The DeleteJob class
-@ingroup libsync
+
+@author Olivier Goffart <ogoffart@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class DeleteJob : AbstractNetworkJob {
 

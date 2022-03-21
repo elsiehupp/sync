@@ -16,7 +16,6 @@ Removing the root encrypted folder is consisted of multiple steps:
 ***********************************************************/
 
 //  #include <GLib.FileInfo>
-//  #include <QLoggingCategory>
 
 
 namespace Occ {

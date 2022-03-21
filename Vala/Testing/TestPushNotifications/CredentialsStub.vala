@@ -41,7 +41,7 @@ public class CredentialsStub : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public Soup create_access_manager () {
+    public Soup.Context create_soup_context () {
         return null;
     }
 

@@ -5,7 +5,6 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QLoggingCategory>
 //  #include <Gtk.Application>
 
 namespace Occ {

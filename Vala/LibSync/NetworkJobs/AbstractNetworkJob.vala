@@ -5,7 +5,6 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QLoggingCategory>
 //  #include <Soup.Request>
 //  #include <QSslConfigur
 //  #include <Soup.Buffer>

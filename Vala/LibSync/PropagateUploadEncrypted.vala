@@ -5,7 +5,6 @@
 //  #include <QFile
 //  #include <GLib.Dir>
 //  #include <QTemporary_file>
-//  #include <QLoggingCategory>
 //  #include <QMimeDatabase>
 
 namespace Occ {

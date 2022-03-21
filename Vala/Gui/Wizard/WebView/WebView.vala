@@ -11,7 +11,6 @@
 //  #include <QWeb_engine_v
 //  #include <QDesktopServices>
 //  #include <QProgres
-//  #include <QLoggingCategory>
 //  #include <QLocale>
 //  #include <QWebEngineCertificateError>
 //  #include <Gtk.MessageBox>

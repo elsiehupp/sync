@@ -6,13 +6,11 @@
 ***********************************************************/
 
 
-//  #include <QLoggingCategory>
 using Soup;
 
 //  #include <GLib.List>
 //  #include <GLib.FileInfo>
 //  #include <GLib.Dir>
-//  #include <QLoggingCategory>
 //  #include <QTimerEvent>
 //  #include <QRegularExpression>
 //  #include <qmath.h>

@@ -32,8 +32,8 @@ public abstract class AbstractTestOAuth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected FakeQNAM fake_access_manager;
-    protected Soup real_access_manager;
+    protected FakeQNAM fake_soup_context;
+    protected Soup.Context real_soup_context;
     protected Soup.Reply browser_reply;
 
     protected string code = generate_etag ();
@@ -54,12 +54,12 @@ public abstract class AbstractTestOAuth : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected virtual void test () {
-        fake_access_manager = new FakeQNAM ({});
+        fake_soup_context = new FakeQNAM ({});
         account = Account.create ();
         account.set_url (s_oauth_test_server);
-        account.set_credentials (new FakeCredentials (fake_access_manager));
-        fake_access_manager.set_parent (this);
-        fake_access_manager.set_override (this.oauth_test_case_override);
+        account.set_credentials (new FakeCredentials (fake_soup_context));
+        fake_soup_context.set_parent (this);
+        fake_soup_context.set_override (this.oauth_test_case_override);
 
         desktop_service_hook.signal_hooked.connect (
             this.on_signal_open_browser_hook
@@ -101,7 +101,7 @@ public abstract class AbstractTestOAuth : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected virtual Soup.Reply create_browser_reply (Soup.Request request) {
-        browser_reply = real_access_manager.get (request);
+        browser_reply = real_soup_context.get (request);
         browser_reply.signal_finished.connect (
             this.on_signal_browser_reply_finished);
         return browser_reply;
@@ -129,7 +129,7 @@ public abstract class AbstractTestOAuth : GLib.Object {
         //  ASSERT (request.url.path == s_oauth_test_server.path + "/index.php/apps/oauth2/api/v1/token");
         std.unique_ptr<QBuffer> payload = new std.unique_ptr<QBuffer> (new QBuffer ());
         payload.set_data (token_reply_payload ());
-        return new FakePostReply (operation, request, std.move (payload), fake_access_manager);
+        return new FakePostReply (operation, request, std.move (payload), fake_soup_context);
     }
 
 

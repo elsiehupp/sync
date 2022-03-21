@@ -5,7 +5,6 @@
 ***********************************************************/
 
 //  #include <QAbstractItemModel>
-//  #include <QLoggingCategory>
 //  #include <QElapsedTimer>
 //  #include <QPointer>
 

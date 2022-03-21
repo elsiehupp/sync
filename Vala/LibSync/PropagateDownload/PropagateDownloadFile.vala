@@ -7,7 +7,6 @@
 //  #include <common/checksums.h>
 //  #include <common/asserts.h>
 //  #include <common/constants.h>
-//  #include <QLoggingCategory>
 //  #include <QNetworkAc
 //  #include <QFile
 //  #include <GLib.Dir>

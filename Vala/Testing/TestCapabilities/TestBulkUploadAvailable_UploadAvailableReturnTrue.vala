@@ -1,5 +1,3 @@
-
-
 namespace Occ {
 namespace Testing {
 

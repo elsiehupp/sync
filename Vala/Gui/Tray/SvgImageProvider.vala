@@ -4,7 +4,6 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QLoggingCategory>
 //  #include <QQuickImageProvider>
 
 namespace Occ {

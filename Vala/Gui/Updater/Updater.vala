@@ -7,7 +7,6 @@
 //  #include <QUrlQuery>
 //  #include <QProcess>
 //  #include <QSysInfo>
-//  #include <QLoggingCategory>
 
 namespace Occ {
 namespace Ui {

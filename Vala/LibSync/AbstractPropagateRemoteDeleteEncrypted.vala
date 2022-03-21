@@ -7,7 +7,6 @@
 using Soup;
 
 //  #include <GLib.FileInfo>
-//  #include <QLoggingCategory>
 
 namespace Occ {
 namespace LibSync {

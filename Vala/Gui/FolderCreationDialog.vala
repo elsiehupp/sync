@@ -7,7 +7,6 @@
 //  #include <limits>
 //  #include <GLib.Dir>
 //  #include <Gtk.MessageBox>
-//  #include <QLoggingCategory>
 
 //  #include <Gtk.Dialog>
 

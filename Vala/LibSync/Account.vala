@@ -5,7 +5,6 @@
 ***********************************************************/
 
 //  #include <deletejob.h>
-//  #include <QLoggingCategory>
 //  #include <QNetworkAccessMana
 //  #include <QSslSocket>
 //  #include <QNetworkCo
@@ -18,7 +17,6 @@
 //  #include <QJsonDocument>
 //  #include <QJsonObject>
 //  #include <QJsonArray>
-//  #include <QLoggingCategory>
 //  #include <QHttpMultiPart>
 //  #include <qt5keychain/keychain.h>
 

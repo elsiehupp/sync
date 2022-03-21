@@ -6,7 +6,6 @@
 ***********************************************************/
 
 //  #include <QJsonDocument>
-//  #include <QLoggingCategory>
 //  #include <Soup.Request>
 //  #include <QSslConfigu
 //  #include <Soup.Buffer>

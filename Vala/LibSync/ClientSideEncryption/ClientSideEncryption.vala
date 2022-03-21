@@ -12,7 +12,6 @@
 //  #include <cstdio>
 
 //  #include <QDebug>
-//  #include <QLoggingCategory>
 //  #include <GLib.FileInfo>
 //  #include <GLib.Dir>
 //  #include <QJsonObject>

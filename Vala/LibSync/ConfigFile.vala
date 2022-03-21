@@ -12,7 +12,6 @@
 //  #include <Gtk.Application>
 //  #include <GLib.Dir>
 //  #include <GLib.FileInfo>
-//  #include <QLoggingCategory>
 //  #include <GLib.Settings>
 //  #include <Soup.ProxyResolverDefault>
 //  #include <QStandardPaths>

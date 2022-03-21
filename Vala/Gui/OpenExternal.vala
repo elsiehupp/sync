@@ -7,7 +7,6 @@
 //  #include <QClipboard>
 //  #include <Gtk.Application>
 //  #include <QDesktopServices>
-//  #include <QLoggingCategory>
 //  #include <Gtk.MessageBox>
 //  #include <QUrlQuery>
 

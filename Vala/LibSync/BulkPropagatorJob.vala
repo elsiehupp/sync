@@ -12,7 +12,6 @@ Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
 //  #include <QJsonValue>
 
 
-//  #include <QLoggingCategory>
 //  #include <deque>
 
 namespace Occ {

@@ -5,7 +5,6 @@
 ***********************************************************/
 
 //  #include <GLib.HashTable<string, GLib.Variant>>
-//  #include <QLoggingCategory>
 //  #include <QDebug>
 //  #include <GLib.HashTable<string, GLib.Variant>>
 //  #include <QMimeDatabase>

@@ -11,7 +11,6 @@
 //  #include <owncloudgui.h>
 //  #include <cstdlib>
 //  #include <QWizard>
-//  #include <QLoggingCategory>
 //  #include <QSslKey>
 //  #include <QSslCertificate>
 

@@ -7,7 +7,6 @@
 //  #include <QJsonDocument>
 //  #include <QJsonObject>
 //  #include <QJsonArray>
-//  #include <QLoggingCategory>
 //  #include <QNetworkProxyFacto
 //  #include <QXmlStreamReader>
 //  #include <creds/abstractcredentials.h>

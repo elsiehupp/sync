@@ -5,7 +5,6 @@
 ***********************************************************/
 
 //  #include <QRegularExpression>
-//  #include <QLoggingCategory>
 //  #include <Soup.Buffer>
 
 using Soup;

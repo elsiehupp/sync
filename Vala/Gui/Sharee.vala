@@ -9,7 +9,6 @@
 //  #include <QJsonArray>
 //  #include <QFlags>
 //  #include <QAbstractListMode
-//  #include <QLoggingCategory>
 //  #include <QModelIndex>
 
 namespace Occ {
