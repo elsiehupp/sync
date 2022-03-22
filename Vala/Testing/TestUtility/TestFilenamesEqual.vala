@@ -14,7 +14,7 @@ public class TestFilenamesEqual : AbstractTestUtility {
     ***********************************************************/
     private TestFilenamesEqual () {
         QTemporaryDir directory;
-        GLib.assert_true (directory.is_valid ());
+        GLib.assert_true (directory.is_valid);
         GLib.Dir dir2 = new GLib.Dir (directory.path);
         GLib.assert_true (dir2.mkpath ("test"));
         if ( !filesystem_case_preserving () ) {

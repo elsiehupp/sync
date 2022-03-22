@@ -24,7 +24,7 @@ public class TestSearchTermStartStopSearch : AbstractTestUnifiedSearchListmodel 
         GLib.assert_true (model.search_term () == "dis");
 
         // #2 test set_search_term actually sets the search term and the signal is emitted
-        search_term_changed.clear ();
+        search_term_changed == "";
         model.set_search_term (model.search_term () + "cuss");
         GLib.assert_true (model.search_term () == "discuss");
         GLib.assert_true (search_term_changed.count () == 1);

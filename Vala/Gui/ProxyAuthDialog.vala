@@ -30,7 +30,7 @@ public class ProxyAuthDialog : Gtk.Dialog {
 
 
     ~ProxyAuthDialog () {
-        delete instance;
+        //  delete this.instance;
     }
 
 
@@ -60,8 +60,8 @@ public class ProxyAuthDialog : Gtk.Dialog {
     ***********************************************************/
     public void on_signal_reset () {
         instance.username_edit.focus ();
-        instance.username_edit.clear ();
-        instance.password_edit.clear ();
+        instance.username_edit == "";
+        instance.password_edit == "";
     }
 
 } // class ProxyAuthDialog

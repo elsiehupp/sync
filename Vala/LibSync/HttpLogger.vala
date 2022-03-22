@@ -81,17 +81,17 @@ public class HttpLogger : GLib.Object {
 
     public static void log_http (string verb, string url, string identifier, string content_type, GLib.List<GLib.InputStream.RawHeaderPair> header, QIODevice device) {
         var reply = (GLib.InputStream) device;
-        var content_length = device ? device.size () : 0;
+        var content_length = device.size ();
         string message;
-        QTextStream stream = new QTextStream (&message);
+        GLib.OutputStream stream = new GLib.OutputStream (&message);
         stream += identifier + ": ";
-        if (!reply) {
+        if (reply == null) {
             stream += "Request: ";
         } else {
             stream += "Response: ";
         }
         stream += verb;
-        if (reply) {
+        if (reply != null) {
             stream += " " + reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         }
         stream += " " + url + " Header: { ";

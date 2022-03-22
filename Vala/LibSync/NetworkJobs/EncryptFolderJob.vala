@@ -61,7 +61,7 @@ public class EncryptFolderJob : AbstractNetworkJob {
     private void on_signal_set_encryption_flag_job_success (string file_identifier) {
         SyncJournalFileRecord record;
         this.journal.get_file_record (this.path, record);
-        if (record.is_valid ()) {
+        if (record.is_valid) {
             record.is_e2e_encrypted = true;
             this.journal.file_record (record);
         }

@@ -158,7 +158,7 @@ public class HttpCredentialsGui : HttpCredentials {
     private void on_signal_finished_with_result (Gtk.Dialog dialog, int result) {
         if (result == Gtk.Dialog.Accepted) {
             this.password = dialog.text_value ();
-            this.refresh_token.clear ();
+            this.refresh_token == "";
             this.ready = true;
             persist ();
         }

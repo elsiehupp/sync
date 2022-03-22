@@ -94,7 +94,7 @@ public class PropagateLocalRemove : AbstractPropagateItemJob {
             foreach (var it in deleted) {
                 if (!it.first.has_prefix (this.propagator.local_path))
                     continue;
-                if (!deleted_dir == "" && it.first.has_prefix (deleted_dir))
+                if (deleted_dir != "" && it.first.has_prefix (deleted_dir))
                     continue;
                 if (it.second) {
                     deleted_dir = it.first;

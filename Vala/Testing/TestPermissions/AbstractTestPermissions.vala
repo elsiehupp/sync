@@ -86,13 +86,13 @@ public class AbstractTestPermissions : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected static SyncFileItemPtr find_discovery_item (SyncFileItemVector spy, string path) {
+    protected static SyncFileItem find_discovery_item (SyncFileItemVector spy, string path) {
         foreach (var item in spy) {
             if (item.destination () == path) {
                 return item;
             }
         }
-        return new SyncFileItemPtr (new SyncFileItem ());
+        return new SyncFileItem (new SyncFileItem ());
     }
 
 

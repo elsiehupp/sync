@@ -27,15 +27,15 @@ public class TestConflictRecordRemoval1 : AbstractTestSyncConflict {
         // A nothing-to-sync keeps them alive
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
-        GLib.assert_true (fake_folder.sync_journal ().conflict_record ("A/a1").is_valid ());
-        GLib.assert_true (fake_folder.sync_journal ().conflict_record ("A/a2").is_valid ());
+        GLib.assert_true (fake_folder.sync_journal ().conflict_record ("A/a1").is_valid);
+        GLib.assert_true (fake_folder.sync_journal ().conflict_record ("A/a2").is_valid);
 
         // When the file is removed, the record is removed too
         fake_folder.local_modifier.remove ("A/a2");
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
-        GLib.assert_true (fake_folder.sync_journal ().conflict_record ("A/a1").is_valid ());
-        GLib.assert_true (!fake_folder.sync_journal ().conflict_record ("A/a2").is_valid ());
+        GLib.assert_true (fake_folder.sync_journal ().conflict_record ("A/a1").is_valid);
+        GLib.assert_true (!fake_folder.sync_journal ().conflict_record ("A/a2").is_valid);
     }
 
 } // class TestConflictRecordRemoval1

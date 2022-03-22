@@ -47,7 +47,7 @@ public class TestWipeVirtualSuffixFiles : AbstractTestSyncXAttr {
         cfverify_gone (fake_folder, "f1");
         cfverify_gone (fake_folder, "A/a1");
         GLib.assert_true (new FileInfo (fake_folder.local_path + "A/a3").exists ());
-        GLib.assert_true (!database_record (fake_folder, "A/a3").is_valid ());
+        GLib.assert_true (!database_record (fake_folder, "A/a3").is_valid);
         cfverify_gone (fake_folder, "A/B/b1");
 
         fake_folder.switch_to_vfs (new VfsOff ());

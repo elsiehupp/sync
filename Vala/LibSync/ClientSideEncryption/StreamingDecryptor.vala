@@ -28,7 +28,7 @@ public class StreamingDecryptor : GLib.Object {
     public StreamingDecryptor (string key, string initialization_vector, uint64 total_size) {
         this.is_initialized = false;
         this.total_size = total_size;
-        if (this.context && !key == "" && !initialization_vector == "" && total_size > 0) {
+        if (this.context != null && key != "" && initialization_vector != "" && total_size > 0) {
             this.is_initialized = true;
 
             // Initialize the decryption operation.
@@ -71,7 +71,7 @@ public class StreamingDecryptor : GLib.Object {
         }
 
         GLib.assert (input);
-        if (!input) {
+        if (input == null) {
             GLib.critical ("Decryption failed. Incorrect input!");
             return "";
         }

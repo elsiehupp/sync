@@ -53,7 +53,7 @@ public class TestIncompatiblePins : AbstractTestSyncXAttr {
         GLib.assert_true (new FileInfo (folder.local_path + (path)).exists ());
         GLib.assert_true (new FileInfo (folder.local_path + (path)).size () == 1);
         GLib.assert_true (xattr.has_nextcloud_placeholder_attributes ( folder.local_path + (path)));
-        GLib.assert_true (database_record (folder, path).is_valid ());
+        GLib.assert_true (database_record (folder, path).is_valid);
         GLib.assert_true (database_record (folder, path).type == ItemType.VIRTUAL_FILE);
     }
 
@@ -63,7 +63,7 @@ public class TestIncompatiblePins : AbstractTestSyncXAttr {
     private static void xaverify_nonvirtual (FakeFolder folder, string path) {
         GLib.assert_true (new FileInfo (folder.local_path + (path)).exists ());
         GLib.assert_true (!xattr.has_nextcloud_placeholder_attributes ( folder.local_path + (path)));
-        GLib.assert_true (database_record (folder, path).is_valid ());
+        GLib.assert_true (database_record (folder, path).is_valid);
         GLib.assert_true (database_record (folder, path).type == ItemType.FILE);
     }
 
@@ -72,7 +72,7 @@ public class TestIncompatiblePins : AbstractTestSyncXAttr {
     ***********************************************************/
     private static void cfverify_gone (FakeFolder folder, string path) {
         GLib.assert_true (!GLib.FileInfo (folder.local_path + (path)).exists ());
-        GLib.assert_true (!database_record (folder, path).is_valid ());
+        GLib.assert_true (!database_record (folder, path).is_valid);
     }
 
 } // class TestIncompatiblePins

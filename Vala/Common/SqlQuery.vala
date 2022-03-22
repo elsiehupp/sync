@@ -186,7 +186,7 @@ public class SqlQuery : GLib.Object {
     Returns true if 'a' starts with 'b' in a case insensitive way
     ***********************************************************/
     private static bool starts_with_insensitive (string a, string b) {
-        return a.size () >= b.size () && qstrnicmp (a.const_data (), b.const_data (), static_cast<uint32> (b.size ())) == 0;
+        return a.length >= b.length && qstrnicmp (a.const_data (), b.const_data (), static_cast<uint32> (b.length)) == 0;
     }
 
 
@@ -348,14 +348,14 @@ public class SqlQuery : GLib.Object {
             const GLib.DateTime date_time = value.to_date_time ();
             const string string_value = date_time.to_string ("yyyy-MM-dd_thh:mm:ss.zzz");
             res = sqlite3_bind_text16 (this.stmt, pos, string_value.utf16 (),
-                string_value.size () * static_cast<int> (sizeof (ushort)), SQLITE_TRANSIENT);
+                string_value.length * static_cast<int> (sizeof (ushort)), SQLITE_TRANSIENT);
             break;
         }
         case GLib.Variant.Time: {
             const QTime time = value.to_time ();
             const string string_value = time.to_string ("hh:mm:ss.zzz");
             res = sqlite3_bind_text16 (this.stmt, pos, string_value.utf16 (),
-                string_value.size () * static_cast<int> (sizeof (ushort)), SQLITE_TRANSIENT);
+                string_value.length * static_cast<int> (sizeof (ushort)), SQLITE_TRANSIENT);
             break;
         }
         case GLib.Variant.String: {
@@ -363,7 +363,7 @@ public class SqlQuery : GLib.Object {
                 // lifetime of string == lifetime of its qvariant
                 const var string_value = static_cast<const string> (value.const_data ());
                 res = sqlite3_bind_text16 (this.stmt, pos, string_value.utf16 (),
-                    (string_value.size ()) * static_cast<int> (sizeof (char)), SQLITE_TRANSIENT);
+                    (string_value.length) * static_cast<int> (sizeof (char)), SQLITE_TRANSIENT);
             } else {
                 res = sqlite3_bind_null (this.stmt, pos);
             }
@@ -371,14 +371,14 @@ public class SqlQuery : GLib.Object {
         }
         case GLib.Variant.Byte_array: {
             var ba = value.to_byte_array ();
-            res = sqlite3_bind_text (this.stmt, pos, ba.const_data (), ba.size (), SQLITE_TRANSIENT);
+            res = sqlite3_bind_text (this.stmt, pos, ba.const_data (), ba.length, SQLITE_TRANSIENT);
             break;
         }
         default: {
             string string_value = value.to_string ();
             // SQLITE_TRANSIENT makes sure that sqlite buffers the data
             res = sqlite3_bind_text16 (this.stmt, pos, string_value.utf16 (),
-                (string_value.size ()) * static_cast<int> (sizeof (char)), SQLITE_TRANSIENT);
+                (string_value.length) * static_cast<int> (sizeof (char)), SQLITE_TRANSIENT);
             break;
         }
         }

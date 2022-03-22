@@ -200,7 +200,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
 
 
     override ~ShareUserGroupWidget () {
-        delete this.instance;
+        //  delete this.instance;
     }
 
 
@@ -214,7 +214,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public void on_signal_share_created (Share share) {
-        if (share && this.account.capabilities.share_email_password_enabled () && !this.account.capabilities.share_email_password_enforced ()) {
+        if (this.account.capabilities.share_email_password_enabled () && !this.account.capabilities.share_email_password_enforced ()) {
             // remember this share Id so we can set its password Line Edit to focus later
             this.last_created_share_id = share.identifier;
         }
@@ -249,7 +249,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         foreach (var share in shares) {
             // We don't handle link shares, only Share.Type.USER or Share.Type.GROUP
             if (share.share_type == Share.Type.LINK) {
-                if (!share.owner_uid == "" &&
+                if (share.owner_uid != "" &&
                         share.owner_uid != share.account.dav_user) {
                     link_owners.append (share.owner_display_name);
                  }
@@ -258,7 +258,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
 
             // the owner of the file that shared it first
             // leave out if it's the current user
-            if (x == 0 && !share.owner_uid == "" && ! (share.owner_uid == this.account.credentials ().user ())) {
+            if (x == 0 && share.owner_uid != "" && ! (share.owner_uid == this.account.credentials ().user ())) {
                 this.instance.main_owner_label.text ("SharedFlag.SHARED with you by " += share.owner_display_name ());
             }
 
@@ -317,7 +317,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         this.disable_completer_activated = false;
         activate_sharee_line_edit ();
 
-        if (just_created_share_that_needs_password) {
+        if (just_created_share_that_needs_password != null) {
             // always set focus to a password Line Edit when the new email share is created on a server with optional passwords enabled for email shares
             just_created_share_that_needs_password.on_signal_focus_password_line_edit ();
         }
@@ -362,7 +362,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         this.disable_completer_activated = false;
         // First text_changed is called first and we stopped the timer when the text is changed, programatically or not
         // Then we restart the timer here if the user touched a key
-        if (!text == "") {
+        if (text != "") {
             this.completion_timer.on_signal_start ();
             /* emit */ signal_toggle_public_link_share (true);
         }
@@ -425,7 +425,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
 
         string password;
         if (sharee.type () == Sharee.Type.EMAIL && this.account.capabilities.share_email_password_enforced ()) {
-            this.instance.sharee_line_edit.clear ();
+            this.instance.sharee_line_edit == "";
             // always show a dialog for password-enforced email shares
             bool ok = false;
 
@@ -451,7 +451,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         );
 
         this.instance.sharee_line_edit.enabled = false;
-        this.instance.sharee_line_edit.clear ();
+        this.instance.sharee_line_edit == "";
     }
 
 

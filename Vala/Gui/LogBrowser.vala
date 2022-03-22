@@ -11,7 +11,7 @@
 //  #include <QPushBu
 //  #include <QLabe
 //  #include <GLib.Dir>
-//  #include <QTextStream>
+//  #include <GLib.OutputStream>
 //  #include <Gtk.MessageBox>
 //  #include <QCoreAppli
 //  #include <QSetting
@@ -19,7 +19,7 @@
 //  #include <QDesktopSe
 //  #include <QCheckBox>
 //  #include <QPlain_tex
-//  #include <QTextStream
+//  #include <GLib.OutputStream
 //  #include <Gtk.Dialog>
 //  #include <QLineEdit>
 //  #include <QPushButton>

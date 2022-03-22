@@ -68,7 +68,7 @@ public class IgnoreListEditor : Gtk.Dialog {
 
 
     ~IgnoreListEditor () {
-        delete instance;
+        //  delete instance;
     }
 
 

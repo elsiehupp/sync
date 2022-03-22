@@ -63,8 +63,8 @@ public class LocalDiscoveryTracker : GLib.Object {
     Call when a sync run starts that rediscovers all local files
     ***********************************************************/
     public void start_sync_full_discovery () {
-        this.local_discovery_paths.clear ();
-        this.previous_local_discovery_paths.clear ();
+        this.local_discovery_paths == "";
+        this.previous_local_discovery_paths == "";
         GLib.debug ("Full discovery");
     }
 
@@ -82,7 +82,7 @@ public class LocalDiscoveryTracker : GLib.Object {
         }
 
         this.previous_local_discovery_paths = std.move (this.local_discovery_paths);
-        this.local_discovery_paths.clear ();
+        this.local_discovery_paths == "";
     }
 
 
@@ -106,7 +106,7 @@ public class LocalDiscoveryTracker : GLib.Object {
                         || item.instruction == CSync.SyncInstructions.UPDATE_METADATA))) {
             if (this.previous_local_discovery_paths.erase (item.file.to_utf8 ()))
                 GLib.debug ("Wiped successful item " + item.file);
-            if (!item.rename_target == "" && this.previous_local_discovery_paths.erase (item.rename_target.to_utf8 ()))
+            if (item.rename_target != "" && this.previous_local_discovery_paths.erase (item.rename_target.to_utf8 ()))
                 GLib.debug ("Wiped successful item " + item.rename_target);
         } else {
             this.local_discovery_paths.insert (item.file.to_utf8 ());
@@ -129,7 +129,7 @@ public class LocalDiscoveryTracker : GLib.Object {
                 this.previous_local_discovery_paths.begin (), this.previous_local_discovery_paths.end ());
             GLib.debug ("Sync failed; keeping last sync's local discovery path list.");
         }
-        this.previous_local_discovery_paths.clear ();
+        this.previous_local_discovery_paths == "";
     }
 
 } // class LocalDiscoveryTracker

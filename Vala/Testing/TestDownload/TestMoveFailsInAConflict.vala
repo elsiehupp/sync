@@ -37,7 +37,7 @@ public class TestMoveFailsInAConflict : GLib.Object {
         );
 
         GLib.assert_true (!fake_folder.sync_once ()); // The sync must fail because the rename failed
-        GLib.assert_true (!conflict_file == "");
+        GLib.assert_true (conflict_file != "");
 
         // restore permissions
         GLib.File (fake_folder.local_path + "A/").set_permissions (GLib.File.Permissions (0x7777));

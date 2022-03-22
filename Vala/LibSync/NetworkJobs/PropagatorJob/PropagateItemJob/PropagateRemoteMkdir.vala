@@ -76,10 +76,10 @@ public class PropagateRemoteMkdir : AbstractPropagateItemJob {
     /***********************************************************
     ***********************************************************/
     public new void abort (AbstractPropagatorJob.AbortType abort_type) {
-        if (this.mkcol_job && this.mkcol_job.input_stream) {
+        if (this.mkcol_job != null && this.mkcol_job.input_stream) {
             this.mkcol_job.input_stream.abort ();
         }
-        if (this.delete_job && this.delete_job.input_stream) {
+        if (this.delete_job != null && this.delete_job.input_stream) {
             this.delete_job.input_stream.abort ();
         }
 
@@ -212,7 +212,7 @@ public class PropagateRemoteMkdir : AbstractPropagateItemJob {
 
         var job_path = this.mkcol_job.path;
 
-        if (this.upload_encrypted_helper && this.upload_encrypted_helper.is_folder_locked && !this.upload_encrypted_helper.is_unlock_running) {
+        if (this.upload_encrypted_helper != null && this.upload_encrypted_helper.is_folder_locked && !this.upload_encrypted_helper.is_unlock_running) {
             // since we are done, we need to unlock a folder in case it was locked
             this.upload_encrypted_helper.signal_folder_unlocked.connect (
                 this.on_signal_propagate_upload_encrypted_folder_unlocked
@@ -245,7 +245,7 @@ public class PropagateRemoteMkdir : AbstractPropagateItemJob {
         // Never save the etag on first mkdir.
         // Only fully propagated directories should have the etag set.
         var item_copy = this.item;
-        item_copy.etag.clear ();
+        item_copy.etag == "";
 
         // save the file identifier already so we can detect rename or remove
         var result = this.propagator.update_metadata (item_copy);
@@ -301,9 +301,9 @@ public class PropagateRemoteMkdir : AbstractPropagateItemJob {
 
     private void on_signal_prop_find_job_result (string job_path, GLib.HashTable<string, GLib.Variant> result) {
         this.propagator.active_job_list.remove_one (this);
-        this.item.remote_perm = RemotePermissions.from_server_string (result.value ("permissions").to_string ());
+        this.item.remote_permissions = RemotePermissions.from_server_string (result.value ("permissions").to_string ());
 
-        if (!this.upload_encrypted_helper && !this.item.is_encrypted) {
+        if (this.upload_encrypted_helper == null && !this.item.is_encrypted) {
             on_signal_success ();
         } else {
             // We still need to mark that folder encrypted in case we were uploading it as encrypted one

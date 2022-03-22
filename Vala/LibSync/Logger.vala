@@ -23,7 +23,7 @@ public class Logger : GLib.Object {
         }
         public set {
             QMutexLocker locker = new QMutexLocker (&this.mutex);
-            if (this.logstream) {
+            if (this.logstream != null) {
                 this.logstream.reset (null);
                 this.log_file_object.close ();
             }
@@ -49,7 +49,7 @@ public class Logger : GLib.Object {
                 return;
             }
 
-            this.logstream.reset (new QTextStream (&this.log_file));
+            this.logstream.reset (new GLib.OutputStream (&this.log_file));
             this.logstream.codec (GMime.Encoding.codec_for_name ("UTF-8"));
         }
     }
@@ -71,7 +71,7 @@ public class Logger : GLib.Object {
         }
     }
 
-    private QTextStream logstream;
+    private GLib.OutputStream logstream;
     private /*mutable*/ QMutex mutex;
     public string log_directory;
     private bool temporary_folder_log_dir = false;
@@ -83,7 +83,7 @@ public class Logger : GLib.Object {
         public set {
             this.log_rules = value;
             string temporary;
-            QTextStream output = new QTextStream (temporary);
+            GLib.OutputStream output = new GLib.OutputStream (temporary);
             foreach (var p in value) {
                 output += p + '\n';
             }
@@ -152,7 +152,7 @@ public class Logger : GLib.Object {
             QMutexLocker lock = new QMutexLocker (this.mutex);
             this.crash_log_index = (this.crash_log_index + 1) % CRASH_LOG_SIZE;
             this.crash_log[this.crash_log_index] = message;
-            if (this.logstream) {
+            if (this.logstream != null) {
                 (*this.logstream) + message + Qt.endl;
                 if (this.do_file_flush) {
                     this.logstream.flush ();
@@ -265,7 +265,7 @@ public class Logger : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_enter_next_log_file () {
-        if (!this.log_directory == "") {
+        if (this.log_directory != "") {
 
             GLib.Dir directory = new GLib.Dir (this.log_directory);
             if (!directory.exists ()) {
@@ -348,7 +348,7 @@ public class Logger : GLib.Object {
     private void dump_crash_log () {
         GLib.File log_file = GLib.File.new_for_path (GLib.Dir.temp_path + "/" + APPLICATION_NAME + "-crash.log");
         if (log_file_object.open (GLib.File.WriteOnly)) {
-            QTextStream output = new QTextStream (&log_file);
+            GLib.OutputStream output = new GLib.OutputStream (&log_file);
             for (int i = 1; i <= CRASH_LOG_SIZE; ++i) {
                 output += this.crash_log[ (this.crash_log_index + i) % CRASH_LOG_SIZE] + '\n';
             }

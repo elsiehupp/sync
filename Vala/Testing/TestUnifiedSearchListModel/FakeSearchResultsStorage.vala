@@ -71,7 +71,7 @@ public class FakeSearchResultsStorage : GLib.Object {
     ***********************************************************/
     public static void destroy () {
         if (this.instance) {
-            delete this.instance;
+            //  delete this.instance;
         }
 
         this.instance = null;
@@ -81,7 +81,7 @@ public class FakeSearchResultsStorage : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_init () {
-        if (!this.search_results_data == "") {
+        if (this.search_results_data != null) {
             return;
         }
 

@@ -33,7 +33,7 @@ public class SvgImageProvider : QQuickImageProvider {
         const var pixmap_name = id_split.at (0);
         const var pixmap_color = id_split.size () > 1 ? Gtk.Color (id_split.at (1)) : QColor_constants.Svg.black;
 
-        if (pixmap_name == "" || !pixmap_color.is_valid ()) {
+        if (pixmap_name == "" || !pixmap_color.is_valid) {
             GLib.warning ("Image identifier is incorrect!");
             return {};
         }

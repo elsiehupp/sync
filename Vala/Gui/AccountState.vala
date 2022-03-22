@@ -75,7 +75,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
 
                 if (this.state == State.SIGNED_OUT) {
                     this.connection_status = ConnectionValidator.Status.UNDEFINED;
-                    this.connection_errors.clear ();
+                    this.connection_errors == "";
                 } else if (old_state == State.SIGNED_OUT && this.state == State.DISCONNECTED) {
                     // If we stop being voluntarily signed-out, try to connect and
                     // auth right now!
@@ -84,7 +84,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
                     // Check if we are actually down for maintenance.
                     // To do this we must clear the connection validator that just
                     // produced the 503. It's on_signal_finished anyway and will delete itself.
-                    this.connection_validator.clear ();
+                    this.connection_validator == "";
                     on_signal_check_connectivity ();
                 }
                 if (old_state == State.CONNECTED || this.state == State.CONNECTED) {
@@ -152,7 +152,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     /***********************************************************
     Holds the App names and URLs available on the server
     ***********************************************************/
-    private AccountAppList apps;
+    public AccountAppList app_list { public get; private set; }
 
     public bool are_desktop_notifications_allowed {
         /***********************************************************
@@ -269,23 +269,18 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
 
     /***********************************************************
     ***********************************************************/
-    public bool is_signed_out () {
-        return this.state == State.SIGNED_OUT;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public AccountAppList app_list {
-        return this.apps;
+    public bool is_signed_out {
+        public get {
+            return this.state == State.SIGNED_OUT;
+        }
     }
 
 
     /***********************************************************
     ***********************************************************/
     public AccountApp find_app (string app_id) {
-        if (!app_id != "") {
-            foreach (var app in app_list) {
+        if (app_id == "") {
+            foreach (var app in this.app_list) {
                 if (app.identifier == app_id) {
                     return app;
                 }
@@ -376,7 +371,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     Asks for user credentials
     ***********************************************************/
     public void handle_invalid_credentials () {
-        if (is_signed_out () || this.waiting_for_new_credentials)
+        if (is_signed_out || this.waiting_for_new_credentials)
             return;
 
         GLib.info ("Invalid credentials for " + this.account.url.to_string ()
@@ -403,7 +398,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     status and errors.
     ***********************************************************/
     public void on_signal_check_connectivity () {
-        if (is_signed_out () || this.waiting_for_new_credentials) {
+        if (is_signed_out || this.waiting_for_new_credentials) {
             return;
         }
 
@@ -424,7 +419,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
         // if the last successful etag check job is not so long ago.
         const int polltime = ConfigFile ().remote_poll_interval ().seconds;
         const int elapsed = this.time_of_last_e_tag_check.secs_to (GLib.DateTime.current_date_time_utc ());
-        if (is_connected && this.time_of_last_e_tag_check.is_valid ()
+        if (is_connected && this.time_of_last_e_tag_check.is_valid
             && elapsed <= polltime.count ()) {
             GLib.debug (account.display_name + "The last ETag check succeeded within the last " + polltime.count () + "s (" + elapsed + "s). No connection check needed!");
             return;
@@ -483,7 +478,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_connection_validator_result (ConnectionValidator.Status status, string[] errors) {
-        if (is_signed_out ()) {
+        if (is_signed_out) {
             GLib.warning ("Signed out, ignoring " + status + this.account.url.to_string ());
             return;
         }
@@ -492,7 +487,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
         if (status == ConnectionValidator.State.CONNECTED
             && (this.connection_status == ConnectionValidator.State.SERVICE_UNAVAILABLE
                 || this.connection_status == ConnectionValidator.State.MAINTENANCE_MODE)) {
-            if (!this.time_since_maintenance_over.is_valid ()) {
+            if (!this.time_since_maintenance_over.is_valid) {
                 GLib.info ("AccountState reconnection: delaying for "
                     + this.maintenance_to_connected_delay + "ms.");
                 this.time_since_maintenance_over.on_signal_start ();
@@ -619,22 +614,22 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     protected void on_signal_navigation_apps_fetched (QJsonDocument reply, int status_code) {
         if (this.account != null) {
             if (status_code == 304) {
-                GLib.warning ("Status code " + status_code + " Not Modified - No new navigation apps.");
+                GLib.warning ("Status code " + status_code + " Not Modified - No new navigation app_list.");
             } else {
-                this.apps.clear ();
+                this.app_list == "";
 
-                if (!reply == "") {
+                if (reply != "") {
                     var element = reply.object ().value ("ocs").to_object ().value ("data");
                     const var nav_links = element.to_array ();
 
-                    if (nav_links.size () > 0) {
+                    if (nav_links.length > 0) {
                         foreach (QJsonValue value in nav_links) {
                             var nav_link = value.to_object ();
 
                             var app = new AccountApp (nav_link.value ("name").to_string (), GLib.Uri (nav_link.value ("href").to_string ()),
                                 nav_link.value ("identifier").to_string (), GLib.Uri (nav_link.value ("icon").to_string ()));
 
-                            this.apps + app;
+                            this.app_list + app;
                         }
                     }
                 }
@@ -649,7 +644,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     ***********************************************************/
     protected void on_signal_etag_response_header_received (string value, int status_code) {
         if (status_code == 200) {
-            GLib.debug ("New navigation apps ETag Response Header received " + value);
+            GLib.debug ("New navigation app_list ETag Response Header received " + value);
             this.navigation_apps_etag_response_header = value;
         }
     }
@@ -658,7 +653,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_ocs_error (int status_code, string message) {
-        GLib.debug ("Error " + status_code.to_string () + " while fetching new navigation apps: " + message);
+        GLib.debug ("Error " + status_code.to_string () + " while fetching new navigation app_list: " + message);
     }
 
 } // class AccountState

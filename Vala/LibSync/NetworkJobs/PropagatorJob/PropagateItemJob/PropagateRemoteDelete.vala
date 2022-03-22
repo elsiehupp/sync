@@ -81,7 +81,7 @@ public class PropagateRemoteDelete : AbstractPropagateItemJob {
     /***********************************************************
     ***********************************************************/
     public new void abort (AbstractPropagatorJob.AbortType abort_type) {
-        if (this.delete_job && this.delete_job.input_stream)
+        if (this.delete_job != null && this.delete_job.input_stream)
             this.delete_job.input_stream.abort ();
 
         if (abort_type == AbstractPropagatorJob.AbortType.ASYNCHRONOUS) {

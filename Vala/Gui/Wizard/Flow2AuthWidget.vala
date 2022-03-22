@@ -69,21 +69,19 @@ public class Flow2AuthWidget : Gtk.Widget {
 
         this.status_update_skip_count = 0;
 
-        if (account) {
-            this.account = account;
+        this.account = account;
 
-            this.async_auth.reset (new Flow2Auth (this.account, this));
-            this.async_auth.signal_result.connect (
-                this.on_signal_auth_result // Qt.QueuedConnection
-            );
-            this.async_auth.signal_status_changed.connect (
-                this.on_signal_status_changed
-            );
-            this.signal_poll_now.connect (
-                this.async_auth.on_signal_poll_now
-            );
-            this.async_auth.start ();
-        }
+        this.async_auth.reset (new Flow2Auth (this.account, this));
+        this.async_auth.signal_result.connect (
+            this.on_signal_auth_result // Qt.QueuedConnection
+        );
+        this.async_auth.signal_status_changed.connect (
+            this.on_signal_status_changed
+        );
+        this.signal_poll_now.connect (
+            this.async_auth.on_signal_poll_now
+        );
+        this.async_auth.start ();
     }
 
 
@@ -180,12 +178,12 @@ public class Flow2AuthWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_open_browser () {
-        if (this.instance.error_label) {
+        if (this.instance.error_label != null) {
             this.instance.error_label.hide ();
         }
 
-        if (this.async_auth) {
-            this.async_auth.openBrowser ();
+        if (this.async_auth != null) {
+            this.async_auth.open_browser ();
         }
     }
 
@@ -193,11 +191,11 @@ public class Flow2AuthWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_copy_link_to_clipboard () {
-        if (this.instance.error_label) {
+        if (this.instance.error_label != null) {
             this.instance.error_label.hide ();
         }
 
-        if (this.async_auth) {
+        if (this.async_auth != null) {
             this.async_auth.copy_link_to_clipboard ();
         }
     }
@@ -234,9 +232,9 @@ public class Flow2AuthWidget : Gtk.Widget {
     private void customize_style () {
         logo ();
 
-        if (this.progress_indicator) {
+        if (this.progress_indicator != null) {
             const bool is_dark_background = Theme.is_dark_color (palette ().window ().color ());
-            if (is_dark_background) {
+            if (this.is_dark_background) {
                 this.progress_indicator.color (Qt.white);
             } else {
                 this.progress_indicator.color (Qt.black);

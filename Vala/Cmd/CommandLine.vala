@@ -266,11 +266,11 @@ public class CommandLine : GLib.Object {
         string user = host_url.user_name ();
         string password = host_url.password ();
 
-        if (!options.user == "") {
+        if (options.user != "") {
             user = options.user;
         }
 
-        if (!options.password == "") {
+        if (options.password != "") {
             password = options.password;
         }
 
@@ -305,7 +305,7 @@ public class CommandLine : GLib.Object {
 
         const string folder = options.remote_path;
 
-        if (!options.proxy == null) {
+        if (options.proxy != null) {
             string host;
             int port = 0;
             bool ok = false;
@@ -374,7 +374,7 @@ public class CommandLine : GLib.Object {
         opts = options;
 
         string[] selective_sync_list;
-        if (!options.unsynced_folders == "") {
+        if (options.unsynced_folders != "") {
             GLib.File f = new GLib.File (options.unsynced_folders);
             if (!f.open (GLib.File.ReadOnly)) {
                 GLib.critical ("Could not open file containing the list of unsynced folders: " + options.unsynced_folders);

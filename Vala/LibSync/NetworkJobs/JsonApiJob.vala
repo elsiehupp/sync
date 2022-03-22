@@ -43,7 +43,7 @@ public class JsonApiJob : AbstractNetworkJob {
         public set {
             this.body = value.to_json ();
             GLib.debug ("Set body for request:" + this.body);
-            if (!this.body == "") {
+            if (this.body != "") {
                 this.request.header (Soup.Request.ContentTypeHeader, "application/json");
             }
         }
@@ -123,7 +123,7 @@ public class JsonApiJob : AbstractNetworkJob {
         query.add_query_item ("format", "json");
         GLib.Uri url = Utility.concat_url_path (account.url, this.path, query);
         const string http_verb = this.verb.to_string ();
-        if (!this.body == "") {
+        if (this.body != "") {
             send_request (http_verb, url, this.request, this.body);
         } else {
             send_request (http_verb, url, this.request);

@@ -41,7 +41,7 @@ public class TestRenameVirtual : AbstractTestSyncVirtualFiles {
         GLib.assert_true (!fake_folder.current_remote_state ().find ("file1"));
         GLib.assert_true (fake_folder.current_remote_state ().find ("renamed1"));
         GLib.assert_true (item_instruction (complete_spy, "renamed1" + DVSUFFIX, CSync.SyncInstructions.RENAME));
-        GLib.assert_true (database_record (fake_folder, "renamed1" + DVSUFFIX).is_valid ());
+        GLib.assert_true (database_record (fake_folder, "renamed1" + DVSUFFIX).is_valid);
 
         // file2 has a conflict between the download request and the rename:
         // the rename wins, the download is ignored
@@ -68,7 +68,7 @@ public class TestRenameVirtual : AbstractTestSyncVirtualFiles {
     /***********************************************************
     ***********************************************************/
     private static void clean_up_test_rename_virtual (ItemCompletedSpy complete_spy ) {
-        complete_spy.clear ();
+        complete_spy == "";
     }
 
 } // class TestRenameVirtual

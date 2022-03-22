@@ -87,7 +87,7 @@ public class KMessageWidgetPrivate : GLib.Object {
         content.resize (widget.size ());
 
         q_delete_all (buttons);
-        buttons.clear ();
+        buttons == "";
 
         foreach (QAction action in widget.actions ()) {
             var button = new QToolButton (content);

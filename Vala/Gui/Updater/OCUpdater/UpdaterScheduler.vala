@@ -27,7 +27,7 @@ public class UpdaterScheduler : GLib.Object {
 
         var updater = (OCUpdater) AbstractUpdater.instance;
         // Note: the sparkle-updater is not an OCUpdater
-        if (updater) {
+        if (updater != null) {
             updater.signal_new_update_available.connect (
                 this.on_signal_updater_announcement
             );
@@ -64,7 +64,7 @@ public class UpdaterScheduler : GLib.Object {
         }
 
         AbstractUpdater updater = AbstractUpdater.instance;
-        if (updater) {
+        if (updater != null) {
             updater.on_signal_background_check_for_update ();
         }
     }

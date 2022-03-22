@@ -71,7 +71,7 @@ public class TestExtraFilesWhileLocalHydrated : AbstractTestSyncVirtualFiles {
     /***********************************************************
     ***********************************************************/
     private static void clean_up_test_extra_files_local_dehydrated (ItemCompletedSpy complete_spy) {
-        complete_spy.clear ();
+        complete_spy == "";
     }
 
 } // class TestExtraFilesWhileLocalHydrated

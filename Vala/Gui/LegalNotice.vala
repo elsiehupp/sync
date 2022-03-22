@@ -35,7 +35,7 @@ public class LegalNotice : Gtk.Dialog {
 
 
     override ~LegalNotice () {
-        delete this.instance;
+        //  delete this.instance;
     }
 
 

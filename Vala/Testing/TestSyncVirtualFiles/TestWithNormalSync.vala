@@ -46,7 +46,7 @@ public class TestWithNormalSync : AbstractTestSyncVirtualFiles {
 
 
     private static void clean_up_test_with_normal_sync (ItemCompletedSpy complete_spy) {
-        complete_spy.clear ();
+        complete_spy == "";
     }
 
 } // class TestWithNormalSync

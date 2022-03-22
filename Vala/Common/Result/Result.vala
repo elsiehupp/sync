@@ -103,9 +103,9 @@ public class Result<T> : GLib.Object {
 
     ~Result () {
         if (this.is_error) {
-            delete (this.error);
+            this.error = null;
         } else {
-            delete (this.result);
+            this.result = null;
         }
     }
 
@@ -119,8 +119,10 @@ public class Result<T> : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public bool is_valid () {
-        return !this.is_error;
+    public bool is_valid {
+        public get {
+            return !this.is_error;
+        }
     }
 
 

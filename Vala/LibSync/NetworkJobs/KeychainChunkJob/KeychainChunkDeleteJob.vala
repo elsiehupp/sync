@@ -42,7 +42,7 @@ public class KeychainChunkDeleteJob : AbstractKeychainChunkJob {
         this.chunk_count = 0;
         this.error = Secret.Collection.NoError;
 
-        const string keychain_key = this.account ? AbstractCredentials.keychain_key (
+        const string keychain_key = this.account != null ? AbstractCredentials.keychain_key (
                 this.account.url.to_string (),
                 this.key,
                 this.keychain_migration ? "" : this.account.identifier

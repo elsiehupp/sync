@@ -17,7 +17,7 @@ public class TestOnWebSocketErrorConnectionLostEmitConnectionLost : AbstractTest
         var account = FakeWebSocketServer.create_account ();
         QSignalSpy connection_lost_spy = new QSignalSpy (account.push_notifications (), &PushNotificationManager.connection_lost);
         QSignalSpy push_notifications_disabled_spy = new QSignalSpy (account, &Account.push_notifications_disabled);
-        GLib.assert_true (connection_lost_spy.is_valid ());
+        GLib.assert_true (connection_lost_spy.is_valid);
 
         // Wait for authentication and then sent a network error
         GLib.assert_true (fake_server.wait_for_text_messages ());

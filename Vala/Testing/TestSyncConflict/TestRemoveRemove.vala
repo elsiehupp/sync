@@ -28,11 +28,11 @@ public class TestRemoveRemove : AbstractTestSyncConflict {
         GLib.assert_true (fake_folder.current_local_state () == expected_state);
         GLib.assert_true (fake_folder.current_remote_state () == expected_state);
 
-        GLib.assert_true (database_record (fake_folder, "B/b2").is_valid ());
+        GLib.assert_true (database_record (fake_folder, "B/b2").is_valid);
 
-        GLib.assert_true (!database_record (fake_folder, "B/b1").is_valid ());
-        GLib.assert_true (!database_record (fake_folder, "A/a1").is_valid ());
-        GLib.assert_true (!database_record (fake_folder, "A").is_valid ());
+        GLib.assert_true (!database_record (fake_folder, "B/b1").is_valid);
+        GLib.assert_true (!database_record (fake_folder, "A/a1").is_valid);
+        GLib.assert_true (!database_record (fake_folder, "A").is_valid);
     }
 
 } // class TestRemoveRemove

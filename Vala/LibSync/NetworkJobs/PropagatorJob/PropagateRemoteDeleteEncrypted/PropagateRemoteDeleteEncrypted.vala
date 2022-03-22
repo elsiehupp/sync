@@ -20,10 +20,9 @@ public class PropagateRemoteDeleteEncrypted : AbstractPropagateRemoteDeleteEncry
     /***********************************************************
     ***********************************************************/
     public new void start () {
-        GLib.assert (!this.item.encrypted_filename == "");
+        GLib.assert (this.item.encrypted_filename != "");
 
-        const GLib.FileInfo info = GLib.File.new_for_path (this.item.encrypted_filename);
-        start_lscol_job (info.path);
+        start_lscol_job (GLib.File.new_for_path (this.item.encrypted_filename).path);
     }
 
 

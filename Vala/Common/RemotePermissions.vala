@@ -25,9 +25,9 @@ public class RemotePermissions : GLib.Object {
     /***********************************************************
     ***********************************************************/
     //  private template <typename Char> // can be 'char' or 'ushort' if conversion from string
-    private void from_array (Char[] remote_permissions) {
-        this.value = not_null_mask;
-        if (!remote_permissions)
+    private void from_array (char[] remote_permissions) {
+        this.value = (uint16)not_null_mask;
+        if (remote_permissions == null)
             return;
         for (int i; i < remote_permissions.length; i++) {
             var res = std.strchr (LETTERS, static_cast<char> (remote_permissions[i]));
@@ -71,16 +71,18 @@ public class RemotePermissions : GLib.Object {
     ***********************************************************/
     public string to_database_value () {
         string result;
-        if (is_null ())
+        if (is_null ()) {
             return result;
-        result.reserve (Permissions.PERMISSIONS_COUNT);
+        }
+        //  result.reserve (Permissions.PERMISSIONS_COUNT);
         for (uint32 i = 1; i <= Permissions.PERMISSIONS_COUNT; ++i) {
-            if (this.value & (1 << i))
-                result.append (LETTERS[i]);
+            if ((this.value & (1 << i)) != 0) {
+                result += LETTERS[i].to_string ();
+            }
         }
         if (result == "") {
             // Make sure it is not empty so we can differentiate null and empty permissions
-            result.append (' ');
+            result += " ";
         }
         return result;
     }

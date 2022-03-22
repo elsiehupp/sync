@@ -88,10 +88,12 @@ public class FolderWatcher : GLib.Object {
     Check if the path is ignored.
     ***********************************************************/
     public bool path_is_ignored (string path) {
-        if (path == "")
+        if (path == "") {
             return true;
-        if (!this.folder_connection)
+        }
+        if (this.folder_connection == null) {
             return false;
+        }
 
     //  #ifndef OWNCLOUD_TEST
         if (this.folder_connection.is_file_excluded_absolute (path) && !Utility.is_conflict_file (path)) {
@@ -164,9 +166,9 @@ public class FolderWatcher : GLib.Object {
         // ------- handle ignores:
         for (int i = 0; i < paths.size (); ++i) {
             string path = paths[i];
-            if (!this.test_notification_path == ""
+            if (this.test_notification_path != ""
                 && Utility.filenames_equal (path, this.test_notification_path)) {
-                this.test_notification_path.clear ();
+                this.test_notification_path = "";
             }
             if (path_is_ignored (path)) {
                 continue;
@@ -209,9 +211,10 @@ public class FolderWatcher : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_timer () {
-        if (!this.test_notification_path == "")
+        if (this.test_notification_path != "") {
             /* emit */ signal_became_unreliable (_("The watcher did not receive a test notification."));
-        this.test_notification_path.clear ();
+        }
+        this.test_notification_path == "";
     }
 
 

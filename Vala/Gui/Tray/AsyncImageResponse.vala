@@ -68,7 +68,7 @@ public class AsyncImageResponse : QQuickImageResponse {
         const var current_user = UserModel.instance.is_current_user ();
         if (current_user && current_user.account) {
             const GLib.Uri icon_url = new GLib.Uri (this.image_paths.at (this.index));
-            if (icon_url.is_valid () && !icon_url.scheme () == "") {
+            if (icon_url.is_valid && !icon_url.scheme () == "") {
                 // fetch the remote resource
                 const var reply = current_user.account.send_raw_request ("GET", icon_url);
                 reply.signal_finished.connect (

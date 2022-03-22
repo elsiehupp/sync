@@ -27,7 +27,7 @@ public class TestParentsGetWarningForError : AbstractTestSyncFileStatusTracker {
         GLib.assert_true (status_spy.status_of ("A/a1") == SyncFileStatus.StatusSync);
         GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusSync);
         GLib.assert_true (status_spy.status_of ("B/b0") == SyncFileStatus.StatusSync);
-        status_spy.clear ();
+        status_spy == "";
 
         fake_folder.exec_until_finished ();
         verify_that_push_matches_pull (fake_folder, status_spy);
@@ -37,10 +37,10 @@ public class TestParentsGetWarningForError : AbstractTestSyncFileStatusTracker {
         GLib.assert_true (fake_folder.sync_engine.sync_file_status_tracker.file_status ("A/a2") == SyncFileStatus.StatusUpToDate);
         GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusWarning);
         GLib.assert_true (status_spy.status_of ("B/b0") == SyncFileStatus.StatusError);
-        status_spy.clear ();
+        status_spy == "";
 
         // Remove the error and start a second sync, the blocklist should kick in
-        fake_folder.server_error_paths ().clear ();
+        fake_folder.server_error_paths () == "";
         fake_folder.schedule_sync ();
         fake_folder.exec_until_before_propagation ();
         verify_that_push_matches_pull (fake_folder, status_spy);
@@ -50,7 +50,7 @@ public class TestParentsGetWarningForError : AbstractTestSyncFileStatusTracker {
         GLib.assert_true (status_spy.status_of ("A/a1") == SyncFileStatus.StatusError);
         GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusWarning);
         GLib.assert_true (status_spy.status_of ("B/b0") == SyncFileStatus.StatusError);
-        status_spy.clear ();
+        status_spy == "";
         fake_folder.exec_until_finished ();
         verify_that_push_matches_pull (fake_folder, status_spy);
         GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusWarning);
@@ -59,7 +59,7 @@ public class TestParentsGetWarningForError : AbstractTestSyncFileStatusTracker {
         GLib.assert_true (fake_folder.sync_engine.sync_file_status_tracker.file_status ("A/a2") == SyncFileStatus.StatusUpToDate);
         GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusWarning);
         GLib.assert_true (status_spy.status_of ("B/b0") == SyncFileStatus.StatusError);
-        status_spy.clear ();
+        status_spy == "";
 
         // Start a third sync, this time together with a real file to sync
         fake_folder.local_modifier.append_byte ("C/c1");
@@ -75,7 +75,7 @@ public class TestParentsGetWarningForError : AbstractTestSyncFileStatusTracker {
         GLib.assert_true (status_spy.status_of ("B/b0") == SyncFileStatus.StatusError);
         GLib.assert_true (status_spy.status_of ("C") == SyncFileStatus.StatusSync);
         GLib.assert_true (status_spy.status_of ("C/c1") == SyncFileStatus.StatusSync);
-        status_spy.clear ();
+        status_spy == "";
         fake_folder.exec_until_finished ();
         verify_that_push_matches_pull (fake_folder, status_spy);
         GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusWarning);
@@ -86,7 +86,7 @@ public class TestParentsGetWarningForError : AbstractTestSyncFileStatusTracker {
         GLib.assert_true (status_spy.status_of ("B/b0") == SyncFileStatus.StatusError);
         GLib.assert_true (status_spy.status_of ("C") == SyncFileStatus.StatusUpToDate);
         GLib.assert_true (status_spy.status_of ("C/c1") == SyncFileStatus.StatusUpToDate);
-        status_spy.clear ();
+        status_spy == "";
 
         // Another sync after clearing the blocklist entry, everything should return to order.
         fake_folder.sync_engine.journal.wipe_error_blocklist_entry ("A/a1");
@@ -99,7 +99,7 @@ public class TestParentsGetWarningForError : AbstractTestSyncFileStatusTracker {
         GLib.assert_true (status_spy.status_of ("A/a1") == SyncFileStatus.StatusSync);
         GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusSync);
         GLib.assert_true (status_spy.status_of ("B/b0") == SyncFileStatus.StatusSync);
-        status_spy.clear ();
+        status_spy == "";
         fake_folder.exec_until_finished ();
         verify_that_push_matches_pull (fake_folder, status_spy);
         GLib.assert_true (status_spy.status_of ("") == SyncFileStatus.StatusUpToDate);

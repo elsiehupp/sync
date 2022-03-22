@@ -119,12 +119,12 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
         UploadFileInfo file_to_upload) {
         // Reuse the content checksum as the transmission checksum if possible
         var supported_transmission_checksums =
-            this.propagator.account.capabilities.supported_checksum_types ();
+            this.propagator.account.capabilities.supported_checksum_types;
 
         // Compute the transmission checksum.
         var compute_checksum = std.make_unique<ComputeChecksum> (this);
         if (upload_checksum_enabled ()) {
-            compute_checksum.checksum_type ("MD5" /*this.propagator.account.capabilities.upload_checksum_type ()*/);
+            compute_checksum.checksum_type ("MD5" /*this.propagator.account.capabilities.upload_checksum_type*/);
         } else {
             compute_checksum.checksum_type ("");
         }
@@ -338,7 +338,7 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
         var current_headers = headers (item);
         current_headers["Content-Length"] = new string.number (file_to_upload.size);
 
-        if (!item.rename_target == "" && item.file != item.rename_target) {
+        if (item.rename_target != "" && item.file != item.rename_target) {
             // Try to rename the file
             var original_file_path_absolute = this.propagator.full_local_path (item.file);
             var new_file_path_absolute = this.propagator.full_local_path (item.rename_target);
@@ -610,17 +610,17 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
             headers["OC-Tag"] = ".sys.admin#recall#";
         }
 
-        if (!item.etag == "" && item.etag != "empty_etag"
+        if (item.etag != "" && item.etag != "empty_etag"
             && item.instruction != CSync.SyncInstructions.NEW // On new files never send a If-Match
             && item.instruction != CSync.SyncInstructions.TYPE_CHANGE) {
             // We add quotes because the owncloud server always adds quotes around the etag, and
             //  csync_owncloud.c's owncloud_file_id always strips the quotes.
-            headers["If-Match"] = '"' + item.etag + '"';
+            headers["If-Match"] = "\\" + item.etag + "\\";
         }
 
         // Set up a conflict file header pointing to the original file
         var conflict_record = this.propagator.journal.conflict_record (item.file.to_utf8 ());
-        if (conflict_record.is_valid ()) {
+        if (conflict_record.is_valid) {
             headers["OC-Conflict"] = "1";
             if (!conflict_record.initial_base_path == "") {
                 headers["OC-ConflictInitialBasePath"] = conflict_record.initial_base_path;
@@ -658,7 +658,7 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
     ***********************************************************/
     private void check_resetting_errors (SyncFileItem item) {
         if (item.http_error_code == 412
-            || this.propagator.account.capabilities.http_error_codes_that_reset_failing_chunked_uploads ().contains (item.http_error_code)) {
+            || this.propagator.account.capabilities.http_error_codes_that_reset_failing_chunked_uploads.contains (item.http_error_code)) {
             var upload_info = this.propagator.journal.get_upload_info (item.file);
             upload_info.error_count += 1;
             if (upload_info.error_count > 3) {

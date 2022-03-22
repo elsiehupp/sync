@@ -10,7 +10,7 @@ namespace Testing {
 public abstract class AbstractTestSyncConflict : GLib.Object {
 
     protected static void clean_up (ItemCompletedSpy complete_spy) {
-        complete_spy.clear ();
+        complete_spy == "";
     }
 
 

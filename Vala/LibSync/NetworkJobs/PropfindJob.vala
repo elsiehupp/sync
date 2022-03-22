@@ -97,7 +97,7 @@ public class PropfindJob : AbstractNetworkJob {
             while (!reader.at_end ()) {
                 QXmlStreamReader.TokenType type = reader.read_next ();
                 if (type == QXmlStreamReader.StartElement) {
-                    if (!current_element == "" && current_element.top () == "prop") {
+                    if (current_element != "" && current_element.top () == "prop") {
                         items.insert (reader.name ().to_string (), reader.read_element_text (QXmlStreamReader.SkipChildElements));
                     } else {
                         current_element.push (reader.name ().to_string ());

@@ -22,7 +22,7 @@ public class TestValidNetrcWithDefault : AbstractTestNetrcParser {
         GLib.assert_true (parser.find ("foo") == new Pair<string, string> ("bar", "baz"));
         GLib.assert_true (parser.find ("dontknow") == new Pair<string, string> ("user", "pass"));
 
-        delete (this);
+        //  delete (this);
     }
 
 } // class TestValidNetrcWithDefault

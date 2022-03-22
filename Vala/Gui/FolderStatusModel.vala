@@ -95,7 +95,7 @@ public class FolderStatusModel : QAbstractItemModel {
         string last_error_string;
 
         /***********************************************************
-        Whether a 'fetching in progress' label is shown.
+        Whether a "fetching in progress" label is shown.
         ***********************************************************/
         bool fetching_label = false;
 
@@ -129,7 +129,7 @@ public class FolderStatusModel : QAbstractItemModel {
             if (this.fetching_job) {
                 disconnect (this.fetching_job, null, model, null);
                 this.fetching_job.delete_later ();
-                this.fetching_job.clear ();
+                this.fetching_job == "";
             }
             if (has_label ()) {
                 model.begin_remove_rows (index, 0, 0);
@@ -138,7 +138,7 @@ public class FolderStatusModel : QAbstractItemModel {
                 model.end_remove_rows ();
             } else if (!this.subs == "") {
                 model.begin_remove_rows (index, 0, this.subs.count () - 1);
-                this.subs.clear ();
+                this.subs == "";
                 model.end_remove_rows ();
             }
         }
@@ -179,7 +179,7 @@ public class FolderStatusModel : QAbstractItemModel {
         public set {
             begin_reset_model ();
             this.dirty = false;
-            this.folders.clear ();
+            this.folders == "";
             this.account_state = value;
 
             FolderManager.instance.signal_folder_sync_state_change.connect (
@@ -297,7 +297,7 @@ public class FolderStatusModel : QAbstractItemModel {
     /***********************************************************
     ***********************************************************/
     public GLib.Variant data_for_index_and_role (QModelIndex index, int role) {
-        if (!index.is_valid ()) {
+        if (!index.is_valid) {
             return GLib.Variant ();
         }
 
@@ -549,7 +549,7 @@ public class FolderStatusModel : QAbstractItemModel {
     /***********************************************************
     ***********************************************************/
     public int row_count (QModelIndex parent = QModelIndex ()) {
-        if (!parent.is_valid ()) {
+        if (!parent.is_valid) {
             if (Theme.single_sync_folder && this.folders.count () != 0) {
                 // "Add folder_connection" button not visible in the single_sync_folder configuration.
                 return this.folders.count ();
@@ -568,7 +568,7 @@ public class FolderStatusModel : QAbstractItemModel {
     /***********************************************************
     ***********************************************************/
     public QModelIndex index (int row, int column = 0, QModelIndex parent = QModelIndex ()) {
-        if (!parent.is_valid ()) {
+        if (!parent.is_valid) {
             return create_index (row, column /*, null*/);
         }
         switch (classify (parent)) {
@@ -597,7 +597,7 @@ public class FolderStatusModel : QAbstractItemModel {
     /***********************************************************
     ***********************************************************/
     public QModelIndex parent (QModelIndex child) {
-        if (!child.is_valid ()) {
+        if (!child.is_valid) {
             return {};
         }
         switch (classify (child)) {
@@ -692,7 +692,7 @@ public class FolderStatusModel : QAbstractItemModel {
         QPersistentModelIndex persistent_index = new QPersistentModelIndex (parent);
         lscol_job.property (PROPERTY_PARENT_INDEX_C, GLib.Variant.from_value (persistent_index));
 
-        // Show 'fetching data...' hint after a while.
+        // Show "fetching data..." hint after a while.
         this.fetching_items[persistent_index].on_signal_start ();
         GLib.Timeout.single_shot (1000, this, FolderStatusModel.on_signal_show_fetch_progress);
     }
@@ -710,7 +710,7 @@ public class FolderStatusModel : QAbstractItemModel {
     /***********************************************************
     ***********************************************************/
     public bool has_children (QModelIndex parent = QModelIndex ()) {
-        if (!parent.is_valid ())
+        if (!parent.is_valid)
             return true;
 
         var info = info_for_index (parent);
@@ -748,7 +748,7 @@ public class FolderStatusModel : QAbstractItemModel {
     /***********************************************************
     ***********************************************************/
     public SubFolderInfo info_for_index (QModelIndex index) {
-        if (!index.is_valid ()) {
+        if (!index.is_valid) {
             return null;
         }
         var parent_info = (SubFolderInfo) index.internal_pointer ();
@@ -774,7 +774,7 @@ public class FolderStatusModel : QAbstractItemModel {
     ***********************************************************/
     public bool is_any_ancestor_encrypted (QModelIndex index) {
         var parent_index = parent (index);
-        while (parent_index.is_valid ()) {
+        while (parent_index.is_valid) {
             const var info = info_for_index (parent_index);
             if (info.is_encrypted) {
                 return true;
@@ -802,11 +802,8 @@ public class FolderStatusModel : QAbstractItemModel {
     path was not fetched from the server before
     ***********************************************************/
     public QModelIndex index_for_path (FolderConnection folder_connection, string path) {
-        if (!folder_connection) {
-            return {};
-        }
 
-        int slash_pos = path.last_index_of ('/');
+        int slash_pos = path.last_index_of ("/");
         if (slash_pos == -1) {
             // first level folder_connection
             for (int i = 0; i < this.folders.size (); ++i) {
@@ -828,7 +825,7 @@ public class FolderStatusModel : QAbstractItemModel {
         }
 
         var parent = index_for_path (folder_connection, path.left (slash_pos));
-        if (!parent.is_valid ())
+        if (!parent.is_valid)
             return parent;
 
         if (slash_pos == path.size () - 1) {
@@ -853,8 +850,6 @@ public class FolderStatusModel : QAbstractItemModel {
     /***********************************************************
     ***********************************************************/
     public void on_signal_update_folder_state (FolderConnection folder_connection) {
-        if (!folder_connection)
-            return;
         for (int i = 0; i < this.folders.count (); ++i) {
             if (this.folders.at (i).folder_connection == folder_connection) {
                 /* emit */ data_changed (index (i), index (i));
@@ -1138,7 +1133,7 @@ public class FolderStatusModel : QAbstractItemModel {
                         Utility.duration_to_descriptive_string (progress.file_progress (cur_item).estimated_eta),
                         Utility.octets_to_string (estimated_bw) );
                 */
-                // : Example text: "Syncing 'foo.txt', 'bar.txt'"
+                // : Example text: "Syncing "foo.txt", "bar.txt""
                 file_progress_string = _("Syncing %1").printf (all_filenames);
                 if (estimated_down_bandwidth > 0) {
                     file_progress_string.append (_(", "));
@@ -1196,7 +1191,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
         int overall_percent = 0;
         if (total_file_count > 0) {
-            // Add one 'byte' for each file so the percentage is moving when deleting or renaming files
+            // Add one "byte" for each file so the percentage is moving when deleting or renaming files
             overall_percent = q_round (double (completed_size + completed_file) / double (total_size + total_file_count) * 100.0);
         }
         pi.overall_percent = q_bound (0, overall_percent, 100);
@@ -1224,14 +1219,14 @@ public class FolderStatusModel : QAbstractItemModel {
             end_remove_rows ();
         }
 
-        parent_info.last_error_string.clear ();
+        parent_info.last_error_string == "";
         parent_info.fetching_job = null;
         parent_info.fetched = true;
 
         GLib.Uri url = parent_info.folder_connection.remote_url ();
         string path_to_remove = url.path;
-        if (!path_to_remove.has_suffix ('/'))
-            path_to_remove += '/';
+        if (!path_to_remove.has_suffix ("/"))
+            path_to_remove += "/";
 
         string[] selective_sync_block_list;
         bool ok1 = true;
@@ -1280,19 +1275,19 @@ public class FolderStatusModel : QAbstractItemModel {
 
             SyncJournalFileRecord record;
             parent_info.folder_connection.journal_database ().file_record_by_e2e_mangled_name (remove_trailing_slash (relative_path), record);
-            if (record.is_valid ()) {
-                new_info.name = remove_trailing_slash (record.path).split ('/').last ();
+            if (record.is_valid) {
+                new_info.name = remove_trailing_slash (record.path).split ("/").last ();
                 if (record.is_e2e_encrypted && !record.e2e_mangled_name == "") {
                     // we must use local path for Settings Dialog's filesystem tree, otherwise open and create new folder_connection actions won't work
                     // hence, we are storing this.e2e_mangled_name separately so it can be use later for LscolJob
                     new_info.e2e_mangled_name = relative_path;
                     new_info.path = record.path;
                 }
-                if (!new_info.path.has_suffix ('/')) {
-                    new_info.path += '/';
+                if (!new_info.path.has_suffix ("/")) {
+                    new_info.path += "/";
                 }
             } else {
-                new_info.name = remove_trailing_slash (relative_path).split ('/').last ();
+                new_info.name = remove_trailing_slash (relative_path).split ("/").last ();
             }
 
             const var folder_info = lscol_job.folder_infos.value (path);
@@ -1372,7 +1367,7 @@ public class FolderStatusModel : QAbstractItemModel {
         var abstract_network_job = sender ();
         var permission_map = abstract_network_job.property (PROPERTY_PERMISSION_MAP).to_map ();
         abstract_network_job.property (PROPERTY_PERMISSION_MAP, GLib.Variant ()); // avoid a detach of the map while it is modified
-        //  ASSERT (!href.has_suffix ('/'), "LscolXMLParser.parse should remove the trailing slash before calling us.");
+        //  ASSERT (!href.has_suffix ("/"), "LscolXMLParser.parse should remove the trailing slash before calling us.");
         permission_map[href] = *it;
         abstract_network_job.property (PROPERTY_PERMISSION_MAP, permission_map);
     }
@@ -1388,7 +1383,7 @@ public class FolderStatusModel : QAbstractItemModel {
         var abstract_network_job = sender ();
         var encryption_map = abstract_network_job.property (PROPERTY_ENCRYPTION_MAP).to_map ();
         abstract_network_job.property (PROPERTY_ENCRYPTION_MAP, GLib.Variant ()); // avoid a detach of the map while it is modified
-        //  ASSERT (!href.has_suffix ('/'), "LscolXMLParser.parse should remove the trailing slash before calling us.");
+        //  ASSERT (!href.has_suffix ("/"), "LscolXMLParser.parse should remove the trailing slash before calling us.");
         encryption_map[href] = *it;
         abstract_network_job.property (PROPERTY_ENCRYPTION_MAP, encryption_map);
     }
@@ -1400,7 +1395,7 @@ public class FolderStatusModel : QAbstractItemModel {
         var lscol_job = qobject_cast<LscolJob> (sender ());
         //  ASSERT (lscol_job);
         QModelIndex index = qvariant_cast<QPersistentModelIndex> (lscol_job.property (PROPERTY_PARENT_INDEX_C));
-        if (!index.is_valid ()) {
+        if (!index.is_valid) {
             return;
         }
         var parent_info = info_for_index (index);
@@ -1426,10 +1421,6 @@ public class FolderStatusModel : QAbstractItemModel {
     /***********************************************************
     ***********************************************************/
     private void on_signal_folder_sync_state_change (FolderConnection folder_connection) {
-        if (!folder_connection) {
-            return;
-        }
-
         int folder_index = -1;
         for (int i = 0; i < this.folders.count (); ++i) {
             if (this.folders.at (i).folder_connection == folder_connection) {
@@ -1571,7 +1562,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
 
     private static string remove_trailing_slash (string s) {
-        if (s.has_suffix ('/')) {
+        if (s.has_suffix ("/")) {
             return s.left (s.size () - 1);
         }
         return s;

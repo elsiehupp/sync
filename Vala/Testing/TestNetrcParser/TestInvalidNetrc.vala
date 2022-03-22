@@ -20,7 +20,7 @@ public class TestInvalidNetrc : AbstractTestNetrcParser {
         NetrcParser parser = new NetrcParser (TESTFILE);
         GLib.assert_true (!parser.parse ());
 
-        delete (this);
+        //  delete (this);
     }
 
 } // class TestInvalidNetrc

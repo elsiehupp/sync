@@ -89,7 +89,7 @@ public abstract class AbstractPropagateItemJob : AbstractPropagatorJob {
         while (!path_components == "") {
             SyncJournalFileRecord record;
             this.propagator.journal.get_file_record (path_components.join ("/"), record);
-            if (record.is_valid () && record.is_e2e_encrypted) {
+            if (record.is_valid && record.is_e2e_encrypted) {
                 return true;
             }
             path_components.remove_last ();
@@ -103,7 +103,7 @@ public abstract class AbstractPropagateItemJob : AbstractPropagatorJob {
     ***********************************************************/
     protected void on_signal_restore_job_finished (SyncFileItem.Status status) {
         string message;
-        if (this.restore_job) {
+        if (this.restore_job != null) {
             message = this.restore_job.restore_job_msg ();
             this.restore_job.restore_job_msg ();
         }

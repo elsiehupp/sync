@@ -105,7 +105,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
 
         var account = this.propagator.account;
         if (!account.capabilities.client_side_encryption_available () ||
-            !parent_rec.is_valid () ||
+            !parent_rec.is_valid ||
             !parent_rec.is_e2e_encrypted) {
             start_after_is_encrypted_is_checked ();
         } else {
@@ -302,7 +302,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
             // We were provided a direct URL, use that one
             GLib.info ("direct_download_url given for " + this.item.file + this.item.direct_download_url);
 
-            if (!this.item.direct_download_cookies == "") {
+            if (this.item.direct_download_cookies != "") {
                 headers["Cookie"] = this.item.direct_download_cookies.to_utf8 ();
             }
 
@@ -365,10 +365,10 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
                 this.propagator.journal.download_info (this.item.file, Common.SyncJournalDb.DownloadInfo ());
             }
 
-            if (!this.item.direct_download_url == "" && err != GLib.InputStream.OperationCanceledError) {
+            if (this.item.direct_download_url != "" && err != GLib.InputStream.OperationCanceledError) {
                 // If this was with a direct download, retry without direct download
                 GLib.warning ("Direct download of" + this.item.direct_download_url + " failed. Retrying through owncloud.");
-                this.item.direct_download_url.clear ();
+                this.item.direct_download_url == "";
                 start ();
                 return;
             }
@@ -377,7 +377,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
             // set a custom error string to make this a soft error. In contrast to the default hard error this won't bring down
             // the whole sync and allows for a custom error message.
             GLib.InputStream reply = get_file_job.input_stream;
-            if (err == GLib.InputStream.OperationCanceledError && reply.property (OWNCLOUD_CUSTOM_SOFT_ERROR_STRING_C).is_valid ()) {
+            if (err == GLib.InputStream.OperationCanceledError && reply.property (OWNCLOUD_CUSTOM_SOFT_ERROR_STRING_C).is_valid) {
                 get_file_job.on_signal_error_string (reply.property (OWNCLOUD_CUSTOM_SOFT_ERROR_STRING_C).to_string ());
                 get_file_job.error_status (SyncFileItem.Status.SOFT_ERROR);
             } else if (bad_range_header) {
@@ -513,7 +513,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
     Called when the download's checksum header was signal_validated
     ***********************************************************/
     private void on_signal_validate_checksum_header_validated (string checksum_type, string checksum) {
-        const string the_content_checksum_type = this.propagator.account.capabilities.preferred_upload_checksum_type ();
+        const string the_content_checksum_type = this.propagator.account.capabilities.preferred_upload_checksum_type;
 
         // Reuse transmission checksum as content checksum.
         //
@@ -606,7 +606,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
         }
 
         // Apply the remote permissions
-        FileSystem.file_read_only_weak (this.temporary_file.filename (), !this.item.remote_perm == null && !this.item.remote_perm.has_permission (RemotePermissions.Permissions.CAN_WRITE));
+        FileSystem.file_read_only_weak (this.temporary_file.filename (), !this.item.remote_permissions == null && !this.item.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_WRITE));
 
         bool is_conflict = this.item.instruction == CSync.SyncInstructions.CONFLICT
             && (GLib.File.new_for_path (fn).query_info ().get_file_type () == FileType.DIRECTORY || !FileSystem.file_equals (fn, this.temporary_file.filename ()));
@@ -662,7 +662,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
 
         // Maybe what we downloaded was a conflict file? If so, set a conflict record.
         // (the data was prepared in on_signal_get_file_job_finished above)
-        if (this.conflict_record.is_valid ())
+        if (this.conflict_record.is_valid)
             this.propagator.journal.conflict_record (this.conflict_record);
 
         if (vfs && vfs.mode () == AbstractVfs.WithSuffix) {
@@ -724,7 +724,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
         on_signal_done (is_conflict ? SyncFileItem.Status.CONFLICT : SyncFileItem.Status.SUCCESS);
 
         // handle the special recall file
-        if (!this.item.remote_perm.has_permission (RemotePermissions.Permissions.IS_SHARED)
+        if (!this.item.remote_permissions.has_permission (RemotePermissions.Permissions.IS_SHARED)
             && (this.item.file == ".sys.admin#recall#"
                 || this.item.file.has_suffix ("/.sys.admin#recall#"))) {
             handle_recall_file (fn, this.propagator.local_path, *this.propagator.journal);
@@ -740,8 +740,9 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
     /***********************************************************
     ***********************************************************/
     public new void abort (AbstractPropagatorJob.AbortType abort_type)  {
-        if (this.get_file_job && this.get_file_job.input_stream)
+        if (this.get_file_job != null && this.get_file_job.input_stream) {
             this.get_file_job.input_stream.abort ();
+        }
 
         if (abort_type == AbstractPropagatorJob.AbortType.ASYNCHRONOUS) {
             /* emit */ signal_abort_finished ();
@@ -752,8 +753,9 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_get_file_job_download_progress (int64 received, int64 value) {
-        if (!this.get_file_job)
+        if (this.get_file_job == null) {
             return;
+        }
         this.download_progress = received;
         this.propagator.report_progress (*this.item, this.resume_start + received);
     }
@@ -794,7 +796,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
             this.propagator.journal.delete_file_record (this.item.original_file);
             update_metadata (false);
 
-            if (!this.item.remote_perm == null && !this.item.remote_perm.has_permission (RemotePermissions.Permissions.CAN_WRITE)) {
+            if (this.item.remote_permissions != null && !this.item.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_WRITE)) {
                 // make sure ReadOnly flag is preserved for placeholder, similarly to regular files
                 FileSystem.file_read_only (this.propagator.full_local_path (this.item.file), true);
             }
@@ -824,7 +826,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
             }
             update_metadata (false);
 
-            if (!this.item.remote_perm == null && !this.item.remote_perm.has_permission (RemotePermissions.Permissions.CAN_WRITE)) {
+            if (this.item.remote_permissions != null && !this.item.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_WRITE)) {
                 // make sure ReadOnly flag is preserved for placeholder, similarly to regular files
                 FileSystem.file_read_only (this.propagator.full_local_path (this.item.file), true);
             }
@@ -953,7 +955,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
             string local_recalled_file = recalled_file.mid (folder_path.size ());
 
             SyncJournalFileRecord record;
-            if (!journal.get_file_record (local_recalled_file, record) || !record.is_valid ()) {
+            if (!journal.get_file_record (local_recalled_file, record) || !record.is_valid) {
                 GLib.warning ("No database entry for recall of " + local_recalled_file);
                 continue;
             }

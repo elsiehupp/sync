@@ -29,7 +29,7 @@ public class FileStat : GLib.Object {
     public int64 size = 0;
     public uint64 inode = 0;
 
-    public RemotePermissions remote_perm;
+    public RemotePermissions remote_permissions;
     public ItemType type = BITFIELD (4);
     public bool child_modified = BITFIELD (1);
     public bool has_ignored_files = BITFIELD (1); // Specify that a directory, or child directory contains ignored files.

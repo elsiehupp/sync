@@ -83,7 +83,7 @@ public class LscolJob : AbstractNetworkJob {
         var buf = new Soup.Buffer (this);
         buf.data (xml);
         buf.open (QIODevice.ReadOnly);
-        if (this.url.is_valid ()) {
+        if (this.url.is_valid != null) {
             send_request ("PROPFIND", this.url, request, buf);
         } else {
             send_request ("PROPFIND", make_dav_url (path), request, buf);

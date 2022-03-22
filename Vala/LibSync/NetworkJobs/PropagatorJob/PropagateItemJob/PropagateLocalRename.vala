@@ -72,7 +72,7 @@ public class PropagateLocalRename : AbstractPropagateItemJob {
 
         if (!this.item.is_directory ()) { // Directories are saved at the end
             SyncFileItem signal_new_item = new SyncFileItem (*this.item);
-            if (old_record.is_valid ()) {
+            if (old_record.is_valid) {
                 signal_new_item.checksum_header = old_record.checksum_header;
             }
             var result = this.propagator.update_metadata (signal_new_item);

@@ -32,7 +32,7 @@ public class AccessManager : Soup.Session {
         Soup.Request new_request = new Soup.Request (request);
 
         // Respect request specific user agent if any
-        if (!new_request.header (Soup.Request.UserAgentHeader).is_valid ()) {
+        if (!new_request.header (Soup.Request.UserAgentHeader).is_valid) {
             new_request.header (Soup.Request.UserAgentHeader, Utility.user_agent_string ());
         }
 

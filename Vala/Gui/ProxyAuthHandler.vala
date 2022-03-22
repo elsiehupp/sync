@@ -87,7 +87,7 @@ public class ProxyAuthHandler : GLib.Object {
     private GLib.List<GLib.Object> gave_credentials_to;
 
     ~ProxyAuthHandler () {
-        delete this.dialog;
+        //  delete this.dialog;
     }
 
 
@@ -97,7 +97,7 @@ public class ProxyAuthHandler : GLib.Object {
     public void on_signal_handle_proxy_authentication_required (
         QNetworkProxy proxy,
         QAuthenticator authenticator) {
-        if (!this.dialog) {
+        if (this.dialog == null) {
             return;
         }
 
@@ -106,10 +106,10 @@ public class ProxyAuthHandler : GLib.Object {
         // If the proxy server has changed, forget what we know.
         if (key != this.proxy) {
             this.proxy = key;
-            this.username.clear ();
-            this.password.clear ();
+            this.username == "";
+            this.password == "";
             this.blocked = false;
-            this.gave_credentials_to.clear ();
+            this.gave_credentials_to == "";
 
             // If the user explicitly configured the proxy in the
             // network settings, don't ask about it.
@@ -132,7 +132,7 @@ public class ProxyAuthHandler : GLib.Object {
             // liveness.
             sending_access_manager = account.shared_network_access_manager;
         }
-        if (!sending_access_manager) {
+        if (sending_access_manager == null) {
             GLib.warning ("Could not get the sending QNAM for " + sender ());
         }
 
@@ -143,16 +143,21 @@ public class ProxyAuthHandler : GLib.Object {
         // isn't reliable, so we also invalidate credentials if we previously
         // gave presumably valid credentials to the same QNAM.
         bool invalidated = false;
-        if (!this.waiting_for_dialog && !this.waiting_for_keychain && (!authenticator.user () == ""
-                                                            || (sending_access_manager && this.gave_credentials_to.contains (sending_access_manager)))) {
+        if (this.waiting_for_dialog <= 0 && this.waiting_for_keychain <= 0 && (
+            authenticator.user () != "" || (
+                sending_access_manager != null && this.gave_credentials_to.contains (sending_access_manager)
+            )
+        )) {
             GLib.info ("Invalidating old credentials " + key);
-            this.username.clear ();
-            this.password.clear ();
+            this.username == "";
+            this.password == "";
             invalidated = true;
-            this.gave_credentials_to.clear ();
+            for (GLib.Object receiver in this.gave_credentials_to) {
+                this.gave_credentials_to.remove_all (receiver);
+            }
         }
 
-        if (this.username == "" || this.waiting_for_keychain) {
+        if (this.username == "" || this.waiting_for_keychain > 0) {
             if (invalidated || !creds_from_keychain ()) {
                 if (creds_from_dialog ()) {
                     store_creds_in_keychain ();
@@ -167,7 +172,7 @@ public class ProxyAuthHandler : GLib.Object {
         GLib.info ("Got credentials for " + this.proxy);
         authenticator.user (this.username);
         authenticator.password (this.password);
-        if (sending_access_manager) {
+        if (sending_access_manager != null) {
             this.gave_credentials_to.insert (sending_access_manager);
             sending_access_manager.destroyed.connect (
                 this.on_signal_sender_destroyed
@@ -201,7 +206,7 @@ public class ProxyAuthHandler : GLib.Object {
     ***********************************************************/
     private bool creds_from_dialog () {
         // Open the credentials dialog
-        if (!this.waiting_for_dialog) {
+        if (this.waiting_for_dialog <= 0) {
             this.dialog.on_signal_reset ();
             this.dialog.proxy_address (this.proxy);
             this.dialog.open ();
@@ -210,14 +215,16 @@ public class ProxyAuthHandler : GLib.Object {
         // This function can be reentered while the dialog is open.
         // If that's the case, continue processing the dialog until
         // it's done.
-        if (this.dialog) {
-            exec_await (this.dialog,
-                    &Gtk.Dialog.signal_finished,
-                    this.waiting_for_dialog,
-                    QEventLoop.Exclude_socket_notifiers);
+        if (this.dialog != null) {
+            exec_await (
+                this.dialog,
+                Gtk.Dialog.signal_finished,
+                this.waiting_for_dialog,
+                QEventLoop.ExcludeSocketNotifiers
+            );
         }
 
-        if (this.dialog && this.dialog.result () == Gtk.Dialog.Accepted) {
+        if (this.dialog != null && this.dialog.result () == Gtk.Dialog.Accepted) {
             GLib.info ("Got credentials for " + this.proxy + " from dialog.");
             this.username = this.dialog.username ();
             this.password = this.dialog.password ();
@@ -231,13 +238,13 @@ public class ProxyAuthHandler : GLib.Object {
     Checks the keychain for credentials of the current proxy.
     ***********************************************************/
     private bool creds_from_keychain () {
-        if (this.waiting_for_dialog) {
+        if (this.waiting_for_dialog != null) {
             return false;
         }
 
         GLib.debug ("Trying to load " + this.proxy);
 
-        if (!this.waiting_for_keychain) {
+        if (this.waiting_for_keychain <= 0) {
             this.username = this.settings.value (keychain_username_key ()).to_string ();
             if (this.username == "") {
                 return false;
@@ -266,7 +273,7 @@ public class ProxyAuthHandler : GLib.Object {
             return true;
         }
 
-        this.username.clear ();
+        this.username == "";
         if (this.read_password_job.error != EntryNotFound) {
             GLib.warning ("ReadPasswordJob failed with " + this.read_password_job.error_string);
         }
@@ -278,7 +285,7 @@ public class ProxyAuthHandler : GLib.Object {
     Stores the current credentials in the keychain.
     ***********************************************************/
     private void store_creds_in_keychain () {
-        if (this.waiting_for_keychain) {
+        if (this.waiting_for_keychain > 0) {
             return;
         }
 
@@ -314,7 +321,7 @@ public class ProxyAuthHandler : GLib.Object {
         PointerToMemberFunction some_signal,
         int counter,
         QEventLoop.ProcessEventsFlags flags = QEventLoop.AllEvents) {
-        if (!sender) {
+        if (sender == null) {
             return;
         }
 

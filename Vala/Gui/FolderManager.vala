@@ -15,6 +15,10 @@
 namespace Occ {
 namespace Ui {
 
+public errordomain FolderManagerError {
+    FOLDER_FOR_ALIAS_DOES_NOT_EXIST,
+}
+
 /***********************************************************
 @brief The FolderManager class
 @ingroup gui
@@ -448,11 +452,6 @@ public class FolderManager : GLib.Object {
     Removes a folder_connection
     ***********************************************************/
     public void remove_folder (FolderConnection folder_connection) {
-        if (!folder_connection) {
-            GLib.critical ("Can not remove null folder_connection.");
-            return;
-        }
-
         GLib.info ("Removing " + folder_connection.alias ());
 
         const bool currently_running = folder_connection.is_sync_running ();
@@ -482,7 +481,7 @@ public class FolderManager : GLib.Object {
                 folder_connection.delete_later
             );
         } else {
-            delete folder_connection;
+            //  delete folder_connection;
         }
 
         this.navigation_pane_helper.schedule_update_cloud_storage_registry ();
@@ -539,13 +538,13 @@ public class FolderManager : GLib.Object {
     /***********************************************************
     Returns the folder_connection by alias or \c null if no folder_connection with the alias exists.
     ***********************************************************/
-    public FolderConnection folder_by_alias (string alias) {
+    public FolderConnection folder_by_alias (string alias) throws FolderManagerError {
         if (alias != "") {
             if (this.folder_map.contains (alias)) {
                 return this.folder_map[alias];
             }
         }
-        return null;
+        throw new FolderManagerError.FOLDER_FOR_ALIAS_DOES_NOT_EXIST (alias)
     }
 
 
@@ -610,7 +609,7 @@ public class FolderManager : GLib.Object {
             target_path.remove (0, 1);
         }
 
-        if (!account_state) {
+        if (account_state == null) {
             GLib.critical ("can't create folder_connection without an account.");
             return null;
         }
@@ -871,7 +870,7 @@ public class FolderManager : GLib.Object {
         a.replace ('*', STAR_TAG);
         a.replace (':', COLON_TAG);
         a.replace ('|', PIPE_TAG);
-        a.replace ('"', QUOTE_TAG);
+        a.replace ("\", QUOTE_TAG);
         a.replace ('<', LT_TAG);
         a.replace ('>', GT_TAG);
         a.replace ('[', PAR_O_TAG);
@@ -931,7 +930,7 @@ public class FolderManager : GLib.Object {
     ***********************************************************/
     public string check_path_validity_for_new_folder (string path, GLib.Uri server_url = GLib.Uri ()) {
         string recursive_validity = check_path_validity_recursive (path);
-        if (!recursive_validity == "") {
+        if (recursive_validity != "") {
             GLib.debug (path + recursive_validity);
             return recursive_validity;
         }
@@ -963,7 +962,7 @@ public class FolderManager : GLib.Object {
             // if both pathes are equal, the server url needs to be different
             // otherwise it would mean that a new connection from the same local folder_connection
             // to the same account is added which is not wanted. The account must differ.
-            if (server_url.is_valid () && !different_paths) {
+            if (GLib.Uri.is_valid (server_url) && !different_paths) {
                 GLib.Uri folder_url = folder_connection.account_state.account.url;
                 string user = folder_connection.account_state.account.credentials ().user ();
                 folder_url.user_name (user);
@@ -1068,7 +1067,7 @@ public class FolderManager : GLib.Object {
 
         this.last_sync_folder = null;
         this.current_sync_folder = null;
-        this.scheduled_folders.clear ();
+        this.scheduled_folders == "";
         /* emit */ signal_folder_list_changed (this.folder_map);
         /* emit */ signal_schedule_queue_changed ();
 
@@ -1085,10 +1084,6 @@ public class FolderManager : GLib.Object {
     called afterwards.
     ***********************************************************/
     public void schedule_folder (FolderConnection folder_connection) {
-        if (!folder_connection) {
-            GLib.critical ("on_signal_schedule_sync called with null folder_connection.");
-            return;
-        }
         var alias = folder_connection.alias ();
 
         GLib.info ("Schedule folder_connection " + alias + " to sync!");
@@ -1256,10 +1251,6 @@ public class FolderManager : GLib.Object {
 
         bool on_signal_success = false;
         foreach (FolderConnection folder_connection in folders_to_remove) {
-            if (!folder_connection) {
-                GLib.critical ("Can not remove null folder_connection.");
-                return;
-            }
 
             GLib.info ("Removing " + folder_connection.alias ());
 
@@ -1298,7 +1289,7 @@ public class FolderManager : GLib.Object {
 
             unload_folder (folder_connection);
             if (currently_running) {
-                delete folder_connection;
+                //  delete folder_connection;
             }
 
             this.navigation_pane_helper.schedule_update_cloud_storage_registry ();
@@ -1312,11 +1303,6 @@ public class FolderManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_folder_sync_paused (FolderConnection folder_connection, bool paused) {
-        if (!folder_connection) {
-            GLib.critical ("on_signal_folder_sync_paused called with empty folder_connection.");
-            return;
-        }
-
         if (!paused) {
             this.disabled_folders.remove (folder_connection);
             schedule_folder (folder_connection);
@@ -1447,7 +1433,7 @@ public class FolderManager : GLib.Object {
 
         // Find the first folder_connection in the queue that can be synced.
         FolderConnection folder_connection = null;
-        while (!this.scheduled_folders == "") {
+        while (this.scheduled_folders != "") {
             FolderConnection g = this.scheduled_folders.dequeue ();
             if (g.can_sync ()) {
                 folder_connection = g;
@@ -1845,10 +1831,9 @@ public class FolderManager : GLib.Object {
     Makes the folder_connection known to the socket api
     ***********************************************************/
     private void register_folder_with_socket_api (FolderConnection folder_connection) {
-        if (!folder_connection)
+        if (!GLib.Dir (folder_connection.path).exists ()) {
             return;
-        if (!GLib.Dir (folder_connection.path).exists ())
-            return;
+        }
 
         // register the folder_connection with the socket API
         if (folder_connection.can_sync ())
@@ -2026,9 +2011,6 @@ public class FolderManager : GLib.Object {
 
         GLib.info ("Run etag job on folder_connection " + folder_connection);
 
-        if (!folder_connection) {
-            return;
-        }
         if (folder_connection.is_sync_running ()) {
             GLib.info ("Can not run etag job: Sync is running");
             return;

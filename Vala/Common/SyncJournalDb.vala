@@ -13,7 +13,7 @@ namespace Common {
 public class SyncJournalDb : GLib.Object {
 
     const string GET_FILE_RECORD_QUERY
-        = "SELECT path, inode, modtime, type, md5, fileid, remote_perm, filesize,"
+        = "SELECT path, inode, modtime, type, md5, fileid, remote_permissions, filesize,"
         + "  ignored_children_remote, contentchecksumtype.name || ':' || content_checksum, e2e_mangled_name, is_e2e_encrypted "
         + " FROM metadata"
         + "  LEFT JOIN checksumtype as contentchecksumtype ON metadata.content_checksum_type_id == contentchecksumtype.identifier";
@@ -492,7 +492,7 @@ public class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     To verify that the record could be found check with
-    SyncJournalFileRecord.is_valid ()
+    SyncJournalFileRecord.is_valid
     ***********************************************************/
     //  public bool get_file_record (string filename, SyncJournalFileRecord record) {
     //      return get_file_record (filename.to_utf8 (), record);
@@ -506,16 +506,16 @@ public class SyncJournalDb : GLib.Object {
 
         // Reset the output var in case the caller is reusing it.
         //  Q_ASSERT (record);
-        record.path.clear ();
-        //  Q_ASSERT (!record.is_valid ());
+        record.path == "";
+        //  Q_ASSERT (!record.is_valid);
 
         if (this.metadata_table_is_empty)
-            return true; // no error, yet nothing found (record.is_valid () == false)
+            return true; // no error, yet nothing found (record.is_valid == false)
 
         if (!check_connect ())
             return false;
 
-        if (!filename == "") {
+        if (filename != "") {
             PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_FILE_RECORD_QUERY, GET_FILE_RECORD_QUERY + " WHERE phash=?1", this.database);
             if (!query) {
                 return false;
@@ -550,18 +550,18 @@ public class SyncJournalDb : GLib.Object {
 
         // Reset the output var in case the caller is reusing it.
         //  Q_ASSERT (record);
-        record.path.clear ();
-        //  Q_ASSERT (!record.is_valid ());
+        record.path == "";
+        //  Q_ASSERT (!record.is_valid);
 
         if (this.metadata_table_is_empty) {
-            return true; // no error, yet nothing found (record.is_valid () == false)
+            return true; // no error, yet nothing found (record.is_valid == false)
         }
 
         if (!check_connect ()) {
             return false;
         }
 
-        if (!mangled_name == "") {
+        if (mangled_name != "") {
             PreparedSqlQuery query = this.query_manager.get (
                 PreparedSqlQueryManager.Key.GET_FILE_RECORD_QUERY_BY_MANGLED_NAME,
                 GET_FILE_RECORD_QUERY + " WHERE e2e_mangled_name=?1",
@@ -599,14 +599,15 @@ public class SyncJournalDb : GLib.Object {
 
         // Reset the output var in case the caller is reusing it.
         //  Q_ASSERT (record);
-        record.path.clear ();
-        //  Q_ASSERT (!record.is_valid ());
+        //  record.path == "";
+        //  Q_ASSERT (!record.is_valid);
 
-        if (!inode || this.metadata_table_is_empty)
-            return true; // no error, yet nothing found (record.is_valid () == false)
+        if (inode == null || this.metadata_table_is_empty)
+            return true; // no error, yet nothing found (record.is_valid == false)
 
-        if (!check_connect ())
+        if (!check_connect ()) {
             return false;
+        }
         PreparedSqlQuery query = this.query_manager.get (
             PreparedSqlQueryManager.Key.GET_FILE_RECORD_QUERY_BY_INODE,
             GET_FILE_RECORD_QUERY + " WHERE inode=?1",
@@ -637,7 +638,7 @@ public class SyncJournalDb : GLib.Object {
         QMutexLocker locker = new QMutexLocker (this.mutex);
 
         if (file_id == "" || this.metadata_table_is_empty)
-            return true; // no error, yet nothing found (record.is_valid () == false)
+            return true; // no error, yet nothing found (record.is_valid == false)
 
         if (!check_connect ())
             return false;
@@ -772,7 +773,7 @@ public class SyncJournalDb : GLib.Object {
 
             SyncJournalFileRecord record;
             fill_file_record_from_get_query (record, *query);
-            if (!record.path.has_prefix (path) || record.path.index_of ("/", path.size () + 1) > 0) {
+            if (!record.path.has_prefix (path) || record.path.index_of ("/", path.length + 1) > 0) {
                 GLib.warning ("hash collision" + path + record.path);
                 continue;
             }
@@ -789,7 +790,7 @@ public class SyncJournalDb : GLib.Object {
         SyncJournalFileRecord record = this.record;
         QMutexLocker locker = new QMutexLocker (this.mutex);
 
-        if (!this.etag_storage_filter == "") {
+        if (this.etag_storage_filter != null) {
             // If we are a directory that should not be read from database next time, don't write the etag
             string prefix = record.path + "/";
             foreach (string it in this.etag_storage_filter) {
@@ -802,9 +803,9 @@ public class SyncJournalDb : GLib.Object {
         }
 
         GLib.info (
-            + "Updating file record for path:" + record.path ("inode:") + record.inode
+            "Updating file record for path:" + record.path ("inode:") + record.inode
             + "modtime:" + record.modtime + "type:" + record.type
-            + "etag:" + record.etag + "file_id:" + record.file_id + "remote_perm:" + record.remote_perm.to_string ()
+            + "etag:" + record.etag + "file_id:" + record.file_id + "remote_permissions:" + record.remote_permissions.to_string ()
             + "file_size:" + record.file_size + "checksum:" + record.checksum_header
             + "e2e_mangled_name:" + record.e2e_mangled_name ("is_e2e_encrypted:") + record.is_e2e_encrypted);
 
@@ -814,7 +815,7 @@ public class SyncJournalDb : GLib.Object {
 
             string etag = record.etag;
             string file_id = record.file_id;
-            string remote_perm = record.remote_perm.to_database_value ();
+            string remote_permissions = record.remote_permissions.to_database_value ();
             string checksum_type;
             string checksum;
             parse_checksum_header (record.checksum_header, checksum_type, checksum);
@@ -823,7 +824,7 @@ public class SyncJournalDb : GLib.Object {
             PreparedSqlQuery query = this.query_manager.get (
                 PreparedSqlQueryManager.Key.SET_FILE_RECORD_QUERY,
                 "INSERT OR REPLACE INTO metadata "
-                + " (phash, pathlen, path, inode, uid, gid, mode, modtime, type, md5, fileid, remote_perm, filesize, ignored_children_remote, content_checksum, content_checksum_type_id, e2e_mangled_name, is_e2e_encrypted) "
+                + " (phash, pathlen, path, inode, uid, gid, mode, modtime, type, md5, fileid, remote_permissions, filesize, ignored_children_remote, content_checksum, content_checksum_type_id, e2e_mangled_name, is_e2e_encrypted) "
                 + "VALUES (?1 , ?2, ?3 , ?4 , ?5 , ?6 , ?7,  ?8 , ?9 , ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18);",
                 this.database);
             if (!query) {
@@ -841,7 +842,7 @@ public class SyncJournalDb : GLib.Object {
             query.bind_value (9, record.type);
             query.bind_value (10, etag);
             query.bind_value (11, file_id);
-            query.bind_value (12, remote_perm);
+            query.bind_value (12, remote_permissions);
             query.bind_value (13, record.file_size);
             query.bind_value (14, record.server_has_ignored_files ? 1 : 0);
             query.bind_value (15, checksum);
@@ -1075,7 +1076,7 @@ public class SyncJournalDb : GLib.Object {
     ***********************************************************/
     public bool exists () {
         QMutexLocker locker = new QMutexLocker (this.mutex);
-        return (!this.database_file == "" && GLib.File.exists (this.database_file));
+        return (this.database_file != "" && GLib.File.exists (this.database_file));
     }
 
 
@@ -1778,7 +1779,7 @@ public class SyncJournalDb : GLib.Object {
     Wipe this.etag_storage_filter. Also done implicitly on close ().
     ***********************************************************/
     public void clear_etag_storage_filter () {
-        this.etag_storage_filter.clear ();
+        this.etag_storage_filter == "";
     }
 
 
@@ -2033,7 +2034,7 @@ public class SyncJournalDb : GLib.Object {
     public string conflict_file_base_name (string conflict_name) {
         var conflict = conflict_record (conflict_name);
         string result;
-        //  if (conflict.is_valid ()) {
+        //  if (conflict.is_valid) {
         //      get_file_records_by_file_id (conflict.base_file_id, [&result] (SyncJournalFileRecord record) => {
         //          if (!record.path == "") {
         //              result = record.path;
@@ -2198,14 +2199,14 @@ public class SyncJournalDb : GLib.Object {
             }
             commit_internal ("update database structure: add fileid col");
         }
-        if (columns.index_of ("remote_perm") == -1) {
+        if (columns.index_of ("remote_permissions") == -1) {
             SqlQuery query = new SqlQuery (this.database);
-            query.prepare ("ALTER TABLE metadata ADD COLUMN remote_perm VARCHAR (128);");
+            query.prepare ("ALTER TABLE metadata ADD COLUMN remote_permissions VARCHAR (128);");
             if (!query.exec ()) {
-                sql_fail ("update_metadata_table_structure: add column remote_perm", query);
+                sql_fail ("update_metadata_table_structure: add column remote_permissions", query);
                 re = false;
             }
-            commit_internal ("update database structure (remote_perm)");
+            commit_internal ("update database structure (remote_permissions)");
         }
         if (columns.index_of ("filesize") == -1) {
             SqlQuery query = new SqlQuery (this.database);
@@ -2444,7 +2445,8 @@ public class SyncJournalDb : GLib.Object {
     ***********************************************************/
     private bool check_connect () {
         if (autotest_fail_counter >= 0) {
-            if (!autotest_fail_counter--) {
+            autotest_fail_counter--;
+            if (autotest_fail_counter <= 0) {
                 GLib.info ("Error Simulated");
                 return false;
             }
@@ -2573,7 +2575,7 @@ public class SyncJournalDb : GLib.Object {
                              + "md5 VARCHAR (32)," // This is the etag.  Called md5 for compatibility
                             // update_database_structure () will add
                             // fileid
-                            // remote_perm
+                            // remote_permissions
                             // filesize
                             // ignored_children_remote
                             // content_checksum
@@ -2903,7 +2905,7 @@ public class SyncJournalDb : GLib.Object {
         record.type = static_cast<ItemType> (query.int_value (3));
         record.etag = query.byte_array_value (4);
         record.file_id = query.byte_array_value (5);
-        record.remote_perm = RemotePermissions.from_database_value (query.byte_array_value (6));
+        record.remote_permissions = RemotePermissions.from_database_value (query.byte_array_value (6));
         record.file_size = query.int64_value (7);
         record.server_has_ignored_files = (query.int_value (8) > 0);
         record.checksum_header = query.byte_array_value (9);

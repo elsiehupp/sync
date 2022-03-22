@@ -175,7 +175,7 @@ public class OwncloudPropagator : GLib.Object {
         // When we enter a directory, we can create the directory job and push it on the stack.
 
         var regular_expression = sync_options.file_regex;
-        if (regular_expression.is_valid ()) {
+        if (regular_expression.is_valid) {
             GLib.List</* QStringRef */ string> names;
             foreach (var i in synced_items) {
                 if (regular_expression.match (i.file).has_match ()) {
@@ -247,7 +247,7 @@ public class OwncloudPropagator : GLib.Object {
                     item.instruction = CSync.SyncInstructions.NONE;
                     continue;
                 } else {
-                    maybe_conflict_directory.clear ();
+                    maybe_conflict_directory == "";
                 }
             }
 
@@ -351,10 +351,10 @@ public class OwncloudPropagator : GLib.Object {
         if (item.instruction == CSync.SyncInstructions.TYPE_CHANGE) {
             // will delete directories, so defer execution
             var propagate_item_job = create_job (item);
-            if (propagate_item_job) {
+            if (propagate_item_job != null) {
                 directories_to_remove.prepend (propagate_item_job);
             }
-            removed_directory = item.file + "/";
+            removed_directory = item.file.to_string () + "/";
         } else {
             directories.top ().second.append_task (item);
         }
@@ -374,7 +374,8 @@ public class OwncloudPropagator : GLib.Object {
     public int maximum_active_transfer_job () {
         if (this.download_limit != 0
             || this.upload_limit != 0
-            || !this.sync_options.parallel_network_jobs) {
+            || this.sync_options.parallel_network_jobs == null
+        ) {
             // disable parallelism when there is a network limit.
             return 1;
         }
@@ -399,7 +400,7 @@ public class OwncloudPropagator : GLib.Object {
     The maximum number of active jobs in parallel
     ***********************************************************/
     public int hard_maximum_active_job () {
-        if (!this.sync_options.parallel_network_jobs) {
+        if (this.sync_options.parallel_network_jobs == null) {
             return 1;
         }
         return this.sync_options.parallel_network_jobs;
@@ -562,7 +563,7 @@ public class OwncloudPropagator : GLib.Object {
         if (this.abort_requested) {
             return;
         }
-        if (this.propagate_root_directory_job) {
+        if (this.propagate_root_directory_job != null) {
             // Connect to signal_abort_finished  which signals that abort has been asynchronously on_signal_finished
             this.propagate_root_directory_job.signal_abort_finished.connect (
                 this.on_signal_propagate_root_directory_job_finished
@@ -637,7 +638,7 @@ public class OwncloudPropagator : GLib.Object {
             return false;
         }
         string conflict_user_name;
-        if (account.capabilities.upload_conflict_files ()) {
+        if (account.capabilities.upload_conflict_files) {
             conflict_user_name = account.display_name;
         }
         string conflict_filename = Utility.make_conflict_filename (
@@ -649,8 +650,9 @@ public class OwncloudPropagator : GLib.Object {
 
         if (!FileSystem.rename (fn, conflict_file_path, rename_error)) {
             // If the rename fails, don't replace it.
-            if (error)
+            if (error != null) {
                 *error = rename_error;
+            }
             return false;
         }
         GLib.info ("Created conflict file " + fn + " -> " + conflict_filename);
@@ -662,7 +664,7 @@ public class OwncloudPropagator : GLib.Object {
         conflict_record.initial_base_path = item.file.to_utf8 ();
 
         SyncJournalFileRecord base_record;
-        if (this.journal.get_file_record (item.original_file, base_record) && base_record.is_valid ()) {
+        if (this.journal.get_file_record (item.original_file, base_record) && base_record.is_valid) {
             conflict_record.base_etag = base_record.etag;
             conflict_record.base_file_id = base_record.file_id;
         } else {
@@ -672,8 +674,8 @@ public class OwncloudPropagator : GLib.Object {
         this.journal.conflict_record (conflict_record);
 
         // Create a new upload job if the new conflict file should be uploaded
-        if (account.capabilities.upload_conflict_files ()) {
-            if (composite && !GLib.File.new_for_path (conflict_file_path).query_info ().get_file_type () == FileType.DIRECTORY) {
+        if (account.capabilities.upload_conflict_files != null) {
+            if (composite != null && !GLib.File.new_for_path (conflict_file_path).query_info ().get_file_type () == FileType.DIRECTORY) {
                 SyncFileItem conflict_item = new SyncFileItem ();
                 conflict_item.file = conflict_filename;
                 conflict_item.type = ItemType.FILE;
@@ -762,7 +764,7 @@ public class OwncloudPropagator : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void clear_delayed_tasks () {
-        this.delayed_tasks.clear ();
+        this.delayed_tasks == "";
     }
 
 
@@ -875,7 +877,7 @@ public class OwncloudPropagator : GLib.Object {
     ***********************************************************/
     private void reset_delayed_upload_tasks () {
         this.schedule_delayed_tasks = false;
-        this.delayed_tasks.clear ();
+        this.delayed_tasks == "";
     }
 
 
@@ -1001,7 +1003,7 @@ public class OwncloudPropagator : GLib.Object {
 
         // No new entry? Possibly remove the old one, then done.
         if (!may_blocklist) {
-            if (old_entry.is_valid ()) {
+            if (old_entry.is_valid) {
                 journal.wipe_error_blocklist_entry (item.file);
             }
             return;

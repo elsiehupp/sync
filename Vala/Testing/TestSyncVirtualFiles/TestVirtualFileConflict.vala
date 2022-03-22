@@ -70,11 +70,11 @@ public class TestVirtualFileConflict : AbstractTestSyncVirtualFiles {
         GLib.assert_true (database_record (fake_folder, "B/b1").type == ItemType.FILE);
         GLib.assert_true (database_record (fake_folder, "B/b2").type == ItemType.FILE);
         GLib.assert_true (database_record (fake_folder, "C/c1").type == ItemType.FILE);
-        GLib.assert_true (!database_record (fake_folder, "A/a1" + DVSUFFIX).is_valid ());
-        GLib.assert_true (!database_record (fake_folder, "A/a2" + DVSUFFIX).is_valid ());
-        GLib.assert_true (!database_record (fake_folder, "B/b1" + DVSUFFIX).is_valid ());
-        GLib.assert_true (!database_record (fake_folder, "B/b2" + DVSUFFIX).is_valid ());
-        GLib.assert_true (!database_record (fake_folder, "C/c1" + DVSUFFIX).is_valid ());
+        GLib.assert_true (!database_record (fake_folder, "A/a1" + DVSUFFIX).is_valid);
+        GLib.assert_true (!database_record (fake_folder, "A/a2" + DVSUFFIX).is_valid);
+        GLib.assert_true (!database_record (fake_folder, "B/b1" + DVSUFFIX).is_valid);
+        GLib.assert_true (!database_record (fake_folder, "B/b2" + DVSUFFIX).is_valid);
+        GLib.assert_true (!database_record (fake_folder, "C/c1" + DVSUFFIX).is_valid);
 
         TestSyncVirtualFiles.clean_up_test_virtual_file_conflict ();
     }
@@ -83,7 +83,7 @@ public class TestVirtualFileConflict : AbstractTestSyncVirtualFiles {
     /***********************************************************
     ***********************************************************/
     private static void clean_up_test_virtual_file_conflict (ItemCompletedSpy complete_spy) {
-        complete_spy.clear ();
+        complete_spy == "";
     }
 
 } // class TestVirtualFileConflict

@@ -949,7 +949,7 @@ public class FolderConnection : GLib.Object {
         if (cancel) {
             FileSystem.folder_minimum_permissions (path);
             journal_database ().clear_file_table ();
-            this.last_etag.clear ();
+            this.last_etag == "";
             on_signal_schedule_this_folder ();
         }
         this.sync_paused = old_paused;
@@ -990,7 +990,7 @@ public class FolderConnection : GLib.Object {
         dirty_network_limits ();
         sync_options ();
 
-        bool has_done_full_local_discovery = this.time_since_last_full_local_discovery.is_valid ();
+        bool has_done_full_local_discovery = this.time_since_last_full_local_discovery.is_valid;
         bool periodic_full_local_discovery_now =
             full_local_discovery_interval.count () >= 0 // negative means we don't require periodic full runs
             && this.time_since_last_full_local_discovery.has_expired (full_local_discovery_interval.count ());
@@ -1124,7 +1124,7 @@ public class FolderConnection : GLib.Object {
             // Check that the mtime/size actually changed or there was
             // an attribute change (pin state) that caused the notification
             bool spurious = false;
-            if (record.is_valid ()
+            if (record.is_valid
                 && !FileSystem.file_changed (path, record.file_size, record.modtime)) {
                 spurious = true;
 
@@ -1177,7 +1177,7 @@ public class FolderConnection : GLib.Object {
         // Set in the database that we should download the file
         SyncJournalFileRecord record;
         this.journal.file_record (relative_path.to_utf8 (), record);
-        if (!record.is_valid ()) {
+        if (!record.is_valid) {
             GLib.info ("Did not find file in database.");
             return;
         }
@@ -1347,7 +1347,7 @@ public class FolderConnection : GLib.Object {
     A item is completed. Count the errors and forward to the
     ProgressDispatcher
     ***********************************************************/
-    private void on_signal_item_completed (SyncFileItemPtr item) {
+    private void on_signal_item_completed (SyncFileItem item) {
         if (item.instruction == CSync.SyncInstructions.NONE || item.instruction == CSync.SyncInstructions.UPDATE_METADATA) {
             // We only care about the updates that deserve to be shown in the UI
             return;
@@ -1512,7 +1512,7 @@ public class FolderConnection : GLib.Object {
     ***********************************************************/
     private void on_signal_warn_on_signal_new_excluded_item (SyncJournalFileRecord record, /* QStringRef */ string path) {
         // Never warn for items in the database
-        if (record.is_valid ()) {
+        if (record.is_valid) {
             return;
         }
 
@@ -1776,7 +1776,7 @@ public class FolderConnection : GLib.Object {
                 break;
             }
 
-            if (!text == "") {
+            if (text != "") {
                 // Ignores the settings in case of an error or conflict
                 if (status == LogStatus.ERROR || status == LogStatus.CONFLICT)
                     logger.post_optional_gui_log (_("Sync Activity"), text);

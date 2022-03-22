@@ -339,16 +339,21 @@ public class UserStatusSelectorModel : GLib.Object {
     ***********************************************************/
     private void on_signal_reset () {
         if (this.user_status_connector) {
-            disconnect (this.user_status_connector.get (), LibSync.AbstractUserStatusConnector.signal_user_status_fetched, this,
-                &UserStatusSelectorModel.on_signal_user_status_fetched);
-            disconnect (this.user_status_connector.get (), LibSync.AbstractUserStatusConnector.signal_predefined_statuses_fetched, this,
-                &UserStatusSelectorModel.on_signal_predefined_statuses_fetched);
-            disconnect (this.user_status_connector.get (), LibSync.AbstractUserStatusConnector.signal_error, this,
-                &UserStatusSelectorModel.on_signal_error);
-            disconnect (this.user_status_connector.get (), LibSync.AbstractUserStatusConnector.signal_user_status_set, this,
-                &UserStatusSelectorModel.on_signal_user_status_set);
-            disconnect (this.user_status_connector.get (), LibSync.AbstractUserStatusConnector.message_cleared, this,
-                &UserStatusSelectorModel.on_signal_message_cleared);
+            this.user_status_connector.get ().signal_user_status_fetched.disconnect (
+                this.on_signal_user_status_fetched
+            );
+            this.user_status_connector.get ().signal_predefined_statuses_fetched.disconnect (
+                this.on_signal_predefined_statuses_fetched
+            );
+            this.user_status_connector.get ().signal_error.disconnect (
+                this.on_signal_error
+            );
+            this.user_status_connector.get ().signal_user_status_set.disconnect (
+                this.on_signal_user_status_set
+            );
+            this.user_status_connector.get ().signal_message_cleared.disconnect (
+                this.on_signal_message_cleared
+            );
         }
         this.user_status_connector = null;
     }
@@ -465,7 +470,7 @@ public class UserStatusSelectorModel : GLib.Object {
     Q_REQUIRED_RESULT
     ***********************************************************/
     private string clear_at_readable (Optional<ClearAt> clear_at) {
-        if (clear_at) {
+        if (clear_at != null) {
             switch (clear_at.type) {
             case ClearAtType.PERIOD: {
                 return time_difference_to_string (clear_at.period);

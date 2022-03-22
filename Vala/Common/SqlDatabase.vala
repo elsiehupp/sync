@@ -151,7 +151,7 @@ public class SqlDatabase : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool transaction () {
-        if (!this.database) {
+        if (this.database == null) {
             return false;
         }
         sqlite_do (sqlite3_exec (this.database, "BEGIN", null, null, null));
@@ -162,7 +162,7 @@ public class SqlDatabase : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool commit () {
-        if (!this.database) {
+        if (this.database == null) {
             return false;
         }
         sqlite_do (sqlite3_exec (this.database, "COMMIT", null, null, null));
@@ -215,7 +215,7 @@ public class SqlDatabase : GLib.Object {
             return false;
         }
 
-        if (!this.database) {
+        if (this.database == null) {
             GLib.warning ("Error : no database for" + filename);
             return false;
         }

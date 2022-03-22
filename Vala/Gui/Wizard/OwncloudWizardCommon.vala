@@ -42,8 +42,6 @@ public class WizardCommon : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static void set_up_custom_media (GLib.Variant variant, Gtk.Label label) {
-        if (!label)
-            return;
 
         Gdk.Pixbuf pix = variant.value<Gdk.Pixbuf> ();
         if (!pix == null) {

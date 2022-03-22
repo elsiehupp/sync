@@ -346,7 +346,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
                 this.jobs.append (delete_job);
                 delete_job.start ();
             }
-            this.server_chunks.clear ();
+            this.server_chunks == "";
             return;
         }
 

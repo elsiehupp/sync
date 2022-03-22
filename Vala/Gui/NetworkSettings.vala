@@ -122,7 +122,7 @@ public class NetworkSettings : Gtk.Widget {
 
 
     override ~NetworkSettings () {
-        delete this.instance;
+        //  delete this.instance;
     }
 
 

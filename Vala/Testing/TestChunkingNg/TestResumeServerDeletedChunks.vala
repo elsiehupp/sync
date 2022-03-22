@@ -22,7 +22,7 @@ public class TestResumeServerDeletedChunks : AbstractTestChunkingNg {
         var chunking_identifier = fake_folder.upload_state ().children.first ().name;
 
         // Delete the chunks on the server
-        fake_folder.upload_state ().children.clear ();
+        fake_folder.upload_state ().children == "";
         GLib.assert_true (fake_folder.sync_once ());
 
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
@@ -66,7 +66,7 @@ public class TestResumeServerDeletedChunks : AbstractTestChunkingNg {
         fake_folder.local_modifier.insert ("A/a0", size);
         GLib.assert_true (!fake_folder.sync_once ()); // timeout!
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ()); // but the upload succeeded
-        GLib.assert_true (!checksum_header == "");
+        GLib.assert_true (checksum_header != "");
         fake_folder.remote_modifier ().find ("A/a0").checksums = checksum_header; // The test system don't do that automatically
         // Should be resolved properly
         GLib.assert_true (fake_folder.sync_once ());

@@ -65,7 +65,7 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
         this.instance.warn_label.word_wrap (true);
         if (is_ok) {
             this.instance.warn_label.hide ();
-            this.instance.warn_label.clear ();
+            this.instance.warn_label == "";
         } else {
             this.instance.warn_label.show ();
             string warnings = format_warnings (warn_strings);

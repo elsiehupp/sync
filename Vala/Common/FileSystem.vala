@@ -245,7 +245,7 @@ public class FileSystem : GLib.Object {
 
         info_file.open (QIODevice.ReadWrite);
 
-        QTextStream stream = new QTextStream (info_file); // for write data on open file
+        GLib.OutputStream stream = new GLib.OutputStream (info_file); // for write data on open file
 
         stream += "[Trash Info]\n"
                + "Path="

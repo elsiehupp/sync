@@ -29,7 +29,7 @@ public class TestParentsGetSyncStatusNewFileUploadDownload : AbstractTestSyncFil
         GLib.assert_true (fake_folder.sync_engine.sync_file_status_tracker.file_status ("A/a1") == SyncFileStatus.StatusUpToDate);
         GLib.assert_true (fake_folder.sync_engine.sync_file_status_tracker.file_status ("B/b1") == SyncFileStatus.StatusUpToDate);
         GLib.assert_true (fake_folder.sync_engine.sync_file_status_tracker.file_status ("C/c1") == SyncFileStatus.StatusUpToDate);
-        status_spy.clear ();
+        status_spy == "";
 
         fake_folder.exec_until_finished ();
         verify_that_push_matches_pull (fake_folder, status_spy);

@@ -56,7 +56,7 @@ public class NotificationConfirmJob : AbstractNetworkJob {
     @brief Start the OCS request
     ***********************************************************/
     public override void on_signal_start () {
-        if (!this.link.is_valid ()) {
+        if (!this.link.is_valid) {
             GLib.warning ("Attempt to trigger invalid URL: " + this.link.to_string ());
             return;
         }

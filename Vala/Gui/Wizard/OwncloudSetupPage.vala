@@ -146,7 +146,7 @@ public class OwncloudSetupPage : QWizardPage {
             on_signal_url_edit_finished ();
             string u = this.url;
             GLib.Uri qurl = new GLib.Uri (u);
-            if (!qurl.is_valid () || qurl.host () == "") {
+            if (!qurl.is_valid || qurl.host () == "") {
                 on_signal_error_string (_("Server address does not seem to be valid"), false);
                 return false;
             }
@@ -197,7 +197,7 @@ public class OwncloudSetupPage : QWizardPage {
         this.oc_wizard.registration = false;
         this.oc_url = new_url;
         if (this.oc_url == "") {
-            this.instance.le_url.clear ();
+            this.instance.le_url == "";
             return;
         }
 

@@ -57,7 +57,7 @@ public class FolderCreationDialog : Gtk.Dialog {
 
 
     ~FolderCreationDialog () {
-        delete instance;
+        //  delete this.instance;
     }
 
 

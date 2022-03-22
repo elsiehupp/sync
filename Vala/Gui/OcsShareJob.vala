@@ -88,7 +88,7 @@ public class OcsShareJob : OcsJob {
         append_path (share_id);
         verb ("PUT");
 
-        if (date.is_valid ()) {
+        if (date.is_valid) {
             add_param ("expire_date", date.to_string ("yyyy-MM-dd"));
         } else {
             add_param ("expire_date", "");

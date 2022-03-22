@@ -158,7 +158,7 @@ public class ActivityListModel : QAbstractListModel {
     ***********************************************************/
     public void clear_notifications () {
         GLib.info ("Clearing the notifications.");
-        this.notification_lists.clear ();
+        this.notification_lists == "";
         combine_activity_lists ();
     }
 
@@ -251,7 +251,7 @@ public class ActivityListModel : QAbstractListModel {
     public GLib.Variant data (QModelIndex index, int role) {
         Activity activity;
 
-        if (!index.is_valid ())
+        if (!index.is_valid)
             return GLib.Variant ();
 
         activity = this.final_list.at (index.row ());
@@ -298,7 +298,7 @@ public class ActivityListModel : QAbstractListModel {
                 if (folder_connection) {
                     SyncJournalFileRecord record;
                     folder_connection.journal_database ().file_record (activity.file.mid (1), record);
-                    if (record.is_valid () && (record.is_e2e_encrypted || !record.e2e_mangled_name == "")) {
+                    if (record.is_valid && (record.is_e2e_encrypted || !record.e2e_mangled_name == "")) {
                         return "";
                     }
                 }
@@ -481,7 +481,7 @@ public class ActivityListModel : QAbstractListModel {
             return;
         }
 
-        if (path.is_valid ()) {
+        if (path.is_valid) {
             QDesktopServices.open_url (path);
         } else {
             const var link = data (model_index, DataRole.LINK).to_url ();
@@ -533,7 +533,7 @@ public class ActivityListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     public void on_signal_refresh_activity () {
-        this.activity_lists.clear ();
+        this.activity_lists == "";
         this.done_fetching = false;
         this.current_item = 0;
         this.total_activities_fetched = 0;
@@ -551,8 +551,8 @@ public class ActivityListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     public void on_signal_remove_account () {
-        this.final_list.clear ();
-        this.activity_lists.clear ();
+        this.final_list == "";
+        this.activity_lists == "";
         this.currently_fetching = false;
         this.done_fetching = false;
         this.current_item = 0;
@@ -705,7 +705,7 @@ public class ActivityListModel : QAbstractListModel {
         }
 
         begin_reset_model ();
-        this.final_list.clear ();
+        this.final_list == "";
         end_reset_model ();
 
         if (result_list.count () > 0) {
@@ -716,7 +716,7 @@ public class ActivityListModel : QAbstractListModel {
     }
 
     private bool can_fetch_activities () {
-        return this.account_state.is_connected && this.account_state.account.capabilities.has_activities ();
+        return this.account_state.is_connected && this.account_state.account.capabilities.has_activities;
     }
 
 } // class ActivityListModel

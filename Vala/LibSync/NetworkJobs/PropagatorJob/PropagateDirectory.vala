@@ -33,7 +33,7 @@ public class PropagateDirectory : AbstractPropagatorJob {
         this.item = item;
         this.first_job = propagator.create_job (item);
         this.sub_jobs = propagator;
-        if (this.first_job) {
+        if (this.first_job != null) {
             this.first_job.signal_finished.connect (
                 this.on_signal_first_job_finished
             );
@@ -70,11 +70,11 @@ public class PropagateDirectory : AbstractPropagatorJob {
             this.state = Running;
         }
 
-        if (this.first_job && this.first_job.state == NotYetStarted) {
+        if (this.first_job != null && this.first_job.state == NotYetStarted) {
             return this.first_job.on_signal_schedule_self_or_child ();
         }
 
-        if (this.first_job && this.first_job.state == Running) {
+        if (this.first_job != null && this.first_job.state == Running) {
             // Don't schedule any more job until this is done.
             return false;
         }
@@ -87,7 +87,7 @@ public class PropagateDirectory : AbstractPropagatorJob {
     ***********************************************************/
     public new JobParallelism parallelism () {
         // If any of the non-on_signal_finished sub jobs is not parallel, we have to wait
-        if (this.first_job && this.first_job.parallelism () != JobParallelism.FULL_PARALLELISM) {
+        if (this.first_job != null && this.first_job.parallelism () != JobParallelism.FULL_PARALLELISM) {
             return JobParallelism.WAIT_FOR_FINISHED;
         }
         if (this.sub_jobs.parallelism () != JobParallelism.FULL_PARALLELISM) {
@@ -100,7 +100,7 @@ public class PropagateDirectory : AbstractPropagatorJob {
     /***********************************************************
     ***********************************************************/
     public new void abort (AbstractPropagatorJob.AbortType abort_type) {
-        if (this.first_job)
+        if (this.first_job != null)
             // Force first job to abort synchronously
             // even if caller allows async abort (async_abort)
             this.first_job.abort (AbstractPropagatorJob.AbortType.SYNCHRONOUS);
@@ -153,7 +153,7 @@ public class PropagateDirectory : AbstractPropagatorJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_sub_jobs_finished (SyncFileItem.Status status) {
-        if (!this.item == "" && status == SyncFileItem.Status.SUCCESS) {
+        if (this.item != null && status == SyncFileItem.Status.SUCCESS) {
             // If a directory is renamed, recursively delete any stale items
             // that may still exist below the old path.
             if (this.item.instruction == CSync.SyncInstructions.RENAME

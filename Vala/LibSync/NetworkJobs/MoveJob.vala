@@ -49,7 +49,7 @@ public class MoveJob : AbstractNetworkJob {
         for (var it = this.extra_headers.const_begin (); it != this.extra_headers.const_end (); ++it) {
             request.raw_header (it.key (), it.value ());
         }
-        if (this.url.is_valid ()) {
+        if (this.url.is_valid) {
             send_request ("MOVE", this.url, request);
         } else {
             send_request ("MOVE", make_dav_url (path), request);

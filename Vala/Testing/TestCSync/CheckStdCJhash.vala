@@ -45,7 +45,7 @@ class CheckStdCJhash : GLib.Object {
 
                         /*---- check that every output bit is affected by that input bit */
                         for (k=0; k<MAXPAIR; k+=2) {
-                            uint32 on_signal_finished=1;
+                            uint32 finished=1;
                             /* keys have one bit different */
                             for (l=0; l<hlen+1; ++l) {a[l] = b[l] = (uint8)0;}
                             /* have a and b be two keys differing in only one bit */
@@ -63,9 +63,13 @@ class CheckStdCJhash : GLib.Object {
                                 h[l] &= ~c[l];
                                 x[l] &= d[l];
                                 y[l] &= ~d[l];
-                                if (e[l]|f[l]|g[l]|h[l]|x[l]|y[l]) on_signal_finished=0;
+                                if ((e[l]|f[l]|g[l]|h[l]|x[l]|y[l]) != 0) {
+                                    finished = 0;
+                                }
                             }
-                            if (on_signal_finished) break;
+                            if (finished > 0) {
+                                break;
+                            }
                         }
                         if (k>z) z=k;
                         if (k==MAXPAIR) {
@@ -184,7 +188,7 @@ class CheckStdCJhash : GLib.Object {
 
                         /*---- check that every input bit affects every output bit */
                         for (k=0; k<MAXPAIR; k+=2) {
-                            uint64 on_signal_finished=1;
+                            uint64 finished=1;
                             /* keys have one bit different */
                             for (l=0; l<hlen+1; ++l) {a[l] = b[l] = (uint8)0;}
                             /* have a and b be two keys differing in only one bit */
@@ -202,23 +206,34 @@ class CheckStdCJhash : GLib.Object {
                                 h[l] &= ~c[l];
                                 x[l] &= d[l];
                                 y[l] &= ~d[l];
-                                if (e[l]|f[l]|g[l]|h[l]|x[l]|y[l]) on_signal_finished=0;
+                                if ((e[l]|f[l]|g[l]|h[l]|x[l]|y[l]) != 0) {
+                                    finished = 0;
+                                }
                             }
-                            if (on_signal_finished) break;
+                            if (finished > 0) {
+                                break;
+                            }
                         }
-                        if (k>z) z=k;
-                        if (k==MAXPAIR) {
-    #if 0
+                        if (k>z) {
+                            z=k;
+                        }
+                        if (k == MAXPAIR) {
+    //  #if 0
                             print_error ("Some bit didn't change: ");
                             print_error ("%.8llx %.8llx %.8llx %.8llx %.8llx %.8llx    ",
-                                                    (long long uint32) e[0],
-                                                    (long long uint32) f[0],
-                                                    (long long uint32) g[0],
-                                                    (long long uint32) h[0],
-                                                    (long long uint32) x[0],
-                                                    (long long uint32) y[0]);
+                                (uint64) e[0],
+                                (uint64) f[0],
+                                (uint64) g[0],
+                                (uint64) h[0],
+                                (uint64) x[0],
+                                (uint64) y[0]
+                            );
                             print_error ("i %d j %d m %d len %d\n",
-                                                    (uint32)i, (uint32)j, (uint32)m, (uint32)hlen);
+                                (uint32)i,
+                                (uint32)j,
+                                (uint32)m,
+                                (uint32)hlen
+                            );
     //  #endif
                         }
                         if (z == MAXPAIR) {

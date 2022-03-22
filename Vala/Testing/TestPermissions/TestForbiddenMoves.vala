@@ -114,7 +114,7 @@ public class TestForbiddenMoves : AbstractTestPermissions {
         GLib.assert_true (fake_folder.sync_engine.is_another_sync_needed () == ImmediateFollowUp);
 
         // A follow-up sync will restore allowed/file and allowed/sub2 and maintain the nocreatedir/file errors
-        complete_spy.clear ();
+        complete_spy == "";
         GLib.assert_true (!fake_folder.sync_once ());
 
         GLib.assert_true (item_instruction (complete_spy, "nocreatefile/file", CSync.SyncInstructions.ERROR));

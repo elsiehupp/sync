@@ -78,7 +78,7 @@ public abstract class AbstractTestFolderWatcher : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void init () {
-        this.path_changed_spy.clear ();
+        this.path_changed_spy == "";
         check_watch_count (count_folders (this.root_path) + 1);
     }
 

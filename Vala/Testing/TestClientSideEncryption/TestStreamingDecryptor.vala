@@ -83,12 +83,12 @@ public class TestStreamingDecryptor : AbstractTestClientSideEncryption {
 
             var decrypted_chunk = streaming_decryptor.chunk_decryption (dummy_encryption_output_file.read (to_read).const_data (), to_read);
 
-            GLib.assert_true (decrypted_chunk.size () == to_read || streaming_decryptor.is_finished () || !pending_bytes == "");
+            GLib.assert_true (decrypted_chunk.size () == to_read || streaming_decryptor.is_finished () || pending_bytes != "");
 
             chunked_output_decrypted.write (decrypted_chunk);
         }
 
-        if (!pending_bytes == "") {
+        if (pending_bytes != "") {
             var decrypted_chunk = streaming_decryptor.chunk_decryption (pending_bytes.const_data (), pending_bytes.size ());
 
             GLib.assert_true (decrypted_chunk.size () == pending_bytes.size () || streaming_decryptor.is_finished ());

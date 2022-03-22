@@ -62,7 +62,7 @@ public class MkColJob : AbstractNetworkJob {
         }
 
         // assumes ownership
-        if (this.url.is_valid ()) {
+        if (this.url.is_valid != null) {
             send_request ("MKCOL", this.url, request);
         } else {
             send_request ("MKCOL", make_dav_url (path), request);

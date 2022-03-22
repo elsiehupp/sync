@@ -39,9 +39,9 @@ public class BrokenFakeGetReply : FakeGetReply {
 
     /***********************************************************
     ***********************************************************/
-    SyncFileItemPtr get_item (QSignalSpy spy, string path) {
+    SyncFileItem get_item (QSignalSpy spy, string path) {
         foreach (GLib.List<GLib.Variant> args in spy) {
-            var item = args[0].value<SyncFileItemPtr> ();
+            var item = args[0].value<SyncFileItem> ();
             if (item.destination () == path) {
                 return item;
             }

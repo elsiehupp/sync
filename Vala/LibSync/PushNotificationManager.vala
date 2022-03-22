@@ -303,7 +303,7 @@ public class PushNotificationManager : GLib.Object {
             return false;
         }
 
-        if (!this.reconnect_timer) {
+        if (this.reconnect_timer == null) {
             this.reconnect_timer = new GLib.Timeout (this);
         }
 

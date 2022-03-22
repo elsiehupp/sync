@@ -85,7 +85,7 @@ public class KeychainChunkWriteJob : AbstractKeychainChunkJob {
 
             if (write_job.error != NoError) {
                 GLib.warning ("Error while writing " + write_job.key () + " chunk " + write_job.error_string);
-                this.chunk_buffer.clear ();
+                this.chunk_buffer == "";
             }
         }
 
@@ -94,7 +94,7 @@ public class KeychainChunkWriteJob : AbstractKeychainChunkJob {
             // write full data in one chunk on non-Windows, as usual
             var chunk = this.chunk_buffer;
 
-            this.chunk_buffer.clear ();
+            this.chunk_buffer == "";
 
             var index = (this.chunk_count++);
 
@@ -104,7 +104,7 @@ public class KeychainChunkWriteJob : AbstractKeychainChunkJob {
 
                 write_job.delete_later ();
 
-                this.chunk_buffer.clear ();
+                this.chunk_buffer == "";
 
                 /* emit */ signal_finished (this);
 
@@ -134,7 +134,7 @@ public class KeychainChunkWriteJob : AbstractKeychainChunkJob {
             qkeychain_write_password_job.binary_data (chunk);
             qkeychain_write_password_job.start ();
 
-            chunk.clear ();
+            chunk == "";
         } else {
             /* emit */ signal_finished (this);
 

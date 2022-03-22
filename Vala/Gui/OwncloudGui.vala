@@ -192,7 +192,7 @@ public class OwncloudGui : GLib.Object {
             this.bus
         );
 
-        if (!dbus_iface.is_valid ()) {
+        if (!dbus_iface.is_valid) {
             GLib.info ("DBus interface unavailable.");
             return false;
         }
@@ -224,7 +224,7 @@ public class OwncloudGui : GLib.Object {
         GLib.List<unowned AccountState> problem_accounts;
 
         foreach (var account in AccountManager.instance.accounts) {
-            if (!account.is_signed_out ()) {
+            if (!account.is_signed_out) {
                 all_signed_out = false;
             }
             if (!account.is_connected) {
@@ -431,7 +431,7 @@ public class OwncloudGui : GLib.Object {
             string action_text = _("%1 (%2, %3)").printf (progress.last_completed_item.file, kind_str, time_str);
             var action = new QAction (action_text, this);
             FolderConnection folder_connection = FolderManager.instance.folder_by_alias (folder_connection);
-            if (folder_connection) {
+            if (folder_connection != null) {
                 string full_path = folder_connection.path + '/' + progress.last_completed_item.file;
                 if (new GLib.File (full_path).exists ()) {
                     action.triggered.connect (
@@ -498,13 +498,11 @@ public class OwncloudGui : GLib.Object {
 
 
     /***********************************************************
+    May be called with folder_connection == null if just a
+    general GUI redraw was needed?
     ***********************************************************/
     public void on_signal_sync_state_change (FolderConnection folder_connection) {
         on_signal_compute_overall_sync_status ();
-
-        if (!folder_connection) {
-            return; // Valid, just a general GUI redraw was needed.
-        }
 
         var result = folder_connection.sync_result;
 
@@ -540,10 +538,12 @@ public class OwncloudGui : GLib.Object {
         // that saving the geometries happens ASAP during a OS signal_shutdown
 
         // those do delete on close
-        if (!this.settings_dialog == null)
+        if (this.settings_dialog != null) {
             this.settings_dialog.close ();
-        if (!this.log_browser == null)
+        }
+        if (this.log_browser != null) {
             this.log_browser.delete_later ();
+        }
         this.app.quit ();
     }
 
@@ -592,7 +592,7 @@ public class OwncloudGui : GLib.Object {
     ***********************************************************/
     public void on_signal_open_settings_dialog () {
         // if account is set up, on_signal_start the configuration wizard.
-        if (!AccountManager.instance.accounts == "") {
+        if (AccountManager.instance.accounts != "") {
             if (this.settings_dialog == null || Gtk.Application.active_window () != this.settings_dialog) {
                 on_signal_show_settings ();
             } else {
@@ -676,9 +676,9 @@ public class OwncloudGui : GLib.Object {
         SyncJournalFileRecord file_record;
 
         bool resharing_allowed = true; // lets assume the good
-        if (folder_connection.journal_database ().file_record (file, file_record) && file_record.is_valid ()) {
+        if (folder_connection.journal_database ().file_record (file, file_record) && file_record.is_valid) {
             // check the permission : Is resharing allowed?
-            if (!file_record.remote_perm == null && !file_record.remote_perm.has_permission (RemotePermissions.Permissions.CAN_RESHARE)) {
+            if (!file_record.remote_permissions == null && !file_record.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_RESHARE)) {
                 resharing_allowed = false;
             }
         }
@@ -745,7 +745,7 @@ public class OwncloudGui : GLib.Object {
         var list = AccountManager.instance.accounts;
         var account = (AccountState) sender ().property (PROPERTY_ACCOUNT_C);
         if (account) {
-            list.clear ();
+            list == "";
             list.append (account);
         }
 

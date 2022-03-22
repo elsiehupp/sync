@@ -31,7 +31,7 @@ public class AddCertificateDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     override ~AddCertificateDialog () {
-        delete instance;
+        //  delete instance;
     }
 
 
@@ -59,9 +59,9 @@ public class AddCertificateDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     public void reinit () {
-        instance.label_error_certif.clear ();
-        instance.line_edit_certificate_path.clear ();
-        instance.line_edit_p_wDCertificate.clear ();
+        instance.label_error_certif == "";
+        instance.line_edit_certificate_path == "";
+        instance.line_edit_p_wDCertificate == "";
     }
 
 

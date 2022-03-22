@@ -172,7 +172,7 @@ public class HttpCredentials : AbstractCredentials {
         // User must be fetched from config file
         fetch_user ();
 
-        if (!this.ready && !this.refresh_token == "") {
+        if (!this.ready && this.refresh_token != "") {
             // This happens if the credentials are still loaded from the keychain, but we are called
             // here because the auth is invalid, so this means we simply need to refresh the credentials
             refresh_access_token ();
@@ -208,7 +208,7 @@ public class HttpCredentials : AbstractCredentials {
 
         this.account.credential_setting (USER_C, this.user);
         this.account.credential_setting (IS_OAUTH_C, is_using_oauth ());
-        if (!this.client_cert_bundle == "") {
+        if (this.client_cert_bundle != "") {
             // Note that the this.client_cert_bundle will often be cleared after usage,
             // it's just written if it gets passed into the constructor.
             this.account.credential_setting (CLIENT_CERT_BUNDLE_C, this.client_cert_bundle);
@@ -216,7 +216,7 @@ public class HttpCredentials : AbstractCredentials {
         this.account.signal_wants_account_saved (this.account);
 
         // write secrets to the keychain
-        if (!this.client_cert_bundle == "") {
+        if (this.client_cert_bundle != "") {
             // Option 1 : If we have a pkcs12 bundle, that'll be written to the config file
             // and we'll just store the bundle password in the keychain. That's prefered
             // since the keychain on older Windows platforms can only store a limited number
@@ -230,9 +230,9 @@ public class HttpCredentials : AbstractCredentials {
             qkeychain_write_password_job.key (keychain_key (this.account.url.to_string (), this.user + CLIENT_CERT_PASSWORD_C, this.account.identifier));
             qkeychain_write_password_job.binary_data (this.client_cert_password);
             qkeychain_write_password_job.start ();
-            this.client_cert_bundle.clear ();
-            this.client_cert_password.clear ();
-        } else if (this.account.credential_setting (CLIENT_CERT_BUNDLE_C) == null && !this.client_ssl_certificate == null) {
+            this.client_cert_bundle == "";
+            this.client_cert_password == "";
+        } else if (this.account.credential_setting (CLIENT_CERT_BUNDLE_C) == null && this.client_ssl_certificate != null) {
             // Option 2, pre 2.6 configs: We used to store the raw cert/key in the keychain and
             // still do so if no bundle is available. We can't currently migrate to Option 1
             // because we have no functions for creating an encrypted pkcs12 bundle.
@@ -255,7 +255,7 @@ public class HttpCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     public void invalidate_token () {
-        if (!this.password == "") {
+        if (this.password != "") {
             this.previous_password = this.password;
         }
         this.password = "";
@@ -273,7 +273,7 @@ public class HttpCredentials : AbstractCredentials {
         // clear the session cookie.
         this.account.clear_cookie_jar ();
 
-        if (!this.refresh_token == "") {
+        if (this.refresh_token != "") {
             // Only invalidate the access_token (this.password) but keep the this.refresh_token in the keychain
             // (when coming from forget_sensitive_data, the this.refresh_token is cleared)
             return;
@@ -298,10 +298,10 @@ public class HttpCredentials : AbstractCredentials {
     ***********************************************************/
     public void forget_sensitive_data () {
         // need to be done before invalidate_token, so it actually deletes the refresh_token from the keychain
-        this.refresh_token.clear ();
+        this.refresh_token == "";
 
         invalidate_token ();
-        this.previous_password.clear ();
+        this.previous_password == "";
     }
 
 
@@ -359,7 +359,7 @@ public class HttpCredentials : AbstractCredentials {
                     // If the json was valid, but the input_stream did not contain an access token, the token
                     // is considered expired. (Usually the HTTP reply code is 400)
                     GLib.debug ("Expired refresh token. Logging out.");
-                    this.refresh_token.clear ();
+                    this.refresh_token == "";
                 } else {
                     this.ready = true;
                     this.password = access_token;
@@ -372,7 +372,7 @@ public class HttpCredentials : AbstractCredentials {
                         job_to_retry.retry ();
                     }
                 }
-                this.retry_queue.clear ();
+                this.retry_queue == "";
                 /* emit */ fetched ();
             }
         );
@@ -396,15 +396,14 @@ public class HttpCredentials : AbstractCredentials {
     Whether we are using OAuth
     ***********************************************************/
     public bool is_using_oauth () {
-        return !this.refresh_token == null;
+        return this.refresh_token != null;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool retry_if_needed (AbstractNetworkJob job_to_retry) {
-        var input_stream = job_to_retry.input_stream;
-        if (!input_stream || !input_stream.property (NEED_RETRY_C).to_bool ())
+        if (job_to_retry.input_stream == null || !job_to_retry.input_stream.property (NEED_RETRY_C).to_bool ())
             return false;
         if (this.is_renewing_oauth_token) {
             this.retry_queue.append (job_to_retry);
@@ -454,8 +453,8 @@ public class HttpCredentials : AbstractCredentials {
         if (!unpack_client_cert_bundle ()) {
             GLib.warning ("Could not unpack client cert bundle.");
         }
-        this.client_cert_bundle.clear ();
-        this.client_cert_password.clear ();
+        this.client_cert_bundle == "";
+        this.client_cert_password == "";
 
         on_signal_read_password_from_keychain ();
     }
@@ -541,7 +540,7 @@ public class HttpCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     private void on_signal_write_client_cert_password_job_done (Secret.Collection.Job finished_job) {
-        if (finished_job && finished_job.error != Secret.Collection.NoError) {
+        if (finished_job.error != Secret.Collection.NoError) {
             GLib.warning (
                 "Could not write client cert password to credentials"
                 + finished_job.error + finished_job.error_string);
@@ -554,14 +553,14 @@ public class HttpCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     private void on_signal_write_client_cert_pem_job_done (Secret.Collection.Job finished_job) {
-        if (finished_job && finished_job.error != Secret.Collection.NoError) {
+        if (finished_job.error != Secret.Collection.NoError) {
             GLib.warning (
                 "Could not write client cert to credentials"
                 + finished_job.error + finished_job.error_string);
         }
 
         // write ssl key if there is one
-        if (!this.client_ssl_key == null) {
+        if (this.client_ssl_key != null) {
             var qkeychain_write_password_job = new Secret.Collection.WritePasswordJob (Theme.app_name);
             add_settings_to_job (this.account, qkeychain_write_password_job);
             qkeychain_write_password_job.insecure_fallback (false);
@@ -580,7 +579,7 @@ public class HttpCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     private void on_signal_write_client_key_pem_job_done (Secret.Collection.Job finished_job) {
-        if (finished_job && finished_job.error != Secret.Collection.NoError) {
+        if (finished_job.error != Secret.Collection.NoError) {
             GLib.warning (
                 "Could not write client key to credentials"
                 + finished_job.error + finished_job.error_string);
@@ -617,9 +616,9 @@ public class HttpCredentials : AbstractCredentials {
             GLib.warning ("Strange: User is empty!");
         }
 
-        if (!this.refresh_token == "" && error == Secret.Collection.NoError) {
+        if (this.refresh_token != "" && error == Secret.Collection.NoError) {
             refresh_access_token ();
-        } else if (!this.password == "" && error == Secret.Collection.NoError) {
+        } else if (this.password != "" && error == Secret.Collection.NoError) {
             // All cool, the keychain did not come back with error.
             // Still, the password can be empty which indicates a problem and
             // the password dialog has to be opened.
@@ -663,7 +662,7 @@ public class HttpCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     private void on_signal_write_job_done (Secret.Collection.Job qkeychain_job) {
-        if (qkeychain_job && qkeychain_job.error != Secret.Collection.NoError) {
+        if (qkeychain_job.error != Secret.Collection.NoError) {
             GLib.warning (
                 "Error while writing password"
                 + qkeychain_job.error + qkeychain_job.error_string);
@@ -681,7 +680,7 @@ public class HttpCredentials : AbstractCredentials {
     ***********************************************************/
     protected void fetch_from_keychain_helper () {
         this.client_cert_bundle = this.account.credential_setting (CLIENT_CERT_BUNDLE_C).to_byte_array ();
-        if (!this.client_cert_bundle == "") {
+        if (this.client_cert_bundle != "") {
             // New case (>=2.6) : We have a bundle in the settings and read the password from
             // the keychain
             var qkeychain_read_password_job = new Secret.Collection.ReadPasswordJob (Theme.app_name);

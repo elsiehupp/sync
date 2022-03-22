@@ -14,25 +14,25 @@ public class ItemCompletedSpy : QSignalSpy {
     }
 
 
-    public SyncFileItemPtr find_item (string path) {
+    public SyncFileItem find_item (string path) {
         foreach (GLib.List<GLib.Variant> args in *this) {
-            var item = args[0].value<SyncFileItemPtr> ();
+            var item = args[0].value<SyncFileItem> ();
             if (item.destination () == path)
                 return item;
         }
-        return SyncFileItemPtr.create ();
+        return SyncFileItem.create ();
     }
 
 
-    public SyncFileItemPtr find_item_with_expected_rank (string path, int rank) {
+    public SyncFileItem find_item_with_expected_rank (string path, int rank) {
         GLib.assert_true (size () > rank);
         GLib.assert_true (! (*this)[rank] == "");
 
-        var item = (*this)[rank][0].value<SyncFileItemPtr> ();
+        var item = (*this)[rank][0].value<SyncFileItem> ();
         if (item.destination () == path) {
             return item;
         } else {
-            return SyncFileItemPtr.create ();
+            return SyncFileItem.create ();
         }
     }
 

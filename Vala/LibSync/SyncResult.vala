@@ -200,7 +200,7 @@ public class SyncResult : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void clear_errors () {
-        this.errors.clear ();
+        this.errors == "";
     }
 
 
@@ -288,7 +288,7 @@ public class SyncResult : GLib.Object {
         } else if (item.status == SyncFileItem.Status.CONFLICT) {
             if (item.instruction == CSync.CSync.SyncInstructions.CONFLICT) {
                 this.num_new_conflict_items++;
-                if (!this.first_new_conflict_item) {
+                if (this.first_new_conflict_item == null) {
                     this.first_new_conflict_item = item;
                 }
             } else {

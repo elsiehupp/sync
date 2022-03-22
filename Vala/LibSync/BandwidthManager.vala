@@ -242,20 +242,20 @@ public class BandwidthManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_relative_upload_measuring_timer_timeout () {
-        if (!this.using_relative_upload_limit || this.relative_upload_device_list.empty ()) {
+        if (!this.using_relative_upload_limit || this.relative_upload_device_list.is_empty () ) {
             // Not in this limiting mode, just wait 1 sec to continue the cycle
             this.relative_upload_delay_timer.interval (1000);
             this.relative_upload_delay_timer.start ();
             return;
         }
-        if (!this.relative_limit_current_measured_device) {
+        if (this.relative_limit_current_measured_device == null) {
             GLib.debug ("No device set, just waiting 1 sec");
             this.relative_upload_delay_timer.interval (1000);
             this.relative_upload_delay_timer.start ();
             return;
         }
 
-        GLib.debug (this.relative_upload_device_list.size () + "Starting Delay");
+        GLib.debug (this.relative_upload_device_list.length.to_string () + "Starting Delay");
 
         int64 relative_limit_progress_measured = (this.relative_limit_current_measured_device.read_with_progress
                                                    + this.relative_limit_current_measured_device.read)
@@ -289,7 +289,7 @@ public class BandwidthManager : GLib.Object {
         this.relative_upload_delay_timer.interval (real_wait_time_msec);
         this.relative_upload_delay_timer.start ();
 
-        var device_count = this.relative_upload_device_list.size ();
+        var device_count = this.relative_upload_device_list.length;
         int64 quota_per_device = relative_limit_progress_difference * (upload_limit_percent / 100.0) / device_count + 1.0;
         foreach (UploadDevice upload_device in this.relative_upload_device_list) {
             upload_device.bandwidth_limited = true;
@@ -316,17 +316,17 @@ public class BandwidthManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_absolute_limit_timer_timeout () {
-        if (this.using_absolute_upload_limit && !this.absolute_upload_device_list.empty ()) {
-            int64 quota_per_device = this.current_upload_limit / q_max ( 1, this.absolute_upload_device_list.size ());
-            GLib.debug (quota_per_device + this.absolute_upload_device_list.size () + this.current_upload_limit);
+        if (this.using_absolute_upload_limit && !this.absolute_upload_device_list.is_empty () ) {
+            int64 quota_per_device = this.current_upload_limit / q_max ( 1, this.absolute_upload_device_list.length);
+            GLib.debug (quota_per_device + this.absolute_upload_device_list.length + this.current_upload_limit);
             foreach (UploadDevice device in this.absolute_upload_device_list) {
                 device.give_bandwidth_quota (quota_per_device);
                 GLib.debug ("Gave " + quota_per_device / 1024.0 + " kB to" + device);
             }
         }
-        if (this.using_absolute_download_limit && !this.download_job_list.empty ()) {
-            int64 quota_per_job = this.current_download_limit / q_max ( 1, this.download_job_list.size ());
-            GLib.debug (quota_per_job + this.download_job_list.size () + this.current_download_limit);
+        if (this.using_absolute_download_limit && !this.download_job_list.is_empty () ) {
+            int64 quota_per_job = this.current_download_limit / q_max ( 1, this.download_job_list.length);
+            GLib.debug (quota_per_job + this.download_job_list.length + this.current_download_limit);
             foreach (GETFileJob get_file_job in this.download_job_list) {
                 get_file_job.give_bandwidth_quota (quota_per_job);
                 GLib.debug ("Gave " + quota_per_job / 1024.0 + " k_b to" + get_file_job);
@@ -385,11 +385,11 @@ public class BandwidthManager : GLib.Object {
             return; // oh, not actually needed
         }
 
-        if (this.relative_upload_device_list.empty ()) {
+        if (this.relative_upload_device_list.is_empty () ) {
             return;
         }
 
-        GLib.debug (this.relative_upload_device_list.size () + " Starting measuring");
+        GLib.debug (this.relative_upload_device_list.length.to_string () + " Starting measuring");
 
         // Take first device and then append it again (= we round robin all devices)
         this.relative_limit_current_measured_device = this.relative_upload_device_list.front ();
@@ -419,20 +419,20 @@ public class BandwidthManager : GLib.Object {
     // for downloads:
     ***********************************************************/
     public void on_signal_relative_download_measuring_timer_timeout () {
-        if (!this.using_relative_download_limit || this.download_job_list.empty ()) {
+        if (!this.using_relative_download_limit || this.download_job_list.is_empty () ) {
             // Not in this limiting mode, just wait 1 sec to continue the cycle
             this.relative_download_delay_timer.interval (1000);
             this.relative_download_delay_timer.start ();
             return;
         }
-        if (!this.relative_limit_current_measured_job) {
+        if (this.relative_limit_current_measured_job == null) {
             GLib.debug ("No job set, just waiting 1 sec.");
             this.relative_download_delay_timer.interval (1000);
             this.relative_download_delay_timer.start ();
             return;
         }
 
-        GLib.debug (this.download_job_list.size () + " Starting Delay");
+        GLib.debug (this.download_job_list.length.to_string () + " Starting Delay");
 
         int64 relative_limit_progress_measured = this.relative_limit_current_measured_job.current_download_position ();
         int64 relative_limit_progress_difference = relative_limit_progress_measured - this.relative_download_limit_progress_at_measuring_restart;
@@ -458,7 +458,7 @@ public class BandwidthManager : GLib.Object {
         this.relative_download_delay_timer.interval (real_wait_time_msec);
         this.relative_download_delay_timer.start ();
 
-        var job_count = this.download_job_list.size ();
+        var job_count = this.download_job_list.length;
         int64 quota = relative_limit_progress_difference * (download_limit_percent / 100.0);
         if (quota > 20 * 1024) {
             GLib.info ("ADJUSTING QUOTA FROM " + quota + " TO " + quota - 20 * 1024);
@@ -485,12 +485,12 @@ public class BandwidthManager : GLib.Object {
             return; // oh, not actually needed
         }
 
-        if (this.download_job_list.empty ()) {
-            GLib.debug (this.download_job_list.size () + " No jobs?");
+        if (this.download_job_list.is_empty () ) {
+            GLib.debug (this.download_job_list.length.to_string () + " No jobs?");
             return;
         }
 
-        GLib.debug (this.download_job_list.size () + " Starting measuring");
+        GLib.debug (this.download_job_list.length.to_string () + " Starting measuring");
 
         // Take first device and then append it again (= we round robin all devices)
         this.relative_limit_current_measured_job = this.download_job_list.front ();

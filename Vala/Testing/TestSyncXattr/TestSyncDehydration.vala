@@ -97,12 +97,12 @@ public class TestSyncDehydration : AbstractTestSyncXAttr {
         GLib.assert_true (has_dehydrated_database_entries ("B/b3"));
 
         GLib.assert_true (new FileInfo (fake_folder.local_path + "C/c1").exists ());
-        GLib.assert_true (database_record (fake_folder, "C/c1").is_valid ());
+        GLib.assert_true (database_record (fake_folder, "C/c1").is_valid);
         GLib.assert_true (!is_dehydrated ("C/c1"));
         GLib.assert_true (!has_dehydrated_database_entries ("C/c1"));
 
         GLib.assert_true (new FileInfo (fake_folder.local_path + "C/c2").exists ());
-        GLib.assert_true (database_record (fake_folder, "C/c2").is_valid ());
+        GLib.assert_true (database_record (fake_folder, "C/c2").is_valid);
         GLib.assert_true (!is_dehydrated ("C/c2"));
         GLib.assert_true (!has_dehydrated_database_entries ("C/c2"));
     }
@@ -111,7 +111,7 @@ public class TestSyncDehydration : AbstractTestSyncXAttr {
     /***********************************************************
     ***********************************************************/
     private static void clean_up_test_sync_dehydration () {
-        complete_spy.clear ();
+        complete_spy == "";
     }
 
 
@@ -128,7 +128,7 @@ public class TestSyncDehydration : AbstractTestSyncXAttr {
     private static bool has_dehydrated_database_entries (FakeFolder fake_folder, string path) {
         SyncJournalFileRecord record;
         fake_folder.sync_journal ().get_file_record (path, record);
-        return record.is_valid () && record.type == ItemType.VIRTUAL_FILE;
+        return record.is_valid && record.type == ItemType.VIRTUAL_FILE;
     }
 
 } // class TestSyncDehydration

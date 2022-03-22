@@ -20,7 +20,7 @@ public class CrashReporter {
         Gtk.Application.attribute (Qt.AAUseHighDpiPixmaps, true);
         Gtk.Application app = new Gtk.Application (argc, argv);
 
-        if (app.arguments ().size () != 2) {
+        if (app.arguments ().length != 2) {
             GLib.debug ("You need to pass the .dmp file path as only argument.");
             return 1;
         }

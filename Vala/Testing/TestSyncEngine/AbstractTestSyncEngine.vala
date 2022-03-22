@@ -44,7 +44,7 @@ public abstract class AbstractTestSyncEngine : GLib.Object {
 
     protected static int item_successfully_completed_get_rank (ItemCompletedSpy spy, string path) {
         var it_item = std.find_if (spy.begin (), spy.end (), (current_item) => {
-            var item = current_item[0].template_value<SyncFileItemPtr> ();
+            var item = current_item[0].template_value<SyncFileItem> ();
             return item.destination () == path;
         });
         if (it_item != spy.end ()) {

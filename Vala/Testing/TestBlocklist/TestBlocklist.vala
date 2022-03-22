@@ -47,7 +47,7 @@ public class TestBlocklist : GLib.Object {
             GLib.assert_true (it.instruction == CSync.SyncInstructions.NEW);
 
             var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
-            GLib.assert_true (entry.is_valid ());
+            GLib.assert_true (entry.is_valid);
             GLib.assert_true (entry.error_category == SyncJournalErrorBlocklistRecord.Normal);
             GLib.assert_true (entry.retry_count == 1);
             GLib.assert_true (counter == 1);
@@ -68,7 +68,7 @@ public class TestBlocklist : GLib.Object {
             GLib.assert_true (it.instruction == CSync.SyncInstructions.IGNORE); // no retry happened!
 
             var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
-            GLib.assert_true (entry.is_valid ());
+            GLib.assert_true (entry.is_valid);
             GLib.assert_true (entry.error_category == SyncJournalErrorBlocklistRecord.Normal);
             GLib.assert_true (entry.retry_count == 1);
             GLib.assert_true (counter == 1);
@@ -93,7 +93,7 @@ public class TestBlocklist : GLib.Object {
         GLib.assert_true (it.instruction == CSync.SyncInstructions.NEW); // retry!
 
         var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
-        GLib.assert_true (entry.is_valid ());
+        GLib.assert_true (entry.is_valid);
         GLib.assert_true (entry.error_category == SyncJournalErrorBlocklistRecord.Normal);
         GLib.assert_true (entry.retry_count == 2);
         GLib.assert_true (counter == 2);
@@ -114,7 +114,7 @@ public class TestBlocklist : GLib.Object {
             GLib.assert_true (it.instruction == CSync.SyncInstructions.NEW); // retry!
 
             var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
-            GLib.assert_true (entry.is_valid ());
+            GLib.assert_true (entry.is_valid);
             GLib.assert_true (entry.error_category == SyncJournalErrorBlocklistRecord.Normal);
             GLib.assert_true (entry.retry_count == 3);
             GLib.assert_true (counter == 3);
@@ -127,7 +127,7 @@ public class TestBlocklist : GLib.Object {
         clean_up_complete_spy ();
 
         // When the error goes away and the item is retried, the sync succeeds
-        fake_folder.server_error_paths ().clear (); {
+        fake_folder.server_error_paths () == ""; {
             var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
             entry.ignore_duration = 1;
             entry.last_try_time -= 1;
@@ -140,7 +140,7 @@ public class TestBlocklist : GLib.Object {
             GLib.assert_true (it.instruction == CSync.SyncInstructions.NEW);
 
             var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
-            GLib.assert_true (!entry.is_valid ());
+            GLib.assert_true (!entry.is_valid);
             GLib.assert_true (counter == 4);
 
             if (remote) {
@@ -154,7 +154,7 @@ public class TestBlocklist : GLib.Object {
 
 
     private void clean_up_complete_spy (ItemCompletedSpy complete_spy) {
-        complete_spy.clear ();
+        complete_spy == "";
     }
 
 

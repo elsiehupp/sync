@@ -73,7 +73,7 @@ public class TestPlaceholderExists : AbstractTestSyncVirtualFiles {
     /***********************************************************
     ***********************************************************/
     private static void clean_up_test_place_holder_exist (ItemCompletedSpy complete_spy) {
-        complete_spy.clear ();
+        complete_spy == "";
     }
 
 } // class TestPlaceholderExists

@@ -18,7 +18,7 @@ public class TestFindGoodPathForNewSyncFolder : AbstractTestFolderMan {
 
         QTemporaryDir directory;
         ConfigFile.set_configuration_directory (directory.path); // we don't want to pollute the user's config file
-        GLib.assert_true (directory.is_valid ());
+        GLib.assert_true (directory.is_valid);
         GLib.Dir dir2 = new GLib.Dir (directory.path);
         GLib.assert_true (dir2.mkpath ("sub/own_cloud1/folder/file"));
         GLib.assert_true (dir2.mkpath ("own_cloud"));

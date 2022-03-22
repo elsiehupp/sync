@@ -53,7 +53,7 @@ public class TestSearchTermResultTickled : AbstractTestUnifiedSearchListmodel {
                         .to_string ();
                 url_for_clicked_result = model.data (model.index (i), UnifiedSearchResultsListModel.DataRole.ResourceUrlRole).to_string ();
 
-                if (!provider_id == "" && !url_for_clicked_result == "") {
+                if (provider_id != "" && url_for_clicked_result != "") {
                     model.signal_result_clicked (provider_id, GLib.Uri (url_for_clicked_result));
                     break;
                 }

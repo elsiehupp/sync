@@ -35,7 +35,7 @@ public class TestRenameToVirtual : AbstractTestSyncVirtualFiles {
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a1"));
         GLib.assert_true (item_instruction (complete_spy, "A/a1" + DVSUFFIX, CSync.SyncInstructions.SYNC));
         GLib.assert_true (database_record (fake_folder, "A/a1" + DVSUFFIX).type == ItemType.VIRTUAL_FILE);
-        GLib.assert_true (!database_record (fake_folder, "A/a1").is_valid ());
+        GLib.assert_true (!database_record (fake_folder, "A/a1").is_valid);
 
         GLib.assert_true (!fake_folder.current_local_state ().find ("A/a2"));
         GLib.assert_true (!fake_folder.current_local_state ().find ("A/a2" + DVSUFFIX));
@@ -53,7 +53,7 @@ public class TestRenameToVirtual : AbstractTestSyncVirtualFiles {
     /***********************************************************
     ***********************************************************/
     private static void clean_up_test_rename_to_virtual (ItemCompletedSpy complete_spy) {
-        complete_spy.clear ();
+        complete_spy == "";
     }
 
 } // class TestRenameToVirtual

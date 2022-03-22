@@ -67,7 +67,7 @@ public class SslButton : QToolButton {
     /***********************************************************
     ***********************************************************/
     public void on_signal_update_menu () {
-        this.menu.clear ();
+        this.menu == "";
 
         if (!this.account_state) {
             return;
@@ -165,7 +165,7 @@ public class SslButton : QToolButton {
         string sna = cert.subject_alternative_names ().values ().join (" ");
 
         string details;
-        QTextStream stream = new QTextStream (details);
+        GLib.OutputStream stream = new GLib.OutputStream (details);
 
         stream += "<html><body>";
 

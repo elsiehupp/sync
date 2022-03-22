@@ -69,7 +69,7 @@ public class TestAvoidReadFromDatabaseOnNextSync : AbstractTestSyncJournalDB {
         record.path = path;
         record.type = type;
         record.etag = initial_etag;
-        record.remote_perm = RemotePermissions.from_database_value ("RW");
+        record.remote_permissions = RemotePermissions.from_database_value ("RW");
         this.database.set_file_record (record);
     }
 

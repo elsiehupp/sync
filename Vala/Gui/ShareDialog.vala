@@ -169,8 +169,8 @@ public class ShareDialog : Gtk.Dialog {
 
 
     override ~ShareDialog () {
-        this.link_widget_list.clear ();
-        delete this.instance;
+        this.link_widget_list == "";
+        //  delete this.instance;
     }
 
 
@@ -238,7 +238,7 @@ public class ShareDialog : Gtk.Dialog {
         bool enabled = (state == AccountState.State.Connected);
         GLib.debug ("Account connected? " + enabled);
 
-        if (this.user_group_widget) {
+        if (this.user_group_widget != null) {
             this.user_group_widget.enabled (enabled);
         }
 
@@ -298,9 +298,9 @@ public class ShareDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void on_signal_create_link_share () {
-        if (this.share_manager) {
-            const var ask_optional_password = this.account_state.account.capabilities.share_public_link_ask_optional_password ();
-            const var password = ask_optional_password ? create_random_password (): "";
+        if (this.share_manager != null) {
+            const bool ask_optional_password = this.account_state.account.capabilities.share_public_link_ask_optional_password ();
+            const string password = ask_optional_password ? create_random_password (): "";
             this.share_manager.create_link_share (this.share_path, "", password);
         }
     }
@@ -356,7 +356,7 @@ public class ShareDialog : Gtk.Dialog {
             return;
         }
 
-        if (this.share_manager) {
+        if (this.share_manager != null) {
             // Try to create the link share again with the newly entered password
             this.share_manager.create_link_share (this.share_path, "", password);
         }
@@ -428,7 +428,7 @@ public class ShareDialog : Gtk.Dialog {
         }
 
         if (theme.link_sharing) {
-            if (this.share_manager) {
+            if (this.share_manager != null) {
                 this.share_manager.fetch_shares (this.share_path);
             }
         }
@@ -450,8 +450,8 @@ public class ShareDialog : Gtk.Dialog {
             link_share_widget.on_signal_delete_share_fetched
         );
 
-        if (this.share_manager) {
-            this.share_manager.on_signal_server_error.connect (
+        if (this.share_manager != null) {
+            this.share_manager.signal_server_error.connect (
                 link_share_widget.on_signal_server_error
             );
         }
@@ -509,7 +509,7 @@ public class ShareDialog : Gtk.Dialog {
 
             this.instance.vertical_layout.insert_widget (this.link_widget_list.size ()+1, this.empty_share_link_widget);
             this.empty_share_link_widget.show ();
-        } else if (this.empty_share_link_widget) {
+        } else if (this.empty_share_link_widget != null) {
             this.empty_share_link_widget.hide ();
             this.instance.vertical_layout.remove_widget (this.empty_share_link_widget);
             this.link_widget_list.remove_all (this.empty_share_link_widget);

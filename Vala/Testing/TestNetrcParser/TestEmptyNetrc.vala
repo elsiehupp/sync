@@ -21,7 +21,7 @@ public class TestEmptyNetrc : AbstractTestNetrcParser {
         GLib.assert_true (!parser.parse ());
         GLib.assert_true (parser.find ("foo") == new Pair<string, string> ("", ""));
 
-        delete (this);
+        //  delete (this);
     }
 
 } // class TestEmptyNetrc

@@ -33,7 +33,7 @@ public abstract class AbstractTestSyncXAttr : GLib.Object {
         var journal = folder.sync_journal ();
         SyncJournalFileRecord record;
         journal.get_file_record (path, record);
-        if (!record.is_valid ())
+        if (!record.is_valid)
             return;
         record.type = ItemType.VIRTUAL_FILE_DOWNLOAD;
         journal.set_file_record (record);
@@ -47,7 +47,7 @@ public abstract class AbstractTestSyncXAttr : GLib.Object {
         var journal = folder.sync_journal ();
         SyncJournalFileRecord record;
         journal.get_file_record (path, record);
-        if (!record.is_valid ())
+        if (!record.is_valid)
             return;
         record.type = ItemType.VIRTUAL_FILE_DEHYDRATION;
         journal.set_file_record (record);

@@ -19,7 +19,7 @@ public class TestResume : GLib.Object {
         fake_folder.sync_engine.set_ignore_hidden_files (true);
         QSignalSpy complete_spy = new QSignalSpy (
             fake_folder.sync_engine,
-            signal_item_completed (SyncFileItemPtr)
+            signal_item_completed (SyncFileItem)
         );
         var size = 30 * 1000 * 1000;
         fake_folder.remote_modifier ().insert ("A/a0", size);

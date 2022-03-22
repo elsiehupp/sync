@@ -48,7 +48,7 @@ public class KeychainChunkDeleteJob : AbstractNetworkJob {
             request.raw_header ("e2e-token", this.folder_token);
         }
 
-        if (this.url.is_valid ()) {
+        if (this.url.is_valid) {
             send_request ("DELETE", this.url, request);
         } else {
             send_request ("DELETE", make_dav_url (path), request);

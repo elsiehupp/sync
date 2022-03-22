@@ -319,16 +319,20 @@ public class Capabilities : GLib.Object {
     /***********************************************************
     Returns true if the capabilities are loaded already.
     ***********************************************************/
-    public bool is_valid () {
-        return !this.capabilities == "";
+    public bool is_valid {
+        public get {
+            return this.capabilities != null;
+        }
     }
 
 
     /***********************************************************
     Returns true if the activity app is enabled.
     ***********************************************************/
-    public bool has_activities () {
-        return this.capabilities.contains ("activity");
+    public bool has_activities {
+        public get {
+            return this.capabilities.contains ("activity");
+        }
     }
 
 
@@ -343,12 +347,14 @@ public class Capabilities : GLib.Object {
     Default: []
     Possible entries: "Adler32", "MD5", "SHA1"
     ***********************************************************/
-    public GLib.List<string> supported_checksum_types () {
-        GLib.List<string> list;
-        foreach (var t in this.capabilities["checksums"].to_map ()["supported_types"].to_list ()) {
-            list.push_back (t.to_byte_array ());
+    public GLib.List<string> supported_checksum_types {
+        public get {
+            unowned GLib.List<string> list = new GLib.List<string> ();
+            foreach (var t in this.capabilities["checksums"].to_map ()["supported_types"].to_list ()) {
+                list.push_back (t.to_byte_array ());
+            }
+            return list;
         }
-        return list;
     }
 
 
@@ -360,29 +366,33 @@ public class Capabilities : GLib.Object {
     Default: empty, meaning "no preference"
     Possible values : empty or any of the supported_types
     ***********************************************************/
-    public string preferred_upload_checksum_type () {
-        return q_environment_variable ("OWNCLOUD_CONTENT_CHECKSUM_TYPE",
-            this.capabilities.value ("checksums").to_map ()
-            .value ("preferred_upload_type", "SHA1").to_string ()).to_utf8 ();
+    public string preferred_upload_checksum_type {
+        public get {
+            return q_environment_variable ("OWNCLOUD_CONTENT_CHECKSUM_TYPE",
+                this.capabilities.value ("checksums").to_map ()
+                .value ("preferred_upload_type", "SHA1").to_string ()).to_utf8 ();
+        }
     }
 
 
     /***********************************************************
-    Helper that returns the preferred_upload_checksum_type () if
-    set, or one of the supported_checksum_types () if it isn't.
+    Helper that returns the preferred_upload_checksum_type if
+    set, or one of the supported_checksum_types if it isn't.
     May return an empty string if no checksum types are
     supported.
     ***********************************************************/
-    public string upload_checksum_type () {
-        string preferred = preferred_upload_checksum_type ();
-        if (!preferred == "") {
-            return preferred;
+    public string upload_checksum_type {
+        public get {
+            string preferred = preferred_upload_checksum_type;
+            if (preferred != "") {
+                return preferred;
+            }
+            GLib.List<string> supported = supported_checksum_types;
+            if (supported != null) {
+                return supported.first ();
+            }
+            return "";
         }
-        GLib.List<string> supported = supported_checksum_types ();
-        if (!supported == "") {
-            return supported.first ();
-        }
-        return "";
     }
 
 
@@ -403,12 +413,14 @@ public class Capabilities : GLib.Object {
     Default: []
     Example: [503, 500]
     ***********************************************************/
-    public GLib.List<int> http_error_codes_that_reset_failing_chunked_uploads () {
-        GLib.List<int> list;
-        foreach (var t in this.capabilities["dav"].to_map ()["http_error_codes_that_reset_failing_chunked_uploads"].to_list ()) {
-            list.push_back (t.to_int ());
+    public GLib.List<int> http_error_codes_that_reset_failing_chunked_uploads {
+        public get {
+            unowned GLib.List<int> list = new GLib.List<int> ();
+            foreach (var t in this.capabilities["dav"].to_map ()["http_error_codes_that_reset_failing_chunked_uploads"].to_list ()) {
+                list.push_back (t.to_int ());
+            }
+            return list;
         }
-        return list;
     }
 
 
@@ -421,16 +433,20 @@ public class Capabilities : GLib.Object {
 
     Note that it just needs to be contained. The regular_expression [ab] is contained in "car".
     ***********************************************************/
-    public string invalid_filename_regex () {
-        return this.capabilities["dav"].to_map ()["invalid_filename_regex"].to_string ();
+    public string invalid_filename_regex {
+        public get {
+            return this.capabilities["dav"].to_map ()["invalid_filename_regex"].to_string ();
+        }
     }
 
 
     /***********************************************************
     return the list of filename that should not be uploaded
     ***********************************************************/
-    public string[] blocklisted_files () {
-        return this.capabilities["files"].to_map ()["blocklisted_files"].to_string_list ();
+    public string[] blocklisted_files {
+        public get {
+            return this.capabilities["files"].to_map ()["blocklisted_files"].to_string_list ();
+        }
     }
 
 
@@ -438,13 +454,15 @@ public class Capabilities : GLib.Object {
     Whether conflict files should remain local (default) or
     should be uploaded.
     ***********************************************************/
-    public bool upload_conflict_files () {
-        var env_is_set = !q_environment_variable_is_empty ("OWNCLOUD_UPLOAD_CONFLICT_FILES");
-        int env_value = q_environment_variable_int_value ("OWNCLOUD_UPLOAD_CONFLICT_FILES");
-        if (env_is_set)
-            return env_value != 0;
-
-        return this.capabilities["upload_conflict_files"].to_bool ();
+    public bool upload_conflict_files {
+        public get {
+            var env_is_set = !q_environment_variable_is_empty ("OWNCLOUD_UPLOAD_CONFLICT_FILES");
+            int env_value = q_environment_variable_int_value ("OWNCLOUD_UPLOAD_CONFLICT_FILES");
+            if (env_is_set)
+                return env_value != 0;
+    
+            return this.capabilities["upload_conflict_files"].to_bool ();
+        }
     }
 
 
@@ -452,9 +470,7 @@ public class Capabilities : GLib.Object {
     Direct Editing
     ***********************************************************/
     public void add_direct_editor (DirectEditor direct_editor) {
-        if (direct_editor) {
-            this.direct_editors.append (direct_editor);
-        }
+        this.direct_editors.append (direct_editor);
     }
 
 

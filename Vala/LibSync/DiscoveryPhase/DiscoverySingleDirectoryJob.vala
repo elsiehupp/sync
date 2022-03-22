@@ -140,7 +140,7 @@ public class DiscoverySingleDirectoryJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public new void abort () {
-        if (this.lscol_job && this.lscol_job.input_stream) {
+        if (this.lscol_job != null && this.lscol_job.input_stream != null) {
             this.lscol_job.input_stream.abort ();
         }
     }

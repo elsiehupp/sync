@@ -72,7 +72,7 @@ public class SocketUploadJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_sync_engine_item_completed (SyncFileItemPtr item) {
+    private void on_signal_sync_engine_item_completed (SyncFileItem item) {
         this.synced_files.append (item.file);
     }
 
@@ -109,7 +109,7 @@ public class SocketUploadJob : GLib.Object {
     public void on_signal_start () {
         var opt = this.sync_engine.sync_options ();
         opt.file_pattern (this.pattern);
-        if (!opt.file_regex ().is_valid ()) {
+        if (!opt.file_regex ().is_valid) {
             this.api_job.failure (opt.file_regex ().error_string);
             return;
         }

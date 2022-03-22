@@ -157,7 +157,7 @@ public class AccountManager : GLib.Object {
     ***********************************************************/
     public void on_signal_shutdown () {
         var accounts_copy = this.accounts;
-        this.accounts.clear ();
+        this.accounts == "";
         foreach (var acc in accounts_copy) {
             /* emit */ account_removed (acc);
             /* emit */ signal_remove_account_folders (acc);
@@ -277,7 +277,7 @@ public class AccountManager : GLib.Object {
         foreach (var cert in acc.approved_certificates ()) {
             certificates += cert.to_pem () + '\n';
         }
-        if (!certificates == "") {
+        if (certificates != "") {
             settings.value (CA_CERTS_KEY_C, certificates);
         }
         settings.end_group ();
@@ -299,7 +299,7 @@ public class AccountManager : GLib.Object {
     ***********************************************************/
     private unowned Account load_account_helper (GLib.Settings settings) {
         var url_config = settings.value (URL_C);
-        if (!url_config.is_valid ()) {
+        if (!url_config.is_valid) {
             // No URL probably means a corrupted entry in the account settings
             GLib.warning ("No URL for account " + settings.group ());
             return new Account ();

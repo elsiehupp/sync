@@ -475,7 +475,7 @@ public class ClientSideEncryption : GLib.Object {
         string prev;
 
         while (true) {
-            if (!prev == "") {
+            if (prev != "") {
                 dialog.text_value (prev);
             }
             bool ok = dialog.exec ();
@@ -500,7 +500,7 @@ public class ClientSideEncryption : GLib.Object {
 
                 GLib.info ("Private key: " + this.private_key.to_string ());
 
-                if (!this.private_key == null && check_public_key_validity (account)) {
+                if (this.private_key != "" && check_public_key_validity (account)) {
                     write_private_key (account);
                     write_certificate (account);
                     write_mnemonic (account);
@@ -576,13 +576,13 @@ public class ClientSideEncryption : GLib.Object {
         Biometric certificate_bio;
         var certificate_pem = this.certificate.to_pem ();
         BIO_write (certificate_bio, certificate_pem.const_data (), certificate_pem.size ());
-        var x509Certificate = X509Certificate.read_certificate (certificate_bio);
-        if (!x509Certificate) {
+        var x509_certificate = X509Certificate.read_certificate (certificate_bio);
+        if (x509_certificate == null) {
             GLib.info ("Client certificate is invalid. Could not check it against the server public key.");
             return false;
         }
 
-        if (X509_verify (x509Certificate, server_public_key) == 0) {
+        if (X509_verify (x509_certificate, server_public_key) == 0) {
             GLib.info ("Client certificate is not valid against the server public key.");
             return false;
         }

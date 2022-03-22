@@ -24,7 +24,7 @@ public class TestValidNetrc : AbstractTestNetrcParser {
         GLib.assert_true (parser.find ("funnysplit") == new Pair<string, string> ("bar3", "baz3"));
         GLib.assert_true (parser.find ("frob") == new Pair<string, string> ("user with spaces", "space pwd"));
 
-        delete (this);
+        //  delete (this);
     }
 
 } // class TestValidNetrc

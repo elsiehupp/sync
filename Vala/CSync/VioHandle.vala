@@ -19,25 +19,23 @@ public class VioHandle : GLib.Object {
     public string path;
 
     public static VioHandle open_directory (string name) {
-        VioHandle handle = new VioHandle ();
+        VioHandle directory_handle = new VioHandle ();
 
         var dirname = GLib.File.encode_name (name);
 
-        handle.directory = opendir (dirname.const_data ());
-        if (handle.directory == null) {
+        directory_handle.directory = opendir (dirname.const_data ());
+        if (directory_handle.directory == null) {
             return null;
         }
 
-        handle.path = dirname;
-        return handle.take ();
+        directory_handle.path = dirname;
+        return directory_handle.take ();
     }
 
 
     public int close_directory (VioHandle directory_handle) {
-        //    Q_ASSERT (directory_handle);
-        var rc = closedir (directory_handle.directory);
-        delete directory_handle;
-        return rc;
+        //  var rc = Posix.closedir (directory_handle.directory);
+        return Posix.close (directory_handle.directory);
     }
 
 
@@ -47,7 +45,7 @@ public class VioHandle : GLib.Object {
         FileStat file_stat;
 
         do {
-            posix_dirent = Posix.readdir (handle.directory);
+            posix_dirent = Posix.readdir (directory_handle.directory);
             if (posix_dirent == null) {
                 return new FileStat (); // null
             }
@@ -55,10 +53,10 @@ public class VioHandle : GLib.Object {
 
         file_stat = FileStat ();
         file_stat.path = GLib.File.decode_name (posix_dirent.d_name).to_utf8 ();
-        string full_path = handle.path % '/' % "" % (string) posix_dirent.d_name;
+        string full_path = directory_handle.path % '/' % "" % (string) posix_dirent.d_name;
         if (file_stat.path == null) {
                 file_stat.original_path = full_path;
-                GLib.warning ("Invalid characters in file/directory name, please rename: " + posix_dirent.d_name + handle.path);
+                GLib.warning ("Invalid characters in file/directory name, please rename: " + posix_dirent.d_name + directory_handle.path);
         }
 
         /* Check for availability of d_type, see manpage. */
@@ -94,7 +92,7 @@ public class VioHandle : GLib.Object {
         if (vfs == null) {
                 // Directly modifies file_stat.type.
                 // We can ignore the return value since we're done here anyway.
-                const var result = vfs.stat_type_virtual_file (file_stat.get (), handle.path);
+                const var result = vfs.stat_type_virtual_file (file_stat.get (), directory_handle.path);
                 //    Q_UNUSED (result)
         }
 

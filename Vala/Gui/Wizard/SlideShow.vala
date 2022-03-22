@@ -51,10 +51,11 @@ public class SlideShow : Gtk.Widget {
             return this.current_slide;
         }
         public set {
-            if (this.current_slide == value)
+            if (this.current_slide == value) {
                 return;
+            }
 
-            if (!this.animation) {
+            if (this.animation == null) {
                 this.animation = new QVariantAnimation (this);
                 this.animation.duration (SLIDE_DURATION);
                 this.animation.easing_curve (QEasing_curve.Out_cubic);
@@ -178,8 +179,8 @@ public class SlideShow : Gtk.Widget {
     ***********************************************************/
     public void on_signal_reset () {
         on_signal_stop_show ();
-        this.pixmaps.clear ();
-        this.labels.clear ();
+        this.pixmaps == "";
+        this.labels == "";
         update_geometry ();
         update ();
     }
@@ -195,8 +196,9 @@ public class SlideShow : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     protected void mouse_release_event (QMouseEvent event) {
-        if (!this.animation && QLine_f (this.press_point, event.position ()).length < Gtk.Application.style_hints ().start_drag_distance ())
+        if (this.animation == null && QLine_f (this.press_point, event.position ()).length < Gtk.Application.style_hints ().start_drag_distance ()) {
             /* emit */ signal_clicked ();
+        }
     }
 
 
@@ -205,7 +207,7 @@ public class SlideShow : Gtk.Widget {
     protected void paint_event (QPaintEvent event) {
         QPainter painter = new QPainter (this);
 
-        if (this.animation) {
+        if (this.animation != null) {
             int from = this.animation.start_value ().to_int ();
             int to = this.animation.end_value ().to_int ();
             double progress = this.animation.easing_curve ().value_for_progress (this.animation.current_time () / static_cast<double> (this.animation.duration ()));

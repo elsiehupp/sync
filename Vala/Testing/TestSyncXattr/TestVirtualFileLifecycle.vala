@@ -73,7 +73,7 @@ public class TestVirtualFileLifecycle : AbstractTestSyncXAttr {
         GLib.assert_true (!fake_folder.current_local_state ().find ("A/a1"));
         GLib.assert_true (!fake_folder.current_remote_state ().find ("A/a1"));
         GLib.assert_true (item_instruction (complete_spy, "A/a1", CSync.SyncInstructions.REMOVE));
-        GLib.assert_true (!database_record (fake_folder, "A/a1").is_valid ());
+        GLib.assert_true (!database_record (fake_folder, "A/a1").is_valid);
         clean_up_test_virtual_file_lifecycle ();
 
         // Recreate a1 before carrying on with the other tests
@@ -100,7 +100,7 @@ public class TestVirtualFileLifecycle : AbstractTestSyncXAttr {
             item_instruction (complete_spy, "A/a1m", CSync.SyncInstructions.RENAME)
             || (item_instruction (complete_spy, "A/a1m", CSync.SyncInstructions.NEW)
                 && item_instruction (complete_spy, "A/a1", CSync.SyncInstructions.REMOVE)));
-        GLib.assert_true (!database_record (fake_folder, "A/a1").is_valid ());
+        GLib.assert_true (!database_record (fake_folder, "A/a1").is_valid);
         clean_up_test_virtual_file_lifecycle ();
 
         // Remote remove is propagated
@@ -109,8 +109,8 @@ public class TestVirtualFileLifecycle : AbstractTestSyncXAttr {
         GLib.assert_true (!GLib.FileInfo (fake_folder.local_path + "A/a1m").exists ());
         GLib.assert_true (!fake_folder.current_remote_state ().find ("A/a1m"));
         GLib.assert_true (item_instruction (complete_spy, "A/a1m", CSync.SyncInstructions.REMOVE));
-        GLib.assert_true (!database_record (fake_folder, "A/a1").is_valid ());
-        GLib.assert_true (!database_record (fake_folder, "A/a1m").is_valid ());
+        GLib.assert_true (!database_record (fake_folder, "A/a1").is_valid);
+        GLib.assert_true (!database_record (fake_folder, "A/a1m").is_valid);
         clean_up_test_virtual_file_lifecycle ();
 
         // Edge case : Local virtual file but no database entry for some reason
@@ -133,14 +133,14 @@ public class TestVirtualFileLifecycle : AbstractTestSyncXAttr {
         GLib.assert_true (item_instruction (complete_spy, "A/a2", CSync.SyncInstructions.UPDATE_METADATA));
         GLib.assert_true (!GLib.FileInfo (fake_folder.local_path + "A/a3").exists ());
         GLib.assert_true (item_instruction (complete_spy, "A/a3", CSync.SyncInstructions.REMOVE));
-        GLib.assert_true (!database_record (fake_folder, "A/a3").is_valid ());
+        GLib.assert_true (!database_record (fake_folder, "A/a3").is_valid);
         clean_up_test_virtual_file_lifecycle ();
     }
 
     /***********************************************************
     ***********************************************************/
     private static void clean_up_test_virtual_file_lifecycle () {
-        complete_spy.clear ();
+        complete_spy == "";
         if (!do_local_discovery) {
             fake_folder.sync_engine.set_local_discovery_options (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM);
         }

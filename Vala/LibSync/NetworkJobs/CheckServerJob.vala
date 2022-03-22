@@ -95,9 +95,9 @@ public class CheckServerJob : AbstractNetworkJob {
     ***********************************************************/
     public new void on_signal_timed_out () {
         GLib.warning ("TIMEOUT");
-        if (this.input_stream && this.input_stream.is_running ()) {
+        if (this.input_stream != null && this.input_stream.is_running ()) {
             /* emit */ timeout (this.input_stream.url);
-        } else if (!this.input_stream) {
+        } else if (this.input_stream == null) {
             GLib.warning ("Timeout even there was no input_stream?");
         }
         delete_later ();

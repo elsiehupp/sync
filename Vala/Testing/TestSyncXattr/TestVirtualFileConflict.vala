@@ -71,7 +71,7 @@ public class TestVirtualFileConflict : AbstractTestSyncXAttr {
     /***********************************************************
     ***********************************************************/
     private static void clean_up_test_virtual_file_conflict () {
-        complete_spy.clear ();
+        complete_spy == "";
     }
 
 } // class TestVirtualFileConflict

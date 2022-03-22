@@ -29,7 +29,7 @@ public class SimpleNetworkJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public GLib.InputStream start_request (string verb, GLib.Uri url,
-        Soup.Request request = Soup.Request (),
+        Soup.Request request = new Soup.Request (),
         QIODevice request_body = null) {
         var reply = send_request (verb, url, request, request_body);
         start ();

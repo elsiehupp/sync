@@ -115,7 +115,7 @@ public class CookieJar : Soup.CookieJar {
 
 
     //  QDataStream operator>> (QDataStream stream, GLib.List<Soup.Cookie> list) {
-    //      list.clear ();
+    //      list == "";
 
     //      uint32 version = 0;
     //      stream >> version;

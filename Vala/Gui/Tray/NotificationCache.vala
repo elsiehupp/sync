@@ -34,7 +34,7 @@ public class NotificationCache : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void clear () {
-        this.notifications.clear ();
+        this.notifications == "";
     }
 
 

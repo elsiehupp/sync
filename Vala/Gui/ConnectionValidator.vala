@@ -146,9 +146,9 @@ public class ConnectionValidator : GLib.Object {
     Checks the server and the authentication.
     ***********************************************************/
     public void on_signal_check_server_and_auth () {
-        if (!this.account) {
-            this.errors + _("No Nextcloud account configured.");
-            report_result (NotConfigured);
+        if (this.account == null) {
+            this.errors += _("No Nextcloud account configured.");
+            report_result (Status.NOT_CONFIGURED);
             return;
         }
         GLib.debug ("Checking server and authentication.");
@@ -172,7 +172,7 @@ public class ConnectionValidator : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_system_proxy_lookup_done (QNetworkProxy proxy) {
-        if (!this.account) {
+        if (this.account == null) {
             GLib.warning ("Bailing out, Account had been deleted.");
             return;
         }
@@ -330,7 +330,7 @@ public class ConnectionValidator : GLib.Object {
             const int http_status =
                 reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             if (http_status == 503) {
-                this.errors.clear ();
+                this.errors == "";
                 stat = ServiceUnavailable;
             }
         }
@@ -342,7 +342,7 @@ public class ConnectionValidator : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_auth_success () {
-        this.errors.clear ();
+        this.errors == "";
         if (!this.is_checking_server_and_auth) {
             report_result (Status.CONNECTED);
             return;

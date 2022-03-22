@@ -403,7 +403,7 @@ public class Application : Gtk.Application {
     public void show_help () {
         help ();
         string help_text;
-        QTextStream stream = new QTextStream (help_text);
+        GLib.OutputStream stream = new GLib.OutputStream (help_text);
         stream +=  this.theme.app_name
             " version "
             this.theme.version + endl;
@@ -488,7 +488,7 @@ public class Application : Gtk.Application {
 
             // If one account is configured : enable autostart
     //  #ifndef QT_DEBUG
-            bool should_auto_start = AccountManager.instance.accounts.size () == 1;
+            bool should_auto_start = AccountManager.instance.accounts.length == 1;
     //  #else
             bool should_auto_start = false;
     //  #endif
@@ -520,14 +520,14 @@ public class Application : Gtk.Application {
             return;
         }
         var folder_connection = FolderManager.instance.folder_for_path (filename);
-        if (!folder_connection) {
+        if (folder_connection == null) {
             GLib.warning ("Can't find sync folder_connection for " + filename);
             // TODO: show a Gtk.MessageBox for errors
             return;
         }
         string relative_path = GLib.Dir.clean_path (filename).mid (folder_connection.clean_path.length + 1);
         folder_connection.on_signal_implicitly_hydrate_file (relative_path);
-        string normal_name = filename.left (filename.size () - virtual_file_ext.size ());
+        string normal_name = filename.left (filename.length - virtual_file_ext.length);
         GLib.Object.Connection.create () = connect (
             folder_connection,
             FolderConnection.signal_sync_finished, folder_connection,
@@ -743,7 +743,7 @@ public class Application : Gtk.Application {
             }
 
             // Show the main dialog only if there is at least one account configured
-            if (!AccountManager.instance.accounts == "") {
+            if (AccountManager.instance.accounts != "") {
                 this.show_main_dialog ();
             } else {
                 this.gui.on_signal_new_account_wizard ();
@@ -891,7 +891,7 @@ public class Application : Gtk.Application {
 
         // We want to message the user either for destructive changes,
         // or if we're ignoring something and the client version changed.
-        bool warning_message = !delete_keys == "" || (!ignore_keys == "" && version_changed);
+        bool warning_message = delete_keys != null || (ignore_keys != null && version_changed);
 
         if (!version_changed && !warning_message)
             return true;
@@ -900,7 +900,7 @@ public class Application : Gtk.Application {
 
         if (warning_message) {
             string bold_message;
-            if (!delete_keys == "") {
+            if (delete_keys != null) {
                 bold_message = _("Continuing will mean <b>deleting these settings</b>.");
             } else {
                 bold_message = _("Continuing will mean <b>ignoring these settings</b>.");

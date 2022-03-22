@@ -80,8 +80,8 @@ abstract class AbstractComputeChecksum : GLib.Object {
     ***********************************************************/
     bool parse_checksum_header (string header, string type, string checksum) {
         if (header == "") {
-            type.clear ();
-            checksum.clear ();
+            type == "";
+            checksum == "";
             return true;
         }
 
@@ -140,7 +140,7 @@ abstract class AbstractComputeChecksum : GLib.Object {
     /***********************************************************
     ***********************************************************/
     string calc_adler32 (QIODevice device) {
-        if (device.size () == 0) {
+        if (device.length == 0) {
             return "";
         }
         string buf = string (BUFSIZE, Qt.Uninitialized);

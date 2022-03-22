@@ -26,7 +26,7 @@ public class EtagParser : GLib.Object {
         // https://github.com/owncloud/client/issues/1195
         header_copy.replace ("-gzip", "");
 
-        if (header_copy.length >= 2 && header_copy.has_prefix ('"') && header_copy.has_suffix ('"')) {
+        if (header_copy.length >= 2 && header_copy.has_prefix ("\") && header_copy.has_suffix ("\")) {
             header_copy = header_copy.mid (1, header_copy.length - 2);
         }
         return header_copy;

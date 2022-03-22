@@ -135,7 +135,7 @@ public class TestSuffixFilesWhileLocalHydrated : AbstractTestSyncVirtualFiles {
     /***********************************************************
     ***********************************************************/
     private static void clean_up_test_suffix_files_while_local_hydrated (ItemCompletedSpy complete_spy) {
-        complete_spy.clear ();
+        complete_spy == "";
     }
 
 } // class TestSuffixFilesWhileLocalHydrated

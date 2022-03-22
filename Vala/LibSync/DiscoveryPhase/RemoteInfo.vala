@@ -15,23 +15,24 @@ public class RemoteInfo : GLib.Object {
     FileName of the entry (this does not contains any directory
     or path, just the plain name).
     ***********************************************************/
-    string name;
-    string etag;
-    string file_identifier;
-    string checksum_header;
-    RemotePermissions remote_perm;
-    time_t modtime = 0;
-    int64 size = 0;
-    int64 size_of_folder = 0;
-    bool is_directory = false;
-    bool is_e2e_encrypted = false;
-    string e2e_mangled_name;
-    string direct_download_url;
-    string direct_download_cookies;
+    public string name;
+    public string etag;
+    public public string file_identifier;
+    public string checksum_header;
+    public RemotePermissions remote_permissions;
+    public time_t modtime = 0;
+    public int64 size = 0;
+    public int64 size_of_folder = 0;
+    public bool is_directory = false;
+    public bool is_e2e_encrypted = false;
+    public string e2e_mangled_name;
+    public string direct_download_url;
+    public string direct_download_cookies;
 
-
-    bool is_valid () {
-        return !name == null;
+    public bool is_valid {
+        public get {
+            return name != null;
+        }
     }
 
 } // class RemoteInfo

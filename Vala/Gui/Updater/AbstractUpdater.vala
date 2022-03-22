@@ -67,7 +67,7 @@ public abstract class AbstractUpdater : GLib.Object {
             if (update_base_url == "") {
                 update_base_url = GLib.Uri (APPLICATION_UPDATE_URL);
             }
-            if (!update_base_url.is_valid () || update_base_url.host () == ".") {
+            if (!update_base_url.is_valid || update_base_url.host () == ".") {
                 return new GLib.Uri ();
             }
 
@@ -114,7 +114,7 @@ public abstract class AbstractUpdater : GLib.Object {
             string output = process.read_all_standard_output ();
             GLib.debug ("Sys Info size: " + output.length);
             if (output.length > 1024)
-                output.clear (); // don't send too much.
+                output == ""; // don't send too much.
 
             return string.from_local8Bit (output.to_base64 ());
         }
@@ -138,9 +138,8 @@ public abstract class AbstractUpdater : GLib.Object {
                 platform = "macos";
             }
 
-            string sys_info = AbstractUpdater.system_info;
-            if (!sys_info == "") {
-                query.add_query_item ("client", sys_info);
+            if (AbstractUpdater.system_info != "") {
+                query.add_query_item ("client", AbstractUpdater.system_info);
             }
             query.add_query_item ("version", client_version ());
             query.add_query_item ("platform", platform);

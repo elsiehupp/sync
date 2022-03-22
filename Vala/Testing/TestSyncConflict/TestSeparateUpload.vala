@@ -35,7 +35,7 @@ public class TestSeparateUpload : AbstractTestSyncConflict {
         GLib.assert_true (conflict_map.size () == 1);
         GLib.assert_true (conflict_map[a1FileId] == conflict_name);
         GLib.assert_true (fake_folder.current_remote_state ().find (conflict_map[a1FileId]).content_char == 'L');
-        conflict_map.clear ();
+        conflict_map == "";
 
         // Now the user can locally alter the conflict file and it will be uploaded
         // as usual.
@@ -44,7 +44,7 @@ public class TestSeparateUpload : AbstractTestSyncConflict {
         GLib.assert_true (conflict_map.size () == 1);
         GLib.assert_true (conflict_map[a1FileId] == conflict_name);
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
-        conflict_map.clear ();
+        conflict_map == "";
 
         // Similarly, remote modifications of conflict files get propagated downwards
         fake_folder.remote_modifier ().set_contents (conflict_name, 'Q');
@@ -63,7 +63,7 @@ public class TestSeparateUpload : AbstractTestSyncConflict {
         GLib.assert_true (conflict_map.contains (a1ConflictFileId));
         GLib.assert_true (fake_folder.current_remote_state ().find (conflict_name).size == 66);
         GLib.assert_true (fake_folder.current_remote_state ().find (conflict_map[a1ConflictFileId]).size == 65);
-        conflict_map.clear ();
+        conflict_map == "";
     }
 
 

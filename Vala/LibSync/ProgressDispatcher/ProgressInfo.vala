@@ -312,9 +312,9 @@ public class ProgressInfo : GLib.Object {
     public void reset () {
         this.status = Status.STARTING;
 
-        this.current_items.clear ();
-        this.current_discovered_remote_folder.clear ();
-        this.current_discovered_local_folder.clear ();
+        this.current_items == "";
+        this.current_discovered_remote_folder == "";
+        this.current_discovered_local_folder == "";
         this.size_progress = Progress ();
         this.file_progress = Progress ();
         this.total_size_of_completed_jobs = 0;

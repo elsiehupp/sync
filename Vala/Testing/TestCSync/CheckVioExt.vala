@@ -87,7 +87,7 @@ public class CheckVioExt : GLib.Object {
         rc = wipe_testdir ();
         GLib.assert_true (rc == 0);
 
-        delete (StateVar) state;
+        //  delete (StateVar) state;
         return 0;
     }
 

@@ -154,7 +154,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     public int row_count (QModelIndex parent) {
-        if (parent.is_valid ()) {
+        if (parent.is_valid) {
             return 0;
         }
 
@@ -234,7 +234,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
         if (!this.results == "") {
             begin_reset_model ();
-            this.results.clear ();
+            this.results == "";
             end_reset_model ();
         }
 
@@ -492,7 +492,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
         }
 
         if (!this.search_job_connections == "") {
-            this.search_job_connections.clear ();
+            this.search_job_connections == "";
             /* emit */ signal_is_search_in_progress_changed ();
         }
     }
@@ -502,7 +502,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
     ***********************************************************/
     private void clear_current_fetch_more_in_progress_provider_id () {
         if (!this.current_fetch_more_in_progress_provider_id == "") {
-            this.current_fetch_more_in_progress_provider_id.clear ();
+            this.current_fetch_more_in_progress_provider_id == "";
             /* emit */ signal_current_fetch_more_in_progress_provider_id_changed ();
         }
     }
@@ -519,7 +519,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
         /* emit */ signal_search_term_changed ();
 
         if (!this.error_string == "") {
-            this.error_string.clear ();
+            this.error_string == "";
             /* emit */ signal_error_string_changed ();
         }
 
@@ -544,7 +544,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
         if (!this.results == "") {
             begin_reset_model ();
-            this.results.clear ();
+            this.results == "";
             end_reset_model ();
         }
     }
@@ -719,7 +719,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
     private static string icon_url_for_default_icon_name (string default_icon_name) {
         const GLib.Uri url_for_icon = new GLib.Uri (default_icon_name);
 
-        if (url_for_icon.is_valid () && !url_for_icon.scheme () == "") {
+        if (url_for_icon.is_valid && !url_for_icon.scheme () == "") {
             return default_icon_name;
         }
 

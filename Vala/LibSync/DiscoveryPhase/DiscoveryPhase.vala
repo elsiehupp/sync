@@ -135,7 +135,7 @@ public class DiscoveryPhase : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    int currently_active_jobs = 0;
+    public int currently_active_jobs = 0;
 
     /***********************************************************
     Both must contain a sorted list
@@ -228,10 +228,10 @@ public class DiscoveryPhase : GLib.Object {
     ***********************************************************/
     void check_selective_sync_new_folder (
         string path,
-        RemotePermissions remote_perm,
+        RemotePermissions remote_permissions,
         Callback callback) {
         if (this.sync_options.confirm_external_storage && this.sync_options.vfs.mode () == AbstractVfs.Off
-            && remote_perm.has_permission (RemotePermissions.Permissions.IS_MOUNTED)) {
+            && remote_permissions.has_permission (RemotePermissions.Permissions.IS_MOUNTED)) {
             // external storage.
 
             // Note: DiscoverySingleDirectoryJob.on_signal_directory_listing_iterated_slot make sure that only the
@@ -380,9 +380,9 @@ public class DiscoveryPhase : GLib.Object {
             this.deleted_item.erase (it);
         }
         var other_job = this.queued_deleted_directories.take (original_path);
-        if (other_job) {
+        if (other_job != null) {
             old_etag = other_job.dir_item.etag;
-            delete other_job;
+            other_job = null;
             result = true;
         }
         return new QPair<bool, string> (
@@ -406,13 +406,14 @@ public class DiscoveryPhase : GLib.Object {
     private void on_signal_process_directory_job_finished (ProcessDirectoryJob process_directory_job) {
         //  ENFORCE (this.current_root_job == sender ());
         this.current_root_job = null;
-        if (process_directory_job.dir_item)
+        if (process_directory_job.dir_item != null) {
             /* emit */ signal_item_discovered (process_directory_job.dir_item);
+        }
         process_directory_job.delete_later ();
 
         // Once the main process_directory_job has on_signal_finished recurse here to execute the remaining
         // jobs for queued deleted directories.
-        if (!this.queued_deleted_directories == "") {
+        if (this.queued_deleted_directories != "") {
             var next_job = this.queued_deleted_directories.take (this.queued_deleted_directories.first_key ());
             start_job (next_job);
         } else {
@@ -478,7 +479,7 @@ public class DiscoveryPhase : GLib.Object {
                 result.is_directory = value.contains ("collection");
             } else if (property == "getlastmodified") {
                 var date = GLib.DateTime.from_string (value, Qt.RFC2822Date);
-                GLib.assert (date.is_valid ());
+                GLib.assert (date.is_valid);
                 result.modtime = date.to_time_t ();
             } else if (property == "getcontentlength") {
                 // See #4573, sometimes negative size values are returned
@@ -498,19 +499,19 @@ public class DiscoveryPhase : GLib.Object {
             } else if (property == "d_dC") {
                 result.direct_download_cookies = value;
             } else if (property == "permissions") {
-                result.remote_perm = RemotePermissions.from_server_string (value);
+                result.remote_permissions = RemotePermissions.from_server_string (value);
             } else if (property == "checksums") {
                 result.checksum_header = find_best_checksum (value.to_utf8 ());
             } else if (property == "share-types" && !value == "") {
                 // Since GLib.HashTable is sorted, "share-types" is always after "permissions".
-                if (result.remote_perm == null) {
+                if (result.remote_permissions == null) {
                     GLib.warning ("Server returned a share type but no permissions?");
                 } else {
                     // S means shared with me.
                     // But for our purpose, we want to know if the file is shared. It does not matter
                     // if we are the owner or not.
                     // Piggy back on the persmission field
-                    result.remote_perm.permission (RemotePermissions.Permissions.IS_SHARED);
+                    result.remote_permissions.permission (RemotePermissions.Permissions.IS_SHARED);
                 }
             } else if (property == "is-encrypted" && value == "1") {
                 result.is_e2e_encrypted = true;

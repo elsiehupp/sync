@@ -61,10 +61,10 @@ public class EncryptionHelper : GLib.Object {
 
         string initialization_vector = generate_random (12);
 
-        CipherContext context;
+        CipherContext context = new CipherContext ();
 
         // Create and initialise the context
-        if (!context) {
+        if (context == null) {
             GLib.info ("Error creating cipher");
             handle_errors ();
         }
@@ -163,10 +163,10 @@ public class EncryptionHelper : GLib.Object {
         cipher_text2.chop (Constants.E2EE_TAG_SIZE);
 
         // Init
-        CipherContext context;
+        CipherContext context = new CipherContext ();
 
         // Create and initialise the context
-        if (!context) {
+        if (context == null) {
             GLib.info ("Error creating cipher.");
             return "";
         }
@@ -240,10 +240,10 @@ public class EncryptionHelper : GLib.Object {
         string data) {
         string initialization_vector = generate_random (16);
 
-        CipherContext context;
+        CipherContext context = new CipherContext ();
 
         // Create and initialise the context
-        if (!context) {
+        if (context == null) {
             GLib.info ("Error creating cipher");
             handle_errors ();
             return {};
@@ -347,10 +347,10 @@ public class EncryptionHelper : GLib.Object {
         cipher_text2.chop (Constants.E2EE_TAG_SIZE);
 
         // Init
-        CipherContext context;
+        CipherContext context = new CipherContext ();
 
         // Create and initialise the context
-        if (!context) {
+        if (context == null) {
             GLib.info ("Error creating cipher.");
             return "";
         }
@@ -427,7 +427,7 @@ public class EncryptionHelper : GLib.Object {
         int err = -1;
 
         var context = PrivateKeyContext.for_key (public_key, ENGINE_get_default_RSA ());
-        if (!context) {
+        if (context == null) {
             GLib.info ("Could not initialize the pkey context.");
             exit (1);
         }
@@ -479,7 +479,7 @@ public class EncryptionHelper : GLib.Object {
 
         GLib.info ("Start to work the decryption.");
         var context = PrivateKeyContext.for_key (private_key, ENGINE_get_default_RSA ());
-        if (!context) {
+        if (context == null) {
             GLib.info ("Could not create the PKEY context.");
             handle_errors ();
             return {};
@@ -547,10 +547,10 @@ public class EncryptionHelper : GLib.Object {
         }
 
         // Init
-        CipherContext context;
+        CipherContext context = new CipherContext ();
 
         // Create and initialise the context
-        if (!context) {
+        if (context == null) {
             GLib.info ("Could not create context");
             return false;
         }
@@ -628,10 +628,10 @@ public class EncryptionHelper : GLib.Object {
         output.open (QIODevice.WriteOnly);
 
         // Init
-        CipherContext context;
+        CipherContext context = new CipherContext ();
 
         // Create and initialise the context
-        if (!context) {
+        if (context == null) {
             GLib.info ("Could not create context");
             return false;
         }

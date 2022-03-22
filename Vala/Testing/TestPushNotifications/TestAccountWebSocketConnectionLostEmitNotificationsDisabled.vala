@@ -21,10 +21,10 @@ public class TestAccountWebSocketConnectionLostEmitNotificationsDisabled : Abstr
         GLib.assert_true (socket);
 
         QSignalSpy connection_lost_spy = new QSignalSpy (account.push_notifications (), &PushNotificationManager.connection_lost);
-        GLib.assert_true (connection_lost_spy.is_valid ());
+        GLib.assert_true (connection_lost_spy.is_valid);
 
         QSignalSpy push_notifications_disabled_spy = new QSignalSpy (account, &Account.push_notifications_disabled);
-        GLib.assert_true (push_notifications_disabled_spy.is_valid ());
+        GLib.assert_true (push_notifications_disabled_spy.is_valid);
 
         // Wait for authentication and then sent a network error
         socket.on_signal_abort ();

@@ -97,7 +97,7 @@ public class WebView : Gtk.Widget {
 
         [1] https://doc.qt.io/qt-5/qwebenginepage.html#QWebEnginePage-1
         ***********************************************************/
-        delete this.page;
+        this.page = null;
     }
 
 

@@ -33,7 +33,7 @@ public class TestHttp2Resend : GLib.Object {
 
         QSignalSpy complete_spy = new QSignalSpy (
             fake_folder.sync_engine,
-            signal_item_completed (SyncFileItemPtr)
+            signal_item_completed (SyncFileItem)
         );
         GLib.assert_true (!fake_folder.sync_once ());
         GLib.assert_true (resend_actual == 4); // the 4th fails because it only resends 3 times

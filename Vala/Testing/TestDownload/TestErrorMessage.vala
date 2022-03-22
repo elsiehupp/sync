@@ -20,7 +20,7 @@ public class TestErrorMessage : GLib.Object {
         fake_folder.sync_engine.set_ignore_hidden_files (true);
         QSignalSpy complete_spy = new QSignalSpy (
             fake_folder.sync_engine,
-            signal_item_completed (SyncFileItemPtr)
+            signal_item_completed (SyncFileItem)
         );
         var size = 3500000;
         fake_folder.remote_modifier ().insert ("A/broken", size);

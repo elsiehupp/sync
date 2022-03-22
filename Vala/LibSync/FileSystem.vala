@@ -169,7 +169,7 @@ public class FileSystem : GLib.Object {
                     if (signal_delegate)
                         signal_delegate (dir_iterator.file_path, false);
                 } else {
-                    if (errors) {
+                    if (errors != null) {
                         errors.append (_("FileSystem", "Error removing \"%1\" : %2")
                                             .printf (GLib.Dir.to_native_separators (dir_iterator.file_path), remove_error));
                     }
@@ -186,7 +186,7 @@ public class FileSystem : GLib.Object {
                 if (signal_delegate)
                     signal_delegate (path, true);
             } else {
-                if (errors) {
+                if (errors != null) {
                     errors.append (_("FileSystem", "Could not remove folder \"%1\"")
                                         .printf (GLib.Dir.to_native_separators (path)));
                 }

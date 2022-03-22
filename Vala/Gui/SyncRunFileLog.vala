@@ -6,7 +6,7 @@
 
 //  #include <GLib.Regex>
 //  #include <qfileinfo.h>
-//  #include <QTextStream>
+//  #include <GLib.OutputStream>
 //  #include <QScopedPointer>
 //  #include <GLib.Timer>
 //  #include <QStandardPaths>
@@ -24,7 +24,7 @@ public class SyncRunFileLog : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private GLib.File file;
-    private QTextStream out;
+    private GLib.OutputStream out;
     private GLib.Timer total_duration;
     private GLib.Timer lap_duration;
 
@@ -52,7 +52,7 @@ public class SyncRunFileLog : GLib.Object {
 
             GLib.File file = GLib.File.new_for_path (filename);
             file.open (QIODevice.ReadOnly | QIODevice.Text);
-            string line = new QTextStream (file).read_line ();
+            string line = new GLib.OutputStream (file).read_line ();
 
             if (string.compare (folder_path,line,Qt.CaseSensitive)!=0) {
                 depth_index++;

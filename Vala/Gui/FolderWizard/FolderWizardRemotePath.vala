@@ -268,10 +268,10 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_refresh_folders () {
-        this.encrypted_paths.clear ();
+        this.encrypted_paths == "";
         run_lscol_job ("/");
-        this.instance.folder_tree_widget.clear ();
-        this.instance.folder_entry.clear ();
+        this.instance.folder_tree_widget == "";
+        this.instance.folder_entry == "";
     }
 
 

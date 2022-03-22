@@ -54,7 +54,7 @@ public class SslErrorDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     override ~SslErrorDialog () {
-        delete this.instance;
+        //  delete this.instance;
     }
 
 
@@ -62,7 +62,7 @@ public class SslErrorDialog : Gtk.Dialog {
     ***********************************************************/
     public bool check_failing_certificates_known (GLib.List<QSslError> errors) {
         // check if unknown certificates caused errors.
-        this.unknown_certificates.clear ();
+        this.unknown_certificates == "";
 
         string[] error_strings;
 
@@ -112,7 +112,7 @@ public class SslErrorDialog : Gtk.Dialog {
             }
         }
 
-        if (!additional_error_strings == "") {
+        if (additional_error_strings != "") {
             message += QL ("<h4>") + _("Additional errors:") + QL ("</h4>");
 
             foreach (var error_string in additional_error_strings) {
@@ -204,7 +204,7 @@ public class SslErrorDialog : Gtk.Dialog {
 
         message += QL ("<h3>") + _("Issuer : %1").printf (Utility.escape (cert.issuer_info (QSslCertificate.Common_name))) + QL ("</h3>");
         message += QL ("<div identifier=\"issuer\">");
-        li.clear ();
+        li == "";
         li += _("Organization : %1").printf (Utility.escape (cert.issuer_info (QSslCertificate.Organization)));
         li += _("Unit : %1").printf (Utility.escape (cert.issuer_info (QSslCertificate.Organizational_unit_name)));
         li += _("Country : %1").printf (Utility.escape (cert.issuer_info (QSslCertificate.Country_name)));

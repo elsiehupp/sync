@@ -93,29 +93,29 @@ public class TestVirtualFileDownload : AbstractTestSyncVirtualFiles {
         GLib.assert_true (item_instruction (complete_spy, "A/b4m" + DVSUFFIX, CSync.SyncInstructions.NEW));
         GLib.assert_true (item_instruction (complete_spy, "A/b4", CSync.SyncInstructions.REMOVE));
         GLib.assert_true (database_record (fake_folder, "A/a1").type == ItemType.FILE);
-        GLib.assert_true (!database_record (fake_folder, "A/a1" + DVSUFFIX).is_valid ());
+        GLib.assert_true (!database_record (fake_folder, "A/a1" + DVSUFFIX).is_valid);
         GLib.assert_true (database_record (fake_folder, "A/a2").type == ItemType.FILE);
-        GLib.assert_true (!database_record (fake_folder, "A/a3").is_valid ());
+        GLib.assert_true (!database_record (fake_folder, "A/a3").is_valid);
         GLib.assert_true (database_record (fake_folder, "A/a4m").type == ItemType.FILE);
         GLib.assert_true (database_record (fake_folder, "A/a5").type == ItemType.FILE);
         GLib.assert_true (database_record (fake_folder, "A/a6").type == ItemType.FILE);
         GLib.assert_true (database_record (fake_folder, "A/a7").type == ItemType.FILE);
         GLib.assert_true (database_record (fake_folder, "A/b1").type == ItemType.FILE);
-        GLib.assert_true (!database_record (fake_folder, "A/b1" + DVSUFFIX).is_valid ());
+        GLib.assert_true (!database_record (fake_folder, "A/b1" + DVSUFFIX).is_valid);
         GLib.assert_true (database_record (fake_folder, "A/b2").type == ItemType.FILE);
-        GLib.assert_true (!database_record (fake_folder, "A/b3").is_valid ());
+        GLib.assert_true (!database_record (fake_folder, "A/b3").is_valid);
         GLib.assert_true (database_record (fake_folder, "A/b4m" + DVSUFFIX).type == ItemType.VIRTUAL_FILE);
-        GLib.assert_true (!database_record (fake_folder, "A/a1" + DVSUFFIX).is_valid ());
-        GLib.assert_true (!database_record (fake_folder, "A/a2" + DVSUFFIX).is_valid ());
-        GLib.assert_true (!database_record (fake_folder, "A/a3" + DVSUFFIX).is_valid ());
-        GLib.assert_true (!database_record (fake_folder, "A/a4" + DVSUFFIX).is_valid ());
-        GLib.assert_true (!database_record (fake_folder, "A/a5" + DVSUFFIX).is_valid ());
-        GLib.assert_true (!database_record (fake_folder, "A/a6" + DVSUFFIX).is_valid ());
-        GLib.assert_true (!database_record (fake_folder, "A/a7" + DVSUFFIX).is_valid ());
-        GLib.assert_true (!database_record (fake_folder, "A/b1" + DVSUFFIX).is_valid ());
-        GLib.assert_true (!database_record (fake_folder, "A/b2" + DVSUFFIX).is_valid ());
-        GLib.assert_true (!database_record (fake_folder, "A/b3" + DVSUFFIX).is_valid ());
-        GLib.assert_true (!database_record (fake_folder, "A/b4" + DVSUFFIX).is_valid ());
+        GLib.assert_true (!database_record (fake_folder, "A/a1" + DVSUFFIX).is_valid);
+        GLib.assert_true (!database_record (fake_folder, "A/a2" + DVSUFFIX).is_valid);
+        GLib.assert_true (!database_record (fake_folder, "A/a3" + DVSUFFIX).is_valid);
+        GLib.assert_true (!database_record (fake_folder, "A/a4" + DVSUFFIX).is_valid);
+        GLib.assert_true (!database_record (fake_folder, "A/a5" + DVSUFFIX).is_valid);
+        GLib.assert_true (!database_record (fake_folder, "A/a6" + DVSUFFIX).is_valid);
+        GLib.assert_true (!database_record (fake_folder, "A/a7" + DVSUFFIX).is_valid);
+        GLib.assert_true (!database_record (fake_folder, "A/b1" + DVSUFFIX).is_valid);
+        GLib.assert_true (!database_record (fake_folder, "A/b2" + DVSUFFIX).is_valid);
+        GLib.assert_true (!database_record (fake_folder, "A/b3" + DVSUFFIX).is_valid);
+        GLib.assert_true (!database_record (fake_folder, "A/b4" + DVSUFFIX).is_valid);
 
         trigger_download (fake_folder, "A/b4m");
         GLib.assert_true (fake_folder.sync_once ());
@@ -127,7 +127,7 @@ public class TestVirtualFileDownload : AbstractTestSyncVirtualFiles {
     /***********************************************************
     ***********************************************************/
     private static void clean_up_test_virtual_file_download (ItemCompletedSpy complete_spy) {
-        complete_spy.clear ();
+        complete_spy == "";
     }
 
 } // class TestVirtualFileDownload

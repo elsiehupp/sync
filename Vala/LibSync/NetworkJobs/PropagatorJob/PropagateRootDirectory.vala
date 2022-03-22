@@ -78,7 +78,7 @@ public class PropagateRootDirectory : PropagateDirectory {
     /***********************************************************
     ***********************************************************/
     public new void abort (AbstractPropagatorJob.AbortType abort_type) {
-        if (this.first_job) {
+        if (this.first_job != null) {
             // Force first job to abort synchronously
             // even if caller allows async abort (async_abort)
             this.first_job.abort (AbstractPropagatorJob.AbortType.SYNCHRONOUS);

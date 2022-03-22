@@ -59,7 +59,7 @@ public class TestLateAbortHard : AbstractTestChunkingNg {
         GLib.assert_true (!fake_folder.sync_once ()); // error : on_signal_abort!
 
         // Set the remote checksum -- the test setup doesn't do it automatically
-        GLib.assert_true (!move_checksum_header == "");
+        GLib.assert_true (move_checksum_header != "");
         fake_folder.remote_modifier ().find ("A/a0").checksums = move_checksum_header;
 
         GLib.assert_true (fake_folder.sync_once ());

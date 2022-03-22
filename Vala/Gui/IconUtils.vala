@@ -31,7 +31,7 @@ public class IconUtils : GLib.Object {
                     return result;
                 }
             }
-            result.clear ();
+            result == "";
         }
 
         return result;
@@ -43,7 +43,7 @@ public class IconUtils : GLib.Object {
     public static Gdk.Pixbuf pixmap_for_background (string filename, Gtk.Color background_color) {
         //  Q_ASSERT (!filename == "");
 
-        const var pixmap_color = background_color.is_valid () && !Theme.is_dark_color (background_color)
+        const var pixmap_color = background_color.is_valid && !Theme.is_dark_color (background_color)
             ? QColor_constants.Svg.black
             : QColor_constants.Svg.white;
         ;
@@ -55,11 +55,11 @@ public class IconUtils : GLib.Object {
     ***********************************************************/
     public static Gtk.Image create_svg_image_with_custom_color (string filename, Gtk.Color custom_color, QSize original_size = null, QSize requested_size = {}) {
         //  Q_ASSERT (!filename == "");
-        //  Q_ASSERT (custom_color.is_valid ());
+        //  Q_ASSERT (custom_color.is_valid);
 
         Gtk.Image result = new Gtk.Image ();
 
-        if (filename == "" || !custom_color.is_valid ()) {
+        if (filename == "" || !custom_color.is_valid) {
             GLib.warning ("invalid filename or custom_color");
             return result;
         }
@@ -75,7 +75,7 @@ public class IconUtils : GLib.Object {
             result = new Gtk.Image (
                 Theme.THEME_PREFIX + custom_color_name + "/" + filename
             );
-            if (!result == null) {
+            if (result != null) {
                 return result;
             }
         }
@@ -137,7 +137,7 @@ public class IconUtils : GLib.Object {
 
         cached_pixmap = Gdk.Pixbuf.from_image (create_svg_image_with_custom_color (filename, custom_color, original_size, requested_size));
 
-        if (!cached_pixmap == null) {
+        if (cached_pixmap != null) {
             QPixmapCache.insert (cache_key, cached_pixmap);
         }
 
@@ -155,7 +155,7 @@ public class IconUtils : GLib.Object {
             return {};
         }
 
-        const var req_size = requested_size.is_valid () ? requested_size : svg_renderer.default_size ();
+        const var req_size = requested_size.is_valid ? requested_size : svg_renderer.default_size ();
 
         if (original_size != null) {
             *original_size = svg_renderer.default_size ();

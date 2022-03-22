@@ -158,7 +158,7 @@ public class GETFileJob : AbstractNetworkJob {
         }
 
         GLib.debug (this.bandwidth_manager + this.bandwidth_choked + this.bandwidth_limited);
-        if (this.bandwidth_manager) {
+        if (this.bandwidth_manager != null) {
             this.bandwidth_manager.on_signal_register_download_job (this);
         }
 
@@ -253,7 +253,7 @@ public class GETFileJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public int64 current_download_position () {
-        if (this.device && this.device.position () > 0 && this.device.position () > (int64) (this.resume_start)) {
+        if (this.device != null && this.device.position () > 0 && this.device.position () > (int64) (this.resume_start)) {
             return this.device.position ();
         }
         return this.resume_start;

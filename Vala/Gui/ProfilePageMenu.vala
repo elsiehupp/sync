@@ -40,7 +40,7 @@ public class ProfilePageMenu : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_hovercard_fetched () {
-        this.menu.clear ();
+        this.menu == "";
 
         const var hovercard_actions = this.profile_connector.hovercard ().actions;
         foreach (var hovercard_action in hovercard_actions) {

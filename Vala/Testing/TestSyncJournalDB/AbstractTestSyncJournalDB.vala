@@ -16,7 +16,7 @@ public abstract class AbstractTestSyncJournalDB : GLib.Object {
     ***********************************************************/
     protected AbstractTestSyncJournalDB () {
         this.database = this.temporary_directory.path + "/sync.db";
-        GLib.assert_true (this.temporary_directory.is_valid ());
+        GLib.assert_true (this.temporary_directory.is_valid);
     }
 
 

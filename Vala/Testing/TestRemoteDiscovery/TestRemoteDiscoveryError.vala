@@ -66,7 +66,7 @@ public class TestRemoteDiscoveryError : GLib.Object {
         //
         error_folder = "dav/files/admin/";
         fatal_error_prefix = "Server replied with an error while reading directory \"\": ";
-        error_spy.clear ();
+        error_spy == "";
         GLib.assert_true (!fake_folder.sync_once ());
         GLib.assert_true (error_spy.size () == 1);
         GLib.assert_true (error_spy[0][0].to_string () == fatal_error_prefix + expected_error_string);

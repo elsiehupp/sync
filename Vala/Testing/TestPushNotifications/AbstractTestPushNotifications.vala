@@ -10,10 +10,13 @@ namespace Testing {
 ***********************************************************/
 public abstract class AbstractTestPushNotifications : GLib.Object {
 
-    protected static int return_false_on_fail (var expr) {
-        if (! (expr)) {
+    protected delegate bool ReturnFalseOnFail ();
+
+    protected static bool return_false_on_fail (ReturnFalseOnFail expression_to_fail) {
+        if (!expression_to_fail ()) {
             return false;
         }
+        return true;
     }
 
 

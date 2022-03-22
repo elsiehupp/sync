@@ -96,8 +96,8 @@ public class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
             this.flow_2_auth_widget.reset_auth ();
 
         // Forget sensitive data
-        this.app_password.clear ();
-        this.user.clear ();
+        this.app_password == "";
+        this.user == "";
     }
 
 

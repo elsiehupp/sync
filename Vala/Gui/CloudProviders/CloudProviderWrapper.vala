@@ -331,7 +331,7 @@ public class CloudProviderWrapper : GLib.Object {
                 && should_show_in_recents_menu (progress.last_completed_item)) {
             GMenuItem* item;
             g_menu_remove_all (G_MENU (this.recent_menu));
-            if (!this.recently_changed == "") {
+            if (this.recently_changed != null) {
                 foreach (var item in this.recently_changed) {
                     string label = item.first;
                     string full_path = item.second;

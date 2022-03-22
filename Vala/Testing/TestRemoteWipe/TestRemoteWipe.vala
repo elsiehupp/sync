@@ -18,7 +18,7 @@ public class TestRemoteWipe : GLib.Object {
     private TestRemoteWipe () {
 //        QTemporaryDir directory;
 //        ConfigFile.set_configuration_directory (directory.path); // we don't want to pollute the user's config file
-//        GLib.assert_true (directory.is_valid ());
+//        GLib.assert_true (directory.is_valid);
 
 //        GLib.Dir dir_to_remove = new GLib.Dir (directory.path);
 //        GLib.assert_true (dir_to_remove.mkpath ("nextcloud"));

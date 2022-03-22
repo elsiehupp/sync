@@ -136,7 +136,7 @@ public class FakeWebSocketServer : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void clear_text_messages () {
-        this.process_text_message_spy.clear ();
+        this.process_text_message_spy == "";
     }
 
 

@@ -33,7 +33,7 @@ public class TestDirectoryDownloadWithError : AbstractTestSyncEngine {
 
         GLib.Set<string> seen;
         foreach (GLib.List<GLib.Variant> args in complete_spy) {
-            var item = args[0].value<SyncFileItemPtr> ();
+            var item = args[0].value<SyncFileItem> ();
             GLib.debug () + item.file + item.is_directory () + item.status;
             GLib.assert_true (!seen.contains (item.file)); // signal only sent once per item
             seen.insert (item.file);

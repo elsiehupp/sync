@@ -35,13 +35,13 @@ public class ServerNotificationHandler : GLib.Object {
     ***********************************************************/
     public void on_signal_fetch_notifications () {
         // check connectivity and credentials
-        if (! (this.account_state && this.account_state.is_connected && this.account_state.account && this.account_state.account.credentials () && this.account_state.account.credentials ().ready ())) {
+        if (! (this.account_state != null && this.account_state.is_connected && this.account_state.account != null && this.account_state.account.credentials () != null && this.account_state.account.credentials ().ready ())) {
             delete_later ();
             return;
         }
         // check if the account has notifications enabled. If the capabilities are
         // not yet valid, its assumed that notifications are available.
-        if (this.account_state.account.capabilities.is_valid ()) {
+        if (this.account_state.account.capabilities.is_valid) {
             if (!this.account_state.account.capabilities.notifications_available ()) {
                 GLib.info ("Account" + this.account_state.account.display_name + "does not have notifications enabled.");
                 delete_later ();

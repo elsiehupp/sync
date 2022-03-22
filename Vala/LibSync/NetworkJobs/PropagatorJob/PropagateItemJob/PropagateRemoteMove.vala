@@ -36,7 +36,7 @@ public class PropagateRemoteMove : AbstractPropagateItemJob {
         if (origin == this.item.rename_target) {
             // The parent has been renamed already so there is nothing more to do.
 
-            if (!this.item.encrypted_filename == "") {
+            if (this.item.encrypted_filename != "") {
                 // when renaming non-encrypted folder that contains encrypted folder, nested files of its encrypted folder are incorrectly displayed in the Settings dialog
                 // encrypted name is displayed instead of a local folder name, unless the sync folder is removed, then added again and re-synced
                 // we are fixing it by modifying the "this.encrypted_filename" in such a way so it will have a renamed root path at the beginning of it as expected
@@ -141,7 +141,7 @@ public class PropagateRemoteMove : AbstractPropagateItemJob {
     /***********************************************************
     ***********************************************************/
     public new void abort (AbstractPropagatorJob.AbortType abort_type) {
-        if (this.move_job && this.move_job.input_stream)
+        if (this.move_job != null && this.move_job.input_stream)
             this.move_job.input_stream.abort ();
 
         if (abort_type == AbstractPropagatorJob.AbortType.ASYNCHRONOUS) {
@@ -243,7 +243,7 @@ public class PropagateRemoteMove : AbstractPropagateItemJob {
 
         SyncFileItem signal_new_item = new SyncFileItem (this.item);
         signal_new_item.type = this.item.type;
-        if (old_record.is_valid ()) {
+        if (old_record.is_valid) {
             signal_new_item.checksum_header = old_record.checksum_header;
             if (signal_new_item.size != old_record.file_size) {
                 GLib.warning ("File sizes differ on server vs sync journal: " + signal_new_item.size + old_record.file_size);

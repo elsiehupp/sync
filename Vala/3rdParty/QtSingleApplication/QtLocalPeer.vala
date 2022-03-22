@@ -77,7 +77,7 @@ public class QtLocalPeer : GLib.Object {
 
         string u_msg = message.to_utf8 ();
         QDataStream ds = new QDataStream (socket);
-        ds.write_bytes (u_msg.const_data (), u_msg.size ());
+        ds.write_bytes (u_msg.const_data (), u_msg.length);
         bool res = socket.wait_for_bytes_written (timeout);
         res &= socket.wait_for_ready_read (timeout); // wait for ACK
         res &= (socket.read (ACK.length) == ACK);
@@ -98,7 +98,7 @@ public class QtLocalPeer : GLib.Object {
     ***********************************************************/
     public static string app_session_id (string app_id) {
         string idc = app_id.to_utf8 ();
-        uint16 id_num = q_checksum (idc.const_data (), idc.size ());
+        uint16 id_num = q_checksum (idc.const_data (), idc.length);
         //### could do : two 16bit checksums over separate halves of identifier, for a 32bit result - improved uniqeness probability. Every-other-char split would be best.
 
         string res = "qtsingleapplication-" + string.number (id_num, 16);
@@ -117,7 +117,7 @@ public class QtLocalPeer : GLib.Object {
 
         // Why doesn't Qt have a blocking stream that takes care of this shait???
         while (socket.bytes_available () < static_cast<int> (sizeof (uint32))) {
-            if (!socket.is_valid ()) // stale request
+            if (!socket.is_valid) // stale request
                 return;
             socket.wait_for_ready_read (1000);
         }
@@ -142,7 +142,7 @@ public class QtLocalPeer : GLib.Object {
             return;
         }
         // ### async this
-        string message = string.from_utf8 (u_msg.const_data (), u_msg.size ());
+        string message = string.from_utf8 (u_msg.const_data (), u_msg.length);
         socket.write (ACK, ACK.length);
         socket.wait_for_bytes_written (1000);
         /* emit */ signal_message_received (message, socket); // ## (might take a long time to return)

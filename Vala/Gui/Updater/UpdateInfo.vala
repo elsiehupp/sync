@@ -36,7 +36,7 @@ public class UpdateInfo : GLib.Object {
         //  UpdateInfo this = UpdateInfo ();
 
         QDomNode n;
-        for (n = element.first_child (); !n == null; n = n.next_sibling ()) {
+        for (n = element.first_child (); n != null; n = n.next_sibling ()) {
             QDomElement child_element = n.to_element ();
             if (child_element.tag_name () == "version") {
                 this.version = child_element.text ();

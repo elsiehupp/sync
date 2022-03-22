@@ -159,7 +159,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
         var account = this.propagator.account;
 
         if (!account.capabilities.client_side_encryption_available () ||
-            !parent_rec.is_valid () ||
+            !parent_rec.is_valid ||
             !parent_rec.is_e2e_encrypted) {
             up_unencrypted_file ();
             return;
@@ -285,7 +285,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
             return;
         }
 
-        const string checksum_type = this.propagator.account.capabilities.preferred_upload_checksum_type ();
+        const string checksum_type = this.propagator.account.capabilities.preferred_upload_checksum_type;
 
         // Maybe the discovery already computed the checksum?
         // Should I compute the checksum of the original (this.item.file)
@@ -319,7 +319,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
 
         // Reuse the content checksum as the transmission checksum if possible
         var supported_transmission_checksums =
-            this.propagator.account.capabilities.supported_checksum_types ();
+            this.propagator.account.capabilities.supported_checksum_types;
         if (supported_transmission_checksums.contains (content_checksum_type)) {
             on_signal_compute_checksum_finished (content_checksum_type, content_checksum);
             return;
@@ -328,7 +328,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
         // Compute the transmission checksum.
         var compute_checksum = new ComputeChecksum (this);
         if (upload_checksum_enabled ()) {
-            compute_checksum.checksum_type (this.propagator.account.capabilities.upload_checksum_type ());
+            compute_checksum.checksum_type (this.propagator.account.capabilities.upload_checksum_type);
         } else {
             compute_checksum.checksum_type ("");
         }
@@ -627,7 +627,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
     ***********************************************************/
     protected void check_resetting_errors () {
         if (this.item.http_error_code == 412
-            || this.propagator.account.capabilities.http_error_codes_that_reset_failing_chunked_uploads ().contains (this.item.http_error_code)) {
+            || this.propagator.account.capabilities.http_error_codes_that_reset_failing_chunked_uploads.contains (this.item.http_error_code)) {
             var upload_info = this.propagator.journal.get_upload_info (this.item.file);
             upload_info.error_count += 1;
             if (upload_info.error_count > 3) {
@@ -752,7 +752,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
 
         // Set up a conflict file header pointing to the original file
         var conflict_record = this.propagator.journal.conflict_record (this.item.file.to_utf8 ());
-        if (conflict_record.is_valid ()) {
+        if (conflict_record.is_valid) {
             headers["OC-Conflict"] = "1";
             if (!conflict_record.initial_base_path == "")
                 headers["OC-ConflictInitialBasePath"] = conflict_record.initial_base_path;

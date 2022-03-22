@@ -60,7 +60,7 @@ public class AbstractTestAsyncOp : GLib.Object {
         GLib.assert_true (n_get == 0);
         GLib.assert_true (fake_folder.current_local_state ().find ("success") ==
             fake_folder.current_remote_state ().find ("success"));
-        test_cases.clear ();
+        test_cases == "";
         test_cases["err/chunked_error"] = new TestCase (success_callback);
         test_cases["err/chunked_error2"] = new TestCase (success_callback);
         test_cases["err/single_error"] = new TestCase (success_callback);

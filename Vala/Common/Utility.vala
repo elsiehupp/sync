@@ -40,12 +40,12 @@ public class Utility : GLib.Object {
         for (int i = 0; i < steps; i++) {
             hash.append (fmhash[i * 2]);
             hash.append (fmhash[i * 2 + 1]);
-            hash.append (' ');
+            hash.append (" ");
         }
 
         string fp = hash.trimmed ();
         if (colon_separated) {
-            fp.replace (' ', ':');
+            fp.replace (" ", ":");
         }
 
         return fp;
@@ -70,7 +70,7 @@ public class Utility : GLib.Object {
             if (!places.contains (folder_url)) {
                 places += folder_url;
                 gtk_bookmarks.on_signal_reset ();
-                gtk_bookmarks.write (places + '\n');
+                gtk_bookmarks.write (places + "\n");
             }
         }
     }
@@ -106,7 +106,7 @@ public class Utility : GLib.Object {
 
         GLib.File file = GLib.File.new_for_path (fname);
         if (file.open (QIODevice.WriteOnly | QIODevice.Text)) {
-            string outfile; // = new QTextStream (&file);
+            string outfile; // = new GLib.OutputStream (&file);
             outfile = rand_string;
             // optional, as GLib.File destructor will already do it:
             file.close ();
@@ -136,18 +136,18 @@ public class Utility : GLib.Object {
         // see the JEDEC standard
         // https://en.wikipedia.org/wiki/JEDEC_memory_standards
         if (octets >= GB) {
-            s = _("Utility", "%L1 GB");
+            s = _("%L1 GB");
             value /= GB;
             round = false;
         } else if (octets >= MB) {
-            s = _("Utility", "%L1 MB");
+            s = _("%L1 MB");
             value /= MB;
             round = false;
         } else if (octets >= KB) {
-            s = _("Utility", "%L1 KB");
+            s = _("%L1 KB");
             value /= KB;
         } else {
-            s = _("Utility", "%L1 B");
+            s = _("%L1 B");
         }
 
         if (value > 9.95)
@@ -156,7 +156,7 @@ public class Utility : GLib.Object {
         if (round)
             return s.printf (q_round (value));
 
-        return s.printf (value, 0, 'g', 2);
+        return s.printf (value, 0, "g", 2);
     }
 
     /***********************************************************
@@ -262,14 +262,14 @@ public class Utility : GLib.Object {
             const bool running_inside_app_image = !app_image_path == null && GLib.File.exists (app_image_path);
             const string executable_path = running_inside_app_image ? app_image_path : Gtk.Application.application_file_path;
 
-            string ts; // = new QTextStream (&ini_file);
+            string ts; // = new GLib.OutputStream (&ini_file);
             //  ts.codec ("UTF-8");
             ts = "[Desktop Entry]\n"
-               + "Name=" + gui_name + '\n'
+               + "Name=" + gui_name + "\n"
                + "GenericName=" + "File Synchronizer\n"
                + "Exec=\"" + executable_path + "\" --background\n"
                + "Terminal=" + "false\n"
-               + "Icon=" + APPLICATION_ICON_NAME + '\n'
+               + "Icon=" + APPLICATION_ICON_NAME + "\n"
                + "Categories=" + "Network\n"
                + "Type=" + "Application\n"
                + "StartupNotify=" + "false\n"
@@ -336,16 +336,17 @@ public class Utility : GLib.Object {
     public static string compact_format_double (double value, int prec, string unit = "") {
         QLocale locale = QLocale.system ();
         char dec_point = locale.decimal_point ();
-        string string_value = locale.to_string (value, 'f', prec);
-        while (string_value.has_suffix ('0') || string_value.has_suffix (dec_point)) {
+        string string_value = locale.to_string (value, "f", prec);
+        while (string_value.has_suffix ("0") || string_value.has_suffix (dec_point)) {
             if (string_value.has_suffix (dec_point)) {
                 string_value.chop (1);
                 break;
             }
             string_value.chop (1);
         }
-        if (!unit == "")
-            string_value += (' ' + unit);
+        if (unit != "") {
+            string_value += (" " + unit);
+        }
         return string_value;
     }
 
@@ -420,7 +421,7 @@ public class Utility : GLib.Object {
             return first_part;
         }
 
-        return _("Utility", "%1 %2").printf (first_part, periods[p + 1].description (second_part_num));
+        return _("%1 %2").printf (first_part, periods[p + 1].description (second_part_num));
     }
 
 
@@ -578,7 +579,7 @@ public class Utility : GLib.Object {
             process.on_signal_start (binary, parameters);
             process.wait_for_finished (); // sets current thread to sleep and waits for ping_process end
             re = process.read_all_standard_output ();
-            int newline = re.index_of ('\n');
+            int newline = re.index_of ("\n");
             if (newline > 0) {
                 re.truncate (newline);
             }
@@ -592,7 +593,7 @@ public class Utility : GLib.Object {
     public static string filename_for_gui_use (string f_name) {
         if (is_mac ()) {
             string n = f_name;
-            return n.replace (':', '/');
+            return n.replace (":", "/");
         }
         return f_name;
     }
@@ -602,7 +603,7 @@ public class Utility : GLib.Object {
     ***********************************************************/
     public static string normalize_etag (string etag) {
         // strip "XXXX-gzip"
-        if (etag.has_prefix ('"') && etag.has_suffix ("-gzip\"")) {
+        if (etag.has_prefix ("\"") && etag.has_suffix ("-gzip\"")) {
             etag.chop (6);
             etag.remove (0, 1);
         }
@@ -611,7 +612,7 @@ public class Utility : GLib.Object {
             etag.chop (5);
         }
         // strip normal quotes
-        if (etag.has_prefix ('"') && etag.has_suffix ('"')) {
+        if (etag.has_prefix ("\"") && etag.has_suffix ("\"") {
             etag.chop (1);
             etag.remove (0, 1);
         }
@@ -632,7 +633,7 @@ public class Utility : GLib.Object {
     public static string time_ago_in_words (GLib.DateTime dt, GLib.DateTime from = GLib.DateTime ()) {
         GLib.DateTime now = GLib.DateTime.current_date_time_utc ();
 
-        if (from.is_valid ()) {
+        if (from.is_valid) {
             now = from;
         }
 
@@ -697,7 +698,7 @@ public class Utility : GLib.Object {
 
 
         public uint64 add_lap_time (string lap_name) {
-            if (!this.timer.is_valid ()) {
+            if (!this.timer.is_valid) {
                 on_signal_start ();
             }
             uint64 re = this.timer.elapsed ();
@@ -709,7 +710,7 @@ public class Utility : GLib.Object {
         public void reset () {
             this.timer.invalidate ();
             this.start_time.m_secs_since_epoch (0);
-            this.lap_times.clear ();
+            this.lap_times == "";
         }
 
 
@@ -734,7 +735,6 @@ public class Utility : GLib.Object {
 
     /***********************************************************
     @brief Sort a string[] in a way that's appropriate for filenames
-
     ***********************************************************/
     public static void sort_filenames (string[] filenames) {
         QCollator collator;
@@ -752,13 +752,13 @@ public class Utility : GLib.Object {
         GLib.Uri url, string concat_path,
         QUrlQuery query_items = {}) {
         string path = url.path;
-        if (!concat_path == "") {
-            // avoid '//'
-            if (path.has_suffix ('/') && concat_path.has_prefix ('/')) {
+        if (concat_path != "") {
+            // avoid "//"
+            if (path.has_suffix ("/") && concat_path.has_prefix ("/")) {
                 path.chop (1);
-            } // avoid missing '/'
-            else if (!path.has_suffix ('/') && !concat_path.has_prefix ('/')) {
-                path += '/';
+            } // avoid missing "/""
+            else if (!path.has_suffix ("/") && !concat_path.has_prefix ("/")) {
+                path += "/";
             }
             path += concat_path; // put the complete path together
         }
@@ -786,16 +786,16 @@ public class Utility : GLib.Object {
     - reserved characters : /, ?, <, >, \, :, *, |, and "
 
     Warning : This does not sanitize the
-    - unix reserved filenames ('.
+    - unix reserved filenames (".
     - trailing periods and spaces
-    - windows reserved filenames ('CON' etc)
+    - windows reserved filenames ("CON" etc)
     will pass unchanged.
 
     ***********************************************************/
     public static string sanitize_for_filename (string name) {
         const string invalid = " (/?<>:*|\")";
         string result;
-        result.reserve (name.size ());
+        result.reserve (name.length);
         foreach (var c in name) {
             if (!invalid.contains (c)
                 && c.category () != char.Other_Control
@@ -816,20 +816,20 @@ public class Utility : GLib.Object {
         string fn, GLib.DateTime dt, string user) {
         string conflict_filename = fn;
         // Add conflict tag before the extension.
-        int dot_location = conflict_filename.last_index_of ('.');
+        int dot_location = conflict_filename.last_index_of (".");
         // If no extension, add it at the end  (take care of cases like foo/.hidden or foo.bar/file)
-        if (dot_location <= conflict_filename.last_index_of ('/') + 1) {
-            dot_location = conflict_filename.size ();
+        if (dot_location <= conflict_filename.last_index_of ("/") + 1) {
+            dot_location = conflict_filename.length;
         }
 
         string conflict_marker = " (conflicted copy ";
-        if (!user == "") {
+        if (user != "") {
             // Don't allow parens in the user name, to ensure
             // we can find the beginning and end of the conflict tag.
-            const var user_name = sanitize_for_filename (user).replace ('(', '_').replace (')', '_');
-            conflict_marker += user_name + ' ';
+            const string user_name = sanitize_for_filename (user).replace ("(", "_").replace (")", "_");
+            conflict_marker += user_name + " ";
         }
-        conflict_marker += dt.to_string ("yyyy-MM-dd hhmmss") + ')';
+        conflict_marker += dt.to_string ("yyyy-MM-dd hhmmss") + ")";
 
         conflict_filename.insert (dot_location, conflict_marker);
         return conflict_filename;
@@ -841,7 +841,7 @@ public class Utility : GLib.Object {
 
     ***********************************************************/
     //  public static bool is_conflict_file (char name) {
-    //      const string bname = std.strrchr (name, '/');
+    //      const string bname = std.strrchr (name, "/");
     //      if (bname) {
     //          bname += 1;
     //      } else {
@@ -863,7 +863,7 @@ public class Utility : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static bool is_conflict_file (string name) {
-        var bname = name.mid_ref (name.last_index_of ('/') + 1);
+        var bname = name.mid_ref (name.last_index_of ("/") + 1);
 
         if (bname.contains ("this.conflict-")) {
             return true;
@@ -896,7 +896,7 @@ public class Utility : GLib.Object {
 
         // A single space before " (conflicted copy" is considered part of the tag
         var start_new = conflict_name.last_index_of (" (conflicted copy");
-        if (start_new > 0 && conflict_name[start_new - 1] == ' ')
+        if (start_new > 0 && conflict_name[start_new - 1] == " ")
             start_new -= 1;
 
         // The rightmost tag is relevant
@@ -905,12 +905,12 @@ public class Utility : GLib.Object {
             return "";
 
         // Find the end of the tag
-        var tag_end = conflict_name.size ();
-        var dot = conflict_name.last_index_of ('.'); // dot could be part of user name for new tag!
+        var tag_end = conflict_name.length;
+        var dot = conflict_name.last_index_of ("."); // dot could be part of user name for new tag!
         if (dot > tag_start)
             tag_end = dot;
         if (tag_start == start_new) {
-            var paren = conflict_name.index_of (')', tag_start);
+            var paren = conflict_name.index_of (")", tag_start);
             if (paren != -1)
                 tag_end = paren + 1;
         }
@@ -943,7 +943,7 @@ public class Utility : GLib.Object {
         uint64 msec;
 
         string description (uint64 value) {
-            return _("Utility", name, null, value);
+            return _(name, null, value);
         }
     }
 
@@ -953,7 +953,7 @@ public class Utility : GLib.Object {
     // (it must be in the form ("context", "source", "comment", n)
     //  #undef QT_TRANSLATE_NOOP
     //  const int QT_TRANSLATE_NOOP (context, string_value, ...) string_value
-    //      Q_DECL_CONSTEXPR Period periods[] = { { QT_TRANSLATE_NOOP ("Utility", "%n year (s)", 0, this.), 365 * 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n month (s)", 0, this.), 30 * 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n day (s)", 0, this.), 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n hour (s)", 0, this.), 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n minute (s)", 0, this.), 60 * 1000LL }, { QT_TRANSLATE_NOOP ("Utility", "%n second (s)", 0, this.), 1000LL }, { null, 0 }
+    //      Q_DECL_CONSTEXPR Period periods[] = { { QT_TRANSLATE_NOOP ("%n year (s)", 0, this.), 365 * 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("%n month (s)", 0, this.), 30 * 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("%n day (s)", 0, this.), 24 * 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("%n hour (s)", 0, this.), 3600 * 1000LL }, { QT_TRANSLATE_NOOP ("%n minute (s)", 0, this.), 60 * 1000LL }, { QT_TRANSLATE_NOOP ("%n second (s)", 0, this.), 1000LL }, { null, 0 }
     //  };
 
 } // class Utility

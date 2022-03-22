@@ -301,7 +301,7 @@ public class Theme : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static bool is_hidpi (QPaintDevice dev = null) {
-        var device_pixel_ratio = dev ? dev.device_pixel_ratio () : Gtk.Application.primary_screen ().device_pixel_ratio ();
+        var device_pixel_ratio = dev != null ? dev.device_pixel_ratio () : Gtk.Application.primary_screen ().device_pixel_ratio ();
         return device_pixel_ratio > 1;
     }
 
@@ -710,7 +710,7 @@ public class Theme : GLib.Object {
     public static Gdk.Pixbuf wizard_header_banner {
         public get {
             Gtk.Color c = wizard_header_background_color;
-            if (!c.is_valid ()) {
+            if (!c.is_valid) {
                 return Gdk.Pixbuf ();
             }
 

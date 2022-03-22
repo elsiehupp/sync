@@ -53,7 +53,7 @@ public class TestSyncFileItemProperties : AbstractTestSyncEngine {
 
 
     private void on_signal_sync_engine_about_to_propagate (SyncFileItemVector items) {
-        SyncFileItemPtr a1, b1, c1;
+        SyncFileItem a1, b1, c1;
         foreach (var item in items) {
             if (item.file == "A/a1") {
                 a1 = item;

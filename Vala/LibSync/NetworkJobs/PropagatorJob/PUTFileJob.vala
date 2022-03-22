@@ -78,7 +78,7 @@ public class PUTFileJob : AbstractNetworkJob {
 
         request.priority (Soup.Request.Low_priority); // Long uploads must not block non-propagation jobs.
 
-        if (this.url.is_valid ()) {
+        if (this.url.is_valid != null) {
             send_request ("PUT", this.url, request, this.device);
         } else {
             send_request ("PUT", make_dav_url (path), request, this.device);

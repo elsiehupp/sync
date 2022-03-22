@@ -115,7 +115,7 @@ public class OcsProfileConnector : GLib.Object {
             return;
         }
         var icon = icon_data_to_pixmap (icon_data);
-        if (icon.is_valid ()) {
+        if (icon.is_valid) {
             hovercard_action_icon (hovercard_action_index, icon);
             return;
         }

@@ -182,7 +182,7 @@ public class OAuth : GLib.Object {
             /* emit */ signal_result (Error);
             return;
         }
-        if (!this.expected_user == null && user != this.expected_user) {
+        if (this.expected_user != null && user != this.expected_user) {
             // Connected with the wrong user
             string message = _("<h1>Wrong user</h1>"
                              + "<p>You logged-in with user <em>%1</em>, but must log in with user <em>%2</em>.<br>"
@@ -195,7 +195,7 @@ public class OAuth : GLib.Object {
             return;
         }
         const string login_successfull_html = "<h1>Login Successful</h1><p>You can close this window.</p>";
-        if (message_url.is_valid ()) {
+        if (message_url.is_valid) {
             http_reply_and_close (socket, "303 See Other", login_successfull_html,
                 ("Location: " + message_url.to_encoded ()).const_data ());
         } else {
@@ -262,8 +262,9 @@ public class OAuth : GLib.Object {
                 "http://localhost:" + this.server.server_port ().to_string ()
             }
         });
-        if (!this.expected_user == null)
+        if (this.expected_user != null) {
             query.add_query_item ("user", this.expected_user);
+        }
         GLib.Uri url = Utility.concat_url_path (this.account.url, "/index.php/apps/oauth2/authorize", query);
         return url;
     }

@@ -138,7 +138,7 @@ public class SyncFileStatusTracker : GLib.Object {
                 this.sync_problems[item.destination ()] = Common.SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED;
             }
 
-            SharedFlag shared_flag = item.remote_perm.has_permission (RemotePermissions.Permissions.IS_SHARED) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED;
+            SharedFlag shared_flag = item.remote_permissions.has_permission (RemotePermissions.Permissions.IS_SHARED) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED;
             if (item.instruction != CSync.SyncInstructions.NONE
                 && item.instruction != CSync.SyncInstructions.UPDATE_METADATA
                 && item.instruction != CSync.SyncInstructions.IGNORE
@@ -186,7 +186,7 @@ public class SyncFileStatusTracker : GLib.Object {
             this.sync_problems.erase (item.destination ());
         }
 
-        SharedFlag shared_flag = item.remote_perm.has_permission (RemotePermissions.Permissions.IS_SHARED) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED;
+        SharedFlag shared_flag = item.remote_permissions.has_permission (RemotePermissions.Permissions.IS_SHARED) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED;
         if (item.instruction != CSync.SyncInstructions.NONE
             && item.instruction != CSync.SyncInstructions.UPDATE_METADATA
             && item.instruction != CSync.SyncInstructions.IGNORE
@@ -317,7 +317,7 @@ public class SyncFileStatusTracker : GLib.Object {
             int last_slash_index = relative_path.last_index_of ("/");
             if (last_slash_index != -1)
                 inc_sync_count_and_emit_status_changed (relative_path.left (last_slash_index), SharedFlag.UNKNOWN_SHARED);
-            else if (!relative_path == "")
+            else if (relative_path != "")
                 inc_sync_count_and_emit_status_changed ("", SharedFlag.UNKNOWN_SHARED);
         }
     }
@@ -339,10 +339,11 @@ public class SyncFileStatusTracker : GLib.Object {
             // We passed from SYNC to OK, decrement our parent.
             //  ASSERT (!relative_path.has_suffix ("/"));
             int last_slash_index = relative_path.last_index_of ("/");
-            if (last_slash_index != -1)
+            if (last_slash_index != -1) {
                 dec_sync_count_and_emit_status_changed (relative_path.left (last_slash_index), SharedFlag.UNKNOWN_SHARED);
-            else if (!relative_path == "")
+            } else if (relative_path != "") {
                 dec_sync_count_and_emit_status_changed ("", SharedFlag.UNKNOWN_SHARED);
+            }
         }
     }
 
@@ -378,8 +379,8 @@ public class SyncFileStatusTracker : GLib.Object {
 
         // First look it up in the database to know if it's shared
         SyncJournalFileRecord sync_journal_file_record;
-        if (this.sync_engine.journal.get_file_record (relative_path, sync_journal_file_record) && sync_journal_file_record.is_valid ()) {
-            return this.resolve_sync_and_error_status (relative_path, sync_journal_file_record.remote_perm.has_permission (RemotePermissions.Permissions.IS_SHARED) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED);
+        if (this.sync_engine.journal.get_file_record (relative_path, sync_journal_file_record) && sync_journal_file_record.is_valid) {
+            return this.resolve_sync_and_error_status (relative_path, sync_journal_file_record.remote_permissions.has_permission (RemotePermissions.Permissions.IS_SHARED) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED);
         }
 
         // Must be a new file not yet in the database, check if it's syncing or has an error.

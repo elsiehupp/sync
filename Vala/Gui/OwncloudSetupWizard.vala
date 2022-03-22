@@ -138,7 +138,7 @@ public class OwncloudSetupWizard : GLib.Object {
         // Here the client certificate is added, if any. Later it'll be in HttpCredentials
         account.ssl_configuration (QSslConfiguration ());
         var ssl_configuration = account.or_create_ssl_config (); // let Account set defaults
-        if (!this.oc_wizard.client_ssl_certificate == null) {
+        if (this.oc_wizard.client_ssl_certificate != null) {
             ssl_configuration.local_certificate (this.oc_wizard.client_ssl_certificate);
             ssl_configuration.private_key (this.oc_wizard.client_ssl_key);
         }
@@ -284,7 +284,7 @@ public class OwncloudSetupWizard : GLib.Object {
 
         // Do this early because reply might be deleted in message box event loop
         string message;
-        if (!this.oc_wizard.account.url.is_valid ()) {
+        if (!this.oc_wizard.account.url.is_valid) {
             message = _("Invalid URL");
         } else {
             message = _("Failed to connect to %1 at %2:<br/>%3")
@@ -498,12 +498,12 @@ public class OwncloudSetupWizard : GLib.Object {
                 _("<p><font color=\"red\">Remote folder creation failed probably because the provided credentials are wrong.</font>"
                 + "<br/>Please go back and check your credentials.</p>")
             );
-            this.remote_folder.clear ();
+            this.remote_folder == "";
             on_signal_success = false;
         } else {
             this.oc_wizard.on_signal_append_to_configuration_log (_("Remote folder %1 creation failed with error <tt>%2</tt>.").printf (Utility.escape (this.remote_folder)).printf (error));
             this.oc_wizard.on_signal_display_error (_("Remote folder %1 creation failed with error <tt>%2</tt>.").printf (Utility.escape (this.remote_folder)).printf (error), false);
-            this.remote_folder.clear ();
+            this.remote_folder == "";
             on_signal_success = false;
         }
 

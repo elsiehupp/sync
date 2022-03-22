@@ -216,7 +216,7 @@ public class SyncFileItem : GLib.Object {
     /***********************************************************
     Variable useful to report to the user
     ***********************************************************/
-    public Common.RemotePermissions remote_perm;
+    public Common.RemotePermissions remote_permissions;
 
     /***********************************************************
     Contains a string only in case of error
@@ -332,7 +332,7 @@ public class SyncFileItem : GLib.Object {
         record.etag = this.etag;
         record.file_id = this.file_identifier;
         record.file_size = this.size;
-        record.remote_perm = this.remote_perm;
+        record.remote_permissions = this.remote_permissions;
         record.server_has_ignored_files = this.server_has_ignored_files;
         record.checksum_header = this.checksum_header;
         record.e2e_mangled_name = this.encrypted_filename.to_utf8 ();
@@ -368,7 +368,7 @@ public class SyncFileItem : GLib.Object {
         item.etag = record.etag;
         item.file_id = record.file_id;
         item.size = record.file_size;
-        item.remote_perm = record.remote_perm;
+        item.remote_permissions = record.remote_permissions;
         item.server_has_ignored_files = record.server_has_ignored_files;
         item.checksum_header = record.checksum_header;
         item.encrypted_filename = record.e2e_mangled_name ();
@@ -423,7 +423,7 @@ public class SyncFileItem : GLib.Object {
         return this.status == Status.SOFT_ERROR
             || this.status == Status.NORMAL_ERROR
             || this.status == Status.FATAL_ERROR
-            || !this.error_string == "";
+            || this.error_string!= "";
     }
 
 

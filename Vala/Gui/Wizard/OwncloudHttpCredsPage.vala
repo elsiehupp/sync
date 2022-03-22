@@ -116,8 +116,8 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
     /***********************************************************
     ***********************************************************/
     public void clean_up_page () {
-        this.instance.le_username.clear ();
-        this.instance.le_password.clear ();
+        this.instance.le_username == "";
+        this.instance.le_password == "";
     }
 
 

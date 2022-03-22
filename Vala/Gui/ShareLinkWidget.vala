@@ -162,7 +162,7 @@ public class ShareLinkWidget : Gtk.Widget {
 
 
     override ~ShareLinkWidget () {
-        delete this.instance;
+        //  delete this.instance;
     }
 
     /***********************************************************
@@ -187,7 +187,7 @@ public class ShareLinkWidget : Gtk.Widget {
         );
 
         // Prepare permissions check and create group action
-        const QDate expire_date = this.link_share.expire_date ().is_valid ()
+        const QDate expire_date = this.link_share.expire_date ().is_valid
             ? this.link_share.expire_date ()
             : QDate ();
         const SharePermissions share_permissions = this.link_share.permissions ();
@@ -276,7 +276,7 @@ public class ShareLinkWidget : Gtk.Widget {
         this.note_link_action = this.link_context_menu.add_action (_("Note to recipient"));
         this.note_link_action.checkable (true);
 
-        if (this.link_share.note.is_simple_text () && !this.link_share.note == "") {
+        if (this.link_share.note.is_simple_text () && this.link_share.note != "") {
             this.instance.text_edit_note.on_signal_text (this.link_share.note);
             this.note_link_action.checked (true);
             toggle_note_options ();
@@ -385,7 +385,7 @@ public class ShareLinkWidget : Gtk.Widget {
     void ShareLinkWidget.on_signal_delete_share_fetched () {
         on_signal_toggle_share_link_animation (false);
 
-        this.link_share.clear ();
+        this.link_share == "";
         toggle_password_options (false);
         toggle_note_options (false);
         toggle_expire_date_options (false);
@@ -454,7 +454,7 @@ public class ShareLinkWidget : Gtk.Widget {
     public void on_signal_create_share_requires_password (string message) {
         on_signal_toggle_share_link_animation (message == "");
 
-        if (!message == "") {
+        if (message != "") {
             this.instance.error_label.on_signal_text (message);
             this.instance.error_label.show ();
         }
@@ -484,7 +484,7 @@ public class ShareLinkWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_create_password () {
-        if (!this.link_share || this.instance.line_edit_password.text () == "") {
+        if (this.link_share == null || this.instance.line_edit_password.text () == "") {
             return;
         }
 
@@ -528,7 +528,7 @@ public class ShareLinkWidget : Gtk.Widget {
     ***********************************************************/
     private void on_signal_create_note () {
         const var note = this.instance.text_edit_note.to_plain_text ();
-        if (!this.link_share || this.link_share.note == note || note == "") {
+        if (this.link_share == null || this.link_share.note == note || note == "") {
             return;
         }
 
@@ -550,7 +550,7 @@ public class ShareLinkWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_expire_date () {
-        if (!this.link_share) {
+        if (this.link_share == null) {
             return;
         }
 
@@ -598,7 +598,7 @@ public class ShareLinkWidget : Gtk.Widget {
     ***********************************************************/
     private void on_signal_create_label () {
         string label_text = this.share_link_edit.text ();
-        if (!this.link_share || this.link_share.label == label_text || label_text == "") {
+        if (this.link_share == null || this.link_share.label == label_text || label_text == "") {
             return;
         }
         this.share_link_widget_action.checked (true);
@@ -646,8 +646,8 @@ public class ShareLinkWidget : Gtk.Widget {
         this.instance.confirm_note.visible (enable);
         this.instance.text_edit_note.on_signal_text (enable && this.link_share ? this.link_share.note: "");
 
-        if (!enable && this.link_share && !this.link_share.note == "") {
-            this.link_share.note = {};
+        if (!enable && this.link_share != null && this.link_share.note != "") {
+            this.link_share.note = "";
         }
     }
 
@@ -666,7 +666,7 @@ public class ShareLinkWidget : Gtk.Widget {
             QDate.current_date ().add_days (this.account.capabilities.share_public_link_expire_date_days ()));
         this.instance.calendar.focus ();
 
-        if (!enable && this.link_share && this.link_share.expire_date.is_valid ()) {
+        if (!enable && this.link_share && this.link_share.expire_date.is_valid) {
             this.link_share.expire_date = {};
         }
     }
@@ -786,8 +786,8 @@ public class ShareLinkWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void display_share_link_label () {
-        this.share_link_elided_label.clear ();
-        if (!this.link_share.label == "") {
+        this.share_link_elided_label = "";
+        if (this.link_share.label != "") {
             this.share_link_elided_label.on_signal_text (" (%1)".printf (this.link_share.label));
         }
     }

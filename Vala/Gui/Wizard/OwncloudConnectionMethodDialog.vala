@@ -53,7 +53,7 @@ public class OwncloudConnectionMethodDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     ~OwncloudConnectionMethodDialog () {
-        delete instance;
+        //  delete this.instance;
     }
 
 

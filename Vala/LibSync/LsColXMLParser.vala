@@ -108,14 +108,14 @@ public class LscolXMLParser : GLib.Object {
                             current_href.chop (1);
                         }
                         /* emit */ signal_directory_listing_iterated (current_href, current_http200Properties);
-                        current_href.clear ();
-                        current_http200Properties.clear ();
+                        current_href == "";
+                        current_http200Properties == "";
                     } else if (reader.name () == "propstat") {
                         inside_propstat = false;
                         if (current_props_have_http200) {
                             current_http200Properties = GLib.HashTable<string, string> (current_temporary_properties);
                         }
-                        current_temporary_properties.clear ();
+                        current_temporary_properties == "";
                         current_props_have_http200 = false;
                     } else if (reader.name () == "prop") {
                         inside_prop = false;

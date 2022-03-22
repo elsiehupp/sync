@@ -336,13 +336,13 @@ public class WebFlowCredentials : AbstractCredentials {
             if (this.client_ssl_key == null) {
                 GLib.warning ("Could not load SSL key into Qt!");
             }
-            client_key_pem.clear ();
+            client_key_pem == "";
         } else {
             GLib.warning ("Unable to read client key " + read_job.error_string);
         }
 
         // Start fetching client CA certificates
-        this.client_ssl_ca_certificates.clear ();
+        this.client_ssl_ca_certificates == "";
 
         read_single_client_ca_cert_pem ();
     }
@@ -453,7 +453,7 @@ public class WebFlowCredentials : AbstractCredentials {
     ***********************************************************/
     private void on_signal_write_client_key_pem_job_done (KeychainChunkWriteJob write_job) {
         //  Q_UNUSED (write_job)
-        this.client_ssl_ca_certificates_write_queue.clear ();
+        this.client_ssl_ca_certificates_write_queue == "";
 
         // write ca certificates if there are any
         if (!this.client_ssl_ca_certificates == "") {
@@ -553,7 +553,7 @@ public class WebFlowCredentials : AbstractCredentials {
             if (index > (this.client_ssl_ca_certificates_max_count - 1)) {
                 GLib.warning ("Maximum client CA cert count exceeded while writing slot " + index.to_string () + " cutting off after " + this.client_ssl_ca_certificates_max_count.to_string () + " certificates.");
 
-                this.client_ssl_ca_certificates_write_queue.clear ();
+                this.client_ssl_ca_certificates_write_queue == "";
 
                 on_signal_write_client_ca_certificates_pem_job_done (null);
                 return;

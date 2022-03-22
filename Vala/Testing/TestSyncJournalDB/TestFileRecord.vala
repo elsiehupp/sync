@@ -14,7 +14,7 @@ public class TestFileRecord : AbstractTestSyncJournalDB {
     private TestFileRecord () {
         SyncJournalFileRecord record;
         GLib.assert_true (this.database.get_file_record ("nonexistant", record));
-        GLib.assert_true (!record.is_valid ());
+        GLib.assert_true (!record.is_valid);
 
         record.path = "foo";
         // Use a value that exceeds uint32 and isn't representable by the
@@ -24,7 +24,7 @@ public class TestFileRecord : AbstractTestSyncJournalDB {
         record.type = ItemType.DIRECTORY;
         record.etag = "789789";
         record.file_identifier = "abcd";
-        record.remote_perm = RemotePermissions.from_database_value ("RW");
+        record.remote_permissions = RemotePermissions.from_database_value ("RW");
         record.file_size = 213089055;
         record.checksum_header = "MD5:mychecksum";
         GLib.assert_true (this.database.set_file_record (record));
@@ -46,7 +46,7 @@ public class TestFileRecord : AbstractTestSyncJournalDB {
         record.type = ItemType.FILE;
         record.etag = "789FFF";
         record.file_identifier = "efg";
-        record.remote_perm = RemotePermissions.from_database_value ("NV");
+        record.remote_permissions = RemotePermissions.from_database_value ("NV");
         record.file_size = 289055;
         this.database.set_file_record (record);
         GLib.assert_true (this.database.get_file_record ("foo", stored_record));
@@ -54,7 +54,7 @@ public class TestFileRecord : AbstractTestSyncJournalDB {
 
         GLib.assert_true (this.database.delete_file_record ("foo"));
         GLib.assert_true (this.database.get_file_record ("foo", record));
-        GLib.assert_true (!record.is_valid ());
+        GLib.assert_true (!record.is_valid);
     }
 
 } // class TestFileRecord

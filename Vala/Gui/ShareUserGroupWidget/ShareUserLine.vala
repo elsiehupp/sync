@@ -116,7 +116,7 @@ public class ShareUserLine : Gtk.Widget {
             this.note_link_action.triggered.connect (
                 this.toggle_note_options
             );
-            if (!this.share.note == "") {
+            if (this.share.note != "") {
                 this.note_link_action.checked (true);
                 show_note_options (true);
             }
@@ -134,8 +134,8 @@ public class ShareUserLine : Gtk.Widget {
             this.expiration_date_link_action.triggered.connect (
                 this.toggle_expire_date_options
             );
-            const var on_signal_expire_date = this.share.on_signal_expire_date ().is_valid () ? share.on_signal_expire_date () : QDate ();
-            if (!on_signal_expire_date == null) {
+            const var on_signal_expire_date = this.share.on_signal_expire_date ().is_valid ? share.on_signal_expire_date () : QDate ();
+            if (on_signal_expire_date != null) {
                 this.expiration_date_link_action.checked (true);
                 show_expire_date_options (true, on_signal_expire_date);
             }
@@ -252,7 +252,7 @@ public class ShareUserLine : Gtk.Widget {
 
 
     override ~ShareUserLine () {
-        delete this.instance;
+        //  delete this.instance;
     }
 
 
@@ -357,10 +357,10 @@ public class ShareUserLine : Gtk.Widget {
     private void on_signal_password_checkbox_changed () {
         if (!this.password_protect_link_action.is_checked ()) {
             this.instance.error_label.hide ();
-            this.instance.error_label.clear ();
+            this.instance.error_label == "";
 
             if (!this.share.password_is_set) {
-                this.instance.line_edit_password.clear ();
+                this.instance.line_edit_password == "";
                 on_signal_refresh_password_options ();
             } else {
                 // do not call on_signal_refresh_password_options here, as it will be called after the network request is complete
@@ -488,7 +488,7 @@ public class ShareUserLine : Gtk.Widget {
         this.instance.confirm_password.enabled (false);
 
         this.instance.error_label.hide ();
-        this.instance.error_label.clear ();
+        this.instance.error_label == "";
 
         toggle_password_progress_animation (true);
         this.share.password (this.instance.line_edit_password.text ());
@@ -751,7 +751,7 @@ public class ShareUserLine : Gtk.Widget {
 
         if (show) {
             this.instance.calendar.minimum_date (QDate.current_date ().add_days (1));
-            this.instance.calendar.date (initial_date.is_valid () ? initial_date : this.instance.calendar.minimum_date ());
+            this.instance.calendar.date (initial_date.is_valid ? initial_date : this.instance.calendar.minimum_date ());
             this.instance.calendar.focus ();
 
             if (enforce_expiration_date_for_share (this.share.share_type)) {

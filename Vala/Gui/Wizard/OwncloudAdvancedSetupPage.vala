@@ -108,8 +108,8 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
 
     private void on_virtual_file_sync_toggled (bool checked) {
         if (checked) {
-            this.instance.l_selective_sync_size_label.clear ();
-            this.selective_sync_blocklist.clear ();
+            this.instance.l_selective_sync_size_label == "";
+            this.selective_sync_blocklist == "";
         }
     }
 
@@ -137,8 +137,8 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         }
 
         this.checking = false;
-        this.instance.l_selective_sync_size_label.clear ();
-        this.instance.l_sync_everything_size_label.clear ();
+        this.instance.l_selective_sync_size_label == "";
+        this.instance.l_sync_everything_size_label == "";
 
         // Update the local folder - this is not guaranteed to find a good one
         string good_local_folder = FolderManager.instance.find_good_path_for_new_sync_folder (local_folder (), server_url ());
@@ -258,7 +258,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     public void on_signal_remote_folder (string remote_folder) {
-        if (!remote_folder == "") {
+        if (remote_folder != "") {
             this.remote_folder = remote_folder;
         }
     }
@@ -324,7 +324,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     private void on_signal_sync_everything_clicked () {
         this.instance.l_selective_sync_size_label.on_signal_text ("");
         radio_checked (this.instance.r_sync_everything);
-        this.selective_sync_blocklist.clear ();
+        this.selective_sync_blocklist == "";
 
         string error_str = check_local_space (this.r_size);
         on_signal_error_string (error_str);
@@ -592,7 +592,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void server_address_label_url (GLib.Uri url) {
-        if (!url.is_valid ()) {
+        if (!url.is_valid) {
             return;
         }
 

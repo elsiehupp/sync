@@ -37,7 +37,7 @@ public class TestWarningStatusForExcludedFile : AbstractTestSyncFileStatusTracke
         GLib.assert_true (status_spy.status_of ("B/b2") == SyncFileStatus.StatusExcluded);
         GLib.assert_true (fake_folder.sync_engine.sync_file_status_tracker.file_status (""), SyncFileStatus.StatusUpToDate);
         GLib.assert_true (fake_folder.sync_engine.sync_file_status_tracker.file_status ("A"), SyncFileStatus.StatusUpToDate);
-        status_spy.clear ();
+        status_spy == "";
 
         // Clears the exclude expr above
         fake_folder.sync_engine.excluded_files ().clear_manual_excludes ();
@@ -48,7 +48,7 @@ public class TestWarningStatusForExcludedFile : AbstractTestSyncFileStatusTracke
         GLib.assert_true (status_spy.status_of ("A/a1") == SyncFileStatus.StatusSync);
         GLib.assert_true (status_spy.status_of ("B") == SyncFileStatus.StatusSync);
         GLib.assert_true (status_spy.status_of ("B/b1") == SyncFileStatus.StatusSync);
-        status_spy.clear ();
+        status_spy == "";
 
         fake_folder.exec_until_finished ();
         verify_that_push_matches_pull (fake_folder, status_spy);

@@ -129,7 +129,7 @@ public class UserInfo : GLib.Object {
             return;
         }
 
-        if (this.json_api_job) {
+        if (this.json_api_job != null) {
             // The previous job was not finished?  Then we cancel it!
             this.json_api_job.delete_later ();
         }
@@ -231,7 +231,7 @@ public class UserInfo : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private bool can_get_info () {
-        if (!this.account_state || !this.active) {
+        if !this.account_state == null || !this.active) {
             return false;
         }
         unowned Account account = this.account_state.account;

@@ -36,23 +36,23 @@ public class TestVirtualFileDownloadResume : AbstractTestSyncVirtualFiles {
         GLib.assert_true (fake_folder.current_local_state ().find ("A/a1" + DVSUFFIX));
         GLib.assert_true (!fake_folder.current_local_state ().find ("A/a1"));
         GLib.assert_true (database_record (fake_folder, "A/a1" + DVSUFFIX).type == ItemType.VIRTUAL_FILE_DOWNLOAD);
-        GLib.assert_true (!database_record (fake_folder, "A/a1").is_valid ());
+        GLib.assert_true (!database_record (fake_folder, "A/a1").is_valid);
         TestSyncVirtualFiles.clean_up_test_virtual_file_download_resume (complete_spy, fake_folder);
 
-        fake_folder.server_error_paths ().clear ();
+        fake_folder.server_error_paths () == "";
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (item_instruction (complete_spy, "A/a1", CSync.SyncInstructions.SYNC));
         GLib.assert_true (item_instruction (complete_spy, "A/a1" + DVSUFFIX, CSync.SyncInstructions.NONE));
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         GLib.assert_true (database_record (fake_folder, "A/a1").type == ItemType.FILE);
-        GLib.assert_true (!database_record (fake_folder, "A/a1" + DVSUFFIX).is_valid ());
+        GLib.assert_true (!database_record (fake_folder, "A/a1" + DVSUFFIX).is_valid);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private static void clean_up_test_virtual_file_download_resume (ItemCompletedSpy complete_spy, FakeFolder fake_folder) {
-        complete_spy.clear ();
+        complete_spy == "";
         fake_folder.sync_journal ().wipe_error_blocklist ();
     }
 

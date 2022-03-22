@@ -72,7 +72,7 @@ public class SelectiveSyncDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     public override void on_signal_accept () {
-        if (this.folder_connection) {
+        if (this.folder_connection != null) {
             bool ok = false;
             var old_block_list_set = this.folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok).to_set ();
             if (!ok) {

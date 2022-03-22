@@ -87,7 +87,7 @@ public class PropagatorCompositeJob : AbstractPropagatorJob {
 
         // Now it's our turn, check if we have something left to do.
         // First, convert a task to a job if necessary
-        while (this.jobs_to_do == "" && !this.tasks_to_do == "") {
+        while (this.jobs_to_do == null && this.tasks_to_!= null) {
             unowned SyncFileItem next_task = this.tasks_to_do.first ();
             this.tasks_to_do.remove (0);
             AbstractPropagatorJob propagator_job = this.propagator.create_job (next_task);
@@ -99,7 +99,7 @@ public class PropagatorCompositeJob : AbstractPropagatorJob {
             break;
         }
         // Then run the next job
-        if (!this.jobs_to_do == "") {
+        if (this.jobs_to_do != null) {
             AbstractPropagatorJob next_job = this.jobs_to_do.first ();
             this.jobs_to_do.remove (0);
             this.running_jobs.append (next_job);

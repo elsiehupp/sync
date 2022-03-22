@@ -104,8 +104,8 @@ public class TestVirtualFileLifecycle : AbstractTestSyncVirtualFiles {
         GLib.assert_true (!fake_folder.current_local_state ().find ("A/a1m" + DVSUFFIX));
         GLib.assert_true (!fake_folder.current_remote_state ().find ("A/a1m"));
         GLib.assert_true (item_instruction (complete_spy, "A/a1m" + DVSUFFIX, CSync.SyncInstructions.REMOVE));
-        GLib.assert_true (!database_record (fake_folder, "A/a1" + DVSUFFIX).is_valid ());
-        GLib.assert_true (!database_record (fake_folder, "A/a1m" + DVSUFFIX).is_valid ());
+        GLib.assert_true (!database_record (fake_folder, "A/a1" + DVSUFFIX).is_valid);
+        GLib.assert_true (!database_record (fake_folder, "A/a1m" + DVSUFFIX).is_valid);
         TestSyncVirtualFiles.clean_up_test_virtual_file_lifecycle (complete_spy, do_local_discovery, fake_folder);
 
         // Edge case : Local virtual file but no database entry for some reason
@@ -123,10 +123,10 @@ public class TestVirtualFileLifecycle : AbstractTestSyncVirtualFiles {
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state ().find ("A/a2" + DVSUFFIX));
         GLib.assert_true (item_instruction (complete_spy, "A/a2" + DVSUFFIX, CSync.SyncInstructions.UPDATE_METADATA));
-        GLib.assert_true (database_record (fake_folder, "A/a2" + DVSUFFIX).is_valid ());
+        GLib.assert_true (database_record (fake_folder, "A/a2" + DVSUFFIX).is_valid);
         GLib.assert_true (!fake_folder.current_local_state ().find ("A/a3" + DVSUFFIX));
         GLib.assert_true (item_instruction (complete_spy, "A/a3" + DVSUFFIX, CSync.SyncInstructions.REMOVE));
-        GLib.assert_true (!database_record (fake_folder, "A/a3" + DVSUFFIX).is_valid ());
+        GLib.assert_true (!database_record (fake_folder, "A/a3" + DVSUFFIX).is_valid);
         TestSyncVirtualFiles.clean_up_test_virtual_file_lifecycle (complete_spy, do_local_discovery, fake_folder);
     }
 
@@ -134,7 +134,7 @@ public class TestVirtualFileLifecycle : AbstractTestSyncVirtualFiles {
     /***********************************************************
     ***********************************************************/
     private static void clean_up_test_virtual_file_lifecycle (ItemCompletedSpy complete_spy, bool do_local_discovery, FakeFolder fake_folder) {
-        complete_spy.clear ();
+        complete_spy == "";
         if (!do_local_discovery) {
             fake_folder.sync_engine.set_local_discovery_options (LocalDiscoveryStyle.DATABASE_AND_FILESYSTEM);
         }

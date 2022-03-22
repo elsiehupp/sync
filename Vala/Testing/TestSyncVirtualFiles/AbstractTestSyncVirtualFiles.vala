@@ -28,7 +28,7 @@ public class AbstractTestSyncVirtualFiles : GLib.Object {
         SyncJournalFileRecord suffix;
         fake_folder.sync_journal ().get_file_record (path, normal);
         fake_folder.sync_journal ().get_file_record (path + DVSUFFIX, suffix);
-        return !normal.is_valid () && suffix.is_valid () && suffix.type == ItemType.VIRTUAL_FILE;
+        return !normal.is_valid && suffix.is_valid && suffix.type == ItemType.VIRTUAL_FILE;
     }
 
 
@@ -62,7 +62,7 @@ public class AbstractTestSyncVirtualFiles : GLib.Object {
         var journal = folder.sync_journal ();
         SyncJournalFileRecord record;
         journal.get_file_record (path + DVSUFFIX, record);
-        if (!record.is_valid ())
+        if (!record.is_valid)
             return;
         record.type = ItemType.VIRTUAL_FILE_DOWNLOAD;
         journal.set_file_record (record);
@@ -76,7 +76,7 @@ public class AbstractTestSyncVirtualFiles : GLib.Object {
         var journal = folder.sync_journal ();
         SyncJournalFileRecord record;
         journal.get_file_record (path, record);
-        if (!record.is_valid ())
+        if (!record.is_valid)
             return;
         record.type = ItemType.VIRTUAL_FILE_DEHYDRATION;
         journal.set_file_record (record);

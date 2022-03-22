@@ -235,8 +235,8 @@ public class Systray : QSystemTrayIcon {
     /***********************************************************
     ***********************************************************/
     public void create () {
-        if (this.tray_engine) {
-            if (!AccountManager.instance.accounts == "") {
+        if (this.tray_engine != null) {
+            if (AccountManager.instance.accounts != "") {
                 this.tray_engine.root_context ().context_property ("activity_model", UserModel.instance.current_activity_model);
             }
             this.tray_engine.on_signal_load ("qrc:/qml/src/gui/tray/Window.qml");
@@ -256,7 +256,7 @@ public class Systray : QSystemTrayIcon {
     /***********************************************************
     ***********************************************************/
     public void show_message (string title, string message, Message_icon icon) {
-        if (QDBusInterface (NOTIFICATIONS_SERVICE, NOTIFICATIONS_PATH, NOTIFICATIONS_IFACE).is_valid ()) {
+        if (QDBusInterface (NOTIFICATIONS_SERVICE, NOTIFICATIONS_PATH, NOTIFICATIONS_IFACE).is_valid) {
             const GLib.VariantMap hints = {{"desktop-entry", LINUX_APPLICATION_ID}};
             GLib.List<GLib.Variant> args = {
                 APPLICATION_NAME,

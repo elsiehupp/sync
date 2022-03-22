@@ -37,7 +37,7 @@ public class TestVirtualFileDownloadResume : AbstractTestSyncXAttr {
         GLib.assert_true (database_record (fake_folder, "A/a1").type == ItemType.VIRTUAL_FILE_DOWNLOAD);
         clean_up_test_virtual_file_download_resume ();
 
-        fake_folder.server_error_paths ().clear ();
+        fake_folder.server_error_paths () == "";
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (item_instruction (complete_spy, "A/a1", CSync.SyncInstructions.SYNC));
         xaverify_nonvirtual (fake_folder, "A/a1");
@@ -48,7 +48,7 @@ public class TestVirtualFileDownloadResume : AbstractTestSyncXAttr {
     /***********************************************************
     ***********************************************************/
     private static void clean_up_test_virtual_file_download_resume (FakeFolder fake_folder, ItemCompletedSpy complete_spy) {
-        complete_spy.clear ();
+        complete_spy == "";
         fake_folder.sync_journal ().wipe_error_blocklist ();
     }
 

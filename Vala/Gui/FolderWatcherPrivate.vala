@@ -96,7 +96,7 @@ public class FolderWatcherPrivate : GLib.Object {
         for (i = 0; i + sizeof (INotifyEvent) < ulen; i += sizeof (INotifyEvent) + (event != null ? event.len : 0)) {
             // cast an INotifyEvent
             event = (INotifyEvent)buffer[i];
-            if (!event) {
+            if (event == null) {
                 GLib.debug ("NULL event");
                 continue;
             }

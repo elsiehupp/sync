@@ -35,13 +35,13 @@ public class AbstractNetworkJob : GLib.Object {
         ***********************************************************/
         public NetworkJobTimeoutPauser (GLib.InputStream input_stream) {
             this.timer = input_stream.property ("timer").value<GLib.Timeout> ();
-            if (!this.timer == null) {
+            if (this.timer != null) {
                 this.timer.stop ();
             }
         }
 
         ~NetworkJobTimeoutPauser () {
-            if (!this.timer == null) {
+            if (this.timer != null) {
                 this.timer.start ();
             }
         }
@@ -105,7 +105,7 @@ public class AbstractNetworkJob : GLib.Object {
 
             GLib.InputStream old = this.input_stream;
             this.input_stream = value;
-            delete old;
+            old = null;
         }
     }
 
@@ -170,7 +170,7 @@ public class AbstractNetworkJob : GLib.Object {
         // Network activity on the propagator jobs (GET/PUT) keeps all requests alive.
         // This is a workaround for OC instances which only support one
         // parallel up and download
-        if (this.account) {
+        if (this.account != null) {
             this.account.signal_propagator_network_activity.connect (
                 this.reset_timeout
             );
@@ -201,7 +201,7 @@ public class AbstractNetworkJob : GLib.Object {
     request is sent)
     ***********************************************************/
     public string request_id () {
-        return this.input_stream ? this.input_stream.request ().raw_header ("X-Request-ID") : "";
+        return this.input_stream != null ? this.input_stream.request ().raw_header ("X-Request-ID") : "";
     }
 
 
@@ -249,14 +249,14 @@ public class AbstractNetworkJob : GLib.Object {
 
     Warning : Needs to call this.input_stream.read_all ().
     ***********************************************************/
-    public string error_string_parsing_body (string body = null) {
+    public string error_string_parsing_body (string body = "") {
         string base_string = this.error_string;
-        if (base_string == "" || !this.input_stream) {
+        if (base_string == "" || this.input_stream == null) {
             return "";
         }
 
         string reply_body = this.input_stream.read_all ();
-        if (body) {
+        if (body != "") {
             *body = reply_body;
         }
 
@@ -280,7 +280,7 @@ public class AbstractNetworkJob : GLib.Object {
         string verb = HttpLogger.request_verb (*this.input_stream);
         GLib.info ("Restarting " + verb + requested_url);
         reset_timeout ();
-        if (this.request_body) {
+        if (this.request_body != null) {
             this.request_body.seek (0);
         }
         // The cookie will be added automatically, we don't want AccessManager.create_request to duplicate them
@@ -321,7 +321,7 @@ public class AbstractNetworkJob : GLib.Object {
     protected GLib.InputStream send_request_for_device (
         string verb,
         GLib.Uri url,
-        Soup.Request request = Soup.Request (),
+        Soup.Request request = new Soup.Request (),
         QIODevice request_body = null) {
         var input_stream = this.account.send_raw_request (verb, url, request, request_body);
         this.request_body = null;
@@ -350,11 +350,12 @@ public class AbstractNetworkJob : GLib.Object {
     protected GLib.InputStream send_request_for_relative_path (
         string verb,
         string relative_path,
-        Soup.Request request = Soup.Request (),
-        QIODevice request_body = null) {
+        Soup.Request request = new Soup.Request (),
+        QIODevice request_body = null
+    ) {
         var input_stream = this.account.send_raw_request (verb, url, request, request_body);
         this.request_body = request_body;
-        if (this.request_body) {
+        if (this.request_body != null) {
             this.request_body.parent (input_stream);
         }
         adopt_request (input_stream);
@@ -443,7 +444,7 @@ public class AbstractNetworkJob : GLib.Object {
     The default implementation aborts the input_stream.
     ***********************************************************/
     protected virtual void on_signal_timed_out () {
-        if (this.input_stream) {
+        if (this.input_stream != null) {
             this.input_stream.abort ();
         } else {
             delete_later ();
@@ -487,7 +488,7 @@ public class AbstractNetworkJob : GLib.Object {
         if (this.input_stream.error == GLib.InputStream.ContentReSendError
             && this.input_stream.attribute (Soup.Request.HTTP2WasUsedAttribute).to_bool ()) {
 
-            if ( (this.request_body && !this.request_body.is_sequential ()) || verb == "") {
+            if ( (this.request_body != null && !this.request_body.is_sequential ()) || verb == "") {
                 GLib.warning (
                     "Can't resend HTTP2 request; verb or body not suitable "
                     + this.input_stream.request ().url + verb + this.request_body
@@ -502,7 +503,7 @@ public class AbstractNetworkJob : GLib.Object {
                 this.http2_resend_count++;
 
                 reset_timeout ();
-                if (this.request_body) {
+                if (this.request_body != null) {
                     if (!this.request_body.is_open) {
                         this.request_body.open (QIODevice.ReadOnly);
                     }
@@ -550,7 +551,8 @@ public class AbstractNetworkJob : GLib.Object {
             if (this.input_stream.operation () == Soup.Session.PostOperation
                 && requested_url.has_query ()
                 && !redirect_url.has_query ()
-                && !this.request_body) {
+                && this.request_body == null
+            ) {
                 GLib.warning ("Redirecting a POST request with an implicit body loses that body.");
             }
 
@@ -560,7 +562,7 @@ public class AbstractNetworkJob : GLib.Object {
                 GLib.warning (this + " HTTPS.HTTP downgrade detected!");
             } else if (requested_url == redirect_url || this.redirect_count + 1 >= max_redirects ()) {
                 GLib.warning (this + " Redirect loop detected!");
-            } else if (this.request_body && this.request_body.is_sequential ()) {
+            } else if (this.request_body != null && this.request_body.is_sequential ()) {
                 GLib.warning (this + " cannot redirect request with sequential body.");
             } else if (verb == "") {
                 GLib.warning (this + " cannot redirect request: could not detect original verb.");
@@ -574,10 +576,10 @@ public class AbstractNetworkJob : GLib.Object {
                     // Create the redirected request and send it
                     GLib.info ("Redirecting " + verb + requested_url + redirect_url);
                     reset_timeout ();
-                    if (this.request_body) {
+                    if (this.request_body != null) {
                         if (!this.request_body.is_open) {
                             // Avoid the QIODevice.seek (Soup.Buffer) : The device is not open warning message
-                        this.request_body.open (QIODevice.ReadOnly);
+                            this.request_body.open (QIODevice.ReadOnly);
                         }
                         this.request_body.seek (0);
                     }
@@ -603,8 +605,6 @@ public class AbstractNetworkJob : GLib.Object {
         }
     }
 
-}
-
 
     /***********************************************************
     Gets the SabreDAV-style error message from an error response.
@@ -614,7 +614,7 @@ public class AbstractNetworkJob : GLib.Object {
 
     Returns a null string if no message was found.
     ***********************************************************/
-    string extract_error_message (string error_response) {
+    private static string extract_error_message (string error_response) {
         QXmlStreamReader reader = new QXmlStreamReader (error_response);
         reader.read_next_start_element ();
         if (reader.name () != "error") {
@@ -641,10 +641,10 @@ public class AbstractNetworkJob : GLib.Object {
     /***********************************************************
     Builds a error message based on the error and the input_stream body.
     ***********************************************************/
-    string error_message (string base_error, string body) {
+    private static string error_message (string base_error, string body) {
         string message = base_error;
         string extra = extract_error_message (body);
-        if (!extra == "") {
+        if (extra != "") {
             message += " (%1)".printf (extra);
         }
         return message;
@@ -661,7 +661,7 @@ public class AbstractNetworkJob : GLib.Object {
 
     This function produces clearer error messages for HTTP errors.
     ***********************************************************/
-    string network_reply_error_string (GLib.InputStream input_stream) {
+    private static string network_reply_error_string (GLib.InputStream input_stream) {
         string base_string = input_stream.error_string;
         int http_status = input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         string http_reason = input_stream.attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ();

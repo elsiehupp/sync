@@ -13,20 +13,21 @@ public class LocalInfo : GLib.Object {
     FileName of the entry (this does not contains any directory
     or path, just the plain name)
     ***********************************************************/
-    string name;
-    string rename_name;
-    time_t modtime = 0;
-    int64 size = 0;
-    uint64 inode = 0;
-    ItemType type = ItemType.SKIP;
-    bool is_directory = false;
-    bool is_hidden = false;
-    bool is_virtual_file = false;
-    bool is_sym_link = false;
+    public string name;
+    public string rename_name;
+    public time_t modtime = 0;
+    public int64 size = 0;
+    public uint64 inode = 0;
+    public ItemType type = ItemType.SKIP;
+    public bool is_directory = false;
+    public bool is_hidden = false;
+    public bool is_virtual_file = false;
+    public bool is_sym_link = false;
 
-
-    bool is_valid () {
-        return !name == null;
+    public bool is_valid {
+        public get {
+            return name != null;
+        }
     }
 
 } // class LocalInfo

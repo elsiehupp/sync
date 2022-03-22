@@ -584,7 +584,7 @@ public class ConfigFile : GLib.Object {
     string ConfigFile.proxy_password () {
         string pass_encoded = get_value (PROXY_PASS_C).to_byte_array ();
         var pass = string.from_utf8 (string.from_base64 (pass_encoded));
-        pass_encoded.clear ();
+        pass_encoded == "";
 
         var key = KEYCHAIN_PROXY_PASSWORD_KEY ();
 

@@ -305,7 +305,7 @@ public class ExcludedFiles : GLib.Object {
     Primarily used in tests.
     ***********************************************************/
     public void clear_manual_excludes () {
-        this.manual_excludes.clear ();
+        this.manual_excludes == "";
         on_signal_reload_exclude_files ();
     }
 
@@ -425,14 +425,14 @@ public class ExcludedFiles : GLib.Object {
     Reloads the exclude patterns from the registered paths.
     ***********************************************************/
     public bool on_signal_reload_exclude_files () {
-        this.all_excludes.clear ();
+        this.all_excludes == "";
         // clear all regular_expression
-        this.bname_traversal_regex_file.clear ();
-        this.bname_traversal_regex_dir.clear ();
-        this.full_traversal_regex_file.clear ();
-        this.full_traversal_regex_dir.clear ();
-        this.full_regex_file.clear ();
-        this.full_regex_dir.clear ();
+        this.bname_traversal_regex_file == "";
+        this.bname_traversal_regex_dir == "";
+        this.full_traversal_regex_file == "";
+        this.full_traversal_regex_dir == "";
+        this.full_regex_file == "";
+        this.full_regex_dir == "";
 
         bool on_signal_success = true;
         const var keys = this.exclude_files.keys ();
@@ -782,12 +782,12 @@ public class ExcludedFiles : GLib.Object {
     ***********************************************************/
     private void prepare () {
         // clear all regular_expression
-        this.bname_traversal_regex_file.clear ();
-        this.bname_traversal_regex_dir.clear ();
-        this.full_traversal_regex_file.clear ();
-        this.full_traversal_regex_dir.clear ();
-        this.full_regex_file.clear ();
-        this.full_regex_dir.clear ();
+        this.bname_traversal_regex_file == "";
+        this.bname_traversal_regex_dir == "";
+        this.full_traversal_regex_file == "";
+        this.full_traversal_regex_dir == "";
+        this.full_regex_file == "";
+        this.full_regex_dir == "";
 
         const var keys = this.all_excludes.keys ();
         foreach (var base_path in keys) {
@@ -878,7 +878,7 @@ public class ExcludedFiles : GLib.Object {
                 // at worst input[this.iterator+1] is \0
                 switch (line[this.iterator+1]) {
                 case '\'' : line[o++] = '\''; break;
-                case '"' : line[o++] = '"'; break;
+                case "\" : line[o++] = "\"; break;
                 case '?' : line[o++] = '?'; break;
                 case '#' : line[o++] = '#'; break;
                 case 'a' : line[o++] = 'a'; break;

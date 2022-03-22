@@ -219,7 +219,7 @@ public class GeneralSettings : Gtk.Widget {
 
 
     override ~GeneralSettings () {
-        delete this.instance;
+        //  delete this.instance;
     }
 
 
@@ -359,7 +359,7 @@ public class GeneralSettings : Gtk.Widget {
     private void on_signal_legal_notice_button_clicked () {
         var notice = new LegalNotice ();
         notice.exec ();
-        delete notice;
+        //  delete notice;
     }
 
 
@@ -372,7 +372,7 @@ public class GeneralSettings : Gtk.Widget {
     #if defined (BUILD_UPDATER)
     ***********************************************************/
     private void update_info () {
-        if (ConfigFile ().skip_update_check () || !AbstractUpdater.instance) {
+        if (ConfigFile ().skip_update_check () || AbstractUpdater.instance == null) {
             // updater disabled on compile
             this.instance.updates_group_box.visible (false);
             return;

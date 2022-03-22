@@ -21,7 +21,7 @@ public class SyncJournalFileRecord : GLib.Object {
     public string etag;
     public string file_id;
     public int64 file_size = 0;
-    public RemotePermissions remote_perm;
+    public RemotePermissions remote_permissions;
     public bool server_has_ignored_files = false;
     public string checksum_header;
     public string e2e_mangled_name;
@@ -29,10 +29,12 @@ public class SyncJournalFileRecord : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public bool is_valid () {
-        return !this.path == ""
-            && (!this.last_try_etag == "" || this.last_try_modtime != 0)
-            && this.last_try_time > 0;
+    public bool is_valid {
+        public get {
+            return this.path != ""
+                && (this.last_try_etag != "" || this.last_try_modtime != 0)
+                && this.last_try_time > 0;
+        }
     }
 
 
@@ -45,7 +47,7 @@ public class SyncJournalFileRecord : GLib.Object {
     ***********************************************************/
     public string numeric_file_id () {
         // Use the identifier up until the first non-numeric character
-        for (int i = 0; i < this.file_id.size (); ++i) {
+        for (int i = 0; i < this.file_id.length; ++i) {
             if (this.file_id[i] < '0' || this.file_id[i] > '9') {
                 return this.file_id.left (i);
             }
@@ -92,7 +94,7 @@ public class SyncJournalFileRecord : GLib.Object {
     //          && lhs.etag == rhs.etag
     //          && lhs.file_id == rhs.file_id
     //          && lhs.file_size == rhs.file_size
-    //          && lhs.remote_perm == rhs.remote_perm
+    //          && lhs.remote_permissions == rhs.remote_permissions
     //          && lhs.server_has_ignored_files == rhs.server_has_ignored_files
     //          && lhs.checksum_header == rhs.checksum_header;
     //  }

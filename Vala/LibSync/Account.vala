@@ -26,7 +26,7 @@ public class Account : GLib.Object {
     @brief Reimplement this to handle SSL errors from libsync
     @ingroup libsync
     ***********************************************************/
-    public abstract class AbstractSslErrorHandler {
+    public abstract class AbstractSslErrorHandler : GLib.Object {
         public abstract bool handle_errors (GLib.List<GnuTLS.ErrorCode> error_list, QSslConfiguration conf, GLib.List<GLib.TlsCertificate> cert_list, Account account);
     }
 
@@ -469,20 +469,20 @@ public class Account : GLib.Object {
     ***********************************************************/
     public GLib.InputStream send_raw_request_for_device (
         string verb,
-        GLib.Uri url, Soup.Request request = Soup.Request (),
+        GLib.Uri url, Soup.Request request = new Soup.Request (),
         QIODevice data = null
     ) {
         request.url (url);
         request.ssl_configuration (this.get_or_create_ssl_config ());
-        if (verb == "HEAD" && !data) {
+        if (verb == "HEAD" && data == null) {
             return this.soup_session.head (request);
-        } else if (verb == "GET" && !data) {
+        } else if (verb == "GET" && data == null) {
             return this.soup_session.get (request);
         } else if (verb == "POST") {
             return this.soup_session.post (request, data);
         } else if (verb == "PUT") {
             return this.soup_session.put (request, data);
-        } else if (verb == "DELETE" && !data) {
+        } else if (verb == "DELETE" && data == null) {
             return this.soup_session.delete_resource (request);
         }
         return this.soup_session.send_custom_request (request, verb, data);
@@ -542,7 +542,7 @@ public class Account : GLib.Object {
     public SimpleNetworkJob send_request (
         string verb,
         GLib.Uri url,
-        Soup.Request request = Soup.Request (),
+        Soup.Request request = new Soup.Request (),
         QIODevice data = null
     ) {
         var simple_network_job = new SimpleNetworkJob (shared_from_this ());
@@ -555,7 +555,7 @@ public class Account : GLib.Object {
     The ssl configuration during the first connection
     ***********************************************************/
     public QSslConfiguration get_or_create_ssl_config () {
-        if (!this.ssl_configuration == null) {
+        if (this.ssl_configuration != null) {
             // Will be set by CheckServerJob.on_signal_finished ()
             // We need to use a central shared config to get SSL session tickets
             return this.ssl_configuration;
@@ -589,7 +589,7 @@ public class Account : GLib.Object {
     shown when the next unknown certificate is encountered.
     ***********************************************************/
     public void reset_rejected_certificates () {
-        this.rejected_certificates.clear ();
+        this.rejected_certificates == "";
     }
 
 
@@ -751,7 +751,7 @@ public class Account : GLib.Object {
     ***********************************************************/
     private void on_push_notifications_connection_lost () {
         GLib.info ("Disable push notifications object because authentication failed or connection lost.");
-        if (!this.push_notifications) {
+        if (this.push_notifications == null) {
             return;
         }
         if (!this.push_notifications.is_ready) {
@@ -812,11 +812,11 @@ public class Account : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void reset_network_access_manager () {
-        if (!this.credentials || !this.soup_session) {
+        if (this.credentials == null || this.soup_session == null) {
             return;
         }
 
-        GLib.debug ("Resetting QNAM");
+        GLib.debug ("Resetting Soup Session");
         Soup.CookieJar jar = this.soup_session.add_feature ();
         Soup.ProxyResolverDefault proxy = this.soup_session.add_feature ();
 

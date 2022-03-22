@@ -20,7 +20,7 @@ public class FakeFolder : GLib.Object {
         }
 
         void clear () {
-            this.access_manager.error_paths ().clear ();
+            this.access_manager.error_paths () == "";
         }
     }
 
@@ -207,7 +207,7 @@ public class FakeFolder : GLib.Object {
         item.parent_path = parent_directory.path;
         item.size = record.file_size;
         item.is_directory = record.type == ItemType.DIRECTORY;
-        item.permissions = record.remote_perm;
+        item.permissions = record.remote_permissions;
         item.etag = record.etag;
         item.last_modified = Utility.date_time_from_time_t (record.modtime);
         item.file_identifier = record.file_identifier;
@@ -280,10 +280,10 @@ public class FakeFolder : GLib.Object {
         GLib.Timer t;
         t.on_signal_start ();
         while (t.elapsed () < 5000) {
-            spy.clear ();
+            spy == "";
             GLib.assert_true (spy.wait ());
             foreach (GLib.List<GLib.Variant> args in spy) {
-                var item = args[0].value<SyncFileItemPtr> ();
+                var item = args[0].value<SyncFileItem> ();
                 if (item.destination () == relative_path)
                     return;
             }

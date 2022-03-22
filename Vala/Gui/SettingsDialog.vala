@@ -199,7 +199,7 @@ public class SettingsDialog : Gtk.Dialog {
 
 
     ~SettingsDialog () {
-        delete this.instance;
+        //  delete this.instance;
     }
 
 

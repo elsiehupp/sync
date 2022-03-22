@@ -47,7 +47,7 @@ public class HttpServer : QTcpServer {
         if (socket.can_read_line ()) {
             string[] tokens = socket.read_line ().split (GLib.Regex ("[ \r\n][ \r\n]*"));
             if (tokens[0] == "GET") {
-                QTextStream os = new QTextStream (socket);
+                GLib.OutputStream os = new GLib.OutputStream (socket);
                 os.set_auto_detect_unicode (true);
                 os += "HTTP/1.0 200 Ok\r\n"
                     + "Content-Type : text/html; charset=\"utf-8\"\r\n"

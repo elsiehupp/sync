@@ -77,8 +77,8 @@ public class TestFetchMoreClicked : AbstractTestUnifiedSearchListmodel {
 
         // make sure the FetchMoreTrigger gets removed when no more results available
         if (!provider_id_fetch_more_triggered == "") {
-            current_fetch_more_in_progress_provider_id_changed.clear ();
-            rows_inserted.clear ();
+            current_fetch_more_in_progress_provider_id_changed == "";
+            rows_inserted == "";
 
             QSignalSpy rows_removed = new QSignalSpy (model, &UnifiedSearchResultsListModel.rows_removed);
 

@@ -80,7 +80,7 @@ public class SyncJournalErrorBlocklistRecord : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public bool is_valid ();
+    public bool is_valid;
 
 } // class SyncJournalErrorBlocklistRecord
 

@@ -76,7 +76,7 @@ public class EmojiCategoriesModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     public override GLib.Variant data (QModelIndex index, int role) {
-        if (!index.is_valid ()) {
+        if (!index.is_valid) {
             return {};
         }
 

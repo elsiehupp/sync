@@ -72,7 +72,7 @@ public class NetrcParser : GLib.Object {
         }
         try_add_entry_and_clear (machine, pair, is_default);
 
-        if (!this.entries == "" || this.default_pair != q_make_pair ("", "")) {
+        if (this.entries != null || this.default_pair != q_make_pair ("", "")) {
             return true;
         } else {
             return false;
@@ -96,11 +96,11 @@ public class NetrcParser : GLib.Object {
     private void try_add_entry_and_clear (string machine, QPair<string, string> pair, bool is_default) {
         if (is_default) {
             this.default_pair = pair;
-        } else if (!machine == "" && !pair.first == "") {
+        } else if (machine != "" && pair.first != "") {
             this.entries.insert (machine, pair);
         }
         pair = q_make_pair ("", "");
-        machine.clear ();
+        machine == "";
         is_default = false;
     }
 

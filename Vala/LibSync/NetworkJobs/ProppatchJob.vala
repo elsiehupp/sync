@@ -62,16 +62,16 @@ public class ProppatchJob : AbstractNetworkJob {
         while (it.has_next ()) {
             it.next ();
             string key_name = it.key ();
-            string key_ns;
+            string key_namespace;
             if (key_name.contains (':')) {
                 int col_index = key_name.last_index_of (":");
-                key_ns = key_name.left (col_index);
+                key_namespace = key_name.left (col_index);
                 key_name = key_name.mid (col_index + 1);
             }
 
             prop_str += "    <" + key_name;
-            if (!key_ns == "") {
-                prop_str += " xmlns=\"" + key_ns + "\" ";
+            if (key_namespace != "") {
+                prop_str += " xmlns=\"" + key_namespace + "\" ";
             }
             prop_str += ">";
             prop_str += it.value ();

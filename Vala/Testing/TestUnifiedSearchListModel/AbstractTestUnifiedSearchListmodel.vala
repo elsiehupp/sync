@@ -87,7 +87,7 @@ public class AbstractTestUnifiedSearchListmodel : GLib.Object {
             }
         }
 
-        if (!reply) {
+        if (reply == null) {
             return (GLib.InputStream)new FakeErrorReply (operation, request, this, 404, "{error : \"Not found!\"}");
         }
 

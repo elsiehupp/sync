@@ -212,7 +212,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
         // Since / cannot be in the blocklist, expand it to the actual
         // list of top-level folders as soon as possible.
         if (this.old_block_list == string[] ("/")) {
-            this.old_block_list.clear ();
+            this.old_block_list == "";
             foreach (string path, list) {
                 path.remove (path_to_remove);
                 if (path == "") {
@@ -394,7 +394,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void refresh_folders () {
-        this.encrypted_paths.clear ();
+        this.encrypted_paths == "";
 
         var lscol_job = new LscolJob (this.account, this.folder_path, this);
         var props = GLib.List<string> ("resourcetype"
@@ -413,7 +413,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
             this.on_signal_gather_encrypted_paths
         );
         lscol_job.on_signal_start ();
-        this.folder_tree.clear ();
+        this.folder_tree == "";
         this.loading.show ();
         this.loading.move (10, this.folder_tree.header ().height () + 10);
     }

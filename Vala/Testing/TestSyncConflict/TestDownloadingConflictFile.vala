@@ -23,7 +23,7 @@ public class TestDownloadingConflictFile : AbstractTestSyncConflict {
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         var conflict_record = fake_folder.sync_journal ().conflict_record ("A/a1 (conflicted copy 1234)");
-        GLib.assert_true (conflict_record.is_valid ());
+        GLib.assert_true (conflict_record.is_valid);
         GLib.assert_true (conflict_record.base_file_id == fake_folder.remote_modifier ().find ("A/a1").file_identifier);
         GLib.assert_true (conflict_record.initial_base_path == "A/a1");
 
@@ -36,7 +36,7 @@ public class TestDownloadingConflictFile : AbstractTestSyncConflict {
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         conflict_record = fake_folder.sync_journal ().conflict_record ("A/really-a-conflict");
-        GLib.assert_true (conflict_record.is_valid ());
+        GLib.assert_true (conflict_record.is_valid);
         GLib.assert_true (conflict_record.base_file_id == a2FileId);
         GLib.assert_true (conflict_record.base_modtime == 1234);
         GLib.assert_true (conflict_record.base_etag == "etag");

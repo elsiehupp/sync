@@ -329,7 +329,7 @@ public class SyncEngine : GLib.Object {
 
         this.has_none_files = false;
         this.has_remove_file = false;
-        this.seen_conflict_files.clear ();
+        this.seen_conflict_files == "";
 
         this.progress_info.reset ();
 
@@ -396,7 +396,7 @@ public class SyncEngine : GLib.Object {
         // undo the filter to allow this sync to retrieve and store the correct etags.
         this.journal.clear_etag_storage_filter ();
 
-        this.excluded_files.exclude_conflict_files (!this.account.capabilities.upload_conflict_files ());
+        this.excluded_files.exclude_conflict_files (!this.account.capabilities.upload_conflict_files);
 
         this.last_local_discovery_style = this.local_discovery_style;
 
@@ -455,7 +455,7 @@ public class SyncEngine : GLib.Object {
         }
 
         // Check for invalid character in old server version
-        string invalid_filename_pattern = this.account.capabilities.invalid_filename_regex ();
+        string invalid_filename_pattern = this.account.capabilities.invalid_filename_regex;
         if (invalid_filename_pattern == null
             && this.account.server_version_int < Account.make_server_version (8, 1, 0)) {
             // Server versions older than 8.1 don't support some characters in filenames.
@@ -467,7 +467,7 @@ public class SyncEngine : GLib.Object {
         }
         if (!invalid_filename_pattern == "")
             this.discovery_phase.invalid_filename_rx = GLib.Regex (invalid_filename_pattern);
-        this.discovery_phase.server_blocklisted_files = this.account.capabilities.blocklisted_files ();
+        this.discovery_phase.server_blocklisted_files = this.account.capabilities.blocklisted_files;
         this.discovery_phase.ignore_hidden_files = ignore_hidden_files;
 
         this.discovery_phase.signal_item_discovered.connect (
@@ -608,7 +608,7 @@ public class SyncEngine : GLib.Object {
         string prev;
         var it = this.local_discovery_paths.begin ();
         while (it != this.local_discovery_paths.end ()) {
-            if (!prev == null && it.has_prefix (prev) && (prev.has_suffix ("/") || *it == prev || it.at (prev.size ()) <= "/")) {
+            if (prev != null && it.has_prefix (prev) && (prev.has_suffix ("/") || *it == prev || it.at (prev.size ()) <= "/")) {
                 it = this.local_discovery_paths.erase (it);
             } else {
                 prev = *it;
@@ -727,7 +727,7 @@ public class SyncEngine : GLib.Object {
         SyncFileItem item;
         string local_file = local_path + path;
         var result = vfs.convert_to_placeholder (local_file, item, local_file);
-        if (!result.is_valid ()) {
+        if (!result.is_valid) {
             GLib.warning ("Could not convert file to placeholder" + result.error);
         }
     }
@@ -745,7 +745,7 @@ public class SyncEngine : GLib.Object {
     ***********************************************************/
     private void on_signal_folder_discovered (bool local, string folder) {
         // Don't wanna overload the UI
-        if (!this.last_update_progress_callback_call.is_valid () || this.last_update_progress_callback_call.elapsed () >= 200) {
+        if (!this.last_update_progress_callback_call.is_valid || this.last_update_progress_callback_call.elapsed () >= 200) {
             this.last_update_progress_callback_call.start (); // first call or enough elapsed time
         } else {
             return;
@@ -753,10 +753,10 @@ public class SyncEngine : GLib.Object {
 
         if (local) {
             this.progress_info.current_discovered_local_folder = folder;
-            this.progress_info.current_discovered_remote_folder.clear ();
+            this.progress_info.current_discovered_remote_folder == "";
         } else {
             this.progress_info.current_discovered_remote_folder = folder;
-            this.progress_info.current_discovered_local_folder.clear ();
+            this.progress_info.current_discovered_local_folder == "";
         }
         /* emit */ signal_transmission_progress (*this.progress_info);
     }
@@ -803,9 +803,9 @@ public class SyncEngine : GLib.Object {
                 // If the 'W' remote permission changed, update the local filesystem
                 SyncJournalFileRecord prev;
                 if (this.journal.get_file_record (item.file, prev)
-                    && prev.is_valid ()
-                    && prev.remote_perm.has_permission (RemotePermissions.Permissions.CAN_WRITE) != item.remote_perm.has_permission (RemotePermissions.Permissions.CAN_WRITE)) {
-                    const bool is_read_only = !item.remote_perm == null && !item.remote_perm.has_permission (RemotePermissions.Permissions.CAN_WRITE);
+                    && prev.is_valid
+                    && prev.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_WRITE) != item.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_WRITE)) {
+                    const bool is_read_only = item.remote_permissions != null && !item.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_WRITE);
                     FileSystem.file_read_only_weak (file_path, is_read_only);
                 }
                 var record = item.to_sync_journal_file_record_with_inode (file_path);
@@ -846,7 +846,7 @@ public class SyncEngine : GLib.Object {
             return;
         } else if (item.instruction == CSync.SyncInstructions.NONE) {
             this.has_none_files = true;
-            if (this.account.capabilities.upload_conflict_files () && Common.Utility.is_conflict_file (item.file)) {
+            if (this.account.capabilities.upload_conflict_files && Common.Utility.is_conflict_file (item.file)) {
                 // For uploaded conflict files, files with no action performed on them should
                 // be displayed : but we mustn't overwrite the instruction if something happens
                 // to the file!
@@ -910,7 +910,7 @@ public class SyncEngine : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_discovery_finished () {
-        if (!this.discovery_phase) {
+        if (this.discovery_phase == null) {
             // There was an error that was already taken care of
             return;
         }
@@ -928,8 +928,8 @@ public class SyncEngine : GLib.Object {
             this.journal.commit_if_needed_and_start_new_transaction ("Post discovery");
         }
 
-        this.progress_info.current_discovered_remote_folder.clear ();
-        this.progress_info.current_discovered_local_folder.clear ();
+        this.progress_info.current_discovered_remote_folder == "";
+        this.progress_info.current_discovered_local_folder == "";
         this.progress_info.status = ProgressInfo.Status.RECONCILE;
         /* emit */ signal_transmission_progress (*this.progress_info);
 
@@ -973,7 +973,7 @@ public class SyncEngine : GLib.Object {
 
         GLib.info ("#### Reconcile (signal_about_to_propagate) #################################################### " + this.stop_watch.add_lap_time ("Reconcile (signal_about_to_propagate)") + "ms");
 
-        this.local_discovery_paths.clear ();
+        this.local_discovery_paths == "";
 
         // To announce the beginning of the sync
         /* emit */ signal_about_to_propagate (this.sync_items);
@@ -1151,7 +1151,7 @@ public class SyncEngine : GLib.Object {
     Wipes the this.touched_files hash
     ***********************************************************/
     private void on_signal_clear_touched_files_timer_timeout () {
-        this.touched_files.clear ();
+        this.touched_files == "";
     }
 
 
@@ -1197,7 +1197,7 @@ public class SyncEngine : GLib.Object {
     stale, return false.
     ***********************************************************/
     private bool check_error_blocklisting (SyncFileItem item) {
-        if (!this.journal) {
+        if (this.journal == null) {
             GLib.critical ("Journal is undefined!");
             return false;
         }
@@ -1205,7 +1205,7 @@ public class SyncEngine : GLib.Object {
         SyncJournalErrorBlocklistRecord entry = this.journal.error_blocklist_entry (item.file);
         item.has_blocklist_entry = false;
 
-        if (!entry.is_valid ()) {
+        if (!entry.is_valid) {
             return false;
         }
 
@@ -1374,7 +1374,7 @@ public class SyncEngine : GLib.Object {
 
                 // Determine fileid of target file
                 SyncJournalFileRecord base_record;
-                if (this.journal.get_file_record (base_path, base_record) && base_record.is_valid ()) {
+                if (this.journal.get_file_record (base_path, base_record) && base_record.is_valid) {
                     record.base_file_id = base_record.file_id;
                 }
 
@@ -1391,7 +1391,7 @@ public class SyncEngine : GLib.Object {
         GLib.info ("Sync run took " + this.stop_watch.add_lap_time ("Sync Finished") + "ms.");
         this.stop_watch.stop ();
 
-        if (this.discovery_phase) {
+        if (this.discovery_phase != null) {
             this.discovery_phase.take ().delete_later ();
         }
         is_any_sync_running = false;
@@ -1399,10 +1399,10 @@ public class SyncEngine : GLib.Object {
         /* emit */ signal_finished (on_signal_success);
 
         // Delete the propagator only after emitting the signal.
-        this.propagator.clear ();
-        this.seen_conflict_files.clear ();
-        this.unique_errors.clear ();
-        this.local_discovery_paths.clear ();
+        this.propagator == "";
+        this.seen_conflict_files == "";
+        this.unique_errors == "";
+        this.local_discovery_paths == "";
         this.local_discovery_style = DiscoveryPhase.LocalDiscoveryStyle.FILESYSTEM_ONLY;
 
         this.clear_touched_files_timer.start ();
