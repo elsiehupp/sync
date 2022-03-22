@@ -102,7 +102,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
             this.instance.conf_trailling_size_label.hide ();
         }
 
-        this.instance.r_virtual_file_sync.on_signal_text (_("Use virtual files instead of downloading content immediately %1").printf (this.best_available_vfs_mode == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
+        this.instance.r_virtual_file_sync.on_signal_text (_("Use virtual files instead of downloading content immediately %1").printf (this.best_available_vfs_mode == AbstractVfs.WindowsCfApi ? "" : _(" (experimental)")));
     }
 
 
@@ -128,7 +128,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     public void initialize_page () {
         WizardCommon.init_error_label (this.instance.error_label);
 
-        if (!Theme.show_virtual_files_option || this.best_available_vfs_mode == Vfs.Off) {
+        if (!Theme.show_virtual_files_option || this.best_available_vfs_mode == AbstractVfs.Off) {
             // If the layout were wrapped in a widget, the var-grouping of the
             // radio buttons no longer works and there are surprising margins.
             // Just manually hide the button and remove the layout.
@@ -141,7 +141,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         this.instance.l_sync_everything_size_label.clear ();
 
         // Update the local folder - this is not guaranteed to find a good one
-        string good_local_folder = FolderMan.instance.find_good_path_for_new_sync_folder (local_folder (), server_url ());
+        string good_local_folder = FolderManager.instance.find_good_path_for_new_sync_folder (local_folder (), server_url ());
         wizard ().property ("local_folder", good_local_folder);
 
         // call to on_signal_init label
@@ -199,7 +199,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     ***********************************************************/
     public bool validate_page () {
         if (use_virtual_file_sync ()) {
-            const var availability = Vfs.check_availability (local_folder ());
+            const var availability = AbstractVfs.check_availability (local_folder ());
             if (!availability) {
                 var message = new Gtk.MessageBox (Gtk.MessageBox.Warning, _("Virtual files are not available for the selected folder"), availability.error, Gtk.MessageBox.Ok, this);
                 message.attribute (Qt.WA_DeleteOnClose);
@@ -303,7 +303,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void on_signal_select_folder () {
-        string directory = QFileDialog.existing_directory (null, _("Local Sync Folder"), GLib.Dir.home_path);
+        string directory = QFileDialog.existing_directory (null, _("Local Sync FolderConnection"), GLib.Dir.home_path);
         if (!directory == "") {
             // TODO: remove when UX decision is made
             refresh_virtual_files_availibility (directory);
@@ -410,7 +410,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_quota_retrieved (QVariantMap result) {
+    private void on_signal_quota_retrieved (GLib.VariantMap result) {
         this.r_size = result["size"].to_double ();
         this.instance.l_sync_everything_size_label.on_signal_text (_(" (%1)").printf (Utility.octets_to_string (this.r_size)));
 
@@ -467,7 +467,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         const string loc_folder = local_folder ();
 
         // check if the local folder exists. If so, and if its not empty, show a warning.
-        string error_str = FolderMan.instance.check_path_validity_for_new_folder (loc_folder, server_url ());
+        string error_str = FolderManager.instance.check_path_validity_for_new_folder (loc_folder, server_url ());
         this.local_folder_valid = error_str == "";
 
         string status_string;
@@ -604,9 +604,9 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void local_folder_push_button_path (string path) {
-        const var home_dir = GLib.Dir.home_path.ends_with ('/') ? GLib.Dir.home_path : GLib.Dir.home_path + '/';
+        const var home_dir = GLib.Dir.home_path.has_suffix ('/') ? GLib.Dir.home_path : GLib.Dir.home_path + '/';
 
-        if (!path.starts_with (home_dir)) {
+        if (!path.has_prefix (home_dir)) {
             this.instance.pb_select_local_folder.on_signal_text (GLib.Dir.to_native_separators (path));
             return;
         }
@@ -718,7 +718,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
             radio_checked (this.instance.r_sync_everything);
             this.instance.r_virtual_file_sync.enabled (false);
         } else {
-            this.instance.r_virtual_file_sync.on_signal_text (_("Use virtual files instead of downloading content immediately %1").printf (this.best_available_vfs_mode == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
+            this.instance.r_virtual_file_sync.on_signal_text (_("Use virtual files instead of downloading content immediately %1").printf (this.best_available_vfs_mode == AbstractVfs.WindowsCfApi ? "" : _(" (experimental)")));
             this.instance.r_virtual_file_sync.enabled (true);
         }
         //

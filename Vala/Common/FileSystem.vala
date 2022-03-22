@@ -1,6 +1,14 @@
 namespace Occ {
 namespace Common {
 
+public errordomain FileSystemError {
+    MOVE_TO_TRASH_ERROR,
+    OPEN_AND_SEEK_FILE_SHARED_ERROR,
+    REMOVE_ERROR,
+    RENAME_ERROR,
+    UNCHECKED_RENAME_REPLACE_ERROR,
+}
+
 /***********************************************************
 @class FileSystem
 
@@ -15,16 +23,6 @@ public class FileSystem : GLib.Object {
     static GLib.File.Permissions default_write_permissions;
 
     /***********************************************************
-    @brief Mark the file as hidden  (only has effects on windows)
-
-    ***********************************************************/
-    public static void file_hidden (string filename, bool hidden) {
-        //  Q_UNUSED (filename);
-        //  Q_UNUSED (hidden);
-    }
-
-
-    /***********************************************************
     @brief Marks the file as read-only.
 
     On linux this either revokes all 'w' permissions or
@@ -32,6 +30,7 @@ public class FileSystem : GLib.Object {
 
     ***********************************************************/
     public static void file_read_only (string filename, bool read_only) {
+        GLib.FileUtils.chmod ()
         GLib.File file = GLib.File.new_for_path (filename);
         GLib.File.Permissions permissions = file.permissions ();
 
@@ -116,9 +115,10 @@ public class FileSystem : GLib.Object {
     correctly on Windows.
 
     ***********************************************************/
-    public static bool rename (string origin_filename,
-        string destination_filename,
-        string error_string = "") {
+    public static bool rename (
+        string origin_filename,
+        string destination_filename
+    ) throws FileSystemError {
         bool success = false;
         string error;
 
@@ -126,16 +126,13 @@ public class FileSystem : GLib.Object {
         success = orig.rename (destination_filename);
         if (!success) {
             error = orig.error_string;
-        }
 
-        if (!success) {
             GLib.warning (
                 "Error renaming file " + origin_filename
                 + " to " + destination_filename
-                + " failed: " + error);
-            if (error_string) {
-                *error_string = error;
-            }
+                + " failed: " + error
+            );
+            throw new FileSystemError.RENAME_ERROR (error_string);
         }
         return success;
     }
@@ -145,12 +142,11 @@ public class FileSystem : GLib.Object {
     Rename the file \a origin_filename to
     \a destination_filename, and overwrite the destination if
     it already exists, without extra checks.
-
     ***********************************************************/
     public static bool unchecked_rename_replace (
         string origin_filename,
-        string destination_filename,
-        string error_string) {
+        string destination_filename
+    ) throws FileSystemError {
 
         bool success = false;
         GLib.File orig = new GLib.File (origin_filename);
@@ -160,17 +156,15 @@ public class FileSystem : GLib.Object {
         success = true;
         bool dest_exists = file_exists (destination_filename);
         if (dest_exists && !GLib.File.remove (destination_filename)) {
-            *error_string = orig.error_string;
             GLib.warning ("Target file could not be removed.");
-            success = false;
+            throw new FileSystemError.UNCHECKED_RENAME_REPLACE_ERROR (orig.error_string);
         }
         if (success) {
             success = orig.rename (destination_filename);
         }
         if (!success) {
-            *error_string = orig.error_string;
-            GLib.warning ("Renaming temp file to final failed: " + *error_string);
-            return false;
+            GLib.warning ("Renaming temp file to final failed: " + orig.error_string);
+            throw new FileSystemError.UNCHECKED_RENAME_REPLACE_ERROR (orig.error_string);
         }
 
         return true;
@@ -184,13 +178,10 @@ public class FileSystem : GLib.Object {
     successfully remove read-only files.
 
     ***********************************************************/
-    public static bool remove (string filename, string error_string = "") {
+    public static bool remove (string filename) throws FileSystemError {
         GLib.File file = GLib.File.new_for_path (filename);
         if (!file.remove ()) {
-            if (error_string) {
-                *error_string = file.error_string;
-            }
-            return false;
+            throw new FileSystemError.REMOVE_ERROR (file.error_string);
         }
         return true;
     }
@@ -199,11 +190,12 @@ public class FileSystem : GLib.Object {
     /***********************************************************
     Move the specified file or folder to the trash.
     (Only implemented on linux)
-
     ***********************************************************/
-    public static bool move_to_trash (string filename, string error_string) {
+    public static bool move_to_trash (string filename) throws FileSystemError {
         // TODO : Qt 5.15 bool GLib.File.move_to_trash ()
-        string trash_path, trash_file_path, trash_info_path;
+        string trash_path;
+        string trash_file_path;
+        string trash_info_path;
         string xdg_data_home = GLib.File.decode_name (qgetenv ("XDG_DATA_HOME"));
         if (xdg_data_home == "") {
             trash_path = GLib.Dir.home_path + "/.local/share/Trash/"; // trash path that should exist
@@ -278,19 +270,15 @@ public class FileSystem : GLib.Object {
     with GLib.FileInfo! Calling seek () on the GLib.File with >32bit signed values will fail!
 
     ***********************************************************/
-    public static bool open_and_seek_file_shared_read (GLib.File file, string error_or_null, int64 seek) {
-        string error_dummy;
-        // avoid many if (error_or_null) later.
-        string error = error_or_null ? *error_or_null : error_dummy;
-        error.clear ();
-
+    public static bool open_and_seek_file_shared_read (
+        GLib.File file,
+        string error_or_null,
+        int64 seek) throws FileSystemError {
         if (!file.open (GLib.File.ReadOnly)) {
-            error = file.error_string;
-            return false;
+            throw new FileSystemError.OPEN_AND_SEEK_FILE_SHARED_ERROR (file.error_string);
         }
         if (!file.seek (seek)) {
-            error = file.error_string;
-            return false;
+            throw new FileSystemError.OPEN_AND_SEEK_FILE_SHARED_ERROR (file.error_string);
         }
         return true;
     }
@@ -298,16 +286,15 @@ public class FileSystem : GLib.Object {
 
     /***********************************************************
     Returns whether the file is a shortcut file (ends with .lnk)
-
     ***********************************************************/
     public static bool is_lnk_file (string filename) {
-        return filename.ends_with (".lnk");
+        return filename.has_suffix (".lnk");
     }
 
 
     /***********************************************************
-    Returns whether the file is an exclude file (contains patterns to exclude from sync)
-
+    Returns whether the file is an exclude file (contains
+    patterns to exclude from sync).
     ***********************************************************/
     public static bool is_exclude_file (string filename) {
         return filename.down () == ".sync-exclude.lst"

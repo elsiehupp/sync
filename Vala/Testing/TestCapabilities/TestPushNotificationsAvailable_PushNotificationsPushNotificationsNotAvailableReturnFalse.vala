@@ -8,7 +8,7 @@ public class TestPushNotificationsAvailable_PushNotificationsPushNotificationsNo
     /***********************************************************
     ***********************************************************/
     private TestPushNotificationsAvailable_PushNotificationsPushNotificationsNotAvailableReturnFalse () {
-        var capabilities = Capabilities (QVariantMap ());
+        var capabilities = Capabilities (GLib.VariantMap ());
         var activities_push_notifications_available = capabilities.available_push_notifications ().test_flag (PushNotificationType.ACTIVITIES);
         var files_push_notifications_available = capabilities.available_push_notifications ().test_flag (PushNotificationType.FILES);
         var notifications_push_notifications_available = capabilities.available_push_notifications ().test_flag (PushNotificationType.NOTIFICATIONS);

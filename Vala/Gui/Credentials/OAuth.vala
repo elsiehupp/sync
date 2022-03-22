@@ -223,13 +223,14 @@ public class OAuth : GLib.Object {
     ***********************************************************/
     private static void http_reply_and_close (QTcpSocket socket, string code, string html,
         string more_headers = null) {
-        if (!socket)
+        if (socket == null) {
             return; // socket can have been deleted if the browser was closed
+        }
         socket.write ("HTTP/1.1 ");
         socket.write (code);
         socket.write ("\r\n_content-Type : text/html\r\n_connection : close\r\n_content-Length: ");
-        socket.write (string.number (qstrlen (html)));
-        if (more_headers) {
+        socket.write (html.length.to_string ());
+        if (more_headers != null) {
             socket.write ("\r\n");
             socket.write (more_headers);
         }

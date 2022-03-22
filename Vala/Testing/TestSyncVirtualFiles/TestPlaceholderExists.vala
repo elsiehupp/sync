@@ -17,7 +17,7 @@ public class TestPlaceholderExists : AbstractTestSyncVirtualFiles {
         fake_folder.remote_modifier ().insert ("A/a1" + DVSUFFIX, 111);
         fake_folder.remote_modifier ().insert ("A/hello" + DVSUFFIX, 222);
         GLib.assert_true (fake_folder.sync_once ());
-        Vfs vfs = set_up_vfs (fake_folder);
+        AbstractVfs vfs = set_up_vfs (fake_folder);
 
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
 
@@ -60,7 +60,7 @@ public class TestPlaceholderExists : AbstractTestSyncVirtualFiles {
         // Now disable vfs and check that all files are still there
         TestSyncVirtualFiles.clean_up_test_place_holder_exist ();
         SyncEngine.wipe_virtual_files (fake_folder.local_path, fake_folder.sync_journal (), *vfs);
-        fake_folder.switch_to_vfs ((Vfs)(new VfsOff ()));
+        fake_folder.switch_to_vfs ((AbstractVfs)(new VfsOff ()));
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
         GLib.assert_true (fake_folder.current_local_state ().find ("A/a1" + DVSUFFIX).size == 111);

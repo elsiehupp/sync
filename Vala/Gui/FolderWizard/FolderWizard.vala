@@ -48,7 +48,7 @@ public class FolderWizard : QWizard {
 
 
     /***********************************************************
-    Folder wizard itself
+    FolderConnection wizard itself
     ***********************************************************/
     public FolderWizard (unowned Account account, Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
@@ -65,7 +65,7 @@ public class FolderWizard : QWizard {
         }
         page (Page.SELECTIVE_SYNC, this.folder_wizard_selective_sync_page);
 
-        window_title (_("Add Folder Sync Connection"));
+        window_title (_("Add FolderConnection Sync Connection"));
         options (QWizard.Cancel_button_on_signal_left);
         button_text (QWizard.FinishButton, _("Add Sync Connection"));
     }

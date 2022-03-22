@@ -202,13 +202,13 @@ public class Systray : QSystemTrayIcon {
 
 
     private void on_signal_context_menu_about_to_show () {
-        const var folders = FolderMan.instance.map ();
+        const var folders = FolderManager.instance.map ();
 
-        GLib.List<Folder> all_paused = new GLib.List<Folder> ();
+        GLib.List<FolderConnection> all_paused = new GLib.List<FolderConnection> ();
 
-        foreach (Folder folder in folders) {
-            if (folder.sync_paused) {
-                all_paused.append (folder);
+        foreach (FolderConnection folder_connection in folders) {
+            if (folder_connection.sync_paused) {
+                all_paused.append (folder_connection);
             }
         }
 
@@ -217,11 +217,11 @@ public class Systray : QSystemTrayIcon {
         pause_action.visible (!all_paused);
         pause_action.enabled (!all_paused);
 
-        GLib.List<Folder> any_paused = new GLib.List<Folder> ();
+        GLib.List<FolderConnection> any_paused = new GLib.List<FolderConnection> ();
 
-        foreach (Folder folder in folders) {
-            if (folder.sync_paused) {
-                any_paused.append (folder);
+        foreach (FolderConnection folder_connection in folders) {
+            if (folder_connection.sync_paused) {
+                any_paused.append (folder_connection);
             }
         }
 
@@ -244,9 +244,9 @@ public class Systray : QSystemTrayIcon {
         hide_window ();
         /* emit */ activated (QSystemTrayIcon.Activation_reason.Unknown);
 
-        const var folder_map = FolderMan.instance.map ();
-        foreach (var folder in folder_map) {
-            if (!folder.sync_paused) {
+        const var folder_map = FolderManager.instance.map ();
+        foreach (var folder_connection in folder_map) {
+            if (!folder_connection.sync_paused) {
                 this.sync_is_paused = false;
                 break;
             }
@@ -257,7 +257,7 @@ public class Systray : QSystemTrayIcon {
     ***********************************************************/
     public void show_message (string title, string message, Message_icon icon) {
         if (QDBusInterface (NOTIFICATIONS_SERVICE, NOTIFICATIONS_PATH, NOTIFICATIONS_IFACE).is_valid ()) {
-            const QVariantMap hints = {{"desktop-entry", LINUX_APPLICATION_ID}};
+            const GLib.VariantMap hints = {{"desktop-entry", LINUX_APPLICATION_ID}};
             GLib.List<GLib.Variant> args = {
                 APPLICATION_NAME,
                 (uint32)0,
@@ -388,12 +388,12 @@ public class Systray : QSystemTrayIcon {
     /***********************************************************
     ***********************************************************/
     private void pause_on_signal_all_folders_helper (bool pause) {
-        const var folders = FolderMan.instance.map ();
-        foreach (var folder in folders) {
-            if (accounts.contains (folder.account_state)) {
-                folder.sync_paused (pause);
+        const var folders = FolderManager.instance.map ();
+        foreach (var folder_connection in folders) {
+            if (accounts.contains (folder_connection.account_state)) {
+                folder_connection.sync_paused (pause);
                 if (pause) {
-                    folder.on_signal_terminate_sync ();
+                    folder_connection.on_signal_terminate_sync ();
                 }
             }
         }
@@ -402,7 +402,7 @@ public class Systray : QSystemTrayIcon {
 
 
     /***********************************************************
-    For some reason we get the raw pointer from Folder.account_state
+    For some reason we get the raw pointer from FolderConnection.account_state
     that's why we need a list of raw pointers for the call to
     contains later on...
     ***********************************************************/

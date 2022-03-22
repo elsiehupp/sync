@@ -32,7 +32,7 @@ public abstract class AbstractTestPushNotifications : GLib.Object {
 
         account.push_notifications ().set_reconnect_timer_interval (0);
 
-        QSignalSpy authentication_failed_spy = new QSignalSpy (account.push_notifications (), &PushNotifications.authentication_failed);
+        QSignalSpy authentication_failed_spy = new QSignalSpy (account.push_notifications (), &PushNotificationManager.authentication_failed);
 
         // Let three authentication attempts fail
         for (uint8 i = 0; i < 3; ++i) {

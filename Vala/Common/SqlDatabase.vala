@@ -68,11 +68,9 @@ public class SqlDatabase : GLib.Object {
 
 
     int sqlite_do (var A) {
-        if (1) {
-            this.err_id = (A);
-            if (this.err_id != SQLITE_OK && this.err_id != SQLITE_DONE && this.err_id != SQLITE_ROW) {
-                this.error = string.from_utf8 (sqlite3_errmsg (this.database));
-            }
+        this.err_id = (A);
+        if (this.err_id != SQLITE_OK && this.err_id != SQLITE_DONE && this.err_id != SQLITE_ROW) {
+            this.error = string.from_utf8 (sqlite3_errmsg (this.database));
         }
     }
 
@@ -175,7 +173,7 @@ public class SqlDatabase : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void close () {
-        if (this.database) {
+        if (this.database != null) {
             foreach (var q in this.queries) {
                 q.finish ();
             }

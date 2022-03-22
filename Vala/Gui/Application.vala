@@ -46,12 +46,12 @@ public class Application : Gtk.Application {
         "  --logwindow, -l      : open a window to show log output.\n",
         "  --logfile <filename> : write log output to file <filename>.\n",
         "  --logdir <name>      : write each sync log output in a new file\n",
-        "                         in folder <name>.\n",
+        "                         in folder_connection <name>.\n",
         "  --logexpire <hours>  : removes logs older than <hours> hours.\n",
         "                         (to be used with --logdir)\n",
         "  --logflush           : flush the log file after every write.\n",
         "  --logdebug           : also output debug-level messages in the log.\n",
-        "  --confdir <dirname>  : Use the given configuration folder.\n",
+        "  --confdir <dirname>  : Use the given configuration folder_connection.\n",
         "  --background         : launch the application in the background.\n"
     };
 
@@ -154,11 +154,11 @@ public class Application : Gtk.Application {
 
     /***********************************************************
     ***********************************************************/
-    private FolderMan folder_manager;
+    private FolderManager folder_manager;
 
 
     internal signal void signal_folder_removed ();
-    internal signal void signal_folder_state_changed (Folder folder);
+    internal signal void signal_folder_state_changed (FolderConnection folder_connection);
     internal signal void signal_is_showing_settings_dialog ();
 
     /***********************************************************
@@ -205,7 +205,7 @@ public class Application : Gtk.Application {
             // We need to use the deprecated QDesktopServices.storage_location because of its Qt4
             // behavior of adding "data" to the path
             string old_dir = QDesktopServices.storage_location (QDesktopServices.DataLocation);
-            if (old_dir.ends_with ('/')) {
+            if (old_dir.has_suffix ('/')) {
                 // macOS 10.11.x does not like trailing slash for rename/move.
                 old_dir.chop (1);
             }
@@ -213,7 +213,7 @@ public class Application : Gtk.Application {
             application_name (this.theme.app_name);
             if (GLib.FileInfo (old_dir).is_dir ()) {
                 var configuration_directory = ConfigFile ().config_path;
-                if (configuration_directory.ends_with ('/')) {
+                if (configuration_directory.has_suffix ('/')) {
                     // macOS 10.11.x does not like trailing slash for rename/move.
                     configuration_directory.chop (1);
                 }
@@ -269,15 +269,15 @@ public class Application : Gtk.Application {
             AbstractNetworkJob.http_timeout = config.timeout ();
 
         // Check vfs plugins
-        if (Theme.show_virtual_files_option && this.best_available_vfs_mode == Vfs.Off) {
+        if (Theme.show_virtual_files_option && this.best_available_vfs_mode == AbstractVfs.Off) {
             GLib.warning ("Theme wants to show vfs mode, but no vfs plugins are available.");
         }
-        if (is_vfs_plugin_available (Vfs.WindowsCfApi))
+        if (is_vfs_plugin_available (AbstractVfs.WindowsCfApi))
             GLib.info ("VFS windows plugin is available");
-        if (is_vfs_plugin_available (Vfs.WithSuffix))
+        if (is_vfs_plugin_available (AbstractVfs.WithSuffix))
             GLib.info ("VFS suffix plugin is available");
 
-        this.folder_manager.on_signal_reset (new FolderMan ());
+        this.folder_manager.on_signal_reset (new FolderManager ());
 
         this.signal_message_received.connect (
             this.on_signal_parse_message
@@ -302,7 +302,7 @@ public class Application : Gtk.Application {
             }
         }
 
-        FolderMan.instance.sync_enabled = true;
+        FolderManager.instance.sync_enabled = true;
 
         quit_on_signal_last_window_closed (false);
 
@@ -312,7 +312,7 @@ public class Application : Gtk.Application {
         );
 
         // Setting up the gui class will allow tray notifications for the
-        // setup that follows, like folder setup
+        // setup that follows, like folder_connection setup
         this.gui = new OwncloudGui (this);
         if (this.show_log_window) {
             this.gui.on_signal_toggle_log_browser (); // this.show_log_window is set in parse_options.
@@ -321,7 +321,7 @@ public class Application : Gtk.Application {
         this.gui.setup_cloud_providers ();
     //  #endif
 
-        FolderMan.instance.set_up_folders ();
+        FolderManager.instance.set_up_folders ();
         this.proxy.on_signal_setup_qt_proxy_from_config (); // folders have to be defined first, than we set up the Qt proxy.
 
         AccountManager.instance.signal_account_added.connect (
@@ -334,11 +334,11 @@ public class Application : Gtk.Application {
             on_signal_account_state_added (account_instance);
         }
 
-        FolderMan.instance.socket_api.signal_share_command_received.connect (
+        FolderManager.instance.socket_api.signal_share_command_received.connect (
             this.gui.on_signal_show_share_dialog
         );
 
-        FolderMan.instance.socket_api.signal_file_activity_command_received.connect (
+        FolderManager.instance.socket_api.signal_file_activity_command_received.connect (
             Systray.instance.show_file_activity_dialog
         );
 
@@ -384,13 +384,14 @@ public class Application : Gtk.Application {
     ~Application () {
         // Make sure all folders are gone, otherwise removing the
         // accounts will remove the associated folders from the settings.
-        if (this.folder_manager) {
+        if (this.folder_manager != null) {
             this.folder_manager.unload_and_delete_all_folders ();
         }
 
         // Remove the account from the account manager so it can be deleted.
-        disconnect (AccountManager.instance, AccountManager.on_signal_account_removed,
-            this, Application.on_signal_account_state_removed);
+        AccountManager.instance.on_account_removed.disconnect (
+            this.on_signal_account_state_removed
+        );
         AccountManager.instance.on_signal_shutdown ();
     }
 
@@ -475,7 +476,7 @@ public class Application : Gtk.Application {
     TODO: this should not be public
     ***********************************************************/
     public void on_signal_owncloud_wizard_done (int res) {
-        FolderMan folder_man = FolderMan.instance;
+        FolderManager folder_man = FolderManager.instance;
 
         // During the wizard, scheduling of new syncs is disabled
         folder_man.sync_enabled = true;
@@ -514,22 +515,22 @@ public class Application : Gtk.Application {
     ***********************************************************/
     public void on_signal_open_virtual_file (string filename) {
         string virtual_file_ext = APPLICATION_DOTVIRTUALFILE_SUFFIX;
-        if (!filename.ends_with (virtual_file_ext)) {
+        if (!filename.has_suffix (virtual_file_ext)) {
             GLib.warning ("Can only handle file ending in .owncloud. Unable to open " + filename);
             return;
         }
-        var folder = FolderMan.instance.folder_for_path (filename);
-        if (!folder) {
-            GLib.warning ("Can't find sync folder for " + filename);
+        var folder_connection = FolderManager.instance.folder_for_path (filename);
+        if (!folder_connection) {
+            GLib.warning ("Can't find sync folder_connection for " + filename);
             // TODO: show a Gtk.MessageBox for errors
             return;
         }
-        string relative_path = GLib.Dir.clean_path (filename).mid (folder.clean_path.length + 1);
-        folder.on_signal_implicitly_hydrate_file (relative_path);
+        string relative_path = GLib.Dir.clean_path (filename).mid (folder_connection.clean_path.length + 1);
+        folder_connection.on_signal_implicitly_hydrate_file (relative_path);
         string normal_name = filename.left (filename.size () - virtual_file_ext.size ());
         GLib.Object.Connection.create () = connect (
-            folder,
-            Folder.signal_sync_finished, folder,
+            folder_connection,
+            FolderConnection.signal_sync_finished, folder_connection,
             this.on_signal_sync_finished
         );
     }
@@ -537,8 +538,8 @@ public class Application : Gtk.Application {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_sync_finished (Folder folder, GLib.Object con, string normal_name) {
-        folder.disconnect (con);
+    private void on_signal_sync_finished (FolderConnection folder_connection, GLib.Object con, string normal_name) {
+        folder_connection.disconnect (con);
         if (GLib.File.exists (normal_name)) {
             QDesktopServices.open_url (GLib.Uri.from_local_file (normal_name));
         }
@@ -575,19 +576,19 @@ public class Application : Gtk.Application {
             } else if (option == "--logwindow" || option == "-l") {
                 this.show_log_window = true;
             } else if (option == "--logfile") {
-                if (iterator.has_next () && !iterator.peek_next ().starts_with ("--")) {
+                if (iterator.has_next () && !iterator.peek_next ().has_prefix ("--")) {
                     this.log_file = iterator.next ();
                 } else {
                     show_hint ("Log file not specified");
                 }
             } else if (option == "--logdir") {
-                if (iterator.has_next () && !iterator.peek_next ().starts_with ("--")) {
+                if (iterator.has_next () && !iterator.peek_next ().has_prefix ("--")) {
                     this.log_dir = iterator.next ();
                 } else {
                     show_hint ("Log directory not specified");
                 }
             } else if (option == "--logexpire") {
-                if (iterator.has_next () && !iterator.peek_next ().starts_with ("--")) {
+                if (iterator.has_next () && !iterator.peek_next ().has_prefix ("--")) {
                     this.log_expire = iterator.next ().to_int ();
                 } else {
                     show_hint ("Log expiration not specified");
@@ -597,7 +598,7 @@ public class Application : Gtk.Application {
             } else if (option == "--logdebug") {
                 this.log_debug = true;
             } else if (option == "--confdir") {
-                if (iterator.has_next () && !iterator.peek_next ().starts_with ("--")) {
+                if (iterator.has_next () && !iterator.peek_next ().has_prefix ("--")) {
                     string configuration_directory = iterator.next ();
                     if (!ConfigFile.configuration_directory (configuration_directory)) {
                         show_hint ("Invalid path passed to --confdir");
@@ -612,8 +613,8 @@ public class Application : Gtk.Application {
                 this.background_mode = true;
             } else if (option == "--version" || option == "-v") {
                 this.version_only = true;
-            } else if (option.ends_with (APPLICATION_DOTVIRTUALFILE_SUFFIX)) {
-                // virtual file, open iterator after the Folder were created (if the app is not terminated)
+            } else if (option.has_suffix (APPLICATION_DOTVIRTUALFILE_SUFFIX)) {
+                // virtual file, open iterator after the FolderConnection were created (if the app is not terminated)
                 GLib.Timeout.single_shot (
                     0,
                     this,
@@ -645,7 +646,7 @@ public class Application : Gtk.Application {
             lang = subst_lang (lang);
             const string tr_path = application_tr_path;
             const string tr_file = "client_" + lang;
-            if (translator.on_signal_load (tr_file, tr_path) || lang.starts_with ("en")) {
+            if (translator.on_signal_load (tr_file, tr_path) || lang.has_prefix ("en")) {
                 // Permissive approach : Qt and keychain translations
                 // may be missing, but Qt translations must be there in order
                 // for us to accept the language. Otherwise, we try with the next.
@@ -720,7 +721,7 @@ public class Application : Gtk.Application {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_parse_message (string message, GLib.Object object) {
-        if (message.starts_with ("MSG_PARSEOPTIONS:")) {
+        if (message.has_prefix ("MSG_PARSEOPTIONS:")) {
             const int length_of_msg_prefix = 17;
             string[] options = message.mid (length_of_msg_prefix).split ('|');
             this.show_log_window = false;
@@ -733,7 +734,7 @@ public class Application : Gtk.Application {
                 Gtk.Application.quit ();
             }
 
-        } else if (message.starts_with ("MSG_SHOWMAINDIALOG")) {
+        } else if (message.has_prefix ("MSG_SHOWMAINDIALOG")) {
             GLib.info ("Running for" + this.started_at.elapsed () / 1000.0 = " sec.");
             if (this.started_at.elapsed () < 10 * 1000) {
                 // This call is mirrored with the one in int main ()
@@ -789,7 +790,7 @@ public class Application : Gtk.Application {
     ***********************************************************/
     protected void clean_up () {
         AccountManager.instance.save ();
-        FolderMan.instance.unload_and_delete_all_folders ();
+        FolderManager.instance.unload_and_delete_all_folders ();
 
         this.gui.on_signal_shutdown ();
         this.gui.delete_later ();
@@ -819,13 +820,13 @@ public class Application : Gtk.Application {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_account_state_removed (AccountState account_state) {
-        if (this.gui) {
+        if (this.gui != null) {
             disconnect (account_state, AccountState.signal_state_changed,
                 this.gui, OwncloudGui.on_signal_account_state_changed);
             disconnect (account_state.account, Account.server_version_changed,
                 this.gui, OwncloudGui.on_signal_tray_message_if_server_unsupported);
         }
-        if (this.folder_manager) {
+        if (this.folder_manager != null) {
             account_state.signal_state_changed.disconnect (
                 this.folder_manager.on_signal_account_state_changed
             );
@@ -835,7 +836,7 @@ public class Application : Gtk.Application {
         }
 
         // if there is no more account, show the wizard.
-        if (this.gui && AccountManager.instance.accounts == "") {
+        if (this.gui != null && AccountManager.instance.accounts == "") {
             // allow to add a new account if there is non any more. Always think
             // about single account theming!
             OwncloudSetupWizard.run_wizard (this, SLOT (on_signal_owncloud_wizard_done (int)));
@@ -880,7 +881,7 @@ public class Application : Gtk.Application {
     private bool config_version_migration () {
         string[] delete_keys, ignore_keys;
         AccountManager.backward_migration_settings_keys (delete_keys, ignore_keys);
-        FolderMan.backward_migration_settings_keys (delete_keys, ignore_keys);
+        FolderManager.backward_migration_settings_keys (delete_keys, ignore_keys);
 
         ConfigFile config_file;
 

@@ -11,7 +11,7 @@
 //  #include <QXmlStreamReader>
 //  #include <creds/abstractcredentials.h>
 
-//  #include <QVariantMap>
+//  #include <GLib.VariantMap>
 
 namespace Occ {
 namespace Ui {

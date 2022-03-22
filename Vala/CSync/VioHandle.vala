@@ -18,7 +18,7 @@ public class VioHandle : GLib.Object {
     public Posix.Dir *directory;
     public string path;
 
-    public static VioHandle csync_vio_local_opendir (string name) {
+    public static VioHandle open_directory (string name) {
         VioHandle handle = new VioHandle ();
 
         var dirname = GLib.File.encode_name (name);
@@ -33,7 +33,7 @@ public class VioHandle : GLib.Object {
     }
 
 
-    public int csync_vio_local_closedir (VioHandle directory_handle) {
+    public int close_directory (VioHandle directory_handle) {
         //    Q_ASSERT (directory_handle);
         var rc = closedir (directory_handle.directory);
         delete directory_handle;
@@ -41,28 +41,29 @@ public class VioHandle : GLib.Object {
     }
 
 
-    public FileStat csync_vio_local_readdir (VioHandle directory_handle, Vfs vfs) {
+    public FileStat read_directory (VioHandle directory_handle, AbstractVfs vfs) {
 
-        Posix.DirEnt dirent = null;
+        Posix.DirEnt posix_dirent = null;
         FileStat file_stat;
 
         do {
-                dirent = readdir (handle.directory);
-                if (!dirent)
-                        return {};
-        } while (qstrcmp (dirent.d_name, ".") == 0 || qstrcmp (dirent.d_name, "..") == 0);
+            posix_dirent = Posix.readdir (handle.directory);
+            if (posix_dirent == null) {
+                return new FileStat (); // null
+            }
+        } while (posix_dirent.d_name == "." || posix_dirent.d_name == "..");
 
-        file_stat = std.make_unique<FileStat> ();
-        file_stat.path = GLib.File.decode_name (dirent.d_name).to_utf8 ();
-        string full_path = handle.path % '/' % "" % (char) dirent.d_name;
+        file_stat = FileStat ();
+        file_stat.path = GLib.File.decode_name (posix_dirent.d_name).to_utf8 ();
+        string full_path = handle.path % '/' % "" % (string) posix_dirent.d_name;
         if (file_stat.path == null) {
                 file_stat.original_path = full_path;
-                GLib.warning ("Invalid characters in file/directory name, please rename: " + dirent.d_name + handle.path);
+                GLib.warning ("Invalid characters in file/directory name, please rename: " + posix_dirent.d_name + handle.path);
         }
 
         /* Check for availability of d_type, see manpage. */
     //  #if defined (this.DIRENT_HAVE_D_TYPE) || defined (__APPLE__)
-        switch (dirent.d_type) {
+        switch (posix_dirent.d_type) {
             case DT_FIFO:
             case DT_SOCK:
             case DT_CHR:
@@ -70,7 +71,7 @@ public class VioHandle : GLib.Object {
                 break;
             case DT_DIR:
             case DT_REG:
-                if (dirent.d_type == DT_DIR) {
+                if (posix_dirent.d_type == DT_DIR) {
                     file_stat.type = ItemType.DIRECTORY;
                 } else {
                     file_stat.type = ItemType.FILE;
@@ -84,13 +85,13 @@ public class VioHandle : GLib.Object {
         if (file_stat.path == null)
                 return file_stat;
 
-        if (this.csync_vio_local_stat_mb (full_path.const_data (), file_stat.get ()) < 0) {
+        if (CSync.VioHandle.stat_mb (full_path.const_data (), file_stat.get ()) < 0) {
                 // Will get excluded by this.csync_detect_update.
                 file_stat.type = ItemType.SKIP;
         }
 
         // Override type for virtual files if desired
-        if (vfs) {
+        if (vfs == null) {
                 // Directly modifies file_stat.type.
                 // We can ignore the return value since we're done here anyway.
                 const var result = vfs.stat_type_virtual_file (file_stat.get (), handle.path);
@@ -101,36 +102,36 @@ public class VioHandle : GLib.Object {
     }
 
 
-    public int csync_vio_local_stat (string uri, FileStat buf) {
-            return this.csync_vio_local_stat_mb (GLib.File.encode_name (uri).const_data (), buf);
+    public int csync_vio_local_stat (string uri, FileStat file_stat) {
+        return CSync.VioHandle.stat_mb (GLib.File.encode_name (uri).const_data (), file_stat);
     }
 
-    private static int csync_vio_local_stat_mb (char wuri, FileStat buf) {
-            stat sb;
+    private static int stat_mb (char wuri, FileStat file_stat) {
+            Posix.Stat posix_stat;
 
-            if (stat (wuri, sb) < 0) {
-                    return -1;
+            if (Posix.stat (wuri, posix_stat) < 0) {
+                return -1;
             }
 
-            switch (sb.st_mode & S_IFMT) {
+            switch (posix_stat.st_mode & S_IFMT) {
             case S_IFDIR:
-                buf.type = ItemType.DIRECTORY;
+                file_stat.type = ItemType.DIRECTORY;
                 break;
             case S_IFREG:
-                buf.type = ItemType.FILE;
+                file_stat.type = ItemType.FILE;
                 break;
             case S_IFLNK:
             case S_IFSOCK:
-                buf.type = ItemType.SOFT_LINK;
+                file_stat.type = ItemType.SOFT_LINK;
                 break;
             default:
-                buf.type = ItemType.SKIP;
+                file_stat.type = ItemType.SKIP;
                 break;
         }
 
-        buf.inode = sb.st_ino;
-        buf.modtime = sb.st_mtime;
-        buf.size = sb.st_size;
+        file_stat.inode = posix_stat.st_ino;
+        file_stat.modtime = posix_stat.st_mtime;
+        file_stat.size = posix_stat.st_size;
         return 0;
     }
 

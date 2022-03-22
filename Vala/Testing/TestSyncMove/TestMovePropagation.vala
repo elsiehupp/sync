@@ -148,7 +148,7 @@ public class TestMovePropagation : AbstractTestSyncMove {
         GLib.assert_true (counter.number_of_move == 0);
         GLib.assert_true (counter.number_of_delete == 0);
 
-        // Folder move {
+        // FolderConnection move {
             counter.on_signal_reset ();
             local.rename ("A", "AM");
             remote.rename ("B", "BM");
@@ -168,7 +168,7 @@ public class TestMovePropagation : AbstractTestSyncMove {
             GLib.assert_true (complete_spy.find_item ("BM").rename_target == "BM");
         //  }
 
-        // Folder move with contents touched on the same side {
+        // FolderConnection move with contents touched on the same side {
             counter.on_signal_reset ();
             local.set_contents ("AM/a2m", 'C');
             // We must change the modtime for it is likely that it did not change between sync.
@@ -193,7 +193,7 @@ public class TestMovePropagation : AbstractTestSyncMove {
             GLib.assert_true (item_successful_move (complete_spy, "B2"));
         //  }
 
-        // Folder rename with contents touched on the other tree
+        // FolderConnection rename with contents touched on the other tree
         counter.on_signal_reset ();
         remote.set_contents ("A2/a2m", 'D');
         // set_contents alone may not produce updated mtime if the test is fast
@@ -213,7 +213,7 @@ public class TestMovePropagation : AbstractTestSyncMove {
         GLib.assert_true (remote.find ("A3/a2m").content_char == 'D');
         GLib.assert_true (remote.find ("B3/b2m").content_char == 'D');
 
-        // Folder rename with contents touched on both ends
+        // FolderConnection rename with contents touched on both ends
         counter.on_signal_reset ();
         remote.set_contents ("A3/a2m", 'R');
         remote.append_byte ("A3/a2m");

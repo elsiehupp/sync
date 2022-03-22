@@ -13,7 +13,7 @@ public class AbstractTestChunkingNg : GLib.Object {
     ***********************************************************/
     private TestCreateConflictWhileSyncing () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new QVariantMap ({ "chunking", "1.0" }) } });
+        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new GLib.VariantMap ({ "chunking", "1.0" }) } });
         int size = 10 * 1000 * 1000; // 10 MB
         set_chunk_size (fake_folder.sync_engine, 1 * 1000 * 1000);
 
@@ -51,7 +51,7 @@ public class AbstractTestChunkingNg : GLib.Object {
         var state_a_children = local_state.find ("A").children;
         FileInfo file_info;
         foreach (FileInfo child in state_a_children) {
-            if (child.name.starts_with ("a0 (conflicted copy")) {
+            if (child.name.has_prefix ("a0 (conflicted copy")) {
                 file_info = child;
                 break;
             }

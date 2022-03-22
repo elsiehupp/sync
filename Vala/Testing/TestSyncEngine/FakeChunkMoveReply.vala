@@ -28,9 +28,9 @@ public class FakeChunkMoveReply : FakeReply {
     ***********************************************************/
     public static FileInfo perform (FileInfo uploads_file_info, FileInfo remote_root_file_info, Soup.Request request) {
         string source = get_file_path_from_url (request.url);
-        GLib.assert_true (!source == "");
-        GLib.assert_true (source.ends_with ("/.file"));
-        source = source.left (source.length - (int) (qstrlen ("/.file")));
+        GLib.assert_true (source != "");
+        GLib.assert_true (source.has_suffix ("/.file"));
+        source = source.left (source.length - "/.file".length);
 
         var source_folder = uploads_file_info.find (source);
         GLib.assert_true (source_folder);
@@ -62,7 +62,7 @@ public class FakeChunkMoveReply : FakeReply {
 
             // And it should condition on the destination file
             var on_signal_start = "<" + request.raw_header ("Destination") + ">";
-            GLib.assert_true (request.raw_header ("If").starts_with (on_signal_start));
+            GLib.assert_true (request.raw_header ("If").has_prefix (on_signal_start));
 
             if (request.raw_header ("If") != on_signal_start + " ([\"" + file_info.etag + "\"])") {
                 return null;

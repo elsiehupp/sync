@@ -303,11 +303,11 @@ public class Account : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public PushNotifications push_notifications { public get; private set; }
+    public PushNotificationManager push_notifications { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
-    public unowned UserStatusConnector user_status_connector { public get; private set; }
+    public unowned AbstractUserStatusConnector user_status_connector { public get; private set; }
 
     /***********************************************************
     IMPORTANT - remove later - FIXME MS@2019-12-07 -.
@@ -721,7 +721,7 @@ public class Account : GLib.Object {
             GLib.info ("Try to setup push notifications");
 
             if (this.push_notifications == null) {
-                this.push_notifications = new PushNotifications (this, this);
+                this.push_notifications = new PushNotificationManager (this, this);
 
                 this.push_notifications.signal_ready.connect (
                     this.on_push_notifications_signal_ready

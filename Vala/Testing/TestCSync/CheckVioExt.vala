@@ -112,7 +112,7 @@ public class CheckVioExt : GLib.Object {
 
                 var mb_dir = mypath;
                 rc = oc_mkdir (mb_dir);
-                if (rc) {
+                if (rc != null) {
                     rc = errno;
                 }
                 GLib.assert_true (rc == 0);
@@ -135,19 +135,19 @@ public class CheckVioExt : GLib.Object {
 
     ***********************************************************/
     static void traverse_dir (void **state, string directory, int count) {
-        CSync.VioHandle dh = null;
-        CSync.FileStat dirent;
+        CSync.VioHandle directory_handle = null;
+        Posix.DirEnt dirent;
         var sv = (StateVar*) *state;
         string subdir;
         string subdir_out;
         int rc = -1;
-        int is_dir = 0;
+        bool is_dir = false;
 
-        dh = csync_vio_local_opendir (directory);
-        assert_non_null (dh);
+        directory_handle = CSync.VioHandle.open_directory (directory);
+        assert_non_null (directory_handle);
 
-        Vfs vfs = null;
-        while ( (dirent = csync_vio_local_readdir (dh, vfs)) ) {
+        AbstractVfs vfs = null;
+        while ( (dirent = CSync.VioHandle.read_directory (directory_handle, vfs)) ) {
             assert_non_null (dirent.get ());
             if (!dirent.original_path == "") {
                 sv.ignored_dir = dirent.original_path;
@@ -160,7 +160,7 @@ public class CheckVioExt : GLib.Object {
             continue;
             }
 
-            is_dir = (dirent.type == ItemType.DIRECTORY) ? 1:0;
+            is_dir = dirent.type == ItemType.DIRECTORY;
 
             subdir = directory + "/" + dirent.path;
             subdir_out = (is_dir ? "<DIR> ":"      ") + subdir;
@@ -180,7 +180,7 @@ public class CheckVioExt : GLib.Object {
             }
         }
 
-        rc = csync_vio_local_closedir (dh);
+        rc = CSync.VioHandle.close_directory (directory_handle);
         GLib.assert_true (rc == 0);
 
     }

@@ -14,7 +14,7 @@ public class TestResumeServerDeletedChunks : AbstractTestChunkingNg {
     private TestResumeServerDeletedChunks () {
 
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new QVariantMap ({ "chunking", "1.0" }) } });
+        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new GLib.VariantMap ({ "chunking", "1.0" }) } });
         int size = 30 * 1000 * 1000; // 30 MB
         set_chunk_size (fake_folder.sync_engine, 1 * 1000 * 1000);
         partial_upload (fake_folder, "A/a0", size);
@@ -50,7 +50,7 @@ public class TestResumeServerDeletedChunks : AbstractTestChunkingNg {
     private static void connection_dropped_before_etag_recieved () {
         QFETCH (bool, chunking);
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new QVariantMap ( { "chunking", "1.0" } ) }, { "checksums", new QVariantMap ( { "supportedTypes", { "SHA1" } } ) } });
+        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new GLib.VariantMap ( { "chunking", "1.0" } ) }, { "checksums", new GLib.VariantMap ( { "supportedTypes", { "SHA1" } } ) } });
         int size = chunking ? 1 * 1000 * 1000 : 300;
         set_chunk_size (fake_folder.sync_engine, 300 * 1000);
 

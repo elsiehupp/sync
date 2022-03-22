@@ -64,7 +64,7 @@ public class AbstractTestUnifiedSearchListmodel : GLib.Object {
         var search_term = url_query.query_item_value ("term");
         var path = request.url.path;
 
-        if (!request.url.to_string ().starts_with (account_state.account.url.to_string ())) {
+        if (!request.url.to_string ().has_prefix (account_state.account.url.to_string ())) {
             reply = new FakeErrorReply (operation, request, this, 404, FAKE_404_RESPONSE);
         }
         if (format != "json") {
@@ -72,11 +72,11 @@ public class AbstractTestUnifiedSearchListmodel : GLib.Object {
         }
 
         // handle fetch of providers list
-        if (path.starts_with ("/ocs/v2.php/search/providers") && search_term == "") {
+        if (path.has_prefix ("/ocs/v2.php/search/providers") && search_term == "") {
             reply = new FakePayloadReply (operation, request,
                 FakeSearchResultsStorage.instance.fake_providers_response_json (), fake_access_manager);
         // handle search for provider
-        } else if (path.starts_with ("/ocs/v2.php/search/providers") && !search_term == "") {
+        } else if (path.has_prefix ("/ocs/v2.php/search/providers") && !search_term == "") {
             var path_split = path.mid ("/ocs/v2.php/search/providers".size ())
                                        .split ('/', Qt.SkipEmptyParts);
 

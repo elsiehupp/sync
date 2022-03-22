@@ -51,7 +51,7 @@ public class TestDownloadRecursive : AbstractTestSyncVirtualFiles {
         GLib.assert_true (!fake_folder.current_local_state ().find ("B/Sub/b2"));
 
         // Download All file in the directory A/Sub
-        // (as in Folder.download_virtual_file)
+        // (as in FolderConnection.download_virtual_file)
         fake_folder.sync_journal ().mark_virtual_file_for_download_recursively ("A/Sub");
 
         GLib.assert_true (fake_folder.sync_once ());

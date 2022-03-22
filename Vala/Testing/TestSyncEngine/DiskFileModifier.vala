@@ -7,7 +7,7 @@ implied, as to its usefulness for any purpose.
 namespace Occ {
 namespace Testing {
 
-public class DiskFileModifier : FileModifier {
+public class DiskFileModifier : AbstractFileModifier {
 
     GLib.Dir root_directory;
 

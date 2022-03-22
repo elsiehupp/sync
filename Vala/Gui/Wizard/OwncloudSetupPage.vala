@@ -346,17 +346,17 @@ public class OwncloudSetupPage : QWizardPage {
         this.auth_type_known = false;
 
         string new_url = url;
-        if (url.ends_with ("index.php")) {
+        if (url.has_suffix ("index.php")) {
             new_url.chop (9);
         }
         if (this.oc_wizard && this.oc_wizard.account) {
             string web_dav_path = this.oc_wizard.account.dav_path;
-            if (url.ends_with (web_dav_path)) {
+            if (url.has_suffix (web_dav_path)) {
                 new_url.chop (web_dav_path.length);
             }
-            if (web_dav_path.ends_with ('/')) {
+            if (web_dav_path.has_suffix ('/')) {
                 web_dav_path.chop (1); // cut off the slash
-                if (url.ends_with (web_dav_path)) {
+                if (url.has_suffix (web_dav_path)) {
                     new_url.chop (web_dav_path.length);
                 }
             }

@@ -312,10 +312,10 @@ public class OwncloudWizard : QWizard {
         Gtk.MessageBox message_box = null;
         QPushButton accept_button = null;
         switch (best_vfs_mode) {
-        case Vfs.WindowsCfApi:
+        case AbstractVfs.WindowsCfApi:
             callback (true);
             return;
-        case Vfs.WithSuffix:
+        case AbstractVfs.WithSuffix:
             message_box = new Gtk.MessageBox (
                 Gtk.MessageBox.Warning,
                 _("Enable experimental feature?"),
@@ -336,8 +336,8 @@ public class OwncloudWizard : QWizard {
             accept_button = message_box.add_button (_("Enable experimental placeholder mode"), Gtk.MessageBox.AcceptRole);
             message_box.add_button (_("Stay safe"), Gtk.MessageBox.RejectRole);
             break;
-        case Vfs.XAttr:
-        case Vfs.Off:
+        case AbstractVfs.XAttr:
+        case AbstractVfs.Off:
             GLib.assert_not_reached ();
         }
 

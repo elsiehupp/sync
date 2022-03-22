@@ -65,7 +65,7 @@ public class WebView : Gtk.Widget {
             string accept_language;
             if (system_locale == "C") {
                 accept_language = "en,*";
-            } else if (system_locale.starts_with ("en-")) {
+            } else if (system_locale.has_prefix ("en-")) {
                 accept_language = system_locale + ",*";
             } else {
                 accept_language = system_locale + ",en,*";

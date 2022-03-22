@@ -7,7 +7,7 @@
 namespace Occ {
 namespace Testing {
 
-public class FakeUserStatusConnector : UserStatusConnector {
+public class FakeUserStatusConnector : AbstractUserStatusConnector {
 
     /***********************************************************
     ***********************************************************/
@@ -60,7 +60,7 @@ public class FakeUserStatusConnector : UserStatusConnector {
         }
 
         this.user_status_set_by_caller_of_set_user_status = user_status;
-        /* emit */ UserStatusConnector.signal_user_status_set ();
+        /* emit */ AbstractUserStatusConnector.signal_user_status_set ();
     }
 
 

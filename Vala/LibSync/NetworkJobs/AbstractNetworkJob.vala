@@ -6,12 +6,21 @@ namespace LibSync {
 
 @brief The AbstractNetworkJob class
 
+@author Olivier Goffart <ogoffart@owncloud.com>
+@author Klaas Freitag <freitag@owncloud.com>
 @author Klaas Freitag <freitag@owncloud.com>
 @author Daniel Molkentin <danimo@owncloud.com>
 
 @copyright GPLv3 or Later
 ***********************************************************/
 public class AbstractNetworkJob : GLib.Object {
+
+    /***********************************************************
+    Tags for checksum header.
+    It's here for being shared between Upload- and Download Job
+    ***********************************************************/
+    const string CHECK_SUM_HEADER_C = "OC-Checksum";
+    const string CONTENT_MD5_HEADER_C = "Content-MD5";
 
     /***********************************************************
     @brief Internal Helper class

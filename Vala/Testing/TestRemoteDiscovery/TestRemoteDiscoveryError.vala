@@ -76,7 +76,7 @@ public class TestRemoteDiscoveryError : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private GLib.InputStream override_delegate_remote_error (Soup.Operation operation, Soup.Request request, QIODevice device) {
-        if (request.attribute (Soup.Request.CustomVerbAttribute) == "PROPFIND" && request.url.path.ends_with (error_folder)) {
+        if (request.attribute (Soup.Request.CustomVerbAttribute) == "PROPFIND" && request.url.path.has_suffix (error_folder)) {
             if (error_kind == InvalidXML) {
                 return new FakeBrokenXmlPropfindReply (fake_folder.remote_modifier (), operation, request, this);
             } else if (error_kind == Timeout) {

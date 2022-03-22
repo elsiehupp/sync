@@ -48,7 +48,7 @@ public class FolderDefinition : GLib.Object {
     /***********************************************************
     Which virtual files setting the folder uses
     ***********************************************************/
-    public Common.AbstractVfs.Mode virtual_files_mode = Vfs.Off;
+    public Common.AbstractVfs.Mode virtual_files_mode = AbstractVfs.Off;
 
     /***********************************************************
     The CLSID where this folder appears in registry for the Explorer navigation pane entry.
@@ -73,7 +73,7 @@ public class FolderDefinition : GLib.Object {
         settings.value ("virtual_files_mode", Common.AbstractVfs.Mode.to_string (folder.virtual_files_mode));
 
         // Ensure new vfs modes won't be attempted by older clients
-        if (folder.virtual_files_mode == Vfs.WindowsCfApi) {
+        if (folder.virtual_files_mode == AbstractVfs.WindowsCfApi) {
             settings.value (VERSION_C, 3);
         } else {
             settings.value (VERSION_C, 2);
@@ -93,7 +93,7 @@ public class FolderDefinition : GLib.Object {
     ***********************************************************/
     public static bool on_signal_load (GLib.Settings settings, string alias,
         FolderDefinition folder) {
-        folder.alias = FolderMan.unescape_alias (alias);
+        folder.alias = FolderManager.unescape_alias (alias);
         folder.local_path = settings.value ("local_path").to_string ();
         folder.journal_path = settings.value ("journal_path").to_string ();
         folder.target_path = settings.value ("target_path").to_string ();
@@ -101,7 +101,7 @@ public class FolderDefinition : GLib.Object {
         folder.ignore_hidden_files = settings.value ("ignore_hidden_files", GLib.Variant (true)).to_bool ();
         folder.navigation_pane_clsid = settings.value ("navigation_pane_clsid").to_uuid ();
 
-        folder.virtual_files_mode = Vfs.Off;
+        folder.virtual_files_mode = AbstractVfs.Off;
         string vfs_mode_string = settings.value ("virtual_files_mode").to_string ();
         if (!vfs_mode_string == "") {
             if (var mode = Common.AbstractVfs.Mode.from_string (vfs_mode_string)) {
@@ -111,7 +111,7 @@ public class FolderDefinition : GLib.Object {
             }
         } else {
             if (settings.value ("use_placeholders").to_bool ()) {
-                folder.virtual_files_mode = Vfs.WithSuffix;
+                folder.virtual_files_mode = AbstractVfs.WithSuffix;
                 folder.upgrade_vfs_mode = true; // maybe winvfs is available?
             }
         }
@@ -145,7 +145,7 @@ public class FolderDefinition : GLib.Object {
     ***********************************************************/
     public static string prepare_local_path (string path) {
         string p = GLib.Dir.from_native_separators (path);
-        if (!p.ends_with ('/')) {
+        if (!p.has_suffix ('/')) {
             p.append ('/');
         }
         return p;
@@ -157,12 +157,12 @@ public class FolderDefinition : GLib.Object {
     ***********************************************************/
     public static string prepare_target_path (string path) {
         string p = path;
-        if (p.ends_with ('/')) {
+        if (p.has_suffix ('/')) {
             p.chop (1);
         }
         // Doing this second ensures the empty string or "/" come
         // out as "/".
-        if (!p.starts_with ('/')) {
+        if (!p.has_prefix ('/')) {
             p.prepend ('/');
         }
         return p;

@@ -4,7 +4,7 @@ namespace Common {
 /***********************************************************
 @struct SetupParameters
 
-@brife Collection of parameters for initializing a Vfs
+@brife Collection of parameters for initializing a AbstractVfs
 instance.
 
 @author Christian Kamm <mail@ckamm.de>
@@ -22,12 +22,12 @@ public struct SetupParameters {
 
 
     /***********************************************************
-    Folder display name in Windows Explorer
+    FolderConnection display name in Windows Explorer
     ***********************************************************/
     string display_name;
 
     /***********************************************************
-    Folder alias
+    FolderConnection alias
     ***********************************************************/
     string alias;
 
@@ -46,7 +46,7 @@ public struct SetupParameters {
     /***********************************************************
     Access to the sync folder's database.
 
-    Note: The journal must live at least until the Vfs.stop () call.
+    Note: The journal must live at least until the AbstractVfs.stop () call.
     ***********************************************************/
     SyncJournalDb journal = null;
 
@@ -67,6 +67,6 @@ public struct SetupParameters {
 
 } // struct SetupParameters
 
-} // namespace Vfs
+} // namespace AbstractVfs
 } // namespace Occ
 

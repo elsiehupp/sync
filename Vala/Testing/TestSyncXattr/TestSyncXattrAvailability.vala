@@ -71,7 +71,7 @@ public class TestSyncXattrAvailability : AbstractTestSyncXAttr {
 
         var r = vfs.availability ("nonexistant");
         GLib.assert_true (!r);
-        GLib.assert_true (r.error == Vfs.AvailabilityError.NO_SUCH_ITEM);
+        GLib.assert_true (r.error == AbstractVfs.AvailabilityError.NO_SUCH_ITEM);
     }
 
 } // class TestSyncXattrAvailability

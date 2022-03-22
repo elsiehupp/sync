@@ -8,7 +8,7 @@ namespace Common {
 
 @copyright LGPLv2.1 or later
 ***********************************************************/
-public class DefaultPluginFactory : PluginFactory {
+public class DefaultPluginFactory : AbstractPluginFactory {
 
     //  template<class PluginClass>
 

@@ -93,7 +93,7 @@ public class FolderWatcherPrivate : GLib.Object {
 
         // iterate events in buffer
         uint32 ulen = len;
-        for (i = 0; i + sizeof (INotifyEvent) < ulen; i += sizeof (INotifyEvent) + (event ? event.len : 0)) {
+        for (i = 0; i + sizeof (INotifyEvent) < ulen; i += sizeof (INotifyEvent) + (event != null ? event.len : 0)) {
             // cast an INotifyEvent
             event = (INotifyEvent)buffer[i];
             if (!event) {
@@ -108,9 +108,9 @@ public class FolderWatcherPrivate : GLib.Object {
             string filename = event.name;
             // Filter out journal changes - redundant with filtering in
             // FolderWatcher.path_is_ignored.
-            if (filename.starts_with (".sync_")
-                || filename.starts_with (".csync_journal.db")
-                || filename.starts_with (".sync_")) {
+            if (filename.has_prefix (".sync_")
+                || filename.has_prefix (".csync_journal.db")
+                || filename.has_prefix (".sync_")) {
                 continue;
             }
             const string p = this.watch_to_path[event.wd] + '/' + filename;
@@ -230,9 +230,9 @@ public class FolderWatcherPrivate : GLib.Object {
         // Remove the entry and all subentries
         while (it != this.path_to_watch.end ()) {
             var it_path = it.key ();
-            if (!it_path.starts_with (path))
+            if (!it_path.has_prefix (path))
                 break;
-            if (it_path != path && !it_path.starts_with (path_slash)) {
+            if (it_path != path && !it_path.has_prefix (path_slash)) {
                 // order is 'foo', 'foo bar', 'foo/bar'
                 ++it;
                 continue;

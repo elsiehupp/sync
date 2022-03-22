@@ -48,7 +48,7 @@ public class IgnoreListEditor : Gtk.Dialog {
             this.on_signal_restore_defaults
         );
 
-        instance.sync_hidden_files_check_box.checked (!FolderMan.instance.ignore_hidden_files);
+        instance.sync_hidden_files_check_box.checked (!FolderManager.instance.ignore_hidden_files);
     }
 
 
@@ -63,7 +63,7 @@ public class IgnoreListEditor : Gtk.Dialog {
        TODO this can now be fixed, simply attach this IgnoreListEditor to top-level account
        settings
         */
-        FolderMan.instance.ignore_hidden_files = this.ignore_hidden_files;
+        FolderManager.instance.ignore_hidden_files = this.ignore_hidden_files;
     }
 
 

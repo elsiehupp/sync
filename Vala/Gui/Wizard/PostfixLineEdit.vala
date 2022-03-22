@@ -51,7 +51,7 @@ public class PostfixLineEdit : QLineEdit {
         ***********************************************************/
         public set {
             string prefix_string = value;
-            if (prefix_string.ends_with (postfix ())) {
+            if (prefix_string.has_suffix (postfix ())) {
                 prefix_string.chop (postfix ().length);
             }
             on_signal_text (prefix_string);

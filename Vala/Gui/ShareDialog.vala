@@ -112,7 +112,7 @@ public class ShareDialog : Gtk.Dialog {
         } else {
             this.instance.grid_layout.add_widget (this.instance.label_name, 0, 1, 1, 1);
             this.instance.grid_layout.add_widget (this.instance.label_share_path, 1, 1, 1, 1);
-            this.instance.label_share_path.on_signal_text (_("Folder : %2").printf (oc_dir));
+            this.instance.label_share_path.on_signal_text (_("FolderConnection : %2").printf (oc_dir));
         }
 
         this.window_title (_("%1 Sharing").printf (Theme.app_name_gui));
@@ -185,7 +185,7 @@ public class ShareDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_propfind_received (QVariantMap result) {
+    private void on_signal_propfind_received (GLib.VariantMap result) {
         const GLib.Variant received_permissions = result["share-permissions"];
         if (!received_permissions.to_string () == "") {
             this.max_sharing_permissions = static_cast<SharePermissions> (received_permissions.to_int ());

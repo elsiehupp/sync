@@ -57,7 +57,7 @@ public class FakePropfindReply : FakeReply {
         xml.write_start_element (dav_uri, "response");
 
         var url = GLib.Uri.to_percent_encoding (file_info.absolute_path, "/");
-        if (!url.ends_with (char ('/'))) {
+        if (!url.has_suffix (char ('/'))) {
             url.append (char ('/'));
         }
         const string href = Utility.concat_url_path (prefix, url).path;

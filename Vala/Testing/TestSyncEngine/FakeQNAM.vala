@@ -128,7 +128,7 @@ public class FakeQNAM : Soup {
             reply = override_reply_with_error (get_file_path_from_url (new_request.url), operation, new_request);
         }
         if (!reply) {
-            const bool is_upload = new_request.url.path.starts_with (s_upload_url.path);
+            const bool is_upload = new_request.url.path.has_prefix (s_upload_url.path);
             FileInfo info = is_upload ? this.upload_file_info : this.remote_root_file_info;
 
             var verb = new_request.attribute (Soup.Request.CustomVerbAttribute);
@@ -148,7 +148,7 @@ public class FakeQNAM : Soup {
             } else if (verb == "MOVE" && is_upload) {
                 reply = new FakeChunkMoveReply ( info, this.remote_root_file_info, operation, new_request, this);
             } else if (verb == "POST" || operation == Soup.PostOperation) {
-                if (content_type.starts_with ("multipart/related; boundary=")) {
+                if (content_type.has_prefix ("multipart/related; boundary=")) {
                     reply = new FakePutMultiFileReply (info, operation, new_request, content_type, outgoing_data.read_all (), this);
                 }
             } else {

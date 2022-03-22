@@ -23,12 +23,12 @@ srcs = files([
     'ElidedLabel.vala',
     'EmojiCategoriesModel.vala',
     'FileActivityListModel.vala',
+    'FolderConnection.vala',
     'FolderCreationDialog.vala',
-    'FolderMan.vala',
+    'FolderManager.vala',
     'FolderStatusDelegate.vala',
     'FolderStatusModel.vala',
     'FolderStatusView.vala',
-    'Folder.vala',
     'FolderWatcherPrivate.vala',
     'FolderWatcher.vala',
 
@@ -105,13 +105,14 @@ srcs = files([
     'Tray/UserModel/UserAppsModel.vala',
     'Tray/UserModel/UserModel.vala',
 
+    'Updater/AbstractUpdater.vala',
+
     'Updater/OCUpdater/NSISUpdater.vala',
     'Updater/OCUpdater/OCUpdater.vala',
     'Updater/OCUpdater/PassiveUpdateNotifier.vala',
     'Updater/OCUpdater/UpdaterScheduler.vala',
 
     'Updater/UpdateInfo.vala',
-    'Updater/Updater.vala',
 
     'UserInfo.vala',
     'UserStatusSelectorModel.vala',

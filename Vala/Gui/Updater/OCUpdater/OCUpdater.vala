@@ -25,7 +25,7 @@ To reflect that all platforms have their own update scheme, a little
 complex class design was set up:
 
 For Windows and Linux, the updaters are inherited from OCUpdater, wh
-the Mac_o_s_x Sparkle_updater directly uses the class Updater. On windows,
+the Mac_o_s_x Sparkle_updater directly uses the class AbstractUpdater. On windows,
 NSISUpdater starts the update if a new version of the client is available.
 On Mac_o_s_x, the sparkle framework handles the installation of the new
 version. On Linux, the update capabilit
@@ -46,7 +46,7 @@ Simple class diagram of the updater:
   |   +---------------+   v
   +-.|   OCUpdater   +------+
       +--------+------+      |
-               |   Updater   |
+               |   AbstractUpdater   |
                +-------------+
 ***********************************************************/
 
@@ -54,15 +54,15 @@ Simple class diagram of the updater:
 @brief Class that uses an own_cloud proprietary XML format to fetch update information
 @ingroup gui
 ***********************************************************/
-public class OCUpdater : Updater {
+public class OCUpdater : AbstractUpdater {
 
     /***********************************************************
     ***********************************************************/
-    private const string update_available_c = "Updater/update_available";
-    private const string update_target_version_c = "Updater/update_target_version";
-    private const string update_target_version_string_c = "Updater/update_target_version_string";
-    private const string seen_version_c = "Updater/seen_version";
-    private const string auto_update_attempted_c = "Updater/auto_update_attempted";
+    private const string update_available_c = "AbstractUpdater/update_available";
+    private const string update_target_version_c = "AbstractUpdater/update_target_version";
+    private const string update_target_version_string_c = "AbstractUpdater/update_target_version_string";
+    private const string seen_version_c = "AbstractUpdater/seen_version";
+    private const string auto_update_attempted_c = "AbstractUpdater/auto_update_attempted";
 
     /***********************************************************
     ***********************************************************/
@@ -226,7 +226,7 @@ public class OCUpdater : Updater {
         settings.sync ();
         GLib.info ("Running updater " + update_file);
 
-        if (update_file.ends_with (".exe")) {
+        if (update_file.has_suffix (".exe")) {
             QProcess.start_detached (
                 update_file,
                 {
@@ -234,7 +234,7 @@ public class OCUpdater : Updater {
                     "/launch"
                 }
             );
-        } else if (update_file.ends_with (".msi")) {
+        } else if (update_file.has_suffix (".msi")) {
             // When MSIs are installed without gui they cannot launch applications
             // as they lack the user context. That is why we need to run the client
             // manually here. We wrap the msiexec and client invocation in a powershell

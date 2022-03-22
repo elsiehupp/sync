@@ -33,23 +33,23 @@ public class TestPingTimeoutPingTimeoutReconnect : AbstractTestPushNotifications
     }
 
 
-    private void authentication_delegate_ping_timeout_ping_timed_out_reconnect_1 (PushNotifications push_notifications) {
+    private void authentication_delegate_ping_timeout_ping_timed_out_reconnect_1 (PushNotificationManager push_notifications) {
         files_changed_spy.on_signal_reset (
             new QSignalSpy (
                 push_notifications,
-                PushNotifications.files_changed
+                PushNotificationManager.files_changed
             )
         );
         notifications_changed_spy.on_signal_reset (
             new QSignalSpy (
                 push_notifications,
-                PushNotifications.notifications_changed
+                PushNotificationManager.notifications_changed
             )
         );
         activities_changed_spy.on_signal_reset (
             new QSignalSpy (
                 push_notifications,
-                PushNotifications.activities_changed
+                PushNotificationManager.activities_changed
             )
         );
     }

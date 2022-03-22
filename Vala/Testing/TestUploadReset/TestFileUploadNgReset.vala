@@ -18,7 +18,7 @@ public class TestFileUploadNgReset : GLib.Object {
 
         fake_folder.sync_engine.account.set_capabilities ({
             {
-                "dav", new QVariantMap (
+                "dav", new GLib.VariantMap (
                     {
                         "chunking", "1.0"
                     },

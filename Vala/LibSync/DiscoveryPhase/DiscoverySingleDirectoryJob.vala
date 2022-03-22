@@ -67,7 +67,7 @@ public class DiscoverySingleDirectoryJob : GLib.Object {
     ***********************************************************/
     internal signal void first_directory_permissions (RemotePermissions);
     internal signal void etag (string , GLib.DateTime time);
-    internal signal void signal_finished (HttpResult<GLib.List<RemoteInfo>> result);
+    internal signal void signal_finished (Result<T, HttpError><GLib.List<RemoteInfo>> result);
 
 
     /***********************************************************

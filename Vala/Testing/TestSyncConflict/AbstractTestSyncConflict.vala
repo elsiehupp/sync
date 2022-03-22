@@ -42,14 +42,14 @@ public abstract class AbstractTestSyncConflict : GLib.Object {
     }
 
 
-    protected static bool expect_and_wipe_conflict (FileModifier local, FileInfo state, string path) {
+    protected static bool expect_and_wipe_conflict (AbstractFileModifier local, FileInfo state, string path) {
         PathComponents path_components = new PathComponents (path);
         var base_path = state.find (path_components.parent_directory_components ());
         if (!base_path) {
             return false;
         }
         foreach (var item in base_path.children) {
-            if (item.name.starts_with (path_components.filename ()) && item.name.contains (" (conflicted copy")) {
+            if (item.name.has_prefix (path_components.filename ()) && item.name.contains (" (conflicted copy")) {
                 local.remove (item.path);
                 return true;
             }

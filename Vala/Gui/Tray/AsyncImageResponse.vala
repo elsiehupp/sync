@@ -60,7 +60,7 @@ public class AsyncImageResponse : QQuickImageResponse {
             return;
         }
 
-        if (this.image_paths.at (this.index).starts_with (":/client")) {
+        if (this.image_paths.at (this.index).has_prefix (":/client")) {
             image_and_emit_finished (Gtk.Icon (this.image_paths.at (this.index)).pixmap (this.requested_image_size).to_image ());
             return;
         }
@@ -98,7 +98,7 @@ public class AsyncImageResponse : QQuickImageResponse {
         if (image_data == "" || image_data == "[]") {
             process_next_image ();
         } else {
-            if (image_data.starts_with ("<svg")) {
+            if (image_data.has_prefix ("<svg")) {
                 // SVG image needs proper scaling, let's do it with QPainter and QSvgRenderer
                 QSvgRenderer svg_renderer;
                 if (svg_renderer.on_signal_load (image_data)) {

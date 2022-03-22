@@ -40,7 +40,7 @@ public class TestRemoteWipe : GLib.Object {
 //        account.set_credentials (credentials);
 //        account.set_url ( url );
 
-//        FolderMan folder_manager = FolderMan.instance;
+//        FolderManager folder_manager = FolderManager.instance;
 //        folder_manager.add_folder (new_account_state, folder_definition (directory_path + "/sub/nextcloud/"));
 
 //        // check if account exists

@@ -71,24 +71,24 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
 
             string[] warn_strings;
             string directory = this.instance.folder_tree_widget.current_item ().data (0, Qt.USER_ROLE).to_string ();
-            if (!directory.starts_with ('/')) {
+            if (!directory.has_prefix ('/')) {
                 directory.prepend ('/');
             }
             wizard ().property ("target_path", directory);
 
-            Folder.Map map = FolderMan.instance.map ();
-            Folder.Map.ConstIterator i = map.const_begin ();
+            FolderConnection.Map map = FolderManager.instance.map ();
+            FolderConnection.Map.ConstIterator i = map.const_begin ();
             for (i = map.const_begin (); i != map.const_end (); i++) {
-                var f = static_cast<Folder> (i.value ());
+                var f = static_cast<FolderConnection> (i.value ());
                 if (f.account_state.account != this.account) {
                     continue;
                 }
                 string cur_dir = f.remote_path_trailing_slash;
                 if (GLib.Dir.clean_path (directory) == GLib.Dir.clean_path (cur_dir)) {
                     warn_strings.append (_("This folder is already being synced."));
-                } else if (directory.starts_with (cur_dir)) {
+                } else if (directory.has_prefix (cur_dir)) {
                     warn_strings.append (_("You are already syncing <i>%1</i>, which is a parent folder of <i>%2</i>.").printf (Utility.escape (cur_dir), Utility.escape (directory)));
-                } else if (cur_dir.starts_with (directory)) {
+                } else if (cur_dir.has_prefix (directory)) {
                     warn_strings.append (_("You are already syncing <i>%1</i>, which is a subfolder of <i>%2</i>.").printf (Utility.escape (cur_dir), Utility.escape (directory)));
                 }
             }
@@ -138,7 +138,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
 
         var dialog = new QInputDialog (this);
 
-        dialog.window_title (_("Create Remote Folder"));
+        dialog.window_title (_("Create Remote FolderConnection"));
         dialog.label_text (_("Enter the name of the new folder to be created below \"%1\":")
                               .printf (parent));
         dialog.open (this, SLOT (on_signal_create_remote_folder (string)));
@@ -175,7 +175,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     ***********************************************************/
     protected void on_signal_create_remote_folder_finished () {
         GLib.debug ("webdav mkdir request on_signal_finished");
-        on_signal_show_warning (_("Folder was successfully created on %1.").printf (Theme.app_name_gui));
+        on_signal_show_warning (_("FolderConnection was successfully created on %1.").printf (Theme.app_name_gui));
         on_signal_refresh_folders ();
         this.instance.folder_entry.on_signal_text (static_cast<MkColJob> (sender ()).path);
         on_signal_lscol_folder_entry ();
@@ -236,7 +236,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
             //  const var is_any_ancestor_encrypted = std.any_of (
             //      std.cbegin (this.encrypted_paths),
             //      std.cend (this.encrypted_paths), [=] (string encrypted_path) {
-            //      return path.size () > encrypted_path.size () && path.starts_with (encrypted_path);
+            //      return path.size () > encrypted_path.size () && path.has_prefix (encrypted_path);
             //  });
             if (is_any_ancestor_encrypted) {
                 continue;
@@ -260,7 +260,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
         }
 
         const var webdav_folder = GLib.Uri (this.account.dav_url ()).path;
-        //  Q_ASSERT (path.starts_with (webdav_folder));
+        //  Q_ASSERT (path.has_prefix (webdav_folder));
         this.encrypted_paths + path.mid (webdav_folder.size ());
     }
 
@@ -293,7 +293,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
             const var encrypted = this.encrypted_paths.contains (directory);
             this.instance.add_folder_button.enabled (!encrypted);
 
-            if (!directory.starts_with ('/')) {
+            if (!directory.has_prefix ('/')) {
                 directory.prepend ('/');
             }
             this.instance.folder_entry.on_signal_text (directory);
@@ -320,7 +320,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     ***********************************************************/
     protected void on_signal_lscol_folder_entry () {
         string path = this.instance.folder_entry.text ();
-        if (path.starts_with ('/'))
+        if (path.has_prefix ('/'))
             path = path.mid (1);
 
         LscolJob lscol_job = run_lscol_job (path);
@@ -386,7 +386,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
         if (!item) {
             item = new QTreeWidgetItem (parent);
             QFileIconProvider prov;
-            Gtk.Icon folder_icon = prov.icon (QFileIconProvider.Folder);
+            Gtk.Icon folder_icon = prov.icon (QFileIconProvider.FolderConnection);
             item.icon (0, folder_icon);
             item.on_signal_text (0, folder_name);
             item.data (0, Qt.USER_ROLE, folder_path);
@@ -402,10 +402,10 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     /***********************************************************
     ***********************************************************/
     private bool select_by_path (string path) {
-        if (path.starts_with ('/')) {
+        if (path.has_prefix ('/')) {
             path = path.mid (1);
         }
-        if (path.ends_with ('/')) {
+        if (path.has_suffix ('/')) {
             path.chop (1);
         }
 

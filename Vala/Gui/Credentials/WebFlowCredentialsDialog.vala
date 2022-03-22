@@ -108,8 +108,9 @@ public class WebFlowCredentialsDialog : Gtk.Dialog {
     ***********************************************************/
     public void url (GLib.Uri url) {
     //  #ifdef WITH_WEBENGINE
-        if (this.web_view)
+        if (this.web_view != null) {
             this.web_view.url (url);
+        }
     //  #else // WITH_WEBENGINE
         //  Q_UNUSED (url);
     //  #endif // WITH_WEBENGINE
@@ -156,7 +157,7 @@ public class WebFlowCredentialsDialog : Gtk.Dialog {
         //  Q_UNUSED (e)
 
     //  #ifdef WITH_WEBENGINE
-        if (this.web_view) {
+        if (this.web_view != null) {
             // Force calling WebView.~WebView () earlier so that this.profile and this.page are
             // deleted in the correct order.
             this.web_view.delete_later ();
@@ -164,7 +165,7 @@ public class WebFlowCredentialsDialog : Gtk.Dialog {
         }
     //  #endif // WITH_WEBENGINE
 
-        if (this.flow_2_auth_widget) {
+        if (this.flow_2_auth_widget != null) {
             this.flow_2_auth_widget.reset_auth ();
             this.flow_2_auth_widget.delete_later ();
             this.flow_2_auth_widget = null;

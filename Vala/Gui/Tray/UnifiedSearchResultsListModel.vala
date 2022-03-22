@@ -191,7 +191,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
             const string relative_path = directory + '/' + filename;
             const var local_files =
-                FolderMan.instance.find_file_in_local_folders (GLib.FileInfo (relative_path).path, this.account_state.account);
+                FolderManager.instance.find_file_in_local_folders (GLib.FileInfo (relative_path).path, this.account_state.account);
 
             if (!local_files == "") {
                 GLib.info ("Opening file: " + local_files.const_first ());
@@ -723,7 +723,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
             return default_icon_name;
         }
 
-        if (default_icon_name.starts_with ("icon-")) {
+        if (default_icon_name.has_prefix ("icon-")) {
             const var parts = default_icon_name.split ('-');
 
             if (parts.size () > 1) {
@@ -757,7 +757,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
         var server_url_copy = server_url;
         var thumbnail_url_copy = thumbnail_url;
 
-        if (thumbnail_url_copy.starts_with ('/') || thumbnail_url_copy.starts_with ('\\')) {
+        if (thumbnail_url_copy.has_prefix ('/') || thumbnail_url_copy.has_prefix ('\\')) {
             // relative image resource URL, just needs some concatenation with current server URL
             // some icons may contain parameters after (?)
             const string[] thumbnail_url_copy_splitted = thumbnail_url_copy.contains ('?')
@@ -782,7 +782,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
         var fallack_icon_copy = fallack_icon;
 
-        if (fallack_icon_copy.starts_with ('/') || fallack_icon_copy.starts_with ('\\')) {
+        if (fallack_icon_copy.has_prefix ('/') || fallack_icon_copy.has_prefix ('\\')) {
             // relative image resource URL, just needs some concatenation with current server URL
             // some icons may contain parameters after (?)
             const string[] fallack_icon_path_splitted =

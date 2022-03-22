@@ -28,7 +28,7 @@ public class Emoji : GLib.Object {
     //  friend QDataStream operator>> (QDataStream arch, Emoji object) {
     //      arch >> object.unicode;
     //      arch >> object.shortname;
-    //      object.is_custom = object.unicode.starts_with ("image://");
+    //      object.is_custom = object.unicode.has_prefix ("image://");
     //      return arch;
     //  }
 

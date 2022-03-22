@@ -7,7 +7,7 @@ implied, as to its usefulness for any purpose.
 namespace Occ {
 namespace Testing {
 
-public class FileInfo : FileModifier {
+public class FileInfo : AbstractFileModifier {
 
     /***********************************************************
     ***********************************************************/
@@ -268,7 +268,7 @@ public class FileInfo : FileModifier {
     /***********************************************************
     ***********************************************************/
     public string absolute_path {
-        if (parent_path.ends_with ('/')) {
+        if (parent_path.has_suffix ('/')) {
             return parent_path + name;
         } else {
             return parent_path + '/' + name;
@@ -339,7 +339,7 @@ public class FileInfo : FileModifier {
             return null;
         string on_signal_start = info.base_name () + " (conflicted copy";
         foreach (var item in parent_directory.children) {
-            if (item.name.starts_with (on_signal_start)) {
+            if (item.name.has_prefix (on_signal_start)) {
                 return item;
             }
         }

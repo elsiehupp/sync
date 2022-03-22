@@ -43,7 +43,7 @@ public class SyncOptions : GLib.Object {
     Create a virtual file for new files instead of downloading.
     May not be null
     ***********************************************************/
-    public unowned Vfs vfs;
+    public unowned AbstractVfs vfs;
 
     /***********************************************************
     The initial un-adjusted chunk size in bytes for chunked

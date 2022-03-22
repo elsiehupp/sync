@@ -10,7 +10,7 @@ namespace Common {
 
 @copyright LGPLv2.1 or later
 ***********************************************************/
-public class CSyncChecksumHook : ComputeChecksumBase {
+public class CSyncChecksumHook : AbstractComputeChecksum {
 
     using ZLib;
 

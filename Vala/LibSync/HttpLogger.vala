@@ -98,7 +98,7 @@ public class HttpLogger : GLib.Object {
         foreach (var item in header) {
             stream += item.first + ": ";
             if (item.first == "Authorization") {
-                stream += (item.second.starts_with ("Bearer ") ? "Bearer": "Basic");
+                stream += (item.second.has_prefix ("Bearer ") ? "Bearer": "Basic");
                 stream += " [redacted]";
             } else {
                 stream += item.second;

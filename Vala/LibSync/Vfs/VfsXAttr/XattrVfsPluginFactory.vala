@@ -11,8 +11,8 @@ namespace LibSync {
 public class XattrVfsPluginFactory : DefaultPluginFactory<VfsXAttr> {
 
     construct {
-        Q_PLUGIN_METADATA (IID + "org.owncloud.PluginFactory" + FILE + "vfspluginmetadata.json");
-        Q_INTERFACES (PluginFactory);
+        Q_PLUGIN_METADATA (IID + "org.owncloud.AbstractPluginFactory" + FILE + "vfspluginmetadata.json");
+        Q_INTERFACES (AbstractPluginFactory);
     }
 
 } // class XattrVfsPluginFactory

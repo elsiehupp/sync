@@ -4,7 +4,7 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <folder.h>
+//  #include <folder_connection.h>
 //  #include <QPush
 //  #include <GLib.Dir>
 //  #include <qabstractbutton.h
@@ -32,7 +32,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private unowned Account account;
-    private Folder folder;
+    private FolderConnection folder_connection;
     private string file_path;
     private string relative_file_path;
     private string original_filename;
@@ -40,18 +40,18 @@ public class InvalidFilenameDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public InvalidFilenameDialog (unowned Account account, Folder folder, string file_path, Gtk.Widget parent = new Gtk.Widget ()) {
+    public InvalidFilenameDialog (unowned Account account, FolderConnection folder_connection, string file_path, Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.instance = new InvalidFilenameDialog ();
         this.account = account;
-        this.folder = folder;
+        this.folder_connection = folder_connection;
         this.file_path = std.move (file_path);
         //  Q_ASSERT (this.account);
-        //  Q_ASSERT (this.folder);
+        //  Q_ASSERT (this.folder_connection);
 
         const GLib.FileInfo file_path_file_info = GLib.FileInfo (this.file_path);
         this.relative_file_path = file_path_file_info.path + "/";
-        this.relative_file_path = this.relative_file_path.replace (folder.path, "");
+        this.relative_file_path = this.relative_file_path.replace (folder_connection.path, "");
         this.relative_file_path = this.relative_file_path == "" ? "" : this.relative_file_path + "/";
 
         this.original_filename = this.relative_file_path + file_path_file_info.filename ();
@@ -82,7 +82,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
     ***********************************************************/
     public override void on_signal_accept () {
         this.new_filename = this.relative_file_path + this.instance.filename_line_edit.text ().trimmed ();
-        const var propfind_job = new PropfindJob (this.account, GLib.Dir.clean_path (this.folder.remote_path + this.new_filename));
+        const var propfind_job = new PropfindJob (this.account, GLib.Dir.clean_path (this.folder_connection.remote_path + this.new_filename));
         propfind_job.signal_result.connect (
             this.on_signal_remote_file_already_exists
         );
@@ -98,7 +98,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
     private void on_signal_filename_line_edit_text_changed (string text) {
         const bool is_new_filename_different = text != this.original_filename;
         const var illegal_contained_characters = illegal_chars_from_string (text);
-        const var contains_illegal_chars = !illegal_contained_characters.empty () || text.ends_with ('.');
+        const var contains_illegal_chars = !illegal_contained_characters.empty () || text.has_suffix ('.');
         const bool is_text_valid = is_new_filename_different && !contains_illegal_chars;
 
         if (is_text_valid) {
@@ -130,7 +130,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_remote_file_already_exists (QVariantMap values) {
+    private void on_signal_remote_file_already_exists (GLib.VariantMap values) {
         //  Q_UNUSED (values);
 
         this.instance.error_label.on_signal_text (_("Cannot rename file because a file with the same name does already exist on the server. Please pick another name."));
@@ -144,8 +144,8 @@ public class InvalidFilenameDialog : Gtk.Dialog {
         //  Q_UNUSED (reply);
 
         // File does not exist. We can rename it.
-        const var remote_source = GLib.Dir.clean_path (this.folder.remote_path + this.original_filename);
-        const var remote_destionation = GLib.Dir.clean_path (this.account.dav_url ().path + this.folder.remote_path + this.new_filename);
+        const var remote_source = GLib.Dir.clean_path (this.folder_connection.remote_path + this.original_filename);
+        const var remote_destionation = GLib.Dir.clean_path (this.account.dav_url ().path + this.folder_connection.remote_path + this.new_filename);
         const var move_job = new MoveJob (
             this.account,
             remote_source,
@@ -162,7 +162,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void check_if_allowed_to_rename () {
-        const var propfind_job = new PropfindJob (this.account, GLib.Dir.clean_path (this.folder.remote_path + this.original_filename));
+        const var propfind_job = new PropfindJob (this.account, GLib.Dir.clean_path (this.folder_connection.remote_path + this.original_filename));
         propfind_job.properties ({
             "http://owncloud.org/ns:permissions"
         });
@@ -175,7 +175,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_propfind_permission_success (QVariantMap values) {
+    private void on_signal_propfind_permission_success (GLib.VariantMap values) {
         if (!values.contains ("permissions")) {
             return;
         }

@@ -35,7 +35,7 @@ public class SocketUploadJob : GLib.Object {
 
         this.local_path = this.api_job.arguments ()["local_path"].to_string ();
         this.remote_path = this.api_job.arguments ()["remote_path"].to_string ();
-        if (!this.remote_path.starts_with ('/')) {
+        if (!this.remote_path.has_prefix ('/')) {
             this.remote_path = '/' + this.remote_path;
         }
 
@@ -54,7 +54,7 @@ public class SocketUploadJob : GLib.Object {
         }
 
         this.database = new SyncJournalDb (this.temporary.filename (), this);
-        this.sync_engine = new SyncEngine (account.account, this.local_path.ends_with ('/') ? this.local_path : this.local_path + '/', this.remote_path, this.database);
+        this.sync_engine = new SyncEngine (account.account, this.local_path.has_suffix ('/') ? this.local_path : this.local_path + '/', this.remote_path, this.database);
         this.sync_engine.parent (this.database);
 
         this.sync_engine.signal_item_completed.connect (

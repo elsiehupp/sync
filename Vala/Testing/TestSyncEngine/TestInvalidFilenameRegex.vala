@@ -28,13 +28,13 @@ public class TestInvalidFilenameRegex : AbstractTestSyncEngine {
         GLib.assert_true (!fake_folder.current_remote_state ().find ("B/\\:?*\"<>|.txt"));
 
         // We can override that by setting the capability
-        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new QVariantMap ( { "invalid_filename_regex", "" } ) } });
+        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new GLib.VariantMap ( { "invalid_filename_regex", "" } ) } });
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         // Check that new servers also accept the capability
         fake_folder.sync_engine.account.set_server_version ("10.0.0");
-        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new QVariantMap ( { "invalid_filename_regex", "my[fgh]ile" } ) } });
+        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new GLib.VariantMap ( { "invalid_filename_regex", "my[fgh]ile" } ) } });
         fake_folder.local_modifier.insert ("C/myfile.txt");
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (!fake_folder.current_remote_state ().find ("C/myfile.txt"));

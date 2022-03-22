@@ -336,7 +336,7 @@ public class AccountManager : GLib.Object {
             settings.value (AUTH_TYPE_C, auth_type);
 
             foreach (string key in settings.child_keys ()) {
-                if (!key.starts_with ("http_")) {
+                if (!key.has_prefix ("http_")) {
                     continue;
                 }
                 var newkey = "webflow_".append (key.mid (5));
@@ -354,7 +354,7 @@ public class AccountManager : GLib.Object {
         acc.settings_map.insert (USER_C, settings.value (USER_C));
         string auth_type_prefix = auth_type + "this.";
         foreach (var key in settings.child_keys ()) {
-            if (!key.starts_with (auth_type_prefix))
+            if (!key.has_prefix (auth_type_prefix))
                 continue;
             acc.settings_map.insert (key, settings.value (key));
         }
@@ -401,11 +401,11 @@ public class AccountManager : GLib.Object {
                 // Check the theme url to see if it is the same url that the o_c config was for
                 string override_url = Theme.override_server_url;
                 if (!override_url == "") {
-                    if (override_url.ends_with ('/')) {
+                    if (override_url.has_suffix ('/')) {
                         override_url.chop (1);
                     }
                     string oc_url = oc_settings.value (URL_C).to_string ();
-                    if (oc_url.ends_with ('/')) {
+                    if (oc_url.has_suffix ('/')) {
                         oc_url.chop (1);
                     }
 

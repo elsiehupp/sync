@@ -58,8 +58,9 @@ public class FakePostReply : GLib.InputStream {
         set_header (Soup.Request.ContentLengthHeader, payload.size ());
         set_attribute (Soup.Request.HttpStatusCodeAttribute, 200);
         /* emit */ signal_meta_data_changed ();
-        if (bytes_available ())
+        if (bytes_available () > 0) {
             /* emit */ signal_ready_read ();
+        }
         /* emit */ signal_finished ();
     }
 

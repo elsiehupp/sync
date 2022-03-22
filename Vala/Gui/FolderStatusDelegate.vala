@@ -490,7 +490,7 @@ public class FolderStatusDelegate : QStyledItemDelegate {
     /***********************************************************
     ***********************************************************/
     private static string add_folder_text () {
-        return _("Add Folder Sync Connection");
+        return _("Add FolderConnection Sync Connection");
     }
 
 } // class FolderStatusDelegate

@@ -44,7 +44,7 @@ public class FakeWebSocketServer : GLib.Object {
         close ();
     }
 
-    delegate void BeforeAuthentication (PushNotifications push_notifications);
+    delegate void BeforeAuthentication (PushNotificationManager push_notifications);
     delegate void AfterAuthentication ();
 
     /***********************************************************
@@ -52,7 +52,7 @@ public class FakeWebSocketServer : GLib.Object {
     public QWebSocket authenticate_account (Account account, BeforeAuthentication before_authentication, AfterAuthentication after_authentication) {
         var push_notifications = account.push_notifications ();
         GLib.assert_true (push_notifications);
-        QSignalSpy ready_spy = new QSignalSpy (push_notifications, &PushNotifications.ready);
+        QSignalSpy ready_spy = new QSignalSpy (push_notifications, &PushNotificationManager.ready);
 
         before_authentication (push_notifications);
 
@@ -152,14 +152,14 @@ public class FakeWebSocketServer : GLib.Object {
 
         string web_socket_url = "ws://localhost:12345";
 
-        QVariantMap endpoints_map;
+        GLib.VariantMap endpoints_map;
         endpoints_map["websocket"] = web_socket_url;
 
-        QVariantMap notify_push_map;
+        GLib.VariantMap notify_push_map;
         notify_push_map["type"] = type_list;
         notify_push_map["endpoints"] = endpoints_map;
 
-        QVariantMap capabilities_map;
+        GLib.VariantMap capabilities_map;
         capabilities_map["notify_push"] = notify_push_map;
 
         account.set_capabilities (capabilities_map);

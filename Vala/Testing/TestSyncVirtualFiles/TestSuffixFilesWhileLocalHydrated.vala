@@ -21,7 +21,7 @@ public class TestSuffixFilesWhileLocalHydrated : AbstractTestSyncVirtualFiles {
 
         TestSyncVirtualFiles.clean_up_test_suffix_files_while_local_hydrated ();
 
-        // suffixed files are happily synced with Vfs.Off
+        // suffixed files are happily synced with AbstractVfs.Off
         fake_folder.remote_modifier ().mkdir ("A");
         fake_folder.remote_modifier ().insert ("A/test1" + DVSUFFIX, 10, 'A');
         fake_folder.remote_modifier ().insert ("A/test2" + DVSUFFIX, 20, 'A');

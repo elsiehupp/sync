@@ -97,7 +97,7 @@ public class FakeFolder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void switch_to_vfs (Vfs vfs) {
+    public void switch_to_vfs (AbstractVfs vfs) {
         var opts = this.sync_engine.sync_options ();
 
         opts.vfs.stop ();
@@ -106,7 +106,7 @@ public class FakeFolder : GLib.Object {
         opts.vfs = vfs;
         this.sync_engine.set_sync_options (opts);
 
-        Vfs.SetupParameters vfs_params;
+        AbstractVfs.SetupParameters vfs_params;
         vfs_params.filesystem_path = local_path;
         vfs_params.remote_path = '/';
         vfs_params.account = this.account;
@@ -120,7 +120,7 @@ public class FakeFolder : GLib.Object {
     }
 
 
-    private void on_signal_sync_engine_destroyed (Vfs vfs) {
+    private void on_signal_sync_engine_destroyed (AbstractVfs vfs) {
         vfs.stop ();
         vfs.unregister_folder ();
     }
@@ -149,7 +149,7 @@ public class FakeFolder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public FileModifier local_modifier {
+    public AbstractFileModifier local_modifier {
         return this.local_modifier;
     }
 
@@ -245,7 +245,7 @@ public class FakeFolder : GLib.Object {
     ***********************************************************/
     public string local_path {
         // SyncEngine wants a trailing slash
-        if (this.temporary_directory.path.ends_with ('/'))
+        if (this.temporary_directory.path.has_suffix ('/'))
             return this.temporary_directory.path;
         return this.temporary_directory.path + '/';
     }

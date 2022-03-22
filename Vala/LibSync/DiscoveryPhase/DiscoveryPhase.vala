@@ -230,7 +230,7 @@ public class DiscoveryPhase : GLib.Object {
         string path,
         RemotePermissions remote_perm,
         Callback callback) {
-        if (this.sync_options.confirm_external_storage && this.sync_options.vfs.mode () == Vfs.Off
+        if (this.sync_options.confirm_external_storage && this.sync_options.vfs.mode () == AbstractVfs.Off
             && remote_perm.has_permission (RemotePermissions.Permissions.IS_MOUNTED)) {
             // external storage.
 
@@ -253,7 +253,7 @@ public class DiscoveryPhase : GLib.Object {
         }
 
         var limit = this.sync_options.new_big_folder_size_limit;
-        if (limit < 0 || this.sync_options.vfs.mode () != Vfs.Off) {
+        if (limit < 0 || this.sync_options.vfs.mode () != AbstractVfs.Off) {
             // no limit, everything is allowed;
             return callback (false);
         }
@@ -463,8 +463,8 @@ public class DiscoveryPhase : GLib.Object {
             return false;
         }
         --it;
-        GLib.assert (it.has_suffix ("/")); // Folder.selective_sync_block_list makes sure of that
-        return path_slash.starts_with (*it);
+        GLib.assert (it.has_suffix ("/")); // FolderConnection.selective_sync_block_list makes sure of that
+        return path_slash.has_prefix (*it);
     }
 
 

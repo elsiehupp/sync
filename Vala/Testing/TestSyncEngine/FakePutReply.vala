@@ -50,7 +50,7 @@ public class FakePutReply : FakeReply {
         set_raw_header ("OC-ETag", file_info.etag);
         set_raw_header ("ETag", file_info.etag);
         set_raw_header ("OC-FileID", file_info.file_identifier);
-        set_raw_header ("X-OC-MTime", "accepted"); // Prevents GLib.assert_true (!this.running_now) since we'll call PropagateItemJob.done twice in that case.
+        set_raw_header ("X-OC-MTime", "accepted"); // Prevents GLib.assert_true (!this.running_now) since we'll call AbstractPropagateItemJob.done twice in that case.
         set_attribute (Soup.Request.HttpStatusCodeAttribute, 200);
         /* emit */ signal_meta_data_changed ();
         /* emit */ signal_finished ();

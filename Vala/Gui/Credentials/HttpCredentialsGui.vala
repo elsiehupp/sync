@@ -65,7 +65,7 @@ public class HttpCredentialsGui : HttpCredentials {
     static string request_app_password_text (Account account) {
         int version = account.server_version_int;
         var url = account.url.to_string ();
-        if (url.ends_with ('/'))
+        if (url.has_suffix ('/'))
             url.chop (1);
 
         if (version >= Account.make_server_version (13, 0, 0)) {

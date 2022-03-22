@@ -99,7 +99,7 @@ public class OwncloudSetupWizard : GLib.Object {
         setup_wizard.signal_own_cloud_wizard_done.connect (
             object.wizard_done_delegate
         );
-        FolderMan.instance.sync_enabled = false;
+        FolderManager.instance.sync_enabled = false;
         setup_wizard.start_wizard ();
     }
 
@@ -124,7 +124,7 @@ public class OwncloudSetupWizard : GLib.Object {
         string fixed_url = url_string;
         GLib.Uri url = GLib.Uri.from_user_input (fixed_url);
         // from_user_input defaults to http, not http if no scheme is specified
-        if (!fixed_url.starts_with ("http://") && !fixed_url.starts_with ("https://")) {
+        if (!fixed_url.has_prefix ("http://") && !fixed_url.has_prefix ("https://")) {
             url.scheme ("https");
         }
         unowned Account account = this.oc_wizard.account;
@@ -407,17 +407,17 @@ public class OwncloudSetupWizard : GLib.Object {
             string new_dav_path = this.oc_wizard.account.dav_path,
                     new_remote_folder = remote_folder;
 
-            while (new_dav_path.starts_with ('/')) {
+            while (new_dav_path.has_prefix ('/')) {
                 new_dav_path.remove (0, 1);
             }
-            while (new_dav_path.ends_with ('/')) {
+            while (new_dav_path.has_suffix ('/')) {
                 new_dav_path.chop (1);
             }
 
-            while (new_remote_folder.starts_with ('/')) {
+            while (new_remote_folder.has_prefix ('/')) {
                 new_remote_folder.remove (0, 1);
             }
-            while (new_remote_folder.ends_with ('/')) {
+            while (new_remote_folder.has_suffix ('/')) {
                 new_remote_folder.chop (1);
             }
 
@@ -516,7 +516,7 @@ public class OwncloudSetupWizard : GLib.Object {
     setup.
     ***********************************************************/
     private void on_signal_assistant_finished (int result) {
-        FolderMan folder_man = FolderMan.instance;
+        FolderManager folder_man = FolderManager.instance;
 
         if (result == Gtk.Dialog.Rejected) {
             GLib.info ("Rejected the new config, use the old!");
@@ -544,7 +544,7 @@ public class OwncloudSetupWizard : GLib.Object {
 
                 var f = folder_man.add_folder (account, folder_definition);
                 if (f) {
-                    if (folder_definition.virtual_files_mode != Vfs.Off && this.oc_wizard.use_virtual_file_sync ())
+                    if (folder_definition.virtual_files_mode != AbstractVfs.Off && this.oc_wizard.use_virtual_file_sync ())
                         f.root_pin_state (Common.ItemAvailability.ONLINE_ONLY);
 
                     f.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
@@ -615,7 +615,7 @@ public class OwncloudSetupWizard : GLib.Object {
             // strip the expected path
             string path = redirect_url.path;
             OwncloudSetupWizard.expected_path = "/" + this.oc_wizard.account.dav_path;
-            if (path.ends_with (OwncloudSetupWizard.expected_path)) {
+            if (path.has_suffix (OwncloudSetupWizard.expected_path)) {
                 path.chop (OwncloudSetupWizard.expected_path.size ());
                 redirect_url.path (path);
 
@@ -681,7 +681,7 @@ public class OwncloudSetupWizard : GLib.Object {
 
         // remember the local folder to compare later if it changed, but clean first
         string lf = GLib.Dir.from_native_separators (local_folder);
-        if (!lf.ends_with ('/')) {
+        if (!lf.has_suffix ('/')) {
             lf.append ('/');
         }
 
@@ -785,11 +785,11 @@ public class OwncloudSetupWizard : GLib.Object {
         // first try to rename (backup) the current local directory.
         bool rename_ok = false;
         while (!rename_ok) {
-            rename_ok = FolderMan.instance.start_from_scratch (local_folder);
+            rename_ok = FolderManager.instance.start_from_scratch (local_folder);
             if (!rename_ok) {
                 Gtk.MessageBox.StandardButton but = Gtk.MessageBox.question (
                     null,
-                    _("Folder rename failed"),
+                    _("FolderConnection rename failed"),
                     _("Cannot remove and back up the folder because the folder or a file in it is open in another program."
                     + " Please close the folder or file and hit retry or cancel the setup."),
                     Gtk.MessageBox.Retry | Gtk.MessageBox.Abort, Gtk.MessageBox.Retry);

@@ -79,5 +79,5 @@ public enum PinState {
 
 } // enum PinState
 
-} // namespace Vfs
+} // namespace AbstractVfs
 } // namespace Occ

@@ -49,7 +49,7 @@ public class GeneralSettings : Gtk.Widget {
             return entry;
         }
 
-        public static ZipEntry sync_folder_to_zip_entry (Folder f) {
+        public static ZipEntry sync_folder_to_zip_entry (FolderConnection f) {
             const var journal_path = f.journal_database ().database_file_path;
             const var journal_info = GLib.FileInfo (journal_path);
             return file_info_to_zip_entry (journal_info);
@@ -75,7 +75,7 @@ public class GeneralSettings : Gtk.Widget {
                 list.append (file_info_to_zip_entry (GLib.FileInfo (logger.log_file ())));
             }
 
-            const var folders = FolderMan.instance.map ().values ();
+            const var folders = FolderManager.instance.map ().values ();
             std.transform (std.cbegin (folders), std.cend (folders),
                         std.back_inserter (list),
                         sync_folder_to_zip_entry);
@@ -301,7 +301,7 @@ public class GeneralSettings : Gtk.Widget {
         ConfigFile config_file;
         config_file.show_in_explorer_navigation_pane (checked);
         // Now update the registry with the change.
-        FolderMan.instance.navigation_pane_helper.show_in_explorer_navigation_pane = checked;
+        FolderManager.instance.navigation_pane_helper.show_in_explorer_navigation_pane = checked;
     }
 
 
@@ -372,14 +372,14 @@ public class GeneralSettings : Gtk.Widget {
     #if defined (BUILD_UPDATER)
     ***********************************************************/
     private void update_info () {
-        if (ConfigFile ().skip_update_check () || !Updater.instance) {
+        if (ConfigFile ().skip_update_check () || !AbstractUpdater.instance) {
             // updater disabled on compile
             this.instance.updates_group_box.visible (false);
             return;
         }
 
         // Note: the sparkle-updater is not an OCUpdater
-        Updater.instance.signal_download_state_changed.connect (
+        AbstractUpdater.instance.signal_download_state_changed.connect (
             this.on_signal_updater_download_state_changed // Qt.UniqueConnection
         );
         this.instance.restart_button.clicked.connect (
@@ -388,7 +388,7 @@ public class GeneralSettings : Gtk.Widget {
         this.instance.auto_check_for_updates_check_box.toggled.connect (
             this.on_signal_auto_check_for_updates_check_box_toggled
         );
-        string status = Updater.instance.status_string (
+        string status = AbstractUpdater.instance.status_string (
             OCUpdater.UpdateStatusStringFormat.HTML
         );
         Theme.replace_link_color_string_background_aware (status);
@@ -400,13 +400,13 @@ public class GeneralSettings : Gtk.Widget {
         this.instance.update_state_label.on_signal_text (status);
 
         this.instance.restart_button.visible (
-            Updater.instance.download_state == OCUpdater.DownloadState.DOWNLOAD_COMPLETE
+            AbstractUpdater.instance.download_state == OCUpdater.DownloadState.DOWNLOAD_COMPLETE
         );
 
         this.instance.update_button.enabled (
-            Updater.instance.download_state != OCUpdater.DownloadState.CHECKING_SERVER &&
-            Updater.instance.download_state != OCUpdater.DownloadState.DOWNLOADING &&
-            Updater.instance.download_state != OCUpdater.DownloadState.DOWNLOAD_COMPLETE
+            AbstractUpdater.instance.download_state != OCUpdater.DownloadState.CHECKING_SERVER &&
+            AbstractUpdater.instance.download_state != OCUpdater.DownloadState.DOWNLOADING &&
+            AbstractUpdater.instance.download_state != OCUpdater.DownloadState.DOWNLOAD_COMPLETE
         );
 
         this.instance.auto_check_for_updates_check_box.checked (
@@ -424,7 +424,7 @@ public class GeneralSettings : Gtk.Widget {
 
 
     private void on_signal_restart_button_clicked () {
-        this.Updater.instance.start_installer ();
+        this.AbstractUpdater.instance.start_installer ();
         Gtk.Application.quit ();
         this.on_signal_update_check_now ();
     }
@@ -478,8 +478,8 @@ public class GeneralSettings : Gtk.Widget {
         change_update_channel_message_box.delete_later ();
         if (change_update_channel_message_box.clicked_button () == accept_button) {
             ConfigFile.update_channel = channel;
-            Updater.instance.update_url = Updater.update_url;
-            Updater.instance.check_for_update ();
+            AbstractUpdater.instance.update_url = AbstractUpdater.update_url;
+            AbstractUpdater.instance.check_for_update ();
         } else {
             this.instance.update_channel.current_text (ConfigFile ().update_channel);
         }
@@ -493,7 +493,7 @@ public class GeneralSettings : Gtk.Widget {
         // don't show update info if updates are disabled
         if (!ConfigFile.skip_update_check) {
             this.instance.update_button.enabled (false);
-            Updater.instance.check_for_update ();
+            AbstractUpdater.instance.check_for_update ();
         }
     }
 

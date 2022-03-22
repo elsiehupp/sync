@@ -6,10 +6,10 @@ public class TestBulkUploadAvailable_UploadAvailableReturnTrue : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private TestBulkUploadAvailable_UploadAvailableReturnTrue () {
-        QVariantMap bulkupload_map;
+        GLib.VariantMap bulkupload_map;
         bulkupload_map["bulkupload"] = "1.0";
 
-        QVariantMap capabilities_map;
+        GLib.VariantMap capabilities_map;
         capabilities_map["dav"] = bulkupload_map;
 
         var capabilities = Capabilities (capabilities_map);

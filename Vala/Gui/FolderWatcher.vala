@@ -6,7 +6,7 @@ namespace Ui {
 
 @brief Monitors a directory recursively for changes
 
-@details Folder Watcher monitors a directory and its
+@details FolderConnection Watcher monitors a directory and its
 subdirectories for changes in the local file system.
 through the signal_path_changed () signal.
 
@@ -23,10 +23,10 @@ public class FolderWatcher : GLib.Object {
     private FolderWatcherPrivate d;
     private GLib.Timer timer;
     private GLib.List<string> last_paths;
-    private Folder folder;
+    private FolderConnection folder_connection;
 
     /***********************************************************
-    Returns false if the folder watcher can't be trusted to capture all
+    Returns false if the folder_connection watcher can't be trusted to capture all
     notifications.
 
     For example, this can happen on linux if the inotify user limit from
@@ -68,15 +68,15 @@ public class FolderWatcher : GLib.Object {
     /***********************************************************
     Construct, connect signals, call init ()
     ***********************************************************/
-    public FolderWatcher (Folder folder = null) {
-        base (folder);
-        this.folder = folder;
+    public FolderWatcher (FolderConnection folder_connection = null) {
+        base (folder_connection);
+        this.folder_connection = folder_connection;
         this.is_reliable = true;
     }
 
 
     /***********************************************************
-    @param root Path of the root of the folder
+    @param root Path of the root of the folder_connection
     ***********************************************************/
     public void init (string root) {
         this.d.on_signal_reset (new FolderWatcherPrivate (this, root));
@@ -90,11 +90,11 @@ public class FolderWatcher : GLib.Object {
     public bool path_is_ignored (string path) {
         if (path == "")
             return true;
-        if (!this.folder)
+        if (!this.folder_connection)
             return false;
 
     //  #ifndef OWNCLOUD_TEST
-        if (this.folder.is_file_excluded_absolute (path) && !Utility.is_conflict_file (path)) {
+        if (this.folder_connection.is_file_excluded_absolute (path) && !Utility.is_conflict_file (path)) {
             GLib.debug ("* Ignoring file " + path);
             return true;
         }

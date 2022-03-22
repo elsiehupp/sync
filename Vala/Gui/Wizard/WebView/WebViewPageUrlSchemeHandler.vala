@@ -27,11 +27,11 @@ public class WebViewPageUrlSchemeHandler : QWebEngineUrlSchemeHandler {
         string password;
 
         foreach (string part in parts) {
-            if (part.starts_with ("server:")) {
+            if (part.has_prefix ("server:")) {
                 server = part.mid (7);
-            } else if (part.starts_with ("user:")) {
+            } else if (part.has_prefix ("user:")) {
                 user = part.mid (5);
-            } else if (part.starts_with ("password:")) {
+            } else if (part.has_prefix ("password:")) {
                 password = part.mid (9);
             }
         }
@@ -44,7 +44,7 @@ public class WebViewPageUrlSchemeHandler : QWebEngineUrlSchemeHandler {
         user = GLib.Uri.from_percent_encoding (user.to_utf8 ());
         password = GLib.Uri.from_percent_encoding (password.to_utf8 ());
 
-        if (!server.starts_with ("http://") && !server.starts_with ("https://")) {
+        if (!server.has_prefix ("http://") && !server.has_prefix ("https://")) {
             server = "https://" + server;
         }
         GLib.info ("Got user: " + user + ", server: " + server);

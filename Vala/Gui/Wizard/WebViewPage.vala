@@ -70,7 +70,7 @@ public class WebViewPage : AbstractCredentialsWizardPage {
             url = "https://nextcloud.com/register";
         } else {
             url = this.oc_wizard.oc_url ();
-            if (!url.ends_with ('/')) {
+            if (!url.has_suffix ('/')) {
                 url += "/";
             }
             url += "index.php/login/flow";

@@ -131,7 +131,6 @@ public class SyncFileItem : GLib.Object {
     ***********************************************************/
     public string rename_target;
 
-
     /***********************************************************
     The database-path of this item.
 
@@ -154,7 +153,9 @@ public class SyncFileItem : GLib.Object {
     /***********************************************************
     Variable useful for everybody
     ***********************************************************/
-    public ItemType type = BITFIELD (3);
+    public CSync.ItemType type = BITFIELD (3);
+
+    public Direction direction;
 
     /***********************************************************
     Variable useful for everybody
@@ -170,7 +171,6 @@ public class SyncFileItem : GLib.Object {
     Variable useful for everybody
     ***********************************************************/
     public bool has_blocklist_entry = BITFIELD (1);
-
 
     /***********************************************************
     If true and NormalError, this error may be blocklisted
@@ -216,7 +216,7 @@ public class SyncFileItem : GLib.Object {
     /***********************************************************
     Variable useful to report to the user
     ***********************************************************/
-    public RemotePermissions remote_perm;
+    public Common.RemotePermissions remote_perm;
 
     /***********************************************************
     Contains a string only in case of error
@@ -277,7 +277,6 @@ public class SyncFileItem : GLib.Object {
     ***********************************************************/
     public string file_identifier;
 
-
     /***********************************************************
     This is the value for the 'new' side, matching with
     this.size and this.modtime.
@@ -290,7 +289,6 @@ public class SyncFileItem : GLib.Object {
     Variable used by the propagator
     ***********************************************************/
     public string checksum_header;
-
 
     /***********************************************************
     The size and modtime of the file getting overwritten (on
@@ -305,7 +303,6 @@ public class SyncFileItem : GLib.Object {
     ***********************************************************/
     public time_t previous_modtime = 0;
 
-
     /***********************************************************
     Variable used by the propagator
     ***********************************************************/
@@ -316,20 +313,21 @@ public class SyncFileItem : GLib.Object {
     ***********************************************************/
     public string direct_download_cookies;
 
-
     /***********************************************************
     ***********************************************************/
-    public SyncJournalFileRecord to_sync_journal_file_record_with_inode (string local_filename) {
-        SyncJournalFileRecord record;
+    public Common.SyncJournalFileRecord to_sync_journal_file_record_with_inode (string local_filename) {
+        Common.SyncJournalFileRecord record;
         record.path = destination ().to_utf8 ();
         record.modtime = this.modtime;
 
         // Some types should never be written to the database when propagation completes
         record.type = this.type;
-        if (record.type == ItemType.VIRTUAL_FILE_DOWNLOAD)
-            record.type = ItemType.FILE;
-        if (record.type == ItemType.VIRTUAL_FILE_DEHYDRATION)
-            record.type = ItemType.VIRTUAL_FILE;
+        if (record.type == CSync.ItemType.VIRTUAL_FILE_DOWNLOAD) {
+            record.type = CSync.ItemType.FILE;
+        }
+        if (record.type == CSync.ItemType.VIRTUAL_FILE_DEHYDRATION) {
+            record.type = CSync.ItemType.VIRTUAL_FILE;
+        }
 
         record.etag = this.etag;
         record.file_id = this.file_identifier;
@@ -361,8 +359,8 @@ public class SyncFileItem : GLib.Object {
     This is intended in particular for read-update-write cycles that need
     to go through a a SyncFileItem, like PollJob.
     ***********************************************************/
-    public static unowned SyncFileItem from_sync_journal_file_record (SyncJournalFileRecord record) {
-        var item = SyncFileItem.create ();
+    public static unowned SyncFileItem from_sync_journal_file_record (Common.SyncJournalFileRecord record) {
+        var item = new SyncFileItem ()();
         item.file = record.path;
         item.inode = record.inode;
         item.modtime = record.modtime;
@@ -382,7 +380,7 @@ public class SyncFileItem : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public SyncFileItem () {
-        this.type = ItemType.SKIP;
+        this.type = CSync.ItemType.SKIP;
         this.direction = Direction.NONE;
         this.server_has_ignored_files = false;
         this.has_blocklist_entry = false;
@@ -397,7 +395,7 @@ public class SyncFileItem : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public string destination () {
-        if (!this.rename_target == "") {
+        if (this.rename_target != "") {
             return this.rename_target;
         }
         return this.file;
@@ -414,7 +412,7 @@ public class SyncFileItem : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool is_directory () {
-        return this.type == ItemType.DIRECTORY;
+        return this.type == CSync.ItemType.DIRECTORY;
     }
 
 

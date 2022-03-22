@@ -8,11 +8,11 @@ public class TestUserStatusSupportsEmoji_SupportsEmojiAvailableReturnTrue : GLib
     /***********************************************************
     ***********************************************************/
     private TestUserStatusSupportsEmoji_SupportsEmojiAvailableReturnTrue () {
-        QVariantMap user_status_map;
+        GLib.VariantMap user_status_map;
         user_status_map["enabled"] = true;
         user_status_map["supports_emoji"] = true;
 
-        QVariantMap capabilities_map;
+        GLib.VariantMap capabilities_map;
         capabilities_map["user_status"] = user_status_map;
 
         const Capabilities capabilities = new Capabilities (capabilities_map);

@@ -50,7 +50,7 @@ public class TestWipeVirtualSuffixFiles : AbstractTestSyncVirtualFiles {
         GLib.assert_true (fake_folder.current_local_state ().find ("A/a3" + DVSUFFIX));
         GLib.assert_true (!fake_folder.current_local_state ().find ("A/B/b1" + DVSUFFIX));
 
-        fake_folder.switch_to_vfs ((Vfs)(new VfsOff ()));
+        fake_folder.switch_to_vfs ((AbstractVfs)(new VfsOff ()));
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a3" + DVSUFFIX)); // regular upload
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());

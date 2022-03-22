@@ -13,7 +13,7 @@ value.
 
 @copyright LGPLv2.1 or later
 ***********************************************************/
-public class ValidateChecksumHeader : ComputeChecksumBase {
+public class ValidateChecksumHeader : AbstractComputeChecksum {
 
     /***********************************************************
     ***********************************************************/

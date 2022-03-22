@@ -20,20 +20,14 @@ overlay icons in the shell.
 ***********************************************************/
 public class SyncFileStatusTracker : GLib.Object {
 
-
     /***********************************************************
-    ***********************************************************/
-    private struct PathComparator {
-        //  private bool operator () (string lhs, string rhs) {
-        //      // This will make sure that the std.map is ordered and queried case-insensitively on macOS and Windows.
-        //      return path_compare (lhs, rhs) < 0;
-        //  }
-    }
+    In order to make sure the hashtable is ordered and queried
+    case-insensitively on macOS and Windows, the path comparator
+    should be:
 
-
-    /***********************************************************
+    return path_compare (lhs, rhs) < 0;
     ***********************************************************/
-    private class ProblemsMap : GLib.HashTable<string, Common.SyncFileStatus.SyncFileStatusTag, PathComparator> { }
+    private class ProblemsMap : GLib.HashTable<string, Common.SyncFileStatus.SyncFileStatusTag, path_compare> { }
 
 
     /***********************************************************
@@ -108,7 +102,7 @@ public class SyncFileStatusTracker : GLib.Object {
     public void on_signal_path_touched (string filename) {
         string folder_path = this.sync_engine.local_path;
 
-        //  ASSERT (filename.starts_with (folder_path));
+        //  ASSERT (filename.has_prefix (folder_path));
         string local_path = filename.mid (folder_path.size ());
         this.dirty_paths.insert (local_path);
 
@@ -248,7 +242,7 @@ public class SyncFileStatusTracker : GLib.Object {
                 // since: "a/" < "a/aa" < "a/aa/aaa" < "a/ab/aba"
                 // If problem_map keys are ["a/aa/aaa", "a/ab/aba"] and path_to_match == "a/aa",
                 // lower_bound (path_to_match) will point to "a/aa/aaa", and the moment that
-                // problem_path.starts_with (path_to_match) == false, we know that we've looked
+                // problem_path.has_prefix (path_to_match) == false, we know that we've looked
                 // at everything that interest us.
                 break;
             }
@@ -404,7 +398,7 @@ public class SyncFileStatusTracker : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private static bool path_starts_with (string lhs, string rhs) {
-        return lhs.starts_with (rhs, Qt.CaseSensitive);
+        return lhs.has_prefix (rhs, Qt.CaseSensitive);
     }
 
 

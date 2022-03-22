@@ -337,8 +337,8 @@ public class Utility : GLib.Object {
         QLocale locale = QLocale.system ();
         char dec_point = locale.decimal_point ();
         string string_value = locale.to_string (value, 'f', prec);
-        while (string_value.ends_with ('0') || string_value.ends_with (dec_point)) {
-            if (string_value.ends_with (dec_point)) {
+        while (string_value.has_suffix ('0') || string_value.has_suffix (dec_point)) {
+            if (string_value.has_suffix (dec_point)) {
                 string_value.chop (1);
                 break;
             }
@@ -602,16 +602,16 @@ public class Utility : GLib.Object {
     ***********************************************************/
     public static string normalize_etag (string etag) {
         // strip "XXXX-gzip"
-        if (etag.starts_with ('"') && etag.ends_with ("-gzip\"")) {
+        if (etag.has_prefix ('"') && etag.has_suffix ("-gzip\"")) {
             etag.chop (6);
             etag.remove (0, 1);
         }
         // strip trailing -gzip
-        if (etag.ends_with ("-gzip")) {
+        if (etag.has_suffix ("-gzip")) {
             etag.chop (5);
         }
         // strip normal quotes
-        if (etag.starts_with ('"') && etag.ends_with ('"')) {
+        if (etag.has_prefix ('"') && etag.has_suffix ('"')) {
             etag.chop (1);
             etag.remove (0, 1);
         }
@@ -716,7 +716,7 @@ public class Utility : GLib.Object {
         // out helpers, return the measured times.
         public GLib.DateTime time_of_lap (string lap_name) {
             uint64 t = duration_of_lap (lap_name);
-            if (t) {
+            if (t == 0) {
                 GLib.DateTime re = new GLib.DateTime (this.start_time);
                 return re.add_m_secs (t);
             }
@@ -754,10 +754,10 @@ public class Utility : GLib.Object {
         string path = url.path;
         if (!concat_path == "") {
             // avoid '//'
-            if (path.ends_with ('/') && concat_path.starts_with ('/')) {
+            if (path.has_suffix ('/') && concat_path.has_prefix ('/')) {
                 path.chop (1);
             } // avoid missing '/'
-            else if (!path.ends_with ('/') && !concat_path.starts_with ('/')) {
+            else if (!path.has_suffix ('/') && !concat_path.has_prefix ('/')) {
                 path += '/';
             }
             path += concat_path; // put the complete path together

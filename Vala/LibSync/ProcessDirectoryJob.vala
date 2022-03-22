@@ -260,7 +260,6 @@ public class ProcessDirectoryJob : GLib.Object {
     ***********************************************************/
     internal signal void etag (string array, GLib.DateTime time);
 
-
     /***********************************************************
     For creating the root job
 
@@ -282,8 +281,12 @@ public class ProcessDirectoryJob : GLib.Object {
     /***********************************************************
     For creating subjobs
     ***********************************************************/
-    public ProcessDirectoryJob.sub_job (PathTuple path, SyncFileItem dir_item,
-        QueryMode query_local, QueryMode query_server, int64 last_sync_timestamp,
+    public ProcessDirectoryJob.sub_job (
+        PathTuple path,
+        SyncFileItem dir_item,
+        QueryMode query_local,
+        QueryMode query_server,
+        int64 last_sync_timestamp,
         ProcessDirectoryJob parent) {
         base_record (parent);
         this.dir_item = dir_item;
@@ -398,7 +401,7 @@ public class ProcessDirectoryJob : GLib.Object {
             }
 
             if (!error_message == "") {
-                SyncFileItem item = SyncFileItem.create ();
+                SyncFileItem item = new SyncFileItem ()();
                 if (entry.local_entry.is_directory) {
                     item.type = ItemType.DIRECTORY;
                 } else {
@@ -521,11 +524,11 @@ public class ProcessDirectoryJob : GLib.Object {
 
             // On the server the path is mangled in case of E2EE
             if (!e.server_entry.e2e_mangled_name == "") {
-                GLib.assert (this.discovery_data.remote_folder.starts_with ("/"));
+                GLib.assert (this.discovery_data.remote_folder.has_prefix ("/"));
                 GLib.assert (this.discovery_data.remote_folder.has_suffix ("/"));
 
                 var root_path = this.discovery_data.remote_folder.mid (1);
-                GLib.assert (e.server_entry.e2e_mangled_name.starts_with (root_path));
+                GLib.assert (e.server_entry.e2e_mangled_name.has_prefix (root_path));
 
                 path.server = e.server_entry.e2e_mangled_name.mid (root_path.length);
             }
@@ -580,19 +583,20 @@ public class ProcessDirectoryJob : GLib.Object {
             is_invalid_pattern = true;
         }
 
-        var local_codec = QTextCodec.codec_for_locale ();
-        if (local_codec.mib_enum () != 106) {
-            // If the locale codec is not UTF-8, we must check that the filename from the server can
-            // be encoded in the local file system.
-            //
-            // We cannot use QTextCodec.can_encode () since that can incorrectly return true, see
-            // https://bugreports.qt.io/browse/QTBUG-6925.
-            QTextEncoder encoder = new QTextEncoder (local_codec, QTextCodec.Convert_invalid_to_null);
-            if (encoder.from_unicode (path).contains ('\0')) {
-                GLib.warning ("Cannot encode " + path + " to local encoding " + local_codec.name ());
-                excluded = CSync.ExcludedFiles.Type.CANNOT_ENCODE;
-            }
-        }
+        // Ignored because Vala is already Unicode?
+        //  var local_codec = GMime.Encoding.codec_for_locale ();
+        //  if (local_codec.mib_enum () != 106) {
+        //      // If the locale codec is not UTF-8, we must check that the filename from the server can
+        //      // be encoded in the local file system.
+        //      //
+        //      // We cannot use GMime.Encoding.can_encode () since that can incorrectly return true, see
+        //      // https://bugreports.qt.io/browse/QTBUG-6925.
+        //      QTextEncoder encoder = new QTextEncoder (local_codec, GMime.Encoding.Convert_invalid_to_null);
+        //      if (encoder.from_unicode (path).contains ('\0')) {
+        //          GLib.warning ("Cannot encode " + path + " to local encoding " + local_codec.name ());
+        //          excluded = CSync.ExcludedFiles.Type.CANNOT_ENCODE;
+        //      }
+        //  }
 
         if (excluded == CSync.ExcludedFiles.Type.NOT_EXCLUDED && !is_symlink) {
             return false;
@@ -601,7 +605,7 @@ public class ProcessDirectoryJob : GLib.Object {
             return true;
         }
 
-        SyncFileItem item = SyncFileItem.create ();
+        SyncFileItem item = new SyncFileItem ()();
         item.file = path;
         item.original_file = path;
         item.instruction = CSync.SyncInstructions.IGNORE;
@@ -648,7 +652,7 @@ public class ProcessDirectoryJob : GLib.Object {
                 item.status = SyncFileItem.Status.FILENAME_INVALID;
                 break;
             case CSync.ExcludedFiles.Type.HIDDEN:
-                item.error_string = _("File/Folder is ignored because it's hidden.");
+                item.error_string = _("File/FolderConnection is ignored because it's hidden.");
                 break;
             case CSync.ExcludedFiles.Type.STAT_FAILED:
                 item.error_string = _("Stat failed.");
@@ -794,11 +798,11 @@ public class ProcessDirectoryJob : GLib.Object {
                 return "";
             }
 
-            GLib.assert (this.discovery_data.remote_folder.starts_with ("/"));
+            GLib.assert (this.discovery_data.remote_folder.has_prefix ("/"));
             GLib.assert (this.discovery_data.remote_folder.has_suffix ("/"));
 
             var root_path = this.discovery_data.remote_folder.mid (1);
-            GLib.assert (server_entry.e2e_mangled_name.starts_with (root_path));
+            GLib.assert (server_entry.e2e_mangled_name.has_prefix (root_path));
             return server_entry.e2e_mangled_name.mid (root_path.length);
         };
 
@@ -931,7 +935,7 @@ public class ProcessDirectoryJob : GLib.Object {
     placeholder?
     ***********************************************************/
     private QueryMode server_query_mode (SyncJournalFileRecord database_entry, RemoteInfo server_entry) {
-        const bool is_vfs_mode_on = this.discovery_data && this.discovery_data.sync_options.vfs && this.discovery_data.sync_options.vfs.mode () != Vfs.Off;
+        const bool is_vfs_mode_on = this.discovery_data && this.discovery_data.sync_options.vfs && this.discovery_data.sync_options.vfs.mode () != AbstractVfs.Off;
         if (is_vfs_mode_on && database_entry.is_directory () && database_entry.is_e2e_encrypted) {
             int64 local_folder_size = 0;
 
@@ -961,7 +965,7 @@ public class ProcessDirectoryJob : GLib.Object {
         var opts = this.discovery_data.sync_options;
         if (!local_entry.is_valid ()
             && item.type == ItemType.FILE
-            && opts.vfs.mode () != Vfs.Off
+            && opts.vfs.mode () != AbstractVfs.Off
             && this.pin_state != PinState.PinState.ALWAYS_LOCAL
             && !FileSystem.is_exclude_file (item.file)) {
             item.type = ItemType.VIRTUAL_FILE;
@@ -969,7 +973,7 @@ public class ProcessDirectoryJob : GLib.Object {
                 add_virtual_file_suffix (path.original);
         }
 
-        if (opts.vfs.mode () != Vfs.Off && !item.encrypted_filename == "") {
+        if (opts.vfs.mode () != AbstractVfs.Off && !item.encrypted_filename == "") {
             // We are syncing a file for the first time (local entry is invalid) and it is encrypted file that will be virtual once synced
             // to avoid having error of "file has changed during sync" when trying to hydrate it excplicitly - we must remove Constants.E2EE_TAG_SIZE bytes from the end
             // as explicit hydration does not care if these bytes are present in the placeholder or not, but, the size must not change in the middle of the sync
@@ -1017,7 +1021,7 @@ public class ProcessDirectoryJob : GLib.Object {
     }
 
 
-    private void on_signal_request_etag_job_finished_with_result (HttpResult<string> etag) /*mutable*/ {
+    private void on_signal_request_etag_job_finished_with_result (Result<T, HttpError><string> etag) /*mutable*/ {
         this.pending_async_jobs--;
         GLib.Timeout.single_shot (0, this.discovery_data, DiscoveryPhase.schedule_more_jobs);
         if (etag || etag.error.code != 404 ||
@@ -1443,7 +1447,7 @@ public class ProcessDirectoryJob : GLib.Object {
     }
 
 
-    private void on_signal_request_etag_job_finished_with_result (HttpResult<string> etag) /*mutable*/ {
+    private void on_signal_request_etag_job_finished_with_result (Result<T, HttpError><string> etag) /*mutable*/ {
         if (!etag || (etag != base_record.etag && !item.is_directory ()) || this.discovery_data.is_renamed (original_path)) {
             GLib.info ("Can't rename because the etag has changed or the directory is gone " + original_path);
             // Can't be a rename, leave it as a new.
@@ -1464,7 +1468,7 @@ public class ProcessDirectoryJob : GLib.Object {
         // TODO: We may want to execute the same logic for non-VFS mode, as, moving/renaming the same folder by 2 or more clients at the same time is not possible in Web UI.
         // Keeping it like this (for VFS files and folders only) just to fix a user issue.
 
-        if (! (this.discovery_data && this.discovery_data.sync_options.vfs && this.discovery_data.sync_options.vfs.mode () != Vfs.Off)) {
+        if (! (this.discovery_data && this.discovery_data.sync_options.vfs && this.discovery_data.sync_options.vfs.mode () != AbstractVfs.Off)) {
             // for VFS files and folders only
             return;
         }
@@ -1473,7 +1477,7 @@ public class ProcessDirectoryJob : GLib.Object {
             return;
         }
 
-        if (local_entry.is_directory && this.discovery_data.sync_options.vfs.mode () != Vfs.WindowsCfApi) {
+        if (local_entry.is_directory && this.discovery_data.sync_options.vfs.mode () != AbstractVfs.WindowsCfApi) {
             // for VFS folders on Windows only
             return;
         }
@@ -1488,9 +1492,9 @@ public class ProcessDirectoryJob : GLib.Object {
         const bool is_file_place_holder = !local_entry.is_directory && this.discovery_data.sync_options.vfs.is_dehydrated_placeholder (this.discovery_data.local_dir + path.local);
 
         // either correct availability, or a result with error if the folder is new or otherwise has no availability set yet
-        var folder_place_holder_availability = local_entry.is_directory ? this.discovery_data.sync_options.vfs.availability (path.local) : AbstractVfs.AvailabilityResult (Vfs.AvailabilityError.NO_SUCH_ITEM);
+        var folder_place_holder_availability = local_entry.is_directory ? this.discovery_data.sync_options.vfs.availability (path.local) : AbstractVfs.AvailabilityResult (AbstractVfs.AvailabilityError.NO_SUCH_ITEM);
 
-        var folder_pin_state = local_entry.is_directory ? this.discovery_data.sync_options.vfs.pin_state (path.local) : Optional<Vfs.PinState> (PinState.PinState.UNSPECIFIED);
+        var folder_pin_state = local_entry.is_directory ? this.discovery_data.sync_options.vfs.pin_state (path.local) : Optional<AbstractVfs.PinState> (PinState.PinState.UNSPECIFIED);
 
         if (!is_file_place_holder && !folder_place_holder_availability.is_valid () && !folder_pin_state.is_valid ()) {
             // not a file placeholder and not a synced folder placeholder (new local folder)
@@ -1834,7 +1838,7 @@ public class ProcessDirectoryJob : GLib.Object {
             if (forbidden_it != this.discovery_data.forbidden_deletes.begin ())
                 forbidden_it -= 1;
             if (forbidden_it != this.discovery_data.forbidden_deletes.end ()
-                && file_slash.starts_with (forbidden_it.key ())) {
+                && file_slash.has_prefix (forbidden_it.key ())) {
                 item.instruction = CSync.SyncInstructions.NEW;
                 item.direction = SyncFileItem.Direction.DOWN;
                 item.is_restoration = true;
@@ -1875,7 +1879,7 @@ public class ProcessDirectoryJob : GLib.Object {
                                                     : this.dir_item ? this.dir_item.remote_perm : this.root_permissions;
         var file_perms = src_perm;
         //true when it is just a rename in the same directory. (not a move)
-        bool is_rename = src_path.starts_with (this.current_folder.original)
+        bool is_rename = src_path.has_prefix (this.current_folder.original)
             && src_path.last_index_of ("/") == this.current_folder.original.size ();
         // Check if we are allowed to move to the destination.
         bool destination_ok = true;
@@ -2001,7 +2005,7 @@ public class ProcessDirectoryJob : GLib.Object {
     Convenience to detect suffix-vfs modes
     ***********************************************************/
     private bool is_vfs_with_suffix () {
-        return this.discovery_data.sync_options.vfs.mode () == Vfs.WithSuffix;
+        return this.discovery_data.sync_options.vfs.mode () == AbstractVfs.WithSuffix;
     }
 
 

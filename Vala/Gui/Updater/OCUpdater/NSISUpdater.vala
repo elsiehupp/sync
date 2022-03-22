@@ -8,7 +8,7 @@ namespace Occ {
 namespace Ui {
 
 /***********************************************************
-@brief Windows Updater Using NSIS
+@brief Windows AbstractUpdater Using NSIS
 ***********************************************************/
 public class NSISUpdater : OCUpdater {
 

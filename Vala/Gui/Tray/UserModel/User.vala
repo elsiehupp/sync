@@ -86,7 +86,7 @@ public class User : GLib.Object {
         this.account_state.account.account_changed_display_name.connect (
             this.on_signal_name_changed
         );
-        FolderMan.instance.signal_folder_list_changed.connect (
+        FolderManager.instance.signal_folder_list_changed.connect (
             this.on_signal_has_local_folder_changed
         );
         this.signal_gui_log.connect (
@@ -147,11 +147,11 @@ public class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public Folder folder {
+    public FolderConnection folder_connection {
         public get {
-            foreach (Folder folder in FolderMan.instance.map ()) {
-                if (folder.account_state == this.account_state) {
-                    return folder;
+            foreach (FolderConnection folder_connection in FolderManager.instance.map ()) {
+                if (folder_connection.account_state == this.account_state) {
+                    return folder_connection;
                 }
             }
 
@@ -205,10 +205,10 @@ public class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void open_local_folder () {
-        const var folder = folder;
+        const var folder_connection = folder_connection;
 
-        if (folder) {
-            QDesktopServices.open_url (GLib.Uri.from_local_file (folder.path));
+        if (folder_connection) {
+            QDesktopServices.open_url (GLib.Uri.from_local_file (folder_connection.path));
         }
     }
 
@@ -216,7 +216,7 @@ public class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool has_local_folder () {
-        return folder != null;
+        return folder_connection != null;
     }
 
 
@@ -339,16 +339,16 @@ public class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void process_completed_sync_item (Folder folder, SyncFileItemPtr item) {
+    public void process_completed_sync_item (FolderConnection folder_connection, SyncFileItemPtr item) {
         Activity activity;
         activity.type = Activity.Type.SYNC_FILE_ITEM; //client activity
         activity.status = item.status;
         activity.date_time = GLib.DateTime.current_date_time ();
         activity.message = item.original_file;
-        activity.link = folder.account_state.account.url;
-        activity.acc_name = folder.account_state.account.display_name;
+        activity.link = folder_connection.account_state.account.url;
+        activity.acc_name = folder_connection.account_state.account.display_name;
         activity.file = item.file;
-        activity.folder = folder.alias ();
+        activity.folder_connection = folder_connection.alias ();
         activity.file_action = "";
 
         if (item.instruction == CSync.SyncInstructions.REMOVE) {
@@ -396,8 +396,8 @@ public class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_item_completed (string folder, SyncFileItemPtr item) {
-        var folder_instance = FolderMan.instance.folder_by_alias (folder);
+    public void on_signal_item_completed (string folder_connection, SyncFileItemPtr item) {
+        var folder_instance = FolderManager.instance.folder_by_alias (folder_connection);
 
         if (!folder_instance || !is_activity_of_current_account (folder_instance) || is_unsolvable_conflict (item)) {
             return;
@@ -411,7 +411,7 @@ public class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_add_error (string folder_alias, string message, ErrorCategory category) {
-        var folder_instance = FolderMan.instance.folder_by_alias (folder_alias);
+        var folder_instance = FolderManager.instance.folder_by_alias (folder_alias);
         if (!folder_instance)
             return;
 
@@ -426,7 +426,7 @@ public class User : GLib.Object {
             activity.message = folder_instance.short_gui_local_path;
             activity.link = folder_instance.short_gui_local_path;
             activity.acc_name = folder_instance.account_state.account.display_name;
-            activity.folder = folder_alias;
+            activity.folder_connection = folder_alias;
 
             if (category == ErrorCategory.INSUFFICIENT_REMOTE_STORAGE) {
                 ActivityLink link;
@@ -446,7 +446,7 @@ public class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_add_error_to_gui (string folder_alias, LibSync.SyncFileItem.Status status, string error_message, string subject) {
-        const var folder_instance = FolderMan.instance.folder_by_alias (folder_alias);
+        const var folder_instance = FolderManager.instance.folder_by_alias (folder_alias);
         if (!folder_instance) {
             return;
         }
@@ -464,7 +464,7 @@ public class User : GLib.Object {
             activity.message = error_message;
             activity.link = folder_instance.short_gui_local_path;
             activity.acc_name = folder_instance.account_state.account.display_name;
-            activity.folder = folder_alias;
+            activity.folder_connection = folder_alias;
 
             // add 'other errors' to activity list
             this.activity_model.add_error_to_activity_list (activity);
@@ -519,11 +519,11 @@ public class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_progress_info (string folder, ProgressInfo progress) {
+    public void on_signal_progress_info (string folder_connection, ProgressInfo progress) {
         if (progress.status () == ProgressInfo.Status.RECONCILE) {
             // Wipe all non-persistent entries - as well as the persistent ones
             // in cases where a local discovery was done.
-            var f = FolderMan.instance.folder_by_alias (folder);
+            var f = FolderManager.instance.folder_by_alias (folder_connection);
             if (!f)
                 return;
             const var engine = f.sync_engine;
@@ -533,7 +533,7 @@ public class User : GLib.Object {
                     // we process expired activities in a different slot
                     continue;
                 }
-                if (activity.folder != folder) {
+                if (activity.folder_connection != folder_connection) {
                     continue;
                 }
 
@@ -576,13 +576,13 @@ public class User : GLib.Object {
             // Inform other components about them.
             string[] conflicts;
             foreach (Activity activity in this.activity_model.errors_list ()) {
-                if (activity.folder == folder
+                if (activity.folder_connection == folder_connection
                     && activity.status == LibSync.SyncFileItem.Status.CONFLICT) {
                     conflicts.append (activity.file);
                 }
             }
 
-            /* emit */ ProgressDispatcher.instance.signal_folder_conflicts (folder, conflicts);
+            /* emit */ ProgressDispatcher.instance.signal_folder_conflicts (folder_connection, conflicts);
         }
     }
 
@@ -767,8 +767,8 @@ public class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_disconnect_push_notifications () {
-        disconnect (this.account_state.account.push_notifications (), PushNotifications.notifications_changed, this, User.on_signal_received_push_notification);
-        disconnect (this.account_state.account.push_notifications (), PushNotifications.activities_changed, this, User.on_signal_received_push_activity);
+        disconnect (this.account_state.account.push_notifications (), PushNotificationManager.notifications_changed, this, User.on_signal_received_push_notification);
+        disconnect (this.account_state.account.push_notifications (), PushNotificationManager.activities_changed, this, User.on_signal_received_push_activity);
 
         disconnect (this.account_state.account, Account.push_notifications_disabled, this, User.on_signal_disconnect_push_notifications);
 
@@ -828,8 +828,8 @@ public class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private bool is_activity_of_current_account (Folder folder) {
-        return folder.account_state == this.account_state;
+    private bool is_activity_of_current_account (FolderConnection folder_connection) {
+        return folder_connection.account_state == this.account_state;
     }
 
 

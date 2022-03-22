@@ -76,7 +76,7 @@ public class TestAllFilesDeletedKeep : AbstractTestAllFilesDeleted {
             delete_on_remote ? LibSync.SyncFileItem.Direction.DOWN : LibSync.SyncFileItem.Direction.UP
         );
         callback (true);
-        fake_folder.sync_engine.journal.clear_file_table (); // That's what Folder is doing
+        fake_folder.sync_engine.journal.clear_file_table (); // That's what FolderConnection is doing
     }
 
 }

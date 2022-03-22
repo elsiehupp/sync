@@ -42,9 +42,9 @@ public class RemoteWipe : GLib.Object {
             this.on_signal_account_removed
         );
         this.signal_authorized.connect (
-            FolderMan.instance.on_signal_wipe_folder_for_account
+            FolderManager.instance.on_signal_wipe_folder_for_account
         );
-        FolderMan.instance.signal_wipe_done.connect (
+        FolderManager.instance.signal_wipe_done.connect (
             this.on_signal_notify_server_success_job
         );
         this.account.app_password_retrieved.connect (

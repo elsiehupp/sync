@@ -29,23 +29,23 @@ public class TestSetUpCorrectCredentialsAuthenticateAndEmitReady : AbstractTestP
     }
 
 
-    private void authentication_delegate_setup_correct_credentials_authenticate_and_emit_read_1 (PushNotifications push_notifications) {
+    private void authentication_delegate_setup_correct_credentials_authenticate_and_emit_read_1 (PushNotificationManager push_notifications) {
         files_changed_spy.on_signal_reset (
             new QSignalSpy (
                 push_notifications,
-                PushNotifications.files_changed
+                PushNotificationManager.files_changed
             )
         );
         notifications_changed_spy.on_signal_reset (
             new QSignalSpy (
                 push_notifications,
-                PushNotifications.notifications_changed
+                PushNotificationManager.notifications_changed
             )
         );
         activities_changed_spy.on_signal_reset (
             new QSignalSpy (
                 push_notifications,
-                PushNotifications.activities_changed
+                PushNotificationManager.activities_changed
             )
         );
     }

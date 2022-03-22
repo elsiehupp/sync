@@ -40,7 +40,7 @@ public class TestCheckPathValidityForNewFolder : AbstractTestFolderMan {
         //  }
 
         // those should be allowed
-        // string FolderMan.check_path_validity_for_new_folder (string path, GLib.Uri server_url, bool for_new_directory)
+        // string FolderManager.check_path_validity_for_new_folder (string path, GLib.Uri server_url, bool for_new_directory)
 
         GLib.assert_true (folder_manager.check_path_validity_for_new_folder (directory_path + "/sub/free") == "");
         GLib.assert_true (folder_manager.check_path_validity_for_new_folder (directory_path + "/free2/") == "");

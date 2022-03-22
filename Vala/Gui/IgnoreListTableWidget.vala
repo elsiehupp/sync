@@ -66,9 +66,9 @@ public class IgnoreListTableWidget : Gtk.Widget {
             while (!ignores.at_end ()) {
                 string line = string.from_utf8 (ignores.read_line ());
                 line.chop (1);
-                if (!line == "" && !line.starts_with ("#")) {
+                if (!line == "" && !line.has_prefix ("#")) {
                     bool deletable = false;
-                    if (line.starts_with (']')) {
+                    if (line.has_prefix (']')) {
                         deletable = true;
                         line = line.mid (1);
                     }
@@ -127,7 +127,7 @@ public class IgnoreListTableWidget : Gtk.Widget {
                     string prepend;
                     if (deletable_item.check_state () == Qt.Checked) {
                         prepend = "]";
-                    } else if (pattern_item.text ().starts_with ('#')) {
+                    } else if (pattern_item.text ().has_prefix ('#')) {
                         prepend = "\\";
                     }
                     ignores.write (prepend + pattern_item.text ().to_utf8 () + '\n');
@@ -139,14 +139,14 @@ public class IgnoreListTableWidget : Gtk.Widget {
         }
         ignores.close (); //close the file before reloading stuff.
 
-        FolderMan folder_man = FolderMan.instance;
+        FolderManager folder_man = FolderManager.instance;
 
         // We need to force a remote discovery after a change of the ignore list.
         // Otherwise we would not download the files/directories that are no longer
         // ignored (because the remote etag did not change)   (issue #3172)
-        foreach (Folder folder in folder_man.map ()) {
-            folder.journal_database ().force_remote_discovery_next_sync ();
-            folder_man.schedule_folder (folder);
+        foreach (FolderConnection folder_connection in folder_man.map ()) {
+            folder_connection.journal_database ().force_remote_discovery_next_sync ();
+            folder_man.schedule_folder (folder_connection);
         }
     }
 

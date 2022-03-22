@@ -46,7 +46,7 @@ public class TestErrorMessage : GLib.Object {
 
 
     private GLib.InputStream override_delegate_error_message (Soup.Operation operation, Soup.Request request, QIODevice device) {
-        if (operation == Soup.GetOperation && request.url.path.ends_with ("A/broken")) {
+        if (operation == Soup.GetOperation && request.url.path.has_suffix ("A/broken")) {
             return new FakeErrorReply (operation, request, this, 400,
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
                 + "<d:error xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\">\n"

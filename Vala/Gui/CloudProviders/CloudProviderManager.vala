@@ -45,14 +45,14 @@ public class CloudProviderManager : GLib.Object {
         //  Q_UNUSED (connection);
         //  Q_UNUSED (name);
         //  Q_UNUSED (user_data);
-        g_clear_object (this.provider_exporter);
+        GLib.Object.clear (this.provider_exporter);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void register_signals () {
-        FolderMan.instance.signal_folder_list_changed.connect (
+        FolderManager.instance.signal_folder_list_changed.connect (
             this.on_signal_folder_list_changed
         );
         on_signal_folder_list_changed (folder_manager.map ());
@@ -61,7 +61,7 @@ public class CloudProviderManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_folder_list_changed (Folder.Map folder_map) {
+    public void on_signal_folder_list_changed (FolderConnection.Map folder_map) {
         var iterator = new QMapIterator<string, CloudProviderWrapper> (this.map);
         while (iterator.has_next ()) {
             iterator.next ();
@@ -72,7 +72,7 @@ public class CloudProviderManager : GLib.Object {
             }
         }
 
-        Folder.MapIterator iterator2 = new Folder.MapIterator (folder_map);
+        FolderConnection.MapIterator iterator2 = new FolderConnection.MapIterator (folder_map);
         while (iterator2.has_next ()) {
             iterator2.next ();
             if (!this.map.contains (iterator2.key ())) {

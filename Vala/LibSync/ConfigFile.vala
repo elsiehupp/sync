@@ -1054,11 +1054,11 @@ public class ConfigFile : GLib.Object {
     string ConfigFile.update_channel {
         string default_update_channel = "stable";
         string suffix = MIRALL_STRINGIFY (MIRALL_VERSION_SUFFIX);
-        if (suffix.starts_with ("daily")
-            || suffix.starts_with ("nightly")
-            || suffix.starts_with ("alpha")
-            || suffix.starts_with ("rc")
-            || suffix.starts_with ("beta")) {
+        if (suffix.has_prefix ("daily")
+            || suffix.has_prefix ("nightly")
+            || suffix.has_prefix ("alpha")
+            || suffix.has_prefix ("rc")
+            || suffix.has_prefix ("beta")) {
             default_update_channel = "beta";
         }
 

@@ -122,7 +122,7 @@ public class OwncloudGui : GLib.Object {
         ProgressDispatcher.instance.progress_info.connect (
             this.on_signal_update_progress
         );
-        FolderMan.instance.signal_folder_sync_state_change.connect (
+        FolderManager.instance.signal_folder_sync_state_change.connect (
             this.on_signal_sync_state_change
         );
         Logger.instance.signal_gui_log.connect (
@@ -150,7 +150,7 @@ public class OwncloudGui : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static void raise_dialog (Gtk.Widget raise_widget) {
-        if (raise_widget && !raise_widget.parent_widget ()) {
+        if (raise_widget != null && !raise_widget.parent_widget ()) {
             // Qt has a bug which causes parent-less dialogs to pop-under.
             raise_widget.show_normal ();
             raise_widget.raise ();
@@ -233,8 +233,8 @@ public class OwncloudGui : GLib.Object {
                 all_disconnected = false;
             }
         }
-        foreach (Folder folder in FolderMan.instance.map ()) {
-            if (!folder.sync_paused) {
+        foreach (FolderConnection folder_connection in FolderManager.instance.map ()) {
+            if (!folder_connection.sync_paused) {
                 all_paused = false;
             }
         }
@@ -275,12 +275,12 @@ public class OwncloudGui : GLib.Object {
 
         // display the info of the least successful sync (eg. do not just display the result of the latest sync)
         string tray_message;
-        FolderMan folder_man = FolderMan.instance;
-        Folder.Map map = folder_man.map ();
+        FolderManager folder_man = FolderManager.instance;
+        FolderConnection.Map map = folder_man.map ();
 
         LibSync.SyncResult.Status overall_status = LibSync.SyncResult.Status.UNDEFINED;
         bool has_unresolved_conflicts = false;
-        FolderMan.tray_overall_status (map.values (), overall_status, has_unresolved_conflicts);
+        FolderManager.tray_overall_status (map.values (), overall_status, has_unresolved_conflicts);
 
         // If the sync succeeded but there are unresolved conflicts,
         // show the problem icon!
@@ -300,12 +300,12 @@ public class OwncloudGui : GLib.Object {
         // create the tray blob message, check if we have an defined state
         if (map.count () > 0) {
             string[] all_status_strings;
-            foreach (Folder folder in map.values ()) {
-                string folder_message = FolderMan.tray_tooltip_status_string (
-                    folder.sync_result.status (),
-                    folder.sync_result.has_unresolved_conflicts,
-                    folder.sync_paused);
-                all_status_strings += _("Folder %1: %2").printf (folder.short_gui_local_path, folder_message);
+            foreach (FolderConnection folder_connection in map.values ()) {
+                string folder_message = FolderManager.tray_tooltip_status_string (
+                    folder_connection.sync_result.status (),
+                    folder_connection.sync_result.has_unresolved_conflicts,
+                    folder_connection.sync_paused);
+                all_status_strings += _("FolderConnection %1: %2").printf (folder_connection.short_gui_local_path, folder_message);
             }
             tray_message = all_status_strings.join ("\n");
     //  #endif
@@ -335,7 +335,7 @@ public class OwncloudGui : GLib.Object {
     private void status_text (string text) {
         //  Q_UNUSED (text)
         // Don't overwrite the status if we're currently syncing
-        if (FolderMan.instance.is_any_sync_running ()) {
+        if (FolderManager.instance.is_any_sync_running ()) {
             return;
         }
         //this.action_status.on_signal_text (text);
@@ -345,10 +345,11 @@ public class OwncloudGui : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_show_tray_message (string title, string message) {
-        if (this.tray)
+        if (this.tray != null) {
             this.tray.show_message (title, message);
-        else
+        } else {
             GLib.warning ("Tray not ready: " + message);
+        }
     }
 
 
@@ -360,13 +361,13 @@ public class OwncloudGui : GLib.Object {
 
 
     /***********************************************************
-    open the folder with the given Alias
+    open the folder_connection with the given Alias
     ***********************************************************/
     private void OwncloudGui.on_signal_folder_open_action (string alias) {
-        Folder folder = FolderMan.instance.folder_by_alias (alias);
-        if (folder) {
-            GLib.info ("opening local url " + folder.path);
-            GLib.Uri url = GLib.Uri.from_local_file (folder.path);
+        FolderConnection folder_connection = FolderManager.instance.folder_by_alias (alias);
+        if (folder_connection != null {
+            GLib.info ("opening local url " + folder_connection.path);
+            GLib.Uri url = GLib.Uri.from_local_file (folder_connection.path);
             QDesktopServices.open_url (url);
         }
     }
@@ -374,8 +375,8 @@ public class OwncloudGui : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_update_progress (string folder, ProgressInfo progress) {
-        //  Q_UNUSED (folder);
+    public void on_signal_update_progress (string folder_connection, ProgressInfo progress) {
+        //  Q_UNUSED (folder_connection);
 
         // FIXME: Lots of messages computed for nothing in this method, needs revisiting
         if (progress.status () == ProgressInfo.Status.DISCOVERY) {
@@ -429,9 +430,9 @@ public class OwncloudGui : GLib.Object {
             string time_str = QTime.current_time ().to_string ("hh:mm");
             string action_text = _("%1 (%2, %3)").printf (progress.last_completed_item.file, kind_str, time_str);
             var action = new QAction (action_text, this);
-            Folder folder = FolderMan.instance.folder_by_alias (folder);
-            if (folder) {
-                string full_path = folder.path + '/' + progress.last_completed_item.file;
+            FolderConnection folder_connection = FolderManager.instance.folder_by_alias (folder_connection);
+            if (folder_connection) {
+                string full_path = folder_connection.path + '/' + progress.last_completed_item.file;
                 if (new GLib.File (full_path).exists ()) {
                     action.triggered.connect (
                         this.on_progress_action_triggered
@@ -498,16 +499,16 @@ public class OwncloudGui : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_sync_state_change (Folder folder) {
+    public void on_signal_sync_state_change (FolderConnection folder_connection) {
         on_signal_compute_overall_sync_status ();
 
-        if (!folder) {
+        if (!folder_connection) {
             return; // Valid, just a general GUI redraw was needed.
         }
 
-        var result = folder.sync_result;
+        var result = folder_connection.sync_result;
 
-        GLib.info ("Sync state changed for folder " + folder.remote_url ().to_string () + ": " + result.status_string);
+        GLib.info ("Sync state changed for folder_connection " + folder_connection.remote_url ().to_string () + ": " + result.status_string);
 
         if (result.status () == LibSync.SyncResult.Status.SUCCESS
             || result.status () == LibSync.SyncResult.Status.PROBLEM
@@ -656,26 +657,26 @@ public class OwncloudGui : GLib.Object {
 
 
     /***********************************************************
-    Open a share dialog for a file or folder.
+    Open a share dialog for a file or folder_connection.
 
     share_path is the full remote path to the item,
     local_path is the absolute local path to it (so not relative
-    to the folder).
+    to the folder_connection).
     ***********************************************************/
     private void on_signal_show_share_dialog (string share_path, string local_path, ShareDialogStartPage start_page) {
-        const var folder = FolderMan.instance.folder_for_path (local_path);
-        if (!folder) {
-            GLib.warning ("Could not open share dialog for " + local_path +  "no responsible folder found.");
+        const var folder_connection = FolderManager.instance.folder_for_path (local_path);
+        if (!folder_connection) {
+            GLib.warning ("Could not open share dialog for " + local_path +  "no responsible folder_connection found.");
             return;
         }
 
-        const var account_state = folder.account_state;
+        const var account_state = folder_connection.account_state;
 
-        const string file = local_path.mid (folder.clean_path.length + 1);
+        const string file = local_path.mid (folder_connection.clean_path.length + 1);
         SyncJournalFileRecord file_record;
 
         bool resharing_allowed = true; // lets assume the good
-        if (folder.journal_database ().file_record (file, file_record) && file_record.is_valid ()) {
+        if (folder_connection.journal_database ().file_record (file, file_record) && file_record.is_valid ()) {
             // check the permission : Is resharing allowed?
             if (!file_record.remote_perm == null && !file_record.remote_perm.has_permission (RemotePermissions.Permissions.CAN_RESHARE)) {
                 resharing_allowed = false;

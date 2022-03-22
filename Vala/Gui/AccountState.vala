@@ -407,7 +407,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
             return;
         }
 
-        if (this.connection_validator) {
+        if (this.connection_validator != null) {
             GLib.warning ("ConnectionValidator already running, ignoring " + account.display_name);
             return;
         }
@@ -603,7 +603,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
             return;
         }
 
-        if (this.connection_validator) {
+        if (this.connection_validator != null) {
             // When new credentials become available we always want to restart the
             // connection validation, even if it's currently running.
             this.connection_validator.delete_later ();
@@ -617,7 +617,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_navigation_apps_fetched (QJsonDocument reply, int status_code) {
-        if (this.account) {
+        if (this.account != null) {
             if (status_code == 304) {
                 GLib.warning ("Status code " + status_code + " Not Modified - No new navigation apps.");
             } else {

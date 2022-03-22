@@ -14,7 +14,7 @@ public class TestIncompatiblePins : AbstractTestSyncVirtualFiles {
     ***********************************************************/
     private TestIncompatiblePins () {
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
-        Vfs vfs = set_up_vfs (fake_folder);
+        AbstractVfs vfs = set_up_vfs (fake_folder);
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         fake_folder.remote_modifier ().mkdir ("local");

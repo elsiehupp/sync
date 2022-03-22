@@ -3,8 +3,8 @@
 srcs = files([
     'Asserts.vala',
 
+    'ComputeChecksum/AbstractComputeChecksum.vala',
     'ComputeChecksum/ComputeChecksum.vala',
-    'ComputeChecksum/ComputeChecksumBase.vala',
     'ComputeChecksum/CSyncChecksumHook.vala',
     'ComputeChecksum/ValidateChecksumHeader.vala',
 
@@ -15,7 +15,7 @@ srcs = files([
     'FileSystem.vala',
     'JenkinsHash.vala',
 
-    'PluginFactory/PluginFactory.vala',
+    'PluginFactory/AbstractPluginFactory.vala',
     'PluginFactory/DefaultPluginFactory.vala',
 
     'PreparedSqlQueryManager.vala',

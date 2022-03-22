@@ -16,7 +16,7 @@ public class TestDirectoryUploadWithDelayedAlgorithm : AbstractTestSyncEngine {
         fake_folder.sync_engine.account.set_capabilities (
             {
                 {
-                    "dav", new QVariantMap (
+                    "dav", new GLib.VariantMap (
                         {
                             "bulkupload", "1.0"
                         }

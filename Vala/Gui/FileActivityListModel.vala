@@ -29,7 +29,7 @@ public class FileActivityListModel : ActivityListModel {
         }
         account_state (account_state);
 
-        const var folder = FolderMan.instance.folder_for_path (local_path);
+        const var folder = FolderManager.instance.folder_for_path (local_path);
         if (!folder) {
             return;
         }

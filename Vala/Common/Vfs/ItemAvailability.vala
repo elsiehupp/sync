@@ -99,5 +99,5 @@ public enum ItemAvailability {
 
 } // enum ItemAvailability
 
-} // namespace Vfs
+} // namespace AbstractVfs
 } // namespace Occ

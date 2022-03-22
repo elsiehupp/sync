@@ -14,7 +14,7 @@ public class TestResume1 : AbstractTestChunkingNg {
     ***********************************************************/
     private TestResume1 () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new QVariantMap ({ "chunking", "1.0" }) } });
+        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new GLib.VariantMap ({ "chunking", "1.0" }) } });
         int size = 10 * 1000 * 1000; // 10 MB
         set_chunk_size (fake_folder.sync_engine, 1 * 1000 * 1000);
 
@@ -48,7 +48,7 @@ public class TestResume1 : AbstractTestChunkingNg {
             // Test that we properly resuming and are not sending past data again.
             GLib.assert_true (request.raw_header ("OC-Chunk-Offset").to_int64 () >= uploaded_size);
         } else if (operation == Soup.DeleteOperation) {
-            GLib.assert_true (request.url.path.ends_with ("/10000"));
+            GLib.assert_true (request.url.path.has_suffix ("/10000"));
         }
         return null;
     }

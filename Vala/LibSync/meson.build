@@ -1,11 +1,8 @@
 # project('com.elsiehupp.NextcloudVala', 'c', 'vala', version: '1.0.0')
 
 srcs = files([
-    'AbstractPropagateRemoteDeleteEncrypted.vala',
-    'AccessManager.vala',
     'Account.vala',
     'BandwidthManager.vala',
-    'BulkPropagatorJob.vala',
 
     'Capabilities/Capabilities.vala',
     'Capabilities/DirectEditor.vala',
@@ -16,10 +13,11 @@ srcs = files([
     'ClientSideEncryption/Biometric.vala',
     'ClientSideEncryption/CipherContext.vala',
     'ClientSideEncryption/ClientSideEncryption.vala',
+    'ClientSideEncryption/EncryptedFile.vala',
     'ClientSideEncryption/EncryptionHelper.vala',
     'ClientSideEncryption/FolderMetadata.vala',
-    'ClientSideEncryption/PrivateKey.vala',
     'ClientSideEncryption/PrivateKeyContext.vala',
+    'ClientSideEncryption/PrivateKey.vala',
     'ClientSideEncryption/StreamingDecryptor.vala',
     'ClientSideEncryption/X509Certificate.vala',
 
@@ -34,62 +32,87 @@ srcs = files([
     'ClientSideEncryptionJobs/UpdateMetadataApiJob.vala',
 
     'ConfigFile.vala',
-    'CookieJar.vala',
 
     'Credentials/AbstractCredentials.vala',
     'Credentials/DummyCredentials.vala',
     'Credentials/HttpCredentials.vala',
-    'Credentials/HttpCredentialsAccessManager.vala',
-
-    'Credentials/KeychainChunkDeleteJob.vala',
-    'Credentials/KeychainChunkJob.vala',
-    'Credentials/KeychainChunkReadJob.vala',
-    'Credentials/KeychainChunkWriteJob.vala',
-
     'Credentials/TokenCredentials.vala',
 
-    'DateTimeProvider.vala',
-    'DeleteJob.vala',
     'DiscoveryPhase/DiscoveryPhase.vala',
-    'EncryptFolderJob.vala',
+    'DiscoveryPhase/DiscoverySingleDirectoryJob.vala',
+    'DiscoveryPhase/DiscoverySingleLocalDirectoryJob.vala',
+    'DiscoveryPhase/LocalInfo.vala',
+    'DiscoveryPhase/RemoteInfo.vala',
+
+    'EtagParser.vala',
+    'ExtraFolderInfo.vala',
     'FileSystem.vala',
+    'HttpError.vala',
     'HttpLogger.vala',
     'IconJob.vala',
+
     'LocalDiscoveryTracker.vala',
     'Logger.vala',
+    'LsColXMLParser.vala',
 
     'NetworkJobs/AbstractNetworkJob.vala',
     'NetworkJobs/AvatarJob.vala',
     'NetworkJobs/CheckServerJob.vala',
     'NetworkJobs/DeleteApiJob.vala',
     'NetworkJobs/DetermineAuthTypeJob.vala',
+    'NetworkJobs/EncryptFolderJob.vala',
     'NetworkJobs/EntityExistsJob.vala',
+    'NetworkJobs/GETEncryptedFileJob.vala',
+    'NetworkJobs/GETFileJob.vala',
     'NetworkJobs/JsonApiJob.vala',
+    'NetworkJobs/KeychainChunkDeleteJob-1.vala',
+
+    'NetworkJobs/KeychainChunkJob/AbstractKeychainChunkJob.vala',
+    'NetworkJobs/KeychainChunkJob/KeychainChunkDeleteJob.vala',
+    'NetworkJobs/KeychainChunkJob/KeychainChunkReadJob.vala',
+    'NetworkJobs/KeychainChunkJob/KeychainChunkWriteJob.vala',
+
     'NetworkJobs/LsColJob.vala',
-    'NetworkJobs/LsColXMLParser.vala',
     'NetworkJobs/MkColJob.vala',
-    'NetworkJobs/NetworkJobs.vala',
+    'NetworkJobs/MoveJob.vala',
+    'NetworkJobs/PollJob.vala',
+    'NetworkJobs/PropagateDownloadFile.vala',
+
+    'NetworkJobs/PropagatorJob/AbstractPropagatorJob.vala',
+    'NetworkJobs/PropagatorJob/BulkPropagatorJob.vala',
+
+    'NetworkJobs/PropagatorJob/PropagateDirectory.vala',
+
+    'NetworkJobs/PropagatorJob/PropagateItemJob/AbstractPropagateItemJob.vala',
+    'NetworkJobs/PropagatorJob/PropagateItemJob/PropagateIgnoreJob.vala',
+    'NetworkJobs/PropagatorJob/PropagateItemJob/PropagateLocalMkdir.vala',
+    'NetworkJobs/PropagatorJob/PropagateItemJob/PropagateLocalRemove.vala',
+    'NetworkJobs/PropagatorJob/PropagateItemJob/PropagateLocalRename.vala',
+    'NetworkJobs/PropagatorJob/PropagateItemJob/PropagateRemoteDelete.vala',
+    'NetworkJobs/PropagatorJob/PropagateItemJob/PropagateRemoteMkdir.vala',
+    'NetworkJobs/PropagatorJob/PropagateItemJob/PropagateRemoteMove.vala',
+
+    'NetworkJobs/PropagatorJob/PropagateRemoteDeleteEncrypted/AbstractPropagateRemoteDeleteEncrypted.vala',
+    'NetworkJobs/PropagatorJob/PropagateRemoteDeleteEncrypted/PropagateRemoteDeleteEncryptedRootFolder.vala',
+    'NetworkJobs/PropagatorJob/PropagateRemoteDeleteEncrypted/PropagateRemoteDeleteEncrypted.vala',
+
+    'NetworkJobs/PropagatorJob/PropagateRootDirectory.vala',
+    'NetworkJobs/PropagatorJob/PropagateUploadCommon.vala',
+    'NetworkJobs/PropagatorJob/PropagateUploadEncrypted.vala',
+    'NetworkJobs/PropagatorJob/PropagateUploadNg.vala',
+    'NetworkJobs/PropagatorJob/PropagateUploadV1.vala',
+    'NetworkJobs/PropagatorJob/PropagatorCompositeJob.vala',
+    'NetworkJobs/PropagatorJob/PUTFileJob.vala',
+
     'NetworkJobs/PropfindJob.vala',
     'NetworkJobs/ProppatchJob.vala',
+    'NetworkJobs/PutMultiFileJob.vala',
     'NetworkJobs/RequestEtagJob.vala',
     'NetworkJobs/SimpleNetworkJob.vala',
 
-    'NextcloudTheme.vala',
-
-    'OcsProfileConnector/Hovercard.vala',
-    'OcsProfileConnector/HovercardAction.vala',
-    'OcsProfileConnector/OcsProfileConnector.vala',
-
-    'OcsUserStatusConnector.vala',
-
     'OwncloudPropagator/CleanupPollsJob.vala',
     'OwncloudPropagator/OwncloudPropagator.vala',
-    'OwncloudPropagator/PropagateDirectory.vala',
-    'OwncloudPropagator/PropagateIgnoreJob.vala',
-    'OwncloudPropagator/PropagateItemJob.vala',
-    'OwncloudPropagator/PropagateRootDirectory.vala',
-    'OwncloudPropagator/PropagatorCompositeJob.vala',
-    'OwncloudPropagator/PropagatorJob.vala',
+    'OwncloudPropagator/PropagateDownloadEncrypted.vala',
 
     'ProcessDirectoryJob.vala',
 
@@ -97,44 +120,32 @@ srcs = files([
     'ProgressDispatcher/ProgressDispatcher.vala',
     'ProgressDispatcher/ProgressInfo.vala',
 
-    'PropagateDownload/GETEncryptedFileJob.vala',
-    'PropagateDownload/GETFileJob.vala',
-    'PropagateDownload/PropagateDownloadFile.vala',
+    'PushNotificationManager.vala',
 
-    'PropagateDownloadEncrypted.vala',
-    'PropagateRemoteDeleteEncryptedRootFolder.vala',
-    'PropagateRemoteDeleteEncrypted.vala',
-    'PropagateRemoteDelete.vala',
-    'PropagateRemoteMkdir.vala',
+    'Soup/AccessManager.vala',
+    'Soup/CookieJar.vala',
+    'Soup/HttpCredentialsAccessManager.vala',
+    'Soup/TokenCredentialsAccessManager.vala',
 
-    'PropagateRemoteMove/MoveJob.vala',
-    'PropagateRemoteMove/PropagateRemoteMove.vala',
-
-    'PropagateUpload/PollJob.vala',
-    'PropagateUpload/PropagateUploadCommon.vala',
-    'PropagateUpload/PropagateUploadNg.vala',
-    'PropagateUpload/PropagateUploadV1.vala',
-    'PropagateUpload/PUTFileJob.vala',
-    'PropagateUpload/UploadDevice.vala',
-
-    'PropagateUploadEncrypted.vala',
-
-    'PropagatorJobs/PropagateLocalMkdir.vala',
-    'PropagatorJobs/PropagateLocalRemove.vala',
-    'PropagatorJobs/PropagateLocalRename.vala',
-    'PropagatorJobs/PropagatorJobs.vala',
-
-    'PushNotifications.vala',
-    'PutMultiFileJob.vala',
     'SyncEngine.vala',
     'SyncFileItem.vala',
     'SyncFileStatusTracker.vala',
     'SyncOptions.vala',
     'SyncResult.vala',
-    'Theme.vala',
 
+    'Theme/AbstractTheme.vala',
+    'Theme/NextcloudTheme.vala',
+
+    'UploadDevice.vala',
+
+    'UserStatus/AbstractUserStatusConnector.vala',
     'UserStatus/ClearAt.vala',
-    'UserStatus/UserStatusConnector.vala',
+
+    'UserStatus/OcsProfileConnector/HovercardAction.vala',
+    'UserStatus/OcsProfileConnector/Hovercard.vala',
+    'UserStatus/OcsProfileConnector/OcsProfileConnector.vala',
+
+    'UserStatus/OcsUserStatusConnector.vala',
     'UserStatus/UserStatus.vala',
 
     'Vfs/VfsSuffix/SuffixVfsPluginFactory.vala',

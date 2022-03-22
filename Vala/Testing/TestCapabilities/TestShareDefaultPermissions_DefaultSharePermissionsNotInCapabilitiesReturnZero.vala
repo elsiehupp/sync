@@ -8,10 +8,10 @@ public class TestShareDefaultPermissions_DefaultSharePermissionsNotInCapabilitie
     /***********************************************************
     ***********************************************************/
     private TestShareDefaultPermissions_DefaultSharePermissionsNotInCapabilitiesReturnZero () {
-        QVariantMap file_sharing_map;
+        GLib.VariantMap file_sharing_map;
         file_sharing_map["api_enabled"] = false;
 
-        QVariantMap capabilities_map;
+        GLib.VariantMap capabilities_map;
         capabilities_map["files_sharing"] = file_sharing_map;
 
         const Capabilities capabilities = new Capabilities (capabilities_map);

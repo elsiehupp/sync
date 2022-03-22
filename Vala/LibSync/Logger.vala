@@ -50,7 +50,7 @@ public class Logger : GLib.Object {
             }
 
             this.logstream.reset (new QTextStream (&this.log_file));
-            this.logstream.codec (QTextCodec.codec_for_name ("UTF-8"));
+            this.logstream.codec (GMime.Encoding.codec_for_name ("UTF-8"));
         }
     }
 
@@ -289,7 +289,7 @@ public class Logger : GLib.Object {
                     }
                 }
                 var regular_expression_match = regular_expression.match (s);
-                if (s.starts_with (new_log_name) && regular_expression_match.has_match ()) {
+                if (s.has_prefix (new_log_name) && regular_expression_match.has_match ()) {
                     max_number = q_max (max_number, regular_expression_match.captured (1).to_int ());
                 }
             }

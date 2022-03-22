@@ -80,7 +80,7 @@ public class ShareManager : GLib.Object {
     /***********************************************************
     Tell the manager to create a new share
 
-    @param path The path of the share relative to the user folder on the
+    @param path The path of the share relative to the user folder_connection on the
     @param share_type The type of share (Type_u
     @param Permissions The share permissions
 
@@ -348,20 +348,20 @@ public class ShareManager : GLib.Object {
     When a share is modified, we need to tell the folders so they can adjust overlay icons
     ***********************************************************/
     private static void update_folder (unowned Account account, string path) {
-        foreach (Folder folder in FolderMan.instance.map ()) {
-            if (folder.account_state.account != account) {
+        foreach (FolderConnection folder_connection in FolderManager.instance.map ()) {
+            if (folder_connection.account_state.account != account) {
                 continue;
             }
-            var folder_path = folder.remote_path;
-            if (path.starts_with (folder_path) && (path == folder_path || folder_path.ends_with ('/') || path[folder_path.size ()] == '/')) {
+            var folder_path = folder_connection.remote_path;
+            if (path.has_prefix (folder_path) && (path == folder_path || folder_path.has_suffix ('/') || path[folder_path.size ()] == '/')) {
                 // Workaround the fact that the server does not invalidate the etags of parent directories
                 // when something is shared.
-                var relative = path.mid_ref (folder.remote_path_trailing_slash.length);
-                folder.journal_database ().schedule_path_for_remote_discovery (relative.to_string ());
+                var relative = path.mid_ref (folder_connection.remote_path_trailing_slash.length);
+                folder_connection.journal_database ().schedule_path_for_remote_discovery (relative.to_string ());
 
                 // Schedule a sync so it can update the remote permission flag and let the socket API
                 // know about the shared icon.
-                folder.schedule_this_folder_soon ();
+                folder_connection.schedule_this_folder_soon ();
             }
         }
     }

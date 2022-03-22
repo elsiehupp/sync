@@ -7,7 +7,35 @@
 namespace Occ {
 namespace Testing {
 
-public class FakeDateTimeProvider : DateTimeProvider {
+
+namespace Occ {
+namespace LibSync {
+
+/***********************************************************
+@class AbstractDateTimeProvider
+***********************************************************/
+public class AbstractDateTimeProvider : GLib.Object {
+
+    /***********************************************************
+    ***********************************************************/
+    public virtual GLib.DateTime current_date_time () {
+        return GLib.DateTime.current_date_time ();
+    }
+
+
+    /***********************************************************
+    ***********************************************************/
+    public virtual QDate current_date () {
+        return QDate.current_date ();
+    }
+
+} // class GLib.DateTime
+
+} // namespace LibSync
+} // namespace Occ
+        
+
+public class FakeDateTimeProvider : AbstractDateTimeProvider {
 
     /***********************************************************
     ***********************************************************/

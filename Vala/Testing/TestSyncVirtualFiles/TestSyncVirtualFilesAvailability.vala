@@ -14,7 +14,7 @@ public class TestSyncVirtualFilesAvailability : AbstractTestSyncVirtualFiles {
     ***********************************************************/
     private TestSyncVirtualFilesAvailability () {
         FakeFolder fake_folder = new FakeFolder (new FileInfo ());
-        Vfs vfs = set_up_vfs (fake_folder);
+        AbstractVfs vfs = set_up_vfs (fake_folder);
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         fake_folder.remote_modifier ().mkdir ("local");
@@ -70,7 +70,7 @@ public class TestSyncVirtualFilesAvailability : AbstractTestSyncVirtualFiles {
 
         var r = vfs.availability ("nonexistant");
         GLib.assert_true (!r);
-        GLib.assert_true (r.error == Vfs.AvailabilityError.NO_SUCH_ITEM);
+        GLib.assert_true (r.error == AbstractVfs.AvailabilityError.NO_SUCH_ITEM);
     }
 
 } // class TestSyncVirtualFilesAvailability

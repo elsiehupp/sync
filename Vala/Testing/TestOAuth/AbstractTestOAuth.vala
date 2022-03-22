@@ -87,7 +87,7 @@ public abstract class AbstractTestOAuth : GLib.Object {
         GLib.assert_true (state == AbstractTestOAuth.State.START_STATE);
         state = AbstractTestOAuth.State.BROWSER_OPENED;
         GLib.assert_true (url.path == s_oauth_test_server.path + "/index.php/apps/oauth2/authorize");
-        GLib.assert_true (url.to_string ().starts_with (s_oauth_test_server.to_string ()));
+        GLib.assert_true (url.to_string ().has_prefix (s_oauth_test_server.to_string ()));
         QUrlQuery query = new QUrlQuery (url);
         GLib.assert_true (query.query_item_value ("response_type") == "code");
         GLib.assert_true (query.query_item_value ("client_id") == Theme.oauth_client_id);
@@ -125,7 +125,7 @@ public abstract class AbstractTestOAuth : GLib.Object {
         //  ASSERT (state == AbstractTestOAuth.State.BROWSER_OPENED);
         state = AbstractTestOAuth.State.TOKEN_ASKED;
         //  ASSERT (operation == Soup.PostOperation);
-        //  ASSERT (request.url.to_string ().starts_with (s_oauth_test_server.to_string ()));
+        //  ASSERT (request.url.to_string ().has_prefix (s_oauth_test_server.to_string ()));
         //  ASSERT (request.url.path == s_oauth_test_server.path + "/index.php/apps/oauth2/api/v1/token");
         GLib.OutputStream payload = new GLib.OutputStream ();
         payload.set_data (token_reply_payload ());

@@ -22,11 +22,11 @@ public class SyncEngineTestUtils : GLib.Object {
     ***********************************************************/
     inline string get_file_path_from_url (GLib.Uri url) {
         string path = url.path;
-        if (path.starts_with (s_root_url_2.path))
+        if (path.has_prefix (s_root_url_2.path))
             return path.mid (s_root_url_2.path.length);
-        if (path.starts_with (s_upload_url.path))
+        if (path.has_prefix (s_upload_url.path))
             return path.mid (s_upload_url.path.length);
-        if (path.starts_with (s_root_url.path))
+        if (path.has_prefix (s_root_url.path))
             return path.mid (s_root_url.path.length);
         return {};
     }

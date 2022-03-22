@@ -15,7 +15,7 @@ public class TestErrorsWithBulkUpload : AbstractTestSyncEngine {
     ***********************************************************/
     private TestErrorsWithBulkUpload () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
-        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new QVariantMap ( { "bulkupload", "1.0" } ) } });
+        fake_folder.sync_engine.account.set_capabilities ({ { "dav", new GLib.VariantMap ( { "bulkupload", "1.0" } ) } });
 
         // Disable parallel uploads
         SyncOptions sync_options;
@@ -59,7 +59,7 @@ public class TestErrorsWithBulkUpload : AbstractTestSyncEngine {
         var content_type = request.header (Soup.Request.ContentTypeHeader).to_string ();
         if (operation == Soup.PostOperation) {
             ++number_of_post;
-            if (content_type.starts_with ("multipart/related; boundary=")) {
+            if (content_type.has_prefix ("multipart/related; boundary=")) {
                 var json_reply_object = fake_folder.for_each_reply_part (outgoing_data, content_type, fake_folder_for_each_reply_part_delegate
                 );
                 if (json_reply_object.size ()) {
@@ -72,12 +72,12 @@ public class TestErrorsWithBulkUpload : AbstractTestSyncEngine {
         } else if (operation == Soup.PutOperation) {
             ++number_of_put;
             var filename = get_file_path_from_url (request.url);
-            if (filename.ends_with ("A/big2") ||
-                    filename.ends_with ("A/big3") ||
-                    filename.ends_with ("A/big4") ||
-                    filename.ends_with ("A/big5") ||
-                    filename.ends_with ("A/big7") ||
-                    filename.ends_with ("B/big8")) {
+            if (filename.has_suffix ("A/big2") ||
+                    filename.has_suffix ("A/big3") ||
+                    filename.has_suffix ("A/big4") ||
+                    filename.has_suffix ("A/big5") ||
+                    filename.has_suffix ("A/big7") ||
+                    filename.has_suffix ("B/big8")) {
                 return new FakeErrorReply (operation, request, this, 412);
             }
             return null;
@@ -89,12 +89,12 @@ public class TestErrorsWithBulkUpload : AbstractTestSyncEngine {
     private QJsonObject fake_folder_for_each_reply_part_delegate (GLib.HashTable<string, string> all_headers) {
         var reply = new QJsonObject ();
         var filename = all_headers["X-File-Path"];
-        if (filename.ends_with ("A/big2") ||
-                filename.ends_with ("A/big3") ||
-                filename.ends_with ("A/big4") ||
-                filename.ends_with ("A/big5") ||
-                filename.ends_with ("A/big7") ||
-                filename.ends_with ("B/big8")) {
+        if (filename.has_suffix ("A/big2") ||
+                filename.has_suffix ("A/big3") ||
+                filename.has_suffix ("A/big4") ||
+                filename.has_suffix ("A/big5") ||
+                filename.has_suffix ("A/big7") ||
+                filename.has_suffix ("B/big8")) {
             reply.insert ("error", true);
             reply.insert ("etag", {});
             return reply;

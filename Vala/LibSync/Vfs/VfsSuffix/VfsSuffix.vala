@@ -131,9 +131,9 @@ public class VfsSuffix : Common.AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
-    public Result<Vfs.ConvertToPlaceholderResult, string> convert_to_placeholder (string filename, SyncFileItem item, string value) {
+    public Result<AbstractVfs.ConvertToPlaceholderResult, string> convert_to_placeholder (string filename, SyncFileItem item, string value) {
         // Nothing necessary
-        return Vfs.ConvertToPlaceholderResult.Ok;
+        return AbstractVfs.ConvertToPlaceholderResult.Ok;
     }
 
 
@@ -195,7 +195,7 @@ public class VfsSuffix : Common.AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
-    protected void start_impl (Vfs.SetupParameters parameters) {
+    protected void start_impl (AbstractVfs.SetupParameters parameters) {
         // It is unsafe for the database to contain any ".owncloud" file entries
         // that are not marked as a virtual file. These could be real .owncloud
         // files that were synced before vfs was enabled.

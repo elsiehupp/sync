@@ -15,7 +15,7 @@ public class TestFolder : GLib.Object {
     private TestFolder () {
         QFETCH (string, folder);
         QFETCH (string, expected_folder);
-        Folder f = new Folder ("alias", folder, "http://foo.bar.net");
+        FolderConnection f = new FolderConnection ("alias", folder, "http://foo.bar.net");
         GLib.assert_true (f.path == expected_folder);
         delete f;
     }

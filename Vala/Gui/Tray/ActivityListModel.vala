@@ -262,14 +262,14 @@ public class ActivityListModel : QAbstractListModel {
         switch (role) {
         case DataRole.DISPLAY_PATH:
             if (!activity.file == "") {
-                var folder = FolderMan.instance.folder_by_alias (activity.folder);
+                var folder_connection = FolderManager.instance.folder_by_alias (activity.folder_connection);
                 string relative_path = activity.file;
-                if (folder) {
-                    relative_path.prepend (folder.remote_path);
+                if (folder_connection) {
+                    relative_path.prepend (folder_connection.remote_path);
                 }
-                const var local_files = FolderMan.instance.find_file_in_local_folders (relative_path, ast.account);
+                const var local_files = FolderManager.instance.find_file_in_local_folders (relative_path, ast.account);
                 if (local_files.count () > 0) {
-                    if (relative_path.starts_with ('/') || relative_path.starts_with ('\\')) {
+                    if (relative_path.has_prefix ('/') || relative_path.has_prefix ('\\')) {
                         return relative_path.remove (0, 1);
                     } else {
                         return relative_path;
@@ -279,25 +279,25 @@ public class ActivityListModel : QAbstractListModel {
             return "";
         case DataRole.PATH:
             if (!activity.file == "") {
-                const var folder = FolderMan.instance.folder_by_alias (activity.folder);
+                const var folder_connection = FolderManager.instance.folder_by_alias (activity.folder_connection);
 
                 string relative_path = activity.file;
-                if (folder) {
-                    relative_path.prepend (folder.remote_path);
+                if (folder_connection) {
+                    relative_path.prepend (folder_connection.remote_path);
                 }
 
                 // get relative path to the file so we can open it in the file manager
-                const var local_files = FolderMan.instance.find_file_in_local_folders (GLib.FileInfo (relative_path).path, ast.account);
+                const var local_files = FolderManager.instance.find_file_in_local_folders (GLib.FileInfo (relative_path).path, ast.account);
 
                 if (local_files == "") {
                     return "";
                 }
 
-                // If this is an E2EE file or folder, pretend we got no path, this leads to
+                // If this is an E2EE file or folder_connection, pretend we got no path, this leads to
                 // hiding the share button which is what we want
-                if (folder) {
+                if (folder_connection) {
                     SyncJournalFileRecord record;
-                    folder.journal_database ().file_record (activity.file.mid (1), record);
+                    folder_connection.journal_database ().file_record (activity.file.mid (1), record);
                     if (record.is_valid () && (record.is_e2e_encrypted || !record.e2e_mangled_name == "")) {
                         return "";
                     }
@@ -307,13 +307,13 @@ public class ActivityListModel : QAbstractListModel {
             }
             return "";
         case DataRole.ABSOLUTE_PATH: {
-            const var folder = FolderMan.instance.folder_by_alias (activity.folder);
+            const var folder_connection = FolderManager.instance.folder_by_alias (activity.folder_connection);
             string relative_path = activity.file;
             if (!activity.file == "") {
-                if (folder) {
-                    relative_path.prepend (folder.remote_path);
+                if (folder_connection) {
+                    relative_path.prepend (folder_connection.remote_path);
                 }
-                const var local_files = FolderMan.instance.find_file_in_local_folders (relative_path, ast.account);
+                const var local_files = FolderManager.instance.find_file_in_local_folders (relative_path, ast.account);
                 if (!local_files.empty ()) {
                     return local_files.const_first ();
                 } else {
@@ -431,15 +431,15 @@ public class ActivityListModel : QAbstractListModel {
         const var activity = this.final_list.at (activity_index);
         if (activity.status == SyncFileItem.Status.CONFLICT) {
             //  Q_ASSERT (!activity.file == "");
-            //  Q_ASSERT (!activity.folder == "");
+            //  Q_ASSERT (!activity.folder_connection == "");
             //  Q_ASSERT (Utility.is_conflict_file (activity.file));
 
-            const var folder = FolderMan.instance.folder_by_alias (activity.folder);
+            const var folder_connection = FolderManager.instance.folder_by_alias (activity.folder_connection);
 
             const var conflicted_relative_path = activity.file;
-            const var base_relative_path = folder.journal_database ().conflict_file_base_name (conflicted_relative_path.to_utf8 ());
+            const var base_relative_path = folder_connection.journal_database ().conflict_file_base_name (conflicted_relative_path.to_utf8 ());
 
-            const var directory = GLib.Dir (folder.path);
+            const var directory = GLib.Dir (folder_connection.path);
             const var conflicted_path = directory.file_path (conflicted_relative_path);
             const var base_path = directory.file_path (base_relative_path);
 
@@ -454,7 +454,7 @@ public class ActivityListModel : QAbstractListModel {
             this.current_conflict_dialog.on_signal_remote_version_filename (base_path);
             this.current_conflict_dialog.attribute (Qt.WA_DeleteOnClose);
             this.current_conflict_dialog.accepted.connect (
-                folder,
+                folder_connection,
                 this.on_signal_current_conflict_dialog_accepted
             );
             this.current_conflict_dialog.open ();
@@ -465,15 +465,15 @@ public class ActivityListModel : QAbstractListModel {
                 this.current_invalid_filename_dialog.close ();
             }
 
-            var folder = FolderMan.instance.folder_by_alias (activity.folder);
-            const var folder_dir = GLib.Dir (folder.path);
+            var folder_connection = FolderManager.instance.folder_by_alias (activity.folder_connection);
+            const var folder_dir = GLib.Dir (folder_connection.path);
             this.current_invalid_filename_dialog = new InvalidFilenameDialog (
                 this.account_state.account,
-                folder,
+                folder_connection,
                 folder_dir.file_path (activity.file)
             );
             this.current_invalid_filename_dialog.accepted.connect (
-                folder,
+                folder_connection,
                 this.on_signal_current_invalid_filename_dialog_accepted
             );
             this.current_invalid_filename_dialog.open ();
@@ -492,15 +492,15 @@ public class ActivityListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private static void on_signal_current_conflict_dialog_accepted (Folder folder) {
-        folder.schedule_this_folder_soon ();
+    private static void on_signal_current_conflict_dialog_accepted (FolderConnection folder_connection) {
+        folder_connection.schedule_this_folder_soon ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private static void on_signal_current_invalid_filename_dialog_accepted (Folder folder) {
-        folder.schedule_this_folder_soon ();
+    private static void on_signal_current_invalid_filename_dialog_accepted (FolderConnection folder_connection) {
+        folder_connection.schedule_this_folder_soon ();
     }
 
 

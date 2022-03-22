@@ -30,7 +30,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
     /***********************************************************
     During account setup we want to filter out excluded folders
     from the view without having a
-    Folder.SyncEngine.ExcludedFiles instance.
+    FolderConnection.SyncEngine.ExcludedFiles instance.
     ***********************************************************/
     private ExcludedFiles excluded_files;
 
@@ -106,7 +106,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
             // We did not load from the server so we re-use the one from the old block list
             string path = root.data (0, Qt.USER_ROLE).to_string ();
             foreach (string it, this.old_block_list) {
-                if (it.starts_with (path))
+                if (it.has_prefix (path))
                     result += it;
             }
         }
@@ -166,7 +166,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
         string folder_path, string root_name,
         string[] old_block_list = string[] ()) {
         this.folder_path = folder_path;
-        if (this.folder_path.starts_with ('/')) {
+        if (this.folder_path.has_prefix ('/')) {
             // remove leading '/'
             this.folder_path = folder_path.mid (1);
         }
@@ -194,7 +194,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
 
         GLib.Uri url = this.account.dav_url ();
         string path_to_remove = url.path;
-        if (!path_to_remove.ends_with ('/')) {
+        if (!path_to_remove.has_suffix ('/')) {
             path_to_remove.append ('/');
         }
         path_to_remove.append (this.folder_path);
@@ -205,7 +205,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
         QMutableListIterator<string> it (list);
         while (it.has_next ()) {
             it.next ();
-            if (this.excluded_files.is_excluded (it.value (), path_to_remove, FolderMan.instance.ignore_hidden_files))
+            if (this.excluded_files.is_excluded (it.value (), path_to_remove, FolderManager.instance.ignore_hidden_files))
                 it.remove ();
         }
 
@@ -250,7 +250,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
 
             // Don't allow to select subfolders of encrypted subfolders
             const var is_any_ancestor_encrypted = std.any_of (std.cbegin (this.encrypted_paths), std.cend (this.encrypted_paths), [=] (string encrypted_path) {
-                return path.size () > encrypted_path.size () && path.starts_with (encrypted_path);
+                return path.size () > encrypted_path.size () && path.has_prefix (encrypted_path);
             });
             if (is_any_ancestor_encrypted) {
                 continue;
@@ -261,7 +261,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
                 paths.remove_last ();
             if (paths == "")
                 continue;
-            if (!path.ends_with ('/')) {
+            if (!path.has_suffix ('/')) {
                 path.append ('/');
             }
             recursive_insert (root, paths, path, size);
@@ -385,7 +385,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
         }
 
         const var webdav_folder = GLib.Uri (this.account.dav_url ()).path;
-        //  Q_ASSERT (path.starts_with (webdav_folder));
+        //  Q_ASSERT (path.has_prefix (webdav_folder));
         // This dialog use the postfix / convention for folder paths
         this.encrypted_paths + path.mid (webdav_folder.size ()) + '/';
     }
@@ -436,9 +436,9 @@ public class SelectiveSyncWidget : Gtk.Widget {
     ***********************************************************/
     private static void SelectiveSyncWidget.recursive_insert (QTreeWidgetItem parent, string[] path_trail, string path, int64 size) {
         QFileIconProvider prov;
-        Gtk.Icon folder_icon = prov.icon (QFileIconProvider.Folder);
+        Gtk.Icon folder_icon = prov.icon (QFileIconProvider.FolderConnection);
         if (path_trail.size () == 0) {
-            if (path.ends_with ('/')) {
+            if (path.has_suffix ('/')) {
                 path.chop (1);
             }
             parent.tool_tip (0, path);
@@ -454,7 +454,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
                         if (string_value == path || string_value == "/") {
                             item.check_state (0, Qt.Unchecked);
                             break;
-                        } else if (string_value.starts_with (path)) {
+                        } else if (string_value.has_prefix (path)) {
                             item.check_state (0, Qt.PartiallyChecked);
                         }
                     }

@@ -60,7 +60,7 @@ Checksum Algorithms
 
 @copyright LGPLv2.1 or later
 ***********************************************************/
-public class ComputeChecksum : ComputeChecksumBase {
+public class ComputeChecksum : AbstractComputeChecksum {
 
     using ZLib;
 

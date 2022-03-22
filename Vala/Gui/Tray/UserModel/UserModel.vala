@@ -382,7 +382,7 @@ public class UserModel : QAbstractListModel {
         }
 
         string url = this.users[this.current_user_id].server (false);
-        if (!url.starts_with ("http://") && !url.starts_with ("https://")) {
+        if (!url.has_prefix ("http://") && !url.has_prefix ("https://")) {
             url = "https://" + this.users[this.current_user_id].server (false);
         }
 
@@ -467,7 +467,7 @@ public class UserModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public UserStatusConnector user_status_connector (int identifier) {
+    public AbstractUserStatusConnector user_status_connector (int identifier) {
         if (identifier < 0 || identifier >= this.users.size ()) {
             return null;
         }

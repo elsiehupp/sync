@@ -150,12 +150,12 @@ public class VfsXAttr : Common.AbstractVfs {
 
         var parent_path = static_cast<string> (stat_data);
         GLib.assert (!parent_path.has_suffix ("/"));
-        GLib.assert (!stat.path.starts_with ("/"));
+        GLib.assert (!stat.path.has_prefix ("/"));
 
         string path = parent_path + "/" + stat.path;
         var pin = () => {
             var absolute_path = string.from_utf8 (path);
-            GLib.assert (absolute_path.starts_with (parameters ().filesystem_path.to_utf8 ()));
+            GLib.assert (absolute_path.has_prefix (parameters ().filesystem_path.to_utf8 ()));
             var folder_path = absolute_path.mid (parameters ().filesystem_path.length);
             return pin_state (folder_path);
         };
@@ -205,7 +205,7 @@ public class VfsXAttr : Common.AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
-    protected void start_impl (Vfs.SetupParameters parameters) {
+    protected void start_impl (AbstractVfs.SetupParameters parameters) {
         return;
     }
 

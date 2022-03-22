@@ -191,7 +191,7 @@ public class NetworkSettings : Gtk.Widget {
 
         // ...and set the folders dirty, they refresh their proxy next time they
         // on_signal_start the sync.
-        FolderMan.instance.dirty_proxy ();
+        FolderManager.instance.dirty_proxy ();
 
         const var accounts = AccountManager.instance.accounts;
         foreach (var account in accounts) {
@@ -222,7 +222,7 @@ public class NetworkSettings : Gtk.Widget {
         }
         config_file.upload_limit (this.instance.upload_spin_box.value ());
 
-        FolderMan.instance.dirty_network_limits ();
+        FolderManager.instance.dirty_network_limits ();
     }
 
 
@@ -248,7 +248,7 @@ public class NetworkSettings : Gtk.Widget {
             foreach (var account in AccountManager.instance.accounts) {
                 const var host = account.account.url.host ();
                 // Some typical url for localhost
-                if (host == "localhost" || host.starts_with ("127.") || host == "[.1]") {
+                if (host == "localhost" || host.has_prefix ("127.") || host == "[.1]") {
                     visible = true;
                 }
             }

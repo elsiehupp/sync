@@ -12,7 +12,7 @@ public class AbstractTestFolderMan : GLib.Object {
 
     Account account
     AccountState account_state;
-    FolderMan folder_manager;
+    FolderManager folder_manager;
     GLib.Uri url
 
     protected AbstractTestFolderMan () {
@@ -23,7 +23,7 @@ public class AbstractTestFolderMan : GLib.Object {
         this.account.set_url (this.url);
         this.url.set_user_name (this.credentials.user ());
         this.account_state = new AccountState (this.account);
-        this.folder_manager = FolderMan.instance;
+        this.folder_manager = FolderManager.instance;
     }
 
 } // class AbstractTestFolderMan

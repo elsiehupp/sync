@@ -1,4 +1,5 @@
 srcs = files([
+    'AbstractFileModifier.vala',
     'AbstractTestSyncEngine.vala',
     'DelayedReply.vala',
     'DiskFileModifier.vala',
@@ -20,7 +21,6 @@ srcs = files([
     'FakeQNAM.vala',
     'FakeReply.vala',
     'FileInfo.vala',
-    'FileModifier.vala',
     'ItemCompletedSpy.vala',
     'PathComponents.vala',
     'SyncEngineTestUtils.vala',

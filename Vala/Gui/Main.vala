@@ -103,8 +103,8 @@ int main (int argc, char **argv) {
     // if handle_startup returns true, main ()
     // needs to terminate here, e.g. because
     // the updater is triggered
-    Updater updater = Updater.instance;
-    if (updater && updater.handle_startup ()) {
+    AbstractUpdater updater = AbstractUpdater.instance;
+    if (updater != null && updater.handle_startup ()) {
         return 1;
     }
 //  #endif

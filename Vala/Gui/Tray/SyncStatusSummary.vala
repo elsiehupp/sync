@@ -120,7 +120,7 @@ public class SyncStatusSummary : GLib.Object {
     ***********************************************************/
     public SyncStatusSummary (GLib.Object parent = new GLib.Object ()) {
         base (parent);
-        FolderMan folder_man = FolderMan.instance;
+        FolderManager folder_man = FolderManager.instance;
         this.is_syncing = false;
         this.sync_icon = Theme.sync_status_ok;
         this.sync_status_string = _("All synced!");
@@ -159,23 +159,23 @@ public class SyncStatusSummary : GLib.Object {
         }
         this.account_state = current_user.account_state;
         this.clear_folder_errors ();
-        this.connect_to_folders_progress (FolderMan.instance.map ());
+        this.connect_to_folders_progress (FolderManager.instance.map ());
         this.init_sync_state ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void connect_to_folders_progress (Folder.Map map) {
-        foreach (Folder folder in folder_map) {
-            if (folder.account_state == this.account_state) {
-                folder.signal_progress_info.connect (
+    private void connect_to_folders_progress (FolderConnection.Map map) {
+        foreach (FolderConnection folder_connection in folder_map) {
+            if (folder_connection.account_state == this.account_state) {
+                folder_connection.signal_progress_info.connect (
                     this.on_signal_folder_progress_info // Qt.UniqueConnection
                 );
             } else {
                 disconnect (
-                    folder,
-                    Folder.signal_progress_info,
+                    folder_connection,
+                    FolderConnection.signal_progress_info,
                     this,
                     SyncStatusSummary.on_signal_folder_progress_info
                 );
@@ -186,7 +186,7 @@ public class SyncStatusSummary : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_folder_list_changed (Folder.Map folder_map) {
+    private void on_signal_folder_list_changed (FolderConnection.Map folder_map) {
         connect_to_folders_progress (folder_map);
     }
 
@@ -224,16 +224,16 @@ public class SyncStatusSummary : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_folder_sync_state_changed (Folder folder) {
-        if (!folder) {
+    private void on_signal_folder_sync_state_changed (FolderConnection folder_connection) {
+        if (!folder_connection) {
             return;
         }
 
-        if (!this.account_state || folder.account_state != this.account_state) {
+        if (!this.account_state || folder_connection.account_state != this.account_state) {
             return;
         }
 
-        sync_state_for_folder (folder);
+        sync_state_for_folder (folder_connection);
     }
 
 
@@ -246,7 +246,7 @@ public class SyncStatusSummary : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void sync_state_for_folder (Folder folder) {
+    private void sync_state_for_folder (FolderConnection folder_connection) {
         if (this.account_state && !this.account_state.is_connected) {
             this.is_syncing = false;
             this.sync_status_string = _("Offline");
@@ -255,18 +255,18 @@ public class SyncStatusSummary : GLib.Object {
             return;
         }
 
-        const var state = determine_sync_status (folder.sync_result);
+        const var state = determine_sync_status (folder_connection.sync_result);
 
         switch (state) {
         case LibSync.SyncResult.Status.SUCCESS:
         case LibSync.SyncResult.Status.SYNC_PREPARE:
             // Success should only be shown if all folders were fine
-            if (!folder_errors () || folder_error (folder)) {
+            if (!folder_errors () || folder_error (folder_connection)) {
                 is_syncing (false);
                 sync_status_string (_("All synced!"));
                 sync_status_detail_string ("");
                 sync_icon (Theme.sync_status_ok);
-                mark_folder_as_success (folder);
+                mark_folder_as_success (folder_connection);
             }
             break;
         case LibSync.SyncResult.Status.ERROR:
@@ -275,7 +275,7 @@ public class SyncStatusSummary : GLib.Object {
             sync_status_string (_("Some files couldn't be synced!"));
             sync_status_detail_string (_("See below for errors"));
             sync_icon (Theme.sync_status_error);
-            mark_folder_as_error (folder);
+            mark_folder_as_error (folder_connection);
             break;
         case LibSync.SyncResult.Status.SYNC_RUNNING:
         case LibSync.SyncResult.Status.NOT_YET_STARTED:
@@ -297,7 +297,7 @@ public class SyncStatusSummary : GLib.Object {
             sync_status_string (_("Some files could not be synced!"));
             sync_status_detail_string (_("See below for warnings"));
             sync_icon (Theme.sync_status_warning ());
-            mark_folder_as_error (folder);
+            mark_folder_as_error (folder_connection);
             break;
         }
     }
@@ -305,15 +305,15 @@ public class SyncStatusSummary : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void mark_folder_as_error (Folder folder) {
-        this.folders_with_errors.insert (folder.alias ());
+    private void mark_folder_as_error (FolderConnection folder_connection) {
+        this.folders_with_errors.insert (folder_connection.alias ());
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void mark_folder_as_success (Folder folder) {
-        this.folders_with_errors.erase (folder.alias ());
+    private void mark_folder_as_success (FolderConnection folder_connection) {
+        this.folders_with_errors.erase (folder_connection.alias ());
     }
 
 
@@ -326,8 +326,8 @@ public class SyncStatusSummary : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private bool folder_error (Folder folder) {
-        return this.folders_with_errors.find (folder.alias ()) != this.folders_with_errors.end ();
+    private bool folder_error (FolderConnection folder_connection) {
+        return this.folders_with_errors.find (folder_connection.alias ()) != this.folders_with_errors.end ();
     }
 
 
@@ -367,8 +367,8 @@ public class SyncStatusSummary : GLib.Object {
     ***********************************************************/
     private void init_sync_state () {
         var sync_state_fallback_needed = true;
-        foreach (Folder folder in FolderMan.instance.map ()) {
-            on_signal_folder_sync_state_changed (folder);
+        foreach (FolderConnection folder_connection in FolderManager.instance.map ()) {
+            on_signal_folder_sync_state_changed (folder_connection);
             sync_state_fallback_needed = false;
         }
 

@@ -43,7 +43,7 @@ public class ExcludedFiles : GLib.Object {
             base ();
 
             this.string_value = string_value;
-            //  Q_ASSERT (ends_with ('/'));
+            //  Q_ASSERT (has_suffix ('/'));
         }
 
 
@@ -53,7 +53,7 @@ public class ExcludedFiles : GLib.Object {
 
         //  public BasePathString (string other) {
         //      base (other);
-        //      //  Q_ASSERT (ends_with ('/'));
+        //      //  Q_ASSERT (has_suffix ('/'));
         //  }
     }
 
@@ -198,7 +198,7 @@ public class ExcludedFiles : GLib.Object {
     public ExcludedFiles (string local_path = "/") {
         this.local_path = local_path;
         this.client_version = { MIRALL_VERSION_MAJOR, MIRALL_VERSION_MINOR, MIRALL_VERSION_PATCH };
-        //  Q_ASSERT (this.local_path.ends_with ("/"));
+        //  Q_ASSERT (this.local_path.has_suffix ("/"));
         // Windows used to use PathMatchSpec which allows foo to match abc/deffoo.
         this.wildcards_match_slash = Utility.is_windows ();
 
@@ -239,7 +239,7 @@ public class ExcludedFiles : GLib.Object {
         string file_path,
         string base_path,
         bool exclude_hidden) {
-        if (!file_path.starts_with (base_path, Utility.fs_case_preserving () ? Qt.CaseInsensitive : Qt.CaseSensitive)) {
+        if (!file_path.has_prefix (base_path, Utility.fs_case_preserving () ? Qt.CaseInsensitive : Qt.CaseSensitive)) {
             // Mark paths we're not responsible for as excluded...
             return true;
         }
@@ -252,7 +252,7 @@ public class ExcludedFiles : GLib.Object {
             while (path.length > base_path.length) {
                 GLib.FileInfo file_info = new GLib.FileInfo (path);
                 if (file_info.filename () != ".sync-exclude.lst"
-                    && (file_info.is_hidden () || file_info.filename ().starts_with ('.'))) {
+                    && (file_info.is_hidden () || file_info.filename ().has_prefix ('.'))) {
                     return true;
                 }
 
@@ -268,7 +268,7 @@ public class ExcludedFiles : GLib.Object {
         }
 
         string relative_path = file_path.mid (base_path.length);
-        if (relative_path.ends_with ('/')) {
+        if (relative_path.has_suffix ('/')) {
             relative_path.chop (1);
         }
 
@@ -290,7 +290,7 @@ public class ExcludedFiles : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void add_manual_exclude_with_base_path (string expr, string base_path) {
-        //  Q_ASSERT (base_path.ends_with ('/'));
+        //  Q_ASSERT (base_path.has_suffix ('/'));
 
         var key = base_path;
         this.manual_excludes[key].append (expr);
@@ -465,11 +465,11 @@ public class ExcludedFiles : GLib.Object {
         string[] patterns;
         while (!file.at_end ()) {
             string line = file.read_line ().trimmed ();
-            if (line.starts_with ("#!version")) {
+            if (line.has_prefix ("#!version")) {
                 if (!version_directive_keep_next_line (line))
                     file.read_line ();
             }
-            if (line == "" || line.starts_with ('#'))
+            if (line == "" || line.has_prefix ('#'))
                 continue;
             csync_exclude_expand_escapes (line);
             patterns.append (string.from_utf8 (line));
@@ -499,7 +499,7 @@ public class ExcludedFiles : GLib.Object {
     Would enable the "myexclude" pattern only for versions before 2.5.0.
     ***********************************************************/
     private bool version_directive_keep_next_line (string directive) {
-        if (!directive.starts_with ("#!version"))
+        if (!directive.has_prefix ("#!version"))
             return true;
         QByteArrayList args = directive.split (' ');
         if (args.length != 3)
@@ -542,7 +542,7 @@ public class ExcludedFiles : GLib.Object {
         // `path` seems to always be relative to `this.local_path`, the tests however have not been
         // written that way... this makes the tests happy for now. TODO Fix the tests at some point
         string path = p;
-        if (path.starts_with (this.local_path)) {
+        if (path.has_prefix (this.local_path)) {
             path = path.mid (this.local_path.length);
         }
 
@@ -647,7 +647,7 @@ public class ExcludedFiles : GLib.Object {
                 continue; // empty line
             }
 
-            bool match_dir_only = exclude.ends_with ('/');
+            bool match_dir_only = exclude.has_suffix ('/');
             if (match_dir_only) {
                 exclude = exclude.left (exclude.length - 1);
             }
@@ -961,13 +961,13 @@ public class ExcludedFiles : GLib.Object {
         // 9 = strlen (".sync_.db")
         if (blen >= 9 && bname.at (0) == '.') {
             if (bname.contains (".db")) {
-                if (bname.starts_with (".sync_", Qt.CaseInsensitive)  // ".sync_*.db*"
-                    || bname.starts_with (".sync_", Qt.CaseInsensitive) // ".sync_*.db*"
-                    || bname.starts_with (".csync_journal.db", Qt.CaseInsensitive)) { // ".csync_journal.db*"
+                if (bname.has_prefix (".sync_", Qt.CaseInsensitive)  // ".sync_*.db*"
+                    || bname.has_prefix (".sync_", Qt.CaseInsensitive) // ".sync_*.db*"
+                    || bname.has_prefix (".csync_journal.db", Qt.CaseInsensitive)) { // ".csync_journal.db*"
                     return CSync.ExcludedFiles.Type.EXCLUDE_SILENT;
                 }
             }
-            if (bname.starts_with (".owncloudsync.log", Qt.CaseInsensitive)) { // ".owncloudsync.log*"
+            if (bname.has_prefix (".owncloudsync.log", Qt.CaseInsensitive)) { // ".owncloudsync.log*"
                 return CSync.ExcludedFiles.Type.EXCLUDE_SILENT;
             }
         }
@@ -1057,7 +1057,7 @@ public class ExcludedFiles : GLib.Object {
                 }
                 // Translate [! to [^
                 string bracket_expr = exclude.mid (this.iterator, j - this.iterator + 1);
-                if (bracket_expr.starts_with ("[!")) {
+                if (bracket_expr.has_prefix ("[!")) {
                     bracket_expr[1] = '^';
                 }
                 this.regular_expression.append (bracket_expr);

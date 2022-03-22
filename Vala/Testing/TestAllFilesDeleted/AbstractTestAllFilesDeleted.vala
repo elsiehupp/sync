@@ -26,7 +26,7 @@ public abstract class AbstractTestAllFilesDeleted : GLib.Object {
         if (verb == "PROPFIND") {
             var data = stream.read_all ();
             if (data.contains ("data-fingerprint")) {
-                if (request.url.path.ends_with ("dav/files/admin/")) {
+                if (request.url.path.has_suffix ("dav/files/admin/")) {
                     ++fingerprint_requests;
                 } else {
                     fingerprint_requests = -10000; // fingerprint queried on incorrect path

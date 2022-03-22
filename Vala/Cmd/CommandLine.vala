@@ -129,7 +129,7 @@ public class CommandLine : GLib.Object {
         options.target_url = args.take_last ();
 
         options.source_dir = args.take_last ();
-        if (!options.source_dir.ends_with ('/')) {
+        if (!options.source_dir.has_suffix ('/')) {
             options.source_dir.append ('/');
         }
         GLib.FileInfo file_info = new GLib.FileInfo (options.source_dir);
@@ -148,7 +148,7 @@ public class CommandLine : GLib.Object {
         while (it.has_next ()) {
             const string option = it.next ();
 
-            if (option == "--httpproxy" && !it.peek_next ().starts_with ("-")) {
+            if (option == "--httpproxy" && !it.peek_next ().has_prefix ("-")) {
                 options.proxy = it.next ();
             } else if (option == "-s" || option == "--silent") {
                 options.silent = true;
@@ -160,24 +160,24 @@ public class CommandLine : GLib.Object {
                 options.ignore_hidden_files = false;
             } else if (option == "--non-interactive") {
                 options.interactive = false;
-            } else if ( (option == "-u" || option == "--user") && !it.peek_next ().starts_with ("-")) {
+            } else if ( (option == "-u" || option == "--user") && !it.peek_next ().has_prefix ("-")) {
                 options.user = it.next ();
-            } else if ( (option == "-p" || option == "--password") && !it.peek_next ().starts_with ("-")) {
+            } else if ( (option == "-p" || option == "--password") && !it.peek_next ().has_prefix ("-")) {
                 options.password = it.next ();
-            } else if (option == "--exclude" && !it.peek_next ().starts_with ("-")) {
+            } else if (option == "--exclude" && !it.peek_next ().has_prefix ("-")) {
                 options.exclude = it.next ();
-            } else if (option == "--unsynced_folders" && !it.peek_next ().starts_with ("-")) {
+            } else if (option == "--unsynced_folders" && !it.peek_next ().has_prefix ("-")) {
                 options.unsynced_folders = it.next ();
-            } else if (option == "--max-sync-retries" && !it.peek_next ().starts_with ("-")) {
+            } else if (option == "--max-sync-retries" && !it.peek_next ().has_prefix ("-")) {
                 options.restart_times = it.next ().to_int ();
-            } else if (option == "--uplimit" && !it.peek_next ().starts_with ("-")) {
+            } else if (option == "--uplimit" && !it.peek_next ().has_prefix ("-")) {
                 options.uplimit = it.next ().to_int () * 1000;
-            } else if (option == "--downlimit" && !it.peek_next ().starts_with ("-")) {
+            } else if (option == "--downlimit" && !it.peek_next ().has_prefix ("-")) {
                 options.downlimit = it.next ().to_int () * 1000;
             } else if (option == "--logdebug") {
                 Logger.instance.log_file ("-");
                 Logger.instance.log_debug (true);
-            } else if (option == "--path" && !it.peek_next ().starts_with ("-")) {
+            } else if (option == "--path" && !it.peek_next ().has_prefix ("-")) {
                 options.remote_path = it.next ();
             }
             else {
@@ -255,7 +255,7 @@ public class CommandLine : GLib.Object {
             return EXIT_FAILURE;
         }
 
-        GLib.Uri host_url = GLib.Uri.from_user_input ( (options.target_url.ends_with ('/') || options.target_url.ends_with ('\\')) ? options.target_url.chopped (1) : options.target_url);
+        GLib.Uri host_url = GLib.Uri.from_user_input ( (options.target_url.has_suffix ('/') || options.target_url.has_suffix ('\\')) ? options.target_url.chopped (1) : options.target_url);
 
         // Order of retrieval attempt (later attempts override earlier ones):
         // 1. From URL
@@ -315,7 +315,7 @@ public class CommandLine : GLib.Object {
                 // http : //192.168.178.23 : 8080
                 //  0            1            2
                 host = p_list.at (1);
-                if (host.starts_with ("//"))
+                if (host.has_prefix ("//"))
                     host.remove (0, 2);
 
                 port = p_list.at (2).to_int (&ok);
@@ -383,7 +383,7 @@ public class CommandLine : GLib.Object {
                 selective_sync_list = f.read_all ().split ('\n').filter (GLib.Regex ("\\S+")).filter (GLib.Regex ("^[^#]"));
 
                 foreach (var item in selective_sync_list) {
-                    if (!item.ends_with ("/")) {
+                    if (!item.has_suffix ("/")) {
                         item += "/";
                     }
                 }

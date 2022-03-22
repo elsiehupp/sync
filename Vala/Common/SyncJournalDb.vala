@@ -772,7 +772,7 @@ public class SyncJournalDb : GLib.Object {
 
             SyncJournalFileRecord record;
             fill_file_record_from_get_query (record, *query);
-            if (!record.path.starts_with (path) || record.path.index_of ("/", path.size () + 1) > 0) {
+            if (!record.path.has_prefix (path) || record.path.index_of ("/", path.size () + 1) > 0) {
                 GLib.warning ("hash collision" + path + record.path);
                 continue;
             }
@@ -793,7 +793,7 @@ public class SyncJournalDb : GLib.Object {
             // If we are a directory that should not be read from database next time, don't write the etag
             string prefix = record.path + "/";
             foreach (string it in this.etag_storage_filter) {
-                if (it.starts_with (prefix)) {
+                if (it.has_prefix (prefix)) {
                     GLib.info ("Filtered writing the etag of" + prefix + "because it is a prefix of" + it);
                     record.etag = "this.invalid_";
                     break;
@@ -1682,7 +1682,7 @@ public class SyncJournalDb : GLib.Object {
                 break;
 
             var entry = query.string_value (0);
-            if (!entry.ends_with ('/')) {
+            if (!entry.has_suffix ('/')) {
                 entry.append ('/');
             }
             result.append (entry);
@@ -1757,7 +1757,7 @@ public class SyncJournalDb : GLib.Object {
 
         // Remove trailing slash
         var argument = filename;
-        if (argument.ends_with ('/'))
+        if (argument.has_suffix ('/'))
             argument.chop (1);
 
         SqlQuery query = new SqlQuery (this.database);
@@ -2101,7 +2101,7 @@ public class SyncJournalDb : GLib.Object {
     Access to PinStates stored in the database.
 
     Important: Not all vfs plugins store the pin states in the database,
-    prefer to use Vfs.pin_state () etc.
+    prefer to use AbstractVfs.pin_state () etc.
     ***********************************************************/
     public PinStateInterface internal_pin_states {
         public get {
@@ -2814,12 +2814,6 @@ public class SyncJournalDb : GLib.Object {
         // This avoid reading from the DB if we already know it is empty
         // thereby speeding up the initial discovery significantly.
         this.metadata_table_is_empty = (get_file_record_count () == 0);
-
-        // Hide 'em all!
-        FileSystem.file_hidden (database_file_path, true);
-        FileSystem.file_hidden (database_file_path + "-wal", true);
-        FileSystem.file_hidden (database_file_path + "-shm", true);
-        FileSystem.file_hidden (database_file_path + "-journal", true);
 
         return rc;
     }

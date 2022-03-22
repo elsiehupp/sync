@@ -36,16 +36,16 @@ public class FolderStatusModel : QAbstractItemModel {
 
         Progress progress;
 
-        Folder folder = null;
+        FolderConnection folder_connection = null;
 
         /***********************************************************
-        Folder name to be displayed in the UI
+        FolderConnection name to be displayed in the UI
         ***********************************************************/
         string name;
 
         /***********************************************************
-        Sub-folder path that should always point to a local
-        filesystem's folder
+        Sub-folder_connection path that should always point to a local
+        filesystem's folder_connection
         ***********************************************************/
         string path;
 
@@ -76,7 +76,7 @@ public class FolderStatusModel : QAbstractItemModel {
         bool is_encrypted = false;
 
         /***********************************************************
-        If we did the LSCOL for this folder already
+        If we did the LSCOL for this folder_connection already
         ***********************************************************/
         bool fetched = false;
 
@@ -106,7 +106,7 @@ public class FolderStatusModel : QAbstractItemModel {
         bool is_undecided = false;
 
         /***********************************************************
-        The file identifier for this folder on the server
+        The file identifier for this folder_connection on the server
         ***********************************************************/
         string file_id;
 
@@ -182,32 +182,32 @@ public class FolderStatusModel : QAbstractItemModel {
             this.folders.clear ();
             this.account_state = value;
 
-            FolderMan.instance.signal_folder_sync_state_change.connect (
+            FolderManager.instance.signal_folder_sync_state_change.connect (
                 this.on_signal_folder_sync_state_change // Qt.UniqueConnection
             );
-            FolderMan.instance.signal_schedule_queue_changed.connect (
+            FolderManager.instance.signal_schedule_queue_changed.connect (
                 this.on_signal_folder_schedule_queue_changed // Qt.UniqueConnection
             );
 
-            var folders = FolderMan.instance.map ();
-            foreach (var folder in folders) {
+            var folders = FolderManager.instance.map ();
+            foreach (var folder_connection in folders) {
                 if (!this.account_state) {
                     break;
                 }
-                if (folder.account_state != this.account_state) {
+                if (folder_connection.account_state != this.account_state) {
                     continue;
                 }
                 SubFolderInfo info;
-                info.name = folder.alias ();
+                info.name = folder_connection.alias ();
                 info.path = "/";
-                info.folder = folder;
+                info.folder_connection = folder_connection;
                 info.checked = Qt.PartiallyChecked;
                 this.folders + info;
 
-                folder.signal_progress_info.connect (
+                folder_connection.signal_progress_info.connect (
                     this.on_signal_folder_progress_info // Qt.UniqueConnection
                 );
-                folder.signal_new_big_folder_discovered.connect (
+                folder_connection.signal_new_big_folder_discovered.connect (
                     this.on_signal_new_big_folder_discovered // Qt.UniqueConnection
                 );
             }
@@ -268,7 +268,7 @@ public class FolderStatusModel : QAbstractItemModel {
         }
 
         const var info = info_for_index (index);
-        const var supports_selective_sync = info && info.folder && info.folder.supports_selective_sync;
+        const var supports_selective_sync = info && info.folder_connection && info.folder_connection.supports_selective_sync;
 
         switch (classify (index)) {
         case ItemType.ADD_BUTTON: {
@@ -311,15 +311,15 @@ public class FolderStatusModel : QAbstractItemModel {
                 return GLib.Variant (true);
             } else if (role == Qt.ToolTipRole) {
                 if (!this.account_state.is_connected) {
-                    return _("You need to be connected to add a folder");
+                    return _("You need to be connected to add a folder_connection");
                 }
-                return _("Click this button to add a folder to synchronize.");
+                return _("Click this button to add a folder_connection to synchronize.");
             }
             return GLib.Variant ();
         }
         case ItemType.SUBFOLDER: {
             const var x = static_cast<SubFolderInfo> (index.internal_pointer ()).subs.at (index.row ());
-            const var supports_selective_sync = x.folder && x.folder.supports_selective_sync;
+            const var supports_selective_sync = x.folder_connection && x.folder_connection.supports_selective_sync;
 
             switch (role) {
             case Qt.Display_role:
@@ -339,7 +339,7 @@ public class FolderStatusModel : QAbstractItemModel {
                 } else if (x.size > 0 && is_any_ancestor_encrypted (index)) {
                     return new Gtk.Icon (":/client/theme/lock-broken.svg");
                 }
-                return QFileIconProvider ().icon (x.is_external ? QFileIconProvider.Network : QFileIconProvider.Folder);
+                return QFileIconProvider ().icon (x.is_external ? QFileIconProvider.Network : QFileIconProvider.FolderConnection);
             }
             case Qt.Foreground_role:
                 if (x.is_undecided) {
@@ -349,10 +349,10 @@ public class FolderStatusModel : QAbstractItemModel {
             case FILE_ID_ROLE:
                 return x.file_id;
             case DataRole.FOLDER_PATH_ROLE: {
-                var folder = x.folder;
-                if (!folder)
+                var folder_connection = x.folder_connection;
+                if (!folder_connection)
                     return GLib.Variant ();
-                return GLib.Variant (folder.path + x.path);
+                return GLib.Variant (folder_connection.path + x.path);
             }
             }
         }
@@ -365,7 +365,7 @@ public class FolderStatusModel : QAbstractItemModel {
                     return GLib.Variant (_("Error while loading the list of folders from the server.")
                         + "\n" + x.last_error_string);
                 } else {
-                    return _("Fetching folder list from server …");
+                    return _("Fetching folder_connection list from server …");
                 }
                 break;
             default:
@@ -377,8 +377,8 @@ public class FolderStatusModel : QAbstractItemModel {
         }
 
         const SubFolderInfo folder_info = this.folders.at (index.row ());
-        var folder = folder_info.folder;
-        if (!folder)
+        var folder_connection = folder_info.folder_connection;
+        if (!folder_connection)
             return GLib.Variant ();
 
         const SubFolderInfo.Progress progress = folder_info.progress;
@@ -386,29 +386,29 @@ public class FolderStatusModel : QAbstractItemModel {
 
         switch (role) {
         case DataRole.FOLDER_PATH_ROLE:
-            return folder.short_gui_local_path;
+            return folder_connection.short_gui_local_path;
         case DataRole.FOLDER_SECOND_PATH_ROLE:
-            return folder.remote_path;
+            return folder_connection.remote_path;
         case DataRole.FOLDER_CONFLICT_MESSAGE:
-            return (folder.sync_result.has_unresolved_conflicts)
+            return (folder_connection.sync_result.has_unresolved_conflicts)
                 ? { (_("There are unresolved conflicts. Click for details.")) }
                 : { };
         case DataRole.FOLDER_ERROR_MESSAGE:
-            return folder.sync_result.error_strings ();
+            return folder_connection.sync_result.error_strings ();
         case DataRole.FOLDER_INFO_MESSAGE:
-            return folder.virtual_files_enabled () && folder.vfs ().mode () != AbstractVfs.Mode.WindowsCfApi
+            return folder_connection.virtual_files_enabled () && folder_connection.vfs ().mode () != AbstractVfs.Mode.WindowsCfApi
                 ? { (_("Virtual file support is enabled."))}
                 : { };
         case DataRole.SYNC_RUNNING:
-            return folder.sync_result.status () == LibSync.SyncResult.Status.SYNC_RUNNING;
+            return folder_connection.sync_result.status () == LibSync.SyncResult.Status.SYNC_RUNNING;
         case DataRole.SYNC_DATE:
-            return folder.sync_result.sync_time ();
+            return folder_connection.sync_result.sync_time ();
         case DataRole.HEADER_ROLE:
-            return folder.short_gui_remote_path_or_app_name ();
+            return folder_connection.short_gui_remote_path_or_app_name ();
         case DataRole.FOLDER_ALIAS_ROLE:
-            return folder.alias ();
+            return folder_connection.alias ();
         case DataRole.FOLDER_SYNC_PAUSED:
-            return folder.sync_paused;
+            return folder_connection.sync_paused;
         case DataRole.FOLDER_ACCOUNT_CONNECTED:
             return account_connected;
         case Qt.ToolTipRole: {
@@ -417,18 +417,18 @@ public class FolderStatusModel : QAbstractItemModel {
                 return progress.progress_string;
             }
             if (account_connected)
-                tool_tip = Theme.status_header_text (folder.sync_result.status ());
+                tool_tip = Theme.status_header_text (folder_connection.sync_result.status ());
             else
                 tool_tip = _("Signed out");
             tool_tip += "\n";
-            tool_tip += folder_info.folder.path;
+            tool_tip += folder_info.folder_connection.path;
             return tool_tip;
         }
         case DataRole.FOLDER_STATUS_ICON_ROLE:
             if (account_connected) {
                 var theme = Theme.instance;
-                var status = folder.sync_result.status ();
-                if (folder.sync_paused) {
+                var status = folder_connection.sync_result.status ();
+                if (folder_connection.sync_paused) {
                     return theme.folder_disabled_icon;
                 } else {
                     if (status == LibSync.SyncResult.Status.SYNC_PREPARE || status == LibSync.SyncResult.Status.UNDEFINED) {
@@ -438,7 +438,7 @@ public class FolderStatusModel : QAbstractItemModel {
                         // synced, so we show "Success" in these cases. But we
                         // do use the "Problem" *icon* for unresolved conflicts.
                         if (status == LibSync.SyncResult.Status.SUCCESS || status == LibSync.SyncResult.Status.PROBLEM) {
-                            if (folder.sync_result.has_unresolved_conflicts) {
+                            if (folder_connection.sync_result.has_unresolved_conflicts) {
                                 return theme.sync_state_icon (LibSync.SyncResult.Status.PROBLEM);
                             } else {
                                 return theme.sync_state_icon (LibSync.SyncResult.Status.SUCCESS);
@@ -460,10 +460,10 @@ public class FolderStatusModel : QAbstractItemModel {
         case DataRole.SYNC_PROGRESS_OVERALL_STRING:
             return progress.overall_sync_string;
         case DataRole.FOLDER_SYNC_TEXT:
-            if (folder.virtual_files_enabled ()) {
-                return _("Synchronizing Virtual_files with local folder");
+            if (folder_connection.virtual_files_enabled ()) {
+                return _("Synchronizing Virtual_files with local folder_connection");
             } else {
-                return _("Synchronizing with local folder");
+                return _("Synchronizing with local folder_connection");
             }
         }
         return GLib.Variant ();
@@ -475,7 +475,7 @@ public class FolderStatusModel : QAbstractItemModel {
     public bool data_for_index_value_and_role (QModelIndex index, GLib.Variant value, int role = Qt.EditRole) {
         if (role == Qt.CheckStateRole) {
             var info = info_for_index (index);
-            //  Q_ASSERT (info.folder && info.folder.supports_selective_sync);
+            //  Q_ASSERT (info.folder_connection && info.folder_connection.supports_selective_sync);
             var checked = static_cast<Qt.CheckState> (value.to_int ());
 
             if (info && info.checked != checked) {
@@ -551,10 +551,10 @@ public class FolderStatusModel : QAbstractItemModel {
     public int row_count (QModelIndex parent = QModelIndex ()) {
         if (!parent.is_valid ()) {
             if (Theme.single_sync_folder && this.folders.count () != 0) {
-                // "Add folder" button not visible in the single_sync_folder configuration.
+                // "Add folder_connection" button not visible in the single_sync_folder configuration.
                 return this.folders.count ();
             }
-            return this.folders.count () + 1; // +1 for the "add folder" button
+            return this.folders.count () + 1; // +1 for the "add folder_connection" button
         }
         var info = info_for_index (parent);
         if (!info)
@@ -653,7 +653,7 @@ public class FolderStatusModel : QAbstractItemModel {
         if (!info || info.fetched || info.fetching_job)
             return;
         info.reset_subs (this, parent);
-        string path = info.folder.remote_path_trailing_slash;
+        string path = info.folder_connection.remote_path_trailing_slash;
 
         // info.path always contains non-mangled name, so we need to use mangled when requesting nested folders for encrypted subfolders as required by LscolJob
         const string info_path = (info.is_encrypted && !info.e2e_mangled_name == "") ? info.e2e_mangled_name : info.path;
@@ -801,18 +801,18 @@ public class FolderStatusModel : QAbstractItemModel {
     folder. Note: this method returns an invalid index if the
     path was not fetched from the server before
     ***********************************************************/
-    public QModelIndex index_for_path (Folder folder, string path) {
-        if (!folder) {
+    public QModelIndex index_for_path (FolderConnection folder_connection, string path) {
+        if (!folder_connection) {
             return {};
         }
 
         int slash_pos = path.last_index_of ('/');
         if (slash_pos == -1) {
-            // first level folder
+            // first level folder_connection
             for (int i = 0; i < this.folders.size (); ++i) {
                 var info = this.folders.at (i);
-                if (info.folder == folder) {
-                    if (path == "") { // the folder object
+                if (info.folder_connection == folder_connection) {
+                    if (path == "") { // the folder_connection object
                         return index (i, 0);
                     }
                     for (int j = 0; j < info.subs.size (); ++j) {
@@ -827,7 +827,7 @@ public class FolderStatusModel : QAbstractItemModel {
             return {};
         }
 
-        var parent = index_for_path (folder, path.left (slash_pos));
+        var parent = index_for_path (folder_connection, path.left (slash_pos));
         if (!parent.is_valid ())
             return parent;
 
@@ -852,11 +852,11 @@ public class FolderStatusModel : QAbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_update_folder_state (Folder folder) {
-        if (!folder)
+    public void on_signal_update_folder_state (FolderConnection folder_connection) {
+        if (!folder_connection)
             return;
         for (int i = 0; i < this.folders.count (); ++i) {
-            if (this.folders.at (i).folder == folder) {
+            if (this.folders.at (i).folder_connection == folder_connection) {
                 /* emit */ data_changed (index (i), index (i));
             }
         }
@@ -868,41 +868,41 @@ public class FolderStatusModel : QAbstractItemModel {
     public void on_signal_apply_selective_sync () {
         foreach (var folder_info in this.folders) {
             if (!folder_info.fetched) {
-                folder_info.folder.journal_database ().selective_sync_list (
+                folder_info.folder_connection.journal_database ().selective_sync_list (
                     SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST,
                     { });
                 continue;
             }
-            const Folder folder = folder_info.folder;
+            const FolderConnection folder_connection = folder_info.folder_connection;
 
             bool ok = false;
-            var old_block_list = folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
+            var old_block_list = folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
             if (!ok) {
                 GLib.warning ("Could not read selective sync list from database.");
                 continue;
             }
             string[] block_list = create_block_list (folder_info, old_block_list);
-            folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, block_list);
+            folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, block_list);
 
             var block_list_set = block_list.to_set ();
             var old_block_list_set = old_block_list.to_set ();
 
             // The folders that were undecided or blocklisted and that are now checked should go on the allow list.
             // The user confirmed them already just now.
-            string[] to_add_to_allow_list = ( (old_block_list_set + folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok).to_set ()) - block_list_set).values ();
+            string[] to_add_to_allow_list = ( (old_block_list_set + folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok).to_set ()) - block_list_set).values ();
 
             if (!to_add_to_allow_list == "") {
-                var allow_list = folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, ok);
+                var allow_list = folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, ok);
                 if (ok) {
                     allow_list += to_add_to_allow_list;
-                    folder.journal_database ().selective_sync_list (
+                    folder_connection.journal_database ().selective_sync_list (
                         SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST,
                         allow_list
                     );
                 }
             }
             // clear the undecided list
-            folder.journal_database ().selective_sync_list (
+            folder_connection.journal_database ().selective_sync_list (
                 SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST,
                 { }
             );
@@ -910,16 +910,16 @@ public class FolderStatusModel : QAbstractItemModel {
             // do the sync if there were changes
             var changes = (old_block_list_set - block_list_set) + (block_list_set - old_block_list_set);
             if (!changes == "") {
-                if (folder.is_busy ()) {
-                    folder.on_signal_terminate_sync ();
+                if (folder_connection.is_busy ()) {
+                    folder_connection.on_signal_terminate_sync ();
                 }
                 //The part that changed should not be read from the DB on next sync because there might be new folders
                 // (the ones that are no longer in the blocklist)
                 foreach (var change in changes) {
-                    folder.journal_database ().schedule_path_for_remote_discovery (change);
-                    folder.on_signal_schedule_path_for_local_discovery (change);
+                    folder_connection.journal_database ().schedule_path_for_remote_discovery (change);
+                    folder_connection.on_signal_schedule_path_for_local_discovery (change);
                 }
-                FolderMan.instance.schedule_folder (folder);
+                FolderManager.instance.schedule_folder (folder_connection);
             }
         }
 
@@ -939,16 +939,16 @@ public class FolderStatusModel : QAbstractItemModel {
     public void on_signal_sync_all_pending_big_folders () {
         for (int i = 0; i < this.folders.count (); ++i) {
             if (!this.folders[i].fetched) {
-                this.folders[i].folder.journal_database ().selective_sync_list (
+                this.folders[i].folder_connection.journal_database ().selective_sync_list (
                     SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST,
                     { }
                 );
                 continue;
             }
-            var folder = this.folders.at (i).folder;
+            var folder_connection = this.folders.at (i).folder_connection;
 
             bool ok = false;
-            var undecided_list = folder.journal_database ().selective_sync_list (
+            var undecided_list = folder_connection.journal_database ().selective_sync_list (
                 SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST,
                 ok
             );
@@ -957,13 +957,13 @@ public class FolderStatusModel : QAbstractItemModel {
                 return;
             }
 
-            // If this folder had no undecided entries, skip it.
+            // If this folder_connection had no undecided entries, skip it.
             if (undecided_list == "") {
                 continue;
             }
 
             // Remove all undecided folders from the blocklist
-            var block_list = folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
+            var block_list = folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
             if (!ok) {
                 GLib.warning ("Could not read selective sync list from database.");
                 return;
@@ -971,13 +971,13 @@ public class FolderStatusModel : QAbstractItemModel {
             foreach (var undecided_folder in undecided_list) {
                 block_list.remove_all (undecided_folder);
             }
-            folder.journal_database ().selective_sync_list (
+            folder_connection.journal_database ().selective_sync_list (
                 SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
                 block_list
             );
 
             // Add all undecided folders to the allow list
-            var allow_list = folder.journal_database ().selective_sync_list (
+            var allow_list = folder_connection.journal_database ().selective_sync_list (
                 SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST,
                 ok
             );
@@ -986,28 +986,28 @@ public class FolderStatusModel : QAbstractItemModel {
                 return;
             }
             allow_list += undecided_list;
-            folder.journal_database ().selective_sync_list (
+            folder_connection.journal_database ().selective_sync_list (
                 SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST,
                 allow_list
             );
 
             // Clear the undecided list
-            folder.journal_database ().selective_sync_list (
+            folder_connection.journal_database ().selective_sync_list (
                 SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST,
                 { }
             );
 
             // Trigger a sync
-            if (folder.is_busy ()) {
-                folder.on_signal_terminate_sync ();
+            if (folder_connection.is_busy ()) {
+                folder_connection.on_signal_terminate_sync ();
             }
             // The part that changed should not be read from the DB on next sync because there might be new folders
             // (the ones that are no longer in the blocklist)
             foreach (var it in undecided_list) {
-                folder.journal_database ().schedule_path_for_remote_discovery (it);
-                folder.on_signal_schedule_path_for_local_discovery (it);
+                folder_connection.journal_database ().schedule_path_for_remote_discovery (it);
+                folder_connection.on_signal_schedule_path_for_local_discovery (it);
             }
-            FolderMan.instance.schedule_folder (folder);
+            FolderManager.instance.schedule_folder (folder_connection);
         }
 
         on_signal_reset_folders ();
@@ -1019,10 +1019,10 @@ public class FolderStatusModel : QAbstractItemModel {
     ***********************************************************/
     public void on_signal_sync_no_pending_big_folders () {
         for (int i = 0; i < this.folders.count (); ++i) {
-            var folder = this.folders.at (i).folder;
+            var folder_connection = this.folders.at (i).folder_connection;
 
             // clear the undecided list
-            folder.journal_database ().selective_sync_list (
+            folder_connection.journal_database ().selective_sync_list (
                 SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST,
                 { }
             );
@@ -1041,14 +1041,14 @@ public class FolderStatusModel : QAbstractItemModel {
             return; // for https://github.com/owncloud/client/issues/2648#issuecomment-71377909
         }
 
-        var folder = qobject_cast<Folder> (sender ());
-        if (!folder) {
+        var folder_connection = qobject_cast<FolderConnection> (sender ());
+        if (!folder_connection) {
             return;
         }
 
         int folder_index = -1;
         for (int i = 0; i < this.folders.count (); ++i) {
-            if (this.folders.at (i).folder == folder) {
+            if (this.folders.at (i).folder_connection == folder_connection) {
                 folder_index = i;
                 break;
             }
@@ -1228,18 +1228,18 @@ public class FolderStatusModel : QAbstractItemModel {
         parent_info.fetching_job = null;
         parent_info.fetched = true;
 
-        GLib.Uri url = parent_info.folder.remote_url ();
+        GLib.Uri url = parent_info.folder_connection.remote_url ();
         string path_to_remove = url.path;
-        if (!path_to_remove.ends_with ('/'))
+        if (!path_to_remove.has_suffix ('/'))
             path_to_remove += '/';
 
         string[] selective_sync_block_list;
         bool ok1 = true;
         bool ok2 = true;
         if (parent_info.checked == Qt.PartiallyChecked) {
-            selective_sync_block_list = parent_info.folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok1);
+            selective_sync_block_list = parent_info.folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok1);
         }
-        var selective_sync_undecided_list = parent_info.folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok2);
+        var selective_sync_undecided_list = parent_info.folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok2);
 
         if (! (ok1 && ok2)) {
             GLib.warning ("Could not retrieve selective sync info from journal.");
@@ -1248,7 +1248,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
         GLib.List<string> selective_sync_undecided_set; // not GLib.List because it's not sorted
         foreach (string string_value in selective_sync_undecided_list) {
-            if (string_value.starts_with (parent_info.path) || parent_info.path == "/") {
+            if (string_value.has_prefix (parent_info.path) || parent_info.path == "/") {
                 selective_sync_undecided_set.insert (string_value);
             }
         }
@@ -1266,12 +1266,12 @@ public class FolderStatusModel : QAbstractItemModel {
         new_subs.reserve (sorted_subfolders.size ());
         foreach (string path in sorted_subfolders) {
             var relative_path = path.mid (path_to_remove.size ());
-            if (parent_info.folder.is_file_excluded_relative (relative_path)) {
+            if (parent_info.folder_connection.is_file_excluded_relative (relative_path)) {
                 continue;
             }
 
             SubFolderInfo new_info;
-            new_info.folder = parent_info.folder;
+            new_info.folder_connection = parent_info.folder_connection;
             new_info.path_index = parent_info.path_index;
             new_info.path_index += new_subs.size ();
             new_info.is_external = permission_map.value (remove_trailing_slash (path)).to_string ().contains ("M");
@@ -1279,16 +1279,16 @@ public class FolderStatusModel : QAbstractItemModel {
             new_info.path = relative_path;
 
             SyncJournalFileRecord record;
-            parent_info.folder.journal_database ().file_record_by_e2e_mangled_name (remove_trailing_slash (relative_path), record);
+            parent_info.folder_connection.journal_database ().file_record_by_e2e_mangled_name (remove_trailing_slash (relative_path), record);
             if (record.is_valid ()) {
                 new_info.name = remove_trailing_slash (record.path).split ('/').last ();
                 if (record.is_e2e_encrypted && !record.e2e_mangled_name == "") {
-                    // we must use local path for Settings Dialog's filesystem tree, otherwise open and create new folder actions won't work
+                    // we must use local path for Settings Dialog's filesystem tree, otherwise open and create new folder_connection actions won't work
                     // hence, we are storing this.e2e_mangled_name separately so it can be use later for LscolJob
                     new_info.e2e_mangled_name = relative_path;
                     new_info.path = record.path;
                 }
-                if (!new_info.path.ends_with ('/')) {
+                if (!new_info.path.has_suffix ('/')) {
                     new_info.path += '/';
                 }
             } else {
@@ -1310,7 +1310,7 @@ public class FolderStatusModel : QAbstractItemModel {
                     if (string_value == relative_path || string_value == "/") {
                         new_info.checked = Qt.Unchecked;
                         break;
-                    } else if (string_value.starts_with (relative_path)) {
+                    } else if (string_value.has_prefix (relative_path)) {
                         new_info.checked = Qt.PartiallyChecked;
                     }
                 }
@@ -1321,7 +1321,7 @@ public class FolderStatusModel : QAbstractItemModel {
                 if (*it == relative_path) {
                     new_info.is_undecided = true;
                     selective_sync_undecided_set.erase (it);
-                } else if ( (*it).starts_with (relative_path)) {
+                } else if ( (*it).has_prefix (relative_path)) {
                     undecided_indexes.append (new_info.path_index.last ());
 
                     // Remove all the items from the selective_sync_undecided_set that starts with this path
@@ -1355,7 +1355,7 @@ public class FolderStatusModel : QAbstractItemModel {
         }
         if (iterator != selective_sync_undecided_list.end ()) {
             selective_sync_undecided_list.erase (it, selective_sync_undecided_list.end ());
-            parent_info.folder.journal_database ().selective_sync_list (
+            parent_info.folder_connection.journal_database ().selective_sync_list (
                 SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, selective_sync_undecided_list);
             /* emit */ dirty_changed ();
         }
@@ -1372,7 +1372,7 @@ public class FolderStatusModel : QAbstractItemModel {
         var abstract_network_job = sender ();
         var permission_map = abstract_network_job.property (PROPERTY_PERMISSION_MAP).to_map ();
         abstract_network_job.property (PROPERTY_PERMISSION_MAP, GLib.Variant ()); // avoid a detach of the map while it is modified
-        //  ASSERT (!href.ends_with ('/'), "LscolXMLParser.parse should remove the trailing slash before calling us.");
+        //  ASSERT (!href.has_suffix ('/'), "LscolXMLParser.parse should remove the trailing slash before calling us.");
         permission_map[href] = *it;
         abstract_network_job.property (PROPERTY_PERMISSION_MAP, permission_map);
     }
@@ -1388,7 +1388,7 @@ public class FolderStatusModel : QAbstractItemModel {
         var abstract_network_job = sender ();
         var encryption_map = abstract_network_job.property (PROPERTY_ENCRYPTION_MAP).to_map ();
         abstract_network_job.property (PROPERTY_ENCRYPTION_MAP, GLib.Variant ()); // avoid a detach of the map while it is modified
-        //  ASSERT (!href.ends_with ('/'), "LscolXMLParser.parse should remove the trailing slash before calling us.");
+        //  ASSERT (!href.has_suffix ('/'), "LscolXMLParser.parse should remove the trailing slash before calling us.");
         encryption_map[href] = *it;
         abstract_network_job.property (PROPERTY_ENCRYPTION_MAP, encryption_map);
     }
@@ -1425,14 +1425,14 @@ public class FolderStatusModel : QAbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_folder_sync_state_change (Folder folder) {
-        if (!folder) {
+    private void on_signal_folder_sync_state_change (FolderConnection folder_connection) {
+        if (!folder_connection) {
             return;
         }
 
         int folder_index = -1;
         for (int i = 0; i < this.folders.count (); ++i) {
-            if (this.folders.at (i).folder == folder) {
+            if (this.folders.at (i).folder_connection == folder_connection) {
                 folder_index = i;
                 break;
             }
@@ -1443,22 +1443,22 @@ public class FolderStatusModel : QAbstractItemModel {
 
         var pi = this.folders[folder_index].progress;
 
-        LibSync.SyncResult.Status state = folder.sync_result.status ();
-        if (!folder.can_sync () || state == LibSync.SyncResult.Status.PROBLEM || state == LibSync.SyncResult.Status.SUCCESS || state == LibSync.SyncResult.Status.ERROR) {
+        LibSync.SyncResult.Status state = folder_connection.sync_result.status ();
+        if (!folder_connection.can_sync () || state == LibSync.SyncResult.Status.PROBLEM || state == LibSync.SyncResult.Status.SUCCESS || state == LibSync.SyncResult.Status.ERROR) {
             // Reset progress info.
             pi = SubFolderInfo.Progress ();
         } else if (state == LibSync.SyncResult.Status.NOT_YET_STARTED) {
-            FolderMan folder_man = FolderMan.instance;
-            int position = folder_man.schedule_queue ().index_of (folder);
+            FolderManager folder_man = FolderManager.instance;
+            int position = folder_man.schedule_queue ().index_of (folder_connection);
             foreach (var other in folder_man.map ()) {
-                if (other != folder && other.is_sync_running ())
+                if (other != folder_connection && other.is_sync_running ())
                     position += 1;
             }
             string message;
             if (position <= 0) {
                 message = _("Waiting …");
             } else {
-                message = _("Waiting for %n other folder (s) …", "", position);
+                message = _("Waiting for %n other folder_connection (s) …", "", position);
             }
             pi = SubFolderInfo.Progress ();
             pi.overall_sync_string = message;
@@ -1468,11 +1468,11 @@ public class FolderStatusModel : QAbstractItemModel {
         }
 
         // update the icon etc. now
-        on_signal_update_folder_state (folder);
+        on_signal_update_folder_state (folder_connection);
 
-        if (folder.sync_result.folder_structure_was_changed ()
+        if (folder_connection.sync_result.folder_structure_was_changed ()
             && (state == LibSync.SyncResult.Status.SUCCESS || state == LibSync.SyncResult.Status.PROBLEM)) {
-            // There is a new or a removed folder. reset all data
+            // There is a new or a removed folder_connection. reset all data
             reset_and_fetch (index (folder_index));
         }
     }
@@ -1482,8 +1482,8 @@ public class FolderStatusModel : QAbstractItemModel {
     Update messages on waiting folders.
     ***********************************************************/
     private void on_signal_folder_schedule_queue_changed () {
-        foreach (Folder folder in FolderMan.instance.map ()) {
-            on_signal_folder_sync_state_change (folder);
+        foreach (FolderConnection folder_connection in FolderManager.instance.map ()) {
+            on_signal_folder_sync_state_change (folder_connection);
         }
     }
 
@@ -1491,12 +1491,12 @@ public class FolderStatusModel : QAbstractItemModel {
     /***********************************************************
     ***********************************************************/
     private void on_signal_new_big_folder_discovered () {
-        var folder = qobject_cast<Folder> (sender ());
-        //  ASSERT (folder);
+        var folder_connection = qobject_cast<FolderConnection> (sender ());
+        //  ASSERT (folder_connection);
 
         int folder_index = -1;
         for (int i = 0; i < this.folders.count (); ++i) {
-            if (this.folders.at (i).folder == folder) {
+            if (this.folders.at (i).folder_connection == folder_connection) {
                 folder_index = i;
                 break;
             }
@@ -1561,7 +1561,7 @@ public class FolderStatusModel : QAbstractItemModel {
             // We did not load from the server so we re-use the one from the old block list
             const string path = root.path;
             foreach (string it in old_block_list) {
-                if (it.starts_with (path)) {
+                if (it.has_prefix (path)) {
                     result += it;
                 }
             }
@@ -1571,7 +1571,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
 
     private static string remove_trailing_slash (string s) {
-        if (s.ends_with ('/')) {
+        if (s.has_suffix ('/')) {
             return s.left (s.size () - 1);
         }
         return s;
@@ -1579,8 +1579,8 @@ public class FolderStatusModel : QAbstractItemModel {
 
 
     private static bool sort_by_folder_header (FolderStatusModel.SubFolderInfo lhs, FolderStatusModel.SubFolderInfo rhs) {
-        return string.compare (lhs.folder.short_gui_remote_path_or_app_name (),
-                rhs.folder.short_gui_remote_path_or_app_name (),
+        return string.compare (lhs.folder_connection.short_gui_remote_path_or_app_name (),
+                rhs.folder_connection.short_gui_remote_path_or_app_name (),
                 Qt.CaseInsensitive)
             < 0;
     }

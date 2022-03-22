@@ -11,8 +11,8 @@ namespace LibSync {
 public class SuffixVfsPluginFactory : GLib.Object, DefaultPluginFactory<VfsSuffix> {
 
     construct {
-        Q_PLUGIN_METADATA (IID + "org.owncloud.PluginFactory" + FILE + "vfspluginmetadata.json");
-        Q_INTERFACES (PluginFactory);
+        Q_PLUGIN_METADATA (IID + "org.owncloud.AbstractPluginFactory" + FILE + "vfspluginmetadata.json");
+        Q_INTERFACES (AbstractPluginFactory);
     }
 
 }

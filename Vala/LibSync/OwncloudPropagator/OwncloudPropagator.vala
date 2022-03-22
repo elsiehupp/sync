@@ -48,7 +48,7 @@ public class OwncloudPropagator : GLib.Object {
     Jobs on the list can be multiple times, such as when several
     chunks are uploaded in parallel.
     ***********************************************************/
-    public GLib.List<PropagateItemJob> active_job_list;
+    public GLib.List<AbstractPropagateItemJob> active_job_list;
 
     /***********************************************************
     We detected that another sync is required after this one
@@ -160,7 +160,7 @@ public class OwncloudPropagator : GLib.Object {
         this.remote_folder = remote_folder.has_suffix ("/") ? remote_folder : remote_folder + "/";
         this.bulk_upload_block_list = bulk_upload_block_list;
         this.schedule_delayed_tasks = false;
-        q_register_meta_type<PropagatorJob.AbortType> ("PropagatorJob.AbortType");
+        q_register_meta_type<AbstractPropagatorJob.AbortType> ("AbstractPropagatorJob.AbortType");
     }
 
 
@@ -200,11 +200,11 @@ public class OwncloudPropagator : GLib.Object {
         this.propagate_root_directory_job.reset (new PropagateRootDirectory (this));
         GLib.List<QPair<string /* directory name */, PropagateDirectory /* job */>> directories; // should be a LIFO stack
         directories.push (q_make_pair ("", this.propagate_root_directory_job));
-        GLib.List<PropagatorJob> directories_to_remove;
+        GLib.List<AbstractPropagatorJob> directories_to_remove;
         string removed_directory;
         string maybe_conflict_directory;
         foreach (unowned SyncFileItem item in synced_items) {
-            if (!removed_directory == "" && item.file.starts_with (removed_directory)) {
+            if (!removed_directory == "" && item.file.has_prefix (removed_directory)) {
                 // this is an item in a directory which is going to be removed.
                 var del_dir_job = qobject_cast<PropagateDirectory> (directories_to_remove.first ());
 
@@ -239,7 +239,7 @@ public class OwncloudPropagator : GLib.Object {
             // the conflict handling is likely to rename the directory. This can happen
             // when there's a new local directory at the same time as a remote file.
             if (!maybe_conflict_directory == "") {
-                if (item.destination ().starts_with (maybe_conflict_directory)) {
+                if (item.destination ().has_prefix (maybe_conflict_directory)) {
                     GLib.info (
                         "Skipping job inside CONFLICT directory "
                         + item.file + item.instruction
@@ -251,7 +251,7 @@ public class OwncloudPropagator : GLib.Object {
                 }
             }
 
-            while (!item.destination ().starts_with (directories.top ().first)) {
+            while (!item.destination ().has_prefix (directories.top ().first)) {
                 directories.pop ();
             }
 
@@ -270,7 +270,7 @@ public class OwncloudPropagator : GLib.Object {
             }
         }
 
-        foreach (PropagatorJob it in directories_to_remove) {
+        foreach (AbstractPropagatorJob it in directories_to_remove) {
             this.propagate_root_directory_job.dir_deletion_jobs.append_job (it);
         }
 
@@ -297,7 +297,7 @@ public class OwncloudPropagator : GLib.Object {
     public void start_directory_propagation (
         SyncFileItem item,
         GLib.List<QPair<string, PropagateDirectory>> directories, // should be a LIFO stack
-        GLib.List<PropagatorJob> directories_to_remove,
+        GLib.List<AbstractPropagatorJob> directories_to_remove,
         string removed_directory,
         SyncFileItemVector synced_items) {
         var directory_propagation_job = std.make_unique<PropagateDirectory> (this, item);
@@ -310,7 +310,7 @@ public class OwncloudPropagator : GLib.Object {
             // of the file we're about to delete to decide whether uploading
             // to the new directory is ok...
             foreach (unowned SyncFileItem dir_item in synced_items) {
-                if (dir_item.destination ().starts_with (item.destination () + "/")) {
+                if (dir_item.destination ().has_prefix (item.destination () + "/")) {
                     dir_item.instruction = CSync.SyncInstructions.NONE;
                     this.another_sync_needed = true;
                 }
@@ -345,7 +345,7 @@ public class OwncloudPropagator : GLib.Object {
     public void start_file_propagation (
         SyncFileItem item,
         GLib.List<QPair<string, PropagateDirectory>> directories, // should be a LIFO stack
-        GLib.List<PropagatorJob> directories_to_remove,
+        GLib.List<AbstractPropagatorJob> directories_to_remove,
         string removed_directory,
         string maybe_conflict_directory) {
         if (item.instruction == CSync.SyncInstructions.TYPE_CHANGE) {
@@ -485,7 +485,7 @@ public class OwncloudPropagator : GLib.Object {
     /***********************************************************
     Creates the job for an item.
     ***********************************************************/
-    public PropagateItemJob create_job (SyncFileItem item) {
+    public AbstractPropagateItemJob create_job (SyncFileItem item) {
         bool delete_existing = item.instruction == CSync.SyncInstructions.TYPE_CHANGE;
         switch (item.instruction) {
         case CSync.SyncInstructions.REMOVE:
@@ -570,7 +570,7 @@ public class OwncloudPropagator : GLib.Object {
 
             // Use Queued Connection because we're possibly already in an item's on_signal_finished stack
             GLib.Object.invoke_method (this.propagate_root_directory_job, "abort", Qt.QueuedConnection,
-                                      Q_ARG (PropagatorJob.AbortType, PropagatorJob.AbortType.ASYNCHRONOUS));
+                                      Q_ARG (AbstractPropagatorJob.AbortType, AbstractPropagatorJob.AbortType.ASYNCHRONOUS));
 
             // Give asynchronous abort 5000 msec to finish on its own
             GLib.Timeout.single_shot (5000, this, SLOT (on_signal_abort_timeout ()));
@@ -708,10 +708,10 @@ public class OwncloudPropagator : GLib.Object {
     Typically after a sync operation succeeded. Updates the inode from
     the filesystem.
 
-    Will also trigger a Vfs.convert_to_placeholder.
+    Will also trigger a AbstractVfs.convert_to_placeholder.
     ***********************************************************/
-    public Result<Vfs.ConvertToPlaceholderResult, string> update_metadata (SyncFileItem item);
-    Result<Vfs.ConvertToPlaceholderResult, string> OwncloudPropagator.update_metadata (SyncFileItem item) {
+    public Result<AbstractVfs.ConvertToPlaceholderResult, string> update_metadata (SyncFileItem item);
+    Result<AbstractVfs.ConvertToPlaceholderResult, string> OwncloudPropagator.update_metadata (SyncFileItem item) {
         return OwncloudPropagator.static_update_metadata (item, this.local_dir, sync_options.vfs, this.journal);
     }
 
@@ -722,24 +722,24 @@ public class OwncloudPropagator : GLib.Object {
     Typically after a sync operation succeeded. Updates the inode from
     the filesystem.
 
-    Will also trigger a Vfs.convert_to_placeholder.
+    Will also trigger a AbstractVfs.convert_to_placeholder.
     ***********************************************************/
-    public static Result<Vfs.ConvertToPlaceholderResult, string> static_update_metadata (
+    public static Result<AbstractVfs.ConvertToPlaceholderResult, string> static_update_metadata (
         SyncFileItem item, string local_dir,
-        Vfs vfs, SyncJournalDb journal) {
+        AbstractVfs vfs, SyncJournalDb journal) {
         const string fs_path = local_dir + item.destination ();
         var result = vfs.convert_to_placeholder (fs_path, item);
         if (!result) {
             return result.error;
-        } else if (*result == Vfs.ConvertToPlaceholderResult.Locked) {
-            return Vfs.ConvertToPlaceholderResult.Locked;
+        } else if (*result == AbstractVfs.ConvertToPlaceholderResult.Locked) {
+            return AbstractVfs.ConvertToPlaceholderResult.Locked;
         }
         var record = item.to_sync_journal_file_record_with_inode (fs_path);
         var d_bresult = journal.file_record (record);
         if (!d_bresult) {
             return d_bresult.error;
         }
-        return Vfs.ConvertToPlaceholderResult.Ok;
+        return AbstractVfs.ConvertToPlaceholderResult.Ok;
     }
 
 
@@ -793,7 +793,7 @@ public class OwncloudPropagator : GLib.Object {
     ***********************************************************/
     private void on_signal_abort_timeout () {
         // Abort synchronously and finish
-        this.propagate_root_directory_job.abort (PropagatorJob.AbortType.SYNCHRONOUS);
+        this.propagate_root_directory_job.abort (AbstractPropagatorJob.AbortType.SYNCHRONOUS);
         on_signal_propagate_root_directory_job_finished (SyncFileItem.Status.NORMAL_ERROR);
     }
 

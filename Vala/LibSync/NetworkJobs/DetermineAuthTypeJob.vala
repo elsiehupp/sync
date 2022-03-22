@@ -11,7 +11,7 @@ namespace LibSync {
 
 @copyright GPLv3 or Later
 ***********************************************************/
-public class DetermineAuthTypeJob : GLib.Object {
+public class DetermineAuthTypeJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
@@ -112,7 +112,7 @@ public class DetermineAuthTypeJob : GLib.Object {
         var reply = get_request.input_stream;
         var www_authenticate_header = reply.raw_header ("WWW-Authenticate");
         if (reply.error == GLib.InputStream.AuthenticationRequiredError
-            && (www_authenticate_header.starts_with ("Basic") || www_authenticate_header.starts_with ("Bearer"))) {
+            && (www_authenticate_header.has_prefix ("Basic") || www_authenticate_header.has_prefix ("Bearer"))) {
             this.result_get = Basic;
         } else {
             this.result_get = LoginFlowV2;

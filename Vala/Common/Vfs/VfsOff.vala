@@ -4,7 +4,7 @@ namespace Common {
 /***********************************************************
 @class VfsOff
 
-@brief Implementation of Vfs for Mode.OFF mode - does nothing
+@brief Implementation of AbstractVfs for Mode.OFF mode - does nothing
 
 @author Christian Kamm <mail@ckamm.de>
 @author Dominik Schmidt <dschmidt@owncloud.com>
@@ -133,7 +133,7 @@ public class VfsOff : AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
-    protected override void start_impl (Vfs.SetupParameters setup_parameters) {
+    protected override void start_impl (AbstractVfs.SetupParameters setup_parameters) {
         return;
     }
 
@@ -159,7 +159,7 @@ public class VfsOff : AbstractVfs {
             GLib.debug ("Plugin " + loader.filename () + " doesn't exist.");
             return false;
         }
-        if (base_meta_data["IID"].to_string () != "org.owncloud.PluginFactory") {
+        if (base_meta_data["IID"].to_string () != "org.owncloud.AbstractPluginFactory") {
             GLib.warning ("Plugin " + loader.filename () + " IID " + base_meta_data["IID"] + " is incorrect");
             return false;
         }
@@ -251,15 +251,15 @@ public class VfsOff : AbstractVfs {
             return null;
         }
 
-        var factory = (PluginFactory) plugin;
+        var factory = (AbstractPluginFactory) plugin;
         if (!factory) {
-            GLib.critical ("Plugin" + loader.filename () + " does not implement PluginFactory.");
+            GLib.critical ("Plugin" + loader.filename () + " does not implement AbstractPluginFactory.");
             return null;
         }
 
         var vfs = (AbstractVfs) factory.create (null);
         if (!vfs) {
-            GLib.critical ("Plugin" + loader.filename () + " does not create a Vfs instance.");
+            GLib.critical ("Plugin" + loader.filename () + " does not create a AbstractVfs instance.");
             return null;
         }
 
@@ -271,7 +271,7 @@ public class VfsOff : AbstractVfs {
     /***********************************************************
     ***********************************************************/
     //  const int OCC_DEFINE_VFS_FACTORY (name, Type) {
-    //      static_assert (std.is_base_of<Vfs, Type>.value, "Please define VFS factories only for Vfs subclasses");
+    //      static_assert (std.is_base_of<AbstractVfs, Type>.value, "Please define VFS factories only for AbstractVfs subclasses");
     //  }
 
 

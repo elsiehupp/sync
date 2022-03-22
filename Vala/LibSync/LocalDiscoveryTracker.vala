@@ -15,7 +15,7 @@ It does this by being notified about
 Then local_discovery_paths () can be used to determine paths to redis
 and send to SyncEngine.local_disco
 
-This class is primarily used from Folder and separate primarily for
+This class is primarily used from FolderConnection and separate primarily for
 readability and testing purposes.
 
 All paths used in this class are expected to be utf8 encoded byte arrays,

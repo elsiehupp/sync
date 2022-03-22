@@ -14,7 +14,7 @@ public class NavigationPaneHelper : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private FolderMan folder_man;
+    private FolderManager folder_man;
     public bool show_in_explorer_navigation_pane {
         public get {
 
@@ -27,8 +27,8 @@ public class NavigationPaneHelper : GLib.Object {
             this.show_in_explorer_navigation_pane = value;
             // Re-generate a new CLSID when enabling, possibly throwing away the old one.
             // update_cloud_storage_registry will take care of removing any unknown CLSID our application owns from the registry.
-            foreach (Folder folder in this.folder_man.map ()) {
-                folder.navigation_pane_clsid (value ? QUuid.create_uuid () : QUuid ());
+            foreach (FolderConnection folder_connection in this.folder_man.map ()) {
+                folder_connection.navigation_pane_clsid (value ? QUuid.create_uuid () : QUuid ());
             }
 
             schedule_update_cloud_storage_registry ();
@@ -38,7 +38,7 @@ public class NavigationPaneHelper : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public NavigationPaneHelper (FolderMan folder_man) {
+    public NavigationPaneHelper (FolderManager folder_man) {
         this.folder_man = folder_man;
         ConfigFile config;
         this.show_in_explorer_navigation_pane = config.show_in_explorer_navigation_pane ();
@@ -48,8 +48,8 @@ public class NavigationPaneHelper : GLib.Object {
             this.on_signal_update_cloud_storage_registry_timer_timeout
         );
 
-        // Ensure that the folder integration stays persistent in Explorer,
-        // the uninstaller removes the folder upon updating the client.
+        // Ensure that the folder_connection integration stays persistent in Explorer,
+        // the uninstaller removes the folder_connection upon updating the client.
         this.show_in_explorer_navigation_pane = !this.show_in_explorer_navigation_pane;
     }
 
@@ -76,28 +76,28 @@ public class NavigationPaneHelper : GLib.Object {
         // that matches ours when we saved.
         GLib.List<QUuid> entries_to_remove;
 
-        // Only save folder entries if the option is enabled.
+        // Only save folder_connection entries if the option is enabled.
         if (this.show_in_explorer_navigation_pane) {
-            // Then re-save every folder that has a valid navigation_pane_clsid to the registry.
+            // Then re-save every folder_connection that has a valid navigation_pane_clsid to the registry.
             // We currently don't distinguish between new and existing CLSIDs, if it's there we just
             // save over it. We at least need to update the tile in case we are suddently using multiple accounts.
-            foreach (Folder folder in this.folder_man.map ()) {
-                if (!folder.navigation_pane_clsid () == null) {
+            foreach (FolderConnection folder_connection in this.folder_man.map ()) {
+                if (!folder_connection.navigation_pane_clsid () == null) {
                     // If it already exists, unmark it for removal, this is a valid sync root.
-                    entries_to_remove.remove_one (folder.navigation_pane_clsid ());
+                    entries_to_remove.remove_one (folder_connection.navigation_pane_clsid ());
 
-                    string clsid_str = folder.navigation_pane_clsid ().to_string ();
+                    string clsid_str = folder_connection.navigation_pane_clsid ().to_string ();
                     string clsid_path = "" % " (Software\Classes\CLSID\)" % clsid_str;
                     string clsid_path_wow64 = "" % " (Software\Classes\Wow6432Node\CLSID\)" % clsid_str;
                     string namespace_path = "" % " (Software\Microsoft\Windows\Current_version\Explorer\Desktop\Name_space\)" % clsid_str;
 
-                    string title = folder.short_gui_remote_path_or_app_name ();
+                    string title = folder_connection.short_gui_remote_path_or_app_name ();
                     // Write the account name in the sidebar only when using more than one account.
                     if (AccountManager.instance.accounts.size () > 1) {
-                        title = title % " - " % folder.account_state.account.display_name;
+                        title = title % " - " % folder_connection.account_state.account.display_name;
                     }
                     string icon_path = GLib.Dir.to_native_separators (Gtk.Application.application_file_path);
-                    string target_folder_path = GLib.Dir.to_native_separators (folder.clean_path);
+                    string target_folder_path = GLib.Dir.to_native_separators (folder_connection.clean_path);
 
                     GLib.info ("Explorer Cloud storage provider: saving path " + target_folder_path + " to CLSID " + clsid_str);
 
@@ -110,7 +110,7 @@ public class NavigationPaneHelper : GLib.Object {
             }
         }
 
-        // Then remove anything that isn't in our folder list anymore.
+        // Then remove anything that isn't in our folder_connection list anymore.
         foreach (var clsid in entries_to_remove) {
             string clsid_str = clsid.to_string ();
             string clsid_path = "" % " (Software\Classes\CLSID\)" % clsid_str;

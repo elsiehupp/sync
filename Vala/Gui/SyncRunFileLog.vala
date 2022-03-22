@@ -93,8 +93,6 @@ public class SyncRunFileLog : GLib.Object {
                       + "size | file_id | status | error_string | http result code | "
                       + "other size | other modtime | X-Request-ID"
                       + endl;
-
-            FileSystem.file_hidden (filename, true);
         }
 
         this.total_duration.on_signal_start ();

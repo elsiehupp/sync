@@ -12,7 +12,7 @@ public class TestNoLocalEncoding : AbstractTestSyncEngine {
     /***********************************************************
     ***********************************************************/
     private TestNoLocalEncoding () {
-        var utf8Locale = QTextCodec.codec_for_locale ();
+        var utf8Locale = GMime.Encoding.codec_for_locale ();
         if (utf8Locale.mib_enum () != 106) {
             QSKIP ("Test only works for UTF8 locale");
         }
@@ -29,8 +29,8 @@ public class TestNoLocalEncoding : AbstractTestSyncEngine {
         GLib.assert_true (fake_folder.current_local_state ().find ("A/t𠜎t"));
 
         // Try again with a locale that can represent ö but not 𠜎 (4-byte utf8).
-        QTextCodec.set_codec_for_locale (QTextCodec.codec_for_name ("ISO-8859-15"));
-        GLib.assert_true (QTextCodec.codec_for_locale ().mib_enum () == 111);
+        GMime.Encoding.set_codec_for_locale (GMime.Encoding.codec_for_name ("ISO-8859-15"));
+        GLib.assert_true (GMime.Encoding.codec_for_locale ().mib_enum () == 111);
 
         fake_folder.remote_modifier ().insert ("B/tößt");
         fake_folder.remote_modifier ().insert ("B/t𠜎t");
@@ -46,8 +46,8 @@ public class TestNoLocalEncoding : AbstractTestSyncEngine {
         GLib.assert_true (fake_folder.current_remote_state ().find ("B/t𠜎t"));
 
         // Try again with plain ascii
-        QTextCodec.set_codec_for_locale (QTextCodec.codec_for_name ("ASCII"));
-        GLib.assert_true (QTextCodec.codec_for_locale ().mib_enum () == 3);
+        GMime.Encoding.set_codec_for_locale (GMime.Encoding.codec_for_name ("ASCII"));
+        GLib.assert_true (GMime.Encoding.codec_for_locale ().mib_enum () == 3);
 
         fake_folder.remote_modifier ().insert ("C/tößt");
         GLib.assert_true (fake_folder.sync_once ());
@@ -57,7 +57,7 @@ public class TestNoLocalEncoding : AbstractTestSyncEngine {
         GLib.assert_true (fake_folder.sync_once ());
         GLib.assert_true (fake_folder.current_remote_state ().find ("C/tößt"));
 
-        QTextCodec.set_codec_for_locale (utf8Locale);
+        GMime.Encoding.set_codec_for_locale (utf8Locale);
     }
 
 } // class TestNoLocalEncoding

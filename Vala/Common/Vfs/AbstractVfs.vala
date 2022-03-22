@@ -68,7 +68,7 @@ public abstract class AbstractVfs : GLib.Object {
             } else if (string_value == "wincfapi") {
                 return Mode.WINDOWS_CF_API;
             }
-            throw new InvalidParameterError.INVALID_VALUE (string_value + " is not a valid Vfs Mode");
+            throw new InvalidParameterError.INVALID_VALUE (string_value + " is not a valid AbstractVfs Mode");
         }
 
 
@@ -81,7 +81,7 @@ public abstract class AbstractVfs : GLib.Object {
             case Mode.XATTR:
                 return "xattr";
             }
-            throw new InvalidParameterError.INVALID_VALUE (Mode.to_string (mode) + " is not a valid Vfs Mode");
+            throw new InvalidParameterError.INVALID_VALUE (Mode.to_string (mode) + " is not a valid AbstractVfs Mode");
         }
     }
 
@@ -125,7 +125,7 @@ public abstract class AbstractVfs : GLib.Object {
     /***********************************************************
     the parameters passed to on_signal_start ()
     ***********************************************************/
-    protected Vfs.SetupParameters setup_params;
+    protected AbstractVfs.SetupParameters setup_params;
 
 
     /***********************************************************
@@ -149,7 +149,7 @@ public abstract class AbstractVfs : GLib.Object {
     /***********************************************************
     Access to the parameters the instance was on_signal_start ()ed with.
     ***********************************************************/
-    public Vfs.SetupParameters parameters () {
+    public AbstractVfs.SetupParameters parameters () {
         return this.setup_params;
     }
 
@@ -159,7 +159,7 @@ public abstract class AbstractVfs : GLib.Object {
 
     The plugin-specific work is done in start_impl ().
     ***********************************************************/
-    public void on_signal_start (Vfs.SetupParameters parameters) {
+    public void on_signal_start (AbstractVfs.SetupParameters parameters) {
         this.setup_params = parameters;
         start_impl (parameters);
     }
@@ -246,7 +246,7 @@ public abstract class AbstractVfs : GLib.Object {
     for example.
     Q_REQUIRED_RESULT
     ***********************************************************/
-    public abstract Result<Vfs.ConvertToPlaceholderResult, string> convert_to_placeholder (
+    public abstract Result<AbstractVfs.ConvertToPlaceholderResult, string> convert_to_placeholder (
         string filename,
         SyncFileItem sync_file_item,
         string replaces_file = "");
@@ -343,7 +343,7 @@ public abstract class AbstractVfs : GLib.Object {
     Usually some registration needs to be done with the backend. This function
     should take care of it if necessary.
     ***********************************************************/
-    protected abstract void start_impl (Vfs.SetupParameters setup_parameters);
+    protected abstract void start_impl (AbstractVfs.SetupParameters setup_parameters);
 
 
     /***********************************************************

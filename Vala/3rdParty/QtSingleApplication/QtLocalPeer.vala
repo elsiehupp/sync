@@ -80,7 +80,7 @@ public class QtLocalPeer : GLib.Object {
         ds.write_bytes (u_msg.const_data (), u_msg.size ());
         bool res = socket.wait_for_bytes_written (timeout);
         res &= socket.wait_for_ready_read (timeout); // wait for ACK
-        res &= (socket.read (qstrlen (ACK)) == ACK);
+        res &= (socket.read (ACK.length) == ACK);
         if (block) // block until peer disconnects
             socket.wait_for_disconnected (-1);
         return res;
@@ -143,7 +143,7 @@ public class QtLocalPeer : GLib.Object {
         }
         // ### async this
         string message = string.from_utf8 (u_msg.const_data (), u_msg.size ());
-        socket.write (ACK, qstrlen (ACK));
+        socket.write (ACK, ACK.length);
         socket.wait_for_bytes_written (1000);
         /* emit */ signal_message_received (message, socket); // ## (might take a long time to return)
     }

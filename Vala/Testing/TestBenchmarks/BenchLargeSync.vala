@@ -31,7 +31,7 @@ public class BenchLargeSync : GLib.Object {
     }
 
 
-    private void add_a_bunch_of_files (int files_per_directory, int directories_per_directory, int max_depth, int depth, string path, FileModifier file_info) {
+    private void add_a_bunch_of_files (int files_per_directory, int directories_per_directory, int max_depth, int depth, string path, AbstractFileModifier file_info) {
         for (int file_number = 1; file_number <= files_per_directory; ++file_number) {
             string name = "file" + file_number.to_string ();
             file_info.insert (path == "" ? name : path + "/" + name);

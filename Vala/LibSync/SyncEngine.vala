@@ -400,7 +400,7 @@ public class SyncEngine : GLib.Object {
 
         this.last_local_discovery_style = this.local_discovery_style;
 
-        if (this.sync_options.vfs.mode () == Vfs.WithSuffix && this.sync_options.vfs.file_suffix () == "") {
+        if (this.sync_options.vfs.mode () == AbstractVfs.WithSuffix && this.sync_options.vfs.file_suffix () == "") {
             /* Q_EMIT */ signal_sync_error (_("Using virtual files with suffix, but suffix is not set"));
             on_signal_finalize (false);
             return;
@@ -608,7 +608,7 @@ public class SyncEngine : GLib.Object {
         string prev;
         var it = this.local_discovery_paths.begin ();
         while (it != this.local_discovery_paths.end ()) {
-            if (!prev == null && it.starts_with (prev) && (prev.has_suffix ("/") || *it == prev || it.at (prev.size ()) <= "/")) {
+            if (!prev == null && it.has_prefix (prev) && (prev.has_suffix ("/") || *it == prev || it.at (prev.size ()) <= "/")) {
                 it = this.local_discovery_paths.erase (it);
             } else {
                 prev = *it;
@@ -639,9 +639,9 @@ public class SyncEngine : GLib.Object {
         // Check out Test_local_discovery.TestLocalDiscoveryDecision ()
 
         var it = this.local_discovery_paths.lower_bound (path);
-        if (it == this.local_discovery_paths.end () || !it.starts_with (path)) {
+        if (it == this.local_discovery_paths.end () || !it.has_prefix (path)) {
             // Maybe a subfolder of something in the list?
-            if (it != this.local_discovery_paths.begin () && path.starts_with (* (--it))) {
+            if (it != this.local_discovery_paths.begin () && path.has_prefix (* (--it))) {
                 return it.has_suffix ("/") || (path.size () > it.size () && path.at (it.size ()) <= "/");
             }
             return false;
@@ -657,7 +657,7 @@ public class SyncEngine : GLib.Object {
             if (it.size () > path.size () && it.at (path.size ()) == "/")
                 return true;
             ++it;
-            if (it == this.local_discovery_paths.end () || !it.starts_with (path))
+            if (it == this.local_discovery_paths.end () || !it.has_prefix (path))
                 return false;
         }
         return false;
@@ -673,9 +673,9 @@ public class SyncEngine : GLib.Object {
     different kind of vfs.
 
     Note that hydrated* placeholder files might still be left. These will
-    get cleaned up by Vfs.unregister_folder ().
+    get cleaned up by AbstractVfs.unregister_folder ().
     ***********************************************************/
-    public static void wipe_virtual_files (string local_path, Common.SyncJournalDb journal, Vfs vfs) {
+    public static void wipe_virtual_files (string local_path, Common.SyncJournalDb journal, AbstractVfs vfs) {
         GLib.info ("Wiping virtual files inside " + local_path);
         journal.get_files_below_path (
             "",
@@ -709,7 +709,7 @@ public class SyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static void switch_to_virtual_files (string local_path, Common.SyncJournalDb journal, Vfs vfs) {
+    public static void switch_to_virtual_files (string local_path, Common.SyncJournalDb journal, AbstractVfs vfs) {
         GLib.info ("Convert to virtual files inside" + local_path);
         journal.get_files_below_path (
             {},

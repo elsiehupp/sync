@@ -18,7 +18,7 @@ every individual file or the overall sync progress.
 ***********************************************************/
 public class ProgressDispatcher : GLib.Object {
 
-    //  friend class Folder; // only allow Folder class to access the setting slots.
+    //  friend class FolderConnection; // only allow FolderConnection class to access the setting slots.
 
     /***********************************************************
     ***********************************************************/

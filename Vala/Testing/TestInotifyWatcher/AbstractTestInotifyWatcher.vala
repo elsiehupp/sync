@@ -32,7 +32,7 @@ public abstract class AbstractTestInotifyWatcher : FolderWatcherPrivate {
     /***********************************************************
     ***********************************************************/
     ~AbstractTestInotifyWatcher () {
-        if (this.root.starts_with (GLib.Dir.temporary_path)) {
+        if (this.root.has_prefix (GLib.Dir.temporary_path)) {
            system ("rm -rf %1".printf (this.root).to_local_8_bit ());
         }
     }

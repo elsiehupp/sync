@@ -32,7 +32,7 @@ public class FakeSearchResultsStorage : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private QVariantMap meta_success;
+    private GLib.VariantMap meta_success;
 
     public class Provider : GLib.Object {
 
@@ -112,7 +112,7 @@ public class FakeSearchResultsStorage : GLib.Object {
         GLib.List<GLib.Variant> providers_list;
 
         foreach (var fake_provider_init_info in fake_providers_init_info) {
-            providers_list.push_back (new QVariantMap ({
+            providers_list.push_back (new GLib.VariantMap ({
                 {
                     "identifier", fake_provider_init_info.id
                 },
@@ -125,7 +125,7 @@ public class FakeSearchResultsStorage : GLib.Object {
             }));
         }
 
-        QVariantMap ocs_map = new QVariantMap (
+        GLib.VariantMap ocs_map = new GLib.VariantMap (
             {
                 "meta", this.meta_success
             },
@@ -135,7 +135,7 @@ public class FakeSearchResultsStorage : GLib.Object {
         );
 
         this.providers_response = QJsonDocument.from_variant (
-            new QVariantMap ({
+            new GLib.VariantMap ({
                 {
                     "ocs", ocs_map
                 }
@@ -183,7 +183,7 @@ public class FakeSearchResultsStorage : GLib.Object {
         }
 
         foreach (var result in results) {
-            list.push_back (new QVariantMap (
+            list.push_back (new GLib.VariantMap (
                 {
                     "thumbnail_url", result.thumbnail_url
                 },
@@ -244,7 +244,7 @@ public class FakeSearchResultsStorage : GLib.Object {
         }
 
         if (search_term == "[empty]") {
-            QVariantMap data_map = {
+            GLib.VariantMap data_map = {
                 {
                     "name", this.search_results_data[provider_id].name
                 },
@@ -259,7 +259,7 @@ public class FakeSearchResultsStorage : GLib.Object {
                 }
             };
 
-            QVariantMap ocs_map = {
+            GLib.VariantMap ocs_map = {
                 {
                     "meta", this.meta_success
                 },
@@ -269,7 +269,7 @@ public class FakeSearchResultsStorage : GLib.Object {
             };
 
             return QJsonDocument.from_variant (
-                new QVariantMap (
+                new GLib.VariantMap (
                     {
                         "ocs", ocs_map
                     }
@@ -281,7 +281,7 @@ public class FakeSearchResultsStorage : GLib.Object {
 
         var next_cursor = cursor + page_size;
 
-        const QVariantMap data_map = {
+        const GLib.VariantMap data_map = {
             {
                 "name", this.search_results_data[provider_id].name
             },
@@ -296,7 +296,7 @@ public class FakeSearchResultsStorage : GLib.Object {
             }
         };
 
-        QVariantMap ocs_map = {
+        GLib.VariantMap ocs_map = {
             {
                 "meta", this.meta_success
             },
@@ -306,7 +306,7 @@ public class FakeSearchResultsStorage : GLib.Object {
         };
 
         return new QJsonDocument.from_variant (
-            new QVariantMap (
+            new GLib.VariantMap (
                 {
                     "ocs", ocs_map
                 }

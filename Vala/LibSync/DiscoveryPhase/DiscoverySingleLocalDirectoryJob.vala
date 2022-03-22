@@ -17,7 +17,7 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, QRunnable*/ {
     ***********************************************************/
     private string local_path;
     private unowned Account account;
-    private Vfs vfs;
+    private AbstractVfs vfs;
 
 
     internal signal void signal_finished (GLib.List<LocalInfo> result);
@@ -29,7 +29,7 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, QRunnable*/ {
 
     /***********************************************************
     ***********************************************************/
-    public DiscoverySingleLocalDirectoryJob.for_account (unowned Account account, string local_path, Vfs vfs, GLib.Object parent = new GLib.Object ()) {
+    public DiscoverySingleLocalDirectoryJob.for_account (unowned Account account, string local_path, AbstractVfs vfs, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.local_path = local_path;
         this.account = account;
@@ -46,7 +46,7 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, QRunnable*/ {
         if (local_path.has_suffix ("/")) // Happens if this.current_folder.local == ""
             local_path.chop (1);
 
-        var dh = csync_vio_local_opendir (local_path);
+        var dh = CSync.VioHandle.open_directory (local_path);
         if (!dh) {
             GLib.info ("Error while opening directory" + (local_path) + errno;
             string error_string = _("Error while opening directory %1").printf (local_path);
@@ -68,19 +68,19 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, QRunnable*/ {
         GLib.List<LocalInfo> results;
         while (true) {
             errno = 0;
-            var dirent = csync_vio_local_readdir (dh, this.vfs);
+            var dirent = CSync.VioHandle.read_directory (dh, this.vfs);
             if (!dirent)
                 break;
             if (dirent.type == ItemType.SKIP)
                 continue;
             LocalInfo i;
-            static QTextCodec codec = QTextCodec.codec_for_name ("UTF-8");
+            static GMime.Encoding codec = GMime.Encoding.codec_for_name ("UTF-8");
             //  ASSERT (codec);
-            QTextCodec.ConverterState state;
+            GMime.Encoding.ConverterState state;
             i.name = codec.to_unicode (dirent.path, dirent.path.size (), state);
             if (state.invalid_chars > 0 || state.remaining_chars > 0) {
                 /* emit */ child_ignored (true);
-                var item = unowned SyncFileItem.create ();
+                var item = unowned new SyncFileItem ()();
                 //item.file = this.current_folder.target + i.name;
                 // FIXME ^^ do we really need to use this.target or is local fine?
                 item.file = this.local_path + i.name;
@@ -101,7 +101,7 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, QRunnable*/ {
             results.push_back (i);
         }
         if (errno != 0) {
-            csync_vio_local_closedir (dh);
+            CSync.VioHandle.close_directory (dh);
 
             // Note: Windows vio converts any error into EACCES
             GLib.warning ("readdir failed for file in " + local_path + " - errno: " + errno;
@@ -110,7 +110,7 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, QRunnable*/ {
         }
 
         errno = 0;
-        csync_vio_local_closedir (dh);
+        CSync.VioHandle.close_directory (dh);
         if (errno != 0) {
             GLib.warning ("closedir failed for file in " + local_path + " - errno: " + errno;
         }

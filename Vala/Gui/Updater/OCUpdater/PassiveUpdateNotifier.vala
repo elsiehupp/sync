@@ -8,7 +8,7 @@ namespace Occ {
 namespace Ui {
 
 /***********************************************************
-@brief Updater that only implements notification for use in settings
+@brief AbstractUpdater that only implements notification for use in settings
 
 The implementation does not show popups
 

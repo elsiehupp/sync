@@ -33,26 +33,26 @@ public class SelectiveSyncDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private Folder folder;
+    private FolderConnection folder_connection;
     private QPushButton ok_button;
 
     /***********************************************************
-    Dialog for a specific folder (used from the account settings button)
+    Dialog for a specific folder_connection (used from the account settings button)
     ***********************************************************/
-    public SelectiveSyncDialog.for_folder (unowned Account account, Folder folder, Gtk.Widget parent = null, Qt.Window_flags f = {}) {
+    public SelectiveSyncDialog.for_folder (unowned Account account, FolderConnection folder_connection, Gtk.Widget parent = null, Qt.Window_flags f = {}) {
         base (parent, f);
-        this.folder = folder;
+        this.folder_connection = folder_connection;
         this.ok_button = null; // defined in on_signal_init ()
         bool ok = false;
         on_signal_init (account);
-        string[] selective_sync_list = this.folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
+        string[] selective_sync_list = this.folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
         if (ok) {
-            this.selective_sync.folder_info (this.folder.remote_path, this.folder.alias (), selective_sync_list);
+            this.selective_sync.folder_info (this.folder_connection.remote_path, this.folder_connection.alias (), selective_sync_list);
         } else {
             this.ok_button.enabled (false);
         }
-        // Make sure we don't get crashes if the folder is destroyed while we are still open
-        this.folder.destroyed.connect (
+        // Make sure we don't get crashes if the folder_connection is destroyed while we are still open
+        this.folder_connection.destroyed.connect (
             this.delete_later
         );
     }
@@ -61,29 +61,29 @@ public class SelectiveSyncDialog : Gtk.Dialog {
     /***********************************************************
     Dialog for the whole account (Used from the wizard)
     ***********************************************************/
-    public SelectiveSyncDialog.for_path (unowned Account account, string folder, string[] blocklist, Gtk.Widget parent = null, Qt.Window_flags f = {}) {
+    public SelectiveSyncDialog.for_path (unowned Account account, string folder_connection, string[] blocklist, Gtk.Widget parent = null, Qt.Window_flags f = {}) {
         base (parent, f);
-        this.folder = null;
+        this.folder_connection = null;
         on_signal_init (account);
-        this.selective_sync.folder_info (folder, folder, blocklist);
+        this.selective_sync.folder_info (folder_connection, folder_connection, blocklist);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public override void on_signal_accept () {
-        if (this.folder) {
+        if (this.folder_connection) {
             bool ok = false;
-            var old_block_list_set = this.folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok).to_set ();
+            var old_block_list_set = this.folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok).to_set ();
             if (!ok) {
                 return;
             }
             string[] block_list = this.selective_sync.create_block_list ();
-            this.folder.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, block_list);
+            this.folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, block_list);
 
-            FolderMan folder_man = FolderMan.instance;
-            if (this.folder.is_busy ()) {
-                this.folder.on_signal_terminate_sync ();
+            FolderManager folder_man = FolderManager.instance;
+            if (this.folder_connection.is_busy ()) {
+                this.folder_connection.on_signal_terminate_sync ();
             }
 
             //The part that changed should not be read from the DB on next sync because there might be new folders
@@ -91,11 +91,11 @@ public class SelectiveSyncDialog : Gtk.Dialog {
             var block_list_set = block_list.to_set ();
             var changes = (old_block_list_set - block_list_set) + (block_list_set - old_block_list_set);
             foreach (var it in changes) {
-                this.folder.journal_database ().schedule_path_for_remote_discovery (it);
-                this.folder.on_signal_schedule_path_for_local_discovery (it);
+                this.folder_connection.journal_database ().schedule_path_for_remote_discovery (it);
+                this.folder_connection.on_signal_schedule_path_for_local_discovery (it);
             }
 
-            folder_man.schedule_folder (this.folder);
+            folder_man.schedule_folder (this.folder_connection);
         }
         Gtk.Dialog.on_signal_accept ();
     }

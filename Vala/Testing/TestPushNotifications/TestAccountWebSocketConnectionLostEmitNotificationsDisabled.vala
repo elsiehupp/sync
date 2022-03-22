@@ -20,7 +20,7 @@ public class TestAccountWebSocketConnectionLostEmitNotificationsDisabled : Abstr
         var socket = fake_server.authenticate_account (account);
         GLib.assert_true (socket);
 
-        QSignalSpy connection_lost_spy = new QSignalSpy (account.push_notifications (), &PushNotifications.connection_lost);
+        QSignalSpy connection_lost_spy = new QSignalSpy (account.push_notifications (), &PushNotificationManager.connection_lost);
         GLib.assert_true (connection_lost_spy.is_valid ());
 
         QSignalSpy push_notifications_disabled_spy = new QSignalSpy (account, &Account.push_notifications_disabled);

@@ -8,7 +8,7 @@ public class TestUserStatus_UserStatusNotInCapabilitiesReturnFalse : GLib.Object
     /***********************************************************
     ***********************************************************/
     private TestUserStatus_UserStatusNotInCapabilitiesReturnFalse () {
-        QVariantMap capabilities_map;
+        GLib.VariantMap capabilities_map;
 
         const Capabilities capabilities = new Capabilities (capabilities_map);
 

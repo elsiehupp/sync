@@ -106,7 +106,7 @@ public class IconUtils : GLib.Object {
     ***********************************************************/
     private static string custom_color_name (string custom_color) {
         var result = custom_color.name ();
-        if (result.starts_with ("#")) {
+        if (result.has_prefix ("#")) {
             if (result == "#000000") {
                 result = "black";
             }
@@ -129,7 +129,7 @@ public class IconUtils : GLib.Object {
 
         // check for existing Gdk.Pixbuf in cache
         if (QPixmapCache.find (cache_key, cached_pixmap)) {
-            if (original_size) {
+            if (*original_size != null) {
                 *original_size = {};
             }
             return cached_pixmap;
@@ -157,7 +157,7 @@ public class IconUtils : GLib.Object {
 
         const var req_size = requested_size.is_valid () ? requested_size : svg_renderer.default_size ();
 
-        if (original_size) {
+        if (original_size != null) {
             *original_size = svg_renderer.default_size ();
         }
 
