@@ -7,7 +7,7 @@
 ***********************************************************/
 
 //  #include <QProcess>
-//  #include <QSettings>
+//  #include <GLib.Settings>
 //  #include <GLib.Dir>
 //  #include <QDesktopServices>
 //  #include <Gtk.Application>
@@ -40,7 +40,7 @@ public class OpenFileManager : GLib.Object {
         string[] args;
 
         OpenFileManager.default_manager = find_default_file_manager ();
-        QSettings desktop_file = new QSettings (OpenFileManager.default_manager, QSettings.IniFormat);
+        GLib.Settings desktop_file = new GLib.Settings (OpenFileManager.default_manager, GLib.Settings.IniFormat);
         string exec = desktop_file.value ("Desktop Entry/Exec").to_string ();
 
         string file_to_open = GLib.FileInfo (local_path).absolute_file_path;

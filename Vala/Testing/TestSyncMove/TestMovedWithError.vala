@@ -42,7 +42,7 @@ public class TestMovedWithError : AbstractTestSyncMove {
             var vfs = unowned<Vfs> (create_vfs_from_plugin (vfs_mode).release ());
             GLib.assert_true (vfs);
             fake_folder.switch_to_vfs (vfs);
-            fake_folder.sync_journal ().internal_pin_states.set_for_path ("", Vfs.ItemAvailability.ONLINE_ONLY);
+            fake_folder.sync_journal ().internal_pin_states.set_for_path ("", Common.ItemAvailability.ONLINE_ONLY);
 
             // make files virtual
             fake_folder.sync_once ();

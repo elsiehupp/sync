@@ -1,4 +1,5 @@
 namespace Occ {
+namespace Common {
 
 /***********************************************************
 @class SqlQuery
@@ -399,6 +400,8 @@ public class SqlQuery : GLib.Object {
             this.sqldatabase.queries.remove (this);
         }
     }
-}
 
+} // class SqlQuery
+
+} // namespace Common
 } // namespace Occ

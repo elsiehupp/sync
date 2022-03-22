@@ -1125,7 +1125,7 @@ public class Theme : GLib.Object {
     the app palette can not account for that (Qt 5.12.5).
     ***********************************************************/
     public static Gtk.Color get_background_aware_link_color (Gtk.Color background_color = Gtk.Application.palette ().base ().color ()) {
-        return is_dark_color (background_color) ? new Gtk.Color ("#6193dc") : Gtk.Application.palette ().color (QPalette.Link);
+        return is_dark_color (background_color) ? new Gtk.Color ("#6193dc") : Gtk.Application.palette ().color (Gtk.Palette.Link);
     }
 
 
@@ -1140,7 +1140,7 @@ public class Theme : GLib.Object {
     This way we also avoid having certain strings re-translated
     on Transifex.
     ***********************************************************/
-    public static void replace_link_color_string_background_aware (string link_string, Gtk.Color background_color = Gtk.Application.palette ().color (QPalette.Base)) {
+    public static void replace_link_color_string_background_aware (string link_string, Gtk.Color background_color = Gtk.Application.palette ().color (Gtk.Palette.Base)) {
         replace_link_color_string (link_string, get_background_aware_link_color (background_color));
     }
 
@@ -1168,7 +1168,7 @@ public class Theme : GLib.Object {
 
     2019/12/09: Moved here from SettingsDialog.
     ***********************************************************/
-    public static Gtk.Icon create_color_aware_icon (string name, QPalette palette = Gtk.Application.palette ()) {
+    public static Gtk.Icon create_color_aware_icon (string name, Gtk.Palette palette = Gtk.Application.palette ()) {
         QSvgRenderer renderer = new QSvgRenderer (name);
         Gtk.Image img = new Gtk.Image (64, 64, Gtk.Image.FormatARGB32);
         img.fill (Qt.GlobalColor.transparent);
@@ -1183,12 +1183,12 @@ public class Theme : GLib.Object {
         inverted.invert_pixels (Gtk.Image.InvertRgb);
 
         Gtk.Icon icon;
-        if (Theme.is_dark_color (palette.color (QPalette.Base))) {
+        if (Theme.is_dark_color (palette.color (Gtk.Palette.Base))) {
             icon.add_pixmap (Gdk.Pixbuf.from_image (inverted));
         } else {
             icon.add_pixmap (Gdk.Pixbuf.from_image (img));
         }
-        if (Theme.is_dark_color (palette.color (QPalette.HighlightedText))) {
+        if (Theme.is_dark_color (palette.color (Gtk.Palette.HighlightedText))) {
             icon.add_pixmap (Gdk.Pixbuf.from_image (img), Gtk.Icon.Normal, Gtk.Icon.On);
         } else {
             icon.add_pixmap (Gdk.Pixbuf.from_image (inverted), Gtk.Icon.Normal, Gtk.Icon.On);
@@ -1205,13 +1205,13 @@ public class Theme : GLib.Object {
 
     2019/12/09: Adapted from create_color_aware_icon.
     ***********************************************************/
-    public static Gdk.Pixbuf create_color_aware_pixmap (string name, QPalette palette = Gtk.Application.palette ()) {
+    public static Gdk.Pixbuf create_color_aware_pixmap (string name, Gtk.Palette palette = Gtk.Application.palette ()) {
         Gtk.Image img = new Gtk.Image (name);
         Gtk.Image inverted = new Gtk.Image (img);
         inverted.invert_pixels (Gtk.Image.InvertRgb);
 
         Gdk.Pixbuf pixmap;
-        if (Theme.is_dark_color (palette.color (QPalette.Base))) {
+        if (Theme.is_dark_color (palette.color (Gtk.Palette.Base))) {
             pixmap = Gdk.Pixbuf.from_image (inverted);
         } else {
             pixmap = Gdk.Pixbuf.from_image (img);

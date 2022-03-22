@@ -1,4 +1,5 @@
 namespace Occ {
+namespace Common {
 
 /***********************************************************
 @class Result<T>
@@ -163,4 +164,7 @@ public class Result<T> : GLib.Object {
 //      public Result () : Result (detail.NoResultData{}) {}
 //  }
 
+} // class Result
+
+} // namespace Common
 } // namespace Occ

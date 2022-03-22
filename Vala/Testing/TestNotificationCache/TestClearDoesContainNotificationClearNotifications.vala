@@ -6,8 +6,8 @@ public class TestClearDoesContainNotificationClearNotifications : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private TestClearDoesContainNotificationClearNotifications () {
-        NotificationCache notification_cache;
-        const NotificationCache.Notification notification = new NotificationCache.Notification ("Title", "message");
+        Gui.NotificationCache notification_cache;
+        const Gui.NotificationCache.Notification notification = new Gui.NotificationCache.Notification ("Title", "message");
 
         notification_cache.insert (notification);
         notification_cache.clear ();

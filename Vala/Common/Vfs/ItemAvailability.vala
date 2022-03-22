@@ -1,5 +1,5 @@
 namespace Occ {
-namespace Vfs {
+namespace Common {
 
 /***********************************************************
 @enum enum ItemAvailability
@@ -96,7 +96,8 @@ public enum ItemAvailability {
     public static string vfs_free_space_action_text () {
         return _("Free up local space");
     }
-}
+
+} // enum ItemAvailability
 
 } // namespace Vfs
 } // namespace Occ

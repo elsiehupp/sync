@@ -22,7 +22,7 @@ public class WebView : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private UiWebView ui;
+    private UiWebView instance;
 
     /***********************************************************
     ***********************************************************/
@@ -41,8 +41,8 @@ public class WebView : Gtk.Widget {
     ***********************************************************/
     public WebView (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
-        this.ui;
-        this.ui.up_ui (this);
+        this.instance;
+        this.instance.up_ui (this);
         QWebEngineUrlScheme.register_scheme (new QWebEngineUrlScheme ("nc"));
         this.webview = new QWebEngineView (this);
         this.profile = new QWebEngineProfile (this);
@@ -74,10 +74,10 @@ public class WebView : Gtk.Widget {
         }
 
         this.webview.page (this.page);
-        this.ui.vertical_layout.add_widget (this.webview);
+        this.instance.vertical_layout.add_widget (this.webview);
 
         this.webview.load_progress.connect (
-            this.ui.progress_bar.value
+            this.instance.progress_bar.value
         );
         this.scheme_handler.signal_url_catched.connect (
             this.on_signal_url_catched

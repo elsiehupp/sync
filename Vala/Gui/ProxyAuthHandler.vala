@@ -7,13 +7,13 @@
 //  #include <Gtk.Application>
 //  #include <qt5keychain/keychain.h>
 
-using QKeychain;
+using Secret.Collection;
 
 //  #include <QNetworkProxy>
 //  #include <QAuthenticator>
 //  #include <QPointer>
 //  #include <QScopedPointer>
-//  #include <QSettings>
+//  #include <GLib.Settings>
 
 namespace Occ {
 namespace Ui {
@@ -63,16 +63,16 @@ public class ProxyAuthHandler : GLib.Object {
     private QPointer<ProxyAuthDialog> dialog;
 
     /***********************************************************
-    The QSettings instance to securely store username/password
+    The GLib.Settings instance to securely store username/password
     in the keychain.
     ***********************************************************/
-    private QScopedPointer<QSettings> settings;
+    private QScopedPointer<GLib.Settings> settings;
 
     /***********************************************************
     Pointer to the most-recently-run ReadPasswordJob, needed
     due to reentrancy.
     ***********************************************************/
-    private QScopedPointer<QKeychain.ReadPasswordJob> read_password_job;
+    private QScopedPointer<Secret.Collection.ReadPasswordJob> read_password_job;
 
     /***********************************************************
     For checking the proxy config settings.
@@ -189,7 +189,7 @@ public class ProxyAuthHandler : GLib.Object {
         this.dialog = new ProxyAuthDialog ();
 
         this.config_file.on_signal_reset (new ConfigFile ());
-        this.settings.on_signal_reset (new QSettings (this.config_file.config_file (), QSettings.IniFormat));
+        this.settings.on_signal_reset (new GLib.Settings (this.config_file.config_file (), GLib.Settings.IniFormat));
         this.settings.begin_group ("Proxy");
         this.settings.begin_group ("Credentials");
     }
@@ -257,7 +257,7 @@ public class ProxyAuthHandler : GLib.Object {
         // but before the while loop has on_signal_finished.
         exec_await (
             this.read_password_job,
-            QKeychain.Job.signal_finished,
+            Secret.Collection.Job.signal_finished,
             this.waiting_for_keychain);
 
         if (this.read_password_job.error == NoError) {
@@ -296,7 +296,7 @@ public class ProxyAuthHandler : GLib.Object {
 
         exec_await (
             write_password_job,
-            QKeychain.Job.signal_finished,
+            Secret.Collection.Job.signal_finished,
             this.waiting_for_keychain);
 
         write_password_job.delete_later ();

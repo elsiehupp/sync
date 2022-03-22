@@ -1,24 +1,12 @@
-/***********************************************************
-@author Krzesimir Nowak <krzesimir@endocode.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <Soup.ProxyResolverDefault>
-//  #include <QAuthenticator>
-//  #include <QSslConfigurati
-//  #include <Soup.CookieJar>
-//  #include <QNetwor
-//  #include <QUuid>
-
-//  #include <Soup.Session>
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
 @brief The AccessManager class
-@ingroup libsync
+
+@author Krzesimir Nowak <krzesimir@endocode.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class AccessManager : Soup.Session {
 

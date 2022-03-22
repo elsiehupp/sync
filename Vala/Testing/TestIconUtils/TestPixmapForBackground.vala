@@ -21,11 +21,11 @@ public class TestPixmapForBackground : AbstractTestIconUtils {
 
         GLib.assert_true (!black_images == "");
 
-        GLib.assert_true (!Ui.IconUtils.pixmap_for_background (white_images.at (0), Gtk.Color ("blue")) == null);
+        GLib.assert_true (!IconUtils.pixmap_for_background (white_images.at (0), Gtk.Color ("blue")) == null);
 
         GLib.assert_true (!white_images == "");
 
-        GLib.assert_true (!Ui.IconUtils.pixmap_for_background (black_images.at (0), Gtk.Color ("yellow")) == null);
+        GLib.assert_true (!IconUtils.pixmap_for_background (black_images.at (0), Gtk.Color ("yellow")) == null);
     }
 
 } // class TestPixmapForBackground

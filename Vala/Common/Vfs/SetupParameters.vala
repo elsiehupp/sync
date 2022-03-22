@@ -1,8 +1,5 @@
-/***********************************************************
-***********************************************************/
-
 namespace Occ {
-namespace Vfs {
+namespace Common {
 
 /***********************************************************
 @struct SetupParameters
@@ -29,12 +26,10 @@ public struct SetupParameters {
     ***********************************************************/
     string display_name;
 
-
     /***********************************************************
     Folder alias
     ***********************************************************/
     string alias;
-
 
     /***********************************************************
     The path to the synced folder on the account
@@ -43,12 +38,10 @@ public struct SetupParameters {
     ***********************************************************/
     string remote_path;
 
-
     /***********************************************************
     Account url, credentials etc for network calls
     ***********************************************************/
     unowned Account account;
-
 
     /***********************************************************
     Access to the sync folder's database.
@@ -57,23 +50,22 @@ public struct SetupParameters {
     ***********************************************************/
     SyncJournalDb journal = null;
 
-
     /***********************************************************
     Strings potentially passed on to the platform
     ***********************************************************/
     string provider_name;
 
-
     /***********************************************************
     ***********************************************************/
     string provider_version;
-
 
     /***********************************************************
     When registering with the system we might use a different
     presentaton to identify the accounts
     ***********************************************************/
     bool multiple_accounts_registered = false;
+
+} // struct SetupParameters
 
 } // namespace Vfs
 } // namespace Occ

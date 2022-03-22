@@ -21,7 +21,7 @@ public class TestModifyLocalFileWhileUploading : AbstractTestChunkingNg {
         fake_folder.local_modifier.insert ("A/a0", size);
 
         // middle of the sync, modify the file
-        QMetaObject.Connection con = connect (
+        GLib.Object.Connection con = connect (
             fake_folder.sync_engine,
             SyncEngine.signal_transmission_progress,
             this.on_signal_sync_engine_transmission_progress_modify_local_file_while_uploading

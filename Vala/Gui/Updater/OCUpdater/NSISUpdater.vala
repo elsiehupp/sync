@@ -28,7 +28,7 @@ public class NSISUpdater : OCUpdater {
     ***********************************************************/
     public override bool handle_startup () {
         ConfigFile config;
-        QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
+        GLib.Settings settings = new GLib.Settings (config.config_file (), GLib.Settings.IniFormat);
         string update_filename = settings.value (update_available_c).to_string ();
         // has the previous run downloaded an update?
         if (!update_filename == "" && GLib.File (update_filename).exists ()) {
@@ -63,7 +63,7 @@ public class NSISUpdater : OCUpdater {
     ***********************************************************/
     private void on_signal_seen_version () {
         ConfigFile config;
-        QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
+        GLib.Settings settings = new GLib.Settings (config.config_file (), GLib.Settings.IniFormat);
         settings.value (seen_version_c, update_info ().version);
     }
 
@@ -82,7 +82,7 @@ public class NSISUpdater : OCUpdater {
         this.file.close ();
 
         ConfigFile config;
-        QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
+        GLib.Settings settings = new GLib.Settings (config.config_file (), GLib.Settings.IniFormat);
 
         // remove previously downloaded but not used installer
         GLib.File old_target_file = new GLib.File (settings.value (update_available_c).to_string ());
@@ -113,7 +113,7 @@ public class NSISUpdater : OCUpdater {
     ***********************************************************/
     private void wipe_update_data () {
         ConfigFile config;
-        QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
+        GLib.Settings settings = new GLib.Settings (config.config_file (), GLib.Settings.IniFormat);
         string update_filename = settings.value (update_available_c).to_string ();
         if (!update_filename == "")
             GLib.File.remove (update_filename);
@@ -286,7 +286,7 @@ public class NSISUpdater : OCUpdater {
     ***********************************************************/
     private override void version_info_arrived (UpdateInfo info) {
         ConfigFile config;
-        QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
+        GLib.Settings settings = new GLib.Settings (config.config_file (), GLib.Settings.IniFormat);
         int64 info_version = Helper.string_version_to_int (info.version);
         var seen_string = settings.value (seen_version_c).to_string ();
         int64 seen_version = Helper.string_version_to_int (seen_string);

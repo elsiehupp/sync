@@ -26,13 +26,13 @@ public class FakeUserStatusConnector : UserStatusConnector {
     ***********************************************************/
     public override void fetch_user_status () {
         if (this.could_not_fetch_user_status) {
-            /* emit */ signal_error (Error.CouldNotFetchUserStatus);
+            /* emit */ signal_error (Error.COULD_NOT_FETCH_USER_STATUS);
             return;
         } else if (this.user_status_not_supported) {
-            /* emit */ signal_error (Error.UserStatusNotSupported);
+            /* emit */ signal_error (Error.USER_STATUS_NOT_SUPPORTED);
             return;
         } else if (this.emojis_not_supported) {
-            /* emit */ signal_error (Error.EmojisNotSupported);
+            /* emit */ signal_error (Error.EMOJIS_NOT_SUPPORTED);
             return;
         }
 
@@ -44,7 +44,7 @@ public class FakeUserStatusConnector : UserStatusConnector {
     ***********************************************************/
     public override void fetch_predefined_statuses () {
         if (this.could_not_fetch_predefined_user_statuses) {
-            /* emit */ signal_error (Error.CouldNotFetchPredefinedUserStatuses);
+            /* emit */ signal_error (Error.COULD_NOT_FETCH_PREDEFINED_USER_STATUSES);
             return;
         }
         /* emit */ signal_predefined_statuses_fetched (this.predefined_statuses);
@@ -55,7 +55,7 @@ public class FakeUserStatusConnector : UserStatusConnector {
     ***********************************************************/
     public override void set_user_status (UserStatus user_status) {
         if (this.could_not_set_user_status_message) {
-            /* emit */ signal_error (Error.CouldNotSetUserStatus);
+            /* emit */ signal_error (Error.COULD_NOT_SET_USER_STATUS);
             return;
         }
 
@@ -68,7 +68,7 @@ public class FakeUserStatusConnector : UserStatusConnector {
     ***********************************************************/
     public override void clear_message () {
         if (this.could_not_clear_user_status_message) {
-            /* emit */ signal_error (Error.CouldNotClearMessage);
+            /* emit */ signal_error (Error.COULD_NOT_CLEAR_MESSAGE);
         } else {
             this.is_message_cleared = true;
         }

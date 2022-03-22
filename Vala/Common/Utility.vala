@@ -1,4 +1,5 @@
 namespace Occ {
+namespace Common {
 
 /***********************************************************
 @class Utility
@@ -774,7 +775,7 @@ public class Utility : GLib.Object {
     with the given parent. If no parent is specified, the caller must destroy the settings
 
     ***********************************************************/
-    // public static std.unique_ptr<QSettings> settings_with_group (string group, GLib.Object parent = new GLib.Object ());
+    // public static GLib.Settings settings_with_group (string group, GLib.Object parent = new GLib.Object ());
 
 
     /***********************************************************
@@ -957,5 +958,5 @@ public class Utility : GLib.Object {
 
 } // class Utility
 
+} // namespace Common
 } // namespace Occ
-        

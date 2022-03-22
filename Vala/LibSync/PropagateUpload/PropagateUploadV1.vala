@@ -79,7 +79,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
         }
         this.transfer_identifier = uint32 (Utility.rand ()) ^ uint32 (this.item.modtime) ^ (uint32 (this.file_to_upload.size) << 16);
 
-        const SyncJournalDb.UploadInfo progress_info = this.propagator.journal.get_upload_info (this.item.file);
+        const Common.SyncJournalDb.UploadInfo progress_info = this.propagator.journal.get_upload_info (this.item.file);
 
         GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
@@ -94,7 +94,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
             // If there is only one chunk, write the checksum in the database, so if the PUT is sent
             // to the server, but the connection drops before we get the etag, we can check the checksum
             // in reconcile (issue #5106)
-            SyncJournalDb.UploadInfo upload_info;
+            Common.SyncJournalDb.UploadInfo upload_info;
             upload_info.valid = true;
             upload_info.chunk = 0;
             upload_info.transferid = 0; // We set a null transfer identifier because it is not chunked.
@@ -354,7 +354,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
                 this.item.has_blocklist_entry = false;
             }
 
-            SyncJournalDb.UploadInfo upload_info;
+            Common.SyncJournalDb.UploadInfo upload_info;
             upload_info.valid = true;
             var current_chunk = put_file_job.chunk;
             foreach (var job in this.jobs) {

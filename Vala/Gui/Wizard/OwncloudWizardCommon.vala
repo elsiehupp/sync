@@ -95,9 +95,9 @@ public class WizardCommon : GLib.Object {
     ***********************************************************/
     public static void customize_hint_label (Gtk.Label label) {
         var palette = label.palette ();
-        Gtk.Color text_color = palette.color (QPalette.Text);
+        Gtk.Color text_color = palette.color (Gtk.Palette.Text);
         text_color.alpha (128);
-        palette.on_signal_color (QPalette.Text, text_color);
+        palette.on_signal_color (Gtk.Palette.Text, text_color);
         label.palette (palette);
     }
 

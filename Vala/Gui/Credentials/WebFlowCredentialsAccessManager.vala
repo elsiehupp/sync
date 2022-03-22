@@ -55,7 +55,7 @@ public class WebFlowCredentialsAccessManager : AccessManager {
     /***********************************************************
     #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
     ***********************************************************/
-    private static void add_settings_to_job (Account account, QKeychain.Job qkeychain_job) {
+    private static void add_settings_to_job (Account account, Secret.Collection.Job qkeychain_job) {
         //  Q_UNUSED (account)
         var settings = ConfigFile.settings_with_group (Theme.app_name);
         settings.parent (qkeychain_job); // make the qkeychain_job parent to make setting deleted properly

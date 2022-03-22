@@ -2,7 +2,7 @@ namespace Occ {
 namespace CSync {
 
 /***********************************************************
-@class VioHandleT
+@class VioHandle
 
 @brief CSync directory functions
 
@@ -13,13 +13,13 @@ libcsync -- a library to sync a directory with another
 
 @copyright LGPL 2.1 or later
 ***********************************************************/
-public class VioHandleT : GLib.Object {
+public class VioHandle : GLib.Object {
 
     public Posix.Dir *directory;
     public string path;
 
-    public static CSync.VioHandleT csync_vio_local_opendir (string name) {
-        VioHandleT handle = new VioHandleT ();
+    public static VioHandle csync_vio_local_opendir (string name) {
+        VioHandle handle = new VioHandle ();
 
         var dirname = GLib.File.encode_name (name);
 
@@ -33,7 +33,7 @@ public class VioHandleT : GLib.Object {
     }
 
 
-    public int csync_vio_local_closedir (CSync.VioHandleT directory_handle) {
+    public int csync_vio_local_closedir (VioHandle directory_handle) {
         //    Q_ASSERT (directory_handle);
         var rc = closedir (directory_handle.directory);
         delete directory_handle;
@@ -41,10 +41,10 @@ public class VioHandleT : GLib.Object {
     }
 
 
-    public CSyncFileStatT csync_vio_local_readdir (CSync.VioHandleT directory_handle, Vfs vfs) {
+    public FileStat csync_vio_local_readdir (VioHandle directory_handle, Vfs vfs) {
 
         Posix.DirEnt dirent = null;
-        CSyncFileStatT file_stat;
+        FileStat file_stat;
 
         do {
                 dirent = readdir (handle.directory);
@@ -52,7 +52,7 @@ public class VioHandleT : GLib.Object {
                         return {};
         } while (qstrcmp (dirent.d_name, ".") == 0 || qstrcmp (dirent.d_name, "..") == 0);
 
-        file_stat = std.make_unique<CSyncFileStatT> ();
+        file_stat = std.make_unique<FileStat> ();
         file_stat.path = GLib.File.decode_name (dirent.d_name).to_utf8 ();
         string full_path = handle.path % '/' % "" % (char) dirent.d_name;
         if (file_stat.path == null) {
@@ -101,11 +101,11 @@ public class VioHandleT : GLib.Object {
     }
 
 
-    public int csync_vio_local_stat (string uri, CSyncFileStatT buf) {
+    public int csync_vio_local_stat (string uri, FileStat buf) {
             return this.csync_vio_local_stat_mb (GLib.File.encode_name (uri).const_data (), buf);
     }
 
-    private static int csync_vio_local_stat_mb (char wuri, CSyncFileStatT buf) {
+    private static int csync_vio_local_stat_mb (char wuri, FileStat buf) {
             stat sb;
 
             if (stat (wuri, sb) < 0) {
@@ -134,7 +134,7 @@ public class VioHandleT : GLib.Object {
         return 0;
     }
 
-} // class CSync.VioHandleT
+} // class VioHandle
 
 } // namespace CSync
 } // namespace Occ

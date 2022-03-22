@@ -23,7 +23,7 @@ public class TestIncompatiblePins : AbstractTestSyncVirtualFiles {
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         TestSyncVirtualFiles.set_pin ("local", PinState.PinState.ALWAYS_LOCAL);
-        TestSyncVirtualFiles.set_pin ("online", Vfs.ItemAvailability.ONLINE_ONLY);
+        TestSyncVirtualFiles.set_pin ("online", Common.ItemAvailability.ONLINE_ONLY);
 
         fake_folder.local_modifier.insert ("local/file1");
         fake_folder.local_modifier.insert ("online/file1");

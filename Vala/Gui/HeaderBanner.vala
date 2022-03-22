@@ -128,9 +128,9 @@ public class HeaderBanner : Gtk.Widget {
     public HeaderBanner (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         size_policy (QSizePolicy.Expanding, QSizePolicy.Fixed);
-        background_role (QPalette.Base);
+        background_role (Gtk.Palette.Base);
         title_label = new Gtk.Label (this);
-        title_label.background_role (QPalette.Base);
+        title_label.background_role (Gtk.Palette.Base);
         logo_label = new Gtk.Label (this);
         QFont font = title_label.font ();
         font.bold (true);
@@ -152,7 +152,7 @@ public class HeaderBanner : Gtk.Widget {
     ***********************************************************/
     public void setup (
         string title, Gdk.Pixbuf logo, Gdk.Pixbuf banner,
-        Qt.Text_format title_format, string style_sheet) {
+        Qt.TextFormat title_format, string style_sheet) {
         QStyle style = parent_widget ().this.style;
         //const int layout_horizontal_spacing = style.pixel_metric (QStyle.PM_Layout_horizontal_spacing);
         int top_level_margin_left = style.pixel_metric (QStyle.PM_Layout_left_margin, null, parent_widget ());
@@ -191,7 +191,7 @@ public class HeaderBanner : Gtk.Widget {
         painter.draw_pixmap (0, 0, width (), banner_pixmap.height (), banner_pixmap);
         int x = width () - 2;
         int y = height () - 2;
-        const QPalette pal = Gtk.Application.palette ();
+        const Gtk.Palette pal = Gtk.Application.palette ();
         painter.pen (pal.mid ().color ());
         painter.draw_line (0, y, x, y);
         painter.pen (pal.base ().color ());

@@ -182,20 +182,20 @@ public class FolderStatusDelegate : QStyledItemDelegate {
             // Hack : Windows Vista's light blue is not contrasting enough for white
 
             // (code from QWindows_vista_style.draw_control for CE_Item_view_item)
-            palette.on_signal_color (QPalette.All, QPalette.HighlightedText, palette.color (QPalette.Active, QPalette.Text));
-            palette.on_signal_color (QPalette.All, QPalette.Highlight, palette.base ().color ().darker (108));
+            palette.on_signal_color (Gtk.Palette.All, Gtk.Palette.HighlightedText, palette.color (Gtk.Palette.Active, Gtk.Palette.Text));
+            palette.on_signal_color (Gtk.Palette.All, Gtk.Palette.Highlight, palette.base ().color ().darker (108));
         }
 
-        QPalette.Color_group cg = option.state & QStyle.State_Enabled
-            ? QPalette.Normal
-            : QPalette.Disabled;
-        if (cg == QPalette.Normal && ! (option.state & QStyle.State_Active))
-            cg = QPalette.Inactive;
+        Gtk.Palette.ColorGroup cg = option.state & QStyle.State_Enabled
+            ? Gtk.Palette.Normal
+            : Gtk.Palette.Disabled;
+        if (cg == Gtk.Palette.Normal && ! (option.state & QStyle.State_Active))
+            cg = Gtk.Palette.Inactive;
 
         if (option.state & QStyle.State_Selected) {
-            painter.pen (palette.color (cg, QPalette.HighlightedText));
+            painter.pen (palette.color (cg, Gtk.Palette.HighlightedText));
         } else {
-            painter.pen (palette.color (cg, QPalette.Text));
+            painter.pen (palette.color (cg, Gtk.Palette.Text));
         }
         string elided_alias = alias_font_metrics.elided_text (alias_text, Qt.Elide_right, alias_rect.width ());
         painter.font (alias_font);

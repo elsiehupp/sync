@@ -12,7 +12,7 @@ public class TestUploadInfo : AbstractTestSyncJournalDB {
     /***********************************************************
     ***********************************************************/
     private TestUploadInfo () {
-        SyncJournalDb.UploadInfo record = this.database.get_upload_info ("nonexistant");
+        Common.SyncJournalDb.UploadInfo record = this.database.get_upload_info ("nonexistant");
         GLib.assert_true (!record.valid);
 
         record.error_count = 5;
@@ -23,11 +23,11 @@ public class TestUploadInfo : AbstractTestSyncJournalDB {
         record.valid = true;
         this.database.set_upload_info ("foo", record);
 
-        SyncJournalDb.UploadInfo stored_record = this.database.get_upload_info ("foo");
+        Common.SyncJournalDb.UploadInfo stored_record = this.database.get_upload_info ("foo");
         GLib.assert_true (stored_record == record);
 
-        this.database.set_upload_info ("foo", SyncJournalDb.UploadInfo ());
-        SyncJournalDb.UploadInfo wiped_record = this.database.get_upload_info ("foo");
+        this.database.set_upload_info ("foo", Common.SyncJournalDb.UploadInfo ());
+        Common.SyncJournalDb.UploadInfo wiped_record = this.database.get_upload_info ("foo");
         GLib.assert_true (!wiped_record.valid);
     }
 

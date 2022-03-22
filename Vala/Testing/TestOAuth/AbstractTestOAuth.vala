@@ -17,13 +17,13 @@ public abstract class AbstractTestOAuth : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected enum State {
-        StartState,
-        BrowserOpened,
-        TokenAsked,
-        CustomState
+        START_STATE,
+        BROWSER_OPENED,
+        TOKEN_ASKED,
+        CUSTOM_STATE
     }
 
-    protected State state = StartState;
+    protected State state = AbstractTestOAuth.State.START_STATE;
 
     /***********************************************************
     ***********************************************************/
@@ -44,7 +44,7 @@ public abstract class AbstractTestOAuth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected OAuth oauth;
+    protected Gui.OAuth oauth;
 
     protected virtual bool finished () {
         return reply_to_browser_ok && got_auth_ok;
@@ -65,7 +65,7 @@ public abstract class AbstractTestOAuth : GLib.Object {
             this.on_signal_open_browser_hook
         );
 
-        oauth.on_signal_reset (new OAuth (account, null));
+        oauth.on_signal_reset (new Gui.OAuth (account, null));
         oauth.signal_result.connect (
             this.on_signal_oauth_result
         );
@@ -84,8 +84,8 @@ public abstract class AbstractTestOAuth : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected virtual void on_signal_open_browser_hook (GLib.Uri url) {
-        GLib.assert_true (state == StartState);
-        state = BrowserOpened;
+        GLib.assert_true (state == AbstractTestOAuth.State.START_STATE);
+        state = AbstractTestOAuth.State.BROWSER_OPENED;
         GLib.assert_true (url.path == s_oauth_test_server.path + "/index.php/apps/oauth2/authorize");
         GLib.assert_true (url.to_string ().starts_with (s_oauth_test_server.to_string ()));
         QUrlQuery query = new QUrlQuery (url);
@@ -112,7 +112,7 @@ public abstract class AbstractTestOAuth : GLib.Object {
     ***********************************************************/
     protected virtual void on_signal_browser_reply_finished () {
         GLib.assert_true (sender () == browser_reply);
-        GLib.assert_true (state == TokenAsked);
+        GLib.assert_true (state == AbstractTestOAuth.State.TOKEN_ASKED);
         browser_reply.delete_later ();
         GLib.assert_true (browser_reply.raw_header ("Location") == "owncloud://on_signal_success");
         reply_to_browser_ok = true;
@@ -121,13 +121,13 @@ public abstract class AbstractTestOAuth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected virtual GLib.InputStream token_reply (Soup.Operation operation, Soup.Request request) {
-        //  ASSERT (state == BrowserOpened);
-        state = TokenAsked;
+    protected virtual GLib.OutputStream token_reply (Soup.Operation operation, Soup.Request request) {
+        //  ASSERT (state == AbstractTestOAuth.State.BROWSER_OPENED);
+        state = AbstractTestOAuth.State.TOKEN_ASKED;
         //  ASSERT (operation == Soup.PostOperation);
         //  ASSERT (request.url.to_string ().starts_with (s_oauth_test_server.to_string ()));
         //  ASSERT (request.url.path == s_oauth_test_server.path + "/index.php/apps/oauth2/api/v1/token");
-        std.unique_ptr<QBuffer> payload = new std.unique_ptr<QBuffer> (new QBuffer ());
+        GLib.OutputStream payload = new GLib.OutputStream ();
         payload.set_data (token_reply_payload ());
         return new FakePostReply (operation, request, std.move (payload), fake_soup_context);
     }
@@ -149,9 +149,9 @@ public abstract class AbstractTestOAuth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected virtual void on_signal_oauth_result (OAuth.Result result, string user, string token , string refresh_token) {
-        GLib.assert_true (state == TokenAsked);
-        GLib.assert_true (result == OAuth.LoggedIn);
+    protected virtual void on_signal_oauth_result (Gui.OAuth.Result result, string user, string token , string refresh_token) {
+        GLib.assert_true (state == AbstractTestOAuth.State.TOKEN_ASKED);
+        GLib.assert_true (result == Gui.OAuth.LoggedIn);
         GLib.assert_true (user == "789");
         GLib.assert_true (token == "123");
         GLib.assert_true (refresh_token == "456");

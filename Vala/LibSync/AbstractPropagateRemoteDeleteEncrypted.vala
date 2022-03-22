@@ -1,20 +1,17 @@
-/***********************************************************
-@author Oleksandr Zolotov <alex@nextcloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
 using Soup;
-
-//  #include <GLib.FileInfo>
 
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class AbstractPropagateRemoteDeleteEncrypted
+
 @brief The AbstractPropagateRemoteDeleteEncrypted class is
 the base class for Propagate Remote Delete Encrypted jobs
-@ingroup libsync
+
+@author Oleksandr Zolotov <alex@nextcloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public abstract class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
 
@@ -266,6 +263,7 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
             /* emit */ signal_finished (false);
         }
     }
+
 } // class AbstractPropagateRemoteDeleteEncrypted
 
 } // namespace LibSync

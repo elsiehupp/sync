@@ -1,34 +1,14 @@
-/***********************************************************
-Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <GLib.FileInfo>
-//  #include <GLib.Dir>
-//  #include <QJsonDocument>
-//  #include <QJsonArray>
-//  #include <QJsonObject>
-//  #include <QJsonValue>
-
-
-//  #include <deque>
-
 namespace Occ {
 namespace LibSync {
 
+/***********************************************************
+@class BulkPropagatorJob
+
+@author Matthieu Gallien <matthieu.gallien@nextcloud.com>
+
+@copyright GPLv3 or Later
+***********************************************************/
 public class BulkPropagatorJob : PropagatorJob {
-
-    const int BATCH_SIZE = 100;
-    const int PARALLEL_JOBS_MAXIMUM_COUNT = 1;
-
-    /***********************************************************
-    ***********************************************************/
-    private GLib.List<BulkUploadItem> files_to_upload;
-
-    /***********************************************************
-    ***********************************************************/
-    private SyncFileItem.Status final_status = SyncFileItem.Status.NoStatus;
 
     /***********************************************************
     This is a minified version of the SyncFileItem, that holds
@@ -53,6 +33,16 @@ public class BulkPropagatorJob : PropagatorJob {
         GLib.HashTable<string, string> headers;
     }
 
+    const int BATCH_SIZE = 100;
+    const int PARALLEL_JOBS_MAXIMUM_COUNT = 1;
+
+    /***********************************************************
+    ***********************************************************/
+    private GLib.List<BulkUploadItem?> files_to_upload;
+
+    /***********************************************************
+    ***********************************************************/
+    private SyncFileItem.Status final_status = SyncFileItem.Status.NO_STATUS;
 
     /***********************************************************
     ***********************************************************/
@@ -81,7 +71,7 @@ public class BulkPropagatorJob : PropagatorJob {
             var current_item = this.items.front ();
             this.items.pop_front ();
             this.pending_checksum_files.insert (current_item.file);
-            QMetaObject.invoke_method (this, /*[this, current_item]*/ () => {
+            GLib.Object.invoke_method (this, /*[this, current_item]*/ () => {
                 UploadFileInfo file_to_upload;
                 file_to_upload.file = current_item.file;
                 file_to_upload.size = current_item.size;
@@ -96,7 +86,7 @@ public class BulkPropagatorJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    public new JobParallelism parallelism () {
+    public new PropagatorJob.JobParallelism parallelism () {
         return PropagatorJob.JobParallelism.FULL_PARALLELISM;
     }
 
@@ -114,7 +104,9 @@ public class BulkPropagatorJob : PropagatorJob {
             return;
         }
 
-        return on_signal_compute_transmission_checksum (item, file_to_upload);
+        on_signal_compute_transmission_checksum (item, file_to_upload);
+
+        return;
     }
 
 
@@ -148,7 +140,6 @@ public class BulkPropagatorJob : PropagatorJob {
         );
         compute_checksum.release ().start (file_to_upload.path);
     }
-
 
 
     /***********************************************************
@@ -208,7 +199,6 @@ public class BulkPropagatorJob : PropagatorJob {
 
         do_start_upload (item, file_to_upload, transmission_checksum);
     }
-
 
 
     /***********************************************************
@@ -289,13 +279,13 @@ public class BulkPropagatorJob : PropagatorJob {
             || one_file.item.instruction == CSync.SyncInstructions.TYPE_CHANGE) {
             var vfs = this.propagator.sync_options.vfs;
             var pin = vfs.pin_state (one_file.item.file);
-            if (pin && *pin == Vfs.ItemAvailability.ONLINE_ONLY && !vfs.pin_state (one_file.item.file, PinState.PinState.UNSPECIFIED)) {
+            if (pin && *pin == Common.ItemAvailability.ONLINE_ONLY && !vfs.pin_state (one_file.item.file, PinState.PinState.UNSPECIFIED)) {
                 GLib.warning ("Could not set pin state of " + one_file.item.file + " to unspecified.");
             }
         }
 
         // Remove from the progress database:
-        this.propagator.journal.upload_info (one_file.item.file, SyncJournalDb.UploadInfo ());
+        this.propagator.journal.upload_info (one_file.item.file, Common.SyncJournalDb.UploadInfo ());
         this.propagator.journal.commit ("upload file start");
     }
 
@@ -334,7 +324,7 @@ public class BulkPropagatorJob : PropagatorJob {
         // write the checksum in the database, so if the POST is sent
         // to the server, but the connection drops before we get the etag, we can check the checksum
         // in reconcile (issue #5106)
-        SyncJournalDb.UploadInfo pi;
+        Common.SyncJournalDb.UploadInfo pi;
         pi.valid = true;
         pi.chunk = 0;
         pi.transferid = 0; // We set a null transfer identifier because it is not chunked.
@@ -374,7 +364,9 @@ public class BulkPropagatorJob : PropagatorJob {
         current_headers["X-File-MD5"] = transmission_checksum_header;
 
         BulkUploadItem new_upload_file = BulkUploadItem (
-            this.propagator.account, item, file_to_upload,
+            this.propagator.account,
+            item,
+            file_to_upload,
             remote_path, file_to_upload.path,
             file_to_upload.size, current_headers
         );
@@ -672,7 +664,7 @@ public class BulkPropagatorJob : PropagatorJob {
             if (upload_info.error_count > 3) {
                 GLib.info ("Reset transfer of " + item.file
                             + " due to repeated error " + item.http_error_code.to_string ());
-                upload_info = SyncJournalDb.UploadInfo ();
+                upload_info = Common.SyncJournalDb.UploadInfo ();
             } else {
                 GLib.info ("Error count for maybe-reset error" + item.http_error_code
                         + "on file" + item.file

@@ -580,7 +580,7 @@ public class OwncloudPropagator : GLib.Object {
             );
 
             // Use Queued Connection because we're possibly already in an item's on_signal_finished stack
-            QMetaObject.invoke_method (this.propagate_root_directory_job, "abort", Qt.QueuedConnection,
+            GLib.Object.invoke_method (this.propagate_root_directory_job, "abort", Qt.QueuedConnection,
                                       Q_ARG (PropagatorJob.AbortType, PropagatorJob.AbortType.ASYNCHRONOUS));
 
             // Give asynchronous abort 5000 msec to finish on its own

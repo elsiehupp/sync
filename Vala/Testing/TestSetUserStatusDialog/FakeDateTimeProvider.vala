@@ -29,13 +29,13 @@ public class FakeDateTimeProvider : DateTimeProvider {
 
     /***********************************************************
     ***********************************************************/
-    static GLib.List<UserStatus> create_fake_predefined_statuses (GLib.DateTime current_time) {
-        GLib.List<UserStatus> statuses;
+    static GLib.List<LibSync.UserStatus> create_fake_predefined_statuses (GLib.DateTime current_time) {
+        GLib.List<LibSync.UserStatus> statuses;
 
         const string user_status_id = "fake-identifier";
         const string user_status_message = "Predefined status";
         const string user_status_icon = "🏖";
-        const UserStatus.OnlineStatus user_status_state = UserStatus.OnlineStatus.Online;
+        const LibSync.UserStatus.OnlineStatus user_status_state = LibSync.UserStatus.OnlineStatus.Online;
         const bool user_status_message_predefined = true;
         Optional<ClearAt> user_status_clear_at;
         ClearAt clear_at;

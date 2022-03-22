@@ -358,15 +358,15 @@ public class OwncloudWizard : QWizard {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_auth_type (DetermineAuthTypeJob.AuthType type) {
+    public void on_signal_auth_type (LibSync.DetermineAuthTypeJob.AuthType type) {
         this.setup_page.on_signal_auth_type (type);
 
-        if (type == DetermineAuthTypeJob.AuthType.OAUTH) {
+        if (type == LibSync.DetermineAuthTypeJob.AuthType.OAUTH) {
             this.credentials_page = this.browser_creds_page;
-        } else if (type == DetermineAuthTypeJob.AuthType.LOGIN_FLOW_V2) {
+        } else if (type == LibSync.DetermineAuthTypeJob.AuthType.LOGIN_FLOW_V2) {
             this.credentials_page = this.flow_2_creds_page;
     //  #ifdef WITH_WEBENGINE
-        } else if (type == DetermineAuthTypeJob.WEB_VIEW_FLOW) {
+        } else if (type == LibSync.DetermineAuthTypeJob.WEB_VIEW_FLOW) {
             this.credentials_page = this.web_view_page;
     //  #endif WITH_WEBENGINE
         } else { // try Basic auth even for "Unknown"
@@ -518,10 +518,10 @@ public class OwncloudWizard : QWizard {
 
         // Set background colors
         var wizard_palette = palette ();
-        const var background_color = wizard_palette.color (QPalette.Window);
-        wizard_palette.on_signal_color (QPalette.Base, background_color);
+        const var background_color = wizard_palette.color (Gtk.Palette.Window);
+        wizard_palette.on_signal_color (Gtk.Palette.Base, background_color);
         // Set separator color
-        wizard_palette.on_signal_color (QPalette.Mid, background_color);
+        wizard_palette.on_signal_color (Gtk.Palette.Mid, background_color);
 
         palette (wizard_palette);
     }

@@ -96,7 +96,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.HashTable<string, QMetaObject.Connection> search_job_connections;
+    private GLib.HashTable<string, GLib.Object.Connection> search_job_connections;
 
     /***********************************************************
     ***********************************************************/

@@ -24,7 +24,7 @@ public class TestNewVirtuals : AbstractTestSyncVirtualFiles {
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         TestSyncVirtualFiles.set_pin ("local", PinState.PinState.ALWAYS_LOCAL);
-        TestSyncVirtualFiles.set_pin ("online", Vfs.ItemAvailability.ONLINE_ONLY);
+        TestSyncVirtualFiles.set_pin ("online", Common.ItemAvailability.ONLINE_ONLY);
         TestSyncVirtualFiles.set_pin ("unspec", PinState.PinState.UNSPECIFIED);
 
         // Test 1 : root is PinState.UNSPECIFIED
@@ -61,8 +61,8 @@ public class TestNewVirtuals : AbstractTestSyncVirtualFiles {
         GLib.assert_true (fake_folder.current_local_state ().find ("local/file1"));
         GLib.assert_true (fake_folder.current_local_state ().find ("unspec/file1" + DVSUFFIX));
 
-        // Test 3 : change root to Vfs.ItemAvailability.ONLINE_ONLY
-        TestSyncVirtualFiles.set_pin ("", Vfs.ItemAvailability.ONLINE_ONLY);
+        // Test 3 : change root to Common.ItemAvailability.ONLINE_ONLY
+        TestSyncVirtualFiles.set_pin ("", Common.ItemAvailability.ONLINE_ONLY);
 
         fake_folder.remote_modifier ().insert ("file3");
         fake_folder.remote_modifier ().insert ("online/file3");

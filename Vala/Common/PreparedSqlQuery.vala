@@ -1,4 +1,5 @@
 namespace Occ {
+namespace Common {
 
 /***********************************************************
 @class PreparedSqlQuery
@@ -46,6 +47,8 @@ public class PreparedSqlQuery : GLib.Object {
     //      //  Q_ASSERT (this.ok);
     //      return this.query;
     //  }
-}
 
-}
+} // class PreparedSqlQuery
+
+} // namespace Common
+} // namespace Occ

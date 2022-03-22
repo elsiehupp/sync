@@ -10,7 +10,7 @@
 //  #include <qpushbutton.h>
 //  #include <QFileIconProvider>
 //  #include <QHeaderView>
-//  #include <QSettings>
+//  #include <GLib.Settings>
 //  #include <QScopedValueRollback>
 //  #include <QTreeWidgetItem>
 //  #include <QVBoxLayout>

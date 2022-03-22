@@ -347,7 +347,7 @@ public class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_private_key_fetched (QKeychain.Job incoming) {
+    private void on_signal_private_key_fetched (Secret.Collection.Job incoming) {
         var read_job = static_cast<ReadPasswordJob> (incoming);
         var account = read_job.property (ACCOUNT_PROPERTY).value<unowned Account> ();
         GLib.assert (account);
@@ -389,7 +389,7 @@ public class ClientSideEncryption : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_mnemonic_key_fetched (QKeychain.Job incoming) {
+    private void on_signal_mnemonic_key_fetched (Secret.Collection.Job incoming) {
         var read_job = static_cast<ReadPasswordJob> (incoming);
         var account = read_job.property (ACCOUNT_PROPERTY).value<unowned Account> ();
         GLib.assert (account);

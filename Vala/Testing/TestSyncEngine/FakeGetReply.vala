@@ -32,7 +32,7 @@ public class FakeGetReply : FakeReply {
             GLib.debug ("meh;");
         }
         Q_ASSERT_X (file_info, Q_FUNC_INFO, "Could not find file on the remote");
-        QMetaObject.invoke_method (this, &FakeGetReply.respond, Qt.QueuedConnection);
+        GLib.Object.invoke_method (this, &FakeGetReply.respond, Qt.QueuedConnection);
     }
 
 

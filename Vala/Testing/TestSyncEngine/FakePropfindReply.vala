@@ -26,7 +26,7 @@ public class FakePropfindReply : FakeReply {
         GLib.assert_true (!filename == null); // for root, it should be empty
         const FileInfo file_info = remote_root_file_info.find (filename);
         if (!file_info) {
-            QMetaObject.invoke_method (this, "respond_404", Qt.QueuedConnection);
+            GLib.Object.invoke_method (this, "respond_404", Qt.QueuedConnection);
             return;
         }
         const string prefix = request.url.path.left (request.url.path.size () - filename.size ());
@@ -34,7 +34,7 @@ public class FakePropfindReply : FakeReply {
         // Don't care about the request and just return a full propfind
         const string dav_uri = "DAV:";
         const string oc_uri = "http://owncloud.org/ns";
-        QBuffer buffer = new QBuffer (payload);
+        GLib.OutputStream buffer = new GLib.OutputStream (payload);
         buffer.open (QIODevice.WriteOnly);
         QXmlStreamWriter xml = new QXmlStreamWriter (buffer);
         xml.write_namespace (dav_uri, "d");
@@ -49,7 +49,7 @@ public class FakePropfindReply : FakeReply {
         xml.write_end_element (); // multistatus
         xml.write_end_document ();
 
-        QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
+        GLib.Object.invoke_method (this, "respond", Qt.QueuedConnection);
     }
 
 

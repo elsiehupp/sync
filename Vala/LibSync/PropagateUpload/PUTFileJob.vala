@@ -41,7 +41,7 @@ public class PUTFileJob : AbstractNetworkJob {
     /***********************************************************
     Takes ownership of the device
     ***********************************************************/
-    public PUTFileJob.for_path (Account account, string path, std.unique_ptr<QIODevice> device,
+    public PUTFileJob.for_path (Account account, string path, QIODevice device,
         GLib.HashTable<string, string> headers, int chunk, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
         this.device = device.release ();
@@ -53,7 +53,7 @@ public class PUTFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public PUTFileJob.for_url (Account account, GLib.Uri url, std.unique_ptr<QIODevice> device,
+    public PUTFileJob.for_url (Account account, GLib.Uri url, QIODevice device,
         GLib.HashTable<string, string> headers, int chunk, GLib.Object parent = new GLib.Object ()) {
         base (account, "", parent);
         this.device = device.release ();

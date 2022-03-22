@@ -7,7 +7,7 @@
 //  #include <QJsonDocument>
 //  #include <QJsonObject>
 //  #include <Soup.Request>
-//  #include <QBuffer>
+//  #include <GLib.OutputStream>
 //  #include <QNetworkAccessManager>
 
 namespace Occ {
@@ -93,7 +93,7 @@ public class RemoteWipe : GLib.Object {
         );
         request.url (request_url);
         request.ssl_configuration (this.account.or_create_ssl_config ());
-        var request_body = new QBuffer ();
+        var request_body = new GLib.OutputStream ();
         QUrlQuery arguments = new QUrlQuery ("token=%1".printf (this.app_password));
         request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
         this.network_reply_check = this.network_manager.post (request, request_body);
@@ -190,7 +190,7 @@ public class RemoteWipe : GLib.Object {
                 "application/x-www-form-urlencoded");
             request.url (request_url);
             request.ssl_configuration (this.account.or_create_ssl_config ());
-            var request_body = new QBuffer ();
+            var request_body = new GLib.OutputStream ();
             QUrlQuery arguments = new QUrlQuery ("token=%1".printf (this.app_password));
             request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
             this.network_reply_success = this.network_manager.post (request, request_body);

@@ -1,4 +1,5 @@
 namespace Occ {
+namespace Common {
 
 /***********************************************************
 @class SqlDatabase
@@ -255,6 +256,8 @@ public class SqlDatabase : GLib.Object {
 
         return CheckDbResult.OK;
     }
-}
 
+} // class SqlDatabase
+
+} // namespace Common
 } // namespace Occ

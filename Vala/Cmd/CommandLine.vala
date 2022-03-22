@@ -434,7 +434,7 @@ public class CommandLine : GLib.Object {
         }
 
         // Have to be done async, else, an error before exec () does not terminate the event loop.
-        QMetaObject.invoke_method (&sync_engine, "on_signal_start_sync", Qt.QueuedConnection);
+        GLib.Object.invoke_method (&sync_engine, "on_signal_start_sync", Qt.QueuedConnection);
 
         int result_code = app.exec ();
 

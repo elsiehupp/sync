@@ -41,7 +41,7 @@ public class KeychainChunkJob : GLib.Object {
 
     protected bool keychain_migration = false;
 
-    public QKeychain.Error error { public get; protected set; }
+    public Secret.Collection.Error error { public get; protected set; }
 
     public string error_string { public get; protected set; }
 
@@ -52,7 +52,7 @@ public class KeychainChunkJob : GLib.Object {
     ***********************************************************/
     public KeychainChunkJob (GLib.Object parent = new GLib.Object ()) {
         base (parent);
-        this.error = QKeychain.NoError;
+        this.error = Secret.Collection.NoError;
         this.service_name = Theme.app_name;
     }
 
@@ -79,7 +79,7 @@ public class KeychainChunkJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected static void add_settings_to_job (Account account, QKeychain.Job qkeychain_job) {
+    protected static void add_settings_to_job (Account account, Secret.Collection.Job qkeychain_job) {
         //  Q_UNUSED (account)
         var settings = ConfigFile.settings_with_group (Theme.app_name);
         settings.parent (qkeychain_job); // make the qkeychain_job parent to make setting deleted properly

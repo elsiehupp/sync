@@ -90,7 +90,7 @@ public class Systray : QSystemTrayIcon {
 
             this.tray_engine.add_import_path ("qrc:/qml/theme");
             this.tray_engine.add_ImageProvider ("avatars", new ImageProvider ());
-            this.tray_engine.add_ImageProvider ("svgimage-custom-color", new Ui.SvgImageProvider ());
+            this.tray_engine.add_ImageProvider ("svgimage-custom-color", new SvgImageProvider ());
             this.tray_engine.add_ImageProvider ("unified-search-result-icon", new UnifiedSearchResultImageProvider ());
         }
     }

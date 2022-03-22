@@ -4,7 +4,7 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QBuffer>
+//  #include <GLib.OutputStream>
 //  #include <QJsonDocument>
 //  #include <QJsonObject>
 //  #include <QPair>
@@ -145,7 +145,7 @@ public class OcsJob : AbstractNetworkJob {
         add_raw_header ("Ocs-APIREQUEST", "true");
         add_raw_header ("Content-Type", "application/x-www-form-urlencoded");
 
-        var buffer = new QBuffer ();
+        var buffer = new GLib.OutputStream ();
 
         QUrlQuery query_items;
         if (this.verb == "GET") {

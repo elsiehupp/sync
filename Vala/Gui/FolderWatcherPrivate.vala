@@ -52,7 +52,7 @@ public class FolderWatcherPrivate : GLib.Object {
             GLib.warning ("notify_init () failed: " + strerror (errno));
         }
 
-        QMetaObject.invoke_method (this, "on_signal_add_folder_recursive", Q_ARG (string, path));
+        GLib.Object.invoke_method (this, "on_signal_add_folder_recursive", Q_ARG (string, path));
     }
 
 

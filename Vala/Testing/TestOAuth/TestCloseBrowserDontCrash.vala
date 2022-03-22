@@ -24,10 +24,10 @@ class TestCloseBrowserDontCrash : AbstractTestOAuth {
         browser_reply.on_signal_abort ();
         Gtk.Application.process_events ();
 
-        //  ASSERT (state == BrowserOpened);
-        state = TokenAsked;
+        //  ASSERT (state == AbstractTestOAuth.State.BROWSER_OPENED);
+        state = AbstractTestOAuth.State.TOKEN_ASKED;
 
-        std.unique_ptr<QBuffer> payload = new std.unique_ptr<QBuffer> (new QBuffer ());
+        GLib.OutputStream payload = new new GLib.OutputStream ();
         payload.set_data (token_reply_payload ());
         return new SlowFakePostReply (operation, request, std.move (payload), fake_access_manager);
     }

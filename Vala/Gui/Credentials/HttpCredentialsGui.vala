@@ -1,26 +1,13 @@
-/***********************************************************
-@author Klaas Freitag <freitag@kde.org>
-@author Olivier Goffart <ogoffart@woboq.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <QInputDialog>
-//  #include <QDesktopServices>
-//  #include <QBuffer>
-//  #include <Gtk.MessageBox>
-
-using QKeychain;
-
-//  #include <QPointer>
-//  #include <QTcpServer>
-
 namespace Occ {
 namespace Ui {
 
 /***********************************************************
 @brief The HttpCredentialsGui class
-@ingroup gui
+
+@author Klaas Freitag <freitag@kde.org>
+@author Olivier Goffart <ogoffart@woboq.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class HttpCredentialsGui : HttpCredentials {
 
@@ -182,7 +169,7 @@ public class HttpCredentialsGui : HttpCredentials {
     ***********************************************************/
     private void on_signal_ask_from_user_async () {
         // First, we will check what kind of auth we need.
-        var determine_auth_type_job = new DetermineAuthTypeJob (
+        var determine_auth_type_job = new LibSync.DetermineAuthTypeJob (
             this.account.shared_from_this (), this
         );
         determine_auth_type_job.signal_auth_type.connect (
@@ -194,8 +181,8 @@ public class HttpCredentialsGui : HttpCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_auth_type (DetermineAuthTypeJob.AuthType type) {
-        if (type == DetermineAuthTypeJob.AuthType.OAUTH) {
+    private void on_signal_auth_type (LibSync.DetermineAuthTypeJob.AuthType type) {
+        if (type == LibSync.DetermineAuthTypeJob.AuthType.OAUTH) {
 
             this.async_auth.on_signal_reset (new OAuth (this.account, this));
             this.async_auth.expected_user = this.account.dav_user;
@@ -207,7 +194,7 @@ public class HttpCredentialsGui : HttpCredentials {
             );
             this.async_auth.on_signal_start ();
             /* emit */ signal_authorisation_link_changed ();
-        } else if (type == DetermineAuthTypeJob.AuthType.BASIC) {
+        } else if (type == LibSync.DetermineAuthTypeJob.AuthType.BASIC) {
             on_signal_show_dialog ();
         } else {
             // Shibboleth?

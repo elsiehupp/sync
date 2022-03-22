@@ -1,4 +1,5 @@
 namespace Occ {
+namespace Common {
 
 /***********************************************************
 @class FileSystem
@@ -330,7 +331,8 @@ public class FileSystem : GLib.Object {
         }
         return result;
     }
-}
 
+} // class FileSystem
+
+} // namespace Common
 } // namespace Occ
-    

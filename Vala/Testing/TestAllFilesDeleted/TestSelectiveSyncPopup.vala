@@ -39,7 +39,7 @@ public class TestSelectiveSyncPopup : AbstractTestAllFilesDeleted {
 
 
     protected void on_signal_about_to_remove_all_files_selective_sync_o_popup (
-        SyncFileItem.Direction direction,
+        LibSync.SyncFileItem.Direction direction,
         Callback callback
     ) {
         about_to_remove_all_files_called++;

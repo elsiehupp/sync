@@ -19,9 +19,9 @@ public class TestDrawSvgWithCustomFillColor : AbstractTestIconUtils {
 
         GLib.assert_true (!black_images == "");
 
-        GLib.assert_true (!Ui.IconUtils.draw_svg_with_custom_fill_color (black_svg_dir_path + "/" + black_images.at (0), QColorConstants.Svg.red) == null);
+        GLib.assert_true (!IconUtils.draw_svg_with_custom_fill_color (black_svg_dir_path + "/" + black_images.at (0), QColorConstants.Svg.red) == null);
 
-        GLib.assert_true (!Ui.IconUtils.draw_svg_with_custom_fill_color (black_svg_dir_path + "/" + black_images.at (0), QColorConstants.Svg.green) == null);
+        GLib.assert_true (!IconUtils.draw_svg_with_custom_fill_color (black_svg_dir_path + "/" + black_images.at (0), QColorConstants.Svg.green) == null);
 
         const string white_svg_dir_path = Theme.THEME_PREFIX + "white";
         const GLib.Dir white_svg_dir = new GLib.Dir (white_svg_dir_path);
@@ -29,7 +29,7 @@ public class TestDrawSvgWithCustomFillColor : AbstractTestIconUtils {
 
         GLib.assert_true (!white_images == "");
 
-        GLib.assert_true (!Ui.IconUtils.draw_svg_with_custom_fill_color (white_svg_dir_path + "/" + white_images.at (0), QColorConstants.Svg.blue) == null);
+        GLib.assert_true (!IconUtils.draw_svg_with_custom_fill_color (white_svg_dir_path + "/" + white_images.at (0), QColorConstants.Svg.blue) == null);
     }
 
 } // class TestDrawSvgWithCustomFillColor

@@ -12,7 +12,7 @@ public class TestDownloadInfo : AbstractTestSyncJournalDB {
     /***********************************************************
     ***********************************************************/
     private TestDownloadInfo () {
-        SyncJournalDb.DownloadInfo record = this.database.get_download_info ("nonexistant");
+        Common.SyncJournalDb.DownloadInfo record = this.database.get_download_info ("nonexistant");
         GLib.assert_true (!record.valid);
 
         record.error_count = 5;
@@ -21,11 +21,11 @@ public class TestDownloadInfo : AbstractTestSyncJournalDB {
         record.temporaryfile = "/temporary/foo";
         this.database.set_download_info ("foo", record);
 
-        SyncJournalDb.DownloadInfo stored_record = this.database.get_download_info ("foo");
+        Common.SyncJournalDb.DownloadInfo stored_record = this.database.get_download_info ("foo");
         GLib.assert_true (stored_record == record);
 
-        this.database.set_download_info ("foo", SyncJournalDb.DownloadInfo ());
-        SyncJournalDb.DownloadInfo wiped_record = this.database.get_download_info ("foo");
+        this.database.set_download_info ("foo", Common.SyncJournalDb.DownloadInfo ());
+        Common.SyncJournalDb.DownloadInfo wiped_record = this.database.get_download_info ("foo");
         GLib.assert_true (!wiped_record.valid);
     }
 

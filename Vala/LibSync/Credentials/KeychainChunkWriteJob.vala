@@ -2,7 +2,7 @@ namespace Occ {
 namespace LibSync {
 
 /***********************************************************
-@brief Simple wrapper class for QKeychain.WritePasswordJob,
+@brief Simple wrapper class for Secret.Collection.WritePasswordJob,
 splits too large keychain entry's data into chunks on Windows
 
 @author Michael Schuster <michael@schuster.ms>
@@ -38,10 +38,10 @@ public class KeychainChunkWriteJob : KeychainChunkJob {
     Call this method to start the job (async).
     You should connect some slot to the signal_finished () signal first.
 
-    @see QKeychain.Job.start ()
+    @see Secret.Collection.Job.start ()
     ***********************************************************/
     public new void start () {
-        this.error = QKeychain.NoError;
+        this.error = Secret.Collection.NoError;
 
         on_signal_write_job_done (null);
     }
@@ -51,7 +51,7 @@ public class KeychainChunkWriteJob : KeychainChunkJob {
     Call this method to start the job synchronously.
     Awaits completion with no need to connect some slot to the signal_finished () signal first.
 
-    @return Returns true on succeess (QKeychain.NoError).
+    @return Returns true on succeess (Secret.Collection.NoError).
     ***********************************************************/
     public bool exec () {
         start ();
@@ -73,8 +73,8 @@ public class KeychainChunkWriteJob : KeychainChunkJob {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_write_job_done (QKeychain.Job incoming_job) {
-        var write_job = (QKeychain.WritePasswordJob)incoming_job;
+    private void on_signal_write_job_done (Secret.Collection.Job incoming_job) {
+        var write_job = (Secret.Collection.WritePasswordJob)incoming_job;
 
         // Errors? (write_job can be null here, see : KeychainChunkWriteJob.start)
         if (write_job) {
@@ -97,8 +97,8 @@ public class KeychainChunkWriteJob : KeychainChunkJob {
             var index = (this.chunk_count++);
 
             // keep the limit
-            if (this.chunk_count > KeychainChunk.MaxChunks) {
-                GLib.warning ("Maximum chunk count exceeded while writing " + write_job.key () + " chunk " + index + " cutting off after " + KeychainChunk.MaxChunks.to_string () + " chunks.");
+            if (this.chunk_count > MaxChunks) {
+                GLib.warning ("Maximum chunk count exceeded while writing " + write_job.key () + " chunk " + index + " cutting off after " + MaxChunks.to_string () + " chunks.");
 
                 write_job.delete_later ();
 
@@ -119,7 +119,7 @@ public class KeychainChunkWriteJob : KeychainChunkJob {
                     this.account.identifier
                 ) : key_with_index;
 
-            var qkeychain_write_password_job = new QKeychain.WritePasswordJob (this.service_name, this);
+            var qkeychain_write_password_job = new Secret.Collection.WritePasswordJob (this.service_name, this);
     // #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
             add_settings_to_job (this.account, qkeychain_write_password_job);
     // #endif

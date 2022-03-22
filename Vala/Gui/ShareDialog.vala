@@ -26,7 +26,7 @@ public class ShareDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private Ui.ShareDialog ui;
+    private ShareDialog instance;
 
     /***********************************************************
     ***********************************************************/
@@ -60,7 +60,7 @@ public class ShareDialog : Gtk.Dialog {
         ShareDialogStartPage start_page,
         Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
-        this.ui = new Ui.ShareDialog ();
+        this.instance = new ShareDialog ();
         this.account_state = account_state;
         this.share_path = share_path;
         this.local_path = local_path;
@@ -71,7 +71,7 @@ public class ShareDialog : Gtk.Dialog {
         attribute (Qt.WA_DeleteOnClose);
         object_name ("Sharing_dialog"); // required as group for save_geometry call
 
-        this.ui.up_ui (this);
+        this.instance.up_ui (this);
 
         // We want to act on account state changes
         this.account_state.signal_state_changed.connect (
@@ -84,15 +84,15 @@ public class ShareDialog : Gtk.Dialog {
         Gtk.Icon icon = icon_provider.icon (file_info);
         var pixmap = icon.pixmap (THUMBNAIL_SIZE, THUMBNAIL_SIZE);
         if (pixmap.width () > 0) {
-            this.ui.label_icon.pixmap (pixmap);
+            this.instance.label_icon.pixmap (pixmap);
         }
 
         // Set filename
         string filename = GLib.FileInfo (this.share_path).filename ();
-        this.ui.label_name.on_signal_text (_("%1").printf (filename));
-        QFont font = new QFont (this.ui.label_name.font ());
+        this.instance.label_name.on_signal_text (_("%1").printf (filename));
+        QFont font = new QFont (this.instance.label_name.font ());
         font.point_size (q_round (font.point_size () * 1.4));
-        this.ui.label_name.font (font);
+        this.instance.label_name.font (font);
 
         string oc_dir = this.share_path;
         oc_dir.truncate (oc_dir.length - filename.length);
@@ -102,15 +102,15 @@ public class ShareDialog : Gtk.Dialog {
 
         // Laying this out is complex because share_path
         // may be in use or not.
-        this.ui.grid_layout.remove_widget (this.ui.label_share_path);
-        this.ui.grid_layout.remove_widget (this.ui.label_name);
+        this.instance.grid_layout.remove_widget (this.instance.label_share_path);
+        this.instance.grid_layout.remove_widget (this.instance.label_name);
         if (oc_dir == "") {
-            this.ui.grid_layout.add_widget (this.ui.label_name, 0, 1, 2, 1);
-            this.ui.label_share_path.on_signal_text ("");
+            this.instance.grid_layout.add_widget (this.instance.label_name, 0, 1, 2, 1);
+            this.instance.label_share_path.on_signal_text ("");
         } else {
-            this.ui.grid_layout.add_widget (this.ui.label_name, 0, 1, 1, 1);
-            this.ui.grid_layout.add_widget (this.ui.label_share_path, 1, 1, 1, 1);
-            this.ui.label_share_path.on_signal_text (_("Folder : %2").printf (oc_dir));
+            this.instance.grid_layout.add_widget (this.instance.label_name, 0, 1, 1, 1);
+            this.instance.grid_layout.add_widget (this.instance.label_share_path, 1, 1, 1, 1);
+            this.instance.label_share_path.on_signal_text (_("Folder : %2").printf (oc_dir));
         }
 
         this.window_title (_("%1 Sharing").printf (Theme.app_name_gui));
@@ -168,7 +168,7 @@ public class ShareDialog : Gtk.Dialog {
 
     override ~ShareDialog () {
         this.link_widget_list.clear ();
-        delete this.ui;
+        delete this.instance;
     }
 
 
@@ -206,7 +206,7 @@ public class ShareDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void on_signal_propfind_error () {
-        // On error show the share ui anyway. The user can still see shares,
+        // On error show the share instance anyway. The user can still see shares,
         // delete them and so on, even though adding new shares or granting
         // some of the permissions might fail.
 
@@ -225,8 +225,8 @@ public class ShareDialog : Gtk.Dialog {
         Gdk.Pixbuf p;
         p.load_from_data (reply, "PNG");
         p = p.scaled_to_height (THUMBNAIL_SIZE, Qt.Smooth_transformation);
-        this.ui.label_icon.pixmap (p);
-        this.ui.label_icon.show ();
+        this.instance.label_icon.pixmap (p);
+        this.instance.label_icon.show ();
     }
 
 
@@ -287,7 +287,7 @@ public class ShareDialog : Gtk.Dialog {
     private void on_signal_delete_share () {
         var sharelink_widget = dynamic_cast<ShareLinkWidget> (sender ());
         sharelink_widget.hide ();
-        this.ui.vertical_layout.remove_widget (sharelink_widget);
+        this.instance.vertical_layout.remove_widget (sharelink_widget);
         this.link_widget_list.remove_all (sharelink_widget);
         init_link_share_widget ();
     }
@@ -365,11 +365,11 @@ public class ShareDialog : Gtk.Dialog {
     ***********************************************************/
     private void on_signal_adjust_scroll_widget_size () {
         int count = this.find_children<ShareLinkWidget> ().count ();
-        this.ui.scroll_area.visible (count > 0);
+        this.instance.scroll_area.visible (count > 0);
         if (count > 0 && count <= 3) {
-            this.ui.scroll_area.fixed_height (this.ui.scroll_area.widget ().size_hint ().height ());
+            this.instance.scroll_area.fixed_height (this.instance.scroll_area.widget ().size_hint ().height ());
         }
-        this.ui.scroll_area.frame_shape (count > 3 ? Gdk.Frame.Styled_panel : Gdk.Frame.No_frame);
+        this.instance.scroll_area.frame_shape (count > 3 ? Gdk.Frame.Styled_panel : Gdk.Frame.No_frame);
     }
 
 
@@ -404,7 +404,7 @@ public class ShareDialog : Gtk.Dialog {
             var label = new Gtk.Label (this);
             label.on_signal_text (_("The file cannot be shared because it does not have sharing permission."));
             label.word_wrap (true);
-            this.ui.vertical_layout.insert_widget (1, label);
+            this.instance.vertical_layout.insert_widget (1, label);
             return;
         }
 
@@ -421,7 +421,7 @@ public class ShareDialog : Gtk.Dialog {
                 this.user_group_widget.on_signal_style_changed
             );
 
-            this.ui.vertical_layout.insert_widget (1, this.user_group_widget);
+            this.instance.vertical_layout.insert_widget (1, this.user_group_widget);
             this.user_group_widget.on_signal_get_shares ();
         }
 
@@ -478,7 +478,7 @@ public class ShareDialog : Gtk.Dialog {
             link_share_widget.on_signal_style_changed
         );
 
-        this.ui.vertical_layout.insert_widget (this.link_widget_list.size () + 1, link_share_widget);
+        this.instance.vertical_layout.insert_widget (this.link_widget_list.size () + 1, link_share_widget);
         link_share_widget.set_up_ui_options ();
 
         return link_share_widget;
@@ -505,11 +505,11 @@ public class ShareDialog : Gtk.Dialog {
                 this.on_signal_create_password_for_link_share
             );
 
-            this.ui.vertical_layout.insert_widget (this.link_widget_list.size ()+1, this.empty_share_link_widget);
+            this.instance.vertical_layout.insert_widget (this.link_widget_list.size ()+1, this.empty_share_link_widget);
             this.empty_share_link_widget.show ();
         } else if (this.empty_share_link_widget) {
             this.empty_share_link_widget.hide ();
-            this.ui.vertical_layout.remove_widget (this.empty_share_link_widget);
+            this.instance.vertical_layout.remove_widget (this.empty_share_link_widget);
             this.link_widget_list.remove_all (this.empty_share_link_widget);
             this.empty_share_link_widget = null;
         }

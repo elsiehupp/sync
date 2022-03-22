@@ -1,8 +1,5 @@
-/***********************************************************
-***********************************************************/
-
-
 namespace Occ {
+namespace Common {
 
 /***********************************************************
 @class ConflictRecord
@@ -69,4 +66,5 @@ public class ConflictRecord : GLib.Object {
 
 } // class ConflictRecord
 
+} // namespace Common
 } // namespace Occ

@@ -61,7 +61,7 @@ public class TestAllFilesDeletedDelete : AbstractTestAllFilesDeleted {
 
 
     protected void on_signal_about_to_remove_all_files_all_files_deleted_delete (
-        SyncFileItem.Direction directory,
+        LibSync.SyncFileItem.Direction directory,
         Callback callback
     ) {
         GLib.assert_true (
@@ -71,12 +71,12 @@ public class TestAllFilesDeletedDelete : AbstractTestAllFilesDeleted {
         about_to_remove_all_files_called++;
         GLib.assert_true (
             directory ==
-            delete_on_remote ? SyncFileItem.Direction.DOWN : SyncFileItem.Direction.UP
+            delete_on_remote ? LibSync.SyncFileItem.Direction.DOWN : LibSync.SyncFileItem.Direction.UP
         );
         callback (false);
     }
 
-}
+} // class TestAllFilesDeletedDelete
 
-}
-}
+} // namespace Testing
+} // namespace Occ

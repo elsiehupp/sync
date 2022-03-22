@@ -15,7 +15,7 @@ public class FakeDeleteReply : FakeReply {
         string filename = get_file_path_from_url (request.url);
         GLib.assert_true (!filename == "");
         remote_root_file_info.remove (filename);
-        QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
+        GLib.Object.invoke_method (this, "respond", Qt.QueuedConnection);
     }
 
 

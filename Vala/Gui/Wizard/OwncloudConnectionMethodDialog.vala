@@ -28,23 +28,23 @@ public class OwncloudConnectionMethodDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private Ui.OwncloudConnectionMethodDialog ui;
+    private OwncloudConnectionMethodDialog instance;
 
 
     /***********************************************************
     ***********************************************************/
     public OwncloudConnectionMethodDialog (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent, Qt.CustomizeWindowHint | Qt.WindowTitleHint | Qt.WindowCloseButtonHint | Qt.MSWindowsFixedSizeDialogHint);
-        this.ui = new Ui.OwncloudConnectionMethodDialog ();
-        ui.up_ui (this);
+        this.instance = new OwncloudConnectionMethodDialog ();
+        instance.up_ui (this);
 
-        ui.no_tls_button.clicked.connect (
+        instance.no_tls_button.clicked.connect (
             this.on_signal_return_no_tls
         );
-        ui.client_side_tls_button.clicked.connect (
+        instance.client_side_tls_button.clicked.connect (
             this.on_signal_return_client_side_tls
         );
-        ui.back_button.clicked.connect (
+        instance.back_button.clicked.connect (
             this.return_back
         );
     }
@@ -53,7 +53,7 @@ public class OwncloudConnectionMethodDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     ~OwncloudConnectionMethodDialog () {
-        delete ui;
+        delete instance;
     }
 
 
@@ -61,7 +61,7 @@ public class OwncloudConnectionMethodDialog : Gtk.Dialog {
     The URL that was tried
     ***********************************************************/
     public void url (GLib.Uri url) {
-        ui.label.on_signal_text (_("<html><head/><body><p>Failed to connect to the secure server address <em>%1</em>. How do you wish to proceed?</p></body></html>").printf (url.to_display_string ().to_html_escaped ()));
+        instance.label.on_signal_text (_("<html><head/><body><p>Failed to connect to the secure server address <em>%1</em>. How do you wish to proceed?</p></body></html>").printf (url.to_display_string ().to_html_escaped ()));
     }
 
 

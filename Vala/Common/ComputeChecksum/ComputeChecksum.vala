@@ -1,4 +1,5 @@
 namespace Occ {
+namespace Common {
 
 /***********************************************************
 @class ComputeChecksum
@@ -98,7 +99,7 @@ public class ComputeChecksum : ComputeChecksumBase {
     The device ownership transfers into the thread that
     will compute the checksum. It must not have a parent.
     ***********************************************************/
-    public void start_for_device (std.unique_ptr<QIODevice> device) {
+    public void start_for_device (QIODevice device) {
         //  ENFORCE (device);
         GLib.info ("Computing " + this.checksum_type + " checksum of device " + device.get () + " in a thread.");
         //  ASSERT (!device.parent ());
@@ -172,14 +173,14 @@ public class ComputeChecksum : ComputeChecksumBase {
 
     /***********************************************************
     ***********************************************************/
-    private void start_impl (std.unique_ptr<QIODevice> device) {
+    private void start_impl (QIODevice device) {
         this.watcher.signal_finished.connect (
             this.on_signal_calculation_done
         ); // Qt.UniqueConnection
 
         // We'd prefer to move the unique_ptr into the lambda, but that's
         // awkward with the C++ standard we're on
-        var shared_device = unowned<QIODevice> (device.release ());
+        var shared_device = unowned QIODevice  (device.release ());
 
         // Bug: The thread will keep running even if ComputeChecksum is deleted.
         string type = this.checksum_type;
@@ -205,6 +206,8 @@ public class ComputeChecksum : ComputeChecksumBase {
         shared_device.close ();
         return result;
     }
-}
 
+} // class ComputeChecksum
+
+} // namespace Common
 } // namespace Occ

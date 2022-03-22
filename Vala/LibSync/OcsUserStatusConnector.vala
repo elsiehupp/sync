@@ -50,7 +50,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
         }
         public set {
             if (!this.user_status_supported) {
-                /* emit */ signal_error (Error.UserStatusNotSupported);
+                /* emit */ signal_error (Error.USER_STATUS_NOT_SUPPORTED);
                 return;
             }
 
@@ -83,7 +83,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
 
         if (!this.user_status_supported) {
             GLib.debug ("User status not supported.");
-            /* emit */ signal_error (Error.UserStatusNotSupported);
+            /* emit */ signal_error (Error.USER_STATUS_NOT_SUPPORTED);
             return;
         }
 
@@ -95,7 +95,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
     ***********************************************************/
     public void fetch_predefined_statuses () {
         if (!this.user_status_supported) {
-            /* emit */ signal_error (Error.UserStatusNotSupported);
+            /* emit */ signal_error (Error.USER_STATUS_NOT_SUPPORTED);
             return;
         }
         start_fetch_predefined_statuses ();
@@ -123,7 +123,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
 
         if (status_code != 200) {
             GLib.info ("Slot fetch UserStatus finished with status code " + status_code);
-            /* emit */ signal_error (Error.CouldNotFetchUserStatus);
+            /* emit */ signal_error (Error.COULD_NOT_FETCH_USER_STATUS);
             return;
         }
 
@@ -139,7 +139,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
 
         if (status_code != 200) {
             GLib.info ("Slot predefined user statuses finished with status code " + status_code);
-            /* emit */ signal_error (Error.CouldNotFetchPredefinedUserStatuses);
+            /* emit */ signal_error (Error.COULD_NOT_FETCH_PREDEFINED_USER_STATUSES);
             return;
         }
         var json_data = json.object ().value ("ocs").to_object ().value ("data");
@@ -158,7 +158,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
         log_response ("Online status set", json, status_code);
 
         if (status_code != 200) {
-            /* emit */ signal_error (Error.CouldNotSetUserStatus);
+            /* emit */ signal_error (Error.COULD_NOT_SET_USER_STATUS);
             return;
         }
     }
@@ -170,7 +170,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
         log_response ("Message set", json, status_code);
 
         if (status_code != 200) {
-            /* emit */ signal_error (Error.CouldNotSetUserStatus);
+            /* emit */ signal_error (Error.COULD_NOT_SET_USER_STATUS);
             return;
         }
 
@@ -189,7 +189,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
         log_response ("Message cleared", json, status_code);
 
         if (status_code != 200) {
-            /* emit */ signal_error (Error.CouldNotClearMessage);
+            /* emit */ signal_error (Error.COULD_NOT_CLEAR_MESSAGE);
             return;
         }
 
@@ -311,7 +311,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
         }
 
         if (!this.user_status_emojis_supported) {
-            /* emit */ signal_error (Error.EmojisNotSupported);
+            /* emit */ signal_error (Error.EMOJIS_NOT_SUPPORTED);
             return;
         }
         this.message_job = new JsonApiJob (this.account, USER_STATUS_BASE_URL + "/message/custom", this);

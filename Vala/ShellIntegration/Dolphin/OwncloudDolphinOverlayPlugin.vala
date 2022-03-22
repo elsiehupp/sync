@@ -14,8 +14,7 @@ public class OwncloudDolphinPlugin : KOverlayIconPlugin {
 
     //  Q_PLUGIN_METADATA (IID "com.owncloud.ovarlayiconplugin" FILE "ownclouddolphinoverlayplugin.json")
 
-    using StatusMap = GLib.HashTable<string, string>;
-    StatusMap m_status;
+    GLib.HashTable<string, string> status_map;
 
     /***********************************************************
     ***********************************************************/
@@ -42,8 +41,8 @@ public class OwncloudDolphinPlugin : KOverlayIconPlugin {
 
         helper.send_command ("RETRIEVE_FILE_STATUS:" + local_file + "\n");
 
-        StatusMap.iterator it = m_status.find (local_file);
-        if (it != m_status.const_end ()) {
+        GLib.HashTable<string, string>.iterator it = status_map.find (local_file);
+        if (it != status_map.const_end ()) {
             return  overlaysForString (*it);
         }
         return { };
@@ -88,7 +87,7 @@ public class OwncloudDolphinPlugin : KOverlayIconPlugin {
         // We can't use tokens[2] because the filename might contain ':'
         int secondColon = line.indexOf (":", line.indexOf (":") + 1);
         const string name = line.mid (secondColon + 1);
-        string status = m_status[name]; // reference to the item in the hash
+        string status = status_map[name]; // reference to the item in the hash
         if (status == tokens[1])
             return;
         status = tokens[1];

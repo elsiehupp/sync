@@ -25,14 +25,14 @@ class TestTokenUrlHasRedirect : AbstractTestOAuth {
         //  ASSERT (browser_reply);
         // Kind of reproduces what we had in https://github.com/owncloud/enterprise/issues/2951 (not 1:1)
         if (redirects_done == 0) {
-            std.unique_ptr<QBuffer> payload = new std.unique_ptr<QBuffer> (new QBuffer ());
+            GLib.OutputStream payload = new GLib.OutputStream ();
             payload.set_data ("");
             var reply = new SlowFakePostReply (operation, request, std.move (payload), this);
             reply.redirect_to_policy = true;
             redirects_done++;
             return reply;
         } else if  (redirects_done == 1) {
-            std.unique_ptr<QBuffer> payload = new std.unique_ptr<QBuffer> (new QBuffer ());
+            GLib.OutputStream payload = new GLib.OutputStream ();
             payload.set_data ("");
             var reply = new SlowFakePostReply (operation, request, std.move (payload), this);
             reply.redirect_to_token = true;

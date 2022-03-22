@@ -71,7 +71,7 @@ public class PostfixLineEdit : QLineEdit {
         QLineEdit.paint_event (event);
         QPainter p = new QPainter (this);
 
-        p.pen (palette ().color (QPalette.Disabled, QPalette.Text));
+        p.pen (palette ().color (Gtk.Palette.Disabled, Gtk.Palette.Text));
         QFontMetricsF font_metrics = new QFontMetricsF (font ());
         int on_signal_start = rect ().right () - q_round (font_metrics.width (this.postfix));
         QStyle_option_frame panel;

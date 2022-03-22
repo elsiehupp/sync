@@ -164,7 +164,7 @@ public class ConnectionValidator : GLib.Object {
             // We want to reset the QNAM proxy so that the global proxy settings are used (via ClientProxy settings)
             this.account.network_access_manager.proxy (QNetworkProxy (QNetworkProxy.DefaultProxy));
             // use a queued invocation so we're as asynchronous as with the other code path
-            QMetaObject.invoke_method (this, "on_signal_actual_check", Qt.QueuedConnection);
+            GLib.Object.invoke_method (this, "on_signal_actual_check", Qt.QueuedConnection);
         }
     }
 

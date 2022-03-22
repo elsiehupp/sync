@@ -13,9 +13,9 @@ namespace LibSync {
 @ingroup libsync
 ***********************************************************/
 public class CleanupPollsJob : GLib.Object {
-    GLib.List<SyncJournalDb.PollInfo> poll_infos;
+    GLib.List<Common.SyncJournalDb.PollInfo> poll_infos;
     unowned Account account;
-    SyncJournalDb journal;
+    Common.SyncJournalDb journal;
     string local_path;
     unowned Vfs vfs;
 
@@ -25,9 +25,9 @@ public class CleanupPollsJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public CleanupPollsJob (
-        GLib.List<SyncJournalDb.PollInfo> poll_infos,
+        GLib.List<Common.SyncJournalDb.PollInfo> poll_infos,
         Account account,
-        SyncJournalDb journal,
+        Common.SyncJournalDb journal,
         string local_path,
         Vfs vfs,
         GLib.Object parent = new GLib.Object ()) {
@@ -85,7 +85,7 @@ public class CleanupPollsJob : GLib.Object {
                 delete_later ();
                 return;
             }
-            this.journal.upload_info (poll_job.item.file, SyncJournalDb.UploadInfo ());
+            this.journal.upload_info (poll_job.item.file, Common.SyncJournalDb.UploadInfo ());
         }
         // Continue with the next entry, or finish
         start ();

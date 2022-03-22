@@ -1,4 +1,5 @@
 namespace Occ {
+namespace Common {
 
 /***********************************************************
 @class ComputeChecksumBase
@@ -175,4 +176,8 @@ abstract class ComputeChecksumBase : GLib.Object {
         ComputeChecksumBase.enabled = q_environment_variable_is_empty ("OWNCLOUD_DISABLE_CHECKSUM_COMPUTATIONS");
         return ComputeChecksumBase.enabled;
     }
-}
+
+} // class ComputeChecksumBase
+
+} // namespace Common
+} // namespace Occ

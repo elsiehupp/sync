@@ -31,7 +31,7 @@ public class SyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private class ProblemsMap : GLib.HashTable<string, SyncFileStatus.SyncFileStatusTag, PathComparator> { }
+    private class ProblemsMap : GLib.HashTable<string, Common.SyncFileStatus.SyncFileStatusTag, PathComparator> { }
 
 
     /***********************************************************
@@ -76,7 +76,7 @@ public class SyncFileStatusTracker : GLib.Object {
     private GLib.HashTable<string, int> sync_count;
 
 
-    internal signal void signal_file_status_changed (string system_filename, SyncFileStatus file_status);
+    internal signal void signal_file_status_changed (string system_filename, Common.SyncFileStatus file_status);
 
 
     /***********************************************************
@@ -110,7 +110,7 @@ public class SyncFileStatusTracker : GLib.Object {
         string local_path = filename.mid (folder_path.size ());
         this.dirty_paths.insert (local_path);
 
-        /* emit */ signal_file_status_changed (filename, SyncFileStatus.SyncFileStatusTag.STATUS_SYNC);
+        /* emit */ signal_file_status_changed (filename, Common.SyncFileStatus.SyncFileStatusTag.STATUS_SYNC);
     }
 
 
@@ -118,7 +118,7 @@ public class SyncFileStatusTracker : GLib.Object {
     Path relative to folder
     ***********************************************************/
     public void on_signal_add_silently_excluded (string folder_path) {
-        this.sync_problems[folder_path] = SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED;
+        this.sync_problems[folder_path] = Common.SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED;
         /* emit */ signal_file_status_changed (get_system_destination (folder_path), resolve_sync_and_error_status (folder_path, SharedFlag.NOT_SHARED));
     }
 
@@ -136,10 +136,10 @@ public class SyncFileStatusTracker : GLib.Object {
             this.dirty_paths.remove (item.destination ());
 
             if (has_error_status (*item)) {
-                this.sync_problems[item.destination ()] = SyncFileStatus.SyncFileStatusTag.STATUS_ERROR;
+                this.sync_problems[item.destination ()] = Common.SyncFileStatus.SyncFileStatusTag.STATUS_ERROR;
                 invalidate_parent_paths (item.destination ());
             } else if (has_excluded_status (*item)) {
-                this.sync_problems[item.destination ()] = SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED;
+                this.sync_problems[item.destination ()] = Common.SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED;
             }
 
             SharedFlag shared_flag = item.remote_perm.has_permission (RemotePermissions.Permissions.IS_SHARED) ? SharedFlag.SHARED : SharedFlag.NOT_SHARED;
@@ -168,8 +168,8 @@ public class SyncFileStatusTracker : GLib.Object {
             old_problems.erase (sync_problem.first);
         foreach (var old_problem in old_problems) {
             const string path = old_problem.first;
-            SyncFileStatus.SyncFileStatusTag severity = old_problem.second;
-            if (severity == SyncFileStatus.SyncFileStatusTag.STATUS_ERROR)
+            Common.SyncFileStatus.SyncFileStatusTag severity = old_problem.second;
+            if (severity == Common.SyncFileStatus.SyncFileStatusTag.STATUS_ERROR)
                 invalidate_parent_paths (path);
             /* emit */ signal_file_status_changed (get_system_destination (path), file_status (path));
         }
@@ -182,10 +182,10 @@ public class SyncFileStatusTracker : GLib.Object {
         GLib.debug ("Item completed " + item.destination () + item.status + item.instruction);
 
         if (has_error_status (item)) {
-            this.sync_problems[item.destination ()] = SyncFileStatus.SyncFileStatusTag.STATUS_ERROR;
+            this.sync_problems[item.destination ()] = Common.SyncFileStatus.SyncFileStatusTag.STATUS_ERROR;
             invalidate_parent_paths (item.destination ());
         } else if (has_excluded_status (item)) {
-            this.sync_problems[item.destination ()] = SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED;
+            this.sync_problems[item.destination ()] = Common.SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED;
         } else {
             this.sync_problems.erase (item.destination ());
         }
@@ -229,18 +229,18 @@ public class SyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private SyncFileStatus.SyncFileStatusTag lookup_problem (string path_to_match, ProblemsMap problem_map) {
+    private Common.SyncFileStatus.SyncFileStatusTag lookup_problem (string path_to_match, ProblemsMap problem_map) {
         var lower = problem_map.lower_bound (path_to_match);
         for (var it = lower; it != problem_map.cend (); ++it) {
             const string problem_path = it.first;
-            SyncFileStatus.SyncFileStatusTag severity = it.second;
+            Common.SyncFileStatus.SyncFileStatusTag severity = it.second;
 
             if (path_compare (problem_path, path_to_match) == 0) {
                 return severity;
-            } else if (severity == SyncFileStatus.SyncFileStatusTag.STATUS_ERROR
+            } else if (severity == Common.SyncFileStatus.SyncFileStatusTag.STATUS_ERROR
                 && path_starts_with (problem_path, path_to_match)
                 && (path_to_match == "" || problem_path.at (path_to_match.size ()) == "/")) {
-                return SyncFileStatus.SyncFileStatusTag.STATUS_WARNING;
+                return Common.SyncFileStatus.SyncFileStatusTag.STATUS_WARNING;
             } else if (!path_starts_with (problem_path, path_to_match)) {
                 // Starting at lower_bound we get the first path that is not smaller,
                 // since: "a/" < "a/aa" < "a/aa/aaa" < "a/ab/aba"
@@ -251,23 +251,23 @@ public class SyncFileStatusTracker : GLib.Object {
                 break;
             }
         }
-        return SyncFileStatus.SyncFileStatusTag.STATUS_NONE;
+        return Common.SyncFileStatus.SyncFileStatusTag.STATUS_NONE;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private SyncFileStatus resolve_sync_and_error_status (string relative_path, SharedFlag shared_state, PathKnownFlag is_path_known = PathKnownFlag.PATH_KNOWN) {
+    private Common.SyncFileStatus resolve_sync_and_error_status (string relative_path, SharedFlag shared_state, PathKnownFlag is_path_known = PathKnownFlag.PATH_KNOWN) {
         // If it's a new file and that we're not syncing it yet,
         // don't show any icon and wait for the filesystem watcher to trigger a sync.
-        SyncFileStatus status = new SyncFileStatus (is_path_known ? SyncFileStatus.SyncFileStatusTag.STATUS_UP_TO_DATE : SyncFileStatus.SyncFileStatusTag.STATUS_NONE);
+        Common.SyncFileStatus status = new Common.SyncFileStatus (is_path_known ? Common.SyncFileStatus.SyncFileStatusTag.STATUS_UP_TO_DATE : Common.SyncFileStatus.SyncFileStatusTag.STATUS_NONE);
         if (this.sync_count.value (relative_path)) {
-            status.set (SyncFileStatus.SyncFileStatusTag.STATUS_SYNC);
+            status.set (Common.SyncFileStatus.SyncFileStatusTag.STATUS_SYNC);
         } else {
             // After a sync on_signal_finished, we need to show the users issues from that last sync like the activity list does.
             // Also used for parent directories showing a warning for an error child.
-            SyncFileStatus.SyncFileStatusTag problem_status = lookup_problem (relative_path, this.sync_problems);
-            if (problem_status != SyncFileStatus.SyncFileStatusTag.STATUS_NONE)
+            Common.SyncFileStatus.SyncFileStatusTag problem_status = lookup_problem (relative_path, this.sync_problems);
+            if (problem_status != Common.SyncFileStatus.SyncFileStatusTag.STATUS_NONE)
                 status.set (problem_status);
         }
 
@@ -310,7 +310,7 @@ public class SyncFileStatusTracker : GLib.Object {
         // Will return 0 (and increase to 1) if the path wasn't in the map yet
         int count = this.sync_count[relative_path]++;
         if (!count) {
-            SyncFileStatus status = shared_flag == SharedFlag.UNKNOWN_SHARED
+            Common.SyncFileStatus status = shared_flag == SharedFlag.UNKNOWN_SHARED
                 ? file_status (relative_path)
                 : resolve_sync_and_error_status (relative_path, shared_flag);
             /* emit */ signal_file_status_changed (get_system_destination (relative_path), status);
@@ -335,7 +335,7 @@ public class SyncFileStatusTracker : GLib.Object {
             // Remove from the map, same as 0
             this.sync_count.remove (relative_path);
 
-            SyncFileStatus status = shared_flag == SharedFlag.UNKNOWN_SHARED
+            Common.SyncFileStatus status = shared_flag == SharedFlag.UNKNOWN_SHARED
                 ? file_status (relative_path)
                 : resolve_sync_and_error_status (relative_path, shared_flag);
             /* emit */ signal_file_status_changed (get_system_destination (relative_path), status);
@@ -353,7 +353,7 @@ public class SyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private SyncFileStatus file_status (string relative_path) {
+    private Common.SyncFileStatus file_status (string relative_path) {
         //  ASSERT (!relative_path.has_suffix ("/"));
 
         if (relative_path == "") {
@@ -374,11 +374,11 @@ public class SyncFileStatusTracker : GLib.Object {
             this.sync_engine.local_path,
             this.sync_engine.ignore_hidden_files
         )) {
-            return SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED;
+            return Common.SyncFileStatus.SyncFileStatusTag.STATUS_EXCLUDED;
         }
 
         if (this.dirty_paths.contains (relative_path))
-            return SyncFileStatus.SyncFileStatusTag.STATUS_SYNC;
+            return Common.SyncFileStatus.SyncFileStatusTag.STATUS_SYNC;
 
         // First look it up in the database to know if it's shared
         SyncJournalFileRecord sync_journal_file_record;

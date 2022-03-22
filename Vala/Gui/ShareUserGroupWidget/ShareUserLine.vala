@@ -14,7 +14,7 @@ public class ShareUserLine : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private Ui.ShareUserLine ui;
+    private ShareUserLine instance;
     private unowned Account account;
 
     unowned UserGroupShare share { public get; private set; }
@@ -48,16 +48,16 @@ public class ShareUserLine : Gtk.Widget {
         bool is_file,
         Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
-        this.ui = new Ui.ShareUserLine ();
+        this.instance = new ShareUserLine ();
         this.account = account;
         this.share = share;
         this.is_file = is_file;
         this.profile_page_menu = new ProfilePageMenu (account, share.share_with.share_with);
         //  Q_ASSERT (this.share);
-        this.ui.up_ui (this);
+        this.instance.up_ui (this);
 
-        this.ui.shared_with.elide_mode (Qt.Elide_right);
-        this.ui.shared_with.on_signal_text (share.share_with ().to_string ());
+        this.instance.shared_with.elide_mode (Qt.Elide_right);
+        this.instance.shared_with.on_signal_text (share.share_with ().to_string ());
 
         // adds permissions
         // can edit permission
@@ -68,15 +68,15 @@ public class ShareUserLine : Gtk.Widget {
                 && max_sharing_permissions & Share_permission_delete);
         }
 
-        this.ui.permissions_edit.enabled (enabled);
+        this.instance.permissions_edit.enabled (enabled);
 
-        this.ui.permissions_edit.clicked.connect (
+        this.instance.permissions_edit.clicked.connect (
             this.on_signal_edit_permissions_changed
         );
-        this.ui.note_confirm_button.clicked.connect (
+        this.instance.note_confirm_button.clicked.connect (
             this.on_signal_note_confirm_button_clicked
         );
-        this.ui.calendar.date_changed.connect (
+        this.instance.calendar.date_changed.connect (
             this.on_signal_expire_date
         );
         this.share.signal_note_set.connect (
@@ -88,10 +88,10 @@ public class ShareUserLine : Gtk.Widget {
         this.share.signal_expire_date_set.connect (
             this.disable_progess_indicator_animation
         );
-        this.ui.confirm_password.clicked.connect (
+        this.instance.confirm_password.clicked.connect (
             this.on_signal_confirm_password_clicked
         );
-        this.ui.line_edit_password.return_pressed.connect (
+        this.instance.line_edit_password.return_pressed.connect (
             this.on_signal_line_edit_password_return_pressed
         );
 
@@ -206,12 +206,12 @@ public class ShareUserLine : Gtk.Widget {
 
         on_signal_refresh_password_options ();
 
-        this.ui.error_label.hide ();
+        this.instance.error_label.hide ();
 
-        this.ui.permission_tool_button.menu (menu);
-        this.ui.permission_tool_button.popup_mode (QToolButton.Instant_popup);
+        this.instance.permission_tool_button.menu (menu);
+        this.instance.permission_tool_button.popup_mode (QToolButton.Instant_popup);
 
-        this.ui.password_progress_indicator.visible (false);
+        this.instance.password_progress_indicator.visible (false);
 
         // Set the permissions checkboxes
         display_permissions ();
@@ -224,7 +224,7 @@ public class ShareUserLine : Gtk.Widget {
         if (share.share_type == Share.Type.REMOTE
             && share.account.server_version_int < Account.make_server_version (9, 1, 0)) {
             this.permission_reshare.visible (false);
-            this.ui.permission_tool_button.visible (false);
+            this.instance.permission_tool_button.visible (false);
         }
 
         share.signal_permissions_set.connect (
@@ -238,11 +238,11 @@ public class ShareUserLine : Gtk.Widget {
             this.permission_reshare.visible (false);
         }
 
-        const AvatarEventFilter avatar_event_filter = new AvatarEventFilter (this.ui.avatar);
+        const AvatarEventFilter avatar_event_filter = new AvatarEventFilter (this.instance.avatar);
         avatar_event_filter.context_menu.connect (
             this.on_signal_avatar_context_menu
         );
-        this.ui.avatar.install_event_filter (avatar_event_filter);
+        this.instance.avatar.install_event_filter (avatar_event_filter);
 
         load_avatar ();
 
@@ -252,7 +252,7 @@ public class ShareUserLine : Gtk.Widget {
 
 
     override ~ShareUserLine () {
-        delete this.ui;
+        delete this.instance;
     }
 
 
@@ -266,7 +266,7 @@ public class ShareUserLine : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public void on_signal_focus_password_line_edit () {
-        this.ui.line_edit_password.focus ();
+        this.instance.line_edit_password.focus ();
     }
 
 
@@ -299,7 +299,7 @@ public class ShareUserLine : Gtk.Widget {
                 permissions |= Share_permission_delete;
             }
         } else {
-            if (this.ui.permissions_edit.is_checked ()) {
+            if (this.instance.permissions_edit.is_checked ()) {
                 permissions |= Share_permission_update;
             }
         }
@@ -316,15 +316,15 @@ public class ShareUserLine : Gtk.Widget {
         // Can never manually be set to "partial".
         // This works because the state cycle for clicking is
         // unchecked . partial . checked . unchecked.
-        if (this.ui.permissions_edit.check_state () == Qt.PartiallyChecked) {
-            this.ui.permissions_edit.check_state (Qt.Checked);
+        if (this.instance.permissions_edit.check_state () == Qt.PartiallyChecked) {
+            this.instance.permissions_edit.check_state (Qt.Checked);
         }
 
         Share.Permissions permissions = SharePermissionRead;
 
         //  folders edit = CREATE, READ, UPDATE, DELETE
         //  files edit = READ + UPDATE
-        if (this.ui.permissions_edit.check_state () == Qt.Checked) {
+        if (this.instance.permissions_edit.check_state () == Qt.Checked) {
 
             /***********************************************************
             Files can't have create or delete permisisons
@@ -356,11 +356,11 @@ public class ShareUserLine : Gtk.Widget {
     ***********************************************************/
     private void on_signal_password_checkbox_changed () {
         if (!this.password_protect_link_action.is_checked ()) {
-            this.ui.error_label.hide ();
-            this.ui.error_label.clear ();
+            this.instance.error_label.hide ();
+            this.instance.error_label.clear ();
 
             if (!this.share.password_is_set) {
-                this.ui.line_edit_password.clear ();
+                this.instance.line_edit_password.clear ();
                 on_signal_refresh_password_options ();
             } else {
                 // do not call on_signal_refresh_password_options here, as it will be called after the network request is complete
@@ -370,7 +370,7 @@ public class ShareUserLine : Gtk.Widget {
         } else {
             on_signal_refresh_password_options ();
 
-            if (this.ui.line_edit_password.is_visible () && this.ui.line_edit_password.is_enabled ()) {
+            if (this.instance.line_edit_password.is_visible () && this.instance.line_edit_password.is_enabled ()) {
                 on_signal_focus_password_line_edit ();
             }
         }
@@ -398,10 +398,10 @@ public class ShareUserLine : Gtk.Widget {
     private void on_signal_refresh_password_options () {
         const bool is_password_enabled = this.share.share_type == Share.Type.EMAIL && this.password_protect_link_action.is_checked ();
 
-        this.ui.password_label.visible (is_password_enabled);
-        this.ui.line_edit_password.enabled (is_password_enabled);
-        this.ui.line_edit_password.visible (is_password_enabled);
-        this.ui.confirm_password.visible (is_password_enabled);
+        this.instance.password_label.visible (is_password_enabled);
+        this.instance.line_edit_password.enabled (is_password_enabled);
+        this.instance.line_edit_password.visible (is_password_enabled);
+        this.instance.confirm_password.visible (is_password_enabled);
 
         /* emit */ resize_requested ();
     }
@@ -411,9 +411,9 @@ public class ShareUserLine : Gtk.Widget {
     ***********************************************************/
     private void on_signal_refresh_password_line_edit_placeholder () {
         if (this.share.password_is_set) {
-            this.ui.line_edit_password.placeholder_text (string.from_utf8 (PASSWORD_IS_PLACEHOLDER));
+            this.instance.line_edit_password.placeholder_text (string.from_utf8 (PASSWORD_IS_PLACEHOLDER));
         } else {
-            this.ui.line_edit_password.placeholder_text ("");
+            this.instance.line_edit_password.placeholder_text ("");
         }
     }
 
@@ -422,10 +422,10 @@ public class ShareUserLine : Gtk.Widget {
     ***********************************************************/
     private void on_signal_link_share_password_set () {
         toggle_password_progress_animation (false);
-        this.ui.line_edit_password.enabled (true);
-        this.ui.confirm_password.enabled (true);
+        this.instance.line_edit_password.enabled (true);
+        this.instance.confirm_password.enabled (true);
 
-        this.ui.line_edit_password.on_signal_text ("");
+        this.instance.line_edit_password.on_signal_text ("");
 
         this.password_protect_link_action.enabled (!this.share.password_is_set || !this.account.capabilities.share_email_password_enforced ());
 
@@ -471,27 +471,27 @@ public class ShareUserLine : Gtk.Widget {
         }
 
         avatar = AvatarJob.make_circular_avatar (avatar);
-        this.ui.avatar.pixmap (Gdk.Pixbuf.from_image (avatar));
+        this.instance.avatar.pixmap (Gdk.Pixbuf.from_image (avatar));
 
         // Remove the stylesheet for the fallback avatar
-        this.ui.avatar.style_sheet ("");
+        this.instance.avatar.style_sheet ("");
     }
 
     /***********************************************************
     ***********************************************************/
     private void on_signal_password_confirmed () {
-        if (this.ui.line_edit_password.text () == "") {
+        if (this.instance.line_edit_password.text () == "") {
             return;
         }
 
-        this.ui.line_edit_password.enabled (false);
-        this.ui.confirm_password.enabled (false);
+        this.instance.line_edit_password.enabled (false);
+        this.instance.confirm_password.enabled (false);
 
-        this.ui.error_label.hide ();
-        this.ui.error_label.clear ();
+        this.instance.error_label.hide ();
+        this.instance.error_label.clear ();
 
         toggle_password_progress_animation (true);
-        this.share.password (this.ui.line_edit_password.text ());
+        this.share.password (this.instance.line_edit_password.text ());
     }
 
 
@@ -525,8 +525,8 @@ public class ShareUserLine : Gtk.Widget {
 
         toggle_password_progress_animation (false);
 
-        this.ui.line_edit_password.enabled (true);
-        this.ui.confirm_password.enabled (true);
+        this.instance.line_edit_password.enabled (true);
+        this.instance.confirm_password.enabled (true);
 
         on_signal_refresh_password_line_edit_placeholder ();
 
@@ -534,8 +534,8 @@ public class ShareUserLine : Gtk.Widget {
 
         on_signal_focus_password_line_edit ();
 
-        this.ui.error_label.show ();
-        this.ui.error_label.on_signal_text (message);
+        this.instance.error_label.show ();
+        this.instance.error_label.on_signal_text (message);
 
         /* emit */ resize_requested ();
     }
@@ -554,11 +554,11 @@ public class ShareUserLine : Gtk.Widget {
                     perm & Share_permission_create && perm & Share_permission_delete)
                 )
             ) {
-            this.ui.permissions_edit.check_state (Qt.Checked);
+            this.instance.permissions_edit.check_state (Qt.Checked);
         } else if (!this.is_file && perm & (Share_permission_update | Share_permission_create | Share_permission_delete)) {
-            this.ui.permissions_edit.check_state (Qt.PartiallyChecked);
+            this.instance.permissions_edit.check_state (Qt.PartiallyChecked);
         } else if (perm & SharePermissionRead) {
-            this.ui.permissions_edit.check_state (Qt.Unchecked);
+            this.instance.permissions_edit.check_state (Qt.Unchecked);
         }
 
         // Edit is independent of reshare
@@ -580,11 +580,11 @@ public class ShareUserLine : Gtk.Widget {
         const int avatar_size = 36;
 
         // Set size of the placeholder
-        this.ui.avatar.minimum_height (avatar_size);
-        this.ui.avatar.minimum_width (avatar_size);
-        this.ui.avatar.maximum_height (avatar_size);
-        this.ui.avatar.maximum_width (avatar_size);
-        this.ui.avatar.alignment (Qt.AlignCenter);
+        this.instance.avatar.minimum_height (avatar_size);
+        this.instance.avatar.minimum_width (avatar_size);
+        this.instance.avatar.maximum_height (avatar_size);
+        this.instance.avatar.maximum_width (avatar_size);
+        this.instance.avatar.alignment (Qt.AlignCenter);
 
         default_avatar (avatar_size);
 
@@ -625,17 +625,17 @@ public class ShareUserLine : Gtk.Widget {
             line-height : %2px;
             font-size : %2px;
         })""".printf (background_color.name (), string.number (avatar_size / 2));
-        this.ui.avatar.style_sheet (style);
+        this.instance.avatar.style_sheet (style);
 
         const var pixmap = pixmap_for_sharee_type (this.share.share_with ().type (), background_color);
 
         if (!pixmap == null) {
-            this.ui.avatar.pixmap (pixmap);
+            this.instance.avatar.pixmap (pixmap);
         } else {
             GLib.debug ("pixmap is null for share type: " + this.share.share_with.type);
 
             // The avatar label is the first character of the user name.
-            this.ui.avatar.on_signal_text (this.share.share_with ().display_name.at (0).to_upper ());
+            this.instance.avatar.on_signal_text (this.share.share_with ().display_name.at (0).to_upper ());
         }
     }
 
@@ -643,7 +643,7 @@ public class ShareUserLine : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void customize_style () {
-        this.ui.permission_tool_button.icon (Theme.create_color_aware_icon (":/client/theme/more.svg"));
+        this.instance.permission_tool_button.icon (Theme.create_color_aware_icon (":/client/theme/more.svg"));
 
         Gtk.Icon delete_icon = Gtk.Icon.from_theme (
             "user-trash",
@@ -652,11 +652,11 @@ public class ShareUserLine : Gtk.Widget {
 
         this.delete_share_button.icon (delete_icon);
 
-        this.ui.note_confirm_button.icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
-        this.ui.progress_indicator.on_signal_color (Gtk.Application.palette ().color (QPalette.Window_text));
+        this.instance.note_confirm_button.icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
+        this.instance.progress_indicator.on_signal_color (Gtk.Application.palette ().color (Gtk.Palette.Window_text));
 
-        // make sure to force Background_role to QPalette.Window_text for a lable, because it's parent always has a different role set that applies to children unless customized
-        this.ui.error_label.background_role (QPalette.Window_text);
+        // make sure to force Background_role to Gtk.Palette.Window_text for a lable, because it's parent always has a different role set that applies to children unless customized
+        this.instance.error_label.background_role (Gtk.Palette.Window_text);
     }
 
 
@@ -665,9 +665,9 @@ public class ShareUserLine : Gtk.Widget {
     private Gdk.Pixbuf pixmap_for_sharee_type (Sharee.Type type, Gtk.Color background_color) {
         switch (type) {
         case Sharee.Type.ROOM:
-            return Ui.IconUtils.pixmap_for_background ("talk-app.svg", background_color);
+            return IconUtils.pixmap_for_background ("talk-app.svg", background_color);
         case Sharee.Type.EMAIL:
-            return Ui.IconUtils.pixmap_for_background ("email.svg", background_color);
+            return IconUtils.pixmap_for_background ("email.svg", background_color);
         case Sharee.Type.GROUP:
         case Sharee.Type.FEDERATED:
         case Sharee.Type.CIRCLE:
@@ -682,14 +682,14 @@ public class ShareUserLine : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void show_note_options (bool show) {
-        this.ui.note_label.visible (show);
-        this.ui.note_text_edit.visible (show);
-        this.ui.note_confirm_button.visible (show);
+        this.instance.note_label.visible (show);
+        this.instance.note_text_edit.visible (show);
+        this.instance.note_confirm_button.visible (show);
 
         if (show) {
             const var note = this.share.note;
-            this.ui.note_text_edit.on_signal_text (note);
-            this.ui.note_text_edit.focus ();
+            this.instance.note_text_edit.on_signal_text (note);
+            this.instance.note_text_edit.focus ();
         }
 
         /* emit */ resize_requested ();
@@ -711,7 +711,7 @@ public class ShareUserLine : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_note_confirm_button_clicked () {
-        this.note = this.ui.note_text_edit.to_plain_text ();
+        this.note = this.instance.note_text_edit.to_plain_text ();
     }
 
 
@@ -746,16 +746,16 @@ public class ShareUserLine : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void show_expire_date_options (bool show, QDate initial_date = new QDate ()) {
-        this.ui.expiration_label.visible (show);
-        this.ui.calendar.visible (show);
+        this.instance.expiration_label.visible (show);
+        this.instance.calendar.visible (show);
 
         if (show) {
-            this.ui.calendar.minimum_date (QDate.current_date ().add_days (1));
-            this.ui.calendar.date (initial_date.is_valid () ? initial_date : this.ui.calendar.minimum_date ());
-            this.ui.calendar.focus ();
+            this.instance.calendar.minimum_date (QDate.current_date ().add_days (1));
+            this.instance.calendar.date (initial_date.is_valid () ? initial_date : this.instance.calendar.minimum_date ());
+            this.instance.calendar.focus ();
 
             if (enforce_expiration_date_for_share (this.share.share_type)) {
-                this.ui.calendar.maximum_date (max_expiration_date_for_share (this.share.share_type, this.ui.calendar.maximum_date ()));
+                this.instance.calendar.maximum_date (max_expiration_date_for_share (this.share.share_type, this.instance.calendar.maximum_date ()));
                 this.expiration_date_link_action.checked (true);
                 this.expiration_date_link_action.enabled (false);
             }
@@ -769,7 +769,7 @@ public class ShareUserLine : Gtk.Widget {
     ***********************************************************/
     private void on_signal_expire_date () {
         enable_progess_indicator_animation (true);
-        this.share.on_signal_expire_date (this.ui.calendar.date ());
+        this.share.on_signal_expire_date (this.instance.calendar.date ());
     }
 
 
@@ -777,14 +777,14 @@ public class ShareUserLine : Gtk.Widget {
     ***********************************************************/
     private void toggle_password_progress_animation (bool show) {
         // button and progress indicator are interchanged depending on if the network request is in progress or not
-        this.ui.confirm_password.visible (!show && this.password_protect_link_action.is_checked ());
-        this.ui.password_progress_indicator.visible (show);
+        this.instance.confirm_password.visible (!show && this.password_protect_link_action.is_checked ());
+        this.instance.password_progress_indicator.visible (show);
         if (show) {
-            if (!this.ui.password_progress_indicator.is_animated ()) {
-                this.ui.password_progress_indicator.on_signal_start_animation ();
+            if (!this.instance.password_progress_indicator.is_animated ()) {
+                this.instance.password_progress_indicator.on_signal_start_animation ();
             }
         } else {
-            this.ui.password_progress_indicator.on_signal_stop_animation ();
+            this.instance.password_progress_indicator.on_signal_stop_animation ();
         }
     }
 
@@ -793,11 +793,11 @@ public class ShareUserLine : Gtk.Widget {
     ***********************************************************/
     private void enable_progess_indicator_animation (bool enable) {
         if (enable) {
-            if (!this.ui.progress_indicator.is_animated ()) {
-                this.ui.progress_indicator.on_signal_start_animation ();
+            if (!this.instance.progress_indicator.is_animated ()) {
+                this.instance.progress_indicator.on_signal_start_animation ();
             }
         } else {
-            this.ui.progress_indicator.on_signal_stop_animation ();
+            this.instance.progress_indicator.on_signal_stop_animation ();
         }
     }
 
@@ -859,7 +859,7 @@ public class ShareUserLine : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void calculate_background_based_on_signal_text () {
-        const QCryptographicHash hash = QCryptographicHash.hash (this.ui.shared_with.text ().to_utf8 (), QCryptographicHash.Md5);
+        const QCryptographicHash hash = QCryptographicHash.hash (this.instance.shared_with.text ().to_utf8 (), QCryptographicHash.Md5);
         //  Q_ASSERT (hash.size () > 0);
         if (hash.size () == 0) {
             GLib.warning ("Failed to calculate hash color for share: " + this.share.path);

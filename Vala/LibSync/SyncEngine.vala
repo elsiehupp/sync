@@ -88,7 +88,7 @@ public class SyncEngine : GLib.Object {
     public string local_path { public get; private set; }
     private string remote_path;
     private string remote_root_etag;
-    public SyncJournalDb journal { public get; private set; }
+    public Common.SyncJournalDb journal { public get; private set; }
     private QScopedPointer<DiscoveryPhase> discovery_phase;
     private unowned OwncloudPropagator propagator;
 
@@ -109,7 +109,7 @@ public class SyncEngine : GLib.Object {
     ***********************************************************/
     public ExcludedFiles excluded_files { public get; private set; }
     public SyncFileStatusTracker sync_file_status_tracker { public get; private set; }
-    public Utility.StopWatch stop_watch { public get; private set; }
+    public Common.Utility.StopWatch stop_watch { public get; private set; }
 
 
     /***********************************************************
@@ -267,7 +267,7 @@ public class SyncEngine : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public SyncEngine.for_account (Account account, string local_path,
-        string remote_path, SyncJournalDb journal) {
+        string remote_path, Common.SyncJournalDb journal) {
         this.account = account;
         this.needs_update = false;
         this.sync_running = false;
@@ -321,7 +321,7 @@ public class SyncEngine : GLib.Object {
     ***********************************************************/
     public void on_signal_start_sync () {
         if (this.journal.exists ()) {
-            GLib.List<SyncJournalDb.PollInfo> poll_infos = this.journal.get_poll_infos ();
+            GLib.List<Common.SyncJournalDb.PollInfo> poll_infos = this.journal.get_poll_infos ();
             if (!poll_infos == "") {
                 GLib.info ("Finish Poll jobs before starting a sync");
                 var cleanup_polls_job = new CleanupPollsJob (
@@ -369,7 +369,7 @@ public class SyncEngine : GLib.Object {
 
         // Check free size on disk first.
         int64 min_free = critical_free_space_limit ();
-        int64 free_bytes = Utility.free_disk_space (this.local_path);
+        int64 free_bytes = Common.Utility.free_disk_space (this.local_path);
         if (free_bytes >= 0) {
             if (free_bytes < min_free) {
                 GLib.warning ("Too little space available at" + this.local_path + ". Have"
@@ -377,10 +377,10 @@ public class SyncEngine : GLib.Object {
                 this.another_sync_needed = AnotherSyncNeeded.DELAYED_FOLLOW_UP;
                 /* Q_EMIT */ signal_sync_error (
                     _("Only %1 are available, need at least %2 to start"
-                    + "Placeholders are postfixed with file sizes using Utility.octets_to_string ()")
+                    + "Placeholders are postfixed with file sizes using Common.Utility.octets_to_string ()")
                         .printf (
-                            Utility.octets_to_string (free_bytes),
-                            Utility.octets_to_string (min_free)));
+                            Common.Utility.octets_to_string (free_bytes),
+                            Common.Utility.octets_to_string (min_free)));
                 on_signal_finalize (false);
                 return;
             } else {
@@ -405,7 +405,7 @@ public class SyncEngine : GLib.Object {
         version_string.append (q_version ());
 
         version_string.append (" SSL library ").append (QSslSocket.ssl_library_version_string ().to_utf8 ());
-        version_string.append (" on ").append (Utility.platform_name ());
+        version_string.append (" on ").append (Common.Utility.platform_name ());
         GLib.info (version_string);
 
         // This creates the DB if it does not exist yet.
@@ -433,7 +433,7 @@ public class SyncEngine : GLib.Object {
         }
 
         bool ok = false;
-        var selective_sync_block_list = this.journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
+        var selective_sync_block_list = this.journal.get_selective_sync_list (Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
         if (ok) {
             bool using_selective_sync = (!selective_sync_block_list == "");
             GLib.info (using_selective_sync ? "Using Selective Sync": "NOT Using Selective Sync");
@@ -472,7 +472,7 @@ public class SyncEngine : GLib.Object {
         this.discovery_phase.sync_options = this.sync_options;
         this.discovery_phase.local_discovery_delegate = this.local_discovery_delegate;
         this.discovery_phase.selective_sync_block_list (selective_sync_block_list);
-        this.discovery_phase.selective_sync_allow_list (this.journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, ok));
+        this.discovery_phase.selective_sync_allow_list (this.journal.get_selective_sync_list (Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, ok));
         if (!ok) {
             GLib.warning ("Unable to read selective sync list; aborting.");
             /* Q_EMIT */ signal_sync_error (_("Unable to read from the sync journal."));
@@ -701,7 +701,7 @@ public class SyncEngine : GLib.Object {
     Note that hydrated* placeholder files might still be left. These will
     get cleaned up by Vfs.unregister_folder ().
     ***********************************************************/
-    public static void wipe_virtual_files (string local_path, SyncJournalDb journal, Vfs vfs) {
+    public static void wipe_virtual_files (string local_path, Common.SyncJournalDb journal, Vfs vfs) {
         GLib.info ("Wiping virtual files inside " + local_path);
         journal.get_files_below_path (
             "",
@@ -735,7 +735,7 @@ public class SyncEngine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static void switch_to_virtual_files (string local_path, SyncJournalDb journal, Vfs vfs) {
+    public static void switch_to_virtual_files (string local_path, Common.SyncJournalDb journal, Vfs vfs) {
         GLib.info ("Convert to virtual files inside" + local_path);
         journal.get_files_below_path (
             {},
@@ -803,7 +803,7 @@ public class SyncEngine : GLib.Object {
     When the discovery phase discovers an item
     ***********************************************************/
     private void on_signal_item_discovered (SyncFileItem item) {
-        if (Utility.is_conflict_file (item.file)) {
+        if (Common.Utility.is_conflict_file (item.file)) {
             this.seen_conflict_files.insert (item.file);
         }
         if (item.instruction == CSync.SyncInstructions.UPDATE_METADATA && !item.is_directory ()) {
@@ -872,7 +872,7 @@ public class SyncEngine : GLib.Object {
             return;
         } else if (item.instruction == CSync.SyncInstructions.NONE) {
             this.has_none_files = true;
-            if (this.account.capabilities.upload_conflict_files () && Utility.is_conflict_file (item.file)) {
+            if (this.account.capabilities.upload_conflict_files () && Common.Utility.is_conflict_file (item.file)) {
                 // For uploaded conflict files, files with no action performed on them should
                 // be displayed : but we mustn't overwrite the instruction if something happens
                 // to the file!
@@ -1199,7 +1199,7 @@ public class SyncEngine : GLib.Object {
         on_signal_summary_error (
             _("Disk space is low : Downloads that would reduce free space "
             + "below %1 were skipped.")
-                .printf (Utility.octets_to_string (free_space_limit ())));
+                .printf (Common.Utility.octets_to_string (free_space_limit ())));
     }
 
 
@@ -1238,7 +1238,7 @@ public class SyncEngine : GLib.Object {
         item.has_blocklist_entry = true;
 
         // If duration has expired, it's not blocklisted anymore
-        time_t now = Utility.q_date_time_to_time_t (GLib.DateTime.current_date_time_utc ());
+        time_t now = Common.Utility.q_date_time_to_time_t (GLib.DateTime.current_date_time_utc ());
         if (now >= entry.last_try_time + entry.ignore_duration) {
             GLib.info ("blocklist entry for " + item.file + " has expired!");
             return false;
@@ -1279,7 +1279,7 @@ public class SyncEngine : GLib.Object {
         item.instruction = CSync.SyncInstructions.IGNORE;
         item.status = SyncFileItem.Status.BLOCKLISTED_ERROR;
 
-        var wait_seconds_str = Utility.duration_to_descriptive_string1 (1000 * wait_seconds);
+        var wait_seconds_str = Common.Utility.duration_to_descriptive_string1 (1000 * wait_seconds);
         item.error_string = _("%1 (skipped due to earlier error, trying again in %2)").printf (entry.error_string, wait_seconds_str);
 
         if (entry.error_category == SyncJournalErrorBlocklistRecord.INSUFFICIENT_REMOTE_STORAGE) {
@@ -1306,9 +1306,9 @@ public class SyncEngine : GLib.Object {
         }
 
         // Delete from journal and from filesystem.
-        const GLib.List<SyncJournalDb.DownloadInfo> deleted_infos =
+        const GLib.List<Common.SyncJournalDb.DownloadInfo> deleted_infos =
             this.journal.get_and_delete_stale_download_infos (download_file_paths);
-        foreach (SyncJournalDb.DownloadInfo deleted_info in deleted_infos) {
+        foreach (Common.SyncJournalDb.DownloadInfo deleted_info in deleted_infos) {
             const string temporary_path = this.propagator.full_local_path (deleted_info.temporaryfile);
             GLib.info ("Deleting stale temporary file: " + temporary_path);
             FileSystem.remove (temporary_path);
@@ -1338,7 +1338,7 @@ public class SyncEngine : GLib.Object {
             foreach (uint32 transfer_identifier in ids) {
                 if (!transfer_identifier)
                     continue; // Was not a chunked upload
-                GLib.Uri url = Utility.concat_url_path (account.url, "remote.php/dav/uploads/" + account.dav_user + "/" + string.number (transfer_identifier));
+                GLib.Uri url = Common.Utility.concat_url_path (account.url, "remote.php/dav/uploads/" + account.dav_user + "/" + string.number (transfer_identifier));
                 (new KeychainChunkDeleteJob (account, url, this)).start ();
             }
         }
@@ -1389,13 +1389,13 @@ public class SyncEngine : GLib.Object {
         // This happens when the conflicts table is new or when conflict files
         // are downlaoded but the server doesn't send conflict headers.
         foreach (var path in q_as_const (this.seen_conflict_files)) {
-            //  ASSERT (Utility.is_conflict_file (path));
+            //  ASSERT (Common.Utility.is_conflict_file (path));
 
             var bapath = path.to_utf8 ();
             if (!conflict_record_paths.contains (bapath)) {
                 ConflictRecord record;
                 record.path = bapath;
-                var base_path = Utility.conflict_file_base_name_from_pattern (bapath);
+                var base_path = Common.Utility.conflict_file_base_name_from_pattern (bapath);
                 record.initial_base_path = base_path;
 
                 // Determine fileid of target file

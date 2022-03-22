@@ -411,9 +411,9 @@ public class ProcessDirectoryJob : GLib.Object {
             if (!error_message == "") {
                 SyncFileItem item = SyncFileItem.create ();
                 if (entry.local_entry.is_directory) {
-                    item.type = CSyncEnums.ItemType.DIRECTORY;
+                    item.type = ItemType.DIRECTORY;
                 } else {
-                    item.type = CSyncEnums.ItemType.FILE;
+                    item.type = ItemType.FILE;
                 }
                 item.file = path.target;
                 item.original_file = path.target;
@@ -1106,7 +1106,7 @@ public class ProcessDirectoryJob : GLib.Object {
         string original_path_adjusted = this.discovery_data.adjust_renamed_path (original_path, SyncFileItem.Direction.UP);
 
         if (!base_record.is_directory ()) {
-            CSyncFileStatT buf;
+            CSync.FileStat buf;
             if (csync_vio_local_stat (this.discovery_data.local_dir + original_path_adjusted, buf)) {
                 GLib.info ("Local file does not exist anymore. " + original_path_adjusted);
                 return;
@@ -1508,9 +1508,9 @@ public class ProcessDirectoryJob : GLib.Object {
             return;
         }
 
-        var is_folder_pin_state_online_only = (folder_pin_state.is_valid () && *folder_pin_state == Vfs.ItemAvailability.ONLINE_ONLY);
+        var is_folder_pin_state_online_only = (folder_pin_state.is_valid () && *folder_pin_state == Common.ItemAvailability.ONLINE_ONLY);
 
-        var isfolder_place_holder_availability_online_only = (folder_place_holder_availability.is_valid () && *folder_place_holder_availability == Vfs.ItemAvailability.ONLINE_ONLY);
+        var isfolder_place_holder_availability_online_only = (folder_place_holder_availability.is_valid () && *folder_place_holder_availability == Common.ItemAvailability.ONLINE_ONLY);
 
         // a folder is considered online-only if : no files are hydrated, or, if it's an empty folder
         var is_online_only_folder = isfolder_place_holder_availability_online_only || (!folder_place_holder_availability && is_folder_pin_state_online_only);
@@ -2200,8 +2200,8 @@ public class ProcessDirectoryJob : GLib.Object {
         if (!pin || *pin == PinState.PinState.INHERITED)
             pin = this.pin_state;
 
-        // Vfs.ItemAvailability.ONLINE_ONLY hydrated files want to be dehydrated
-        if (record.type == ItemType.FILE && *pin == Vfs.ItemAvailability.ONLINE_ONLY)
+        // Common.ItemAvailability.ONLINE_ONLY hydrated files want to be dehydrated
+        if (record.type == ItemType.FILE && *pin == Common.ItemAvailability.ONLINE_ONLY)
             record.type = ItemType.VIRTUAL_FILE_DEHYDRATION;
 
         // PinState.ALWAYS_LOCAL dehydrated files want to be hydrated

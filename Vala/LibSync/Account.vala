@@ -1,45 +1,18 @@
-/***********************************************************
-@author Daniel Molkentin <danimo@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <deletejob.h>
-//  #include <QNetworkAccessMana
-//  #include <QSslSocket>
-//  #include <QNetworkCo
-//  #include <QNetw
-//  #include <GLib.FileInfo>
-//  #include <GLib.Dir>
-//  #include <QSslKey>
-//  #include <QAuthenticat
-//  #include <QStandardPa
-//  #include <QJsonDocument>
-//  #include <QJsonObject>
-//  #include <QJsonArray>
-//  #include <QHttpMultiPart>
-//  #include <qt5keychain/keychain.h>
-
-//  using QKeychain;
-
-//  #include <QSslSocket>
-//  #include <QSslConfiguration>
-
-//  #ifndef TOKEN_AUTH_ONLY
-//  #endif
-
-//  #include <memory>
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class Account
+
 @brief The Account class represents an account on an
 ownCloud Server
-@ingroup libsync
 
 The Account has a name and url. It also has information
 about credentials, SSL errors and certificates.
+
+@author Daniel Molkentin <danimo@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class Account : GLib.Object {
 

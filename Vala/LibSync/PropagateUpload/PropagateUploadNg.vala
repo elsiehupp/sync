@@ -115,7 +115,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
     public new void do_start_upload () {
         this.propagator.active_job_list.append (this);
 
-        const SyncJournalDb.UploadInfo progress_info = this.propagator.journal.get_upload_info (this.item.file);
+        const Common.SyncJournalDb.UploadInfo progress_info = this.propagator.journal.get_upload_info (this.item.file);
         GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
             GLib.warning ("Invalid modified time " + this.item.file + this.item.modtime);
@@ -171,7 +171,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
         this.propagator.report_progress (*this.item, 0);
 
-        SyncJournalDb.UploadInfo pi;
+        Common.SyncJournalDb.UploadInfo pi;
         pi.valid = true;
         pi.transferid = this.transfer_identifier;
         GLib.assert (this.item.modtime > 0);

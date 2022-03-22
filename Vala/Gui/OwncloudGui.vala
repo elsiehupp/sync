@@ -267,7 +267,7 @@ public class OwncloudGui : GLib.Object {
             status_text (_("Signed out"));
             return;
         } else if (all_paused) {
-            this.tray.icon (Theme.sync_state_icon (SyncResult.Status.PAUSED, true));
+            this.tray.icon (Theme.sync_state_icon (LibSync.SyncResult.Status.PAUSED, true));
             this.tray.tool_tip (_("Account synchronization is disabled"));
             status_text (_("Synchronization is paused"));
             return;
@@ -278,20 +278,20 @@ public class OwncloudGui : GLib.Object {
         FolderMan folder_man = FolderMan.instance;
         Folder.Map map = folder_man.map ();
 
-        SyncResult.Status overall_status = SyncResult.Status.UNDEFINED;
+        LibSync.SyncResult.Status overall_status = LibSync.SyncResult.Status.UNDEFINED;
         bool has_unresolved_conflicts = false;
         FolderMan.tray_overall_status (map.values (), overall_status, has_unresolved_conflicts);
 
         // If the sync succeeded but there are unresolved conflicts,
         // show the problem icon!
         var icon_status = overall_status;
-        if (icon_status == SyncResult.Status.SUCCESS && has_unresolved_conflicts) {
-            icon_status = SyncResult.Status.PROBLEM;
+        if (icon_status == LibSync.SyncResult.Status.SUCCESS && has_unresolved_conflicts) {
+            icon_status = LibSync.SyncResult.Status.PROBLEM;
         }
 
         // If we don't get a status for whatever reason, that's a Problem
-        if (icon_status == SyncResult.Status.UNDEFINED) {
-            icon_status = SyncResult.Status.PROBLEM;
+        if (icon_status == LibSync.SyncResult.Status.UNDEFINED) {
+            icon_status = LibSync.SyncResult.Status.PROBLEM;
         }
 
         Gtk.Icon status_icon = Theme.sync_state_icon (icon_status, true);
@@ -311,13 +311,13 @@ public class OwncloudGui : GLib.Object {
     //  #endif
             this.tray.tool_tip (tray_message);
 
-            if (overall_status == SyncResult.Status.SUCCESS || overall_status == SyncResult.Status.PROBLEM) {
+            if (overall_status == LibSync.SyncResult.Status.SUCCESS || overall_status == LibSync.SyncResult.Status.PROBLEM) {
                 if (has_unresolved_conflicts) {
                     status_text (_("Unresolved conflicts"));
                 } else {
                     status_text (_("Up to date"));
                 }
-            } else if (overall_status == SyncResult.Status.PAUSED) {
+            } else if (overall_status == LibSync.SyncResult.Status.PAUSED) {
                 status_text (_("Synchronization is paused"));
             } else {
                 status_text (_("Error during synchronization"));
@@ -509,10 +509,10 @@ public class OwncloudGui : GLib.Object {
 
         GLib.info ("Sync state changed for folder " + folder.remote_url ().to_string () + ": " + result.status_string);
 
-        if (result.status () == SyncResult.Status.SUCCESS
-            || result.status () == SyncResult.Status.PROBLEM
-            || result.status () == SyncResult.Status.SYNC_ABORT_REQUESTED
-            || result.status () == SyncResult.Status.ERROR) {
+        if (result.status () == LibSync.SyncResult.Status.SUCCESS
+            || result.status () == LibSync.SyncResult.Status.PROBLEM
+            || result.status () == LibSync.SyncResult.Status.SYNC_ABORT_REQUESTED
+            || result.status () == LibSync.SyncResult.Status.ERROR) {
             Logger.instance.on_signal_enter_next_log_file ();
         }
     }

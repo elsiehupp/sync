@@ -13,7 +13,7 @@
 namespace Occ {
 namespace LibSync {
 
-public class VfsXAttr : AbstractVfs {
+public class VfsXAttr : Common.AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
@@ -24,7 +24,7 @@ public class VfsXAttr : AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
-    public AbstractVfs.Mode mode () {
+    public Common.AbstractVfs.Mode mode () {
         return XAttr;
     }
 
@@ -148,7 +148,7 @@ public class VfsXAttr : AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
-    public bool stat_type_virtual_file (CSyncFileStatT stat, void stat_data) {
+    public bool stat_type_virtual_file (CSync.FileStat stat, void stat_data) {
         if (stat.type == ItemType.DIRECTORY) {
             return false;
         }
@@ -170,7 +170,7 @@ public class VfsXAttr : AbstractVfs {
             stat.type = should_download ? ItemType.VIRTUAL_FILE_DOWNLOAD : ItemType.VIRTUAL_FILE;
             return true;
         } else {
-            var should_dehydrate = pin && (*pin == Vfs.ItemAvailability.ONLINE_ONLY);
+            var should_dehydrate = pin && (*pin == Common.ItemAvailability.ONLINE_ONLY);
             if (should_dehydrate) {
                 stat.type = ItemType.VIRTUAL_FILE_DEHYDRATION;
                 return true;

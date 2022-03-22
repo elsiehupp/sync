@@ -139,7 +139,7 @@ public class OCUpdater : Updater {
     ***********************************************************/
     public bool perform_update () {
         ConfigFile config;
-        QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
+        GLib.Settings settings = new GLib.Settings (config.config_file (), GLib.Settings.IniFormat);
         string update_file = settings.value (update_available_c).to_string ();
         if (!update_file == "" && GLib.File (update_file).exists ()
             && !update_succeeded () /* Someone might have run the updater manually between restarts */) {
@@ -220,7 +220,7 @@ public class OCUpdater : Updater {
     ***********************************************************/
     public void on_signal_start_installer () {
         ConfigFile config;
-        QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
+        GLib.Settings settings = new GLib.Settings (config.config_file (), GLib.Settings.IniFormat);
         string update_file = settings.value (update_available_c).to_string ();
         settings.value (auto_update_attempted_c, true);
         settings.sync ();
@@ -334,7 +334,7 @@ public class OCUpdater : Updater {
     ***********************************************************/
     protected bool update_succeeded () {
         ConfigFile config;
-        QSettings settings = new QSettings (config.config_file (), QSettings.IniFormat);
+        GLib.Settings settings = new GLib.Settings (config.config_file (), GLib.Settings.IniFormat);
 
         int64 target_version_int = Helper.string_version_to_int (settings.value (update_target_version_c).to_string ());
         int64 current_version = Helper.current_version_to_int ();

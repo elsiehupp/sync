@@ -229,7 +229,7 @@ public class GETFileJob : AbstractNetworkJob {
     ***********************************************************/
     public void choked (bool c) {
         this.bandwidth_choked = c;
-        QMetaObject.invoke_method (this, "on_signal_ready_read", Qt.QueuedConnection);
+        GLib.Object.invoke_method (this, "on_signal_ready_read", Qt.QueuedConnection);
     }
 
 
@@ -237,7 +237,7 @@ public class GETFileJob : AbstractNetworkJob {
     ***********************************************************/
     public void bandwidth_limited (bool b) {
         this.bandwidth_limited = b;
-        QMetaObject.invoke_method (this, "on_signal_ready_read", Qt.QueuedConnection);
+        GLib.Object.invoke_method (this, "on_signal_ready_read", Qt.QueuedConnection);
     }
 
 
@@ -247,7 +247,7 @@ public class GETFileJob : AbstractNetworkJob {
     public void give_bandwidth_quota (int64 q) {
         this.bandwidth_quota = q;
         GLib.debug ("Got " + q + " bytes");
-        QMetaObject.invoke_method (this, "on_signal_ready_read", Qt.QueuedConnection);
+        GLib.Object.invoke_method (this, "on_signal_ready_read", Qt.QueuedConnection);
     }
 
 

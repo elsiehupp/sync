@@ -11,7 +11,7 @@ public class FakePostReply : GLib.InputStream {
 
     /***********************************************************
     ***********************************************************/
-    public std.unique_ptr<QIODevice> payload;
+    public QIODevice payload;
     public bool aborted = false;
     public bool redirect_to_policy = false;
     public bool redirect_to_token = false;
@@ -19,7 +19,7 @@ public class FakePostReply : GLib.InputStream {
     /***********************************************************
     ***********************************************************/
     public FakePostReply (Soup.Operation operation, Soup.Request request,
-        std.unique_ptr<QIODevice> payload_, GLib.Object parent) {
+        QIODevice payload_, GLib.Object parent) {
         base (parent);
         payload = std.move (payload_);
         set_request (request);
@@ -27,7 +27,7 @@ public class FakePostReply : GLib.InputStream {
         set_operation (operation);
         open (QIODevice.ReadOnly);
         payload.open (QIODevice.ReadOnly);
-        QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
+        GLib.Object.invoke_method (this, "respond", Qt.QueuedConnection);
     }
 
     public virtual void respond () {

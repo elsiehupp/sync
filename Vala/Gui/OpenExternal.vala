@@ -95,7 +95,7 @@ public class OpenExternal : GLib.Object {
         }
     }
 
-} // class Utility
+} // class OpenExternal
 
 } // namespace Ui
 } // namespace Occ

@@ -5,7 +5,7 @@
 ***********************************************************/
 
 //  #include <QDesktopServices>
-//  #include <QBuffer>
+//  #include <GLib.OutputStream>
 //  #include <QJsonObject>
 //  #include <QJsonDocument>
 
@@ -128,7 +128,7 @@ public class OAuth : GLib.Object {
         // We just added the Authorization header, don't let HttpCredentialsAccessManager tamper with it
         req.attribute (HttpCredentials.DontAddCredentialsAttribute, true);
 
-        var request_body = new QBuffer ();
+        var request_body = new GLib.OutputStream ();
         QUrlQuery arguments = new QUrlQuery (
             "grant_type=authorization_code&code=%1&redirect_uri=http://localhost:%2"
                 .printf (code, string.number (this.server.server_port ())));

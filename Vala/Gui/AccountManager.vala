@@ -88,7 +88,7 @@ public class AccountManager : GLib.Object {
         backward_migration_settings_keys (skip_settings_keys, skip_settings_keys);
 
         var settings = ConfigFile.settings_with_group (ACCOUNTS_C);
-        if (settings.status () != QSettings.NoError || !settings.is_writable ()) {
+        if (settings.status () != GLib.Settings.NoError || !settings.is_writable ()) {
             GLib.warning ("Could not read settings from "
                          + settings.filename ()
                          + settings.status ());
@@ -247,7 +247,7 @@ public class AccountManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     // saving and loading Account to settings
-    private void save_account_helper (Account account, QSettings settings, bool save_credentials = true) {
+    private void save_account_helper (Account account, GLib.Settings settings, bool save_credentials = true) {
         settings.value (VERSION_C, MAX_ACCOUNT_VERSION);
         settings.value (URL_C, acc.url.to_string ());
         settings.value (DAV_USER_C, acc.dav_user);
@@ -297,7 +297,7 @@ public class AccountManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private unowned Account load_account_helper (QSettings settings) {
+    private unowned Account load_account_helper (GLib.Settings settings) {
         var url_config = settings.value (URL_C);
         if (!url_config.is_valid ()) {
             // No URL probably means a corrupted entry in the account settings
@@ -395,7 +395,7 @@ public class AccountManager : GLib.Object {
 
             GLib.FileInfo file_info = new GLib.FileInfo (oc_config_file);
             if (file_info.is_readable ()) {
-                std.unique_ptr<QSettings> oc_settings = new QSettings (oc_config_file, QSettings.IniFormat);
+                GLib.Settings oc_settings = new GLib.Settings (oc_config_file, GLib.Settings.IniFormat);
                 oc_settings.begin_group ("own_cloud");
 
                 // Check the theme url to see if it is the same url that the o_c config was for
@@ -515,16 +515,16 @@ public class AccountManager : GLib.Object {
     ***********************************************************/
     public static void on_signal_display_mnemonic (string mnemonic) {
         var widget = new Gtk.Dialog ();
-        Ui_Dialog ui;
-        ui.up_ui (widget);
+        Ui_Dialog instance;
+        instance.up_ui (widget);
         widget.window_title (_("End to end encryption mnemonic"));
-        ui.label.on_signal_text (_("To protect your Cryptographic Identity, we encrypt it with a mnemonic of 12 dictionary words. "
+        instance.label.on_signal_text (_("To protect your Cryptographic Identity, we encrypt it with a mnemonic of 12 dictionary words. "
                                  + "Please note these down and keep them safe. "
                                  + "They will be needed to add other devices to your account (like your mobile phone or laptop)."));
-        ui.text_edit.on_signal_text (mnemonic);
-        ui.text_edit.focus_widget ();
-        ui.text_edit.select_all ();
-        ui.text_edit.alignment (Qt.AlignCenter);
+        instance.text_edit.on_signal_text (mnemonic);
+        instance.text_edit.focus_widget ();
+        instance.text_edit.select_all ();
+        instance.text_edit.alignment (Qt.AlignCenter);
         widget.exec ();
         widget.resize (widget.size_hint ());
     }

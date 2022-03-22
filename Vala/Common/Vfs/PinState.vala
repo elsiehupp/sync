@@ -1,8 +1,5 @@
-/***********************************************************
-***********************************************************/
-
 namespace Occ {
-namespace Vfs {
+namespace Common {
 
 /***********************************************************
 @public enum PinState
@@ -20,7 +17,7 @@ parent path would do.
 The pin state of a directory usually only matters for the
 initial pin a hydration state of new remote files. It's
 perfectly possible for a PinState.ALWAYS_LOCAL directory to
-have only Vfs.ItemAvailability.ONLINE_ONLY items states is
+have only ItemAvailability.ONLINE_ONLY items states is
 usually done recursively, so one'd need to set the folder to
 pinned and then each contained item to unpinned)
 
@@ -79,7 +76,8 @@ public enum PinState {
     public static string vfs_pin_action_text () {
         return _("Make always available locally");
     }
-}
+
+} // enum PinState
 
 } // namespace Vfs
 } // namespace Occ

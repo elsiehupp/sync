@@ -24,7 +24,7 @@ public class TestPinStateLocals : AbstractTestSyncXAttr {
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         set_pin ("local", PinState.PinState.ALWAYS_LOCAL);
-        set_pin ("online", Vfs.ItemAvailability.ONLINE_ONLY);
+        set_pin ("online", Common.ItemAvailability.ONLINE_ONLY);
         set_pin ("unspec", PinState.PinState.UNSPECIFIED);
 
         fake_folder.local_modifier.insert ("file1");
@@ -55,12 +55,12 @@ public class TestPinStateLocals : AbstractTestSyncXAttr {
         // When a folder is renamed, the pin states inside should be retained
         fake_folder.local_modifier.rename ("online", "onlinerenamed1");
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_true (vfs.pin_state ("onlinerenamed1") == Vfs.ItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (vfs.pin_state ("onlinerenamed1") == Common.ItemAvailability.ONLINE_ONLY);
         GLib.assert_true (vfs.pin_state ("onlinerenamed1/file1rename") == PinState.PinState.UNSPECIFIED);
 
         fake_folder.remote_modifier ().rename ("onlinerenamed1", "onlinerenamed2");
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_true (vfs.pin_state ("onlinerenamed2") == Vfs.ItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (vfs.pin_state ("onlinerenamed2") == Common.ItemAvailability.ONLINE_ONLY);
         GLib.assert_true (vfs.pin_state ("onlinerenamed2/file1rename") == PinState.PinState.UNSPECIFIED);
 
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
@@ -70,10 +70,10 @@ public class TestPinStateLocals : AbstractTestSyncXAttr {
         GLib.assert_true (vfs.pin_state ("onlinerenamed2/file1rename") == PinState.PinState.UNSPECIFIED);
         fake_folder.remote_modifier ().remove ("onlinerenamed2/file1rename");
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_true (vfs.pin_state ("onlinerenamed2/file1rename") == Vfs.ItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (vfs.pin_state ("onlinerenamed2/file1rename") == Common.ItemAvailability.ONLINE_ONLY);
         fake_folder.remote_modifier ().insert ("onlinerenamed2/file1rename");
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_true (vfs.pin_state ("onlinerenamed2/file1rename") == Vfs.ItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (vfs.pin_state ("onlinerenamed2/file1rename") == Common.ItemAvailability.ONLINE_ONLY);
 
         // When a file is hydrated or dehydrated due to pin state it retains its pin state
         GLib.assert_true (vfs.set_pin_state ("onlinerenamed2/file1rename", PinState.PinState.ALWAYS_LOCAL));
@@ -82,12 +82,12 @@ public class TestPinStateLocals : AbstractTestSyncXAttr {
         GLib.assert_true (vfs.pin_state ("onlinerenamed2/file1rename") == PinState.PinState.ALWAYS_LOCAL);
 
         GLib.assert_true (vfs.set_pin_state ("onlinerenamed2", PinState.PinState.UNSPECIFIED));
-        GLib.assert_true (vfs.set_pin_state ("onlinerenamed2/file1rename", Vfs.ItemAvailability.ONLINE_ONLY));
+        GLib.assert_true (vfs.set_pin_state ("onlinerenamed2/file1rename", Common.ItemAvailability.ONLINE_ONLY));
         GLib.assert_true (fake_folder.sync_once ());
 
         xaverify_virtual (fake_folder, "onlinerenamed2/file1rename");
 
-        GLib.assert_true (vfs.pin_state ("onlinerenamed2/file1rename") == Vfs.ItemAvailability.ONLINE_ONLY);
+        GLib.assert_true (vfs.pin_state ("onlinerenamed2/file1rename") == Common.ItemAvailability.ONLINE_ONLY);
     }
 
 } // class TestPinStateLocals

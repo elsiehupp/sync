@@ -30,7 +30,7 @@ public class FakeGetWithDataReply : FakeReply {
         string filename = get_file_path_from_url (request.url);
         GLib.assert_true (!filename == "");
         file_info = remote_root_file_info.find (filename);
-        QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
+        GLib.Object.invoke_method (this, "respond", Qt.QueuedConnection);
 
         if (request.has_raw_header ("Range")) {
             const string range = request.raw_header ("Range").to_string ();

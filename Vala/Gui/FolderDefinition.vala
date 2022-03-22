@@ -16,7 +16,7 @@ namespace Ui {
 public class FolderDefinition : GLib.Object {
 
     /***********************************************************
-    The name of the folder in the ui and internally
+    The name of the folder in the instance and internally
     ***********************************************************/
     public string alias;
 
@@ -48,7 +48,7 @@ public class FolderDefinition : GLib.Object {
     /***********************************************************
     Which virtual files setting the folder uses
     ***********************************************************/
-    public AbstractVfs.Mode virtual_files_mode = Vfs.Off;
+    public Common.AbstractVfs.Mode virtual_files_mode = Vfs.Off;
 
     /***********************************************************
     The CLSID where this folder appears in registry for the Explorer navigation pane entry.
@@ -63,14 +63,14 @@ public class FolderDefinition : GLib.Object {
     /***********************************************************
     Saves the folder definition into the current settings group.
     ***********************************************************/
-    public static void save (QSettings settings, FolderDefinition folder) {
+    public static void save (GLib.Settings settings, FolderDefinition folder) {
         settings.value ("local_path", folder.local_path);
         settings.value ("journal_path", folder.journal_path);
         settings.value ("target_path", folder.target_path);
         settings.value ("paused", folder.paused);
         settings.value ("ignore_hidden_files", folder.ignore_hidden_files);
 
-        settings.value ("virtual_files_mode", AbstractVfs.Mode.to_string (folder.virtual_files_mode));
+        settings.value ("virtual_files_mode", Common.AbstractVfs.Mode.to_string (folder.virtual_files_mode));
 
         // Ensure new vfs modes won't be attempted by older clients
         if (folder.virtual_files_mode == Vfs.WindowsCfApi) {
@@ -91,7 +91,7 @@ public class FolderDefinition : GLib.Object {
     /***********************************************************
     Reads a folder definition from the current settings group.
     ***********************************************************/
-    public static bool on_signal_load (QSettings settings, string alias,
+    public static bool on_signal_load (GLib.Settings settings, string alias,
         FolderDefinition folder) {
         folder.alias = FolderMan.unescape_alias (alias);
         folder.local_path = settings.value ("local_path").to_string ();
@@ -104,7 +104,7 @@ public class FolderDefinition : GLib.Object {
         folder.virtual_files_mode = Vfs.Off;
         string vfs_mode_string = settings.value ("virtual_files_mode").to_string ();
         if (!vfs_mode_string == "") {
-            if (var mode = AbstractVfs.Mode.from_string (vfs_mode_string)) {
+            if (var mode = Common.AbstractVfs.Mode.from_string (vfs_mode_string)) {
                 folder.virtual_files_mode = *mode;
             } else {
                 GLib.warning ("Unknown virtual_files_mode:" + vfs_mode_string + "assuming 'off'";

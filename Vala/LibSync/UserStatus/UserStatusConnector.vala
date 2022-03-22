@@ -12,17 +12,17 @@
 namespace Occ {
 namespace LibSync {
 
-abstract class UserStatusConnector : GLib.Object {
+public abstract class UserStatusConnector : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
     public enum Error {
-        CouldNotFetchUserStatus,
-        CouldNotFetchPredefinedUserStatuses,
-        UserStatusNotSupported,
-        EmojisNotSupported,
-        CouldNotSetUserStatus,
-        CouldNotClearMessage
+        COULD_NOT_FETCH_USER_STATUS,
+        COULD_NOT_FETCH_PREDEFINED_USER_STATUSES,
+        USER_STATUS_NOT_SUPPORTED,
+        EMOJIS_NOT_SUPPORTED,
+        COULD_NOT_SET_USER_STATUS,
+        COULD_NOT_CLEAR_MESSAGE
     }
 
     UserStatus user_status { public get; public set; }

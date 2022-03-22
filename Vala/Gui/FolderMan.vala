@@ -212,9 +212,10 @@ public class FolderMan : GLib.Object {
         this.socket_api = new SocketApi ();
 
         ConfigFile config;
-        std.chrono.milliseconds polltime = config.remote_poll_interval ();
-        GLib.info ("setting remote poll timer interval to " + polltime.count () + "msec");
-        this.etag_poll_timer.interval (polltime.count ());
+        // std.chrono.milliseconds polltime_in_microseconds
+        GLib.TimeSpan polltime_in_microseconds = config.remote_poll_interval ();
+        GLib.info ("setting remote poll timer interval to " + polltime_in_microseconds.count () + "msec");
+        this.etag_poll_timer.interval (polltime_in_microseconds.count ());
         this.etag_poll_timer.timeout.connect (
             this.on_signal_etag_poll_timer_timeout
         );
@@ -579,7 +580,7 @@ public class FolderMan : GLib.Object {
             return folder;
         }
 
-        QSettings settings = new QSettings (this.folder_config_path + '/' + escaped_alias, QSettings.IniFormat);
+        GLib.Settings settings = new GLib.Settings (this.folder_config_path + '/' + escaped_alias, GLib.Settings.IniFormat);
         GLib.info ("    . file path: " + settings.filename ());
 
         // Check if the filename is equal to the group setting. If not, use the group
@@ -721,38 +722,38 @@ public class FolderMan : GLib.Object {
     /***********************************************************
     Produce text for use in the tray tooltip
     ***********************************************************/
-    public static string tray_tooltip_status_string (SyncResult.Status sync_status, bool has_unresolved_conflicts, bool paused) {
+    public static string tray_tooltip_status_string (LibSync.SyncResult.Status sync_status, bool has_unresolved_conflicts, bool paused) {
         string folder_message;
         switch (sync_status) {
-        case SyncResult.Status.UNDEFINED:
+        case LibSync.SyncResult.Status.UNDEFINED:
             folder_message = _("Undefined State.");
             break;
-        case SyncResult.Status.NOT_YET_STARTED:
+        case LibSync.SyncResult.Status.NOT_YET_STARTED:
             folder_message = _("Waiting to on_signal_start syncing.");
             break;
-        case SyncResult.Status.SYNC_PREPARE:
+        case LibSync.SyncResult.Status.SYNC_PREPARE:
             folder_message = _("Preparing for sync.");
             break;
-        case SyncResult.Status.SYNC_RUNNING:
+        case LibSync.SyncResult.Status.SYNC_RUNNING:
             folder_message = _("Sync is running.");
             break;
-        case SyncResult.Status.SUCCESS:
-        case SyncResult.Status.PROBLEM:
+        case LibSync.SyncResult.Status.SUCCESS:
+        case LibSync.SyncResult.Status.PROBLEM:
             if (has_unresolved_conflicts) {
                 folder_message = _("Sync on_signal_finished with unresolved conflicts.");
             } else {
                 folder_message = _("Last Sync was successful.");
             }
             break;
-        case SyncResult.Status.ERROR:
+        case LibSync.SyncResult.Status.ERROR:
             break;
-        case SyncResult.Status.SETUP_ERROR:
+        case LibSync.SyncResult.Status.SETUP_ERROR:
             folder_message = _("Setup Error.");
             break;
-        case SyncResult.Status.SYNC_ABORT_REQUESTED:
+        case LibSync.SyncResult.Status.SYNC_ABORT_REQUESTED:
             folder_message = _("User Abort.");
             break;
-        case SyncResult.Status.PAUSED:
+        case LibSync.SyncResult.Status.PAUSED:
             folder_message = _("Sync is paused.");
             break;
             // no default case on purpose, check compiler warnings
@@ -769,8 +770,8 @@ public class FolderMan : GLib.Object {
     Compute status summarizing multiple folders
     ***********************************************************/
     public static void tray_overall_status (GLib.List<Folder> folders,
-        SyncResult.Status status, bool unresolved_conflicts) {
-        *status = SyncResult.Status.UNDEFINED;
+        LibSync.SyncResult.Status status, bool unresolved_conflicts) {
+        *status = LibSync.SyncResult.Status.UNDEFINED;
         *unresolved_conflicts = false;
 
         int count = folders.count ();
@@ -785,15 +786,15 @@ public class FolderMan : GLib.Object {
             if (folder) {
                 var sync_result = folder.sync_result;
                 if (folder.sync_paused) {
-                    *status = SyncResult.Status.PAUSED;
+                    *status = LibSync.SyncResult.Status.PAUSED;
                 } else {
-                    SyncResult.Status sync_status = sync_result.status ();
+                    LibSync.SyncResult.Status sync_status = sync_result.status ();
                     switch (sync_status) {
-                    case SyncResult.Status.UNDEFINED:
-                        *status = SyncResult.Status.ERROR;
+                    case LibSync.SyncResult.Status.UNDEFINED:
+                        *status = LibSync.SyncResult.Status.ERROR;
                         break;
-                    case SyncResult.Status.PROBLEM : // don't show the problem icon in tray.
-                        *status = SyncResult.Status.SUCCESS;
+                    case LibSync.SyncResult.Status.PROBLEM : // don't show the problem icon in tray.
+                        *status = LibSync.SyncResult.Status.SUCCESS;
                         break;
                     default:
                         *status = sync_status;
@@ -810,31 +811,31 @@ public class FolderMan : GLib.Object {
             int various = 0;
 
             foreach (Folder folder in folders) {
-                SyncResult folder_result = folder.sync_result;
+                LibSync.SyncResult folder_result = folder.sync_result;
                 if (folder.sync_paused) {
                     abort_or_paused_seen++;
                 } else {
-                    SyncResult.Status sync_status = folder_result.status ();
+                    LibSync.SyncResult.Status sync_status = folder_result.status ();
 
                     switch (sync_status) {
-                    case SyncResult.Status.UNDEFINED:
-                    case SyncResult.Status.NOT_YET_STARTED:
+                    case LibSync.SyncResult.Status.UNDEFINED:
+                    case LibSync.SyncResult.Status.NOT_YET_STARTED:
                         various++;
                         break;
-                    case SyncResult.Status.SYNC_PREPARE:
-                    case SyncResult.Status.SYNC_RUNNING:
+                    case LibSync.SyncResult.Status.SYNC_PREPARE:
+                    case LibSync.SyncResult.Status.SYNC_RUNNING:
                         run_seen++;
                         break;
-                    case SyncResult.Status.PROBLEM : // don't show the problem icon in tray.
-                    case SyncResult.Status.SUCCESS:
+                    case LibSync.SyncResult.Status.PROBLEM : // don't show the problem icon in tray.
+                    case LibSync.SyncResult.Status.SUCCESS:
                         good_seen++;
                         break;
-                    case SyncResult.Status.ERROR:
-                    case SyncResult.Status.SETUP_ERROR:
+                    case LibSync.SyncResult.Status.ERROR:
+                    case LibSync.SyncResult.Status.SETUP_ERROR:
                         errors_seen++;
                         break;
-                    case SyncResult.Status.SYNC_ABORT_REQUESTED:
-                    case SyncResult.Status.PAUSED:
+                    case LibSync.SyncResult.Status.SYNC_ABORT_REQUESTED:
+                    case LibSync.SyncResult.Status.PAUSED:
                         abort_or_paused_seen++;
                         // no default case on purpose, check compiler warnings
                     }
@@ -843,21 +844,21 @@ public class FolderMan : GLib.Object {
                     *unresolved_conflicts = true;
             }
             if (errors_seen > 0) {
-                *status = SyncResult.Status.ERROR;
+                *status = LibSync.SyncResult.Status.ERROR;
             } else if (abort_or_paused_seen > 0 && abort_or_paused_seen == count) {
                 // only if all folders are paused
-                *status = SyncResult.Status.PAUSED;
+                *status = LibSync.SyncResult.Status.PAUSED;
             } else if (run_seen > 0) {
-                *status = SyncResult.Status.SYNC_RUNNING;
+                *status = LibSync.SyncResult.Status.SYNC_RUNNING;
             } else if (good_seen > 0) {
-                *status = SyncResult.Status.SUCCESS;
+                *status = LibSync.SyncResult.Status.SUCCESS;
             }
         }
     }
 
 
     /***********************************************************
-    Escaping of the alias which is used in QSettings AND the
+    Escaping of the alias which is used in GLib.Settings AND the
     file system, thus need to be escaped.
     ***********************************************************/
     public static string escape_alias (string alias) {
@@ -1232,7 +1233,7 @@ public class FolderMan : GLib.Object {
         request_etag_job.destroyed.connect (
             this.on_signal_etag_job_destroyed
         );
-        QMetaObject.invoke_method (
+        GLib.Object.invoke_method (
             this,
             "on_signal_run_one_etag_job",
             Qt.QueuedConnection
@@ -1359,7 +1360,7 @@ public class FolderMan : GLib.Object {
     This delay is particularly useful to avoid late file change notifications
     (that we caused ourselves by syncing) from triggering another spurious sync.
     ***********************************************************/
-    private void on_signal_folder_sync_finished (SyncResult result) {
+    private void on_signal_folder_sync_finished (LibSync.SyncResult result) {
         var folder = qobject_cast<Folder> (sender ());
         //  ASSERT (folder);
         if (!folder)
@@ -1411,7 +1412,7 @@ public class FolderMan : GLib.Object {
     private void on_signal_etag_job_destroyed (GLib.Object object) {
         // this.current_etag_job is automatically cleared
         // maybe : remove from queue
-        QMetaObject.invoke_method (this, "on_signal_run_one_etag_job", Qt.QueuedConnection);
+        GLib.Object.invoke_method (this, "on_signal_run_one_etag_job", Qt.QueuedConnection);
     }
 
 
@@ -1577,7 +1578,7 @@ public class FolderMan : GLib.Object {
                 continue;
             }
 
-            var msecs_since_sync = folder.msec_since_last_sync ();
+            var msecs_since_sync = folder.microseconds_since_last_sync ();
 
             // Possibly it's just time for a new sync run
             bool force_sync_interval_expired = msecs_since_sync > ConfigFile ().force_sync_interval ();
@@ -1668,7 +1669,7 @@ public class FolderMan : GLib.Object {
     does not set an account on the new folder.
     ***********************************************************/
     private Folder add_folder_internal (FolderDefinition folder_definition,
-        AccountState account_state, std.unique_ptr<Vfs> vfs) {
+        AccountState account_state, AbstractVfs vfs) {
         var alias = folder_definition.alias;
         int count = 0;
         while (folder_definition.alias == ""
@@ -1791,7 +1792,7 @@ public class FolderMan : GLib.Object {
         // Require a pause based on the duration of the last sync run.
         Folder last_folder = this.last_sync_folder;
         if (last_folder) {
-            ms_since_last_sync = last_folder.msec_since_last_sync ().count ();
+            ms_since_last_sync = last_folder.microseconds_since_last_sync ().count ();
 
             //  1s   . 1.5s pause
             // 10s   . 5s pause
@@ -1875,7 +1876,7 @@ public class FolderMan : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void setup_folders_helper (QSettings settings, unowned AccountState account, string[] ignore_keys, bool backwards_compatible, bool folders_with_placeholders) {
+    private void setup_folders_helper (GLib.Settings settings, unowned AccountState account, string[] ignore_keys, bool backwards_compatible, bool folders_with_placeholders) {
         foreach (var folder_alias in settings.child_groups ()) {
             // Skip folders with too-new version
             settings.begin_group (folder_alias);
@@ -1971,8 +1972,8 @@ public class FolderMan : GLib.Object {
                     // Migrate the old "use_placeholders" setting to the root folder pin state
                     if (settings.value (VERSION_C, 1).to_int () == 1
                         && settings.value ("use_placeholders", false).to_bool ()) {
-                        GLib.info ("Migrate: From use_placeholders to Vfs.ItemAvailability.ONLINE_ONLY");
-                        folder.root_pin_state (Vfs.ItemAvailability.ONLINE_ONLY);
+                        GLib.info ("Migrate: From use_placeholders to Common.ItemAvailability.ONLINE_ONLY");
+                        folder.root_pin_state (Common.ItemAvailability.ONLINE_ONLY);
                     }
 
                     // Migration: Mark folders that shall be saved in a backwards-compatible way
@@ -2021,7 +2022,7 @@ public class FolderMan : GLib.Object {
     ***********************************************************/
     private void run_etag_job_if_possible (Folder folder) {
         const ConfigFile config = new ConfigFile ();
-        const var polltime = config.remote_poll_interval ();
+        const var polltime_in_microseconds = config.remote_poll_interval ();
 
         GLib.info ("Run etag job on folder " + folder);
 
@@ -2044,15 +2045,15 @@ public class FolderMan : GLib.Object {
             GLib.info ("Can not run etag job: Folder is busy.");
             return;
         }
-        // When not using push notifications, make sure polltime is reached
+        // When not using push notifications, make sure polltime_in_microseconds is reached
         if (!push_notifications_files_ready (folder.account_state.account)) {
-            if (folder.msec_since_last_sync () < polltime) {
+            if (folder.microseconds_since_last_sync () < polltime_in_microseconds) {
                 GLib.info ("Can not run etag job: Polltime not reached.");
                 return;
             }
         }
 
-        QMetaObject.invoke_method (
+        GLib.Object.invoke_method (
             folder,
             "on_signal_run_etag_job",
             Qt.QueuedConnection

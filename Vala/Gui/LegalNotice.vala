@@ -17,16 +17,16 @@ public class LegalNotice : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private Ui.LegalNotice ui;
+    private LegalNotice instance;
 
     /***********************************************************
     ***********************************************************/
     public LegalNotice (Gtk.Dialog parent = null) {
         base (parent);
-        this.ui = new Ui.LegalNotice ();
-        this.ui.up_ui (this);
+        this.instance = new LegalNotice ();
+        this.instance.up_ui (this);
 
-        this.ui.close_button.clicked.connect (
+        this.instance.close_button.clicked.connect (
             this.accept
         );
 
@@ -35,7 +35,7 @@ public class LegalNotice : Gtk.Dialog {
 
 
     override ~LegalNotice () {
-        delete this.ui;
+        delete this.instance;
     }
 
 
@@ -70,10 +70,10 @@ public class LegalNotice : Gtk.Dialog {
 
         Theme.replace_link_color_string_background_aware (notice);
 
-        this.ui.notice.text_interaction_flags (Qt.Text_selectable_by_mouse | Qt.TextBrowserInteraction);
-        this.ui.notice.on_signal_text (notice);
-        this.ui.notice.word_wrap (true);
-        this.ui.notice.open_external_links (true);
+        this.instance.notice.text_interaction_flags (Qt.Text_selectable_by_mouse | Qt.TextBrowserInteraction);
+        this.instance.notice.on_signal_text (notice);
+        this.instance.notice.word_wrap (true);
+        this.instance.notice.open_external_links (true);
     }
 
 } // class LegalNotice

@@ -123,7 +123,7 @@ public class PropagateItemJob : PropagatorJob {
         GLib.info ("Starting " + this.item.instruction + " propagation of " + this.item.destination () + " by " + this);
 
         this.state = Running;
-        QMetaObject.invoke_method (this, "start"); // We could be in a different thread (neon jobs)
+        GLib.Object.invoke_method (this, "start"); // We could be in a different thread (neon jobs)
         return true;
     }
 

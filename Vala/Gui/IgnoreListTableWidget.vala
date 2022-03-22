@@ -17,45 +17,45 @@ public class IgnoreListTableWidget : Gtk.Widget {
     const int read_only_rows = 3;
 
     private string read_only_tooltip;
-    private Ui.IgnoreListTableWidget ui;
+    private IgnoreListTableWidget instance;
 
     /***********************************************************
     ***********************************************************/
     public IgnoreListTableWidget (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
-        this.ui = new Ui.IgnoreListTableWidget ();
+        this.instance = new IgnoreListTableWidget ();
         window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
-        ui.up_ui (this);
+        instance.up_ui (this);
 
-        ui.description_label.on_signal_text (
+        instance.description_label.on_signal_text (
             _("Files or folders matching a pattern will not be synchronized.\n\n"
             + "Items where deletion is allowed will be deleted if they prevent a "
             + "directory from being removed. "
             + "This is useful for metadata.")
         );
 
-        ui.remove_push_button.enabled (false);
-        ui.table_widget.item_selection_changed.connect (
+        instance.remove_push_button.enabled (false);
+        instance.table_widget.item_selection_changed.connect (
             this.on_signal_item_selection_changed
         );
-        ui.remove_push_button.clicked.connect (
+        instance.remove_push_button.clicked.connect (
             this.on_signal_remove_current_item
         );
-        ui.add_push_button.clicked.connect (
+        instance.add_push_button.clicked.connect (
             this.on_signal_add_pattern
         );
-        ui.remove_all_push_button.clicked.connect (
+        instance.remove_all_push_button.clicked.connect (
             this.on_signal_remove_all_items
         );
 
-        ui.table_widget.resize_columns_to_contents ();
-        ui.table_widget.horizontal_header ().section_resize_mode (pattern_col, QHeaderView.Stretch);
-        ui.table_widget.vertical_header ().visible (false);
+        instance.table_widget.resize_columns_to_contents ();
+        instance.table_widget.horizontal_header ().section_resize_mode (pattern_col, QHeaderView.Stretch);
+        instance.table_widget.vertical_header ().visible (false);
     }
 
 
     ~IgnoreListTableWidget () {
-        delete ui;
+        delete instance;
     }
 
     /***********************************************************
@@ -82,17 +82,17 @@ public class IgnoreListTableWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public int add_pattern (string pattern, bool deletable, bool read_only) {
-        int new_row = ui.table_widget.row_count ();
-        ui.table_widget.row_count (new_row + 1);
+        int new_row = instance.table_widget.row_count ();
+        instance.table_widget.row_count (new_row + 1);
 
         var pattern_item = new QTableWidgetItem ();
         pattern_item.on_signal_text (pattern);
-        ui.table_widget.item (new_row, pattern_col, pattern_item);
+        instance.table_widget.item (new_row, pattern_col, pattern_item);
 
         var deletable_item = new QTableWidgetItem ();
         deletable_item.flags (Qt.ItemIsUserCheckable | Qt.ItemIsEnabled);
         deletable_item.check_state (deletable ? Qt.Checked : Qt.Unchecked);
-        ui.table_widget.item (new_row, deletable_col, deletable_item);
+        instance.table_widget.item (new_row, deletable_col, deletable_item);
 
         if (read_only) {
             pattern_item.flags (pattern_item.flags () ^ Qt.ItemIsEnabled);
@@ -100,7 +100,7 @@ public class IgnoreListTableWidget : Gtk.Widget {
             deletable_item.flags (deletable_item.flags () ^ Qt.ItemIsEnabled);
         }
 
-        ui.remove_all_push_button.enabled (true);
+        instance.remove_all_push_button.enabled (true);
 
         return new_row;
     }
@@ -109,7 +109,7 @@ public class IgnoreListTableWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public void on_signal_remove_all_items () {
-        ui.table_widget.row_count (0);
+        instance.table_widget.row_count (0);
     }
 
 
@@ -120,9 +120,9 @@ public class IgnoreListTableWidget : Gtk.Widget {
         if (ignores.open (QIODevice.WriteOnly)) {
             // rewrites the whole file since now the user can also remove system patterns
             GLib.File.resize (file, 0);
-            for (int row = 0; row < ui.table_widget.row_count (); ++row) {
-                QTableWidgetItem pattern_item = ui.table_widget.item (row, pattern_col);
-                QTableWidgetItem deletable_item = ui.table_widget.item (row, deletable_col);
+            for (int row = 0; row < instance.table_widget.row_count (); ++row) {
+                QTableWidgetItem pattern_item = instance.table_widget.item (row, pattern_col);
+                QTableWidgetItem deletable_item = instance.table_widget.item (row, deletable_col);
                 if (pattern_item.flags () & Qt.ItemIsEnabled) {
                     string prepend;
                     if (deletable_item.check_state () == Qt.Checked) {
@@ -154,23 +154,23 @@ public class IgnoreListTableWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_item_selection_changed () {
-        QTableWidgetItem item = ui.table_widget.current_item ();
+        QTableWidgetItem item = instance.table_widget.current_item ();
         if (!item) {
-            ui.remove_push_button.enabled (false);
+            instance.remove_push_button.enabled (false);
             return;
         }
 
         bool enable = item.flags () & Qt.ItemIsEnabled;
-        ui.remove_push_button.enabled (enable);
+        instance.remove_push_button.enabled (enable);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_signal_remove_current_item () {
-        ui.table_widget.remove_row (ui.table_widget.current_row ());
-        if (ui.table_widget.row_count () == read_only_rows)
-            ui.remove_all_push_button.enabled (false);
+        instance.table_widget.remove_row (instance.table_widget.current_row ());
+        if (instance.table_widget.row_count () == read_only_rows)
+            instance.remove_all_push_button.enabled (false);
     }
 
 
@@ -186,7 +186,7 @@ public class IgnoreListTableWidget : Gtk.Widget {
             return;
 
         add_pattern (pattern, false, false);
-        ui.table_widget.scroll_to_bottom ();
+        instance.table_widget.scroll_to_bottom ();
     }
 
 

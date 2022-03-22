@@ -17,7 +17,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    private Ui_Folder_wizard_target_page ui;
+    private Ui_Folder_wizard_target_page instance;
     private bool warn_was_visible;
     private unowned Account account;
     private GLib.Timeout lscol_timer;
@@ -29,25 +29,25 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
         base ();
         this.warn_was_visible = false;
         this.account = account;
-        this.ui.up_ui (this);
-        this.ui.warn_frame.hide ();
+        this.instance.up_ui (this);
+        this.instance.warn_frame.hide ();
 
-        this.ui.folder_tree_widget.sorting_enabled (true);
-        this.ui.folder_tree_widget.sort_by_column (0, Qt.AscendingOrder);
+        this.instance.folder_tree_widget.sorting_enabled (true);
+        this.instance.folder_tree_widget.sort_by_column (0, Qt.AscendingOrder);
 
-        this.ui.add_folder_button.clicked.connect (
+        this.instance.add_folder_button.clicked.connect (
             this.on_signal_add_remote_folder
         );
-        this.ui.refresh_button.clicked.connect (
+        this.instance.refresh_button.clicked.connect (
             this.on_signal_refresh_folders
         );
-        this.ui.folder_tree_widget.item_expanded.connect (
+        this.instance.folder_tree_widget.item_expanded.connect (
             this.on_signal_item_expanded
         );
-        this.ui.folder_tree_widget.current_item_changed.connect (
+        this.instance.folder_tree_widget.current_item_changed.connect (
             this.on_signal_current_item_changed
         );
-        this.ui.folder_entry.text_edited.connect (
+        this.instance.folder_entry.text_edited.connect (
             this.on_signal_folder_entry_edited
         );
 
@@ -57,20 +57,20 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
             this.on_signal_lscol_folder_entry
         );
 
-        this.ui.folder_tree_widget.header ().section_resize_mode (0, QHeaderView.ResizeToContents);
+        this.instance.folder_tree_widget.header ().section_resize_mode (0, QHeaderView.ResizeToContents);
         // Make sure that there will be a scrollbar when the contents is too wide
-        this.ui.folder_tree_widget.header ().stretch_last_section (false);
+        this.instance.folder_tree_widget.header ().stretch_last_section (false);
     }
 
     /***********************************************************
     ***********************************************************/
     public bool is_complete {
         public get {
-            if (!this.ui.folder_tree_widget.current_item ())
+            if (!this.instance.folder_tree_widget.current_item ())
                 return false;
 
             string[] warn_strings;
-            string directory = this.ui.folder_tree_widget.current_item ().data (0, Qt.USER_ROLE).to_string ();
+            string directory = this.instance.folder_tree_widget.current_item ().data (0, Qt.USER_ROLE).to_string ();
             if (!directory.starts_with ('/')) {
                 directory.prepend ('/');
             }
@@ -117,11 +117,11 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     ***********************************************************/
     protected void on_signal_show_warning (string message = "") {
         if (message == "") {
-            this.ui.warn_frame.hide ();
+            this.instance.warn_frame.hide ();
 
         } else {
-            this.ui.warn_frame.show ();
-            this.ui.warn_label.on_signal_text (message);
+            this.instance.warn_frame.show ();
+            this.instance.warn_label.on_signal_text (message);
         }
     }
 
@@ -129,7 +129,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_add_remote_folder () {
-        QTreeWidgetItem current = this.ui.folder_tree_widget.current_item ();
+        QTreeWidgetItem current = this.instance.folder_tree_widget.current_item ();
 
         string parent = '/';
         if (current) {
@@ -152,7 +152,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
         if (folder == "")
             return;
 
-        QTreeWidgetItem current = this.ui.folder_tree_widget.current_item ();
+        QTreeWidgetItem current = this.instance.folder_tree_widget.current_item ();
         string full_path;
         if (current) {
             full_path = current.data (0, Qt.USER_ROLE).to_string ();
@@ -177,7 +177,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
         GLib.debug ("webdav mkdir request on_signal_finished");
         on_signal_show_warning (_("Folder was successfully created on %1.").printf (Theme.app_name_gui));
         on_signal_refresh_folders ();
-        this.ui.folder_entry.on_signal_text (static_cast<MkColJob> (sender ()).path);
+        this.instance.folder_entry.on_signal_text (static_cast<MkColJob> (sender ()).path);
         on_signal_lscol_folder_entry ();
     }
 
@@ -219,9 +219,9 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     protected void on_signal_update_directories (string[] list) {
         string webdav_folder = GLib.Uri (this.account.dav_url ()).path;
 
-        QTreeWidgetItem root = this.ui.folder_tree_widget.top_level_item (0);
+        QTreeWidgetItem root = this.instance.folder_tree_widget.top_level_item (0);
         if (!root) {
-            root = new QTreeWidgetItem (this.ui.folder_tree_widget);
+            root = new QTreeWidgetItem (this.instance.folder_tree_widget);
             root.on_signal_text (0, Theme.app_name_gui);
             root.icon (0, Theme.application_icon);
             root.tool_tip (0, _("Choose this to sync the entire account"));
@@ -270,8 +270,8 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     protected void on_signal_refresh_folders () {
         this.encrypted_paths.clear ();
         run_lscol_job ("/");
-        this.ui.folder_tree_widget.clear ();
-        this.ui.folder_entry.clear ();
+        this.instance.folder_tree_widget.clear ();
+        this.instance.folder_entry.clear ();
     }
 
 
@@ -291,12 +291,12 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
 
             // We don't want to allow creating subfolders in encrypted folders outside of the sync logic
             const var encrypted = this.encrypted_paths.contains (directory);
-            this.ui.add_folder_button.enabled (!encrypted);
+            this.instance.add_folder_button.enabled (!encrypted);
 
             if (!directory.starts_with ('/')) {
                 directory.prepend ('/');
             }
-            this.ui.folder_entry.on_signal_text (directory);
+            this.instance.folder_entry.on_signal_text (directory);
         }
 
         /* emit */ complete_changed ();
@@ -311,7 +311,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
             return;
         }
 
-        this.ui.folder_tree_widget.current_item (null);
+        this.instance.folder_tree_widget.current_item (null);
         this.lscol_timer.on_signal_start (); // avoid sending a request on each keystroke
     }
 
@@ -319,7 +319,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_lscol_folder_entry () {
-        string path = this.ui.folder_entry.text ();
+        string path = this.instance.folder_entry.text ();
         if (path.starts_with ('/'))
             path = path.mid (1);
 
@@ -340,7 +340,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     ***********************************************************/
     protected void on_signal_typed_path_found (string[] subpaths) {
         on_signal_update_directories (subpaths);
-        select_by_path (this.ui.folder_entry.text ());
+        select_by_path (this.instance.folder_entry.text ());
     }
 
 
@@ -409,7 +409,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
             path.chop (1);
         }
 
-        QTreeWidgetItem it = this.ui.folder_tree_widget.top_level_item (0);
+        QTreeWidgetItem it = this.instance.folder_tree_widget.top_level_item (0);
         if (!path == "") {
             const string[] path_trail = path.split ('/');
             foreach (string path in path_trail) {
@@ -423,8 +423,8 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
             return false;
         }
 
-        this.ui.folder_tree_widget.current_item (it);
-        this.ui.folder_tree_widget.scroll_to_item (it);
+        this.instance.folder_tree_widget.current_item (it);
+        this.instance.folder_tree_widget.scroll_to_item (it);
         return true;
     }
 

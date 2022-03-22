@@ -18,7 +18,7 @@ public class TestStreamingDecryptor : AbstractTestClientSideEncryption {
 
         GLib.assert_true (dummy_input_file.open ());
 
-        var dummy_file_random_contents = EncryptionHelper.generate_random (total_bytes);
+        var dummy_file_random_contents = LibSync.EncryptionHelper.generate_random (total_bytes);
 
         GLib.assert_true (dummy_input_file.write (dummy_file_random_contents) == dummy_file_random_contents.size ());
 
@@ -29,15 +29,15 @@ public class TestStreamingDecryptor : AbstractTestClientSideEncryption {
         dummy_input_file.close ();
         GLib.assert_true (!dummy_input_file.is_open);
 
-        var encryption_key = EncryptionHelper.generate_random (16);
-        var initialization_vector = EncryptionHelper.generate_random (16);
+        var encryption_key = LibSync.EncryptionHelper.generate_random (16);
+        var initialization_vector = LibSync.EncryptionHelper.generate_random (16);
 
         // test normal file encryption/decryption
         QTemporaryFile dummy_encryption_output_file;
 
         string tag;
 
-        GLib.assert_true (EncryptionHelper.file_encryption (encryption_key, initialization_vector, dummy_input_file, dummy_encryption_output_file, tag));
+        GLib.assert_true (LibSync.EncryptionHelper.file_encryption (encryption_key, initialization_vector, dummy_input_file, dummy_encryption_output_file, tag));
         dummy_input_file.close ();
         GLib.assert_true (!dummy_input_file.is_open);
 
@@ -46,17 +46,17 @@ public class TestStreamingDecryptor : AbstractTestClientSideEncryption {
 
         QTemporaryFile dummy_decryption_output_file;
 
-        GLib.assert_true (EncryptionHelper.file_decryption (encryption_key, initialization_vector, dummy_encryption_output_file, dummy_decryption_output_file));
+        GLib.assert_true (LibSync.EncryptionHelper.file_decryption (encryption_key, initialization_vector, dummy_encryption_output_file, dummy_decryption_output_file));
         GLib.assert_true (dummy_decryption_output_file.open ());
         var dummy_decryption_output_file_hash = hash_from_string (dummy_decryption_output_file.read_all ());
         GLib.assert_true (dummy_decryption_output_file_hash == original_file_hash);
 
         // test streaming decryptor
-        EncryptionHelper.StreamingDecryptor streaming_decryptor = new EncryptionHelper.StreamingDecryptor (encryption_key, initialization_vector, dummy_encryption_output_file.size ());
+        LibSync.EncryptionHelper.StreamingDecryptor streaming_decryptor = new LibSync.EncryptionHelper.StreamingDecryptor (encryption_key, initialization_vector, dummy_encryption_output_file.size ());
         GLib.assert_true (streaming_decryptor.is_initialized ());
 
-        QBuffer chunked_output_decrypted;
-        GLib.assert_true (chunked_output_decrypted.open (QBuffer.WriteOnly));
+        GLib.OutputStream chunked_output_decrypted;
+        GLib.assert_true (chunked_output_decrypted.open (GLib.OutputStream.WriteOnly));
 
         GLib.assert_true (dummy_encryption_output_file.open ());
 
@@ -98,7 +98,7 @@ public class TestStreamingDecryptor : AbstractTestClientSideEncryption {
 
         chunked_output_decrypted.close ();
 
-        GLib.assert_true (chunked_output_decrypted.open (QBuffer.ReadOnly));
+        GLib.assert_true (chunked_output_decrypted.open (GLib.OutputStream.ReadOnly));
         GLib.assert_true (hash_from_string (chunked_output_decrypted.read_all ()) == original_file_hash);
         chunked_output_decrypted.close ();
     }

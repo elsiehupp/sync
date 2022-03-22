@@ -35,7 +35,7 @@ public class TestFileUploadNgReset : GLib.Object {
         fake_folder.local_modifier.set_modification_time ("A/a0", modification_time);
 
         // Create a transfer identifier, so we can make the final MOVE fail
-        SyncJournalDb.UploadInfo upload_info;
+        Common.SyncJournalDb.UploadInfo upload_info;
         upload_info.transferid = 1;
         upload_info.valid = true;
         upload_info.modtime = Utility.date_time_to_time_t (modification_time);

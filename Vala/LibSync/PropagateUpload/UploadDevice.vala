@@ -65,7 +65,7 @@ public class UploadDevice : QIODevice {
         }
         public set {
             this.bandwidth_limited = value;
-            QMetaObject.invoke_method (this, "ready_read", Qt.QueuedConnection);
+            GLib.Object.invoke_method (this, "ready_read", Qt.QueuedConnection);
         }
     }
 
@@ -81,7 +81,7 @@ public class UploadDevice : QIODevice {
         public set {
             this.choked = value;
             if (!this.choked) {
-                QMetaObject.invoke_method (this, "ready_read", Qt.QueuedConnection);
+                GLib.Object.invoke_method (this, "ready_read", Qt.QueuedConnection);
             }
         }
     }
@@ -225,7 +225,7 @@ public class UploadDevice : QIODevice {
     public void give_bandwidth_quota (int64 bwq) {
         if (!at_end ()) {
             this.bandwidth_quota = bwq;
-            QMetaObject.invoke_method (this, "ready_read", Qt.QueuedConnection); // tell QNAM that we have quota
+            GLib.Object.invoke_method (this, "ready_read", Qt.QueuedConnection); // tell QNAM that we have quota
         }
     }
 

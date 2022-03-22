@@ -15,53 +15,53 @@ public class AddCertificateDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private Ui.AddCertificateDialog ui;
+    private AddCertificateDialog instance;
 
 
     /***********************************************************
     ***********************************************************/
     public AddCertificateDialog (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
-        this.ui = new Ui.AddCertificateDialog ();
-        ui.up_ui (this);
-        ui.label_error_certif.on_signal_text ("");
+        this.instance = new AddCertificateDialog ();
+        instance.up_ui (this);
+        instance.label_error_certif.on_signal_text ("");
     }
 
 
     /***********************************************************
     ***********************************************************/
     override ~AddCertificateDialog () {
-        delete ui;
+        delete instance;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public string certificate_path {
-        return ui.line_edit_certificate_path.text ();
+        return instance.line_edit_certificate_path.text ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public string certificate_password () {
-        return ui.line_edit_p_wDCertificate.text ();
+        return instance.line_edit_p_wDCertificate.text ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void show_error_message (string message) {
-        ui.label_error_certif.on_signal_text (message);
+        instance.label_error_certif.on_signal_text (message);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void reinit () {
-        ui.label_error_certif.clear ();
-        ui.line_edit_certificate_path.clear ();
-        ui.line_edit_p_wDCertificate.clear ();
+        instance.label_error_certif.clear ();
+        instance.line_edit_certificate_path.clear ();
+        instance.line_edit_p_wDCertificate.clear ();
     }
 
 
@@ -69,7 +69,7 @@ public class AddCertificateDialog : Gtk.Dialog {
     ***********************************************************/
     private void on_signal_push_button_browse_certificate_clicked () {
         string filename = QFileDialog.open_filename (this, _("Select a certificate"), "", _("Certificate files (*.p12 *.pfx)"));
-        ui.line_edit_certificate_path.on_signal_text (filename);
+        instance.line_edit_certificate_path.on_signal_text (filename);
     }
 
 } // class AddCertificateDialog

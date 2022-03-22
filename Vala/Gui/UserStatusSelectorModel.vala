@@ -38,10 +38,10 @@ public class UserStatusSelectorModel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private std.shared_ptr<UserStatusConnector> user_status_connector = new UserStatusConnector ();
-    private GLib.List<UserStatus> predefined_statuses;
-    private UserStatus user_status;
-    private std.unique_ptr<DateTimeProvider> date_time_provider = new DateTimeProvider ();
+    private LibSync.UserStatusConnector user_status_connector = new LibSync.UserStatusConnector ();
+    private GLib.List<LibSync.UserStatus> predefined_statuses;
+    private LibSync.UserStatus user_status;
+    private DateTimeProvider date_time_provider = new DateTimeProvider ();
 
     /***********************************************************
     ***********************************************************/
@@ -79,11 +79,11 @@ public class UserStatusSelectorModel : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public UserStatusSelectorModel.with_connector (
-        std.shared_ptr<UserStatusConnector> user_status_connector,
+        LibSync.UserStatusConnector user_status_connector,
         GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.user_status_connector = user_status_connector;
-        this.user_status = new UserStatus ("no-identifier", "", "😀", UserStatus.OnlineStatus.Online, false, {});
+        this.user_status = new LibSync.UserStatus ("no-identifier", "", "😀", LibSync.UserStatus.OnlineStatus.Online, false, {});
         this.date_time_provider = new DateTimeProvider ();
         this.user_status.icon ("😀");
         on_signal_init ();
@@ -93,13 +93,13 @@ public class UserStatusSelectorModel : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public UserStatusSelectorModel.with_connector_and_provider (
-        std.shared_ptr<UserStatusConnector> user_status_connector,
-        std.unique_ptr<DateTimeProvider> date_time_provider = new DateTimeProvider (),
+        LibSync.UserStatusConnector user_status_connector,
+        DateTimeProvider date_time_provider = new DateTimeProvider (),
         GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.user_status_connector = user_status_connector;
         this.date_time_provider = std.move (date_time_provider);
-        this.user_status = new UserStatus ();
+        this.user_status = new LibSync.UserStatus ();
         this.user_status.icon ("😀");
         on_signal_init ();
     }
@@ -108,8 +108,8 @@ public class UserStatusSelectorModel : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public UserStatusSelectorModel.with_user_status_and_provider (
-        UserStatus user_status,
-        std.unique_ptr<DateTimeProvider> date_time_provider,
+        LibSync.UserStatus user_status,
+        DateTimeProvider date_time_provider,
         GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.user_status = user_status;
@@ -121,7 +121,7 @@ public class UserStatusSelectorModel : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public UserStatusSelectorModel.with_user_status (
-        UserStatus user_status,
+        LibSync.UserStatus user_status,
         GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.user_status = user_status;
@@ -129,7 +129,7 @@ public class UserStatusSelectorModel : GLib.Object {
     }
 
 
-    UserStatus.OnlineStatus online_status {
+    LibSync.UserStatus.OnlineStatus online_status {
         public get {
             return this.user_status.state;
         }
@@ -233,7 +233,7 @@ public class UserStatusSelectorModel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public UserStatus predefined_status_for_index (int index) {
+    public LibSync.UserStatus predefined_status_for_index (int index) {
         //  Q_ASSERT (0 <= index && index < static_cast<int> (this.predefined_statuses.size ()));
         return this.predefined_statuses[index];
     }
@@ -339,15 +339,15 @@ public class UserStatusSelectorModel : GLib.Object {
     ***********************************************************/
     private void on_signal_reset () {
         if (this.user_status_connector) {
-            disconnect (this.user_status_connector.get (), UserStatusConnector.signal_user_status_fetched, this,
+            disconnect (this.user_status_connector.get (), LibSync.UserStatusConnector.signal_user_status_fetched, this,
                 &UserStatusSelectorModel.on_signal_user_status_fetched);
-            disconnect (this.user_status_connector.get (), UserStatusConnector.signal_predefined_statuses_fetched, this,
+            disconnect (this.user_status_connector.get (), LibSync.UserStatusConnector.signal_predefined_statuses_fetched, this,
                 &UserStatusSelectorModel.on_signal_predefined_statuses_fetched);
-            disconnect (this.user_status_connector.get (), UserStatusConnector.signal_error, this,
+            disconnect (this.user_status_connector.get (), LibSync.UserStatusConnector.signal_error, this,
                 &UserStatusSelectorModel.on_signal_error);
-            disconnect (this.user_status_connector.get (), UserStatusConnector.signal_user_status_set, this,
+            disconnect (this.user_status_connector.get (), LibSync.UserStatusConnector.signal_user_status_set, this,
                 &UserStatusSelectorModel.on_signal_user_status_set);
-            disconnect (this.user_status_connector.get (), UserStatusConnector.message_cleared, this,
+            disconnect (this.user_status_connector.get (), LibSync.UserStatusConnector.message_cleared, this,
                 &UserStatusSelectorModel.on_signal_message_cleared);
         }
         this.user_status_connector = null;
@@ -356,8 +356,8 @@ public class UserStatusSelectorModel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_user_status_fetched (UserStatus user_status) {
-        if (user_status.state != UserStatus.OnlineStatus.Offline) {
+    private void on_signal_user_status_fetched (LibSync.UserStatus user_status) {
+        if (user_status.state != LibSync.UserStatus.OnlineStatus.Offline) {
             this.user_status.state (user_status.state);
         }
         this.user_status.message (user_status.message ());
@@ -377,7 +377,7 @@ public class UserStatusSelectorModel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_predefined_statuses_fetched (GLib.List<UserStatus> statuses) {
+    private void on_signal_predefined_statuses_fetched (GLib.List<LibSync.UserStatus> statuses) {
         this.predefined_statuses = statuses;
         /* emit */ predefined_statuses_changed ();
     }
@@ -399,31 +399,31 @@ public class UserStatusSelectorModel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_error (UserStatusConnector.Error error) {
-        GLib.warning ("Error: " + error);
+    private void on_signal_error (LibSync.UserStatusConnector.Error error) {
+        GLib.warning ("Error: " + LibSync.UserStatusConnector.Error.to_string (error));
 
         switch (error) {
-        case UserStatusConnector.Error.CouldNotFetchPredefinedUserStatuses:
+        case LibSync.UserStatusConnector.Error.COULD_NOT_FETCH_PREDEFINED_USER_STATUSES:
             error (_("Could not fetch predefined statuses. Make sure you are connected to the server."));
             return;
 
-        case UserStatusConnector.Error.CouldNotFetchUserStatus:
+        case LibSync.UserStatusConnector.Error.COULD_NOT_FETCH_USER_STATUS:
             error (_("Could not fetch user status. Make sure you are connected to the server."));
             return;
 
-        case UserStatusConnector.Error.UserStatusResult.NOT_SUPPORTED:
+        case LibSync.UserStatusConnector.Error.UserStatusResult.NOT_SUPPORTED:
             error (_("User status feature is not supported. You will not be able to set your user status."));
             return;
 
-        case UserStatusConnector.Error.EmojisResult.NOT_SUPPORTED:
+        case LibSync.UserStatusConnector.Error.EmojisResult.NOT_SUPPORTED:
             error (_("Emojis feature is not supported. Some user status functionality may not work."));
             return;
 
-        case UserStatusConnector.Error.CouldNotSetUserStatus:
+        case LibSync.UserStatusConnector.Error.COULD_NOT_SET_USER_STATUS:
             error (_("Could not set user status. Make sure you are connected to the server."));
             return;
 
-        case UserStatusConnector.Error.CouldNotClearMessage:
+        case LibSync.UserStatusConnector.Error.COULD_NOT_CLEAR_MESSAGE:
             error (_("Could not clear user status message. Make sure you are connected to the server."));
             return;
         }

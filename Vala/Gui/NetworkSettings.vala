@@ -18,39 +18,39 @@ public class NetworkSettings : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private Ui.NetworkSettings ui;
+    private NetworkSettings instance;
 
     /***********************************************************
     ***********************************************************/
     public NetworkSettings (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
-        this.ui = new Ui.NetworkSettings ();
-        this.ui.up_ui (this);
+        this.instance = new NetworkSettings ();
+        this.instance.up_ui (this);
 
-        this.ui.host_line_edit.placeholder_text (_("Hostname of proxy server"));
-        this.ui.user_line_edit.placeholder_text (_("Username for proxy server"));
-        this.ui.password_line_edit.placeholder_text (_("Password for proxy server"));
+        this.instance.host_line_edit.placeholder_text (_("Hostname of proxy server"));
+        this.instance.user_line_edit.placeholder_text (_("Username for proxy server"));
+        this.instance.password_line_edit.placeholder_text (_("Password for proxy server"));
 
-        this.ui.type_combo_box.add_item (_("HTTP (S) proxy"), QNetworkProxy.HttpProxy);
-        this.ui.type_combo_box.add_item (_("SOCKS5 proxy"), QNetworkProxy.Socks5Proxy);
+        this.instance.type_combo_box.add_item (_("HTTP (S) proxy"), QNetworkProxy.HttpProxy);
+        this.instance.type_combo_box.add_item (_("SOCKS5 proxy"), QNetworkProxy.Socks5Proxy);
 
-        this.ui.auth_requiredcheck_box.enabled (true);
+        this.instance.auth_requiredcheck_box.enabled (true);
 
         // Explicitly set up the enabled status of the proxy auth widgets to ensure
         // toggling the parent enables/disables the children
-        this.ui.user_line_edit.enabled (true);
-        this.ui.password_line_edit.enabled (true);
-        this.ui.auth_widgets.enabled (this.ui.auth_requiredcheck_box.is_checked ());
-        this.ui.auth_requiredcheck_box.toggled.connect (
-            this.ui.auth_widgets.enabled
+        this.instance.user_line_edit.enabled (true);
+        this.instance.password_line_edit.enabled (true);
+        this.instance.auth_widgets.enabled (this.instance.auth_requiredcheck_box.is_checked ());
+        this.instance.auth_requiredcheck_box.toggled.connect (
+            this.instance.auth_widgets.enabled
         );
-        this.ui.manual_proxy_radio_button.toggled.connect (
-            this.ui.manual_settings.enabled
+        this.instance.manual_proxy_radio_button.toggled.connect (
+            this.instance.manual_settings.enabled
         );
-        this.ui.manual_proxy_radio_button.toggled.connect (
-            this.ui.type_combo_box.enabled
+        this.instance.manual_proxy_radio_button.toggled.connect (
+            this.instance.type_combo_box.enabled
         );
-        this.ui.manual_proxy_radio_button.toggled.connect (
+        this.instance.manual_proxy_radio_button.toggled.connect (
             this.on_signal_check_account_localhost
         );
 
@@ -58,56 +58,56 @@ public class NetworkSettings : Gtk.Widget {
         load_bandwidth_limit_settings ();
 
         // proxy
-        this.ui.type_combo_box.current_index_changed.connect (
+        this.instance.type_combo_box.current_index_changed.connect (
             this.on_signal_save_proxy_settings
         );
-        this.ui.proxy_button_group.button_clicked.connect (
+        this.instance.proxy_button_group.button_clicked.connect (
             this.on_signal_save_proxy_settings
         );
-        this.ui.host_line_edit.editing_finished.connect (
+        this.instance.host_line_edit.editing_finished.connect (
             this.on_signal_save_proxy_settings
         );
-        this.ui.user_line_edit.editing_finished.connect (
+        this.instance.user_line_edit.editing_finished.connect (
             this.on_signal_save_proxy_settings
         );
-        this.ui.password_line_edit.editing_finished.connect (
+        this.instance.password_line_edit.editing_finished.connect (
             this.on_signal_save_proxy_settings
         );
-        this.ui.port_spin_box.editing_finished.connect (
+        this.instance.port_spin_box.editing_finished.connect (
             this.on_signal_save_proxy_settings
         );
-        this.ui.auth_requiredcheck_box.toggled.connect (
+        this.instance.auth_requiredcheck_box.toggled.connect (
             this.on_signal_save_proxy_settings
         );
 
         // Limits
-        this.ui.upload_limit_radio_button.clicked.connect (
+        this.instance.upload_limit_radio_button.clicked.connect (
             this.on_signal_save_bandwidth_limit_settings
         );
-        this.ui.no_upload_limit_radio_button.clicked.connect (
+        this.instance.no_upload_limit_radio_button.clicked.connect (
             this.on_signal_save_bandwidth_limit_settings
         );
-        this.ui.auto_upload_limit_radio_button.clicked.connect (
+        this.instance.auto_upload_limit_radio_button.clicked.connect (
             this.on_signal_save_bandwidth_limit_settings
         );
-        this.ui.download_limit_radio_button.clicked.connect (
+        this.instance.download_limit_radio_button.clicked.connect (
             this.on_signal_save_bandwidth_limit_settings
         );
-        this.ui.no_download_limit_radio_button.clicked.connect (
+        this.instance.no_download_limit_radio_button.clicked.connect (
             this.on_signal_save_bandwidth_limit_settings
         );
-        this.ui.auto_download_limit_radio_button.clicked.connect (
+        this.instance.auto_download_limit_radio_button.clicked.connect (
             this.on_signal_save_bandwidth_limit_settings
         );
-        this.ui.download_spin_box.value_changed.connect (
+        this.instance.download_spin_box.value_changed.connect (
             this.on_signal_save_bandwidth_limit_settings
         );
-        this.ui.upload_spin_box.value_changed.connect (
+        this.instance.upload_spin_box.value_changed.connect (
             this.on_signal_save_bandwidth_limit_settings
         );
 
         // Warn about empty proxy host
-        this.ui.host_line_edit.text_changed.connect (
+        this.instance.host_line_edit.text_changed.connect (
             this.on_signal_check_empty_proxy_host
         );
         on_signal_check_empty_proxy_host ();
@@ -122,7 +122,7 @@ public class NetworkSettings : Gtk.Widget {
 
 
     override ~NetworkSettings () {
-        delete this.ui;
+        delete this.instance;
     }
 
 
@@ -143,23 +143,23 @@ public class NetworkSettings : Gtk.Widget {
 
         int use_download_limit = config_file.use_download_limit ();
         if (use_download_limit >= 1) {
-            this.ui.download_limit_radio_button.checked (true);
+            this.instance.download_limit_radio_button.checked (true);
         } else if (use_download_limit == 0) {
-            this.ui.no_download_limit_radio_button.checked (true);
+            this.instance.no_download_limit_radio_button.checked (true);
         } else {
-            this.ui.auto_download_limit_radio_button.checked (true);
+            this.instance.auto_download_limit_radio_button.checked (true);
         }
-        this.ui.download_spin_box.value (config_file.download_limit ());
+        this.instance.download_spin_box.value (config_file.download_limit ());
 
         int use_upload_limit = config_file.use_upload_limit ();
         if (use_upload_limit >= 1) {
-            this.ui.upload_limit_radio_button.checked (true);
+            this.instance.upload_limit_radio_button.checked (true);
         } else if (use_upload_limit == 0) {
-            this.ui.no_upload_limit_radio_button.checked (true);
+            this.instance.no_upload_limit_radio_button.checked (true);
         } else {
-            this.ui.auto_upload_limit_radio_button.checked (true);
+            this.instance.auto_upload_limit_radio_button.checked (true);
         }
-        this.ui.upload_spin_box.value (config_file.upload_limit ());
+        this.instance.upload_spin_box.value (config_file.upload_limit ());
     }
 
 
@@ -169,20 +169,20 @@ public class NetworkSettings : Gtk.Widget {
         ConfigFile config_file;
 
         on_signal_check_empty_proxy_host ();
-        if (this.ui.no_proxy_radio_button.is_checked ()) {
+        if (this.instance.no_proxy_radio_button.is_checked ()) {
             config_file.proxy_type (QNetworkProxy.NoProxy);
-        } else if (this.ui.system_proxy_radio_button.is_checked ()) {
+        } else if (this.instance.system_proxy_radio_button.is_checked ()) {
             config_file.proxy_type (QNetworkProxy.DefaultProxy);
-        } else if (this.ui.manual_proxy_radio_button.is_checked ()) {
-            int type = this.ui.type_combo_box.item_data (this.ui.type_combo_box.current_index ()).to_int ();
-            string host = this.ui.host_line_edit.text ();
+        } else if (this.instance.manual_proxy_radio_button.is_checked ()) {
+            int type = this.instance.type_combo_box.item_data (this.instance.type_combo_box.current_index ()).to_int ();
+            string host = this.instance.host_line_edit.text ();
             if (host == "")
                 type = QNetworkProxy.NoProxy;
-            bool needs_auth = this.ui.auth_requiredcheck_box.is_checked ();
-            string user = this.ui.user_line_edit.text ();
-            string pass = this.ui.password_line_edit.text ();
-            config_file.proxy_type (type, this.ui.host_line_edit.text (),
-                this.ui.port_spin_box.value (), needs_auth, user, pass);
+            bool needs_auth = this.instance.auth_requiredcheck_box.is_checked ();
+            string user = this.instance.user_line_edit.text ();
+            string pass = this.instance.password_line_edit.text ();
+            config_file.proxy_type (type, this.instance.host_line_edit.text (),
+                this.instance.port_spin_box.value (), needs_auth, user, pass);
         }
 
         ClientProxy proxy;
@@ -204,23 +204,23 @@ public class NetworkSettings : Gtk.Widget {
     ***********************************************************/
     private void on_signal_save_bandwidth_limit_settings () {
         ConfigFile config_file;
-        if (this.ui.download_limit_radio_button.is_checked ()) {
+        if (this.instance.download_limit_radio_button.is_checked ()) {
             config_file.use_download_limit (1);
-        } else if (this.ui.no_download_limit_radio_button.is_checked ()) {
+        } else if (this.instance.no_download_limit_radio_button.is_checked ()) {
             config_file.use_download_limit (0);
-        } else if (this.ui.auto_download_limit_radio_button.is_checked ()) {
+        } else if (this.instance.auto_download_limit_radio_button.is_checked ()) {
             config_file.use_download_limit (-1);
         }
-        config_file.download_limit (this.ui.download_spin_box.value ());
+        config_file.download_limit (this.instance.download_spin_box.value ());
 
-        if (this.ui.upload_limit_radio_button.is_checked ()) {
+        if (this.instance.upload_limit_radio_button.is_checked ()) {
             config_file.use_upload_limit (1);
-        } else if (this.ui.no_upload_limit_radio_button.is_checked ()) {
+        } else if (this.instance.no_upload_limit_radio_button.is_checked ()) {
             config_file.use_upload_limit (0);
-        } else if (this.ui.auto_upload_limit_radio_button.is_checked ()) {
+        } else if (this.instance.auto_upload_limit_radio_button.is_checked ()) {
             config_file.use_upload_limit (-1);
         }
-        config_file.upload_limit (this.ui.upload_spin_box.value ());
+        config_file.upload_limit (this.instance.upload_spin_box.value ());
 
         FolderMan.instance.dirty_network_limits ();
     }
@@ -230,10 +230,10 @@ public class NetworkSettings : Gtk.Widget {
     Red marking of host field if empty and enabled
     ***********************************************************/
     private void on_signal_check_empty_proxy_host () {
-        if (this.ui.host_line_edit.is_enabled () && this.ui.host_line_edit.text () == "") {
-            this.ui.host_line_edit.style_sheet ("border : 1px solid red");
+        if (this.instance.host_line_edit.is_enabled () && this.instance.host_line_edit.text () == "") {
+            this.instance.host_line_edit.style_sheet ("border : 1px solid red");
         } else {
-            this.ui.host_line_edit.style_sheet ("");
+            this.instance.host_line_edit.style_sheet ("");
         }
     }
 
@@ -242,7 +242,7 @@ public class NetworkSettings : Gtk.Widget {
     ***********************************************************/
     private void on_signal_check_account_localhost () {
         bool visible = false;
-        if (this.ui.manual_proxy_radio_button.is_checked ()) {
+        if (this.instance.manual_proxy_radio_button.is_checked ()) {
             // Check if at least one account is using localhost, because Qt proxy settings have no
             // effect for localhost (#7169)
             foreach (var account in AccountManager.instance.accounts) {
@@ -253,7 +253,7 @@ public class NetworkSettings : Gtk.Widget {
                 }
             }
         }
-        this.ui.label_localhost.visible (visible);
+        this.instance.label_localhost.visible (visible);
     }
 
 
@@ -261,9 +261,9 @@ public class NetworkSettings : Gtk.Widget {
     ***********************************************************/
     protected override void show_event (QShowEvent event) {
         if (!event.spontaneous ()
-            && this.ui.manual_proxy_radio_button.is_checked ()
-            && this.ui.host_line_edit.text () == "") {
-            this.ui.no_proxy_radio_button.checked (true);
+            && this.instance.manual_proxy_radio_button.is_checked ()
+            && this.instance.host_line_edit.text () == "") {
+            this.instance.no_proxy_radio_button.checked (true);
             on_signal_check_empty_proxy_host ();
             on_signal_save_proxy_settings ();
         }
@@ -277,8 +277,8 @@ public class NetworkSettings : Gtk.Widget {
     ***********************************************************/
     private void load_proxy_settings () {
         if (Theme.force_system_network_proxy) {
-            this.ui.system_proxy_radio_button.checked (true);
-            this.ui.proxy_group_box.enabled (false);
+            this.instance.system_proxy_radio_button.checked (true);
+            this.instance.proxy_group_box.enabled (false);
             return;
         }
         // load current proxy settings
@@ -286,28 +286,28 @@ public class NetworkSettings : Gtk.Widget {
         int type = config_file.proxy_type ();
         switch (type) {
         case QNetworkProxy.NoProxy:
-            this.ui.no_proxy_radio_button.checked (true);
+            this.instance.no_proxy_radio_button.checked (true);
             break;
         case QNetworkProxy.DefaultProxy:
-            this.ui.system_proxy_radio_button.checked (true);
+            this.instance.system_proxy_radio_button.checked (true);
             break;
         case QNetworkProxy.Socks5Proxy:
         case QNetworkProxy.HttpProxy:
-            this.ui.type_combo_box.current_index (this.ui.type_combo_box.find_data (type));
-            this.ui.manual_proxy_radio_button.checked (true);
+            this.instance.type_combo_box.current_index (this.instance.type_combo_box.find_data (type));
+            this.instance.manual_proxy_radio_button.checked (true);
             break;
         default:
             break;
         }
 
-        this.ui.host_line_edit.on_signal_text (config_file.proxy_host_name ());
+        this.instance.host_line_edit.on_signal_text (config_file.proxy_host_name ());
         int port = config_file.proxy_port ();
         if (port == 0)
             port = 8080;
-        this.ui.port_spin_box.value (port);
-        this.ui.auth_requiredcheck_box.checked (config_file.proxy_needs_auth ());
-        this.ui.user_line_edit.on_signal_text (config_file.proxy_user ());
-        this.ui.password_line_edit.on_signal_text (config_file.proxy_password ());
+        this.instance.port_spin_box.value (port);
+        this.instance.auth_requiredcheck_box.checked (config_file.proxy_needs_auth ());
+        this.instance.user_line_edit.on_signal_text (config_file.proxy_user ());
+        this.instance.password_line_edit.on_signal_text (config_file.proxy_password ());
     }
 
 } // class NetworkSettings

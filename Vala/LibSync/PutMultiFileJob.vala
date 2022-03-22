@@ -21,7 +21,7 @@ namespace LibSync {
 public class PutMultiFileJob : AbstractNetworkJob {
 
     struct SingleUploadFileData {
-        std.unique_ptr<UploadDevice> device;
+        UploadDevice device;
         GLib.HashTable<string, string> headers;
     }
 

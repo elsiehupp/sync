@@ -2,7 +2,7 @@ namespace Occ {
 namespace LibSync {
 
 /***********************************************************
-@brief Simple wrapper class for QKeychain.DeletePasswordJob
+@brief Simple wrapper class for Secret.Collection.DeletePasswordJob
 
 @author Michael Schuster <michael@schuster.ms>
 
@@ -10,7 +10,7 @@ namespace LibSync {
 ***********************************************************/
 public class KeychainChunkDeleteJob : KeychainChunkJob {
 
-    internal signal void signal_finished (KeychainChunk.KeychainChunkDeleteJob incoming_job);
+    internal signal void signal_finished (KeychainChunkDeleteJob incoming_job);
 
     /***********************************************************
     ***********************************************************/
@@ -34,11 +34,11 @@ public class KeychainChunkDeleteJob : KeychainChunkJob {
     Call this method to start the job (async).
     You should connect some slot to the signal_finished () signal first.
 
-    @see QKeychain.Job.start ()
+    @see Secret.Collection.Job.start ()
     ***********************************************************/
     public new void start () {
         this.chunk_count = 0;
-        this.error = QKeychain.NoError;
+        this.error = Secret.Collection.NoError;
 
         const string keychain_key = this.account ? AbstractCredentials.keychain_key (
                 this.account.url.to_string (),
@@ -46,7 +46,7 @@ public class KeychainChunkDeleteJob : KeychainChunkJob {
                 this.keychain_migration ? "" : this.account.identifier
             ) : this.key;
 
-        var qkeychain_delete_password_job = new QKeychain.DeletePasswordJob (this.service_name, this);
+        var qkeychain_delete_password_job = new Secret.Collection.DeletePasswordJob (this.service_name, this);
     // #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
         add_settings_to_job (this.account, qkeychain_delete_password_job);
     // #endif
@@ -63,7 +63,7 @@ public class KeychainChunkDeleteJob : KeychainChunkJob {
     Call this method to start the job synchronously.
     Awaits completion with no need to connect some slot to the signal_finished () signal first.
 
-    @return Returns true on succeess (QKeychain.NoError).
+    @return Returns true on succeess (Secret.Collection.NoError).
     ***********************************************************/
     public bool exec () {
         start ();
@@ -88,16 +88,16 @@ public class KeychainChunkDeleteJob : KeychainChunkJob {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_delete_job_done (QKeychain.Job incoming_job) {
+    private void on_signal_delete_job_done (Secret.Collection.Job incoming_job) {
         // Errors or next chunk?
-        var delete_job = qobject_cast<QKeychain.DeletePasswordJob> (incoming_job);
+        var delete_job = qobject_cast<Secret.Collection.DeletePasswordJob> (incoming_job);
         GLib.assert (delete_job);
 
         if (delete_job.error == NoError) {
             this.chunk_count++;
         } else {
-            if (delete_job.error != QKeychain.EntryNotFound ||
-                ( (delete_job.error == QKeychain.EntryNotFound) && this.chunk_count == 0)) {
+            if (delete_job.error != Secret.Collection.EntryNotFound ||
+                ( (delete_job.error == Secret.Collection.EntryNotFound) && this.chunk_count == 0)) {
                 this.error = delete_job.error;
                 this.error_string = delete_job.error_string;
                 GLib.warning ("Unable to delete " + delete_job.key () + " chunk " + this.chunk_count + delete_job.error_string);

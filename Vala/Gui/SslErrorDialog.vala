@@ -15,7 +15,7 @@ public class SslErrorDialog : Gtk.Dialog {
     GLib.List<QSslCertificate> unknown_certificates { public get; private set; }
 
     private string custom_config_handle;
-    private Ui.SslErrorDialog ui;
+    private SslErrorDialog instance;
     private unowned Account account;
 
     /***********************************************************
@@ -23,19 +23,19 @@ public class SslErrorDialog : Gtk.Dialog {
     public SslErrorDialog (unowned Account account, Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.all_trusted = false;
-        this.ui = new Ui.SslErrorDialog ();
+        this.instance = new SslErrorDialog ();
         this.account = account;
         window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
-        this.ui.up_ui (this);
+        this.instance.up_ui (this);
         window_title (_("Untrusted Certificate"));
         QPushButton ok_button =
-            this.ui.dialog_button_box.button (QDialogButtonBox.Ok);
+            this.instance.dialog_button_box.button (QDialogButtonBox.Ok);
         QPushButton cancel_button =
-            this.ui.dialog_button_box.button (QDialogButtonBox.Cancel);
+            this.instance.dialog_button_box.button (QDialogButtonBox.Cancel);
         ok_button.enabled (false);
 
-        this.ui.cb_trust_connect.enabled (!Theme.forbid_bad_ssl);
-        this.ui.cb_trust_connect.clicked.connect (
+        this.instance.cb_trust_connect.enabled (!Theme.forbid_bad_ssl);
+        this.instance.cb_trust_connect.clicked.connect (
             ok_button.enabled
         );
 
@@ -54,7 +54,7 @@ public class SslErrorDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     override ~SslErrorDialog () {
-        delete this.ui;
+        delete this.instance;
     }
 
 
@@ -129,8 +129,8 @@ public class SslErrorDialog : Gtk.Dialog {
         doc.add_resource (QText_document.Style_sheet_resource, GLib.Uri (QL ("format.css")), style);
         doc.html (message);
 
-        this.ui.tb_errors.document (doc);
-        this.ui.tb_errors.show ();
+        this.instance.tb_errors.document (doc);
+        this.instance.tb_errors.show ();
 
         return false;
     }
@@ -142,7 +142,7 @@ public class SslErrorDialog : Gtk.Dialog {
         if (this.all_trusted)
             return true;
 
-        bool stat = (this.ui.cb_trust_connect.check_state () == Qt.Checked);
+        bool stat = (this.instance.cb_trust_connect.check_state () == Qt.Checked);
         GLib.info ("SSL-Connection is trusted: " + stat);
 
         return stat;

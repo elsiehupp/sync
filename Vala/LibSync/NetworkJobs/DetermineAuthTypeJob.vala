@@ -1,16 +1,13 @@
-/***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-@author Daniel Molkentin <danimo@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
 @brief Checks with auth type to use for a server
-@ingroup libsync
+
+@author Klaas Freitag <freitag@owncloud.com>
+@author Daniel Molkentin <danimo@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class DetermineAuthTypeJob : GLib.Object {
 

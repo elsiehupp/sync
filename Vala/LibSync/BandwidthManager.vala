@@ -1,19 +1,14 @@
-/***********************************************************
-@author Markus Goetz <markus@woboq.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <GLib.Timeout>
-//  #include <QIODevice>
-//  #include <list>
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class BandwidthManager
+
 @brief The BandwidthManager class
-@ingroup libsync
+
+@author Markus Goetz <markus@woboq.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class BandwidthManager : GLib.Object {
 
@@ -117,7 +112,7 @@ public class BandwidthManager : GLib.Object {
         );
         this.switching_timer.interval (10 * 1000);
         this.switching_timer.start ();
-        QMetaObject.invoke_method (this, "on_signal_switching_timer_timeout", Qt.QueuedConnection);
+        GLib.Object.invoke_method (this, "on_signal_switching_timer_timeout", Qt.QueuedConnection);
 
         // absolute uploads/downloads
         this.absolute_limit_timer.timeout.connect (

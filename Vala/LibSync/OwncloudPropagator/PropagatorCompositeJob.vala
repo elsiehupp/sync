@@ -19,7 +19,7 @@ public class PropagatorCompositeJob : PropagatorJob {
     public GLib.List<PropagatorJob> running_jobs;
 
     /***********************************************************
-    NoStatus, or NormalError / SoftError if there was an error
+    NO_STATUS, or NormalError / SoftError if there was an error
     ***********************************************************/
     public SyncFileItem.Status has_error;
 
@@ -111,7 +111,7 @@ public class PropagatorCompositeJob : PropagatorJob {
         if (this.jobs_to_do == "" && this.tasks_to_do == "" && this.running_jobs == "") {
             // Our parent jobs are already iterating over their running jobs, post to the event loop
             // to avoid removing ourself from that list while they iterate.
-            QMetaObject.invoke_method (this, "on_signal_finalize", Qt.QueuedConnection);
+            GLib.Object.invoke_method (this, "on_signal_finalize", Qt.QueuedConnection);
         }
         return false;
     }

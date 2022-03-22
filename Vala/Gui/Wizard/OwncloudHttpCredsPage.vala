@@ -15,7 +15,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    private Ui.OwncloudHttpCredsPage ui;
+    private OwncloudHttpCredsPage instance;
     private bool connected;
     private QProgressIndicator progress_indicator;
     private OwncloudWizard oc_wizard;
@@ -28,38 +28,38 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
     ***********************************************************/
     public OwncloudHttpCredsPage (Gtk.Widget parent) {
         base ();
-        this.ui ();
+        this.instance ();
         this.connected = false;
         this.progress_indicator = new QProgressIndicator (this);
-        this.ui.up_ui (this);
+        this.instance.up_ui (this);
 
         if (parent) {
             this.oc_wizard = qobject_cast<OwncloudWizard> (parent);
         }
 
-        register_field ("OCUser*", this.ui.le_username);
-        register_field ("OCPasswd*", this.ui.le_password);
+        register_field ("OCUser*", this.instance.le_username);
+        register_field ("OCPasswd*", this.instance.le_password);
 
         Theme theme = Theme.instance;
         switch (theme.user_identifier_type) {
         case Theme.UserIdentifierType.USER_NAME:
-            // default, handled in ui file
+            // default, handled in instance file
             break;
         case Theme.UserIdentifierType.EMAIL:
-            this.ui.username_label.on_signal_text (_("&Email"));
+            this.instance.username_label.on_signal_text (_("&Email"));
             break;
         case Theme.UserIdentifierType.CUSTOM:
-            this.ui.username_label.on_signal_text (theme.custom_user_id);
+            this.instance.username_label.on_signal_text (theme.custom_user_id);
             break;
         default:
             break;
         }
-        this.ui.le_username.placeholder_text (theme.user_id_hint);
+        this.instance.le_username.placeholder_text (theme.user_id_hint);
 
         title (WizardCommon.title_template ().printf (_("Connect to %1").printf (Theme.app_name_gui)));
         sub_title (WizardCommon.sub_title_template ().printf (_("Enter user credentials")));
 
-        this.ui.result_layout.add_widget (this.progress_indicator);
+        this.instance.result_layout.add_widget (this.progress_indicator);
         on_signal_stop_spinner ();
         set_up_customization ();
     }
@@ -69,7 +69,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
     ***********************************************************/
     public AbstractCredentials credentials {
         public get {
-            return new HttpCredentialsGui (this.ui.le_username.text (), this.ui.le_password.text (), this.oc_wizard.client_cert_bundle, this.oc_wizard.client_cert_password);
+            return new HttpCredentialsGui (this.instance.le_username.text (), this.instance.le_password.text (), this.oc_wizard.client_cert_bundle, this.oc_wizard.client_cert_password);
         }
     }
 
@@ -77,7 +77,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
     /***********************************************************
     ***********************************************************/
     public void initialize_page () {
-        WizardCommon.init_error_label (this.ui.error_label);
+        WizardCommon.init_error_label (this.instance.error_label);
 
         var oc_wizard = (OwncloudWizard) wizard ();
         AbstractCredentials credentials = oc_wizard.account.credentials;
@@ -85,7 +85,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
         if (http_creds) {
             const string user = http_creds.fetch_user ();
             if (!user == "") {
-                this.ui.le_username.on_signal_text (user);
+                this.instance.le_username.on_signal_text (user);
             }
         } else {
             GLib.Uri url = oc_wizard.account.url;
@@ -101,35 +101,35 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
             const string password = url.password ();
 
             if (!user == "") {
-                this.ui.le_username.on_signal_text (user);
+                this.instance.le_username.on_signal_text (user);
             }
             if (!password == "") {
-                this.ui.le_password.on_signal_text (password);
+                this.instance.le_password.on_signal_text (password);
             }
         }
-        this.ui.token_label.on_signal_text (HttpCredentialsGui.request_app_password_text (oc_wizard.account));
-        this.ui.token_label.visible (!this.ui.token_label.text () == "");
-        this.ui.le_username.focus ();
+        this.instance.token_label.on_signal_text (HttpCredentialsGui.request_app_password_text (oc_wizard.account));
+        this.instance.token_label.visible (!this.instance.token_label.text () == "");
+        this.instance.le_username.focus ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void clean_up_page () {
-        this.ui.le_username.clear ();
-        this.ui.le_password.clear ();
+        this.instance.le_username.clear ();
+        this.instance.le_password.clear ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool validate_page () {
-        if (this.ui.le_username.text () == "" || this.ui.le_password.text () == "") {
+        if (this.instance.le_username.text () == "" || this.instance.le_password.text () == "") {
             return false;
         }
 
         if (!this.connected) {
-            this.ui.error_label.visible (false);
+            this.instance.error_label.visible (false);
             on_signal_start_spinner ();
 
             // Reset cookies to ensure the username / password is actually used
@@ -173,10 +173,10 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
     ***********************************************************/
     public void on_signal_error_string (string error_string) {
         if (error_string == "") {
-            this.ui.error_label.visible (false);
+            this.instance.error_label.visible (false);
         } else {
-            this.ui.error_label.visible (true);
-            this.ui.error_label.on_signal_text (error_string);
+            this.instance.error_label.visible (true);
+            this.instance.error_label.on_signal_text (error_string);
         }
         /* emit */ complete_changed ();
         on_signal_stop_spinner ();
@@ -193,7 +193,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
     /***********************************************************
     ***********************************************************/
     private void on_signal_start_spinner () {
-        this.ui.result_layout.enabled (true);
+        this.instance.result_layout.enabled (true);
         this.progress_indicator.visible (true);
         this.progress_indicator.on_signal_start_animation ();
     }
@@ -202,7 +202,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
     /***********************************************************
     ***********************************************************/
     private void on_signal_stop_spinner () {
-        this.ui.result_layout.enabled (false);
+        this.instance.result_layout.enabled (false);
         this.progress_indicator.visible (false);
         this.progress_indicator.on_signal_stop_animation ();
     }
@@ -212,17 +212,17 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
     ***********************************************************/
     private void set_up_customization () {
         // set defaults for the customize labels.
-        this.ui.top_label.hide ();
-        this.ui.bottom_label.hide ();
+        this.instance.top_label.hide ();
+        this.instance.bottom_label.hide ();
 
         Theme theme = Theme.instance;
         GLib.Variant variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_TOP);
         if (!variant == null) {
-            WizardCommon.set_up_custom_media (variant, this.ui.top_label);
+            WizardCommon.set_up_custom_media (variant, this.instance.top_label);
         }
 
         variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_BOTTOM);
-        WizardCommon.set_up_custom_media (variant, this.ui.bottom_label);
+        WizardCommon.set_up_custom_media (variant, this.instance.bottom_label);
     }
 
 
@@ -230,7 +230,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
     ***********************************************************/
     private void customize_style () {
         if (this.progress_indicator) {
-            this.progress_indicator.on_signal_color (Gtk.Application.palette ().color (QPalette.Text));
+            this.progress_indicator.on_signal_color (Gtk.Application.palette ().color (Gtk.Palette.Text));
         }
     }
 

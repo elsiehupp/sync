@@ -15,7 +15,7 @@ public class Flow2AuthWidget : Gtk.Widget {
     ***********************************************************/
     private Account account = null;
     private QScopedPointer<Flow2Auth> async_auth;
-    private Ui_Flow2Auth_widget ui;
+    private Ui_Flow2Auth_widget instance;
 
     /***********************************************************
     ***********************************************************/
@@ -30,15 +30,15 @@ public class Flow2AuthWidget : Gtk.Widget {
     public Flow2AuthWidget (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.progress_indicator = new QProgressIndicator (this);
-        this.ui.setupUi (this);
+        this.instance.setupUi (this);
 
-        WizardCommon.initErrorLabel (this.ui.error_label);
-        this.ui.error_label.setTextFormat (Qt.RichText);
+        WizardCommon.initErrorLabel (this.instance.error_label);
+        this.instance.error_label.setTextFormat (Qt.RichText);
 
-        this.ui.open_link_label.clicked.connect (
+        this.instance.open_link_label.clicked.connect (
             this.on_signal_open_browser
         );
-        this.ui.copy_link_label.clicked.connect (
+        this.instance.copy_link_label.clicked.connect (
             this.on_signal_copy_link_to_clipboard
         );
 
@@ -46,7 +46,7 @@ public class Flow2AuthWidget : Gtk.Widget {
         size_policy.retain_size_when_hidden (true);
         this.progress_indicator.setSizePolicy (size_policy);
 
-        this.ui.progress_layout.add_widget (this.progress_indicator);
+        this.instance.progress_layout.add_widget (this.progress_indicator);
         stop_spinner (false);
 
         customize_style ();
@@ -98,10 +98,10 @@ public class Flow2AuthWidget : Gtk.Widget {
     ***********************************************************/
     public void error (string error) {
         if (error == "") {
-            this.ui.error_label.hide ();
+            this.instance.error_label.hide ();
         } else {
-            this.ui.error_label.text (error);
-            this.ui.error_label.show ();
+            this.instance.error_label.text (error);
+            this.instance.error_label.show ();
         }
     }
 
@@ -114,16 +114,16 @@ public class Flow2AuthWidget : Gtk.Widget {
         switch (r) {
         case Flow2Auth.NotSupported:
             /* Flow2Auth can't open browser */
-            this.ui.error_label.text (_("Unable to open the Browser, please copy the link to your Browser."));
-            this.ui.error_label.show ();
+            this.instance.error_label.text (_("Unable to open the Browser, please copy the link to your Browser."));
+            this.instance.error_label.show ();
             break;
         case Flow2Auth.Error:
             /* Error while getting the access token.  (Timeout, or the server did not accept our client credentials */
-            this.ui.error_label.text (error_string);
-            this.ui.error_label.show ();
+            this.instance.error_label.text (error_string);
+            this.instance.error_label.show ();
             break;
         case Flow2Auth.LoggedIn: {
-            this.ui.error_label.hide ();
+            this.instance.error_label.hide ();
             break;
         }
         }
@@ -148,21 +148,21 @@ public class Flow2AuthWidget : Gtk.Widget {
                 this.status_update_skip_count--;
                 break;
             }
-            this.ui.status_label.setext (_("Waiting for authorization") + "… (%1)".printf (secondsLeft));
+            this.instance.status_label.setext (_("Waiting for authorization") + "… (%1)".printf (secondsLeft));
             stop_spinner (true);
             break;
         case Flow2Auth.statusPollNow:
             this.status_update_skip_count = 0;
-            this.ui.status_label.text (_("Polling for authorization") + "…");
+            this.instance.status_label.text (_("Polling for authorization") + "…");
             startSpinner ();
             break;
         case Flow2Auth.statusFetchToken:
             this.status_update_skip_count = 0;
-            this.ui.status_label.text (_("Starting authorization") + "…");
+            this.instance.status_label.text (_("Starting authorization") + "…");
             startSpinner ();
             break;
         case Flow2Auth.statusCopyLinkToClipboard:
-            this.ui.status_label.text (_("Link copied to clipboard."));
+            this.instance.status_label.text (_("Link copied to clipboard."));
             this.status_update_skip_count = 3;
             stop_spinner (true);
             break;
@@ -180,8 +180,8 @@ public class Flow2AuthWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_open_browser () {
-        if (this.ui.error_label) {
-            this.ui.error_label.hide ();
+        if (this.instance.error_label) {
+            this.instance.error_label.hide ();
         }
 
         if (this.async_auth) {
@@ -193,8 +193,8 @@ public class Flow2AuthWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_copy_link_to_clipboard () {
-        if (this.ui.error_label) {
-            this.ui.error_label.hide ();
+        if (this.instance.error_label) {
+            this.instance.error_label.hide ();
         }
 
         if (this.async_auth) {
@@ -206,26 +206,26 @@ public class Flow2AuthWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_start_spinner () {
-        this.ui.progress_layout.enabled (true);
-        this.ui.status_label.visible (true);
+        this.instance.progress_layout.enabled (true);
+        this.instance.status_label.visible (true);
         this.progress_indicator.visible (true);
         this.progress_indicator.start_animation ();
 
-        this.ui.open_link_label.enabled (false);
-        this.ui.copy_link_label.enabled (false);
+        this.instance.open_link_label.enabled (false);
+        this.instance.copy_link_label.enabled (false);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void on_signal_stop_spinner (bool show_status_label) {
-        this.ui.progress_layout.enabled (false);
-        this.ui.status_label.visible (show_status_label);
+        this.instance.progress_layout.enabled (false);
+        this.instance.status_label.visible (show_status_label);
         this.progress_indicator.visible (false);
         this.progress_indicator.stop_animation ();
 
-        this.ui.open_link_label.enabled (this.status_update_skip_count == 0);
-        this.ui.copy_link_label.enabled (this.status_update_skip_count == 0);
+        this.instance.open_link_label.enabled (this.status_update_skip_count == 0);
+        this.instance.copy_link_label.enabled (this.status_update_skip_count == 0);
     }
 
 
@@ -243,13 +243,13 @@ public class Flow2AuthWidget : Gtk.Widget {
             }
         }
 
-        this.ui.open_link_label.text (_("Reopen Browser"));
-        this.ui.open_link_label.alignment (Qt.AlignCenter);
+        this.instance.open_link_label.text (_("Reopen Browser"));
+        this.instance.open_link_label.alignment (Qt.AlignCenter);
 
-        this.ui.copy_link_label.text (_("Copy Link"));
-        this.ui.copy_link_label.alignment (Qt.AlignCenter);
+        this.instance.copy_link_label.text (_("Copy Link"));
+        this.instance.copy_link_label.alignment (Qt.AlignCenter);
 
-        WizardCommon.customize_hint_label (this.ui.status_label);
+        WizardCommon.customize_hint_label (this.instance.status_label);
     }
 
 
@@ -260,7 +260,7 @@ public class Flow2AuthWidget : Gtk.Widget {
         const var logo_icon_filename = Theme.is_branded
             ? Theme.hidpi_filename ("external.png", background_color)
             : Theme.hidpi_filename (":/client/theme/colored/external.png");
-        this.ui.logo_label.pixmap (logo_icon_filename);
+        this.instance.logo_label.pixmap (logo_icon_filename);
     }
 
 }

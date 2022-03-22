@@ -1,4 +1,5 @@
 namespace Occ {
+namespace Common {
 
 /***********************************************************
 @class Optional
@@ -23,4 +24,5 @@ public class Optional : Result<T, OptionalNoErrorData> {
 
 } // class Optional
 
+} // namespace Common
 } // namespace Occ

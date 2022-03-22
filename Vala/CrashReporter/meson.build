@@ -16,6 +16,8 @@ deps = [
     # dependency('granite'),
     # dependency('gee-0.8'),
     # dependency('json-glib-1.0'),
+    # libsecret-1-dev
+    dependency('libsecret-1'),
     # dependency('libsoup-2.4'),
 ]
 

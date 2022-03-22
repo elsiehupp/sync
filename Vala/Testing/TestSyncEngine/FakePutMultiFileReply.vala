@@ -26,7 +26,7 @@ public class FakePutMultiFileReply : FakeReply {
         set_operation (operation);
         open (QIODevice.ReadOnly);
         this.all_file_info = perform_multi_part (remote_root_file_info, request, put_payload, content_type);
-        QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
+        GLib.Object.invoke_method (this, "respond", Qt.QueuedConnection);
     }
 
 

@@ -160,7 +160,7 @@ public class OwncloudSetupWizard : GLib.Object {
             // We want to reset the QNAM proxy so that the global proxy settings are used (via ClientProxy settings)
             account.network_access_manager.proxy (QNetworkProxy (QNetworkProxy.DefaultProxy));
             // use a queued invocation so we're as asynchronous as with the other code path
-            QMetaObject.invoke_method (this, "on_signal_find_server", Qt.QueuedConnection);
+            GLib.Object.invoke_method (this, "on_signal_find_server", Qt.QueuedConnection);
         }
     }
 
@@ -545,7 +545,7 @@ public class OwncloudSetupWizard : GLib.Object {
                 var f = folder_man.add_folder (account, folder_definition);
                 if (f) {
                     if (folder_definition.virtual_files_mode != Vfs.Off && this.oc_wizard.use_virtual_file_sync ())
-                        f.root_pin_state (Vfs.ItemAvailability.ONLINE_ONLY);
+                        f.root_pin_state (Common.ItemAvailability.ONLINE_ONLY);
 
                     f.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
                         this.oc_wizard.selective_sync_blocklist ());

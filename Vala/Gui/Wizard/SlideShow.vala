@@ -114,7 +114,7 @@ public class SlideShow : Gtk.Widget {
     public void draw_slide (QPainter painter, int index) {
         string label = this.labels.value (index);
         QRect label_rect = this.style.item_text_rect (font_metrics (), rect (), Qt.Align_bottom | Qt.AlignHCenter, is_enabled (), label);
-        this.style.draw_item_text (painter, label_rect, Qt.AlignCenter, palette (), is_enabled (), label, QPalette.Window_text);
+        this.style.draw_item_text (painter, label_rect, Qt.AlignCenter, palette (), is_enabled (), label, Gtk.Palette.Window_text);
 
         Gdk.Pixbuf pixmap = this.pixmaps.value (index);
         QRect pixmap_rect = this.style.item_pixmap_rect (QRect (0, 0, width (), label_rect.top () - SPACING), Qt.AlignCenter, pixmap);

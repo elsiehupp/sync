@@ -4,7 +4,7 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QBuffer>
+//  #include <GLib.OutputStream>
 //  #include <QFileIconProvider>
 //  #include <QClipboard>
 //  #include <GLib.FileInfo>
@@ -46,7 +46,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private Ui.ShareUserGroupWidget ui;
+    private ShareUserGroupWidget instance;
     private QScroll_area parent_scroll_area;
     private unowned Account account;
     private string share_path;
@@ -91,7 +91,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         string private_link_url,
         Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
-        this.ui = new Ui.ShareUserGroupWidget ();
+        this.instance = new ShareUserGroupWidget ();
         this.account = account;
         this.share_path = share_path;
         this.local_path = local_path;
@@ -101,7 +101,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         attribute (Qt.WA_DeleteOnClose);
         object_name ("Sharing_dialog_uG"); // required as group for save_geometry call
 
-        this.ui.up_ui (this);
+        this.instance.up_ui (this);
 
         //Is this a file or folder?
         this.is_file = GLib.FileInfo (local_path).is_file ();
@@ -123,9 +123,9 @@ public class ShareUserGroupWidget : Gtk.Widget {
         this.completer.model (this.completer_model);
         this.completer.case_sensitivity (Qt.CaseInsensitive);
         this.completer.completion_mode (QCompleter.Unfiltered_popup_completion);
-        this.ui.sharee_line_edit.completer (this.completer);
+        this.instance.sharee_line_edit.completer (this.completer);
 
-        var search_globally_action = new QAction (this.ui.sharee_line_edit);
+        var search_globally_action = new QAction (this.instance.sharee_line_edit);
         search_globally_action.icon (Gtk.Icon (":/client/theme/magnifying-glass.svg"));
         search_globally_action.tool_tip (_("Search globally"));
 
@@ -133,7 +133,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
             this.on_search_globally_action
         );
 
-        this.ui.sharee_line_edit.add_action (search_globally_action, QLineEdit.Leading_position);
+        this.instance.sharee_line_edit.add_action (search_globally_action, QLineEdit.Leading_position);
 
         this.manager = new ShareManager (this.account, this);
         this.manager.signal_shares_fetched.connect (
@@ -145,15 +145,15 @@ public class ShareUserGroupWidget : Gtk.Widget {
         this.manager.signal_server_error.connect (
             this.on_signal_display_error
         );
-        this.ui.sharee_line_edit.return_pressed.connect (
+        this.instance.sharee_line_edit.return_pressed.connect (
             this.on_signal_line_edit_return
         );
-        this.ui.confirm_share.clicked.connect (
+        this.instance.confirm_share.clicked.connect (
             this.on_signal_line_edit_return
         );
         // TODO
         //  connect (
-        //      this.ui.private_link_text, Gtk.Label.link_activated,
+        //      this.instance.private_link_text, Gtk.Label.link_activated,
         //      this, ShareUserGroupWidget.on_signal_private_link_share
         //  );
 
@@ -167,21 +167,21 @@ public class ShareUserGroupWidget : Gtk.Widget {
         );
 
         // Queued connection so this signal is recieved after text_changed
-        this.ui.sharee_line_edit.text_edited.connect (
+        this.instance.sharee_line_edit.text_edited.connect (
             this.on_signal_sharee_line_edit_text_edited // Qt.QueuedConnection
         );
-        this.ui.sharee_line_edit.install_event_filter (this);
+        this.instance.sharee_line_edit.install_event_filter (this);
         this.completion_timer.timeout.connect (
             this.on_completion_timer_timeout
         );
         this.completion_timer.single_shot (true);
         this.completion_timer.interval (600);
 
-        this.ui.error_label.hide ();
+        this.instance.error_label.hide ();
 
         // TODO Progress Indicator where should it go?
         // Setup the sharee search progress indicator
-        //this.ui.sharee_horizontal_layout.add_widget (this.pi_sharee);
+        //this.instance.sharee_horizontal_layout.add_widget (this.pi_sharee);
 
         this.parent_scroll_area = parent_widget ().find_child<QScroll_area> ("scroll_area");
 
@@ -200,7 +200,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
 
 
     override ~ShareUserGroupWidget () {
-        delete this.ui;
+        delete this.instance;
     }
 
 
@@ -259,7 +259,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
             // the owner of the file that shared it first
             // leave out if it's the current user
             if (x == 0 && !share.owner_uid == "" && ! (share.owner_uid == this.account.credentials ().user ())) {
-                this.ui.main_owner_label.text ("SharedFlag.SHARED with you by " += share.owner_display_name ());
+                this.instance.main_owner_label.text ("SharedFlag.SHARED with you by " += share.owner_display_name ());
             }
 
             //  Q_ASSERT (Share.is_share_type_user_group_email_room_or_remote (share.share_type));
@@ -273,8 +273,8 @@ public class ShareUserGroupWidget : Gtk.Widget {
             );
             share_user_line.background_role (
                 layout.count () % 2 == 0
-                ? QPalette.Base
-                : QPalette.Alternate_base
+                ? Gtk.Palette.Base
+                : Gtk.Palette.Alternate_base
             );
 
             // Connect signal_style_changed events to our widget
@@ -335,11 +335,11 @@ public class ShareUserGroupWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_search_for_sharees (ShareeModel.LookupMode lookup_mode) {
-        if (this.ui.sharee_line_edit.text () == "") {
+        if (this.instance.sharee_line_edit.text () == "") {
             return;
         }
 
-        this.ui.sharee_line_edit.enabled (false);
+        this.instance.sharee_line_edit.enabled (false);
         this.completion_timer.stop ();
         this.pi_sharee.on_signal_start_animation ();
         ShareeModel.ShareeSet blocklist;
@@ -351,8 +351,8 @@ public class ShareUserGroupWidget : Gtk.Widget {
         foreach (var share_widget in this.parent_scroll_area.find_children<ShareUserLine> ()) {
             blocklist += share_widget.share ().share_with ();
         }
-        this.ui.error_label.hide ();
-        this.completer_model.fetch (this.ui.sharee_line_edit.text (), blocklist, lookup_mode);
+        this.instance.error_label.hide ();
+        this.completer_model.fetch (this.instance.sharee_line_edit.text (), blocklist, lookup_mode);
     }
 
 
@@ -374,7 +374,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
     private void on_signal_line_edit_return () {
         this.disable_completer_activated = false;
         // did the user type in one of the options?
-        const var text = this.ui.sharee_line_edit.text ();
+        const var text = this.instance.sharee_line_edit.text ();
         for (int i = 0; i < this.completer_model.row_count (); ++i) {
             const var sharee = this.completer_model.sharee (i);
             if (sharee.to_string () == text
@@ -425,7 +425,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
 
         string password;
         if (sharee.type () == Sharee.Type.EMAIL && this.account.capabilities.share_email_password_enforced ()) {
-            this.ui.sharee_line_edit.clear ();
+            this.instance.sharee_line_edit.clear ();
             // always show a dialog for password-enforced email shares
             bool ok = false;
 
@@ -450,8 +450,8 @@ public class ShareUserGroupWidget : Gtk.Widget {
             this.max_sharing_permissions, password
         );
 
-        this.ui.sharee_line_edit.enabled = false;
-        this.ui.sharee_line_edit.clear ();
+        this.instance.sharee_line_edit.enabled = false;
+        this.instance.sharee_line_edit.clear ();
     }
 
 
@@ -460,7 +460,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
     private void on_signal_completer_highlighted (QModelIndex index) {
         // By default the completer would set the text to EditRole,
         // override that here.
-        this.ui.sharee_line_edit.on_signal_text (index.data (Qt.Display_role).to_string ());
+        this.instance.sharee_line_edit.on_signal_text (index.data (Qt.Display_role).to_string ());
     }
 
 
@@ -528,8 +528,8 @@ public class ShareUserGroupWidget : Gtk.Widget {
         }
 
         GLib.warning ("Sharing error from server " + code + message);
-        this.ui.error_label.on_signal_text (message);
-        this.ui.error_label.show ();
+        this.instance.error_label.on_signal_text (message);
+        this.instance.error_label.show ();
         activate_sharee_line_edit ();
     }
 
@@ -561,12 +561,12 @@ public class ShareUserGroupWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void customize_style () {
-        this.ui.confirm_share.icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
+        this.instance.confirm_share.icon (Theme.create_color_aware_icon (":/client/theme/confirm.svg"));
 
-        this.pi_sharee.on_signal_color (Gtk.Application.palette ().color (QPalette.Text));
+        this.pi_sharee.on_signal_color (Gtk.Application.palette ().color (Gtk.Palette.Text));
 
         foreach (var progress_indicator in this.parent_scroll_area.find_children<QProgressIndicator> ()) {
-            progress_indicator.on_signal_color (Gtk.Application.palette ().color (QPalette.Text));;
+            progress_indicator.on_signal_color (Gtk.Application.palette ().color (Gtk.Palette.Text));;
         }
     }
 
@@ -574,8 +574,8 @@ public class ShareUserGroupWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void activate_sharee_line_edit () {
-        this.ui.sharee_line_edit.enabled (true);
-        this.ui.sharee_line_edit.focus ();
+        this.instance.sharee_line_edit.enabled (true);
+        this.instance.sharee_line_edit.focus ();
     }
 
 } // class ShareUserGroupWidget

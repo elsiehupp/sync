@@ -527,7 +527,7 @@ public class Application : Gtk.Application {
         string relative_path = GLib.Dir.clean_path (filename).mid (folder.clean_path.length + 1);
         folder.on_signal_implicitly_hydrate_file (relative_path);
         string normal_name = filename.left (filename.size () - virtual_file_ext.size ());
-        QMetaObject.Connection.create () = connect (
+        GLib.Object.Connection.create () = connect (
             folder,
             Folder.signal_sync_finished, folder,
             this.on_signal_sync_finished
@@ -851,7 +851,7 @@ public class Application : Gtk.Application {
     ***********************************************************/
     protected void on_signal_system_online_configuration_changed (QNetworkConfiguration cnf) {
         if (cnf.state & QNetworkConfiguration.Active) {
-            QMetaObject.invoke_method (this, "on_signal_check_connection", Qt.QueuedConnection);
+            GLib.Object.invoke_method (this, "on_signal_check_connection", Qt.QueuedConnection);
         }
     }
 

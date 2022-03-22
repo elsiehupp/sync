@@ -1,4 +1,5 @@
 namespace Occ {
+namespace Common {
 
 /***********************************************************
 @class PreparedSqlQueryManager
@@ -97,6 +98,7 @@ public class PreparedSqlQueryManager : GLib.Object {
         );
     }
 
-}
+} // class PreparedSqlQueryManager
 
-}
+} // namespace Common
+} // namespace Occ

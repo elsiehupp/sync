@@ -1,4 +1,5 @@
 namespace Occ {
+namespace Common {
 
 /***********************************************************
 @class RemotePermissions
@@ -165,5 +166,5 @@ public class RemotePermissions : GLib.Object {
 
 } // class RemotePermissions
 
+} // namespace Common
 } // namespace Occ
-    

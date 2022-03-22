@@ -448,7 +448,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         poll_job.signal_finished.connect (
             this.on_signal_poll_job_finished
         );
-        SyncJournalDb.PollInfo info;
+        Common.SyncJournalDb.PollInfo info;
         info.file = this.item.file;
         info.url = path;
         info.modtime = this.item.modtime;
@@ -524,7 +524,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
             || this.item.instruction == CSync.SyncInstructions.TYPE_CHANGE) {
             var vfs = this.propagator.sync_options.vfs;
             var pin = vfs.pin_state (this.item.file);
-            if (pin && *pin == Vfs.ItemAvailability.ONLINE_ONLY) {
+            if (pin && *pin == Common.ItemAvailability.ONLINE_ONLY) {
                 if (!vfs.pin_state (this.item.file, PinState.PinState.UNSPECIFIED)) {
                     GLib.warning ("Could not set pin state of " + this.item.file + " to unspecified");
                 }
@@ -532,7 +532,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         }
 
         // Remove from the progress database:
-        this.propagator.journal.upload_info (this.item.file, SyncJournalDb.UploadInfo ());
+        this.propagator.journal.upload_info (this.item.file, Common.SyncJournalDb.UploadInfo ());
         this.propagator.journal.commit ("upload file start");
 
         if (this.uploading_encrypted) {
@@ -630,7 +630,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
                 GLib.info (
                     "Reset transfer of " + this.item.file
                     + " due to repeated error " + this.item.http_error_code);
-                upload_info = SyncJournalDb.UploadInfo ();
+                upload_info = Common.SyncJournalDb.UploadInfo ();
             } else {
                 GLib.info (
                     "Error count for maybe-reset error " + this.item.http_error_code

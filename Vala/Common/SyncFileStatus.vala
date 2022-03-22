@@ -1,4 +1,5 @@
 namespace Occ {
+namespace Common {
 
 /***********************************************************
 @class SyncFileStatus
@@ -83,6 +84,8 @@ public class SyncFileStatus : GLib.Object {
     //  inline bool operator!= (SyncFileStatus a, SyncFileStatus b) {
     //      return ! (a == b);
     //  }
-}
 
+} // class SyncFileStatus
+
+} // namespace Common
 } // namespace Occ

@@ -27,7 +27,7 @@ public class AbstractTestChunkingNg : GLib.Object {
         fake_folder.local_modifier.append_byte ("A/a0");
 
         // But in the middle of the sync, modify the file on the server
-        QMetaObject.Connection con = connect (
+        GLib.Object.Connection con = connect (
             fake_folder.sync_engine,
             SyncEngine.signal_transmission_progress,
             this.on_signal_sync_engine_transmission_progress_create_conflict_while_syncing

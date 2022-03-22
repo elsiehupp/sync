@@ -303,7 +303,7 @@ public class ConfigFile : GLib.Object {
 
 
     /***********************************************************
-    Server poll interval in milliseconds
+    Server poll interval_in_microseconds in milliseconds
 
     FIXME: GLib.TimeSpan is microseconds, not milliseconds!
     ***********************************************************/
@@ -328,23 +328,23 @@ public class ConfigFile : GLib.Object {
 
 
     /***********************************************************
-    Set poll interval. Value in milliseconds has to be larger
+    Set poll interval_in_microseconds. Value in milliseconds has to be larger
     than 5000
 
     FIXME: GLib.TimeSpan is microseconds, not milliseconds!
     ***********************************************************/
-    public void remote_poll_interval (GLib.TimeSpan interval, string connection = "") {
+    public void remote_poll_interval (GLib.TimeSpan interval_in_microseconds, string connection = "") {
         string connection_string = connection;
         if (connection == "")
             connection_string = ConfigFile.default_connection;
 
-        if (interval < chrono.seconds (5)) {
-            GLib.warning ("Remote Poll interval of " + interval.count () + " is below five seconds.");
+        if (interval_in_microseconds < chrono.seconds (5)) {
+            GLib.warning ("Remote Poll interval_in_microseconds of " + interval_in_microseconds.count () + " is below five seconds.");
             return;
         }
         GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         settings.begin_group (connection_string);
-        settings.value (REMOTE_POLL_INTERVAL_C, int64 (interval.count ()));
+        settings.value (REMOTE_POLL_INTERVAL_C, int64 (interval_in_microseconds.count ()));
         settings.sync ();
     }
 
@@ -362,17 +362,17 @@ public class ConfigFile : GLib.Object {
         settings.begin_group (connection_string);
 
         var default_interval = chrono.minutes (5);
-        var interval = milliseconds_value (settings, NOTIFICATION_REFRESH_INTERVAL_C, default_interval);
-        if (interval < chrono.minutes (1)) {
-            GLib.warning ("Notification refresh interval smaller than one minute; setting to one minute.");
-            interval = chrono.minutes (1);
+        var interval_in_microseconds = milliseconds_value (settings, NOTIFICATION_REFRESH_INTERVAL_C, default_interval);
+        if (interval_in_microseconds < chrono.minutes (1)) {
+            GLib.warning ("Notification refresh interval_in_microseconds smaller than one minute; setting to one minute.");
+            interval_in_microseconds = chrono.minutes (1);
         }
-        return interval;
+        return interval_in_microseconds;
     }
 
 
     /***********************************************************
-    Force sync interval, in milliseconds
+    Force sync interval_in_microseconds, in milliseconds
 
     FIXME: GLib.TimeSpan is microseconds, not milliseconds!
     ***********************************************************/
@@ -386,12 +386,12 @@ public class ConfigFile : GLib.Object {
         settings.begin_group (connection_string);
 
         var default_interval = chrono.hours (2);
-        var interval = milliseconds_value (settings, FORCE_SYNC_INTERVAL_C, default_interval);
-        if (interval < poll_interval) {
-            GLib.warning ("Force sync interval is less than the remote poll inteval; reverting to " + poll_interval.count ());
-            interval = poll_interval;
+        var interval_in_microseconds = milliseconds_value (settings, FORCE_SYNC_INTERVAL_C, default_interval);
+        if (interval_in_microseconds < poll_interval) {
+            GLib.warning ("Force sync interval_in_microseconds is less than the remote poll inteval; reverting to " + poll_interval.count ());
+            interval_in_microseconds = poll_interval;
         }
-        return interval;
+        return interval_in_microseconds;
     }
 
 
@@ -547,7 +547,7 @@ public class ConfigFile : GLib.Object {
                 settings.remove (PROXY_PASS_C);
 
                 // Delete password from keychain
-                var keychain_chunk_delete_job = new KeychainChunk.KeychainChunkDeleteJob (KEYCHAIN_PROXY_PASSWORD_KEY ());
+                var keychain_chunk_delete_job = new KeychainChunkDeleteJob (KEYCHAIN_PROXY_PASSWORD_KEY ());
                 keychain_chunk_delete_job.exec ();
             } else {
                 // Write password to keychain
@@ -978,14 +978,14 @@ public class ConfigFile : GLib.Object {
         settings.begin_group (connection_string);
 
         var default_interval = chrono.hours (10);
-        var interval = milliseconds_value (settings, UPDATE_CHECK_INTERVAL_C, default_interval);
+        var interval_in_microseconds = milliseconds_value (settings, UPDATE_CHECK_INTERVAL_C, default_interval);
 
         var min_interval = chrono.minutes (5);
-        if (interval < min_interval) {
-            GLib.warning ("Update check interval less than five minutes; resetting to 5 minutes.");
-            interval = min_interval;
+        if (interval_in_microseconds < min_interval) {
+            GLib.warning ("Update check interval_in_microseconds less than five minutes; resetting to 5 minutes.");
+            interval_in_microseconds = min_interval;
         }
-        return interval;
+        return interval_in_microseconds;
     }
 
 

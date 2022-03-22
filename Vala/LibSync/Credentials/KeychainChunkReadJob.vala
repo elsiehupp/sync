@@ -2,7 +2,7 @@ namespace Occ {
 namespace LibSync {
 
 /***********************************************************
-@brief Simple wrapper class for QKeychain.ReadPasswordJob,
+@brief Simple wrapper class for Secret.Collection.ReadPasswordJob,
 splits too large keychain entry's data into chunks on Windows
 
 @author Michael Schuster <michael@schuster.ms>
@@ -43,12 +43,12 @@ public class KeychainChunkReadJob : KeychainChunkJob {
     Call this method to start the job (async).
     You should connect some slot to the signal_finished () signal first.
 
-    @see QKeychain.Job.start ()
+    @see Secret.Collection.Job.start ()
     ***********************************************************/
     public new void start () {
         this.chunk_count = 0;
         this.chunk_buffer.clear ();
-        this.error = QKeychain.NoError;
+        this.error = Secret.Collection.NoError;
 
         const string keychain_key = this.account ? AbstractCredentials.keychain_key (
                 this.account.url.to_string (),
@@ -56,7 +56,7 @@ public class KeychainChunkReadJob : KeychainChunkJob {
                 this.keychain_migration ? "" : this.account.identifier
             ) : this.key;
 
-        var qkeychain_read_password_job = new QKeychain.ReadPasswordJob (this.service_name, this);
+        var qkeychain_read_password_job = new Secret.Collection.ReadPasswordJob (this.service_name, this);
     // #if defined (KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK)
         add_settings_to_job (this.account, qkeychain_read_password_job);
     // #endif
@@ -73,7 +73,7 @@ public class KeychainChunkReadJob : KeychainChunkJob {
     Call this method to start the job synchronously.
     Awaits completion with no need to connect some slot to the signal_finished () signal first.
 
-    @return Returns true on succeess (QKeychain.NoError).
+    @return Returns true on succeess (Secret.Collection.NoError).
     ***********************************************************/
     public bool exec () {
         start ();
@@ -99,9 +99,9 @@ public class KeychainChunkReadJob : KeychainChunkJob {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_read_job_done (QKeychain.Job incoming_job) {
+    private void on_signal_read_job_done (Secret.Collection.Job incoming_job) {
         // Errors or next chunk?
-        var read_job = qobject_cast<QKeychain.ReadPasswordJob> (incoming_job);
+        var read_job = qobject_cast<Secret.Collection.ReadPasswordJob> (incoming_job);
         GLib.assert (read_job);
 
         if (read_job.error == NoError && !read_job.binary_data () == "") {
@@ -109,8 +109,8 @@ public class KeychainChunkReadJob : KeychainChunkJob {
             this.chunk_count++;
         } else {
             if (!read_job.insecure_fallback ()) { // If insecure_fallback is set, the next test would be pointless
-                if (this.retry_on_signal_key_chain_error && (read_job.error == QKeychain.NoBackendAvailable
-                        || read_job.error == QKeychain.OtherError)) {
+                if (this.retry_on_signal_key_chain_error && (read_job.error == Secret.Collection.NoBackendAvailable
+                        || read_job.error == Secret.Collection.OtherError)) {
                     // Could be that the backend was not yet available. Wait some extra seconds.
                     // (Issues #4274 and #6522)
                     // (For kwallet, the error is OtherError instead of NoBackendAvailable, maybe a bug in QtKeychain)
@@ -122,8 +122,8 @@ public class KeychainChunkReadJob : KeychainChunkJob {
                 }
                 this.retry_on_signal_key_chain_error = false;
             }
-            if (read_job.error != QKeychain.EntryNotFound ||
-                ( (read_job.error == QKeychain.EntryNotFound) && this.chunk_count == 0)) {
+            if (read_job.error != Secret.Collection.EntryNotFound ||
+                ( (read_job.error == Secret.Collection.EntryNotFound) && this.chunk_count == 0)) {
                 this.error = read_job.error;
                 this.error_string = read_job.error_string;
                 GLib.warning ("Unable to read " + read_job.key () + " chunk " + string.number (this.chunk_count) + read_job.error_string);

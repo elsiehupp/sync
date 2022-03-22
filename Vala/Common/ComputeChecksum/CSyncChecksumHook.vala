@@ -1,4 +1,5 @@
 namespace Occ {
+namespace Common {
 
 /***********************************************************
 @class CSyncChecksumHook
@@ -36,6 +37,7 @@ public class CSyncChecksumHook : ComputeChecksumBase {
         return make_checksum_header (type, checksum);
     }
 
-}
+} // class CSyncChecksumHook
 
+} // namespace Common
 } // namespace Occ

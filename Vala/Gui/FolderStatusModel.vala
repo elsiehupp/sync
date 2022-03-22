@@ -400,7 +400,7 @@ public class FolderStatusModel : QAbstractItemModel {
                 ? { (_("Virtual file support is enabled."))}
                 : { };
         case DataRole.SYNC_RUNNING:
-            return folder.sync_result.status () == SyncResult.Status.SYNC_RUNNING;
+            return folder.sync_result.status () == LibSync.SyncResult.Status.SYNC_RUNNING;
         case DataRole.SYNC_DATE:
             return folder.sync_result.sync_time ();
         case DataRole.HEADER_ROLE:
@@ -431,17 +431,17 @@ public class FolderStatusModel : QAbstractItemModel {
                 if (folder.sync_paused) {
                     return theme.folder_disabled_icon;
                 } else {
-                    if (status == SyncResult.Status.SYNC_PREPARE || status == SyncResult.Status.UNDEFINED) {
-                        return theme.sync_state_icon (SyncResult.Status.SYNC_RUNNING);
+                    if (status == LibSync.SyncResult.Status.SYNC_PREPARE || status == LibSync.SyncResult.Status.UNDEFINED) {
+                        return theme.sync_state_icon (LibSync.SyncResult.Status.SYNC_RUNNING);
                     } else {
                         // The "Problem" *result* just means some files weren't
                         // synced, so we show "Success" in these cases. But we
                         // do use the "Problem" *icon* for unresolved conflicts.
-                        if (status == SyncResult.Status.SUCCESS || status == SyncResult.Status.PROBLEM) {
+                        if (status == LibSync.SyncResult.Status.SUCCESS || status == LibSync.SyncResult.Status.PROBLEM) {
                             if (folder.sync_result.has_unresolved_conflicts) {
-                                return theme.sync_state_icon (SyncResult.Status.PROBLEM);
+                                return theme.sync_state_icon (LibSync.SyncResult.Status.PROBLEM);
                             } else {
-                                return theme.sync_state_icon (SyncResult.Status.SUCCESS);
+                                return theme.sync_state_icon (LibSync.SyncResult.Status.SUCCESS);
                             }
                         } else {
                             return theme.sync_state_icon (status);
@@ -1035,7 +1035,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_folder_progress_info (ProgressInfo progress) {
+    public void on_signal_folder_progress_info (LibSync.ProgressInfo progress) {
         var par = qobject_cast<Gtk.Widget> (GLib.Object.parent ());
         if (!par.is_visible ()) {
             return; // for https://github.com/owncloud/client/issues/2648#issuecomment-71377909
@@ -1064,7 +1064,7 @@ public class FolderStatusModel : QAbstractItemModel {
                + DataRole.WARNING_COUNT
                + Qt.ToolTipRole;
 
-        if (progress.status () == ProgressInfo.Status.DISCOVERY) {
+        if (progress.status () == LibSync.ProgressInfo.Status.DISCOVERY) {
             if (!progress.current_discovered_remote_folder == "") {
                 pi.overall_sync_string = _("Checking for changes in remote \"%1\"").printf (progress.current_discovered_remote_folder);
                 /* emit */ data_changed (index (folder_index), index (folder_index), roles);
@@ -1076,7 +1076,7 @@ public class FolderStatusModel : QAbstractItemModel {
             }
         }
 
-        if (progress.status () == ProgressInfo.Status.RECONCILE) {
+        if (progress.status () == LibSync.ProgressInfo.Status.RECONCILE) {
             pi.overall_sync_string = _("Reconciling changes");
             /* emit */ data_changed (index (folder_index), index (folder_index), roles);
             return;
@@ -1097,8 +1097,8 @@ public class FolderStatusModel : QAbstractItemModel {
         uint64 estimated_up_bandwidth = 0;
         uint64 estimated_down_bandwidth = 0;
         string all_filenames;
-        foreach (ProgressInfo.ProgressItem current_item in progress.current_items) {
-            if (cur_item_progress == -1 || (ProgressInfo.is_size_dependent (current_item.item)
+        foreach (LibSync.ProgressInfo.ProgressItem current_item in progress.current_items) {
+            if (cur_item_progress == -1 || (LibSync.ProgressInfo.is_size_dependent (current_item.item)
                                             && bigger_item_size < current_item.item.size)) {
                 cur_item_progress = current_item.progress.completed ();
                 cur_item = current_item.item;
@@ -1126,7 +1126,7 @@ public class FolderStatusModel : QAbstractItemModel {
         string kind_string = Progress.as_action_string (cur_item);
 
         string file_progress_string;
-        if (ProgressInfo.is_size_dependent (cur_item)) {
+        if (LibSync.ProgressInfo.is_size_dependent (cur_item)) {
             string s1 = Utility.octets_to_string (cur_item_progress);
             string s2 = Utility.octets_to_string (cur_item.size);
             //uint64 estimated_bw = progress.file_progress (cur_item).estimated_bandwidth;
@@ -1443,11 +1443,11 @@ public class FolderStatusModel : QAbstractItemModel {
 
         var pi = this.folders[folder_index].progress;
 
-        SyncResult.Status state = folder.sync_result.status ();
-        if (!folder.can_sync () || state == SyncResult.Status.PROBLEM || state == SyncResult.Status.SUCCESS || state == SyncResult.Status.ERROR) {
+        LibSync.SyncResult.Status state = folder.sync_result.status ();
+        if (!folder.can_sync () || state == LibSync.SyncResult.Status.PROBLEM || state == LibSync.SyncResult.Status.SUCCESS || state == LibSync.SyncResult.Status.ERROR) {
             // Reset progress info.
             pi = SubFolderInfo.Progress ();
-        } else if (state == SyncResult.Status.NOT_YET_STARTED) {
+        } else if (state == LibSync.SyncResult.Status.NOT_YET_STARTED) {
             FolderMan folder_man = FolderMan.instance;
             int position = folder_man.schedule_queue ().index_of (folder);
             foreach (var other in folder_man.map ()) {
@@ -1462,7 +1462,7 @@ public class FolderStatusModel : QAbstractItemModel {
             }
             pi = SubFolderInfo.Progress ();
             pi.overall_sync_string = message;
-        } else if (state == SyncResult.Status.SYNC_PREPARE) {
+        } else if (state == LibSync.SyncResult.Status.SYNC_PREPARE) {
             pi = SubFolderInfo.Progress ();
             pi.overall_sync_string = _("Preparing to sync …");
         }
@@ -1471,7 +1471,7 @@ public class FolderStatusModel : QAbstractItemModel {
         on_signal_update_folder_state (folder);
 
         if (folder.sync_result.folder_structure_was_changed ()
-            && (state == SyncResult.Status.SUCCESS || state == SyncResult.Status.PROBLEM)) {
+            && (state == LibSync.SyncResult.Status.SUCCESS || state == LibSync.SyncResult.Status.PROBLEM)) {
             // There is a new or a removed folder. reset all data
             reset_and_fetch (index (folder_index));
         }

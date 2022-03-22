@@ -7,7 +7,7 @@
 ***********************************************************/
 
 //  #include <GLib.Dir>
-//  #include <QSettings>
+//  #include <GLib.Settings>
 //  #include <Gtk.MessageBox>
 //  #include <QPushButton>
 //  #include <QApplicat
@@ -69,7 +69,7 @@ public class Folder : GLib.Object {
     /***********************************************************
     The last sync result with error message and status
     ***********************************************************/
-    public SyncResult sync_result { public get; private set; }
+    public LibSync.SyncResult sync_result { public get; private set; }
 
     private QScopedPointer<SyncEngine> engine;
     private QPointer<RequestEtagJob> request_etag_job;
@@ -149,7 +149,7 @@ public class Folder : GLib.Object {
             return this.definition.virtual_files_mode != Vfs.Off && !is_vfs_on_signal_off_switch_pending ();
         }
         public set {
-            AbstractVfs.Mode new_mode = this.definition.virtual_files_mode;
+            Common.AbstractVfs.Mode new_mode = this.definition.virtual_files_mode;
             if (value && this.definition.virtual_files_mode == Vfs.Off) {
                 new_mode = this.best_available_vfs_mode;
             } else if (!value && this.definition.virtual_files_mode != Vfs.Off) {
@@ -238,9 +238,9 @@ public class Folder : GLib.Object {
             save_to_settings ();
 
             if (!value) {
-                sync_state (SyncResult.Status.NOT_YET_STARTED);
+                sync_state (LibSync.SyncResult.Status.NOT_YET_STARTED);
             } else {
-                sync_state (SyncResult.Status.PAUSED);
+                sync_state (LibSync.SyncResult.Status.PAUSED);
             }
             /* emit */ signal_sync_paused_changed (this, value);
             /* emit */ signal_sync_state_change ();
@@ -254,7 +254,7 @@ public class Folder : GLib.Object {
     /***********************************************************
     Create a new Folder
     ***********************************************************/
-    public Folder (FolderDefinition definition, AccountState account_state, std.unique_ptr<Vfs> vfs, GLib.Object parent = new GLib.Object ()) {
+    public Folder (FolderDefinition definition, AccountState account_state, AbstractVfs vfs, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.account_state = account_state;
         this.definition = definition;
@@ -269,9 +269,9 @@ public class Folder : GLib.Object {
         this.time_since_last_sync_start.on_signal_start ();
         this.time_since_last_sync_done.on_signal_start ();
 
-        SyncResult.Status status = SyncResult.Status.NOT_YET_STARTED;
+        LibSync.SyncResult.Status status = LibSync.SyncResult.Status.NOT_YET_STARTED;
         if (definition.paused) {
-            status = SyncResult.Status.PAUSED;
+            status = LibSync.SyncResult.Status.PAUSED;
         }
         this.sync_result.status (status);
 
@@ -528,7 +528,7 @@ public class Folder : GLib.Object {
     ***********************************************************/
     public void prepare_to_sync () {
         this.sync_result.on_signal_reset ();
-        this.sync_result.status (SyncResult.Status.NOT_YET_STARTED);
+        this.sync_result.status (LibSync.SyncResult.Status.NOT_YET_STARTED);
     }
 
 
@@ -603,7 +603,7 @@ public class Folder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void sync_state (SyncResult.Status state) {
+    public void sync_state (LibSync.SyncResult.Status state) {
         this.sync_result.status (state);
     }
 
@@ -670,7 +670,7 @@ public class Folder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public std.chrono.milliseconds msec_since_last_sync () { }
+    public GLib.TimeSpan microseconds_since_last_sync () { }
 
 
     /***********************************************************
@@ -847,7 +847,7 @@ public class Folder : GLib.Object {
 
 
     /***********************************************************
-    Whether this folder should show selective sync ui
+    Whether this folder should show selective sync instance
     ***********************************************************/
     public bool supports_selective_sync {
         public get {
@@ -865,7 +865,7 @@ public class Folder : GLib.Object {
 
     internal signal void signal_sync_state_change ();
     internal signal void signal_sync_started ();
-    internal signal void signal_sync_finished (SyncResult result);
+    internal signal void signal_sync_finished (LibSync.SyncResult result);
     internal signal void signal_progress_info (ProgressInfo progress);
     /***********************************************************
     A new folder bigger than the threshold was discovered
@@ -889,7 +889,7 @@ public class Folder : GLib.Object {
         if (this.engine.is_sync_running ()) {
             this.engine.on_signal_abort ();
 
-            sync_state (SyncResult.Status.SYNC_ABORT_REQUESTED);
+            sync_state (LibSync.SyncResult.Status.SYNC_ABORT_REQUESTED);
         }
     }
 
@@ -900,14 +900,14 @@ public class Folder : GLib.Object {
     /***********************************************************
     Connected to the corresponding signals in the SyncEngine
     ***********************************************************/
-    public void on_signal_about_to_remove_all_files (SyncFileItem.Direction directory, Callback callback) {
+    public void on_signal_about_to_remove_all_files (LibSync.SyncFileItem.Direction directory, Callback callback) {
         ConfigFile config_file;
         if (!config_file.prompt_delete_files ()) {
             callback (false);
             return;
         }
 
-        const string message = directory == SyncFileItem.Direction.DOWN
+        const string message = directory == LibSync.SyncFileItem.Direction.DOWN
             ? _("All files in the sync folder \"%1\" folder were deleted on the server.\n"
               + "These deletes will be synchronized to your local sync folder, making such files "
               + "unavailable unless you have a right to restore. \n"
@@ -967,7 +967,7 @@ public class Folder : GLib.Object {
         }
 
         this.time_since_last_sync_start.on_signal_start ();
-        this.sync_result.status (SyncResult.Status.SYNC_PREPARE);
+        this.sync_result.status (LibSync.SyncResult.Status.SYNC_PREPARE);
         /* emit */ signal_sync_state_change ();
 
         GLib.info (
@@ -980,7 +980,7 @@ public class Folder : GLib.Object {
 
         if (!reload_excludes ()) {
             on_signal_sync_error (_("Could not read system exclude file"));
-            QMetaObject.invoke_method (this, "on_signal_sync_finished", Qt.QueuedConnection, Q_ARG (bool, false));
+            GLib.Object.invoke_method (this, "on_signal_sync_finished", Qt.QueuedConnection, Q_ARG (bool, false));
             return;
         }
 
@@ -1009,7 +1009,7 @@ public class Folder : GLib.Object {
 
         correct_placeholder_files ();
 
-        QMetaObject.invoke_method (this.engine, "on_signal_start_sync", Qt.QueuedConnection);
+        GLib.Object.invoke_method (this.engine, "on_signal_start_sync", Qt.QueuedConnection);
 
         /* emit */ signal_sync_started ();
     }
@@ -1017,12 +1017,13 @@ public class Folder : GLib.Object {
 
 
     /***********************************************************
+    Maybe multiply times 1000?
     ***********************************************************/
-    private static std.chrono.milliseconds full_local_discovery_interval () {
+    private static GLib.TimeSpan full_local_discovery_interval () {
         var interval = ConfigFile ().full_local_discovery_interval ();
         string env = qgetenv ("OWNCLOUD_FULL_LOCAL_DISCOVERY_INTERVAL");
         if (!env == "") {
-            interval = std.chrono.milliseconds (env.to_long_long ());
+            interval = env.to_long_long ();
         }
         return interval;
     }
@@ -1129,7 +1130,7 @@ public class Folder : GLib.Object {
                     if (pin_state == PinState.PinState.ALWAYS_LOCAL && record.is_virtual_file ()) {
                         spurious = false;
                     }
-                    if (pin_state == Vfs.ItemAvailability.ONLINE_ONLY && record.is_file ()) {
+                    if (pin_state == Common.ItemAvailability.ONLINE_ONLY && record.is_file ()) {
                         spurious = false;
                     }
                 }
@@ -1156,7 +1157,7 @@ public class Folder : GLib.Object {
     "implicit" here means that this download request comes from
     the user wan to access the file's data. The user did not
     change the file's pin state. If the file is currently
-    Vfs.ItemAvailability.ONLINE_ONLY its state will change to
+    Common.ItemAvailability.ONLINE_ONLY its state will change to
     Unspecif
 
     The download re (...) in the database. This is necessary
@@ -1187,7 +1188,7 @@ public class Folder : GLib.Object {
         // Change the file's pin state if it's contradictory to being hydrated
         // (suffix-virtual file's pin state is stored at the hydrated path)
         const var pin = this.vfs.pin_state (relative_path);
-        if (pin && *pin == Vfs.ItemAvailability.ONLINE_ONLY) {
+        if (pin && *pin == Common.ItemAvailability.ONLINE_ONLY) {
             if (!this.vfs.pin_state (relative_path, PinState.PinState.UNSPECIFIED)) {
                 GLib.warning ("Could not set pin state of " + relative_path + " to unspecified.");
             }
@@ -1223,7 +1224,7 @@ public class Folder : GLib.Object {
     ***********************************************************/
     private void on_signal_sync_started () {
         GLib.info ("#### Propagation on_signal_start ####################################################");
-        this.sync_result.status (SyncResult.Status.SYNC_RUNNING);
+        this.sync_result.status (LibSync.SyncResult.Status.SYNC_RUNNING);
         /* emit */ signal_sync_state_change ();
     }
 
@@ -1249,32 +1250,32 @@ public class Folder : GLib.Object {
         var another_sync_needed = this.engine.is_another_sync_needed ();
 
         if (sync_error) {
-            this.sync_result.status (SyncResult.Status.ERROR);
+            this.sync_result.status (LibSync.SyncResult.Status.ERROR);
         } else if (this.sync_result.found_files_not_synced ()) {
-            this.sync_result.status (SyncResult.Status.PROBLEM);
+            this.sync_result.status (LibSync.SyncResult.Status.PROBLEM);
         } else if (this.definition.paused) {
             // Maybe the sync was terminated because the user paused the folder
-            this.sync_result.status (SyncResult.Status.PAUSED);
+            this.sync_result.status (LibSync.SyncResult.Status.PAUSED);
         } else {
-            this.sync_result.status (SyncResult.Status.SUCCESS);
+            this.sync_result.status (LibSync.SyncResult.Status.SUCCESS);
         }
 
         // Count the number of syncs that have failed in a row.
-        if (this.sync_result.status () == SyncResult.Status.SUCCESS
-            || this.sync_result.status () == SyncResult.Status.PROBLEM) {
+        if (this.sync_result.status () == LibSync.SyncResult.Status.SUCCESS
+            || this.sync_result.status () == LibSync.SyncResult.Status.PROBLEM) {
             this.consecutive_failing_syncs = 0;
         } else {
             this.consecutive_failing_syncs++;
             GLib.info ("The last " + this.consecutive_failing_syncs + " syncs failed.");
         }
 
-        if (this.sync_result.status () == SyncResult.Status.SUCCESS && success) {
+        if (this.sync_result.status () == LibSync.SyncResult.Status.SUCCESS && success) {
             // Clear the allow list as all the folders that should be on that list are sync-ed
             journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, {});
         }
 
-        if ( (this.sync_result.status () == SyncResult.Status.SUCCESS
-                || this.sync_result.status () == SyncResult.Status.PROBLEM)
+        if ( (this.sync_result.status () == LibSync.SyncResult.Status.SUCCESS
+                || this.sync_result.status () == LibSync.SyncResult.Status.PROBLEM)
             && success) {
             if (this.engine.last_local_discovery_style () == LocalDiscoveryStyle.FILESYSTEM_ONLY) {
                 this.time_since_last_full_local_discovery.on_signal_start ();
@@ -1324,7 +1325,7 @@ public class Folder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_add_error_to_gui (SyncFileItem.Status status, string error_message, string subject = "") {
+    private void on_signal_add_error_to_gui (LibSync.SyncFileItem.Status status, string error_message, string subject = "") {
         /* emit */ ProgressDispatcher.instance.add_error_to_gui (alias (), status, error_message, subject);
     }
 
@@ -1418,8 +1419,8 @@ public class Folder : GLib.Object {
         /* emit */ signal_sync_finished (this.sync_result);
 
         // Immediately check the etag again if there was some sync activity.
-        if ( (this.sync_result.status () == SyncResult.Status.SUCCESS
-                || this.sync_result.status () == SyncResult.Status.PROBLEM)
+        if ( (this.sync_result.status () == LibSync.SyncResult.Status.SUCCESS
+                || this.sync_result.status () == LibSync.SyncResult.Status.PROBLEM)
             && (this.sync_result.first_item_deleted ()
                    || this.sync_result.first_item_new ()
                    || this.sync_result.first_item_renamed ()
@@ -1576,7 +1577,7 @@ public class Folder : GLib.Object {
 
         // Let everyone know we're syncing
         this.sync_result.on_signal_reset ();
-        this.sync_result.status (SyncResult.Status.SYNC_RUNNING);
+        this.sync_result.status (LibSync.SyncResult.Status.SYNC_RUNNING);
         /* emit */ signal_sync_started ();
         /* emit */ signal_sync_state_change ();
     }
@@ -1586,8 +1587,8 @@ public class Folder : GLib.Object {
     Unblocks normal sync operation
     ***********************************************************/
     private void on_signal_hydration_done () {
-        // emit signal to update ui and reschedule normal syncs if necessary
-        this.sync_result.status (SyncResult.Status.SUCCESS);
+        // emit signal to update instance and reschedule normal syncs if necessary
+        this.sync_result.status (LibSync.SyncResult.Status.SUCCESS);
         /* emit */ signal_sync_finished (this.sync_result);
         /* emit */ signal_sync_state_change ();
     }
@@ -1665,13 +1666,13 @@ public class Folder : GLib.Object {
             // Check directory again
             if (!FileSystem.file_exists (this.definition.local_path, file_info)) {
                 this.sync_result.append_error_string (_("Local folder %1 does not exist.").printf (this.definition.local_path));
-                this.sync_result.status (SyncResult.Status.SETUP_ERROR);
+                this.sync_result.status (LibSync.SyncResult.Status.SETUP_ERROR);
             } else if (!file_info.is_dir ()) {
                 this.sync_result.append_error_string (_("%1 should be a folder but is not.").printf (this.definition.local_path));
-                this.sync_result.status (SyncResult.Status.SETUP_ERROR);
+                this.sync_result.status (LibSync.SyncResult.Status.SETUP_ERROR);
             } else if (!file_info.is_readable ()) {
                 this.sync_result.append_error_string (_("%1 is not readable.").printf (this.definition.local_path));
-                this.sync_result.status (SyncResult.Status.SETUP_ERROR);
+                this.sync_result.status (LibSync.SyncResult.Status.SETUP_ERROR);
             }
         }
     }

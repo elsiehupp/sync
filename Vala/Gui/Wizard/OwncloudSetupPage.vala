@@ -14,7 +14,7 @@
 //  #include <QNetworkAccessManager>
 //  #include <QPropertyAnimation>
 //  #include <QGraphics_pixmap_item>
-//  #include <QBuffer>
+//  #include <GLib.OutputStream>
 //  #include <QWizard>
 
 namespace Occ {
@@ -27,7 +27,7 @@ namespace Ui {
 public class OwncloudSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
-    private Ui.OwncloudeSetupPage ui;
+    private OwncloudeSetupPage instance;
 
     /***********************************************************
     ***********************************************************/
@@ -35,7 +35,7 @@ public class OwncloudSetupPage : QWizardPage {
     private string oc_user;
     private bool auth_type_known = false;
     private bool checking = false;
-    private DetermineAuthTypeJob.AuthType auth_type = DetermineAuthTypeJob.AuthType.BASIC;
+    private LibSync.DetermineAuthTypeJob.AuthType auth_type = LibSync.DetermineAuthTypeJob.AuthType.BASIC;
 
     /***********************************************************
     ***********************************************************/
@@ -53,35 +53,35 @@ public class OwncloudSetupPage : QWizardPage {
         base ();
         this.progress_indicator = new QProgressIndicator (this);
         this.oc_wizard = (OwncloudWizard)parent;
-        this.ui.up_ui (this);
+        this.instance.up_ui (this);
 
         setup_server_address_description_label ();
 
         Theme theme = Theme.instance;
         if (theme.override_server_url == "") {
-            this.ui.le_url.postfix (theme.wizard_url_postfix);
-            this.ui.le_url.placeholder_text (theme.WIZARD_URL_HINT);
+            this.instance.le_url.postfix (theme.wizard_url_postfix);
+            this.instance.le_url.placeholder_text (theme.WIZARD_URL_HINT);
         } else if (Theme.force_override_server_url) {
-            this.ui.le_url.enabled (false);
+            this.instance.le_url.enabled (false);
         }
 
-        register_field ("OCUrl*", this.ui.le_url);
+        register_field ("OCUrl*", this.instance.le_url);
 
         var size_policy = this.progress_indicator.size_policy ();
         size_policy.retain_size_when_hidden (true);
         this.progress_indicator.size_policy (size_policy);
 
-        this.ui.progress_layout.add_widget (this.progress_indicator);
+        this.instance.progress_layout.add_widget (this.progress_indicator);
         on_signal_stop_spinner ();
 
         set_up_customization ();
 
         on_signal_url_changed (""); // don't jitter UI
 
-        this.ui.le_url.text_changed.connect (
+        this.instance.le_url.text_changed.connect (
             this.on_signal_url_changed
         );
-        this.ui.le_url.editing_finished.connect (
+        this.instance.le_url.editing_finished.connect (
             this.on_signal_url_edit_finished
         );
 
@@ -96,7 +96,7 @@ public class OwncloudSetupPage : QWizardPage {
     ***********************************************************/
     public bool is_complete {
         public get {
-            return this.ui.le_url.text () != "" && !this.checking;
+            return this.instance.le_url.text () != "" && !this.checking;
         }
     }
 
@@ -106,7 +106,7 @@ public class OwncloudSetupPage : QWizardPage {
     public void initialize_page () {
         customize_style ();
 
-        WizardCommon.init_error_label (this.ui.error_label);
+        WizardCommon.init_error_label (this.instance.error_label);
 
         this.auth_type_known = false;
         this.checking = false;
@@ -117,7 +117,7 @@ public class OwncloudSetupPage : QWizardPage {
             push_button.default (true);
         }
 
-        this.ui.le_url.focus ();
+        this.instance.le_url.focus ();
 
         const var is_server_url_overridden = !Theme.override_server_url == "";
         if (is_server_url_overridden && !Theme.force_override_server_url) {
@@ -197,11 +197,11 @@ public class OwncloudSetupPage : QWizardPage {
         this.oc_wizard.registration = false;
         this.oc_url = new_url;
         if (this.oc_url == "") {
-            this.ui.le_url.clear ();
+            this.instance.le_url.clear ();
             return;
         }
 
-        this.ui.le_url.on_signal_text (this.oc_url);
+        this.instance.le_url.on_signal_text (this.oc_url);
     }
 
 
@@ -213,7 +213,7 @@ public class OwncloudSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     public string this.url {
-        string url = this.ui.le_url.full_text ().simplified ();
+        string url = this.instance.le_url.full_text ().simplified ();
         return url;
     }
 
@@ -236,10 +236,10 @@ public class OwncloudSetupPage : QWizardPage {
     ***********************************************************/
     public void on_signal_error_string (string err, bool retry_http_only) {
         if (err == "") {
-            this.ui.error_label.visible (false);
+            this.instance.error_label.visible (false);
         } else {
             if (retry_http_only) {
-                GLib.Uri url = new GLib.Uri (this.ui.le_url.full_text ());
+                GLib.Uri url = new GLib.Uri (this.instance.le_url.full_text ());
                 if (url.scheme () == "https") {
                     // Ask the user how to proceed when connecting to a https:// URL fails.
                     // It is possible that the server is secured with client-side TLS certificates,
@@ -253,7 +253,7 @@ public class OwncloudSetupPage : QWizardPage {
                     switch (ret_val) {
                     case OwncloudConnectionMethodDialog.Method.NO_TLS: {
                         url.scheme ("http");
-                        this.ui.le_url.full_text (url.to_string ());
+                        this.instance.le_url.full_text (url.to_string ());
                         // skip ahead to next page, since the user would expect us to retry automatically
                         wizard ().next ();
                     } break;
@@ -269,8 +269,8 @@ public class OwncloudSetupPage : QWizardPage {
                 }
             }
 
-            this.ui.error_label.visible (true);
-            this.ui.error_label.on_signal_text (err);
+            this.instance.error_label.visible (true);
+            this.instance.error_label.on_signal_text (err);
         }
         this.checking = false;
         /* emit */ complete_changed ();
@@ -281,7 +281,7 @@ public class OwncloudSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     public void on_signal_start_spinner () {
-        this.ui.progress_layout.enabled (true);
+        this.instance.progress_layout.enabled (true);
         this.progress_indicator.visible (true);
         this.progress_indicator.on_signal_start_animation ();
     }
@@ -290,7 +290,7 @@ public class OwncloudSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     public void on_signal_stop_spinner () {
-        this.ui.progress_layout.enabled (false);
+        this.instance.progress_layout.enabled (false);
         this.progress_indicator.visible (false);
         this.progress_indicator.on_signal_stop_animation ();
     }
@@ -305,7 +305,7 @@ public class OwncloudSetupPage : QWizardPage {
         string cert_data = cert_file.read_all ();
         string cert_password = add_certificate_dialog.certificate_password ().to_local8Bit ();
 
-        QBuffer cert_data_buffer = new QBuffer (cert_data);
+        GLib.OutputStream cert_data_buffer = new GLib.OutputStream (cert_data);
         cert_data_buffer.open (QIODevice.ReadOnly);
         if (QSslCertificate.import_pkcs12 (cert_data_buffer,
                 this.oc_wizard.client_ssl_key, this.oc_wizard.client_ssl_certificate,
@@ -362,7 +362,7 @@ public class OwncloudSetupPage : QWizardPage {
             }
         }
         if (new_url != url) {
-            this.ui.le_url.on_signal_text (new_url);
+            this.instance.le_url.on_signal_text (new_url);
         }
     }
 
@@ -370,11 +370,11 @@ public class OwncloudSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_url_edit_finished () {
-        string url = this.ui.le_url.full_text ();
+        string url = this.instance.le_url.full_text ();
         if (GLib.Uri (url).is_relative () && !url == "") {
             // no scheme defined, set one
             url.prepend ("https://");
-            this.ui.le_url.full_text (url);
+            this.instance.le_url.full_text (url);
         }
     }
 
@@ -383,29 +383,29 @@ public class OwncloudSetupPage : QWizardPage {
     ***********************************************************/
     protected void set_up_customization () {
         // set defaults for the customize labels.
-        this.ui.top_label.hide ();
-        this.ui.bottom_label.hide ();
+        this.instance.top_label.hide ();
+        this.instance.bottom_label.hide ();
 
         Theme theme = Theme.instance;
         GLib.Variant variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_TOP);
         if (!variant == null) {
-            WizardCommon.set_up_custom_media (variant, this.ui.top_label);
+            WizardCommon.set_up_custom_media (variant, this.instance.top_label);
         }
 
         variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_BOTTOM);
-        WizardCommon.set_up_custom_media (variant, this.ui.bottom_label);
+        WizardCommon.set_up_custom_media (variant, this.instance.bottom_label);
 
-        var le_url_palette = this.ui.le_url.palette ();
-        le_url_palette.on_signal_color (QPalette.Text, Qt.black);
-        le_url_palette.on_signal_color (QPalette.Base, Qt.white);
-        this.ui.le_url.palette (le_url_palette);
+        var le_url_palette = this.instance.le_url.palette ();
+        le_url_palette.on_signal_color (Gtk.Palette.Text, Qt.black);
+        le_url_palette.on_signal_color (Gtk.Palette.Base, Qt.white);
+        this.instance.le_url.palette (le_url_palette);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void logo () {
-        this.ui.logo_label.pixmap (Theme.wizard_application_logo);
+        this.instance.logo_label.pixmap (Theme.wizard_application_logo);
     }
 
 
@@ -423,7 +423,7 @@ public class OwncloudSetupPage : QWizardPage {
             }
         }
 
-        WizardCommon.customize_hint_label (this.ui.server_address_description_label);
+        WizardCommon.customize_hint_label (this.instance.server_address_description_label);
     }
 
 
@@ -431,7 +431,7 @@ public class OwncloudSetupPage : QWizardPage {
     ***********************************************************/
     private void setup_server_address_description_label () {
         const var app_name = Theme.app_name_gui;
-        this.ui.server_address_description_label.on_signal_text (_("The link to your %1 web interface when you open it in the browser.", "%1 will be replaced with the application name").printf (app_name));
+        this.instance.server_address_description_label.on_signal_text (_("The link to your %1 web interface when you open it in the browser.", "%1 will be replaced with the application name").printf (app_name));
     }
 
 

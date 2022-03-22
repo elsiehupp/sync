@@ -20,7 +20,7 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
     public string token;
     public string refresh_token;
     public QScopedPointer<OAuth> async_auth;
-    public Ui.OwncloudeOAuthCredsPage ui;
+    public OwncloudeOAuthCredsPage instance;
 
 
     internal signal void connect_to_oc_url (string value);
@@ -30,25 +30,25 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
     ***********************************************************/
     public OwncloudOAuthCredsPage () {
         base ();
-        this.ui.up_ui (this);
+        this.instance.up_ui (this);
 
         Theme theme = Theme.instance;
-        this.ui.top_label.hide ();
-        this.ui.bottom_label.hide ();
+        this.instance.top_label.hide ();
+        this.instance.bottom_label.hide ();
         GLib.Variant variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_TOP);
-        WizardCommon.set_up_custom_media (variant, this.ui.top_label);
+        WizardCommon.set_up_custom_media (variant, this.instance.top_label);
         variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_BOTTOM);
-        WizardCommon.set_up_custom_media (variant, this.ui.bottom_label);
+        WizardCommon.set_up_custom_media (variant, this.instance.bottom_label);
 
-        WizardCommon.init_error_label (this.ui.error_label);
+        WizardCommon.init_error_label (this.instance.error_label);
 
         title (WizardCommon.title_template ().printf (_("Connect to %1").printf (Theme.app_name_gui)));
         sub_title (WizardCommon.sub_title_template ().printf (_("Login in your browser")));
 
-        this.ui.open_link_button.clicked.connect (
+        this.instance.open_link_button.clicked.connect (
             this.on_signal_open_browser
         );
-        this.ui.copy_link_button.clicked.connect (
+        this.instance.copy_link_button.clicked.connect (
             this.on_signal_copy_link_to_clipboard
         );
     }
@@ -135,7 +135,7 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
         }
         case OAuth.Error:
             /* Error while getting the access token.  (Timeout, or the server did not accept our client credentials */
-            this.ui.error_label.show ();
+            this.instance.error_label.show ();
             wizard ().show ();
             break;
         case OAuth.Result.LOGGED_IN: {
@@ -154,8 +154,8 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_open_browser () {
-        if (this.ui.error_label)
-            this.ui.error_label.hide ();
+        if (this.instance.error_label)
+            this.instance.error_label.hide ();
 
         qobject_cast<OwncloudWizard> (wizard ()).account.clear_cookie_jar (); // #6574
 

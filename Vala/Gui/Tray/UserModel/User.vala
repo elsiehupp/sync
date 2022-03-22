@@ -294,7 +294,7 @@ public class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public UserStatus.OnlineStatus status () {
+    public LibSync.UserStatus.OnlineStatus status () {
         public get {
             return this.account_state.account.user_status_connector ().user_status ().state;
         }
@@ -361,10 +361,10 @@ public class User : GLib.Object {
             activity.file_action = "file_changed";
         }
 
-        if (item.status == SyncFileItem.Status.NO_STATUS || item.status == SyncFileItem.Status.SUCCESS) {
+        if (item.status == LibSync.SyncFileItem.Status.NO_STATUS || item.status == LibSync.SyncFileItem.Status.SUCCESS) {
             GLib.warning ("Item " + item.file + " retrieved successfully.");
 
-            if (item.direction != SyncFileItem.Direction.UP) {
+            if (item.direction != LibSync.SyncFileItem.Direction.UP) {
                 activity.message = _("Synced %1").printf (item.original_file);
             } else if (activity.file_action == "file_renamed") {
                 activity.message = _("You renamed %1").printf (item.original_file);
@@ -381,11 +381,11 @@ public class User : GLib.Object {
             GLib.warning ("Item " + item.file + " retrieved resulted in error " + item.error_string);
             activity.subject = item.error_string;
 
-            if (item.status == SyncFileItem.Status.FileIgnored) {
+            if (item.status == LibSync.SyncFileItem.Status.FileIgnored) {
                 this.activity_model.add_ignored_file_to_list (activity);
             } else {
                 // add 'protocol error' to activity list
-                if (item.status == SyncFileItem.Status.FileNameInvalid) {
+                if (item.status == LibSync.SyncFileItem.Status.FileNameInvalid) {
                     show_desktop_notification (item.file, activity.subject);
                 }
                 this.activity_model.add_error_to_activity_list (activity);
@@ -445,7 +445,7 @@ public class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_add_error_to_gui (string folder_alias, SyncFileItem.Status status, string error_message, string subject) {
+    public void on_signal_add_error_to_gui (string folder_alias, LibSync.SyncFileItem.Status status, string error_message, string subject) {
         const var folder_instance = FolderMan.instance.folder_by_alias (folder_alias);
         if (!folder_instance) {
             return;
@@ -542,17 +542,17 @@ public class User : GLib.Object {
                     continue;
                 }
 
-                if (activity.status == SyncFileItem.Status.CONFLICT && !GLib.FileInfo (f.path + activity.file).exists ()) {
+                if (activity.status == LibSync.SyncFileItem.Status.CONFLICT && !GLib.FileInfo (f.path + activity.file).exists ()) {
                     this.activity_model.remove_activity_from_activity_list (activity);
                     continue;
                 }
 
-                if (activity.status == SyncFileItem.Status.FILE_LOCKED && !GLib.FileInfo (f.path + activity.file).exists ()) {
+                if (activity.status == LibSync.SyncFileItem.Status.FILE_LOCKED && !GLib.FileInfo (f.path + activity.file).exists ()) {
                     this.activity_model.remove_activity_from_activity_list (activity);
                     continue;
                 }
 
-                if (activity.status == SyncFileItem.Status.FILE_IGNORED && !GLib.FileInfo (f.path + activity.file).exists ()) {
+                if (activity.status == LibSync.SyncFileItem.Status.FILE_IGNORED && !GLib.FileInfo (f.path + activity.file).exists ()) {
                     this.activity_model.remove_activity_from_activity_list (activity);
                     continue;
                 }
@@ -577,7 +577,7 @@ public class User : GLib.Object {
             string[] conflicts;
             foreach (Activity activity in this.activity_model.errors_list ()) {
                 if (activity.folder == folder
-                    && activity.status == SyncFileItem.Status.CONFLICT) {
+                    && activity.status == LibSync.SyncFileItem.Status.CONFLICT) {
                     conflicts.append (activity.file);
                 }
             }
@@ -731,11 +731,12 @@ public class User : GLib.Object {
 
 
     /***********************************************************
+    FIXME: interval was previously in milliseconds, not microsecomnds!
     ***********************************************************/
-    public void on_signal_notification_refresh_interval (std.chrono.milliseconds interval) {
+    public void on_signal_notification_refresh_interval (GLib.TimeSpan interval_in_microseconds) {
         if (!check_push_notifications_are_ready ()) {
-            GLib.debug ("Starting Notification refresh timer with " + interval.count () / 1000 + " sec interval");
-            this.notification_check_timer.on_signal_start (interval.count ());
+            GLib.debug ("Starting Notification refresh timer with " + interval_in_microseconds.count () / 1000 + " sec interval_in_microseconds");
+            this.notification_check_timer.on_signal_start (interval_in_microseconds.count ());
         }
     }
 
@@ -837,7 +838,7 @@ public class User : GLib.Object {
     resolve
     ***********************************************************/
     private static bool is_unsolvable_conflict (SyncFileItemPtr item) {
-        return item.status == SyncFileItem.Status.CONFLICT && !Utility.is_conflict_file (item.file);
+        return item.status == LibSync.SyncFileItem.Status.CONFLICT && !Utility.is_conflict_file (item.file);
     }
 
 

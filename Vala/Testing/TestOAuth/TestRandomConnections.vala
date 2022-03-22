@@ -23,7 +23,7 @@ class TestRandomConnections : AbstractTestOAuth {
     private override GLib.InputStream create_browser_reply (Soup.Request request) {
         GLib.Timeout.single_shot (0, this, () => {
             var port = request.url.port ();
-            state = CustomState;
+            state = AbstractTestOAuth.State.CUSTOM_STATE;
             GLib.List<string> payloads = {
                 "GET FOFOFO HTTP 1/1\n\n",
                 "GET /?code=invalie HTTP 1/1\n\n",
@@ -45,8 +45,8 @@ class TestRandomConnections : AbstractTestOAuth {
                 100,
                 this,
                 () => {
-                    GLib.assert_true (state == CustomState);
-                    state = BrowserOpened;
+                    GLib.assert_true (state == AbstractTestOAuth.State.CUSTOM_STATE);
+                    state = AbstractTestOAuth.State.BROWSER_OPENED;
                     this.AbstractTestOAuth.create_browser_reply (request);
                 }
             );
@@ -58,7 +58,7 @@ class TestRandomConnections : AbstractTestOAuth {
     /***********************************************************
     ***********************************************************/
     private override GLib.InputStream token_reply (Soup.Operation operation, Soup.Request request) {
-        if (state == CustomState) {
+        if (state == AbstractTestOAuth.State.CUSTOM_STATE) {
             return new FakeErrorReply (operation, request, this, 500);
         }
         return AbstractTestOAuth.token_reply (operation, request);
@@ -68,12 +68,12 @@ class TestRandomConnections : AbstractTestOAuth {
     /***********************************************************
     ***********************************************************/
     private override void oauth_result (
-        OAuth.Result result, string user,
+        Gui.OAuth.Result result, string user,
         string token, string refresh_token) {
-        if (state != CustomState) {
+        if (state != AbstractTestOAuth.State.CUSTOM_STATE) {
             return AbstractTestOAuth.oauth_result (result, user, token, refresh_token);
         }
-        GLib.assert_true (result == OAuth.Error);
+        GLib.assert_true (result == Gui.OAuth.Error);
     }
 
 } // class TestRandomConnections

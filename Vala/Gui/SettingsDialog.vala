@@ -7,7 +7,7 @@
 //  #include <QStandard_item_model>
 //  #include <QStacked_widget>
 //  #include <QPushButton>
-//  #include <QSettings>
+//  #include <GLib.Settings>
 //  #include <QToolBar>
 //  #include <QToolButton>
 //  #include <QLayout>
@@ -105,11 +105,11 @@ public class SettingsDialog : Gtk.Dialog {
     ***********************************************************/
     public SettingsDialog (OwncloudGui gui, Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
-        this.ui = new Ui.SettingsDialog ();
+        this.instance = new SettingsDialog ();
         this.gui = gui;
         ConfigFile config;
 
-        this.ui.up_ui (this);
+        this.instance.up_ui (this);
         this.tool_bar = new QToolBar ();
         this.tool_bar.icon_size (QSize (32, 32));
         this.tool_bar.tool_button_style (Qt.Tool_button_text_under_icon);
@@ -151,7 +151,7 @@ public class SettingsDialog : Gtk.Dialog {
         this.action_group.add_action (general_action);
         this.tool_bar.add_action (general_action);
         var general_settings = new GeneralSettings ();
-        this.ui.stack.add_widget (general_settings);
+        this.instance.stack.add_widget (general_settings);
 
         // Connect signal_style_changed events to our widgets, so they can adapt (Dark-/Light-Mode switching)
         this.signal_style_changed.connect (
@@ -162,7 +162,7 @@ public class SettingsDialog : Gtk.Dialog {
         this.action_group.add_action (network_action);
         this.tool_bar.add_action (network_action);
         var network_settings = new NetworkSettings ();
-        this.ui.stack.add_widget (network_settings);
+        this.instance.stack.add_widget (network_settings);
 
         this.action_group_widgets.insert (general_action, general_settings);
         this.action_group_widgets.insert (network_action, network_settings);
@@ -199,21 +199,21 @@ public class SettingsDialog : Gtk.Dialog {
 
 
     ~SettingsDialog () {
-        delete this.ui;
+        delete this.instance;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public Gtk.Widget current_page () {
-        return this.ui.stack.current_widget ();
+        return this.instance.stack.current_widget ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void on_signal_switch_page (QAction action) {
-        this.ui.stack.current_widget (this.action_group_widgets.value (action));
+        this.instance.stack.current_widget (this.action_group_widgets.value (action));
     }
 
 
@@ -339,7 +339,7 @@ public class SettingsDialog : Gtk.Dialog {
         string object_name = "account_settings_";
         object_name += account_state.account.display_name;
         account_settings.object_name (object_name);
-        this.ui.stack.insert_widget (0 , account_settings);
+        this.instance.stack.insert_widget (0 , account_settings);
 
         this.action_group.add_action (account_action);
         this.action_group_widgets.insert (account_action, account_settings);
@@ -380,7 +380,7 @@ public class SettingsDialog : Gtk.Dialog {
             if (as.on_signal_accounts_state () == account_state) {
                 this.tool_bar.remove_action (it.key ());
 
-                if (this.ui.stack.current_widget () == it.value ()) {
+                if (this.instance.stack.current_widget () == it.value ()) {
                     show_first_page ();
                 }
 

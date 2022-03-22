@@ -17,7 +17,7 @@ public class FakeWebSocketServer : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private std.unique_ptr<QSignalSpy> process_text_message_spy;
+    private QSignalSpy process_text_message_spy;
 
     internal signal void signal_closed ();
     internal signal void signal_process_text_message (QWebSocket sender, string message);

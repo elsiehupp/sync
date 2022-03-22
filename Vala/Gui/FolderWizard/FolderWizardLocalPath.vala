@@ -17,7 +17,7 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    private Ui_Folder_wizard_source_page ui;
+    private Ui_Folder_wizard_source_page instance;
 
     Folder.Map folder_map { private get; public set; }
 
@@ -28,22 +28,22 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
     public FolderWizardLocalPath (Account account) {
         base ();
         this.account = account;
-        this.ui.up_ui (this);
-        register_field ("source_folder*", this.ui.local_folder_line_edit);
-        this.ui.local_folder_choose_btn.clicked.connect (
+        this.instance.up_ui (this);
+        register_field ("source_folder*", this.instance.local_folder_line_edit);
+        this.instance.local_folder_choose_btn.clicked.connect (
             this.on_signal_choose_local_folder
         );
-        this.ui.local_folder_choose_btn.tool_tip (_("Click to select a local folder to sync."));
+        this.instance.local_folder_choose_btn.tool_tip (_("Click to select a local folder to sync."));
 
         GLib.Uri server_url = this.account.url;
         server_url.user_name (this.account.credentials ().user ());
         string default_path = GLib.Dir.home_path + '/' + Theme.app_name;
         default_path = FolderMan.instance.find_good_path_for_new_sync_folder (default_path, server_url);
-        this.ui.local_folder_line_edit.on_signal_text (GLib.Dir.to_native_separators (default_path));
-        this.ui.local_folder_line_edit.tool_tip (_("Enter the path to the local folder."));
+        this.instance.local_folder_line_edit.on_signal_text (GLib.Dir.to_native_separators (default_path));
+        this.instance.local_folder_line_edit.tool_tip (_("Enter the path to the local folder."));
 
-        this.ui.warn_label.text_format (Qt.RichText);
-        this.ui.warn_label.hide ();
+        this.instance.warn_label.text_format (Qt.RichText);
+        this.instance.warn_label.hide ();
     }
 
 
@@ -54,7 +54,7 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
         server_url.user_name (this.account.credentials ().user ());
 
         string error_str = FolderMan.instance.check_path_validity_for_new_folder (
-            GLib.Dir.from_native_separators (this.ui.local_folder_line_edit.text ()), server_url);
+            GLib.Dir.from_native_separators (this.instance.local_folder_line_edit.text ()), server_url);
 
         bool is_ok = error_str == "";
         string[] warn_strings;
@@ -62,14 +62,14 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
             warn_strings += error_str;
         }
 
-        this.ui.warn_label.word_wrap (true);
+        this.instance.warn_label.word_wrap (true);
         if (is_ok) {
-            this.ui.warn_label.hide ();
-            this.ui.warn_label.clear ();
+            this.instance.warn_label.hide ();
+            this.instance.warn_label.clear ();
         } else {
-            this.ui.warn_label.show ();
+            this.instance.warn_label.show ();
             string warnings = format_warnings (warn_strings);
-            this.ui.warn_label.on_signal_text (warnings);
+            this.instance.warn_label.on_signal_text (warnings);
         }
         return is_ok;
     }
@@ -78,14 +78,14 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
     /***********************************************************
     ***********************************************************/
     public override void initialize_page () {
-        this.ui.warn_label.hide ();
+        this.instance.warn_label.hide ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public override void clean_up_page () {
-        this.ui.warn_label.hide ();
+        this.instance.warn_label.hide ();
     }
 
 
@@ -108,7 +108,7 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
             sf);
         if (!directory == "") {
             // set the last directory component name as alias
-            this.ui.local_folder_line_edit.on_signal_text (GLib.Dir.to_native_separators (directory));
+            this.instance.local_folder_line_edit.on_signal_text (GLib.Dir.to_native_separators (directory));
         }
         /* emit */ complete_changed ();
     }

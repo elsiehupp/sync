@@ -1,9 +1,7 @@
-/***********************************************************
-***********************************************************/
-
 using ZLib;
 
 namespace Occ {
+namespace Common {
 
 /***********************************************************
 @class ValidateChecksumHeader
@@ -58,7 +56,7 @@ public class ValidateChecksumHeader : ComputeChecksumBase {
     The device ownership transfers into the thread that
     will compute the checksum. It must not have a parent.
     ***********************************************************/
-    public void start_for_device (std.unique_ptr<QIODevice> device, string checksum_header) {
+    public void start_for_device (QIODevice device, string checksum_header) {
         var calculator = prepare_start (checksum_header);
         if (calculator) {
             calculator.on_signal_start (std.move (device));
@@ -103,4 +101,8 @@ public class ValidateChecksumHeader : ComputeChecksumBase {
         );
         return calculator;
     }
-}
+
+} // class ValidateChecksumHeader
+
+} // namespace Common
+} // namespace Occ

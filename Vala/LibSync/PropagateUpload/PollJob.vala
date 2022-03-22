@@ -16,7 +16,7 @@ replies with an etag.
 ***********************************************************/
 public class PollJob : AbstractNetworkJob {
 
-    SyncJournalDb journal;
+    Common.SyncJournalDb journal;
     string local_path;
 
     /***********************************************************
@@ -29,7 +29,7 @@ public class PollJob : AbstractNetworkJob {
     Takes ownership of the device
     ***********************************************************/
     public PollJob.for_account (Account account, string path, SyncFileItem item,
-        SyncJournalDb journal, string local_path, GLib.Object parent) {
+        Common.SyncJournalDb journal, string local_path, GLib.Object parent) {
         base (account, path, parent);
         this.journal = journal;
         this.local_path = local_path;
@@ -65,7 +65,7 @@ public class PollJob : AbstractNetworkJob {
             if (this.item.status == SyncFileItem.Status.FATAL_ERROR || this.item.http_error_code >= 400) {
                 if (this.item.status != SyncFileItem.Status.FATAL_ERROR
                     && this.item.http_error_code != 503) {
-                    SyncJournalDb.PollInfo info;
+                    Common.SyncJournalDb.PollInfo info;
                     info.file = this.item.file;
                     // no info.url removes it from the database
                     this.journal.poll_info (info);
@@ -107,7 +107,7 @@ public class PollJob : AbstractNetworkJob {
             this.item.error_string = json["error_message"].to_string ();
         }
 
-        SyncJournalDb.PollInfo info;
+        Common.SyncJournalDb.PollInfo info;
         info.file = this.item.file;
         // no info.url removes it from the database
         this.journal.poll_info (info);

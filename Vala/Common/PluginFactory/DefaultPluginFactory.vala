@@ -1,4 +1,5 @@
 namespace Occ {
+namespace Common {
 
 /***********************************************************
 @class DefaultPluginFactory
@@ -16,6 +17,8 @@ public class DefaultPluginFactory : PluginFactory {
     public override GLib.Object create (GLib.Object parent) {
         return new PluginClass (parent);
     }
-}
 
+} // class DefaultPluginFactory
+
+} // namespace Common
 } // namespace Occ

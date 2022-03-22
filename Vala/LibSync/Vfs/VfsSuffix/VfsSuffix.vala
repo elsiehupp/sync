@@ -9,7 +9,7 @@
 namespace Occ {
 namespace LibSync {
 
-public class VfsSuffix : AbstractVfs {
+public class VfsSuffix : Common.AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
@@ -20,7 +20,7 @@ public class VfsSuffix : AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
-    public AbstractVfs.Mode mode () {
+    public Common.AbstractVfs.Mode mode () {
         return WithSuffix;
     }
 
@@ -157,7 +157,7 @@ public class VfsSuffix : AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
-    public bool stat_type_virtual_file (CSyncFileStatT stat, void stat_data) {
+    public bool stat_type_virtual_file (CSync.FileStat stat, void stat_data) {
         if (stat.path.has_suffix (file_suffix ().to_utf8 ())) {
             stat.type = ItemType.VIRTUAL_FILE;
             return true;

@@ -19,7 +19,7 @@
 //  #include <array>
 //  #include <GLib.BitArray>
 //  #include <QMeta_method>
-//  #include <QMetaObject>
+//  #include <GLib.Object>
 //  #include <QScopedPointer>
 //  #include <GLib.Dir>
 //  #include <Gtk.Application>
@@ -809,7 +809,7 @@ public class SocketApi : GLib.Object {
             }
 
             // Update the pin state on all items
-            if (!data.folder.vfs ().pin_state (data.folder_relative_path, Vfs.ItemAvailability.ONLINE_ONLY)) {
+            if (!data.folder.vfs ().pin_state (data.folder_relative_path, Common.ItemAvailability.ONLINE_ONLY)) {
                 GLib.warning ("Could not set pin state of " + data.folder_relative_path + " to online only.");
             }
 
@@ -1150,13 +1150,13 @@ public class SocketApi : GLib.Object {
             //  ENFORCE (!files == "");
 
             // Determine the combined availability status of the files
-            var combined = new Optional<Vfs.ItemAvailability> ();
+            var combined = new Optional<Common.ItemAvailability> ();
             foreach (var file in files) {
                 var file_data = FileData.file_data (file);
                 var availability = sync_folder.vfs ().availability (file_data.folder_relative_path);
                 if (!availability) {
                     if (availability.error == Vfs.AvailabilityError.DATABASE_ERROR) {
-                        availability = Vfs.ItemAvailability.MIXED;
+                        availability = Common.ItemAvailability.MIXED;
                     }
                     if (availability.error == Vfs.AvailabilityError.NO_SUCH_ITEM) {
                         continue;
@@ -1171,15 +1171,15 @@ public class SocketApi : GLib.Object {
 
             if (combined) {
                 switch (*combined) {
-                case Vfs.ItemAvailability.PinState.ALWAYS_LOCAL:
+                case Common.ItemAvailability.PinState.ALWAYS_LOCAL:
                     make_pin_context_menu (false, true);
                     break;
-                case Vfs.ItemAvailability.ALL_HYDRATED:
-                case Vfs.ItemAvailability.MIXED:
+                case Common.ItemAvailability.ALL_HYDRATED:
+                case Common.ItemAvailability.MIXED:
                     make_pin_context_menu (true, true);
                     break;
-                case Vfs.ItemAvailability.ALL_DEHYDRATED:
-                case Vfs.ItemAvailability.ONLINE_ONLY:
+                case Common.ItemAvailability.ALL_DEHYDRATED:
+                case Common.ItemAvailability.ONLINE_ONLY:
                     make_pin_context_menu (true, false);
                     break;
                 }
@@ -1192,20 +1192,20 @@ public class SocketApi : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static void merge (Vfs.ItemAvailability lhs, Vfs.ItemAvailability rhs) {
+    private static void merge (Common.ItemAvailability lhs, Common.ItemAvailability rhs) {
         if (lhs == rhs) {
             return lhs;
         }
         if ((int)lhs) > (int)rhs) {
             std.swap (lhs, rhs); // reduce cases ensuring lhs < rhs
         }
-        if (lhs == Vfs.ItemAvailability.ALWAYS_LOCAL && rhs == Vfs.ItemAvailability.ALL_HYDRATED) {
-            return Vfs.ItemAvailability.ALL_HYDRATED;
+        if (lhs == Common.ItemAvailability.ALWAYS_LOCAL && rhs == Common.ItemAvailability.ALL_HYDRATED) {
+            return Common.ItemAvailability.ALL_HYDRATED;
         }
-        if (lhs == Vfs.ItemAvailability.ALL_DEHYDRATED && rhs == Vfs.ItemAvailability.ONLINE_ONLY) {
-            return Vfs.ItemAvailability.ALL_DEHYDRATED;
+        if (lhs == Common.ItemAvailability.ALL_DEHYDRATED && rhs == Common.ItemAvailability.ONLINE_ONLY) {
+            return Common.ItemAvailability.ALL_DEHYDRATED;
         }
-        return Vfs.ItemAvailability.MIXED;
+        return Common.ItemAvailability.MIXED;
     }
 
 
@@ -1215,7 +1215,7 @@ public class SocketApi : GLib.Object {
     private void make_pin_context_menu (bool make_available_locally, bool free_space) {
         listener.on_signal_send_message (
             "MENU_ITEM:CURRENT_PIN:d:"
-            + Vfs.ItemAvailability.to_string (combined));
+            + Common.ItemAvailability.to_string (combined));
         if (!Theme.enforce_virtual_files_sync_folder) {
             listener.on_signal_send_message (
                 "MENU_ITEM:MAKE_AVAILABLE_LOCALLY:"
@@ -1372,7 +1372,7 @@ public class SocketApi : GLib.Object {
             return;
         }
 
-        QMetaObject.invoke_method (widget, arguments["method"].to_string ().to_utf8 ().const_data ());
+        GLib.Object.invoke_method (widget, arguments["method"].to_string ().to_utf8 ().const_data ());
         socket_api_job.resolve ();
     }
 

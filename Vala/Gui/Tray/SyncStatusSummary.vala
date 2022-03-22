@@ -135,16 +135,16 @@ public class SyncStatusSummary : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private SyncResult.Status determine_sync_status (SyncResult sync_result) {
+    private LibSync.SyncResult.Status determine_sync_status (LibSync.SyncResult sync_result) {
         const var status = sync_result.status ();
 
-        if (status == SyncResult.Status.SUCCESS || status == SyncResult.Status.PROBLEM) {
+        if (status == LibSync.SyncResult.Status.SUCCESS || status == LibSync.SyncResult.Status.PROBLEM) {
             if (sync_result.has_unresolved_conflicts) {
-                return SyncResult.Status.PROBLEM;
+                return LibSync.SyncResult.Status.PROBLEM;
             }
-            return SyncResult.Status.SUCCESS;
-        } else if (status == SyncResult.Status.SYNC_PREPARE || status == SyncResult.Status.UNDEFINED) {
-            return SyncResult.Status.SYNC_RUNNING;
+            return LibSync.SyncResult.Status.SUCCESS;
+        } else if (status == LibSync.SyncResult.Status.SYNC_PREPARE || status == LibSync.SyncResult.Status.UNDEFINED) {
+            return LibSync.SyncResult.Status.SYNC_RUNNING;
         }
         return status;
     }
@@ -258,8 +258,8 @@ public class SyncStatusSummary : GLib.Object {
         const var state = determine_sync_status (folder.sync_result);
 
         switch (state) {
-        case SyncResult.Status.SUCCESS:
-        case SyncResult.Status.SYNC_PREPARE:
+        case LibSync.SyncResult.Status.SUCCESS:
+        case LibSync.SyncResult.Status.SYNC_PREPARE:
             // Success should only be shown if all folders were fine
             if (!folder_errors () || folder_error (folder)) {
                 is_syncing (false);
@@ -269,30 +269,30 @@ public class SyncStatusSummary : GLib.Object {
                 mark_folder_as_success (folder);
             }
             break;
-        case SyncResult.Status.ERROR:
-        case SyncResult.Status.SETUP_ERROR:
+        case LibSync.SyncResult.Status.ERROR:
+        case LibSync.SyncResult.Status.SETUP_ERROR:
             is_syncing (false);
             sync_status_string (_("Some files couldn't be synced!"));
             sync_status_detail_string (_("See below for errors"));
             sync_icon (Theme.sync_status_error);
             mark_folder_as_error (folder);
             break;
-        case SyncResult.Status.SYNC_RUNNING:
-        case SyncResult.Status.NOT_YET_STARTED:
+        case LibSync.SyncResult.Status.SYNC_RUNNING:
+        case LibSync.SyncResult.Status.NOT_YET_STARTED:
             is_syncing (true);
             sync_status_string (_("Syncing"));
             sync_status_detail_string ("");
             sync_icon (Theme.sync_status_running ());
             break;
-        case SyncResult.Status.PAUSED:
-        case SyncResult.Status.SYNC_ABORT_REQUESTED:
+        case LibSync.SyncResult.Status.PAUSED:
+        case LibSync.SyncResult.Status.SYNC_ABORT_REQUESTED:
             is_syncing (false);
             sync_status_string (_("Sync paused"));
             sync_status_detail_string ("");
             sync_icon (Theme.sync_status_pause ());
             break;
-        case SyncResult.Status.PROBLEM:
-        case SyncResult.Status.UNDEFINED:
+        case LibSync.SyncResult.Status.PROBLEM:
+        case LibSync.SyncResult.Status.UNDEFINED:
             is_syncing (false);
             sync_status_string (_("Some files could not be synced!"));
             sync_status_detail_string (_("See below for warnings"));

@@ -42,7 +42,7 @@ public class FileInfo : FileModifier {
 
     /***********************************************************
     ***********************************************************/
-    public FileInfo (string name, int64 size) {
+    public FileInfo.with_size (string name, int64 size) {
         this.name = name;
         this.is_directory = false;
         this.size = size;
@@ -51,7 +51,7 @@ public class FileInfo : FileModifier {
 
     /***********************************************************
     ***********************************************************/
-    public FileInfo (string name, int64 size, char content_char) {
+    public FileInfo.with_size_and_content_char (string name, int64 size, char content_char) {
         this.name = name;
         this.is_directory = false;
         this.size = size;
@@ -61,7 +61,7 @@ public class FileInfo : FileModifier {
 
     /***********************************************************
     ***********************************************************/
-    public FileInfo (string name, std.initializer_list<FileInfo> children) {
+    public FileInfo.with_children (string name, GLib.List<FileInfo> children) {
         this.name = name;
         foreach (var source in children) {
             add_child (source);

@@ -44,7 +44,7 @@ public class TestPlaceholderExists : AbstractTestSyncVirtualFiles {
 
         TestSyncVirtualFiles.clean_up_test_place_holder_exist ();
         // Dehydrate
-        GLib.assert_true (vfs.set_pin_state ("", Vfs.ItemAvailability.ONLINE_ONLY));
+        GLib.assert_true (vfs.set_pin_state ("", Common.ItemAvailability.ONLINE_ONLY));
         GLib.assert_true (!fake_folder.sync_once ());
 
         GLib.assert_true (item_instruction (complete_spy, "A/igno" + DVSUFFIX, CSync.SyncInstructions.IGNORE));

@@ -8,7 +8,7 @@
 //  #include <QDesktopServices>
 //  #include <Gtk.Application>
 //  #include <QClipboard>
-//  #include <QBuffer>
+//  #include <GLib.OutputStream>
 //  #include <QJsonObject>
 //  #include <QJsonDocument>
 
@@ -191,9 +191,9 @@ public class Flow2Auth : GLib.Object {
 
         // Start polling
         ConfigFile config;
-        std.chrono.milliseconds polltime = config.remote_poll_interval ();
-        GLib.info ("setting remote poll timer interval to " + polltime.count () + "msec.");
-        this.seconds_interval = (polltime.count () / 1000);
+        GLib.TimeSpan polltime_in_microseconds = config.remote_poll_interval ();
+        GLib.info ("setting remote poll timer interval to " + polltime_in_microseconds.count () + "msec.");
+        this.seconds_interval = (polltime_in_microseconds.count () / 1000);
         this.seconds_left = this.seconds_interval;
         /* emit */ signal_status_changed (PollStatus.PollStatus.POLL_COUNTDOWN, this.seconds_left);
 
@@ -277,7 +277,7 @@ public class Flow2Auth : GLib.Object {
         Soup.Request req;
         req.header (Soup.Request.ContentTypeHeader, "application/x-www-form-urlencoded");
 
-        var request_body = new QBuffer ();
+        var request_body = new GLib.OutputStream ();
         QUrlQuery arguments = new QUrlQuery ("token=%1".printf (this.poll_token));
         request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
 

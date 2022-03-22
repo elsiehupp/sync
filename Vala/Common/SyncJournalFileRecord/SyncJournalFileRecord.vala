@@ -1,4 +1,5 @@
 namespace Occ {
+namespace Common {
 
 /***********************************************************
 @class SyncJournalFileRecord
@@ -98,5 +99,5 @@ public class SyncJournalFileRecord : GLib.Object {
 
 } // class SyncJournalFileRecord
 
+} // namespace Common
 } // namespace Occ
-    

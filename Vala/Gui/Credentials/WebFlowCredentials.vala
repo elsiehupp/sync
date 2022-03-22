@@ -12,9 +12,9 @@
 //  #ifdef WITH_WEBENGINE
 //  #endif // WITH_WEBENGINE
 
-using QKeychain;
+using Secret.Collection;
 
-//  namespace QKeychain {
+//  namespace Secret.Collection {
 //      class Job;
 //  }
 
@@ -235,8 +235,8 @@ public class WebFlowCredentials : AbstractCredentials {
     ***********************************************************/
     private void ask_from_user () {
         // Determine if the old flow has to be used (GS for now)
-        // Do a DetermineAuthTypeJob to make sure that the server is still using Flow2
-        var determine_auth_type_job = new DetermineAuthTypeJob (this.account.shared_from_this (), this);
+        // Do a LibSync.DetermineAuthTypeJob to make sure that the server is still using Flow2
+        var determine_auth_type_job = new LibSync.DetermineAuthTypeJob (this.account.shared_from_this (), this);
         determine_auth_type_job.auth_type.connect (
             this.on_signal_determine_auth_type
         );
@@ -248,10 +248,10 @@ public class WebFlowCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_determine_auth_type (DetermineAuthTypeJob.AuthType type) {
+    private void on_signal_determine_auth_type (LibSync.DetermineAuthTypeJob.AuthType type) {
     // LoginFlowV2 > WEB_VIEW_FLOW > OAuth > Shib > Basic
 //  #ifdef WITH_WEBENGINE
-        bool use_flow2 = (type != DetermineAuthTypeJob.WEB_VIEW_FLOW);
+        bool use_flow2 = (type != LibSync.DetermineAuthTypeJob.WEB_VIEW_FLOW);
 //  #else // WITH_WEBENGINE
         bool use_flow2 = true;
 //  #endif // WITH_WEBENGINE
@@ -363,8 +363,8 @@ public class WebFlowCredentials : AbstractCredentials {
                 read_single_client_ca_cert_pem ();
                 return;
             } else {
-                if (read_job.error != QKeychain.Error.EntryNotFound ||
-                    ( (read_job.error == QKeychain.Error.EntryNotFound) && this.client_ssl_ca_certificates.count () == 0)) {
+                if (read_job.error != Secret.Collection.Error.EntryNotFound ||
+                    ( (read_job.error == Secret.Collection.Error.EntryNotFound) && this.client_ssl_ca_certificates.count () == 0)) {
                     GLib.warning ("Unable to read client CA cert slot " + this.client_ssl_ca_certificates.count ().to_string () + read_job.error_string);
                 }
             }
@@ -392,12 +392,12 @@ public class WebFlowCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_read_password_job_finished (QKeychain.Job incoming_job) {
+    private void on_signal_read_password_job_finished (Secret.Collection.Job incoming_job) {
         var read_password_job = qobject_cast<ReadPasswordJob> (incoming_job);
-        QKeychain.Error error = read_password_job.error;
+        Secret.Collection.Error error = read_password_job.error;
 
         // If we could not find the entry try the old entries
-        if (!this.keychain_migration && error == QKeychain.EntryNotFound) {
+        if (!this.keychain_migration && error == Secret.Collection.EntryNotFound) {
             this.keychain_migration = true;
             fetch_from_keychain_helper ();
             return;
@@ -407,7 +407,7 @@ public class WebFlowCredentials : AbstractCredentials {
             GLib.warning ("Strange: User is empty!");
         }
 
-        if (error == QKeychain.NoError) {
+        if (error == Secret.Collection.NoError) {
             this.password = read_password_job.text_data ();
             this.ready = true;
             this.credentials_valid = true;
@@ -501,7 +501,7 @@ public class WebFlowCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_write_job_done (QKeychain.Job qkeychain_job) {
+    private void on_signal_write_job_done (Secret.Collection.Job qkeychain_job) {
         delete qkeychain_job.settings ();
         switch (qkeychain_job.error) {
         case NoError:
@@ -636,7 +636,7 @@ public class WebFlowCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     private void start_delete_job (bool old_keychain_entries, string key) {
-        new KeychainChunk.KeychainChunkDeleteJob (this.account, key, old_keychain_entries, this).on_signal_start ();
+        new KeychainChunkDeleteJob (this.account, key, old_keychain_entries, this).on_signal_start ();
     }
 
 

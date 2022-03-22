@@ -242,12 +242,12 @@ public class PropagateDownloadFile : PropagateItemJob {
 
         string temporary_filename;
         string expected_etag_for_resume;
-        const SyncJournalDb.DownloadInfo progress_info = this.propagator.journal.get_download_info (this.item.file);
+        const Common.SyncJournalDb.DownloadInfo progress_info = this.propagator.journal.get_download_info (this.item.file);
         if (progress_info.valid) {
             // if the etag has changed meanwhile, remove the already downloaded part.
             if (progress_info.etag != this.item.etag) {
                 FileSystem.remove (this.propagator.full_local_path (progress_info.temporaryfile));
-                this.propagator.journal.download_info (this.item.file, SyncJournalDb.DownloadInfo ());
+                this.propagator.journal.download_info (this.item.file, Common.SyncJournalDb.DownloadInfo ());
             } else {
                 temporary_filename = progress_info.temporaryfile;
                 expected_etag_for_resume = progress_info.etag;
@@ -301,7 +301,7 @@ public class PropagateDownloadFile : PropagateItemJob {
             return;
         }
     {
-            SyncJournalDb.DownloadInfo pi;
+            Common.SyncJournalDb.DownloadInfo pi;
             pi.etag = this.item.etag;
             pi.temporaryfile = temporary_filename;
             pi.valid = true;
@@ -380,7 +380,7 @@ public class PropagateDownloadFile : PropagateItemJob {
             if (this.temporary_file.exists () && (this.temporary_file.size () == 0 || bad_range_header || file_not_found)) {
                 this.temporary_file.close ();
                 FileSystem.remove (this.temporary_file.filename ());
-                this.propagator.journal.download_info (this.item.file, SyncJournalDb.DownloadInfo ());
+                this.propagator.journal.download_info (this.item.file, Common.SyncJournalDb.DownloadInfo ());
             }
 
             if (!this.item.direct_download_url == "" && err != GLib.InputStream.OperationCanceledError) {
@@ -709,7 +709,7 @@ public class PropagateDownloadFile : PropagateItemJob {
 
             // Ensure the pin state isn't contradictory
             var pin = vfs.pin_state (this.item.file);
-            if (pin && *pin == Vfs.ItemAvailability.ONLINE_ONLY)
+            if (pin && *pin == Common.ItemAvailability.ONLINE_ONLY)
                 if (!vfs.pin_state (this.item.file, PinState.PinState.UNSPECIFIED)) {
                     GLib.warning ("Could not set pin state of " + this.item.file + " to unspecified.");
                 }
@@ -734,9 +734,9 @@ public class PropagateDownloadFile : PropagateItemJob {
         }
 
         if (this.is_encrypted) {
-            this.propagator.journal.download_info (this.item.file, SyncJournalDb.DownloadInfo ());
+            this.propagator.journal.download_info (this.item.file, Common.SyncJournalDb.DownloadInfo ());
         } else {
-            this.propagator.journal.download_info (this.item.encrypted_filename, SyncJournalDb.DownloadInfo ());
+            this.propagator.journal.download_info (this.item.encrypted_filename, Common.SyncJournalDb.DownloadInfo ());
         }
 
         this.propagator.journal.commit ("download file start2");
@@ -948,7 +948,7 @@ public class PropagateDownloadFile : PropagateItemJob {
     /***********************************************************
     Anonymous namespace for the recall feature
     ***********************************************************/
-    static void handle_recall_file (string file_path, string folder_path, SyncJournalDb journal) {
+    static void handle_recall_file (string file_path, string folder_path, Common.SyncJournalDb journal) {
         GLib.debug ("Handling recall file: " + file_path);
 
         FileSystem.file_hidden (file_path, true);

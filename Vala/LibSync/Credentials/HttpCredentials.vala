@@ -56,7 +56,7 @@ from the keychain
               emit fetched ()
 
 2) If the credentials is still not valid when fetched () is
-emitted, the ui, will call ask_from_user () which is
+emitted, the instance, will call ask_from_user () which is
 implemented in HttpCredentialsGui
 ***********************************************************/
 public class HttpCredentials : AbstractCredentials {
@@ -232,7 +232,7 @@ public class HttpCredentials : AbstractCredentials {
             // and we'll just store the bundle password in the keychain. That's prefered
             // since the keychain on older Windows platforms can only store a limited number
             // of bytes per entry and key/cert may exceed that.
-            var qkeychain_write_password_job = new QKeychain.WritePasswordJob (Theme.app_name);
+            var qkeychain_write_password_job = new Secret.Collection.WritePasswordJob (Theme.app_name);
             add_settings_to_job (this.account, qkeychain_write_password_job);
             qkeychain_write_password_job.insecure_fallback (false);
             qkeychain_write_password_job.signal_finished.connect (
@@ -247,7 +247,7 @@ public class HttpCredentials : AbstractCredentials {
             // Option 2, pre 2.6 configs: We used to store the raw cert/key in the keychain and
             // still do so if no bundle is available. We can't currently migrate to Option 1
             // because we have no functions for creating an encrypted pkcs12 bundle.
-            var qkeychain_write_password_job = new QKeychain.WritePasswordJob (Theme.app_name);
+            var qkeychain_write_password_job = new Secret.Collection.WritePasswordJob (Theme.app_name);
             add_settings_to_job (this.account, qkeychain_write_password_job);
             qkeychain_write_password_job.insecure_fallback (false);
             qkeychain_write_password_job.signal_finished.connect (
@@ -290,7 +290,7 @@ public class HttpCredentials : AbstractCredentials {
             return;
         }
 
-        var qkeychain_delete_password_job = new QKeychain.DeletePasswordJob (Theme.app_name);
+        var qkeychain_delete_password_job = new Secret.Collection.DeletePasswordJob (Theme.app_name);
         add_settings_to_job (this.account, qkeychain_delete_password_job);
         qkeychain_delete_password_job.insecure_fallback (true);
         qkeychain_delete_password_job.key (keychain_key);
@@ -450,13 +450,13 @@ public class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_read_client_cert_password_job_done (QKeychain.Job qkeychain_job) {
-        var read_job = qobject_cast<QKeychain.ReadPasswordJob> (qkeychain_job);
+    private void on_signal_read_client_cert_password_job_done (Secret.Collection.Job qkeychain_job) {
+        var read_job = qobject_cast<Secret.Collection.ReadPasswordJob> (qkeychain_job);
         if (keychain_unavailable_retry_later (read_job)) {
             return;
         }
 
-        if (read_job.error == QKeychain.NoError) {
+        if (read_job.error == Secret.Collection.NoError) {
             this.client_cert_password = read_job.binary_data ();
         } else {
             GLib.warning ("Could not retrieve client cert password from keychain " + read_job.error_string);
@@ -474,13 +474,13 @@ public class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_read_client_cert_pem_job_done (QKeychain.Job incoming) {
-        var read_job = qobject_cast<QKeychain.ReadPasswordJob> (incoming);
+    private void on_signal_read_client_cert_pem_job_done (Secret.Collection.Job incoming) {
+        var read_job = qobject_cast<Secret.Collection.ReadPasswordJob> (incoming);
         if (keychain_unavailable_retry_later (read_job))
             return;
 
         // Store PEM in memory
-        if (read_job.error == QKeychain.NoError && read_job.binary_data ().length > 0) {
+        if (read_job.error == Secret.Collection.NoError && read_job.binary_data ().length > 0) {
             GLib.List<GLib.TlsCertificate> ssl_certificate_list = GLib.TlsCertificate.from_data (read_job.binary_data (), QSsl.Pem);
             if (ssl_certificate_list.length >= 1) {
                 this.client_ssl_certificate = ssl_certificate_list.at (0);
@@ -493,7 +493,7 @@ public class HttpCredentials : AbstractCredentials {
             this.user + CLIENT_KEY_PEM_C,
             this.keychain_migration ? "" : this.account.identifier);
 
-        var qkeychain_read_password_job = new QKeychain.ReadPasswordJob (Theme.app_name);
+        var qkeychain_read_password_job = new Secret.Collection.ReadPasswordJob (Theme.app_name);
         add_settings_to_job (this.account, qkeychain_read_password_job);
         qkeychain_read_password_job.insecure_fallback (false);
         qkeychain_read_password_job.key (keychain_key);
@@ -506,11 +506,11 @@ public class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_read_client_key_pem_job_done (QKeychain.Job incoming) {
-        var read_job = qobject_cast<QKeychain.ReadPasswordJob> (incoming);
+    private void on_signal_read_client_key_pem_job_done (Secret.Collection.Job incoming) {
+        var read_job = qobject_cast<Secret.Collection.ReadPasswordJob> (incoming);
         // Store key in memory
 
-        if (read_job.error == QKeychain.NoError && read_job.binary_data ().length > 0) {
+        if (read_job.error == Secret.Collection.NoError && read_job.binary_data ().length > 0) {
             string client_key_pem = read_job.binary_data ();
             // FIXME Unfortunately Qt has a bug and we can't just use QSsl.Opaque to let it
             // load whatever we have. So we try until it works.
@@ -538,7 +538,7 @@ public class HttpCredentials : AbstractCredentials {
             this.user,
             this.keychain_migration ? "" : this.account.identifier);
 
-        var qkeychain_read_password_job = new QKeychain.ReadPasswordJob (Theme.app_name);
+        var qkeychain_read_password_job = new Secret.Collection.ReadPasswordJob (Theme.app_name);
         add_settings_to_job (this.account, qkeychain_read_password_job);
         qkeychain_read_password_job.insecure_fallback (false);
         qkeychain_read_password_job.key (keychain_key);
@@ -551,8 +551,8 @@ public class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_write_client_cert_password_job_done (QKeychain.Job finished_job) {
-        if (finished_job && finished_job.error != QKeychain.NoError) {
+    private void on_signal_write_client_cert_password_job_done (Secret.Collection.Job finished_job) {
+        if (finished_job && finished_job.error != Secret.Collection.NoError) {
             GLib.warning (
                 "Could not write client cert password to credentials"
                 + finished_job.error + finished_job.error_string);
@@ -564,8 +564,8 @@ public class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_write_client_cert_pem_job_done (QKeychain.Job finished_job) {
-        if (finished_job && finished_job.error != QKeychain.NoError) {
+    private void on_signal_write_client_cert_pem_job_done (Secret.Collection.Job finished_job) {
+        if (finished_job && finished_job.error != Secret.Collection.NoError) {
             GLib.warning (
                 "Could not write client cert to credentials"
                 + finished_job.error + finished_job.error_string);
@@ -573,7 +573,7 @@ public class HttpCredentials : AbstractCredentials {
 
         // write ssl key if there is one
         if (!this.client_ssl_key == null) {
-            var qkeychain_write_password_job = new QKeychain.WritePasswordJob (Theme.app_name);
+            var qkeychain_write_password_job = new Secret.Collection.WritePasswordJob (Theme.app_name);
             add_settings_to_job (this.account, qkeychain_write_password_job);
             qkeychain_write_password_job.insecure_fallback (false);
             qkeychain_write_password_job.signal_finished.connect (
@@ -590,8 +590,8 @@ public class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_write_client_key_pem_job_done (QKeychain.Job finished_job) {
-        if (finished_job && finished_job.error != QKeychain.NoError) {
+    private void on_signal_write_client_key_pem_job_done (Secret.Collection.Job finished_job) {
+        if (finished_job && finished_job.error != Secret.Collection.NoError) {
             GLib.warning (
                 "Could not write client key to credentials"
                 + finished_job.error + finished_job.error_string);
@@ -603,13 +603,13 @@ public class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_read_job_done (QKeychain.Job incoming) {
-        var qkeychain_read_password_job = static_cast<QKeychain.ReadPasswordJob> (incoming);
-        QKeychain.Error error = qkeychain_read_password_job.error;
+    private void on_signal_read_job_done (Secret.Collection.Job incoming) {
+        var qkeychain_read_password_job = static_cast<Secret.Collection.ReadPasswordJob> (incoming);
+        Secret.Collection.Error error = qkeychain_read_password_job.error;
 
         // If we can't find the credentials at the keys that include the account identifier,
         // try to read them from the legacy locations that don't have a account identifier.
-        if (!this.keychain_migration && error == QKeychain.EntryNotFound) {
+        if (!this.keychain_migration && error == Secret.Collection.EntryNotFound) {
             GLib.warning ()
                 + "Could not find keychain entries, attempting to read from legacy locations";
             this.keychain_migration = true;
@@ -628,9 +628,9 @@ public class HttpCredentials : AbstractCredentials {
             GLib.warning ("Strange: User is empty!");
         }
 
-        if (!this.refresh_token == "" && error == QKeychain.NoError) {
+        if (!this.refresh_token == "" && error == Secret.Collection.NoError) {
             refresh_access_token ();
-        } else if (!this.password == "" && error == QKeychain.NoError) {
+        } else if (!this.password == "" && error == Secret.Collection.NoError) {
             // All cool, the keychain did not come back with error.
             // Still, the password can be empty which indicates a problem and
             // the password dialog has to be opened.
@@ -640,7 +640,7 @@ public class HttpCredentials : AbstractCredentials {
             // we come here if the password is empty or any other keychain
             // error happend.
 
-            this.fetch_error_string = qkeychain_read_password_job.error != QKeychain.EntryNotFound ? qkeychain_read_password_job.error_string: "";
+            this.fetch_error_string = qkeychain_read_password_job.error != Secret.Collection.EntryNotFound ? qkeychain_read_password_job.error_string: "";
 
             this.password = "";
             this.ready = false;
@@ -659,7 +659,7 @@ public class HttpCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     private void on_signal_write_password_to_keychain () {
-        var qkeychain_write_password_job = new QKeychain.WritePasswordJob (Theme.app_name);
+        var qkeychain_write_password_job = new Secret.Collection.WritePasswordJob (Theme.app_name);
         add_settings_to_job (this.account, qkeychain_write_password_job);
         qkeychain_write_password_job.insecure_fallback (false);
         qkeychain_write_password_job.signal_finished.connect (
@@ -673,8 +673,8 @@ public class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_write_job_done (QKeychain.Job qkeychain_job) {
-        if (qkeychain_job && qkeychain_job.error != QKeychain.NoError) {
+    private void on_signal_write_job_done (Secret.Collection.Job qkeychain_job) {
+        if (qkeychain_job && qkeychain_job.error != Secret.Collection.NoError) {
             GLib.warning (
                 "Error while writing password"
                 + qkeychain_job.error + qkeychain_job.error_string);
@@ -695,7 +695,7 @@ public class HttpCredentials : AbstractCredentials {
         if (!this.client_cert_bundle == "") {
             // New case (>=2.6) : We have a bundle in the settings and read the password from
             // the keychain
-            var qkeychain_read_password_job = new QKeychain.ReadPasswordJob (Theme.app_name);
+            var qkeychain_read_password_job = new Secret.Collection.ReadPasswordJob (Theme.app_name);
             add_settings_to_job (this.account, qkeychain_read_password_job);
             qkeychain_read_password_job.insecure_fallback (false);
             qkeychain_read_password_job.key (keychain_key (this.account.url.to_string (), this.user + CLIENT_CERT_PASSWORD_C, this.account.identifier));
@@ -712,7 +712,7 @@ public class HttpCredentials : AbstractCredentials {
             this.user + CLIENT_CERTIFICATE_PEM_C,
             this.keychain_migration ? "" : this.account.identifier);
 
-        var qkeychain_read_password_job = new QKeychain.ReadPasswordJob (Theme.app_name);
+        var qkeychain_read_password_job = new Secret.Collection.ReadPasswordJob (Theme.app_name);
         add_settings_to_job (this.account, qkeychain_read_password_job);
         qkeychain_read_password_job.insecure_fallback (false);
         qkeychain_read_password_job.key (keychain_key);
@@ -735,7 +735,7 @@ public class HttpCredentials : AbstractCredentials {
 
 
     private void start_delete_job (string user) {
-        var qkeychain_delete_password_job = new QKeychain.DeletePasswordJob (Theme.app_name);
+        var qkeychain_delete_password_job = new Secret.Collection.DeletePasswordJob (Theme.app_name);
         add_settings_to_job (this.account, qkeychain_delete_password_job);
         qkeychain_delete_password_job.insecure_fallback (true);
         qkeychain_delete_password_job.key (keychain_key (this.account.url.to_string (), user, ""));
@@ -752,10 +752,10 @@ public class HttpCredentials : AbstractCredentials {
     available yet. If that happens, this function will schedule
     another try and return true.
     ***********************************************************/
-    protected bool keychain_unavailable_retry_later (QKeychain.ReadPasswordJob incoming) {
+    protected bool keychain_unavailable_retry_later (Secret.Collection.ReadPasswordJob incoming) {
         GLib.assert (!incoming.insecure_fallback ()); // If insecure_fallback is set, the next test would be pointless
-        if (this.retry_on_signal_key_chain_error && (incoming.error == QKeychain.NoBackendAvailable
-                || incoming.error == QKeychain.OtherError)) {
+        if (this.retry_on_signal_key_chain_error && (incoming.error == Secret.Collection.NoBackendAvailable
+                || incoming.error == Secret.Collection.OtherError)) {
             // Could be that the backend was not yet available. Wait some extra seconds.
             // (Issues #4274 and #6522)
             // (For kwallet, the error is OtherError instead of NoBackendAvailable, maybe a bug in QtKeychain)
@@ -789,7 +789,7 @@ public class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private static void add_settings_to_job (Account account, QKeychain.Job qkeychain_job) {
+    private static void add_settings_to_job (Account account, Secret.Collection.Job qkeychain_job) {
         //  Q_UNUSED (account);
         var settings = ConfigFile.settings_with_group (Theme.app_name);
         settings.parent (qkeychain_job); // make the qkeychain_job parent to make setting deleted properly

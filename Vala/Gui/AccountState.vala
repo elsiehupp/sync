@@ -226,9 +226,9 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     /***********************************************************
     Creates an account state from settings and an Account object.
 
-    Use from AccountManager with a prepared QSettings object only.
+    Use from AccountManager with a prepared GLib.Settings object only.
     ***********************************************************/
-    public static AccountState load_from_settings (unowned Account account, QSettings settings) {
+    public static AccountState load_from_settings (unowned Account account, GLib.Settings settings) {
         var account_state = new AccountState (account);
         return account_state;
     }
@@ -239,7 +239,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
 
     It does not write the Account data.
     ***********************************************************/
-    public void write_to_settings (QSettings settings) { }
+    public void write_to_settings (GLib.Settings settings) { }
 
 
     /***********************************************************
@@ -347,7 +347,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     Returns a new settings object for this account, already in
     the right groups.
     ***********************************************************/
-    public std.unique_ptr<QSettings> settings () {
+    public GLib.Settings settings () {
         var s = ConfigFile.settings_with_group ("Accounts");
         s.begin_group (this.account.identifier);
         return s;
@@ -422,8 +422,8 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
 
         // IF the account is connected the connection check can be skipped
         // if the last successful etag check job is not so long ago.
-        const var polltime = std.chrono.duration_cast<std.chrono.seconds> (ConfigFile ().remote_poll_interval ());
-        const var elapsed = this.time_of_last_e_tag_check.secs_to (GLib.DateTime.current_date_time_utc ());
+        const int polltime = ConfigFile ().remote_poll_interval ().seconds;
+        const int elapsed = this.time_of_last_e_tag_check.secs_to (GLib.DateTime.current_date_time_utc ());
         if (is_connected && this.time_of_last_e_tag_check.is_valid ()
             && elapsed <= polltime.count ()) {
             GLib.debug (account.display_name + "The last ETag check succeeded within the last " + polltime.count () + "s (" + elapsed + "s). No connection check needed!");

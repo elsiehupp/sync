@@ -25,7 +25,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    private Ui.Owncloude_advanced_setup_page ui;
+    private Owncloude_advanced_setup_page instance;
     private bool checking = false;
     private bool created = false;
     private bool local_folder_valid = false;
@@ -46,44 +46,44 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         base ();
         this.progress_indicator = new QProgressIndicator (this);
         this.oc_wizard = wizard;
-        this.ui.up_ui (this);
+        this.instance.up_ui (this);
 
         set_up_resolution_widget ();
 
-        register_field ("OCSync_from_scratch", this.ui.cb_sync_from_scratch);
+        register_field ("OCSync_from_scratch", this.instance.cb_sync_from_scratch);
 
         var size_policy = this.progress_indicator.size_policy ();
         size_policy.retain_size_when_hidden (true);
         this.progress_indicator.size_policy (size_policy);
 
-        this.ui.result_layout.add_widget (this.progress_indicator);
+        this.instance.result_layout.add_widget (this.progress_indicator);
         on_signal_stop_spinner ();
         set_up_customization ();
 
-        this.ui.pb_select_local_folder.clicked.connect (
+        this.instance.pb_select_local_folder.clicked.connect (
             this.on_signal_select_folder
         );
         button_text (QWizard.FinishButton, _("Connect"));
 
         if (Theme.enforce_virtual_files_sync_folder) {
-            this.ui.r_sync_everything.disabled (true);
-            this.ui.r_selective_sync.disabled (true);
-            this.ui.b_selective_sync.disabled (true);
+            this.instance.r_sync_everything.disabled (true);
+            this.instance.r_selective_sync.disabled (true);
+            this.instance.b_selective_sync.disabled (true);
         }
 
-        this.ui.r_sync_everything.clicked.connect (
+        this.instance.r_sync_everything.clicked.connect (
             this.on_signal_sync_everything_clicked
         );
-        this.ui.r_selective_sync.clicked.connect (
+        this.instance.r_selective_sync.clicked.connect (
             this.on_signal_selective_sync_clicked
         );
-        this.ui.r_virtual_file_sync.clicked.connect (
+        this.instance.r_virtual_file_sync.clicked.connect (
             this.on_signal_virtual_file_sync_clicked
         );
-        this.ui.r_virtual_file_sync.toggled.connect (
+        this.instance.r_virtual_file_sync.toggled.connect (
             this.on_virtual_file_sync_toggled
         );
-        this.ui.b_selective_sync.clicked.connect (
+        this.instance.b_selective_sync.clicked.connect (
             this.on_signal_selective_sync_clicked
         );
 
@@ -91,24 +91,24 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         const Gtk.Icon app_icon = theme.application_icon;
         const int app_icon_size = Theme.is_hidpi () ? 128 : 64;
 
-        this.ui.l_server_icon.pixmap (app_icon.pixmap (app_icon_size));
+        this.instance.l_server_icon.pixmap (app_icon.pixmap (app_icon_size));
 
         if (theme.wizard_hide_external_storage_confirmation_checkbox) {
-            this.ui.conf_check_box_external.hide ();
+            this.instance.conf_check_box_external.hide ();
         }
         if (theme.wizard_hide_folder_size_limit_checkbox) {
-            this.ui.conf_check_box_size.hide ();
-            this.ui.conf_spin_box.hide ();
-            this.ui.conf_trailling_size_label.hide ();
+            this.instance.conf_check_box_size.hide ();
+            this.instance.conf_spin_box.hide ();
+            this.instance.conf_trailling_size_label.hide ();
         }
 
-        this.ui.r_virtual_file_sync.on_signal_text (_("Use virtual files instead of downloading content immediately %1").printf (this.best_available_vfs_mode == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
+        this.instance.r_virtual_file_sync.on_signal_text (_("Use virtual files instead of downloading content immediately %1").printf (this.best_available_vfs_mode == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
     }
 
 
     private void on_virtual_file_sync_toggled (bool checked) {
         if (checked) {
-            this.ui.l_selective_sync_size_label.clear ();
+            this.instance.l_selective_sync_size_label.clear ();
             this.selective_sync_blocklist.clear ();
         }
     }
@@ -126,19 +126,19 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     public void initialize_page () {
-        WizardCommon.init_error_label (this.ui.error_label);
+        WizardCommon.init_error_label (this.instance.error_label);
 
         if (!Theme.show_virtual_files_option || this.best_available_vfs_mode == Vfs.Off) {
             // If the layout were wrapped in a widget, the var-grouping of the
             // radio buttons no longer works and there are surprising margins.
             // Just manually hide the button and remove the layout.
-            this.ui.r_virtual_file_sync.hide ();
-            this.ui.w_sync_strategy.layout ().remove_item (this.ui.l_virtual_file_sync);
+            this.instance.r_virtual_file_sync.hide ();
+            this.instance.w_sync_strategy.layout ().remove_item (this.instance.l_virtual_file_sync);
         }
 
         this.checking = false;
-        this.ui.l_selective_sync_size_label.clear ();
-        this.ui.l_sync_everything_size_label.clear ();
+        this.instance.l_selective_sync_size_label.clear ();
+        this.instance.l_sync_everything_size_label.clear ();
 
         // Update the local folder - this is not guaranteed to find a good one
         string good_local_folder = FolderMan.instance.find_good_path_for_new_sync_folder (local_folder (), server_url ());
@@ -163,15 +163,15 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
             this.selective_sync_blocklist = {
                 "/"
             };
-            radio_checked (this.ui.r_selective_sync);
+            radio_checked (this.instance.r_selective_sync);
             GLib.Timeout.single_shot (0, this, OwncloudAdvancedSetupPage.on_signal_selective_sync_clicked);
         }
 
         ConfigFile config_file;
         var new_folder_limit = config_file.new_big_folder_size_limit;
-        this.ui.conf_check_box_size.checked (new_folder_limit.first);
-        this.ui.conf_spin_box.value (new_folder_limit.second);
-        this.ui.conf_check_box_external.checked (config_file.confirm_external_storage ());
+        this.instance.conf_check_box_size.checked (new_folder_limit.first);
+        this.instance.conf_spin_box.value (new_folder_limit.second);
+        this.instance.conf_check_box_external.checked (config_file.confirm_external_storage ());
 
         fetch_user_avatar ();
         user_information ();
@@ -214,11 +214,11 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
             on_signal_start_spinner ();
             /* emit */ complete_changed ();
 
-            if (this.ui.r_sync_everything.is_checked ()) {
+            if (this.instance.r_sync_everything.is_checked ()) {
                 ConfigFile config_file;
-                config_file.new_big_folder_size_limit (this.ui.conf_check_box_size.is_checked (),
-                    this.ui.conf_spin_box.value ());
-                config_file.confirm_external_storage (this.ui.conf_check_box_external.is_checked ());
+                config_file.new_big_folder_size_limit (this.instance.conf_check_box_size.is_checked (),
+                    this.instance.conf_spin_box.value ());
+                config_file.confirm_external_storage (this.instance.conf_check_box_external.is_checked ());
             }
 
             /* emit */ create_local_and_remote_folders (local_folder (), this.remote_folder);
@@ -244,14 +244,14 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     public bool use_virtual_file_sync () {
-        return this.ui.r_virtual_file_sync.is_checked ();
+        return this.instance.r_virtual_file_sync.is_checked ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool is_confirm_big_folder_checked () {
-        return this.ui.r_sync_everything.is_checked () && this.ui.conf_check_box_size.is_checked ();
+        return this.instance.r_sync_everything.is_checked () && this.instance.conf_check_box_size.is_checked ();
     }
 
 
@@ -283,10 +283,10 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     ***********************************************************/
     public void on_signal_error_string (string error_string) {
         if (error_string == "") {
-            this.ui.error_label.visible (false);
+            this.instance.error_label.visible (false);
         } else {
-            this.ui.error_label.visible (true);
-            this.ui.error_label.on_signal_text (error_string);
+            this.instance.error_label.visible (true);
+            this.instance.error_label.on_signal_text (error_string);
         }
         this.checking = false;
         /* emit */ complete_changed ();
@@ -313,7 +313,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
             update_status ();
         }
 
-        int64 r_space = this.ui.r_sync_everything.is_checked () ? this.r_size : this.r_selected_size;
+        int64 r_space = this.instance.r_sync_everything.is_checked () ? this.r_size : this.r_selected_size;
         string error_str = check_local_space (r_space);
         on_signal_error_string (error_str);
     }
@@ -322,8 +322,8 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void on_signal_sync_everything_clicked () {
-        this.ui.l_selective_sync_size_label.on_signal_text ("");
-        radio_checked (this.ui.r_sync_everything);
+        this.instance.l_selective_sync_size_label.on_signal_text ("");
+        radio_checked (this.instance.r_sync_everything);
         this.selective_sync_blocklist.clear ();
 
         string error_str = check_local_space (this.r_size);
@@ -366,18 +366,18 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
 
         if (update_blocklist) {
             if (!this.selective_sync_blocklist == "") {
-                this.ui.r_selective_sync.block_signals (true);
-                radio_checked (this.ui.r_selective_sync);
-                this.ui.r_selective_sync.block_signals (false);
+                this.instance.r_selective_sync.block_signals (true);
+                radio_checked (this.instance.r_selective_sync);
+                this.instance.r_selective_sync.block_signals (false);
                 var s = dialog.estimated_size ();
                 if (s > 0) {
-                    this.ui.l_selective_sync_size_label.on_signal_text (_(" (%1)").printf (Utility.octets_to_string (s)));
+                    this.instance.l_selective_sync_size_label.on_signal_text (_(" (%1)").printf (Utility.octets_to_string (s)));
                 } else {
-                    this.ui.l_selective_sync_size_label.on_signal_text ("");
+                    this.instance.l_selective_sync_size_label.on_signal_text ("");
                 }
             } else {
-                radio_checked (this.ui.r_sync_everything);
-                this.ui.l_selective_sync_size_label.on_signal_text ("");
+                radio_checked (this.instance.r_sync_everything);
+                this.instance.l_selective_sync_size_label.on_signal_text ("");
             }
             wizard ().property ("blocklist", this.selective_sync_blocklist);
         }
@@ -389,7 +389,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void on_signal_virtual_file_sync_clicked () {
-        if (!this.ui.r_virtual_file_sync.is_checked ()) {
+        if (!this.instance.r_virtual_file_sync.is_checked ()) {
             OwncloudWizard.ask_experimental_virtual_files_feature (
                 this,
                 this.on_ask_experimental_virtual_files_feature
@@ -404,7 +404,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         if (!enable) {
             return;
         }
-        radio_checked (this.ui.r_virtual_file_sync);
+        radio_checked (this.instance.r_virtual_file_sync);
     }
 
 
@@ -412,7 +412,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     ***********************************************************/
     private void on_signal_quota_retrieved (QVariantMap result) {
         this.r_size = result["size"].to_double ();
-        this.ui.l_sync_everything_size_label.on_signal_text (_(" (%1)").printf (Utility.octets_to_string (this.r_size)));
+        this.instance.l_sync_everything_size_label.on_signal_text (_(" (%1)").printf (Utility.octets_to_string (this.r_size)));
 
         update_status ();
     }
@@ -427,11 +427,11 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         radio.checkable (true);
         radio.checked (true);
 
-        if (radio != this.ui.r_selective_sync) {
-            this.ui.r_selective_sync.checkable (false);
+        if (radio != this.instance.r_selective_sync) {
+            this.instance.r_selective_sync.checkable (false);
         }
-        if (radio != this.ui.r_virtual_file_sync) {
-            this.ui.r_virtual_file_sync.checkable (false);
+        if (radio != this.instance.r_virtual_file_sync) {
+            this.instance.r_virtual_file_sync.checkable (false);
         }
     }
 
@@ -440,22 +440,22 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     ***********************************************************/
     private void set_up_customization () {
         // set defaults for the customize labels.
-        this.ui.top_label.hide ();
-        this.ui.bottom_label.hide ();
+        this.instance.top_label.hide ();
+        this.instance.bottom_label.hide ();
 
         Theme theme = Theme.instance;
         GLib.Variant variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_TOP);
         if (!variant == null) {
-            WizardCommon.set_up_custom_media (variant, this.ui.top_label);
+            WizardCommon.set_up_custom_media (variant, this.instance.top_label);
         }
 
         variant = theme.custom_media (Theme.CustomMediaType.OC_SETUP_BOTTOM);
-        WizardCommon.set_up_custom_media (variant, this.ui.bottom_label);
+        WizardCommon.set_up_custom_media (variant, this.instance.bottom_label);
 
-        WizardCommon.customize_hint_label (this.ui.l_free_space);
-        WizardCommon.customize_hint_label (this.ui.l_sync_everything_size_label);
-        WizardCommon.customize_hint_label (this.ui.l_selective_sync_size_label);
-        WizardCommon.customize_hint_label (this.ui.server_address_label);
+        WizardCommon.customize_hint_label (this.instance.l_free_space);
+        WizardCommon.customize_hint_label (this.instance.l_sync_everything_size_label);
+        WizardCommon.customize_hint_label (this.instance.l_selective_sync_size_label);
+        WizardCommon.customize_hint_label (this.instance.server_address_label);
     }
 
 
@@ -485,7 +485,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
                                             GLib.Dir.to_native_separators (loc_folder)
                                         )
                                     );
-                this.ui.r_sync_everything.on_signal_text (_("Sync the folder \"%1\"").printf (this.remote_folder));
+                this.instance.r_sync_everything.on_signal_text (_("Sync the folder \"%1\"").printf (this.remote_folder));
             }
 
             const bool dir_not_empty = new GLib.Dir (loc_folder).entry_list (GLib.Dir.AllEntries | GLib.Dir.NoDotAndDotDot).count () > 0;
@@ -498,12 +498,12 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         }
 
         string lfree_space_str = Utility.octets_to_string (available_local_space ());
-        this.ui.l_free_space.text (_("%1 free space", "%1 gets replaced with the size and a matching unit. Example: 3 MB or 5 GB").printf (lfree_space_str));
+        this.instance.l_free_space.text (_("%1 free space", "%1 gets replaced with the size and a matching unit. Example: 3 MB or 5 GB").printf (lfree_space_str));
 
-        this.ui.sync_mode_label.text (status_string);
-        this.ui.sync_mode_label.fixed_height (this.ui.sync_mode_label.size_hint ().height ());
+        this.instance.sync_mode_label.text (status_string);
+        this.instance.sync_mode_label.fixed_height (this.instance.sync_mode_label.size_hint ().height ());
 
-        int64 r_space = this.ui.r_sync_everything.is_checked () ? this.r_size : this.r_selected_size;
+        int64 r_space = this.instance.r_sync_everything.is_checked () ? this.r_size : this.r_selected_size;
 
         string space_error = check_local_space (r_space);
         if (!space_error == "") {
@@ -526,7 +526,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void on_signal_start_spinner () {
-        this.ui.result_layout.enabled (true);
+        this.instance.result_layout.enabled (true);
         this.progress_indicator.visible (true);
         this.progress_indicator.on_signal_start_animation ();
     }
@@ -535,7 +535,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void on_signal_stop_spinner () {
-        this.ui.result_layout.enabled (false);
+        this.instance.result_layout.enabled (false);
         this.progress_indicator.visible (false);
         this.progress_indicator.on_signal_stop_animation ();
     }
@@ -597,7 +597,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         }
 
         const var pretty_url = url.to_string ().mid (url.scheme ().size () + 3); // + 3 because we need to remove ://
-        this.ui.server_address_label.on_signal_text (pretty_url);
+        this.instance.server_address_label.on_signal_text (pretty_url);
     }
 
 
@@ -607,14 +607,14 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         const var home_dir = GLib.Dir.home_path.ends_with ('/') ? GLib.Dir.home_path : GLib.Dir.home_path + '/';
 
         if (!path.starts_with (home_dir)) {
-            this.ui.pb_select_local_folder.on_signal_text (GLib.Dir.to_native_separators (path));
+            this.instance.pb_select_local_folder.on_signal_text (GLib.Dir.to_native_separators (path));
             return;
         }
 
         var pretty_path = path;
         pretty_path.remove (0, home_dir.size ());
 
-        this.ui.pb_select_local_folder.on_signal_text (GLib.Dir.to_native_separators (pretty_path));
+        this.instance.pb_select_local_folder.on_signal_text (GLib.Dir.to_native_separators (pretty_path));
     }
 
 
@@ -622,7 +622,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     ***********************************************************/
     private void style_sync_logo () {
         const var sync_arrow_icon = Theme.create_color_aware_icon (":/client/theme/sync-arrow.svg", palette ());
-        this.ui.sync_logo_label.pixmap (sync_arrow_icon.pixmap (QSize (50, 50)));
+        this.instance.sync_logo_label.pixmap (sync_arrow_icon.pixmap (QSize (50, 50)));
     }
 
 
@@ -632,24 +632,24 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         const var background_color = palette ().window ().color ();
         const var folder_icon_filename = Theme.is_branded ? Theme.hidpi_filename ("folder.png", background_color)
                                                                        : Theme.hidpi_filename (":/client/theme/colored/folder.png");
-        this.ui.l_local.pixmap (folder_icon_filename);
+        this.instance.l_local.pixmap (folder_icon_filename);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void resolution_gui_visible (bool value) {
-        this.ui.sync_mode_label.visible (value);
-        this.ui.r_keep_local.visible (value);
-        this.ui.cb_sync_from_scratch.visible (value);
+        this.instance.sync_mode_label.visible (value);
+        this.instance.r_keep_local.visible (value);
+        this.instance.cb_sync_from_scratch.visible (value);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void set_up_resolution_widget () {
-        for (int i = 0; i < this.ui.resolution_widget_layout.count (); ++i) {
-            var widget = this.ui.resolution_widget_layout.item_at (i).widget ();
+        for (int i = 0; i < this.instance.resolution_widget_layout.count (); ++i) {
+            var widget = this.instance.resolution_widget_layout.item_at (i).widget ();
             if (!widget) {
                 continue;
             }
@@ -666,7 +666,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     private void fetch_user_avatar () {
         // Reset user avatar
         const var app_icon = Theme.application_icon;
-        this.ui.l_server_icon.pixmap (app_icon.pixmap (48));
+        this.instance.l_server_icon.pixmap (app_icon.pixmap (48));
         // Fetch user avatar
         const var account = this.oc_wizard.account;
         var avatar_size = 64;
@@ -689,7 +689,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
             return;
         }
         const var avatar_pixmap = Gdk.Pixbuf.from_image (AvatarJob.make_circular_avatar (avatar_image));
-        this.ui.l_server_icon.pixmap (avatar_pixmap);
+        this.instance.l_server_icon.pixmap (avatar_pixmap);
     }
 
 
@@ -700,7 +700,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
         const var server_url = account.url.to_string ();
         server_address_label_url (server_url);
         const var user_name = account.dav_display_name ();
-        this.ui.user_name_label.on_signal_text (user_name);
+        this.instance.user_name_label.on_signal_text (user_name);
     }
 
 
@@ -709,17 +709,17 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     ***********************************************************/
     private void refresh_virtual_files_availibility (string path) {
         // TODO: remove when UX decision is made
-        if (!this.ui.r_virtual_file_sync.is_visible ()) {
+        if (!this.instance.r_virtual_file_sync.is_visible ()) {
             return;
         }
 
         if (Utility.is_path_windows_drive_partition_root (path)) {
-            this.ui.r_virtual_file_sync.on_signal_text (_("Virtual files are not supported for Windows partition roots as local folder. Please choose a valid subfolder under drive letter."));
-            radio_checked (this.ui.r_sync_everything);
-            this.ui.r_virtual_file_sync.enabled (false);
+            this.instance.r_virtual_file_sync.on_signal_text (_("Virtual files are not supported for Windows partition roots as local folder. Please choose a valid subfolder under drive letter."));
+            radio_checked (this.instance.r_sync_everything);
+            this.instance.r_virtual_file_sync.enabled (false);
         } else {
-            this.ui.r_virtual_file_sync.on_signal_text (_("Use virtual files instead of downloading content immediately %1").printf (this.best_available_vfs_mode == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
-            this.ui.r_virtual_file_sync.enabled (true);
+            this.instance.r_virtual_file_sync.on_signal_text (_("Use virtual files instead of downloading content immediately %1").printf (this.best_available_vfs_mode == Vfs.WindowsCfApi ? "" : _(" (experimental)")));
+            this.instance.r_virtual_file_sync.enabled (true);
         }
         //
     }

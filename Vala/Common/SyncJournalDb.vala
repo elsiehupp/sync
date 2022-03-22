@@ -1,4 +1,5 @@
 namespace Occ {
+namespace Common {
 
 /***********************************************************
 @brief Class that handles the sync database
@@ -2961,4 +2962,5 @@ public class SyncJournalDb : GLib.Object {
 
 } // class SyncJournalDb
 
+} // namespace Common
 } // namespace Occ

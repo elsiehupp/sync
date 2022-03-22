@@ -81,7 +81,7 @@ public class FakeFolder : GLib.Object {
     delegate void Callback (bool value);
 
 
-    void on_signal_sync_engine_about_to_remove_all_files (SyncFileItem.Direction direction, Callback callback) {
+    void on_signal_sync_engine_about_to_remove_all_files (LibSync.SyncFileItem.Direction direction, Callback callback) {
         GLib.Timeout.single_shot (
             1 * 1000,
             this.sync_engine.get (),
@@ -255,7 +255,7 @@ public class FakeFolder : GLib.Object {
     ***********************************************************/
     public void schedule_sync () {
         // Have to be done async, else, an error before exec () does not terminate the event loop.
-        QMetaObject.invoke_method (this.sync_engine.get (), "start_sync", Qt.QueuedConnection);
+        GLib.Object.invoke_method (this.sync_engine.get (), "start_sync", Qt.QueuedConnection);
     }
 
 

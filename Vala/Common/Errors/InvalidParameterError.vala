@@ -1,4 +1,5 @@
 namespace Occ {
+namespace Common {
 
 /***********************************************************
 @errordomain InvalidParameterError
@@ -8,7 +9,10 @@ namespace Occ {
 @copyright GPLv3 or Later
 ***********************************************************/
 public errordomain InvalidParameterError {
-    INVALID_VALUE,
-}
 
-}
+    INVALID_VALUE,
+
+} // errordomain InvalidParameterError
+
+} // namespace Common
+} // namespace Occ

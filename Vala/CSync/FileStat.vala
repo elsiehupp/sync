@@ -2,7 +2,7 @@ namespace Occ {
 namespace CSync {
 
 /***********************************************************
-@class CSyncFileStatS
+@class FileStat
 
 @brief CSync public API
 
@@ -13,9 +13,7 @@ libcsync -- a library to sync a directory with another
 
 @copyright LGPL 2.1 or later
 ***********************************************************/
-public class CSyncFileStatS : GLib.Object {
-
-    //  struct CSyncFileStatS : CSyncFileStatT {}
+public class FileStat : GLib.Object {
 
     //  #if defined (Q_CC_GNU) && !defined (Q_CC_INTEL) && !defined (Q_CC_CLANG) && (__GNUC__ * 100 + __GNUC_MINOR__ < 408)
     // open_suse 12.3 didn't like enum bitfields.
@@ -53,11 +51,11 @@ public class CSyncFileStatS : GLib.Object {
     public string checksum_header;
     public string e2e_mangled_name;
 
-    public CSyncEnums.SyncStatus error_status = SyncStatus.OK;
+    public SyncStatus error_status = SyncStatus.OK;
 
     public SyncInstructions instruction = SyncInstructions.NONE; // u32
 
-    public CSyncFileStatS () {
+    public FileStat () {
         this.type = ItemType.SKIP;
         this.child_modified = false;
         this.has_ignored_files = false;
@@ -65,7 +63,7 @@ public class CSyncFileStatS : GLib.Object {
         this.is_e2e_encrypted = false;
     }
 
-} // class CSyncFileStatS
+} // class FileStat
 
 } // namespace CSync
 } // namespace Occ

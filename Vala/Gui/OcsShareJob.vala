@@ -4,7 +4,7 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QBuffer>
+//  #include <GLib.OutputStream>
 //  #include <QJsonDocument>
 //  #include <QPair>
 

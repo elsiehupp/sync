@@ -18,40 +18,40 @@ public class ProxyAuthDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private Ui.ProxyAuthDialog ui;
+    private ProxyAuthDialog instance;
 
     /***********************************************************
     ***********************************************************/
     public ProxyAuthDialog (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
-        this.ui = new Ui.ProxyAuthDialog ();
-        ui.up_ui (this);
+        this.instance = new ProxyAuthDialog ();
+        instance.up_ui (this);
     }
 
 
     ~ProxyAuthDialog () {
-        delete ui;
+        delete instance;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void proxy_address (string address) {
-        ui.proxy_address.on_signal_text (address);
+        instance.proxy_address.on_signal_text (address);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public string username () {
-        return ui.username_edit.text ();
+        return instance.username_edit.text ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public string password () {
-        return ui.password_edit.text ();
+        return instance.password_edit.text ();
     }
 
 
@@ -59,9 +59,9 @@ public class ProxyAuthDialog : Gtk.Dialog {
     Resets the dialog for new credential entry.
     ***********************************************************/
     public void on_signal_reset () {
-        ui.username_edit.focus ();
-        ui.username_edit.clear ();
-        ui.password_edit.clear ();
+        instance.username_edit.focus ();
+        instance.username_edit.clear ();
+        instance.password_edit.clear ();
     }
 
 } // class ProxyAuthDialog

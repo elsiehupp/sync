@@ -28,7 +28,7 @@ public class FakeMkcolReply : FakeReply {
             on_signal_abort ();
             return;
         }
-        QMetaObject.invoke_method (this, "respond", Qt.QueuedConnection);
+        GLib.Object.invoke_method (this, "respond", Qt.QueuedConnection);
     }
 
 

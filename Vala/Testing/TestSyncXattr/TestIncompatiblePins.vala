@@ -23,7 +23,7 @@ public class TestIncompatiblePins : AbstractTestSyncXAttr {
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
         set_pin ("local", PinState.PinState.ALWAYS_LOCAL);
-        set_pin ("online", Vfs.ItemAvailability.ONLINE_ONLY);
+        set_pin ("online", Common.ItemAvailability.ONLINE_ONLY);
 
         fake_folder.local_modifier.insert ("local/file1");
         fake_folder.local_modifier.insert ("online/file1");

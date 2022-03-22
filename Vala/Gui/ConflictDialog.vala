@@ -38,30 +38,30 @@ public class ConflictDialog : Gtk.Dialog {
         }
     }
 
-    private QScopedPointer<Ui.ConflictDialog> ui;
+    private QScopedPointer<ConflictDialog> instance;
     private ConflictSolver solver;
 
     /***********************************************************
     ***********************************************************/
     public ConflictDialog (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
-        this.ui = new Ui.ConflictDialog ();
+        this.instance = new ConflictDialog ();
         this.solver = new ConflictSolver (this);
-        this.ui.up_ui (this);
-        force_header_font (this.ui.conflict_message);
-        this.ui.button_box.button (QDialogButtonBox.Ok).enabled (false);
-        this.ui.button_box.button (QDialogButtonBox.Ok).on_signal_text (_("Keep selected version"));
+        this.instance.up_ui (this);
+        force_header_font (this.instance.conflict_message);
+        this.instance.button_box.button (QDialogButtonBox.Ok).enabled (false);
+        this.instance.button_box.button (QDialogButtonBox.Ok).on_signal_text (_("Keep selected version"));
 
-        this.ui.local_version_radio.toggled.connect (
+        this.instance.local_version_radio.toggled.connect (
             this.update_button_states
         );
-        this.ui.local_version_button.clicked.connect (
+        this.instance.local_version_button.clicked.connect (
             this.on_local_version_button_clicked
         );
-        this.ui.remote_version_radio.toggled.connect (
+        this.instance.remote_version_radio.toggled.connect (
             this.update_button_states
         );
-        this.ui.remote_version_button.clicked.connect (
+        this.instance.remote_version_button.clicked.connect (
             this.on_remote_version_button_clicked
         );
         this.solver.signal_local_version_filename_changed.connect (
@@ -95,7 +95,7 @@ public class ConflictDialog : Gtk.Dialog {
         }
 
         this.base_filename = base_filename;
-        this.ui.conflict_message.on_signal_text (_("Conflicting versions of %1.").printf (this.base_filename));
+        this.instance.conflict_message.on_signal_text (_("Conflicting versions of %1.").printf (this.base_filename));
     }
 
 
@@ -116,8 +116,8 @@ public class ConflictDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private override void on_signal_accept () {
-        const var is_local_picked = this.ui.local_version_radio.is_checked ();
-        const var is_remote_picked = this.ui.remote_version_radio.is_checked ();
+        const var is_local_picked = this.instance.local_version_radio.is_checked ();
+        const var is_remote_picked = this.instance.remote_version_radio.is_checked ();
 
         //  Q_ASSERT (is_local_picked || is_remote_picked);
         if (!is_local_picked && !is_remote_picked) {
@@ -140,26 +140,26 @@ public class ConflictDialog : Gtk.Dialog {
 
         const var local_version = this.solver.local_version_filename;
         update_group (local_version,
-                    this.ui.local_version_link,
+                    this.instance.local_version_link,
                     _("Open local version"),
-                    this.ui.local_version_mtime,
-                    this.ui.local_version_size,
-                    this.ui.local_version_button);
+                    this.instance.local_version_mtime,
+                    this.instance.local_version_size,
+                    this.instance.local_version_button);
 
         const string remote_version = this.solver.remote_version_filename;
         update_group (remote_version,
-                    this.ui.remote_version_link,
+                    this.instance.remote_version_link,
                     _("Open server version"),
-                    this.ui.remote_version_mtime,
-                    this.ui.remote_version_size,
-                    this.ui.remote_version_button
+                    this.instance.remote_version_mtime,
+                    this.instance.remote_version_size,
+                    this.instance.remote_version_button
                 );
 
         const Time local_mtime = GLib.FileInfo (local_version).last_modified ();
         const Time remote_mtime = GLib.FileInfo (remote_version).last_modified ();
 
-        bold_font (this.ui.local_version_mtime, local_mtime > remote_mtime);
-        bold_font (this.ui.remote_version_mtime, remote_mtime > local_mtime);
+        bold_font (this.instance.local_version_mtime, local_mtime > remote_mtime);
+        bold_font (this.instance.remote_version_mtime, remote_mtime > local_mtime);
     }
 
 
@@ -185,15 +185,15 @@ public class ConflictDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void update_button_states () {
-        const var is_local_picked = this.ui.local_version_radio.is_checked ();
-        const var is_remote_picked = this.ui.remote_version_radio.is_checked ();
-        this.ui.button_box.button (QDialogButtonBox.Ok).enabled (is_local_picked || is_remote_picked);
+        const var is_local_picked = this.instance.local_version_radio.is_checked ();
+        const var is_remote_picked = this.instance.remote_version_radio.is_checked ();
+        this.instance.button_box.button (QDialogButtonBox.Ok).enabled (is_local_picked || is_remote_picked);
 
         const var text = is_local_picked && is_remote_picked ? _("Keep both versions")
                         : is_local_picked ? _("Keep local version")
                         : is_remote_picked ? _("Keep server version")
                         : _("Keep selected version");
-        this.ui.button_box.button (QDialogButtonBox.Ok).on_signal_text (text);
+        this.instance.button_box.button (QDialogButtonBox.Ok).on_signal_text (text);
     }
 
 

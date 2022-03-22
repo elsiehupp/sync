@@ -1,4 +1,5 @@
 namespace Occ {
+namespace Common {
 
 /***********************************************************
 @class VfsOff
@@ -97,7 +98,7 @@ public class VfsOff : AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
-    public override bool stat_type_virtual_file (CSync.CSyncFileStatT csync_file_stat, void *stat_data) {
+    public override bool stat_type_virtual_file (CSync.CSync.FileStat csync_file_stat, void *stat_data) {
         return false;
     }
 
@@ -119,7 +120,7 @@ public class VfsOff : AbstractVfs {
     /***********************************************************
     ***********************************************************/
     public override AbstractVfs.AvailabilityResult availability (string folder_path) {
-        return Vfs.ItemAvailability.PinState.ALWAYS_LOCAL;
+        return ItemAvailability.PinState.ALWAYS_LOCAL;
     }
 
 
@@ -285,4 +286,7 @@ public class VfsOff : AbstractVfs {
 
     //  Q_COREAPP_STARTUP_FUNCTION (init_plugin)
 
-}
+} // class VfsOff
+
+} // namespace Common
+} // namespace Occ

@@ -1,12 +1,5 @@
-/***********************************************************
-***********************************************************/
-
-//  #include <QPluginLoader>
-//  #includeonce
-//  #include <QScopedPointer>
-//  #include <memory>
-
 namespace Occ {
+namespace Common {
 
 /***********************************************************
 @class AbstractVfs
@@ -32,7 +25,6 @@ create_vfs_from_plugin () function.
 ***********************************************************/
 public abstract class AbstractVfs : GLib.Object {
 
-    public class CSyncFileStatT : CSyncFileStatS { }
     public class AvailabilityResult : Result<ItemAvailability, AvailabilityError> { }
 
     /***********************************************************
@@ -276,7 +268,7 @@ public abstract class AbstractVfs : GLib.Object {
     Returning true means that type was fully determined.
     Q_REQUIRED_RESULT
     ***********************************************************/
-    public abstract bool stat_type_virtual_file (CSync.CSyncFileStatT csync_file_stat, void *stat_data);
+    public abstract bool stat_type_virtual_file (CSync.CSync.FileStat csync_file_stat, void *stat_data);
 
 
     /***********************************************************
@@ -311,7 +303,7 @@ public abstract class AbstractVfs : GLib.Object {
     Returns availability status of an item at a path.
 
     The availability is a condensed user-facing version of PinState. See
-    Vfs.ItemAvailability for details.
+    ItemAvailability for details.
 
     folder_path is relative to the sync folder. Can be "" for root folder.
     Q_REQUIRED_RESULT
@@ -387,20 +379,21 @@ public abstract class AbstractVfs : GLib.Object {
 
         if (hydration_status.has_dehydrated) {
             if (hydration_status.has_hydrated)
-                return Vfs.ItemAvailability.MIXED;
-            if (pin && *pin == Vfs.ItemAvailability.ONLINE_ONLY)
-                return Vfs.ItemAvailability.ONLINE_ONLY;
+                return ItemAvailability.MIXED;
+            if (pin && *pin == ItemAvailability.ONLINE_ONLY)
+                return ItemAvailability.ONLINE_ONLY;
             else
-                return Vfs.ItemAvailability.ALL_DEHYDRATED;
+                return ItemAvailability.ALL_DEHYDRATED;
         } else if (hydration_status.has_hydrated) {
             if (pin && *pin == PinState.PinState.ALWAYS_LOCAL)
-                return Vfs.ItemAvailability.PinState.ALWAYS_LOCAL;
+                return ItemAvailability.PinState.ALWAYS_LOCAL;
             else
-                return Vfs.ItemAvailability.ALL_HYDRATED;
+                return ItemAvailability.ALL_HYDRATED;
         }
         return AvailabilityError.NO_SUCH_ITEM;
     }
 
-} // class Vfs
+} // class AbstractVfs
 
+} // namespace Common
 } // namespace Occ

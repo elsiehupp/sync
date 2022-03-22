@@ -1,4 +1,5 @@
 namespace Occ {
+namespace Common {
 
 /***********************************************************
 @class PluginFactory
@@ -21,7 +22,7 @@ public abstract class PluginFactory {
             .printf (APPLICATION_EXECUTABLE, type, name);
     }
 
-}
+} // class PluginFactory
 
-}
-    
+} // namespace Common
+} // namespace Occ

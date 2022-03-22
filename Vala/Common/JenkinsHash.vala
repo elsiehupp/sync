@@ -1,7 +1,5 @@
-/***********************************************************
-c_jhash.c Jenkins Hash
-
-***********************************************************/
+namespace Occ {
+namespace Common {
 
 /***********************************************************
 @class JenkinsHash
@@ -251,4 +249,8 @@ public class JenkinsHash : GLib.Object {
         return xhashsize (n) - 1;
     }
 
-}
+} // class JenkinsHash
+
+} // namespace Common
+} // namespace Occ
+

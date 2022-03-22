@@ -1,4 +1,5 @@
 namespace Occ {
+namespace Common {
 
 /***********************************************************
 @class SyncJournalErrorBlocklistRecord
@@ -77,8 +78,11 @@ public class SyncJournalErrorBlocklistRecord : GLib.Object {
     ***********************************************************/
     public string request_id;
 
-
     /***********************************************************
     ***********************************************************/
     public bool is_valid ();
-}
+
+} // class SyncJournalErrorBlocklistRecord
+
+} // namespace Common
+} // namespace Occ
