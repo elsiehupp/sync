@@ -1,14 +1,13 @@
+namespace Occ {
+namespace LibSync {
+
 /***********************************************************
+@class XAttrWrapper
+
 @author Kevin Ottens <kevin.ottens@nextcloud.com>
 
 @copyright GPLv3 or Later
 ***********************************************************/
-
-//  #include <sys/xattr.h>
-
-namespace Occ {
-namespace LibSync {
-
 public class XAttrWrapper : GLib.Object {
 
     const string HYDRATE_EXEC_ATTRIBUT_NAME = "user.nextcloud.hydrate_exec";

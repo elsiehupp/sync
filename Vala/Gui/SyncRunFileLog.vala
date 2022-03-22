@@ -8,7 +8,7 @@
 //  #include <qfileinfo.h>
 //  #include <QTextStream>
 //  #include <QScopedPointer>
-//  #include <QElapsedTimer>
+//  #include <GLib.Timer>
 //  #include <QStandardPaths>
 //  #include <GLib.Dir>
 
@@ -23,10 +23,10 @@ public class SyncRunFileLog : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private QScopedPointer<GLib.File> file;
+    private GLib.File file;
     private QTextStream out;
-    private QElapsedTimer total_duration;
-    private QElapsedTimer lap_duration;
+    private GLib.Timer total_duration;
+    private GLib.Timer lap_duration;
 
     /***********************************************************
     ***********************************************************/

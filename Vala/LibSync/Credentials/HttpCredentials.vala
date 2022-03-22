@@ -1,31 +1,15 @@
-/***********************************************************
-@author Klaas Freitag <freitag@kde.org>
-@author Krzesimir Nowak <krzesimir@endocode.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <QMutex>
-//  #include <QSetting
-//  #include <QSslKey>
-//  #include <QJsonObject>
-//  #include <QJsonDocument
-//  #include <Soup.Buffer>
-//  #include <qt5keychain/keyc
-//  #include <QAuthenticator>
-
-//  #include <QSslKey>
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
-The authentication system is this way because of Shibboleth.
-There used to be two different ways to authenticate:
-Shibboleth and HTTP Basic Auth. AbstractCredentials can be
-inherited from both ShibbolethCrendentials and
-HttpCredentials. HttpCredentials is then split in
-HttpCredentials and HttpCredentialsGui.
+@class HttpCredentials
+
+@details The authentication system is this way because of
+Shibboleth. There used to be two different ways to
+authenticate: Shibboleth and HTTP Basic Auth.
+AbstractCredentials can be inherited from both
+ShibbolethCrendentials and HttpCredentials. HttpCredentials
+is then split in HttpCredentials and HttpCredentialsGui.
 
 This class handle both HTTP Basic Auth and OAuth. But
 anything that needs GUI to ask the user is in
@@ -58,6 +42,11 @@ from the keychain
 2) If the credentials is still not valid when fetched () is
 emitted, the instance, will call ask_from_user () which is
 implemented in HttpCredentialsGui
+
+@author Klaas Freitag <freitag@kde.org>
+@author Krzesimir Nowak <krzesimir@endocode.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class HttpCredentials : AbstractCredentials {
 
@@ -130,7 +119,7 @@ public class HttpCredentials : AbstractCredentials {
     /***********************************************************
     Jobs we need to retry once the auth token is fetched
     ***********************************************************/
-    protected GLib.List<QPointer<AbstractNetworkJob>> retry_queue;
+    protected GLib.List<AbstractNetworkJob> retry_queue;
 
     /***********************************************************
     Don't add credentials if this is set on a Soup.Request

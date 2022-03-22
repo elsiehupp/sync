@@ -2,6 +2,8 @@ namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class CipherContext
+
 Simple classes for safe (RAII) handling of OpenSSL
 data structures
 ***********************************************************/

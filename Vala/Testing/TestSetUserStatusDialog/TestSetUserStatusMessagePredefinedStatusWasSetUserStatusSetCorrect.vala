@@ -37,7 +37,7 @@ public class TestSetUserStatusMessagePredefinedStatusWasSetUserStatusSetCorrect 
         GLib.assert_true (signal_user_status_set.message_predefined () == false);
         var clear_at = signal_user_status_set.clear_at ();
         GLib.assert_true (clear_at.is_valid ());
-        GLib.assert_true (clear_at.type == ClearAtType.Period);
+        GLib.assert_true (clear_at.type == ClearAtType.PERIOD);
         GLib.assert_true (clear_at.period == 60 * 30);
     }
 

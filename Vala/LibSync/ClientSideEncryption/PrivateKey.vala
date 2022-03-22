@@ -2,6 +2,8 @@ namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class PrivateKey
+
 Simple classes for safe (RAII) handling of OpenSSL
 data structures
 ***********************************************************/

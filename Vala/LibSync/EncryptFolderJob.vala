@@ -1,13 +1,13 @@
+namespace Occ {
+namespace LibSync {
+
 /***********************************************************
+@class EncryptFolderJob
+
 @author Kevin Ottens <kevin.ottens@nextcloud.com>
 
 @copyright GPLv3 or Later
 ***********************************************************/
-
-
-namespace Occ {
-namespace LibSync {
-
 public class EncryptFolderJob : GLib.Object {
 
     /***********************************************************

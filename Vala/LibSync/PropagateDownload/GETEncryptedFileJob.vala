@@ -1,15 +1,15 @@
-/***********************************************************
-@author Olivier Goffart <ogoffart@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
-@brief The GETEncryptedFileJob class that provides file decryption on the fly while the download is running
-@ingroup libsync
+@class GETEncryptedFileJob
+
+@brief The GETEncryptedFileJob class that provides file
+decryption on the fly while the download is running.
+
+@author Olivier Goffart <ogoffart@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class GETEncryptedFileJob : GETFileJob {
 

@@ -38,7 +38,7 @@ public class ConflictDialog : Gtk.Dialog {
         }
     }
 
-    private QScopedPointer<ConflictDialog> instance;
+    private ConflictDialog instance;
     private ConflictSolver solver;
 
     /***********************************************************

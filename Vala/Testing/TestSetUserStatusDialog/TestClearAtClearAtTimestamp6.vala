@@ -12,7 +12,7 @@ public class TestClearAtClearAtTimestamp6 : GLib.Object {
     private TestClearAtClearAtTimestamp6 (GLib.DateTime current_time) {
         UserStatus user_status;
         ClearAt clear_at;
-        clear_at.type = ClearAtType.Timestamp;
+        clear_at.type = ClearAtType.TIMESTAMP;
         clear_at.timestamp = current_time.add_secs (60 * 60 * 4).to_time_t ();
         user_status.set_clear_at (clear_at);
 

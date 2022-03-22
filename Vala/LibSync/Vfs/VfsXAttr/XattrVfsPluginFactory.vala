@@ -1,12 +1,13 @@
+namespace Occ {
+namespace LibSync {
+
 /***********************************************************
+@class XattrVfsPluginFactory
+
 @author Kevin Ottens <kevin.ottens@nextcloud.com>
 
 @copyright GPLv3 or Later
 ***********************************************************/
-
-namespace Occ {
-namespace LibSync {
-
 public class XattrVfsPluginFactory : DefaultPluginFactory<VfsXAttr> {
 
     construct {
@@ -14,7 +15,7 @@ public class XattrVfsPluginFactory : DefaultPluginFactory<VfsXAttr> {
         Q_INTERFACES (PluginFactory);
     }
 
-}
+} // class XattrVfsPluginFactory
 
 } // namespace LibSync
 } // namespace Occ

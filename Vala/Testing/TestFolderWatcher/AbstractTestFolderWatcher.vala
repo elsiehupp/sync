@@ -47,7 +47,7 @@ public abstract class AbstractTestFolderWatcher : GLib.Object {
 
 
     protected bool wait_for_path_changed (string path) {
-        QElapsedTimer timer;
+        GLib.Timer timer;
         timer.start ();
         while (timer.elapsed () < 5000) {
             // Check if it was already reported as changed by the watcher

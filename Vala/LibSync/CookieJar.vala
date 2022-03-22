@@ -1,21 +1,12 @@
-/***********************************************************
-@author Daniel Molkentin <danimo@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <QDataStream>
-//  #include <GLib.Dir>
-//  #include <Soup.CookieJar>
-
 namespace Occ {
 namespace LibSync {
 
-//  using Soup.CookieJar.all_cookies;
-
 /***********************************************************
 @brief The CookieJar class
-@ingroup libsync
+
+@author Daniel Molkentin <danimo@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class CookieJar : Soup.CookieJar {
 

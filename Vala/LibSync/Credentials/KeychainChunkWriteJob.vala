@@ -2,6 +2,8 @@ namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class KeychainChunkWriteJob
+
 @brief Simple wrapper class for Secret.Collection.WritePasswordJob,
 splits too large keychain entry's data into chunks on Windows
 

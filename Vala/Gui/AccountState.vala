@@ -103,7 +103,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
 
     private bool waiting_for_new_credentials;
     private GLib.DateTime time_of_last_e_tag_check;
-    private QPointer<ConnectionValidator> connection_validator;
+    private ConnectionValidator connection_validator;
 
     string notifications_etag_response_header {
         /***********************************************************
@@ -136,7 +136,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     maintenance mode. The account will only become connected once this
     timer exceeds the this.maintenance_to_connected_delay value.
     ***********************************************************/
-    private QElapsedTimer time_since_maintenance_over;
+    private GLib.Timer time_since_maintenance_over;
 
     /***********************************************************
     Milliseconds for which to delay reconnection after 503/maintenance.

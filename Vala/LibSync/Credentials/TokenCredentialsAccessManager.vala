@@ -2,6 +2,9 @@
 namespace Occ {
 namespace LibSync {
 
+/***********************************************************
+@class TokenCredentialsAccessManager
+***********************************************************/
 public class TokenCredentialsAccessManager : AccessManager {
 
     private const TokenCredentials credentials;

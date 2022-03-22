@@ -1,16 +1,15 @@
-/***********************************************************
-@author Olivier Goffart <ogoffart@owncloud.com>
-@author Klaas Freitag <freitag@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class CleanupPollsJob
+
 @brief Job that wait for all the poll jobs to be completed
-@ingroup libsync
+
+@author Olivier Goffart <ogoffart@owncloud.com>
+@author Klaas Freitag <freitag@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class CleanupPollsJob : GLib.Object {
     GLib.List<Common.SyncJournalDb.PollInfo> poll_infos;

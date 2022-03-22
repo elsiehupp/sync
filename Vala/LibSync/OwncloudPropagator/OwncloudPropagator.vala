@@ -1,44 +1,28 @@
+namespace Occ {
+namespace LibSync {
+
 /***********************************************************
+@class OwncloudPropagator
+
 @author Olivier Goffart <ogoffart@owncloud.com>
 @author Klaas Freitag <freitag@owncloud.com>
 
 @copyright GPLv3 or Later
 ***********************************************************/
-
-
-using Soup;
-
-//  #include <GLib.List>
-//  #include <GLib.FileInfo>
-//  #include <GLib.Dir>
-//  #include <QTimerEvent>
-//  #include <GLib.Regex>
-//  #include <qmath.h>
-//  #include <QElapse
-//  #include <QPointer>
-//  #include <QIODevic
-//  #include <QMutex>
-
-//  #include <deque>
-
-
-namespace Occ {
-namespace LibSync {
-
 public class OwncloudPropagator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
     public enum DiskSpaceResult {
-        DiskSpaceOk,
-        DiskSpaceFailure,
-        DiskSpaceCritical
+        OK,
+        FAILURE,
+        CRITICAL
     }
 
     /***********************************************************
     const?
     ***********************************************************/
-    public SyncJournalDb journal;
+    public SyncJournalDb journal { public get; construct; }
 
     /***********************************************************
     Used to ensure that on_signal_finished is only emitted once
@@ -55,11 +39,14 @@ public class OwncloudPropagator : GLib.Object {
     public bool abort_requested = false;
 
     /***********************************************************
-    The list of currently active jobs.
-        This list contains the jobs that are currently using ressources and is used purely to
-        know how many jobs there is currently running for the scheduler.
-        Jobs add themself to the list when they do an assynchronous operation.
-        Jobs can be several time on the list (example, when several chunks are uploaded in parallel)
+    @brief The list of currently active jobs.
+    
+    @details This list contains the jobs that are currently
+    using ressources and is used purely to know how many jobs
+    there is currently running for the scheduler. Jobs add
+    themselves to the list when they do asynchronous operations.
+    Jobs on the list can be multiple times, such as when several
+    chunks are uploaded in parallel.
     ***********************************************************/
     public GLib.List<PropagateItemJob> active_job_list;
 
@@ -69,26 +56,28 @@ public class OwncloudPropagator : GLib.Object {
     public bool another_sync_needed;
 
     /***********************************************************
-    Per-folder quota guesses.
+    @brief Per-folder quota guesses.
 
-    This starts out empty. When an upload in a folder fails due to insufficent
-    remote quota, the quota guess is updated to be attempted_size-1 at maximum.
+    @details This starts out empty. When an upload in a folder fails due
+    to insufficent remote quota, the quota guess is updated to
+    be attempted_size-1 at maximum.
 
-    Note that it will usually just an upper limit for the actual quota - but
-    since the quota on the server might ch
+    Note that it will usually just an upper limit for the
+    actual quota, but since the quota on the server might ch
     wrong in the other direction as well.
 
-    This allows skipping of uploads that have a very high likelihood of failure.
+    This allows skipping of uploads that have a very high
+    likelihood of failure.
     ***********************************************************/
     public GLib.HashTable<string, int64?> folder_quota;
 
 
     /***********************************************************
-    The size to use for upload chunks.
+    @brief The size to use for upload chunks.
 
-    Will be dynamically adjusted after each chunk upload finishes
-    if Capabilities.desired_chunk_upload_duration has a target
-    chunk-upload duration set.
+    @details Will be dynamically adjusted after each chunk
+    upload finishes if Capabilities.desired_chunk_upload_duration
+    has a target chunk-upload duration set.
     ***********************************************************/
     public int64 chunk_size;
 
@@ -117,7 +106,7 @@ public class OwncloudPropagator : GLib.Object {
     /***********************************************************
     Absolute path to the local directory. ends with "/"
     ***********************************************************/
-    private const string local_dir;
+    private string local_dir { private set; construct; }
 
     /***********************************************************
     ***********************************************************/
@@ -610,18 +599,18 @@ public class OwncloudPropagator : GLib.Object {
     public DiskSpaceResult disk_space_check () {
         const int64 free_bytes = Utility.free_disk_space (this.local_dir);
         if (free_bytes < 0) {
-            return DiskSpaceOk;
+            return DiskSpaceResult.OK;
         }
 
         if (free_bytes < critical_free_space_limit ()) {
-            return DiskSpaceCritical;
+            return DiskSpaceResult.CRITICAL;
         }
 
         if (free_bytes - this.propagate_root_directory_job.committed_disk_space () < free_space_limit ()) {
-            return DiskSpaceFailure;
+            return DiskSpaceResult.FAILURE;
         }
 
-        return DiskSpaceOk;
+        return DiskSpaceResult.OK;
     }
 
 

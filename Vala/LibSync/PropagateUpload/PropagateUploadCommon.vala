@@ -1,15 +1,14 @@
 /***********************************************************
-@author Olivier Goffart <ogoffart@owncloud.com>
-
-@copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
-@brief The PropagateUploadFileCommon class is the code common between all chunking algorithms
-@ingroup libsync
+@class PropagateUploadFileCommon
+
+@brief The PropagateUploadFileCommon class is the code
+common between all chunking algorithms.
 
 State Machine:
 
@@ -26,6 +25,11 @@ State Machine:
                                  .
                                  v
        on_signal_finalize () or abort_with_error ()  or start_poll_job ()
+
+
+@author Olivier Goffart <ogoffart@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class PropagateUploadFileCommon : PropagateItemJob {
 

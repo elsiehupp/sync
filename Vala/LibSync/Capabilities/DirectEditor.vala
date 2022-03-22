@@ -1,12 +1,13 @@
+namespace Occ {
+namespace LibSync {
+
 /***********************************************************
+@class DirectEditor
+
 @author Roeland Jago Douma <roeland@famdouma.nl>
 
 @copyright GPLv3 or Later
 ***********************************************************/
-
-namespace Occ {
-namespace LibSync {
-
 public class DirectEditor : GLib.Object {
 
     /***********************************************************

@@ -2,6 +2,8 @@ namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class X509Certificate
+
 Simple classes for safe (RAII) handling of OpenSSL
 data structures
 ***********************************************************/

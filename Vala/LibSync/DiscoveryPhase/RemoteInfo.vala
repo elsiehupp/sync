@@ -1,14 +1,14 @@
-/***********************************************************
-@author Olivier Goffart <ogoffart@woboq.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
-Represent all the meta-data about a file in the server
+@class RemoteInfo
+
+@brief Represent all the meta-data about a file in the server
+
+@author Olivier Goffart <ogoffart@woboq.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class RemoteInfo : GLib.Object {
     /***********************************************************

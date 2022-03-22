@@ -1,15 +1,14 @@
-/***********************************************************
-@author Olivier Goffart <ogoffart@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class PUTFileJob
+
 @brief The PUTFileJob class
-@ingroup libsync
+
+@author Olivier Goffart <ogoffart@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class PUTFileJob : AbstractNetworkJob {
 
@@ -27,7 +26,7 @@ public class PUTFileJob : AbstractNetworkJob {
         }
     }
     private GLib.Uri url;
-    private QElapsedTimer request_timer;
+    private GLib.Timer request_timer;
 
     /***********************************************************
     ***********************************************************/

@@ -52,13 +52,15 @@ public class ShareDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public ShareDialog (QPointer<AccountState> account_state,
+    public ShareDialog (
+        AccountState account_state,
         string share_path,
         string local_path,
         SharePermissions max_sharing_permissions,
         string numeric_file_id,
         ShareDialogStartPage start_page,
-        Gtk.Widget parent = new Gtk.Widget ()) {
+        Gtk.Widget parent = new Gtk.Widget ()
+    ) {
         base (parent);
         this.instance = new ShareDialog ();
         this.account_state = account_state;

@@ -5,7 +5,7 @@
 ***********************************************************/
 
 //  #include <QAbstractItemModel>
-//  #include <QElapsedTimer>
+//  #include <GLib.Timer>
 //  #include <QPointer>
 
 namespace Occ {
@@ -236,7 +236,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
     See on_signal_show_pending_fetch_progress ()
     ***********************************************************/
-    private GLib.HashTable<QPersistentModelIndex, QElapsedTimer> fetching_items;
+    private GLib.HashTable<QPersistentModelIndex, GLib.Timer> fetching_items;
 
 
     internal signal void dirty_changed ();
@@ -1517,7 +1517,7 @@ public class FolderStatusModel : QAbstractItemModel {
     only added after some time to avoid popping.
     ***********************************************************/
     private void on_signal_show_fetch_progress () {
-        var it = new QMutableMapIterator<QPersistentModelIndex, QElapsedTimer> (this.fetching_items);
+        var it = new QMutableMapIterator<QPersistentModelIndex, GLib.Timer> (this.fetching_items);
         while (it.has_next ()) {
             it.next ();
             if (it.value ().elapsed () > 800) {

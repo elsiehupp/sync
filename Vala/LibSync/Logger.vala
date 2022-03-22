@@ -1,29 +1,14 @@
-/***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <GLib.Dir>
-//  #include <GLib.Regex>
-//  #include <QtGlobal>
-//  #include <QTextCodec>
-//  #include <qmetaobject.h>
-//  #include <iostream>
-
-//  #ifdef ZLIB_FOUND
-//  using ZLib
-//  #endif
-
-//  #include <QTextStream>
-//  #include <qmutex.h>
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class Logger
+
 @brief The Logger class
-@ingroup libsync
+
+@author Klaas Freitag <freitag@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class Logger : GLib.Object {
 
@@ -86,7 +71,7 @@ public class Logger : GLib.Object {
         }
     }
 
-    private QScopedPointer<QTextStream> logstream;
+    private QTextStream logstream;
     private /*mutable*/ QMutex mutex;
     public string log_directory;
     private bool temporary_folder_log_dir = false;

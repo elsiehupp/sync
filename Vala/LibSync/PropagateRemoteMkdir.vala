@@ -1,16 +1,14 @@
-/***********************************************************
-@author Olivier Goffart <ogoffart@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class PropagateRemoteMkdir
+
 @brief The PropagateRemoteMkdir class
-@ingroup libsync
+
+@author Olivier Goffart <ogoffart@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class PropagateRemoteMkdir : PropagateItemJob {
 

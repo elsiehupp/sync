@@ -68,7 +68,7 @@ public class ActivityListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private QPointer<ConflictDialog> current_conflict_dialog;
+    private ConflictDialog current_conflict_dialog;
 
     /***********************************************************
     ***********************************************************/

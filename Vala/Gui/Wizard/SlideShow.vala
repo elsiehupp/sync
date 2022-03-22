@@ -11,7 +11,7 @@
 //  #include <QStyle_hints>
 //  const int HASQT5_11 (QT_VERSION >= QT_VERSION_CHECK (5,11,0))
 //  #include <Gtk.Widget>
-//  #include <QBasic_timer>
+//  #include <GLib.Timer>
 //  #include <QPointer>
 //  #include <QVariantAnimation>
 
@@ -75,10 +75,10 @@ public class SlideShow : Gtk.Widget {
     }
 
     private QPoint press_point;
-    private QBasic_timer timer;
+    private GLib.Timer timer;
     private GLib.List<string> labels;
     private GLib.List<Gdk.Pixbuf> pixmaps;
-    private QPointer<QVariantAnimation> animation = null;
+    private QVariantAnimation animation = null;
 
     internal signal void signal_clicked ();
     internal signal void signal_current_slide_changed (int index);

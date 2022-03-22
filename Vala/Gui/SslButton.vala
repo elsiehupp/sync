@@ -23,7 +23,7 @@ public class SslButton : QToolButton {
 
     /***********************************************************
     ***********************************************************/
-    private QPointer<AccountState> account_state;
+    private AccountState account_state;
     private QMenu menu;
 
     /***********************************************************

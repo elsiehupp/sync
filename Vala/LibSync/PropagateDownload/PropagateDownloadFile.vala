@@ -1,23 +1,3 @@
-/***********************************************************
-@author Olivier Goffart <ogoffart@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <common/checksums.h>
-//  #include <common/asserts.h>
-//  #include <common/constants.h>
-//  #include <QNetworkAc
-//  #include <QFile
-//  #include <GLib.Dir>
-//  #include <cmath>
-
-//  #ifdef Q_OS_UNIX
-//  #include <unistd.h>
-//  #endif
-
-//  #include <Soup.Buffer>
-
 namespace Occ {
 namespace LibSync {
 
@@ -58,6 +38,10 @@ This is the flow:
     +. update_metadata () <-------------------------+
 
 \endcode
+
+@author Olivier Goffart <ogoffart@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class PropagateDownloadFile : PropagateItemJob {
 
@@ -67,7 +51,7 @@ public class PropagateDownloadFile : PropagateItemJob {
     ***********************************************************/
     private int64 resume_start;
     private int64 download_progress;
-    private QPointer<GETFileJob> get_file_job;
+    private GETFileJob get_file_job;
     private GLib.File temporary_file;
 
     /***********************************************************
@@ -87,7 +71,7 @@ public class PropagateDownloadFile : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    private QElapsedTimer stopwatch;
+    private GLib.Timer stopwatch;
 
     /***********************************************************
     ***********************************************************/
@@ -280,15 +264,15 @@ public class PropagateDownloadFile : PropagateItemJob {
 
         // If there's not enough space to fully download this file, stop.
         var disk_space_result = this.propagator.disk_space_check ();
-        if (disk_space_result != OwncloudPropagator.DiskSpaceOk) {
-            if (disk_space_result == OwncloudPropagator.DiskSpaceFailure) {
+        if (disk_space_result != OwncloudPropagator.DiskSpaceResult.OK) {
+            if (disk_space_result == OwncloudPropagator.DiskSpaceResult.FAILURE) {
                 // Using DetailError here will make the error not pop up in the account
                 // tab : instead we'll generate a general "disk space low" message and show
                 // these detail errors only in the error view.
                 on_signal_done (SyncFileItem.Status.DETAIL_ERROR,
                     _("The download would reduce free local disk space below the limit"));
                 /* emit */ this.propagator.signal_insufficient_local_storage ();
-            } else if (disk_space_result == OwncloudPropagator.DiskSpaceCritical) {
+            } else if (disk_space_result == OwncloudPropagator.DiskSpaceResult.CRITICAL) {
                 on_signal_done (SyncFileItem.Status.FATAL_ERROR,
                     _("Free space on disk is less than %1").printf (Utility.octets_to_string (critical_free_space_limit ())));
             }

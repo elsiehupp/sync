@@ -1,17 +1,13 @@
+namespace Occ {
+namespace LibSync {
+
 /***********************************************************
+@class UserStatusConnector
+
 @author Felix Weilbach <felix.weilbach@nextcloud.com>
 
 @copyright GPLv3 or Later
 ***********************************************************/
-
-
-//  #include <QMetaType>
-//  #include <QtGlobal>
-//  #include <vector>
-
-namespace Occ {
-namespace LibSync {
-
 public abstract class UserStatusConnector : GLib.Object {
 
     /***********************************************************

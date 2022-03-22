@@ -1,11 +1,11 @@
-/***********************************************************
-@author Oleksandr Zolotov <alex@nextcloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
+namespace Occ {
+namespace LibSync {
 
 /***********************************************************
-Removing the root encrypted folder is consisted of multiple steps:
+@class PropagateRemoteDeleteEncryptedRootFolder
+
+@details Removing the root encrypted folder is consisted of
+multiple steps:
 - 1st step is to obtain the folder_iD via LscolJob so it then can be used for the next step
 - 2nd step is to lock the root folder useing the folder_iD from the previous step. !!! Note: If there are no nested items in the folder, this, and subsequent steps are skipped until step 7.
 - 3rd step is to obtain the root folder's metadata (it contains list of nested files and folders)
@@ -13,14 +13,11 @@ Removing the root encrypted folder is consisted of multiple steps:
 - 5th step is to trigger KeychainChunkDeleteJob for every nested file and folder of the root folder
 - 6th step is to unlock the root folder using the previously obtained token from locking
 - 7th step is to decrypt and delete the root folder, because it is now possible as it has become empty
+
+@author Oleksandr Zolotov <alex@nextcloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
-
-//  #include <GLib.FileInfo>
-
-
-namespace Occ {
-namespace LibSync {
-
 public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteDeleteEncrypted {
 
     const string ENCRYPTED_FILENAME_PROPERTY_KEY = "encrypted_filename";

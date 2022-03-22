@@ -1,20 +1,23 @@
 /***********************************************************
-@author Olivier Goffart <ogoffart@owncloud.com>
-@author Klaas Freitag <freitag@owncloud.com>
-
-@copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class PropagatorJob
+
 @brief the base class of propagator jobs
 
-This can either be a job, or a container for jobs.
-If it is a composite job, it then inherits from PropagateDirectory
+@details This can either be a job or a container for jobs.
+If it is a composite job, it then inherits from
+PropagateDirectory.
 
-@ingroup libsync
+
+@author Olivier Goffart <ogoffart@owncloud.com>
+@author Klaas Freitag <freitag@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class PropagatorJob : GLib.Object {
 

@@ -60,24 +60,24 @@ public class ProxyAuthHandler : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private QPointer<ProxyAuthDialog> dialog;
+    private ProxyAuthDialog dialog;
 
     /***********************************************************
     The GLib.Settings instance to securely store username/password
     in the keychain.
     ***********************************************************/
-    private QScopedPointer<GLib.Settings> settings;
+    private GLib.Settings settings;
 
     /***********************************************************
     Pointer to the most-recently-run ReadPasswordJob, needed
     due to reentrancy.
     ***********************************************************/
-    private QScopedPointer<Secret.Collection.ReadPasswordJob> read_password_job;
+    private Secret.Collection.ReadPasswordJob read_password_job;
 
     /***********************************************************
     For checking the proxy config settings.
     ***********************************************************/
-    private QScopedPointer<ConfigFile> config_file;
+    private ConfigFile config_file;
 
     /***********************************************************
     To distinguish between a new QNAM asking for credentials and
@@ -124,7 +124,7 @@ public class ProxyAuthHandler : GLib.Object {
         }
 
         // Find the responsible QNAM if possible.
-        QPointer<QNetworkAccessManager> sending_access_manager = null;
+        QNetworkAccessManager sending_access_manager = null;
         var account = (Account) sender ();
         if (account) {
             // Since we go into an event loop, it's possible for the account's access_manager

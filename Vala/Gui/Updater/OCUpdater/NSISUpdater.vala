@@ -9,13 +9,12 @@ namespace Ui {
 
 /***********************************************************
 @brief Windows Updater Using NSIS
-@ingroup gui
 ***********************************************************/
 public class NSISUpdater : OCUpdater {
 
     /***********************************************************
     ***********************************************************/
-    private QScopedPointer<QTemporaryFile> file;
+    private QTemporaryFile file;
     private string target_file;
 
     /***********************************************************

@@ -1,18 +1,18 @@
-/***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-@author Daniel Molkentin <danimo@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
-@brief A basic job around a network request without extra funtionality
-@ingroup libsync
+@class SimpleNetworkJob
+
+@brief A basic job around a network request without extra
+funtionality
 
 Primarily adds timeout and redirection handling.
+
+@author Klaas Freitag <freitag@owncloud.com>
+@author Daniel Molkentin <danimo@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class SimpleNetworkJob : AbstractNetworkJob {
 

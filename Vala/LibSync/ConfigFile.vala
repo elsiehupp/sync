@@ -1,37 +1,14 @@
-/***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #ifndef TOKEN_AUTH_ONLY
-//  #include <Gtk.Widget>
-//  #include <QHeaderView>
-//  #endif
-
-//  #include <Gtk.Application>
-//  #include <GLib.Dir>
-//  #include <GLib.FileInfo>
-//  #include <GLib.Settings>
-//  #include <Soup.ProxyResolverDefault>
-//  #include <QStandardPaths>
-
-//  #if ! (QTLEGACY)
-//  #include <QOperatingSystemVersion>
-//  #endif
-
-
-//  #include <memory>
-
-//  #include <GLib.Settings>
-//  #include <chrono>
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class ConfigFile
+
 @brief The ConfigFile class
-@ingroup libsync
+
+@author Klaas Freitag <freitag@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class ConfigFile : GLib.Object {
 

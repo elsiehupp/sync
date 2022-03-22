@@ -1,14 +1,13 @@
+namespace Occ {
+namespace LibSync {
+
 /***********************************************************
+@class VfsSuffix
+
 @author Christian Kamm <mail@ckamm.de>
 
 @copyright GPLv3 or Later
 ***********************************************************/
-
-//  #include <QScopedPointer>
-
-namespace Occ {
-namespace LibSync {
-
 public class VfsSuffix : Common.AbstractVfs {
 
     /***********************************************************

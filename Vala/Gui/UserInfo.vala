@@ -58,7 +58,7 @@ public class UserInfo : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private QPointer<AccountState> account_state;
+    private AccountState account_state;
     private bool allow_disconnected_account_state;
     private bool fetch_avatar_image;
 
@@ -95,7 +95,7 @@ public class UserInfo : GLib.Object {
     /***********************************************************
     The currently running job
     ***********************************************************/
-    private QPointer<JsonApiJob> json_api_job;
+    private JsonApiJob json_api_job;
 
 
     internal signal void quota_updated (int64 total, int64 used);

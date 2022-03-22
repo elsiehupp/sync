@@ -1,16 +1,15 @@
-/***********************************************************
-@author Olivier Goffart <ogoffart@woboq.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
-@brief Run a PROPFIND on a directory and process the results for Discovery
+@class DiscoverySingleDirectoryJob
 
-@ingroup libsync
+@brief Run a PROPFIND on a directory and process the results
+for Discovery.
+
+@author Olivier Goffart <ogoffart@woboq.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class DiscoverySingleDirectoryJob : GLib.Object {
 
@@ -55,7 +54,7 @@ public class DiscoverySingleDirectoryJob : GLib.Object {
     ***********************************************************/
     private int64 size = 0;
     private string error;
-    private QPointer<LscolJob> lscol_job;
+    private LscolJob lscol_job;
 
 
     /***********************************************************

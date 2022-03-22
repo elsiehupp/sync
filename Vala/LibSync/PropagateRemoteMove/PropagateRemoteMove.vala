@@ -1,17 +1,14 @@
-/***********************************************************
-@author Olivier Goffart <ogoffart@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <GLib.Dir>
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class PropagateRemoteMove
+
 @brief The PropagateRemoteMove class
-@ingroup libsync
+
+@author Olivier Goffart <ogoffart@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class PropagateRemoteMove : PropagateItemJob {
 

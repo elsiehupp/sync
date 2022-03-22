@@ -33,7 +33,7 @@ public class FolderWatcherPrivate : GLib.Object {
     private string folder;
     private GLib.HashTable<int, string> watch_to_path;
     private GLib.HashTable<string, int> path_to_watch;
-    private QScopedPointer<QSocketNotifier> socket_notifier;
+    private QSocketNotifier socket_notifier;
     private int fd;
 
     /***********************************************************

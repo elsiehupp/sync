@@ -1,36 +1,28 @@
-/***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <QMetaType>
-//  #include <Gtk.Application>
-//  #include <QTime>
-//  #include <QQueue>
-//  #include <QElapsedTimer>
-
 namespace Occ {
 namespace LibSync {
 namespace Progress {
 
 /***********************************************************
-@file progressdispatcher.h
-@brief A singleton class to provide sync progress information to other gui classes.
+@class ProgressDispatcher
 
-How to use the ProgressDispatcher:
-Just connect to the two signals either to progress for every individual file
-or the overall sync progress.
+@brief A singleton class to provide sync progress
+information to other gui classes.
 
+@details How to use the ProgressDispatcher:
+Just connect to the two signals either to progress for
+every individual file or the overall sync progress.
+
+@author Klaas Freitag <freitag@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class ProgressDispatcher : GLib.Object {
 
     //  friend class Folder; // only allow Folder class to access the setting slots.
 
-
     /***********************************************************
     ***********************************************************/
-    private QElapsedTimer timer;
+    private GLib.Timer timer;
     static ProgressDispatcher instance {
         public get {
             if (!this.instance) {

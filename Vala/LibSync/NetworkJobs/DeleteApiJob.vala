@@ -1,19 +1,19 @@
-/***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-@author Daniel Molkentin <danimo@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class DeleteApiJob
+
 @brief sends a DELETE http request to a url.
 
 See Nextcloud API usage for the possible DELETE requests.
 
-This does not* delete files, it does a http request.
+This does *not* delete files, it does a http request.
+
+@author Klaas Freitag <freitag@owncloud.com>
+@author Daniel Molkentin <danimo@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class DeleteApiJob : AbstractNetworkJob {
 

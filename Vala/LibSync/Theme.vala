@@ -1,33 +1,14 @@
-/***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <QtCore>
-//  #include TOKEN_A
-//  #include <QtGui>
-//  #include <QStyle>
-//  #include <QApplicatio
-//  #include <QSslSocket>
-//  #include <QSvgRenderer>
-
-//  #ifdef THEME_INCLUDE
-//  const int Mirall Occ // namespace hack to make old themes work
-//  const int QUOTEME (M) #M
-//  const int INCLUDE_FILE (M) QUOTEME (M)
-//  #include INCLUDE_FILE (THEME_INCLUDE)
-//  #undef Mirall
-//  #endif
-
-//  #include <Gtk.Icon>
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class Theme
+
 @brief The Theme class
-@ingroup libsync
+
+@author Klaas Freitag <freitag@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class Theme : GLib.Object {
 

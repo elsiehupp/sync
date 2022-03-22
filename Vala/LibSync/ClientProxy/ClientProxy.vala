@@ -1,19 +1,14 @@
-/***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <QThreadPool>
-//  #include <Soup.ProxyResolverDefault>
-//  #include <QRunnable>
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class ClientProxy
+
 @brief The ClientProxy class
-@ingroup libsync
+
+@author Klaas Freitag <freitag@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class ClientProxy : GLib.Object {
 

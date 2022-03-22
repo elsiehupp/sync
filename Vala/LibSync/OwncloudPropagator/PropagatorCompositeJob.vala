@@ -1,16 +1,16 @@
-/***********************************************************
-@author Olivier Goffart <ogoffart@owncloud.com>
-@author Klaas Freitag <freitag@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
-@brief Job that runs subjobs. It becomes on_signal_finished only when all subjobs are on_signal_finished.
-@ingroup libsync
+@class PropagatorCompositeJob
+
+@brief Job that runs subjobs. It becomes finished only when
+all subjobs are finished.
+
+@author Olivier Goffart <ogoffart@owncloud.com>
+@author Klaas Freitag <freitag@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class PropagatorCompositeJob : PropagatorJob {
 

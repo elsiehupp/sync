@@ -715,7 +715,7 @@ public class AccountSettings : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_enable_vfs_current_folder () {
-        QPointer<Folder> folder = FolderMan.instance.folder_by_alias (selected_folder_alias ());
+        Folder folder = FolderMan.instance.folder_by_alias (selected_folder_alias ());
         QModelIndex selected = this.instance.folder_list.selection_model ().current_index ();
         if (!selected.is_valid () || !folder) {
             return;
@@ -792,7 +792,7 @@ public class AccountSettings : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_disable_vfs_current_folder () {
-        QPointer<Folder> folder = FolderMan.instance.folder_by_alias (selected_folder_alias ());
+        Folder folder = FolderMan.instance.folder_by_alias (selected_folder_alias ());
         QModelIndex selected = this.instance.folder_list.selection_model ().current_index ();
         if (!selected.is_valid () || !folder) {
             return;
@@ -877,7 +877,7 @@ public class AccountSettings : Gtk.Widget {
     protected void on_signal_current_folder_availability (PinState state) {
         //  ASSERT (state == Common.ItemAvailability.ONLINE_ONLY || state == PinState.PinState.ALWAYS_LOCAL);
 
-        QPointer<Folder> folder = FolderMan.instance.folder_by_alias (selected_folder_alias ());
+        Folder folder = FolderMan.instance.folder_by_alias (selected_folder_alias ());
         QModelIndex selected = this.instance.folder_list.selection_model ().current_index ();
         if (!selected.is_valid () || !folder)
             return;

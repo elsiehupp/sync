@@ -21,7 +21,7 @@ public class TestCtorFetchStatusAndPredefinedStatuses : GLib.Object {
         const bool user_status_message_predefined = false;
         Optional<ClearAt> user_status_clear_at; {
             ClearAt clear_at;
-            clear_at.type = ClearAtType.Timestamp;
+            clear_at.type = ClearAtType.TIMESTAMP;
             clear_at.timestamp = current_date_time.add_days (1).to_time_t ();
             user_status_clear_at = clear_at;
         }

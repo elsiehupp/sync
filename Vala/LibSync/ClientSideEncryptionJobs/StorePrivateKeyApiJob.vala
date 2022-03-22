@@ -1,14 +1,14 @@
-/***********************************************************
-Here are all of the network jobs for the client side
-encryption. Anything that goes through the server and
-expects a response is here.
-***********************************************************/
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class StorePrivateKeyApiJob
+
 @brief Job to upload the PrivateKey that return JSON
+
+Here are all of the network jobs for the client side
+encryption. Anything that goes through the server and
+expects a response is here.
 
 To be
 \code

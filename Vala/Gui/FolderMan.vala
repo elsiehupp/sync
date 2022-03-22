@@ -77,7 +77,7 @@ public class FolderMan : GLib.Object {
     ***********************************************************/
     public Folder current_sync_folder { public get; private set; }
 
-    private QPointer<Folder> last_sync_folder;
+    private Folder last_sync_folder;
 
     /***********************************************************
     If enabled is set to false, no new folders will start to
@@ -143,7 +143,7 @@ public class FolderMan : GLib.Object {
     /***********************************************************
     The currently running etag query
     ***********************************************************/
-    private QPointer<RequestEtagJob> current_etag_job;
+    private RequestEtagJob current_etag_job;
 
     /***********************************************************
     Occasionally schedules folders

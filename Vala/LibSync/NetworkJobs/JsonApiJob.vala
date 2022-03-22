@@ -1,14 +1,9 @@
-/***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-@author Daniel Molkentin <danimo@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class JsonApiJob
+
 @brief Job to check an API that return JSON
 
 Note! you need to be in the connected state befo
@@ -20,7 +15,10 @@ this.job = new JsonApiJob (account, "o
 connectThe received GLib.HashTable<string, GLib.Variant> is null in case of error
 \encode
 
-@ingroup libsync
+@author Klaas Freitag <freitag@owncloud.com>
+@author Daniel Molkentin <danimo@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class JsonApiJob : AbstractNetworkJob {
 

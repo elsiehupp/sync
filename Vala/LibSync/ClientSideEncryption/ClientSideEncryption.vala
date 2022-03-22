@@ -1,47 +1,11 @@
-
-//  #include <openssl/rsa.h>
-//  #include <openssl/evp.h>
-//  #include <openssl/pem.h>
-//  #include <openssl/err.h>
-//  #include <openssl/engine.h>
-//  #include <openssl/rand.h>
-
-//  #include <map>
-//  #include <algorithm>
-
-//  #include <cstdio>
-
-//  #include <QDebug>
-//  #include <GLib.FileInfo>
-//  #include <GLib.Dir>
-//  #include <QJsonObject>
-//  #include <QXmlStreamReader>
-//  #include <QXmlStreamNamespaceDeclaration>
-//  #include <GLib.List>
-//  #include <QInputDialog>
-//  #include <QLineEdit>
-//  #include <QIODevice>
-//  #include <QUuid>
-//  #include <QScopeGuard>
-//  #include <QRandomGenerator>
-
-//  #include <qt5keychain/keychain.h>
-//  #include <common/utility.h>
-//  #include <common/constants.h>
-
-//  QDebug operator<< (QDebug out, string string_value) {
-//      out + string.from_std_string (string_value);
-//      return out;
-//  }
-
-//  #include <QJsonDocument>
-//  #include <QSslKey>
-
-//  #include <openssl/evp.h>
+using OpenSSL;
 
 namespace Occ {
 namespace LibSync {
 
+/***********************************************************
+@class ClientSideEncryption
+***********************************************************/
 public class ClientSideEncryption : GLib.Object {
 
     const string E2EE_BASE_URL = "ocs/v2.php/apps/end_to_end_encryption/api/v1/";

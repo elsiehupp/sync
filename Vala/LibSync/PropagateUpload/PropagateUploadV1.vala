@@ -1,23 +1,14 @@
-/***********************************************************
-@author Olivier Goffart <ogoffart@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <Soup.Session>
-//  #include <GLib.FileInfo>
-//  #include <GLib.Dir>
-//  #include <cmath>
-//  #include <cstring>
-
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
-@ingroup libsync
+@class PropagateUploadFileV1
 
-Propagation job, impementing the old chunking agorithm
+@brief Propagation job impementing the old chunking agorithm
+
+@author Olivier Goffart <ogoffart@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class PropagateUploadFileV1 : PropagateUploadFileCommon {
 

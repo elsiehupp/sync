@@ -1,18 +1,16 @@
-/***********************************************************
-@author Olivier Goffart <ogoffart@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class PollJob
+
 @brief This job implements the asynchronous PUT
 
-If the server replies
-replies with an etag.
-@ingroup libsync
+@details If the server replies replies with an etag.
+
+@author Olivier Goffart <ogoffart@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class PollJob : AbstractNetworkJob {
 

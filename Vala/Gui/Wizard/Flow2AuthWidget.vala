@@ -14,7 +14,7 @@ public class Flow2AuthWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private Account account = null;
-    private QScopedPointer<Flow2Auth> async_auth;
+    private Flow2Auth async_auth;
     private Ui_Flow2Auth_widget instance;
 
     /***********************************************************

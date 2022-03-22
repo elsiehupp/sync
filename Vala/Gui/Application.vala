@@ -24,7 +24,7 @@
 //  #include <QApplicat
 //  #include <QPointe
 //  #include <QQueue>
-//  #include <QElapsedTimer>
+//  #include <GLib.Timer>
 //  #include <QNetworkConfigurationManager>
 
 namespace Occ {
@@ -38,26 +38,26 @@ public class Application : Gtk.Application {
 
     /***********************************************************
     ***********************************************************/
-    const string[] OPTIONS =
-        { "Options:\n",
-        + "  --help, -h           : show this help screen.\n",
-        + "  --version, -v        : show version information.\n"
-        + "  -q --quit            : quit the running instance\n",
-        + "  --logwindow, -l      : open a window to show log output.\n",
-        + "  --logfile <filename> : write log output to file <filename>.\n",
-        + "  --logdir <name>      : write each sync log output in a new file\n",
-        + "                         in folder <name>.\n",
-        + "  --logexpire <hours>  : removes logs older than <hours> hours.\n",
-        + "                         (to be used with --logdir)\n",
-        + "  --logflush           : flush the log file after every write.\n",
-        + "  --logdebug           : also output debug-level messages in the log.\n",
-        + "  --confdir <dirname>  : Use the given configuration folder.\n",
-        + "  --background         : launch the application in the background.\n"
+    const string[] OPTIONS = {
+        "Options:\n",
+        "  --help, -h           : show this help screen.\n",
+        "  --version, -v        : show version information.\n",
+        "  -q --quit            : quit the running instance\n",
+        "  --logwindow, -l      : open a window to show log output.\n",
+        "  --logfile <filename> : write log output to file <filename>.\n",
+        "  --logdir <name>      : write each sync log output in a new file\n",
+        "                         in folder <name>.\n",
+        "  --logexpire <hours>  : removes logs older than <hours> hours.\n",
+        "                         (to be used with --logdir)\n",
+        "  --logflush           : flush the log file after every write.\n",
+        "  --logdebug           : also output debug-level messages in the log.\n",
+        "  --confdir <dirname>  : Use the given configuration folder.\n",
+        "  --background         : launch the application in the background.\n"
     };
 
     /***********************************************************
     ***********************************************************/
-    QPointer<OwncloudGui> gui { public get; private set; }
+    OwncloudGui gui { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
@@ -69,7 +69,7 @@ public class Application : Gtk.Application {
 
     /***********************************************************
     ***********************************************************/
-    private QElapsedTimer started_at;
+    private GLib.Timer started_at;
 
     /***********************************************************
     Option from command line
@@ -154,7 +154,7 @@ public class Application : Gtk.Application {
 
     /***********************************************************
     ***********************************************************/
-    private QScopedPointer<FolderMan> folder_manager;
+    private FolderMan folder_manager;
 
 
     internal signal void signal_folder_removed ();
@@ -294,7 +294,7 @@ public class Application : Gtk.Application {
                     null,
                     _("Error accessing the configuration file"),
                     _("There was an error while accessing the configuration "
-                    + "file at %1. Please make sure the file can be accessed by your user.")
+                    "file at %1. Please make sure the file can be accessed by your user.")
                         .printf (ConfigFile ().config_file ()),
                     _("Quit %1").printf (Theme.app_name_gui));
                 GLib.Timeout.single_shot (0, Gtk.Application, SLOT (quit ()));
@@ -404,17 +404,17 @@ public class Application : Gtk.Application {
         string help_text;
         QTextStream stream = new QTextStream (help_text);
         stream +=  this.theme.app_name
-            + " version "
-            + this.theme.version + endl;
+            " version "
+            this.theme.version + endl;
 
         stream += "File synchronisation desktop utility." + endl
-            + endl
-            + OPTIONS;
+            endl
+            OPTIONS;
 
         if (this.theme.app_name == "own_cloud") {
             stream += endl
-                + "For more information, see http://www.owncloud.org" + endl
-                + endl;
+                "For more information, see http://www.owncloud.org" + endl
+                endl;
         }
 
         display_help_text (help_text);
@@ -700,11 +700,11 @@ public class Application : Gtk.Application {
         logger.on_signal_enter_next_log_file ();
 
         GLib.info ("##################"
-            + this.theme.app_name
-            + "locale:" + QLocale.system ().name ()
-            + "ui_lang:" + property ("ui_lang")
-            + "version:" + this.theme.version
-            + "os:" + Utility.platform_name ()
+            this.theme.app_name
+            "locale:" + QLocale.system ().name ()
+            "ui_lang:" + property ("ui_lang")
+            "version:" + this.theme.version
+            "os:" + Utility.platform_name ()
         );
         GLib.info ("Arguments: " + Gtk.Application.arguments ());
     }
@@ -909,11 +909,11 @@ public class Application : Gtk.Application {
                 Gtk.MessageBox.Warning,
                 APPLICATION_SHORTNAME,
                 _("Some settings were configured in newer versions of this client and "
-                + "use features that are not available in this version.<br>"
-                + "<br>"
-                + "%1<br>"
-                + "<br>"
-                + "The current configuration file was already backed up to <i>%2</i>.")
+                "use features that are not available in this version.<br>"
+                "<br>"
+                "%1<br>"
+                "<br>"
+                "The current configuration file was already backed up to <i>%2</i>.")
                     .printf (bold_message, backup_file));
             box.add_button (_("Quit"), Gtk.MessageBox.AcceptRole);
             var continue_btn = box.add_button (_("Continue"), Gtk.MessageBox.DestructiveRole);

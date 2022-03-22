@@ -1,7 +1,4 @@
 /***********************************************************
-@author Olivier Goffart <ogoffart@woboq.com>
-
-@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <GLib.Regex>
@@ -13,7 +10,14 @@ namespace Occ {
 namespace LibSync {
 
 /***********************************************************
-Value class containing the options given to the sync engine
+@class SyncOptions
+
+@brief Value class containing the options given to the sync
+engine
+
+@author Olivier Goffart <ogoffart@woboq.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class SyncOptions : GLib.Object {
 

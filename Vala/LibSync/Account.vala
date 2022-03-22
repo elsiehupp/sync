@@ -1075,10 +1075,10 @@ public class Account : GLib.Object {
         // Keep a ref here on our stackframe to make sure that it doesn't get deleted before
         // handle_errors returns.
         unowned Soup.Session access_manager_lock = this.soup_session;
-        QPointer<GLib.Object> guard = input_stream;
+        GLib.Object guard = input_stream;
 
         if (this.ssl_error_handler.handle_errors (errors, input_stream.ssl_configuration (), approved_certificates, shared_from_this ())) {
-            if (!guard) {
+            if (guard == null) {
                 return;
             }
 

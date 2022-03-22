@@ -1,13 +1,14 @@
+namespace Occ {
+namespace LibSync {
+
 /***********************************************************
+@class LscolJob
+
 @author Klaas Freitag <freitag@owncloud.com>
 @author Daniel Molkentin <danimo@owncloud.com>
 
 @copyright GPLv3 or Later
 ***********************************************************/
-
-namespace Occ {
-namespace LibSync {
-
 public class LscolJob : AbstractNetworkJob {
 
     public GLib.HashTable<string, ExtraFolderInfo> folder_infos;

@@ -1,6 +1,9 @@
 namespace Occ {
 namespace LibSync {
 
+/***********************************************************
+@class EncryptionHelper
+***********************************************************/
 public class EncryptionHelper : GLib.Object {
 
     public static string generate_random_filename () {

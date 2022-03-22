@@ -1,31 +1,15 @@
-/***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-@author Daniel Molkentin <danimo@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <Soup.Request>
-//  #include <QSslConfigur
-//  #include <Soup.Buffer>
-//  #include <QXmlStrea
-//  #include <string[
-//  #include <GLib.List>
-//  #include <QMutex>
-//  #include <QCoreApplicatio
-//  #include <QAuthentic
-//  #include <QMetaEnum>
-//  #include <GLib.Regex>
-
-//  #include <QPointer>
-//  #include <QElapsedTimer>
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class AbstractNetworkJob
+
 @brief The AbstractNetworkJob class
-@ingroup libsync
+
+@author Klaas Freitag <freitag@owncloud.com>
+@author Daniel Molkentin <danimo@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class AbstractNetworkJob : GLib.Object {
 
@@ -36,7 +20,7 @@ public class AbstractNetworkJob : GLib.Object {
 
         /***********************************************************
         ***********************************************************/
-        private QPointer<GLib.Timeout> timer;
+        private GLib.Timeout timer;
 
         /***********************************************************
         ***********************************************************/

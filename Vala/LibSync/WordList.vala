@@ -1,10 +1,9 @@
-
-//  #include <openssl/rand.h>
-// #include <initializer_list>
-
 namespace Occ {
 namespace LibSync {
 
+/***********************************************************
+@class WordList
+***********************************************************/
 public class WordList : GLib.Object {
 
     public static string[] get_random_words (int nr) {

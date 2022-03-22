@@ -1,15 +1,12 @@
-/***********************************************************
-@author Duncan Mac-Vicar P. <duncan@kde.org>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
 @brief The SyncResult class
-@ingroup libsync
+
+@author Duncan Mac-Vicar P. <duncan@kde.org>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class SyncResult : GLib.Object {
 

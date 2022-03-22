@@ -1,14 +1,13 @@
+namespace Occ {
+namespace LibSync {
+
 /***********************************************************
+@class PropagateRemoteCeleteEncrypted
+
 @author Oleksandr Zolotov <alex@nextcloud.com>
 
 @copyright GPLv3 or Later
 ***********************************************************/
-
-//  #include <GLib.FileInfo>
-
-namespace Occ {
-namespace LibSync {
-
 public class PropagateRemoteCeleteEncrypted : AbstractPropagateRemoteDeleteEncrypted {
 
     /***********************************************************

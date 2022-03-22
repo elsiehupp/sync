@@ -1086,7 +1086,7 @@ public class SyncJournalDb : GLib.Object {
     next sync (and the SocketApi) will have a faster access.
     ***********************************************************/
     public void wal_checkpoint () {
-        QElapsedTimer t;
+        GLib.Timer t;
         t.on_signal_start ();
         SqlQuery pragma1 = new SqlQuery (this.database);
         pragma1.prepare ("PRAGMA wal_checkpoint (FULL);");

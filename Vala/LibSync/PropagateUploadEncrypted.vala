@@ -1,20 +1,13 @@
-
-
-//  #include <QJsonDocument>
-//  #include <QTemporary
-//  #include <QFile
-//  #include <GLib.Dir>
-//  #include <QTemporary_file>
-//  #include <QMimeDatabase>
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
-This class is used if the server supports end to end
-encryption. It will fire for any* folder, encrypted or not,
-because when the client starts the upload request we don't
-know if the folder is encrypted on the server.
+@class PropagateUploadEncrypted
+
+@details This class is used if the server supports end to
+end encryption. It will fire for *any* folder, encrypted or
+not, because when the client starts the upload request we
+don't know if the folder is encrypted on the server.
 
 emits:
 finalized () if the encrypted file is ready to be

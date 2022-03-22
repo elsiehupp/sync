@@ -1,18 +1,13 @@
+namespace Occ {
+namespace LibSync {
+
 /***********************************************************
+@class VfsXAttr
+
 @author Kevin Ottens <kevin.ottens@nextcloud.com>
 
 @copyright GPLv3 or Later
 ***********************************************************/
-
-//  #include <QScopedPointer>
-
-//  namespace xattr {
-//      using XAttrWrapper;
-//  }
-
-namespace Occ {
-namespace LibSync {
-
 public class VfsXAttr : Common.AbstractVfs {
 
     /***********************************************************

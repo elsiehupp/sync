@@ -21,7 +21,7 @@ public class BenchLargeSync : GLib.Object {
 
         GLib.debug ("NUMFILES " + number_of_files.to_string ());
         GLib.debug ("NUMDIRS " + number_of_directories.to_string ());
-        QElapsedTimer timer;
+        GLib.Timer timer;
         timer.start ();
         bool result1 = fake_folder.sync_once ();
         GLib.debug ("FIRST SYNC: " + result1 + timer.restart ());

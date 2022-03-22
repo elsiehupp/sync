@@ -3,7 +3,6 @@
 srcs = files([
     'AbstractPropagateRemoteDeleteEncrypted.vala',
     'AccessManager.vala',
-    'AccountFwd.vala',
     'Account.vala',
     'BandwidthManager.vala',
     'BulkPropagatorJob.vala',
@@ -38,7 +37,6 @@ srcs = files([
     'CookieJar.vala',
 
     'Credentials/AbstractCredentials.vala',
-    'Credentials/CredentialsCommon.vala',
     'Credentials/DummyCredentials.vala',
     'Credentials/HttpCredentials.vala',
     'Credentials/HttpCredentialsAccessManager.vala',

@@ -109,7 +109,7 @@ public class GeneralSettings : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private GeneralSettings instance;
-    private QPointer<IgnoreListEditor> ignore_editor;
+    private IgnoreListEditor ignore_editor;
     private bool currently_loading = false;
 
     /***********************************************************

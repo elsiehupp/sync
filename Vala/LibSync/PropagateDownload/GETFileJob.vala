@@ -1,15 +1,14 @@
-/***********************************************************
-@author Olivier Goffart <ogoffart@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class GETFileJob
+
 @brief The GETFileJob class
-@ingroup libsync
+
+@author Olivier Goffart <ogoffart@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class GETFileJob : AbstractNetworkJob {
 
@@ -63,7 +62,7 @@ public class GETFileJob : AbstractNetworkJob {
     bool bandwidth_choked;
     int64 bandwidth_quota;
 
-    QPointer<BandwidthManager> bandwidth_manager { private get; public set; }
+    BandwidthManager bandwidth_manager { private get; public set; }
     bool has_emitted_finished_signal;
     time_t last_modified { public get; private set; }
 

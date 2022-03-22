@@ -679,7 +679,7 @@ public class Utility : GLib.Object {
 
         private GLib.HashTable<string, uint64> lap_times;
         GLib.DateTime start_time { public get; private set; }
-        private QElapsedTimer timer;
+        private GLib.Timer timer;
 
 
         public void start () {

@@ -1,15 +1,14 @@
-/***********************************************************
-@author Olivier Goffart <ogoffart@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class UploadDevice
+
 @brief The UploadDevice class
-@ingroup libsync
+
+@author Olivier Goffart <ogoffart@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class UploadDevice : QIODevice {
 
@@ -18,42 +17,35 @@ public class UploadDevice : QIODevice {
     ***********************************************************/
     private GLib.File file;
 
-
     /***********************************************************
     Start of the file data to use
     ***********************************************************/
     private int64 start = 0;
-
 
     /***********************************************************
     Amount of file data after this.start to use
     ***********************************************************/
     int64 size { public get; private set; }
 
-
     /***********************************************************
     Position between this.start and this.start+this.size
     ***********************************************************/
     public private int64 read = 0;
 
-
     /***********************************************************
     Bandwidth manager related
     ***********************************************************/
-    private QPointer<BandwidthManager> bandwidth_manager;
-
+    private BandwidthManager bandwidth_manager;
 
     /***********************************************************
     Bandwidth manager related
     ***********************************************************/
     private int64 bandwidth_quota = 0;
 
-
     /***********************************************************
     Bandwidth manager related
     ***********************************************************/
     public private int64 read_with_progress = 0;
-
 
     /***********************************************************
     Bandwidth manager related

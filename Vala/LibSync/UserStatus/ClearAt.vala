@@ -1,25 +1,28 @@
+namespace Occ {
+namespace LibSync {
+
 /***********************************************************
+@class ClearAt
+
+// TODO: If we can use C++17 make it a std.variant
+
 @author Felix Weilbach <felix.weilbach@nextcloud.com>
 
 @copyright GPLv3 or Later
 ***********************************************************/
-
-namespace Occ {
-namespace LibSync {
-
-// TODO: If we can use C++17 make it a std.variant
 public class ClearAt : GLib.Object {
-    enum ClearAtType {
-        Period,
-        EndOf,
-        Timestamp
+
+    public enum ClearAtType {
+        PERIOD,
+        END_OF,
+        TIMESTAMP
     }
 
-    ClearAtType type = ClearAtType.Period;
+    public ClearAtType type = ClearAtType.PERIOD;
 
-    uint64 timestamp;
-    int period;
-    string endof;
+    public uint64 timestamp;
+    public int period;
+    public string endof;
 
 } // class ClearAt
 

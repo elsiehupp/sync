@@ -1,20 +1,18 @@
-/***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-@author Daniel Molkentin <danimo@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
 namespace Occ {
 namespace LibSync {
 
 //  #ifndef TOKEN_AUTH_ONLY
 /***********************************************************
+@class AvatarJob
+
 @brief Retrieves the account users avatar from the server using a GET request.
 
 If the server does not have the avatar, the result Pixmap is empty.
 
-@ingroup libsync
+@author Klaas Freitag <freitag@owncloud.com>
+@author Daniel Molkentin <danimo@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class AvatarJob : AbstractNetworkJob {
 

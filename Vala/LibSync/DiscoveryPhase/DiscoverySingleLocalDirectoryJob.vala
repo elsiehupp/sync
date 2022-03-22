@@ -1,17 +1,15 @@
-/***********************************************************
-@author Olivier Goffart <ogoffart@woboq.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class DiscoverySingleLocalDirectoryJob
+
 @brief Run list on a local directory and process the results
 for Discovery
 
-@ingroup libsync
+@author Olivier Goffart <ogoffart@woboq.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, QRunnable*/ {
 

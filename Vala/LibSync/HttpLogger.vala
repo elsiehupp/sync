@@ -1,17 +1,15 @@
-/***********************************************************
-@author Hannah von Reth <hannah.vonreth@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <GLib.Regex>
-//  #include <Soup.Buffer>
-
 using Soup;
 
 namespace Occ {
 namespace LibSync {
 
+/***********************************************************
+@class HttpLogger
+
+@author Hannah von Reth <hannah.vonreth@owncloud.com>
+
+@copyright GPLv3 or Later
+***********************************************************/
 public class HttpLogger : GLib.Object {
 
     const int64 PEEK_SIZE = 1024 * 1024;

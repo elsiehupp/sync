@@ -13,7 +13,7 @@ public class WebFlowCredentialsAccessManager : AccessManager {
     The credentials object dies along with the account, while
     the QNAM might outlive both.
     ***********************************************************/
-    private QPointer<const WebFlowCredentials> credentials;
+    private WebFlowCredentials credentials { private get; construct; }
 
     /***********************************************************
     ***********************************************************/

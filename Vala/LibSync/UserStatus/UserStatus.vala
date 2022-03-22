@@ -1,12 +1,13 @@
+namespace Occ {
+namespace LibSync {
+
 /***********************************************************
+@class UserStatus
+
 @author Felix Weilbach <felix.weilbach@nextcloud.com>
 
 @copyright GPLv3 or Later
 ***********************************************************/
-
-namespace Occ {
-namespace LibSync {
-
 public class UserStatus : GLib.Object {
 
     /***********************************************************

@@ -39,7 +39,7 @@ public class FakeDateTimeProvider : DateTimeProvider {
         const bool user_status_message_predefined = true;
         Optional<ClearAt> user_status_clear_at;
         ClearAt clear_at;
-        clear_at.type = ClearAtType.Timestamp;
+        clear_at.type = ClearAtType.TIMESTAMP;
         clear_at.timestamp = current_time.add_secs (60 * 60).to_time_t ();
         user_status_clear_at = clear_at;
 

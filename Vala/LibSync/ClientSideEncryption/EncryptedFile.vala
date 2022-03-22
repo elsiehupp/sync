@@ -2,18 +2,22 @@ namespace Occ {
 namespace LibSync {
 
 /***********************************************************
-Generates the Metadata for the folder
+@class EncryptedFile
+
+@brief Generates the Metadata for the folder
 ***********************************************************/
 public class EncryptedFile : GLib.Object {
-    string encryption_key;
-    string mimetype;
-    string initialization_vector;
-    string authentication_tag;
-    string encrypted_filename;
-    string original_filename;
-    int file_version;
-    int metadata_key;
-}
+
+    public string encryption_key;
+    public string mimetype;
+    public string initialization_vector;
+    public string authentication_tag;
+    public string encrypted_filename;
+    public string original_filename;
+    public int file_version;
+    public int metadata_key;
+
+} // class EncryptedFile
 
 } // namespace LibSync
 } // namespace Occ

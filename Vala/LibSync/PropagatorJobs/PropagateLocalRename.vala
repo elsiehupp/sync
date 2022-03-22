@@ -1,16 +1,15 @@
-/***********************************************************
-@author Olivier Goffart <ogoffart@owncloud.com>
-@author Klaas Freitag <freitag@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class PropagateLocalRename
+
 @brief The PropagateLocalRename class
-@ingroup libsync
+
+@author Olivier Goffart <ogoffart@owncloud.com>
+@author Klaas Freitag <freitag@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class PropagateLocalRename : PropagateItemJob {
 

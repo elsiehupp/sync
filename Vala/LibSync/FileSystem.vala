@@ -1,29 +1,14 @@
-/***********************************************************
-@author Olivier Goffart <ogoffart@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <GLib.FileInfo>
-//  #include <GLib.Dir>
-//  #include <QDirIterator>
-//  #include <Gtk.Application>
-
-
-//  #include <ctime>
-//  #include <functional>
-//  #include <owncloudlib.h>
-
-
-// Chain in the base include and extend the namespace
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class FileSystem
+
 @brief This file contains file system helper
 
- \addtogroup libsync
- @{
+@author Olivier Goffart <ogoffart@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class FileSystem : GLib.Object {
 

@@ -1,17 +1,9 @@
-//  #pragma once
-
-//  #include <QJsonObject>
-//  #include <QJsonDocument>
-//  #include <QJsonArray>
-//  #include <Gtk.Icon>
-//  #include <QPainter>
-//  #include <Gtk.Image>
-//  #include <QSvgRenderer>
-//  #include <QPixmapCache>
-
 namespace Occ {
 namespace LibSync {
 
+/***********************************************************
+@class OcsProfileConnector
+***********************************************************/
 public class OcsProfileConnector : GLib.Object {
 
     private unowned Account account;

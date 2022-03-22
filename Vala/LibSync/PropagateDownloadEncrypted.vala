@@ -1,9 +1,9 @@
-
-//  #include <GLib.FileInfo>
-
 namespace Occ {
 namespace LibSync {
 
+
+/***********************************************************
+***********************************************************/
 public class PropagateDownloadEncrypted : GLib.Object {
 
     /***********************************************************

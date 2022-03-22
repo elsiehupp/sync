@@ -1,18 +1,17 @@
+namespace Occ {
+namespace LibSync {
+
 /***********************************************************
+@class PushNotifications
+
 @author Felix Weilbach <felix.weilbach@nextcloud.com>
 
 @copyright GPLv3 or Later
 ***********************************************************/
-
-//  #include <QWebSocket>
-
-namespace Occ {
-namespace LibSync {
-
 public class PushNotifications : GLib.Object {
 
-    const int MAX_ALLOWED_FAILED_AUTHENTICATION_ATTEMPTS = 3;
-    const int PING_INTERVAL = 30 * 1000;
+    private const int MAX_ALLOWED_FAILED_AUTHENTICATION_ATTEMPTS = 3;
+    private const int PING_INTERVAL = 30 * 1000;
 
     /***********************************************************
     ***********************************************************/

@@ -1,19 +1,21 @@
+namespace Occ {
+namespace LibSync {
+
 /***********************************************************
+@class HttpCredentialsAccessManager
+
 @author Klaas Freitag <freitag@kde.org>
 @author Krzesimir Nowak <krzesimir@endocode.com>
 
 @copyright GPLv3 or Later
 ***********************************************************/
-namespace Occ {
-namespace LibSync {
-
 public class HttpCredentialsAccessManager : AccessManager {
 
     /***********************************************************
     The credentials object dies along with the account, while
     the QNAM might outlive both.
     ***********************************************************/
-    private const QPointer<HttpCredentials> credentials;
+    private HttpCredentials credentials { private get; construct; }
 
 
     public HttpCredentialsAccessManager (HttpCredentials credentials, GLib.Object parent = new GLib.Object ()) {

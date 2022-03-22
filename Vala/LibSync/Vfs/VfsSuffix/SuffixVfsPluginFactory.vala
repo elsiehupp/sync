@@ -1,12 +1,13 @@
+namespace Occ {
+namespace LibSync {
+
 /***********************************************************
+@class SuffixVfsPluginFactory
+
 @author Christian Kamm <mail@ckamm.de>
 
 @copyright GPLv3 or Later
 ***********************************************************/
-
-namespace Occ {
-namespace LibSync {
-
 public class SuffixVfsPluginFactory : GLib.Object, DefaultPluginFactory<VfsSuffix> {
 
     construct {

@@ -1,18 +1,14 @@
-/***********************************************************
-@author Camila Ayres <hello@camila.codes>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <Soup.Session>
-using Soup;
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class IconJob
+
 @brief Job to fetch a icon
-@ingroup gui
+
+@author Camila Ayres <hello@camila.codes>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class IconJob : GLib.Object {
 

@@ -1,12 +1,13 @@
+namespace Occ {
+namespace LibSync {
+
 /***********************************************************
+@class StoreMetadataApiJob
+
 Here are all of the network jobs for the client side
 encryption. Anything that goes through the server and
 expects a response is here.
 ***********************************************************/
-
-namespace Occ {
-namespace LibSync {
-
 public class StoreMetadataApiJob : AbstractNetworkJob {
 
     /***********************************************************

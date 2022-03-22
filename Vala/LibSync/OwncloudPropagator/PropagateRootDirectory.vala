@@ -1,19 +1,22 @@
 /***********************************************************
-@author Olivier Goffart <ogoffart@owncloud.com>
-@author Klaas Freitag <freitag@owncloud.com>
-
-@copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
-@brief Propagate the root directory, and all its sub entries.
-@ingroup libsync
+@class PropagateRootDirectory
 
-Primary difference to PropagateDirectory is that it keeps track of directory
-deletions that must happen at the very end.
+@brief Propagate the root directory, and all its sub entries.
+
+@details Primary difference to PropagateDirectory is that it
+keeps track of directory deletions that must happen at the
+very end.
+
+@author Olivier Goffart <ogoffart@owncloud.com>
+@author Klaas Freitag <freitag@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class PropagateRootDirectory : PropagateDirectory {
 

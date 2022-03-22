@@ -1,41 +1,15 @@
-/***********************************************************
-@author Duncan Mac-Vicar P. <duncan@kde.org>
-@author Klaas Freitag <freitag@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <unistd.h>
-//  #include <climits>
-//  #include <cassert>
-//  #include <chrono>
-//  #include <QCore
-//  #include <QSslSocket>
-//  #include <GLib.Dir>
-//  #include <QLogging
-//  #include <QMutexLoc
-//  #include <QThread>
-//  #include <string
-//  #include <QTextStream>
-//  #include <QTime>
-//  #include <QSslCertificat
-//  #include <QProcess>
-//  #include <QElapsedTimer>
-//  #include <GLib.FileInfo>
-//  #include <qtextcodec.h>
-
-//  #include <cstdint>
-//  #include <QMutex>
-//  #include <QThread>
-
-//  #include <set>
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@lass SyncEngine
+
 @brief The SyncEngine class
-@ingroup libsync
+
+@author Duncan Mac-Vicar P. <duncan@kde.org>
+@author Klaas Freitag <freitag@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class SyncEngine : GLib.Object {
 
@@ -89,7 +63,7 @@ public class SyncEngine : GLib.Object {
     private string remote_path;
     private string remote_root_etag;
     public Common.SyncJournalDb journal { public get; private set; }
-    private QScopedPointer<DiscoveryPhase> discovery_phase;
+    private DiscoveryPhase discovery_phase;
     private unowned OwncloudPropagator propagator;
 
     /***********************************************************
@@ -146,12 +120,12 @@ public class SyncEngine : GLib.Object {
     /***********************************************************
     Stores the time since a job touched a file.
     ***********************************************************/
-    private GLib.HashTable<QElapsedTimer, string> touched_files;
+    private GLib.HashTable<GLib.Timer, string> touched_files;
 
 
     /***********************************************************
     ***********************************************************/
-    private QElapsedTimer last_update_progress_callback_call;
+    private GLib.Timer last_update_progress_callback_call;
 
 
     /***********************************************************
@@ -970,8 +944,8 @@ public class SyncEngine : GLib.Object {
                 }
             }
 
-            QPointer<GLib.Object> guard = new GLib.Object ();
-            QPointer<GLib.Object> self = this;
+            GLib.Object guard = new GLib.Object ();
+            GLib.Object self = this;
             /* emit */ signal_about_to_remove_all_files (side >= 0 ? SyncFileItem.Direction.DOWN : SyncFileItem.Direction.UP, callback);
             return;
         }
@@ -1082,10 +1056,10 @@ public class SyncEngine : GLib.Object {
 
 
 
-    private void callback (QPointer<GLib.Object> self, FinishDelegate finish_delegate, QPointer<GLib.Object> guard, bool cancel) {
+    private void callback (GLib.Object self, FinishDelegate finish_delegate, GLib.Object guard, bool cancel) {
         // use a guard to ensure its only called once...
         // qpointer to self to ensure we still exist
-        if (!guard || !self) {
+        if (guard == null || self == null) {
             return;
         }
         guard.delete_later ();
@@ -1146,7 +1120,7 @@ public class SyncEngine : GLib.Object {
     Records that a file was touched by a job.
     ***********************************************************/
     private void on_signal_add_touched_file (string filename) {
-        QElapsedTimer now;
+        GLib.Timer now;
         now.start ();
         string file = GLib.Dir.clean_path (filename);
 
@@ -1155,7 +1129,7 @@ public class SyncEngine : GLib.Object {
             var first = this.touched_files.begin ();
             if (first == this.touched_files.end ())
                 break;
-            // Compare to our new QElapsedTimer instead of using elapsed ().
+            // Compare to our new GLib.Timer instead of using elapsed ().
             // This avoids querying the current time from the OS for every loop.
             var elapsed = new GLib.TimeSpan (
                 now.msecs_since_reference () - first.key ().msecs_since_reference ()
@@ -1168,7 +1142,7 @@ public class SyncEngine : GLib.Object {
             this.touched_files.erase (first);
         }
 
-        // This should be the largest QElapsedTimer yet, use const_end () as hint.
+        // This should be the largest GLib.Timer yet, use const_end () as hint.
         this.touched_files.insert (this.touched_files.const_end (), now, file);
     }
 

@@ -1,27 +1,12 @@
-/***********************************************************
-@author Olivier Goffart <ogoffart@woboq.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <QDebug>
-//  #include <algorithm>
-//  #include <QEventLoop>
-//  #include <GLib.Dir>
-//  #include <set>
-//  #include <QTextCodec>
-//  #include <GLib.FileInfo>
-//  #include <QThreadPool>
-//  #include <common/checksums.h>
-//  #include <common/constants.h>
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
-Job that handles discovery of a directory.
+@class ProcessDirectoryJob
 
-This includes:
+@brief Job that handles discovery of a directory.
+
+@details This includes:
  - Do a DiscoverySingleDirectoryJob network job which will do a PRO
  - Stat all the entries in the local file system for this directory
  - Merge all information (and the information from
@@ -37,6 +22,10 @@ finished. DiscoveryPhase.schedule_more_jobs will call process_sub_jobs () to con
 the job is finished.
 
 Results are fed outwards via the DiscoveryPhase.signal_item_discovered () signal.
+
+@author Olivier Goffart <ogoffart@woboq.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class ProcessDirectoryJob : GLib.Object {
 

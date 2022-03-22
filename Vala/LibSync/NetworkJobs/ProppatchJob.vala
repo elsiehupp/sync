@@ -1,21 +1,22 @@
 /***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-@author Daniel Molkentin <danimo@owncloud.com>
-
-@copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class ProppatchJob
+
 @brief Send a Proppatch request
 
 Setting the desired p
 
 WARNING : Untested!
 
-@ingroup libsync
+@author Klaas Freitag <freitag@owncloud.com>
+@author Daniel Molkentin <danimo@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class ProppatchJob : AbstractNetworkJob {
 

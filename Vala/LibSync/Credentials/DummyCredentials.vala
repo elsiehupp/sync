@@ -1,12 +1,13 @@
+namespace Occ {
+namespace LibSync {
+
 /***********************************************************
+@class DummyCredentials
+
 @author Krzesimir Nowak <krzesimir@endocode.com>
 
 @copyright GPLv3 or Later
 ***********************************************************/
-
-namespace Occ {
-namespace LibSync {
-
 public class DummyCredentials : AbstractCredentials {
 
     /***********************************************************

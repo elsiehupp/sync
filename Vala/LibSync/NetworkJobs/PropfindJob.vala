@@ -1,22 +1,21 @@
 /***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-@author Daniel Molkentin <danimo@owncloud.com>
-
-@copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
-@brief The PropfindJob class
+@class PropfindJob
 
-Setting the desired properties with properties
+@brief Sets the desired properties with properties
 
 Note that this job is only for querying one item.
-There is also the LscolJob which can be used to list collections
+There is also the LscolJob which can be used to list collections.
 
-@ingroup libsync
+@author Klaas Freitag <freitag@owncloud.com>
+@author Daniel Molkentin <danimo@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class PropfindJob : AbstractNetworkJob {
 

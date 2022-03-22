@@ -1,19 +1,14 @@
-/***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #ifndef TOKEN_AUTH_ONLY
-//  #include <Gtk.Icon>
-//  #include <Gtk.Application>
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class NextcloudTheme
+
 @brief The NextcloudTheme class
-@ingroup libsync
+
+@author Klaas Freitag <freitag@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class NextcloudTheme : Theme {
 

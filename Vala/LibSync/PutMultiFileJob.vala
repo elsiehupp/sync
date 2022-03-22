@@ -1,22 +1,14 @@
-/***********************************************************
-Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <QHttp_part>
-
-
-//  #include <QElapsedTimer>
-//  #include <QHttpMultiPart>
-//  #include <memory>
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class PutMultiFileJob
+
 @brief The PutMultiFileJob class
-@ingroup libsync
+
+Copyright 2021 (c) Matthieu Gallien <matthieu.gallien@nextcloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class PutMultiFileJob : AbstractNetworkJob {
 
@@ -41,7 +33,7 @@ public class PutMultiFileJob : AbstractNetworkJob {
     }
 
     private GLib.Uri url;
-    private QElapsedTimer request_timer;
+    private GLib.Timer request_timer;
 
 
     internal signal void signal_finished ();

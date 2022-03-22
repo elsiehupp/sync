@@ -71,12 +71,12 @@ public class Folder : GLib.Object {
     ***********************************************************/
     public LibSync.SyncResult sync_result { public get; private set; }
 
-    private QScopedPointer<SyncEngine> engine;
-    private QPointer<RequestEtagJob> request_etag_job;
+    private SyncEngine engine;
+    private RequestEtagJob request_etag_job;
     private string last_etag;
-    private QElapsedTimer time_since_last_sync_done;
-    private QElapsedTimer time_since_last_sync_start;
-    private QElapsedTimer time_since_last_full_local_discovery;
+    private GLib.Timer time_since_last_sync_done;
+    private GLib.Timer time_since_last_sync_start;
+    private GLib.Timer time_since_last_full_local_discovery;
 
     /***********************************************************
     std.chrono.milliseconds
@@ -101,7 +101,7 @@ public class Folder : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private QScopedPointer<SyncRunFileLog> file_log;
+    private SyncRunFileLog file_log;
 
     /***********************************************************
     ***********************************************************/
@@ -199,13 +199,13 @@ public class Folder : GLib.Object {
     Created by register_folder_watcher (),
     triggers on_signal_watched_path_changed ()
     ***********************************************************/
-    private QScopedPointer<FolderWatcher> folder_watcher;
+    private FolderWatcher folder_watcher;
 
     /***********************************************************
     Keeps track of locally dirty files so we can skip local
     discovery sometimes.
     ***********************************************************/
-    private QScopedPointer<LocalDiscoveryTracker> local_discovery_tracker;
+    private LocalDiscoveryTracker local_discovery_tracker;
 
     /***********************************************************
     The vfs mode instance (created by plugin) to use. Never null.

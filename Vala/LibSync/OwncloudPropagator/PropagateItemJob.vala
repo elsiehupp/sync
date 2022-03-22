@@ -1,21 +1,24 @@
 /***********************************************************
-@author Olivier Goffart <ogoffart@owncloud.com>
-@author Klaas Freitag <freitag@owncloud.com>
-
-@copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
-Abstract class to propagate a single item
+@class PropagateItemJob
+
+@brief Abstract class to propagate a single item
+
+@author Olivier Goffart <ogoffart@owncloud.com>
+@author Klaas Freitag <freitag@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
-public class PropagateItemJob : PropagatorJob {
+public abstract class PropagateItemJob : PropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    private QScopedPointer<PropagateItemJob> restore_job;
+    private PropagateItemJob restore_job;
     new JobParallelism parallelism { public get; private set; }
 
     /***********************************************************
@@ -50,7 +53,7 @@ public class PropagateItemJob : PropagatorJob {
     batch-write on one folder and only lock and unlock a folder
     once per batch.
     ***********************************************************/
-    public PropagateItemJob (OwncloudPropagator propagator, SyncFileItem item) {
+    protected PropagateItemJob (OwncloudPropagator propagator, SyncFileItem item) {
         base (propagator);
         this.parallelism = JobParallelism.FULL_PARALLELISM;
         this.item = item;

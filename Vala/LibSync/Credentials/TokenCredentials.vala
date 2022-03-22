@@ -1,17 +1,14 @@
+namespace Occ {
+namespace LibSync {
+
 /***********************************************************
+@class TokenCredentials
+
 @author Klaas Freitag <freitag@kde.org>
 @author by Markus Goetz <guruz@owncloud.com>
 
 @copyright GPLv3 or Later
 ***********************************************************/
-
-//  #include <QMutex>
-//  #include <GLib.Settings>
-//  #include <Soup.CookieJar>
-
-namespace Occ {
-namespace LibSync {
-
 public class TokenCredentials : AbstractCredentials {
 
     const string AUTHENTICATION_FAILED_C = "owncloud-authentication-failed";

@@ -1,7 +1,4 @@
 /***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-
-@copyright GPLv3 or Later
 ***********************************************************/
 
 namespace Occ {
@@ -9,15 +6,23 @@ namespace LibSync {
 namespace Progress {
 
 /***********************************************************
-Type of error
+@enum ErrorCategory
 
-Used for ProgressDispatcher.signal_sync_error. May trigger error interactivity
-in IssuesWidget.
+@brief Type of error.
+
+Used for ProgressDispatcher.signal_sync_error. May trigger
+error interactivity in IssuesWidget.
+
+@author Klaas Freitag <freitag@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
-enum ErrorCategory {
+public enum ErrorCategory {
+
     NORMAL,
     INSUFFICIENT_REMOTE_STORAGE,
-}
+
+} // enum ErrorCategory
 
 } // namespace Progress
 } // namespace LibSync

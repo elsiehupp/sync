@@ -12,7 +12,7 @@ public class TestClearAtClearAtEndOf3 : GLib.Object {
     private TestClearAtClearAtEndOf3 () {
         UserStatus user_status;
         ClearAt clear_at;
-        clear_at.type = ClearAtType.EndOf;
+        clear_at.type = ClearAtType.END_OF;
         clear_at.endof = "week";
         user_status.set_clear_at (clear_at);
 

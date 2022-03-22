@@ -19,7 +19,7 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
     public string user;
     public string token;
     public string refresh_token;
-    public QScopedPointer<OAuth> async_auth;
+    public OAuth async_auth;
     public OwncloudeOAuthCredsPage instance;
 
 

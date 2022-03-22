@@ -1,24 +1,13 @@
+namespace Occ {
+namespace LibSync {
+
 /***********************************************************
+@class DiscoveryPhase
+
 @author Olivier Goffart <ogoffart@woboq.com>
 
 @copyright GPLv3 or Later
 ***********************************************************/
-
-//  #include <csync_exclude.h>
-//  #include <QLoggingCa
-//  #include <GLib.FileInfo>
-//  #include <QTextCodec>
-//  #include <cstring>
-
-//  #include <QElapsedTimer>
-//  #include <QMutex>
-//  #include <QWaitCondition>
-//  #include <QRunnable>
-//  #include <deque>
-
-namespace Occ {
-namespace LibSync {
-
 public class DiscoveryPhase : GLib.Object {
 
     /***********************************************************
@@ -38,10 +27,9 @@ public class DiscoveryPhase : GLib.Object {
 
     //  friend class ProcessDirectoryJob;
 
-
     /***********************************************************
     ***********************************************************/
-    QPointer<ProcessDirectoryJob> current_root_job;
+    ProcessDirectoryJob current_root_job;
 
 
     /***********************************************************

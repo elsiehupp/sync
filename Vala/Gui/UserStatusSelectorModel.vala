@@ -467,16 +467,16 @@ public class UserStatusSelectorModel : GLib.Object {
     private string clear_at_readable (Optional<ClearAt> clear_at) {
         if (clear_at) {
             switch (clear_at.type) {
-            case ClearAtType.Period: {
+            case ClearAtType.PERIOD: {
                 return time_difference_to_string (clear_at.period);
             }
 
-            case ClearAtType.Timestamp: {
+            case ClearAtType.TIMESTAMP: {
                 const int difference = static_cast<int> (clear_at.timestamp - this.date_time_provider.current_date_time ().to_time_t ());
                 return time_difference_to_string (difference);
             }
 
-            case ClearAtType.EndOf: {
+            case ClearAtType.END_OF: {
                 if (clear_at.endof == "day") {
                     return _("Today");
                 } else if (clear_at.endof == "week") {
@@ -534,35 +534,35 @@ public class UserStatusSelectorModel : GLib.Object {
 
         case ClearStageType.HALF_HOUR: {
             ClearAt clear_at;
-            clear_at.type = ClearAtType.Period;
+            clear_at.type = ClearAtType.PERIOD;
             clear_at.period = 60 * 30;
             return clear_at;
         }
 
         case ClearStageType.ONE_HOUR: {
             ClearAt clear_at;
-            clear_at.type = ClearAtType.Period;
+            clear_at.type = ClearAtType.PERIOD;
             clear_at.period = 60 * 60;
             return clear_at;
         }
 
         case ClearStageType.FOUR_HOUR: {
             ClearAt clear_at;
-            clear_at.type = ClearAtType.Period;
+            clear_at.type = ClearAtType.PERIOD;
             clear_at.period = 60 * 60 * 4;
             return clear_at;
         }
 
         case ClearStageType.TODAY: {
             ClearAt clear_at;
-            clear_at.type = ClearAtType.EndOf;
+            clear_at.type = ClearAtType.END_OF;
             clear_at.endof = "day";
             return clear_at;
         }
 
         case ClearStageType.WEEK: {
             ClearAt clear_at;
-            clear_at.type = ClearAtType.EndOf;
+            clear_at.type = ClearAtType.END_OF;
             clear_at.endof = "week";
             return clear_at;
         }

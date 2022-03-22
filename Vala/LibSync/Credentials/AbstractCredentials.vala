@@ -1,15 +1,14 @@
+namespace Occ {
+namespace LibSync {
+
 /***********************************************************
+@class AbstractCredentials
+
 @author Krzesimir Nowak <krzesimir@endocode.com>
 @author Daniel Molkentin <danimo@owncloud.com>
 
 @copyright GPLv3 or Later
 ***********************************************************/
-
-//  #include <Gtk.Application>
-
-namespace Occ {
-namespace LibSync {
-
 public abstract class AbstractCredentials : GLib.Object {
 
     /***********************************************************

@@ -1,18 +1,14 @@
-/***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <QMetaType>
-//  #include <owncloudlib.h>
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class SyncFileItem
+
 @brief The SyncFileItem class
-@ingroup libsync
+
+@author Klaas Freitag <freitag@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class SyncFileItem : GLib.Object {
 

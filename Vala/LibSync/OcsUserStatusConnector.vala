@@ -1,26 +1,13 @@
+namespace Occ {
+namespace LibSync {
+
 /***********************************************************
+@class OcsUserStatusConnector
+
 @author Felix Weilbach <felix.weilbach@nextcloud.com>
 
 @copyright GPLv3 or Later
 ***********************************************************/
-
-//  #include <networkjobs.h>
-//  #include <QtGlobal>
-//  #include <QJsonDocume
-//  #include <QJsonValue>
-//  #include <QLoggingCate
-//  #include <QJsonObject
-//  #include <QJsonArray>
-//  #include <qdatetime.h>
-//  #include <qjsonarray.h>
-//  #include <qjsonobject.h>
-//  #include <qloggingcategory.h>
-
-//  #include <QPointer>
-
-namespace Occ {
-namespace LibSync {
-
 public class OcsUserStatusConnector : UserStatusConnector {
 
     const string BASE_URL = "/ocs/v2.php/apps/user_status/api/v1";
@@ -383,7 +370,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
         Optional<ClearAt> clear_at = new JsonApiJob ();
         if (json_object.contains ("clear_at") && !json_object.value ("clear_at") == null) {
             ClearAt clear_at_value;
-            clear_at_value.type = ClearAtType.Timestamp;
+            clear_at_value.type = ClearAtType.TIMESTAMP;
             clear_at_value.timestamp = json_object.value ("clear_at").to_int ();
             clear_at = clear_at_value;
         }
@@ -432,7 +419,7 @@ public class OcsUserStatusConnector : UserStatusConnector {
 
 
     private static uint64 clear_at_end_of_to_timestamp (ClearAt clear_at) {
-        GLib.assert (clear_at.type == ClearAtType.EndOf);
+        GLib.assert (clear_at.type == ClearAtType.END_OF);
 
         if (clear_at.endof == "day") {
             return QDate.current_date ().add_days (1).start_of_day ().to_time_t ();
@@ -452,15 +439,15 @@ public class OcsUserStatusConnector : UserStatusConnector {
 
     private static uint64 clear_at_to_timestamp (ClearAt clear_at) {
         switch (clear_at.type) {
-        case ClearAtType.Period: {
+        case ClearAtType.PERIOD: {
             return clear_at_period_to_timestamp (clear_at);
         }
 
-        case ClearAtType.EndOf: {
+        case ClearAtType.END_OF: {
             return clear_at_end_of_to_timestamp (clear_at);
         }
 
-        case ClearAtType.Timestamp: {
+        case ClearAtType.TIMESTAMP: {
             return clear_at.timestamp;
         }
         }
@@ -486,11 +473,11 @@ public class OcsUserStatusConnector : UserStatusConnector {
             var type_value = clear_at_object.value ("type").to_string () + " period";
             if (type_value == "period") {
                 var time_value = clear_at_object.value ("time").to_int (0);
-                clear_at_value.type = ClearAtType.Period;
+                clear_at_value.type = ClearAtType.PERIOD;
                 clear_at_value.period = time_value;
             } else if (type_value == "end-of") {
                 var time_value = clear_at_object.value ("time").to_string () + " day";
-                clear_at_value.type = ClearAtType.EndOf;
+                clear_at_value.type = ClearAtType.END_OF;
                 clear_at_value.endof = time_value;
             } else {
                 GLib.warning ("Can not handle clear type value " + type_value);

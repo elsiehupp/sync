@@ -1,43 +1,19 @@
+namespace Occ {
+namespace LibSync {
+
 /***********************************************************
+@brief Strips quotes and gzip annotations
+
 @author Klaas Freitag <freitag@owncloud.com>
 @author Daniel Molkentin <danimo@owncloud.com>
 
 @copyright GPLv3 or Later
 ***********************************************************/
-
-//  #include <QJsonDocument>
-//  #include <Soup.Request>
-//  #include <QSslConfigu
-//  #include <Soup.Buffer>
-//  #include <QXmlStrea
-//  #include <string[
-//  #include <GLib.List>
-//  #include <QMutex>
-//  #include <QCoreApplicati
-//  #include <QJsonDocumen
-//  #include <QJsonObject>
-//  #include <qloggingc
-//  #include TOKEN_AUTH_ONLY
-//  #include <QPainter>
-//  #include <QPainterPath>
-//  #endif
-
-//  #include <Soup.Buffer>
-//  #include <QUrlQuery>
-//  #include <QJsonDocument>
-//  #include <functional>
-
-namespace Occ {
-namespace LibSync {
-
-/***********************************************************
-Strips quotes and gzip annotations
-***********************************************************/
-string parse_etag (char header) {
-    if (!header) {
+string parse_etag (char *header) {
+    if (header == null) {
         return "";
     }
-    string arr = header;
+    string arr = header.to_string ();
 
     // Weak E-Tags can appear when gzip compression is on, see #3946
     if (arr.starts_with ("W/"))

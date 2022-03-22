@@ -29,7 +29,7 @@ public class OwncloudSetupWizard : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    static QPointer<OwncloudSetupWizard> setup_wizard = null;
+    static OwncloudSetupWizard setup_wizard = null;
 
     static string expected_path;
 

@@ -1,16 +1,15 @@
-/***********************************************************
-@author Olivier Goffart <ogoffart@owncloud.com>
-@author Klaas Freitag <freitag@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class PropagateDirectory
+
 @brief Propagate a directory, and all its sub entries.
-@ingroup libsync
+
+@author Olivier Goffart <ogoffart@owncloud.com>
+@author Klaas Freitag <freitag@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class PropagateDirectory : PropagatorJob {
 
@@ -21,7 +20,7 @@ public class PropagateDirectory : PropagatorJob {
     /***********************************************************
     e.g : create the directory
     ***********************************************************/
-    public QScopedPointer<PropagateItemJob> first_job;
+    public PropagateItemJob first_job;
 
     /***********************************************************
     ***********************************************************/

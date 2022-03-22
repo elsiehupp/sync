@@ -1,34 +1,18 @@
-/***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-// event masks
-
-//  #include <cstdint>
-//  #include <QFileIn
-//  #include <QFlag
-//  #include <GLib.Dir>
-//  #include <QMutexLoc
-//  #include <string[]
-//  #include <GLib.List
-//  #include <QLoggingCatego
-//  #include <QElapsedTimer>
-//  #include <QScopedPointer>
-//  #include <GLib.Dir>
-
 namespace Occ {
 namespace Ui {
 
 /***********************************************************
+@class FolderWatcher
+
 @brief Monitors a directory recursively for changes
 
-Folder Watcher monitors a directory and its sub directories
-for changes in the local file system.
+@details Folder Watcher monitors a directory and its
+subdirectories for changes in the local file system.
 through the signal_path_changed () signal.
 
-@ingroup gui
+@author Klaas Freitag <freitag@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class FolderWatcher : GLib.Object {
 
@@ -36,8 +20,8 @@ public class FolderWatcher : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private QScopedPointer<FolderWatcherPrivate> d;
-    private QElapsedTimer timer;
+    private FolderWatcherPrivate d;
+    private GLib.Timer timer;
     private GLib.List<string> last_paths;
     private Folder folder;
 

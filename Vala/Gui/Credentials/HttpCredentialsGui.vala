@@ -12,8 +12,9 @@ namespace Ui {
 public class HttpCredentialsGui : HttpCredentials {
 
     /***********************************************************
+    QScopedPointerObjectDeleteLater
     ***********************************************************/
-    private QScopedPointer<OAuth, QScopedPointerObjectDeleteLater<OAuth>> async_auth;
+    private OAuth async_auth;
 
     internal signal void signal_authorisation_link_changed ();
 

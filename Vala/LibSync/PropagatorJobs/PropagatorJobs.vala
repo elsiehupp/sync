@@ -1,22 +1,14 @@
+namespace Occ {
+namespace LibSync {
+
 /***********************************************************
+@class PropagatorJobs
+
 @author Olivier Goffart <ogoffart@owncloud.com>
 @author Klaas Freitag <freitag@owncloud.com>
 
 @copyright GPLv3 or Later
 ***********************************************************/
-
-//  #include <qfile.h>
-//  #include <qdir.h>
-//  #include <qdiriterator.h>
-//  #include <qtemporaryfile.h>
-//  #include <qsavefile.h>
-//  #include <qstack.h>
-//  #include <Gtk.Application>
-//  #include <ctime>
-
-namespace Occ {
-namespace LibSync {
-
 public class PropagatorJobs : GLib.Object {
 
     /***********************************************************

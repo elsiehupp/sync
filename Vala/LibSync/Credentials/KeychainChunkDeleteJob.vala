@@ -2,6 +2,8 @@ namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class KeychainChunkDeleteJob
+
 @brief Simple wrapper class for Secret.Collection.DeletePasswordJob
 
 @author Michael Schuster <michael@schuster.ms>

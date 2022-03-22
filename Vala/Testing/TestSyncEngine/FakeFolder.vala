@@ -277,7 +277,7 @@ public class FakeFolder : GLib.Object {
             this.sync_engine.get (),
             this.sync_engine.signal_item_completed
         );
-        QElapsedTimer t;
+        GLib.Timer t;
         t.on_signal_start ();
         while (t.elapsed () < 5000) {
             spy.clear ();

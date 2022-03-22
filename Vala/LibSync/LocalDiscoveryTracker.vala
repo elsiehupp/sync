@@ -1,15 +1,9 @@
-/***********************************************************
-@author Christian Kamm <mail@ckamm.de>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <set>
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class LocalDiscoveryTracker
+
 @brief Tracks files that must be rediscovered locally
 
 It does this by being notified about
@@ -27,7 +21,9 @@ readability and testing purposes.
 All paths used in this class are expected to be utf8 encoded byte arrays,
 relative to the folder that is being synced, without a starting slash.
 
-@ingroup libsync
+@author Christian Kamm <mail@ckamm.de>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class LocalDiscoveryTracker : GLib.Object {
 

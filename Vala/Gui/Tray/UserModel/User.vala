@@ -23,11 +23,11 @@ public class User : GLib.Object {
     ***********************************************************/
     private GLib.Timeout expired_activities_check_timer;
     private GLib.Timeout notification_check_timer;
-    private GLib.HashTable<AccountState, QElapsedTimer> time_since_last_check;
+    private GLib.HashTable<AccountState, GLib.Timer> time_since_last_check;
 
     /***********************************************************
     ***********************************************************/
-    private QElapsedTimer gui_log_timer;
+    private GLib.Timer gui_log_timer;
     private NotificationCache notification_cache;
 
     /***********************************************************
@@ -690,11 +690,11 @@ public class User : GLib.Object {
             return;
         }
 
-        // QElapsedTimer isn't actually constructed as invalid.
+        // GLib.Timer isn't actually constructed as invalid.
         if (!this.time_since_last_check.contains (this.account_state)) {
             this.time_since_last_check[this.account_state].invalidate ();
         }
-        QElapsedTimer timer = this.time_since_last_check[this.account_state];
+        GLib.Timer timer = this.time_since_last_check[this.account_state];
 
         // Fetch Activities only if visible and if last check is longer than 15 secs ago
         if (timer.is_valid () && timer.elapsed () < NOTIFICATION_REQUEST_FREE_PERIOD) {

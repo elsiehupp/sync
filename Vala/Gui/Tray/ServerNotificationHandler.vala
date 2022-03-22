@@ -15,7 +15,7 @@ public class ServerNotificationHandler : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private QPointer<JsonApiJob> notification_job;
+    private JsonApiJob notification_job;
     private AccountState account_state;
 
 

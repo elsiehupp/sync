@@ -1,7 +1,4 @@
 /***********************************************************
-@author Roeland Jago Douma <roeland@famdouma.nl>
-
-@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <GLib.HashTable<string, GLib.Variant>>
@@ -12,13 +9,15 @@
 namespace Occ {
 namespace LibSync {
 
-// Q_DECLARE_FLAGS (PushNotificationTypes, PushNotificationType)
-// Q_DECLARE_OPERATORS_FOR_FLAGS (PushNotificationTypes)
-
 /***********************************************************
-@brief The Capabilities class represents the capabilities of an own_cloud
-server
-@ingroup libsync
+@class Capabilities
+
+@brief The Capabilities class represents the capabilities of
+an OCS server
+
+@author Roeland Jago Douma <roeland@famdouma.nl>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class Capabilities : GLib.Object {
 

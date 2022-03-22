@@ -2,6 +2,8 @@ namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class KeychainChunkJob
+
 @brief Abstract base class for KeychainChunk jobs.
 
 Workaround for Windows:

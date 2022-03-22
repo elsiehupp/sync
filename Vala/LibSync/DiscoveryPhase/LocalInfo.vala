@@ -1,12 +1,13 @@
+namespace Occ {
+namespace LibSync {
+
 /***********************************************************
+@class LocalInfo
+
 @author Olivier Goffart <ogoffart@woboq.com>
 
 @copyright GPLv3 or Later
 ***********************************************************/
-
-namespace Occ {
-namespace LibSync {
-
 public class LocalInfo : GLib.Object {
     /***********************************************************
     FileName of the entry (this does not contains any directory

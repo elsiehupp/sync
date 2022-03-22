@@ -16,7 +16,7 @@ public class WheelHandler : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private QPointer<QQuickItem> m_target;
+    private QQuickItem m_target;
     private bool m_block_target_wheel = true;
     private bool m_scroll_flickable_target = true;
     private KirigamiWheelEvent m_wheel_event;

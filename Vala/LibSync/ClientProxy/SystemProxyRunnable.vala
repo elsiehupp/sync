@@ -1,17 +1,13 @@
+namespace Occ {
+namespace LibSync {
+
 /***********************************************************
+@class SystemProxyRunnable
+
 @author Klaas Freitag <freitag@owncloud.com>
 
 @copyright GPLv3 or Later
 ***********************************************************/
-
-//  #include <QThreadPool>
-
-//  #include <Soup.ProxyResolverDefault>
-//  #include <QRunnable>
-
-namespace Occ {
-namespace LibSync {
-
 public class SystemProxyRunnable : GLib.Object /*, QRunnable*/ {
 
     /***********************************************************

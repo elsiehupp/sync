@@ -2,6 +2,8 @@ namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class DetermineAuthTypeJob
+
 @brief Checks with auth type to use for a server
 
 @author Klaas Freitag <freitag@owncloud.com>

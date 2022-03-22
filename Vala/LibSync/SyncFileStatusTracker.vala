@@ -1,8 +1,4 @@
 /***********************************************************
-@author Klaas Freitag <freitag@owncloud.com>
-@author Jocelyn Turcotte <jturcotte@woboq.com>
-
-@copyright GPLv3 or Later
 ***********************************************************/
 
 //  #include <map>
@@ -11,10 +7,16 @@ namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@class SyncFileStatusTracker
+
 @brief Takes care of tracking the status of individual
 files as they go through the SyncEngine, to be reported as
 overlay icons in the shell.
-@ingroup libsync
+
+@author Klaas Freitag <freitag@owncloud.com>
+@author Jocelyn Turcotte <jturcotte@woboq.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class SyncFileStatusTracker : GLib.Object {
 

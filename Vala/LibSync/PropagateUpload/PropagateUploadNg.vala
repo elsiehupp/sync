@@ -1,22 +1,10 @@
-/***********************************************************
-@author Olivier Goffart <ogoffart@owncloud.com>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
-//  #include <Soup.Session>
-//  #include <GLib.FileInfo>
-//  #include <GLib.Dir>
-//  #include <cmath>
-//  #include <cstring>
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
-@ingroup libsync
+@class PropagateUploadFileNG
 
-Propagation job, impementing the new chunking agorithm
+@brief Propagation job, impementing the new chunking agorithm
 
 State machine:
 
@@ -45,6 +33,10 @@ State machine:
     |
     +. MOVE -----. move_job_finished () --. on_signal_finalize ()
 
+
+@author Olivier Goffart <ogoffart@owncloud.com>
+
+@copyright GPLv3 or Later
 ***********************************************************/
 public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
