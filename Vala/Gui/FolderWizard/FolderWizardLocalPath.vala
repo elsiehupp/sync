@@ -100,7 +100,7 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
         string[] dirs = d.entry_list (GLib.Dir.Dirs | GLib.Dir.NoDotAndDotDot | GLib.Dir.No_sym_links,
             GLib.Dir.Dirs_first | GLib.Dir.Name);
 
-        if (dirs.count () > 0)
+        if (dirs.length > 0)
             sf += "/" + dirs.at (0); // Take the first directory in home directory.
 
         string directory = QFileDialog.existing_directory (this,

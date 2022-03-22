@@ -57,7 +57,7 @@ public class UserAppsModel : QAbstractListModel {
             end_remove_rows ();
         }
 
-        if (UserModel.instance.app_list.count () > 0) {
+        if (UserModel.instance.app_list.length > 0) {
             const var talk_app = UserModel.instance.is_current_user ().talk_app ();
             foreach (AccountApp app in UserModel.instance.app_list) {
                 // Filter out Talk because we have a dedicated button for it
@@ -76,14 +76,14 @@ public class UserAppsModel : QAbstractListModel {
     ***********************************************************/
     private int row_count (QModelIndex parent) {
         //  Q_UNUSED (parent);
-        return this.apps.count ();
+        return this.apps.length;
     }
 
 
     /***********************************************************
     ***********************************************************/
     private GLib.Variant data (QModelIndex index, int role) {
-        if (index.row () < 0 || index.row () >= this.apps.count ()) {
+        if (index.row () < 0 || index.row () >= this.apps.length) {
             return GLib.Variant ();
         }
 

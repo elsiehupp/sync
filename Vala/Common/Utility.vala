@@ -64,7 +64,7 @@ public class Utility : GLib.Object {
     static void setup_fav_link_private (string folder) {
         // Nautilus : add to ~/.gtk-bookmarks
         GLib.File gtk_bookmarks = GLib.File.new_for_path (GLib.Dir.home_path + "/.config/gtk-3.0/bookmarks");
-        string folder_url = "file://" + folder.to_utf8 ();
+        string folder_url = "file://" + folder;
         if (gtk_bookmarks.open (GLib.File.ReadWrite)) {
             string places = gtk_bookmarks.read_all ();
             if (!places.contains (folder_url)) {

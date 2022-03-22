@@ -80,7 +80,7 @@ public class TestSelectiveSyncMovedFolder : AbstractTestSyncMove {
         expected_server_state = fake_folder.current_remote_state ();
         ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
         fake_folder.sync_once (); // This sync should do nothing
-        GLib.assert_true (complete_spy.count () == 0);
+        GLib.assert_true (complete_spy.length == 0);
 
         GLib.assert_true (fake_folder.current_remote_state () == expected_server_state);
         GLib.assert_true (fake_folder.current_local_state () == remote_state);

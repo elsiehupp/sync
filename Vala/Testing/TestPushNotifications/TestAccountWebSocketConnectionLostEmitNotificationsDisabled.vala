@@ -30,9 +30,9 @@ public class TestAccountWebSocketConnectionLostEmitNotificationsDisabled : Abstr
         socket.on_signal_abort ();
 
         GLib.assert_true (push_notifications_disabled_spy.wait ());
-        GLib.assert_true (push_notifications_disabled_spy.count () == 1);
+        GLib.assert_true (push_notifications_disabled_spy.length == 1);
 
-        GLib.assert_true (connection_lost_spy.count () == 1);
+        GLib.assert_true (connection_lost_spy.length == 1);
 
         var account_sent = push_notifications_disabled_spy.at (0).at (0).value<Account> ();
         GLib.assert_true (account_sent == account);

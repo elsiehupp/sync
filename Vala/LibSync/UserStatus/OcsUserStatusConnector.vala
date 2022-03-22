@@ -109,7 +109,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
         log_response ("user status fetched", json, status_code);
 
         if (status_code != 200) {
-            GLib.info ("Slot fetch UserStatus finished with status code " + status_code);
+            GLib.info ("Slot fetch UserStatus finished with status code " + status_code.to_string ());
             /* emit */ signal_error (Error.COULD_NOT_FETCH_USER_STATUS);
             return;
         }
@@ -125,7 +125,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
         log_response ("predefined statuses", json, status_code);
 
         if (status_code != 200) {
-            GLib.info ("Slot predefined user statuses finished with status code " + status_code);
+            GLib.info ("Slot predefined user statuses finished with status code " + status_code.to_string ());
             /* emit */ signal_error (Error.COULD_NOT_FETCH_PREDEFINED_USER_STATUSES);
             return;
         }
@@ -188,7 +188,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
     /***********************************************************
     ***********************************************************/
     private void log_response (string message, QJsonDocument json, int status_code) {
-        GLib.debug ("Response from: " + message + " Status: " + status_code +  " Json: " + json);
+        GLib.debug ("Response from: " + message + " Status: " + status_code.to_string () +  " Json: " + json.to_string ());
     }
 
 

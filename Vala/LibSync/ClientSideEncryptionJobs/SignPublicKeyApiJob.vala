@@ -64,7 +64,7 @@ public class SignPublicKeyApiJob : AbstractNetworkJob {
         GLib.Uri url = Utility.concat_url_path (account.url, this.path);
         url.query (query);
 
-        GLib.info ("Sending the CSR " + this.csr);
+        GLib.info ("Sending the CSR " + this.csr.to_string ());
         send_request ("POST", url, request, this.csr);
         AbstractNetworkJob.start ();
     }

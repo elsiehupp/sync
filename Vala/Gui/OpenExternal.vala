@@ -49,7 +49,7 @@ public class OpenExternal : GLib.Object {
                     + "URL %1. Maybe no default browser is configured?")
                         .printf (url.to_string ()));
             }
-            GLib.warning ("QDesktopServices.open_url failed for " + url);
+            GLib.warning ("QDesktopServices.open_url failed for " + url.to_string ());
             throw new OpenExternalError.OPEN_EXTERNAL_FAILED ("QDesktopServices.open_url failed for " + url.to_string ());
         }
         return;

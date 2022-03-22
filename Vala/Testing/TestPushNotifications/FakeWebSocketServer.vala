@@ -79,7 +79,7 @@ public class FakeWebSocketServer : GLib.Object {
 
         // Wait for ready signal
         ready_spy.wait ();
-        if (ready_spy.count () != 1 || !account.push_notifications ().is_ready ()) {
+        if (ready_spy.length != 1 || !account.push_notifications ().is_ready ()) {
             return null;
         }
 
@@ -113,14 +113,14 @@ public class FakeWebSocketServer : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public uint32 text_messages_count () {
-        return this.process_text_message_spy.count ();
+        return this.process_text_message_spy.length;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public string text_message (int message_number) {
-        GLib.assert_true (0 <= message_number && message_number < this.process_text_message_spy.count ());
+        GLib.assert_true (0 <= message_number && message_number < this.process_text_message_spy.length);
         return this.process_text_message_spy.at (message_number).at (1).to_string ();
     }
 
@@ -128,7 +128,7 @@ public class FakeWebSocketServer : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public QWebSocket socket_for_text_message (int message_number) {
-        GLib.assert_true (0 <= message_number && message_number < this.process_text_message_spy.count ());
+        GLib.assert_true (0 <= message_number && message_number < this.process_text_message_spy.length);
         return this.process_text_message_spy.at (message_number).at (0).value<QWebSocket> ();
     }
 

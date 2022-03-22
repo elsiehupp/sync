@@ -227,7 +227,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
             illegal_characters_string += illegal_characters[0];
         }
 
-        for (int i = 1; i < illegal_characters.count (); ++i) {
+        for (int i = 1; i < illegal_characters.length; ++i) {
             if (illegal_characters_string.contains (illegal_characters[i])) {
                 continue;
             }

@@ -272,7 +272,7 @@ public class AccountManager : GLib.Object {
 
         // Save accepted certificates.
         settings.begin_group ("General");
-        GLib.info ("Saving " + acc.approved_certificates ().count () + " unknown certificates.");
+        GLib.info ("Saving " + acc.approved_certificates ().length + " unknown certificates.");
         string certificates;
         foreach (var cert in acc.approved_certificates ()) {
             certificates += cert.to_pem () + '\n';
@@ -364,7 +364,7 @@ public class AccountManager : GLib.Object {
         // now the server cert, it is in the general group
         settings.begin_group ("General");
         const var certificates = QSslCertificate.from_data (settings.value (CA_CERTS_KEY_C).to_byte_array ());
-        GLib.info ("Restored: " + certificates.count () + " unknown certificates.");
+        GLib.info ("Restored: " + certificates.length + " unknown certificates.");
         acc.approved_certificates (certificates);
         settings.end_group ();
 

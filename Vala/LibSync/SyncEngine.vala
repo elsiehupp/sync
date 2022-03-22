@@ -521,7 +521,7 @@ public class SyncEngine : GLib.Object {
         this.propagator.download_limit = download;
 
         if (upload != 0 || download != 0) {
-            GLib.info ("Network Limits (down/up) " + upload + download);
+            GLib.info ("Network Limits (down/up) " + upload.to_string () + download.to_string ());
         }
     }
 

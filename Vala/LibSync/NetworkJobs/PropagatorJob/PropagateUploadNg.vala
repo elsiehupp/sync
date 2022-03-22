@@ -110,7 +110,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         const Common.SyncJournalDb.UploadInfo progress_info = this.propagator.journal.get_upload_info (this.item.file);
         GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warning ("Invalid modified time " + this.item.file + this.item.modtime);
+            GLib.warning ("Invalid modified time " + this.item.file.to_string () + this.item.modtime.to_string ());
         }
         if (progress_info.valid && progress_info.is_chunked && progress_info.modtime == this.item.modtime
                 && progress_info.size == this.item.size) {
@@ -155,7 +155,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         //  ASSERT (this.propagator.active_job_list.count (this) == 1);
         GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warning ("Invalid modified time" + this.item.file + this.item.modtime);
+            GLib.warning ("Invalid modified time" + this.item.file.to_string () + this.item.modtime.to_string ());
         }
         this.transfer_identifier = uint32 (Utility.rand () ^ uint32 (this.item.modtime) ^ (uint32 (this.file_to_upload.size) << 16) ^ q_hash (this.file_to_upload.file));
         this.sent = 0;
@@ -168,7 +168,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         pi.transferid = this.transfer_identifier;
         GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warning ("Invalid modified time " + this.item.file + this.item.modtime);
+            GLib.warning ("Invalid modified time " + this.item.file.to_string () + this.item.modtime.to_string ());
         }
         pi.modtime = this.item.modtime;
         pi.content_checksum = this.item.checksum_header;
@@ -314,9 +314,9 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
             // Normally this can't happen because the size is xor'ed with the transfer identifier, and it is
             // therefore impossible that there is more data on the server than on the file.
             GLib.critical (
-                "Inconsistency while resuming " + this.item.file
-                + " : the size on the server (" + this.sent + ") is bigger than the size of the file ("
-                + this.file_to_upload.size + ")"
+                "Inconsistency while resuming " + this.item.file.to_string ()
+                + " : the size on the server (" + this.sent.to_string () + ") is bigger than the size of the file ("
+                + this.file_to_upload.size.to_string () + ")"
             );
 
             // Wipe the old chunking data.
@@ -328,7 +328,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
             return;
         }
 
-        GLib.info ("Resuming " + this.item.file + " from chunk " + this.current_chunk + "; sent =" + this.sent);
+        GLib.info ("Resuming " + this.item.file.to_string () + " from chunk " + this.current_chunk.to_string () + "; sent =" + this.sent.to_string ());
 
         if (!this.server_chunks == "") {
             GLib.info ("To Delete " + this.server_chunks.keys ());
@@ -471,7 +471,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         // Dynamic chunk sizing is enabled if the server configured a
         // target duration for each chunk upload.
         var target_duration = this.propagator.sync_options.target_chunk_upload_duration;
-        if (target_duration.count () > 0) {
+        if (target_duration.length > 0) {
             var upload_time = ++put_file_job.ms_since_start; // add one to avoid div-by-zero
             int64 predicted_good_size = (this.current_chunk_size * target_duration) / upload_time;
 
@@ -490,8 +490,8 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
                 this.propagator.sync_options.max_chunk_size);
 
             GLib.info (
-                "Chunked upload of " + this.current_chunk_size.to_string () + " bytes took " + upload_time.count ()
-                + "ms, desired is " + target_duration.count () + "ms, expected good chunk size is "
+                "Chunked upload of " + this.current_chunk_size.to_string () + " bytes took " + upload_time.length
+                + "ms, desired is " + target_duration.length + "ms, expected good chunk size is "
                 + predicted_good_size + " bytes and nudged next chunk size to "
                 + this.propagator.chunk_size + " bytes."
             );
@@ -513,7 +513,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         // Check whether the file changed since discovery - this acts on the original file.
         GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warning ("Invalid modified time " + this.item.file + this.item.modtime);
+            GLib.warning ("Invalid modified time " + this.item.file.to_string () + this.item.modtime.to_string ());
         }
         if (!FileSystem.verify_file_unchanged (full_file_path, this.item.size, this.item.modtime)) {
             this.propagator.another_sync_needed = true;

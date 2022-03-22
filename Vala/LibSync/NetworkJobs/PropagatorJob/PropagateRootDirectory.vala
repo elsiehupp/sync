@@ -38,7 +38,7 @@ public class PropagateRootDirectory : PropagateDirectory {
     /***********************************************************
     ***********************************************************/
     public new bool on_signal_schedule_self_or_child () {
-        GLib.info ("on_signal_schedule_self_or_child " + this.state + " pending uploads" + this.propagator.delayed_tasks ().size () + " subjobs state " + this.sub_jobs.state);
+        GLib.info ("on_signal_schedule_self_or_child " + this.state.to_string () + " pending uploads" + this.propagator.delayed_tasks ().size () + " subjobs state " + this.sub_jobs.state);
 
         if (this.state == Finished) {
             return false;

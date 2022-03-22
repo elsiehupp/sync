@@ -137,7 +137,7 @@ public class FolderStatusModel : QAbstractItemModel {
                 this.has_error = false;
                 model.end_remove_rows ();
             } else if (!this.subs == "") {
-                model.begin_remove_rows (index, 0, this.subs.count () - 1);
+                model.begin_remove_rows (index, 0, this.subs.length - 1);
                 this.subs == "";
                 model.end_remove_rows ();
             }
@@ -500,7 +500,7 @@ public class FolderStatusModel : QAbstractItemModel {
                         }
                     }
                     // also check all the children
-                    for (int i = 0; i < info.subs.count (); ++i) {
+                    for (int i = 0; i < info.subs.length; ++i) {
                         if (info.subs.at (i).checked != Qt.Checked) {
                             data_for_index_value_and_role (this.index (i, 0, index), Qt.Checked, Qt.CheckStateRole);
                         }
@@ -515,7 +515,7 @@ public class FolderStatusModel : QAbstractItemModel {
                     }
 
                     // Uncheck all the children
-                    for (int i = 0; i < info.subs.count (); ++i) {
+                    for (int i = 0; i < info.subs.length; ++i) {
                         if (info.subs.at (i).checked != Qt.Unchecked) {
                             data_for_index_value_and_role (this.index (i, 0, index), Qt.Unchecked, Qt.CheckStateRole);
                         }
@@ -550,18 +550,18 @@ public class FolderStatusModel : QAbstractItemModel {
     ***********************************************************/
     public int row_count (QModelIndex parent = QModelIndex ()) {
         if (!parent.is_valid) {
-            if (Theme.single_sync_folder && this.folders.count () != 0) {
+            if (Theme.single_sync_folder && this.folders.length != 0) {
                 // "Add folder_connection" button not visible in the single_sync_folder configuration.
-                return this.folders.count ();
+                return this.folders.length;
             }
-            return this.folders.count () + 1; // +1 for the "add folder_connection" button
+            return this.folders.length + 1; // +1 for the "add folder_connection" button
         }
         var info = info_for_index (parent);
         if (!info)
             return 0;
         if (info.has_label ())
             return 1;
-        return info.subs.count ();
+        return info.subs.length;
     }
 
 
@@ -576,16 +576,16 @@ public class FolderStatusModel : QAbstractItemModel {
         case ItemType.FETCH_LABEL:
             return {};
         case ItemType.ROOT_FOLDER:
-            if (this.folders.count () <= parent.row ())
+            if (this.folders.length <= parent.row ())
                 return {}; // should not happen
             return create_index (row, column, const_cast<SubFolderInfo> (this.folders[parent.row ()]));
         case ItemType.SUBFOLDER: {
             var pinfo = static_cast<SubFolderInfo> (parent.internal_pointer ());
-            if (pinfo.subs.count () <= parent.row ())
+            if (pinfo.subs.length <= parent.row ())
                 return {}; // should not happen
             var info = pinfo.subs[parent.row ()];
             if (!info.has_label ()
-                && info.subs.count () <= row)
+                && info.subs.length <= row)
                 return {}; // should not happen
             return create_index (row, column, info);
         }
@@ -610,14 +610,14 @@ public class FolderStatusModel : QAbstractItemModel {
         }
         var path_index = static_cast<SubFolderInfo> (child.internal_pointer ()).path_index;
         int i = 1;
-        //  ASSERT (path_index.at (0) < this.folders.count ());
-        if (path_index.count () == 1) {
+        //  ASSERT (path_index.at (0) < this.folders.length);
+        if (path_index.length == 1) {
             return create_index (path_index.at (0), 0 /*, null*/);
         }
 
         const SubFolderInfo info = this.folders[path_index.at (0)];
-        while (i < path_index.count () - 1) {
-            //  ASSERT (path_index.at (i) < info.subs.count ());
+        while (i < path_index.length - 1) {
+            //  ASSERT (path_index.at (i) < info.subs.length);
             info = info.subs.at (path_index.at (i));
             ++i;
         }
@@ -738,7 +738,7 @@ public class FolderStatusModel : QAbstractItemModel {
                 return ItemType.SUBFOLDER;
             }
         }
-        if (index.row () < this.folders.count ()) {
+        if (index.row () < this.folders.length) {
             return ItemType.ROOT_FOLDER;
         }
         return ItemType.ADD_BUTTON;
@@ -761,7 +761,7 @@ public class FolderStatusModel : QAbstractItemModel {
             }
             return parent_info.subs[index.row ()];
         } else {
-            if (index.row () >= this.folders.count ()) {
+            if (index.row () >= this.folders.length) {
                 // ItemType.ADD_BUTTON
                 return null;
             }
@@ -850,7 +850,7 @@ public class FolderStatusModel : QAbstractItemModel {
     /***********************************************************
     ***********************************************************/
     public void on_signal_update_folder_state (FolderConnection folder_connection) {
-        for (int i = 0; i < this.folders.count (); ++i) {
+        for (int i = 0; i < this.folders.length; ++i) {
             if (this.folders.at (i).folder_connection == folder_connection) {
                 /* emit */ data_changed (index (i), index (i));
             }
@@ -932,7 +932,7 @@ public class FolderStatusModel : QAbstractItemModel {
     /***********************************************************
     ***********************************************************/
     public void on_signal_sync_all_pending_big_folders () {
-        for (int i = 0; i < this.folders.count (); ++i) {
+        for (int i = 0; i < this.folders.length; ++i) {
             if (!this.folders[i].fetched) {
                 this.folders[i].folder_connection.journal_database ().selective_sync_list (
                     SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST,
@@ -1013,7 +1013,7 @@ public class FolderStatusModel : QAbstractItemModel {
     /***********************************************************
     ***********************************************************/
     public void on_signal_sync_no_pending_big_folders () {
-        for (int i = 0; i < this.folders.count (); ++i) {
+        for (int i = 0; i < this.folders.length; ++i) {
             var folder_connection = this.folders.at (i).folder_connection;
 
             // clear the undecided list
@@ -1042,7 +1042,7 @@ public class FolderStatusModel : QAbstractItemModel {
         }
 
         int folder_index = -1;
-        for (int i = 0; i < this.folders.count (); ++i) {
+        for (int i = 0; i < this.folders.length; ++i) {
             if (this.folders.at (i).folder_connection == folder_connection) {
                 folder_index = i;
                 break;
@@ -1422,7 +1422,7 @@ public class FolderStatusModel : QAbstractItemModel {
     ***********************************************************/
     private void on_signal_folder_sync_state_change (FolderConnection folder_connection) {
         int folder_index = -1;
-        for (int i = 0; i < this.folders.count (); ++i) {
+        for (int i = 0; i < this.folders.length; ++i) {
             if (this.folders.at (i).folder_connection == folder_connection) {
                 folder_index = i;
                 break;
@@ -1486,7 +1486,7 @@ public class FolderStatusModel : QAbstractItemModel {
         //  ASSERT (folder_connection);
 
         int folder_index = -1;
-        for (int i = 0; i < this.folders.count (); ++i) {
+        for (int i = 0; i < this.folders.length; ++i) {
             if (this.folders.at (i).folder_connection == folder_connection) {
                 folder_index = i;
                 break;
@@ -1545,7 +1545,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
         string[] result;
         if (root.fetched) {
-            for (int i = 0; i < root.subs.count (); ++i) {
+            for (int i = 0; i < root.subs.length; ++i) {
                 result += create_block_list (root.subs.at (i), old_block_list);
             }
         } else {

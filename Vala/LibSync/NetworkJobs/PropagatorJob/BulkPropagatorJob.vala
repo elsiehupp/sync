@@ -443,7 +443,7 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
                 return;
             }
 
-            GLib.info ("final status" + this.final_status);
+            GLib.info ("final status" + this.final_status.to_string ());
             /* emit */ signal_finished (this.final_status);
             this.propagator.schedule_next_job ();
         } else {
@@ -475,7 +475,7 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
         QJsonObject file_reply) {
         bool finished = false;
 
-        GLib.info (single_file.item.file + " file headers " + file_reply);
+        GLib.info (single_file.item.file.to_string () + " file headers " + file_reply.to_string ());
 
         if (file_reply.contains ("error") && !file_reply["error"].to_bool ()) {
             single_file.item.http_error_code = (uint16) 200;
@@ -666,9 +666,9 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
                             + " due to repeated error " + item.http_error_code.to_string ());
                 upload_info = Common.SyncJournalDb.UploadInfo ();
             } else {
-                GLib.info ("Error count for maybe-reset error" + item.http_error_code
-                        + "on file" + item.file
-                        + "is" + upload_info.error_count);
+                GLib.info ("Error count for maybe-reset error" + item.http_error_code.to_string ()
+                        + "on file" + item.file.to_string ()
+                        + "is" + upload_info.error_count.to_string ());
             }
             this.propagator.journal.upload_info (item.file, upload_info);
             this.propagator.journal.commit ("Upload info");

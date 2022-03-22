@@ -37,7 +37,7 @@ public class TestAllFilesDeletedDelete : AbstractTestAllFilesDeleted {
             fake_folder.current_remote_state ()
         );
         GLib.assert_true (
-            fake_folder.current_local_state ().children.count () ==
+            fake_folder.current_local_state ().children.length ==
             0
         );
 
@@ -54,7 +54,7 @@ public class TestAllFilesDeletedDelete : AbstractTestAllFilesDeleted {
             fake_folder.current_remote_state ()
         );
         GLib.assert_true (
-            fake_folder.current_local_state ().children.count () ==
+            fake_folder.current_local_state ().children.length ==
             0
         );
     }

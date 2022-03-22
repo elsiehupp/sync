@@ -25,7 +25,7 @@ public class TestOnWebSocketSslErrorSslErrorDisablePushNotifications : AbstractT
         /* emit */ push_notifications_web_socket_children[0].ssl_errors (GLib.List<QSslError> ());
 
         // Account handled connection_lost signal and the authentication_failed Signal should be emitted
-        GLib.assert_true (push_notifications_disabled_spy.count () == 1);
+        GLib.assert_true (push_notifications_disabled_spy.length == 1);
     }
 
 } // class TestOnWebSocketSslErrorSslErrorDisablePushNotifications

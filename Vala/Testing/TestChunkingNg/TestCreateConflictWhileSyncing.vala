@@ -37,7 +37,7 @@ public class TestCreateConflictWhileSyncing : AbstractTestChunkingNg {
         // There was a precondition failed error, this means wen need to sync again
         GLib.assert_true (fake_folder.sync_engine.is_another_sync_needed () == ImmediateFollowUp);
 
-        GLib.assert_true (fake_folder.upload_state ().children.count () == 1); // We did not clean the chunks at this point
+        GLib.assert_true (fake_folder.upload_state ().children.length == 1); // We did not clean the chunks at this point
 
         // Now we will download the server file and create a conflict
         GLib.assert_true (fake_folder.sync_once ());
@@ -65,7 +65,7 @@ public class TestCreateConflictWhileSyncing : AbstractTestChunkingNg {
 
         GLib.assert_cassert_truemp (fake_folder.current_local_state () == fake_folder.current_remote_state ());
 
-        GLib.assert_true (fake_folder.upload_state ().children.count () == 0); // The last sync cleaned the chunks
+        GLib.assert_true (fake_folder.upload_state ().children.length == 0); // The last sync cleaned the chunks
     }
 
 

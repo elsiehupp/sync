@@ -201,7 +201,7 @@ public class CheckServerJob : AbstractNetworkJob {
             this.server_url.path (path.left (path.size () - slash_status_php.size ()));
             GLib.info (
                 "status.php was permanently redirected to "
-                + target_url + " new server url is " + this.server_url);
+                + target_url.to_string () + " new server url is " + this.server_url.to_string ());
             ++this.permanent_redirects;
         }
     }

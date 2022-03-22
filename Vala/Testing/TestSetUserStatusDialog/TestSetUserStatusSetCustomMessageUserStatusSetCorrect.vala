@@ -29,7 +29,7 @@ public class TestSetUserStatusSetCustomMessageUserStatusSetCorrect : GLib.Object
         model.set_clear_at (1);
 
         model.user_status ();
-        GLib.assert_true (finished_spy.count () == 1);
+        GLib.assert_true (finished_spy.length == 1);
 
         var signal_user_status_set = fake_user_status_job.user_status_set_by_caller_of_set_user_status;
         GLib.assert_true (signal_user_status_set.icon () == user_status_icon);

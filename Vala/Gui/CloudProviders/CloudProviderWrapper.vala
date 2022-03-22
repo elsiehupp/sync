@@ -438,7 +438,7 @@ public class CloudProviderWrapper : GLib.Object {
         }
 
         if (g_str_equal (name, "quit")) {
-            Gtk.Application.quit ();
+            GLib.Application.quit ();
         }
     }
 

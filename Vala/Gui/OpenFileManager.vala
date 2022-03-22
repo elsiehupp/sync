@@ -48,7 +48,7 @@ public class OpenFileManager : GLib.Object {
         bool can_handle_file = false; // assume dumb font_metrics
 
         args = exec.split (' ');
-        if (args.count () > 0)
+        if (args.length > 0)
             app = args.take_first ();
 
         string kde_select_param = "--select";
@@ -92,7 +92,7 @@ public class OpenFileManager : GLib.Object {
             }
         }
 
-        if (args.count () == 0) {
+        if (args.length == 0) {
             args += file_to_open;
         }
 

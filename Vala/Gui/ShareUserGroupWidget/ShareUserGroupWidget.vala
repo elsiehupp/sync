@@ -272,7 +272,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
                 this, ShareUserGroupWidget.on_signal_get_shares
             );
             share_user_line.background_role (
-                layout.count () % 2 == 0
+                layout.length % 2 == 0
                 ? Gtk.Palette.Base
                 : Gtk.Palette.Alternate_base
             );
@@ -408,12 +408,12 @@ public class ShareUserGroupWidget : Gtk.Widget {
     // TODO Progress Indicator where should it go?
     //    var indicator = new QProgressIndicator (view_port);
     //    indicator.on_signal_start_animation ();
-    //    if (layout.count () == 1) {
+    //    if (layout.length == 1) {
     //        // No shares yet! Remove the label, add some stretch.
     //        delete layout.item_at (0).widget ();
     //        layout.add_stretch (1);
     //    }
-    //    layout.insert_widget (layout.count () - 1, indicator);
+    //    layout.insert_widget (layout.length - 1, indicator);
 
         /***********************************************************
         Don't send the reshare permissions for federated shares for servers <9.1
@@ -490,7 +490,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
             share_user_line_child.adjust_size ();
         }
 
-        const int share_user_line_childs_count = share_user_line_childs.count ();
+        const int share_user_line_childs_count = share_user_line_childs.length;
         scroll_area.visible (share_user_line_childs_count > 0);
         if (share_user_line_childs_count > 0 && share_user_line_childs_count <= 3) {
             scroll_area.fixed_height (scroll_area.widget ().size_hint ().height ());
@@ -527,7 +527,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
             delete progress_indicator;
         }
 
-        GLib.warning ("Sharing error from server " + code + message);
+        GLib.warning ("Sharing error from server " + code.to_string () + message);
         this.instance.error_label.on_signal_text (message);
         this.instance.error_label.show ();
         activate_sharee_line_edit ();

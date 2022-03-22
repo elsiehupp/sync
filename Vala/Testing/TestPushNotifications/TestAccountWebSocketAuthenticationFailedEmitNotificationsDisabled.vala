@@ -22,7 +22,7 @@ public class TestAccountWebSocketAuthenticationFailedEmitNotificationsDisabled :
         GLib.assert_true (fail_three_authentication_attempts (fake_server, account));
 
         // Now the push_notifications_disabled Signal should be emitted
-        GLib.assert_true (push_notifications_disabled_spy.count () == 1);
+        GLib.assert_true (push_notifications_disabled_spy.length == 1);
         var account_sent = push_notifications_disabled_spy.at (0).at (0).value<Account> ();
         GLib.assert_true (account_sent == account);
     }

@@ -245,7 +245,7 @@ public class GETFileJob : AbstractNetworkJob {
     ***********************************************************/
     public void give_bandwidth_quota (int64 q) {
         this.bandwidth_quota = q;
-        GLib.debug ("Got " + q + " bytes");
+        GLib.debug ("Got " + q.to_string () + " bytes");
         GLib.Object.invoke_method (this, "on_signal_ready_read", Qt.QueuedConnection);
     }
 
@@ -272,9 +272,12 @@ public class GETFileJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public new void on_signal_timed_out () {
-        GLib.warning ("Timeout" + this.input_stream ? this.input_stream.request ().url : this.path);
-        if (!this.input_stream)
+        if (this.input_stream != null) {
+            GLib.warning ("Timeout " + this.input_stream.request ().url.to_string ());
+        } else {
+            GLib.warning ("Timeout " + this.path);
             return;
+        }
         this.error_string = _("Connection Timeout");
         this.error_status = SyncFileItem.Status.FATAL_ERROR;
         this.input_stream.abort ();
@@ -407,7 +410,7 @@ public class GETFileJob : AbstractNetworkJob {
         this.content_length = this.input_stream.header (Soup.Request.ContentLengthHeader).to_long_long (&ok);
         if (ok && this.expected_content_length != -1 && this.content_length != this.expected_content_length) {
             GLib.warning ("We received a different content length than expected! "
-                    + this.expected_content_length + " vs " + this.content_length);
+                    + this.expected_content_length.to_string () + " vs " + this.content_length.to_string ());
             this.error_string = _("We received an unexpected download Content-Length.");
             this.error_status = SyncFileItem.Status.NORMAL_ERROR;
             this.input_stream.abort ();

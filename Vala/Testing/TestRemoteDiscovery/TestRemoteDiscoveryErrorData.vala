@@ -20,16 +20,16 @@ public class TestRemoteDiscoveryErrorData : GLib.Object {
 
         string item_error_message = "Internal Server Fake Error";
 
-        QTest.new_row ("400") << 400 << item_error_message + false;
-        QTest.new_row ("401") << 401 << item_error_message + false;
-        QTest.new_row ("403") << 403 << item_error_message + true;
-        QTest.new_row ("404") << 404 << item_error_message + true;
-        QTest.new_row ("500") << 500 << item_error_message + true;
-        QTest.new_row ("503") << 503 << item_error_message + true;
+        QTest.new_row ("400", 400, item_error_message, false);
+        QTest.new_row ("401", 401, item_error_message, false);
+        QTest.new_row ("403", 403, item_error_message, true);
+        QTest.new_row ("404", 404, item_error_message, true);
+        QTest.new_row ("500", 500, item_error_message, true);
+        QTest.new_row ("503", 503, item_error_message, true);
         // 200 should be an error since propfind should return 207
-        QTest.new_row ("200") << 200 << item_error_message + false;
-        QTest.new_row ("InvalidXML") + +InvalidXML + "Unknown error" + false;
-        QTest.new_row ("Timeout") + +Timeout + "Operation canceled" + false;
+        QTest.new_row ("200", 200, item_error_message, false);
+        QTest.new_row ("InvalidXML", InvalidXML, "Unknown error", false);
+        QTest.new_row ("Timeout", Timeout, "Operation canceled", false);
     }
 
 } // class TestRemoteDiscoveryErrorData

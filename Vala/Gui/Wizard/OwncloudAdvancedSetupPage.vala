@@ -488,7 +488,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
                 this.instance.r_sync_everything.on_signal_text (_("Sync the folder \"%1\"").printf (this.remote_folder));
             }
 
-            const bool dir_not_empty = new GLib.Dir (loc_folder).entry_list (GLib.Dir.AllEntries | GLib.Dir.NoDotAndDotDot).count () > 0;
+            const bool dir_not_empty = new GLib.Dir (loc_folder).entry_list (GLib.Dir.AllEntries | GLib.Dir.NoDotAndDotDot).length > 0;
             if (dir_not_empty) {
                 status_string += _("Warning : The local folder is not empty. Pick a resolution!");
             }
@@ -648,7 +648,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void set_up_resolution_widget () {
-        for (int i = 0; i < this.instance.resolution_widget_layout.count (); ++i) {
+        for (int i = 0; i < this.instance.resolution_widget_layout.length; ++i) {
             var widget = this.instance.resolution_widget_layout.item_at (i).widget ();
             if (!widget) {
                 continue;

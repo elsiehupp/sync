@@ -1328,7 +1328,7 @@ public class SocketApi : GLib.Object {
 
         GLib.Object current_object = widget;
         Gtk.Icon value;
-        for (int i = 0; i < segments.count (); i++) {
+        for (int i = 0; i < segments.length; i++) {
             var segment = segments.at (i);
             var variable = current_object.property (segment.to_utf8 ().const_data ());
 
@@ -1405,7 +1405,7 @@ public class SocketApi : GLib.Object {
 
         GLib.Object current_object = widget;
         string value;
-        for (int i = 0; i < segments.count (); i++) {
+        for (int i = 0; i < segments.length; i++) {
             var segment = segments.at (i);
             var variable = current_object.property (segment.to_utf8 ().const_data ());
 
@@ -1549,7 +1549,7 @@ public class SocketApi : GLib.Object {
             GLib.debug ("query_string contains >");
 
             var sub_queries = query_string.split (">", string.SkipEmptyParts);
-            //  Q_ASSERT (sub_queries.count () == 2);
+            //  Q_ASSERT (sub_queries.length == 2);
 
             var parent_query_string = sub_queries[0].trimmed ();
             GLib.debug ("Find parent: " + parent_query_string);

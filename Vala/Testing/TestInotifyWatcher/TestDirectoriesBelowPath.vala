@@ -37,7 +37,7 @@ public class TestDirectoriesBelowPath : AbstractTestInotifyWatcher {
         GLib.assert_true ( dirs.index_of (this.root + "/a2/b3"));
         GLib.assert_true ( dirs.index_of (this.root + "/a2/b3/c3"));
 
-        QVERIFY2 (dirs.count () == 11, "Directory count wrong.");
+        QVERIFY2 (dirs.length == 11, "Directory count wrong.");
 
         QVERIFY2 (ok, "find_folders_below failed.");
 

@@ -37,7 +37,7 @@ public class FolderCreationDialog : Gtk.Dialog {
 
         const string suggested_folder_name_prefix = _("New folder");
 
-        const string new_folder_full_path = this.destination + '/' + suggested_folder_name_prefix;
+        const string new_folder_full_path = this.destination + "/" + suggested_folder_name_prefix;
         if (!GLib.Dir (new_folder_full_path).exists ()) {
             instance.new_folder_name_edit.on_signal_text (suggested_folder_name_prefix);
         } else {

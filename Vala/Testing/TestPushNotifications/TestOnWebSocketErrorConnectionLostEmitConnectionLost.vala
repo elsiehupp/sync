@@ -27,7 +27,7 @@ public class TestOnWebSocketErrorConnectionLostEmitConnectionLost : AbstractTest
 
         GLib.assert_true (connection_lost_spy.wait ());
         // Account handled connection_lost signal and disabled push notifications
-        GLib.assert_true (push_notifications_disabled_spy.count () == 1);
+        GLib.assert_true (push_notifications_disabled_spy.length == 1);
     }
 
 } // class TestOnWebSocketErrorConnectionLostEmitConnectionLost

@@ -290,7 +290,7 @@ public class FolderStatusDelegate : QStyledItemDelegate {
         QRect rect = local_path_rect;
         rect.left (icon_rect.left ());
         rect.top (h);
-        rect.height (texts.count () * sub_font_metrics.height () + 2 * margin);
+        rect.height (texts.length * sub_font_metrics.height () + 2 * margin);
         rect.right (option.rect.right () - margin);
 
         // save previous state to not mess up colours with the background (fixes issue : https://github.com/nextcloud/desktop/issues/1237)
@@ -355,7 +355,7 @@ public class FolderStatusDelegate : QStyledItemDelegate {
         foreach (var role in {Folder_conflict_msg, Folder_error_msg, Folder_info_msg}) {
             var msgs = qvariant_cast<string[]> (index.data (role));
             if (!msgs == "") {
-                h += margin + 2 * margin + msgs.count () * font_metrics.height ();
+                h += margin + 2 * margin + msgs.length * font_metrics.height ();
             }
         }
 

@@ -111,7 +111,7 @@ public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
     ***********************************************************/
     public GLib.List<QAction> legacyActions (KFileItemListProperties file_item_infos, Gtk.Widget parentWidget) {
         GLib.List<GLib.Uri> urls = file_item_infos.url_list ();
-        if (urls.count () != 1)
+        if (urls.length != 1)
             return {};
         GLib.Dir local_path = new GLib.Dir (urls.first ().to_local_file ());
         var local_file = local_path.canonical_path;

@@ -521,7 +521,7 @@ public class ShareUserLine : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_link_share_password_error (int status_code, string message) {
-        GLib.warning ("Error from server " + status_code + message);
+        GLib.warning ("Error from server " + status_code.to_string () + message);
 
         toggle_password_progress_animation (false);
 

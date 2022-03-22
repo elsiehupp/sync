@@ -26,7 +26,7 @@ public class TestSearchTermResultsNotFound : AbstractTestUnifiedSearchListmodel 
         GLib.assert_true (search_in_progress_changed.wait ());
 
         // make sure search has started
-        GLib.assert_true (search_in_progress_changed.count () == 1);
+        GLib.assert_true (search_in_progress_changed.length == 1);
         GLib.assert_true (model.is_search_in_progress ());
 
         GLib.assert_true (search_in_progress_changed.wait ());

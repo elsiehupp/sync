@@ -48,7 +48,7 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, QRunnable*/ {
 
         var dh = CSync.VioHandle.open_directory (local_path);
         if (!dh) {
-            GLib.info ("Error while opening directory" + (local_path) + errno;
+            GLib.info ("Error while opening directory" + local_path + errno.to_string ());
             string error_string = _("Error while opening directory %1").printf (local_path);
             if (errno == EACCES) {
                 error_string = _("Directory not accessible on client, permission denied");
@@ -104,7 +104,7 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, QRunnable*/ {
             CSync.VioHandle.close_directory (dh);
 
             // Note: Windows vio converts any error into EACCES
-            GLib.warning ("readdir failed for file in " + local_path + " - errno: " + errno;
+            GLib.warning ("readdir failed for file in " + local_path + " - errno: " + errno.to_string ());
             /* emit */ finished_fatal_error (_("Error while reading directory %1").printf (local_path));
             return;
         }
@@ -112,7 +112,7 @@ public class DiscoverySingleLocalDirectoryJob : GLib.Object /*, QRunnable*/ {
         errno = 0;
         CSync.VioHandle.close_directory (dh);
         if (errno != 0) {
-            GLib.warning ("closedir failed for file in " + local_path + " - errno: " + errno;
+            GLib.warning ("closedir failed for file in " + local_path + " - errno: " + errno.to_string ());
         }
 
         /* emit */ signal_finished (results);

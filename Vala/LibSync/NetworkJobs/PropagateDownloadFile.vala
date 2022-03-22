@@ -94,7 +94,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
             return;
         this.is_encrypted = false;
 
-        GLib.debug (this.item.file + this.propagator.active_job_list.count ());
+        GLib.debug (this.item.file + this.propagator.active_job_list.length);
 
         var path = this.item.file;
         var slash_position = path.last_index_of ("/");
@@ -158,7 +158,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
 
         // Delete the directory if it is empty!
         GLib.Dir directory = new GLib.Dir (existing_dir);
-        if (directory.entry_list (GLib.Dir.NoDotAndDotDot | GLib.Dir.AllEntries).count () == 0) {
+        if (directory.entry_list (GLib.Dir.NoDotAndDotDot | GLib.Dir.AllEntries).length == 0) {
             if (directory.rmdir (existing_dir)) {
                 return;
             }
@@ -188,7 +188,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
             var fn = this.propagator.full_local_path (this.item.file);
             GLib.assert (this.item.modtime > 0);
             if (this.item.modtime <= 0) {
-                GLib.warning ("invalid modified time" + this.item.file + this.item.modtime);
+                GLib.warning ("invalid modified time" + this.item.file.to_string () + this.item.modtime.to_string ());
                 return;
             }
             if (this.item.modtime != this.item.previous_modtime) {
@@ -199,7 +199,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
             this.item.modtime = FileSystem.get_mod_time (fn);
             GLib.assert (this.item.modtime > 0);
             if (this.item.modtime <= 0) {
-                GLib.warning ("Invalid modified time " + this.item.file + this.item.modtime);
+                GLib.warning ("Invalid modified time " + this.item.file.to_string () + this.item.modtime.to_string ());
                 return;
             }
             update_metadata (/*is_conflict=*/false);
@@ -420,7 +420,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
             this.item.modtime = get_file_job.last_modified ();
             GLib.assert (this.item.modtime > 0);
             if (this.item.modtime <= 0) {
-                GLib.warning ("Invalid modified time: " + this.item.file + this.item.modtime);
+                GLib.warning ("Invalid modified time: " + this.item.file.to_string () + this.item.modtime.to_string ());
             }
         }
 
@@ -572,7 +572,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
         }
         GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warning ("Invalid modified time: " + this.item.file + this.item.modtime);
+            GLib.warning ("Invalid modified time: " + this.item.file.to_string () + this.item.modtime.to_string ());
         }
         FileSystem.mod_time (this.temporary_file.filename (), this.item.modtime);
         // We need to fetch the time again because some file systems such as FAT have worse than a second
@@ -585,7 +585,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
         }
         GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warning ("Invalid modified time: " + this.item.file + this.item.modtime);
+            GLib.warning ("Invalid modified time: " + this.item.file.to_string () + this.item.modtime.to_string ());
         }
 
         bool previous_file_exists = FileSystem.file_exists (fn);
@@ -901,9 +901,9 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
         int overhead = 1 + 1 + 2 + 8; // slash dot dot-tilde ffffffff"
         int space_for_filename = q_min (254, temporary_filename.length + overhead) - overhead;
         if (temporary_path.length > 0) {
-            return temporary_path + "/" + '.' + temporary_filename.left (space_for_filename) + ".~" + (string.number (uint32 (Utility.rand () % 0x_f_f_f_f_f_f_f_f), 16));
+            return temporary_path + "/" + "." + temporary_filename.left (space_for_filename) + ".~" + (string.number (uint32 (Utility.rand () % 0x_f_f_f_f_f_f_f_f), 16));
         } else {
-            return '.' + temporary_filename.left (space_for_filename) + ".~" + (string.number (uint32 (Utility.rand () % 0x_f_f_f_f_f_f_f_f), 16));
+            return "." + temporary_filename.left (space_for_filename) + ".~" + (string.number (uint32 (Utility.rand () % 0x_f_f_f_f_f_f_f_f), 16));
         }
     }
 

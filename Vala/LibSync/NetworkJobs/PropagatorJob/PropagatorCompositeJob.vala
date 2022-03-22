@@ -121,7 +121,7 @@ public class PropagatorCompositeJob : AbstractPropagatorJob {
     ***********************************************************/
     public new JobParallelism parallelism () {
         // If any of the running sub jobs is not parallel, we have to wait
-        for (int i = 0; i < this.running_jobs.count (); ++i) {
+        for (int i = 0; i < this.running_jobs.length; ++i) {
             if (this.running_jobs.at (i).parallelism () != JobParallelism.FULL_PARALLELISM) {
                 return this.running_jobs.at (i).parallelism ();
             }

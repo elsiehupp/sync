@@ -249,7 +249,7 @@ public class OCUpdater : AbstractUpdater {
 
             QProcess.start_detached ("powershell.exe", { "-Command", command });
         }
-        Gtk.Application.quit ();
+        GLib.Application.quit ();
     }
 
 

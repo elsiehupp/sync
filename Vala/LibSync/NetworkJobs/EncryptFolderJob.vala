@@ -82,7 +82,7 @@ public class EncryptFolderJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_set_encryption_flag_job_error (string file_identifier, int http_error_code) {
-        GLib.debug ("Error on the encryption flag of " + file_identifier + " HTTP code: " + http_error_code);
+        GLib.debug ("Error on the encryption flag of " + file_identifier + " HTTP code: " + http_error_code.to_string ());
         /* emit */ signal_finished (Error);
     }
 
@@ -116,7 +116,7 @@ public class EncryptFolderJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_lock_for_encryption_error (string file_identifier, int http_error_code) {
-        GLib.info ("Locking error for " + file_identifier + " HTTP code: " + http_error_code);
+        GLib.info ("Locking error for " + file_identifier + " HTTP code: " + http_error_code.to_string ());
         /* emit */ signal_finished (Error);
     }
 
@@ -132,7 +132,7 @@ public class EncryptFolderJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_unlock_folder_error (string file_identifier, int http_error_code) {
-        GLib.info ("Unlocking error for " + file_identifier + " HTTP code: " + http_error_code);
+        GLib.info ("Unlocking error for " + file_identifier + " HTTP code: " + http_error_code.to_string ());
         /* emit */ signal_finished (Error);
     }
 

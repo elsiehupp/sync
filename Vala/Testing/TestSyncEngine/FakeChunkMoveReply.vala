@@ -52,7 +52,7 @@ public class FakeChunkMoveReply : FakeReply {
             payload = x.content_char;
             ++count;
         }
-        GLib.assert_true (source_folder.children.count () == count); // There should not be holes or extra files
+        GLib.assert_true (source_folder.children.length == count); // There should not be holes or extra files
 
         // Note: This does not actually assemble the file data from the chunks!
         FileInfo file_info = remote_root_file_info.find (filename);

@@ -444,7 +444,7 @@ public class ShareLinkWidget : Gtk.Widget {
     public void on_signal_server_error (int code, string message) {
         on_signal_toggle_share_link_animation (false);
 
-        GLib.warning ("Error from server " + code + message);
+        GLib.warning ("Error from server " + code.to_string () + message);
         on_signal_display_error (message);
     }
 

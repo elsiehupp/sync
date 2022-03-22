@@ -21,7 +21,7 @@ public abstract class AbstractTestPushNotifications : GLib.Object {
 
 
     protected static bool verify_called_once_with_account (QSignalSpy spy, unowned Account account) {
-        return_false_on_fail (spy.count () == 1);
+        return_false_on_fail (spy.length == 1);
         var account_from_spy = spy.at (0).at (0).value<Account> ();
         return_false_on_fail (account_from_spy == account);
 
@@ -48,7 +48,7 @@ public abstract class AbstractTestPushNotifications : GLib.Object {
 
         // Now the authentication_failed Signal should be emitted
         return_false_on_fail (authentication_failed_spy.wait ());
-        return_false_on_fail (authentication_failed_spy.count () == 1);
+        return_false_on_fail (authentication_failed_spy.length == 1);
 
         return true;
     }

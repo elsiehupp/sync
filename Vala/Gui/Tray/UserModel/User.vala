@@ -642,7 +642,7 @@ public class User : GLib.Object {
         }
 
         on_signal_end_notification_request (reply_code);
-        GLib.info ("Server Notification reply code " + reply_code + reply);
+        GLib.info ("Server Notification reply code " + reply_code.to_string () + reply);
     }
 
 
@@ -656,7 +656,7 @@ public class User : GLib.Object {
                 GLib.info ("Activity in blocklist; skipping.");
                 continue;
             }
-            const var message = AccountManager.instance.accounts.count () == 1 ? "" : activity.acc_name;
+            const var message = AccountManager.instance.accounts.length == 1 ? "" : activity.acc_name;
             show_desktop_notification (activity.subject, message);
             this.activity_model.add_notification_to_activity_list (activity);
         }
@@ -707,7 +707,7 @@ public class User : GLib.Object {
 
         // Fetch Activities only if visible and if last check is longer than 15 secs ago
         if (timer.is_valid && timer.elapsed () < NOTIFICATION_REQUEST_FREE_PERIOD) {
-            GLib.debug ("Do not check as last check is only secs ago: " + timer.elapsed () / 1000);
+            GLib.debug ("Do not check as last check is only secs ago: " + (timer.elapsed () / 1000).to_string ());
             return;
         }
         if (this.account_state != null && this.account_state.is_connected) {
@@ -744,8 +744,8 @@ public class User : GLib.Object {
     ***********************************************************/
     public void on_signal_notification_refresh_interval (GLib.TimeSpan interval_in_microseconds) {
         if (!check_push_notifications_are_ready ()) {
-            GLib.debug ("Starting Notification refresh timer with " + interval_in_microseconds.count () / 1000 + " sec interval_in_microseconds");
-            this.notification_check_timer.on_signal_start (interval_in_microseconds.count ());
+            GLib.debug ("Starting Notification refresh timer with " + interval_in_microseconds.length / 1000 + " sec interval_in_microseconds");
+            this.notification_check_timer.on_signal_start (interval_in_microseconds.length);
         }
     }
 

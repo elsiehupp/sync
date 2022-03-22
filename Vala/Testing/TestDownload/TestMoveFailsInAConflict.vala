@@ -83,7 +83,7 @@ public class TestMoveFailsInAConflict : GLib.Object {
         }
         if (!conflict_file == "") {
             // Check that the temporary file is still there
-            GLib.assert_true (GLib.Dir (fake_folder.local_path + "A/").entry_list ({ "*.~*" }, GLib.Dir.Files | GLib.Dir.Hidden).count () == 1);
+            GLib.assert_true (GLib.Dir (fake_folder.local_path + "A/").entry_list ({ "*.~*" }, GLib.Dir.Files | GLib.Dir.Hidden).length == 1);
             // Set the permission to read only on the folder, so the rename of the temporary file will fail
             GLib.File (fake_folder.local_path + "A/").set_permissions (GLib.File.Permissions (0x5555));
         }

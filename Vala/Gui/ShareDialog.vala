@@ -189,7 +189,7 @@ public class ShareDialog : Gtk.Dialog {
         const GLib.Variant received_permissions = result["share-permissions"];
         if (!received_permissions.to_string () == "") {
             this.max_sharing_permissions = static_cast<SharePermissions> (received_permissions.to_int ());
-            GLib.info ("Received sharing permissions for " + this.share_path + this.max_sharing_permissions);
+            GLib.info ("Received sharing permissions for " + this.share_path + this.max_sharing_permissions.to_string ());
         }
         var private_link_url = result["privatelink"].to_string ();
         var numeric_file_id = result["fileid"].to_byte_array ();
@@ -220,7 +220,7 @@ public class ShareDialog : Gtk.Dialog {
     ***********************************************************/
     private void on_signal_thumbnail_fetched (int status_code, string reply) {
         if (status_code != 200) {
-            GLib.warning ("Thumbnail status code: " + status_code);
+            GLib.warning ("Thumbnail status code: " + status_code.to_string ());
             return;
         }
 
@@ -256,7 +256,7 @@ public class ShareDialog : Gtk.Dialog {
         /* emit */ signal_toggle_share_link_animation (true);
 
         const string version_string = this.account_state.account.server_version ();
-        GLib.info (version_string + "Fetched" + shares.count () + "shares");
+        GLib.info (version_string + "Fetched" + shares.length + "shares");
         foreach (var share in shares) {
             if (share.share_type != Share.Type.LINK || share.owner_uid != share.account.dav_user) {
                 continue;
@@ -366,7 +366,7 @@ public class ShareDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void on_signal_adjust_scroll_widget_size () {
-        int count = this.find_children<ShareLinkWidget> ().count ();
+        int count = this.find_children<ShareLinkWidget> ().length;
         this.instance.scroll_area.visible (count > 0);
         if (count > 0 && count <= 3) {
             this.instance.scroll_area.fixed_height (this.instance.scroll_area.widget ().size_hint ().height ());

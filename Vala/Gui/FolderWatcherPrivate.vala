@@ -161,7 +161,7 @@ public class FolderWatcherPrivate : GLib.Object {
         }
 
         if (subdirectories > 0) {
-            GLib.debug ("    `. and " + subdirectories + " subdirectories");
+            GLib.debug ("    `. and " + subdirectories.to_string () + " subdirectories");
         }
     }
 
@@ -225,7 +225,7 @@ public class FolderWatcherPrivate : GLib.Object {
         if (it == this.path_to_watch.end ())
             return;
 
-        string path_slash = path + '/';
+        string path_slash = path + "/";
 
         // Remove the entry and all subentries
         while (it != this.path_to_watch.end ()) {

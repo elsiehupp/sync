@@ -63,7 +63,7 @@ public class StorePrivateKeyApiJob : AbstractNetworkJob {
         GLib.Uri url = Utility.concat_url_path (account.url, this.path);
         url.query (query);
 
-        GLib.info ("Sending the private key" + this.private_key);
+        GLib.info ("Sending the private key " + this.private_key.to_string ());
         send_request ("POST", url, request, this.private_key);
         AbstractNetworkJob.start ();
     }

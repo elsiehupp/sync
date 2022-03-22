@@ -199,9 +199,9 @@ public abstract class AbstractPropagateItemJob : AbstractPropagatorJob {
         }
 
         if (this.item.has_error_status ())
-            GLib.warning ("Could not complete propagation of " + this.item.destination () + " by " + this + " with status " + this.item.status + " and error: " + this.item.error_string);
+            GLib.warning ("Could not complete propagation of " + this.item.destination ().to_string () + " by " + this.to_string () + " with status " + this.item.status.to_string () + " and error: " + this.item.error_string);
         else
-            GLib.info ("Completed propagation of " + this.item.destination () + " by " + this + " with status " + this.item.status);
+            GLib.info ("Completed propagation of " + this.item.destination ().to_string () + " by " + this.to_string () + " with status " + this.item.status.to_string ());
         /* emit */ this.propagator.signal_item_completed (this.item);
         /* emit */ signal_finished (this.item.status);
 

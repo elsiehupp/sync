@@ -100,7 +100,7 @@ public class ActivityListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     public override int row_count (QModelIndex parent = new QModelIndex ()) {
-        return this.final_list.count ();
+        return this.final_list.length;
     }
 
 
@@ -268,7 +268,7 @@ public class ActivityListModel : QAbstractListModel {
                     relative_path.prepend (folder_connection.remote_path);
                 }
                 const var local_files = FolderManager.instance.find_file_in_local_folders (relative_path, ast.account);
-                if (local_files.count () > 0) {
+                if (local_files.length > 0) {
                     if (relative_path.has_prefix ('/') || relative_path.has_prefix ('\\')) {
                         return relative_path.remove (0, 1);
                     } else {
@@ -666,24 +666,24 @@ public class ActivityListModel : QAbstractListModel {
     private void combine_activity_lists () {
         ActivityList result_list;
 
-        if (this.notification_errors_lists.count () > 0) {
+        if (this.notification_errors_lists.length > 0) {
             std.sort (this.notification_errors_lists.begin (), this.notification_errors_lists.end ());
             result_list.append (this.notification_errors_lists);
         }
         if (this.list_of_ignored_files.size () > 0)
             result_list.append (this.notification_ignored_files);
 
-        if (this.notification_lists.count () > 0) {
+        if (this.notification_lists.length > 0) {
             std.sort (this.notification_lists.begin (), this.notification_lists.end ());
             result_list.append (this.notification_lists);
         }
 
-        if (this.sync_file_item_lists.count () > 0) {
+        if (this.sync_file_item_lists.length > 0) {
             std.sort (this.sync_file_item_lists.begin (), this.sync_file_item_lists.end ());
             result_list.append (this.sync_file_item_lists);
         }
 
-        if (this.activity_lists.count () > 0) {
+        if (this.activity_lists.length > 0) {
             std.sort (this.activity_lists.begin (), this.activity_lists.end ());
             result_list.append (this.activity_lists);
 
@@ -708,8 +708,8 @@ public class ActivityListModel : QAbstractListModel {
         this.final_list == "";
         end_reset_model ();
 
-        if (result_list.count () > 0) {
-            begin_insert_rows (QModelIndex (), 0, result_list.count () - 1);
+        if (result_list.length > 0) {
+            begin_insert_rows (QModelIndex (), 0, result_list.length - 1);
             this.final_list = result_list;
             end_insert_rows ();
         }

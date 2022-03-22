@@ -62,7 +62,7 @@ public class CommandLine : GLib.Object {
         EchoDisabler disabler;
         GLib.print ("Password for user " + user + ": ");
         string s;
-        getline (std.cin, s);
+        Readline.getc (std.cin, s);
         return s;
     }
 
@@ -97,15 +97,15 @@ public class CommandLine : GLib.Object {
         GLib.print ("  --logdebug             More verbose logging");
         GLib.print ("  --path                 Path to a folder on a remote server");
         GLib.print ("");
-        exit (0);
+        GLib.Application.quit (0);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private void show_version () {
-        GLib.print (Theme.version_switch_output);
-        exit (0);
+        GLib.print (LibSync.Theme.version_switch_output);
+        GLib.Application.quit (0);
     }
 
 
@@ -114,11 +114,11 @@ public class CommandLine : GLib.Object {
     private void parse_options (string[] app_args, CmdOptions options) {
         string[] args = app_args;
 
-        int arg_count = args.count ();
+        int arg_count = args.length;
 
         if (arg_count < 3) {
             if (arg_count >= 2) {
-                const string option = args.at (1);
+                const string option = args[1];
                 if (option == "-v" || option == "--version") {
                     show_version ();
                 }
@@ -135,7 +135,7 @@ public class CommandLine : GLib.Object {
         GLib.FileInfo file_info = new GLib.FileInfo (options.source_dir);
         if (!file_info.exists ()) {
             GLib.error ("Source directory '" + options.source_dir + "' does not exist.");
-            exit (1);
+            GLib.Application.quit (1);
         }
         options.source_dir = file_info.absolute_file_path;
 
@@ -287,7 +287,7 @@ public class CommandLine : GLib.Object {
             if (user == "") {
                 GLib.print ("Please enter user name: ");
                 string s;
-                getline (std.cin, s);
+                Readline.getc (std.cin, s);
                 user = string.from_std_string (s);
             }
             if (password == "") {
@@ -310,15 +310,15 @@ public class CommandLine : GLib.Object {
             int port = 0;
             bool ok = false;
 
-            string[] p_list = options.proxy.split (':');
-            if (p_list.count () == 3) {
+            string[] p_list = options.proxy.split (":");
+            if (p_list.length == 3) {
                 // http : //192.168.178.23 : 8080
                 //  0            1            2
-                host = p_list.at (1);
+                host = p_list[1];
                 if (host.has_prefix ("//"))
                     host.remove (0, 2);
 
-                port = p_list.at (2).to_int (&ok);
+                port = p_list[2].to_int (&ok);
 
                 QNetworkProxyFactory.use_system_configuration (false);
                 QNetworkProxy.application_proxy (QNetworkProxy (QNetworkProxy.HttpProxy, host, port));
@@ -444,7 +444,7 @@ public class CommandLine : GLib.Object {
                 GLib.debug ("Another sync is needed; starting try number " + restart_count.to_string ());
                 restart_sync (options, restart_count);
             }
-            GLib.warning ("Another sync is needed, but not done because restart count is exceeded " + restart_count);
+            GLib.warning ("Another sync is needed, but not done because restart count is exceeded " + restart_count.to_string ());
         }
 
         return result_code;
@@ -469,7 +469,7 @@ public class CommandLine : GLib.Object {
 
 
     private static void on_signal_sync_engine_finished (Gtk.Application app, bool result) {
-        app.exit (result ? EXIT_SUCCESS : EXIT_FAILURE);
+        app.GLib.Application.quit (result ? EXIT_SUCCESS : EXIT_FAILURE);
     }
 
 

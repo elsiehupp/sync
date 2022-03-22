@@ -22,7 +22,7 @@ public class TestSetOnlineStatusEmitOnlineStatusChanged : GLib.Object {
 
         model.set_online_status (online_status);
 
-        GLib.assert_true (online_status_changed_spy.count () == 1);
+        GLib.assert_true (online_status_changed_spy.length == 1);
     }
 
 } // class TestSetOnlineStatusEmitOnlineStatusChanged

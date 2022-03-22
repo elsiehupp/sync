@@ -70,7 +70,7 @@ public class SslErrorDialog : Gtk.Dialog {
 
         GLib.List<QSslCertificate> trusted_certificates = this.account.approved_certificates ();
 
-        for (int i = 0; i < errors.count (); ++i) {
+        for (int i = 0; i < errors.length; ++i) {
             QSslError error = errors.at (i);
             if (trusted_certificates.contains (error.certificate ()) || this.unknown_certificates.contains (error.certificate ())) {
                 continue;
@@ -107,7 +107,7 @@ public class SslErrorDialog : Gtk.Dialog {
             }
             message += QL ("</div>");
             message += cert_div (cert);
-            if (this.unknown_certificates.count () > 1) {
+            if (this.unknown_certificates.length > 1) {
                 message += QL ("<hr/>");
             }
         }

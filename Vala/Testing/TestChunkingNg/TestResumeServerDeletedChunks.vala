@@ -18,7 +18,7 @@ public class TestResumeServerDeletedChunks : AbstractTestChunkingNg {
         int size = 30 * 1000 * 1000; // 30 MB
         set_chunk_size (fake_folder.sync_engine, 1 * 1000 * 1000);
         partial_upload (fake_folder, "A/a0", size);
-        GLib.assert_true (fake_folder.upload_state ().children.count () == 1);
+        GLib.assert_true (fake_folder.upload_state ().children.length == 1);
         var chunking_identifier = fake_folder.upload_state ().children.first ().name;
 
         // Delete the chunks on the server
@@ -29,7 +29,7 @@ public class TestResumeServerDeletedChunks : AbstractTestChunkingNg {
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a0").size == size);
 
         // A different chunk identifier was used
-        GLib.assert_true (fake_folder.upload_state ().children.count () == 1);
+        GLib.assert_true (fake_folder.upload_state ().children.length == 1);
         GLib.assert_true (fake_folder.upload_state ().children.first ().name != chunking_identifier);
     }
 

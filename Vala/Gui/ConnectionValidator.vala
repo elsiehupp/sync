@@ -247,7 +247,7 @@ public class ConnectionValidator : GLib.Object {
 
         // status.php was found.
         GLib.info ("** Application: ownCloud found: "
-                  + url + " with version "
+                  + url.to_string () + " with version "
                   + CheckServerJob.version_string (info)
                   + " (" + server_version + ")");
 

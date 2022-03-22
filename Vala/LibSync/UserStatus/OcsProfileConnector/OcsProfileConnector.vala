@@ -49,10 +49,10 @@ public class OcsProfileConnector : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_hovercard_fetched (QJsonDocument json, int status_code) {
-        GLib.debug ("Hovercard fetched: " + json);
+        GLib.debug ("Hovercard fetched: " + json.to_string ());
 
         if (status_code != 200) {
-            GLib.info ("Fetching of hovercard finished with status code " + status_code);
+            GLib.info ("Fetching of hovercard finished with status code " + status_code.to_string ());
             return;
         }
         var json_data = json.object ().value ("ocs").to_object ().value ("data").to_object ().value ("actions");
@@ -93,7 +93,7 @@ public class OcsProfileConnector : GLib.Object {
 
 
     private void on_signal_icon_job_error (GLib.InputStream.NetworkError error_type) {
-        GLib.warning ("Could not fetch icon: " + error_type);
+        GLib.warning ("Could not fetch icon: " + error_type.to_string ());
     }
 
 

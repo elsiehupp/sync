@@ -36,7 +36,7 @@ public class TestSearchTermResultsError : AbstractTestUnifiedSearchListmodel {
         // make sure the model is empty and an error string has been set
         GLib.assert_true (model.row_count () == 0);
 
-        GLib.assert_true (error_string_changed.count () > 0);
+        GLib.assert_true (error_string_changed.length > 0);
 
         GLib.assert_true (!model.error_string == "");
     }

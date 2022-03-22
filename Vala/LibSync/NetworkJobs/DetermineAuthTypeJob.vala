@@ -68,7 +68,7 @@ public class DetermineAuthTypeJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public new void start () {
-        GLib.info ("Determining auth type for " + this.account.dav_url ());
+        GLib.info ("Determining auth type for " + this.account.dav_url ().to_string ());
 
         Soup.Request request = new Soup.Request ();
         // Prevent HttpCredentialsAccessManager from setting an Authorization header.
@@ -204,7 +204,7 @@ public class DetermineAuthTypeJob : AbstractNetworkJob {
             result = Basic;
         }
 
-        GLib.info ("Auth type for " + this.account.dav_url () + " is " + result);
+        GLib.info ("Auth type for " + this.account.dav_url ().to_string () + " is " + result.to_string ());
         /* emit */ signal_auth_type (result);
         delete_later ();
     }

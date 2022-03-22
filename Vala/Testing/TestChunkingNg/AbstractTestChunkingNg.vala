@@ -15,7 +15,7 @@ public abstract class AbstractTestChunkingNg : GLib.Object {
     ***********************************************************/
     protected static void partial_upload (FakeFolder fake_folder, string name, int64 size) {
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
-        GLib.assert_true (fake_folder.upload_state ().children.count () == 0); // The state should be clean
+        GLib.assert_true (fake_folder.upload_state ().children.length == 0); // The state should be clean
 
         fake_folder.local_modifier.insert (name, size);
         // Abort when the upload is at 1/3
@@ -31,7 +31,7 @@ public abstract class AbstractTestChunkingNg : GLib.Object {
         GLib.assert_true (size_when_abort > 0);
         GLib.assert_true (size_when_abort < size);
 
-        GLib.assert_true (fake_folder.upload_state ().children.count () == 1); // the transfer was done with chunking
+        GLib.assert_true (fake_folder.upload_state ().children.length == 1); // the transfer was done with chunking
         var up_state_children = fake_folder.upload_state ().children.first ().children;
 
         int64 cumulative_size = 0;

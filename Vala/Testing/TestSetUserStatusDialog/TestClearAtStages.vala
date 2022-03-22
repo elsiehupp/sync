@@ -17,7 +17,7 @@ public class TestClearAtStages : GLib.Object {
 
         GLib.assert_true (model.clear_at () == _("Don't clear"));
         var clear_at_values = model.clear_at_values ();
-        GLib.assert_true (clear_at_values.count () == 6);
+        GLib.assert_true (clear_at_values.length == 6);
 
         GLib.assert_true (clear_at_values[0] == _("Don't clear"));
         GLib.assert_true (clear_at_values[1] == _("30 minutes"));

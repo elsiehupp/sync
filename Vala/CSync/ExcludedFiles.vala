@@ -333,8 +333,8 @@ public class ExcludedFiles : GLib.Object {
 
         // Directories are guaranteed to be visited before their files
         if (filetype == ItemType.DIRECTORY) {
-            const string base_path = this.local_path + path + '/';
-            const string absolute_path = base_path + ".sync-exclude.lst";
+            string base_path = this.local_path + path + "/";
+            string absolute_path = base_path + ".sync-exclude.lst";
             GLib.FileInfo exclude_file_info = new GLib.FileInfo (absolute_path);
 
             if (exclude_file_info.is_readable ()) {
@@ -852,15 +852,15 @@ public class ExcludedFiles : GLib.Object {
     /***********************************************************
     Expands C-like escape sequences (in place)
     ***********************************************************/
-    private static void csync_exclude_expand_escapes (string *input) {
+    private static void csync_exclude_expand_escapes (char *input) {
         size_t o = 0;
-        char line = input;
+        char *line = input;
         for (this.iterator = 0; this.iterator < input.length; ++this.iterator) {
             if (line[this.iterator] == '\\') {
                 // at worst input[this.iterator+1] is \0
                 switch (line[this.iterator+1]) {
-                case '\'' : line[o++] = '\''; break;
-                case "\" : line[o++] = "\"; break;
+                case "'" : line[o++] = "'"; break;
+                case "\\" : line[o++] = "\\"; break;
                 case '?' : line[o++] = '?'; break;
                 case '#' : line[o++] = '#'; break;
                 case 'a' : line[o++] = 'a'; break;
@@ -896,7 +896,7 @@ public class ExcludedFiles : GLib.Object {
     private static bool csync_is_windows_reserved_word (/* QStringRef */ string filename) {
 
         // Drive letters
-        if (filename.length == 2 && filename.at (1) == ':') {
+        if (filename.length == 2 && filename[1] == ':') {
             if (filename.at (0) >= 'a' && filename.at (0) <= 'z') {
                 return true;
             }

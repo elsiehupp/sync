@@ -424,7 +424,7 @@ public class OwncloudPropagator : GLib.Object {
             const string[] list = file_info.directory ().entry_list ({
                 fn
             });
-            if (list.count () > 1 || (list.count () == 1 && list[0] != fn)) {
+            if (list.length > 1 || (list.length == 1 && list[0] != fn)) {
                 return true;
             }
         }
@@ -821,23 +821,23 @@ public class OwncloudPropagator : GLib.Object {
 
         this.job_scheduled = false;
 
-        if (this.active_job_list.count () < maximum_active_transfer_job ()) {
+        if (this.active_job_list.length < maximum_active_transfer_job ()) {
             if (this.propagate_root_directory_job.on_signal_schedule_self_or_child ()) {
                 schedule_next_job ();
             }
-        } else if (this.active_job_list.count () < hard_maximum_active_job ()) {
+        } else if (this.active_job_list.length < hard_maximum_active_job ()) {
             int likely_finished_quickly_count = 0;
             // Note: Only counts the first 3 jobs! Then for each
             // one that is likely on_signal_finished quickly, we can launch another one.
             // When a job finishes another one will "move up" to be one of the first 3 and then
             // be counted too.
-            for (int i = 0; i < maximum_active_transfer_job () && i < this.active_job_list.count (); i++) {
+            for (int i = 0; i < maximum_active_transfer_job () && i < this.active_job_list.length; i++) {
                 if (this.active_job_list.at (i).is_likely_finished_quickly ()) {
                     likely_finished_quickly_count++;
                 }
             }
-            if (this.active_job_list.count () < maximum_active_transfer_job () + likely_finished_quickly_count) {
-                GLib.debug ("Can pump in another request! active_jobs = " + this.active_job_list.count ());
+            if (this.active_job_list.length < maximum_active_transfer_job () + likely_finished_quickly_count) {
+                GLib.debug ("Can pump in another request! active_jobs = " + this.active_job_list.length.to_string ());
                 if (this.propagate_root_directory_job.on_signal_schedule_self_or_child ()) {
                     schedule_next_job ();
                 }
@@ -961,11 +961,11 @@ public class OwncloudPropagator : GLib.Object {
         entry.ignore_duration = old.ignore_duration * 5;
 
         if (item.http_error_code == 403) {
-            GLib.warning ("Probably firewall error: " + item.http_error_code + ", blocklisting up to 1h only.");
+            GLib.warning ("Probably firewall error: " + item.http_error_code.to_string () + ", blocklisting up to 1h only.");
             entry.ignore_duration = q_min (entry.ignore_duration, int64 (60 * 60));
 
         } else if (item.http_error_code == 413 || item.http_error_code == 415) {
-            GLib.warning ("Fatal Error condition " + item.http_error_code + ", maximum blocklist ignore time!");
+            GLib.warning ("Fatal Error condition " + item.http_error_code.to_string () + ", maximum blocklist ignore time!");
             entry.ignore_duration = max_blocklist_time;
         }
 
@@ -1030,8 +1030,8 @@ public class OwncloudPropagator : GLib.Object {
         if (item.status == SyncFileItem.Status.SOFT_ERROR
             && new_entry.retry_count > 1) {
             GLib.warning (
-                "escalating soft error on " + item.file
-                + " to normal error, " + item.http_error_code);
+                "escalating soft error on " + item.file.to_string ()
+                + " to normal error, " + item.http_error_code.to_string ());
             item.status = SyncFileItem.Status.NORMAL_ERROR;
             return;
         }

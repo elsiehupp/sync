@@ -143,7 +143,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
             this.item.modtime = FileSystem.get_mod_time (new_file_path_absolute);
             GLib.assert (this.item.modtime > 0);
             if (this.item.modtime <= 0) {
-                GLib.warning ("Invalid modified time " + this.item.file + this.item.modtime);
+                GLib.warning ("Invalid modified time " + this.item.file.to_string () + this.item.modtime.to_string ());
                 on_signal_error_start_folder_unlock (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").printf (GLib.Dir.to_native_separators (this.item.file)));
                 return;
             }
@@ -186,7 +186,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
     /***********************************************************
     ***********************************************************/
     public void on_signal_upload_encrypted_helper_finalized (string path, string filename, uint64 size) {
-        GLib.debug ("Starting to upload encrypted file " + path + filename + size);
+        GLib.debug ("Starting to upload encrypted file " + path + filename + size.to_string ());
         this.uploading_encrypted = true;
         this.file_to_upload.path = path;
         this.file_to_upload.file = filename;
@@ -370,7 +370,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
         }
         GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warning ("Invalid modified time " + this.item.file + this.item.modtime);
+            GLib.warning ("Invalid modified time " + this.item.file.to_string () + this.item.modtime.to_string ());
         }
         time_t prev_modtime = this.item.modtime; // the this.item value was set in PropagateUploadFile.start ()
         // but a potential checksum calculation could have taken some time during which the file could
@@ -632,14 +632,14 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
             upload_info.error_count += 1;
             if (upload_info.error_count > 3) {
                 GLib.info (
-                    "Reset transfer of " + this.item.file
-                    + " due to repeated error " + this.item.http_error_code);
+                    "Reset transfer of " + this.item.file.to_string ()
+                    + " due to repeated error " + this.item.http_error_code.to_string ());
                 upload_info = Common.SyncJournalDb.UploadInfo ();
             } else {
                 GLib.info (
-                    "Error count for maybe-reset error " + this.item.http_error_code
-                    + " on file " + this.item.file
-                    + " is " + upload_info.error_count
+                    "Error count for maybe-reset error " + this.item.http_error_code.to_string ()
+                    + " on file " + this.item.file.to_string ()
+                    + " is " + upload_info.error_count.to_string ()
                 );
             }
             this.propagator.journal.upload_info (this.item.file, upload_info);
@@ -724,7 +724,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
         headers["Content-Type"] = "application/octet-stream";
         GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
-            GLib.warning ("Invalid modified time " + this.item.file + this.item.modtime);
+            GLib.warning ("Invalid modified time " + this.item.file.to_string () + this.item.modtime.to_string ());
         }
         headers["X-OC-Mtime"] = ((int64) (this.item.modtime)).to_string ();
         if (q_environment_variable_int_value ("OWNCLOUD_LAZYOPS"))

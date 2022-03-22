@@ -1007,7 +1007,7 @@ public class SyncJournalDb : GLib.Object {
         int64 modtime, int64 size, uint64 inode) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
 
-        GLib.info ("Updating local metadata for:" + filename + modtime + size + inode);
+        GLib.info ("Updating local metadata for:" + filename + modtime.to_string () + size.to_string () + inode.to_string ());
 
         const int64 phash = get_pHash (filename.to_utf8 ());
         if (!check_connect ()) {
@@ -1120,10 +1120,10 @@ public class SyncJournalDb : GLib.Object {
     public void error_blocklist_entry_for_item (SyncJournalErrorBlocklistRecord item) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
 
-        GLib.info ("Setting blocklist entry for" + item.file + item.retry_count
-                    + item.error_string + item.last_try_time + item.ignore_duration
-                    + item.last_try_modtime + item.last_try_etag + item.rename_target
-                    + item.error_category);
+        GLib.info ("Setting blocklist entry for" + item.file + item.retry_count.to_string ()
+                    + item.error_string + item.last_try_time.to_string () + item.ignore_duration.to_string ()
+                    + item.last_try_modtime.to_string () + item.last_try_etag + item.rename_target
+                    + item.error_category.to_string ());
 
         if (!check_connect ()) {
             return;
@@ -1709,7 +1709,7 @@ public class SyncJournalDb : GLib.Object {
         SqlQuery del_query = new SqlQuery ("DELETE FROM selectivesync WHERE type == ?1", this.database);
         del_query.bind_value (1, int (type));
         if (!del_query.exec ()) {
-            GLib.warning ("SQL error when deleting selective sync list" + list + del_query.error);
+            GLib.warning ("SQL error when deleting selective sync list" + list.to_string () + del_query.error);
         }
 
         SqlQuery ins_query = new SqlQuery ("INSERT INTO selectivesync VALUES (?1, ?2)", this.database);
@@ -1718,7 +1718,7 @@ public class SyncJournalDb : GLib.Object {
             ins_query.bind_value (1, path);
             ins_query.bind_value (2, int (type));
             if (!ins_query.exec ()) {
-                GLib.warning ("SQL error when inserting into selective sync" + type + path + del_query.error);
+                GLib.warning ("SQL error when inserting into selective sync" + type.to_string () + path + del_query.error);
             }
         }
 
@@ -1883,7 +1883,7 @@ public class SyncJournalDb : GLib.Object {
         }
 
         if (!query.next ().has_data) {
-            GLib.warning ("No checksum type mapping found for" + checksum_type_id);
+            GLib.warning ("No checksum type mapping found for" + checksum_type_id.to_string ());
             return "";
         }
         return query.byte_array_value (0);
@@ -2167,7 +2167,7 @@ public class SyncJournalDb : GLib.Object {
         while (query.next ().has_data) {
             columns.append (query.byte_array_value (1));
         }
-        GLib.debug ("Columns in the current journal:" + columns);
+        GLib.debug ("Columns in the current journal:" + columns.to_string ());
         return columns;
     }
 

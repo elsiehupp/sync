@@ -992,8 +992,8 @@ public class FolderConnection : GLib.Object {
 
         bool has_done_full_local_discovery = this.time_since_last_full_local_discovery.is_valid;
         bool periodic_full_local_discovery_now =
-            full_local_discovery_interval.count () >= 0 // negative means we don't require periodic full runs
-            && this.time_since_last_full_local_discovery.has_expired (full_local_discovery_interval.count ());
+            full_local_discovery_interval.length >= 0 // negative means we don't require periodic full runs
+            && this.time_since_last_full_local_discovery.has_expired (full_local_discovery_interval.length);
         if (this.folder_watcher != null && this.folder_watcher.is_reliable ()
             && has_done_full_local_discovery
             && !periodic_full_local_discovery_now) {
@@ -1269,7 +1269,7 @@ public class FolderConnection : GLib.Object {
             this.consecutive_failing_syncs = 0;
         } else {
             this.consecutive_failing_syncs++;
-            GLib.info ("The last " + this.consecutive_failing_syncs + " syncs failed.");
+            GLib.info ("The last " + this.consecutive_failing_syncs.to_string () + " syncs failed.");
         }
 
         if (this.sync_result.status () == LibSync.SyncResult.Status.SUCCESS && success) {
@@ -1302,7 +1302,7 @@ public class FolderConnection : GLib.Object {
         if (another_sync_needed == AnotherSyncNeeded.IMMEDIATE_FOLLOW_UP) {
             this.consecutive_follow_up_syncs++;
             GLib.info ("Another sync was requested by the finished sync. This has happened "
-                + this.consecutive_follow_up_syncs + " times.");
+                + this.consecutive_follow_up_syncs.to_string () + " times.");
         } else {
             this.consecutive_follow_up_syncs = 0;
         }
@@ -1363,7 +1363,7 @@ public class FolderConnection : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_run_etag_job () {
-        GLib.info ("Trying to check " + remote_url ().to_string () + " for changes via ETag check. (time since last sync: " + (this.time_since_last_sync_done.elapsed () / 1000) + "s)");
+        GLib.info ("Trying to check " + remote_url ().to_string () + " for changes via ETag check. (time since last sync: " + (this.time_since_last_sync_done.elapsed () / 1000).to_string () + "s)");
 
         unowned Account account = this.account_state.account;
 
@@ -1438,8 +1438,8 @@ public class FolderConnection : GLib.Object {
     ***********************************************************/
     private void on_signal_new_big_folder_discovered (string new_folder, bool is_external) {
         var new_folder = new_folder;
-        if (!new_folder.has_suffix ('/')) {
-            new_folder += '/';
+        if (!new_folder.has_suffix ("/")) {
+            new_folder += "/";
         }
         var journal = journal_database ();
 

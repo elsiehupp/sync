@@ -364,8 +364,8 @@ public class WebFlowCredentials : AbstractCredentials {
                 return;
             } else {
                 if (read_job.error != Secret.Collection.Error.EntryNotFound ||
-                    ( (read_job.error == Secret.Collection.Error.EntryNotFound) && this.client_ssl_ca_certificates.count () == 0)) {
-                    GLib.warning ("Unable to read client CA cert slot " + this.client_ssl_ca_certificates.count ().to_string () + read_job.error_string);
+                    ( (read_job.error == Secret.Collection.Error.EntryNotFound) && this.client_ssl_ca_certificates.length == 0)) {
+                    GLib.warning ("Unable to read client CA cert slot " + this.client_ssl_ca_certificates.length.to_string () + read_job.error_string);
                 }
             }
         }
@@ -520,10 +520,10 @@ public class WebFlowCredentials : AbstractCredentials {
     ***********************************************************/
     private void read_single_client_ca_cert_pem () {
         // try to fetch a client ca cert
-        if (this.client_ssl_ca_certificates.count () < this.client_ssl_ca_certificates_max_count) {
+        if (this.client_ssl_ca_certificates.length < this.client_ssl_ca_certificates_max_count) {
             var keychain_chunk_read_job = new KeychainChunkReadJob (
                 this.account,
-                this.user + client_ca_certificate_pemC + this.client_ssl_ca_certificates.count ().to_string (),
+                this.user + client_ca_certificate_pemC + this.client_ssl_ca_certificates.length.to_string (),
                 this.keychain_migration,
                 this
             );
@@ -547,7 +547,7 @@ public class WebFlowCredentials : AbstractCredentials {
             // grab and remove the first cert from the queue
             var cert = this.client_ssl_ca_certificates_write_queue.dequeue ();
 
-            var index = (this.client_ssl_ca_certificates.count () - this.client_ssl_ca_certificates_write_queue.count ()) - 1;
+            var index = (this.client_ssl_ca_certificates.length - this.client_ssl_ca_certificates_write_queue.length) - 1;
 
             // keep the limit
             if (index > (this.client_ssl_ca_certificates_max_count - 1)) {
@@ -623,7 +623,7 @@ public class WebFlowCredentials : AbstractCredentials {
             start_delete_job (this.user + CLIENT_CERTIFICATE_PEM_C);
 
             // CA cert slots
-            for (var i = 0; i < this.client_ssl_ca_certificates.count (); i++) {
+            for (var i = 0; i < this.client_ssl_ca_certificates.length; i++) {
                 start_delete_job (this.user + client_ca_certificate_pemC + string.number (i));
             }
 

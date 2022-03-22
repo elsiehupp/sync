@@ -41,7 +41,7 @@ public class UpdaterScheduler : GLib.Object {
 
         ConfigFile config;
         var check_interval = config.update_check_interval ();
-        this.update_check_timer.on_signal_start (std.chrono.milliseconds (check_interval).count ());
+        this.update_check_timer.on_signal_start (std.chrono.milliseconds (check_interval).length);
     }
 
 
@@ -51,7 +51,7 @@ public class UpdaterScheduler : GLib.Object {
         ConfigFile config;
 
         // re-set the check interval if it changed in the config file meanwhile
-        var check_interval = std.chrono.milliseconds (config.update_check_interval ()).count ();
+        var check_interval = std.chrono.milliseconds (config.update_check_interval ()).length;
         if (check_interval != this.update_check_timer.interval ()) {
             this.update_check_timer.interval (check_interval);
             GLib.info ("Setting new update check interval " + check_interval);

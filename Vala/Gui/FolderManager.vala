@@ -218,8 +218,8 @@ public class FolderManager : GLib.Object {
         ConfigFile config;
         // std.chrono.milliseconds polltime_in_microseconds
         GLib.TimeSpan polltime_in_microseconds = config.remote_poll_interval ();
-        GLib.info ("setting remote poll timer interval to " + polltime_in_microseconds.count () + "msec");
-        this.etag_poll_timer.interval (polltime_in_microseconds.count ());
+        GLib.info ("setting remote poll timer interval to " + polltime_in_microseconds.length + "msec");
+        this.etag_poll_timer.interval (polltime_in_microseconds.length);
         this.etag_poll_timer.timeout.connect (
             this.on_signal_etag_poll_timer_timeout
         );
@@ -579,14 +579,14 @@ public class FolderManager : GLib.Object {
             return folder_connection;
         }
 
-        GLib.Settings settings = new GLib.Settings (this.folder_config_path + '/' + escaped_alias, GLib.Settings.IniFormat);
+        GLib.Settings settings = new GLib.Settings (this.folder_config_path + "/" + escaped_alias, GLib.Settings.IniFormat);
         GLib.info ("    . file path: " + settings.filename ());
 
         // Check if the filename is equal to the group setting. If not, use the group
         // name as an alias.
         string[] groups = settings.child_groups ();
 
-        if (!groups.contains (escaped_alias) && groups.count () > 0) {
+        if (!groups.contains (escaped_alias) && groups.length > 0) {
             escaped_alias = groups.first ();
         }
 
@@ -634,7 +634,7 @@ public class FolderManager : GLib.Object {
 
             folder_connection.save_to_settings ();
         }
-        GLib.info ("Migrated! " + folder_connection);
+        GLib.info ("Migrated! " + folder_connection.to_string ());
         settings.sync ();
         return folder_connection;
     }
@@ -683,7 +683,7 @@ public class FolderManager : GLib.Object {
 
         if (file_info.exists ()) {
             // It exists, but is empty . just reuse it.
-            if (file_info.is_dir () && file_info.directory ().count () == 0) {
+            if (file_info.is_dir () && file_info.directory ().length == 0) {
                 GLib.debug ("start_from_scratch: Directory is empty!");
                 return true;
             }
@@ -773,7 +773,7 @@ public class FolderManager : GLib.Object {
         *status = LibSync.SyncResult.Status.UNDEFINED;
         *unresolved_conflicts = false;
 
-        int count = folders.count ();
+        int count = folders.length;
 
         // if one folder_connection: show the state of the one folder_connection.
         // if more folders:
@@ -1426,7 +1426,7 @@ public class FolderManager : GLib.Object {
             return;
         }
 
-        GLib.debug ("folder_queue size: " + this.scheduled_folders.count ());
+        GLib.debug ("folder_queue size: " + this.scheduled_folders.length);
         if (this.scheduled_folders == "") {
             return;
         }
@@ -1460,7 +1460,7 @@ public class FolderManager : GLib.Object {
     ***********************************************************/
     private void on_signal_etag_poll_timer_timeout () {
         GLib.info ("Etag poll timer timeout.");
-        GLib.info ("Folders to sync: " + this.folder_map.size ());
+        GLib.info ("Folders to sync: " + this.folder_map.size ().to_string ());
         GLib.List<FolderConnection> folders_to_run = new GLib.List<FolderConnection> ();
 
         // Some folders need not to be checked because they use the push notifications
@@ -1571,7 +1571,7 @@ public class FolderManager : GLib.Object {
             if (force_sync_interval_expired) {
                 GLib.info (
                     "Scheduling folder_connection " + folder_connection.alias ()
-                    + " because it has been " + msecs_since_sync.count () + "ms "
+                    + " because it has been " + msecs_since_sync.length + "ms "
                     + " since the last sync.");
 
                 schedule_folder (folder_connection);
@@ -1591,7 +1591,7 @@ public class FolderManager : GLib.Object {
                     + ", the last " + folder_connection.consecutive_failing_syncs () + " syncs failed "
                     + ", another_sync_needed " + folder_connection.sync_engine.is_another_sync_needed ()
                     + ", last status: " + folder_connection.sync_result.status_string
-                    + ", time since last sync: " + msecs_since_sync.count ());
+                    + ", time since last sync: " + msecs_since_sync.length);
 
                 schedule_folder (folder_connection);
                 continue;
@@ -1622,7 +1622,7 @@ public class FolderManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_process_files_push_notification (Account account) {
-        GLib.info ("Got files push notification for account " + account);
+        GLib.info ("Got files push notification for account " + account.to_string ());
 
         foreach (FolderConnection folder_connection in this.folder_map) {
             // Just run on the folders that belong to this account
@@ -1778,13 +1778,13 @@ public class FolderManager : GLib.Object {
         // Require a pause based on the duration of the last sync run.
         FolderConnection last_folder = this.last_sync_folder;
         if (last_folder != null) {
-            ms_since_last_sync = last_folder.microseconds_since_last_sync ().count ();
+            ms_since_last_sync = last_folder.microseconds_since_last_sync ().length;
 
             //  1s   . 1.5s pause
             // 10s   . 5s pause
             //  1min . 12s pause
             //  1h   . 90s pause
-            int64 pause = q_sqrt (last_folder.msec_last_sync_duration ().count ()) / 20.0 * 1000.0;
+            int64 pause = q_sqrt (last_folder.msec_last_sync_duration ().length) / 20.0 * 1000.0;
             ms_delay = q_max (ms_delay, pause);
         }
 
@@ -1796,7 +1796,7 @@ public class FolderManager : GLib.Object {
         // Time since the last sync run counts against the delay
         ms_delay = q_max (1ll, ms_delay - ms_since_last_sync);
 
-        GLib.info ("Starting the next scheduled sync in " + (ms_delay / 1000) + " seconds.");
+        GLib.info ("Starting the next scheduled sync in " + (ms_delay / 1000).to_string () + " seconds.");
         this.start_scheduled_sync_timer.on_signal_start (ms_delay);
     }
 
@@ -1848,7 +1848,7 @@ public class FolderManager : GLib.Object {
         if (Utility.is_linux ()) {
             // restart:
             GLib.info ("Restarting application NOW, PID " + Gtk.Application.application_pid () + " is ending.");
-            Gtk.Application.quit ();
+            GLib.Application.quit ();
             string[] args = Gtk.Application.arguments ();
             string prg = args.take_first ();
 
@@ -2009,7 +2009,7 @@ public class FolderManager : GLib.Object {
         const ConfigFile config = new ConfigFile ();
         const var polltime_in_microseconds = config.remote_poll_interval ();
 
-        GLib.info ("Run etag job on folder_connection " + folder_connection);
+        GLib.info ("Run etag job on folder_connection " + folder_connection.to_string ());
 
         if (folder_connection.is_sync_running ()) {
             GLib.info ("Can not run etag job: Sync is running");

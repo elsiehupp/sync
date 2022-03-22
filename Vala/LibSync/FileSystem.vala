@@ -58,7 +58,7 @@ public class FileSystem : GLib.Object {
         } else {
             result = Utility.q_date_time_to_time_t (GLib.File.new_for_path (filename).last_modified ());
             GLib.warning ("Could not get modification time for " + filename
-                        + "with csync, using GLib.FileInfo: " + result);
+                        + "with csync, using GLib.FileInfo: " + result.to_string ());
         }
         return result;
     }
@@ -127,8 +127,8 @@ public class FileSystem : GLib.Object {
         const time_t actual_mtime = get_mod_time (filename);
         if ( (actual_size != previous_size && actual_mtime > 0) || (actual_mtime != previous_mtime && previous_mtime > 0 && actual_mtime > 0)) {
             GLib.info ("File " + filename + " has changed: "
-                     + "size: " + previous_size + " <-> " + actual_size
-                     + ", mtime: " + previous_mtime + " <-> " + actual_mtime);
+                     + "size: " + previous_size.to_string () + " <-> " + actual_size.to_string ()
+                     + ", mtime: " + previous_mtime.to_string () + " <-> " + actual_mtime.to_string ());
             return false;
         }
         return true;

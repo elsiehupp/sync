@@ -180,7 +180,7 @@ public class FolderWatcher : GLib.Object {
             return;
         }
 
-        GLib.info ("Detected changes in paths: " + changed_paths);
+        GLib.info ("Detected changes in paths: " + changed_paths.to_string ());
         foreach (string path in changed_paths) {
             /* emit */ signal_path_changed (path);
         }

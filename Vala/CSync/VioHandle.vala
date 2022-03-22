@@ -56,7 +56,7 @@ public class VioHandle : GLib.Object {
         string full_path = directory_handle.path % '/' % "" % (string) posix_dirent.d_name;
         if (file_stat.path == null) {
                 file_stat.original_path = full_path;
-                GLib.warning ("Invalid characters in file/directory name, please rename: " + posix_dirent.d_name + directory_handle.path);
+                GLib.warning ("Invalid characters in file/directory name, please rename: " + posix_dirent.d_name.to_string () + directory_handle.path);
         }
 
         /* Check for availability of d_type, see manpage. */

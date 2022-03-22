@@ -21,12 +21,12 @@ public class TestRemoveStale2 : AbstractTestChunkingNg {
         set_chunk_size (fake_folder.sync_engine, 1 * 1000 * 1000);
 
         partial_upload (fake_folder, "A/a0", size);
-        GLib.assert_true (fake_folder.upload_state ().children.count () == 1);
+        GLib.assert_true (fake_folder.upload_state ().children.length == 1);
 
         fake_folder.local_modifier.remove ("A/a0");
 
         GLib.assert_true (fake_folder.sync_once ());
-        GLib.assert_true (fake_folder.upload_state ().children.count () == 0);
+        GLib.assert_true (fake_folder.upload_state ().children.length == 0);
     }
 
 } // class TestRemoveStale2

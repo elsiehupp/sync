@@ -425,7 +425,7 @@ public class GeneralSettings : Gtk.Widget {
 
     private void on_signal_restart_button_clicked () {
         this.AbstractUpdater.instance.start_installer ();
-        Gtk.Application.quit ();
+        GLib.Application.quit ();
         this.on_signal_update_check_now ();
     }
 

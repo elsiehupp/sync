@@ -35,8 +35,8 @@ public class TestSetPredefinedStatusEmitUserStatusChangedAndSetUserStatus : GLib
         var fake_predefined_user_status_index = 0;
         model.set_predefined_status (fake_predefined_user_status_index);
 
-        GLib.assert_true (user_status_changed_spy.count () == 1);
-        GLib.assert_true (clear_at_changed_spy.count () == 1);
+        GLib.assert_true (user_status_changed_spy.length == 1);
+        GLib.assert_true (clear_at_changed_spy.length == 1);
 
         // Was user status set correctly?
         var fake_predefined_user_status = fake_predefined_statuses[fake_predefined_user_status_index];

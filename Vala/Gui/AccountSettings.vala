@@ -273,7 +273,7 @@ public class AccountSettings : Gtk.Widget {
         GLib.Dir folder_path = new GLib.Dir (info.folder_connection.path + info.path);
         folder_path.filter ( GLib.Dir.AllEntries | GLib.Dir.NoDotAndDotDot );
 
-        if (folder_path.count () != 0) {
+        if (folder_path.length != 0) {
             Gtk.MessageBox message_box;
             message_box.text (_("You cannot encrypt a folder_connection with contents, please remove the files.\n"
                                     + "Wait for the new sync, then encrypt it."));
@@ -916,7 +916,7 @@ public class AccountSettings : Gtk.Widget {
 
         // Update the pin state on all items
         if (!folder_connection.vfs.pin_state (path, state)) {
-            GLib.warning ("Could not set pin state of " + path + " to " + state);
+            GLib.warning ("Could not set pin state of " + path + " to " + state.to_string ());
         }
 
         // Trigger sync
@@ -1401,7 +1401,7 @@ public class AccountSettings : Gtk.Widget {
         // Parse folder_connection alias and filename from the link, calculate the index
         // and select it if it exists.
         const string[] li = link.split ("?folder_connection=");
-        if (li.count () > 1) {
+        if (li.length > 1) {
             string my_folder = li[0];
             const string alias = li[1];
             if (my_folder.has_suffix ('/'))
@@ -1463,7 +1463,7 @@ public class AccountSettings : Gtk.Widget {
     Encryption Related Stuff
     ***********************************************************/
     protected void on_signal_encrypt_folder_finished (int status) {
-        GLib.info ("Current folder_connection encryption status code: " + status);
+        GLib.info ("Current folder_connection encryption status code: " + status.to_string ());
         var encrypt_folder_job = (EncryptFolderJob) sender ();
         //  Q_ASSERT (encrypt_folder_job);
         if (!encrypt_folder_job.error_string == "") {

@@ -302,7 +302,7 @@ public class ProcessDirectoryJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public new void start () {
-        GLib.info ("STARTING " + this.current_folder.server + this.query_server + this.current_folder.local + this.query_local);
+        GLib.info ("STARTING " + this.current_folder.server.to_string () + this.query_server.to_string () + this.current_folder.local.to_string () + this.query_local.to_string ());
 
         if (this.query_server == NORMAL_QUERY) {
             this.server_job = start_async_server_query ();

@@ -148,7 +148,7 @@ public class PushNotificationManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_web_socket_connected () {
-        GLib.info ("Connected to websocket for account " + this.account.url);
+        GLib.info ("Connected to websocket for account " + this.account.url.to_string ());
 
         this.web_socket.text_message_received.connect (
             this.on_signal_web_socket_text_message_received // Qt.UniqueConnection
@@ -161,7 +161,7 @@ public class PushNotificationManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_web_socket_disconnected () {
-        GLib.info ("Disconnected from websocket for account " + this.account.url);
+        GLib.info ("Disconnected from websocket for account " + this.account.url.to_string ());
     }
 
 
@@ -194,7 +194,7 @@ public class PushNotificationManager : GLib.Object {
             return;
         }
 
-        GLib.warning ("Websocket error on with account " + this.account.url + error);
+        GLib.warning ("Websocket error on with account " + this.account.url.to_string () + error.to_string ());
         close_web_socket ();
         /* emit */ connection_lost ();
     }
@@ -203,7 +203,7 @@ public class PushNotificationManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_web_socket_ssl_errors (GLib.List<GnuTLS.ErrorCode> errors) {
-        GLib.warning ("Websocket ssl errors with account " + this.account.url + errors);
+        GLib.warning ("Websocket ssl errors with account " + this.account.url.to_string () + errors.to_string ());
         close_web_socket ();
         /* emit */ authentication_failed ();
     }
@@ -263,7 +263,7 @@ public class PushNotificationManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void close_web_socket () {
-        GLib.info ("Closing websocket for account " + this.account.url);
+        GLib.info ("Closing websocket for account " + this.account.url.to_string ());
 
         this.ping_timer.stop ();
         this.ping_timed_out_timer.stop ();

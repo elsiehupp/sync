@@ -77,7 +77,7 @@ public class OwncloudDolphinPlugin : KOverlayIconPlugin {
     private void on_signal_command_received (string line) {
 
         GLib.List<string> tokens = line.split (':');
-        if (tokens.count () < 3)
+        if (tokens.length < 3)
             return;
         if (tokens[0] != "STATUS" && tokens[0] != "BROADCAST")
             return;

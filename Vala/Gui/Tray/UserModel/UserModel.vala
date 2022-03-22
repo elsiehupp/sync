@@ -169,14 +169,14 @@ public class UserModel : QAbstractListModel {
     ***********************************************************/
     public int row_count (QModelIndex index = QModelIndex ()) {
         //  Q_UNUSED (index);
-        return this.users.count ();
+        return this.users.length;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public GLib.Variant data (QModelIndex index, int role) {
-        if (index.row () < 0 || index.row () >= this.users.count ()) {
+        if (index.row () < 0 || index.row () >= this.users.length) {
             return GLib.Variant ();
         }
 
@@ -448,7 +448,7 @@ public class UserModel : QAbstractListModel {
             return;
         }
 
-        if (this.users[identifier].is_current_user () && this.users.count () > 1) {
+        if (this.users[identifier].is_current_user () && this.users.length > 1) {
             if (identifier == 0) {
                 switch_current_user (1);
             } else {

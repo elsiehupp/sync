@@ -296,7 +296,7 @@ public class ConfigFile : GLib.Object {
         var default_poll_interval = chrono.milliseconds (DEFAULT_REMOTE_POLL_INTERVAL);
         var remote_interval = milliseconds_value (settings, REMOTE_POLL_INTERVAL_C, default_poll_interval);
         if (remote_interval < chrono.seconds (5)) {
-            GLib.warning ("Remote Interval is less than 5 seconds, reverting to " + DEFAULT_REMOTE_POLL_INTERVAL);
+            GLib.warning ("Remote Interval is less than 5 seconds, reverting to " + DEFAULT_REMOTE_POLL_INTERVAL.to_string ());
             remote_interval = default_poll_interval;
         }
         return remote_interval;
@@ -316,12 +316,12 @@ public class ConfigFile : GLib.Object {
             connection_string = ConfigFile.default_connection;
 
         if (interval_in_microseconds < chrono.seconds (5)) {
-            GLib.warning ("Remote Poll interval_in_microseconds of " + interval_in_microseconds.count () + " is below five seconds.");
+            GLib.warning ("Remote Poll interval_in_microseconds of " + interval_in_microseconds.length + " is below five seconds.");
             return;
         }
         GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         settings.begin_group (connection_string);
-        settings.value (REMOTE_POLL_INTERVAL_C, int64 (interval_in_microseconds.count ()));
+        settings.value (REMOTE_POLL_INTERVAL_C, int64 (interval_in_microseconds.length));
         settings.sync ();
     }
 
@@ -365,7 +365,7 @@ public class ConfigFile : GLib.Object {
         var default_interval = chrono.hours (2);
         var interval_in_microseconds = milliseconds_value (settings, FORCE_SYNC_INTERVAL_C, default_interval);
         if (interval_in_microseconds < poll_interval) {
-            GLib.warning ("Force sync interval_in_microseconds is less than the remote poll inteval; reverting to " + poll_interval.count ());
+            GLib.warning ("Force sync interval_in_microseconds is less than the remote poll inteval; reverting to " + poll_interval.length);
             interval_in_microseconds = poll_interval;
         }
         return interval_in_microseconds;
@@ -756,7 +756,7 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     private static chrono.milliseconds milliseconds_value (GLib.Settings setting, char key,
         chrono.milliseconds default_value) {
-        return chrono.milliseconds (setting.value (key, int64 (default_value.count ())).to_long_long ());
+        return chrono.milliseconds (setting.value (key, int64 (default_value.length)).to_long_long ());
     }
 
 

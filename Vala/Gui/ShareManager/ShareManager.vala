@@ -166,7 +166,7 @@ public class ShareManager : GLib.Object {
     ***********************************************************/
     private void on_signal_shares_fetched (QJsonDocument reply) {
         var temporary_shares = reply.object ().value ("ocs").to_object ().value ("data").to_array ();
-        GLib.debug (this.account.server_version () + " Fetched " + temporary_shares.count () + "shares");
+        GLib.debug (this.account.server_version () + " Fetched " + temporary_shares.length + "shares");
 
         GLib.List<unowned Share> shares;
 
@@ -188,7 +188,7 @@ public class ShareManager : GLib.Object {
             shares.append (new Share (new_share));
         }
 
-        GLib.debug ("Sending " + shares.count () + " shares.");
+        GLib.debug ("Sending " + shares.length.to_string () + " shares.");
         /* emit */ shares_fetched (shares);
     }
 

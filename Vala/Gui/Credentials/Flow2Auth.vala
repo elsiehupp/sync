@@ -192,8 +192,8 @@ public class Flow2Auth : GLib.Object {
         // Start polling
         ConfigFile config;
         GLib.TimeSpan polltime_in_microseconds = config.remote_poll_interval ();
-        GLib.info ("setting remote poll timer interval to " + polltime_in_microseconds.count () + "msec.");
-        this.seconds_interval = (polltime_in_microseconds.count () / 1000);
+        GLib.info ("setting remote poll timer interval to " + polltime_in_microseconds.length + "msec.");
+        this.seconds_interval = (polltime_in_microseconds.length / 1000);
         this.seconds_left = this.seconds_interval;
         /* emit */ signal_status_changed (PollStatus.PollStatus.POLL_COUNTDOWN, this.seconds_left);
 
@@ -303,7 +303,7 @@ public class Flow2Auth : GLib.Object {
             && !json == "") {
             server_url = json["server"].to_string ();
             if (this.enforce_https && server_url.scheme () != "https") {
-                GLib.warning ("Returned server url " + server_url + " does not start with https.");
+                GLib.warning ("Returned server url " + server_url.to_string () + " does not start with https.");
                 /* emit */ signal_result (Result.ERROR, _("The returned server URL does not on_signal_start with HTTPS despite the login URL started with HTTPS. Login will not be possible because this might be a security issue. Please contact your administrator."));
                 return;
             }

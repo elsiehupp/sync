@@ -420,8 +420,8 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
         const int polltime = ConfigFile ().remote_poll_interval ().seconds;
         const int elapsed = this.time_of_last_e_tag_check.secs_to (GLib.DateTime.current_date_time_utc ());
         if (is_connected && this.time_of_last_e_tag_check.is_valid
-            && elapsed <= polltime.count ()) {
-            GLib.debug (account.display_name + "The last ETag check succeeded within the last " + polltime.count () + "s (" + elapsed + "s). No connection check needed!");
+            && elapsed <= polltime.length) {
+            GLib.debug (account.display_name + "The last ETag check succeeded within the last " + polltime.length + "s (" + elapsed + "s). No connection check needed!");
             return;
         }
 
@@ -479,7 +479,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     ***********************************************************/
     protected void on_signal_connection_validator_result (ConnectionValidator.Status status, string[] errors) {
         if (is_signed_out) {
-            GLib.warning ("Signed out, ignoring " + status + this.account.url.to_string ());
+            GLib.warning ("Signed out, ignoring " + status.to_string () + this.account.url.to_string ());
             return;
         }
 
@@ -489,21 +489,21 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
                 || this.connection_status == ConnectionValidator.State.MAINTENANCE_MODE)) {
             if (!this.time_since_maintenance_over.is_valid) {
                 GLib.info ("AccountState reconnection: delaying for "
-                    + this.maintenance_to_connected_delay + "ms.");
+                    + this.maintenance_to_connected_delay.to_string () + "ms.");
                 this.time_since_maintenance_over.on_signal_start ();
                 GLib.Timeout.single_shot (this.maintenance_to_connected_delay + 100, this, AccountState.on_signal_check_connectivity);
                 return;
             } else if (this.time_since_maintenance_over.elapsed () < this.maintenance_to_connected_delay) {
                 GLib.info ("AccountState reconnection: only"
-                    + this.time_since_maintenance_over.elapsed () + "ms have passed.");
+                    + this.time_since_maintenance_over.elapsed ().to_string () + "ms have passed.");
                 return;
             }
         }
 
         if (this.connection_status != status) {
             GLib.info ("AccountState connection status change: "
-                      + this.connection_status + "."
-                      + status);
+                      + this.connection_status.to_string () + "."
+                      + status.to_string ());
             this.connection_status = status;
         }
         this.connection_errors = errors;
@@ -614,7 +614,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     protected void on_signal_navigation_apps_fetched (QJsonDocument reply, int status_code) {
         if (this.account != null) {
             if (status_code == 304) {
-                GLib.warning ("Status code " + status_code + " Not Modified - No new navigation app_list.");
+                GLib.warning ("Status code " + status_code.to_string () + " Not Modified - No new navigation app_list.");
             } else {
                 this.app_list == "";
 

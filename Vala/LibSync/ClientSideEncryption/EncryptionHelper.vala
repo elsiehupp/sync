@@ -429,41 +429,41 @@ public class EncryptionHelper : GLib.Object {
         var context = PrivateKeyContext.for_key (public_key, ENGINE_get_default_RSA ());
         if (context == null) {
             GLib.info ("Could not initialize the pkey context.");
-            exit (1);
+            GLib.Application.quit (1);
         }
 
         if (EVP_PKEY_encrypt_init (context) != 1) {
             GLib.info ("Error initilaizing the encryption.");
-            exit (1);
+            GLib.Application.quit (1);
         }
 
         if (EVP_PKEY_CTX_rsa_padding (context, RSA_PKCS1_OAEP_PADDING) <= 0) {
             GLib.info ("Error setting the encryption padding.");
-            exit (1);
+            GLib.Application.quit (1);
         }
 
         if (EVP_PKEY_CTX_rsa_oaep_md (context, EVP_sha256 ()) <= 0) {
             GLib.info ("Error setting OAEP SHA 256.");
-            exit (1);
+            GLib.Application.quit (1);
         }
 
         if (EVP_PKEY_CTX_rsa_mgf1_md (context, EVP_sha256 ()) <= 0) {
             GLib.info ("Error setting MGF1 padding.");
-            exit (1);
+            GLib.Application.quit (1);
         }
 
         size_t out_len = 0;
         if (EVP_PKEY_encrypt (context, null, out_len, (uchar *)data.const_data (), data.size ()) != 1) {
             GLib.info ("Error retrieving the size of the encrypted data.");
-            exit (1);
+            GLib.Application.quit (1);
         } else {
-            GLib.info ("Encryption Length: " + out_len);
+            GLib.info ("Encryption Length: " + out_len.to_string ());
         }
 
         string output = new string (static_cast<int> (out_len), '\0');
         if (EVP_PKEY_encrypt (context, unsigned_data (output), out_len, (uchar *)data.const_data (), data.size ()) != 1) {
-            GLib.info ("Could not encrypt key. " + err);
-            exit (1);
+            GLib.info ("Could not encrypt key. " + err.to_string ());
+            GLib.Application.quit (1);
         }
 
         // Transform the encrypted data into base64.
@@ -517,8 +517,8 @@ public class EncryptionHelper : GLib.Object {
             handle_errors ();
             return {};
         } else {
-            GLib.info ("Size of output is: " + outlen);
-            GLib.info ("Size of data is: " + data.size ());
+            GLib.info ("Size of output is: " + outlen.to_string ());
+            GLib.info ("Size of data is: " + data.size ().to_string ());
         }
 
         string output = new string (static_cast<int> (outlen), '\0');

@@ -22,7 +22,7 @@ public class TestSetClearSetClearAtStage5EmitClearAtChangedAndClearAtSet : GLib.
         var clear_at_index = 5;
         model.set_clear_at (clear_at_index);
 
-        GLib.assert_true (clear_at_changed_spy.count () == 1);
+        GLib.assert_true (clear_at_changed_spy.length == 1);
         GLib.assert_true (model.clear_at () == _("This week"));
     }
 

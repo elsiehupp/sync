@@ -19,7 +19,7 @@ public class TestVeryBigFiles : AbstractTestChunkingNg {
 
         // Partial upload of big files
         partial_upload (fake_folder, "A/a0", size);
-        GLib.assert_true (fake_folder.upload_state ().children.count () == 1);
+        GLib.assert_true (fake_folder.upload_state ().children.length == 1);
         var chunking_identifier = fake_folder.upload_state ().children.first ().name;
 
         // Now resume
@@ -28,7 +28,7 @@ public class TestVeryBigFiles : AbstractTestChunkingNg {
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a0").size == size);
 
         // The same chunk identifier was re-used
-        GLib.assert_true (fake_folder.upload_state ().children.count () == 1);
+        GLib.assert_true (fake_folder.upload_state ().children.length == 1);
         GLib.assert_true (fake_folder.upload_state ().children.first ().name == chunking_identifier);
 
         // Upload another file again, this time without interruption

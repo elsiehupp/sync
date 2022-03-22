@@ -17,9 +17,9 @@ public class FormatWarningsWizardPage : QWizardPage {
 
     protected static string format_warnings (string[] warnings) {
         string ret;
-        if (warnings.count () == 1) {
+        if (warnings.length == 1) {
             ret = _("<b>Warning:</b> %1").printf (warnings.first ());
-        } else if (warnings.count () > 1) {
+        } else if (warnings.length > 1) {
             ret = _("<b>Warning:</b>") + " <ul>";
             foreach (string warning in warnings) {
                 ret += "<li>%1</li>".printf (warning);

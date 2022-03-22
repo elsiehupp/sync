@@ -162,7 +162,7 @@ public class SlideShow : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public void on_signal_next_slide () {
-        current_slide = (this.current_slide + 1) % this.labels.count ();
+        current_slide = (this.current_slide + 1) % this.labels.length;
         this.reverse = false;
     }
 
@@ -170,7 +170,7 @@ public class SlideShow : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public void on_signal_prev_slide () {
-        this.current_slide = (this.current_slide > 0 ? this.current_slide : this.labels.count ()) - 1;
+        this.current_slide = (this.current_slide > 0 ? this.current_slide : this.labels.length) - 1;
         this.reverse = true;
     }
 

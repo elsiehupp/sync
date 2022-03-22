@@ -242,7 +242,7 @@ public class Application : Gtk.Application {
             return;
 
         if (this.quit_instance) {
-            GLib.Timeout.single_shot (0, Gtk.Application, Gtk.Application.quit);
+            GLib.Timeout.single_shot (0, Gtk.Application, GLib.Application.quit);
             return;
         }
 
@@ -429,7 +429,7 @@ public class Application : Gtk.Application {
     public void show_hint (string error_hint) {
         std.cerr += error_hint + std.endl;
         std.cerr += "Try '" + Application.GLib.FileInfo (Gtk.Application.application_file_path).filename ().to_std_string () + " --help' for more information" + std.endl;
-        std.exit (1);
+        std.GLib.Application.quit (1);
     }
 
 
@@ -731,11 +731,11 @@ public class Application : Gtk.Application {
                 this.gui.on_signal_toggle_log_browser (); // this.show_log_window is set in parse_options.
             }
             if (this.quit_instance) {
-                Gtk.Application.quit ();
+                GLib.Application.quit ();
             }
 
         } else if (message.has_prefix ("MSG_SHOWMAINDIALOG")) {
-            GLib.info ("Running for" + this.started_at.elapsed () / 1000.0 = " sec.");
+            GLib.info ("Running for" + (this.started_at.elapsed () / 1000.0).to_string () + " sec.");
             if (this.started_at.elapsed () < 10 * 1000) {
                 // This call is mirrored with the one in int main ()
                 GLib.warning ("Ignoring MSG_SHOWMAINDIALOG, possibly double-invocation of client via session restore and var on_signal_start.");

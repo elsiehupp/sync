@@ -125,7 +125,7 @@ public class IconUtils : GLib.Object {
 
         const var custom_color_name = custom_color.name ();
 
-        const string cache_key = filename + "," + custom_color_name;
+        const string cache_key = filename + "," + custom_color_name.to_string ();
 
         // check for existing Gdk.Pixbuf in cache
         if (QPixmapCache.find (cache_key, cached_pixmap)) {

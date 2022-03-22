@@ -52,7 +52,7 @@ public class TestFetchMoreClicked : AbstractTestUnifiedSearchListmodel {
         }
 
         // make sure the current_fetch_more_in_progress_provider_id was set back and forth and correct number fows has been inserted
-        GLib.assert_true (current_fetch_more_in_progress_provider_id_changed.count () == 1);
+        GLib.assert_true (current_fetch_more_in_progress_provider_id_changed.length == 1);
 
         var provider_id_fetch_more_triggered = model.current_fetch_more_in_progress_provider_id ();
 
@@ -62,7 +62,7 @@ public class TestFetchMoreClicked : AbstractTestUnifiedSearchListmodel {
 
         GLib.assert_true (model.current_fetch_more_in_progress_provider_id () == "");
 
-        GLib.assert_true (rows_inserted.count () == 1);
+        GLib.assert_true (rows_inserted.length == 1);
 
         var arguments = rows_inserted.take_first ();
 
@@ -87,12 +87,12 @@ public class TestFetchMoreClicked : AbstractTestUnifiedSearchListmodel {
 
                 GLib.assert_true (current_fetch_more_in_progress_provider_id_changed.wait ());
 
-                if (rows_removed.count () > 0) {
+                if (rows_removed.length > 0) {
                     break;
                 }
             }
 
-            GLib.assert_true (rows_removed.count () == 1);
+            GLib.assert_true (rows_removed.length == 1);
 
             bool is_fetch_more_trigger_found = false;
 
