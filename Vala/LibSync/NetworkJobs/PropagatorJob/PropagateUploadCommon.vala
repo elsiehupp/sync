@@ -314,7 +314,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
     /***********************************************************
     Content checksum computed, compute the transmission checksum
     ***********************************************************/
-    private void on_signal_compute_checksum_finished (string content_checksum_type, string content_checksum) {
+    private void on_signal_compute_content_checksum_finished (string content_checksum_type, string content_checksum) {
         this.item.checksum_header = make_checksum_header (content_checksum_type, content_checksum);
 
         // Reuse the content checksum as the transmission checksum if possible
@@ -346,7 +346,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
     /***********************************************************
     Transmission checksum computed, prepare the upload
     ***********************************************************/
-    private void on_signal_compute_checksum_finished (string transmission_checksum_type, string transmission_checksum) {
+    private void on_signal_compute_transmission_checksum_finished (string transmission_checksum_type, string transmission_checksum) {
         // Remove ourselfs from the list of active job, before any posible call to on_signal_done ()
         // When we start chunks, we will add it again, once for every chunks.
         this.propagator.active_job_list.remove_one (this);

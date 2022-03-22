@@ -106,11 +106,11 @@ public class OwncloudPropagator : GLib.Object {
     /***********************************************************
     Absolute path to the local directory. ends with "/"
     ***********************************************************/
-    private string local_dir { private set; construct; }
+    private string local_dir { private set; }
 
     /***********************************************************
     ***********************************************************/
-    bool schedule_delayed_tasks { private get; public set; }
+    public bool schedule_delayed_tasks { private get; public set; }
 
     /***********************************************************
     ***********************************************************/

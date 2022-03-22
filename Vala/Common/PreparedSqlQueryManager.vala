@@ -12,7 +12,7 @@ namespace Common {
 ***********************************************************/
 public class PreparedSqlQueryManager : GLib.Object {
 
-    using Sqlite3;
+    using Sqlite.Database;
 
     /***********************************************************
     ***********************************************************/

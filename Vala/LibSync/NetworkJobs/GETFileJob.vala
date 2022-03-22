@@ -54,7 +54,15 @@ public class GETFileJob : AbstractNetworkJob {
     /***********************************************************
     If this.bandwidth_quota will be used
     ***********************************************************/
-    public bool bandwidth_limited;
+    public bool bandwidth_limited {
+        public get {
+            return this.bandwidth_limited;
+        }
+        public set {
+            this.bandwidth_limited = value;
+            GLib.Object.invoke_method (this, "on_signal_ready_read", Qt.QueuedConnection);
+        }
+    }
 
     /***********************************************************
     If download is paused (won't read on ready_read ())
@@ -228,14 +236,6 @@ public class GETFileJob : AbstractNetworkJob {
     ***********************************************************/
     public void choked (bool c) {
         this.bandwidth_choked = c;
-        GLib.Object.invoke_method (this, "on_signal_ready_read", Qt.QueuedConnection);
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void bandwidth_limited (bool b) {
-        this.bandwidth_limited = b;
         GLib.Object.invoke_method (this, "on_signal_ready_read", Qt.QueuedConnection);
     }
 

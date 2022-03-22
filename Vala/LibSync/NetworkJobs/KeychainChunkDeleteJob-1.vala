@@ -2,15 +2,15 @@ namespace Occ {
 namespace LibSync {
 
 /***********************************************************
-@class KeychainChunkDeleteJob
+@class KeychainChunkDeleteJob2
 
-@brief The KeychainChunkDeleteJob class
+@brief The KeychainChunkDeleteJob2 class
 
 @author Olivier Goffart <ogoffart@owncloud.com>
 
 @copyright GPLv3 or Later
 ***********************************************************/
-public class KeychainChunkDeleteJob : AbstractNetworkJob {
+public class KeychainChunkDeleteJob2 : AbstractNetworkJob {
 
     /***********************************************************
     Only used if the constructor taking a url is taken.
@@ -27,14 +27,14 @@ public class KeychainChunkDeleteJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public KeychainChunkDeleteJob.for_path (Account account, string path, GLib.Object parent = new GLib.Object ()) {
+    public KeychainChunkDeleteJob2.for_path (Account account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public KeychainChunkDeleteJob.for_url (Account account, GLib.Uri url, GLib.Object parent) {
+    public KeychainChunkDeleteJob2.for_url (Account account, GLib.Uri url, GLib.Object parent) {
         base (account, "", parent);
         this.url = url;
     }
@@ -73,7 +73,7 @@ public class KeychainChunkDeleteJob : AbstractNetworkJob {
 
 
 
-} // class KeychainChunkDeleteJob
+} // class KeychainChunkDeleteJob2
 
 } // namespace LibSync
 } // namespace Occ

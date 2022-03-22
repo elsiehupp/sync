@@ -163,31 +163,28 @@ public class ExcludedFiles : GLib.Object {
     private GLib.HashTable<BasePathString, GLib.Regex> full_regex_dir;
 
     /***********************************************************
-    ***********************************************************/
-    private bool exclude_conflict_files = true;
-
-    /***********************************************************
     Whether conflict files shall be excluded.
 
     Defaults to true.
     ***********************************************************/
-    public void exclude_conflict_files (bool value) {
-        this.exclude_conflict_files = value;
-    }
+    public bool exclude_conflict_files { private get; public set; }
 
     /***********************************************************
+    Adjusts behavior of wildcards. Only used for testing.
     Whether * and ? in patterns can match a /
 
     Unfortunately this was how matching was done on Windows so
     it continues to be enabled there.
     ***********************************************************/
-    private bool wildcards_match_slash = false;
+    public bool wildcards_match_slash { private get; public set; }
 
     /***********************************************************
+    The client version, only used for testing.
+
     The client version. Used to evaluate version-dependent excludes,
     see version_directive_keep_next_line ().
     ***********************************************************/
-    private Version client_version;
+    private Version client_version { private get; public set; }
 
     /***********************************************************
     ***********************************************************/
@@ -199,6 +196,8 @@ public class ExcludedFiles : GLib.Object {
         this.local_path = local_path;
         this.client_version = { MIRALL_VERSION_MAJOR, MIRALL_VERSION_MINOR, MIRALL_VERSION_PATCH };
         //  Q_ASSERT (this.local_path.has_suffix ("/"));
+
+        this.exclude_conflict_files = true;
         // Windows used to use PathMatchSpec which allows foo to match abc/deffoo.
         this.wildcards_match_slash = Utility.is_windows ();
 
@@ -307,23 +306,6 @@ public class ExcludedFiles : GLib.Object {
     public void clear_manual_excludes () {
         this.manual_excludes == "";
         on_signal_reload_exclude_files ();
-    }
-
-
-    /***********************************************************
-    Adjusts behavior of wildcards. Only used for testing.
-    ***********************************************************/
-    public void wildcards_match_slash (bool value) {
-        this.wildcards_match_slash = value;
-        prepare ();
-    }
-
-
-    /***********************************************************
-    Sets the client version, only used for testing.
-    ***********************************************************/
-    public void client_version (Version version) {
-        this.client_version = version;
     }
 
 

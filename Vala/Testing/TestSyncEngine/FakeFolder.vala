@@ -13,14 +13,14 @@ public class FakeFolder : GLib.Object {
     ***********************************************************/
     public struct ErrorList {
 
-        FakeQNAM access_manager;
+        FakeQNAM soup_context;
 
         void append (string path, int error = 500) {
-            this.access_manager.error_paths ().insert (path, error);
+            this.soup_context.error_paths ().insert (path, error);
         }
 
         void clear () {
-            this.access_manager.error_paths () == "";
+            this.soup_context.error_paths () == "";
         }
     }
 
@@ -130,13 +130,6 @@ public class FakeFolder : GLib.Object {
     ***********************************************************/
     public Account account {
         return this.account;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public SyncEngine sync_engine () {
-        return this.sync_engine;
     }
 
 

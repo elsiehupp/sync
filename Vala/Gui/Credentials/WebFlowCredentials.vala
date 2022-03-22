@@ -3,7 +3,7 @@
 //  #include <Soup.Request>
 //  #include <QQueue>
 //  #include <QAuthenticator>
-//  #include <QNetworkAccessManager>
+//  #include <Soup.Context>
 //  #include <QPointe
 //  #include <GLib.Timeout>
 //  #include <Gtk.Dialog>
@@ -84,18 +84,18 @@ public class WebFlowCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public override QNetworkAccessManager create_access_manager () {
+    public override Soup.Context create_access_manager () {
         GLib.info ("Getting QNAM");
-        AccessManager access_manager = new WebFlowCredentialsAccessManager (this);
+        AccessManager soup_context = new WebFlowCredentialsAccessManager (this);
 
-        access_manager.signal_authentication_required.connect (
+        soup_context.signal_authentication_required.connect (
             this.on_signal_authentication
         );
-        access_manager.signal_finished.connect (
+        soup_context.signal_finished.connect (
             this.on_signal_finished
         );
 
-        return access_manager;
+        return soup_context;
     }
 
 

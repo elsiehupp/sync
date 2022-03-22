@@ -45,7 +45,7 @@ public class HttpCredentialsGui : HttpCredentials {
     public override void ask_from_user () {
         // This function can be called from AccountState.on_signal_invalid_credentials,
         // which (indirectly, through HttpCredentials.invalidate_token) schedules
-        // a cache wipe of the access_manager. We can only execute a network job again once
+        // a cache wipe of the soup_context. We can only execute a network job again once
         // the cache has been cleared, otherwise we'd interfere with the job.
         GLib.Timeout.single_shot (100, this, HttpCredentialsGui.on_signal_ask_from_user_async);
     }

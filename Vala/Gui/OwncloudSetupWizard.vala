@@ -62,7 +62,7 @@ public class OwncloudSetupWizard : GLib.Object {
             this.on_signal_create_local_and_remote_folders
         );
         /* basic_setup_finished might be called from a reply from the network.
-           on_signal_assistant_finished might destroy the temporary QNetworkAccessManager.
+           on_signal_assistant_finished might destroy the temporary Soup.Context.
            Therefore Qt.QueuedConnection is required */
         this.oc_wizard.basic_setup_finished.connect (
             this.on_signal_assistant_finished // Qt.QueuedConnection

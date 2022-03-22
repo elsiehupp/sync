@@ -46,7 +46,7 @@ public class Systray : QSystemTrayIcon {
 
         /***********************************************************
         ***********************************************************/
-        public override QNetworkAccessManager create (GLib.Object parent) {
+        public override Soup.Context create (GLib.Object parent) {
             return new AccessManager (parent);
         }
     }

@@ -29,21 +29,18 @@ query: {
 
 @author Klaas Freitag <freitag@owncloud.com>
 
-
 @copyright LGPLv2.1 or later
 ***********************************************************/
 public class SqlQuery : GLib.Object {
-
-    using Sqlite3;
 
     // Q_DISABLE_COPY (SqlQuery)
 
     /***********************************************************
     ***********************************************************/
     private SqlDatabase sqldatabase = null;
-    private Sqlite3 database = null;
+    private Sqlite.Database database = null;
     private Sqlite3Stmt stmt = null;
-    private string error;
+    public string error { public get; private set; }
     private int err_id;
     private string sql;
 
@@ -118,15 +115,8 @@ public class SqlQuery : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public string error () {
-        return this.error;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public int error_id () {
-        return this.err_id;
+    public int error_id {
+        public get;
     }
 
 
@@ -283,17 +273,17 @@ public class SqlQuery : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public template<class T, typename std.enable_if<!std.is_enum<T>.value, int>.type = 0>
-    public void bind_value (int pos, T value) {
-        GLib.debug ("SQL bind" + pos + value;
-        bind_value_internal (pos, value);
+    //  public template<class T, typename std.enable_if<!std.is_enum<T>.value, int>.type = 0>
+    public void bind_value_generic<T> (int pos, T value) {
+        GLib.debug ("SQL bind " + pos + value);
+        bind_value_internal (pos, value.to_string ());
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void bind_value (int pos, string value) {
-        GLib.debug ("SQL bind" + pos + string.from_utf8 (value);
+        GLib.debug ("SQL bind " + pos + value);
         bind_value_internal (pos, value);
     }
 

@@ -7,7 +7,7 @@ implied, as to its usefulness for any purpose.
 namespace Occ {
 namespace Testing {
 
-public class AbstractTestChunkingNg : GLib.Object {
+public class TestCreateConflictWhileSyncing : AbstractTestChunkingNg {
 
     /***********************************************************
     ***********************************************************/
@@ -76,7 +76,7 @@ public class AbstractTestChunkingNg : GLib.Object {
         }
     }
 
-} // class AbstractTestChunkingNg
+} // class TestCreateConflictWhileSyncing
 
 } // namespace Testing
 } // namespace Occ

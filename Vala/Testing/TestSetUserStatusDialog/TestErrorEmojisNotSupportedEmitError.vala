@@ -13,7 +13,7 @@ public class TestErrorEmojisNotSupportedEmitError : GLib.Object {
     ***********************************************************/
     private TestErrorEmojisNotSupportedEmitError () {
         var fake_user_status_job = new FakeUserStatusConnector ();
-        fake_user_status_job.set_error_emojis_not_supported (true);
+        fake_user_status_job.emojis_not_supported (true);
         UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
 
         GLib.assert_true (model.error_message () ==

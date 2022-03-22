@@ -18,7 +18,8 @@ public class OwncloudDolphinPluginHelper : GLib.Object {
     ***********************************************************/
     protected QLocalSocket socket;
     protected string line;
-    protected GLib.List<string> paths;
+    public GLib.List<string> paths { public get; protected set; }
+
     protected QBasicTimer connect_timer;
 
     protected GLib.HashTable<string, string> strings;
@@ -50,13 +51,6 @@ public class OwncloudDolphinPluginHelper : GLib.Object {
     public void send_command (char* data) {
         this.socket.write (data);
         this.socket.flush ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public GLib.List<string> paths () {
-        return this.paths;
     }
 
 

@@ -315,7 +315,7 @@ public class NSISUpdater : OCUpdater {
                 } else {
                     var request = Soup.Request (GLib.Uri (url));
                     request.attribute (Soup.Request.Redirect_policy_attribute, Soup.Request.No_less_safe_redirect_policy);
-                    GLib.InputStream reply = access_manager ().get (request);
+                    GLib.InputStream reply = soup_context ().get (request);
                     reply.ready_read.connect (
                         this.on_signal_write_file
                     );

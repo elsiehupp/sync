@@ -109,7 +109,7 @@ public class OCUpdater : AbstractUpdater {
     new GLib.Uri update_url { private get; public set; }
 
     private int state;
-    private QNetworkAccessManager access_manager;
+    protected Soup.Context soup_context { private set; protected get; }
 
     /***********************************************************
     Timer to guard the timeout of an individual network request
@@ -130,7 +130,7 @@ public class OCUpdater : AbstractUpdater {
         base ();
         this.update_url = url;
         this.state = Unknown;
-        this.access_manager = new AccessManager (this);
+        this.soup_context = new AccessManager (this);
         this.timeout_watchdog = new GLib.Timeout (this);
     }
 
@@ -165,7 +165,7 @@ public class OCUpdater : AbstractUpdater {
     /***********************************************************
     ***********************************************************/
     public override void check_for_update () {
-        GLib.InputStream reply = this.access_manager.get (Soup.Request (this.update_url));
+        GLib.InputStream reply = this.soup_context.get (Soup.Request (this.update_url));
         this.timeout_watchdog.timeout.connect (
             this.on_signal_timed_out
         );
@@ -339,13 +339,6 @@ public class OCUpdater : AbstractUpdater {
         int64 target_version_int = Helper.string_version_to_int (settings.value (update_target_version_c).to_string ());
         int64 current_version = Helper.current_version_to_int ();
         return current_version >= target_version_int;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    protected QNetworkAccessManager access_manager () {
-        return this.access_manager;
     }
 
 } // class OCUpdater

@@ -13,7 +13,7 @@ public class TestErrorCouldNotFetchUserStatusEmitError : GLib.Object {
     ***********************************************************/
     private TestErrorCouldNotFetchUserStatusEmitError () {
         var fake_user_status_job = new FakeUserStatusConnector ();
-        fake_user_status_job.set_error_could_not_fetch_user_status (true);
+        fake_user_status_job.could_not_fetch_user_status (true);
         UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
 
         GLib.assert_true (model.error_message () ==

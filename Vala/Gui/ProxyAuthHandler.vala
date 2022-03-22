@@ -92,7 +92,7 @@ public class ProxyAuthHandler : GLib.Object {
 
 
     /***********************************************************
-    Intended for QNetworkAccessManager.proxy_authentication_required ()
+    Intended for Soup.Context.proxy_authentication_required ()
     ***********************************************************/
     public void on_signal_handle_proxy_authentication_required (
         QNetworkProxy proxy,
@@ -124,10 +124,10 @@ public class ProxyAuthHandler : GLib.Object {
         }
 
         // Find the responsible QNAM if possible.
-        QNetworkAccessManager sending_access_manager = null;
+        Soup.Context sending_access_manager = null;
         var account = (Account) sender ();
         if (account) {
-            // Since we go into an event loop, it's possible for the account's access_manager
+            // Since we go into an event loop, it's possible for the account's soup_context
             // to be destroyed before we get back. We can use this to check for its
             // liveness.
             sending_access_manager = account.shared_network_access_manager;

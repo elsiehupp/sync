@@ -10,7 +10,7 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 public abstract class AbstractTestOwnSql : GLib.Object {
 
-    using Sqlite3;
+    using Sqlite.Database;
 
     /***********************************************************
     ***********************************************************/

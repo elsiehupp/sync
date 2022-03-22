@@ -138,10 +138,33 @@ public class DiscoveryPhase : GLib.Object {
     public int currently_active_jobs = 0;
 
     /***********************************************************
-    Both must contain a sorted list
+    Must return a sorted list
     ***********************************************************/
-    string[] selective_sync_block_list;
-    string[] selective_sync_allow_list;
+    public GLib.List<string> selective_sync_block_list {
+        private get {
+            this.selective_sync_block_list.sort (GLib.strcmp);
+            return this.selective_sync_block_list;
+        }
+        public set {
+            value.sort (GLib.strcmp);
+            this.selective_sync_block_list = value;
+        }
+    }
+
+
+    /***********************************************************
+    Must return a sorted list
+    ***********************************************************/
+    public GLib.List<string> selective_sync_allow_list {
+        private get {
+            this.selective_sync_allow_list.sort (GLib.strcmp);
+            return this.selective_sync_allow_list;
+        }
+        public set {
+            value.sort (GLib.strcmp);
+            this.selective_sync_allow_list = value;
+        }
+    }
 
 
     /***********************************************************
@@ -419,22 +442,6 @@ public class DiscoveryPhase : GLib.Object {
         } else {
             /* emit */ signal_finished ();
         }
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void selective_sync_block_list (string[] list) {
-        this.selective_sync_block_list = list;
-        std.sort (this.selective_sync_block_list.begin (), this.selective_sync_block_list.end ());
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void selective_sync_allow_list (string[] list) {
-        this.selective_sync_allow_list = list;
-        std.sort (this.selective_sync_allow_list.begin (), this.selective_sync_allow_list.end ());
     }
 
 

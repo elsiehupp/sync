@@ -640,35 +640,29 @@ public class ConfigFile : GLib.Object {
 
 
     /***********************************************************
-    in kbyte/s
+    In kbyte/s
     ***********************************************************/
-    public int upload_limit ();
-    int ConfigFile.upload_limit () {
-        return get_value (UPLOAD_LIMIT_C, "", 10).to_int ();
+    public int upload_limit {
+        public get {
+            return get_value (UPLOAD_LIMIT_C, "", 10).to_int ();
+        }
+        public set {
+            set_value (UPLOAD_LIMIT_C, value);
+        }
     }
 
 
 
     /***********************************************************
+    In kbyte/s
     ***********************************************************/
-    public int download_limit ();
-    int ConfigFile.download_limit () {
-        return get_value (DOWNLOAD_LIMIT_C, "", 80).to_int ();
-    }
-
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void upload_limit (int kbytes) {
-        value (UPLOAD_LIMIT_C, kbytes);
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void download_limit (int kbytes) {
-        value (DOWNLOAD_LIMIT_C, kbytes);
+    public int download_limit {
+        public get {
+            return get_value (DOWNLOAD_LIMIT_C, "", 80).to_int ();
+        }
+        public set {
+            set_value (DOWNLOAD_LIMIT_C, kbytes);
+        }
     }
 
 
@@ -1050,48 +1044,42 @@ public class ConfigFile : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public string update_channel;
-    string ConfigFile.update_channel {
-        string default_update_channel = "stable";
-        string suffix = MIRALL_STRINGIFY (MIRALL_VERSION_SUFFIX);
-        if (suffix.has_prefix ("daily")
-            || suffix.has_prefix ("nightly")
-            || suffix.has_prefix ("alpha")
-            || suffix.has_prefix ("rc")
-            || suffix.has_prefix ("beta")) {
-            default_update_channel = "beta";
+    public string update_channel {
+        public get {
+            string default_update_channel = "stable";
+            string suffix = MIRALL_STRINGIFY (MIRALL_VERSION_SUFFIX);
+            if (suffix.has_prefix ("daily")
+                || suffix.has_prefix ("nightly")
+                || suffix.has_prefix ("alpha")
+                || suffix.has_prefix ("rc")
+                || suffix.has_prefix ("beta")) {
+                default_update_channel = "beta";
+            }
+    
+            GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
+            return settings.value (UPDATE_CHANNEL_C, default_update_channel).to_string ();
         }
-
-        GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-        return settings.value (UPDATE_CHANNEL_C, default_update_channel).to_string ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void update_channel (string channel) {
-        GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-        settings.value (UPDATE_CHANNEL_C, channel);
+        public set {
+            GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
+            settings.value (UPDATE_CHANNEL_C, value);
+        }
     }
 
     /***********************************************************
     ***********************************************************/
     //  public void restore_geometry_header
 
-
     /***********************************************************
     ***********************************************************/
     public string certificate_path {
-        return retrieve_data ("", CERT_PATH).to_string ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public void certificate_path_for_path (string c_path) {
-        GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-        settings.value (CERT_PATH, c_path);
-        settings.sync ();
+        public get {
+            return retrieve_data ("", CERT_PATH).to_string ();
+        }
+        public set {
+            GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
+            settings.value (CERT_PATH, value);
+            settings.sync ();
+        }
     }
 
 
@@ -1144,7 +1132,7 @@ public class ConfigFile : GLib.Object {
     /***********************************************************
     Add the system and user exclude file path to the ExcludedFiles instance.
     ***********************************************************/
-    public static void setup_default_exclude_file_paths (ExcludedFiles excluded_files) {
+    public static void set_up_default_exclude_file_paths (ExcludedFiles excluded_files) {
         ConfigFile config;
         string system_list = config.exclude_file (ConfigFile.SYSTEM_SCOPE);
         string user_list = config.exclude_file (ConfigFile.USER_SCOPE);

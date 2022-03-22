@@ -92,7 +92,7 @@ public class TestBlocklist : GLib.Object {
         GLib.assert_true (it.status == SyncFileItem.Status.BLOCKLISTED_ERROR); // blocklisted as it's just a retry
         GLib.assert_true (it.instruction == CSync.SyncInstructions.NEW); // retry!
 
-        var entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
+        entry = fake_folder.sync_journal ().error_blocklist_entry (test_filename);
         GLib.assert_true (entry.is_valid);
         GLib.assert_true (entry.error_category == SyncJournalErrorBlocklistRecord.Normal);
         GLib.assert_true (entry.retry_count == 2);

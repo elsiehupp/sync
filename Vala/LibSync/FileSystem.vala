@@ -68,7 +68,7 @@ public class FileSystem : GLib.Object {
         time_t times[2];
         times[0].tv_sec = times[1].tv_sec = mod_time;
         times[0].tv_usec = times[1].tv_usec = 0;
-        int rc = c_utimes (filename, times);
+        int rc = GLib.FileUtils.utime ( (filename, times);
         if (rc != 0) {
             GLib.warning ("Error setting mtime for " + filename
                         + "failed: rc " + rc + ", errno: " + errno);

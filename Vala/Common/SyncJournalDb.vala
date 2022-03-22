@@ -2486,7 +2486,7 @@ public class SyncJournalDb : GLib.Object {
             return sql_fail ("SELECT sqlite_version ()", pragma1);
         } else {
             pragma1.next ();
-            GLib.info ("Sqlite3 version" + pragma1.string_value (0));
+            GLib.info ("Sqlite.Database version" + pragma1.string_value (0));
         }
 
         // Set locking mode to avoid issues with WAL on Windows
@@ -2498,7 +2498,7 @@ public class SyncJournalDb : GLib.Object {
             return sql_fail ("Set PRAGMA locking_mode", pragma1);
         } else {
             pragma1.next ();
-            GLib.info ("Sqlite3 locking_mode=" + pragma1.string_value (0));
+            GLib.info ("Sqlite.Database locking_mode=" + pragma1.string_value (0));
         }
 
         pragma1.prepare ("PRAGMA journal_mode=" + this.journal_mode + ";");
@@ -2506,7 +2506,7 @@ public class SyncJournalDb : GLib.Object {
             return sql_fail ("Set PRAGMA journal_mode", pragma1);
         } else {
             pragma1.next ();
-            GLib.info ("Sqlite3 journal_mode=" + pragma1.string_value (0));
+            GLib.info ("Sqlite.Database journal_mode=" + pragma1.string_value (0));
         }
 
         // For debugging purposes, allow temp_store to be set
@@ -2516,7 +2516,7 @@ public class SyncJournalDb : GLib.Object {
             if (!pragma1.exec ()) {
                 return sql_fail ("Set PRAGMA temp_store", pragma1);
             }
-            GLib.info ("Sqlite3 with temp_store =" + env_temp_store);
+            GLib.info ("Sqlite.Database with temp_store =" + env_temp_store);
         }
 
         // With WAL journal the NORMAL sync mode is safe from corruption,
@@ -2528,7 +2528,7 @@ public class SyncJournalDb : GLib.Object {
         if (!pragma1.exec ()) {
             return sql_fail ("Set PRAGMA synchronous", pragma1);
         } else {
-            GLib.info ("Sqlite3 synchronous=" + synchronous_mode);
+            GLib.info ("Sqlite.Database synchronous=" + synchronous_mode);
         }
 
         pragma1.prepare ("PRAGMA case_sensitive_like = ON;");

@@ -59,7 +59,7 @@ public class TestSelectiveSyncMovedFolder : AbstractTestSyncMove {
         fake_folder.sync_once ();
 
         GLib.assert_true (fake_folder.current_remote_state () == expected_server_state);
-        var remote_state = fake_folder.current_remote_state ();
+        remote_state = fake_folder.current_remote_state ();
         // The sub_folder_a should still be there on the server.
         GLib.assert_true (remote_state.find ("parent_folder_renamed/sub_folder_a/file_a.txt"));
         // But not on the client because of the selective sync
@@ -70,7 +70,7 @@ public class TestSelectiveSyncMovedFolder : AbstractTestSyncMove {
         fake_folder.local_modifier.rename ("parent_folder_renamed", "parent_third_name");
         fake_folder.sync_once ();
 
-        var remote_state = fake_folder.current_remote_state ();
+        remote_state = fake_folder.current_remote_state ();
         // The sub_folder_a should still be there on the server.
         GLib.assert_true (remote_state.find ("parent_third_name/sub_folder_a/file_a.txt"));
         // But not on the client because of the selective sync

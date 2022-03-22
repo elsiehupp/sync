@@ -19,15 +19,12 @@ public class FakePayloadReply : FakeReply {
 
     /***********************************************************
     ***********************************************************/
-    public FakePayloadReply (Soup.Operation operation, Soup.Request request, string body, GLib.Object parent) {
-        FakePayloadReply (operation, request, body, FakePayloadReply.DEFAULT_DELAY, parent);
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
     public FakePayloadReply (
-        Soup.Operation operation, Soup.Request request, string body, int delay, GLib.Object parent) {
+        Soup.Operation operation,
+        Soup.Request request,
+        string body,
+        int delay = 0,
+        GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.body = body;
         set_request (request);

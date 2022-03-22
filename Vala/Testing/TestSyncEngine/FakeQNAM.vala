@@ -20,7 +20,7 @@ public class FakeQNAM : Soup {
     /***********************************************************
     Maps a path to an HTTP error
     ***********************************************************/
-    private GLib.HashTable<string, int> error_paths;
+    public GLib.HashTable<string, int> error_paths { public get; private set;
 
     /***********************************************************
     Monitor requests and optionally provide custom replies
@@ -50,13 +50,6 @@ public class FakeQNAM : Soup {
     ***********************************************************/
     public FileInfo upload_state () {
         return this.upload_file_info;
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public GLib.HashTable<string, int> error_paths () {
-        return this.error_paths;
     }
 
     delegate QJsonObject ReplyFunction (GLib.HashTable<string, string> map);

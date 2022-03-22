@@ -72,7 +72,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
         this.folder_tree.header_item ().on_signal_text (0, _("Name"));
         this.folder_tree.header_item ().on_signal_text (1, _("Size"));
 
-        ConfigFile.setup_default_exclude_file_paths (this.excluded_files);
+        ConfigFile.set_up_default_exclude_file_paths (this.excluded_files);
         this.excluded_files.on_signal_reload_exclude_files ();
     }
 

@@ -8,7 +8,7 @@
 //  #include <QJsonObject>
 //  #include <Soup.Request>
 //  #include <GLib.OutputStream>
-//  #include <QNetworkAccessManager>
+//  #include <Soup.Context>
 
 namespace Occ {
 namespace Ui {
@@ -20,7 +20,7 @@ public class RemoteWipe : GLib.Object {
     private unowned Account account;
     private string app_password;
     private bool account_removed;
-    private QNetworkAccessManager network_manager;
+    private Soup.Context network_manager;
     private GLib.InputStream network_reply_check;
     private GLib.InputStream network_reply_success;
 

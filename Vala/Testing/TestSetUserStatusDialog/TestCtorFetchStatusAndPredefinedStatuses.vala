@@ -35,7 +35,7 @@ public class TestCtorFetchStatusAndPredefinedStatuses : GLib.Object {
         var fake_date_time_provider = new FakeDateTimeProvider ();
         fake_date_time_provider.set_current_date_time (current_date_time);
         fake_user_status_job.set_fake_user_status (user_status);
-        fake_user_status_job.set_fake_predefined_statuses (fake_predefined_statuses);
+        fake_user_status_job.predefined_statuses (fake_predefined_statuses);
         UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job, std.move (fake_date_time_provider));
 
         // Was user status set correctly?

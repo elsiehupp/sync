@@ -84,7 +84,7 @@ public class TestMovePropagation : AbstractTestSyncMove {
             remote.append_byte ("B/b1m");
             remote.insert ("B/b1mt");
             local.rename ("B/b1m", "B/b1mt");
-            ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
+            complete_spy = new ItemCompletedSpy (fake_folder);
             GLib.assert_true (fake_folder.sync_once ());
             GLib.assert_true (expect_and_wipe_conflict (local, fake_folder.current_local_state (), "A/a1mt"));
             GLib.assert_true (expect_and_wipe_conflict (local, fake_folder.current_local_state (), "B/b1mt"));
@@ -106,7 +106,7 @@ public class TestMovePropagation : AbstractTestSyncMove {
             remote.rename ("A/a1mt", "A/a1N");
             remote.insert ("B/b1N", 13);
             local.rename ("B/b1mt", "B/b1N");
-            ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
+            complete_spy = new ItemCompletedSpy (fake_folder);
             GLib.assert_true (fake_folder.sync_once ());
             GLib.assert_true (expect_and_wipe_conflict (local, fake_folder.current_local_state (), "A/a1N"));
             GLib.assert_true (expect_and_wipe_conflict (local, fake_folder.current_local_state (), "B/b1N"));
@@ -152,7 +152,7 @@ public class TestMovePropagation : AbstractTestSyncMove {
             counter.on_signal_reset ();
             local.rename ("A", "AM");
             remote.rename ("B", "BM");
-            ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
+            complete_spy = new ItemCompletedSpy (fake_folder);
             GLib.assert_true (fake_folder.sync_once ());
             GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
             GLib.assert_true (print_database_data (fake_folder.database_state ()) == print_database_data (fake_folder.current_remote_state ()));
@@ -179,7 +179,7 @@ public class TestMovePropagation : AbstractTestSyncMove {
             local.rename ("AM", "A2");
             remote.set_contents ("BM/b2m", 'C');
             remote.rename ("BM", "B2");
-            ItemCompletedSpy complete_spy = new ItemCompletedSpy (fake_folder);
+            complete_spy = new ItemCompletedSpy (fake_folder);
             GLib.assert_true (fake_folder.sync_once ());
             GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
             GLib.assert_true (print_database_data (fake_folder.database_state ()) == print_database_data (fake_folder.current_remote_state ()));

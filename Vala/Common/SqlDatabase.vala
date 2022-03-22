@@ -12,7 +12,7 @@ namespace Common {
 ***********************************************************/
 public class SqlDatabase : GLib.Object {
 
-    using Sqlite3;
+    using Sqlite.Database;
 
     // Q_DISABLE_COPY (SqlDatabase)
 
@@ -31,7 +31,7 @@ public class SqlDatabase : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private Sqlite3 database = null;
+    private Sqlite.Database database = null;
 
     /***********************************************************
     Last error string
@@ -187,7 +187,7 @@ public class SqlDatabase : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public Sqlite3 sqlite_database () {
+    public Sqlite.Database sqlite_database () {
         return this.database;
     }
 

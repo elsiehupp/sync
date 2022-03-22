@@ -490,7 +490,7 @@ public class Application : Gtk.Application {
     //  #ifndef QT_DEBUG
             bool should_auto_start = AccountManager.instance.accounts.length == 1;
     //  #else
-            bool should_auto_start = false;
+            //  bool should_auto_start = false;
     //  #endif
             if (should_auto_start) {
                 Utility.launch_on_signal_startup (this.theme.app_name, this.theme.app_name_gui, true);

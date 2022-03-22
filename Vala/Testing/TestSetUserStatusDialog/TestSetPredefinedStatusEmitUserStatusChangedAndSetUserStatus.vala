@@ -17,7 +17,7 @@ public class TestSetPredefinedStatusEmitUserStatusChangedAndSetUserStatus : GLib
         var current_time = create_date_time ();
         fake_date_time_provider.set_current_date_time (current_time);
         var fake_predefined_statuses = create_fake_predefined_statuses (current_time);
-        fake_user_status_job.set_fake_predefined_statuses (fake_predefined_statuses);
+        fake_user_status_job.predefined_statuses (fake_predefined_statuses);
         UserStatusSelectorModel model = new UserStatusSelectorModel (
             std.move (fake_user_status_job),
             std.move (fake_date_time_provider)

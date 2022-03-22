@@ -284,7 +284,7 @@ public class FolderConnection : GLib.Object {
         // pass the setting if hidden files are to be ignored, will be read in csync_update
         this.engine.ignore_hidden_files (this.definition.ignore_hidden_files);
 
-        ConfigFile.setup_default_exclude_file_paths (this.engine.excluded_files ());
+        ConfigFile.set_up_default_exclude_file_paths (this.engine.excluded_files ());
         if (!reload_excludes ()) {
             GLib.warning ();
         }
@@ -657,7 +657,7 @@ public class FolderConnection : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public SyncEngine sync_engine () {
+    public SyncEngine sync_engine {
         return;
     }
 

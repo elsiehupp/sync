@@ -28,10 +28,10 @@ public class TestSetUserStatusSetCustomMessageUserStatusSetCorrect : GLib.Object
         model.set_user_status_emoji (user_status_icon);
         model.set_clear_at (1);
 
-        model.set_user_status ();
+        model.user_status ();
         GLib.assert_true (finished_spy.count () == 1);
 
-        var signal_user_status_set = fake_user_status_job.user_status_set_by_caller_of_set_user_status ();
+        var signal_user_status_set = fake_user_status_job.user_status_set_by_caller_of_set_user_status;
         GLib.assert_true (signal_user_status_set.icon () == user_status_icon);
         GLib.assert_true (signal_user_status_set.message () == user_status_message);
         GLib.assert_true (signal_user_status_set.state == user_status_state);

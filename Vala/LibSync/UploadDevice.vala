@@ -45,7 +45,7 @@ public class UploadDevice : QIODevice {
     /***********************************************************
     Bandwidth manager related
     ***********************************************************/
-    public private int64 read_with_progress = 0;
+    public int64 read_with_progress = 0;
 
     /***********************************************************
     Bandwidth manager related

@@ -13,7 +13,7 @@ public class TestSetUserStatusMessagePredefinedStatusWasSetUserStatusSetCorrect 
     ***********************************************************/
     private TestSetUserStatusMessagePredefinedStatusWasSetUserStatusSetCorrect () {
         var fake_user_status_job = new FakeUserStatusConnector ();
-        fake_user_status_job.set_fake_predefined_statuses (create_fake_predefined_statuses (create_date_time ()));
+        fake_user_status_job.predefined_statuses (create_fake_predefined_statuses (create_date_time ()));
         UserStatusSelectorModel model = new UserStatusSelectorModel (fake_user_status_job);
         model.set_predefined_status (0);
         QSignalSpy finished_spy = new QSignalSpy (
@@ -28,10 +28,10 @@ public class TestSetUserStatusMessagePredefinedStatusWasSetUserStatusSetCorrect 
         model.set_user_status_message (user_status_message);
         model.set_clear_at (1);
 
-        model.set_user_status ();
+        model.user_status ();
         GLib.assert_true (finished_spy.count () == 1);
 
-        var signal_user_status_set = fake_user_status_job.user_status_set_by_caller_of_set_user_status ();
+        var signal_user_status_set = fake_user_status_job.user_status_set_by_caller_of_set_user_status;
         GLib.assert_true (signal_user_status_set.message () == user_status_message);
         GLib.assert_true (signal_user_status_set.state == user_status_state);
         GLib.assert_true (signal_user_status_set.message_predefined () == false);

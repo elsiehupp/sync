@@ -3,12 +3,12 @@ namespace Testing {
 
 public class FakeCredentials : AbstractCredentials {
 
-    Soup access_manager;
+    Soup soup_context;
 
     /***********************************************************
     ***********************************************************/
-    public FakeCredentials (Soup access_manager) {
-        this.access_manager = access_manager;
+    public FakeCredentials (Soup soup_context) {
+        this.soup_context = soup_context;
     }
 
 
@@ -36,7 +36,7 @@ public class FakeCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     public override Soup create_access_manager () {
-        return this.access_manager;
+        return this.soup_context;
     }
 
 

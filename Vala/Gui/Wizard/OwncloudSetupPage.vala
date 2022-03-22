@@ -11,7 +11,7 @@
 //  #include <Gtk.MessageBox>
 //  #include <QSsl>
 //  #include <QSslCertificate>
-//  #include <QNetworkAccessManager>
+//  #include <Soup.Context>
 //  #include <QPropertyAnimation>
 //  #include <QGraphics_pixmap_item>
 //  #include <GLib.OutputStream>

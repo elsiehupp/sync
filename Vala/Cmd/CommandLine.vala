@@ -333,11 +333,11 @@ public class CommandLine : GLib.Object {
         var credentials = new TokenCredentials (user, password, "");
         account.credentials (credentials);
     //  #else
-        var credentials = new HttpCredentialsText (user, password);
-        account.credentials (credentials);
-        if (options.trust_s_sL) {
-            credentials.s_sLTrusted (true);
-        }
+        //  var credentials = new HttpCredentialsText (user, password);
+        //  account.credentials (credentials);
+        //  if (options.trust_s_sL) {
+        //      credentials.s_sLTrusted (true);
+        //  }
     //  #endif
 
         account.url (host_url);

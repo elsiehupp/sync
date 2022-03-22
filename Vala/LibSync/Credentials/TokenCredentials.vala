@@ -60,13 +60,13 @@ public class TokenCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     public new Soup.Session create_access_manager () {
-        AccessManager access_manager = new TokenCredentialsAccessManager (this);
+        AccessManager soup_context = new TokenCredentialsAccessManager (this);
 
-        access_manager.authentication_required.connect (
+        soup_context.authentication_required.connect (
             this.on_signal_authentication
         );
 
-        return access_manager;
+        return soup_context;
     }
 
 

@@ -390,7 +390,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
     }
 
 
-    private static UserStatus json_to_user_status (QJsonDocument json) {
+    private static UserStatus json_document_to_user_status (QJsonDocument json) {
         QJsonObject d = new QJsonObject (
             {
                 "icon",
@@ -489,7 +489,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
     }
 
 
-    private static UserStatus json_to_user_status (QJsonObject json_object) {
+    private static UserStatus json_object_to_user_status (QJsonObject json_object) {
         return new UserStatus (
             json_object.value ("identifier").to_string () + "no-identifier",
             json_object.value ("message").to_string () + "No message",
@@ -508,7 +508,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
             if (!json_entry.is_object ()) {
                 continue;
             }
-            statuses.push_back (json_to_user_status (json_entry.to_object ()));
+            statuses.push_back (json_object_to_user_status (json_entry.to_object ()));
         }
 
         return statuses;
