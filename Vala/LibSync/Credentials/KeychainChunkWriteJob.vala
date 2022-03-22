@@ -1,25 +1,22 @@
-/***********************************************************
-@author Michael Schuster <michael@schuster.ms>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
 namespace Occ {
 namespace LibSync {
-namespace KeychainChunk {
 
 /***********************************************************
 @brief Simple wrapper class for QKeychain.WritePasswordJob,
 splits too large keychain entry's data into chunks on Windows
-***********************************************************/
-public class WriteJob : KeychainChunk.Job {
 
-    internal signal void signal_finished (KeychainChunk.WriteJob incoming_job);
+@author Michael Schuster <michael@schuster.ms>
+
+@copyright GPLv3 or Later
+***********************************************************/
+public class KeychainChunkWriteJob : KeychainChunkJob {
+
+    internal signal void signal_finished (KeychainChunkWriteJob incoming_job);
 
     /***********************************************************
-    WriteJob
+    KeychainChunkWriteJob
     ***********************************************************/
-    public WriteJob.for_account (Account account, string key, string data, GLib.Object parent = new GLib.Object ()) {
+    public KeychainChunkWriteJob.for_account (Account account, string key, string data, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.account = account;
         this.key = key;
@@ -32,7 +29,7 @@ public class WriteJob : KeychainChunk.Job {
 
     /***********************************************************
     ***********************************************************/
-    public WriteJob (string key, string data, GLib.Object parent = new GLib.Object ()) {
+    public KeychainChunkWriteJob (string key, string data, GLib.Object parent = new GLib.Object ()) {
         base (null, key, data, parent);
     }
 
@@ -79,7 +76,7 @@ public class WriteJob : KeychainChunk.Job {
     private void on_signal_write_job_done (QKeychain.Job incoming_job) {
         var write_job = (QKeychain.WritePasswordJob)incoming_job;
 
-        // Errors? (write_job can be null here, see : WriteJob.start)
+        // Errors? (write_job can be null here, see : KeychainChunkWriteJob.start)
         if (write_job) {
             this.error = write_job.error;
             this.error_string = write_job.error_string;
@@ -147,8 +144,7 @@ public class WriteJob : KeychainChunk.Job {
         write_job.delete_later ();
     }
 
-} // class WriteJob
+} // class KeychainChunkWriteJob
 
-} // namespace KeychainChunk
 } // namespace LibSync
 } // namespace Occ

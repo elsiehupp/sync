@@ -2,15 +2,15 @@ namespace Occ {
 namespace LibSync {
 
 /***********************************************************
-@class DeleteJob
+@class KeychainChunkDeleteJob
 
-@brief The DeleteJob class
+@brief The KeychainChunkDeleteJob class
 
 @author Olivier Goffart <ogoffart@owncloud.com>
 
 @copyright GPLv3 or Later
 ***********************************************************/
-public class DeleteJob : AbstractNetworkJob {
+public class KeychainChunkDeleteJob : AbstractNetworkJob {
 
     /***********************************************************
     Only used if the constructor taking a url is taken.
@@ -27,14 +27,14 @@ public class DeleteJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public DeleteJob.for_path (Account account, string path, GLib.Object parent = new GLib.Object ()) {
+    public KeychainChunkDeleteJob.for_path (Account account, string path, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public DeleteJob.for_url (Account account, GLib.Uri url, GLib.Object parent) {
+    public KeychainChunkDeleteJob.for_url (Account account, GLib.Uri url, GLib.Object parent) {
         base (account, "", parent);
         this.url = url;
     }
@@ -54,7 +54,7 @@ public class DeleteJob : AbstractNetworkJob {
             send_request ("DELETE", make_dav_url (path), request);
         }
 
-        if (this.reply.error != Soup.Reply.NoError) {
+        if (this.reply.error != GLib.InputStream.NoError) {
             GLib.warning ("Network error: " + this.reply.error_string);
         }
         AbstractNetworkJob.start ();
@@ -73,7 +73,7 @@ public class DeleteJob : AbstractNetworkJob {
 
 
 
-} // class DeleteJob
+} // class KeychainChunkDeleteJob
 
 } // namespace LibSync
 } // namespace Occ

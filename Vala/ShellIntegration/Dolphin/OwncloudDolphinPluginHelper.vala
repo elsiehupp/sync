@@ -6,7 +6,7 @@
 
 //  #include <QBasicTimer>
 //  #include <QLocalSocket>
-//  #include <QRegularExpression>
+//  #include <GLib.Regex>
 //  #include <QtNetwork/QLocalSocket>
 //  #include <qcoreevent.h>
 //  #include <QStandardPaths>

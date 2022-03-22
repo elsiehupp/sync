@@ -86,7 +86,7 @@ public class AsyncImageResponse : QQuickImageResponse {
     /***********************************************************
     ***********************************************************/
     private void on_signal_process_network_input_stream {
-        const var reply = qobject_cast<Soup.Reply> (sender ());
+        const var reply = qobject_cast<GLib.InputStream> (sender ());
         if (!reply) {
             image_and_emit_finished ();
             return;

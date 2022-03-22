@@ -131,7 +131,7 @@ public class CheckServerJob : AbstractNetworkJob {
     private bool on_signal_finished () {
         if (this.input_stream.request ().url.scheme () == "https"
             && this.input_stream.ssl_configuration ().session_ticket () == ""
-            && this.input_stream.error == Soup.Reply.NoError) {
+            && this.input_stream.error == GLib.InputStream.NoError) {
             GLib.warning ("No SSL session identifier / session ticket is used, this might impact sync performance negatively.");
         }
 
@@ -139,7 +139,7 @@ public class CheckServerJob : AbstractNetworkJob {
 
         // The server installs to /owncloud. Let's try that if the file wasn't found
         // at the original location
-        if ((this.input_stream.error == Soup.Reply.ContentNotFoundError) && (!this.subdir_fallback)) {
+        if ((this.input_stream.error == GLib.InputStream.ContentNotFoundError) && (!this.subdir_fallback)) {
             this.subdir_fallback = true;
             this.path = NEXTCLOUD_DIR_C + STATUS_PHP_C;
             this.start ();

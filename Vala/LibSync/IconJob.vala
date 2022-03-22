@@ -17,7 +17,7 @@ namespace LibSync {
 public class IconJob : GLib.Object {
 
     internal signal void signal_job_finished (string icon_data);
-    internal signal void signal_error (Soup.Reply.NetworkError error_type);
+    internal signal void signal_error (GLib.InputStream.NetworkError error_type);
 
 
     /***********************************************************
@@ -43,7 +43,7 @@ public class IconJob : GLib.Object {
         delete_later ();
 
         var network_error = reply.error;
-        if (network_error != Soup.Reply.NoError) {
+        if (network_error != GLib.InputStream.NoError) {
             /* emit */ signal_error (signal_network_error);
             return;
         }

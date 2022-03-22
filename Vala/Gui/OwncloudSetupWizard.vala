@@ -225,7 +225,7 @@ public class OwncloudSetupWizard : GLib.Object {
     }
 
 
-    private void on_redirect_check_job (int permanent_redirects, unowned Account account, Soup.Reply reply, GLib.Uri target_url, int count) {
+    private void on_redirect_check_job (int permanent_redirects, unowned Account account, GLib.InputStream reply, GLib.Uri target_url, int count) {
         int http_code = reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         if (count == *permanent_redirects && (http_code == 301 || http_code == 308)) {
             GLib.info (account.url + " was redirected to " + target_url);
@@ -279,7 +279,7 @@ public class OwncloudSetupWizard : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_no_server_found (Soup.Reply reply) {
+    private void on_signal_no_server_found (GLib.InputStream reply) {
         var check_server_job = qobject_cast<CheckServerJob> (sender ());
 
         // Do this early because reply might be deleted in message box event loop
@@ -443,15 +443,15 @@ public class OwncloudSetupWizard : GLib.Object {
     TODO move into EntityExistsJob once we decide if/how to
     return gui strings from jobs
     ***********************************************************/
-    private void on_signal_remote_folder_exists (Soup.Reply reply) {
+    private void on_signal_remote_folder_exists (GLib.InputStream reply) {
         var entity_exists_job = qobject_cast<EntityExistsJob> (sender ());
         bool ok = true;
         string error;
-        Soup.Reply.NetworkError err_id = reply.error;
+        GLib.InputStream.NetworkError err_id = reply.error;
 
-        if (err_id == Soup.Reply.NoError) {
+        if (err_id == GLib.InputStream.NoError) {
             GLib.info ("Remote folder found, all cool!");
-        } else if (err_id == Soup.Reply.ContentNotFoundError) {
+        } else if (err_id == GLib.InputStream.ContentNotFoundError) {
             if (this.remote_folder == "") {
                 error = _("No remote folder specified!");
                 ok = false;
@@ -473,11 +473,11 @@ public class OwncloudSetupWizard : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_create_remote_folder_finished (Soup.Reply reply) {
+    private void on_signal_create_remote_folder_finished (GLib.InputStream reply) {
         var error = reply.error;
         GLib.debug ("** webdav mkdir request finished " + error);
-        //    disconnect (own_cloud_info.instance, SIGNAL (webdav_col_created (Soup.Reply.NetworkError)),
-        //               this, SLOT (on_signal_create_remote_folder_finished (Soup.Reply.NetworkError)));
+        //    disconnect (own_cloud_info.instance, SIGNAL (webdav_col_created (GLib.InputStream.NetworkError)),
+        //               this, SLOT (on_signal_create_remote_folder_finished (GLib.InputStream.NetworkError)));
 
         bool on_signal_success = true;
         if (error == 202) {
@@ -486,7 +486,7 @@ public class OwncloudSetupWizard : GLib.Object {
             this.oc_wizard.on_signal_display_error (_("The folder creation resulted in HTTP error code %1").printf (static_cast<int> (error)), false);
 
             this.oc_wizard.on_signal_append_to_configuration_log (_("The folder creation resulted in HTTP error code %1").printf (static_cast<int> (error)));
-        } else if (error == Soup.Reply.OperationCanceledError) {
+        } else if (error == GLib.InputStream.OperationCanceledError) {
             this.oc_wizard.on_signal_display_error (
                 _("The remote folder creation failed because the provided credentials "
                 + "are wrong!"
@@ -604,7 +604,7 @@ public class OwncloudSetupWizard : GLib.Object {
             GLib.warning ("Cannot check for authed redirects. This slot should be invoked from PropfindJob!");
             return;
         }
-        Soup.Reply reply = propfind_job.input_stream;
+        GLib.InputStream reply = propfind_job.input_stream;
 
         // If there were redirects on the authed* requests, also store
         // the updated server URL, similar to redirects on status.php.
@@ -630,12 +630,12 @@ public class OwncloudSetupWizard : GLib.Object {
 
             // A 404 is actually a on_signal_success : we were authorized to know that the folder does
             // not exist. It will be created later...
-        } else if (reply.error == Soup.Reply.ContentNotFoundError) {
+        } else if (reply.error == GLib.InputStream.ContentNotFoundError) {
             this.oc_wizard.on_signal_successful_step ();
             return;
 
             // Provide messages for other errors, such as invalid credentials.
-        } else if (reply.error != Soup.Reply.NoError) {
+        } else if (reply.error != GLib.InputStream.NoError) {
             if (!this.oc_wizard.account.credentials ().still_valid (reply)) {
                 error_msg = _("Access forbidden by server. To verify that you have proper access, "
                             + "<a href=\"%1\">click here</a> to access the service with your browser.")
@@ -823,16 +823,16 @@ public class OwncloudSetupWizard : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private bool check_downgrade_advised (Soup.Reply reply) {
+    private bool check_downgrade_advised (GLib.InputStream reply) {
         if (reply.url.scheme () != "https") {
             return false;
         }
 
         switch (reply.error) {
-        case Soup.Reply.NoError:
-        case Soup.Reply.ContentNotFoundError:
-        case Soup.Reply.AuthenticationRequiredError:
-        case Soup.Reply.Host_not_found_error:
+        case GLib.InputStream.NoError:
+        case GLib.InputStream.ContentNotFoundError:
+        case GLib.InputStream.AuthenticationRequiredError:
+        case GLib.InputStream.Host_not_found_error:
             return false;
         default:
             break;

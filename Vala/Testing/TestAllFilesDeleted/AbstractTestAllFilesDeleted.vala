@@ -17,7 +17,7 @@ public abstract class AbstractTestAllFilesDeleted : GLib.Object {
 
     protected delegate void Callback (bool value);
 
-    protected Soup.Reply override_delegate (
+    protected GLib.InputStream override_delegate (
         Soup.Operation operation,
         Soup.Request request,
         QIODevice stream

@@ -1,23 +1,20 @@
+namespace Occ {
+namespace LibSync {
+
 /***********************************************************
+@brief Simple wrapper class for QKeychain.DeletePasswordJob
+
 @author Michael Schuster <michael@schuster.ms>
 
 @copyright GPLv3 or Later
 ***********************************************************/
+public class KeychainChunkDeleteJob : KeychainChunkJob {
 
-namespace Occ {
-namespace LibSync {
-namespace KeychainChunk {
-
-/***********************************************************
-@brief Simple wrapper class for QKeychain.DeletePasswordJob
-***********************************************************/
-public class DeleteJob : KeychainChunk.Job {
-
-    internal signal void signal_finished (KeychainChunk.DeleteJob incoming_job);
+    internal signal void signal_finished (KeychainChunk.KeychainChunkDeleteJob incoming_job);
 
     /***********************************************************
     ***********************************************************/
-    public DeleteJob.for_account (Account account, string key, bool keychain_migration, GLib.Object parent = new GLib.Object ()) {
+    public KeychainChunkDeleteJob.for_account (Account account, string key, bool keychain_migration, GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.account = account;
         this.key = key;
@@ -28,7 +25,7 @@ public class DeleteJob : KeychainChunk.Job {
 
     /***********************************************************
     ***********************************************************/
-    public DeleteJob (string key, GLib.Object parent = new GLib.Object ()) {
+    public KeychainChunkDeleteJob (string key, GLib.Object parent = new GLib.Object ()) {
         base (null, key, false, parent);
     }
 
@@ -116,8 +113,7 @@ public class DeleteJob : KeychainChunk.Job {
         }
     }
 
-} // class DeleteJob
+} // class KeychainChunkDeleteJob
 
-} // namespace KeychainChunk
 } // namespace LibSync
 } // namespace Occ

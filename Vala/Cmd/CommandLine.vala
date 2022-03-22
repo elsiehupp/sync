@@ -351,7 +351,7 @@ public class CommandLine : GLib.Object {
         json_api_job.on_signal_start ();
         loop.exec ();
 
-        if (json_api_job.input_stream.error != Soup.Reply.NoError) {
+        if (json_api_job.input_stream.error != GLib.InputStream.NoError) {
             GLib.print ("Error connecting to server");
             return EXIT_FAILURE;
         }
@@ -380,7 +380,7 @@ public class CommandLine : GLib.Object {
                 GLib.critical ("Could not open file containing the list of unsynced folders: " + options.unsynced_folders);
             } else {
                 // filter out empty lines and comments
-                selective_sync_list = f.read_all ().split ('\n').filter (QRegularExpression ("\\S+")).filter (QRegularExpression ("^[^#]"));
+                selective_sync_list = f.read_all ().split ('\n').filter (GLib.Regex ("\\S+")).filter (GLib.Regex ("^[^#]"));
 
                 foreach (var item in selective_sync_list) {
                     if (!item.ends_with ("/")) {

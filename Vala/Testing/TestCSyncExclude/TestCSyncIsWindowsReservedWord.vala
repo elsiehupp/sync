@@ -52,7 +52,7 @@ public class TestCSyncIsWindowsReservedWord : AbstractTestCSyncExclude {
     ***********************************************************/
     private static bool csync_is_windows_reserved_word (string fn) {
         string s = fn;
-        //  extern bool csync_is_windows_reserved_word (QStringRef filename);
+        //  extern bool csync_is_windows_reserved_word (/* QStringRef */ string filename);
         return csync_is_windows_reserved_word (s);
     }
 

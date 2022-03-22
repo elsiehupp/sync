@@ -54,9 +54,9 @@ public class AbstractTestUnifiedSearchListmodel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected Soup.Reply init_test_case_override_delegate (Soup.Operation operation, Soup.Request request, QIODevice device) {
+    protected GLib.InputStream init_test_case_override_delegate (Soup.Operation operation, Soup.Request request, QIODevice device) {
 
-        Soup.Reply reply = null;
+        GLib.InputStream reply = null;
 
         var url_query = QUrlQuery (request.url);
         var format = url_query.query_item_value ("format");
@@ -88,7 +88,7 @@ public class AbstractTestUnifiedSearchListmodel : GLib.Object {
         }
 
         if (!reply) {
-            return (Soup.Reply)new FakeErrorReply (operation, request, this, 404, "{error : \"Not found!\"}");
+            return (GLib.InputStream)new FakeErrorReply (operation, request, this, 404, "{error : \"Not found!\"}");
         }
 
         return reply;

@@ -1,7 +1,8 @@
+namespace Occ {
 namespace CSync {
 
 /***********************************************************
-@class CSyncVioHandleT
+@class VioHandleT
 
 @brief CSync directory functions
 
@@ -12,42 +13,41 @@ libcsync -- a library to sync a directory with another
 
 @copyright LGPL 2.1 or later
 ***********************************************************/
-public class CSyncVioHandleT : GLib.Object {
+public class VioHandleT : GLib.Object {
 
-    public DIR *dh;
+    public Posix.Dir *directory;
     public string path;
 
-    // OCSYNC_EXPORT
-    public CSyncVioHandleT csync_vio_local_opendir (string name) {
-            QScopedPointer<CSyncVioHandleT> handle = new CSyncVioHandleT ();
+    public static CSync.VioHandleT csync_vio_local_opendir (string name) {
+        VioHandleT handle = new VioHandleT ();
 
-            var dirname = GLib.File.encode_name (name);
+        var dirname = GLib.File.encode_name (name);
 
-            handle.dh = opendir (dirname.const_data ());
-            if (!handle.dh) {
-                return null;
-            }
+        handle.directory = opendir (dirname.const_data ());
+        if (handle.directory == null) {
+            return null;
+        }
 
-            handle.path = dirname;
-            return handle.take ();
+        handle.path = dirname;
+        return handle.take ();
     }
 
 
-    public int csync_vio_local_closedir (CSyncVioHandleT dhandle) {
-            //    Q_ASSERT (dhandle);
-            var rc = closedir (dhandle.dh);
-            delete dhandle;
-            return rc;
+    public int csync_vio_local_closedir (CSync.VioHandleT directory_handle) {
+        //    Q_ASSERT (directory_handle);
+        var rc = closedir (directory_handle.directory);
+        delete directory_handle;
+        return rc;
     }
 
 
-    public CSyncFileStatT csync_vio_local_readdir (CSyncVioHandleT dhandle, Vfs vfs) {
+    public CSyncFileStatT csync_vio_local_readdir (CSync.VioHandleT directory_handle, Vfs vfs) {
 
-        dirent dirent = null;
+        Posix.DirEnt dirent = null;
         CSyncFileStatT file_stat;
 
         do {
-                dirent = readdir (handle.dh);
+                dirent = readdir (handle.directory);
                 if (!dirent)
                         return {};
         } while (qstrcmp (dirent.d_name, ".") == 0 || qstrcmp (dirent.d_name, "..") == 0);
@@ -134,6 +134,7 @@ public class CSyncVioHandleT : GLib.Object {
         return 0;
     }
 
-} // class CSyncVioHandleT
+} // class CSync.VioHandleT
 
 } // namespace CSync
+} // namespace Occ

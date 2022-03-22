@@ -126,7 +126,7 @@ public class DiscoveryPhase : GLib.Object {
     Input
     FIXME: maybe move in ExcludedFiles
     ***********************************************************/
-    public QRegularExpression invalid_filename_rx;
+    public GLib.Regex invalid_filename_rx;
 
     /***********************************************************
     Input
@@ -313,19 +313,20 @@ public class DiscoveryPhase : GLib.Object {
 
 
     /***********************************************************
+    ***********************************************************/
+    //  string adjust_renamed_path (string original, SyncFileItem.Direction d) {
+    //      return adjust_renamed_path (d == SyncFileItem.Direction.DOWN ? this.renamed_items_remote : this.renamed_items_local, original);
+    //  }
+
+
+    /***********************************************************
     Given an original path, return the target path obtained when
     renaming is done.
 
     Note that it only considers parent directory renames. So if
     A/B got renamed to C/D, checking A/B/file would yield
     C/D/file, but checking A/B would yield A/B.
-    ***********************************************************/
-    string adjust_renamed_path (string original, SyncFileItem.Direction d) {
-        return adjust_renamed_path (d == SyncFileItem.Direction.DOWN ? this.renamed_items_remote : this.renamed_items_local, original);
-    }
 
-
-    /***********************************************************
     Implementation of DiscoveryPhase.adjust_renamed_path
     ***********************************************************/
     string adjust_renamed_path (GLib.HashTable<string, string> renamed_items, string original) {

@@ -547,11 +547,11 @@ public class ConfigFile : GLib.Object {
                 settings.remove (PROXY_PASS_C);
 
                 // Delete password from keychain
-                var keychain_chunk_delete_job = new KeychainChunk.DeleteJob (KEYCHAIN_PROXY_PASSWORD_KEY ());
+                var keychain_chunk_delete_job = new KeychainChunk.KeychainChunkDeleteJob (KEYCHAIN_PROXY_PASSWORD_KEY ());
                 keychain_chunk_delete_job.exec ();
             } else {
                 // Write password to keychain
-                var keychain_chunk_delete_job = new KeychainChunk.WriteJob (KEYCHAIN_PROXY_PASSWORD_KEY (), pass.to_utf8 ());
+                var keychain_chunk_delete_job = new KeychainChunkWriteJob (KEYCHAIN_PROXY_PASSWORD_KEY (), pass.to_utf8 ());
                 if (keychain_chunk_delete_job.exec ()) {
                     // Security: Don't keep password in config file
                     settings.remove (PROXY_PASS_C);
@@ -613,7 +613,7 @@ public class ConfigFile : GLib.Object {
 
         if (!pass == "") {
             // Security : Migrate password from config file to keychain
-            var keychain_chunk_write_job = new KeychainChunk.WriteJob (key, pass.to_utf8 ());
+            var keychain_chunk_write_job = new KeychainChunkWriteJob (key, pass.to_utf8 ());
             if (keychain_chunk_write_job.exec ()) {
                 GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
                 settings.remove (PROXY_PASS_C);
@@ -621,7 +621,7 @@ public class ConfigFile : GLib.Object {
             }
         } else {
             // Read password from keychain
-            var keychain_chunk_read_job = new KeychainChunk.ReadJob (key);
+            var keychain_chunk_read_job = new KeychainChunkReadJob (key);
             if (keychain_chunk_read_job.exec ()) {
                 pass = keychain_chunk_read_job.text_data ();
             }

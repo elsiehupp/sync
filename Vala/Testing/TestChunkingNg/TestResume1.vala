@@ -43,7 +43,7 @@ public class TestResume1 : AbstractTestChunkingNg {
     }
 
 
-    private Soup.Reply override_delegate_resume1 (Soup.Operation operation, Soup.Request request, QIODevice device) {
+    private GLib.InputStream override_delegate_resume1 (Soup.Operation operation, Soup.Request request, QIODevice device) {
         if (operation == Soup.PutOperation) {
             // Test that we properly resuming and are not sending past data again.
             GLib.assert_true (request.raw_header ("OC-Chunk-Offset").to_int64 () >= uploaded_size);

@@ -7,7 +7,7 @@ implied, as to its usefulness for any purpose.
 namespace Occ {
 namespace Testing {
 
-public class FakeReply : Soup.Reply {
+public class FakeReply : GLib.InputStream {
 
     /***********************************************************
     ***********************************************************/
@@ -20,7 +20,7 @@ public class FakeReply : Soup.Reply {
     /***********************************************************
     Useful to be public for testing
     ***********************************************************/
-    //  using Soup.Reply.set_raw_header;
+    //  using GLib.InputStream.set_raw_header;
 
 } // class FakeReply
 } // namespace Testing

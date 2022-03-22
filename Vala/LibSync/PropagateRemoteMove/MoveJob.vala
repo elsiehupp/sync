@@ -58,7 +58,7 @@ public class MoveJob : AbstractNetworkJob {
             send_request ("MOVE", make_dav_url (path), request);
         }
 
-        if (this.reply.error != Soup.Reply.NoError) {
+        if (this.reply.error != GLib.InputStream.NoError) {
             GLib.warning ("Network error: " + this.reply.error_string);
         }
         AbstractNetworkJob.start ();

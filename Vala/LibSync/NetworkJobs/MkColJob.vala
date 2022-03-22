@@ -78,7 +78,7 @@ public class MkColJob : AbstractNetworkJob {
         GLib.info ("MKCOL of" + this.reply.request ().url
             + " finished with status " + reply_status_string ());
 
-        if (this.reply.error != Soup.Reply.NoError) {
+        if (this.reply.error != GLib.InputStream.NoError) {
             /* Q_EMIT */ signal_finished_with_error (this.reply);
         } else {
             /* Q_EMIT */ signal_finished_without_error ();

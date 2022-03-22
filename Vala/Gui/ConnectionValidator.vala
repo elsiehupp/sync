@@ -277,10 +277,10 @@ public class ConnectionValidator : GLib.Object {
     /***********************************************************
     status.php could not be loaded (network or server issue!).
     ***********************************************************/
-    protected void on_signal_no_status_found (Soup.Reply reply) {
+    protected void on_signal_no_status_found (GLib.InputStream reply) {
         var check_server_job = qobject_cast<CheckServerJob> (sender ());
         GLib.warning (reply.error + check_server_job.error_string + reply.peek (1024));
-        if (reply.error == Soup.Reply.SslHandshakeFailedError) {
+        if (reply.error == GLib.InputStream.SslHandshakeFailedError) {
             report_result (SslError);
             return;
         }
@@ -310,21 +310,21 @@ public class ConnectionValidator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_auth_failed (Soup.Reply reply) {
+    protected void on_signal_auth_failed (GLib.InputStream reply) {
         var propfind_job = (PropfindJob) sender ();
         Status stat = Status.TIMEOUT;
 
-        if (reply.error == Soup.Reply.SslHandshakeFailedError) {
+        if (reply.error == GLib.InputStream.SslHandshakeFailedError) {
             this.errors + propfind_job.error_string_parsing_body ();
             stat = Status.SSL_ERROR;
 
-        } else if (reply.error == Soup.Reply.AuthenticationRequiredError
+        } else if (reply.error == GLib.InputStream.AuthenticationRequiredError
             || !this.account.credentials ().still_valid (reply)) {
             GLib.warning ("******** Password is wrong! " + reply.error + propfind_job.error_string);
             this.errors + _("The provided credentials are not correct");
             stat = Status.CREDENTIALS_WRONG;
 
-        } else if (reply.error != Soup.Reply.NoError) {
+        } else if (reply.error != GLib.InputStream.NoError) {
             this.errors + propfind_job.error_string_parsing_body ();
 
             const int http_status =

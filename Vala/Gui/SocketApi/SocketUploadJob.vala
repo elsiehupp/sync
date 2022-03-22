@@ -6,7 +6,7 @@
 
 //  #include <GLib.FileInfo>
 //  #include <QJsonArray>
-//  #include <QRegularExpression>
+//  #include <GLib.Regex>
 //  #include <QTemporaryFile>
 
 namespace Occ {
@@ -130,7 +130,7 @@ public class SocketUploadJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_mkcol_job_finished_with_error (Soup.Reply reply) {
+    private void on_signal_mkcol_job_finished_with_error (GLib.InputStream reply) {
         if (reply.error == 202) {
             this.api_job.failure ("Destination %1 already exists".printf (this.remote_path));
         } else {

@@ -34,7 +34,7 @@ public abstract class AbstractTestOAuth : GLib.Object {
     ***********************************************************/
     protected FakeQNAM fake_soup_context;
     protected Soup.Context real_soup_context;
-    protected Soup.Reply browser_reply;
+    protected GLib.InputStream browser_reply;
 
     protected string code = generate_etag ();
 
@@ -74,7 +74,7 @@ public abstract class AbstractTestOAuth : GLib.Object {
     }
 
 
-    protected Soup.Reply oauth_test_case_override (Soup.Operation operation, Soup.Request request, QIODevice device) {
+    protected GLib.InputStream oauth_test_case_override (Soup.Operation operation, Soup.Request request, QIODevice device) {
         //  ASSERT (device);
         //  ASSERT (device.bytes_available ()>0); // OAuth2 always sends around POST data.
         return this.token_reply (operation, request);
@@ -100,7 +100,7 @@ public abstract class AbstractTestOAuth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected virtual Soup.Reply create_browser_reply (Soup.Request request) {
+    protected virtual GLib.InputStream create_browser_reply (Soup.Request request) {
         browser_reply = real_soup_context.get (request);
         browser_reply.signal_finished.connect (
             this.on_signal_browser_reply_finished);
@@ -121,7 +121,7 @@ public abstract class AbstractTestOAuth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected virtual Soup.Reply token_reply (Soup.Operation operation, Soup.Request request) {
+    protected virtual GLib.InputStream token_reply (Soup.Operation operation, Soup.Request request) {
         //  ASSERT (state == BrowserOpened);
         state = TokenAsked;
         //  ASSERT (operation == Soup.PostOperation);

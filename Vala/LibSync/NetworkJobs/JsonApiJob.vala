@@ -17,8 +17,7 @@ https://github.com/ow
 To be used like this:
 \code
 this.job = new JsonApiJob (account, "o
-connect 
-The received GLib.HashTable<string, GLib.Variant> is null in case of error
+connectThe received GLib.HashTable<string, GLib.Variant> is null in case of error
 \encode
 
 @ingroup libsync
@@ -143,7 +142,7 @@ public class JsonApiJob : AbstractNetworkJob {
 
         int status_code = 0;
         int http_status_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-        if (this.reply.error != Soup.Reply.NoError) {
+        if (this.reply.error != GLib.InputStream.NoError) {
             GLib.warning ("Network error: " + this.path + this.error_string + this.reply.attribute (Soup.Request.HttpStatusCodeAttribute));
             status_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             /* emit */ signal_json_received (QJsonDocument (), status_code);
@@ -152,7 +151,7 @@ public class JsonApiJob : AbstractNetworkJob {
 
         string json_str = string.from_utf8 (this.reply.read_all ());
         if (json_str.contains ("<?xml version=\"1.0\"?>")) {
-            const QRegularExpression regular_expression = new QRegularExpression ("<statuscode> (\\d+)</statuscode>");
+            const GLib.Regex regular_expression = new GLib.Regex ("<statuscode> (\\d+)</statuscode>");
             var rex_match = regular_expression.match (json_str);
             if (rex_match.has_match ()) {
                 // this is a error message coming back from ocs.
@@ -162,7 +161,7 @@ public class JsonApiJob : AbstractNetworkJob {
             GLib.warning ("Nothing changed so nothing to retrieve - status code: " + http_status_code);
             status_code = http_status_code;
         } else {
-            const QRegularExpression regular_expression = new QRegularExpression (" (\"statuscode\" : (\\d+))");
+            const GLib.Regex regular_expression = new GLib.Regex (" (\"statuscode\" : (\\d+))");
             // example: "{"ocs":{"meta":{"status":"ok","statuscode":100,"message":null},"data":{"version":{"major":8,"minor":"... (504)
             var regular_expression_match = regular_expression.match (json_str);
             if (regular_expression_match.has_match ()) {

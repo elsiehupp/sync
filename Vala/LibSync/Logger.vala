@@ -5,7 +5,7 @@
 ***********************************************************/
 
 //  #include <GLib.Dir>
-//  #include <QRegularExpression>
+//  #include <GLib.Regex>
 //  #include <QtGlobal>
 //  #include <QTextCodec>
 //  #include <qmetaobject.h>
@@ -294,7 +294,7 @@ public class Logger : GLib.Object {
             // Expire old log files and deal with conflicts
             GLib.List<string> files = directory.entry_list (GLib.List<string> ("*owncloud.log.*"),
                 GLib.Dir.Files, GLib.Dir.Name);
-            const QRegularExpression regular_expression = new QRegularExpression (QRegularExpression.anchored_pattern (" (.*owncloud\.log\. (\d+).*)"));
+            const GLib.Regex regular_expression = new GLib.Regex (GLib.Regex.anchored_pattern (" (.*owncloud\.log\. (\d+).*)"));
             int max_number = -1;
             foreach (string s in files) {
                 if (this.log_expire > 0) {

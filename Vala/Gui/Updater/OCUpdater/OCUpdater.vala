@@ -165,7 +165,7 @@ public class OCUpdater : Updater {
     /***********************************************************
     ***********************************************************/
     public override void check_for_update () {
-        Soup.Reply reply = this.access_manager.get (Soup.Request (this.update_url));
+        GLib.InputStream reply = this.access_manager.get (Soup.Request (this.update_url));
         this.timeout_watchdog.timeout.connect (
             this.on_signal_timed_out
         );
@@ -297,9 +297,9 @@ public class OCUpdater : Updater {
     ***********************************************************/
     private void on_signal_version_info_arrived () {
         this.timeout_watchdog.stop ();
-        var reply = (Soup.Reply) sender ();
+        var reply = (GLib.InputStream) sender ();
         reply.delete_later ();
-        if (reply.error != Soup.Reply.NoError) {
+        if (reply.error != GLib.InputStream.NoError) {
             GLib.warning ("Failed to reach version check url: " + reply.error_string);
             download_state (DownloadState.DOWNLOAD_TIMED_OUT);
             return;

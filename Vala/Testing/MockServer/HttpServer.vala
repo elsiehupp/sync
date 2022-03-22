@@ -45,7 +45,7 @@ public class HttpServer : QTcpServer {
     private void on_signal_read_client () {
         QTcpSocket* socket = (QTcpSocket*)sender ();
         if (socket.can_read_line ()) {
-            string[] tokens = socket.read_line ().split (QRegularExpression ("[ \r\n][ \r\n]*"));
+            string[] tokens = socket.read_line ().split (GLib.Regex ("[ \r\n][ \r\n]*"));
             if (tokens[0] == "GET") {
                 QTextStream os = new QTextStream (socket);
                 os.set_auto_detect_unicode (true);

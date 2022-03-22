@@ -4,7 +4,7 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QRegularExpression>
+//  #include <GLib.Regex>
 //  #include <Soup.Buffer>
 
 using Soup;
@@ -24,7 +24,7 @@ public class HttpLogger : GLib.Object {
             return;
         }
         var keys = request.raw_header_list ();
-        GLib.List<Soup.Reply.RawHeaderPair> header;
+        GLib.List<GLib.InputStream.RawHeaderPair> header;
         header.reserve (keys.size ());
         foreach (var key in keys) {
             header += q_make_pair (key, request.raw_header (key));
@@ -38,7 +38,7 @@ public class HttpLogger : GLib.Object {
 
         GLib.Object.connect (
             reply,
-            Soup.Reply.signal_finished,
+            GLib.InputStream.signal_finished,
             reply,
             () => {
             log_http (request_verb (*reply),
@@ -76,12 +76,12 @@ public class HttpLogger : GLib.Object {
 
 
     public static bool is_text_body (string s) {
-        const QRegularExpression regular_expression = new QRegularExpression ("^ (text/.*| (application/ (xml|json|x-www-form-urlencoded) (;|$)))");
+        const GLib.Regex regular_expression = new GLib.Regex ("^ (text/.*| (application/ (xml|json|x-www-form-urlencoded) (;|$)))");
         return regular_expression.match (s).has_match ();
     }
 
 
-    public static void log_http (string verb, string url, string identifier, string content_type, GLib.List<Soup.Reply.RawHeaderPair> header, QIODevice device) {
+    public static void log_http (string verb, string url, string identifier, string content_type, GLib.List<GLib.InputStream.RawHeaderPair> header, QIODevice device) {
         var reply = (GLib.InputStream) device;
         var content_length = device ? device.size () : 0;
         string message;

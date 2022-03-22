@@ -20,7 +20,7 @@ using QKeychain;
 
 //  namespace KeychainChunk {
 //      class ReadJob;
-//      class WriteJob;
+//      class KeychainChunkWriteJob;
 //  }
 
 namespace Occ {
@@ -118,12 +118,12 @@ public class WebFlowCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public override bool still_valid (Soup.Reply reply) {
-        if (reply.error != Soup.Reply.NoError) {
+    public override bool still_valid (GLib.InputStream reply) {
+        if (reply.error != GLib.InputStream.NoError) {
             GLib.warning (reply.error);
             GLib.warning (reply.error_string);
         }
-        return (reply.error != Soup.Reply.AuthenticationRequiredError);
+        return (reply.error != GLib.InputStream.AuthenticationRequiredError);
     }
 
 
@@ -140,7 +140,7 @@ public class WebFlowCredentials : AbstractCredentials {
 
         // write cert if there is one
         if (!this.client_ssl_certificate == null) {
-            var kechain_chunk_write_job = new KeychainChunk.WriteJob (
+            var kechain_chunk_write_job = new KeychainChunkWriteJob (
                 this.account,
                 this.user + CLIENT_CERTIFICATE_PEM_C,
                 this.client_ssl_certificate.to_pem (),
@@ -212,7 +212,7 @@ public class WebFlowCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_authentication (Soup.Reply reply, QAuthenticator authenticator) {
+    private void on_signal_authentication (GLib.InputStream reply, QAuthenticator authenticator) {
         //  Q_UNUSED (reply)
 
         if (!this.ready) {
@@ -295,7 +295,7 @@ public class WebFlowCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_read_client_cert_pem_job_done (KeychainChunk.ReadJob read_job) {
+    private void on_signal_read_client_cert_pem_job_done (KeychainChunkReadJob read_job) {
         // Store PEM in memory
         if (read_job.error == NoError && read_job.binary_data ().length > 0) {
             GLib.List<QSslCertificate> ssl_certificate_list = QSslCertificate.from_data (read_job.binary_data (), QSsl.Pem);
@@ -305,7 +305,7 @@ public class WebFlowCredentials : AbstractCredentials {
         }
 
         // Load key too
-        var keychain_chunk_read_job = new KeychainChunk.ReadJob (
+        var keychain_chunk_read_job = new KeychainChunkReadJob (
             this.account,
             this.user + CLIENT_KEY_PEM_C,
             this.keychain_migration,
@@ -320,7 +320,7 @@ public class WebFlowCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_read_client_key_pem_job_done (KeychainChunk.ReadJob read_job) {
+    private void on_signal_read_client_key_pem_job_done (KeychainChunkReadJob read_job) {
         // Store key in memory
         if (read_job.error == NoError && read_job.binary_data ().length > 0) {
             string client_key_pem = read_job.binary_data ();
@@ -350,7 +350,7 @@ public class WebFlowCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_read_client_ca_certificates_pem_job_done (KeychainChunk.ReadJob read_job) {
+    private void on_signal_read_client_ca_certificates_pem_job_done (KeychainChunkReadJob read_job) {
         // Store cert in memory
         if (read_job) {
             if (read_job.error == NoError && read_job.binary_data ().length > 0) {
@@ -428,11 +428,11 @@ public class WebFlowCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_write_client_cert_pem_job_done (KeychainChunk.WriteJob write_job) {
+    private void on_signal_write_client_cert_pem_job_done (KeychainChunkWriteJob write_job) {
         //  Q_UNUSED (write_job)
         // write ssl key if there is one
         if (!this.client_ssl_key == null) {
-            var keychain_chunk_write_job = new KeychainChunk.WriteJob (
+            var keychain_chunk_write_job = new KeychainChunkWriteJob (
                 this.account,
                 this.user + CLIENT_KEY_PEM_C,
                 this.client_ssl_key.to_pem (),
@@ -451,7 +451,7 @@ public class WebFlowCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_write_client_key_pem_job_done (KeychainChunk.WriteJob write_job) {
+    private void on_signal_write_client_key_pem_job_done (KeychainChunkWriteJob write_job) {
         //  Q_UNUSED (write_job)
         this.client_ssl_ca_certificates_write_queue.clear ();
 
@@ -470,7 +470,7 @@ public class WebFlowCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_write_client_ca_certificates_pem_job_done (KeychainChunk.WriteJob write_job) {
+    private void on_signal_write_client_ca_certificates_pem_job_done (KeychainChunkWriteJob write_job) {
         // errors / next ca cert?
         if (write_job && !this.client_ssl_ca_certificates == "") {
             if (write_job.error != NoError) {
@@ -521,7 +521,7 @@ public class WebFlowCredentials : AbstractCredentials {
     private void read_single_client_ca_cert_pem () {
         // try to fetch a client ca cert
         if (this.client_ssl_ca_certificates.count () < this.client_ssl_ca_certificates_max_count) {
-            var keychain_chunk_read_job = new KeychainChunk.ReadJob (
+            var keychain_chunk_read_job = new KeychainChunkReadJob (
                 this.account,
                 this.user + client_ca_certificate_pemC + this.client_ssl_ca_certificates.count ().to_string (),
                 this.keychain_migration,
@@ -559,7 +559,7 @@ public class WebFlowCredentials : AbstractCredentials {
                 return;
             }
 
-            var keychain_chunk_write_job = new KeychainChunk.WriteJob (
+            var keychain_chunk_write_job = new KeychainChunkWriteJob (
                 this.account,
                 this.user + client_ca_certificate_pemC + string.number (index),
                 cert.to_pem (),
@@ -586,7 +586,7 @@ public class WebFlowCredentials : AbstractCredentials {
     ***********************************************************/
     protected void fetch_from_keychain_helper () {
         // Read client cert from keychain
-        var keychain_chunk_read_job = new KeychainChunk.ReadJob (
+        var keychain_chunk_read_job = new KeychainChunkReadJob (
             this.account,
             this.user + CLIENT_CERTIFICATE_PEM_C,
             this.keychain_migration,
@@ -636,7 +636,7 @@ public class WebFlowCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     private void start_delete_job (bool old_keychain_entries, string key) {
-        new KeychainChunk.DeleteJob (this.account, key, old_keychain_entries, this).on_signal_start ();
+        new KeychainChunk.KeychainChunkDeleteJob (this.account, key, old_keychain_entries, this).on_signal_start ();
     }
 
 
@@ -650,10 +650,10 @@ public class WebFlowCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_finished (Soup.Reply reply) {
+    private void on_signal_finished (GLib.InputStream reply) {
         GLib.info ("request on_signal_finished");
 
-        if (reply.error == Soup.Reply.NoError) {
+        if (reply.error == GLib.InputStream.NoError) {
             this.credentials_valid = true;
 
             /***********************************************************

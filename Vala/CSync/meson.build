@@ -6,10 +6,14 @@
 
 srcs = files([
 #    'Config.vala.cmake',
-    'Exclude.vala',
-    'CSync.vala',
+    'ExcludedFiles.vala',
+    'FileStat.vala',
+    'IndividualFileStatus.vala',
+    'ItemType.vala',
 #    'Version.vala.in',
     'Private.vala',
+    'SyncInstructions.vala',
+    'SyncStatus.vala',
     'Time.vala',
     'VioLocal.vala'
 ])

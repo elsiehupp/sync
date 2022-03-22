@@ -202,9 +202,9 @@ public class HttpCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     public bool still_valid (GLib.InputStream input_stream) {
-        return ( (input_stream.error != Soup.Reply.AuthenticationRequiredError)
+        return ( (input_stream.error != GLib.InputStream.AuthenticationRequiredError)
             // returned if user or password is incorrect
-            && (input_stream.error != Soup.Reply.OperationCanceledError
+            && (input_stream.error != GLib.InputStream.OperationCanceledError
                    || !input_stream.property (AUTHENTICATION_FAILED_C).to_bool ()));
     }
 

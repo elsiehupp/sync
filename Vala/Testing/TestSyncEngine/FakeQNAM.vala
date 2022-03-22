@@ -29,7 +29,7 @@ public class FakeQNAM : Soup {
 
     /***********************************************************
     ***********************************************************/
-    public delegate Soup.Reply OverrideDelegate (Operation value1, Soup.Request value2, QIODevice value3);
+    public delegate GLib.InputStream OverrideDelegate (Operation value1, Soup.Request value2, QIODevice value3);
 
     /***********************************************************
     ***********************************************************/
@@ -96,8 +96,8 @@ public class FakeQNAM : Soup {
 
     /***********************************************************
     ***********************************************************/
-    public Soup.Reply override_reply_with_error (string filename, Operation operation, Soup.Request new_request) {
-        Soup.Reply reply = null;
+    public GLib.InputStream override_reply_with_error (string filename, Operation operation, Soup.Request new_request) {
+        GLib.InputStream reply = null;
 
         GLib.assert_true (!filename == null);
         if (this.error_paths.contains (filename)) {
@@ -110,11 +110,11 @@ public class FakeQNAM : Soup {
 
     /***********************************************************
     ***********************************************************/
-    protected override Soup.Reply create_request (
+    protected override GLib.InputStream create_request (
         Operation operation,
         Soup.Request request,
         QIODevice outgoing_data = null) {
-        Soup.Reply reply = null;
+        GLib.InputStream reply = null;
         var new_request = request;
         new_request.set_raw_header ("X-Request-ID", AccessManager.generate_request_identifier ());
         var content_type = request.header (Soup.Request.ContentTypeHeader).to_string ();

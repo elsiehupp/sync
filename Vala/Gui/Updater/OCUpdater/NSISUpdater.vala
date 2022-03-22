@@ -71,9 +71,9 @@ public class NSISUpdater : OCUpdater {
     /***********************************************************
     ***********************************************************/
     private void on_signal_download_finished () {
-        var reply = qobject_cast<Soup.Reply> (sender ());
+        var reply = qobject_cast<GLib.InputStream> (sender ());
         reply.delete_later ();
-        if (reply.error != Soup.Reply.NoError) {
+        if (reply.error != GLib.InputStream.NoError) {
             download_state (DownloadState.DOWNLOAD_FAILED);
             return;
         }
@@ -102,7 +102,7 @@ public class NSISUpdater : OCUpdater {
     /***********************************************************
     ***********************************************************/
     private void on_signal_write_file () {
-        var reply = qobject_cast<Soup.Reply> (sender ());
+        var reply = qobject_cast<GLib.InputStream> (sender ());
         if (this.file.is_open) {
             this.file.write (reply.read_all ());
         }
@@ -316,7 +316,7 @@ public class NSISUpdater : OCUpdater {
                 } else {
                     var request = Soup.Request (GLib.Uri (url));
                     request.attribute (Soup.Request.Redirect_policy_attribute, Soup.Request.No_less_safe_redirect_policy);
-                    Soup.Reply reply = access_manager ().get (request);
+                    GLib.InputStream reply = access_manager ().get (request);
                     reply.ready_read.connect (
                         this.on_signal_write_file
                     );

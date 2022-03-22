@@ -43,10 +43,10 @@ srcs = files([
     'Credentials/HttpCredentials.vala',
     'Credentials/HttpCredentialsAccessManager.vala',
 
-    'Credentials/KeychainChunk/DeleteJob.vala',
-    'Credentials/KeychainChunk/Job.vala',
-    'Credentials/KeychainChunk/ReadJob.vala',
-    'Credentials/KeychainChunk/WriteJob.vala',
+    'Credentials/KeychainChunkDeleteJob.vala',
+    'Credentials/KeychainChunkJob.vala',
+    'Credentials/KeychainChunkReadJob.vala',
+    'Credentials/KeychainChunkWriteJob.vala',
 
     'Credentials/TokenCredentials.vala',
 

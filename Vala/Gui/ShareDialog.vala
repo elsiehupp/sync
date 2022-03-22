@@ -97,8 +97,8 @@ public class ShareDialog : Gtk.Dialog {
         string oc_dir = this.share_path;
         oc_dir.truncate (oc_dir.length - filename.length);
 
-        oc_dir.replace (QRegularExpression ("^/*"), "");
-        oc_dir.replace (QRegularExpression ("/*$"), "");
+        oc_dir.replace (GLib.Regex ("^/*"), "");
+        oc_dir.replace (GLib.Regex ("/*$"), "");
 
         // Laying this out is complex because share_path
         // may be in use or not.

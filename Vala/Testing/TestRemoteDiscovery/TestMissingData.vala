@@ -40,7 +40,7 @@ public class TestMissingData : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private Soup.Reply override_delegate_missing_data (Soup.Operation operation, Soup.Request request, QIODevice device) {
+    private GLib.InputStream override_delegate_missing_data (Soup.Operation operation, Soup.Request request, QIODevice device) {
         if (request.attribute (Soup.Request.CustomVerbAttribute) == "PROPFIND" && request.url.path.ends_with ("nopermissions"))
             return new MissingPermissionsPropfindReply (fake_folder.remote_modifier (), operation, request, this);
         return null;

@@ -34,7 +34,7 @@ public class FakeGetWithDataReply : FakeReply {
 
         if (request.has_raw_header ("Range")) {
             const string range = request.raw_header ("Range").to_string ();
-            const QRegularExpression bytes_pattern = new QRegularExpression ("bytes= (?<start>\\d+)- (?<end>\\d+)");
+            const GLib.Regex bytes_pattern = new GLib.Regex ("bytes= (?<start>\\d+)- (?<end>\\d+)");
             const QRegularExpressionMatch match = bytes_pattern.match (range);
             if (match.has_match ()) {
                 const int on_signal_start = match.captured ("on_signal_start").to_int ();

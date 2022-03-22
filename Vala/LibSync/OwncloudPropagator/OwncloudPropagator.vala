@@ -12,7 +12,7 @@ using Soup;
 //  #include <GLib.FileInfo>
 //  #include <GLib.Dir>
 //  #include <QTimerEvent>
-//  #include <QRegularExpression>
+//  #include <GLib.Regex>
 //  #include <qmath.h>
 //  #include <QElapse
 //  #include <QPointer>
@@ -187,11 +187,11 @@ public class OwncloudPropagator : GLib.Object {
 
         var regular_expression = sync_options.file_regex;
         if (regular_expression.is_valid ()) {
-            GLib.List<QStringRef> names;
+            GLib.List</* QStringRef */ string> names;
             foreach (var i in synced_items) {
                 if (regular_expression.match (i.file).has_match ()) {
                     int index = -1;
-                    QStringRef string_ref;
+                    /* QStringRef */ string string_ref;
                     do {
                         string_ref = i.file.mid_ref (0, index);
                         names.insert (string_ref);
@@ -296,8 +296,8 @@ public class OwncloudPropagator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static erase_filter (GLib.List<QStringRef> names, SyncFileItem item) {
-        return !names.contains (new QStringRef (
+    private static erase_filter (GLib.List</* QStringRef */ string> names, SyncFileItem item) {
+        return !names.contains (new /* QStringRef */ string (
             item.file
         ));
     }
@@ -1085,17 +1085,17 @@ public class OwncloudPropagator : GLib.Object {
     /***********************************************************
     Given an error from the network, map to a SyncFileItem.Status error
     ***********************************************************/
-    private SyncFileItem.Status classify_error (Soup.Reply.NetworkError nerror,
+    private SyncFileItem.Status classify_error (GLib.InputStream.NetworkError nerror,
         int http_code, bool another_sync_needed = null, string error_body = "") {
-        GLib.assert (nerror != Soup.Reply.NoError); // we should only be called when there is an error
+        GLib.assert (nerror != GLib.InputStream.NoError); // we should only be called when there is an error
 
-        if (nerror == Soup.Reply.RemoteHostClosedError) {
+        if (nerror == GLib.InputStream.RemoteHostClosedError) {
             // Sometimes server bugs lead to a connection close on certain files,
             // that shouldn't bring the rest of the syncing to a halt.
             return SyncFileItem.Status.NORMAL_ERROR;
         }
 
-        if (nerror > Soup.Reply.NoError && nerror <= Soup.Reply.UnknownProxyError) {
+        if (nerror > GLib.InputStream.NoError && nerror <= GLib.InputStream.UnknownProxyError) {
             // network error or proxy error . fatal
             return SyncFileItem.Status.FATAL_ERROR;
         }

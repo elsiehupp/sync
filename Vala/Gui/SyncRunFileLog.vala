@@ -4,7 +4,7 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QRegularExpression>
+//  #include <GLib.Regex>
 //  #include <qfileinfo.h>
 //  #include <QTextStream>
 //  #include <QScopedPointer>
@@ -113,7 +113,7 @@ public class SyncRunFileLog : GLib.Object {
         }
         string ts = item.response_time_stamp;
         if (ts.length () > 6) {
-            const QRegularExpression regular_expression = new QRegularExpression (" ( (\d\d:\d\d:\d\d))");
+            const GLib.Regex regular_expression = new GLib.Regex (" ( (\d\d:\d\d:\d\d))");
             const var regular_expression_match = regular_expression.match (ts);
             if (regular_expression_match.has_match ()) {
                 ts = regular_expression_match.captured (0);

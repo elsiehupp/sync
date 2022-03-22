@@ -41,7 +41,7 @@ public class RequestEtagJob : AbstractNetworkJob {
         // assumes ownership
         send_request ("PROPFIND", make_dav_url (path), request, buf);
 
-        if (this.reply.error != Soup.Reply.NoError) {
+        if (this.reply.error != GLib.InputStream.NoError) {
             GLib.warning ("Request network error: " + this.reply.error_string);
         }
         AbstractNetworkJob.start ();

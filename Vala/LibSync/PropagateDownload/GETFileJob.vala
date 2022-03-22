@@ -365,8 +365,8 @@ public class GETFileJob : AbstractNetworkJob {
             // Redirects and auth failures (oauth token renew) are handled by AbstractNetworkJob and
             // will end up restarting the job. We do not want to process further data from the initial
             // request. new_reply_hook () will reestablish signal connections for the follow-up request.
-            bool ok = disconnect (this.input_stream, Soup.Reply.signal_finished, this, GETFileJob.on_signal_ready_read)
-                && disconnect (this.input_stream, Soup.Reply.ready_read, this, GETFileJob.on_signal_ready_read);
+            bool ok = disconnect (this.input_stream, GLib.InputStream.signal_finished, this, GETFileJob.on_signal_ready_read)
+                && disconnect (this.input_stream, GLib.InputStream.ready_read, this, GETFileJob.on_signal_ready_read);
             //  ASSERT (ok);
             return;
         }
@@ -379,7 +379,7 @@ public class GETFileJob : AbstractNetworkJob {
             this.input_stream.read_buffer_size (0);
             return;
         }
-        if (this.input_stream.error != Soup.Reply.NoError) {
+        if (this.input_stream.error != GLib.InputStream.NoError) {
             return;
         }
         this.etag = get_etag_from_reply (this.input_stream);
@@ -418,7 +418,7 @@ public class GETFileJob : AbstractNetworkJob {
         int64 start = 0;
         string ranges = this.input_stream.raw_header ("Content-Range");
         if (!ranges == "") {
-            const QRegularExpression regular_expression = new QRegularExpression ("bytes (\\d+)-");
+            const GLib.Regex regular_expression = new GLib.Regex ("bytes (\\d+)-");
             var regular_expression_match = regular_expression.match (ranges);
             if (regular_expression_match.has_match ()) {
                 start = regular_expression_match.captured (1).to_long_long ();

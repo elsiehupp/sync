@@ -100,7 +100,7 @@ public class OcsProfileConnector : GLib.Object {
     }
 
 
-    private void on_signal_icon_job_error (Soup.Reply.NetworkError error_type) {
+    private void on_signal_icon_job_error (GLib.InputStream.NetworkError error_type) {
         GLib.warning ("Could not fetch icon: " + error_type);
     }
 

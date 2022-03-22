@@ -107,7 +107,7 @@ public class OAuth : GLib.Object {
         string peek = socket.peek (q_min (socket.bytes_available (), 4000LL)); //The code should always be within the first 4K
         if (peek.index_of ('\n') < 0)
             return; // wait until we find a \n
-        const QRegularExpression regular_expression = new QRegularExpression ("^GET /\\?code= ([a-z_a-Z0-9]+)[& ]"); // Match a  /?code=...  URL
+        const GLib.Regex regular_expression = new GLib.Regex ("^GET /\\?code= ([a-z_a-Z0-9]+)[& ]"); // Match a  /?code=...  URL
         const var regular_expression_match = regular_expression.match (peek);
         if (!regular_expression_match.has_match ()) {
             http_reply_and_close (socket, "404 Not Found", "<html><head><title>404 Not Found</title></head><body><center><h1>404 Not Found</h1></center></body></html>");
@@ -144,7 +144,7 @@ public class OAuth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_simple_network_job_finished (QTcpSocket socket, Soup.Reply reply) {
+    private void on_signal_simple_network_job_finished (QTcpSocket socket, GLib.InputStream reply) {
         var json_data = reply.read_all ();
         QJsonParseError json_parse_error;
         QJsonObject json = QJsonDocument.from_json (json_data, json_parse_error).object ();
@@ -153,7 +153,7 @@ public class OAuth : GLib.Object {
         string user = json["user_id"].to_string ();
         GLib.Uri message_url = json["message_url"].to_string ();
 
-        if (reply.error != Soup.Reply.NoError || json_parse_error.error != QJsonParseError.NoError
+        if (reply.error != GLib.InputStream.NoError || json_parse_error.error != QJsonParseError.NoError
             || json_data == "" || json == "" || refresh_token == "" || access_token == ""
             || json["token_type"].to_string () != "Bearer") {
             string error_reason;
@@ -161,7 +161,7 @@ public class OAuth : GLib.Object {
             if (!error_from_json == "") {
                 error_reason = _("Error returned from the server : <em>%1</em>")
                                   .printf (error_from_json.to_html_escaped ());
-            } else if (reply.error != Soup.Reply.NoError) {
+            } else if (reply.error != GLib.InputStream.NoError) {
                 error_reason = _("There was an error accessing the \"token\" endpoint : <br><em>%1</em>")
                                   .printf (reply.error_string.to_html_escaped ());
             } else if (json_data == "") {

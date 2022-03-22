@@ -233,7 +233,7 @@ public class PropagateUploadFileCommon : PropagateItemJob {
         }
 
         GLib.debug ("Deleting the current.");
-        var delete_job = new DeleteJob (
+        var delete_job = new KeychainChunkDeleteJob (
             this.propagator.account,
             this.propagator.full_remote_path (this.file_to_upload.file),
             this

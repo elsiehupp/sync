@@ -50,7 +50,7 @@ public class TestFakeConflict : AbstractTestSyncEngine {
     }
 
 
-    private Soup.Reply override_delegate_fake_conflict (Soup.Operation operation, Soup.Request request, QIODevice device) {
+    private GLib.InputStream override_delegate_fake_conflict (Soup.Operation operation, Soup.Request request, QIODevice device) {
         if (operation == Soup.GetOperation)
             ++n_get;
         return null;

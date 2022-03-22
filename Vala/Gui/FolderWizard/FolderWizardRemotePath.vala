@@ -184,7 +184,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_handle_mkdir_network_error (Soup.Reply reply) {
+    protected void on_signal_handle_mkdir_network_error (GLib.InputStream reply) {
         GLib.warning ("webdav mkdir request failed: " + reply.error);
         if (!this.account.credentials ().still_valid (reply)) {
             on_signal_show_warning (_("Authentication failed accessing %1").printf (Theme.app_name_gui));
@@ -197,7 +197,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_handle_lscol_network_error (Soup.Reply reply) {
+    protected void on_signal_handle_lscol_network_error (GLib.InputStream reply) {
         // Ignore 404s, otherwise users will get annoyed by error popups
         // when not typing fast enough. It's still clear that a given path
         // was not found, because the 'Next' button is disabled and no entry

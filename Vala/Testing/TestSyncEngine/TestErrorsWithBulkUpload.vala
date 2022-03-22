@@ -55,7 +55,7 @@ public class TestErrorsWithBulkUpload : AbstractTestSyncEngine {
     }
 
 
-    private Soup.Reply override_delegate_with_bulk_upload (Soup.Operation operation, Soup.Request request, QIODevice outgoing_data) {
+    private GLib.InputStream override_delegate_with_bulk_upload (Soup.Operation operation, Soup.Request request, QIODevice outgoing_data) {
         var content_type = request.header (Soup.Request.ContentTypeHeader).to_string ();
         if (operation == Soup.PostOperation) {
             ++number_of_post;

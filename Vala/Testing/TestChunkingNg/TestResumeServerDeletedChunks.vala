@@ -88,7 +88,7 @@ public class TestResumeServerDeletedChunks : AbstractTestChunkingNg {
     }
 
 
-    private Soup.Reply override_delegate_connection_dropped (Soup.Operation operation, Soup.Request request, QIODevice outgoing_data) {
+    private GLib.InputStream override_delegate_connection_dropped (Soup.Operation operation, Soup.Request request, QIODevice outgoing_data) {
         if (!chunking) {
             GLib.assert_true (!request.url.path.contains ("/uploads/")
                 && "Should not touch uploads endpoint when not chunking");

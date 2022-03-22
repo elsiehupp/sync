@@ -85,7 +85,7 @@ public class PUTFileJob : AbstractNetworkJob {
             send_request ("PUT", make_dav_url (path), request, this.device);
         }
 
-        if (this.input_stream.error != Soup.Reply.NoError) {
+        if (this.input_stream.error != GLib.InputStream.NoError) {
             GLib.warning (" Network error: " + this.input_stream.error_string);
         }
 

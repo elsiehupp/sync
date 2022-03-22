@@ -119,7 +119,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
         const var move_job = qobject_cast<MoveJob> (sender ());
         const var error = move_job.input_stream.error;
 
-        if (error != Soup.Reply.NoError) {
+        if (error != GLib.InputStream.NoError) {
             this.ui.error_label.on_signal_text (_("Could not rename file. Please make sure you are connected to the server."));
             return;
         }
@@ -140,7 +140,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_remote_file_does_not_exist (Soup.Reply reply) {
+    private void on_signal_remote_file_does_not_exist (GLib.InputStream reply) {
         //  Q_UNUSED (reply);
 
         // File does not exist. We can rename it.

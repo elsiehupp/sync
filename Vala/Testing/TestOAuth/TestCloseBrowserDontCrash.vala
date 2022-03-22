@@ -18,7 +18,7 @@ class TestCloseBrowserDontCrash : AbstractTestOAuth {
     }
 
 
-    override Soup.Reply token_reply (Soup.Operation operation, Soup.Request request) {
+    override GLib.InputStream token_reply (Soup.Operation operation, Soup.Request request) {
         //  ASSERT (browser_reply);
         // simulate the fact that the browser is closing the connection
         browser_reply.on_signal_abort ();
@@ -34,7 +34,7 @@ class TestCloseBrowserDontCrash : AbstractTestOAuth {
 
     override void browser_reply_finished () {
         GLib.assert_true (sender () == browser_reply);
-        GLib.assert_true (browser_reply.error == Soup.Reply.OperationCanceledError);
+        GLib.assert_true (browser_reply.error == GLib.InputStream.OperationCanceledError);
         reply_to_browser_ok = true;
     }
 

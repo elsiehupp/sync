@@ -4,9 +4,9 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QRegularExpression>
+//  #include <GLib.Regex>
 //  #includeonce
-//  #include <QRegularExpression>
+//  #include <GLib.Regex>
 //  #include <chrono>
 
 namespace Occ {
@@ -81,14 +81,14 @@ public class SyncOptions : GLib.Object {
     If no pattern is provided the default is an invalid regular
     expression.
     ***********************************************************/
-    public QRegularExpression file_regex { public get; private set; }
+    public GLib.Regex file_regex { public get; private set; }
 
 
     /***********************************************************
     ***********************************************************/
     public SyncOptions () {
         this.vfs = new VfsOff ();
-        this.file_regex = QRegularExpression ("(");
+        this.file_regex = GLib.Regex ("(");
     }
 
 
@@ -152,7 +152,7 @@ public class SyncOptions : GLib.Object {
     A pattern like /own.*\/.*txt matching the full path
     ***********************************************************/
     public void path_pattern (string pattern) {
-        this.file_regex.pattern_options (Utility.fs_case_preserving () ? QRegularExpression.CaseInsensitiveOption : QRegularExpression.NoPatternOption);
+        this.file_regex.pattern_options (Utility.fs_case_preserving () ? GLib.Regex.CaseInsensitiveOption : GLib.Regex.NoPatternOption);
         this.file_regex.pattern (pattern);
     }
 

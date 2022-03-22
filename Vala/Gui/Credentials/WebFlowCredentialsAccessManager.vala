@@ -25,7 +25,7 @@ public class WebFlowCredentialsAccessManager : AccessManager {
 
     /***********************************************************
     ***********************************************************/
-    protected override Soup.Reply create_request (Operation operation, Soup.Request request, QIODevice outgoing_data) {
+    protected override GLib.InputStream create_request (Operation operation, Soup.Request request, QIODevice outgoing_data) {
         Soup.Request req (request);
         if (!req.attribute (WebFlowCredentials.DontAddCredentialsAttribute).to_bool ()) {
             if (this.credentials && !this.credentials.password () == "") {

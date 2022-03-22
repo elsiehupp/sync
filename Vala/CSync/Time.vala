@@ -1,3 +1,6 @@
+namespace Occ {
+namespace CSync {
+
 /***********************************************************
 c_time - time functions
 
@@ -7,8 +10,6 @@ This might be Windows-only and unnecessary on Linux?
 
 @copyright LGPL 2.1 or later
 ***********************************************************/
-namespace CSync {
-
 public class Time : GLib.Object {
 
     private const int CSYNC_SECONDS_SINCE_1601 = 11644473600LL;
@@ -83,3 +84,4 @@ public class Time : GLib.Object {
 } // class Time
 
 } // namespace CSync
+} // namespace Occ

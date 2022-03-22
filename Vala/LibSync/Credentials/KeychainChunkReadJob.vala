@@ -1,25 +1,22 @@
-/***********************************************************
-@author Michael Schuster <michael@schuster.ms>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
 namespace Occ {
 namespace LibSync {
-namespace KeychainChunk {
 
 /***********************************************************
 @brief Simple wrapper class for QKeychain.ReadPasswordJob,
 splits too large keychain entry's data into chunks on Windows
+
+@author Michael Schuster <michael@schuster.ms>
+
+@copyright GPLv3 or Later
 ***********************************************************/
-public class ReadJob : KeychainChunk.Job {
+public class KeychainChunkReadJob : KeychainChunkJob {
 
     /***********************************************************
     true if we haven't done yet any reading from keychain
     ***********************************************************/
     private bool retry_on_signal_key_chain_error = true;
 
-    internal signal void signal_finished (KeychainChunk.ReadJob incoming_job);
+    internal signal void signal_finished (KeychainChunkReadJob incoming_job);
 
     /***********************************************************
     ***********************************************************/
@@ -144,6 +141,5 @@ public class ReadJob : KeychainChunk.Job {
 
 } // class ReadJob
 
-} // namespace KeychainChunk
 } // namespace LibSync
 } // namespace Occ

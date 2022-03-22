@@ -49,7 +49,7 @@ public class TestInsufficientRemoteStorage : AbstractTestSyncEngine {
     }
 
 
-    private Soup.Reply override_delegate_insufficient_remote_storage (Soup.Operation operation, Soup.Request request, QIODevice outgoing_data) {
+    private GLib.InputStream override_delegate_insufficient_remote_storage (Soup.Operation operation, Soup.Request request, QIODevice outgoing_data) {
 
         if (operation == Soup.PutOperation) {
             number_of_put++;

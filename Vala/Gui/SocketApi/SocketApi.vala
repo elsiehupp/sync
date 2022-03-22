@@ -324,7 +324,7 @@ public class SocketApi : GLib.Object {
             const int arg_pos = line.index_of (':');
             const string command = line.mid_ref (0, arg_pos).to_utf8 ().to_upper ();
 
-            const var argument = arg_pos != -1 ? line.mid_ref (arg_pos + 1) : QStringRef ();
+            const var argument = arg_pos != -1 ? line.mid_ref (arg_pos + 1) : /* QStringRef */ string ();
             if (command.starts_with ("ASYNC_")) {
                 var arguments = argument.split ('|');
                 if (arguments.size () != 2) {
@@ -488,7 +488,7 @@ public class SocketApi : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static void on_signal_prop_find_job_finished_with_error (Soup.Reply reply) {
+    private static void on_signal_prop_find_job_finished_with_error (GLib.InputStream reply) {
         SocketApi.target_function (old_url);
     }
 

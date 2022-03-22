@@ -45,7 +45,7 @@ public class TestErrorMessage : GLib.Object {
     }
 
 
-    private Soup.Reply override_delegate_error_message (Soup.Operation operation, Soup.Request request, QIODevice device) {
+    private GLib.InputStream override_delegate_error_message (Soup.Operation operation, Soup.Request request, QIODevice device) {
         if (operation == Soup.GetOperation && request.url.path.ends_with ("A/broken")) {
             return new FakeErrorReply (operation, request, this, 400,
                 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"

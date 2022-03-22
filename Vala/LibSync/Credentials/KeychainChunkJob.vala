@@ -1,25 +1,20 @@
-/***********************************************************
-@author Michael Schuster <michael@schuster.ms>
-
-@copyright GPLv3 or Later
-***********************************************************/
-
 namespace Occ {
 namespace LibSync {
 
 /***********************************************************
+@brief Abstract base class for KeychainChunk jobs.
+
 Workaround for Windows:
 
 Split the keychain entry's data into chunks of 2048 bytes,
 to allow 4k (4096 bit) keys / large certificates to be saved (see
     limits in webflowcredentials.h)
-***********************************************************/
-namespace KeychainChunk {
 
-/***********************************************************
-@brief Abstract base class for KeychainChunk jobs.
+@author Michael Schuster <michael@schuster.ms>
+
+@copyright GPLv3 or Later
 ***********************************************************/
-public class Job : GLib.Object {
+public class KeychainChunkJob : GLib.Object {
 
     // We don't support insecure fallback
     // const bool KEYCHAINCHUNK_ENABLE_INSECURE_FALLBACK = true;
@@ -55,14 +50,14 @@ public class Job : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public Job (GLib.Object parent = new GLib.Object ()) {
+    public KeychainChunkJob (GLib.Object parent = new GLib.Object ()) {
         base (parent);
         this.error = QKeychain.NoError;
         this.service_name = Theme.app_name;
     }
 
 
-    ~Job () {
+    ~KeychainChunkJob () {
         this.chunk_count = 0;
         this.chunk_buffer.steal (); // to clear securely?
     }
@@ -93,6 +88,5 @@ public class Job : GLib.Object {
 
 } // class Job
 
-} // namespace KeychainChunk
 } // namespace LibSync
 } // namespace Occ

@@ -15,7 +15,7 @@
 //  #include <QCoreApplicatio
 //  #include <QAuthentic
 //  #include <QMetaEnum>
-//  #include <QRegularExpression>
+//  #include <GLib.Regex>
 
 //  #include <QPointer>
 //  #include <QElapsedTimer>
@@ -127,7 +127,7 @@ public class AbstractNetworkJob : GLib.Object {
     Set by the xyz_request () functions and needed to be able to
     redirect requests, should it be required.
 
-    Reparented to the currently running Soup.Reply.
+    Reparented to the currently running GLib.InputStream.
     ***********************************************************/
     private QIODevice request_body;
 
@@ -319,7 +319,7 @@ public class AbstractNetworkJob : GLib.Object {
 
 
     /***********************************************************
-    Initiate a network request, returning a Soup.Reply.
+    Initiate a network request, returning a GLib.InputStream.
 
     Calls this.input_stream and up_connections () on it.
 
@@ -460,10 +460,10 @@ public class AbstractNetworkJob : GLib.Object {
 
     protected string reply_status_string () {
         GLib.assert (this.input_stream);
-        if (this.input_stream.error == Soup.Reply.NoError) {
+        if (this.input_stream.error == GLib.InputStream.NoError) {
             return "OK";
         } else {
-            string enum_str = QMetaEnum.from_type<Soup.Reply.NetworkError> ().value_to_key (static_cast<int> (this.input_stream.error));
+            string enum_str = QMetaEnum.from_type<GLib.InputStream.NetworkError> ().value_to_key (static_cast<int> (this.input_stream.error));
             return "%1 %2".printf (enum_str, this.error_string);
         }
     }
@@ -478,20 +478,20 @@ public class AbstractNetworkJob : GLib.Object {
 
 
     /***********************************************************
-    Called at the end of Soup.Reply.on_signal_finished processing.
+    Called at the end of GLib.InputStream.on_signal_finished processing.
 
     Returning true triggers a delete_later () of this job.
     ***********************************************************/
     private void on_signal_finished () {
         this.timer.stop ();
 
-        if (this.input_stream.error == Soup.Reply.SslHandshakeFailedError) {
+        if (this.input_stream.error == GLib.InputStream.SslHandshakeFailedError) {
             GLib.warning ("SslHandshakeFailedError: " + this.error_string + ": can be caused by a webserver wanting SSL client certificates.");
         }
         // Qt doesn't yet transparently resend HTTP2 requests, do so here
         var max_http2Resends = 3;
         string verb = HttpLogger.request_verb (*this.input_stream);
-        if (this.input_stream.error == Soup.Reply.ContentReSendError
+        if (this.input_stream.error == GLib.InputStream.ContentReSendError
             && this.input_stream.attribute (Soup.Request.HTTP2WasUsedAttribute).to_bool ()) {
 
             if ( (this.request_body && !this.request_body.is_sequential ()) || verb == "") {
@@ -524,16 +524,16 @@ public class AbstractNetworkJob : GLib.Object {
             }
         }
 
-        if (this.input_stream.error != Soup.Reply.NoError) {
+        if (this.input_stream.error != GLib.InputStream.NoError) {
 
             if (this.account.credentials ().retry_if_needed (this)) {
                 return;
             }
 
-            if (!this.ignore_credential_failure || this.input_stream.error != Soup.Reply.AuthenticationRequiredError) {
+            if (!this.ignore_credential_failure || this.input_stream.error != GLib.InputStream.AuthenticationRequiredError) {
                 GLib.warning (this.input_stream.error + this.error_string
                     + this.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute));
-                if (this.input_stream.error == Soup.Reply.ProxyAuthenticationRequiredError) {
+                if (this.input_stream.error == GLib.InputStream.ProxyAuthenticationRequiredError) {
                     GLib.warning (this.input_stream.raw_header ("Proxy-Authenticate"));
                 }
             }
@@ -661,7 +661,7 @@ public class AbstractNetworkJob : GLib.Object {
     /***********************************************************
     Nicer this.error_string for GLib.InputStream
 
-    By default Soup.Reply.error_string often produces messages like
+    By default GLib.InputStream.error_string often produces messages like
     "Error downloading <url> - server replied : <reason>"
     but the "downloading" part invariably confuses people since the
     error might very well have been produced by a PUT request.

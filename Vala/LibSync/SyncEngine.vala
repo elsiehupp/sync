@@ -492,7 +492,7 @@ public class SyncEngine : GLib.Object {
             invalid_filename_pattern = " ([\\:?*\"<>|])";
         }
         if (!invalid_filename_pattern == "")
-            this.discovery_phase.invalid_filename_rx = QRegularExpression (invalid_filename_pattern);
+            this.discovery_phase.invalid_filename_rx = GLib.Regex (invalid_filename_pattern);
         this.discovery_phase.server_blocklisted_files = this.account.capabilities.blocklisted_files ();
         this.discovery_phase.ignore_hidden_files = ignore_hidden_files;
 
@@ -1017,7 +1017,7 @@ public class SyncEngine : GLib.Object {
             const string script = q_environment_variable ("OWNCLOUD_POST_UPDATE_SCRIPT");
 
             GLib.debug ("Post Update Script: " + script);
-            var script_args = script.split (QRegularExpression ("\\s+"), Qt.SkipEmptyParts);
+            var script_args = script.split (GLib.Regex ("\\s+"), Qt.SkipEmptyParts);
             if (script_args.size () > 0) {
                 var script_executable = script_args.take_first ();
                 QProcess.execute (script_executable, script_args);
@@ -1339,7 +1339,7 @@ public class SyncEngine : GLib.Object {
                 if (!transfer_identifier)
                     continue; // Was not a chunked upload
                 GLib.Uri url = Utility.concat_url_path (account.url, "remote.php/dav/uploads/" + account.dav_user + "/" + string.number (transfer_identifier));
-                (new DeleteJob (account, url, this)).start ();
+                (new KeychainChunkDeleteJob (account, url, this)).start ();
             }
         }
     }

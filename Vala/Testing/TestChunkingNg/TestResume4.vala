@@ -43,7 +43,7 @@ public class TestResume4 : AbstractTestChunkingNg {
     }
 
 
-    private Soup.Reply override_delegate_resume3 (Soup.Operation operation, Soup.Request request, QIODevice device) {
+    private GLib.InputStream override_delegate_resume3 (Soup.Operation operation, Soup.Request request, QIODevice device) {
         if (operation == Soup.PutOperation) {
             saw_put = true;
         } else if (operation == Soup.DeleteOperation) {

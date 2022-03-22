@@ -150,7 +150,7 @@ public class Application : Gtk.Application {
     /***********************************************************
     #if defined (WITH_CRASHREPORTER)
     ***********************************************************/
-    private QScopedPointer<CrashReporter.Handler> crash_handler;
+    private CrashReporter.Handler crash_handler;
 
     /***********************************************************
     ***********************************************************/
@@ -537,7 +537,7 @@ public class Application : Gtk.Application {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_sync_finished (Folder folder, Glib.Object con, string normal_name) {
+    private void on_signal_sync_finished (Folder folder, GLib.Object con, string normal_name) {
         folder.disconnect (con);
         if (GLib.File.exists (normal_name)) {
             QDesktopServices.open_url (GLib.Uri.from_local_file (normal_name));

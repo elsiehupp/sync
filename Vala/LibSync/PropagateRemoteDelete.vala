@@ -14,7 +14,7 @@ namespace LibSync {
 ***********************************************************/
 public class PropagateRemoteDelete : PropagateItemJob {
 
-    DeleteJob delete_job;
+    KeychainChunkDeleteJob delete_job;
     AbstractPropagateRemoteDeleteEncrypted delete_encrypted_helper = null;
 
     /***********************************************************
@@ -51,7 +51,7 @@ public class PropagateRemoteDelete : PropagateItemJob {
     private void on_signal_abstract_propagate_remote_delete_encrypted_finished (bool on_signal_success) {
         if (!on_signal_success) {
             SyncFileItem.Status status = SyncFileItem.Status.NORMAL_ERROR;
-            if (this.delete_encrypted_helper.network_error != Soup.Reply.NoError && this.delete_encrypted_helper.network_error != Soup.Reply.ContentNotFoundError) {
+            if (this.delete_encrypted_helper.network_error != GLib.InputStream.NoError && this.delete_encrypted_helper.network_error != GLib.InputStream.ContentNotFoundError) {
                 status = this.classify_error (this.delete_encrypted_helper.network_error, this.item.http_error_code, this.propagator.another_sync_needed);
             }
             on_signal_done (status, this.delete_encrypted_helper.error_string);
@@ -66,7 +66,7 @@ public class PropagateRemoteDelete : PropagateItemJob {
     public void create_delete_job (string filename) {
         GLib.info ("Deleting file, local" + this.item.file + "remote" + filename);
 
-        this.delete_job = new DeleteJob (
+        this.delete_job = new KeychainChunkDeleteJob (
             this.propagator.account,
             this.propagator.full_remote_path (filename),
             this
@@ -106,13 +106,13 @@ public class PropagateRemoteDelete : PropagateItemJob {
 
         //  ASSERT (this.delete_job);
 
-        Soup.Reply.NetworkError err = this.delete_job.input_stream.error;
+        GLib.InputStream.NetworkError err = this.delete_job.input_stream.error;
         const int http_status = this.delete_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         this.item.http_error_code = http_status;
         this.item.response_time_stamp = this.delete_job.response_timestamp;
         this.item.request_id = this.delete_job.request_id ();
 
-        if (err != Soup.Reply.NoError && err != Soup.Reply.ContentNotFoundError) {
+        if (err != GLib.InputStream.NoError && err != GLib.InputStream.ContentNotFoundError) {
             SyncFileItem.Status status = classify_error (err, this.item.http_error_code,
                 this.propagator.another_sync_needed);
             on_signal_done (status, this.delete_job.error_string);

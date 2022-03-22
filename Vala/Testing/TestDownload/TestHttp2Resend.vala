@@ -42,10 +42,10 @@ public class TestHttp2Resend : GLib.Object {
     }
 
 
-    private Soup.Reply override_delegate_http2_resend (Soup.Operation operation, Soup.Request request, QIODevice device) {
+    private GLib.InputStream override_delegate_http2_resend (Soup.Operation operation, Soup.Request request, QIODevice device) {
         if (operation == Soup.GetOperation && request.url.path.ends_with ("A/resendme") && resend_actual < resend_expected) {
             var error_reply = new FakeErrorReply (operation, request, this, 400, "ignore this body");
-            error_reply.set_error (Soup.Reply.ContentReSendError, server_message);
+            error_reply.set_error (GLib.InputStream.ContentReSendError, server_message);
             error_reply.set_attribute (Soup.Request.HTTP2WasUsedAttribute, true);
             error_reply.set_attribute (Soup.Request.HttpStatusCodeAttribute, GLib.Variant ());
             resend_actual += 1;

@@ -281,8 +281,8 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
         this.item.http_error_code = put_file_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         this.item.response_time_stamp = put_file_job.response_timestamp;
         this.item.request_id = put_file_job.request_id ();
-        Soup.Reply.NetworkError err = put_file_job.input_stream.error;
-        if (err != Soup.Reply.NoError) {
+        GLib.InputStream.NetworkError err = put_file_job.input_stream.error;
+        if (err != GLib.InputStream.NoError) {
             common_error_handling (put_file_job);
             return;
         }

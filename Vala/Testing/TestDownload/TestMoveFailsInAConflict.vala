@@ -56,7 +56,7 @@ public class TestMoveFailsInAConflict : GLib.Object {
     }
 
 
-    private Soup.Reply override_delegate_move_fails_in_a_conflict (Soup.Operation operation, Soup.Request request, QIODevice device) {
+    private GLib.InputStream override_delegate_move_fails_in_a_conflict (Soup.Operation operation, Soup.Request request, QIODevice device) {
         if (operation == Soup.GetOperation) {
             GLib.assert_fail ("There shouldn't be any download", __FILE__, __LINE__);
         }

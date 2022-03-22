@@ -53,7 +53,7 @@ public class AbstractTestPermissions : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected static void apply_permissions_from_name (FileInfo info) {
-        QRegularExpression regular_expression = new QRegularExpression ("this.PERM_ ([^this.]*)this.[^/]*$");
+        GLib.Regex regular_expression = new GLib.Regex ("this.PERM_ ([^this.]*)this.[^/]*$");
         var m = regular_expression.match (info.name);
         if (m.has_match ()) {
             info.permissions = RemotePermissions.from_server_string (m.captured (1));
@@ -69,8 +69,7 @@ public class AbstractTestPermissions : GLib.Object {
     Check if the expected rows in the DB are non-empty. Note
     that in some cases they might be, then we cannot use this
     function.
-    
-    @see https://github.com/owncloud/client/issues/2038
+       @see https://github.com/owncloud/client/issues/2038
     ***********************************************************/
     protected static static void assert_csync_journal_ok (SyncJournalDb journal) {
         // The DB is openend in locked mode : close to allow us to access.

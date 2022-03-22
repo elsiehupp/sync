@@ -44,7 +44,7 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public Soup.Reply.NetworkError network_error { public get; protected set; }
+    public GLib.InputStream.NetworkError network_error { public get; protected set; }
 
     /***********************************************************
     ***********************************************************/
@@ -58,7 +58,7 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
     ***********************************************************/
     protected AbstractPropagateRemoteDeleteEncrypted (OwncloudPropagator propagator, SyncFileItem item, GLib.Object parent) {
         base (parent);
-        this.network_error = Soup.Reply.NoError;
+        this.network_error = GLib.InputStream.NoError;
         this.propagator = propagator;
         this.item = item;
     }
@@ -71,8 +71,8 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected void store_first_error (Soup.Reply.NetworkError error_to_store) {
-        if (this.network_error == Soup.Reply.NetworkError.NoError) {
+    protected void store_first_error (GLib.InputStream.NetworkError error_to_store) {
+        if (this.network_error == GLib.InputStream.NetworkError.NoError) {
             this.network_error = error_to_store;
         }
     }
@@ -164,12 +164,12 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_delete_remote_item_finished () {
-        var delete_job = qobject_cast<DeleteJob> (GLib.Object.sender ());
+        var delete_job = qobject_cast<KeychainChunkDeleteJob> (GLib.Object.sender ());
 
         GLib.assert (delete_job);
 
         if (!delete_job) {
-            GLib.critical (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED + "Sender is not a DeleteJob instance.");
+            GLib.critical (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED + "Sender is not a KeychainChunkDeleteJob instance.");
             on_signal_task_failed ();
             return;
         }
@@ -178,7 +178,7 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
         this.item.response_time_stamp = delete_job.response_timestamp;
         this.item.request_id = delete_job.request_id ();
 
-        if (delete_job.reply.error != Soup.Reply.NoError && delete_job.reply.error != Soup.Reply.ContentNotFoundError) {
+        if (delete_job.reply.error != GLib.InputStream.NoError && delete_job.reply.error != GLib.InputStream.ContentNotFoundError) {
             store_first_error_string (delete_job.error_string);
             store_first_error (delete_job.reply.error);
 
@@ -214,7 +214,7 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : GLib.Object {
     protected void delete_remote_item (string filename) {
         GLib.info (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED + "Deleting nested encrypted item " + filename);
 
-        var delete_job = new DeleteJob (this.propagator.account, this.propagator.full_remote_path (filename), this);
+        var delete_job = new KeychainChunkDeleteJob (this.propagator.account, this.propagator.full_remote_path (filename), this);
         delete_job.folder_token (this.folder_token);
 
         delete_job.signal_finished.connect (

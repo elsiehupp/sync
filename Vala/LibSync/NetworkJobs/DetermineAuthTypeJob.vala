@@ -112,7 +112,7 @@ public class DetermineAuthTypeJob : GLib.Object {
     private void on_signal_get_request_finished (Soup.Request get_request) {
         var reply = get_request.input_stream;
         var www_authenticate_header = reply.raw_header ("WWW-Authenticate");
-        if (reply.error == Soup.Reply.AuthenticationRequiredError
+        if (reply.error == GLib.InputStream.AuthenticationRequiredError
             && (www_authenticate_header.starts_with ("Basic") || www_authenticate_header.starts_with ("Bearer"))) {
             this.result_get = Basic;
         } else {

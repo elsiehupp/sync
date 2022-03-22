@@ -20,7 +20,7 @@ class TestRandomConnections : AbstractTestOAuth {
 
     /***********************************************************
     ***********************************************************/
-    private override Soup.Reply create_browser_reply (Soup.Request request) {
+    private override GLib.InputStream create_browser_reply (Soup.Request request) {
         GLib.Timeout.single_shot (0, this, () => {
             var port = request.url.port ();
             state = CustomState;
@@ -57,7 +57,7 @@ class TestRandomConnections : AbstractTestOAuth {
 
     /***********************************************************
     ***********************************************************/
-    private override Soup.Reply token_reply (Soup.Operation operation, Soup.Request request) {
+    private override GLib.InputStream token_reply (Soup.Operation operation, Soup.Request request) {
         if (state == CustomState) {
             return new FakeErrorReply (operation, request, this, 500);
         }

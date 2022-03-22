@@ -20,7 +20,7 @@ public class AbstractTestAsyncOp : GLib.Object {
     FakeFolder fake_folder;
     TestCase.PollRequestDelegate
 
-    public delegate Soup.Reply PollRequestDelegate (TestCase test_case, Soup.Request request);
+    public delegate GLib.InputStream PollRequestDelegate (TestCase test_case, Soup.Request request);
     public PollRequestDelegate poll_request;
     public delegate void ToPerform (FileInfo file_info);
     ToPerform perform;
@@ -210,7 +210,7 @@ public class AbstractTestAsyncOp : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private Soup.Reply override_delegate_async_upload_operations1 (Soup.Operation operation, Soup.Request request, QIODevice outgoing_data) {
+    private GLib.InputStream override_delegate_async_upload_operations1 (Soup.Operation operation, Soup.Request request, QIODevice outgoing_data) {
         var path = request.url.path;
 
         if (operation == Soup.GetOperation && path.starts_with ("/async-poll/")) {
@@ -249,7 +249,7 @@ public class AbstractTestAsyncOp : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private Soup.Reply override_delegate_async_upload_operations2 (Soup.Operation operation, Soup.Request request, QIODevice device) {
+    private GLib.InputStream override_delegate_async_upload_operations2 (Soup.Operation operation, Soup.Request request, QIODevice device) {
         var path = request.url.path;
         if (operation == Soup.GetOperation && path.starts_with ("/async-poll/")) {
             var file = path.mid ("/async-poll/".size () - 1);

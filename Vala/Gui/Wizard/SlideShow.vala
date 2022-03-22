@@ -76,7 +76,7 @@ public class SlideShow : Gtk.Widget {
 
     private QPoint press_point;
     private QBasic_timer timer;
-    private Glib.List<string> labels;
+    private GLib.List<string> labels;
     private GLib.List<Gdk.Pixbuf> pixmaps;
     private QPointer<QVariantAnimation> animation = null;
 

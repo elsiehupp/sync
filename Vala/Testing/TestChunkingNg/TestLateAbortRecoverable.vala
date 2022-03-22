@@ -37,7 +37,7 @@ public class TestLateAbortRecoverable : AbstractTestChunkingNg {
     }
 
 
-    private Soup.Reply override_delegate_abort_recoverable (Soup.Operation operation, Soup.Request request, QIODevice device) {
+    private GLib.InputStream override_delegate_abort_recoverable (Soup.Operation operation, Soup.Request request, QIODevice device) {
         if (request.attribute (Soup.Request.CustomVerbAttribute) == "MOVE") {
             GLib.Timeout.single_shot (50, parent, () => { fake_folder.sync_engine.on_signal_abort (); });
             return new DelayedReply<FakeChunkMoveReply> (response_delay, fake_folder.upload_state (), fake_folder.remote_modifier (), operation, request, parent);

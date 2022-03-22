@@ -10,7 +10,7 @@ Removing the root encrypted folder is consisted of multiple steps:
 - 2nd step is to lock the root folder useing the folder_iD from the previous step. !!! Note: If there are no nested items in the folder, this, and subsequent steps are skipped until step 7.
 - 3rd step is to obtain the root folder's metadata (it contains list of nested files and folders)
 - 4th step is to remove the nested files and folders from the metadata and send it to the server via UpdateMetadataApiJob
-- 5th step is to trigger DeleteJob for every nested file and folder of the root folder
+- 5th step is to trigger KeychainChunkDeleteJob for every nested file and folder of the root folder
 - 6th step is to unlock the root folder using the previously obtained token from locking
 - 7th step is to decrypt and delete the root folder, because it is now possible as it has become empty
 ***********************************************************/
@@ -104,7 +104,7 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
     /***********************************************************
     ***********************************************************/
     private void on_signal_delete_nested_remote_item_finished () {
-        var delete_job = qobject_cast<DeleteJob> (GLib.Object.sender ());
+        var delete_job = qobject_cast<KeychainChunkDeleteJob> (GLib.Object.sender ());
 
         GLib.assert (delete_job);
 
@@ -123,13 +123,13 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
             }
         }
 
-        Soup.Reply.NetworkError network_error = delete_job.input_stream.error;
+        GLib.InputStream.NetworkError network_error = delete_job.input_stream.error;
 
         var http_error_code = delete_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         this.item.response_time_stamp = delete_job.response_timestamp;
         this.item.request_id = delete_job.request_id ();
 
-        if (network_error != Soup.Reply.NoError && network_error != Soup.Reply.ContentNotFoundError) {
+        if (network_error != GLib.InputStream.NoError && network_error != GLib.InputStream.ContentNotFoundError) {
             store_first_error (network_error);
             store_first_error_string (delete_job.error_string);
             GLib.warning (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER + "Delete nested item on_signal_finished with error" + network_error + ".");
@@ -156,8 +156,8 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
 
         if (this.nested_items.size () == 0) {
             // we wait for all this.nested_items' Delete_jobs to finish, and then - fail if any of those jobs has failed
-            if (network_error != Soup.Reply.NetworkError.NoError || this.item.http_error_code != 0) {
-                const int error_code = network_error != Soup.Reply.NetworkError.NoError ? network_error : this.item.http_error_code;
+            if (network_error != GLib.InputStream.NetworkError.NoError || this.item.http_error_code != 0) {
+                const int error_code = network_error != GLib.InputStream.NetworkError.NoError ? network_error : this.item.http_error_code;
                 GLib.critical (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER + "Delete of nested items finished with error " + error_code.to_string () + ". Failing the entire sequence.");
                 on_signal_task_failed ();
                 return;
@@ -213,7 +213,7 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
     private void delete_nested_remote_item (string filename) {
         GLib.info (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER) + "Deleting nested encrypted remote item" + filename;
 
-        var delete_job = new DeleteJob (this.propagator.account, this.propagator.full_remote_path (filename), this);
+        var delete_job = new KeychainChunkDeleteJob (this.propagator.account, this.propagator.full_remote_path (filename), this);
         delete_job.folder_token (this.folder_token);
         delete_job.property (ENCRYPTED_FILENAME_PROPERTY_KEY, filename);
 

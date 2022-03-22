@@ -7,7 +7,7 @@ implied, as to its usefulness for any purpose.
 namespace Occ {
 namespace Testing {
 
-public class FakePostReply : Soup.Reply {
+public class FakePostReply : GLib.InputStream {
 
     /***********************************************************
     ***********************************************************/

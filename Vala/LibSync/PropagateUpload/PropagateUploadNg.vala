@@ -33,7 +33,7 @@ State machine:
     on_signal_mkcol_job_finished ()                                         |                      |
         |                                                       no                    yes
         |                                                       |                      |
-        |                                                       |                  DeleteJob
+        |                                                       |                  KeychainChunkDeleteJob
         |                                                       |                      |
     +-----+<------------------------------------------------------+<---  on_signal_delete_job_finished ()
     |
@@ -149,7 +149,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
             // The upload info is stale. remove the stale chunks on the server
             this.transfer_identifier = progress_info.transferid;
             // Fire and forget. Any error will be ignored.
-            (new DeleteJob (this.propagator.account, chunk_url (), this)).start ();
+            (new KeychainChunkDeleteJob (this.propagator.account, chunk_url (), this)).start ();
             // start_new_upload will reset the this.transfer_identifier and the UploadInfo in the database.
         }
 
@@ -329,7 +329,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
             // Wipe the old chunking data.
             // Fire and forget. Any error will be ignored.
-            new DeleteJob (this.propagator.account, chunk_url (), this).start ();
+            new KeychainChunkDeleteJob (this.propagator.account, chunk_url (), this).start ();
 
             this.propagator.active_job_list.append (this);
             start_new_upload ();
@@ -347,7 +347,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
             // we should remove the later chunks. Otherwise when we do dynamic chunk sizing, we may end up
             // with corruptions if there are too many chunks, or if we abort and there are still stale chunks.
             foreach (var server_chunk in q_as_const (this.server_chunks)) {
-                var delete_job = new DeleteJob (this.propagator.account, Utility.concat_url_path (chunk_url (), server_chunk.original_name), this);
+                var delete_job = new KeychainChunkDeleteJob (this.propagator.account, Utility.concat_url_path (chunk_url (), server_chunk.original_name), this);
                 delete_job.signal_finished.connect (
                     this.on_signal_delete_job_finished
                 );
@@ -366,7 +366,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
     private void on_signal_lscol_job_finished_with_error () {
         var lscol_job = qobject_cast<LscolJob> (sender ());
         on_signal_network_job_destroyed (lscol_job); // remove it from the this.jobs list
-        Soup.Reply.NetworkError err = lscol_job.input_stream.error;
+        GLib.InputStream.NetworkError err = lscol_job.input_stream.error;
         var http_error_code = lscol_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         var status = classify_error (err, http_error_code, this.propagator.another_sync_needed);
         if (status == SyncFileItem.Status.FATAL_ERROR) {
@@ -399,12 +399,12 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
     /***********************************************************
     ***********************************************************/
     private void on_signal_delete_job_finished () {
-        var delete_job = qobject_cast<DeleteJob> (sender ());
+        var delete_job = qobject_cast<KeychainChunkDeleteJob> (sender ());
         //  ASSERT (delete_job);
         this.jobs.remove (this.jobs.index_of (delete_job));
 
-        Soup.Reply.NetworkError err = delete_job.input_stream.error;
-        if (err != Soup.Reply.NoError && err != Soup.Reply.ContentNotFoundError) {
+        GLib.InputStream.NetworkError err = delete_job.input_stream.error;
+        if (err != GLib.InputStream.NoError && err != GLib.InputStream.ContentNotFoundError) {
             const int http_status = delete_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             SyncFileItem.Status status = classify_error (err, http_status);
             if (status == SyncFileItem.Status.FATAL_ERROR) {
@@ -412,7 +412,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
                 abort_with_error (status, delete_job.error_string);
                 return;
             } else {
-                GLib.warning ("DeleteJob errored out " + delete_job.error_string + delete_job.input_stream.url);
+                GLib.warning ("KeychainChunkDeleteJob errored out " + delete_job.error_string + delete_job.input_stream.url);
                 this.remove_job_error = true;
                 // Let the other jobs finish
             }
@@ -435,10 +435,10 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         this.propagator.active_job_list.remove_one (this);
         var mkcol_job = qobject_cast<MkColJob> (sender ());
         on_signal_network_job_destroyed (mkcol_job); // remove it from the this.jobs list
-        Soup.Reply.NetworkError err = mkcol_job.input_stream.error;
+        GLib.InputStream.NetworkError err = mkcol_job.input_stream.error;
         this.item.http_error_code = mkcol_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
 
-        if (err != Soup.Reply.NoError || this.item.http_error_code != 201) {
+        if (err != GLib.InputStream.NoError || this.item.http_error_code != 201) {
             this.item.request_id = mkcol_job.request_id ();
             SyncFileItem.Status status = classify_error (err, this.item.http_error_code,
                 this.propagator.another_sync_needed);
@@ -463,9 +463,9 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
             return;
         }
 
-        Soup.Reply.NetworkError err = put_file_job.input_stream.error;
+        GLib.InputStream.NetworkError err = put_file_job.input_stream.error;
 
-        if (err != Soup.Reply.NoError) {
+        if (err != GLib.InputStream.NoError) {
             this.item.http_error_code = put_file_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             this.item.request_id = put_file_job.request_id ();
             common_error_handling (put_file_job);
@@ -553,12 +553,12 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         this.propagator.active_job_list.remove_one (this);
         var move_job = qobject_cast<MoveJob> (sender ());
         on_signal_network_job_destroyed (move_job); // remove it from the this.jobs list
-        Soup.Reply.NetworkError err = move_job.input_stream.error;
+        GLib.InputStream.NetworkError err = move_job.input_stream.error;
         this.item.http_error_code = move_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         this.item.response_time_stamp = move_job.response_timestamp;
         this.item.request_id = move_job.request_id ();
 
-        if (err != Soup.Reply.NoError) {
+        if (err != GLib.InputStream.NoError) {
             common_error_handling (move_job);
             return;
         }

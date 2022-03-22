@@ -1396,7 +1396,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_lscol_finished_with_error (Soup.Reply r) {
+    private void on_signal_lscol_finished_with_error (GLib.InputStream r) {
         var lscol_job = qobject_cast<LscolJob> (sender ());
         //  ASSERT (lscol_job);
         QModelIndex index = qvariant_cast<QPersistentModelIndex> (lscol_job.property (PROPERTY_PARENT_INDEX_C));
@@ -1411,7 +1411,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
             parent_info.reset_subs (this, index);
 
-            if (error == Soup.Reply.ContentNotFoundError) {
+            if (error == GLib.InputStream.ContentNotFoundError) {
                 parent_info.fetched = true;
             } else {
                 //  ASSERT (!parent_info.has_label ());

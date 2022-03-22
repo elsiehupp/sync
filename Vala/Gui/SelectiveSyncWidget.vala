@@ -366,8 +366,8 @@ public class SelectiveSyncWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_lscol_finished_with_error (Soup.Reply r) {
-        if (r.error == Soup.Reply.ContentNotFoundError) {
+    private void on_signal_lscol_finished_with_error (GLib.InputStream r) {
+        if (r.error == GLib.InputStream.ContentNotFoundError) {
             this.loading.on_signal_text (_("No subfolders currently on the server."));
         } else {
             this.loading.on_signal_text (_("An error occurred while loading the list of sub folders."));

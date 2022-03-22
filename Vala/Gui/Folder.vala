@@ -1506,7 +1506,7 @@ public class Folder : GLib.Object {
     /***********************************************************
     Warn users if they create a file or folder that is selective-sync excluded
     ***********************************************************/
-    private void on_signal_warn_on_signal_new_excluded_item (SyncJournalFileRecord record, QStringRef path) {
+    private void on_signal_warn_on_signal_new_excluded_item (SyncJournalFileRecord record, /* QStringRef */ string path) {
         // Never warn for items in the database
         if (record.is_valid ()) {
             return;

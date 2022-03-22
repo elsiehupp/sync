@@ -3,8 +3,8 @@
 /***********************************************************
 ***********************************************************/
 // make public to give tests easy interface
-using Soup.Reply.set_error;
-using Soup.Reply.set_attribute;
+using GLib.InputStream.set_error;
+using GLib.InputStream.set_attribute;
 
 namespace Occ {
 namespace Testing {

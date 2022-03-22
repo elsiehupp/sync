@@ -57,7 +57,7 @@ public class FakeCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public override bool still_valid (Soup.Reply reply) {
+    public override bool still_valid (GLib.InputStream reply) {
         return true;
     }
 

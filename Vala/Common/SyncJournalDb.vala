@@ -18,7 +18,6 @@ public class SyncJournalDb : GLib.Object {
         + "  LEFT JOIN checksumtype as contentchecksumtype ON metadata.content_checksum_type_id == contentchecksumtype.identifier";
 
 
-
     /***********************************************************
     Return value for has_hydrated_or_dehydrated_files ()
     ***********************************************************/

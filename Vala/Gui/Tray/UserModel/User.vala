@@ -504,7 +504,7 @@ public class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_notify_network_error (Soup.Reply reply) {
+    public void on_signal_notify_network_error (GLib.InputStream reply) {
         var notification_confirm_job = qobject_cast<NotificationConfirmJob> (sender ());
         if (!notification_confirm_job) {
             return;

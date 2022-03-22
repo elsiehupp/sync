@@ -55,8 +55,8 @@ public class PollJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public bool on_signal_finished () {
-        Soup.Reply.NetworkError err = this.input_stream.error;
-        if (err != Soup.Reply.NoError) {
+        GLib.InputStream.NetworkError err = this.input_stream.error;
+        if (err != GLib.InputStream.NoError) {
             this.item.http_error_code = this.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             this.item.request_id = request_id ();
             this.item.status = classify_error (err, this.item.http_error_code);
@@ -103,7 +103,7 @@ public class PollJob : AbstractNetworkJob {
             this.item.file_id = json["file_identifier"].to_string ().to_utf8 ();
             this.item.etag = parse_etag (json["ETag"].to_string ().to_utf8 ());
         } else { // error
-            this.item.status = classify_error (Soup.Reply.Unknown_content_error, this.item.http_error_code);
+            this.item.status = classify_error (GLib.InputStream.Unknown_content_error, this.item.http_error_code);
             this.item.error_string = json["error_message"].to_string ();
         }
 

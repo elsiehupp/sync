@@ -755,7 +755,7 @@ public class AccountSettings : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private void switch_vfs_on (Folder folder, Glib.Object connection) {
+    private void switch_vfs_on (Folder folder, GLib.Object connection) {
         if (connection) {
             this.disconnect (connection);
         }

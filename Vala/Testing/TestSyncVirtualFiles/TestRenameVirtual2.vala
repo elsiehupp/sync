@@ -102,7 +102,6 @@ public class TestRenameVirtual2 : AbstractTestSyncVirtualFiles {
         complete_spy.clear ();
     }
 
-} // class 
-
+} // class
 } // namespace Testing
 } // namespace Occ

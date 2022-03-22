@@ -804,7 +804,7 @@ public class Account : GLib.Object {
             return;
         }
 
-        var delete_password_job = new DeleteJob (Theme.app_name);
+        var delete_password_job = new KeychainChunkDeleteJob (Theme.app_name);
         delete_password_job.insecure_fallback (false);
         delete_password_job.key (keychain_key);
         delete_password_job.signal_finished.connect (
@@ -815,7 +815,7 @@ public class Account : GLib.Object {
 
 
     private void on_signal_delete_password_job_finished (AbstractNetworkJob incoming) {
-        var delete_job = (DeleteJob) incoming;
+        var delete_job = (KeychainChunkDeleteJob) incoming;
         if (delete_job.error == NoError) {
             GLib.info ("APP_PASSWORD deleted from keychain.");
         } else {
@@ -976,7 +976,7 @@ public class Account : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void delete_app_token () {
-        var delete_app_token_job = new DeleteJob (shared_from_this (), "/ocs/v2.php/core/apppassword");
+        var delete_app_token_job = new KeychainChunkDeleteJob (shared_from_this (), "/ocs/v2.php/core/apppassword");
         delete_app_token_job.signal_finished.connect (
             this.on_signal_delete_job_finished
         );
@@ -985,7 +985,7 @@ public class Account : GLib.Object {
 
 
     private void on_signal_delete_job_finished () {
-        var delete_job = (DeleteJob)GLib.Object.sender ();
+        var delete_job = (KeychainChunkDeleteJob)GLib.Object.sender ();
         if (delete_job) {
             var http_code = delete_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             if (http_code != 200) {
@@ -995,7 +995,7 @@ public class Account : GLib.Object {
             }
         } else {
             GLib.assert (false);
-            GLib.warning ("The sender is not a DeleteJob instance.");
+            GLib.warning ("The sender is not a KeychainChunkDeleteJob instance.");
         }
     }
 

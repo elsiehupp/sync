@@ -75,7 +75,7 @@ public class TestSelectiveSyncBigFolders : GLib.Object {
     }
 
 
-    private Soup.Reply override_delegate (Soup.Operation operation, Soup.Request request, QIODevice device) {
+    private GLib.InputStream override_delegate (Soup.Operation operation, Soup.Request request, QIODevice device) {
         // Record what path we are querying for the size
         if (request.attribute (Soup.Request.CustomVerbAttribute) == "PROPFIND") {
             if (device.read_all ().contains ("<size ")) {

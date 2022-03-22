@@ -14,7 +14,7 @@ namespace LibSync {
 ***********************************************************/
 public class PropagateRemoteMkdir : PropagateItemJob {
 
-    DeleteJob delete_job;
+    KeychainChunkDeleteJob delete_job;
     MkColJob mkcol_job;
 
     /***********************************************************
@@ -63,7 +63,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
             return;
         }
 
-        this.delete_job = new DeleteJob (
+        this.delete_job = new KeychainChunkDeleteJob (
             this.propagator.account,
             this.propagator.full_remote_path (this.item.file),
             this
@@ -201,7 +201,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
 
         //  ASSERT (this.mkcol_job);
 
-        Soup.Reply.NetworkError err = this.mkcol_job.input_stream.error;
+        GLib.InputStream.NetworkError err = this.mkcol_job.input_stream.error;
         this.item.http_error_code = this.mkcol_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         this.item.response_time_stamp = this.mkcol_job.response_timestamp;
         this.item.request_id = this.mkcol_job.request_id ();
@@ -226,7 +226,7 @@ public class PropagateRemoteMkdir : PropagateItemJob {
     }
 
 
-    protected void on_signal_propagate_upload_encrypted_folder_unlocked (Soup.Reply.NetworkError err, string job_http_reason_phrase_string, string job_path) {
+    protected void on_signal_propagate_upload_encrypted_folder_unlocked (GLib.InputStream.NetworkError err, string job_http_reason_phrase_string, string job_path) {
         finalize_mkcol_job (err, job_http_reason_phrase_string, job_path);
     }
 
@@ -265,11 +265,11 @@ public class PropagateRemoteMkdir : PropagateItemJob {
 
     /***********************************************************
     ***********************************************************/
-    private void finalize_mkcol_job (Soup.Reply.NetworkError err, string job_http_reason_phrase_string, string job_path) {
+    private void finalize_mkcol_job (GLib.InputStream.NetworkError err, string job_http_reason_phrase_string, string job_path) {
         if (this.item.http_error_code == 405) {
             // This happens when the directory already exists. Nothing to do.
             GLib.debug ("Folder " + job_path + " already exists.");
-        } else if (err != Soup.Reply.NoError) {
+        } else if (err != GLib.InputStream.NoError) {
             SyncFileItem.Status status = classify_error (
                 err,
                 this.item.http_error_code,

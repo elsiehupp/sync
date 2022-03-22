@@ -353,8 +353,8 @@ public class PropagateDownloadFile : PropagateItemJob {
         this.item.http_error_code = get_file_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         this.item.request_id = get_file_job.request_id ();
 
-        Soup.Reply.NetworkError err = get_file_job.input_stream.error;
-        if (err != Soup.Reply.NoError) {
+        GLib.InputStream.NetworkError err = get_file_job.input_stream.error;
+        if (err != GLib.InputStream.NoError) {
             // If we sent a 'Range' header and get 416 back, we want to retry
             // without the header.
             const bool bad_range_header = get_file_job.resume_start () > 0 && this.item.http_error_code == 416;
@@ -383,7 +383,7 @@ public class PropagateDownloadFile : PropagateItemJob {
                 this.propagator.journal.download_info (this.item.file, SyncJournalDb.DownloadInfo ());
             }
 
-            if (!this.item.direct_download_url == "" && err != Soup.Reply.OperationCanceledError) {
+            if (!this.item.direct_download_url == "" && err != GLib.InputStream.OperationCanceledError) {
                 // If this was with a direct download, retry without direct download
                 GLib.warning ("Direct download of" + this.item.direct_download_url + " failed. Retrying through owncloud.");
                 this.item.direct_download_url.clear ();
@@ -395,7 +395,7 @@ public class PropagateDownloadFile : PropagateItemJob {
             // set a custom error string to make this a soft error. In contrast to the default hard error this won't bring down
             // the whole sync and allows for a custom error message.
             GLib.InputStream reply = get_file_job.input_stream;
-            if (err == Soup.Reply.OperationCanceledError && reply.property (OWNCLOUD_CUSTOM_SOFT_ERROR_STRING_C).is_valid ()) {
+            if (err == GLib.InputStream.OperationCanceledError && reply.property (OWNCLOUD_CUSTOM_SOFT_ERROR_STRING_C).is_valid ()) {
                 get_file_job.on_signal_error_string (reply.property (OWNCLOUD_CUSTOM_SOFT_ERROR_STRING_C).to_string ());
                 get_file_job.error_status (SyncFileItem.Status.SOFT_ERROR);
             } else if (bad_range_header) {

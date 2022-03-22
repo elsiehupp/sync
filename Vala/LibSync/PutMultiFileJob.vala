@@ -85,7 +85,7 @@ public class PutMultiFileJob : AbstractNetworkJob {
 
         send_request ("POST", this.url, request, this.body);
 
-        if (this.reply.error != Soup.Reply.NoError) {
+        if (this.reply.error != GLib.InputStream.NoError) {
             GLib.warning (" Network error: " + this.reply.error_string);
         }
 

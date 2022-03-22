@@ -135,7 +135,7 @@ public class CheckVioExt : GLib.Object {
 
     ***********************************************************/
     static void traverse_dir (void **state, string directory, int count) {
-        CSyncVioHandleT dh = null;
+        CSync.VioHandleT dh = null;
         std.unique_ptr<CSyncFileStatT> dirent;
         var sv = (StateVar*) *state;
         string subdir;

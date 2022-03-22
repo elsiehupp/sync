@@ -92,7 +92,7 @@ public class TestLocalMoveDetection : AbstractTestSyncMove {
 
     /***********************************************************
     ***********************************************************/
-    private Soup.Reply override_delegate_local_move_detection (Soup.Operation operation, Soup.Request request, QIODevice device) {
+    private GLib.InputStream override_delegate_local_move_detection (Soup.Operation operation, Soup.Request request, QIODevice device) {
         if (operation == Soup.PutOperation)
             ++number_of_put;
         if (operation == Soup.DeleteOperation)

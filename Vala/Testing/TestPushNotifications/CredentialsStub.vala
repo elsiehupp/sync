@@ -56,7 +56,7 @@ public class CredentialsStub : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public bool still_valid (Soup.Reply reply) {
+    public bool still_valid (GLib.InputStream reply) {
         return false;
     }
 

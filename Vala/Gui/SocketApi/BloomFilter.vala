@@ -9,7 +9,7 @@
 namespace Occ {
 namespace Ui {
 
-public class BloomFilter : Glib.Object {
+public class BloomFilter : GLib.Object {
 
     /***********************************************************
     Initialize with m=1024 bits and k=2 (high and low 16 bits of a q_hash).

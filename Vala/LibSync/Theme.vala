@@ -1156,7 +1156,7 @@ public class Theme : GLib.Object {
     on Transifex.
     ***********************************************************/
     public static void replace_link_color_string (string link_string, Gtk.Color new_color) {
-        link_string.replace (QRegularExpression (" (<a href|<a style='color:# ([a-z_a-Z0-9]{6});' href)"), "<a style='color:%1;' href".printf (new_color.name ()));
+        link_string.replace (GLib.Regex (" (<a href|<a style='color:# ([a-z_a-Z0-9]{6});' href)"), "<a style='color:%1;' href".printf (new_color.name ()));
     }
 
 

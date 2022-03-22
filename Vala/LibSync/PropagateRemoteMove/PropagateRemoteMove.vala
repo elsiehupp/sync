@@ -198,12 +198,12 @@ public class PropagateRemoteMove : PropagateItemJob {
 
         //  ASSERT (this.move_job);
 
-        Soup.Reply.NetworkError err = this.move_job.input_stream.error;
+        GLib.InputStream.NetworkError err = this.move_job.input_stream.error;
         this.item.http_error_code = this.move_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         this.item.response_time_stamp = this.move_job.response_timestamp;
         this.item.request_id = this.move_job.request_id ();
 
-        if (err != Soup.Reply.NoError) {
+        if (err != GLib.InputStream.NoError) {
             SyncFileItem.Status status = classify_error (err, this.item.http_error_code,
                 this.propagator.another_sync_needed);
             on_signal_done (status, this.move_job.error_string);
