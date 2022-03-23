@@ -84,7 +84,7 @@ public class SslErrorDialog : Gtk.Dialog {
         }
 
         // if there are no errors left, all Certs were known.
-        if (error_strings == "") {
+        if (error_strings.length () == 0) {
             this.all_trusted = true;
             return true;
         }
@@ -187,7 +187,7 @@ public class SslErrorDialog : Gtk.Dialog {
 
         message += QL ("<p>");
 
-        if (cert.effective_date () < GLib.DateTime (QDate (2016, 1, 1), QTime (), Qt.UTC)) {
+        if (cert.effective_date () < new GLib.DateTime (QDate (2016, 1, 1), QTime (), Qt.UTC)) {
         string sha1sum = Utility.format_fingerprint (cert.digest (QCryptographicHash.Sha1).to_hex ());
             message += _("Fingerprint (SHA1) : <tt>%1</tt>").printf (sha1sum) + QL ("<br/>");
         }

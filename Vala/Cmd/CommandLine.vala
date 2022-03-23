@@ -12,7 +12,7 @@ namespace Cmd {
 
 @copyright GPLv3 or Later
 ***********************************************************/
-public class CommandLine : GLib.Object {
+public class CommandLine : GLib.Application {
 
     private class CmdOptions : GLib.Object {
         public string source_dir;
@@ -97,7 +97,7 @@ public class CommandLine : GLib.Object {
         GLib.print ("  --logdebug             More verbose logging");
         GLib.print ("  --path                 Path to a folder on a remote server");
         GLib.print ("");
-        GLib.Application.quit (0);
+        this.quit ();
     }
 
 
@@ -105,7 +105,7 @@ public class CommandLine : GLib.Object {
     ***********************************************************/
     private void show_version () {
         GLib.print (LibSync.Theme.version_switch_output);
-        GLib.Application.quit (0);
+        this.quit ();
     }
 
 
@@ -134,7 +134,8 @@ public class CommandLine : GLib.Object {
         GLib.FileInfo file_info = new GLib.FileInfo (options.source_dir);
         if (!file_info.exists ()) {
             GLib.error ("Source directory '" + options.source_dir + "' does not exist.");
-            GLib.Application.quit (1);
+            //  this.quit (1);
+            this.quit ();
         }
         options.source_dir = file_info.absolute_file_path;
 
@@ -145,7 +146,7 @@ public class CommandLine : GLib.Object {
         }
 
         while (it.has_next ()) {
-            const string option = it.next ();
+            string option = it.next ();
 
             if (option == "--httpproxy" && !it.peek_next ().has_prefix ("-")) {
                 options.proxy = it.next ();
@@ -174,8 +175,8 @@ public class CommandLine : GLib.Object {
             } else if (option == "--downlimit" && !it.peek_next ().has_prefix ("-")) {
                 options.downlimit = it.next ().to_int () * 1000;
             } else if (option == "--logdebug") {
-                Logger.instance.log_file ("-");
-                Logger.instance.log_debug (true);
+                LibSync.Logger.instance.log_file ("-");
+                LibSync.Logger.instance.log_debug (true);
             } else if (option == "--path" && !it.peek_next ().has_prefix ("-")) {
                 options.remote_path = it.next ();
             }
@@ -340,9 +341,9 @@ public class CommandLine : GLib.Object {
         account.url (host_url);
         account.ssl_error_handler (ssl_error_handler);
 
-        QEventLoop loop;
-        var json_api_job = new JsonApiJob (account, "ocs/v1.php/cloud/capabilities");
-        json_api_job.json_received.connect (
+        GLib.MainLoop loop;
+        var json_api_job = new LibSync.JsonApiJob (account, "ocs/v1.php/cloud/capabilities");
+        json_api_job.signal_json_received.connect (
             this.on_signal_capabilities_json_received
         );
         json_api_job.on_signal_start ();
@@ -353,8 +354,8 @@ public class CommandLine : GLib.Object {
             return EXIT_FAILURE;
         }
 
-        json_api_job = new JsonApiJob (account, "ocs/v1.php/cloud/user");
-        json_api_job.json_received.connect (
+        json_api_job = new LibSync.JsonApiJob (account, "ocs/v1.php/cloud/user");
+        json_api_job.signal_json_received.connect (
             this.on_signal_user_json_received
         );
         json_api_job.on_signal_start ();
@@ -458,7 +459,7 @@ public class CommandLine : GLib.Object {
 
 
     private void on_signal_user_json_received (QJsonDocument json) {
-        const QJsonObject data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
+        Json.Object data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
         account.dav_user (data.value ("identifier").to_string ());
         account.dav_display_name (data.value ("display-name").to_string ());
         loop.quit ();
@@ -466,7 +467,7 @@ public class CommandLine : GLib.Object {
 
 
     private static void on_signal_sync_engine_finished (Gtk.Application app, bool result) {
-        app.GLib.Application.quit (result ? EXIT_SUCCESS : EXIT_FAILURE);
+        app.this.quit (result ? EXIT_SUCCESS : EXIT_FAILURE);
     }
 
 

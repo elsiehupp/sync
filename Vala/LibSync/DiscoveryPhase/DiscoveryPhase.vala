@@ -227,7 +227,7 @@ public class DiscoveryPhase : GLib.Object {
     /***********************************************************
     ***********************************************************/
     bool is_in_selective_sync_block_list (string path) {
-        if (this.selective_sync_block_list == "") {
+        if (this.selective_sync_block_list.length () == 0) {
             // If there is no block list, everything is allowed
             return false;
         }
@@ -436,7 +436,7 @@ public class DiscoveryPhase : GLib.Object {
 
         // Once the main process_directory_job has on_signal_finished recurse here to execute the remaining
         // jobs for queued deleted directories.
-        if (this.queued_deleted_directories != "") {
+        if (this.queued_deleted_directories.length > 0) {
             var next_job = this.queued_deleted_directories.take (this.queued_deleted_directories.first_key ());
             start_job (next_job);
         } else {
@@ -452,7 +452,7 @@ public class DiscoveryPhase : GLib.Object {
     private static bool find_path_in_list (GLib.List<string> list, string path) {
         GLib.assert (std.is_sorted (list.begin (), list.end ()));
 
-        if (list.size () == 1 && list.first () == "/") {
+        if (list.length () == 1 && list.nth_data (0) == "/") {
             // Special case for the case "/" is there, it matches everything
             return true;
         }

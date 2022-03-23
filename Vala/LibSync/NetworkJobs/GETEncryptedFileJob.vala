@@ -23,7 +23,7 @@ public class GETEncryptedFileJob : GETFileJob {
     /***********************************************************
     DOES NOT take ownership of the device.
     ***********************************************************/
-    public GETEncryptedFileJob.for_path (Account account, string path, QIODevice device,
+    public GETEncryptedFileJob.for_path (Account account, string path, GLib.OutputStream device,
         GLib.HashTable<string, string> headers, string expected_etag_for_resume,
         int64 resume_start, EncryptedFile encrypted_info, GLib.Object parent = new GLib.Object ()) {
         base (account, path, device, headers, expected_etag_for_resume, resume_start, parent);
@@ -33,7 +33,7 @@ public class GETEncryptedFileJob : GETFileJob {
 
     /***********************************************************
     ***********************************************************/
-    public GETEncryptedFileJob.for_url (Account account, GLib.Uri url, QIODevice device,
+    public GETEncryptedFileJob.for_url (Account account, GLib.Uri url, GLib.OutputStream device,
         GLib.HashTable<string, string> headers, string expected_etag_for_resume,
         int64 resume_start, EncryptedFile encrypted_info, GLib.Object parent = new GLib.Object ()) {
         base (account, url, device, headers, expected_etag_for_resume, resume_start, parent);

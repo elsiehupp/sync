@@ -1,7 +1,7 @@
 
 //  #include <QtCore>
 //  #include <QJsonDocument>
-//  #include <QJsonObject>
+//  #include <Json.Object>
 
 namespace Occ {
 namespace Ui {
@@ -15,7 +15,7 @@ public class ServerNotificationHandler : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private JsonApiJob notification_job;
+    private LibSync.JsonApiJob notification_job;
     private AccountState account_state;
 
 
@@ -50,8 +50,8 @@ public class ServerNotificationHandler : GLib.Object {
         }
 
         // if the previous notification job has on_signal_finished, on_signal_start next.
-        this.notification_job = new JsonApiJob (this.account_state.account, NOTIFICATIONS_PATH, this);
-        this.notification_job.json_received.connect (
+        this.notification_job = new LibSync.JsonApiJob (this.account_state.account, NOTIFICATIONS_PATH, this);
+        this.notification_job.signal_json_received.connect (
             this.on_signal_notifications_received
         );
         this.notification_job.etag_response_header_received.connect (

@@ -54,7 +54,7 @@ public class AbstractTestUnifiedSearchListmodel : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected GLib.InputStream init_test_case_override_delegate (Soup.Operation operation, Soup.Request request, QIODevice device) {
+    protected GLib.InputStream init_test_case_override_delegate (Soup.Operation operation, Soup.Request request, GLib.OutputStream device) {
 
         GLib.InputStream reply = null;
 

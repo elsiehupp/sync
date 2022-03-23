@@ -59,8 +59,9 @@ public class ClientProxy : GLib.Object {
     private static Soup.ProxyResolverDefault proxy_from_config (ConfigFile config) {
         Soup.ProxyResolverDefault proxy;
 
-        if (config.proxy_host_name () == "")
-            return Soup.ProxyResolverDefault ();
+        if (config.proxy_host_name () == "") {
+            return new Soup.ProxyResolverDefault ();
+        }
 
         proxy.host_name (config.proxy_host_name ());
         proxy.port (config.proxy_port ());

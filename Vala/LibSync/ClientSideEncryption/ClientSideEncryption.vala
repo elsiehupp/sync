@@ -281,7 +281,7 @@ public class ClientSideEncryption : GLib.Object {
             return;
         }
 
-        this.certificate = GLib.TlsCertificate (read_job.binary_data (), QSsl.Pem);
+        this.certificate = new GLib.TlsCertificate (read_job.binary_data (), QSsl.Pem);
 
         if (this.certificate == null) {
             get_public_key_from_server (account);
@@ -318,7 +318,7 @@ public class ClientSideEncryption : GLib.Object {
 
         // Error or no valid public key error out
         if (read_job.error != NoError || read_job.binary_data ().length == 0) {
-            this.certificate = GLib.TlsCertificate ();
+            this.certificate = new GLib.TlsCertificate ();
             this.public_key = QSslKey ();
             get_public_key_from_server (account);
             return;
@@ -360,7 +360,7 @@ public class ClientSideEncryption : GLib.Object {
 
         // Error or no valid public key error out
         if (read_job.error != NoError || read_job.text_data ().length == 0) {
-            this.certificate = GLib.TlsCertificate ();
+            this.certificate = new GLib.TlsCertificate ();
             this.public_key = QSslKey ();
             this.private_key = "";
             get_public_key_from_server (account);
@@ -662,7 +662,7 @@ public class ClientSideEncryption : GLib.Object {
 
     GLib.List<string> old_cipher_format_split (string cipher) {
         var separator = "f_a=="; // BASE64 encoded '|'
-        var result = GLib.List<string> ();
+        var result = new GLib.List<string> ();
 
         var data = cipher;
         var index = data.index_of (separator);

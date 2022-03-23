@@ -3,7 +3,7 @@
 //  #include <QProgressBar>
 //  #include <QVBoxLayout>
 //  #include <QNetworkProxyFactory>
-//  #include <Gdk.Screen>
+//  #include <Gdk.Monitor>
 
 namespace Occ {
 namespace Ui {
@@ -24,7 +24,7 @@ public class WebViewPage : AbstractCredentialsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    private QSize original_wizard_size;
+    private Gdk.Rectangle original_wizard_size;
 
     /***********************************************************
     ***********************************************************/

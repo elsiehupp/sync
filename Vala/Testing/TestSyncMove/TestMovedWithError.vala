@@ -12,7 +12,7 @@ public class TestMovedWithError : AbstractTestSyncMove {
     /***********************************************************
     ***********************************************************/
     private TestMovedWithError () {
-        QFETCH (AbstractVfs.Mode, vfs_mode);
+        QFETCH (VfsMode, vfs_mode);
         const string src = "folder/folder_a/file.txt";
         const string dest = "folder/folder_b/file.txt";
         FakeFolder fake_folder = new FakeFolder (

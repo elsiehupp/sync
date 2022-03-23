@@ -13,7 +13,7 @@ public class ImageProvider : QQuickImageProvider {
 
     /***********************************************************
     ***********************************************************/
-    public Gtk.Image request_image (string identifier, QSize size, QSize requested_size) {
+    public Gtk.Image request_image (string identifier, Gdk.Rectangle size, Gdk.Rectangle requested_size) {
         //  Q_UNUSED (size)
         //  Q_UNUSED (requested_size)
 

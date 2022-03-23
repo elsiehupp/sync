@@ -47,7 +47,7 @@ public class TestUploadAfterDownload : AbstractTestSyncConflict {
     }
 
 
-    private GLib.InputStream override_delegate_upload_after_download (Soup.Operation operation, Soup.Request request, QIODevice device) {
+    private GLib.InputStream override_delegate_upload_after_download (Soup.Operation operation, Soup.Request request, GLib.OutputStream device) {
         if (operation == Soup.PutOperation) {
             if (request.raw_header ("OC-Conflict") == "1") {
                 var base_file_id = request.raw_header ("OC-ConflictBaseFileId");

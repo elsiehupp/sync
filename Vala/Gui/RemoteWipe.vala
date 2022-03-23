@@ -5,7 +5,7 @@
 ***********************************************************/
 
 //  #include <QJsonDocument>
-//  #include <QJsonObject>
+//  #include <Json.Object>
 //  #include <Soup.Request>
 //  #include <GLib.OutputStream>
 //  #include <Soup.Context>
@@ -112,13 +112,13 @@ public class RemoteWipe : GLib.Object {
     ***********************************************************/
     private void on_signal_check_job_slot () {
         var json_data = this.network_reply_check.read_all ();
-        QJsonParseError json_parse_error;
-        QJsonObject json = QJsonDocument.from_json (json_data, json_parse_error).object ();
+        Json.ParserError json_parse_error;
+        Json.Object json = QJsonDocument.from_json (json_data, json_parse_error).object ();
         bool wipe = false;
 
         // check for errors
         if (this.network_reply_check.error != GLib.InputStream.NoError ||
-                json_parse_error.error != QJsonParseError.NoError) {
+                json_parse_error.error != Json.ParserError.NoError) {
             string error_reason;
             string error_from_json = json["error"].to_string ();
             if (!error_from_json == "") {
@@ -129,7 +129,7 @@ public class RemoteWipe : GLib.Object {
                     "There was an error accessing the 'token' endpoint: <br><em>%1</em>"
                         .printf (this.network_reply_check.error_string.to_html_escaped ())
                     );
-            } else if (json_parse_error.error != QJsonParseError.NoError) {
+            } else if (json_parse_error.error != Json.ParserError.NoError) {
                 GLib.warning (
                     "Could not parse the JSON returned from the server: <br><em>%1</em>"
                         .printf (json_parse_error.error_string)
@@ -203,10 +203,10 @@ public class RemoteWipe : GLib.Object {
 
     private void on_signal_notify_server_success_job_slot () {
         var json_data = this.network_reply_success.read_all ();
-        QJsonParseError json_parse_error;
-        QJsonObject json = QJsonDocument.from_json (json_data, json_parse_error).object ();
+        Json.ParserError json_parse_error;
+        Json.Object json = QJsonDocument.from_json (json_data, json_parse_error).object ();
         if (this.network_reply_success.error != GLib.InputStream.NoError ||
-                json_parse_error.error != QJsonParseError.NoError) {
+                json_parse_error.error != Json.ParserError.NoError) {
             string error_reason;
             string error_from_json = json["error"].to_string ();
             if (!error_from_json == "") {
@@ -215,7 +215,7 @@ public class RemoteWipe : GLib.Object {
             } else if (this.network_reply_success.error != GLib.InputStream.NoError) {
                 GLib.warning ("There was an error accessing the 'on_signal_success' endpoint: <br><em>%1</em>"
                     .printf (this.network_reply_success.error_string.to_html_escaped ()));
-            } else if (json_parse_error.error != QJsonParseError.NoError) {
+            } else if (json_parse_error.error != Json.ParserError.NoError) {
                 GLib.warning ("Could not parse the JSON returned from the server: <br><em>%1</em>"
                     .printf (json_parse_error.error_string));
             } else {

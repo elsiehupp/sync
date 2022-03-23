@@ -11,11 +11,11 @@ namespace Ui {
 
 public class SocketListener : GLib.Object {
 
-    public QIODevice socket;
+    public GLib.OutputStream socket;
 
     private BloomFilter monitored_directories_bloom_filter;
 
-    public SocketListener (QIODevice socket) {
+    public SocketListener (GLib.OutputStream socket) {
         this.socket = socket;
     }
 

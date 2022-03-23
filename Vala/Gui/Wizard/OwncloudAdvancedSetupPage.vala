@@ -9,7 +9,7 @@
 //  #include <QFileDialog>
 //  #include <QStorageInfo>
 //  #include <Gtk.MessageBox>
-//  #include <QJsonObject>
+//  #include <Json.Object>
 //  #include <folderman.h>
 
 //  #include <QWizard>
@@ -622,7 +622,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     ***********************************************************/
     private void style_sync_logo () {
         const var sync_arrow_icon = Theme.create_color_aware_icon (":/client/theme/sync-arrow.svg", palette ());
-        this.instance.sync_logo_label.pixmap (sync_arrow_icon.pixmap (QSize (50, 50)));
+        this.instance.sync_logo_label.pixmap (sync_arrow_icon.pixmap (Gdk.Rectangle (50, 50)));
     }
 
 

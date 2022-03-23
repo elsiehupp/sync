@@ -42,7 +42,7 @@ public class TestResume : GLib.Object {
     }
 
 
-    private GLib.InputStream override_delegate_resume1 (Soup.Operation operation, Soup.Request request, QIODevice device) {
+    private GLib.InputStream override_delegate_resume1 (Soup.Operation operation, Soup.Request request, GLib.OutputStream device) {
         if (operation == Soup.GetOperation && request.url.path.has_suffix ("A/a0")) {
             return new BrokenFakeGetReply (fake_folder.remote_modifier (), operation, request, this);
         }
@@ -50,7 +50,7 @@ public class TestResume : GLib.Object {
     }
 
 
-    private GLib.InputStream override_delegate_resume2 (Soup.Operation operation, Soup.Request request, QIODevice device) {
+    private GLib.InputStream override_delegate_resume2 (Soup.Operation operation, Soup.Request request, GLib.OutputStream device) {
         if (operation == Soup.GetOperation && request.url.path.has_suffix ("A/a0")) {
             ranges = request.raw_header ("Range");
         }

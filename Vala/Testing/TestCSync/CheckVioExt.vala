@@ -25,11 +25,11 @@ public class CheckVioExt : GLib.Object {
     const int WD_BUFFER_SIZE = 255;
 
     string csync_test_dir () {
-        return GLib.Dir.temporary_path + "/csync_test";
+        return new GLib.Dir.temporary_path + "/csync_test";
     }
 
     int oc_mkdir (string path) {
-        return GLib.Dir (path).mkpath (path) ? 0 : -1;
+        return new GLib.Dir (path).mkpath (path) ? 0 : -1;
     }
 
     static char wd_buffer[WD_BUFFER_SIZE];

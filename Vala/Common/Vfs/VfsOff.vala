@@ -4,7 +4,7 @@ namespace Common {
 /***********************************************************
 @class VfsOff
 
-@brief Implementation of AbstractVfs for Mode.OFF mode - does nothing
+@brief Implementation of AbstractVfs for VfsMode.OFF mode - does nothing
 
 @author Christian Kamm <mail@ckamm.de>
 @author Dominik Schmidt <dschmidt@owncloud.com>
@@ -22,8 +22,8 @@ public class VfsOff : AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
-    public override Mode mode () {
-        return Mode.OFF;
+    public override VfsMode mode () {
+        return VfsMode.OFF;
     }
 
 
@@ -133,7 +133,7 @@ public class VfsOff : AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
-    protected override void start_impl (AbstractVfs.SetupParameters setup_parameters) {
+    protected override void start_impl (SetupParameters setup_parameters) {
         return;
     }
 
@@ -141,18 +141,18 @@ public class VfsOff : AbstractVfs {
     /***********************************************************
     Check whether the plugin for the mode is available.
     ***********************************************************/
-    bool is_vfs_plugin_available (AbstractVfs.Mode mode) {
+    bool is_vfs_plugin_available (VfsMode mode) {
         // TODO: cache plugins available?
-        if (mode == AbstractVfs.Mode.Off) {
+        if (mode == VfsMode.Off) {
             return true;
         }
 
-        var name = Mode.to_plugin_name (mode);
+        var name = VfsMode.to_plugin_name (mode);
         if (name == "") {
             return false;
         }
 
-        QPluginLoader loader = new QPluginLoader (plugin_filename ("vfs", name));
+        QPluginLoader loader = new QPluginLoader (AbstractPluginFactory.plugin_filename ("vfs", name));
 
         const var base_meta_data = loader.meta_data ();
         if (base_meta_data == "" || !base_meta_data.contains ("IID")) {
@@ -188,14 +188,14 @@ public class VfsOff : AbstractVfs {
     /***********************************************************
     Return the best available VFS mode.
     ***********************************************************/
-    override AbstractVfs.Mode best_available_vfs_mode {
+    override VfsMode best_available_vfs_mode {
         get {
-            if (is_vfs_plugin_available (Mode.WINDOWS_CF_API)) {
-                return Mode.WINDOWS_CF_API;
+            if (is_vfs_plugin_available (VfsMode.WINDOWS_CF_API)) {
+                return VfsMode.WINDOWS_CF_API;
             }
 
-            if (is_vfs_plugin_available (Mode.WITH_SUFFIX)) {
-                return Mode.WITH_SUFFIX;
+            if (is_vfs_plugin_available (VfsMode.WITH_SUFFIX)) {
+                return VfsMode.WITH_SUFFIX;
             }
 
             // For now the "suffix" backend has still precedence over the "xattr" backend.
@@ -214,11 +214,11 @@ public class VfsOff : AbstractVfs {
             // supported in the user session or even per sync folder (in case user would pick a folder
             // which wouldn't support xattr for some reason)
 
-            if (is_vfs_plugin_available (Mode.XATTR)) {
-                return Mode.XATTR;
+            if (is_vfs_plugin_available (VfsMode.XATTR)) {
+                return VfsMode.XATTR;
             }
 
-            return Mode.OFF;
+            return VfsMode.OFF;
         }
     }
 
@@ -226,41 +226,41 @@ public class VfsOff : AbstractVfs {
     /***********************************************************
     Create a VFS instance for the mode, returns null on failure.
     ***********************************************************/
-    AbstractVfs create_vfs_from_plugin (AbstractVfs.Mode mode) {
-        if (mode == Mode.OFF) {
+    AbstractVfs create_vfs_from_plugin (VfsMode mode) throws VfsError {
+        if (mode == VfsMode.OFF) {
             return new VfsOff ();
         }
 
 
-        var name = Mode.to_plugin_name (mode);
+        var name = VfsMode.to_plugin_name (mode);
         if (name == "") {
-            return null;
+            throw new VfsError.NO_NAME_FOR_MODE (mode);
         }
 
-        string plugin_path = plugin_filename ("vfs", name);
+        string plugin_path = AbstractPluginFactory.plugin_filename ("vfs", name);
 
         if (!is_vfs_plugin_available (mode)) {
-            GLib.critical ("Could not load plugin " + AbstractVfs.Mode.to_string (mode) + " because " + plugin_path + " does not exist or has bad metadata.");
-            return null;
+            GLib.critical ("Could not load plugin " + VfsMode.to_string (mode) + " because " + plugin_path + " does not exist or has bad metadata.");
+            throw new VfsError.NO_PLUGIN_FOR_MODE (mode);
         }
 
         QPluginLoader loader = new QPluginLoader (plugin_path);
         var plugin = loader.instance;
         if (!plugin) {
             GLib.critical ("Could not load plugin" + plugin_path + loader.error_string);
-            return null;
+            throw new VfsError.NO_LOADER_FOR_PLUGIN (plugin);
         }
 
         var factory = (AbstractPluginFactory) plugin;
         if (!factory) {
             GLib.critical ("Plugin" + loader.filename () + " does not implement AbstractPluginFactory.");
-            return null;
+            throw new VfsError.CAST_LOADER_TO_FACTORY_FAILED (plugin);
         }
 
         var vfs = (AbstractVfs) factory.create (null);
         if (!vfs) {
             GLib.critical ("Plugin" + loader.filename () + " does not create a AbstractVfs instance.");
-            return null;
+            throw new VfsError.CAST_FACTORY_TO_VFS_FAILED (plugin);
         }
 
         GLib.info ("Created VFS instance from plugin " + plugin_path);

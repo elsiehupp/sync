@@ -13,7 +13,7 @@ public class TestIsDarkColorLightColorReturnFalse : AbstractTestTheme {
     /***********************************************************
     ***********************************************************/
     private TestIsDarkColorLightColorReturnFalse () {
-        const Gtk.Color color = new Gtk.Color (255, 255, 255);
+        const Gdk.RGBA color = Gdk.RGBA (255, 255, 255);
 
         var result = Theme.is_dark_color (color);
 

@@ -9,7 +9,7 @@
 //  #include <Gtk.Application>
 //  #include <QClipboard>
 //  #include <GLib.OutputStream>
-//  #include <QJsonObject>
+//  #include <Json.Object>
 //  #include <QJsonDocument>
 
 //  #include <QPointer>
@@ -136,15 +136,15 @@ public class Flow2Auth : GLib.Object {
     ***********************************************************/
     private void on_network_job_finished (TokenAction action, GLib.InputStream reply) {
         var json_data = reply.read_all ();
-        QJsonParseError json_parse_error;
-        QJsonObject json = QJsonDocument.from_json (json_data, json_parse_error).object ();
+        Json.ParserError json_parse_error;
+        Json.Object json = QJsonDocument.from_json (json_data, json_parse_error).object ();
         string poll_token, poll_endpoint, login_url;
 
-        if (reply.error == GLib.InputStream.NoError && json_parse_error.error == QJsonParseError.NoError
+        if (reply.error == GLib.InputStream.NoError && json_parse_error.error == Json.ParserError.NoError
             && !json == "") {
             poll_token = json.value ("poll").to_object ().value ("token").to_string ();
             poll_endpoint = json.value ("poll").to_object ().value ("endpoint").to_string ();
-            if (this.enforce_https && GLib.Uri (poll_endpoint).scheme () != "https") {
+            if (this.enforce_https && new GLib.Uri (poll_endpoint).scheme () != "https") {
                 GLib.warning ("Can not poll endpoint because the returned url " + poll_endpoint + " does not on_signal_start with https.");
                 /* emit */ signal_result (Result.ERROR, _("The polling URL does not on_signal_start with HTTPS despite the login URL started with HTTPS. Login will not be possible because this might be a security issue. Please contact your administrator."));
                 return;
@@ -152,7 +152,7 @@ public class Flow2Auth : GLib.Object {
             login_url = json["login"].to_string ();
         }
 
-        if (reply.error != GLib.InputStream.NoError || json_parse_error.error != QJsonParseError.NoError
+        if (reply.error != GLib.InputStream.NoError || json_parse_error.error != Json.ParserError.NoError
             || json == "" || poll_token == "" || poll_endpoint == "" || login_url == "") {
             string error_reason;
             string error_from_json = json["error"].to_string ();
@@ -162,7 +162,7 @@ public class Flow2Auth : GLib.Object {
             } else if (reply.error != GLib.InputStream.NoError) {
                 error_reason = _("There was an error accessing the \"token\" endpoint : <br><em>%1</em>")
                     .printf (reply.error_string.to_html_escaped ());
-            } else if (json_parse_error.error != QJsonParseError.NoError) {
+            } else if (json_parse_error.error != Json.ParserError.NoError) {
                 error_reason = _("Could not parse the JSON returned from the server : <br><em>%1</em>")
                     .printf (json_parse_error.error_string);
             } else {
@@ -294,12 +294,12 @@ public class Flow2Auth : GLib.Object {
     ***********************************************************/
     private void on_signal_simple_network_job_finished (GLib.InputStream reply) {
         var json_data = reply.read_all ();
-        QJsonParseError json_parse_error;
-        QJsonObject json = QJsonDocument.from_json (json_data, json_parse_error).object ();
+        Json.ParserError json_parse_error;
+        Json.Object json = QJsonDocument.from_json (json_data, json_parse_error).object ();
         GLib.Uri server_url;
         string login_name, app_password;
 
-        if (reply.error == GLib.InputStream.NoError && json_parse_error.error == QJsonParseError.NoError
+        if (reply.error == GLib.InputStream.NoError && json_parse_error.error == Json.ParserError.NoError
             && !json == "") {
             server_url = json["server"].to_string ();
             if (this.enforce_https && server_url.scheme () != "https") {
@@ -311,8 +311,8 @@ public class Flow2Auth : GLib.Object {
             app_password = json["app_password"].to_string ();
         }
 
-        if (reply.error != GLib.InputStream.NoError || json_parse_error.error != QJsonParseError.NoError
-            || json == "" || server_url == "" || login_name == "" || app_password == "") {
+        if (reply.error != GLib.InputStream.NoError || json_parse_error.error != Json.ParserError.NoError
+            || json == "" || server_url == null || login_name == "" || app_password == "") {
             string error_reason;
             string error_from_json = json["error"].to_string ();
             if (!error_from_json == "") {
@@ -321,7 +321,7 @@ public class Flow2Auth : GLib.Object {
             } else if (reply.error != GLib.InputStream.NoError) {
                 error_reason = _("There was an error accessing the \"token\" endpoint : <br><em>%1</em>")
                                   .printf (reply.error_string.to_html_escaped ());
-            } else if (json_parse_error.error != QJsonParseError.NoError) {
+            } else if (json_parse_error.error != Json.ParserError.NoError) {
                 error_reason = _("Could not parse the JSON returned from the server : <br><em>%1</em>")
                                   .printf (json_parse_error.error_string);
             } else {

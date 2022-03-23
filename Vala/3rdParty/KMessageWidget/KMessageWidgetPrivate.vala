@@ -146,7 +146,7 @@ public class KMessageWidgetPrivate : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void apply_style_sheet () {
-        Gtk.Color bg_base_color;
+        Gdk.RGBA bg_base_color;
 
         // We have to hardcode colors here because KWidgetsAddons is a tier 1 framework
         // and therefore can't depend on any other KDE Frameworks
@@ -169,16 +169,16 @@ public class KMessageWidgetPrivate : GLib.Object {
         bg_base_color.set_alpha_f (bg_base_color_alpha);
 
         const Gtk.Palette palette = Gtk.Application.palette ();
-        const Gtk.Color window_color = palette.window ().color ();
-        const Gtk.Color text_color = palette.text ().color ();
-        const Gtk.Color border = bg_base_color;
+        const Gdk.RGBA window_color = palette.window ().color ();
+        const Gdk.RGBA text_color = palette.text ().color ();
+        const Gdk.RGBA border = bg_base_color;
 
         // Generate a final background color from overlaying bg_base_color over window_color
         const int new_red = q_round (bg_base_color.red () * bg_base_color_alpha) + q_round (window_color.red () * (1 - bg_base_color_alpha));
         const int new_green = q_round (bg_base_color.green () * bg_base_color_alpha) + q_round (window_color.green () * (1 - bg_base_color_alpha));
         const int new_blue = q_round (bg_base_color.blue () * bg_base_color_alpha) + q_round (window_color.blue () * (1 - bg_base_color_alpha));
 
-        const Gtk.Color bg_final_color = Gtk.Color (new_red, new_green, new_blue);
+        const Gdk.RGBA bg_final_color = Gdk.RGBA (new_red, new_green, new_blue);
 
         content.set_style_sheet (
             ".Gdk.Frame {"
@@ -209,8 +209,8 @@ public class KMessageWidgetPrivate : GLib.Object {
         // window layouts to be activated. Calling this method from resize_event ()
         // can lead to infinite recursion, see:
         // https://bugs.kde.org/show_bug.cgi?id=311336
-        content_snap_shot = Gdk.Pixbuf (content.size () * widget.device_pixel_ratio ());
-        content_snap_shot.set_device_pixel_ratio (widget.device_pixel_ratio ());
+        content_snap_shot = Gdk.Pixbuf (content.size () * widget.scale_factor);
+        content_snap_shot.set_device_pixel_ratio (widget.scale_factor);
         content_snap_shot.fill (Qt.transparent);
         content.render (&content_snap_shot, QPoint (), QRegion (), Gtk.Widget.DrawChildren);
     }

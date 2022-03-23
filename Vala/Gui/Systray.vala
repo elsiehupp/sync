@@ -9,8 +9,8 @@
 //  #include <QQmlApplicationEngine>
 //  #include <QQml_context>
 //  #include <QQuick_window>
-//  #include <Gdk.Screen>
-//  #include <QMenu>
+//  #include <Gdk.Monitor>
+//  #include <GLib.Menu>
 
 //  #ifdef USE_FDO_NOTIFICATIONS
 //  #include <QDBusConnection>
@@ -152,7 +152,7 @@ public class Systray : QSystemTrayIcon {
 
         qml_register_type<WheelHandler> ("com.nextcloud.desktopclient", 1, 0, "WheelHandler");
 
-        var context_menu = new QMenu ();
+        var context_menu = new GLib.Menu ();
         if (AccountManager.instance.accounts == "") {
             context_menu.add_action (_("Add account"), this, Systray.signal_open_account_wizard);
         } else {
@@ -417,7 +417,7 @@ public class Systray : QSystemTrayIcon {
 
     /***********************************************************
     ***********************************************************/
-    private Gdk.Screen current_screen () {
+    private Gdk.Monitor current_screen () {
         const var screens = Gtk.Application.screens ();
         const var cursor_pos = QCursor.position ();
 
@@ -429,7 +429,7 @@ public class Systray : QSystemTrayIcon {
 
         // Didn't find anything matching the cursor position,
         // falling back to the primary screen
-        return Gtk.Application.primary_screen ();
+        return Gdk.Display.get_default ().get_default_screen ().get_primary_monitor ();
     }
 
 

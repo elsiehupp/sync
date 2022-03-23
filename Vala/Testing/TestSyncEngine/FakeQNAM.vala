@@ -29,7 +29,7 @@ public class FakeQNAM : Soup {
 
     /***********************************************************
     ***********************************************************/
-    public delegate GLib.InputStream OverrideDelegate (Operation value1, Soup.Request value2, QIODevice value3);
+    public delegate GLib.InputStream OverrideDelegate (Operation value1, Soup.Request value2, GLib.OutputStream value3);
 
     /***********************************************************
     ***********************************************************/
@@ -52,15 +52,15 @@ public class FakeQNAM : Soup {
         return this.upload_file_info;
     }
 
-    delegate QJsonObject ReplyFunction (GLib.HashTable<string, string> map);
+    delegate Json.Object ReplyFunction (GLib.HashTable<string, string> map);
 
     /***********************************************************
     ***********************************************************/
-    public QJsonObject for_each_reply_part (
-        QIODevice outgoing_data,
+    public Json.Object for_each_reply_part (
+        GLib.OutputStream outgoing_data,
         string content_type,
         ReplyFunction reply_function) {
-        var full_reply = new QJsonObject ();
+        var full_reply = new Json.Object ();
         var put_payload = outgoing_data.peek (outgoing_data.bytes_available ());
         outgoing_data.on_signal_reset ();
         string string_put_payload = put_payload;
@@ -106,7 +106,7 @@ public class FakeQNAM : Soup {
     protected override GLib.InputStream create_request (
         Operation operation,
         Soup.Request request,
-        QIODevice outgoing_data = null) {
+        GLib.OutputStream outgoing_data = null) {
         GLib.InputStream reply = null;
         var new_request = request;
         new_request.set_raw_header ("X-Request-ID", AccessManager.generate_request_identifier ());

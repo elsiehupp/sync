@@ -14,7 +14,7 @@ public class PUTFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public QIODevice device { public get; private set; }
+    public GLib.OutputStream device { public get; private set; }
     private GLib.HashTable<string, string> headers;
 
     new string error_string {
@@ -40,7 +40,7 @@ public class PUTFileJob : AbstractNetworkJob {
     /***********************************************************
     Takes ownership of the device
     ***********************************************************/
-    public PUTFileJob.for_path (Account account, string path, QIODevice device,
+    public PUTFileJob.for_path (Account account, string path, GLib.OutputStream device,
         GLib.HashTable<string, string> headers, int chunk, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
         this.device = device.release ();
@@ -52,7 +52,7 @@ public class PUTFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public PUTFileJob.for_url (Account account, GLib.Uri url, QIODevice device,
+    public PUTFileJob.for_url (Account account, GLib.Uri url, GLib.OutputStream device,
         GLib.HashTable<string, string> headers, int chunk, GLib.Object parent = new GLib.Object ()) {
         base (account, "", parent);
         this.device = device.release ();
@@ -116,9 +116,9 @@ public class PUTFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.TimeSpan ms_since_start {
+    public GLib.TimeSpan microseconds_since_start {
         public get {
-            return new GLib.TimeSpan (this.request_timer.elapsed ());
+            return GLib.TimeSpan (this.request_timer.elapsed ());
         }
     }
 

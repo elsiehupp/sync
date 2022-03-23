@@ -76,9 +76,9 @@ public class StorePrivateKeyApiJob : AbstractNetworkJob {
         if (return_code != 200)
             GLib.info ("Sending private key ended with "  + this.path + this.error_string + return_code);
 
-        QJsonParseError error;
+        Json.ParserError error;
         var json = QJsonDocument.from_json (this.reply.read_all (), error);
-        /* emit */ signal_json_received (json, this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ());
+        /* emit */ signal_json_received (this, json, this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ());
         return true;
     }
 

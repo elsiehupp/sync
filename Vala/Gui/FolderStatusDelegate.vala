@@ -73,16 +73,16 @@ public class FolderStatusDelegate : QStyledItemDelegate {
 
         var text_align = Qt.Align_left;
 
-        QFont alias_font = make_alias_font (option.font);
-        QFont sub_font = option.font;
-        QFont error_font = sub_font;
-        QFont progress_font = sub_font;
+        Cairo.FontFace alias_font = make_alias_font (option.font);
+        Cairo.FontFace sub_font = option.font;
+        Cairo.FontFace error_font = sub_font;
+        Cairo.FontFace progress_font = sub_font;
 
         progress_font.point_size (sub_font.point_size () - 2);
 
-        QFontMetrics sub_font_metrics = new QFontMetrics (sub_font);
-        QFontMetrics alias_font_metrics = new QFontMetrics (alias_font);
-        QFontMetrics progress_font_metrics = new QFontMetrics (progress_font);
+        Cairo.FontOptions sub_font_metrics = new Cairo.FontOptions (sub_font);
+        Cairo.FontOptions alias_font_metrics = new Cairo.FontOptions (alias_font);
+        Cairo.FontOptions progress_font_metrics = new Cairo.FontOptions (progress_font);
 
         int alias_margin = alias_font_metrics.height () / 2;
         int margin = sub_font_metrics.height () / 4;
@@ -218,11 +218,11 @@ public class FolderStatusDelegate : QStyledItemDelegate {
         int h = icon_rect.bottom () + margin;
 
         if (!conflict_texts == "")
-            draw_text_box (conflict_texts, Gtk.Color (0xba, 0xba, 0x4d));
+            draw_text_box (conflict_texts, Gdk.RGBA (0xba, 0xba, 0x4d));
         if (!error_texts == "")
-            draw_text_box (error_texts, Gtk.Color (0xbb, 0x4d, 0x4d));
+            draw_text_box (error_texts, Gdk.RGBA (0xbb, 0x4d, 0x4d));
         if (!info_texts == "")
-            draw_text_box (info_texts, Gtk.Color (0x4d, 0x4d, 0xba));
+            draw_text_box (info_texts, Gdk.RGBA (0x4d, 0x4d, 0xba));
 
         // Sync File Progress Bar: Show it if sync_file is not empty.
         if (show_progess) {
@@ -275,7 +275,7 @@ public class FolderStatusDelegate : QStyledItemDelegate {
             btn_opt.rect = options_button_visual_rect;
             btn_opt.icon = this.icon_more;
             int e = Gtk.Application.this.style.pixel_metric (QStyle.PM_Button_icon_size);
-            btn_opt.icon_size = QSize (e,e);
+            btn_opt.icon_size = Gdk.Rectangle (e,e);
             Gtk.Application.this.style.draw_complex_control (QStyle.CC_Tool_button, btn_opt, painter);
         }
     }
@@ -286,7 +286,7 @@ public class FolderStatusDelegate : QStyledItemDelegate {
     Paint an error overlay if there is an error string or
     conflict string
     ***********************************************************/
-    private void draw_text_box (GLib.List<string> texts, Gtk.Color color) {
+    private void draw_text_box (GLib.List<string> texts, Gdk.RGBA color) {
         QRect rect = local_path_rect;
         rect.left (icon_rect.left ());
         rect.top (h);
@@ -296,7 +296,7 @@ public class FolderStatusDelegate : QStyledItemDelegate {
         // save previous state to not mess up colours with the background (fixes issue : https://github.com/nextcloud/desktop/issues/1237)
         painter.save ();
         painter.brush (color);
-        painter.pen (Gtk.Color (0xaa, 0xaa, 0xaa));
+        painter.pen (Gdk.RGBA (0xaa, 0xaa, 0xaa));
         painter.draw_rounded_rect (QStyle.visual_rect (option.direction, option.rect, rect),
             4, 4);
         painter.pen (Qt.white);
@@ -323,23 +323,23 @@ public class FolderStatusDelegate : QStyledItemDelegate {
     /***********************************************************
     allocate each item size in listview.
     ***********************************************************/
-    public QSize size_hint (QStyleOptionViewItem option, QModelIndex index) {
-        QFont alias_font = make_alias_font (option.font);
-        QFont font = option.font;
+    public Gdk.Rectangle size_hint (QStyleOptionViewItem option, QModelIndex index) {
+        Cairo.FontFace alias_font = make_alias_font (option.font);
+        Cairo.FontFace font = option.font;
 
-        QFontMetrics font_metrics = new QFontMetrics(font);
-        QFontMetrics alias_font_metrics = new alias_font_metrics (alias_font);
+        Cairo.FontOptions font_options = new Cairo.FontOptions(font);
+        Cairo.FontOptions alias_font_metrics = new alias_font_metrics (alias_font);
 
         var classif = ((FolderStatusModel) index.model ()).classify (index);
         if (classif == FolderStatusModel.ItemType.ADD_BUTTON) {
             const int margins = alias_font_metrics.height (); // same as 2*alias_margin of paint
-            QFontMetrics font_metrics = new QFontMetrics (Gtk.Application.font ("QPushButton"));
+            Cairo.FontOptions font_options = new Cairo.FontOptions (Gtk.Application.font ("QPushButton"));
             QStyleOptionButton opt = (QStyleOption) option;
             opt.text = add_folder_text ();
             return Gtk.Application.this.style.size_from_contents (
-                QStyle.CT_Push_button, opt, font_metrics.size (Qt.Text_single_line, opt.text))
+                QStyle.CT_Push_button, opt, font_options.size (Qt.Text_single_line, opt.text))
                     .expanded_to (Gtk.Application.global_strut ())
-                + QSize (0, margins);
+                + Gdk.Rectangle (0, margins);
         }
 
         if (classif != FolderStatusModel.ItemType.ROOT_FOLDER) {
@@ -347,15 +347,15 @@ public class FolderStatusDelegate : QStyledItemDelegate {
         }
 
         // calc height
-        int h = root_folder_height_without_errors (font_metrics, alias_font_metrics);
+        int h = root_folder_height_without_errors (font_options, alias_font_metrics);
         // this already includes the bottom margin
 
         // add some space for the message boxes.
-        int margin = font_metrics.height () / 4;
+        int margin = font_options.height () / 4;
         foreach (var role in {Folder_conflict_msg, Folder_error_msg, Folder_info_msg}) {
             var msgs = qvariant_cast<GLib.List<string>> (index.data (role));
             if (!msgs == "") {
-                h += margin + 2 * margin + msgs.length * font_metrics.height ();
+                h += margin + 2 * margin + msgs.length * font_options.height ();
             }
         }
 
@@ -397,16 +397,16 @@ public class FolderStatusDelegate : QStyledItemDelegate {
     Return the position of the option button within the item
     ***********************************************************/
     public static QRect options_button_rect (QRect within, Qt.Layout_direction direction) {
-        QFont font = new QFont ();
-        QFont alias_font = make_alias_font (font);
-        QFontMetrics font_metrics = new QFontMetrics (font);
-        QFontMetrics alias_font_metrics = new QFontMetrics (alias_font);
-        within.height (FolderStatusDelegate.root_folder_height_without_errors (font_metrics, alias_font_metrics));
+        Cairo.FontFace font = new Cairo.FontFace ();
+        Cairo.FontFace alias_font = make_alias_font (font);
+        Cairo.FontOptions font_options = new Cairo.FontOptions (font);
+        Cairo.FontOptions alias_font_metrics = new Cairo.FontOptions (alias_font);
+        within.height (FolderStatusDelegate.root_folder_height_without_errors (font_options, alias_font_metrics));
 
         QStyle_option_tool_button opt;
         int e = Gtk.Application.this.style.pixel_metric (QStyle.PM_Button_icon_size);
-        opt.rect.size (QSize (e,e));
-        QSize size = Gtk.Application.this.style.size_from_contents (QStyle.CT_Tool_button, opt, opt.rect.size ()).expanded_to (Gtk.Application.global_strut ());
+        opt.rect.size (Gdk.Rectangle (e,e));
+        Gdk.Rectangle size = Gtk.Application.this.style.size_from_contents (QStyle.CT_Tool_button, opt, opt.rect.size ()).expanded_to (Gtk.Application.global_strut ());
 
         int margin = Gtk.Application.this.style.pixel_metric (QStyle.PM_Default_layout_spacing);
         QRect rectangle = new QRect (
@@ -421,10 +421,10 @@ public class FolderStatusDelegate : QStyledItemDelegate {
     /***********************************************************
     ***********************************************************/
     public static QRect add_button_rect (QRect within, Qt.Layout_direction direction) {
-        QFontMetrics font_metrics = new QFontMetrics (Gtk.Application.font ("QPushButton"));
+        Cairo.FontOptions font_options = new Cairo.FontOptions (Gtk.Application.font ("QPushButton"));
         QStyleOptionButton opt;
         opt.text = add_folder_text ();
-        QSize size = Gtk.Application.this.style.size_from_contents (QStyle.CT_Push_button, opt, font_metrics.size (Qt.Text_single_line, opt.text)).expanded_to (Gtk.Application.global_strut ());
+        Gdk.Rectangle size = Gtk.Application.this.style.size_from_contents (QStyle.CT_Push_button, opt, font_options.size (Qt.Text_single_line, opt.text)).expanded_to (Gtk.Application.global_strut ());
         QRect rectangle = new QRect (
             QPoint (within.left (),
             within.top () + within.height () / 2 - size.height () / 2),
@@ -437,11 +437,11 @@ public class FolderStatusDelegate : QStyledItemDelegate {
     /***********************************************************
     ***********************************************************/
     public QRect errors_list_rect (QRect within) {
-        QFont font = QFont ();
-        QFont alias_font = make_alias_font (font);
-        QFontMetrics font_metrics = new QFontMetrics (font);
-        QFontMetrics alias_font_metrics = new QFontMetrics (alias_font);
-        within.top (within.top () + FolderStatusDelegate.root_folder_height_without_errors (font_metrics, alias_font_metrics));
+        Cairo.FontFace font = Cairo.FontFace ();
+        Cairo.FontFace alias_font = make_alias_font (font);
+        Cairo.FontOptions font_options = new Cairo.FontOptions (font);
+        Cairo.FontOptions alias_font_metrics = new Cairo.FontOptions (alias_font);
+        within.top (within.top () + FolderStatusDelegate.root_folder_height_without_errors (font_options, alias_font_metrics));
         return within;
     }
 
@@ -462,16 +462,16 @@ public class FolderStatusDelegate : QStyledItemDelegate {
 
     /***********************************************************
     ***********************************************************/
-    public static int root_folder_height_without_errors (QFontMetrics font_metrics, QFontMetrics alias_font_metrics) {
+    public static int root_folder_height_without_errors (Cairo.FontOptions font_options, Cairo.FontOptions alias_font_metrics) {
         const int alias_margin = alias_font_metrics.height () / 2;
-        const int margin = font_metrics.height () / 4;
+        const int margin = font_options.height () / 4;
 
         int h = alias_margin; // margin to top
         h += alias_font_metrics.height (); // alias
         h += margin; // between alias and local path
-        h += font_metrics.height (); // local path
+        h += font_options.height (); // local path
         h += margin; // between local and remote path
-        h += font_metrics.height (); // remote path
+        h += font_options.height (); // remote path
         h += margin; // bottom margin
         return h;
     }
@@ -479,8 +479,8 @@ public class FolderStatusDelegate : QStyledItemDelegate {
 
     /***********************************************************
     ***********************************************************/
-    private static QFont make_alias_font (QFont normal_font) {
-        QFont alias_font = normal_font;
+    private static Cairo.FontFace make_alias_font (Cairo.FontFace normal_font) {
+        Cairo.FontFace alias_font = normal_font;
         alias_font.bold (true);
         alias_font.point_size (normal_font.point_size () + 2);
         return alias_font;

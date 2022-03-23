@@ -92,7 +92,7 @@ public class SyncOptions : GLib.Object {
     ***********************************************************/
     public SyncOptions () {
         this.vfs = new VfsOff ();
-        this.file_regex = GLib.Regex ("(");
+        this.file_regex = new GLib.Regex ("(");
     }
 
 

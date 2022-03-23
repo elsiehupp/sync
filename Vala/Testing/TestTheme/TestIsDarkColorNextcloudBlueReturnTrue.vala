@@ -13,7 +13,7 @@ public class TestIsDarkColorNextcloudBlueReturnTrue : AbstractTestTheme {
     /***********************************************************
     ***********************************************************/
     private TestIsDarkColorNextcloudBlueReturnTrue () {
-        const Gtk.Color color = new Gtk.Color (0, 130, 201);
+        const Gdk.RGBA color = Gdk.RGBA (0, 130, 201);
 
         var result = Theme.is_dark_color (color);
 

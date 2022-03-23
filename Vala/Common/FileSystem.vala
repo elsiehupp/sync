@@ -206,7 +206,7 @@ public class FileSystem : GLib.Object {
         trash_file_path = trash_path + "files/"; // trash file path contain delete files
         trash_info_path = trash_path + "info/"; // trash info path contain delete files information
 
-        if (! (GLib.Dir ().mkpath (trash_file_path) && GLib.Dir ().mkpath (trash_info_path))) {
+        if (! (new GLib.Dir ().mkpath (trash_file_path) && new GLib.Dir ().mkpath (trash_info_path))) {
             *error_string = _("FileSystem", "Could not make directories in trash");
             return false; //mkpath will return true if path exists
         }

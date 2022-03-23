@@ -48,7 +48,7 @@ public class FolderDefinition : GLib.Object {
     /***********************************************************
     Which virtual files setting the folder uses
     ***********************************************************/
-    public Common.AbstractVfs.Mode virtual_files_mode = AbstractVfs.Off;
+    public Common.VfsMode virtual_files_mode = AbstractVfs.Off;
 
     /***********************************************************
     The CLSID where this folder appears in registry for the Explorer navigation pane entry.
@@ -64,24 +64,24 @@ public class FolderDefinition : GLib.Object {
     Saves the folder definition into the current settings group.
     ***********************************************************/
     public static void save (GLib.Settings settings, FolderDefinition folder) {
-        settings.value ("local_path", folder.local_path);
-        settings.value ("journal_path", folder.journal_path);
-        settings.value ("target_path", folder.target_path);
-        settings.value ("paused", folder.paused);
-        settings.value ("ignore_hidden_files", folder.ignore_hidden_files);
+        settings.get_value ("local_path", folder.local_path);
+        settings.get_value ("journal_path", folder.journal_path);
+        settings.get_value ("target_path", folder.target_path);
+        settings.get_value ("paused", folder.paused);
+        settings.get_value ("ignore_hidden_files", folder.ignore_hidden_files);
 
-        settings.value ("virtual_files_mode", Common.AbstractVfs.Mode.to_string (folder.virtual_files_mode));
+        settings.get_value ("virtual_files_mode", Common.VfsMode.to_string (folder.virtual_files_mode));
 
         // Ensure new vfs modes won't be attempted by older clients
         if (folder.virtual_files_mode == AbstractVfs.WindowsCfApi) {
-            settings.value (VERSION_C, 3);
+            settings.get_value (VERSION_C, 3);
         } else {
-            settings.value (VERSION_C, 2);
+            settings.get_value (VERSION_C, 2);
         }
 
         // Happens only on Windows when the explorer integration is enabled.
         if (!folder.navigation_pane_clsid == null) {
-            settings.value ("navigation_pane_clsid", folder.navigation_pane_clsid);
+            settings.get_value ("navigation_pane_clsid", folder.navigation_pane_clsid);
         } else {
             settings.remove ("navigation_pane_clsid");
         }
@@ -94,23 +94,23 @@ public class FolderDefinition : GLib.Object {
     public static bool on_signal_load (GLib.Settings settings, string alias,
         FolderDefinition folder) {
         folder.alias = FolderManager.unescape_alias (alias);
-        folder.local_path = settings.value ("local_path").to_string ();
-        folder.journal_path = settings.value ("journal_path").to_string ();
-        folder.target_path = settings.value ("target_path").to_string ();
-        folder.paused = settings.value ("paused").to_bool ();
-        folder.ignore_hidden_files = settings.value ("ignore_hidden_files", GLib.Variant (true)).to_bool ();
-        folder.navigation_pane_clsid = settings.value ("navigation_pane_clsid").to_uuid ();
+        folder.local_path = settings.get_value ("local_path").to_string ();
+        folder.journal_path = settings.get_value ("journal_path").to_string ();
+        folder.target_path = settings.get_value ("target_path").to_string ();
+        folder.paused = settings.get_value ("paused").to_bool ();
+        folder.ignore_hidden_files = settings.get_value ("ignore_hidden_files", GLib.Variant (true)).to_bool ();
+        folder.navigation_pane_clsid = settings.get_value ("navigation_pane_clsid").to_uuid ();
 
         folder.virtual_files_mode = AbstractVfs.Off;
-        string vfs_mode_string = settings.value ("virtual_files_mode").to_string ();
+        string vfs_mode_string = settings.get_value ("virtual_files_mode").to_string ();
         if (!vfs_mode_string == "") {
-            if (var mode = Common.AbstractVfs.Mode.from_string (vfs_mode_string)) {
+            if (var mode = Common.VfsMode.from_string (vfs_mode_string)) {
                 folder.virtual_files_mode = *mode;
             } else {
                 GLib.warning ("Unknown virtual_files_mode:" + vfs_mode_string + "assuming 'off'";
             }
         } else {
-            if (settings.value ("use_placeholders").to_bool ()) {
+            if (settings.get_value ("use_placeholders").to_bool ()) {
                 folder.virtual_files_mode = AbstractVfs.WithSuffix;
                 folder.upgrade_vfs_mode = true; // maybe winvfs is available?
             }

@@ -113,7 +113,7 @@ public class PutMultiFileJob : AbstractNetworkJob {
     /***********************************************************
     FIXME: GLib.TimeSpan is microseconds, not milliseconds!
     ***********************************************************/
-    public GLib.TimeSpan ms_since_start {
+    public GLib.TimeSpan microseconds_since_start {
         return this.request_timer.elapsed ();
     }
 

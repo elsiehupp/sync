@@ -125,25 +125,25 @@ abstract class AbstractComputeChecksum : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    string calc_md5 (QIODevice device) {
+    string calc_md5 (GLib.OutputStream device) {
         return calc_crypto_hash (device, QCryptographicHash.Md5);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    string calc_sha1 (QIODevice device) {
+    string calc_sha1 (GLib.OutputStream device) {
         return calc_crypto_hash (device, QCryptographicHash.Sha1);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    string calc_adler32 (QIODevice device) {
+    string calc_adler32 (GLib.OutputStream device) {
         if (device.length == 0) {
             return "";
         }
-        string buf = string (BUFSIZE, Qt.Uninitialized);
+        string buf = new string (BUFSIZE, Qt.Uninitialized);
 
         uint32 adler = adler32 (0L, Z_NULL, 0);
         int64 size = 0;
@@ -159,7 +159,7 @@ abstract class AbstractComputeChecksum : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    static string calc_crypto_hash (QIODevice device, QCryptographicHash.Algorithm algo) {
+    static string calc_crypto_hash (GLib.OutputStream device, QCryptographicHash.Algorithm algo) {
         string arr;
         QCryptographicHash crypto = new QCryptographicHash (algo);
 

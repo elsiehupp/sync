@@ -132,7 +132,7 @@ public class HeaderBanner : Gtk.Widget {
         title_label = new Gtk.Label (this);
         title_label.background_role (Gtk.Palette.Base);
         logo_label = new Gtk.Label (this);
-        QFont font = title_label.font ();
+        Cairo.FontFace font = title_label.font ();
         font.bold (true);
         title_label.font (font);
         layout = new QGridLayout (this);
@@ -175,7 +175,7 @@ public class HeaderBanner : Gtk.Widget {
         logo_label.pixmap (logo);
         banner_pixmap = banner;
         if (banner_pixmap == null) {
-            QSize size = layout.total_minimum_size ();
+            Gdk.Rectangle size = layout.total_minimum_size ();
             minimum_size (size);
             maximum_size (QWIDGETSIZE_MAX, size.height ());
         } else {

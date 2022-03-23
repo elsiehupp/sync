@@ -12,8 +12,8 @@ public class TestClearAtClearAtEndOf : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private TestClearAtClearAtEndOf () {
-        TestClearAtClearAtEndOf1 ();
-        TestClearAtClearAtEndOf3 ();
+        new TestClearAtClearAtEndOf1 ();
+        new TestClearAtClearAtEndOf3 ();
     }
 
 } // class TestClearAtClearAtEndOf

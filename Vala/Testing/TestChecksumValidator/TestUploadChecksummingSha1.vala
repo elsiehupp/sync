@@ -23,7 +23,7 @@ public class TestUploadChecksummingSha1 : AbstractTestChecksumValidator {
 
         compute_checksum.on_signal_start (this.testfile);
 
-        QEventLoop loop;
+        GLib.MainLoop loop;
         compute_checksum.signal_finished.connect (
             loop.quit // Qt.QueuedConnection
         );

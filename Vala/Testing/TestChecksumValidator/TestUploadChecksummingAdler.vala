@@ -24,7 +24,7 @@ public class TestUploadChecksummingAdler : AbstractTestChecksumValidator {
         GLib.debug ("XX Expected Checksum: " + this.expected);
         compute_checksum.on_signal_start (this.testfile);
 
-        QEventLoop loop;
+        GLib.MainLoop loop;
         compute_checksum.signal_finished.connect (
             loop.quit // Qt.QueuedConnection
         );

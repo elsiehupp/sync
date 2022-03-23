@@ -51,7 +51,7 @@ public class VioHandle : GLib.Object {
             }
         } while (posix_dirent.d_name == "." || posix_dirent.d_name == "..");
 
-        file_stat = FileStat ();
+        file_stat = new FileStat ();
         file_stat.path = GLib.File.decode_name (posix_dirent.d_name).to_utf8 ();
         string full_path = directory_handle.path % "/" % "" % (string) posix_dirent.d_name;
         if (file_stat.path == null) {

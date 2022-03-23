@@ -17,7 +17,7 @@ public class TokenCredentialsAccessManager : AccessManager {
     }
 
 
-    protected GLib.InputStream create_request (Operation operation, Soup.Request request, QIODevice outgoing_data) {
+    protected GLib.InputStream create_request (Operation operation, Soup.Request request, GLib.OutputStream outgoing_data) {
         if (this.credentials.user () == "" || this.credentials.password () == "") {
             GLib.warning ("Empty user/password provided!");
         }

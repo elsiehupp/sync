@@ -4,7 +4,7 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QMenu>
+//  #include <GLib.Menu>
 //  #include <QtNetwork>
 //  #include <QSslConfiguration>
 //  #include <QWidgetAction>
@@ -24,7 +24,7 @@ public class SslButton : QToolButton {
     /***********************************************************
     ***********************************************************/
     private AccountState account_state;
-    private QMenu menu;
+    private GLib.Menu menu;
 
     /***********************************************************
     ***********************************************************/
@@ -33,7 +33,7 @@ public class SslButton : QToolButton {
         popup_mode (QToolButton.Instant_popup);
         auto_raise (true);
 
-        this.menu = new QMenu (this);
+        this.menu = new GLib.Menu (this);
         this.menu.about_to_show.connect (
             this.on_signal_update_menu
         );
@@ -142,7 +142,7 @@ public class SslButton : QToolButton {
 
     /***********************************************************
     ***********************************************************/
-    private QMenu build_cert_menu (QMenu parent, QSslCertificate cert,
+    private GLib.Menu build_cert_menu (GLib.Menu parent, QSslCertificate cert,
         GLib.List<QSslCertificate> user_approved, int position, GLib.List<QSslCertificate> system_ca_certificates) {
         string cn = cert.subject_info (QSslCertificate.Common_name).join (char (';'));
         string ou = cert.subject_info (QSslCertificate.Organizational_unit_name).join (char (';'));
@@ -234,7 +234,7 @@ public class SslButton : QToolButton {
         var action = new QWidgetAction (parent);
         action.default_widget (label);
         // plug action into menu
-        var menu = new QMenu (parent);
+        var menu = new GLib.Menu (parent);
         menu.menu_action ().on_signal_text (txt);
         menu.add_action (action);
 

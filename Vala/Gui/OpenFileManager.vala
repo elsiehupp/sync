@@ -43,9 +43,9 @@ public class OpenFileManager : GLib.Object {
         GLib.Settings desktop_file = new GLib.Settings (OpenFileManager.default_manager, GLib.Settings.IniFormat);
         string exec = desktop_file.value ("Desktop Entry/Exec").to_string ();
 
-        string file_to_open = GLib.FileInfo (local_path).absolute_file_path;
-        string path_to_open = GLib.FileInfo (local_path).absolute_path;
-        bool can_handle_file = false; // assume dumb font_metrics
+        string file_to_open = new GLib.FileInfo (local_path).absolute_file_path;
+        string path_to_open = new GLib.FileInfo (local_path).absolute_path;
+        bool can_handle_file = false; // assume dumb font_options
 
         args = exec.split (' ');
         if (args.length > 0)
@@ -92,11 +92,11 @@ public class OpenFileManager : GLib.Object {
             }
         }
 
-        if (args.length == 0) {
+        if (args.length () == 0) {
             args += file_to_open;
         }
 
-        if (app == "" || args == "" || !can_handle_file) {
+        if (app == "" || args.length () == 0 || !can_handle_file) {
             // fallback: open the default file manager, without ever selecting the file
             QDesktopServices.open_url (GLib.Uri.from_local_file (path_to_open));
         } else {

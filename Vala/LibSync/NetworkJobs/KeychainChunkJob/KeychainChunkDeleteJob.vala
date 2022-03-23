@@ -71,7 +71,7 @@ public class KeychainChunkDeleteJob : AbstractKeychainChunkJob {
     public bool exec () {
         start ();
 
-        QEventLoop wait_loop;
+        GLib.MainLoop wait_loop;
         this.signal_finished.connect (
             wait_loop.quit
         );

@@ -28,65 +28,6 @@ public abstract class AbstractVfs : GLib.Object {
     public class AvailabilityResult : Result<ItemAvailability, AvailabilityError> { }
 
     /***********************************************************
-    The kind of VFS in use (or no-VFS)
-
-    Currently plugins and modes are one-to-one but that's not required.
-    ***********************************************************/
-    public enum Mode {
-        OFF,
-        WITH_SUFFIX,
-        WINDOWS_CF_API,
-        XATTR;
-
-        /***********************************************************
-        Note: Strings are used for config and must be stable
-        ***********************************************************/
-        public static string to_string (Mode mode) {
-            switch (mode) {
-            case OFF:
-                return "off";
-            case WITH_SUFFIX:
-                return "suffix";
-            case WINDOWS_CF_API:
-                return "wincfapi";
-            case XATTR:
-                return "xattr";
-            }
-            return "off";
-        }
-
-
-        /***********************************************************
-        ***********************************************************/
-        public static Mode from_string (string string_value) throws InvalidParameterError {
-            // Note: Strings are used for config and must be stable
-
-            if (string_value == "off") {
-                return Mode.OFF;
-            } else if (string_value == "suffix") {
-                return Mode.WITH_SUFFIX;
-            } else if (string_value == "wincfapi") {
-                return Mode.WINDOWS_CF_API;
-            }
-            throw new InvalidParameterError.INVALID_VALUE (string_value + " is not a valid AbstractVfs Mode");
-        }
-
-
-        public static string to_plugin_name (Mode mode) throws InvalidParameterError {
-            switch (mode) {
-            case Mode.WITH_SUFFIX:
-                return "suffix";
-            case Mode.WINDOWS_CF_API:
-                return "cfapi";
-            case Mode.XATTR:
-                return "xattr";
-            }
-            throw new InvalidParameterError.INVALID_VALUE (Mode.to_string (mode) + " is not a valid AbstractVfs Mode");
-        }
-    }
-
-
-    /***********************************************************
     ***********************************************************/
     public enum ConvertToPlaceholderResult {
         ERROR,
@@ -110,7 +51,7 @@ public abstract class AbstractVfs : GLib.Object {
     }
 
 
-    protected Mode best_available_vfs_mode { protected get; protected set; }
+    protected VfsMode best_available_vfs_mode { protected get; protected set; }
 
 
     /***********************************************************
@@ -118,14 +59,14 @@ public abstract class AbstractVfs : GLib.Object {
     public static Result<bool, string> check_availability (string path) {
         //  Q_UNUSED (mode)
         //  Q_UNUSED (path)
-        return new Result<bool, string> (true, Mode.to_string (this.best_available_vfs_mode));
+        return new Result<bool, string> (true, VfsMode.to_string (this.best_available_vfs_mode));
     }
 
 
     /***********************************************************
     the parameters passed to on_signal_start ()
     ***********************************************************/
-    protected AbstractVfs.SetupParameters setup_params;
+    protected SetupParameters setup_params;
 
 
     /***********************************************************
@@ -137,7 +78,7 @@ public abstract class AbstractVfs : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public abstract Mode mode ();
+    public abstract VfsMode mode ();
 
 
     /***********************************************************
@@ -149,7 +90,7 @@ public abstract class AbstractVfs : GLib.Object {
     /***********************************************************
     Access to the parameters the instance was on_signal_start ()ed with.
     ***********************************************************/
-    public AbstractVfs.SetupParameters parameters () {
+    public SetupParameters parameters () {
         return this.setup_params;
     }
 
@@ -159,7 +100,7 @@ public abstract class AbstractVfs : GLib.Object {
 
     The plugin-specific work is done in start_impl ().
     ***********************************************************/
-    public void on_signal_start (AbstractVfs.SetupParameters parameters) {
+    public void on_signal_start (SetupParameters parameters) {
         this.setup_params = parameters;
         start_impl (parameters);
     }
@@ -343,7 +284,7 @@ public abstract class AbstractVfs : GLib.Object {
     Usually some registration needs to be done with the backend. This function
     should take care of it if necessary.
     ***********************************************************/
-    protected abstract void start_impl (AbstractVfs.SetupParameters setup_parameters);
+    protected abstract void start_impl (SetupParameters setup_parameters);
 
 
     /***********************************************************
@@ -374,21 +315,25 @@ public abstract class AbstractVfs : GLib.Object {
         var pin = this.setup_params.journal.internal_pin_states.effective_for_path_recursive (path);
         // not being able to retrieve the pin state isn't too bad
         var hydration_status = this.setup_params.journal.has_hydrated_or_dehydrated_files (path);
-        if (!hydration_status)
+        if (!hydration_status) {
             return AvailabilityError.DATABASE_ERROR;
+        }
 
         if (hydration_status.has_dehydrated) {
-            if (hydration_status.has_hydrated)
+            if (hydration_status.has_hydrated) {
                 return ItemAvailability.MIXED;
-            if (pin && *pin == ItemAvailability.ONLINE_ONLY)
+            }
+            if (pin && *pin == ItemAvailability.ONLINE_ONLY) {
                 return ItemAvailability.ONLINE_ONLY;
-            else
+            } else {
                 return ItemAvailability.ALL_DEHYDRATED;
+            }
         } else if (hydration_status.has_hydrated) {
-            if (pin && *pin == PinState.PinState.ALWAYS_LOCAL)
+            if (pin && *pin == PinState.PinState.ALWAYS_LOCAL) {
                 return ItemAvailability.PinState.ALWAYS_LOCAL;
-            else
+            } else {
                 return ItemAvailability.ALL_HYDRATED;
+            }
         }
         return AvailabilityError.NO_SUCH_ITEM;
     }

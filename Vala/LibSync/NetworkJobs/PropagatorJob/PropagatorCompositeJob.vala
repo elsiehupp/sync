@@ -108,7 +108,7 @@ public class PropagatorCompositeJob : AbstractPropagatorJob {
 
         // If neither us or our children had stuff left to do we could hang. Make sure
         // we mark this job as on_signal_finished so that the propagator can schedule a new one.
-        if (this.jobs_to_do == "" && this.tasks_to_do == "" && this.running_jobs == "") {
+        if (this.jobs_to_do.length () == 0 && this.tasks_to_do.length () == 0 && this.running_jobs.length () == 0) {
             // Our parent jobs are already iterating over their running jobs, post to the event loop
             // to avoid removing ourself from that list while they iterate.
             GLib.Object.invoke_method (this, "on_signal_finalize", Qt.QueuedConnection);
@@ -210,7 +210,7 @@ public class PropagatorCompositeJob : AbstractPropagatorJob {
             this.has_error = status;
         }
 
-        if (this.jobs_to_do == "" && this.tasks_to_do == "" && this.running_jobs == "") {
+        if (this.jobs_to_do.length () == 0 && this.tasks_to_do.length () == 0 && this.running_jobs.length () == 0) {
             on_signal_finalize ();
         } else {
             this.propagator.schedule_next_job ();

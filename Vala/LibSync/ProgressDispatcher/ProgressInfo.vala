@@ -312,11 +312,11 @@ public class ProgressInfo : GLib.Object {
     public void reset () {
         this.status = Status.STARTING;
 
-        this.current_items == "";
+        this.current_items = new GLib.HashTable<string, ProgressItem?> ();
         this.current_discovered_remote_folder == "";
         this.current_discovered_local_folder == "";
-        this.size_progress = Progress ();
-        this.file_progress = Progress ();
+        this.size_progress = new Progress ();
+        this.file_progress = new Progress ();
         this.total_size_of_completed_jobs = 0;
 
         // Historically, these starting estimates were way lower, but that lead
@@ -325,7 +325,7 @@ public class ProgressInfo : GLib.Object {
         this.max_files_per_second = 10.0;
 
         this.update_estimates_timer.stop ();
-        this.last_completed_item = SyncFileItem ();
+        this.last_completed_item = new SyncFileItem ();
     }
 
 
@@ -450,7 +450,7 @@ public class ProgressInfo : GLib.Object {
         this.recompute_completed_size ();
 
         // This seems dubious!
-        this.last_completed_item = SyncFileItem ();
+        this.last_completed_item = new SyncFileItem ();
     }
 
 

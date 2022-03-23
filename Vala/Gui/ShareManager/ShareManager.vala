@@ -5,7 +5,7 @@
 ***********************************************************/
 
 //  #include <QJsonDocument>
-//  #include <QJsonObject>
+//  #include <Json.Object>
 //  #include <QJsonArray>
 
 
@@ -241,21 +241,21 @@ public class ShareManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private unowned LinkShare parse_link_share (QJsonObject data);
-    unowned LinkShare ShareManager.parse_link_share (QJsonObject data) {
+    private unowned LinkShare parse_link_share (Json.Object data);
+    unowned LinkShare ShareManager.parse_link_share (Json.Object data) {
         GLib.Uri url;
 
         // From own_cloud server 8.2 the url field is always set for public shares
         if (data.contains ("url")) {
-            url = GLib.Uri (data.value ("url").to_string ());
+            url = new GLib.Uri (data.value ("url").to_string ());
         } else if (this.account.server_version_int >= Account.make_server_version (8, 0, 0)) {
             // From own_cloud server version 8 on, a different share link scheme is used.
-            url = GLib.Uri (Utility.concat_url_path (this.account.url, "index.php/s/" + data.value ("token").to_string ())).to_string ();
+            url = new GLib.Uri (Utility.concat_url_path (this.account.url, "index.php/s/" + data.value ("token").to_string ())).to_string ();
         } else {
             QUrlQuery query_args;
             query_args.add_query_item ("service", "files");
             query_args.add_query_item ("t", data.value ("token").to_string ());
-            url = GLib.Uri (Utility.concat_url_path (this.account.url, "public.php", query_args).to_string ());
+            url = new GLib.Uri (Utility.concat_url_path (this.account.url, "public.php", query_args).to_string ());
         }
 
         QDate expire_date;
@@ -288,7 +288,7 @@ public class ShareManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private unowned UserGroupShare parse_user_group_share (QJsonObject data) {
+    private unowned UserGroupShare parse_user_group_share (Json.Object data) {
         unowned Sharee sharee = new Sharee (
             data.value ("share_with").to_string (),
             data.value ("share_with_displayname").to_string (),
@@ -323,7 +323,7 @@ public class ShareManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private unowned Share parse_share (QJsonObject data) {
+    private unowned Share parse_share (Json.Object data) {
         unowned Sharee sharee = new Sharee (
             data.value ("share_with").to_string (),
             data.value ("share_with_displayname").to_string (),

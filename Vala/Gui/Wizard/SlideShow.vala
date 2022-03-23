@@ -114,7 +114,7 @@ public class SlideShow : Gtk.Widget {
     ***********************************************************/
     public void draw_slide (QPainter painter, int index) {
         string label = this.labels.value (index);
-        QRect label_rect = this.style.item_text_rect (font_metrics (), rect (), Qt.Align_bottom | Qt.AlignHCenter, is_enabled (), label);
+        QRect label_rect = this.style.item_text_rect (font_options (), rect (), Qt.Align_bottom | Qt.AlignHCenter, is_enabled (), label);
         this.style.draw_item_text (painter, label_rect, Qt.AlignCenter, palette (), is_enabled (), label, Gtk.Palette.Window_text);
 
         Gdk.Pixbuf pixmap = this.pixmaps.value (index);
@@ -125,18 +125,18 @@ public class SlideShow : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public QSize size_hint () {
-        QFontMetrics font_metrics = font_metrics ();
-        QSize label_size = new QSize (0, font_metrics.height ());
+    public Gdk.Rectangle size_hint () {
+        Cairo.FontOptions font_options = font_options ();
+        Gdk.Rectangle label_size = Gdk.Rectangle (0, font_options.height ());
         foreach (string label in this.labels) {
-            label_size.width (std.max (font_metrics.horizontal_advance (label), label_size.width ()));
+            label_size.width (std.max (font_options.horizontal_advance (label), label_size.width ()));
         }
-        QSize pixmap_size;
+        Gdk.Rectangle pixmap_size;
         foreach (Gdk.Pixbuf pixmap in this.pixmaps) {
             pixmap_size.width (std.max (pixmap.width (), pixmap_size.width ()));
             pixmap_size.height (std.max (pixmap.height (), pixmap_size.height ()));
         }
-        return new QSize (
+        return Gdk.Rectangle (
             std.max (label_size.width (), pixmap_size.width ()),
             label_size.height () + SPACING + pixmap_size.height ()
         );

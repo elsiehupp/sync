@@ -110,7 +110,7 @@ public class TestCheckPathValidityForNewFolder : AbstractTestFolderMan {
         GLib.assert_true (!folder_manager.check_path_validity_for_new_folder ("") == null);
 
         // REMOVE own_cloud2 from the filesystem, but keep a folder sync'ed to it.
-        GLib.Dir (directory_path + "/own_cloud2/").remove_recursively ();
+        new GLib.Dir (directory_path + "/own_cloud2/").remove_recursively ();
         GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/own_cloud2/blublu") == null);
         GLib.assert_true (!folder_manager.check_path_validity_for_new_folder (directory_path + "/own_cloud2/sub/subsub/sub") == null);
     }

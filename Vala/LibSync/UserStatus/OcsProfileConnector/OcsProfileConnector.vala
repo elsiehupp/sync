@@ -7,7 +7,7 @@ namespace LibSync {
 public class OcsProfileConnector : GLib.Object {
 
     private unowned Account account;
-    private Hovercard current_hovercard;
+    public Hovercard current_hovercard { public get; private set; }
 
     internal signal void signal_error ();
     internal signal void hovercard_fetched ();
@@ -35,13 +35,6 @@ public class OcsProfileConnector : GLib.Object {
             this.on_signal_hovercard_fetched
         );
         json_api_job.start ();
-    }
-
-
-    /***********************************************************
-    ***********************************************************/
-    public Hovercard hovercard () {
-        return this.current_hovercard;
     }
 
 
@@ -122,7 +115,7 @@ public class OcsProfileConnector : GLib.Object {
     }
 
 
-    private static HovercardAction json_to_action (QJsonObject json_action_object) {
+    private static HovercardAction json_to_action (Json.Object json_action_object) {
         var icon_url = json_action_object.value ("icon").to_string ("no-icon");
         Gdk.Pixbuf icon_pixmap;
         HovercardAction hovercard_action = new HovercardAction (
@@ -155,9 +148,9 @@ public class OcsProfileConnector : GLib.Object {
         if (!svg_renderer.on_signal_load (icon_data)) {
             return {};
         }
-        QSize image_size = new QSize (16, 16);
+        Gdk.Rectangle image_size = Gdk.Rectangle (16, 16);
         if (Theme.is_hidpi ()) {
-            image_size = new QSize (32, 32);
+            image_size = Gdk.Rectangle (32, 32);
         }
         Gtk.Image scaled_svg = new Gtk.Image (image_size, Gtk.Image.FormatARGB32);
         scaled_svg.fill ("transparent");

@@ -253,7 +253,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
             return;
         }
 
-        var json_api_job = new JsonApiJob (
+        var json_api_job = new LibSync.JsonApiJob (
             this.account_state.account,
             "ocs/v2.php/search/providers/%1/search".printf (provider_id)
         );
@@ -268,7 +268,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
         json_api_job.add_query_params (parameters);
         const var was_search_in_progress = is_search_in_progress ();
         this.search_job_connections.insert (provider_id,
-            json_api_job.json_received.connect (
+            json_api_job.signal_json_received.connect (
                 this.on_signal_search_for_provider_finished
             )
         );
@@ -281,7 +281,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private void parse_results_for_provider (QJsonObject data, string provider_id, bool fetched_more) {
+    private void parse_results_for_provider (Json.Object data, string provider_id, bool fetched_more) {
         const var cursor = data.value ("cursor").to_int ();
         const var entries = data.value ("entries").to_variant ().to_list ();
 
@@ -563,8 +563,8 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
         }
 
         if (this.providers == "") {
-            var json_api_job = new JsonApiJob (this.account_state.account, "ocs/v2.php/search/providers");
-            json_api_job.json_received.connect (
+            var json_api_job = new LibSync.JsonApiJob (this.account_state.account, "ocs/v2.php/search/providers");
+            json_api_job.signal_json_received.connect (
                 this.on_signal_fetch_providers_finished
             );
             json_api_job.on_signal_start ();
@@ -576,8 +576,8 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_fetch_providers_finished (QJsonDocument json, int status_code) {
-        const var json_api_job = qobject_cast<JsonApiJob> (sender ());
+    private void on_signal_fetch_providers_finished (LibSync.JsonApiJob json_api_job, QJsonDocument json, int status_code) {
+        const var json_api_job = qobject_cast<LibSync.JsonApiJob> (sender ());
 
         if (!json_api_job) {
             GLib.critical ("Failed to fetch providers.".printf (this.search_term));
@@ -621,10 +621,10 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_search_for_provider_finished (QJsonDocument json, int status_code) {
+    private void on_signal_search_for_provider_finished (LibSync.JsonApiJob json_api_job, QJsonDocument json, int status_code) {
         //  Q_ASSERT (this.account_state && this.account_state.account);
 
-        const var json_api_job = qobject_cast<JsonApiJob> (sender ());
+        const var json_api_job = qobject_cast<LibSync.JsonApiJob> (sender ());
 
         if (!json_api_job) {
             GLib.critical ("Search has failed for '%2'.".printf (this.search_term));

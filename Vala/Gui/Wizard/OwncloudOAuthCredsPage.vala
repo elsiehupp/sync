@@ -4,7 +4,7 @@
 @copyright GPLv3 or Later
 ***********************************************************/
 
-//  #include <QMenu>
+//  #include <GLib.Menu>
 //  #include <QClipboard>
 //  #include <QNetworkCookie>
 //  #include <QPointer>

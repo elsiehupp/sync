@@ -55,12 +55,12 @@ public class LscolJob : AbstractNetworkJob {
     public new void start () {
         GLib.List<string> properties = this.properties;
 
-        if (properties == "") {
+        if (properties.length () == 0) {
             GLib.warning ("Propfind with no properties!");
         }
         string prop_str;
         foreach (string prop in properties) {
-            if (prop.contains (':')) {
+            if (prop.contains (":")) {
                 int col_index = prop.last_index_of (":");
                 var ns = prop.left (col_index);
                 if (ns == "http://owncloud.org/ns") {

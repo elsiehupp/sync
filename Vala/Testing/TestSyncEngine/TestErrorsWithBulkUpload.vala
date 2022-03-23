@@ -55,7 +55,7 @@ public class TestErrorsWithBulkUpload : AbstractTestSyncEngine {
     }
 
 
-    private GLib.InputStream override_delegate_with_bulk_upload (Soup.Operation operation, Soup.Request request, QIODevice outgoing_data) {
+    private GLib.InputStream override_delegate_with_bulk_upload (Soup.Operation operation, Soup.Request request, GLib.OutputStream outgoing_data) {
         var content_type = request.header (Soup.Request.ContentTypeHeader).to_string ();
         if (operation == Soup.PostOperation) {
             ++number_of_post;
@@ -86,8 +86,8 @@ public class TestErrorsWithBulkUpload : AbstractTestSyncEngine {
     }
 
 
-    private QJsonObject fake_folder_for_each_reply_part_delegate (GLib.HashTable<string, string> all_headers) {
-        var reply = new QJsonObject ();
+    private Json.Object fake_folder_for_each_reply_part_delegate (GLib.HashTable<string, string> all_headers) {
+        var reply = new Json.Object ();
         var filename = all_headers["X-File-Path"];
         if (filename.has_suffix ("A/big2") ||
                 filename.has_suffix ("A/big3") ||

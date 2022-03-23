@@ -13,9 +13,9 @@ public class SocketApiJob : GLib.Object {
 
     protected string job_id;
     protected unowned SocketListener socket_listener;
-    protected QJsonObject arguments;
+    protected Json.Object arguments;
 
-    public SocketApiJob (string job_id, unowned SocketListener  socket_listener, QJsonObject arguments) {
+    public SocketApiJob (string job_id, unowned SocketListener  socket_listener, Json.Object arguments) {
         this.job_id = job_id;
         this.socket_listener = socket_listener;
         this.arguments = arguments;
@@ -31,7 +31,7 @@ public class SocketApiJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void resolve (QJsonObject response) {
+    public void resolve (Json.Object response) {
         resolve (QJsonDocument {
             response
         }.to_json ());
@@ -40,7 +40,7 @@ public class SocketApiJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public QJsonObject arguments () {
+    public Json.Object arguments () {
         return this.arguments;
     }
 

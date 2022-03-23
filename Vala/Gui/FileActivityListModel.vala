@@ -54,8 +54,8 @@ public class FileActivityListModel : ActivityListModel {
         currently_fetching (true);
 
         const string url = "ocs/v2.php/apps/activity/api/v2/activity/filter";
-        var json_api_job = new JsonApiJob (account_state.account, url, this);
-        json_api_job.json_received.connect (
+        var json_api_job = new LibSync.JsonApiJob (account_state.account, url, this);
+        json_api_job.signal_json_received.connect (
             this.activities_received
         );
 

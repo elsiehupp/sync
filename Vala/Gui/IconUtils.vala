@@ -9,7 +9,7 @@
 //  #include <QPainter>
 //  #include <QPixmapCache>
 //  #include <QSvgRender
-//  #include <Gtk.Color>
+//  #include <Gdk.RGBA>
 //  #include <Gdk.Pixbuf>
 
 namespace Occ {
@@ -40,7 +40,7 @@ public class IconUtils : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static Gdk.Pixbuf pixmap_for_background (string filename, Gtk.Color background_color) {
+    public static Gdk.Pixbuf pixmap_for_background (string filename, Gdk.RGBA background_color) {
         //  Q_ASSERT (!filename == "");
 
         const var pixmap_color = background_color.is_valid && !Theme.is_dark_color (background_color)
@@ -53,7 +53,7 @@ public class IconUtils : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static Gtk.Image create_svg_image_with_custom_color (string filename, Gtk.Color custom_color, QSize original_size = null, QSize requested_size = {}) {
+    public static Gtk.Image create_svg_image_with_custom_color (string filename, Gdk.RGBA custom_color, Gdk.Rectangle original_size = null, Gdk.Rectangle requested_size = {}) {
         //  Q_ASSERT (!filename == "");
         //  Q_ASSERT (custom_color.is_valid);
 
@@ -120,7 +120,7 @@ public class IconUtils : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static Gdk.Pixbuf create_svg_pixmap_with_custom_color_cached (string filename, Gtk.Color custom_color, QSize original_size = null, QSize requested_size = {}) {
+    public static Gdk.Pixbuf create_svg_pixmap_with_custom_color_cached (string filename, Gdk.RGBA custom_color, Gdk.Rectangle original_size = null, Gdk.Rectangle requested_size = {}) {
         Gdk.Pixbuf cached_pixmap;
 
         const var custom_color_name = custom_color.name ();
@@ -147,7 +147,7 @@ public class IconUtils : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static Gtk.Image draw_svg_with_custom_fill_color (string source_svg_path, Gtk.Color fill_color, QSize original_size = null, QSize requested_size = {}) {
+    public static Gtk.Image draw_svg_with_custom_fill_color (string source_svg_path, Gdk.RGBA fill_color, Gdk.Rectangle original_size = null, Gdk.Rectangle requested_size = {}) {
         QSvgRenderer svg_renderer;
 
         if (!svg_renderer.on_signal_load (source_svg_path)) {
@@ -170,7 +170,7 @@ public class IconUtils : GLib.Object {
 
         // draw target image with custom fill_color
         Gtk.Image image = new Gtk.Image (req_size, Gtk.Image.FormatARGB32);
-        image.fill (Gtk.Color (fill_color)); {
+        image.fill (Gdk.RGBA (fill_color)); {
             QPainter image_painter = new QPainter (image);
             image_painter.composition_mode (QPainter.Composition_mode_Destination_in);
             image_painter.draw_image (0, 0, svg_image);

@@ -225,7 +225,7 @@ public class Logger : GLib.Object {
     ***********************************************************/
     public void setup_temporary_folder_log_dir () {
         var directory = temporary_folder_log_dir_path;
-        if (!GLib.Dir ().mkpath (directory)) {
+        if (!new GLib.Dir ().mkpath (directory)) {
             return;
         }
         this.log_debug = true;

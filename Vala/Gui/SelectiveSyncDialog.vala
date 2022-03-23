@@ -39,8 +39,8 @@ public class SelectiveSyncDialog : Gtk.Dialog {
     /***********************************************************
     Dialog for a specific folder_connection (used from the account settings button)
     ***********************************************************/
-    public SelectiveSyncDialog.for_folder (unowned Account account, FolderConnection folder_connection, Gtk.Widget parent = null, Qt.Window_flags f = {}) {
-        base (parent, f);
+    public SelectiveSyncDialog.for_folder (unowned Account account, FolderConnection folder_connection, Gtk.Widget parent = null, Qt.WindowFlags window_flags = {}) {
+        base (parent, window_flags);
         this.folder_connection = folder_connection;
         this.ok_button = null; // defined in on_signal_init ()
         bool ok = false;
@@ -61,8 +61,8 @@ public class SelectiveSyncDialog : Gtk.Dialog {
     /***********************************************************
     Dialog for the whole account (Used from the wizard)
     ***********************************************************/
-    public SelectiveSyncDialog.for_path (unowned Account account, string folder_connection, GLib.List<string> blocklist, Gtk.Widget parent = null, Qt.Window_flags f = {}) {
-        base (parent, f);
+    public SelectiveSyncDialog.for_path (unowned Account account, string folder_connection, GLib.List<string> blocklist, Gtk.Widget parent = null, Qt.WindowFlags window_flags = {}) {
+        base (parent, window_flags);
         this.folder_connection = null;
         on_signal_init (account);
         this.selective_sync.folder_info (folder_connection, folder_connection, blocklist);

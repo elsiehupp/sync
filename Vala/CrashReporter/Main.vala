@@ -26,7 +26,7 @@ public class CrashReporter {
         }
 
         // TODO: install socorro ....
-        CrashReporter reporter = new CrashReporter (GLib.Uri (CRASHREPORTER_SUBMIT_URL), app.arguments ());
+        CrashReporter reporter = new CrashReporter (new GLib.Uri (CRASHREPORTER_SUBMIT_URL), app.arguments ());
 
     //  #ifdef CRASHREPORTER_ICON
         reporter.logo (Gdk.Pixbuf (CRASHREPORTER_ICON));

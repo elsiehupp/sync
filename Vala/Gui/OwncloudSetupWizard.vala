@@ -254,7 +254,7 @@ public class OwncloudSetupWizard : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_found_server (GLib.Uri url, QJsonObject info) {
+    private void on_signal_found_server (GLib.Uri url, Json.Object info) {
         var server_version = CheckServerJob.version (info);
 
         this.oc_wizard.on_signal_append_to_configuration_log (_("<font color=\"green\">Successfully connected to %1 : %2 version %3 (%4)</font><br/><br/>")
@@ -330,8 +330,8 @@ public class OwncloudSetupWizard : GLib.Object {
         GLib.info ("Connect to url: " + url);
         this.oc_wizard.account.credentials = this.oc_wizard.credentials;
 
-        const var fetch_user_name_job = new JsonApiJob (this.oc_wizard.account.shared_from_this (), "/ocs/v1.php/cloud/user");
-        fetch_user_name_job.json_received.connect (
+        const var fetch_user_name_job = new LibSync.JsonApiJob (this.oc_wizard.account.shared_from_this (), "/ocs/v1.php/cloud/user");
+        fetch_user_name_job.signal_json_received.connect (
             this.on_fetch_user_name_job_json_received
         );
         fetch_user_name_job.on_signal_start ();
@@ -673,7 +673,7 @@ public class OwncloudSetupWizard : GLib.Object {
 
         // if its a relative path, prepend with users home directory, otherwise use as absolute path
 
-        if (!GLib.Dir (local_folder).is_absolute ()) {
+        if (!new GLib.Dir (local_folder).is_absolute ()) {
             local_folder = GLib.Dir.home_path + "/" + local_folder;
         }
 

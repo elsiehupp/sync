@@ -147,8 +147,9 @@ public class FileSystem : GLib.Object {
 
     Code inspired from Qt5's GLib.Dir.remove_recursively
     ***********************************************************/
-    public static bool remove_recursively (string path,
-        SignalDelegate signal_delegate = null,
+    public static bool remove_recursively (
+        string path,
+        SignalDelegate signal_delegate,
         GLib.List<string> errors = new GLib.List<string> ()) {
         bool all_removed = true;
         QDirIterator dir_iterator = new QDirIterator (path, GLib.Dir.AllEntries | GLib.Dir.Hidden | GLib.Dir.System | GLib.Dir.NoDotAndDotDot);

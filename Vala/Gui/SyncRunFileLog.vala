@@ -39,8 +39,8 @@ public class SyncRunFileLog : GLib.Object {
         const int64 logfile_max_size = 10 * 1024 * 1024; // 10Mi_b
 
         const string logpath = QStandardPaths.writable_location (QStandardPaths.AppDataLocation);
-        if (!GLib.Dir (logpath).exists ()) {
-            GLib.Dir ().mkdir (logpath);
+        if (!new GLib.Dir (logpath).exists ()) {
+            new GLib.Dir ().mkdir (logpath);
         }
 
         int length = folder_path.split ("/").length;

@@ -22,7 +22,7 @@ public abstract class AbstractTestSyncMove : GLib.Object {
             this.number_of_delete = 0;
         }
 
-        public void functor (Soup.Operation operation, Soup.Request request, QIODevice device) {
+        public void functor (Soup.Operation operation, Soup.Request request, GLib.OutputStream device) {
             if (operation == Soup.GetOperation)
                 ++number_of_get;
             if (operation == Soup.PutOperation)
@@ -81,7 +81,7 @@ public abstract class AbstractTestSyncMove : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static string get_name (Common.AbstractVfs.Mode vfs_mode, string s) {
+    private static string get_name (Common.VfsMode vfs_mode, string s) {
         if (vfs_mode == AbstractVfs.WithSuffix) {
             return s + APPLICATION_DOTVIRTUALFILE_SUFFIX;
         }

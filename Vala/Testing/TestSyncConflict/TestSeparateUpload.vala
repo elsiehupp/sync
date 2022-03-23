@@ -67,7 +67,7 @@ public class TestSeparateUpload : AbstractTestSyncConflict {
     }
 
 
-    private GLib.InputStream override_delegate_separate_upload (Soup.Operation operation, Soup.Request request, QIODevice device) {
+    private GLib.InputStream override_delegate_separate_upload (Soup.Operation operation, Soup.Request request, GLib.OutputStream device) {
         if (operation == Soup.PutOperation) {
             if (request.raw_header ("OC-Conflict") == "1") {
                 var base_file_id = request.raw_header ("OC-ConflictBaseFileId");

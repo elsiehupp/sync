@@ -43,7 +43,7 @@ public class SignPublicKeyApiJob : AbstractNetworkJob {
     @param json - the parsed json document
     @param status_code - the OCS status code : 100 (!) for on_signal_success
     ***********************************************************/
-    internal signal void signal_json_received (QJsonDocument json, int return_code);
+    internal signal void signal_json_received (LibSync.JsonApiJob json_api_job, QJsonDocument json, int return_code);
 
 
     /***********************************************************
@@ -75,9 +75,9 @@ public class SignPublicKeyApiJob : AbstractNetworkJob {
     protected bool on_signal_finished () {
         GLib.info ("Sending CSR ended with " + this.path + this.error_string + this.reply.attribute (Soup.Request.HttpStatusCodeAttribute));
 
-        QJsonParseError error;
+        Json.ParserError error;
         var json = QJsonDocument.from_json (this.reply.read_all (), error);
-        /* emit */ signal_json_received (json, this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ());
+        /* emit */ signal_json_received (this, json, this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ());
         return true;
     }
 

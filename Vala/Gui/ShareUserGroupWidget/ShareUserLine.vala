@@ -96,7 +96,7 @@ public class ShareUserLine : Gtk.Widget {
         );
 
         // create menu with checkable permissions
-        var menu = new QMenu (this);
+        var menu = new GLib.Menu (this);
         this.permission_reshare= new QAction (_("Can reshare"), this);
         this.permission_reshare.checkable (true);
         this.permission_reshare.enabled (max_sharing_permissions & Share_permission_share);
@@ -662,7 +662,7 @@ public class ShareUserLine : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private Gdk.Pixbuf pixmap_for_sharee_type (Sharee.Type type, Gtk.Color background_color) {
+    private Gdk.Pixbuf pixmap_for_sharee_type (Sharee.Type type, Gdk.RGBA background_color) {
         switch (type) {
         case Sharee.Type.ROOM:
             return IconUtils.pixmap_for_background ("talk-app.svg", background_color);
@@ -838,7 +838,7 @@ public class ShareUserLine : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private Gtk.Color background_color_for_sharee_type (Sharee.Type type) {
+    private Gdk.RGBA background_color_for_sharee_type (Sharee.Type type) {
         switch (type) {
         case Sharee.Type.ROOM:
             return Theme.wizard_header_background_color;
@@ -863,10 +863,10 @@ public class ShareUserLine : Gtk.Widget {
         //  Q_ASSERT (hash.size () > 0);
         if (hash.size () == 0) {
             GLib.warning ("Failed to calculate hash color for share: " + this.share.path);
-            return new Gtk.Color ();
+            return Gdk.RGBA ();
         }
         const double hue = (uint8) (hash[0]) / 255.0;
-        return Gtk.Color.from_hsl_f (hue, 0.7, 0.68);
+        return Gdk.RGBA.from_hsl_f (hue, 0.7, 0.68);
     }
 
 } // class ShareUserLine

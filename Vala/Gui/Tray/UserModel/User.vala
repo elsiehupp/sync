@@ -90,7 +90,7 @@ public class User : GLib.Object {
             this.on_signal_has_local_folder_changed
         );
         this.signal_gui_log.connect (
-            Logger.instance.on_signal_gui_log
+            LibSync.Logger.instance.on_signal_gui_log
         );
         this.account_state.account.account_changed_avatar.connect (
             this.signal_avatar_changed
@@ -862,7 +862,7 @@ public class User : GLib.Object {
         // after one hour, clear the gui log notification store
         const int64 clear_gui_log_interval = 60 * 60 * 1000;
         if (this.gui_log_timer.elapsed () > clear_gui_log_interval) {
-            this.notification_cache == "";
+            this.notification_cache = null;
         }
 
         const NotificationCache.Notification notification = NotificationCache.Notification (

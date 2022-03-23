@@ -122,7 +122,7 @@ public class AbstractNetworkJob : GLib.Object {
 
     Reparented to the currently running GLib.InputStream.
     ***********************************************************/
-    private QIODevice request_body;
+    private GLib.OutputStream request_body;
 
     /***********************************************************
     Emitted on network error.
@@ -322,7 +322,7 @@ public class AbstractNetworkJob : GLib.Object {
         string verb,
         GLib.Uri url,
         Soup.Request request = new Soup.Request (),
-        QIODevice request_body = null) {
+        GLib.OutputStream request_body = null) {
         var input_stream = this.account.send_raw_request (verb, url, request, request_body);
         this.request_body = null;
         adopt_request (input_stream);
@@ -351,7 +351,7 @@ public class AbstractNetworkJob : GLib.Object {
         string verb,
         string relative_path,
         Soup.Request request = new Soup.Request (),
-        QIODevice request_body = null
+        GLib.OutputStream request_body = null
     ) {
         var input_stream = this.account.send_raw_request (verb, url, request, request_body);
         this.request_body = request_body;
@@ -366,7 +366,7 @@ public class AbstractNetworkJob : GLib.Object {
     /***********************************************************
     Makes this job drive a pre-made GLib.InputStream
 
-    This input_stream cannot have a QIODevice request body because we can't get
+    This input_stream cannot have a GLib.OutputStream request body because we can't get
     at it and thus not resend it in case of redirects.
     ***********************************************************/
     protected void adopt_request (GLib.InputStream input_stream) {

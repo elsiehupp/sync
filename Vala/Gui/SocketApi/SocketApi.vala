@@ -31,7 +31,7 @@
 //  #include <QAction>
 //  #include <QJsonArray>
 //  #include <QJsonDocumen
-//  #include <QJsonObject>
+//  #include <Json.Object>
 //  #include <Gtk.Widget>
 //  #include <QClipboar
 //  #include <QDesktopServices>
@@ -55,7 +55,7 @@ public class SocketApi : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private GLib.List<string> registered_aliases;
-    private GLib.HashTable<QIODevice *, SocketListener> listeners;
+    private GLib.HashTable<QIODevice, SocketListener> listeners;
     private SocketApiServer local_server;
 
     /***********************************************************
@@ -136,7 +136,7 @@ public class SocketApi : GLib.Object {
         this.local_server.close ();
         // All remaining sockets will be destroyed with this.local_server, their parent
         //  ASSERT (this.listeners == "" || this.listeners.first ().socket.parent () == this.local_server)
-        this.listeners == "";
+        this.listeners = null;
     }
 
 
@@ -257,7 +257,7 @@ public class SocketApi : GLib.Object {
     private void on_signal_new_connection () {
         // Note that on macOS this is not actually a line-based QIODevice, it's a SocketApiSocket which is our
         // custom message based macOS IPC.
-        QIODevice socket = this.local_server.next_pending_connection ();
+        GLib.OutputStream socket = this.local_server.next_pending_connection ();
 
         if (!socket) {
             return;
@@ -341,8 +341,8 @@ public class SocketApi : GLib.Object {
                 var job_id = arguments[0];
 
                 unowned SocketApiJob socket_api_job = new SocketApiJob (job_id.to_string (), listener, json); //, GLib.Object.delete_later);
-                if (index_of_method != -1) {
-                    static_meta_object.method (index_of_method)
+                if (index_of_method (command) != -1) {
+                    static_meta_object.method (index_of_method (command))
                         .invoke (this, Qt.QueuedConnection,
                             Q_ARG (SocketApiJob, socket_api_job));
                 } else {
@@ -352,16 +352,16 @@ public class SocketApi : GLib.Object {
                     socket_api_job.reject ("command not found");
                 }
             } else if (command.has_prefix ("V2/")) {
-                QJsonParseError error;
+                Json.ParserError error;
                 const var json = QJsonDocument.from_json (argument.to_utf8 (), error).object ();
-                if (error.error != QJsonParseError.NoError) {
+                if (error.error != Json.ParserError.NoError) {
                     GLib.warning ("Invalid json " + argument.to_string () + error.error_string);
                     listener.send_error (error.error_string);
                     return;
                 }
                 unowned SocketApiJobV2 socket_api_job = SocketApiJobV2.create (listener, command, json);
-                if (index_of_method != -1) {
-                    static_meta_object.method (index_of_method)
+                if (index_of_method (command) != -1) {
+                    static_meta_object.method (index_of_method (command))
                         .invoke (this, Qt.QueuedConnection,
                             Q_ARG (SocketApiJobV2, socket_api_job));
                 } else {
@@ -371,10 +371,10 @@ public class SocketApi : GLib.Object {
                     socket_api_job.failure ("command not found");
                 }
             } else {
-                if (index_of_method != -1) {
+                if (index_of_method (command) != -1) {
                     // to ensure that listener is still valid we need to call it with Qt.Direct_connection
                     //  ASSERT (thread () == QThread.current_thread ())
-                    static_meta_object.method (index_of_method)
+                    static_meta_object.method (index_of_method (command))
                         .invoke (this, Qt.Direct_connection, Q_ARG (string, argument.to_string ()),
                             Q_ARG (SocketListener, listener));
                 }
@@ -383,8 +383,7 @@ public class SocketApi : GLib.Object {
     }
 
 
-
-    private static int index_of_method () {
+    private static int index_of_method (string command) {
         string function_with_arguments = "command_";
         if (command.has_prefix ("ASYNC_")) {
             function_with_arguments += command + " (SocketApiJob)";
@@ -536,7 +535,7 @@ public class SocketApi : GLib.Object {
             }
 
             data.folder_relative_path = data.local_path.mid (data.folder_connection.clean_path.length + 1);
-            data.server_relative_path = GLib.Dir (data.folder_connection.remote_path).file_path (data.folder_relative_path);
+            data.server_relative_path = new GLib.Dir (data.folder_connection.remote_path).file_path (data.folder_relative_path);
             string virtual_file_ext = APPLICATION_DOTVIRTUALFILE_SUFFIX;
             if (data.server_relative_path.has_suffix (virtual_file_ext)) {
                 data.server_relative_path.chop (virtual_file_ext.size ());
@@ -570,7 +569,7 @@ public class SocketApi : GLib.Object {
         /***********************************************************
         ***********************************************************/
         FileData parent_folder () {
-            return FileData.file_data (GLib.FileInfo (local_path).directory ().path.to_utf8 ());
+            return FileData.file_data (new GLib.FileInfo (local_path).directory ().path.to_utf8 ());
         }
 
 
@@ -915,7 +914,7 @@ public class SocketApi : GLib.Object {
         QJsonArray output;
         foreach (var account in AccountManager.instance.accounts) {
             // TODO: Use uuid once https://github.com/owncloud/client/pull/8397 is merged
-            output += new QJsonObject (
+            output += new Json.Object (
                 {
                     {
                         "name",
@@ -1261,15 +1260,15 @@ public class SocketApi : GLib.Object {
             return;
         }
 
-        var json_api_job = new JsonApiJob (file_data.folder_connection.account_state.account, "ocs/v2.php/apps/files/api/v1/direct_editing/open", this);
+        var json_api_job = new LibSync.JsonApiJob (file_data.folder_connection.account_state.account, "ocs/v2.php/apps/files/api/v1/direct_editing/open", this);
 
         QUrlQuery parameters;
         parameters.add_query_item ("path", file_data.server_relative_path);
         parameters.add_query_item ("editor_id", editor.identifier);
         json_api_job.add_query_params (parameters);
-        json_api_job.verb (JsonApiJob.Verb.POST);
+        json_api_job.verb (LibSync.JsonApiJob.Verb.POST);
 
-        json_api_job.json_received.connect (
+        json_api_job.signal_json_received.connect (
             this.on_signal_json_received
         );
         json_api_job.on_signal_start ();
@@ -1278,7 +1277,7 @@ public class SocketApi : GLib.Object {
 
     private void on_signal_json_received (QJsonDocument json) {
         var data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
-        var url = GLib.Uri (data.value ("url").to_string ());
+        var url = new GLib.Uri (data.value ("url").to_string ());
 
         if (!url == "") {
             OpenExternal.open_browser (url);

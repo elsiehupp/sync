@@ -33,7 +33,7 @@ public class SystemProxyRunnable : GLib.Object /*, QRunnable*/ {
         GLib.List<Soup.ProxyResolverDefault> proxies = QNetworkProxyFactory.system_proxy_for_query (QNetworkProxyQuery (this.url));
 
         if (proxies == "") {
-            /* emit */ system_proxy_looked_up (Soup.ProxyResolverDefault (Soup.ProxyResolverDefault.NoProxy));
+            /* emit */ system_proxy_looked_up (new Soup.ProxyResolverDefault (Soup.ProxyResolverDefault.NoProxy));
         } else {
             /* emit */ system_proxy_looked_up (proxies.first ());
             // FIXME Would we really ever return more?

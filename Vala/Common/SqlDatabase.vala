@@ -98,7 +98,7 @@ public class SqliteDatabase : GLib.Object {
             if (check_result == CheckDbResult.CANT_PREPARE) {
                 // When disk space is low, preparing may fail even though the database is fine.
                 // Typically CANTOPEN or IOERR.
-                int64 free_space = Utility.free_disk_space (GLib.FileInfo (filename).directory ().absolute_path);
+                int64 free_space = Utility.free_disk_space (new GLib.FileInfo (filename).directory ().absolute_path);
                 if (free_space != -1 && free_space < 1000000) {
                     GLib.warning ("Can't prepare consistency check and disk space is low: " + free_space);
                     close ();

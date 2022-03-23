@@ -238,7 +238,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
         );
         this.online_status_job.verb (JsonApiJob.Verb.PUT);
         // Set body
-        QJsonObject data_object;
+        Json.Object data_object;
         data_object.insert ("status_type", online_status_to_string (online_status));
         QJsonDocument body;
         body.object (data_object);
@@ -272,7 +272,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
         this.message_job = new JsonApiJob (this.account, USER_STATUS_BASE_URL + "/message/predefined", this);
         this.message_job.verb (JsonApiJob.Verb.PUT);
         // Set body
-        QJsonObject data_object;
+        Json.Object data_object;
         data_object.insert ("message_id", user_status.identifier);
         if (user_status.clear_at ()) {
             data_object.insert ("clear_at", static_cast<int> (clear_at_to_timestamp (user_status.clear_at ())));
@@ -304,7 +304,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
         this.message_job = new JsonApiJob (this.account, USER_STATUS_BASE_URL + "/message/custom", this);
         this.message_job.verb (JsonApiJob.Verb.PUT);
         // Set body
-        QJsonObject data_object;
+        Json.Object data_object;
         data_object.insert ("status_icon", user_status.icon ());
         data_object.insert ("message", user_status.message ());
         var clear_at = user_status.clear_at ();
@@ -366,7 +366,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
     }
 
 
-    private static Optional<ClearAt> json_extract_clear_at (QJsonObject json_object) {
+    private static Optional<ClearAt> json_extract_clear_at (Json.Object json_object) {
         Optional<ClearAt> clear_at = new JsonApiJob ();
         if (json_object.contains ("clear_at") && !json_object.value ("clear_at") == null) {
             ClearAt clear_at_value;
@@ -378,7 +378,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
     }
 
 
-    private static UserStatus json_extract_user_status (QJsonObject json) {
+    private static UserStatus json_extract_user_status (Json.Object json) {
         return new UserStatus (
             json.value ("message_id").to_string (),
             json.value ("message").to_string ().trimmed (),
@@ -391,7 +391,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
 
 
     private static UserStatus json_document_to_user_status (QJsonDocument json) {
-        QJsonObject d = new QJsonObject (
+        Json.Object d = new Json.Object (
             {
                 "icon",
                 ""
@@ -464,7 +464,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
     }
 
 
-    private static Optional<ClearAt> json_to_clear_at (QJsonObject json_object) {
+    private static Optional<ClearAt> json_to_clear_at (Json.Object json_object) {
         Optional<ClearAt> clear_at;
 
         if (json_object.value ("clear_at").is_object () && !json_object.value ("clear_at") == null) {
@@ -489,7 +489,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
     }
 
 
-    private static UserStatus json_object_to_user_status (QJsonObject json_object) {
+    private static UserStatus json_object_to_user_status (Json.Object json_object) {
         return new UserStatus (
             json_object.value ("identifier").to_string () + "no-identifier",
             json_object.value ("message").to_string () + "No message",

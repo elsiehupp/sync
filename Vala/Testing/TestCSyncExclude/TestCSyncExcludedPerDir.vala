@@ -36,7 +36,7 @@ public class TestCSyncExcludedPerDir : AbstractTestCSyncExclude {
         GLib.assert_true (check_file_full ("B/A/a1") == CSync.ExcludedFiles.Type.LIST);
 
         const string foo_directory = "check_csync1/foo";
-        GLib.assert_true (GLib.Dir (temporary_directory).mkpath (foo_directory));
+        GLib.assert_true (new GLib.Dir (temporary_directory).mkpath (foo_directory));
 
         const string foo_exclude_list = temporary_directory + "/" + foo_directory + "/.sync-exclude.lst";
         GLib.File exclude_list = new GLib.File (foo_exclude_list);

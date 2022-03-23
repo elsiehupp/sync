@@ -18,7 +18,7 @@ public class QProgressIndicator : Gtk.Widget {
 
     //  Q_PROPERTY (int delay READ animation_delay WRITE on_set_animation_delay)
     //  Q_PROPERTY (bool displayed_when_stopped READ is_displayed_when_stopped WRITE on_set_displayed_when_stopped)
-    //  Q_PROPERTY (Gtk.Color color READ color WRITE on_set_color)
+    //  Q_PROPERTY (Gdk.RGBA color READ color WRITE on_set_color)
 
     /***********************************************************
     ***********************************************************/
@@ -26,7 +26,7 @@ public class QProgressIndicator : Gtk.Widget {
     private int m_timer_id = -1;
     private int m_delay = 40;
     private bool m_displayed_when_stopped = false;
-    private Gtk.Color m_color = Qt.black;
+    private Gdk.RGBA m_color = Qt.black;
 
     /***********************************************************
     ***********************************************************/
@@ -71,15 +71,15 @@ public class QProgressIndicator : Gtk.Widget {
     Returns the color of the component.
     \sa on_set_color
     ***********************************************************/
-    public Gtk.Color color () {
+    public Gdk.RGBA color () {
         return m_color;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public override QSize size_hint () {
-        return new QSize (20, 20);
+    public override Gdk.Rectangle size_hint () {
+        return Gdk.Rectangle (20, 20);
     }
 
 
@@ -149,7 +149,7 @@ public class QProgressIndicator : Gtk.Widget {
     Sets the color of the components to the given color.
     \sa color
     ***********************************************************/
-    public void on_set_color (Gtk.Color color) {
+    public void on_set_color (Gdk.RGBA color) {
         m_color = color;
 
         update ();
@@ -185,7 +185,7 @@ public class QProgressIndicator : Gtk.Widget {
         int capsule_radius = capsule_width/2;
 
         for (int i=0; i<12; i++) {
-            Gtk.Color color = m_color;
+            Gdk.RGBA color = m_color;
             color.set_alpha_f (1.0f - (static_cast<float> (i) / 12.0f));
             p.set_pen (Qt.NoPen);
             p.set_brush (color);

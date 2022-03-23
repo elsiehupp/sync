@@ -149,7 +149,7 @@ public class FolderConnection : GLib.Object {
             return this.definition.virtual_files_mode != AbstractVfs.Off && !is_vfs_on_signal_off_switch_pending ();
         }
         public set {
-            Common.AbstractVfs.Mode new_mode = this.definition.virtual_files_mode;
+            Common.VfsMode new_mode = this.definition.virtual_files_mode;
             if (value && this.definition.virtual_files_mode == AbstractVfs.Off) {
                 new_mode = this.best_available_vfs_mode;
             } else if (!value && this.definition.virtual_files_mode != AbstractVfs.Off) {
@@ -383,7 +383,7 @@ public class FolderConnection : GLib.Object {
         //  ENFORCE (this.vfs);
         //  ENFORCE (this.vfs.mode () == this.definition.virtual_files_mode);
 
-        AbstractVfs.SetupParameters vfs_params;
+        Common.SetupParameters vfs_params;
         vfs_params.filesystem_path = this.path;
         vfs_params.display_name = short_gui_remote_path_or_app_name ();
         vfs_params.alias = alias ();
@@ -778,7 +778,7 @@ public class FolderConnection : GLib.Object {
         if (this.folder_watcher != null) {
             return;
         }
-        if (!GLib.Dir (path).exists ()) {
+        if (!new GLib.Dir (path).exists ()) {
             return;
         }
 
@@ -1467,7 +1467,7 @@ public class FolderConnection : GLib.Object {
                                           : (_("A folder_connection from an external storage has been added.\n"));
             message += _("Please go in the settings to select it if you wish to download it.");
 
-            var logger = Logger.instance;
+            var logger = LibSync.Logger.instance;
             logger.post_optional_gui_log (Theme.app_name_gui, message);
         }
     }
@@ -1542,7 +1542,7 @@ public class FolderConnection : GLib.Object {
                 + "It will not be synchronized.")
                   .printf (file_info.file_path);
 
-        Logger.instance.post_optional_gui_log (Theme.app_name_gui, message);
+        LibSync.Logger.instance.post_optional_gui_log (Theme.app_name_gui, message);
     }
 
 
@@ -1560,7 +1560,7 @@ public class FolderConnection : GLib.Object {
             + "\n"
             + "%1"
             ).printf (message);
-        Logger.instance.post_gui_log (Theme.app_name_gui, full_message);
+        LibSync.Logger.instance.post_gui_log (Theme.app_name_gui, full_message);
     }
 
 
@@ -1625,8 +1625,8 @@ public class FolderConnection : GLib.Object {
         if (this.sync_result.first_item_renamed ()) {
             LogStatus status = LogStatus.RENAME;
             // if the path changes it's rather a move
-            GLib.Dir ren_target = GLib.FileInfo (this.sync_result.first_item_renamed ().rename_target).directory ();
-            GLib.Dir ren_source = GLib.FileInfo (this.sync_result.first_item_renamed ().file).directory ();
+            GLib.Dir ren_target = new GLib.FileInfo (this.sync_result.first_item_renamed ().rename_target).directory ();
+            GLib.Dir ren_source = new GLib.FileInfo (this.sync_result.first_item_renamed ().file).directory ();
             if (ren_target != ren_source) {
                 status = LogStatus.MOVE;
             }
@@ -1712,7 +1712,7 @@ public class FolderConnection : GLib.Object {
         string filename, LogStatus status,
         int count, string rename_target) {
         if (count > 0) {
-            Logger logger = Logger.instance;
+            LibSync.Logger logger = LibSync.Logger.instance;
 
             string file = GLib.Dir.to_native_separators (filename);
             string text;

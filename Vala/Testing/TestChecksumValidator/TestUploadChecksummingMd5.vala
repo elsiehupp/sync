@@ -23,7 +23,7 @@ public class TestUploadChecksummingMd5 : AbstractTestChecksumValidator {
         this.expected = calc_md5 (file);
         compute_checksum.on_signal_start (this.testfile);
 
-        QEventLoop loop;
+        GLib.MainLoop loop;
         compute_checksum.signal_finished.connect (
             loop.quit // Qt.QueuedConnection
         );

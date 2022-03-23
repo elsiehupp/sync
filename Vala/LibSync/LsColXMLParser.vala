@@ -113,7 +113,7 @@ public class LscolXMLParser : GLib.Object {
                     } else if (reader.name () == "propstat") {
                         inside_propstat = false;
                         if (current_props_have_http200) {
-                            current_http200Properties = GLib.HashTable<string, string> (current_temporary_properties);
+                            current_http200Properties = new GLib.HashTable<string, string> (current_temporary_properties);
                         }
                         current_temporary_properties == "";
                         current_props_have_http200 = false;

@@ -38,6 +38,7 @@ srcs = files([
     'Vfs/ItemAvailability.vala',
     'Vfs/PinState.vala',
     'Vfs/SetupParameters.vala',
+    'Vfs/VfsMode.vala',
     'Vfs/VfsOff.vala'
 ])
 

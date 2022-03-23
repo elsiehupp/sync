@@ -40,7 +40,7 @@ Here follows the state machine
 
  \code{.unparsed}
  *--. on_signal_fetch_info
-         JsonApiJob (ocs/v1.php/cloud/user)
+         LibSync.JsonApiJob (ocs/v1.php/cloud/user)
          |
          +. on_signal_update_last_info
                AvatarJob (if this.fetch_avatar_image is true)
@@ -95,7 +95,7 @@ public class UserInfo : GLib.Object {
     /***********************************************************
     The currently running job
     ***********************************************************/
-    private JsonApiJob json_api_job;
+    private LibSync.JsonApiJob json_api_job;
 
 
     internal signal void quota_updated (int64 total, int64 used);
@@ -135,9 +135,9 @@ public class UserInfo : GLib.Object {
         }
 
         unowned Account account = this.account_state.account;
-        this.json_api_job = new JsonApiJob (account, "ocs/v1.php/cloud/user", this);
+        this.json_api_job = new LibSync.JsonApiJob (account, "ocs/v1.php/cloud/user", this);
         this.json_api_job.on_signal_timeout (20 * 1000);
-        this.json_api_job.json_received.connect (
+        this.json_api_job.signal_json_received.connect (
             this.on_signal_update_last_info
         );
         this.json_api_job.network_error.connect (

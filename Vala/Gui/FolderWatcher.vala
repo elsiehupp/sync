@@ -68,7 +68,15 @@ public class FolderWatcher : GLib.Object {
     /***********************************************************
     Construct, connect signals, call init ()
     ***********************************************************/
-    public FolderWatcher (FolderConnection folder_connection = null) {
+    public FolderWatcher () {
+        base ();
+        this.is_reliable = true;
+    }
+
+    /***********************************************************
+    Construct, connect signals, call init ()
+    ***********************************************************/
+    public FolderWatcher.with_connection (FolderConnection folder_connection) {
         base (folder_connection);
         this.folder_connection = folder_connection;
         this.is_reliable = true;

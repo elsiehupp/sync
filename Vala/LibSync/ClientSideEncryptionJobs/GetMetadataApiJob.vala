@@ -54,9 +54,9 @@ public class GetMetadataApiJob : AbstractNetworkJob {
             /* emit */ signal_error (this.file_identifier, return_code);
             return true;
         }
-        QJsonParseError error;
+        Json.ParserError error;
         var json = QJsonDocument.from_json (this.reply.read_all (), error);
-        /* emit */ signal_json_received (json, this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ());
+        /* emit */ signal_json_received (this, json, this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ());
         return true;
     }
 

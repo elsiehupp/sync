@@ -90,17 +90,17 @@ public class ShareDialog : Gtk.Dialog {
         }
 
         // Set filename
-        string filename = GLib.FileInfo (this.share_path).filename ();
+        string filename = new GLib.FileInfo (this.share_path).filename ();
         this.instance.label_name.on_signal_text (_("%1").printf (filename));
-        QFont font = new QFont (this.instance.label_name.font ());
+        Cairo.FontFace font = new Cairo.FontFace (this.instance.label_name.font ());
         font.point_size (q_round (font.point_size () * 1.4));
         this.instance.label_name.font (font);
 
         string oc_dir = this.share_path;
         oc_dir.truncate (oc_dir.length - filename.length);
 
-        oc_dir.replace (GLib.Regex ("^/*"), "");
-        oc_dir.replace (GLib.Regex ("/*$"), "");
+        oc_dir.replace (new GLib.Regex ("^/*"), "");
+        oc_dir.replace (new GLib.Regex ("/*$"), "");
 
         // Laying this out is complex because share_path
         // may be in use or not.
@@ -121,7 +121,7 @@ public class ShareDialog : Gtk.Dialog {
             return;
         }
 
-        if (GLib.FileInfo (this.local_path).is_file ()) {
+        if (new GLib.FileInfo (this.local_path).is_file ()) {
             var thumbnail_job = new ThumbnailJob (this.share_path, this.account_state.account, this);
             thumbnail_job.signal_job_finished.connect (
                 this.on_signal_thumbnail_fetched

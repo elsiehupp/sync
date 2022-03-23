@@ -20,7 +20,7 @@ public abstract class AbstractTestAllFilesDeleted : GLib.Object {
     protected GLib.InputStream override_delegate (
         Soup.Operation operation,
         Soup.Request request,
-        QIODevice stream
+        GLib.OutputStream stream
     ) {
         var verb = request.attribute (Soup.Request.CustomVerbAttribute);
         if (verb == "PROPFIND") {

@@ -19,7 +19,7 @@ public class VfsXAttr : Common.AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
-    public Common.AbstractVfs.Mode mode () {
+    public Common.VfsMode mode () {
         return XAttr;
     }
 
@@ -205,7 +205,7 @@ public class VfsXAttr : Common.AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
-    protected void start_impl (AbstractVfs.SetupParameters parameters) {
+    protected void start_impl (Common.SetupParameters parameters) {
         return;
     }
 

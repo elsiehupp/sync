@@ -14,13 +14,13 @@
 //  #include <Gtk.Icon>
 //  #include <QLayout>
 //  #include <QPropertyAnimation>
-//  #include <QMenu>
+//  #include <GLib.Menu>
 //  #include <QAction>
 //  #include <QDesktopServices>
 //  #include <QInputDialog>
 //  #include <Gtk.MessageBox>
 //  #include <QCryptographicHash>
-//  #include <Gtk.Color>
+//  #include <Gdk.RGBA>
 //  #include <QPainter>
 //  #include <QList_widget>
 //  #include <QSvgRenderer>
@@ -104,7 +104,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         this.instance.up_ui (this);
 
         //Is this a file or folder?
-        this.is_file = GLib.FileInfo (local_path).is_file ();
+        this.is_file = new GLib.FileInfo (local_path).is_file ();
 
         this.completer = new QCompleter (this);
         this.completer_model = new ShareeModel (this.account,
@@ -502,7 +502,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_private_link_share () {
-        var menu = new QMenu (this);
+        var menu = new GLib.Menu (this);
         menu.attribute (Qt.WA_DeleteOnClose);
 
         // this icon is not handled by on_signal_style_changed () . customize_style but we can live with that

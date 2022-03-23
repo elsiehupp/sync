@@ -96,7 +96,7 @@ public class ShareeModel : QAbstractListModel {
         {
             const GLib.List<string> sharee_types {"users", "groups", "emails", "remotes", "circles", "rooms"};
 
-            const var append_sharees = [this, sharee_types] (QJsonObject data, GLib.List<unowned Sharee>& out) {
+            const var append_sharees = [this, sharee_types] (Json.Object data, GLib.List<unowned Sharee>& out) {
                 for (var sharee_type : sharee_types) {
                     const var category = data.value (sharee_type).to_array ();
                     for (var sharee : category) {
@@ -167,7 +167,7 @@ public class ShareeModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private unowned Sharee parse_sharee (QJsonObject data) {
+    private unowned Sharee parse_sharee (Json.Object data) {
         string display_name = data.value ("label").to_string ();
         const string share_with = data.value ("value").to_object ().value ("share_with").to_string ();
         Sharee.Type parsed_type = (Sharee.Type)data.value ("value").to_object ().value ("share_type").to_int ();

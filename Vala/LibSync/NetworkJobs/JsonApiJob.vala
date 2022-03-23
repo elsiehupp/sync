@@ -175,16 +175,16 @@ public class JsonApiJob : AbstractNetworkJob {
             /* emit */ allow_desktop_notifications_changed (desktop_notifications_allowed == "online");
         }
 
-        QJsonParseError error;
+        Json.ParserError error;
         var json = QJsonDocument.from_json (json_str.to_utf8 (), error);
         // empty or invalid response and status code is != 304 because json_str is expected to be empty
-        if ( (error.error != QJsonParseError.NoError || json == null) && http_status_code != NOT_MODIFIED_STATUS_CODE) {
+        if ( (error.error != Json.ParserError.NoError || json == null) && http_status_code != NOT_MODIFIED_STATUS_CODE) {
             GLib.warning ("Invalid JSON! " + json_str + error.error_string);
-            /* emit */ signal_json_received (json, status_code);
+            /* emit */ signal_json_received (this, json, status_code);
             return true;
         }
 
-        /* emit */ signal_json_received (json, status_code);
+        /* emit */ signal_json_received (this, json, status_code);
         return true;
     }
 

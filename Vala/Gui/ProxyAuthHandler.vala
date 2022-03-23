@@ -106,10 +106,10 @@ public class ProxyAuthHandler : GLib.Object {
         // If the proxy server has changed, forget what we know.
         if (key != this.proxy) {
             this.proxy = key;
-            this.username == "";
-            this.password == "";
+            this.username = "";
+            this.password = "";
             this.blocked = false;
-            this.gave_credentials_to == "";
+            this.gave_credentials_to = new GLib.List<GLib.Object> ();
 
             // If the user explicitly configured the proxy in the
             // network settings, don't ask about it.
@@ -220,7 +220,7 @@ public class ProxyAuthHandler : GLib.Object {
                 this.dialog,
                 Gtk.Dialog.signal_finished,
                 this.waiting_for_dialog,
-                QEventLoop.ExcludeSocketNotifiers
+                GLib.MainLoop.ExcludeSocketNotifiers
             );
         }
 
@@ -238,14 +238,14 @@ public class ProxyAuthHandler : GLib.Object {
     Checks the keychain for credentials of the current proxy.
     ***********************************************************/
     private bool creds_from_keychain () {
-        if (this.waiting_for_dialog != null) {
+        if (this.waiting_for_dialog != 0) {
             return false;
         }
 
         GLib.debug ("Trying to load " + this.proxy);
 
         if (this.waiting_for_keychain <= 0) {
-            this.username = this.settings.value (keychain_username_key ()).to_string ();
+            this.username = this.settings.get_value (keychain_username_key ()).to_string ();
             if (this.username == "") {
                 return false;
             }
@@ -291,7 +291,7 @@ public class ProxyAuthHandler : GLib.Object {
 
         GLib.info ("Storing " + this.proxy);
 
-        this.settings.value (keychain_username_key (), this.username);
+        this.settings.get_value (keychain_username_key (), this.username);
 
         var write_password_job = new WritePasswordJob (Theme.app_name, this);
         write_password_job.settings (this.settings);
@@ -320,12 +320,12 @@ public class ProxyAuthHandler : GLib.Object {
         T *sender,
         PointerToMemberFunction some_signal,
         int counter,
-        QEventLoop.ProcessEventsFlags flags = QEventLoop.AllEvents) {
+        GLib.MainLoop.ProcessEventsFlags flags = GLib.MainLoop.AllEvents) {
         if (sender == null) {
             return;
         }
 
-        QEventLoop wait_loop;
+        GLib.MainLoop wait_loop;
         sender.some_signal.connect (
             wait_loop.quit
         );

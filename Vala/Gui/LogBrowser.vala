@@ -51,7 +51,7 @@ public class LogBrowser : Gtk.Dialog {
             + "run and compress older ones. It will also delete log files after a couple "
             + "of hours to avoid consuming too much disk space.\n"
             + "If enabled, logs will be written to %1")
-            .printf (Logger.instance.temporary_folder_log_dir_path));
+            .printf (LibSync.Logger.instance.temporary_folder_log_dir_path));
         label.word_wrap (true);
         label.text_interaction_flags (Qt.Text_selectable_by_mouse);
         label.size_policy (QSizePolicy.Expanding, QSizePolicy.Minimum_expanding);
@@ -108,8 +108,8 @@ public class LogBrowser : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void on_open_folder_button_clicked () {
-        string path = Logger.instance.temporary_folder_log_dir_path;
-        GLib.Dir ().mkpath (path);
+        string path = LibSync.Logger.instance.temporary_folder_log_dir_path;
+        new GLib.Dir ().mkpath (path);
         QDesktopServices.open_url (GLib.Uri.from_local_file (path));
     }
 
@@ -127,7 +127,7 @@ public class LogBrowser : Gtk.Dialog {
     protected void toggle_permanent_logging (bool enabled) {
         ConfigFile ().automatic_log_dir (enabled);
 
-        var logger = Logger.instance;
+        var logger = LibSync.Logger.instance;
         if (enabled) {
             if (!logger.is_logging_to_file ()) {
                 logger.setup_temporary_folder_log_dir ();

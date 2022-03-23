@@ -43,7 +43,7 @@ public class CheckServerJob : AbstractNetworkJob {
     \a url see this.server_status_url (does not include "/status.php")
     \a info The status.php input_stream information
     ***********************************************************/
-    internal signal void instance_found (GLib.Uri url, QJsonObject info);
+    internal signal void instance_found (GLib.Uri url, Json.Object info);
 
 
     /***********************************************************
@@ -106,21 +106,21 @@ public class CheckServerJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public string version (QJsonObject info) {
+    public string version (Json.Object info) {
         return info.value ("version").to_string ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public static string version_string (QJsonObject info) {
+    public static string version_string (Json.Object info) {
         return info.value ("versionstring").to_string ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public static bool installed (QJsonObject info) {
+    public static bool installed (Json.Object info) {
         return info.value ("installed").to_bool ();
     }
 
@@ -152,10 +152,10 @@ public class CheckServerJob : AbstractNetworkJob {
             GLib.warning ("Error: status.php replied " + http_status + body);
             /* emit */ instance_not_found (this.input_stream);
         } else {
-            QJsonParseError error;
+            Json.ParserError error;
             var status = QJsonDocument.from_json (body, error);
             // empty or invalid response
-            if (error.error != QJsonParseError.NoError || status == null) {
+            if (error.error != Json.ParserError.NoError || status == null) {
                 GLib.warning ("status.php from server is not valid JSON!" + body + this.input_stream.request ().url + error.error_string);
             }
 

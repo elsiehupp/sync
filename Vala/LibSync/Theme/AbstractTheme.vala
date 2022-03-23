@@ -269,13 +269,16 @@ public class Theme : GLib.Object {
     /***********************************************************
     ***********************************************************/
 //  #ifndef TOKEN_AUTH_ONLY
-    public static string hidpi_filename (string filename, QPaintDevice dev = null) {
-        if (!Theme.is_hidpi (dev)) {
+    public static string hidpi_filename (
+        string filename,
+        Gdk.Monitor monitor
+    ) {
+        if (!Theme.is_hidpi (monitor)) {
             return filename;
         }
         // try to find a 2x version
 
-        int dot_index = filename.last_index_of ('.');
+        int dot_index = filename.last_index_of (".");
         if (dot_index != -1) {
             string at2xfilename = filename;
             at2xfilename.insert (dot_index, "@2x");
@@ -289,19 +292,19 @@ public class Theme : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static string hidpi_filename_for_color (string icon_name, Gtk.Color background_color, QPaintDevice dev = null) {
-        var is_dark_background = Theme.is_dark_color (background_color);
-
-        const string icon_path = Theme.THEME_PREFIX + (is_dark_background ? "white/": "black/") + icon_name;
-
-        return Theme.hidpi_filename (icon_path, dev);
+    public static string hidpi_filename_for_color (
+        string icon_name,
+        Gdk.RGBA background_color,
+        Gdk.Monitor monitor
+    ) {
+        return Theme.hidpi_filename (Theme.THEME_PREFIX + (Theme.is_dark_color (background_color) ? "white/": "black/") + icon_name, monitor);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public static bool is_hidpi (QPaintDevice dev = null) {
-        var device_pixel_ratio = dev != null ? dev.device_pixel_ratio () : Gtk.Application.primary_screen ().device_pixel_ratio ();
+    public static bool is_hidpi (Gdk.Monitor monitor) {
+        var device_pixel_ratio = monitor != null ? monitor.scale_factor : Gdk.Display.get_default ().get_default_screen ().get_primary_monitor ().scale_factor;
         return device_pixel_ratio > 1;
     }
 
@@ -632,9 +635,9 @@ public class Theme : GLib.Object {
     /***********************************************************
     @return color for the setup wizard
     ***********************************************************/
-    public static Gtk.Color wizard_header_title_color {
+    public static Gdk.RGBA wizard_header_title_color {
         public get {
-            return new Gtk.Color (APPLICATION_WIZARD_HEADER_TITLE_COLOR);
+            return Gdk.RGBA (APPLICATION_WIZARD_HEADER_TITLE_COLOR);
         }
     }
 
@@ -642,9 +645,9 @@ public class Theme : GLib.Object {
     /***********************************************************
     @return color for the setup wizard.
     ***********************************************************/
-    public static Gtk.Color wizard_header_background_color {
+    public static Gdk.RGBA wizard_header_background_color {
         public get {
-            return new Gtk.Color (APPLICATION_WIZARD_HEADER_BACKGROUND_COLOR);
+            return Gdk.RGBA (APPLICATION_WIZARD_HEADER_BACKGROUND_COLOR);
         }
     }
 
@@ -663,10 +666,10 @@ public class Theme : GLib.Object {
                 var max_height = Theme.is_hidpi () ? 200 : 100;
                 var max_width = 2 * max_height;
                 var icon = new Gtk.Icon (logo_base_path + ".svg");
-                var size = icon.actual_size (QSize (max_width, max_height));
+                var size = icon.actual_size (Gdk.Rectangle (max_width, max_height));
                 return icon.pixmap (size);
             } else {
-                return Gdk.Pixbuf (hidpi_filename (logo_base_path + ".png"));
+                return new Gdk.Pixbuf (hidpi_filename (logo_base_path + ".png"));
             }
         // #else
             var size = Theme.is_hidpi () ? 200 : 100;
@@ -688,10 +691,10 @@ public class Theme : GLib.Object {
                 var max_height = 64;
                 var max_width = 2 * max_height;
                 var icon = new Gtk.Icon (logo_base_path + ".svg");
-                var size = icon.actual_size (QSize (max_width, max_height));
+                var size = icon.actual_size (Gdk.Rectangle (max_width, max_height));
                 return icon.pixmap (size);
             } else {
-                return Gdk.Pixbuf (hidpi_filename (logo_base_path + ".png"));
+                return new Gdk.Pixbuf (hidpi_filename (logo_base_path + ".png"));
             }
         // #else
             return application_icon.pixmap (64);
@@ -709,17 +712,17 @@ public class Theme : GLib.Object {
     ***********************************************************/
     public static Gdk.Pixbuf wizard_header_banner {
         public get {
-            Gtk.Color c = wizard_header_background_color;
+            Gdk.RGBA c = wizard_header_background_color;
             if (!c.is_valid) {
-                return Gdk.Pixbuf ();
+                return new Gdk.Pixbuf ();
             }
 
-            QSize size = new QSize (750, 78);
-            var screen = Gtk.Application.primary_screen ();
-            if (screen) {
+            Gdk.Rectangle size = Gdk.Rectangle (750, 78);
+            var monitor = Gdk.Display.get_default ().get_default_screen ().get_primary_monitor ();
+            if (monitor) {
                 // Adjust the the size if there is a different DPI. (Issue #6156)
                 // Indeed, this size need to be big enough to for the banner height, and the wizard's width
-                var ratio = screen.logical_dots_per_inch () / 96.0;
+                var ratio = monitor.logical_dots_per_inch () / 96.0;
                 if (ratio > 1.0) {
                     size *= ratio;
                 }
@@ -813,7 +816,7 @@ public class Theme : GLib.Object {
     public static bool mono_icons_available {
         public get {
             string theme_dir = Theme.THEME_PREFIX + "%1/".printf (Theme.systray_icon_flavor (true));
-            return GLib.Dir (theme_dir).exists ();
+            return new GLib.Dir (theme_dir).exists ();
         }
     }
 
@@ -1080,7 +1083,7 @@ public class Theme : GLib.Object {
 
     2019/12/08 : Moved here from SettingsDialog.
     ***********************************************************/
-    public static bool is_dark_color (Gtk.Color color) {
+    public static bool is_dark_color (Gdk.RGBA color) {
         // account for different sensitivity of the human eye to certain colors
         double treshold = 1.0 - (0.299 * color.red () + 0.587 * color.green () + 0.114 * color.blue ()) / 255.0;
         return treshold > 0.5;
@@ -1105,8 +1108,8 @@ public class Theme : GLib.Object {
     2019/12/08: Implemented for the Dark Mode on macOS, because
     the app palette can not account for that (Qt 5.12.5).
     ***********************************************************/
-    public static Gtk.Color get_background_aware_link_color (Gtk.Color background_color = Gtk.Application.palette ().base ().color ()) {
-        return is_dark_color (background_color) ? new Gtk.Color ("#6193dc") : Gtk.Application.palette ().color (Gtk.Palette.Link);
+    public static Gdk.RGBA get_background_aware_link_color (Gdk.RGBA background_color = Gtk.Application.palette ().base ().color ()) {
+        return is_dark_color (background_color) ? Gdk.RGBA ("#6193dc") : Gtk.Application.palette ().color (Gtk.Palette.Link);
     }
 
 
@@ -1121,7 +1124,7 @@ public class Theme : GLib.Object {
     This way we also avoid having certain strings re-translated
     on Transifex.
     ***********************************************************/
-    public static void replace_link_color_string_background_aware (string link_string, Gtk.Color background_color = Gtk.Application.palette ().color (Gtk.Palette.Base)) {
+    public static void replace_link_color_string_background_aware (string link_string, Gdk.RGBA background_color = Gtk.Application.palette ().color (Gtk.Palette.Base)) {
         replace_link_color_string (link_string, get_background_aware_link_color (background_color));
     }
 
@@ -1136,8 +1139,8 @@ public class Theme : GLib.Object {
     This way we also avoid having certain strings re-translated
     on Transifex.
     ***********************************************************/
-    public static void replace_link_color_string (string link_string, Gtk.Color new_color) {
-        link_string.replace (GLib.Regex (" (<a href|<a style='color:# ([a-z_a-Z0-9]{6});' href)"), "<a style='color:%1;' href".printf (new_color.name ()));
+    public static void replace_link_color_string (string link_string, Gdk.RGBA new_color) {
+        link_string.replace (new GLib.Regex (" (<a href|<a style='color:# ([a-z_a-Z0-9]{6});' href)"), "<a style='color:%1;' href".printf (new_color.name ()));
     }
 
 
@@ -1210,7 +1213,7 @@ public class Theme : GLib.Object {
     ***********************************************************/
     public static bool show_virtual_files_option {
         public get {
-            return ConfigFile ().show_experimental_options () || this.best_available_vfs_mode == AbstractVfs.WindowsCfApi;
+            return new ConfigFile ().show_experimental_options () || this.best_available_vfs_mode == AbstractVfs.WindowsCfApi;
         }
     }
 
@@ -1227,9 +1230,9 @@ public class Theme : GLib.Object {
     /***********************************************************
     @return color for the ErrorBox text.
     ***********************************************************/
-    public static Gtk.Color error_box_text_color {
+    public static Gdk.RGBA error_box_text_color {
         public get {
-            return new Gtk.Color ("white");
+            return Gdk.RGBA ("white");
         }
     }
 
@@ -1237,9 +1240,9 @@ public class Theme : GLib.Object {
     /***********************************************************
     @return color for the ErrorBox background.
     ***********************************************************/
-    public static Gtk.Color error_box_background_color {
+    public static Gdk.RGBA error_box_background_color {
         public get {
-            return new Gtk.Color ("red");
+            return Gdk.RGBA ("red");
         }
     }
 
@@ -1247,9 +1250,9 @@ public class Theme : GLib.Object {
     /***********************************************************
     @return color for the ErrorBox border.
     ***********************************************************/
-    public static Gtk.Color error_box_border_color {
+    public static Gdk.RGBA error_box_border_color {
         public get {
-            return new Gtk.Color ("black");
+            return Gdk.RGBA ("black");
         }
     }
 
@@ -1295,7 +1298,7 @@ public class Theme : GLib.Object {
                 if (qgetenv ("DESKTOP_SESSION") == "ubuntu") {
                     QBitmap mask = px.create_mask_from_color (Qt.white, Qt.MaskOutColor);
                     QPainter p = new QPainter (px);
-                    p.pen (Gtk.Color ("#dfdbd2"));
+                    p.pen (Gdk.RGBA ("#dfdbd2"));
                     p.draw_pixmap (px.rect (), mask, mask.rect ());
                 }
                 cached.add_pixmap (px);
@@ -1316,7 +1319,7 @@ public class Theme : GLib.Object {
 
 
     private static Gdk.Pixbuf load_pixmap (string flavor, string name, int size) {
-        return Gdk.Pixbuf (Theme.THEME_PREFIX + "%1/%2-%3.png".printf (flavor).printf (name).printf (size));
+        return new Gdk.Pixbuf (Theme.THEME_PREFIX + "%1/%2-%3.png".printf (flavor).printf (name).printf (size));
     }
 //  #endif
 
@@ -1350,8 +1353,8 @@ public class Theme : GLib.Object {
 
 
     private static unowned GLib.Uri image_path_to_url (string image_path) {
-        if (image_path.has_prefix (':')) {
-            var url = GLib.Uri ();
+        if (image_path.has_prefix (":")) {
+            var url = new GLib.Uri ();
             url.scheme ("qrc");
             url.path (image_path.mid (1));
             return url;

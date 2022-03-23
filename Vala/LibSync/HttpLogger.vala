@@ -16,7 +16,7 @@ public class HttpLogger : GLib.Object {
 
     const string X_REQUEST_ID = "X-Request-ID";
 
-    public static void log_request (GLib.InputStream reply, Soup.Session.Operation operation, QIODevice device) {
+    public static void log_request (GLib.InputStream reply, Soup.Session.Operation operation, GLib.OutputStream device) {
         var request = reply.request ();
         if (!lc_network_http ().is_info_enabled ()) {
             return;
@@ -79,7 +79,7 @@ public class HttpLogger : GLib.Object {
     }
 
 
-    public static void log_http (string verb, string url, string identifier, string content_type, GLib.List<GLib.InputStream.RawHeaderPair> header, QIODevice device) {
+    public static void log_http (string verb, string url, string identifier, string content_type, GLib.List<GLib.InputStream.RawHeaderPair> header, GLib.OutputStream device) {
         var reply = (GLib.InputStream) device;
         var content_length = device.size ();
         string message;

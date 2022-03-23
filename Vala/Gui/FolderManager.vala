@@ -379,11 +379,11 @@ public class FolderManager : GLib.Object {
     ***********************************************************/
     private void process_subgroup (var settings, string name) {
         settings.begin_group (name);
-        const int folders_version = settings.value (VERSION_C, 1).to_int ();
+        const int folders_version = settings.get_value (VERSION_C, 1).to_int ();
         if (folders_version <= MAX_FOLDERS_VERSION) {
             foreach (var folder_alias in settings.child_groups ()) {
                 settings.begin_group (folder_alias);
-                const int folder_version = settings.value (VERSION_C, 1).to_int ();
+                const int folder_version = settings.get_value (VERSION_C, 1).to_int ();
                 if (folder_version > FolderDefinition.max_settings_version ()) {
                     ignore_keys.append (settings.group ());
                 }
@@ -406,19 +406,19 @@ public class FolderManager : GLib.Object {
     /***********************************************************
     Adds a folder_connection for an account, ensures the journal is gone and saves it in the settings.
     ***********************************************************/
-    public FolderConnection add_folder (AccountState account_state, FolderDefinition folder_definition) {
+    public FolderConnection add_folder (AccountState account_state, FolderDefinition folder_definition) throws FolderManagerError {
         // Choose a database filename
         var definition = folder_definition;
         definition.journal_path = definition.default_journal_path (account_state.account);
 
         if (!ensure_journal_gone (definition.absolute_journal_path)) {
-            return null;
+            throw new FolderManagerError ();
         }
 
         var vfs = create_vfs_from_plugin (folder_definition.virtual_files_mode);
         if (!vfs) {
             GLib.warning ("Could not load plugin for mode " + folder_definition.virtual_files_mode);
-            return null;
+            throw new FolderManagerError ();
         }
 
         var folder_connection = add_folder_internal (definition, account_state, std.move (vfs));
@@ -498,7 +498,7 @@ public class FolderManager : GLib.Object {
                 return folder_connection;
             }
         }
-        return null;
+        throw new FolderManagerError ();
     }
 
 
@@ -591,16 +591,16 @@ public class FolderManager : GLib.Object {
 
         settings.begin_group (escaped_alias); // read the group with the same name as the file which is the folder_connection alias
 
-        string path = settings.value ("local_path").to_string ();
-        string backend = settings.value ("backend").to_string ();
-        string target_path = settings.value ("target_path").to_string ();
-        bool paused = settings.value ("paused", false).to_bool ();
-        // string connection = settings.value ("connection").to_string ();
+        string path = settings.get_value ("local_path").to_string ();
+        string backend = settings.get_value ("backend").to_string ();
+        string target_path = settings.get_value ("target_path").to_string ();
+        bool paused = settings.get_value ("paused", false).to_bool ();
+        // string connection = settings.get_value ("connection").to_string ();
         string alias = unescape_alias (escaped_alias);
 
         if (backend == "" || backend != "owncloud") {
             GLib.warning ("obsolete configuration of type" + backend);
-            return null;
+            throw new FolderManagerError ();
         }
 
         // cut off the leading slash, oc_url always has a trailing.
@@ -610,7 +610,7 @@ public class FolderManager : GLib.Object {
 
         if (account_state == null) {
             GLib.critical ("can't create folder_connection without an account.");
-            return null;
+            throw new FolderManagerError ();
         }
 
         FolderDefinition folder_definition;
@@ -622,7 +622,7 @@ public class FolderManager : GLib.Object {
 
         folder_connection = add_folder_internal (folder_definition, account_state, std.make_unique<VfsOff> ());
         if (folder_connection != null) {
-            GLib.List<string> block_list = settings.value ("block_list").to_string_list ();
+            GLib.List<string> block_list = settings.get_value ("block_list").to_string_list ();
             if (!block_list.empty ()) {
                 // migrate settings
                 folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, block_list);
@@ -927,7 +927,7 @@ public class FolderManager : GLib.Object {
 
     @returns an empty string if it is allowed, or an error if it is not allowed
     ***********************************************************/
-    public string check_path_validity_for_new_folder (string path, GLib.Uri server_url = GLib.Uri ()) {
+    public string check_path_validity_for_new_folder (string path, GLib.Uri server_url = new GLib.Uri ()) {
         string recursive_validity = check_path_validity_recursive (path);
         if (recursive_validity != "") {
             GLib.debug (path + recursive_validity);
@@ -942,7 +942,7 @@ public class FolderManager : GLib.Object {
 
         const string user_dir = GLib.Dir.clean_path (canonical_path (path)) + "/";
         for (var i = this.folder_map.const_begin (); i != this.folder_map.const_end (); ++i) {
-            var folder_connection = static_cast<FolderConnection> (i.value ());
+            var folder_connection = static_cast<FolderConnection> (i.get_value ());
             string folder_dir = GLib.Dir.clean_path (canonical_path (folder_connection.path)) + "/";
 
             bool different_paths = string.compare (folder_dir, user_dir, case_sensitivity) != 0;
@@ -993,7 +993,7 @@ public class FolderManager : GLib.Object {
         // possibly find a valid sync folder_connection inside it.
         // Example: Someone syncs their home directory. Then ~/foobar is not
         // going to be an acceptable sync folder_connection path for any value of foobar.
-        string parent_folder = GLib.FileInfo (folder_connection).directory ().canonical_path;
+        string parent_folder = new GLib.FileInfo (folder_connection).directory ().canonical_path;
         if (FolderManager.instance.folder_for_path (parent_folder)) {
             // Any path with that parent is going to be unacceptable,
             // so just keep it as-is.
@@ -1003,7 +1003,7 @@ public class FolderManager : GLib.Object {
         int attempt = 1;
         while (true) {
             const bool is_good =
-                !GLib.FileInfo (folder_connection).exists ()
+                !new GLib.FileInfo (folder_connection).exists ()
                 && FolderManager.instance.check_path_validity_for_new_folder (folder_connection, server_url) == "";
             if (is_good) {
                 break;
@@ -1066,7 +1066,7 @@ public class FolderManager : GLib.Object {
 
         this.last_sync_folder = null;
         this.current_sync_folder = null;
-        this.scheduled_folders == "";
+        this.scheduled_folders = new QQueue<FolderConnection> ();
         /* emit */ signal_folder_list_changed (this.folder_map);
         /* emit */ signal_schedule_queue_changed ();
 
@@ -1426,13 +1426,13 @@ public class FolderManager : GLib.Object {
         }
 
         GLib.debug ("folder_queue size: " + this.scheduled_folders.length);
-        if (this.scheduled_folders == "") {
+        if (this.scheduled_folders.length () == 0) {
             return;
         }
 
         // Find the first folder_connection in the queue that can be synced.
         FolderConnection folder_connection = null;
-        while (this.scheduled_folders != "") {
+        while (this.scheduled_folders.length () > 0) {
             FolderConnection g = this.scheduled_folders.dequeue ();
             if (g.can_sync ()) {
                 folder_connection = g;
@@ -1830,7 +1830,7 @@ public class FolderManager : GLib.Object {
     Makes the folder_connection known to the socket api
     ***********************************************************/
     private void register_folder_with_socket_api (FolderConnection folder_connection) {
-        if (!GLib.Dir (folder_connection.path).exists ()) {
+        if (!new GLib.Dir (folder_connection.path).exists ()) {
             return;
         }
 
@@ -1954,8 +1954,8 @@ public class FolderManager : GLib.Object {
                         folder_connection.switch_to_virtual_files ();
                     }
                     // Migrate the old "use_placeholders" setting to the root folder_connection pin state
-                    if (settings.value (VERSION_C, 1).to_int () == 1
-                        && settings.value ("use_placeholders", false).to_bool ()) {
+                    if (settings.get_value (VERSION_C, 1).to_int () == 1
+                        && settings.get_value ("use_placeholders", false).to_bool ()) {
                         GLib.info ("Migrate: From use_placeholders to Common.ItemAvailability.ONLINE_ONLY");
                         folder_connection.root_pin_state (Common.ItemAvailability.ONLINE_ONLY);
                     }

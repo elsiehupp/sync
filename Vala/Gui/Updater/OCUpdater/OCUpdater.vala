@@ -140,7 +140,7 @@ public class OCUpdater : AbstractUpdater {
     public bool perform_update () {
         ConfigFile config;
         GLib.Settings settings = new GLib.Settings (config.config_file (), GLib.Settings.IniFormat);
-        string update_file = settings.value (update_available_c).to_string ();
+        string update_file = settings.get_value (update_available_c).to_string ();
         if (!update_file == "" && new GLib.File (update_file).exists ()
             && !update_succeeded () /* Someone might have run the updater manually between restarts */) {
             const var message_box_start_installer = new Gtk.MessageBox (Gtk.MessageBox.Information,
@@ -221,8 +221,8 @@ public class OCUpdater : AbstractUpdater {
     public void on_signal_start_installer () {
         ConfigFile config;
         GLib.Settings settings = new GLib.Settings (config.config_file (), GLib.Settings.IniFormat);
-        string update_file = settings.value (update_available_c).to_string ();
-        settings.value (auto_update_attempted_c, true);
+        string update_file = settings.get_value (update_available_c).to_string ();
+        settings.get_value (auto_update_attempted_c, true);
         settings.sync ();
         GLib.info ("Running updater " + update_file);
 
@@ -307,7 +307,7 @@ public class OCUpdater : AbstractUpdater {
         string xml = string.from_utf8 (reply.read_all ());
 
         bool ok = false;
-        this.update_info = UpdateInfo.parse_string (xml, ok);
+        this.update_info = new UpdateInfo.parse_string (xml, ok);
         if (ok) {
             version_info_arrived (this.update_info);
         } else {
@@ -335,7 +335,7 @@ public class OCUpdater : AbstractUpdater {
         ConfigFile config;
         GLib.Settings settings = new GLib.Settings (config.config_file (), GLib.Settings.IniFormat);
 
-        int64 target_version_int = Helper.string_version_to_int (settings.value (update_target_version_c).to_string ());
+        int64 target_version_int = Helper.string_version_to_int (settings.get_value (update_target_version_c).to_string ());
         int64 current_version = Helper.current_version_to_int ();
         return current_version >= target_version_int;
     }

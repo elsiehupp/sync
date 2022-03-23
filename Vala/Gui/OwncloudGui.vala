@@ -24,8 +24,8 @@
 //  #include <QQml_context>
 //  #include <QPointer
 //  #include <QActio
-//  #include <QMenu>
-//  #include <QSize>
+//  #include <GLib.Menu>
+//  #include <Gdk.Rectangle>
 //  #ifdef WITH_LIBCLOUDPROVIDERS
 //  #include <QDBusConnection>
 //  #endif
@@ -84,7 +84,7 @@ public class OwncloudGui : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public OwncloudGui (Application parent = null) {
+    public OwncloudGui (Application parent) {
         base (parent);
         this.tray = null;
         this.settings_dialog = null;
@@ -125,13 +125,13 @@ public class OwncloudGui : GLib.Object {
         FolderManager.instance.signal_folder_sync_state_change.connect (
             this.on_signal_sync_state_change
         );
-        Logger.instance.signal_gui_log.connect (
+        LibSync.Logger.instance.signal_gui_log.connect (
             this.on_signal_show_tray_message
         );
-        Logger.instance.optional_gui_log.connect (
+        LibSync.Logger.instance.optional_gui_log.connect (
             this.on_signal_show_optional_tray_message
         );
-        Logger.instance.gui_message.connect (
+        LibSync.Logger.instance.gui_message.connect (
             this.on_signal_show_gui_message
         );
     }
@@ -161,7 +161,7 @@ public class OwncloudGui : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static QSize settings_dialog_size () {
+    public static Gdk.Rectangle settings_dialog_size () {
         return {800, 500};
     }
 
@@ -512,7 +512,7 @@ public class OwncloudGui : GLib.Object {
             || result.status () == LibSync.SyncResult.Status.PROBLEM
             || result.status () == LibSync.SyncResult.Status.SYNC_ABORT_REQUESTED
             || result.status () == LibSync.SyncResult.Status.ERROR) {
-            Logger.instance.on_signal_enter_next_log_file ();
+            LibSync.Logger.instance.on_signal_enter_next_log_file ();
         }
     }
 

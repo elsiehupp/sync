@@ -470,7 +470,7 @@ public class Account : GLib.Object {
     public GLib.InputStream send_raw_request_for_device (
         string verb,
         GLib.Uri url, Soup.Request request = new Soup.Request (),
-        QIODevice data = null
+        GLib.OutputStream data = null
     ) {
         request.url (url);
         request.ssl_configuration (this.get_or_create_ssl_config ());
@@ -495,7 +495,7 @@ public class Account : GLib.Object {
         string verb,
         GLib.Uri url,
         string data,
-        Soup.Request request = Soup.Request ()
+        Soup.Request request = new Soup.Request ()
     ) {
         request.url (url);
         request.ssl_configuration (this.get_or_create_ssl_config ());
@@ -520,7 +520,7 @@ public class Account : GLib.Object {
         string verb,
         GLib.Uri url,
         Soup.Multipart data,
-        Soup.Request request = Soup.Request ()
+        Soup.Request request = new Soup.Request ()
     ) {
         request.url (url);
         request.ssl_configuration (this.get_or_create_ssl_config ());
@@ -543,7 +543,7 @@ public class Account : GLib.Object {
         string verb,
         GLib.Uri url,
         Soup.Request request = new Soup.Request (),
-        QIODevice data = null
+        GLib.OutputStream data = null
     ) {
         var simple_network_job = new SimpleNetworkJob (shared_from_this ());
         simple_network_job.start_request (verb, url, request, data);

@@ -47,7 +47,7 @@ public class LockEncryptFolderApiJob : AbstractNetworkJob {
             return true;
         }
 
-        QJsonParseError error;
+        Json.ParserError error;
         var json = QJsonDocument.from_json (this.reply.read_all (), error);
         var object = json.object ().to_variant_map ();
         var token = object["ocs"].to_map ()["data"].to_map ()["e2e-token"].to_byte_array ();

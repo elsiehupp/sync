@@ -12,7 +12,7 @@ public class TestAllFilesDeletedDeleteData : AbstractTestAllFilesDeleted {
     /***********************************************************
     ***********************************************************/
     private TestAllFilesDeletedDeleteData () {
-        TestAllFilesDeletedKeepData ();
+        new TestAllFilesDeletedKeepData ();
     }
 
 }

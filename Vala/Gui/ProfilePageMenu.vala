@@ -2,7 +2,7 @@
 
 //  #include <QBox_layout>
 //  #include <account.h>
-//  #include <QMenu>
+//  #include <GLib.Menu>
 //  #include <cstddef>
 
 namespace Occ {
@@ -13,7 +13,7 @@ public class ProfilePageMenu : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private OcsProfileConnector profile_connector;
-    private QMenu menu;
+    private GLib.Menu menu;
 
     /***********************************************************
     ***********************************************************/
@@ -40,12 +40,12 @@ public class ProfilePageMenu : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_hovercard_fetched () {
-        this.menu == "";
+        this.menu == new GLib.Menu ();
 
-        const var hovercard_actions = this.profile_connector.hovercard ().actions;
+        GLib.List<HovercardAction> hovercard_actions = this.profile_connector.current_hovercard.actions;
         foreach (var hovercard_action in hovercard_actions) {
-            const var action = this.menu.add_action (hovercard_action.icon, hovercard_action.title);
-            const var link = hovercard_action.link;
+            var action = this.menu.add_action (hovercard_action.icon, hovercard_action.title);
+            var link = hovercard_action.link;
             action.triggered.connect (
                 action.on_signal_hovercard_open_browser
             );
@@ -63,13 +63,13 @@ public class ProfilePageMenu : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_icon_loaded (size_t hovercard_action_index) {
-        const var hovercard_actions = this.profile_connector.hovercard ().actions;
-        const var menu_actions = this.menu.actions ();
+        GLib.List<HovercardAction> hovercard_actions = this.profile_connector.current_hovercard.actions;
+        var menu_actions = this.menu.actions ();
         if (hovercard_action_index >= hovercard_actions.size ()
             || hovercard_action_index >= static_cast<size_t> (menu_actions.size ())) {
             return;
         }
-        const var menu_action = menu_actions[static_cast<int> (hovercard_action_index)];
+        var menu_action = menu_actions[static_cast<int> (hovercard_action_index)];
         menu_action.icon (hovercard_actions[hovercard_action_index].icon);
     }
 

@@ -2,12 +2,12 @@
 namespace Occ {
 namespace Ui {
 
-public class WebFlowCredentialsAccessManager : AccessManager {
+public class WebFlowCredentialsAccessManager : LibSync.AccessManager {
 
     private const string USER_C = "user";
     private const string CLIENT_CERTIFICATE_PEM_C = "this.client_certificate_pem";
     private const string CLIENT_KEY_PEM_C = "this.client_key_pem";
-    private const string client_ca_certificate_pemC = "this.client_ca_certificate_pem";
+    private const string CLIENT_CA_CERTIFICATE_PEM_C = "this.client_ca_certificate_pem";
 
     /***********************************************************
     The credentials object dies along with the account, while
@@ -25,8 +25,8 @@ public class WebFlowCredentialsAccessManager : AccessManager {
 
     /***********************************************************
     ***********************************************************/
-    protected override GLib.InputStream create_request (Operation operation, Soup.Request request, QIODevice outgoing_data) {
-        Soup.Request req (request);
+    protected override GLib.InputStream create_request (Operation operation, Soup.Request request, GLib.OutputStream outgoing_data) {
+        Soup.Request req = new Soup.Request (request);
         if (!req.attribute (WebFlowCredentials.DontAddCredentialsAttribute).to_bool ()) {
             if (this.credentials && !this.credentials.password () == "") {
                 string cred_hash = (this.credentials.user ().to_utf8 () + ":" + this.credentials.password ().to_utf8 ()).to_base64 ();
@@ -48,7 +48,7 @@ public class WebFlowCredentialsAccessManager : AccessManager {
             req.ssl_configuration (ssl_configuration);
         }
 
-        return AccessManager.create_request (operation, req, outgoing_data);
+        return LibSync.AccessManager.create_request (operation, req, outgoing_data);
     }
 
 

@@ -67,7 +67,7 @@ public class UpdateInfo : GLib.Object {
         if (!doc.content (xml, false, error_msg, error_line, error_col)) {
             GLib.warning (error_msg + " at " + error_line.to_string () + "," + error_col.to_string ()
                 + "\n" +  xml.split_ref ("\n").value (error_line - 1) + "\n"
-                + string (" ").repeated (error_col - 1) + "^\n"
+                + " ".repeated (error_col - 1) + "^\n"
                 + "." + xml + "<-");
             if (this.ok) {
                 this.ok = false;
@@ -75,7 +75,7 @@ public class UpdateInfo : GLib.Object {
             return;
         }
 
-        UpdateInfo.parse_element (doc.document_element ());
+        new UpdateInfo.parse_element (doc.document_element ());
     }
 
 } // class UpdateInfo

@@ -23,7 +23,7 @@ public class UnifiedSearchResultImageProvider : QQuickAsyncImageProvider {
 
     /***********************************************************
     ***********************************************************/
-    public QQuickImageResponse request_image_response (string identifier, QSize requested_size) {
+    public QQuickImageResponse request_image_response (string identifier, Gdk.Rectangle requested_size) {
         return new AsyncImageResponse (identifier, requested_size);
     }
 

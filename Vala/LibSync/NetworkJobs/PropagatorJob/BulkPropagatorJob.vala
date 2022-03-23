@@ -238,7 +238,7 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    private void finalize (QJsonObject full_reply) {
+    private void finalize (Json.Object full_reply) {
         for (var single_file_it = std.begin (this.files_to_upload); single_file_it != std.end (this.files_to_upload); ) {
             var single_file = *single_file_it;
 
@@ -471,7 +471,7 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
     private void on_signal_put_finished_one_file (
         BulkUploadItem single_file,
         PutMultiFileJob put_multi_file_job,
-        QJsonObject file_reply) {
+        Json.Object file_reply) {
         bool finished = false;
 
         GLib.info (single_file.item.file.to_string () + " file headers " + file_reply.to_string ());
@@ -531,7 +531,7 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    private static string get_etag_from_json_reply (QJsonObject reply) {
+    private static string get_etag_from_json_reply (Json.Object reply) {
         var oc_etag = parse_etag (reply.value ("OC-ETag").to_string ().to_latin1 ());
         var ETag = parse_etag (reply.value ("ETag").to_string ().to_latin1 ());
         var  etag = parse_etag (reply.value ("etag").to_string ().to_latin1 ());
@@ -551,7 +551,7 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
 
     /***********************************************************
     ***********************************************************/
-    private static string get_header_from_json_reply (QJsonObject reply, string header_name) {
+    private static string get_header_from_json_reply (Json.Object reply, string header_name) {
         return reply.value (header_name).to_string ().to_latin1 ();
     }
 
@@ -731,7 +731,7 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
     ***********************************************************/
     private void compute_file_id (
         SyncFileItem item,
-        QJsonObject file_reply) {
+        Json.Object file_reply) {
         var fid = get_header_from_json_reply (file_reply, "OC-FileID");
         if (!fid == "") {
             if (!item.file_id == "" && item.file_id != fid) {

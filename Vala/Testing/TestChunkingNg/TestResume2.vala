@@ -64,7 +64,7 @@ public class TestResume2 : AbstractTestChunkingNg {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.InputStream override_delegate_resume2 (Soup.Operation operation, Soup.Request request, QIODevice device) {
+    private GLib.InputStream override_delegate_resume2 (Soup.Operation operation, Soup.Request request, GLib.OutputStream device) {
         if (operation == Soup.PutOperation) {
             // Test that we properly resuming, not resending the first chunk
             GLib.assert_true (request.raw_header ("OC-Chunk-Offset").to_int64 () >= first_chunk.size);

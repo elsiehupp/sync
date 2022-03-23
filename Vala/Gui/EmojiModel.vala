@@ -4321,7 +4321,7 @@ public class EmojiModel : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public QVariantList history () {
-        return this.settings.value ("Editor/emojis", QVariantList ()).to_list ();
+        return this.settings.get_value ("Editor/emojis", QVariantList ()).to_list ();
     }
 
 
@@ -4351,7 +4351,7 @@ public class EmojiModel : GLib.Object {
         }
 
         history_emojis.push_front (model_data);
-        this.settings.value ("Editor/emojis", history_emojis);
+        this.settings.get_value ("Editor/emojis", history_emojis);
 
         /* emit */ signal_history_changed ();
     }

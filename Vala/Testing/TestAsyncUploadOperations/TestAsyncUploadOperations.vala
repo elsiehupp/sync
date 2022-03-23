@@ -210,7 +210,7 @@ public class AbstractTestAsyncOp : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.InputStream override_delegate_async_upload_operations1 (Soup.Operation operation, Soup.Request request, QIODevice outgoing_data) {
+    private GLib.InputStream override_delegate_async_upload_operations1 (Soup.Operation operation, Soup.Request request, GLib.OutputStream outgoing_data) {
         var path = request.url.path;
 
         if (operation == Soup.GetOperation && path.has_prefix ("/async-poll/")) {
@@ -249,7 +249,7 @@ public class AbstractTestAsyncOp : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.InputStream override_delegate_async_upload_operations2 (Soup.Operation operation, Soup.Request request, QIODevice device) {
+    private GLib.InputStream override_delegate_async_upload_operations2 (Soup.Operation operation, Soup.Request request, GLib.OutputStream device) {
         var path = request.url.path;
         if (operation == Soup.GetOperation && path.has_prefix ("/async-poll/")) {
             var file = path.mid ("/async-poll/".size () - 1);

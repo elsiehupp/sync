@@ -374,7 +374,7 @@ public class OwncloudPropagator : GLib.Object {
     public int maximum_active_transfer_job () {
         if (this.download_limit != 0
             || this.upload_limit != 0
-            || this.sync_options.parallel_network_jobs == null
+            || this.sync_options.parallel_network_jobs == 0
         ) {
             // disable parallelism when there is a network limit.
             return 1;
@@ -400,7 +400,7 @@ public class OwncloudPropagator : GLib.Object {
     The maximum number of active jobs in parallel
     ***********************************************************/
     public int hard_maximum_active_job () {
-        if (this.sync_options.parallel_network_jobs == null) {
+        if (this.sync_options.parallel_network_jobs == 0) {
             return 1;
         }
         return this.sync_options.parallel_network_jobs;
@@ -1053,7 +1053,7 @@ public class OwncloudPropagator : GLib.Object {
         var modtime = Utility.q_date_time_from_time_t (item.modtime);
         const int64 ms_since_mod = modtime.msecs_to (GLib.DateTime.current_date_time_utc ());
 
-        return new GLib.TimeSpan (ms_since_mod) < SyncEngine.minimum_file_age_for_upload
+        return GLib.TimeSpan (ms_since_mod) < SyncEngine.minimum_file_age_for_upload
             // if the mtime is too much in the future we do* upload the file
             && ms_since_mod > -10000;
     }
@@ -1078,7 +1078,7 @@ public class OwncloudPropagator : GLib.Object {
     Given an error from the network, map to a SyncFileItem.Status error
     ***********************************************************/
     private SyncFileItem.Status classify_error (GLib.InputStream.NetworkError nerror,
-        int http_code, bool another_sync_needed = null, string error_body = "") {
+        int http_code, bool another_sync_needed = false, string error_body = "") {
         GLib.assert (nerror != GLib.InputStream.NoError); // we should only be called when there is an error
 
         if (nerror == GLib.InputStream.RemoteHostClosedError) {

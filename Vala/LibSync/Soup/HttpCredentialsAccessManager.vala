@@ -24,7 +24,7 @@ public class HttpCredentialsAccessManager : AccessManager {
     }
 
 
-    protected GLib.InputStream create_request (Operation operation, Soup.Request request, QIODevice outgoing_data) {
+    protected GLib.InputStream create_request (Operation operation, Soup.Request request, GLib.OutputStream outgoing_data) {
         Soup.Request request = new Soup.Request (request);
         if (!request.attribute (HttpCredentials.DontAddCredentialsAttribute).to_bool ()) {
             if (this.credentials && !this.credentials.password () == "") {

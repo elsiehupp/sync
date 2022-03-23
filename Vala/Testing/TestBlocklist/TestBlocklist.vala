@@ -158,7 +158,7 @@ public class TestBlocklist : GLib.Object {
     }
 
 
-    private GLib.InputStream override_delegate (Soup.Operation operation, Soup.Request request, QIODevice device) {
+    private GLib.InputStream override_delegate (Soup.Operation operation, Soup.Request request, GLib.OutputStream device) {
         if (request.url.path.has_suffix (test_filename)) {
             request_identifier = request.raw_header ("X-Request-ID");
         }

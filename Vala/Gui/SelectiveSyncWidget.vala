@@ -178,8 +178,8 @@ public class SelectiveSyncWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public override QSize size_hint () {
-        return Gtk.Widget.size_hint ().expanded_to (QSize (600, 600));
+    public override Gdk.Rectangle size_hint () {
+        return Gtk.Widget.size_hint ().expanded_to (Gdk.Rectangle (600, 600));
     }
 
 

@@ -329,11 +329,11 @@ public class SyncEngine : GLib.Object {
 
         this.has_none_files = false;
         this.has_remove_file = false;
-        this.seen_conflict_files == "";
+        this.seen_conflict_files = new GLib.List<string> ();
 
         this.progress_info.reset ();
 
-        if (!GLib.Dir (this.local_path).exists ()) {
+        if (!new GLib.Dir (this.local_path).exists ()) {
             this.another_sync_needed = AnotherSyncNeeded.DELAYED_FOLLOW_UP;
             // No this.tr, it should only occur in non-mirall
             /* Q_EMIT */ signal_sync_error ("Unable to find local sync folder.");
@@ -466,7 +466,7 @@ public class SyncEngine : GLib.Object {
             invalid_filename_pattern = " ([\\:?*\"<>|])";
         }
         if (!invalid_filename_pattern == "")
-            this.discovery_phase.invalid_filename_rx = GLib.Regex (invalid_filename_pattern);
+            this.discovery_phase.invalid_filename_rx = new GLib.Regex (invalid_filename_pattern);
         this.discovery_phase.server_blocklisted_files = this.account.capabilities.blocklisted_files;
         this.discovery_phase.ignore_hidden_files = ignore_hidden_files;
 
@@ -972,7 +972,7 @@ public class SyncEngine : GLib.Object {
 
         GLib.info ("#### Reconcile (signal_about_to_propagate) #################################################### " + this.stop_watch.add_lap_time ("Reconcile (signal_about_to_propagate)") + "ms");
 
-        this.local_discovery_paths == "";
+        this.local_discovery_paths = new GLib.List<string> ();
 
         // To announce the beginning of the sync
         /* emit */ signal_about_to_propagate (this.sync_items);
@@ -1130,7 +1130,7 @@ public class SyncEngine : GLib.Object {
                 break;
             // Compare to our new GLib.Timer instead of using elapsed ().
             // This avoids querying the current time from the OS for every loop.
-            var elapsed = new GLib.TimeSpan (
+            var elapsed = GLib.TimeSpan (
                 now.msecs_since_reference () - first.key ().msecs_since_reference ()
             );
             if (elapsed <= S_TOUCHED_FILES_MAX_AGE_MICROSECONDS) {
@@ -1150,7 +1150,7 @@ public class SyncEngine : GLib.Object {
     Wipes the this.touched_files hash
     ***********************************************************/
     private void on_signal_clear_touched_files_timer_timeout () {
-        this.touched_files == "";
+        this.touched_files = new GLib.HashTable<GLib.Timer, string> ();
     }
 
 
@@ -1158,8 +1158,9 @@ public class SyncEngine : GLib.Object {
     Emit a summary error, unless it was seen before
     ***********************************************************/
     private void on_signal_summary_error (string message) {
-        if (this.unique_errors.contains (message))
+        if (this.unique_errors.contains (message)) {
             return;
+        }
 
         this.unique_errors.insert (message);
         /* emit */ signal_sync_error (message, ErrorCategory.NORMAL);
@@ -1398,10 +1399,10 @@ public class SyncEngine : GLib.Object {
         /* emit */ signal_finished (on_signal_success);
 
         // Delete the propagator only after emitting the signal.
-        this.propagator == "";
-        this.seen_conflict_files == "";
-        this.unique_errors == "";
-        this.local_discovery_paths == "";
+        this.propagator = null;
+        this.seen_conflict_files = new GLib.List<string> ();
+        this.unique_errors = new GLib.List<string> ();
+        this.local_discovery_paths = new GLib.List<string> ();
         this.local_discovery_style = DiscoveryPhase.LocalDiscoveryStyle.FILESYSTEM_ONLY;
 
         this.clear_touched_files_timer.start ();

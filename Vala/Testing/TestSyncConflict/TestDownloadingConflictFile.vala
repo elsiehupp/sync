@@ -44,7 +44,7 @@ public class TestDownloadingConflictFile : AbstractTestSyncConflict {
     }
 
 
-    private GLib.InputStream override_delegate_downloading_conflict_file (Soup.Operation operation, Soup.Request request, QIODevice device) {
+    private GLib.InputStream override_delegate_downloading_conflict_file (Soup.Operation operation, Soup.Request request, GLib.OutputStream device) {
         if (operation == Soup.GetOperation) {
             var reply = new FakeGetReply (fake_folder.remote_modifier (), operation, request, parent);
             reply.set_raw_header ("OC-Conflict", "1");

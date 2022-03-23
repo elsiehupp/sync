@@ -11,10 +11,10 @@
 //  #include <KIOCore/kfileitem.h>
 //  #include <KIOCore/KFileItemListProperties>
 //  #include <QtWidgets/QAction>
-//  #include <QtWidgets/QMenu>
+//  #include <QtWidgets/GLib.Menu>
 //  #include <QtCore/GLib.Dir>
 //  #include <QtCore/GLib.Timeout>
-//  #include <QtCore/QEventLoop>
+//  #include <QtCore/GLib.MainLoop>
 
 public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
 
@@ -54,8 +54,8 @@ public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
             return legacyActions (file_item_infos, parentWidget);
         }
 
-        var menu = new QMenu (parentWidget);
-        QEventLoop loop;
+        var menu = new GLib.Menu (parentWidget);
+        GLib.MainLoop loop;
         var con = connect (
             helper,
             OwncloudDolphinPluginHelper.signal_command_received,
@@ -64,7 +64,7 @@ public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
         );
         GLib.Timeout.singleShot (100, loop, SLOT (quit ())); // add a timeout to be sure we don't freeze dolphin
         helper.send_command ("GET_MENU_ITEMS:" + files + "\n");
-        loop.exec (QEventLoop.ExcludeUserInputEvents);
+        loop.exec (GLib.MainLoop.ExcludeUserInputEvents);
         disconnect (con);
         if (menu.actions ().isEmpty ()) {
             delete menu;
@@ -118,7 +118,7 @@ public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
         var helper = OwncloudDolphinPluginHelper.instance;
         var menuaction = new QAction (parentWidget);
         menuaction.setText (helper.context_menu_title ());
-        var menu = new QMenu (parentWidget);
+        var menu = new GLib.Menu (parentWidget);
         menuaction.setMenu (menu);
 
         var share_action = menu.add_action (helper.share_action_title ());

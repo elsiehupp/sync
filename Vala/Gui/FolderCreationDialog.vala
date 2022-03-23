@@ -38,13 +38,13 @@ public class FolderCreationDialog : Gtk.Dialog {
         const string suggested_folder_name_prefix = _("New folder");
 
         string new_folder_full_path = this.destination + "/" + suggested_folder_name_prefix;
-        if (!GLib.Dir (new_folder_full_path).exists ()) {
+        if (!new GLib.Dir (new_folder_full_path).exists ()) {
             instance.new_folder_name_edit.on_signal_text (suggested_folder_name_prefix);
         } else {
             for (uint32 i = 2; i < std.numeric_limits<uint32>.max (); ++i) {
                 string suggested_postfix = " (%1)".printf (i);
 
-                if (!GLib.Dir (new_folder_full_path + suggested_postfix).exists ()) {
+                if (!new GLib.Dir (new_folder_full_path + suggested_postfix).exists ()) {
                     instance.new_folder_name_edit.on_signal_text (suggested_folder_name_prefix + suggested_postfix);
                     break;
                 }
@@ -66,12 +66,12 @@ public class FolderCreationDialog : Gtk.Dialog {
     private void on_signal_accept () {
         //  Q_ASSERT (!this.destination.has_suffix ("/"));
 
-        if (GLib.Dir (this.destination + "/" + instance.new_folder_name_edit.text ()).exists ()) {
+        if (new GLib.Dir (this.destination + "/" + instance.new_folder_name_edit.text ()).exists ()) {
             instance.label_error_message.visible (true);
             return;
         }
 
-        if (!GLib.Dir (this.destination).mkdir (instance.new_folder_name_edit.text ())) {
+        if (!new GLib.Dir (this.destination).mkdir (instance.new_folder_name_edit.text ())) {
             Gtk.MessageBox.critical (this, _("Error"), _("Could not create a folder! Check your write permissions."));
         }
 
@@ -82,7 +82,7 @@ public class FolderCreationDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void on_signal_new_folder_name_edit_text_edited () {
-        if (!instance.new_folder_name_edit.text () == "" && GLib.Dir (this.destination + "/" + instance.new_folder_name_edit.text ()).exists ()) {
+        if (!instance.new_folder_name_edit.text () == "" && new GLib.Dir (this.destination + "/" + instance.new_folder_name_edit.text ()).exists ()) {
             instance.label_error_message.visible (true);
         } else {
             instance.label_error_message.visible (false);

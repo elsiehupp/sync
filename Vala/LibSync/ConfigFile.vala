@@ -104,7 +104,7 @@ public class ConfigFile : GLib.Object {
 
             GLib.FileInfo file_info = GLib.File.new_for_path (dir_path);
             if (!file_info.exists ()) {
-                GLib.Dir ().mkpath (dir_path);
+                new GLib.Dir ().mkpath (dir_path);
                 file_info.file (dir_path);
             }
             if (file_info.exists () && file_info.query_info ().get_file_type () == FileType.DIRECTORY) {
@@ -1156,7 +1156,7 @@ public class ConfigFile : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected GLib.Variant get_policy_setting (string policy, GLib.Variant default_value = GLib.Variant ()) {
+    protected GLib.Variant get_policy_setting (string policy, GLib.Variant default_value = new GLib.Variant ()) {
         if (Utility.is_windows ()) {
             // check for policies first and return immediately if a value is found.
             GLib.Settings user_policy = new GLib.Settings(

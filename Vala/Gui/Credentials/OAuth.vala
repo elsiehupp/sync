@@ -6,7 +6,7 @@
 
 //  #include <QDesktopServices>
 //  #include <GLib.OutputStream>
-//  #include <QJsonObject>
+//  #include <Json.Object>
 //  #include <QJsonDocument>
 
 //  #include <QPointer>
@@ -146,14 +146,14 @@ public class OAuth : GLib.Object {
     ***********************************************************/
     private void on_signal_simple_network_job_finished (QTcpSocket socket, GLib.InputStream reply) {
         var json_data = reply.read_all ();
-        QJsonParseError json_parse_error;
-        QJsonObject json = QJsonDocument.from_json (json_data, json_parse_error).object ();
+        Json.ParserError json_parse_error;
+        Json.Object json = QJsonDocument.from_json (json_data, json_parse_error).object ();
         string access_token = json["access_token"].to_string ();
         string refresh_token = json["refresh_token"].to_string ();
         string user = json["user_id"].to_string ();
         GLib.Uri message_url = json["message_url"].to_string ();
 
-        if (reply.error != GLib.InputStream.NoError || json_parse_error.error != QJsonParseError.NoError
+        if (reply.error != GLib.InputStream.NoError || json_parse_error.error != Json.ParserError.NoError
             || json_data == "" || json == "" || refresh_token == "" || access_token == ""
             || json["token_type"].to_string () != "Bearer") {
             string error_reason;
@@ -170,7 +170,7 @@ public class OAuth : GLib.Object {
                 // We explicitly have this as error case since the json qc_warning output below is misleading,
                 // it will show a fake json will null values that actually never was received like this as
                 // soon as you access json["whatever"] the debug output json will claim to have "whatever":null
-            } else if (json_parse_error.error != QJsonParseError.NoError) {
+            } else if (json_parse_error.error != Json.ParserError.NoError) {
                 error_reason = _("Could not parse the JSON returned from the server : <br><em>%1</em>")
                                   .printf (json_parse_error.error_string);
             } else {
@@ -221,8 +221,11 @@ public class OAuth : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static void http_reply_and_close (QTcpSocket socket, string code, string html,
-        string more_headers = null) {
+    private static void http_reply_and_close (
+        QTcpSocket socket,
+        string code,
+        string html,
+        string more_headers = "") {
         if (socket == null) {
             return; // socket can have been deleted if the browser was closed
         }

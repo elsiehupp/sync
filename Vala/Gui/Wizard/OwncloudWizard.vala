@@ -291,7 +291,7 @@ public class OwncloudWizard : QWizard {
         const var wizard_window = window ();
         const var screen = Gtk.Application.screen_at (wizard_window.position ())
             ? Gtk.Application.screen_at (wizard_window.position ())
-            : Gtk.Application.primary_screen ();
+            : Gdk.Display.get_default ().get_default_screen ().get_primary_monitor ();
         const var screen_geometry = screen.geometry ();
         const var window_geometry = wizard_window.geometry ();
         const var new_window_position = screen_geometry.center () - QPoint (window_geometry.width () / 2, window_geometry.height () / 2);
@@ -533,18 +533,18 @@ public class OwncloudWizard : QWizard {
         const var page_sizes = calculate_wizard_page_sizes ();
         const var longest_side = calculate_longest_side_of_wizard_pages (page_sizes);
 
-        resize (QSize (longest_side, longest_side));
+        resize (Gdk.Rectangle (longest_side, longest_side));
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private int calculate_longest_side_of_wizard_pages (GLib.List<QSize> page_sizes) {
+    private int calculate_longest_side_of_wizard_pages (GLib.List<Gdk.Rectangle> page_sizes) {
         //  return std.accumulate (
         //      std.cbegin (page_sizes),
         //      std.cend (page_sizes),
         //      0,
-        //      [] (int current, QSize size) {
+        //      [] (int current, Gdk.Rectangle size) {
         //      return std.max ({
         //          current, size.width (), size.height ()
         //      });
@@ -554,8 +554,8 @@ public class OwncloudWizard : QWizard {
 
     /***********************************************************
     ***********************************************************/
-    private GLib.List<QSize> calculate_wizard_page_sizes () {
-        GLib.List<QSize> page_sizes;
+    private GLib.List<Gdk.Rectangle> calculate_wizard_page_sizes () {
+        GLib.List<Gdk.Rectangle> page_sizes;
         const var p_ids = page_ids ();
 
         //  std.transform (

@@ -10,7 +10,7 @@ namespace LibSync {
 
 @copyright GPLv3 or Later
 ***********************************************************/
-public class UploadDevice : QIODevice {
+public class UploadDevice : GLib.OutputStream {
 
     /***********************************************************
     The local file to read data from

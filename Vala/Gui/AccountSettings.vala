@@ -205,7 +205,7 @@ public class AccountSettings : Gtk.Widget {
         );
 
         // quota_progress_bar style now set in customize_style ()
-        /*Gtk.Color color = palette ().highlight ().color ();
+        /*Gdk.RGBA color = palette ().highlight ().color ();
          this.instance.quota_progress_bar.style_sheet (PROGRESS_BAR_STYLE_C.printf (color.name ()));*/
 
         // Connect E2E stuff
@@ -254,7 +254,7 @@ public class AccountSettings : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public override QSize size_hint () {
+    public override Gdk.Rectangle size_hint () {
         return OwncloudGui.settings_dialog_size ();
     }
 
@@ -646,8 +646,9 @@ public class AccountSettings : Gtk.Widget {
     ***********************************************************/
     protected void on_signal_open_current_local_sub_folder () {
         QModelIndex selected = this.instance.folder_list.selection_model ().current_index ();
-        if (!selected.is_valid || this.model.classify (selected) != FolderStatusModel.ItemType.SUBFOLDER)
+        if (!selected.is_valid || this.model.classify (selected) != FolderStatusModel.ItemType.SUBFOLDER) {
             return;
+        }
         string filename = this.model.data (selected, DataRole.FOLDER_PATH_ROLE).to_string ();
         GLib.Uri url = GLib.Uri.from_local_file (filename);
         QDesktopServices.open_url (url);
@@ -1148,7 +1149,7 @@ public class AccountSettings : Gtk.Widget {
     protected void on_signal_subfolder_context_menu_requested (QModelIndex index, QPoint position) {
         //  Q_UNUSED (position);
 
-        QMenu menu;
+        GLib.Menu menu;
         var open_folder_action = menu.add_action (_("Open folder_connection"));
         open_folder_action.triggered.connect (
             this.on_signal_open_current_local_sub_folder
@@ -1248,7 +1249,7 @@ public class AccountSettings : Gtk.Widget {
         if (!FolderManager.instance.folder_by_alias (alias))
             return;
 
-        var menu = new QMenu (tv);
+        var menu = new GLib.Menu (tv);
 
         menu.attribute (Qt.WA_DeleteOnClose);
 
@@ -1400,10 +1401,10 @@ public class AccountSettings : Gtk.Widget {
     protected void on_signal_link_activated (string link) {
         // Parse folder_connection alias and filename from the link, calculate the index
         // and select it if it exists.
-        GLib.List<string> li = link.split ("?folder_connection=");
-        if (li.length > 1) {
-            string my_folder = li[0];
-            string alias = li[1];
+        GLib.List<string> link_split = link.split ("?folder_connection=");
+        if (link_split.length > 1) {
+            string my_folder = link_split[0];
+            string alias = link_split[1];
             if (my_folder.has_suffix ("/"))
                 my_folder.chop (1);
 
@@ -1541,12 +1542,12 @@ public class AccountSettings : Gtk.Widget {
     ***********************************************************/
     private void show_connection_label (
         string message,
-        GLib.List<string> errors = {}
+        GLib.List<string> errors = new GLib.List<string> ()
     ) {
         const string err_style = "color: #ffffff; background-color: #bb4d4d; padding: 5px;"
                                + "border-width: 1px; border-style: solid; border-color: #aaaaaa;"
                                + "border-radius: 5px;";
-        if (errors == "") {
+        if (errors.length () == 0) {
             string message = message;
             Theme.replace_link_color_string_background_aware (message);
             this.instance.connect_label.on_signal_text (message);
@@ -1556,7 +1557,7 @@ public class AccountSettings : Gtk.Widget {
             errors.prepend (message);
             string message = errors.join ("\n");
             GLib.debug (message);
-            Theme.replace_link_color_string (message, Gtk.Color ("#c1c8e6"));
+            Theme.replace_link_color_string (message, Gdk.RGBA ("#c1c8e6"));
             this.instance.connect_label.on_signal_text (message);
             this.instance.connect_label.tool_tip ("");
             this.instance.connect_label.style_sheet (err_style);
@@ -1632,7 +1633,7 @@ public class AccountSettings : Gtk.Widget {
         Theme.replace_link_color_string_background_aware (message);
         this.instance.connect_label.on_signal_text (message);
 
-        Gtk.Color color = palette ().highlight ().color ();
+        Gdk.RGBA color = palette ().highlight ().color ();
         this.instance.quota_progress_bar.style_sheet (PROGRESS_BAR_STYLE_C.printf (color.name ()));
     }
 

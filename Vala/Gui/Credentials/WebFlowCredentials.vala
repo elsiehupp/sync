@@ -523,7 +523,7 @@ public class WebFlowCredentials : AbstractCredentials {
         if (this.client_ssl_ca_certificates.length < this.client_ssl_ca_certificates_max_count) {
             var keychain_chunk_read_job = new KeychainChunkReadJob (
                 this.account,
-                this.user + client_ca_certificate_pemC + this.client_ssl_ca_certificates.length.to_string (),
+                this.user + CLIENT_CA_CERTIFICATE_PEM_C + this.client_ssl_ca_certificates.length.to_string (),
                 this.keychain_migration,
                 this
             );
@@ -561,7 +561,7 @@ public class WebFlowCredentials : AbstractCredentials {
 
             var keychain_chunk_write_job = new KeychainChunkWriteJob (
                 this.account,
-                this.user + client_ca_certificate_pemC + string.number (index),
+                this.user + CLIENT_CA_CERTIFICATE_PEM_C + string.number (index),
                 cert.to_pem (),
                 this
             );
@@ -624,7 +624,7 @@ public class WebFlowCredentials : AbstractCredentials {
 
             // CA cert slots
             for (var i = 0; i < this.client_ssl_ca_certificates.length; i++) {
-                start_delete_job (this.user + client_ca_certificate_pemC + string.number (i));
+                start_delete_job (this.user + CLIENT_CA_CERTIFICATE_PEM_C + string.number (i));
             }
 
         // FIXME MS@2019-12-07 -.

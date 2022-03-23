@@ -56,7 +56,7 @@ public class ValidateChecksumHeader : AbstractComputeChecksum {
     The device ownership transfers into the thread that
     will compute the checksum. It must not have a parent.
     ***********************************************************/
-    public void start_for_device (QIODevice device, string checksum_header) {
+    public void start_for_device (GLib.OutputStream device, string checksum_header) {
         var calculator = prepare_start (checksum_header);
         if (calculator) {
             calculator.on_signal_start (std.move (device));

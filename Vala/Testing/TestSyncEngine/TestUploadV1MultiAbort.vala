@@ -32,7 +32,7 @@ public class TestUploadV1MultiAbort : AbstractTestSyncEngine {
     }
 
 
-    private GLib.InputStream override_delegate (Soup.Operation operation, Soup.Request request, QIODevice device) {
+    private GLib.InputStream override_delegate (Soup.Operation operation, Soup.Request request, GLib.OutputStream device) {
         if (operation == Soup.PutOperation) {
             ++number_of_put;
             return new FakeHangingReply (operation, request, parent);

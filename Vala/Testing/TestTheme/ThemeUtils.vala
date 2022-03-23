@@ -8,7 +8,7 @@ namespace Testing {
 
 @copyright GPLv??? or later
 ***********************************************************/
-public class FakePaintDevice : QPaintDevice {
+public class FakePaintDevice : Gdk.Monitor {
 
     /***********************************************************
     ***********************************************************/
@@ -37,15 +37,15 @@ public class FakePaintDevice : QPaintDevice {
 
     /***********************************************************
     ***********************************************************/
-    protected int metric (QPaintDevice.PaintDeviceMetric metric) {
+    protected int metric (Gdk.Monitor.PaintDeviceMetric metric) {
         switch (metric) {
-        case QPaintDevice.PdmDevicePixelRatio:
+        case Gdk.Monitor.PdmDevicePixelRatio:
             if (this.hidpi) {
                 return 2;
             }
             return 1;
         default:
-            return QPaintDevice.metric (metric);
+            return Gdk.Monitor.metric (metric);
         }
     }
 

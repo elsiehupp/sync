@@ -75,7 +75,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
 
                 if (this.state == State.SIGNED_OUT) {
                     this.connection_status = ConnectionValidator.Status.UNDEFINED;
-                    this.connection_errors == "";
+                    this.connection_errors = new GLib.List<string> ();
                 } else if (old_state == State.SIGNED_OUT && this.state == State.DISCONNECTED) {
                     // If we stop being voluntarily signed-out, try to connect and
                     // auth right now!
@@ -84,7 +84,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
                     // Check if we are actually down for maintenance.
                     // To do this we must clear the connection validator that just
                     // produced the 503. It's on_signal_finished anyway and will delete itself.
-                    this.connection_validator == "";
+                    this.connection_validator = null;
                     on_signal_check_connectivity ();
                 }
                 if (old_state == State.CONNECTED || this.state == State.CONNECTED) {

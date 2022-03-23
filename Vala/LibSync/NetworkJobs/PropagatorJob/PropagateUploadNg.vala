@@ -206,7 +206,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         this.current_chunk_size = q_min (this.propagator.chunk_size, file_size - this.sent);
 
         if (this.current_chunk_size == 0) {
-            GLib.assert (this.jobs == ""); // There should be no running job anymore
+            GLib.assert (this.jobs.length () == 0); // There should be no running job anymore
             this.finished = true;
 
             // Finish with a MOVE
@@ -345,7 +345,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
                 this.jobs.append (delete_job);
                 delete_job.start ();
             }
-            this.server_chunks == "";
+            this.server_chunks = null;
             return;
         }
 
@@ -409,7 +409,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
             }
         }
 
-        if (this.jobs == "") {
+        if (this.jobs.length () == 0) {
             this.propagator.active_job_list.remove_one (this);
             if (this.remove_job_error) {
                 // There was an error removing some files, just start over
@@ -471,7 +471,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         // target duration for each chunk upload.
         var target_duration = this.propagator.sync_options.target_chunk_upload_duration;
         if (target_duration.length > 0) {
-            var upload_time = ++put_file_job.ms_since_start; // add one to avoid div-by-zero
+            var upload_time = ++put_file_job.microseconds_since_start; // add one to avoid div-by-zero
             int64 predicted_good_size = (this.current_chunk_size * target_duration) / upload_time;
 
             // The whole targeting is heuristic. The predicted_good_size will fluctuate

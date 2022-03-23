@@ -63,7 +63,7 @@ public abstract class AbstractUpdater : GLib.Object {
     ***********************************************************/
     public static GLib.Uri update_url {
         public get {
-            GLib.Uri update_base_url = GLib.Uri (qgetenv ("OCC_UPDATE_URL").to_string ());
+            GLib.Uri update_base_url = new GLib.Uri (qgetenv ("OCC_UPDATE_URL").to_string ());
             if (update_base_url == "") {
                 update_base_url = GLib.Uri (APPLICATION_UPDATE_URL);
             }

@@ -63,8 +63,8 @@ public class LocalDiscoveryTracker : GLib.Object {
     Call when a sync run starts that rediscovers all local files
     ***********************************************************/
     public void start_sync_full_discovery () {
-        this.local_discovery_paths == "";
-        this.previous_local_discovery_paths == "";
+        this.local_discovery_paths = new GLib.List<string> ();
+        this.previous_local_discovery_paths = new GLib.List<string> ();
         GLib.debug ("Full discovery");
     }
 
@@ -73,13 +73,13 @@ public class LocalDiscoveryTracker : GLib.Object {
     Call when a sync using local_discovery_paths () starts
     ***********************************************************/
     public void start_sync_partial_discovery () {
-        if (is_debug_enabled ()) {
-            GLib.List<string> paths = new GLib.List<string> ();
-            foreach (var path in this.local_discovery_paths) {
-                paths.append (path);
-            }
-            GLib.debug ("Partial discovery with paths: " + paths.to_string ());
-        }
+        //  if (is_debug_enabled ()) {
+        //      GLib.List<string> paths = new GLib.List<string> ();
+        //      foreach (var path in this.local_discovery_paths) {
+        //          paths.append (path);
+        //      }
+        //      GLib.debug ("Partial discovery with paths: " + paths.to_string ());
+        //  }
 
         this.previous_local_discovery_paths = this.local_discovery_paths;
         this.local_discovery_paths = null;
@@ -129,7 +129,7 @@ public class LocalDiscoveryTracker : GLib.Object {
                 this.previous_local_discovery_paths.begin (), this.previous_local_discovery_paths.end ());
             GLib.debug ("Sync failed; keeping last sync's local discovery path list.");
         }
-        this.previous_local_discovery_paths == "";
+        this.previous_local_discovery_paths = new GLib.List<string> ();
     }
 
 } // class LocalDiscoveryTracker

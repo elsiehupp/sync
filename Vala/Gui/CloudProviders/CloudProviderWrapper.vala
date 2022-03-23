@@ -373,7 +373,7 @@ public class CloudProviderWrapper : GLib.Object {
         GLib.Variant new_state;
 
         old_state = action.get_state ();
-        new_state = GLib.Variant.boolean (! (bool)g_variant_get_boolean (old_state));
+        new_state = new GLib.Variant.boolean (! (bool)g_variant_get_boolean (old_state));
         self.folder_connection.sync_paused = (bool)g_variant_get_boolean (new_state);
         action.set_state (new_state);
         g_variant_unref (old_state);

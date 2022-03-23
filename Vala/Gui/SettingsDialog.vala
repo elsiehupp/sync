@@ -111,7 +111,7 @@ public class SettingsDialog : Gtk.Dialog {
 
         this.instance.up_ui (this);
         this.tool_bar = new QToolBar ();
-        this.tool_bar.icon_size (QSize (32, 32));
+        this.tool_bar.icon_size (Gdk.Rectangle (32, 32));
         this.tool_bar.tool_button_style (Qt.Tool_button_text_under_icon);
         layout ().menu_bar (this.tool_bar);
 
@@ -462,10 +462,10 @@ public class SettingsDialog : Gtk.Dialog {
             host.append (string.number (port));
         }
         if (width > 0) {
-            QFont f;
-            QFontMetrics font_metrics = new QFontMetrics (f);
-            host = font_metrics.elided_text (host, Qt.Elide_middle, width);
-            user = font_metrics.elided_text (user, Qt.Elide_right, width);
+            Cairo.FontFace f;
+            Cairo.FontOptions font_options = new Cairo.FontOptions (f);
+            host = font_options.elided_text (host, Qt.Elide_middle, width);
+            user = font_options.elided_text (user, Qt.Elide_right, width);
         }
         return "%1\n%2".printf (user, host);
     }

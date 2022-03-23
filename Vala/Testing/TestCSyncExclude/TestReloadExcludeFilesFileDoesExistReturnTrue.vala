@@ -17,7 +17,7 @@ public class TestReloadExcludeFilesFileDoesExistReturnTrue : AbstractTestCSyncEx
         excluded_files.on_signal_reset (new ExcludedFiles (temporary_directory + "/"));
 
         const string sub_temp_dir = "exclude";
-        GLib.assert_true (GLib.Dir (temporary_directory).mkpath (sub_temp_dir));
+        GLib.assert_true (new GLib.Dir (temporary_directory).mkpath (sub_temp_dir));
 
         string existing_file_path = temporary_directory + "/" + sub_temp_dir + "/.sync-exclude.lst";
         GLib.File exclude_list = new GLib.File (existing_file_path);

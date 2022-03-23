@@ -443,7 +443,7 @@ public class ProcessDirectoryJob : GLib.Object {
         foreach (var e in this.server_normal_query_entries) {
             entries[e.name].server_entry = std.move (e);
         }
-        this.server_normal_query_entries == "";
+        this.server_normal_query_entries = new GLib.List<LocalInfo> ();
 
         // fetch all the name from the DB
         var path_u8 = this.current_folder.original.to_utf8 ();
@@ -492,7 +492,7 @@ public class ProcessDirectoryJob : GLib.Object {
                 }
             }
         }
-        this.local_normal_query_entries == "";
+        this.local_normal_query_entries = new GLib.List<LocalInfo> ();
 
         //
         // Iterate over entries and process them

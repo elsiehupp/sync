@@ -19,7 +19,7 @@ public class VfsSuffix : Common.AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
-    public Common.AbstractVfs.Mode mode () {
+    public Common.VfsMode mode () {
         return WithSuffix;
     }
 
@@ -195,7 +195,7 @@ public class VfsSuffix : Common.AbstractVfs {
 
     /***********************************************************
     ***********************************************************/
-    protected void start_impl (AbstractVfs.SetupParameters parameters) {
+    protected void start_impl (Common.SetupParameters parameters) {
         // It is unsafe for the database to contain any ".owncloud" file entries
         // that are not marked as a virtual file. These could be real .owncloud
         // files that were synced before vfs was enabled.

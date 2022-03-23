@@ -74,7 +74,7 @@ public class FakePutMultiFileReply : FakeReply {
     public virtual void respond ();
     void FakePutMultiFileReply.respond () {
         QJsonDocument reply;
-        QJsonObject all_file_info_reply;
+        Json.Object all_file_info_reply;
 
         int64 total_size = 0;
 
@@ -83,7 +83,7 @@ public class FakePutMultiFileReply : FakeReply {
         }
 
         foreach (var file_info in this.all_file_info) {
-            QJsonObject file_info_reply;
+            Json.Object file_info_reply;
             file_info_reply.insert ("error", "false");
             file_info_reply.insert ("OC-OperationStatus", file_info.operation_status);
             file_info_reply.insert ("X-File-Path", file_info.path);

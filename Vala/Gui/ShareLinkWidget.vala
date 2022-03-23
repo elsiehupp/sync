@@ -10,7 +10,7 @@
 //  #include <GLib.FileInfo>
 //  #include <QDesktopServices>
 //  #include <Gtk.MessageBox>
-//  #include <QMenu>
+//  #include <GLib.Menu>
 //  #include <QText_edit>
 //  #include <QToolButton>
 //  #include <QPropertyAnimation>
@@ -45,7 +45,7 @@ public class ShareLinkWidget : Gtk.Widget {
     private bool names_supported;
     private bool note_required;
 
-    private QMenu link_context_menu;
+    private GLib.Menu link_context_menu;
     private QAction read_only_link_action;
     private QAction allow_editing_link_action;
     private QAction allow_upload_editing_link_action;
@@ -195,7 +195,7 @@ public class ShareLinkWidget : Gtk.Widget {
         var permissions_group = new GLib.ActionGroup (this);
 
         // Prepare sharing menu
-        this.link_context_menu = new QMenu (this);
+        this.link_context_menu = new GLib.Menu (this);
 
         // radio button style
         permissions_group.exclusive (true);
@@ -381,11 +381,10 @@ public class ShareLinkWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_delete_share_fetched ();
-    void ShareLinkWidget.on_signal_delete_share_fetched () {
+    public void on_signal_delete_share_fetched () {
         on_signal_toggle_share_link_animation (false);
 
-        this.link_share == "";
+        this.link_share = null;
         toggle_password_options (false);
         toggle_note_options (false);
         toggle_expire_date_options (false);

@@ -52,7 +52,7 @@ public class ProppatchJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     public new void start () {
-        if (this.properties == "") {
+        if (this.properties.length == 0) {
             GLib.warning ("Proppatch with no properties!");
         }
         Soup.Request request = new Soup.Request ();

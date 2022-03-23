@@ -254,7 +254,7 @@ public class KMessageWidget : Gdk.Frame {
     /***********************************************************
     Returns the preferred size of the message widget.
     ***********************************************************/
-    public override QSize size_hint () {
+    public override Gdk.Rectangle size_hint () {
         ensure_polished ();
         return d.content.size_hint ();
     }
@@ -263,7 +263,7 @@ public class KMessageWidget : Gdk.Frame {
     /***********************************************************
     Returns the minimum size of the message widget.
     ***********************************************************/
-    public override QSize minimum_size_hint () {
+    public override Gdk.Rectangle minimum_size_hint () {
         ensure_polished ();
         return d.content.minimum_size_hint ();
     }

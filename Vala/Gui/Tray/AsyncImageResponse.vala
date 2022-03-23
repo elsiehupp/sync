@@ -17,10 +17,10 @@ public class AsyncImageResponse : QQuickImageResponse {
 
     Gtk.Image image;
     GLib.List<string> image_paths;
-    QSize requested_image_size;
+    Gdk.Rectangle requested_image_size;
     int index = 0;
 
-    public AsyncImageResponse (string identifier, QSize requested_size) {
+    public AsyncImageResponse (string identifier, Gdk.Rectangle requested_size) {
         if (identifier == "") {
             image_and_emit_finished ();
             return;

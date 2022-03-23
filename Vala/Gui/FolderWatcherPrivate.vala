@@ -117,7 +117,7 @@ public class FolderWatcherPrivate : GLib.Object {
             this.parent.on_signal_change_detected (p);
 
             if ( (event.mask & (IN_MOVED_TO | IN_CREATE))
-                && GLib.FileInfo (p).is_dir ()
+                && new GLib.FileInfo (p).is_dir ()
                 && !this.parent.path_is_ignored (p)) {
                 on_signal_add_folder_recursive (p);
             }
@@ -141,7 +141,7 @@ public class FolderWatcherPrivate : GLib.Object {
         inotify_register_path (in_path.absolute_path);
 
         GLib.List<string> all_subfolders;
-        if (!find_folders_below (GLib.Dir (path), all_subfolders)) {
+        if (!find_folders_below (new GLib.Dir (path), all_subfolders)) {
             GLib.warning ("Could not traverse all subfolders.");
         }
         var subfolders_it = new QStringListIterator (all_subfolders);

@@ -53,7 +53,7 @@ public class StreamingDecryptor : GLib.Object {
         }
     }
 
-    public string chunk_decryption (char input, uint64 chunk_size) {
+    public string chunk_decryption (GLib.InputStream input_stream, uint64 chunk_size) {
         string byte_array;
         Soup.Buffer buffer = new Soup.Buffer (byte_array);
         buffer.open (QIODevice.WriteOnly);
@@ -70,9 +70,9 @@ public class StreamingDecryptor : GLib.Object {
             return "";
         }
 
-        GLib.assert (input);
-        if (input == null) {
-            GLib.critical ("Decryption failed. Incorrect input!");
+        GLib.assert (input_stream);
+        if (input_stream == null) {
+            GLib.critical ("Decryption failed. Incorrect input_stream!");
             return "";
         }
 
@@ -106,7 +106,7 @@ public class StreamingDecryptor : GLib.Object {
         // either the size is more than 0 and an e2Ee_tag is at the end of chunk, or, chunk is the e2Ee_tag itself
         GLib.assert (size > 0 || chunk_size == Constants.E2EE_TAG_SIZE);
         if (size <= 0 && chunk_size != Constants.E2EE_TAG_SIZE) {
-            GLib.critical ("Decryption failed. Invalid input size: " + size + " !");
+            GLib.critical ("Decryption failed. Invalid input_stream size: " + size + " !");
             return "";
         }
 
@@ -117,10 +117,10 @@ public class StreamingDecryptor : GLib.Object {
 
         while (input_pos < size) {
             // read BLOCK_SIZE or less bytes
-            string encrypted_block = new string (input + input_pos, q_min (size - input_pos, BLOCK_SIZE));
+            string encrypted_block = new string (input_stream + input_pos, q_min (size - input_pos, BLOCK_SIZE));
 
             if (encrypted_block.size () == 0) {
-                GLib.critical ("Could not read data from the input buffer.");
+                GLib.critical ("Could not read data from the input_stream buffer.");
                 return "";
             }
 
@@ -141,7 +141,7 @@ public class StreamingDecryptor : GLib.Object {
 
             bytes_written += written_to_output;
 
-            // advance input position for further read
+            // advance input_stream position for further read
             input_pos += encrypted_block.size ();
 
             this.decrypted_so_far += encrypted_block.size ();
@@ -158,7 +158,7 @@ public class StreamingDecryptor : GLib.Object {
 
             int out_len = 0;
 
-            string e2Ee_tag = new string (input + input_pos, Constants.E2EE_TAG_SIZE);
+            string e2Ee_tag = new string (input_stream + input_pos, Constants.E2EE_TAG_SIZE);
 
             // Set expected e2Ee_tag value. Works in OpenSSL 1.0.1d and later
             if (!EVP_CIPHER_CTX_ctrl (this.context, EVP_CTRL_GCM_SET_TAG, e2Ee_tag.size (), reinterpret_cast<uchar> (e2Ee_tag))) {

@@ -17,7 +17,7 @@
 //  #endif
 
 //  #include <QTranslator>
-//  #include <QMenu>
+//  #include <GLib.Menu>
 //  #include <Gtk.MessageBox>
 //  #include <QDesktopServices>
 //  #include <Gtk.Application>
@@ -211,7 +211,7 @@ public class Application : Gtk.Application {
             }
             //  QT_WARNING_POP
             application_name (this.theme.app_name);
-            if (GLib.FileInfo (old_dir).is_dir ()) {
+            if (new GLib.FileInfo (old_dir).is_dir ()) {
                 var configuration_directory = ConfigFile ().config_path;
                 if (configuration_directory.has_suffix ("/")) {
                     // macOS 10.11.x does not like trailing slash for rename/move.
@@ -219,11 +219,11 @@ public class Application : Gtk.Application {
                 }
                 GLib.info ("Migrating old config from " + old_dir + " to " + configuration_directory);
 
-                if (!GLib.File.rename (old_dir, configuration_directory)) {
+                if (!new GLib.File.rename (old_dir, configuration_directory)) {
                     GLib.warning ("Failed to move the old config directory to its new location (" + old_dir + " to " + configuration_directory + ")");
 
                     // Try to move the files one by one
-                    if (GLib.FileInfo (configuration_directory).is_dir () || GLib.Dir ().mkdir (configuration_directory)) {
+                    if (new GLib.FileInfo (configuration_directory).is_dir () || new GLib.Dir ().mkdir (configuration_directory)) {
                         const GLib.List<string> files_list = GLib.Dir (old_dir).entry_list (GLib.Dir.Files);
                         GLib.info ("Will move the individual files " + files_list);
                         foreach (var name in files_list) {
@@ -686,7 +686,7 @@ public class Application : Gtk.Application {
     ***********************************************************/
     protected void setup_logging () {
         // might be called from second instance
-        var logger = Logger.instance;
+        var logger = LibSync.Logger.instance;
         logger.log_file (this.log_file);
         if (this.log_file == "") {
             logger.log_dir (this.log_dir == "" ? ConfigFile ().log_dir () : this.log_dir);

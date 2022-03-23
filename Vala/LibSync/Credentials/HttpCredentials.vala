@@ -349,10 +349,10 @@ public class HttpCredentials : AbstractCredentials {
         simple_network_job.signal_finished.connect (
             (input_stream) => {
                 var json_data = input_stream.read_all ();
-                QJsonParseError json_parse_error;
-                QJsonObject json = QJsonDocument.from_json (json_data, json_parse_error).object ();
+                Json.ParserError json_parse_error;
+                Json.Object json = QJsonDocument.from_json (json_data, json_parse_error).object ();
                 string access_token = json["access_token"].to_string ();
-                if (json_parse_error.error != QJsonParseError.NoError || json == "") {
+                if (json_parse_error.error != Json.ParserError.NoError || json == "") {
                     // Invalid or empty JSON : Network error maybe?
                     GLib.warning ("Error while refreshing the token " + input_stream.error_string + json_data + json_parse_error.error_string);
                 } else if (access_token == "") {

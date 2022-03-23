@@ -28,7 +28,7 @@ public class AccessManager : Soup.Session {
 
     /***********************************************************
     ***********************************************************/
-    protected GLib.InputStream create_request (Soup.Session.Operation operation, Soup.Request request, QIODevice outgoing_data = null) {
+    protected GLib.InputStream create_request (Soup.Session.Operation operation, Soup.Request request, GLib.OutputStream outgoing_data = null) {
         Soup.Request new_request = new Soup.Request (request);
 
         // Respect request specific user agent if any

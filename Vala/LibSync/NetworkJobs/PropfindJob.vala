@@ -30,7 +30,7 @@ public class PropfindJob : AbstractNetworkJob {
     public GLib.List<string> properties;
 
     internal signal void signal_result (GLib.HashTable<string, GLib.Variant> values);
-    internal signal void signal_finished_with_error (GLib.InputStream reply = null);
+    internal signal void signal_finished_with_error (GLib.InputStream reply);
 
     /***********************************************************
     ***********************************************************/
@@ -44,7 +44,7 @@ public class PropfindJob : AbstractNetworkJob {
     public new void start () {
         GLib.List<string> properties = this.properties;
 
-        if (properties == "") {
+        if (properties.length () == 0) {
             GLib.warning ("Propfind with no properties!");
         }
         Soup.Request request = new Soup.Request ();
@@ -97,7 +97,7 @@ public class PropfindJob : AbstractNetworkJob {
             while (!reader.at_end ()) {
                 QXmlStreamReader.TokenType type = reader.read_next ();
                 if (type == QXmlStreamReader.StartElement) {
-                    if (current_element != "" && current_element.top () == "prop") {
+                    if (current_element.length () > 0 && current_element.top () == "prop") {
                         items.insert (reader.name ().to_string (), reader.read_element_text (QXmlStreamReader.SkipChildElements));
                     } else {
                         current_element.push (reader.name ().to_string ());

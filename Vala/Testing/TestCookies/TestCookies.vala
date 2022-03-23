@@ -28,7 +28,7 @@ public class TestCookies : GLib.Object {
         CookieJar jar2;
         GLib.assert_true (jar2.restore (nonexisting_path));
         // here we should have  only cookie_a as the second one was a session cookie
-        GLib.assert_true (GLib.List<QNetworkCookie> (cookie_a) == jar2.all_cookies ());
+        GLib.assert_true (new GLib.List<QNetworkCookie> (cookie_a) == jar2.all_cookies ());
 
     }
 

@@ -74,7 +74,7 @@ public abstract class AbstractTestOAuth : GLib.Object {
     }
 
 
-    protected GLib.InputStream oauth_test_case_override (Soup.Operation operation, Soup.Request request, QIODevice device) {
+    protected GLib.InputStream oauth_test_case_override (Soup.Operation operation, Soup.Request request, GLib.OutputStream device) {
         //  ASSERT (device);
         //  ASSERT (device.bytes_available ()>0); // OAuth2 always sends around POST data.
         return this.token_reply (operation, request);
@@ -94,7 +94,7 @@ public abstract class AbstractTestOAuth : GLib.Object {
         GLib.Uri redirect_uri = new GLib.Uri (query.query_item_value ("redirect_uri"));
         GLib.assert_true (redirect_uri.host () == "localhost");
         redirect_uri.set_query ("code=" + code);
-        create_browser_reply (Soup.Request (redirect_uri));
+        create_browser_reply (new Soup.Request (redirect_uri));
     }
 
 
@@ -136,7 +136,7 @@ public abstract class AbstractTestOAuth : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected virtual string token_reply_payload () {
-        QJsonDocument jsondata = new QJsonObject (
+        QJsonDocument jsondata = new Json.Object (
             { "access_token", "123" },
             { "refresh_token" , "456" },
             { "message_url",  "owncloud://on_signal_success"},

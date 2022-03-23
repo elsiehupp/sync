@@ -53,7 +53,7 @@ public class UserAppsModel : QAbstractListModel {
     public void build_app_list () {
         if (row_count () > 0) {
             begin_remove_rows (QModelIndex (), 0, row_count () - 1);
-            this.apps == "";
+            this.apps = null;
             end_remove_rows ();
         }
 

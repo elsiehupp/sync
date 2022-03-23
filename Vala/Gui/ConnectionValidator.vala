@@ -5,7 +5,7 @@
 ***********************************************************/
 
 //  #include <QJsonDocument>
-//  #include <QJsonObject>
+//  #include <Json.Object>
 //  #include <QJsonArray>
 //  #include <QNetworkProxyFacto
 //  #include <QXmlStreamReader>
@@ -53,7 +53,7 @@ Here follows the state machine
   +---------------------------+
   |
   +. check_server_capabilities --------------v (in parallel)
-        JsonApiJob (cloud/capabilities)
+        LibSync.JsonApiJob (cloud/capabilities)
         +. on_signal_capabilities_recieved -+
                                       |
     +---------------------------------+
@@ -239,7 +239,7 @@ public class ConnectionValidator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_status_found (GLib.Uri url, QJsonObject info) {
+    protected void on_signal_status_found (GLib.Uri url, Json.Object info) {
         // Newer servers don't disclose any version in status.php anymore
         // https://github.com/owncloud/core/pull/27473/files
         // so this string can be empty.
@@ -264,8 +264,8 @@ public class ConnectionValidator : GLib.Object {
 
         // Check for maintenance mode : Servers send "true", so go through GLib.Variant
         // to parse it correctly.
-        if (info["maintenance"].to_variant ().to_bool ()) {
-            report_result (MaintenanceMode);
+        if (info.get_boolean_member ("maintenance")) {
+            report_result (AccountState.State.MAINTENANCE_MODE);
             return;
         }
 
@@ -321,17 +321,15 @@ public class ConnectionValidator : GLib.Object {
         } else if (reply.error == GLib.InputStream.AuthenticationRequiredError
             || !this.account.credentials ().still_valid (reply)) {
             GLib.warning ("******** Password is wrong! " + reply.error + propfind_job.error_string);
-            this.errors + _("The provided credentials are not correct");
+            this.errors.append ( _("The provided credentials are not correct"));
             stat = Status.CREDENTIALS_WRONG;
 
         } else if (reply.error != GLib.InputStream.NoError) {
             this.errors + propfind_job.error_string_parsing_body ();
 
-            const int http_status =
-                reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
-            if (http_status == 503) {
-                this.errors == "";
-                stat = ServiceUnavailable;
+            if (reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int () == 503) {
+                this.errors = new GLib.List<string> ();
+                stat = AccountState.State.SERVICE_UNAVAILABLE;
             }
         }
 
@@ -342,7 +340,7 @@ public class ConnectionValidator : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_auth_success () {
-        this.errors == "";
+        this.errors = null;
         if (!this.is_checking_server_and_auth) {
             report_result (Status.CONNECTED);
             return;
@@ -366,7 +364,7 @@ public class ConnectionValidator : GLib.Object {
         }
 
         // Check for the direct_editing capability
-        GLib.Uri direct_editing_url = GLib.Uri (capabilities["files"].to_object ()["direct_editing"].to_object ()["url"].to_string ());
+        GLib.Uri direct_editing_url = new GLib.Uri (capabilities["files"].to_object ()["direct_editing"].to_object ()["url"].to_string ());
         string direct_editing_e_tag = capabilities["files"].to_object ()["direct_editing"].to_object ()["etag"].to_string ();
         this.account.fetch_direct_editors (direct_editing_url, direct_editing_e_tag);
 
@@ -414,9 +412,9 @@ public class ConnectionValidator : GLib.Object {
     ***********************************************************/
     private void check_server_capabilities () {
         // The main flow now needs the capabilities
-        var json_api_job = new JsonApiJob (this.account, "ocs/v1.php/cloud/capabilities", this);
+        var json_api_job = new LibSync.JsonApiJob (this.account, "ocs/v1.php/cloud/capabilities", this);
         json_api_job.on_signal_timeout (TIMEOUT_TO_USE_MILLISECONDS);
-        json_api_job.json_received.connect (
+        json_api_job.signal_json_received.connect (
             this.on_signal_capabilities_recieved
         );
         json_api_job.on_signal_start ();

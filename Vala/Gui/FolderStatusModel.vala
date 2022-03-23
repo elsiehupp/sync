@@ -343,7 +343,7 @@ public class FolderStatusModel : QAbstractItemModel {
             }
             case Qt.Foreground_role:
                 if (x.is_undecided) {
-                    return Gtk.Color (Qt.red);
+                    return Gdk.RGBA (Qt.red);
                 }
                 break;
             case FILE_ID_ROLE:
@@ -396,7 +396,7 @@ public class FolderStatusModel : QAbstractItemModel {
         case DataRole.FOLDER_ERROR_MESSAGE:
             return folder_connection.sync_result.error_strings ();
         case DataRole.FOLDER_INFO_MESSAGE:
-            return folder_connection.virtual_files_enabled () && folder_connection.vfs ().mode () != AbstractVfs.Mode.WindowsCfApi
+            return folder_connection.virtual_files_enabled () && folder_connection.vfs ().mode () != VfsMode.WindowsCfApi
                 ? { (_("Virtual file support is enabled."))}
                 : { };
         case DataRole.SYNC_RUNNING:
@@ -664,12 +664,13 @@ public class FolderStatusModel : QAbstractItemModel {
 
         var lscol_job = new LscolJob (this.account_state.account, path, this);
         info.fetching_job = lscol_job;
-        var props = GLib.List<string> ("resourcetype"
-                                              + "http://owncloud.org/ns:size"
-                                              + "http://owncloud.org/ns:permissions"
-                                              + "http://owncloud.org/ns:fileid");
+        var props = new GLib.List<string> ();
+        props.append ("resourcetype");
+        props.append ("http://owncloud.org/ns:size");
+        props.append ("http://owncloud.org/ns:permissions");
+        props.append ("http://owncloud.org/ns:fileid");
         if (this.account_state.account.capabilities.client_side_encryption_available ()) {
-            props += "http://nextcloud.org/ns:is-encrypted";
+            props.append ("http://nextcloud.org/ns:is-encrypted");
         }
         lscol_job.properties (props);
 

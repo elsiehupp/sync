@@ -250,7 +250,7 @@ public class Capabilities : GLib.Object {
     ***********************************************************/
     public GLib.Uri push_notifications_web_socket_url () {
         var websocket = this.capabilities["notify_push"].to_map ()["endpoints"].to_map ()["websocket"].to_string ();
-        return GLib.Uri (websocket);
+        return new GLib.Uri (websocket);
     }
 
 

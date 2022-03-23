@@ -147,16 +147,17 @@ public class ConflictDialog : Gtk.Dialog {
                     this.instance.local_version_button);
 
         string remote_version = this.solver.remote_version_filename;
-        update_group (remote_version,
-                    this.instance.remote_version_link,
-                    _("Open server version"),
-                    this.instance.remote_version_mtime,
-                    this.instance.remote_version_size,
-                    this.instance.remote_version_button
-                );
+        update_group (
+            remote_version,
+            this.instance.remote_version_link,
+            _("Open server version"),
+            this.instance.remote_version_mtime,
+            this.instance.remote_version_size,
+            this.instance.remote_version_button
+        );
 
-        const Time local_mtime = GLib.FileInfo (local_version).last_modified ();
-        const Time remote_mtime = GLib.FileInfo (remote_version).last_modified ();
+        const Time local_mtime = new GLib.FileInfo (local_version).last_modified ();
+        const Time remote_mtime = new GLib.FileInfo (remote_version).last_modified ();
 
         bold_font (this.instance.local_version_mtime, local_mtime > remote_mtime);
         bold_font (this.instance.remote_version_mtime, remote_mtime > local_mtime);

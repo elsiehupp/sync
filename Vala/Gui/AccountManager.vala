@@ -64,7 +64,7 @@ public class AccountManager : GLib.Object {
     ***********************************************************/
     public void save (bool save_credentials = true) {
         var settings = ConfigFile.settings_with_group (ACCOUNTS_C);
-        settings.value (VERSION_C, MAX_ACCOUNTS_VERSION);
+        settings.get_value (VERSION_C, MAX_ACCOUNTS_VERSION);
         foreach (var acc in this.accounts) {
             settings.begin_group (acc.account.identifier);
             save_account_helper (acc.account, *settings, save_credentials);
@@ -157,7 +157,7 @@ public class AccountManager : GLib.Object {
     ***********************************************************/
     public void on_signal_shutdown () {
         var accounts_copy = this.accounts;
-        this.accounts == new GLib.List<string> ();
+        this.accounts == new GLib.List<unowned AccountState> ();
         foreach (var acc in accounts_copy) {
             /* emit */ signal_account_removed (acc);
             /* emit */ signal_remove_account_folders (acc);
@@ -228,11 +228,11 @@ public class AccountManager : GLib.Object {
     ***********************************************************/
     public static void backward_migration_settings_keys (GLib.List<string> delete_keys, GLib.List<string> ignore_keys) {
         var settings = ConfigFile.settings_with_group (ACCOUNTS_C);
-        int accounts_version = settings.value (VERSION_C).to_int ();
+        int accounts_version = settings.get_value (VERSION_C).to_int ();
         if (accounts_version <= MAX_ACCOUNTS_VERSION) {
             foreach (var account_id in settings.child_groups ()) {
                 settings.begin_group (account_id);
-                int account_version = settings.value (VERSION_C, 1).to_int ();
+                int account_version = settings.get_value (VERSION_C, 1).to_int ();
                 if (account_version > MAX_ACCOUNT_VERSION) {
                     ignore_keys.append (settings.group ());
                 }
@@ -248,10 +248,10 @@ public class AccountManager : GLib.Object {
     ***********************************************************/
     // saving and loading Account to settings
     private void save_account_helper (Account account, GLib.Settings settings, bool save_credentials = true) {
-        settings.value (VERSION_C, MAX_ACCOUNT_VERSION);
-        settings.value (URL_C, acc.url.to_string ());
-        settings.value (DAV_USER_C, acc.dav_user);
-        settings.value (SERVER_VERSION_C, acc.server_version);
+        settings.get_value (VERSION_C, MAX_ACCOUNT_VERSION);
+        settings.get_value (URL_C, acc.url.to_string ());
+        settings.get_value (DAV_USER_C, acc.dav_user);
+        settings.get_value (SERVER_VERSION_C, acc.server_version);
         if (acc.credentials) {
             if (save_credentials) {
                 // Only persist the credentials if the parameter is set, on migration from 1.8.x
@@ -261,13 +261,13 @@ public class AccountManager : GLib.Object {
                 acc.credentials.persist ();
             }
             foreach (var key in acc.settings_map.keys ()) {
-                settings.value (key, acc.settings_map.value (key));
+                settings.get_value (key, acc.settings_map.get_value (key));
             }
-            settings.value (AUTH_TYPE_C, acc.credentials.auth_type ());
+            settings.get_value (AUTH_TYPE_C, acc.credentials.auth_type ());
 
             // HACK : Save http_user also as user
             if (acc.settings_map.contains (HTTP_USER_C))
-                settings.value (USER_C, acc.settings_map.value (HTTP_USER_C));
+                settings.get_value (USER_C, acc.settings_map.get_value (HTTP_USER_C));
         }
 
         // Save accepted certificates.
@@ -278,7 +278,7 @@ public class AccountManager : GLib.Object {
             certificates += cert.to_pem () + "\n";
         }
         if (certificates != "") {
-            settings.value (CA_CERTS_KEY_C, certificates);
+            settings.get_value (CA_CERTS_KEY_C, certificates);
         }
         settings.end_group ();
 
@@ -298,7 +298,7 @@ public class AccountManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private unowned Account load_account_helper (GLib.Settings settings) {
-        var url_config = settings.value (URL_C);
+        var url_config = settings.get_value (URL_C);
         if (!url_config.is_valid) {
             // No URL probably means a corrupted entry in the account settings
             GLib.warning ("No URL for account " + settings.group ());
@@ -307,7 +307,7 @@ public class AccountManager : GLib.Object {
 
         var acc = create_account ();
 
-        string auth_type = settings.value (AUTH_TYPE_C).to_string ();
+        string auth_type = settings.get_value (AUTH_TYPE_C).to_string ();
 
         // There was an account-type saving bug when 'skip folder config' was used
         // See #5408. This attempts to fix up the "dummy" auth_type
@@ -333,37 +333,37 @@ public class AccountManager : GLib.Object {
         // Migrate to webflow
         if (auth_type == "http") {
             auth_type = "webflow";
-            settings.value (AUTH_TYPE_C, auth_type);
+            settings.get_value (AUTH_TYPE_C, auth_type);
 
             foreach (string key in settings.child_keys ()) {
                 if (!key.has_prefix ("http_")) {
                     continue;
                 }
                 var newkey = "webflow_".append (key.mid (5));
-                settings.value (newkey, settings.value ( (key)));
+                settings.get_value (newkey, settings.get_value ( (key)));
                 settings.remove (key);
             }
         }
 
         GLib.info ("Account for " + acc.url + " using auth type " + auth_type);
 
-        acc.server_version = settings.value (SERVER_VERSION_C).to_string ();
-        acc.dav_user = settings.value (DAV_USER_C, "").to_string ();
+        acc.server_version = settings.get_value (SERVER_VERSION_C).to_string ();
+        acc.dav_user = settings.get_value (DAV_USER_C, "").to_string ();
 
         // We want to only restore settings for that auth type and the user value
-        acc.settings_map.insert (USER_C, settings.value (USER_C));
+        acc.settings_map.insert (USER_C, settings.get_value (USER_C));
         string auth_type_prefix = auth_type + "this.";
         foreach (var key in settings.child_keys ()) {
             if (!key.has_prefix (auth_type_prefix))
                 continue;
-            acc.settings_map.insert (key, settings.value (key));
+            acc.settings_map.insert (key, settings.get_value (key));
         }
 
         acc.credentials (CredentialsFactory.create (auth_type));
 
         // now the server cert, it is in the general group
         settings.begin_group ("General");
-        const var certificates = QSslCertificate.from_data (settings.value (CA_CERTS_KEY_C).to_byte_array ());
+        const var certificates = QSslCertificate.from_data (settings.get_value (CA_CERTS_KEY_C).to_byte_array ());
         GLib.info ("Restored: " + certificates.length + " unknown certificates.");
         acc.approved_certificates (certificates);
         settings.end_group ();
@@ -404,7 +404,7 @@ public class AccountManager : GLib.Object {
                     if (override_url.has_suffix ("/")) {
                         override_url.chop (1);
                     }
-                    string oc_url = oc_settings.value (URL_C).to_string ();
+                    string oc_url = oc_settings.get_value (URL_C).to_string ();
                     if (oc_url.has_suffix ("/")) {
                         oc_url.chop (1);
                     }

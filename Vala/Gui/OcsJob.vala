@@ -6,7 +6,7 @@
 
 //  #include <GLib.OutputStream>
 //  #include <QJsonDocument>
-//  #include <QJsonObject>
+//  #include <Json.Object>
 //  #include <QPair>
 
 namespace Occ {
@@ -194,13 +194,13 @@ public class OcsJob : AbstractNetworkJob {
     private override bool on_signal_finished () {
         const string reply_data = this.reply.read_all ();
 
-        QJsonParseError error;
+        Json.ParserError error;
         string message;
         int status_code = 0;
         var json = QJsonDocument.from_json (reply_data, error);
 
         // when it is null we might have a 304 so get status code from this.reply and gives a warning...
-        if (error.error != QJsonParseError.NoError) {
+        if (error.error != Json.ParserError.NoError) {
             status_code = this.reply.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             GLib.warning ("Could not parse reply to "
                         + this.verb

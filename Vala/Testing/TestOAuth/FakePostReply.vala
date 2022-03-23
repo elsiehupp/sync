@@ -11,7 +11,7 @@ public class FakePostReply : GLib.InputStream {
 
     /***********************************************************
     ***********************************************************/
-    public QIODevice payload;
+    public GLib.OutputStream payload;
     public bool aborted = false;
     public bool redirect_to_policy = false;
     public bool redirect_to_token = false;
@@ -19,7 +19,7 @@ public class FakePostReply : GLib.InputStream {
     /***********************************************************
     ***********************************************************/
     public FakePostReply (Soup.Operation operation, Soup.Request request,
-        QIODevice payload_, GLib.Object parent) {
+        GLib.OutputStream payload_, GLib.Object parent) {
         base (parent);
         payload = std.move (payload_);
         set_request (request);
@@ -46,7 +46,7 @@ public class FakePostReply : GLib.InputStream {
             return;
         } else if (redirect_to_token) {
             // Redirect to self
-            GLib.Variant destination = GLib.Variant (s_oauth_test_server.to_string () + "/index.php/apps/oauth2/api/v1/token");
+            GLib.Variant destination = new GLib.Variant (s_oauth_test_server.to_string () + "/index.php/apps/oauth2/api/v1/token");
             set_header (Soup.Request.LocationHeader, destination);
             set_attribute (Soup.Request.RedirectionTargetAttribute, destination);
             set_attribute (Soup.Request.HttpStatusCodeAttribute, 307); // 307 explicitly in rfc says to not lose POST data

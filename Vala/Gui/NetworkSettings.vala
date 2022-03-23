@@ -128,8 +128,8 @@ public class NetworkSettings : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public override QSize size_hint () {
-        return new QSize (
+    public override Gdk.Rectangle size_hint () {
+        return Gdk.Rectangle (
             OwncloudGui.settings_dialog_size ().width (),
             Gtk.Widget.size_hint ().height ()
         );

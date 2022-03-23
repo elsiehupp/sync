@@ -44,7 +44,7 @@ public class SocketUploadJob : GLib.Object {
         const var accname = socket_api_v2_job.arguments ()["account"]["name"].to_string ();
         var account = AccountManager.instance.account (accname);
 
-        if (!GLib.FileInfo (this.local_path).is_absolute ()) {
+        if (!new GLib.FileInfo (this.local_path).is_absolute ()) {
             socket_api_v2_job.failure ("Local path must be a an absolute path");
             return;
         }

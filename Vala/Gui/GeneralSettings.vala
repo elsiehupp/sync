@@ -56,12 +56,12 @@ public class GeneralSettings : Gtk.Widget {
         }
 
         public static GLib.List<ZipEntry> create_file_list () {
-            var list = GLib.List<ZipEntry> ();
+            var list = new GLib.List<ZipEntry> ();
             ConfigFile config;
 
-            list.append (file_info_to_zip_entry (GLib.FileInfo (config.config_file ())));
+            list.append (file_info_to_zip_entry (new GLib.FileInfo (config.config_file ())));
 
-            const var logger = Logger.instance;
+            const var logger = LibSync.Logger.instance;
 
             if (!logger.log_dir () == "") {
                 list.append ({"", "logs"});
@@ -72,7 +72,7 @@ public class GeneralSettings : Gtk.Widget {
                             std.back_inserter (list),
                             file_info_to_log_zip_entry);
             } else if (!logger.log_file () == "") {
-                list.append (file_info_to_zip_entry (GLib.FileInfo (logger.log_file ())));
+                list.append (file_info_to_zip_entry (new GLib.FileInfo (logger.log_file ())));
             }
 
             const var folders = FolderManager.instance.map ().values ();
@@ -225,8 +225,8 @@ public class GeneralSettings : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    public override QSize size_hint () {
-        return new QSize (
+    public override Gdk.Rectangle size_hint () {
+        return Gdk.Rectangle (
             OwncloudGui.settings_dialog_size ().width (),
             Gtk.Widget.size_hint ().height ()
         );
@@ -434,7 +434,7 @@ public class GeneralSettings : Gtk.Widget {
     #if defined (BUILD_UPDATER)
     ***********************************************************/
     private void on_signal_update_state_label_link_activated (string link) {
-        OpenExternal.open_browser (GLib.Uri (link));
+        OpenExternal.open_browser (new GLib.Uri (link));
     }
 
 

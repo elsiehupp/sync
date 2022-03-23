@@ -43,14 +43,14 @@ public class PropagateLocalRemove : AbstractPropagateItemJob {
 
         string remove_error;
         if (this.move_to_trash) {
-            if ( (GLib.Dir (filename).exists () || FileSystem.file_exists (filename))
+            if ( (new GLib.Dir (filename).exists () || FileSystem.file_exists (filename))
                 && !FileSystem.move_to_trash (filename, remove_error)) {
                 on_signal_done (SyncFileItem.Status.NORMAL_ERROR, remove_error);
                 return;
             }
         } else {
             if (this.item.is_directory ()) {
-                if (GLib.Dir (filename).exists () && !remove_recursively ("")) {
+                if (new GLib.Dir (filename).exists () && !remove_recursively ("")) {
                     on_signal_done (SyncFileItem.Status.NORMAL_ERROR, this.error);
                     return;
                 }

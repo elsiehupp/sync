@@ -40,8 +40,8 @@ public class FakeFolder : GLib.Object {
         this.local_modifier = this.temporary_directory.path;
         // Needs to be done once
         SyncEngine.minimum_file_age_for_upload = std.chrono.milliseconds (0);
-        Logger.instance.set_log_file ("-");
-        Logger.instance.add_log_rule ({ "sync.httplogger=true" });
+        LibSync.Logger.instance.set_log_file ("-");
+        LibSync.Logger.instance.add_log_rule ({ "sync.httplogger=true" });
 
         GLib.Dir root_directory = new GLib.Dir (this.temporary_directory.path);
         GLib.debug ("FakeFolder operating on " + root_directory);
@@ -106,7 +106,7 @@ public class FakeFolder : GLib.Object {
         opts.vfs = vfs;
         this.sync_engine.set_sync_options (opts);
 
-        AbstractVfs.SetupParameters vfs_params;
+        Common.SetupParameters vfs_params;
         vfs_params.filesystem_path = local_path;
         vfs_params.remote_path = "/";
         vfs_params.account = this.account;
@@ -192,7 +192,7 @@ public class FakeFolder : GLib.Object {
 
 
     private void database_record_filter (SyncJournalFileRecord record) {
-        var components = PathComponents (record.path);
+        var components = new PathComponents (record.path);
         var parent_directory = find_or_create_directories (result, components.parent_directory_components ());
         var name = components.filename ();
         var item = parent_directory.children[name];
@@ -222,12 +222,12 @@ public class FakeFolder : GLib.Object {
         this.fake_access_manager.set_override(access_manager_override);
     }
 
-    delegate QJsonObject ReplyFunction (GLib.HashTable<string, string> map);
+    delegate Json.Object ReplyFunction (GLib.HashTable<string, string> map);
 
     /***********************************************************
     ***********************************************************/
-    public QJsonObject for_each_reply_part (
-        QIODevice outgoing_data,
+    public Json.Object for_each_reply_part (
+        GLib.OutputStream outgoing_data,
         string content_type,
         ReplyFunction reply_function) {
         return this.fake_access_manager.for_each_reply_part (outgoing_data, content_type, reply_function);

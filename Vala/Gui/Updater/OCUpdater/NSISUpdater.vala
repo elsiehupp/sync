@@ -28,12 +28,12 @@ public class NSISUpdater : OCUpdater {
     public override bool handle_startup () {
         ConfigFile config;
         GLib.Settings settings = new GLib.Settings (config.config_file (), GLib.Settings.IniFormat);
-        string update_filename = settings.value (update_available_c).to_string ();
+        string update_filename = settings.get_value (update_available_c).to_string ();
         // has the previous run downloaded an update?
         if (!update_filename == "" && GLib.File (update_filename).exists ()) {
             GLib.info ("An updater file is available.");
             // did it try to execute the update?
-            if (settings.value (auto_update_attempted_c, false).to_bool ()) {
+            if (settings.get_value (auto_update_attempted_c, false).to_bool ()) {
                 if (update_succeeded ()) {
                     // on_signal_success: clean up
                     GLib.info (
@@ -45,8 +45,8 @@ public class NSISUpdater : OCUpdater {
                     // var update failed. Ask user what to do
                     GLib.info (
                         "The requested update attempt has failed: "
-                        + settings.value (update_target_version_c).to_string ());
-                    show_update_error_dialog (settings.value (update_target_version_string_c).to_string ());
+                        + settings.get_value (update_target_version_c).to_string ());
+                    show_update_error_dialog (settings.get_value (update_target_version_string_c).to_string ());
                     return false;
                 }
             } else {
@@ -63,7 +63,7 @@ public class NSISUpdater : OCUpdater {
     private void on_signal_seen_version () {
         ConfigFile config;
         GLib.Settings settings = new GLib.Settings (config.config_file (), GLib.Settings.IniFormat);
-        settings.value (seen_version_c, update_info ().version);
+        settings.get_value (seen_version_c, update_info ().version);
     }
 
 
@@ -84,7 +84,7 @@ public class NSISUpdater : OCUpdater {
         GLib.Settings settings = new GLib.Settings (config.config_file (), GLib.Settings.IniFormat);
 
         // remove previously downloaded but not used installer
-        GLib.File old_target_file = new GLib.File (settings.value (update_available_c).to_string ());
+        GLib.File old_target_file = new GLib.File (settings.get_value (update_available_c).to_string ());
         if (old_target_file.exists ()) {
             old_target_file.remove ();
         }
@@ -92,9 +92,9 @@ public class NSISUpdater : OCUpdater {
         GLib.File.copy (this.file.filename (), this.target_file);
         download_state (DownloadState.DOWNLOAD_COMPLETE);
         GLib.info ("Downloaded " + url.to_string () + "to" + this.target_file);
-        settings.value (update_target_version_c, update_info ().version);
-        settings.value (update_target_version_string_c, update_info ().version_string ());
-        settings.value (update_available_c, this.target_file);
+        settings.get_value (update_target_version_c, update_info ().version);
+        settings.get_value (update_target_version_string_c, update_info ().version_string ());
+        settings.get_value (update_available_c, this.target_file);
     }
 
 
@@ -113,7 +113,7 @@ public class NSISUpdater : OCUpdater {
     private void wipe_update_data () {
         ConfigFile config;
         GLib.Settings settings = new GLib.Settings (config.config_file (), GLib.Settings.IniFormat);
-        string update_filename = settings.value (update_available_c).to_string ();
+        string update_filename = settings.get_value (update_available_c).to_string ();
         if (!update_filename == "")
             GLib.File.remove (update_filename);
         settings.remove (update_available_c);
@@ -287,7 +287,7 @@ public class NSISUpdater : OCUpdater {
         ConfigFile config;
         GLib.Settings settings = new GLib.Settings (config.config_file (), GLib.Settings.IniFormat);
         int64 info_version = Helper.string_version_to_int (info.version);
-        var seen_string = settings.value (seen_version_c).to_string ();
+        var seen_string = settings.get_value (seen_version_c).to_string ();
         int64 seen_version = Helper.string_version_to_int (seen_string);
         int64 curr_version = Helper.current_version_to_int ();
         GLib.info ("Version info arrived:"

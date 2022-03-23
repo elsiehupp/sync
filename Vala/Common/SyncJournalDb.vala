@@ -398,7 +398,7 @@ public class SyncJournalDb : GLib.Object {
         journal_path += ba.left (6).to_hex () + ".db";
 
         // If it exists already, the path is clearly usable
-        GLib.File file = GLib.File.new_for_path (GLib.Dir (local_path).file_path (journal_path));
+        GLib.File file = GLib.File.new_for_path (new GLib.Dir (local_path).file_path (journal_path));
         if (file.exists ()) {
             return journal_path;
         }
@@ -602,8 +602,9 @@ public class SyncJournalDb : GLib.Object {
         //  record.path == "";
         //  Q_ASSERT (!record.is_valid);
 
-        if (inode == null || this.metadata_table_is_empty)
+        if (inode == 0 || this.metadata_table_is_empty) {
             return true; // no error, yet nothing found (record.is_valid == false)
+        }
 
         if (!check_connect ()) {
             return false;

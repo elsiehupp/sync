@@ -155,12 +155,10 @@ public class SyncResult : GLib.Object {
     }
 
 
-
-
     /***********************************************************
     ***********************************************************/
     public void reset () {
-        SyncResult ();
+        this = new SyncResult ();
     }
 
 
@@ -168,10 +166,10 @@ public class SyncResult : GLib.Object {
     ***********************************************************/
     public string error_string {
         public get {
-            if (this.errors == "") {
+            if (this.errors.length () == 0) {
                 return "";
             }
-            return this.errors.first ();
+            return this.errors.nth_data (0);
         }
     }
 
@@ -179,7 +177,7 @@ public class SyncResult : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void clear_errors () {
-        this.errors == "";
+        this.errors = new GLib.List<string> ();
     }
 
 

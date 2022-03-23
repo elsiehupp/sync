@@ -69,7 +69,7 @@ public class FolderMetadata : GLib.Object {
     public string encrypted_metadata () {
         GLib.debug ("Generating metadata.");
 
-        QJsonObject metadata_keys;
+        Json.Object metadata_keys;
         foreach (var key in this.metadata_keys) {
             /***********************************************************
             We have to already base64 encode the metadatakey here. This was a misunderstanding in the RFC
@@ -82,7 +82,7 @@ public class FolderMetadata : GLib.Object {
 
         /***********************************************************
         NO SHARING IN V1
-        QJsonObject recepients;
+        Json.Object recepients;
         for (var it = this.sharing.const_begin (), end = this.sharing.const_end (); it != end; it++) {
             recepients.insert (it.first, it.second);
         }
@@ -91,7 +91,7 @@ public class FolderMetadata : GLib.Object {
         string sharing_encrypted = encrypt_json_object (recepient_doc.to_json (QJsonDocument.Compact), this.metadata_keys.last ());
         ***********************************************************/
 
-        QJsonObject metadata = new QJsonObject (
+        Json.Object metadata = new Json.Object (
             {
                 "metadata_keys",
                 metadata_keys
@@ -106,9 +106,9 @@ public class FolderMetadata : GLib.Object {
             }
         );
 
-        QJsonObject files;
+        Json.Object files;
         foreach (var each_file in this.files) {
-            QJsonObject encrypted;
+            Json.Object encrypted;
             encrypted.insert ("key", each_file.encryption_key.to_base64 ().to_string ());
             encrypted.insert ("filename", each_file.original_filename);
             encrypted.insert ("mimetype", each_file.mimetype.to_string ());
@@ -121,7 +121,7 @@ public class FolderMetadata : GLib.Object {
                 GLib.debug ("Metadata generation failed!");
             }
 
-            QJsonObject file;
+            Json.Object file;
             file.insert ("encrypted", encrypted_encrypted);
             file.insert ("initialization_vector", each_file.initialization_vector.to_base64 ().to_string ());
             file.insert ("authentication_tag", each_file.authentication_tag.to_base64 ().to_string ());
@@ -130,7 +130,7 @@ public class FolderMetadata : GLib.Object {
             files.insert (it.encrypted_filename, file);
         }
 
-        QJsonObject meta_object = new QJsonObject (
+        Json.Object meta_object = new Json.Object (
             {
                 "metadata",
                 metadata
@@ -206,10 +206,10 @@ public class FolderMetadata : GLib.Object {
                                 .to_string ();
 
         QJsonDocument meta_data_doc = QJsonDocument.from_json (meta_data_str.to_local8Bit ());
-        QJsonObject metadata_obj = meta_data_doc.object ()["metadata"].to_object ();
-        QJsonObject metadata_keys = metadata_obj["metadata_keys"].to_object ();
+        Json.Object metadata_obj = meta_data_doc.object ()["metadata"].to_object ();
+        Json.Object metadata_keys = metadata_obj["metadata_keys"].to_object ();
         string sharing = metadata_obj["sharing"].to_string ().to_local8Bit ();
-        QJsonObject files = meta_data_doc.object ()["files"].to_object ();
+        Json.Object files = meta_data_doc.object ()["files"].to_object ();
 
         QJsonDocument debug_helper;
         debug_helper.object (metadata_keys);

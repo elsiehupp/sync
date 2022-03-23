@@ -49,7 +49,7 @@ public class TestFindGoodPathForNewSyncFolder : AbstractTestFolderMan {
 
         // REMOVE own_cloud2 from the filesystem, but keep a folder sync'ed to it.
         // We should still not suggest this folder as a new folder.
-        GLib.Dir (directory_path + "/own_cloud2/").remove_recursively ();
+        new GLib.Dir (directory_path + "/own_cloud2/").remove_recursively ();
         GLib.assert_true (
             folder_manager.find_good_path_for_new_sync_folder (directory_path + "/own_cloud", url) ==
             directory_path + "/own_cloud3"

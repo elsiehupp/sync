@@ -247,7 +247,7 @@ public class Utility : GLib.Object {
                                         + LINUX_APPLICATION_ID
                                         + ".desktop";
         if (enable) {
-            if (!GLib.Dir ().exists (user_auto_start_path) && !GLib.Dir ().mkpath (user_auto_start_path)) {
+            if (!new GLib.Dir ().exists (user_auto_start_path) && !new GLib.Dir ().mkpath (user_auto_start_path)) {
                 GLib.warning ("Could not create autostart folder" + user_auto_start_path);
                 return;
             }
@@ -630,7 +630,7 @@ public class Utility : GLib.Object {
     If the second parameter is ommitted, the current time is used.
 
     ***********************************************************/
-    public static string time_ago_in_words (GLib.DateTime dt, GLib.DateTime from = GLib.DateTime ()) {
+    public static string time_ago_in_words (GLib.DateTime dt, GLib.DateTime from = new GLib.DateTime ()) {
         GLib.DateTime now = GLib.DateTime.current_date_time_utc ();
 
         if (from.is_valid) {
@@ -710,7 +710,7 @@ public class Utility : GLib.Object {
         public void reset () {
             this.timer.invalidate ();
             this.start_time.m_secs_since_epoch (0);
-            this.lap_times == "";
+            this.lap_times = new GLib.HashTable<string, uint64?> ();
         }
 
 
@@ -722,7 +722,7 @@ public class Utility : GLib.Object {
                 return re.add_m_secs (t);
             }
 
-            return GLib.DateTime ();
+            return new GLib.DateTime ();
         }
 
 
@@ -896,13 +896,15 @@ public class Utility : GLib.Object {
 
         // A single space before " (conflicted copy" is considered part of the tag
         var start_new = conflict_name.last_index_of (" (conflicted copy");
-        if (start_new > 0 && conflict_name[start_new - 1] == " ")
+        if (start_new > 0 && conflict_name[start_new - 1] == ' ') {
             start_new -= 1;
+        }
 
         // The rightmost tag is relevant
         var tag_start = q_max (start_old, start_new);
-        if (tag_start == -1)
+        if (tag_start == -1) {
             return "";
+        }
 
         // Find the end of the tag
         var tag_end = conflict_name.length;

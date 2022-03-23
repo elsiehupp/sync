@@ -32,9 +32,9 @@ public class PostfixLineEdit : QLineEdit {
         }
         public set {
             this.postfix = value;
-            QFontMetricsF font_metrics = new QFontMetricsF (font ());
+            QFontMetricsF font_options = new QFontMetricsF (font ());
             QMargins text_margins_i = text_margins ();
-            text_margins_i.right (text_margins_i.right () + q_round (font_metrics.width (this.postfix)) + VERTICAL_MARGIN);
+            text_margins_i.right (text_margins_i.right () + q_round (font_options.width (this.postfix)) + VERTICAL_MARGIN);
             text_margins (text_margins_i);
         }
     }
@@ -72,8 +72,8 @@ public class PostfixLineEdit : QLineEdit {
         QPainter p = new QPainter (this);
 
         p.pen (palette ().color (Gtk.Palette.Disabled, Gtk.Palette.Text));
-        QFontMetricsF font_metrics = new QFontMetricsF (font ());
-        int on_signal_start = rect ().right () - q_round (font_metrics.width (this.postfix));
+        QFontMetricsF font_options = new QFontMetricsF (font ());
+        int on_signal_start = rect ().right () - q_round (font_options.width (this.postfix));
         QStyle_option_frame panel;
         init_style_option (panel);
         QRect r = this.style.sub_element_rect (QStyle.SE_Line_edit_contents, panel, this);

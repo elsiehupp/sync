@@ -99,7 +99,7 @@ public class ComputeChecksum : AbstractComputeChecksum {
     The device ownership transfers into the thread that
     will compute the checksum. It must not have a parent.
     ***********************************************************/
-    public void start_for_device (QIODevice device) {
+    public void start_for_device (GLib.OutputStream device) {
         //  ENFORCE (device);
         GLib.info ("Computing " + this.checksum_type + " checksum of device " + device.get () + " in a thread.");
         //  ASSERT (!device.parent ());
@@ -111,7 +111,7 @@ public class ComputeChecksum : AbstractComputeChecksum {
     /***********************************************************
     Computes the checksum synchronously.
     ***********************************************************/
-    public static string compute_now (QIODevice device, string checksum_type) {
+    public static string compute_now (GLib.OutputStream device, string checksum_type) {
         if (!checksum_computation_enabled ()) {
             GLib.warning ("Checksum computation disabled by environment variable.");
             return "";
@@ -173,14 +173,14 @@ public class ComputeChecksum : AbstractComputeChecksum {
 
     /***********************************************************
     ***********************************************************/
-    private void start_impl (QIODevice device) {
+    private void start_impl (GLib.OutputStream device) {
         this.watcher.signal_finished.connect (
             this.on_signal_calculation_done
         ); // Qt.UniqueConnection
 
         // We'd prefer to move the unique_ptr into the lambda, but that's
         // awkward with the C++ standard we're on
-        var shared_device = unowned QIODevice  (device.release ());
+        var shared_device = unowned GLib.OutputStream  (device.release ());
 
         // Bug: The thread will keep running even if ComputeChecksum is deleted.
         string type = this.checksum_type;
@@ -190,7 +190,7 @@ public class ComputeChecksum : AbstractComputeChecksum {
     }
 
 
-    private static void on_watcher_run (QIODevice shared_device, string type) {
+    private static void on_watcher_run (GLib.OutputStream shared_device, string type) {
         if (!shared_device.open (QIODevice.ReadOnly)) {
             var file = qobject_cast<GLib.File> (shared_device);
             if (file) {

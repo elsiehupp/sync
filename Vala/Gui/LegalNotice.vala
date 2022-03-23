@@ -21,7 +21,21 @@ public class LegalNotice : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public LegalNotice (Gtk.Dialog parent = null) {
+    public LegalNotice () {
+        base ();
+        this.instance = new LegalNotice ();
+        this.instance.up_ui (this);
+
+        this.instance.close_button.clicked.connect (
+            this.accept
+        );
+
+        customize_style ();
+    }
+
+    /***********************************************************
+    ***********************************************************/
+    public LegalNotice.with_parent (Gtk.Dialog parent) {
         base (parent);
         this.instance = new LegalNotice ();
         this.instance.up_ui (this);

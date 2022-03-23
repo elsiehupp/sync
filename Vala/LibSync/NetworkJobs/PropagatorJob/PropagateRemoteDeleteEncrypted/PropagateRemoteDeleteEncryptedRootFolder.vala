@@ -44,7 +44,7 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
             this.result_list_filter
         );
 
-        if (!list_files_result || this.nested_items == "") {
+        if (!list_files_result || this.nested_items.length == 0) {
             // if the folder is empty, just decrypt and delete it
             decrypt_and_remote_delete ();
             return;

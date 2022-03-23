@@ -25,7 +25,7 @@ public class DiskFileModifier : AbstractFileModifier {
         if (file_info.is_file ()) {
             GLib.assert_true (this.root_directory.remove (relative_path));
         } else {
-            GLib.assert_true (GLib.Dir ( file_info.file_path ).remove_recursively ());
+            GLib.assert_true (new GLib.Dir ( file_info.file_path ).remove_recursively ());
         }
     }
 
@@ -36,7 +36,7 @@ public class DiskFileModifier : AbstractFileModifier {
         GLib.File file = new GLib.File (this.root_directory.file_path (relative_path));
         GLib.assert_true (!file.exists ());
         file.open (GLib.File.WriteOnly);
-        string buffer = string (1024, content_char);
+        string buffer = new string (1024, content_char);
         for (int x = 0; x < size / buffer.size (); ++x) {
             file.write (buffer);
         }

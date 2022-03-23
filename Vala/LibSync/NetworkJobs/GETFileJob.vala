@@ -12,7 +12,7 @@ namespace LibSync {
 ***********************************************************/
 public class GETFileJob : AbstractNetworkJob {
 
-    QIODevice device;
+    GLib.OutputStream device;
     GLib.HashTable<string, string> headers;
     string error_string {
         public get {
@@ -89,7 +89,7 @@ public class GETFileJob : AbstractNetworkJob {
     /***********************************************************
     DOES NOT take ownership of the device.
     ***********************************************************/
-    public GETFileJob.for_account (Account account, string path, QIODevice device,
+    public GETFileJob.for_account (Account account, string path, GLib.OutputStream device,
         GLib.HashTable<string, string> headers, string expected_etag_for_resume,
         int64 resume_start, GLib.Object parent = new GLib.Object ()) {
         base (account, path, parent);
@@ -113,7 +113,7 @@ public class GETFileJob : AbstractNetworkJob {
     /***********************************************************
     For direct_download_url:
     ***********************************************************/
-    public GETFileJob.direct_for_account (Account account, GLib.Uri url, QIODevice device,
+    public GETFileJob.direct_for_account (Account account, GLib.Uri url, GLib.OutputStream device,
         GLib.HashTable<string, string> headers, string expected_etag_for_resume,
         int64 resume_start, GLib.Object parent = new GLib.Object ()) {
         base (account, url.to_encoded (), parent);
@@ -158,7 +158,7 @@ public class GETFileJob : AbstractNetworkJob {
 
         request.priority (Soup.Request.Low_priority); // Long downloads must not block non-propagation jobs.
 
-        if (this.direct_download_url == "") {
+        if (this.direct_download_url == null) {
             send_request ("GET", make_dav_url (path), request);
         } else {
             // Use direct URL

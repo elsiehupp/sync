@@ -14,11 +14,11 @@ public class SocketApiJobV2 : GLib.Object {
     private unowned SocketListener this.socket_listener;
     private const string this.command;
     private string this.job_id;
-    private QJsonObject this.arguments;
+    private Json.Object this.arguments;
 
     internal signal void signal_finished ();
 
-    public SocketApiJobV2 (unowned SocketListener socket_listener, string command, QJsonObject arguments) {
+    public SocketApiJobV2 (unowned SocketListener socket_listener, string command, Json.Object arguments) {
         this.socket_listener = socket_listener;
         this.command = command;
         this.job_id = arguments["identifier"].to_string ();
@@ -29,7 +29,7 @@ public class SocketApiJobV2 : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_success (QJsonObject response) {
+    public void on_signal_success (Json.Object response) {
         do_finish (response);
     }
 
@@ -47,7 +47,7 @@ public class SocketApiJobV2 : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public const QJsonObject arguments () {
+    public const Json.Object arguments () {
         return this.arguments;
     }
 
@@ -61,7 +61,7 @@ public class SocketApiJobV2 : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void do_finish (QJsonObject object) {
+    private void do_finish (Json.Object object) {
         this.socket_listener.on_signal_send_message (this.command + "this.RESULT:" + QJsonDocument ({
             {
                 "identifier", this.job_id

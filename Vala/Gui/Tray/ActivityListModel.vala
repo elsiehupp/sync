@@ -8,7 +8,7 @@
 //  #include <QAbstractListModel>
 //  #include <QDesktopServices>
 //  #include <Gtk.Widget>
-//  #include <QJsonObject>
+//  #include <Json.Object>
 //  #include <QJsonDocument>
 //  #include <qloggingcategory.h>
 //  #include <QtCore>
@@ -645,8 +645,8 @@ public class ActivityListModel : QAbstractListModel {
         if (!this.account_state.is_connected) {
             return;
         }
-        var json_api_job = new JsonApiJob (this.account_state.account, "ocs/v2.php/apps/activity/api/v2/activity", this);
-        json_api_job.json_received.connect (
+        var json_api_job = new LibSync.JsonApiJob (this.account_state.account, "ocs/v2.php/apps/activity/api/v2/activity", this);
+        json_api_job.signal_json_received.connect (
             this.activities_received
         );
 
