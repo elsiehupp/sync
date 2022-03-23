@@ -188,7 +188,7 @@ public class SslErrorDialog : Gtk.Dialog {
         message += QL ("<p>");
 
         if (cert.effective_date () < new GLib.DateTime (QDate (2016, 1, 1), QTime (), Qt.UTC)) {
-        string sha1sum = Utility.format_fingerprint (cert.digest (QCryptographicHash.Sha1).to_hex ());
+        string sha1sum = Utility.format_fingerprint (cert.digest (GLib.ChecksumType.SHA1).to_hex ());
             message += _("Fingerprint (SHA1) : <tt>%1</tt>").printf (sha1sum) + QL ("<br/>");
         }
 

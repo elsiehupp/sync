@@ -153,7 +153,7 @@ public class SslButton : QToolButton {
         if (issuer == "") {
             issuer = cert.issuer_info (QSslCertificate.Organizational_unit_name).join (char (';'));
         }
-        string sha1 = Utility.format_fingerprint (cert.digest (QCryptographicHash.Sha1).to_hex (), false);
+        string sha1 = Utility.format_fingerprint (cert.digest (GLib.ChecksumType.SHA1).to_hex (), false);
         string sha265hash = cert.digest (QCryptographicHash.Sha256).to_hex ();
         string sha256escaped =
             Utility.escape (Utility.format_fingerprint (sha265hash.left (sha265hash.length / 2), false))

@@ -859,7 +859,7 @@ public class ShareUserLine : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void calculate_background_based_on_signal_text () {
-        const QCryptographicHash hash = QCryptographicHash.hash (this.instance.shared_with.text ().to_utf8 (), QCryptographicHash.Md5);
+        const QCryptographicHash hash = QCryptographicHash.hash (this.instance.shared_with.text ().to_utf8 (), GLib.ChecksumType.MD5);
         //  Q_ASSERT (hash.size () > 0);
         if (hash.size () == 0) {
             GLib.warning ("Failed to calculate hash color for share: " + this.share.path);

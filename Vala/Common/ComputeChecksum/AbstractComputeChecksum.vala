@@ -64,13 +64,13 @@ abstract class AbstractComputeChecksum : GLib.Object {
     /***********************************************************
     Creates a checksum header from type and value.
     ***********************************************************/
-    string make_checksum_header (string checksum_type, string checksum) {
-        if (checksum_type == "" || checksum == "") {
+    string make_checksum_header (string checksum_type, string checksum_string) {
+        if (checksum_type == "" || checksum_string == "") {
             return "";
         }
         string header = checksum_type;
         header += ":";
-        header += checksum;
+        header += checksum_string;
         return header;
     }
 
@@ -78,10 +78,10 @@ abstract class AbstractComputeChecksum : GLib.Object {
     /***********************************************************
     Parses a checksum header
     ***********************************************************/
-    bool parse_checksum_header (string header, string type, string checksum) {
+    bool parse_checksum_header (string header, string type, string checksum_string) {
         if (header == "") {
             type == "";
-            checksum == "";
+            checksum_string == "";
             return true;
         }
 
@@ -91,7 +91,7 @@ abstract class AbstractComputeChecksum : GLib.Object {
         }
 
         *type = header.left (index);
-        *checksum = header.mid (index + 1);
+        *checksum_string = header.mid (index + 1);
         return true;
     }
 
@@ -126,14 +126,14 @@ abstract class AbstractComputeChecksum : GLib.Object {
     /***********************************************************
     ***********************************************************/
     string calc_md5 (GLib.OutputStream device) {
-        return calc_crypto_hash (device, QCryptographicHash.Md5);
+        return calc_crypto_hash (device, GLib.ChecksumType.MD5);
     }
 
 
     /***********************************************************
     ***********************************************************/
     string calc_sha1 (GLib.OutputStream device) {
-        return calc_crypto_hash (device, QCryptographicHash.Sha1);
+        return calc_crypto_hash (device, GLib.ChecksumType.SHA1);
     }
 
 
@@ -159,12 +159,12 @@ abstract class AbstractComputeChecksum : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    static string calc_crypto_hash (GLib.OutputStream device, QCryptographicHash.Algorithm algo) {
+    static string calc_crypto_hash (GLib.OutputStream device, GLib.ChecksumType checksum_type) {
         string arr;
-        QCryptographicHash crypto = new QCryptographicHash (algo);
+        GLib.Checksum checksum = new GLib.Checksum (checksum_type);
 
-        if (crypto.add_data (device)) {
-            arr = crypto.result ().to_hex ();
+        if (checksum.add_data (device)) {
+            arr = checksum.result ().to_hex ();
         }
         return arr;
     }

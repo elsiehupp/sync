@@ -394,7 +394,7 @@ public class SyncJournalDb : GLib.Object {
 
         string key = "%1@%2:%3".printf (user, remote_url.to_string (), remote_path);
 
-        string ba = QCryptographicHash.hash (key.to_utf8 (), QCryptographicHash.Md5);
+        string ba = QCryptographicHash.hash (key.to_utf8 (), GLib.ChecksumType.MD5);
         journal_path += ba.left (6).to_hex () + ".db";
 
         // If it exists already, the path is clearly usable
