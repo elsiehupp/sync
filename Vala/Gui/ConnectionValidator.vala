@@ -130,7 +130,7 @@ public class ConnectionValidator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    internal signal void signal_connection_result (ConnectionValidator.Status status, string[] errors);
+    internal signal void signal_connection_result (ConnectionValidator.Status status, GLib.List<string> errors);
 
     /***********************************************************
     ***********************************************************/

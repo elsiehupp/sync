@@ -112,9 +112,9 @@ public class FolderStatusDelegate : QStyledItemDelegate {
         var alias_text = qvariant_cast<string> (index.data (Header_role));
         var path_text = qvariant_cast<string> (index.data (FolderPathRole));
         var remote_path = qvariant_cast<string> (index.data (Folder_second_path_role));
-        var conflict_texts = qvariant_cast<string[]> (index.data (Folder_conflict_msg));
-        var error_texts = qvariant_cast<string[]> (index.data (Folder_error_msg));
-        var info_texts = qvariant_cast<string[]> (index.data (Folder_info_msg));
+        var conflict_texts = qvariant_cast<GLib.List<string>> (index.data (Folder_conflict_msg));
+        var error_texts = qvariant_cast<GLib.List<string>> (index.data (Folder_error_msg));
+        var info_texts = qvariant_cast<GLib.List<string>> (index.data (Folder_info_msg));
 
         var overall_percent = qvariant_cast<int> (index.data (Sync_progress_overall_percent));
         var overall_string = qvariant_cast<string> (index.data (Sync_progress_overall_string));
@@ -286,7 +286,7 @@ public class FolderStatusDelegate : QStyledItemDelegate {
     Paint an error overlay if there is an error string or
     conflict string
     ***********************************************************/
-    private void draw_text_box (string[] texts, Gtk.Color color) {
+    private void draw_text_box (GLib.List<string> texts, Gtk.Color color) {
         QRect rect = local_path_rect;
         rect.left (icon_rect.left ());
         rect.top (h);
@@ -353,7 +353,7 @@ public class FolderStatusDelegate : QStyledItemDelegate {
         // add some space for the message boxes.
         int margin = font_metrics.height () / 4;
         foreach (var role in {Folder_conflict_msg, Folder_error_msg, Folder_info_msg}) {
-            var msgs = qvariant_cast<string[]> (index.data (role));
+            var msgs = qvariant_cast<GLib.List<string>> (index.data (role));
             if (!msgs == "") {
                 h += margin + 2 * margin + msgs.length * font_metrics.height ();
             }

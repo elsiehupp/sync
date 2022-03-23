@@ -147,7 +147,7 @@ public class FolderWatcher : GLib.Object {
     /***********************************************************
     Called from the implementations to indicate a change in path
     ***********************************************************/
-    protected void on_signal_change_detected_for_multiple_paths (string[] paths) {
+    protected void on_signal_change_detected_for_multiple_paths (GLib.List<string> paths) {
         // TODO: this shortcut doesn't look very reliable:
         //   - why is the timeout only 1 second?
         //   - what if there is more than one file being updated frequently?

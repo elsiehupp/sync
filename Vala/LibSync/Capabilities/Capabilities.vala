@@ -443,7 +443,7 @@ public class Capabilities : GLib.Object {
     /***********************************************************
     return the list of filename that should not be uploaded
     ***********************************************************/
-    public string[] blocklisted_files {
+    public GLib.List<string> blocklisted_files {
         public get {
             return this.capabilities["files"].to_map ()["blocklisted_files"].to_string_list ();
         }

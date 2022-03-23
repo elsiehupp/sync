@@ -734,9 +734,9 @@ public class Utility : GLib.Object {
 
 
     /***********************************************************
-    @brief Sort a string[] in a way that's appropriate for filenames
+    @brief Sort a GLib.List<string> in a way that's appropriate for filenames
     ***********************************************************/
-    public static void sort_filenames (string[] filenames) {
+    public static void sort_filenames (GLib.List<string> filenames) {
         QCollator collator;
         collator.numeric_mode (true);
         collator.case_sensitivity (Qt.CaseInsensitive);

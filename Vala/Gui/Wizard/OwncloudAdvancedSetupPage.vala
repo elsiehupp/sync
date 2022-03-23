@@ -31,7 +31,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     private bool local_folder_valid = false;
     private QProgressIndicator progress_indicator;
     private string remote_folder;
-    public string[] selective_sync_blocklist { public get; private set; }
+    public GLib.List<string> selective_sync_blocklist { public get; private set; }
     private int64 r_size = -1;
     private int64 r_selected_size = -1;
     private OwncloudWizard oc_wizard;

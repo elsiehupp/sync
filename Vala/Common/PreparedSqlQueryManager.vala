@@ -12,8 +12,6 @@ namespace Common {
 ***********************************************************/
 public class PreparedSqlQueryManager : GLib.Object {
 
-    using Sqlite.Database;
-
     /***********************************************************
     ***********************************************************/
     private SqlQuery queries[Key.PREPARED_QUERY_COUNT];
@@ -82,7 +80,7 @@ public class PreparedSqlQueryManager : GLib.Object {
     /***********************************************************
     Prepare the SqlQuery if it was not prepared yet.
     ***********************************************************/
-    public PreparedSqlQuery get_for_key_sql_and_database (Key key, string sql, SqlDatabase database) {
+    public PreparedSqlQuery get_for_key_sql_and_database (Key key, string sql, Sqlite.Database database) {
         var query = this.queries[key];
         //  Q_ASSERT (!Sqlite3StmtBusy (query.stmt));
         //  ENFORCE (!query.sqldb || database == query.sqldb)

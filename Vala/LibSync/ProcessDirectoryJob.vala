@@ -620,7 +620,7 @@ public class ProcessDirectoryJob : GLib.Object {
             case CSync.ExcludedFiles.Type.NOT_EXCLUDED:
             case CSync.ExcludedFiles.Type.EXCLUDE_SILENT:
             case CSync.ExcludedFiles.Type.EXCLUDE_AND_REMOVE:
-                q_fatal ("These were handled earlier");
+                GLib.fatal ("These were handled earlier");
             case CSync.ExcludedFiles.Type.LIST:
                 item.error_string = _("File is listed on the ignore list.");
                 break;

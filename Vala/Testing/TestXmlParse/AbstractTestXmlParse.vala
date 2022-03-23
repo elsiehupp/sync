@@ -18,7 +18,7 @@ public abstract class AbstractTestXmlParse : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_directory_listing_sub_folders (string[] list) {
+    protected void on_signal_directory_listing_sub_folders (GLib.List<string> list) {
         GLib.debug ("subfolders: " + list.join ("/n"));
         this.subdirectories.append (list);
     }

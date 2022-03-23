@@ -783,7 +783,7 @@ public class SocketApi : GLib.Object {
     Context menu action
     ***********************************************************/
     private void command_MAKE_AVAILABLE_LOCALLY (string files_arg, SocketListener listener) {
-        string[] files = split (files_arg);
+        GLib.List<string> files = split (files_arg);
 
         foreach (string file in files) {
             var data = FileData.file_data (file);
@@ -807,7 +807,7 @@ public class SocketApi : GLib.Object {
     Go over all the files and replace them by a virtual file
     ***********************************************************/
     private void command_MAKE_ONLINE_ONLY (string files_arg, SocketListener listener) {
-        string[] files = split (files_arg);
+        GLib.List<string> files = split (files_arg);
 
         foreach (string file in files) {
             var data = FileData.file_data (file);
@@ -1066,7 +1066,7 @@ public class SocketApi : GLib.Object {
     ***********************************************************/
     private void command_GET_MENU_ITEMS (string argument, SocketListener listener) {
         listener.on_signal_send_message ("GET_MENU_ITEMS:BEGIN");
-        string[] files = split (argument);
+        GLib.List<string> files = split (argument);
 
         // Find the common sync folder_connection.
         // sync_folder will be null if files are in different folders.
@@ -1523,7 +1523,7 @@ public class SocketApi : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static string[] split (string data) {
+    private static GLib.List<string> split (string data) {
         const string RECORD_SEPARATOR = '\x1e';
         // TODO: string ref?
         return data.split (RECORD_SEPARATOR);

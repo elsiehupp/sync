@@ -112,7 +112,7 @@ public class PropagateDownloadEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_check_folder_id (string[] list) {
+    public void on_signal_check_folder_id (GLib.List<string> list) {
         var lscol_job = qobject_cast<LscolJob> (sender ());
         const string folder_identifier = list.first ();
         GLib.debug ("Received identifier of folder" + folder_identifier);

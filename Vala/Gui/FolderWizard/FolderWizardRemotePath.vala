@@ -21,7 +21,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     private bool warn_was_visible;
     private unowned Account account;
     private GLib.Timeout lscol_timer;
-    private string[] encrypted_paths;
+    private GLib.List<string> encrypted_paths;
 
     /***********************************************************
     ***********************************************************/
@@ -69,7 +69,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
             if (!this.instance.folder_tree_widget.current_item ())
                 return false;
 
-            string[] warn_strings;
+            GLib.List<string> warn_strings;
             string directory = this.instance.folder_tree_widget.current_item ().data (0, Qt.USER_ROLE).to_string ();
             if (!directory.has_prefix ("/")) {
                 directory.prepend ("/");
@@ -216,7 +216,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_update_directories (string[] list) {
+    protected void on_signal_update_directories (GLib.List<string> list) {
         string webdav_folder = GLib.Uri (this.account.dav_url ()).path;
 
         QTreeWidgetItem root = this.instance.folder_tree_widget.top_level_item (0);
@@ -227,7 +227,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
             root.tool_tip (0, _("Choose this to sync the entire account"));
             root.data (0, Qt.USER_ROLE, "/");
         }
-        string[] sorted_list = list;
+        GLib.List<string> sorted_list = list;
         Utility.sort_filenames (sorted_list);
         foreach (string path in sorted_list) {
             path.remove (webdav_folder);
@@ -242,7 +242,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
                 continue;
             }
 
-            string[] paths = path.split ("/");
+            GLib.List<string> paths = path.split ("/");
             if (paths.last () == "")
                 paths.remove_last ();
             recursive_insert (root, paths, path);
@@ -338,7 +338,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_typed_path_found (string[] subpaths) {
+    protected void on_signal_typed_path_found (GLib.List<string> subpaths) {
         on_signal_update_directories (subpaths);
         select_by_path (this.instance.folder_entry.text ());
     }
@@ -370,7 +370,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
 
     /***********************************************************
     ***********************************************************/
-    private void recursive_insert (QTreeWidgetItem parent, string[] path_trail, string path) {
+    private void recursive_insert (QTreeWidgetItem parent, GLib.List<string> path_trail, string path) {
         if (path_trail == "")
             return;
 
@@ -411,7 +411,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
 
         QTreeWidgetItem it = this.instance.folder_tree_widget.top_level_item (0);
         if (!path == "") {
-            const string[] path_trail = path.split ("/");
+            const GLib.List<string> path_trail = path.split ("/");
             foreach (string path in path_trail) {
                 if (!it) {
                     return false;

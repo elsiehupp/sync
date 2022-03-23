@@ -118,7 +118,7 @@ int main (int argc, char **argv) {
             return -1;
         }
 
-        string[] args = app.arguments ();
+        GLib.List<string> args = app.arguments ();
         if (args.size () > 1) {
             string message = args.join ("|");
             if (!app.on_signal_send_message ("MSG_PARSEOPTIONS:" + message))

@@ -45,7 +45,7 @@ public class SelectiveSyncDialog : Gtk.Dialog {
         this.ok_button = null; // defined in on_signal_init ()
         bool ok = false;
         on_signal_init (account);
-        string[] selective_sync_list = this.folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
+        GLib.List<string> selective_sync_list = this.folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
         if (ok) {
             this.selective_sync.folder_info (this.folder_connection.remote_path, this.folder_connection.alias (), selective_sync_list);
         } else {
@@ -61,7 +61,7 @@ public class SelectiveSyncDialog : Gtk.Dialog {
     /***********************************************************
     Dialog for the whole account (Used from the wizard)
     ***********************************************************/
-    public SelectiveSyncDialog.for_path (unowned Account account, string folder_connection, string[] blocklist, Gtk.Widget parent = null, Qt.Window_flags f = {}) {
+    public SelectiveSyncDialog.for_path (unowned Account account, string folder_connection, GLib.List<string> blocklist, Gtk.Widget parent = null, Qt.Window_flags f = {}) {
         base (parent, f);
         this.folder_connection = null;
         on_signal_init (account);
@@ -78,7 +78,7 @@ public class SelectiveSyncDialog : Gtk.Dialog {
             if (!ok) {
                 return;
             }
-            string[] block_list = this.selective_sync.create_block_list ();
+            GLib.List<string> block_list = this.selective_sync.create_block_list ();
             this.folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, block_list);
 
             FolderManager folder_man = FolderManager.instance;
@@ -103,14 +103,14 @@ public class SelectiveSyncDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    public string[] create_block_list () {
+    public GLib.List<string> create_block_list () {
         return this.selective_sync.create_block_list ();
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public string[] old_block_list () {
+    public GLib.List<string> old_block_list () {
         return this.selective_sync.old_block_list ();
     }
 

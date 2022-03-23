@@ -268,7 +268,7 @@ public class FolderManager : GLib.Object {
     public int set_up_folders () {
         unload_and_delete_all_folders ();
 
-        string[] skip_settings_keys;
+        GLib.List<string> skip_settings_keys;
         backward_migration_settings_keys (skip_settings_keys, skip_settings_keys);
 
         var settings = ConfigFile.settings_with_group ("Accounts");
@@ -313,7 +313,7 @@ public class FolderManager : GLib.Object {
     The "backwards_compatible" flag here is related to migrating
     old database locations
     ***********************************************************/
-    private void process (Settings settings, string[] skip_settings_keys, string group_name, bool backwards_compatible, bool folders_with_placeholders) {
+    private void process (Settings settings, GLib.List<string> skip_settings_keys, string group_name, bool backwards_compatible, bool folders_with_placeholders) {
         settings.begin_group (group_name);
         if (skip_settings_keys.contains (settings.group ())) {
             // Should not happen : bad container keys should have been deleted
@@ -507,8 +507,8 @@ public class FolderManager : GLib.Object {
     incoming relative server path. The method checks with all existing sync
     folders.
     ***********************************************************/
-    public string[] find_file_in_local_folders (string rel_path, unowned Account acc) {
-        string[] re;
+    public GLib.List<string> find_file_in_local_folders (string rel_path, unowned Account acc) {
+        GLib.List<string> re;
 
         // We'll be comparing against FolderConnection.remote_path which always starts with /
         string server_path = rel_path;
@@ -583,7 +583,7 @@ public class FolderManager : GLib.Object {
 
         // Check if the filename is equal to the group setting. If not, use the group
         // name as an alias.
-        string[] groups = settings.child_groups ();
+        GLib.List<string> groups = settings.child_groups ();
 
         if (!groups.contains (escaped_alias) && groups.length > 0) {
             escaped_alias = groups.first ();
@@ -622,7 +622,7 @@ public class FolderManager : GLib.Object {
 
         folder_connection = add_folder_internal (folder_definition, account_state, std.make_unique<VfsOff> ());
         if (folder_connection != null) {
-            string[] block_list = settings.value ("block_list").to_string_list ();
+            GLib.List<string> block_list = settings.value ("block_list").to_string_list ();
             if (!block_list.empty ()) {
                 // migrate settings
                 folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, block_list);
@@ -1848,7 +1848,7 @@ public class FolderManager : GLib.Object {
             // restart:
             GLib.info ("Restarting application NOW, PID " + Gtk.Application.application_pid () + " is ending.");
             GLib.Application.quit ();
-            string[] args = Gtk.Application.arguments ();
+            GLib.List<string> args = Gtk.Application.arguments ();
             string prg = args.take_first ();
 
             QProcess.start_detached (prg, args);
@@ -1860,7 +1860,7 @@ public class FolderManager : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void setup_folders_helper (GLib.Settings settings, unowned AccountState account, string[] ignore_keys, bool backwards_compatible, bool folders_with_placeholders) {
+    private void setup_folders_helper (GLib.Settings settings, unowned AccountState account, GLib.List<string> ignore_keys, bool backwards_compatible, bool folders_with_placeholders) {
         foreach (var folder_alias in settings.child_groups ()) {
             // Skip folders with too-new version
             settings.begin_group (folder_alias);
@@ -1945,7 +1945,7 @@ public class FolderManager : GLib.Object {
                 var vfs = create_vfs_from_plugin (folder_definition.virtual_files_mode);
                 if (!vfs) {
                     // TODO: Must do better error handling
-                    q_fatal ("Could not load plugin");
+                    GLib.fatal ("Could not load plugin");
                 }
 
                 FolderConnection folder_connection = add_folder_internal (std.move (folder_definition), account, std.move (vfs));

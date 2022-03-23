@@ -164,7 +164,7 @@ public class PropagateRemoteMove : AbstractPropagateItemJob {
         bool ok = false;
         // We only care about preserving the blocklist.   The allow list should anyway be empty.
         // And the undecided list will be repopulated on the next sync, if there is anything too big.
-        string[] list = journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
+        GLib.List<string> list = journal.get_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
         if (!ok)
             return false;
 

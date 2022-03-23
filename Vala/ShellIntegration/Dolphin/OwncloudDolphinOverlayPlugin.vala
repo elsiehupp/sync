@@ -28,7 +28,7 @@ public class OwncloudDolphinPlugin : KOverlayIconPlugin {
 
     /***********************************************************
     ***********************************************************/
-    public override string[] getOverlays (GLib.Uri url) {
+    public override GLib.List<string> getOverlays (GLib.Uri url) {
         var helper = OwncloudDolphinPluginHelper.instance;
         if (!helper.is_connected) {
             return { };
@@ -51,8 +51,8 @@ public class OwncloudDolphinPlugin : KOverlayIconPlugin {
 
     /***********************************************************
     ***********************************************************/
-    private string[] overlaysForString (string status) {
-        string[] r;
+    private GLib.List<string> overlaysForString (string status) {
+        GLib.List<string> r;
         if (status.startsWith ("NOP"))
             return r;
 

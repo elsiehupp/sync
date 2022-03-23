@@ -120,17 +120,17 @@ public class ExcludedFiles : GLib.Object {
     /***********************************************************
     Files to load excludes from
     ***********************************************************/
-    private GLib.HashTable<BasePathString, string[]> exclude_files;
+    private GLib.HashTable<BasePathString, GLib.List<string>> exclude_files;
 
     /***********************************************************
     Exclude patterns added with add_manual_exclude ()
     ***********************************************************/
-    private GLib.HashTable<BasePathString, string[]> manual_excludes;
+    private GLib.HashTable<BasePathString, GLib.List<string>> manual_excludes;
 
     /***********************************************************
     List of all active exclude patterns
     ***********************************************************/
-    private GLib.HashTable<BasePathString, string[]> all_excludes;
+    private GLib.HashTable<BasePathString, GLib.List<string>> all_excludes;
 
     /***********************************************************
     see prepare ()

@@ -16,7 +16,7 @@ public class TestDirectoriesBelowPath : AbstractTestInotifyWatcher {
     private TestDirectoriesBelowPath () {
         base ();
 
-        string[] dirs;
+        GLib.List<string> dirs;
 
         bool ok = find_folders_below (GLib.Dir (this.root), dirs);
         GLib.assert_true ( dirs.index_of (this.root + "/a1")>-1);

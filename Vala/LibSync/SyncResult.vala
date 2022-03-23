@@ -143,7 +143,7 @@ public class SyncResult : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public string[] error_strings () {
+    public GLib.List<string> error_strings () {
         return this.errors;
     }
 

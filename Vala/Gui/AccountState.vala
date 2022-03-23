@@ -98,7 +98,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
     }
 
     public ConnectionValidator.Status connection_status { public get; private set; }
-    public string[] connection_errors { public get; private set; }
+    public GLib.List<string> connection_errors { public get; private set; }
 
 
     private bool waiting_for_new_credentials;
@@ -477,7 +477,7 @@ public class AccountState : GLib.Object /*, QSharedData*/ {
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_connection_validator_result (ConnectionValidator.Status status, string[] errors) {
+    protected void on_signal_connection_validator_result (ConnectionValidator.Status status, GLib.List<string> errors) {
         if (is_signed_out) {
             GLib.warning ("Signed out, ignoring " + status.to_string () + this.account.url.to_string ());
             return;

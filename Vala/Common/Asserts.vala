@@ -2,7 +2,7 @@
 //  //  #include <qglobal.h>
 
 //  #if defined (QT_FORCE_ASSERTS) || !defined (QT_NO_DEBUG)
-//  const int OC_ASSERT_MSG q_fatal
+//  const int OC_ASSERT_MSG GLib.fatal
 //  #else
 //  const int OC_ASSERT_MSG q_critical
 //  //  #endif
@@ -44,12 +44,12 @@
 //  // Prints 'message' and aborts execution if 'cond' is false.
 //  const int ENFORCE1 (cond)
 //      if (! (cond)) {
-//          q_fatal ("ENFORCE : \"%s\" in file %s, line %d", #cond, __FILE__, __LINE__);
+//          GLib.fatal ("ENFORCE : \"%s\" in file %s, line %d", #cond, __FILE__, __LINE__);
 //      } else {
 //      }
 //  const int ENFORCE2 (cond, message)
 //      if (! (cond)) {
-//          q_fatal ("ENFORCE : \"%s\" in file %s, line %d with message : %s", #cond, __FILE__, __LINE__, message);
+//          GLib.fatal ("ENFORCE : \"%s\" in file %s, line %d with message : %s", #cond, __FILE__, __LINE__, message);
 //      } else {
 //      }
 //  const int ENFORCE (...) OC_ASSERT_OVERLOAD (ENFORCE, __VA_ARGS__)

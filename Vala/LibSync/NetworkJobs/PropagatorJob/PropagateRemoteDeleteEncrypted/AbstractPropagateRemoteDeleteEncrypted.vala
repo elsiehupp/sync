@@ -102,7 +102,7 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : AbstractNetworkJo
 
     /***********************************************************
     ***********************************************************/
-    protected void on_signal_folder_encrypted_id_received (string[] list) {
+    protected void on_signal_folder_encrypted_id_received (GLib.List<string> list) {
         GLib.debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED + "Received identifier of folder, trying to lock it so we can prepare the metadata");
         var lscol_job = qobject_cast<LscolJob> (sender ());
         const ExtraFolderInfo folder_info = lscol_job.folder_infos.value (list.first ());

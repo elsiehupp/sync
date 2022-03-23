@@ -12,12 +12,12 @@ public class TestDestructor : AbstractTestOwnSql {
 
     /***********************************************************
     This test makes sure that the destructor of SqlQuery works
-    even if the SqlDatabase has already been destroyed.
+    even if the Sqlite.Database has already been destroyed.
     ***********************************************************/
     private TestDestructor () {
         base ();
 
-        SqlDatabase database = new SqlDatabase ();
+        Sqlite.Database database;
         SqlQuery query_1 = new SqlQuery (this.database);
         SqlQuery query_2 = new SqlQuery (this.database);
         query_2.prepare ("SELECT * FROM addresses");

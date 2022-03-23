@@ -10,11 +10,9 @@ implied, as to its usefulness for any purpose.
 ***********************************************************/
 public abstract class AbstractTestOwnSql : GLib.Object {
 
-    using Sqlite.Database;
-
     /***********************************************************
     ***********************************************************/
-    private SqlDatabase database;
+    private Sqlite.Database database;
 
     QTemporaryDir temporary_directory;
 

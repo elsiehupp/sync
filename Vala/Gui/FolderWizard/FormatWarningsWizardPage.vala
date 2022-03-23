@@ -15,7 +15,7 @@ namespace Ui {
 ***********************************************************/
 public class FormatWarningsWizardPage : QWizardPage {
 
-    protected static string format_warnings (string[] warnings) {
+    protected static string format_warnings (GLib.List<string> warnings) {
         string ret;
         if (warnings.length == 1) {
             ret = _("<b>Warning:</b> %1").printf (warnings.first ());

@@ -9,7 +9,7 @@ namespace Testing {
 
 public class PathComponents : GLib.Object {
 
-    private string[] components;
+    private GLib.List<string> components;
 
     /***********************************************************
     ***********************************************************/
@@ -27,7 +27,7 @@ public class PathComponents : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public PathComponents (string[] path_components) {
+    public PathComponents (GLib.List<string> path_components) {
         this.components = path_components;
     }
 

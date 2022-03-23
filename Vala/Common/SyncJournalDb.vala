@@ -309,7 +309,7 @@ public class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private SqlDatabase database;
+    private Sqlite.Database database;
     private string database_file;
 
     /***********************************************************
@@ -370,7 +370,7 @@ public class SyncJournalDb : GLib.Object {
         this.transaction = 0;
         this.metadata_table_is_empty = false;
         // Allow forcing the journal mode for debugging
-        /*static*/ string env_journal_mode = qgetenv ("OWNCLOUD_SQLITE_JOURNAL_MODE");
+        /*static*/ string env_journal_mode = qgetenv ("OWNCLOUD_Sqlite.JOURNAL_MODE");
         this.journal_mode = env_journal_mode;
         if (this.journal_mode == "") {
             this.journal_mode = default_journal_mode (this.database_file);
@@ -1697,7 +1697,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     Write the selective sync list (remove all other entries of that list
     ***********************************************************/
-    public void selective_sync_list (SelectiveSyncListType type, string[] list) {
+    public void selective_sync_list (SelectiveSyncListType type, GLib.List<string> list) {
         QMutexLocker locker = new QMutexLocker (this.mutex);
         if (!check_connect ()) {
             return;
@@ -1857,7 +1857,7 @@ public class SyncJournalDb : GLib.Object {
 
         commit_transaction ();
 
-        this.database.close ();
+        //  this.database.close ();
         clear_etag_storage_filter ();
         this.metadata_table_is_empty = false;
     }
@@ -1875,7 +1875,7 @@ public class SyncJournalDb : GLib.Object {
         // Retrieve the identifier
         PreparedSqlQuery query = this.query_manager.get (PreparedSqlQueryManager.Key.GET_CHECKSUM_TYPE_QUERY, "SELECT name FROM checksumtype WHERE identifier=?1", this.database);
         if (!query) {
-            return {};
+            return "";
         }
         query.bind_value (1, checksum_type_id);
         if (!query.exec ()) {
@@ -2412,7 +2412,7 @@ public class SyncJournalDb : GLib.Object {
     private bool sql_fail (string log, SqlQuery query) {
         commit_transaction ();
         GLib.warning ("SQL Error" + log + query.error);
-        this.database.close ();
+        //  this.database.close ();
         //  ASSERT (false);
         return false;
     }
@@ -2423,7 +2423,7 @@ public class SyncJournalDb : GLib.Object {
     private void start_transaction () {
         if (this.transaction == 0) {
             if (!this.database.transaction ()) {
-                GLib.warning ("ERROR starting transaction:" + this.database.error);
+                GLib.warning ("ERROR starting transaction: " + this.database.errmsg ());
                 return;
             }
             this.transaction = 1;
@@ -2438,7 +2438,7 @@ public class SyncJournalDb : GLib.Object {
     private void commit_transaction () {
         if (this.transaction == 1) {
             if (!this.database.commit ()) {
-                GLib.warning ("ERROR committing to the database:" + this.database.error);
+                GLib.warning ("ERROR committing to the database:" + this.database.errmsg ());
                 return;
             }
             this.transaction = 0;
@@ -2475,10 +2475,9 @@ public class SyncJournalDb : GLib.Object {
             return false;
         }
 
-        // The database file is created by this call (SQLITE_OPEN_CREATE)
+        // The database file is created by this call (Sqlite.OPEN_CREATE)
         if (!this.database.open_or_create_read_write (this.database_file)) {
-            string error = this.database.error;
-            GLib.warning ("Error opening the database:" + error);
+            GLib.warning ("Error opening the database:" + this.database.errmsg ());
             return false;
         }
 
@@ -2497,7 +2496,7 @@ public class SyncJournalDb : GLib.Object {
         }
 
         // Set locking mode to avoid issues with WAL on Windows
-        string locking_mode_env = qgetenv ("OWNCLOUD_SQLITE_LOCKING_MODE");
+        string locking_mode_env = qgetenv ("OWNCLOUD_Sqlite.LOCKING_MODE");
         if (locking_mode_env == "")
             locking_mode_env = "EXCLUSIVE";
         pragma1.prepare ("PRAGMA locking_mode=" + locking_mode_env + ";");
@@ -2517,7 +2516,7 @@ public class SyncJournalDb : GLib.Object {
         }
 
         // For debugging purposes, allow temp_store to be set
-        string env_temp_store = qgetenv ("OWNCLOUD_SQLITE_TEMP_STORE");
+        string env_temp_store = qgetenv ("OWNCLOUD_Sqlite.TEMP_STORE");
         if (!env_temp_store == "") {
             pragma1.prepare ("PRAGMA temp_store = " + env_temp_store + ";");
             if (!pragma1.exec ()) {
@@ -2547,7 +2546,7 @@ public class SyncJournalDb : GLib.Object {
         //      this.database.sqlite_database (),
         //      "parent_hash",
         //      1,
-        //      SQLITE_UTF8 | SQLITE_DETERMINISTIC,
+        //      Sqlite.UTF8 | Sqlite.DETERMINISTIC,
         //      null,
         //      [] (sqlite3_context context, int, sqlite3_value **argv) {
         //          var text = (const char)sqlite3_value_text (argv[0]);
@@ -2590,18 +2589,18 @@ public class SyncJournalDb : GLib.Object {
                             + "PRIMARY KEY (phash)"
                             + ");");
 
-    //  #ifndef SQLITE_IOERR_SHMMAP
+    //  #ifndef Sqlite.IOERR_SHMMAP
     //  // Requires sqlite >= 3.7.7 but old CentOS6 has sqlite-3.6.20
     //  // Definition taken from https://sqlite.org/c3ref/c_abort_rollback.html
-    //  const int SQLITE_IOERR_SHMMAP            (SQLITE_IOERR | (21<<8))
+    //  const int Sqlite.IOERR_SHMMAP            (Sqlite.IOERR | (21<<8))
     //  #endif
 
         if (!create_query.exec ()) {
             // In certain situations the io error can be avoided by switching
             // to the DELETE journal mode, see #5723
             if (this.journal_mode != "DELETE"
-                && create_query.error_id () == SQLITE_IOERR
-                && sqlite3_extended_errcode (this.database.sqlite_database ()) == SQLITE_IOERR_SHMMAP) {
+                && create_query.error_id () == Sqlite.IOERR
+                && this.database.errcode () == Sqlite.IOERR) {
                 GLib.warning ("IO error SHMMAP on table creation, attempting with DELETE journal mode");
                 this.journal_mode = "DELETE";
                 commit_transaction ();

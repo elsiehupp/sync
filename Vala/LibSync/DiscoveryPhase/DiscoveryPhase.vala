@@ -120,7 +120,7 @@ public class DiscoveryPhase : GLib.Object {
     Input
     The blocklist from the capabilities
     ***********************************************************/
-    public string[] server_blocklisted_files;
+    public GLib.List<string> server_blocklisted_files;
 
     /***********************************************************
     Input
@@ -449,7 +449,7 @@ public class DiscoveryPhase : GLib.Object {
     Given a sorted list of paths ending with "/", return whether
     or not the given path is within one of the paths of the list
     ***********************************************************/
-    private static bool find_path_in_list (string[] list, string path) {
+    private static bool find_path_in_list (GLib.List<string> list, string path) {
         GLib.assert (std.is_sorted (list.begin (), list.end ()));
 
         if (list.size () == 1 && list.first () == "/") {

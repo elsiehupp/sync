@@ -760,7 +760,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
         if (thumbnail_url_copy.has_prefix ("/") || thumbnail_url_copy.has_prefix ('\\')) {
             // relative image resource URL, just needs some concatenation with current server URL
             // some icons may contain parameters after (?)
-            const string[] thumbnail_url_copy_splitted = thumbnail_url_copy.contains ('?')
+            const GLib.List<string> thumbnail_url_copy_splitted = thumbnail_url_copy.contains ('?')
                 ? thumbnail_url_copy.split ('?', Qt.SkipEmptyParts)
                 : { thumbnail_url_copy };
             //  Q_ASSERT (!thumbnail_url_copy_splitted == "");
@@ -785,7 +785,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
         if (fallack_icon_copy.has_prefix ("/") || fallack_icon_copy.has_prefix ('\\')) {
             // relative image resource URL, just needs some concatenation with current server URL
             // some icons may contain parameters after (?)
-            const string[] fallack_icon_path_splitted =
+            const GLib.List<string> fallack_icon_path_splitted =
                 fallack_icon_copy.contains ('?') ? fallack_icon_copy.split ('?') : { fallack_icon_copy };
             //  Q_ASSERT (!fallack_icon_path_splitted == "");
             server_url_copy.path (fallack_icon_path_splitted[0]);
@@ -813,7 +813,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
         }
 
         if (server_url == "") {
-            const string[] list_images = {thumbnail_url, fallack_icon};
+            const GLib.List<string> list_images = {thumbnail_url, fallack_icon};
             return list_images.join (';');
         }
 
@@ -828,7 +828,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
             return url_for_thumbnail;
         }
 
-        const string[] list_images = {
+        const GLib.List<string> list_images = {
             url_for_thumbnail,
             url_for_fallack_icon
         };

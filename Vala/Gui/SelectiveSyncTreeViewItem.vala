@@ -25,7 +25,7 @@ public class SelectiveSyncTreeViewItem : QTreeWidgetItem {
 
     /***********************************************************
     ***********************************************************/
-    public SelectiveSyncTreeViewItem.for_string_list (string[] strings, int type = QTreeWidgetItem.Type) {
+    public SelectiveSyncTreeViewItem.for_string_list (GLib.List<string> strings, int type = QTreeWidgetItem.Type) {
 
     }
 

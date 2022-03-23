@@ -72,7 +72,7 @@ public class ProgressDispatcher : GLib.Object {
     /***********************************************************
     @brief Emitted for a folder when a sync is done, listing all pending conflicts
     ***********************************************************/
-    internal signal void signal_folder_conflicts (string folder, string[] conflict_paths);
+    internal signal void signal_folder_conflicts (string folder, GLib.List<string> conflict_paths);
 
 
     /***********************************************************

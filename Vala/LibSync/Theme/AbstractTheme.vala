@@ -763,7 +763,7 @@ public class Theme : GLib.Object {
         public get {
             //  return MIRALL_VERSION_STRING;
             // Shorten Qt's OS name: "macOS Mojave (10.14)" . "macOS"
-            string[] os_string_list = Utility.platform_name ().split (' ');
+            GLib.List<string> os_string_list = Utility.platform_name ().split (' ');
             string os_name = os_string_list.at (0);
 
             string dev_string;

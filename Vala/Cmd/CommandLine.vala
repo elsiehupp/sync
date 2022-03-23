@@ -111,8 +111,8 @@ public class CommandLine : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void parse_options (string[] app_args, CmdOptions options) {
-        string[] args = app_args;
+    private void parse_options (GLib.List<string> app_args, CmdOptions options) {
+        GLib.List<string> args = app_args;
 
         int arg_count = args.length;
 
@@ -195,8 +195,8 @@ public class CommandLine : GLib.Object {
     to disable the read from database. (The normal client does
     it in SelectiveSyncDialog.accept).
     ***********************************************************/
-    private void selective_sync_fixup (SyncJournalDb journal, string[] new_list) {
-        SqlDatabase database;
+    private void selective_sync_fixup (SyncJournalDb journal, GLib.List<string> new_list) {
+        Sqlite.Database database;
         if (!database.open_or_create_read_write (journal.database_file_path)) {
             return;
         }
@@ -243,7 +243,7 @@ public class CommandLine : GLib.Object {
         unowned Account account = Account.create ();
 
         if (!account) {
-            q_fatal ("Could not initialize account!");
+            GLib.fatal ("Could not initialize account!");
             return EXIT_FAILURE;
         }
 
@@ -307,7 +307,7 @@ public class CommandLine : GLib.Object {
             int port = 0;
             bool ok = false;
 
-            string[] p_list = options.proxy.split (":");
+            GLib.List<string> p_list = options.proxy.split (":");
             if (p_list.length == 3) {
                 // http : //192.168.178.23 : 8080
                 //  0            1            2
@@ -320,7 +320,7 @@ public class CommandLine : GLib.Object {
                 QNetworkProxyFactory.use_system_configuration (false);
                 QNetworkProxy.application_proxy (QNetworkProxy (QNetworkProxy.HttpProxy, host, port));
             } else {
-                q_fatal ("Could not read httpproxy. The proxy should have the format \"http://hostname:port\".");
+                GLib.fatal ("Could not read httpproxy. The proxy should have the format \"http://hostname:port\".");
             }
         }
 
@@ -370,7 +370,7 @@ public class CommandLine : GLib.Object {
 
         opts = options;
 
-        string[] selective_sync_list;
+        GLib.List<string> selective_sync_list;
         if (options.unsynced_folders != "") {
             GLib.File f = new GLib.File (options.unsynced_folders);
             if (!f.open (GLib.File.ReadOnly)) {

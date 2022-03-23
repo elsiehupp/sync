@@ -13,7 +13,7 @@ public class TestRecursiveDelete : AbstractTestSyncJournalDB {
     ***********************************************************/
     private TestRecursiveDelete () {
 
-        string[] elements = {
+        GLib.List<string> elements = {
             "foo",
             "foo/file",
             "bar",

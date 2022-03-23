@@ -61,7 +61,7 @@ public class SyncEngineTestUtils : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    inline void add_files (string[] dest, FileInfo file_info) {
+    inline void add_files (GLib.List<string> dest, FileInfo file_info) {
         if (file_info.is_directory) {
             dest += "%1 - directory".printf (file_info.path);
             foreach (FileInfo file_info in file_info.children) {
@@ -75,7 +75,7 @@ public class SyncEngineTestUtils : GLib.Object {
     /***********************************************************
     ***********************************************************/
     inline string to_string_no_elide (FileInfo file_info) {
-        string[] files;
+        GLib.List<string> files;
         foreach (FileInfo file_info in file_info.children) {
             add_files (files, file_info);
         }
@@ -85,7 +85,7 @@ public class SyncEngineTestUtils : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    inline void add_files_database_data (string[] dest, FileInfo file_info) {
+    inline void add_files_database_data (GLib.List<string> dest, FileInfo file_info) {
         // could include etag, permissions etc, but would need extra work
         if (file_info.is_directory) {
             dest += "%1 - %2 %3 %4".printf (
@@ -109,7 +109,7 @@ public class SyncEngineTestUtils : GLib.Object {
     /***********************************************************
     ***********************************************************/
     inline char print_database_data (FileInfo file_info) {
-        string[] files;
+        GLib.List<string> files;
         foreach (FileInfo file_info in file_info.children) {
             add_files_database_data (files, file_info);
         }

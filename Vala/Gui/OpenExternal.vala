@@ -28,7 +28,7 @@ public class OpenExternal : GLib.Object {
     If launching the browser fails, display a message.
     ***********************************************************/
     public static void open_browser (GLib.Uri url, Gtk.Widget error_widget_parent = new Gtk.Widget ()) throws OpenExternalError {
-        const string[] allowed_url_schemes = {
+        const GLib.List<string> allowed_url_schemes = {
             "http",
             "https",
             "oauthtest"

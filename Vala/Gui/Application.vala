@@ -38,7 +38,7 @@ public class Application : Gtk.Application {
 
     /***********************************************************
     ***********************************************************/
-    const string[] OPTIONS = {
+    const GLib.List<string> OPTIONS = {
         "Options:\n",
         "  --help, -h           : show this help screen.\n",
         "  --version, -v        : show version information.\n",
@@ -224,7 +224,7 @@ public class Application : Gtk.Application {
 
                     // Try to move the files one by one
                     if (GLib.FileInfo (configuration_directory).is_dir () || GLib.Dir ().mkdir (configuration_directory)) {
-                        const string[] files_list = GLib.Dir (old_dir).entry_list (GLib.Dir.Files);
+                        const GLib.List<string> files_list = GLib.Dir (old_dir).entry_list (GLib.Dir.Files);
                         GLib.info ("Will move the individual files " + files_list);
                         foreach (var name in files_list) {
                             if (!GLib.File.rename (old_dir + "/" + name, configuration_directory + "/" + name)) {
@@ -558,7 +558,7 @@ public class Application : Gtk.Application {
 
     /***********************************************************
     ***********************************************************/
-    protected void parse_options (string[] options) {
+    protected void parse_options (GLib.List<string> options) {
         QStringListIterator iterator = new QStringListIterator (options);
         // skip file name;
         if (iterator.has_next ()) {
@@ -630,7 +630,7 @@ public class Application : Gtk.Application {
     /***********************************************************
     ***********************************************************/
     protected void setup_translations () {
-        string[] ui_languages;
+        GLib.List<string> ui_languages;
         ui_languages = QLocale.system ().ui_languages ();
 
         string enforced_locale = Theme.enforced_locale;
@@ -723,7 +723,7 @@ public class Application : Gtk.Application {
     protected void on_signal_parse_message (string message, GLib.Object object) {
         if (message.has_prefix ("MSG_PARSEOPTIONS:")) {
             const int length_of_msg_prefix = 17;
-            string[] options = message.mid (length_of_msg_prefix).split ('|');
+            GLib.List<string> options = message.mid (length_of_msg_prefix).split ('|');
             this.show_log_window = false;
             parse_options (options);
             setup_logging ();

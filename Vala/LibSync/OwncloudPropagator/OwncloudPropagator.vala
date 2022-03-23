@@ -421,7 +421,7 @@ public class OwncloudPropagator : GLib.Object {
             // Just check that there is no other file with the same name and different casing.
             GLib.FileInfo file_info = GLib.File.new_for_path (file);
             const string fn = file_info.filename ();
-            const string[] list = file_info.directory ().entry_list ({
+            const GLib.List<string> list = file_info.directory ().entry_list ({
                 fn
             });
             if (list.length > 1 || (list.length == 1 && list[0] != fn)) {

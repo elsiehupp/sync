@@ -16,7 +16,7 @@ namespace Ui {
 public class AsyncImageResponse : QQuickImageResponse {
 
     Gtk.Image image;
-    string[] image_paths;
+    GLib.List<string> image_paths;
     QSize requested_image_size;
     int index = 0;
 

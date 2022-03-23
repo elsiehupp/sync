@@ -354,7 +354,7 @@ public class AccountSettings : Gtk.Widget {
 
             switch (state) {
             case AccountState.State.CONNECTED: {
-                string[] errors;
+                GLib.List<string> errors;
                 if (account.server_version_unsupported) {
                     errors += _("The server version %1 is unsupported! Proceed at your own risk.").printf (account.server_version ());
                 }
@@ -1400,7 +1400,7 @@ public class AccountSettings : Gtk.Widget {
     protected void on_signal_link_activated (string link) {
         // Parse folder_connection alias and filename from the link, calculate the index
         // and select it if it exists.
-        string[] li = link.split ("?folder_connection=");
+        GLib.List<string> li = link.split ("?folder_connection=");
         if (li.length > 1) {
             string my_folder = li[0];
             string alias = li[1];
@@ -1541,7 +1541,7 @@ public class AccountSettings : Gtk.Widget {
     ***********************************************************/
     private void show_connection_label (
         string message,
-        string[] errors = {}
+        GLib.List<string> errors = {}
     ) {
         const string err_style = "color: #ffffff; background-color: #bb4d4d; padding: 5px;"
                                + "border-width: 1px; border-style: solid; border-color: #aaaaaa;"

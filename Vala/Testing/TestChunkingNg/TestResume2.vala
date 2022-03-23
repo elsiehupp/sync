@@ -28,7 +28,7 @@ public class TestResume2 : AbstractTestChunkingNg {
         GLib.assert_true (uploaded_size > 2 * 1000 * 1000); // at least 50 MB
         GLib.assert_true (chunk_map.size () >= 3); // at least three chunks
 
-        string[] chunks_to_delete;
+        GLib.List<string> chunks_to_delete;
 
         // Remove the second chunk, so all further chunks will be deleted and resent
         var first_chunk = chunk_map.first ();
@@ -38,7 +38,7 @@ public class TestResume2 : AbstractTestChunkingNg {
         }
         fake_folder.upload_state ().children.first ().remove (second_chunk.name);
 
-        string[] deleted_paths;
+        GLib.List<string> deleted_paths;
         fake_folder.set_server_override (this.override_delegate_resume2);
 
         GLib.assert_true (fake_folder.sync_once ());

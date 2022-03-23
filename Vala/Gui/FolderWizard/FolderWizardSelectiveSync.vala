@@ -77,7 +77,7 @@ public class FolderWizardSelectiveSync : QWizardPage {
         string alias = GLib.FileInfo (target_path).filename ();
         if (alias == "")
             alias = Theme.app_name;
-        string[] initial_blocklist;
+        GLib.List<string> initial_blocklist;
         if (Theme.wizard_selective_sync_default_nothing) {
             initial_blocklist = { "/" };
         }

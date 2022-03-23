@@ -961,7 +961,7 @@ public class FolderConnection : GLib.Object {
 
     If the list of changed files is known, it is passed.
     ***********************************************************/
-    public void on_signal_start_sync (string[] path_list = {}) {
+    public void on_signal_start_sync (GLib.List<string> path_list = {}) {
         //  Q_UNUSED (path_list)
 
         if (is_busy ()) {
@@ -1496,7 +1496,7 @@ public class FolderConnection : GLib.Object {
     This is pretty awkward, but IssuesWidget just keeps better track
     of conflicts across partial local discovery.
     ***********************************************************/
-    private void on_signal_folder_conflicts (string folder_connection, string[] conflict_paths) {
+    private void on_signal_folder_conflicts (string folder_connection, GLib.List<string> conflict_paths) {
         if (folder_connection != this.definition.alias)
             return;
         var r = this.sync_result;

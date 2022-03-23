@@ -299,7 +299,7 @@ public class OwncloudGui : GLib.Object {
 
         // create the tray blob message, check if we have an defined state
         if (map.length > 0) {
-            string[] all_status_strings;
+            GLib.List<string> all_status_strings;
             foreach (FolderConnection folder_connection in map.values ()) {
                 string folder_message = FolderManager.tray_tooltip_status_string (
                     folder_connection.sync_result.status (),

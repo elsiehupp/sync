@@ -24,7 +24,7 @@ public class TestAllFilesDeletedKeep : AbstractTestAllFilesDeleted {
 
         //Just set a blocklist so we can check it is still there. This directory does not exists but
         // that does not matter for our purposes.
-        string[] selective_sync_blocklist = { "Q/" };
+        GLib.List<string> selective_sync_blocklist = { "Q/" };
         fake_folder.sync_engine.journal.set_selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST,
                                                                 selective_sync_blocklist);
 

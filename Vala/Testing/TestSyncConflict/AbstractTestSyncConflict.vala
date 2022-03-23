@@ -31,8 +31,8 @@ public abstract class AbstractTestSyncConflict : GLib.Object {
     }
 
 
-    protected static string[] find_conflicts (FileInfo directory) {
-        string[] conflicts;
+    protected static GLib.List<string> find_conflicts (FileInfo directory) {
+        GLib.List<string> conflicts;
         foreach (var item in directory.children) {
             if (item.name.contains (" (conflicted copy")) {
                 conflicts.append (item.path);

@@ -79,7 +79,7 @@ public class PropagateLocalRemove : AbstractPropagateItemJob {
     ***********************************************************/
     private bool remove_recursively (string path) {
         string absolute = this.propagator.full_local_path (this.item.file + path);
-        string[] errors;
+        GLib.List<string> errors;
         GLib.List<QPair<string, bool>> deleted;
         bool on_signal_success = FileSystem.remove_recursively (
             absolute,

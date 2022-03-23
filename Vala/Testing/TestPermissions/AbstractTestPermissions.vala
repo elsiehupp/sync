@@ -75,12 +75,12 @@ public class AbstractTestPermissions : GLib.Object {
         // The DB is openend in locked mode : close to allow us to access.
         journal.close ();
 
-        SqlDatabase database;
+        Sqlite.Database database;
         GLib.assert_true (database.open_read_only (journal.database_file_path));
-        SqlQuery q = new SqlQuery ("SELECT count (*) from metadata where length (file_identifier) == 0", database);
-        GLib.assert_true (q.exec ());
-        GLib.assert_true (q.next ().has_data);
-        GLib.assert_true (q.int_value (0) == 0);
+        SqlQuery sql_query = new SqlQuery ("SELECT count (*) from metadata where length (file_identifier) == 0", database);
+        GLib.assert_true (sql_query.exec ());
+        GLib.assert_true (sql_query.next ().has_data);
+        GLib.assert_true (sql_query.int_value (0) == 0);
     }
 
 

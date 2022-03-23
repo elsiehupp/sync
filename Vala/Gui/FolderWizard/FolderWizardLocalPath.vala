@@ -57,7 +57,7 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
             GLib.Dir.from_native_separators (this.instance.local_folder_line_edit.text ()), server_url);
 
         bool is_ok = error_str == "";
-        string[] warn_strings;
+        GLib.List<string> warn_strings;
         if (!is_ok) {
             warn_strings += error_str;
         }
@@ -97,7 +97,7 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
 
         // open the first entry of the home directory. Otherwise the directory picker comes
         // up with the closed home directory icon, stupid Qt default...
-        string[] dirs = d.entry_list (GLib.Dir.Dirs | GLib.Dir.NoDotAndDotDot | GLib.Dir.No_sym_links,
+        GLib.List<string> dirs = d.entry_list (GLib.Dir.Dirs | GLib.Dir.NoDotAndDotDot | GLib.Dir.No_sym_links,
             GLib.Dir.Dirs_first | GLib.Dir.Name);
 
         if (dirs.length > 0)

@@ -44,7 +44,7 @@ public class OwncloudWizard : QWizard {
     private AbstractCredentialsWizardPage credentials_page = null;
     private WebViewPage web_view_page = null;
 
-    string[] setup_log;
+    GLib.List<string> setup_log;
 
     public string oc_url {
         public get {
@@ -213,7 +213,7 @@ public class OwncloudWizard : QWizard {
 
     /***********************************************************
     ***********************************************************/
-    public string[] selective_sync_blocklist () {
+    public GLib.List<string> selective_sync_blocklist () {
         return this.advanced_setup_page.selective_sync_blocklist ();
     }
 

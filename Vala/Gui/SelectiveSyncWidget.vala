@@ -16,7 +16,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
     ***********************************************************/
     private string folder_path;
     private string root_name;
-    private string[] old_block_list;
+    private GLib.List<string> old_block_list;
 
     /***********************************************************
     Set to true when we are inserting new items on the list
@@ -36,7 +36,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private string[] encrypted_paths;
+    private GLib.List<string> encrypted_paths;
 
     /***********************************************************
     ***********************************************************/
@@ -81,23 +81,23 @@ public class SelectiveSyncWidget : Gtk.Widget {
     Returns a list of blocklisted paths, each including the
     trailing "/"
     ***********************************************************/
-    public string[] create_block_list (QTreeWidgetItem root = null) {
+    public GLib.List<string> create_block_list (QTreeWidgetItem root = null) {
         if (!root) {
             root = this.folder_tree.top_level_item (0);
         }
         if (!root)
-            return string[] ();
+            return GLib.List<string> ();
 
         switch (root.check_state (0)) {
         case Qt.Unchecked:
-            return string[] (root.data (0, Qt.USER_ROLE).to_string () + "/");
+            return GLib.List<string> (root.data (0, Qt.USER_ROLE).to_string () + "/");
         case Qt.Checked:
-            return string[] ();
+            return GLib.List<string> ();
         case Qt.PartiallyChecked:
             break;
         }
 
-        string[] result;
+        GLib.List<string> result;
         if (root.child_count ()) {
             for (int i = 0; i < root.child_count (); ++i) {
                 result += create_block_list (root.child (i));
@@ -118,7 +118,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
     Returns the old_block_list passed into folder_info (), except that
     a "/" entry is expanded to all top-level folder names.
     ***********************************************************/
-    public string[] old_block_list () {
+    public GLib.List<string> old_block_list () {
         return this.old_block_list;
     }
 
@@ -164,7 +164,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
     ***********************************************************/
     public void folder_info (
         string folder_path, string root_name,
-        string[] old_block_list = string[] ()) {
+        GLib.List<string> old_block_list = GLib.List<string> ()) {
         this.folder_path = folder_path;
         if (this.folder_path.has_prefix ("/")) {
             // remove leading "/"
@@ -185,7 +185,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_update_directories (string[] list) {
+    private void on_signal_update_directories (GLib.List<string> list) {
         var lscol_job = qobject_cast<LscolJob> (sender ());
         QScopedValueRollback<bool> is_inserting (this.inserting);
         this.inserting = true;
@@ -211,7 +211,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
 
         // Since / cannot be in the blocklist, expand it to the actual
         // list of top-level folders as soon as possible.
-        if (this.old_block_list == string[] ("/")) {
+        if (this.old_block_list == GLib.List<string> ("/")) {
             this.old_block_list == "";
             foreach (string path, list) {
                 path.remove (path_to_remove);
@@ -256,7 +256,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
                 continue;
             }
 
-            string[] paths = path.split ("/");
+            GLib.List<string> paths = path.split ("/");
             if (paths.last () == "")
                 paths.remove_last ();
             if (paths == "")
@@ -434,7 +434,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private static void SelectiveSyncWidget.recursive_insert (QTreeWidgetItem parent, string[] path_trail, string path, int64 size) {
+    private static void SelectiveSyncWidget.recursive_insert (QTreeWidgetItem parent, GLib.List<string> path_trail, string path, int64 size) {
         QFileIconProvider prov;
         Gtk.Icon folder_icon = prov.icon (QFileIconProvider.FolderConnection);
         if (path_trail.size () == 0) {

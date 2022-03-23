@@ -19,7 +19,7 @@ public class IconUtils : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public static string find_svg_file_path (string filename, string[] possible_colors) {
+    public static string find_svg_file_path (string filename, GLib.List<string> possible_colors) {
         string result = Theme.THEME_PREFIX + filename;
         if (GLib.File.exists (result)) {
             return result;
@@ -65,7 +65,7 @@ public class IconUtils : GLib.Object {
         }
 
         // some icons are present in white or black only, so, we need to check both when needed
-        const string[] icon_base_colors = {
+        const GLib.List<string> icon_base_colors = {
             "black",
             "white"
         };

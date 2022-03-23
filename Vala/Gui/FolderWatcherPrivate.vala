@@ -140,7 +140,7 @@ public class FolderWatcherPrivate : GLib.Object {
         GLib.Dir in_path = new GLib.Dir (path);
         inotify_register_path (in_path.absolute_path);
 
-        string[] all_subfolders;
+        GLib.List<string> all_subfolders;
         if (!find_folders_below (GLib.Dir (path), all_subfolders)) {
             GLib.warning ("Could not traverse all subfolders.");
         }
@@ -169,19 +169,19 @@ public class FolderWatcherPrivate : GLib.Object {
     /***********************************************************
     Attention: result list passed by reference!
     ***********************************************************/
-    protected bool find_folders_below (GLib.Dir directory, string[] full_list) {
+    protected bool find_folders_below (GLib.Dir directory, GLib.List<string> full_list) {
         bool ok = true;
         if (! (directory.exists () && directory.is_readable ())) {
             GLib.debug ("Non existing path coming in: " + directory.absolute_path);
             ok = false;
         } else {
-            string[] name_filter;
+            GLib.List<string> name_filter;
             name_filter += "*";
             GLib.Dir.Filters filter = GLib.Dir.Dirs | GLib.Dir.NoDotAndDotDot | GLib.Dir.No_sym_links | GLib.Dir.Hidden;
-            const string[] pathes = directory.entry_list (name_filter, filter);
+            const GLib.List<string> pathes = directory.entry_list (name_filter, filter);
 
-            // FIXME: need to iterate through string[]
-            //  string[].ConstIterator ConstIterator;
+            // FIXME: need to iterate through GLib.List<string>
+            //  GLib.List<string>.ConstIterator ConstIterator;
             //  for (ConstIterator = pathes.const_begin (); ConstIterator != pathes.const_end ();
             //       ++ConstIterator) {
             //      const string full_path (directory.path + "/" + (*ConstIterator));

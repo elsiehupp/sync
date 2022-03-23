@@ -19,7 +19,7 @@ public class TestSelectiveSyncBigFolders : GLib.Object {
         options.new_big_folder_size_limit = 20000; // 20 K
         fake_folder.sync_engine.set_sync_options (options);
 
-        string[] size_requests;
+        GLib.List<string> size_requests;
         fake_folder.set_server_override (this.override_delegate);
 
         QSignalSpy signal_new_big_folder = new QSignalSpy (fake_folder.sync_engine, SyncEngine.signal_new_big_folder);

@@ -279,7 +279,7 @@ public class SyncFileStatusTracker : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void invalidate_parent_paths (string path) {
-        string[] split_path = path.split ("/", Qt.SkipEmptyParts);
+        GLib.List<string> split_path = path.split ("/", Qt.SkipEmptyParts);
         for (int i = 0; i < split_path.size (); ++i) {
             string parent_path = split_path.mid (0, i).join ("/");
             /* emit */ signal_file_status_changed (get_system_destination (parent_path), file_status (parent_path));

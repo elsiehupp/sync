@@ -266,8 +266,8 @@ public class UserStatusSelectorModel : GLib.Object {
     /***********************************************************
     Q_REQUIRED_RESULT
     ***********************************************************/
-    public string[] clear_at_values () {
-        string[] clear_at_stages;
+    public GLib.List<string> clear_at_values () {
+        GLib.List<string> clear_at_stages;
         std.transform (
             this.clear_stages.begin (),
             this.clear_stages.end (),

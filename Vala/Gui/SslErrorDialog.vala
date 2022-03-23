@@ -64,7 +64,7 @@ public class SslErrorDialog : Gtk.Dialog {
         // check if unknown certificates caused errors.
         this.unknown_certificates == null;
 
-        string[] error_strings;
+        GLib.List<string> error_strings;
 
         GLib.List<string> additional_error_strings = new GLib.List<string> ();
 
@@ -169,7 +169,7 @@ public class SslErrorDialog : Gtk.Dialog {
         message += QL ("<h3>") + _("with Certificate %1").printf (Utility.escape (cert.subject_info (QSslCertificate.Common_name))) + QL ("</h3>");
 
         message += QL ("<div identifier=\"ccert\">");
-        string[] li;
+        GLib.List<string> li;
 
         string org = Utility.escape (cert.subject_info (QSslCertificate.Organization));
         string unit = Utility.escape (cert.subject_info (QSslCertificate.Organizational_unit_name));
@@ -218,9 +218,9 @@ public class SslErrorDialog : Gtk.Dialog {
 
     /***********************************************************
     Used for QSSLCertificate.subject_info which returns a
-    string[] in Qt5, but a string in Qt4
+    GLib.List<string> in Qt5, but a string in Qt4
     ***********************************************************/
-    private static string escape (string[] l) {
+    private static string escape (GLib.List<string> l) {
         return escape (l.join (';'));
     }
 

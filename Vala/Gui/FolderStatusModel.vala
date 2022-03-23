@@ -876,7 +876,7 @@ public class FolderStatusModel : QAbstractItemModel {
                 GLib.warning ("Could not read selective sync list from database.");
                 continue;
             }
-            string[] block_list = create_block_list (folder_info, old_block_list);
+            GLib.List<string> block_list = create_block_list (folder_info, old_block_list);
             folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, block_list);
 
             var block_list_set = block_list.to_set ();
@@ -884,7 +884,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
             // The folders that were undecided or blocklisted and that are now checked should go on the allow list.
             // The user confirmed them already just now.
-            string[] to_add_to_allow_list = ( (old_block_list_set + folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok).to_set ()) - block_list_set).values ();
+            GLib.List<string> to_add_to_allow_list = ( (old_block_list_set + folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok).to_set ()) - block_list_set).values ();
 
             if (!to_add_to_allow_list == "") {
                 var allow_list = folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, ok);
@@ -1201,7 +1201,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_update_directories (string[] list) {
+    private void on_signal_update_directories (GLib.List<string> list) {
         var lscol_job = (LscolJob) sender ());
         //  ASSERT (lscol_job);
         QModelIndex index = qvariant_cast<QPersistentModelIndex> (lscol_job.property (PROPERTY_PARENT_INDEX_C));
@@ -1228,7 +1228,7 @@ public class FolderStatusModel : QAbstractItemModel {
         if (!path_to_remove.has_suffix ("/"))
             path_to_remove += "/";
 
-        string[] selective_sync_block_list;
+        GLib.List<string> selective_sync_block_list;
         bool ok1 = true;
         bool ok2 = true;
         if (parent_info.checked == Qt.PartiallyChecked) {
@@ -1250,7 +1250,7 @@ public class FolderStatusModel : QAbstractItemModel {
         const var permission_map = lscol_job.property (PROPERTY_PERMISSION_MAP).to_map ();
         const var encryption_map = lscol_job.property (PROPERTY_ENCRYPTION_MAP).to_map ();
 
-        string[] sorted_subfolders = list;
+        GLib.List<string> sorted_subfolders = list;
         if (!sorted_subfolders == "")
             sorted_subfolders.remove_first (); // skip the parent item (first in the list)
         Utility.sort_filenames (sorted_subfolders);
@@ -1532,8 +1532,8 @@ public class FolderStatusModel : QAbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    private string[] create_block_list (FolderStatusModel.SubFolderInfo root,
-        string[] old_block_list) {
+    private GLib.List<string> create_block_list (FolderStatusModel.SubFolderInfo root,
+        GLib.List<string> old_block_list) {
         switch (root.checked) {
         case Qt.Unchecked:
             return { root.path };
@@ -1543,7 +1543,7 @@ public class FolderStatusModel : QAbstractItemModel {
             break;
         }
 
-        string[] result;
+        GLib.List<string> result;
         if (root.fetched) {
             for (int i = 0; i < root.subs.length; ++i) {
                 result += create_block_list (root.subs.at (i), old_block_list);

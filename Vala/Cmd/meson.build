@@ -14,6 +14,8 @@ deps = [
     # dependency('gee-0.8'),
     # dependency('json-glib-1.0'),
     dependency('libsoup-2.4'),
+    # libsqlite3-dev
+    dependency('sqlite3'),
     meson.get_compiler('vala').find_library('readline'),
 ]
 

@@ -189,7 +189,7 @@ public class PropagateUploadEncrypted : GLib.Object {
 
                                             . on_signal_success.
     ***********************************************************/
-    private void on_signal_folder_encrypted_id_received (string[] list) {
+    private void on_signal_folder_encrypted_id_received (GLib.List<string> list) {
         GLib.debug ("Received identifier of folder; trying to lock it so we can prepare the metadata.");
         var lscol_job = (LscolJob) sender ();
         var folder_info = lscol_job.folder_infos.value (list.first ());

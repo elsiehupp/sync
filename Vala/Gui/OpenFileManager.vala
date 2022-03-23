@@ -37,7 +37,7 @@ public class OpenFileManager : GLib.Object {
     ***********************************************************/
     public static void show_in_file_manager (string local_path) {
         string app;
-        string[] args;
+        GLib.List<string> args;
 
         OpenFileManager.default_manager = find_default_file_manager ();
         GLib.Settings desktop_file = new GLib.Settings (OpenFileManager.default_manager, GLib.Settings.IniFormat);
@@ -150,8 +150,8 @@ public class OpenFileManager : GLib.Object {
         }
 
         GLib.FileInfo file_info;
-        string[] dirs = xdg_data_dirs ();
-        string[] subdirectories;
+        GLib.List<string> dirs = xdg_data_dirs ();
+        GLib.List<string> subdirectories;
         subdirectories += "/applications/"
                 + "/applications/kde4/";
         foreach (string directory in dirs) {

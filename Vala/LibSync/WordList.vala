@@ -6,8 +6,8 @@ namespace LibSync {
 ***********************************************************/
 public class WordList : GLib.Object {
 
-    public static string[] get_random_words (int nr) {
-        string[] word_list = {
+    public static GLib.List<string> get_random_words (int nr) {
+        GLib.List<string> word_list = {
             "abandon",
             "ability",
             "able",
@@ -2069,7 +2069,7 @@ public class WordList : GLib.Object {
     }
 
 
-    public static string get_unified_string (string[] w_list) {
+    public static string get_unified_string (GLib.List<string> w_list) {
         string ret;
         foreach (string string_value in w_list) {
             ret += string_value;

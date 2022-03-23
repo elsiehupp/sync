@@ -2,19 +2,17 @@ namespace Occ {
 namespace Common {
 
 /***********************************************************
-@class SqlDatabase
+@class Sqlite.Database
 
-@brief The SqlDatabase class
+@brief The Sqlite.Database class
 
 @author Klaas Freitag <freitag@owncloud.com>
 
 @copyright LGPLv2.1 or later
 ***********************************************************/
-public class SqlDatabase : GLib.Object {
+public class SqliteDatabase : GLib.Object {
 
-    using Sqlite.Database;
-
-    // Q_DISABLE_COPY (SqlDatabase)
+    // Q_DISABLE_COPY (Sqlite.Database)
 
     /***********************************************************
     ***********************************************************/
@@ -25,8 +23,8 @@ public class SqlDatabase : GLib.Object {
         NOT_OKAY,
     }
 
-    const int SQLITE_SLEEP_TIME_USEC = 100000;
-    const int SQLITE_REPEAT_COUNT = 20;
+    const int SLEEP_TIME_USEC = 100000;
+    const int REPEAT_COUNT = 20;
 
 
     /***********************************************************
@@ -59,17 +57,17 @@ public class SqlDatabase : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    //  public SqlDatabase () = default;
+    //  public Sqlite.Database () = default;
 
 
-    ~SqlDatabase () {
+    ~Sqlite.Database () {
         close ();
     }
 
 
     int sqlite_do (var A) {
         this.err_id = (A);
-        if (this.err_id != SQLITE_OK && this.err_id != SQLITE_DONE && this.err_id != SQLITE_ROW) {
+        if (this.err_id != Sqlite.OK && this.err_id != Sqlite.DONE && this.err_id != Sqlite.ROW) {
             this.error = string.from_utf8 (sqlite3_errmsg (this.database));
         }
     }
@@ -91,7 +89,7 @@ public class SqlDatabase : GLib.Object {
             return true;
         }
 
-        if (!open_helper (filename, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE)) {
+        if (!open_helper (filename, Sqlite.OPEN_READWRITE | Sqlite.OPEN_CREATE)) {
             return false;
         }
 
@@ -109,7 +107,7 @@ public class SqlDatabase : GLib.Object {
 
                 // Even when there's enough disk space, it might very well be that the
                 // file is on a read-only filesystem and can't be opened because of that.
-                if (this.err_id == SQLITE_CANTOPEN) {
+                if (this.err_id == Sqlite.CANTOPEN) {
                     GLib.warning ("Can't open database to prepare consistency check, aborting.");
                     close ();
                     return false;
@@ -120,7 +118,7 @@ public class SqlDatabase : GLib.Object {
             close ();
             GLib.File.remove (filename);
 
-            return open_helper (filename, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
+            return open_helper (filename, Sqlite.OPEN_READWRITE | Sqlite.OPEN_CREATE);
         }
 
         return true;
@@ -134,7 +132,7 @@ public class SqlDatabase : GLib.Object {
             return true;
         }
 
-        if (!open_helper (filename, SQLITE_OPEN_READONLY)) {
+        if (!open_helper (filename, Sqlite.OPEN_READONLY)) {
             return false;
         }
 
@@ -154,8 +152,8 @@ public class SqlDatabase : GLib.Object {
         if (this.database == null) {
             return false;
         }
-        sqlite_do (sqlite3_exec (this.database, "BEGIN", null, null, null));
-        return this.err_id == SQLITE_OK;
+        this.database.exec ("BEGIN", null, null);
+        return this.err_id == Sqlite.OK;
     }
 
 
@@ -165,8 +163,8 @@ public class SqlDatabase : GLib.Object {
         if (this.database == null) {
             return false;
         }
-        sqlite_do (sqlite3_exec (this.database, "COMMIT", null, null, null));
-        return this.err_id == SQLITE_OK;
+        this.database.exec ("COMMIT", null, null);
+        return this.err_id == Sqlite.OK;
     }
 
 
@@ -177,9 +175,10 @@ public class SqlDatabase : GLib.Object {
             foreach (var q in this.queries) {
                 q.finish ();
             }
-            sqlite_do (sqlite3_close (this.database));
-            if (this.err_id != SQLITE_OK)
-                GLib.warning ("Closing database failed" + this.error);
+            //  this.database.close ();
+            if (this.err_id != Sqlite.OK) {
+                GLib.warning ("Closing database failed " + this.error);
+            }
             this.database = null;
         }
     }
@@ -195,20 +194,20 @@ public class SqlDatabase : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private bool open_helper (string filename, int sqlite_flags) {
-        if (is_open) {
+        if (this.is_open) {
             return true;
         }
 
-        sqlite_flags |= SQLITE_OPEN_NOMUTEX;
+        sqlite_flags |= Sqlite.OPEN_NOMUTEX;
 
-        sqlite_do (sqlite3_open_v2 (filename.to_utf8 ().const_data (), this.database, sqlite_flags, null));
+        Sqlite.Database.open_v2 (filename, out this.database, sqlite_flags, null);
 
-        if (this.err_id != SQLITE_OK) {
+        if (this.err_id != Sqlite.OK) {
             GLib.warning ("Error:" + this.error + "for" + filename);
-            if (this.err_id == SQLITE_CANTOPEN) {
+            if (this.err_id == Sqlite.CANTOPEN) {
                 //  GLib.warning ("CANTOPEN extended errcode: " + sqlite3_extended_errcode (this.database);
-    //  #if SQLITE_VERSION_NUMBER >= 3012000
-                GLib.warning ("CANTOPEN system errno: " + sqlite3_system_errno (this.database));
+    //  #if Sqlite.VERSION_NUMBER >= 3012000
+                GLib.warning ("CANTOPEN system errmsg: " + this.database.errmsg ());
     //  #endif
             }
             close ();
@@ -220,7 +219,7 @@ public class SqlDatabase : GLib.Object {
             return false;
         }
 
-        sqlite3_busy_timeout (this.database, 5000);
+        this.database.busy_timeout (5000);
 
         return true;
     }
@@ -232,7 +231,7 @@ public class SqlDatabase : GLib.Object {
         // quick_check can fail with a disk IO error when diskspace is low
         SqlQuery quick_check = new SqlQuery (*this);
 
-        if (quick_check.prepare ("PRAGMA quick_check;", /*allow_failure=*/true) != SQLITE_OK) {
+        if (quick_check.prepare ("PRAGMA quick_check;", /*allow_failure=*/true) != Sqlite.OK) {
             GLib.warning ("Error preparing quick_check on database");
             this.err_id = quick_check.error_id ();
             this.error = quick_check.error;
@@ -255,7 +254,7 @@ public class SqlDatabase : GLib.Object {
         return CheckDbResult.OK;
     }
 
-} // class SqlDatabase
+} // class Sqlite.Database
 
 } // namespace Common
 } // namespace Occ

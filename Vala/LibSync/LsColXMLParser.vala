@@ -24,7 +24,7 @@ public class LscolXMLParser : GLib.Object {
         string expected_path);
 
 
-    internal signal void signal_directory_listing_subfolders (string[] items);
+    internal signal void signal_directory_listing_subfolders (GLib.List<string> items);
     internal signal void signal_directory_listing_iterated (string name, GLib.HashTable<string, string> properties);
     internal signal void signal_finished_with_error (GLib.InputStream reply);
     internal signal void signal_finished_without_error ();

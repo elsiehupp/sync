@@ -94,7 +94,7 @@ public class ShareeModel : QAbstractListModel {
     private void on_signal_sharees_fetched (QJsonDocument reply) {
         GLib.List<unowned Sharee> new_sharees;
         {
-            const string[] sharee_types {"users", "groups", "emails", "remotes", "circles", "rooms"};
+            const GLib.List<string> sharee_types {"users", "groups", "emails", "remotes", "circles", "rooms"};
 
             const var append_sharees = [this, sharee_types] (QJsonObject data, GLib.List<unowned Sharee>& out) {
                 for (var sharee_type : sharee_types) {

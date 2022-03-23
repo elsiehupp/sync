@@ -583,7 +583,7 @@ public class User : GLib.Object {
         if (progress.status () == ProgressInfo.Status.DONE) {
             // We keep track very well of pending conflicts.
             // Inform other components about them.
-            string[] conflicts;
+            GLib.List<string> conflicts;
             foreach (Activity activity in this.activity_model.errors_list ()) {
                 if (activity.folder_connection_alias == folder_connection_alias
                     && activity.status == LibSync.SyncFileItem.Status.CONFLICT) {
@@ -601,7 +601,7 @@ public class User : GLib.Object {
     public void on_signal_send_notification_request (string account_name, string link, string verb, int row) {
         GLib.info ("Server Notification Request " + verb + link + " on account " + account_name);
 
-        const string[] valid_verbs = {
+        const GLib.List<string> valid_verbs = {
             "GET",
             "PUT",
             "POST",

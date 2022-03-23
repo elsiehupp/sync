@@ -201,7 +201,7 @@ public class ClientSideEncryption : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void encrypt_private_key (Account account) {
-        string[] list = WordList.get_random_words (12);
+        GLib.List<string> list = WordList.get_random_words (12);
         this.mnemonic = string.joinv (" ", list);
         this.new_mnemonic_generated = true;
         GLib.info ("Generated mnemonic: " + this.mnemonic);
@@ -484,7 +484,7 @@ public class ClientSideEncryption : GLib.Object {
                 prev = dialog.text_value ();
 
                 this.mnemonic = prev;
-                string[] split = prev.split (" ");
+                GLib.List<string> split = prev.split (" ");
                 string mnemonic = string.joinv ("", split).down ();
                 GLib.info ("Mnemonic: " + mnemonic);
 
