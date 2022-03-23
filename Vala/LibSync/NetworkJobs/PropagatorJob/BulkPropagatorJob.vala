@@ -154,16 +154,15 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
 
         item.checksum_header = transmission_checksum_header;
 
-        const string full_file_path = file_to_upload.path;
-        const string original_file_path = this.propagator.full_local_path (item.file);
+        string original_file_path = this.propagator.full_local_path (item.file);
 
-        if (!FileSystem.file_exists (full_file_path)) {
+        if (!FileSystem.file_exists (file_to_upload.path)) {
             this.pending_checksum_files.remove (item.file);
-            on_signal_error_start_folder_unlock (item, SyncFileItem.Status.SOFT_ERROR, _("File Removed (start upload) %1").printf (full_file_path));
+            on_signal_error_start_folder_unlock (item, SyncFileItem.Status.SOFT_ERROR, _("File Removed (start upload) %1").printf (file_to_upload.path));
             check_propagation_is_done ();
             return;
         }
-        const time_t prev_modtime = item.modtime; // the this.item value was set in PropagateUploadFile.start ()
+        time_t prev_modtime = item.modtime; // the this.item value was set in PropagateUploadFile.start ()
         // but a potential checksum calculation could have taken some time during which the file could
         // have been changed again, so better check again here.
 
@@ -183,7 +182,7 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
             return;
         }
 
-        file_to_upload.size = FileSystem.get_size (full_file_path);
+        file_to_upload.size = FileSystem.get_size (file_to_upload.path);
         item.size = FileSystem.get_size (original_file_path);
 
         // But skip the file if the mtime is too close to 'now'!
@@ -504,15 +503,15 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
         var etag = get_etag_from_json_reply (file_reply);
         finished = etag.length > 0;
 
-        var full_file_path = this.propagator.full_local_path (single_file.item.file);
+        var file_to_upload.path = this.propagator.full_local_path (single_file.item.file);
 
         // Check if the file still exists
-        if (!check_file_still_exists (single_file.item, finished, full_file_path)) {
+        if (!check_file_still_exists (single_file.item, finished, file_to_upload.path)) {
             return;
         }
 
         // Check whether the file changed since discovery. the file check here is the original and not the temporary.
-        if (!check_file_changed (single_file.item, finished, full_file_path)) {
+        if (!check_file_changed (single_file.item, finished, file_to_upload.path)) {
             return;
         }
 
@@ -694,8 +693,8 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
     private bool check_file_still_exists (
         SyncFileItem item,
         bool finished,
-        string full_file_path) {
-        if (!FileSystem.file_exists (full_file_path)) {
+        string file_to_upload.path) {
+        if (!FileSystem.file_exists (file_to_upload.path)) {
             if (!finished) {
                 abort_with_error (item, SyncFileItem.Status.SOFT_ERROR, _("The local file was removed during sync."));
                 return false;
@@ -713,8 +712,8 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
     private bool check_file_changed (
         SyncFileItem item,
         bool finished,
-        string full_file_path) {
-        if (!FileSystem.verify_file_unchanged (full_file_path, item.size, item.modtime)) {
+        string file_to_upload.path) {
+        if (!FileSystem.verify_file_unchanged (file_to_upload.path, item.size, item.modtime)) {
             this.propagator.another_sync_needed = true;
             if (!finished) {
                 abort_with_error (item, SyncFileItem.Status.SOFT_ERROR, _("Local file changed during sync."));

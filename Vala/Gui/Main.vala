@@ -158,7 +158,7 @@ int main (int argc, char **argv) {
 
             if (QSystemTrayIcon.is_system_tray_available ()) {
                 app.on_signal_try_tray_again ();
-            } else if (!app.background_mode () && AccountManager.instance.accounts != "") {
+            } else if (!app.background_mode () && AccountManager.instance.accounts.length () != 0) {
                 if (desktop_session != "ubuntu") {
                     GLib.info ("System tray still not available; showing window and trying again later.");
                     app.show_main_dialog ();

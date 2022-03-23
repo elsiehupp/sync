@@ -40,125 +40,104 @@ public class SyncResult : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private SyncFileItemVector sync_items;
-
+    private GLib.List<unowned SyncFileItem> sync_items;
 
     /***********************************************************
     ***********************************************************/
     GLib.DateTime sync_time { public get; private set; }
 
-
     /***********************************************************
     ***********************************************************/
     public string folder;
 
-
     /***********************************************************
     when the sync tool support this...
     ***********************************************************/
-    private string[] errors;
-
+    private GLib.List<string> errors = new GLib.List<string> ();
 
     /***********************************************************
     ***********************************************************/
     bool found_files_not_synced { public get; private set; }
 
-
     /***********************************************************
     ***********************************************************/
     bool folder_structure_was_changed { public get; private set; }
 
-
     /***********************************************************
     Count new, removed and updated items
     ***********************************************************/
-    int num_new_items { public get; private set; }
-
-
-    /***********************************************************
-    ***********************************************************/
-    int num_removed_items { public get; private set; }
-
+    int number_of_new_items { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
-    int num_updated_items { public get; private set; }
-
-
-    /***********************************************************
-    ***********************************************************/
-    int num_renamed_items { public get; private set; }
-
+    int number_of_removed_items { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
-    int num_new_conflict_items { public get; private set; }
-
-
-    /***********************************************************
-    ***********************************************************/
-    int num_old_conflict_items { public get; public set; }
-
+    int number_of_updated_items { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
-    int num_error_items { public get; private set; }
-
+    int number_of_renamed_items { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
-    int num_locked_items { public get; private set; }
+    int number_of_new_conflict_items { public get; private set; }
 
+    /***********************************************************
+    ***********************************************************/
+    int number_of_old_conflict_items { public get; public set; }
+
+    /***********************************************************
+    ***********************************************************/
+    int number_of_error_items { public get; private set; }
+
+    /***********************************************************
+    ***********************************************************/
+    int number_of_locked_items { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
     unowned SyncFileItem first_item_new { public get; private set; }
 
-
     /***********************************************************
     ***********************************************************/
     unowned SyncFileItem first_item_deleted { public get; private set; }
-
 
     /***********************************************************
     ***********************************************************/
     unowned SyncFileItem first_item_updated { public get; private set; }
 
-
     /***********************************************************
     ***********************************************************/
     unowned SyncFileItem first_item_renamed { public get; private set; }
-
 
     /***********************************************************
     ***********************************************************/
     unowned SyncFileItem first_new_conflict_item { public get; private set; }
 
-
     /***********************************************************
     ***********************************************************/
     unowned SyncFileItem first_item_error { public get; private set; }
-
 
     /***********************************************************
     ***********************************************************/
     unowned SyncFileItem first_item_locked { public get; private set; }
 
-
     /***********************************************************
     ***********************************************************/
-    public SyncResult () {
+    construct {
         this.status = Status.UNDEFINED;
         this.found_files_not_synced = false;
         this.folder_structure_was_changed = false;
-        this.num_new_items = 0;
-        this.num_removed_items = 0;
-        this.num_updated_items = 0;
-        this.num_renamed_items = 0;
-        this.num_new_conflict_items = 0;
-        this.num_old_conflict_items = 0;
-        this.num_error_items = 0;
-        this.num_locked_items = 0;
+        this.number_of_new_items = 0;
+        this.number_of_removed_items = 0;
+        this.number_of_updated_items = 0;
+        this.number_of_renamed_items = 0;
+        this.number_of_new_conflict_items = 0;
+        this.number_of_old_conflict_items = 0;
+        this.number_of_error_items = 0;
+        this.number_of_locked_items = 0;
     }
 
 
@@ -239,7 +218,7 @@ public class SyncResult : GLib.Object {
     ***********************************************************/
     public bool has_unresolved_conflicts {
         public get {
-            return this.num_new_conflict_items + this.num_old_conflict_items > 0;
+            return this.number_of_new_conflict_items + this.number_of_old_conflict_items > 0;
         }
     }
 
@@ -248,7 +227,7 @@ public class SyncResult : GLib.Object {
     ***********************************************************/
     public bool has_locked_files {
         public get {
-            return this.num_locked_items > 0;
+            return this.number_of_locked_items > 0;
         }
     }
 
@@ -271,7 +250,7 @@ public class SyncResult : GLib.Object {
         }
 
         if (item.status == SyncFileItem.Status.FILE_LOCKED) {
-            this.num_locked_items++;
+            this.number_of_locked_items++;
             if (this.first_item_locked == null) {
                 this.first_item_locked = item;
             }
@@ -281,35 +260,35 @@ public class SyncResult : GLib.Object {
         if (item.status == SyncFileItem.Status.FATAL_ERROR || item.status == SyncFileItem.Status.NORMAL_ERROR) {
             // : this displays an error string (%2) for a file %1
             append_error_string (_("%1 : %2").printf (item.file, item.error_string));
-            this.num_error_items++;
+            this.number_of_error_items++;
             if (this.first_item_error == null) {
                 this.first_item_error = item;
             }
         } else if (item.status == SyncFileItem.Status.CONFLICT) {
             if (item.instruction == CSync.CSync.SyncInstructions.CONFLICT) {
-                this.num_new_conflict_items++;
+                this.number_of_new_conflict_items++;
                 if (this.first_new_conflict_item == null) {
                     this.first_new_conflict_item = item;
                 }
             } else {
-                this.num_old_conflict_items++;
+                this.number_of_old_conflict_items++;
             }
         } else {
             if (!item.has_error_status () && item.status != SyncFileItem.Status.FILE_IGNORED && item.direction == SyncFileItem.Direction.DOWN) {
                 switch (item.instruction) {
                 case CSync.SyncInstructions.NEW:
                 case CSync.SyncInstructions.TYPE_CHANGE:
-                    this.num_new_items++;
+                    this.number_of_new_items++;
                     if (!this.first_item_new)
                         this.first_item_new = item;
                     break;
                 case CSync.SyncInstructions.REMOVE:
-                    this.num_removed_items++;
+                    this.number_of_removed_items++;
                     if (!this.first_item_deleted)
                         this.first_item_deleted = item;
                     break;
                 case CSync.SyncInstructions.SYNC:
-                    this.num_updated_items++;
+                    this.number_of_updated_items++;
                     if (!this.first_item_updated)
                         this.first_item_updated = item;
                     break;
@@ -317,7 +296,7 @@ public class SyncResult : GLib.Object {
                     if (!this.first_item_renamed) {
                         this.first_item_renamed = item;
                     }
-                    this.num_renamed_items++;
+                    this.number_of_renamed_items++;
                     break;
                 default:
                     // nothing.

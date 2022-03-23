@@ -106,7 +106,7 @@ public class OcsJob : AbstractNetworkJob {
     This function appends the common identifier. so <PATH>/<ID>
     ***********************************************************/
     protected void append_path (string identifier) {
-        path (path + '/' + identifier);
+        path (path + "/" + identifier);
     }
 
 

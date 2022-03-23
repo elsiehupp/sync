@@ -167,7 +167,7 @@ public class FolderStatusModel : QAbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    public GLib.List<SubFolderInfo> folders;
+    public GLib.List<SubFolderInfo?> folders;
 
 
     /***********************************************************
@@ -179,7 +179,7 @@ public class FolderStatusModel : QAbstractItemModel {
         public set {
             begin_reset_model ();
             this.dirty = false;
-            this.folders == "";
+            this.folders == new GLib.List<SubFolderInfo> ();
             this.account_state = value;
 
             FolderManager.instance.signal_folder_sync_state_change.connect (
@@ -216,7 +216,7 @@ public class FolderStatusModel : QAbstractItemModel {
             std.sort (this.folders.begin (), this.folders.end (), sort_by_folder_header);
 
             // Set the root this.path_index after the sorting
-            for (int i = 0; i < this.folders.size (); ++i) {
+            for (int i = 0; i < this.folders.length (); ++i) {
                 this.folders[i].path_index + i;
             }
 
@@ -550,11 +550,11 @@ public class FolderStatusModel : QAbstractItemModel {
     ***********************************************************/
     public int row_count (QModelIndex parent = QModelIndex ()) {
         if (!parent.is_valid) {
-            if (Theme.single_sync_folder && this.folders.length != 0) {
+            if (Theme.single_sync_folder && this.folders.length () != 0) {
                 // "Add folder_connection" button not visible in the single_sync_folder configuration.
-                return this.folders.length;
+                return this.folders.length ();
             }
-            return this.folders.length + 1; // +1 for the "add folder_connection" button
+            return this.folders.length () + 1; // +1 for the "add folder_connection" button
         }
         var info = info_for_index (parent);
         if (!info)
@@ -806,7 +806,7 @@ public class FolderStatusModel : QAbstractItemModel {
         int slash_pos = path.last_index_of ("/");
         if (slash_pos == -1) {
             // first level folder_connection
-            for (int i = 0; i < this.folders.size (); ++i) {
+            for (int i = 0; i < this.folders.length (); ++i) {
                 var info = this.folders.at (i);
                 if (info.folder_connection == folder_connection) {
                     if (path == "") { // the folder_connection object
@@ -850,7 +850,7 @@ public class FolderStatusModel : QAbstractItemModel {
     /***********************************************************
     ***********************************************************/
     public void on_signal_update_folder_state (FolderConnection folder_connection) {
-        for (int i = 0; i < this.folders.length; ++i) {
+        for (int i = 0; i < this.folders.length (); ++i) {
             if (this.folders.at (i).folder_connection == folder_connection) {
                 /* emit */ data_changed (index (i), index (i));
             }
@@ -1422,7 +1422,7 @@ public class FolderStatusModel : QAbstractItemModel {
     ***********************************************************/
     private void on_signal_folder_sync_state_change (FolderConnection folder_connection) {
         int folder_index = -1;
-        for (int i = 0; i < this.folders.length; ++i) {
+        for (int i = 0; i < this.folders.length (); ++i) {
             if (this.folders.at (i).folder_connection == folder_connection) {
                 folder_index = i;
                 break;

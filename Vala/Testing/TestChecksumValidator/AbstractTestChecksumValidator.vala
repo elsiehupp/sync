@@ -45,7 +45,7 @@ public abstract class AbstractTestChecksumValidator : GLib.Object {
     ***********************************************************/
     protected static string shell_sum (string command, string file) {
         QProcess md5;
-        string[] args;
+        GLib.List<string> args = new GLib.List<string> ()
         args.append (file);
         md5.on_signal_start (command, args);
         string sum_shell;

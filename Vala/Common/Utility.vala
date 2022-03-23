@@ -38,9 +38,9 @@ public class Utility : GLib.Object {
         string hash;
         int steps = fmhash.length / 2;
         for (int i = 0; i < steps; i++) {
-            hash.append (fmhash[i * 2]);
-            hash.append (fmhash[i * 2 + 1]);
-            hash.append (" ");
+            hash += fmhash[i * 2];
+            hash += fmhash[i * 2 + 1];
+            hash += " ";
         }
 
         string fp = hash.trimmed ();
@@ -101,7 +101,7 @@ public class Utility : GLib.Object {
         string rand_string;
         for (int i = 0; i < size; i++) {
             int r = rand () % 128;
-            rand_string.append (char (r));
+            rand_string += (string)(char)r;
         }
 
         GLib.File file = GLib.File.new_for_path (fname);
@@ -573,7 +573,7 @@ public class Utility : GLib.Object {
             if (binary == "") {
                 binary = Gtk.Application.arguments ()[0];
             }
-            string[] parameters;
+            GLib.List<string> parameters = new GLib.List<string> ();
             parameters.append ("--version");
             QProcess process;
             process.on_signal_start (binary, parameters);
@@ -678,7 +678,7 @@ public class Utility : GLib.Object {
 
         const string STOPWATCH_END_TAG = "_STOPWATCH_END";
 
-        private GLib.HashTable<string, uint64> lap_times;
+        private GLib.HashTable<string, uint64?> lap_times;
         GLib.DateTime start_time { public get; private set; }
         private GLib.Timer timer;
 
@@ -826,7 +826,7 @@ public class Utility : GLib.Object {
         if (user != "") {
             // Don't allow parens in the user name, to ensure
             // we can find the beginning and end of the conflict tag.
-            const string user_name = sanitize_for_filename (user).replace ("(", "_").replace (")", "_");
+            string user_name = sanitize_for_filename (user).replace ("(", "_").replace (")", "_");
             conflict_marker += user_name + " ";
         }
         conflict_marker += dt.to_string ("yyyy-MM-dd hhmmss") + ")";

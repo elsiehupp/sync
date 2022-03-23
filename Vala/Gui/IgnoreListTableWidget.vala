@@ -130,7 +130,7 @@ public class IgnoreListTableWidget : Gtk.Widget {
                     } else if (pattern_item.text ().has_prefix ('#')) {
                         prepend = "\\";
                     }
-                    ignores.write (prepend + pattern_item.text ().to_utf8 () + '\n');
+                    ignores.write (prepend + pattern_item.text ().to_utf8 () + "\n");
                 }
             }
         } else {

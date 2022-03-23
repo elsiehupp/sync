@@ -78,7 +78,7 @@ public class AbstractTestUnifiedSearchListmodel : GLib.Object {
         // handle search for provider
         } else if (path.has_prefix ("/ocs/v2.php/search/providers") && !search_term == "") {
             var path_split = path.mid ("/ocs/v2.php/search/providers".size ())
-                                       .split ('/', Qt.SkipEmptyParts);
+                                       .split ("/", Qt.SkipEmptyParts);
 
             if (!path_split == "" && path.contains (path_split.first ())) {
                 reply = new FakePayloadReply (operation, request,

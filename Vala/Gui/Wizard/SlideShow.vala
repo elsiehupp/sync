@@ -97,8 +97,8 @@ public class SlideShow : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public void add_slide (Gdk.Pixbuf pixmap, string label) {
-        this.labels += label;
-        this.pixmaps += pixmap;
+        this.labels.append (label);
+        this.pixmaps.append (pixmap);
         update_geometry ();
     }
 
@@ -162,7 +162,7 @@ public class SlideShow : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public void on_signal_next_slide () {
-        current_slide = (this.current_slide + 1) % this.labels.length;
+        current_slide = (this.current_slide + 1) % this.labels.length ();
         this.reverse = false;
     }
 
@@ -170,7 +170,7 @@ public class SlideShow : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public void on_signal_prev_slide () {
-        this.current_slide = (this.current_slide > 0 ? this.current_slide : this.labels.length) - 1;
+        this.current_slide = (this.current_slide > 0 ? this.current_slide : this.labels.length ()) - 1;
         this.reverse = true;
     }
 
@@ -179,8 +179,8 @@ public class SlideShow : Gtk.Widget {
     ***********************************************************/
     public void on_signal_reset () {
         on_signal_stop_show ();
-        this.pixmaps == "";
-        this.labels == "";
+        this.pixmaps = new GLib.List<Gdk.Pixbuf> ();
+        this.labels = new GLib.List<string> ();
         update_geometry ();
         update ();
     }

@@ -93,7 +93,7 @@ public class FakePutMultiFileReply : FakeReply {
             file_info_reply.insert ("OC-FileID", file_info.file_identifier);
             file_info_reply.insert ("X-OC-MTime", "accepted"); // Prevents GLib.assert_true (!this.running_now) since we'll call AbstractPropagateItemJob.done twice in that case.
             /* emit */ upload_progress (file_info.size, total_size);
-            all_file_info_reply.insert (char ('/') + file_info.path, file_info_reply);
+            all_file_info_reply.insert (char ("/") + file_info.path, file_info_reply);
         }
         reply.set_object (all_file_info_reply);
         this.payload = reply.to_json ();

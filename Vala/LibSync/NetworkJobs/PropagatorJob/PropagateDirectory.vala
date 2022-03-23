@@ -37,7 +37,7 @@ public class PropagateDirectory : AbstractPropagatorJob {
             this.first_job.signal_finished.connect (
                 this.on_signal_first_job_finished
             );
-            this.first_job.associated_composite (this.sub_jobs);
+            this.first_job.associated_composite = this.sub_jobs;
         }
         this.sub_jobs.signal_finished.connect (
             this.on_signal_sub_jobs_finished

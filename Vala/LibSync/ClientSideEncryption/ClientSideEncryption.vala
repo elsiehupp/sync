@@ -246,7 +246,7 @@ public class ClientSideEncryption : GLib.Object {
         this.public_key = new QSslKey ();
         this.mnemonic = "";
 
-        var user = account.credentials ().user ();
+        var user = account.credentials.user;
         start_delete_job (account, user + E2E_PRIVATE);
         start_delete_job (account, user + E2E_CERTIFICATE);
         start_delete_job (account, user + E2E_MNEMONIC);
@@ -294,7 +294,7 @@ public class ClientSideEncryption : GLib.Object {
 
         const string keychain_key = AbstractCredentials.keychain_key (
             account.url.to_string (),
-            account.credentials ().user () + E2E_PRIVATE,
+            account.credentials.user + E2E_PRIVATE,
             account.identifier
         );
 
@@ -336,7 +336,7 @@ public class ClientSideEncryption : GLib.Object {
 
         const string keychain_key = AbstractCredentials.keychain_key (
                     account.url.to_string (),
-                    account.credentials ().user () + E2E_MNEMONIC,
+                    account.credentials.user + E2E_MNEMONIC,
                     account.identifier
         );
 
@@ -464,7 +464,7 @@ public class ClientSideEncryption : GLib.Object {
                         + "<br>"
                         + "User : %2<br>"
                         + "Account : %3<br>")
-                        .printf (Utility.escape (account.credentials ().user ()),
+                        .printf (Utility.escape (account.credentials.user),
                             Utility.escape (account.display_name));
 
         QInputDialog dialog;
@@ -521,10 +521,10 @@ public class ClientSideEncryption : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void fetch_from_key_chain (Account account) {
-        const string keychain_key = AbstractCredentials.keychain_key (
-                    account.url.to_string (),
-                    account.credentials ().user () + E2E_CERTIFICATE,
-                    account.identifier
+        string keychain_key = AbstractCredentials.keychain_key (
+            account.url.to_string (),
+            account.credentials.user + E2E_CERTIFICATE,
+            account.identifier
         );
 
         var read_password_job = new ReadPasswordJob (Theme.app_name);
@@ -595,10 +595,10 @@ public class ClientSideEncryption : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void write_private_key (Account account) {
-        const string keychain_key = AbstractCredentials.keychain_key (
-                    account.url.to_string (),
-                    account.credentials ().user () + E2E_PRIVATE,
-                    account.identifier
+        string keychain_key = AbstractCredentials.keychain_key (
+            account.url.to_string (),
+            account.credentials.user + E2E_PRIVATE,
+            account.identifier
         );
 
         var write_password_job = new WritePasswordJob (Theme.app_name);
@@ -618,10 +618,10 @@ public class ClientSideEncryption : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void write_certificate (Account account) {
-        const string keychain_key = AbstractCredentials.keychain_key (
-                    account.url.to_string (),
-                    account.credentials ().user () + E2E_CERTIFICATE,
-                    account.identifier
+        string keychain_key = AbstractCredentials.keychain_key (
+            account.url.to_string (),
+            account.credentials.user + E2E_CERTIFICATE,
+            account.identifier
         );
 
         var write_password_job = new WritePasswordJob (Theme.app_name);
@@ -641,9 +641,9 @@ public class ClientSideEncryption : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void write_mnemonic (Account account) {
-        const string keychain_key = AbstractCredentials.keychain_key (
+        string keychain_key = AbstractCredentials.keychain_key (
             account.url.to_string (),
-            account.credentials ().user () + E2E_MNEMONIC,
+            account.credentials.user + E2E_MNEMONIC,
             account.identifier
         );
 

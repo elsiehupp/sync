@@ -79,7 +79,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
 
     /***********************************************************
     Returns a list of blocklisted paths, each including the
-    trailing '/'
+    trailing "/"
     ***********************************************************/
     public string[] create_block_list (QTreeWidgetItem root = null) {
         if (!root) {
@@ -160,14 +160,14 @@ public class SelectiveSyncWidget : Gtk.Widget {
 
     /***********************************************************
     old_block_list is a list of excluded paths, each including
-    a trailing '/'
+    a trailing "/"
     ***********************************************************/
     public void folder_info (
         string folder_path, string root_name,
         string[] old_block_list = string[] ()) {
         this.folder_path = folder_path;
-        if (this.folder_path.has_prefix ('/')) {
-            // remove leading '/'
+        if (this.folder_path.has_prefix ("/")) {
+            // remove leading "/"
             this.folder_path = folder_path.mid (1);
         }
         this.root_name = root_name;
@@ -194,12 +194,12 @@ public class SelectiveSyncWidget : Gtk.Widget {
 
         GLib.Uri url = this.account.dav_url ();
         string path_to_remove = url.path;
-        if (!path_to_remove.has_suffix ('/')) {
-            path_to_remove.append ('/');
+        if (!path_to_remove.has_suffix ("/")) {
+            path_to_remove.append ("/");
         }
         path_to_remove.append (this.folder_path);
         if (!this.folder_path == "")
-            path_to_remove.append ('/');
+            path_to_remove.append ("/");
 
         // Check for excludes.
         QMutableListIterator<string> it (list);
@@ -256,13 +256,13 @@ public class SelectiveSyncWidget : Gtk.Widget {
                 continue;
             }
 
-            string[] paths = path.split ('/');
+            string[] paths = path.split ("/");
             if (paths.last () == "")
                 paths.remove_last ();
             if (paths == "")
                 continue;
-            if (!path.has_suffix ('/')) {
-                path.append ('/');
+            if (!path.has_suffix ("/")) {
+                path.append ("/");
             }
             recursive_insert (root, paths, path, size);
         }
@@ -288,7 +288,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
             return;
         string prefix;
         if (!this.folder_path == "") {
-            prefix = this.folder_path + '/';
+            prefix = this.folder_path + "/";
         }
         var lscol_job = new LscolJob (this.account, prefix + directory, this);
         lscol_job.properties (
@@ -387,7 +387,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
         const var webdav_folder = GLib.Uri (this.account.dav_url ()).path;
         //  Q_ASSERT (path.has_prefix (webdav_folder));
         // This dialog use the postfix / convention for folder paths
-        this.encrypted_paths + path.mid (webdav_folder.size ()) + '/';
+        this.encrypted_paths + path.mid (webdav_folder.size ()) + "/";
     }
 
 
@@ -438,7 +438,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
         QFileIconProvider prov;
         Gtk.Icon folder_icon = prov.icon (QFileIconProvider.FolderConnection);
         if (path_trail.size () == 0) {
-            if (path.has_suffix ('/')) {
+            if (path.has_suffix ("/")) {
                 path.chop (1);
             }
             parent.tool_tip (0, path);

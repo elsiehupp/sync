@@ -381,7 +381,7 @@ public class ProcessDirectoryJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private bool check_for_invalid_filename (PathTuple path, GLib.HashTable<string, Entries> entries, Entries entry) {
+    private bool check_for_invalid_filename (PathTuple path, GLib.HashTable<string, Entries?> entries, Entries entry) {
         var original_filename = entry.local_entry.name;
         var new_filename = original_filename.trimmed ();
 
@@ -439,7 +439,7 @@ public class ProcessDirectoryJob : GLib.Object {
         // However, if foo and foo.owncloud exists locally, there'll be "foo"
         // with local, database, server entries and "foo.owncloud" with only a local
         // entry.
-        GLib.HashTable<string, Entries> entries;
+        GLib.HashTable<string, Entries?> entries;
         foreach (var e in this.server_normal_query_entries) {
             entries[e.name].server_entry = std.move (e);
         }
@@ -518,7 +518,7 @@ public class ProcessDirectoryJob : GLib.Object {
                     path.local = PathTuple.path_append (this.current_folder.local, e.local_entry.name);
                 } else if (e.database_entry.is_virtual_file ()) {
                     // We don't have a local entry - but it should be at this path
-                    add_virtual_file_suffix (path.local);
+                    path.local = add_virtual_file_suffix (path.local);
                 }
             }
 
@@ -607,7 +607,7 @@ public class ProcessDirectoryJob : GLib.Object {
             return true;
         }
 
-        SyncFileItem item = new SyncFileItem ()();
+        SyncFileItem item = new SyncFileItem ();
         item.file = path;
         item.original_file = path;
         item.instruction = CSync.SyncInstructions.IGNORE;
@@ -687,10 +687,12 @@ public class ProcessDirectoryJob : GLib.Object {
     This main function delegates some work to the process_file* functions.
     ***********************************************************/
     private void process_file (PathTuple path,
-        LocalInfo local_entry, RemoteInfo server_entry,
-        SyncJournalFileRecord database_entry) {
-        const string has_server = server_entry.is_valid ? "true" : this.query_server == PARENT_NOT_CHANGED ? "database": "false";
-        const string has_local = local_entry.is_valid ? "true" : this.query_local == PARENT_NOT_CHANGED ? "database": "false";
+        LocalInfo local_entry,
+        RemoteInfo server_entry,
+        SyncJournalFileRecord database_entry
+    ) {
+        string has_server = server_entry.is_valid ? "true" : this.query_server == PARENT_NOT_CHANGED ? "database": "false";
+        string has_local = local_entry.is_valid ? "true" : this.query_local == PARENT_NOT_CHANGED ? "database": "false";
         GLib.info (
             "Processing " + path.original
             + " | valid: " + database_entry.is_valid + "/" + has_local + "/" + has_server
@@ -809,15 +811,19 @@ public class ProcessDirectoryJob : GLib.Object {
         };
 
         // Check for missing server data {
-        string[] missing_data;
-        if (server_entry.size == -1)
+        GLib.List<string> missing_data = new GLib.List<string> ();
+        if (server_entry.size == -1) {
             missing_data.append (_("size"));
-        if (server_entry.remote_permissions == null)
+        }
+        if (server_entry.remote_permissions == null) {
             missing_data.append (_("permission"));
-        if (server_entry.etag == "")
+        }
+        if (server_entry.etag == "") {
             missing_data.append ("ETag");
-        if (server_entry.file_identifier == "")
+        }
+        if (server_entry.file_identifier == "") {
             missing_data.append (_("file identifier"));
+        }
         if (missing_data != null) {
             item.instruction = CSync.SyncInstructions.ERROR;
             this.child_ignored = true;
@@ -937,8 +943,12 @@ public class ProcessDirectoryJob : GLib.Object {
     placeholder?
     ***********************************************************/
     private QueryMode server_query_mode (SyncJournalFileRecord database_entry, RemoteInfo server_entry) {
-        const bool is_vfs_mode_on = this.discovery_data != null && this.discovery_data.sync_options.vfs && this.discovery_data.sync_options.vfs.mode () != AbstractVfs.Off;
-        if (is_vfs_mode_on && database_entry.is_directory () && database_entry.is_e2e_encrypted) {
+        if (this.discovery_data != null
+            && this.discovery_data.sync_options.vfs
+            && this.discovery_data.sync_options.vfs.mode () != AbstractVfs.Off
+            && database_entry.is_directory ()
+            && database_entry.is_e2e_encrypted
+        ) {
             int64 local_folder_size = 0;
 
             const bool list_files_succeeded = this.discovery_data.statedatabase.list_files_in_path (database_entry.path.to_utf8 (), list_files_callback);
@@ -971,8 +981,9 @@ public class ProcessDirectoryJob : GLib.Object {
             && this.pin_state != PinState.PinState.ALWAYS_LOCAL
             && !FileSystem.is_exclude_file (item.file)) {
             item.type = ItemType.VIRTUAL_FILE;
-            if (is_vfs_with_suffix ())
-                add_virtual_file_suffix (path.original);
+            if (is_vfs_with_suffix ()) {
+                path.original = add_virtual_file_suffix (path.original);
+            }
         }
 
         if (opts.vfs.mode () != AbstractVfs.Off && !item.encrypted_filename == "") {
@@ -1236,7 +1247,7 @@ public class ProcessDirectoryJob : GLib.Object {
                         item.direction = SyncFileItem.Direction.DOWN;
                         item.instruction = CSync.SyncInstructions.SYNC;
                         item.type = ItemType.VIRTUAL_FILE_DEHYDRATION;
-                        add_virtual_file_suffix (item.file);
+                        item.file = add_virtual_file_suffix (item.file);
                         item.rename_target = item.file;
                     } else {
                         GLib.info ("Virtual file with non-virtual database entry; ignoring: " + item.file);
@@ -1491,7 +1502,7 @@ public class ProcessDirectoryJob : GLib.Object {
         }
 
         // must be a dehydrated placeholder
-        const bool is_file_place_holder = !local_entry.is_directory && this.discovery_data.sync_options.vfs.is_dehydrated_placeholder (this.discovery_data.local_dir + path.local);
+        bool is_file_place_holder = !local_entry.is_directory && this.discovery_data.sync_options.vfs.is_dehydrated_placeholder (this.discovery_data.local_dir + path.local);
 
         // either correct availability, or a result with error if the folder is new or otherwise has no availability set yet
         var folder_place_holder_availability = local_entry.is_directory ? this.discovery_data.sync_options.vfs.availability (path.local) : AbstractVfs.AvailabilityResult (AbstractVfs.AvailabilityError.NO_SUCH_ITEM);
@@ -1590,7 +1601,7 @@ public class ProcessDirectoryJob : GLib.Object {
             return false;
         }
 
-        if (base_record.is_e2e_encrypted || is_inside_encrypted_tree ()) {
+        if (base_record.is_e2e_encrypted || this.is_inside_encrypted_tree) {
             return false;
         }
 
@@ -1723,17 +1734,18 @@ public class ProcessDirectoryJob : GLib.Object {
         // Adjust target path for virtual-suffix files
         if (is_vfs_with_suffix ()) {
             if (item.type == ItemType.VIRTUAL_FILE) {
-                add_virtual_file_suffix (path.target);
-                if (item.instruction == CSync.SyncInstructions.RENAME)
-                    add_virtual_file_suffix (item.rename_target);
-                else
-                    add_virtual_file_suffix (item.file);
+                path.target = add_virtual_file_suffix (path.target);
+                if (item.instruction == CSync.SyncInstructions.RENAME) {
+                    item.rename_target = add_virtual_file_suffix (item.rename_target);
+                } else {
+                    item.file = add_virtual_file_suffix (item.file);
+                }
             }
             if (item.type == ItemType.VIRTUAL_FILE_DEHYDRATION
                 && item.instruction == CSync.SyncInstructions.SYNC) {
                 if (item.rename_target == "") {
                     item.rename_target = item.file;
-                    add_virtual_file_suffix (item.rename_target);
+                    item.rename_target = add_virtual_file_suffix (item.rename_target);
                 }
             }
         }
@@ -1977,8 +1989,8 @@ public class ProcessDirectoryJob : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void add_virtual_file_suffix (string string_value) {
-        string_value.append (this.discovery_data.sync_options.vfs.file_suffix ());
+    private string add_virtual_file_suffix (string string_value) {
+        return string_value + this.discovery_data.sync_options.vfs.file_suffix ();
     }
 
 

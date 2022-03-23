@@ -604,7 +604,7 @@ public class OwncloudAdvancedSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private void local_folder_push_button_path (string path) {
-        const var home_dir = GLib.Dir.home_path.has_suffix ('/') ? GLib.Dir.home_path : GLib.Dir.home_path + '/';
+        const var home_dir = GLib.Dir.home_path.has_suffix ("/") ? GLib.Dir.home_path : GLib.Dir.home_path + "/";
 
         if (!path.has_prefix (home_dir)) {
             this.instance.pb_select_local_folder.on_signal_text (GLib.Dir.to_native_separators (path));

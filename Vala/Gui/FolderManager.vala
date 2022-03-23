@@ -360,7 +360,7 @@ public class FolderManager : GLib.Object {
     Returns a list of keys that can't be read because they are
     from future versions.
     ***********************************************************/
-    public static void backward_migration_settings_keys (string[] delete_keys, string[] ignore_keys) {
+    public static void backward_migration_settings_keys (GLib.List<string> delete_keys, GLib.List<string> ignore_keys) {
         var settings = ConfigFile.settings_with_group ("Accounts");
 
         foreach (var account_id in settings.child_groups ()) {
@@ -432,7 +432,7 @@ public class FolderManager : GLib.Object {
                 count++;
             }
         }
-        const bool one_account_only = count < 2;
+        bool one_account_only = count < 2;
 
         folder_connection.save_backwards_compatible (one_account_only);
 
@@ -454,8 +454,7 @@ public class FolderManager : GLib.Object {
     public void remove_folder (FolderConnection folder_connection) {
         GLib.info ("Removing " + folder_connection.alias ());
 
-        const bool currently_running = folder_connection.is_sync_running ();
-        if (currently_running) {
+        if (folder_connection.is_sync_running ()) {
             // on_signal_abort the sync now
             folder_connection.on_signal_terminate_sync ();
         }
@@ -471,7 +470,7 @@ public class FolderManager : GLib.Object {
         folder_connection.remove_from_settings ();
 
         unload_folder (folder_connection);
-        if (currently_running) {
+        if (folder_connection.is_sync_running ()) {
             // We want to schedule the next folder_connection once this is done
             folder_connection.signal_sync_finished.connect (
                 this.on_signal_folder_sync_finished
@@ -495,7 +494,7 @@ public class FolderManager : GLib.Object {
     ***********************************************************/
     public FolderConnection folder_for_path (string path) {
         foreach (var folder_connection in this.map ().values ()) {
-            if ((GLib.Dir.clean_path (path) + '/').has_prefix (folder_connection.clean_path + '/', (Utility.is_windows () || Utility.is_mac ()) ? Qt.CaseInsensitive : Qt.CaseSensitive)) {
+            if ((GLib.Dir.clean_path (path) + "/").has_prefix (folder_connection.clean_path + "/", (Utility.is_windows () || Utility.is_mac ()) ? Qt.CaseInsensitive : Qt.CaseSensitive)) {
                 return folder_connection;
             }
         }
@@ -513,8 +512,8 @@ public class FolderManager : GLib.Object {
 
         // We'll be comparing against FolderConnection.remote_path which always starts with /
         string server_path = rel_path;
-        if (!server_path.has_prefix ('/')) {
-            server_path.prepend ('/');
+        if (!server_path.has_prefix ("/")) {
+            server_path.prepend ("/");
         }
 
         foreach (FolderConnection folder_connection in this.map ().values ()) {
@@ -525,7 +524,7 @@ public class FolderManager : GLib.Object {
                 continue;
             }
 
-            string path = folder_connection.clean_path + '/';
+            string path = folder_connection.clean_path + "/";
             path += server_path.mid_ref (folder_connection.remote_path_trailing_slash.length);
             if (GLib.File.exists (path)) {
                 re.append (path);
@@ -605,7 +604,7 @@ public class FolderManager : GLib.Object {
         }
 
         // cut off the leading slash, oc_url always has a trailing.
-        if (target_path.has_prefix ('/')) {
+        if (target_path.has_prefix ("/")) {
             target_path.remove (0, 1);
         }
 
@@ -863,7 +862,7 @@ public class FolderManager : GLib.Object {
     public static string escape_alias (string alias) {
         string a = alias;
 
-        a.replace ('/', SLASH_TAG);
+        a.replace ("/", SLASH_TAG);
         a.replace ('\\', BSLASH_TAG);
         a.replace ('?', QMARK_TAG);
         a.replace ('%', PERCENT_TAG);
@@ -941,10 +940,10 @@ public class FolderManager : GLib.Object {
             case_sensitivity = Qt.CaseInsensitive;
         }
 
-        const string user_dir = GLib.Dir.clean_path (canonical_path (path)) + '/';
+        const string user_dir = GLib.Dir.clean_path (canonical_path (path)) + "/";
         for (var i = this.folder_map.const_begin (); i != this.folder_map.const_end (); ++i) {
             var folder_connection = static_cast<FolderConnection> (i.value ());
-            string folder_dir = GLib.Dir.clean_path (canonical_path (folder_connection.path)) + '/';
+            string folder_dir = GLib.Dir.clean_path (canonical_path (folder_connection.path)) + "/";
 
             bool different_paths = string.compare (folder_dir, user_dir, case_sensitivity) != 0;
             if (different_paths && folder_dir.has_prefix (user_dir, case_sensitivity)) {
@@ -1254,8 +1253,8 @@ public class FolderManager : GLib.Object {
 
             GLib.info ("Removing " + folder_connection.alias ());
 
-            const bool currently_running = (this.current_sync_folder == folder_connection);
-            if (currently_running) {
+            const bool folder_connection.is_sync_running () = (this.current_sync_folder == folder_connection);
+            if (folder_connection.is_sync_running ()) {
                 // on_signal_abort the sync now
                 this.current_sync_folder.on_signal_terminate_sync ();
             }
@@ -1288,7 +1287,7 @@ public class FolderManager : GLib.Object {
             folder_connection.remove_from_settings ();
 
             unload_folder (folder_connection);
-            if (currently_running) {
+            if (folder_connection.is_sync_running ()) {
                 //  delete folder_connection;
             }
 
@@ -1470,7 +1469,7 @@ public class FolderManager : GLib.Object {
             }
         }
 
-        GLib.info ("Number of folders that don't use push notifications: " + folders_to_run.size ());
+        GLib.info ("Number of folders that don't use push notifications: " + folders_to_run.length ());
 
         run_etag_jobs_if_possible (folders_to_run);
     }
@@ -2087,7 +2086,7 @@ public class FolderManager : GLib.Object {
                 return path;
             }
 
-            return canonical_path (parent_path) + '/' + sel_file.filename ();
+            return canonical_path (parent_path) + "/" + sel_file.filename ();
         }
         return sel_file.canonical_file_path;
     }

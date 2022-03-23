@@ -84,7 +84,7 @@ public class TestLateAbortHard : AbstractTestChunkingNg {
     Now the next sync gets a NEW/NEW conflict and since there's
     no checksum it just becomes a UPDATE_METADATA.
     ***********************************************************/
-    private static void check_etag_updated (SyncFileItemVector items) {
+    private static void check_etag_updated (GLib.List<unowned SyncFileItem> items) {
         GLib.assert_true (items.size () == 1);
         GLib.assert_true (items[0].file == "A");
         SyncJournalFileRecord record;

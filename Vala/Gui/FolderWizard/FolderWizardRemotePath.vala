@@ -71,8 +71,8 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
 
             string[] warn_strings;
             string directory = this.instance.folder_tree_widget.current_item ().data (0, Qt.USER_ROLE).to_string ();
-            if (!directory.has_prefix ('/')) {
-                directory.prepend ('/');
+            if (!directory.has_prefix ("/")) {
+                directory.prepend ("/");
             }
             wizard ().property ("target_path", directory);
 
@@ -131,7 +131,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     protected void on_signal_add_remote_folder () {
         QTreeWidgetItem current = this.instance.folder_tree_widget.current_item ();
 
-        string parent = '/';
+        string parent = "/";
         if (current) {
             parent = current.data (0, Qt.USER_ROLE).to_string ();
         }
@@ -242,7 +242,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
                 continue;
             }
 
-            string[] paths = path.split ('/');
+            string[] paths = path.split ("/");
             if (paths.last () == "")
                 paths.remove_last ();
             recursive_insert (root, paths, path);
@@ -293,8 +293,8 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
             const var encrypted = this.encrypted_paths.contains (directory);
             this.instance.add_folder_button.enabled (!encrypted);
 
-            if (!directory.has_prefix ('/')) {
-                directory.prepend ('/');
+            if (!directory.has_prefix ("/")) {
+                directory.prepend ("/");
             }
             this.instance.folder_entry.on_signal_text (directory);
         }
@@ -320,7 +320,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     ***********************************************************/
     protected void on_signal_lscol_folder_entry () {
         string path = this.instance.folder_entry.text ();
-        if (path.has_prefix ('/'))
+        if (path.has_prefix ("/"))
             path = path.mid (1);
 
         LscolJob lscol_job = run_lscol_job (path);
@@ -402,16 +402,16 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     /***********************************************************
     ***********************************************************/
     private bool select_by_path (string path) {
-        if (path.has_prefix ('/')) {
+        if (path.has_prefix ("/")) {
             path = path.mid (1);
         }
-        if (path.has_suffix ('/')) {
+        if (path.has_suffix ("/")) {
             path.chop (1);
         }
 
         QTreeWidgetItem it = this.instance.folder_tree_widget.top_level_item (0);
         if (!path == "") {
-            const string[] path_trail = path.split ('/');
+            const string[] path_trail = path.split ("/");
             foreach (string path in path_trail) {
                 if (!it) {
                     return false;

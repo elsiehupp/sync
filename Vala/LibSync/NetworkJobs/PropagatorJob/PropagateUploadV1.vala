@@ -62,13 +62,13 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
     /***********************************************************
     ***********************************************************/
     public new void do_start_upload () {
-        this.chunk_count = int (std.ceil (this.file_to_upload.size / double (chunk_size ())));
+        this.chunk_count = (int) (std.ceil (this.file_to_upload.size / double (this.chunk_size)));
         this.start_chunk = 0;
         GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
             GLib.warning ("Invalid modified time " + this.item.file.to_string () + this.item.modtime.to_string ());
         }
-        this.transfer_identifier = uint32 (Utility.rand ()) ^ uint32 (this.item.modtime) ^ (uint32 (this.file_to_upload.size) << 16);
+        this.transfer_identifier = ((int32)Utility.rand ()) ^ ((uint32)this.item.modtime) ^ ((uint32)this.file_to_upload.size) << 16);
 
         const Common.SyncJournalDb.UploadInfo progress_info = this.propagator.journal.get_upload_info (this.item.file);
 
@@ -124,7 +124,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
             if (abort_type == AbstractPropagatorJob.AbortType.ASYNCHRONOUS
                 && this.chunk_count > 0
                 && ( ( (this.current_chunk + this.start_chunk) % this.chunk_count) == 0)
-                && put_job.device ().at_end ()) {
+                && put_job.device.at_end ()) {
                 return false;
             }
         }
@@ -149,7 +149,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
         int64 file_size = this.file_to_upload.size;
         var headers = PropagateUploadFileCommon.headers ();
         headers["OC-Total-Length"] = new string.number (file_size);
-        headers["OC-Chunk-Size"] = new string.number (chunk_size ());
+        headers["OC-Chunk-Size"] = new string.number (this.chunk_size);
 
         string path = this.file_to_upload.file;
 
@@ -159,18 +159,18 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
         if (this.chunk_count > 1) {
             int sending_chunk = (this.current_chunk + this.start_chunk) % this.chunk_count;
             // XOR with chunk size to make sure everything goes well if chunk size changes between runs
-            uint32 transid = this.transfer_identifier ^ uint32 (chunk_size ());
+            uint32 transid = this.transfer_identifier ^ (uint32)this.chunk_size;
             GLib.info ("Upload chunk" + sending_chunk.to_string () + "of" + this.chunk_count.to_string () + "transferid (remote)=" + transid);
             path += "-chunking-%1-%2-%3".printf (transid).printf (this.chunk_count).printf (sending_chunk);
 
             headers["OC-Chunked"] = "1";
 
-            chunk_start = chunk_size () * sending_chunk;
-            current_chunk_size = chunk_size ();
+            chunk_start = this.chunk_size * sending_chunk;
+            current_chunk_size = this.chunk_size;
             if (sending_chunk == this.chunk_count - 1) { // last chunk
-                current_chunk_size = (file_size % chunk_size ());
+                current_chunk_size = (file_size % this.chunk_size);
                 if (current_chunk_size == 0) { // if the last chunk pretends to be 0, its actually the full chunk size.
-                    current_chunk_size = chunk_size ();
+                    current_chunk_size = this.chunk_size;
                 }
                 is_final_chunk = true;
             }
@@ -185,9 +185,12 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
             headers[CHECK_SUM_HEADER_C] = this.transmission_checksum_header;
         }
 
-        const string filename = this.file_to_upload.path;
-        var device = std.make_unique<UploadDevice> (
-                filename, chunk_start, current_chunk_size, this.propagator.bandwidth_manager);
+        UploadDevice device = new UploadDevice (
+            this.file_to_upload.path,
+            chunk_start,
+            current_chunk_size,
+            this.propagator.bandwidth_manager
+        );
         if (!device.open (QIODevice.ReadOnly)) {
             GLib.warning ("Could not prepare upload device: " + device.error_string);
 
@@ -413,11 +416,11 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
         // not including this one.
         // FIXME: this assumes all chunks have the same size, which is true only if the last chunk
         // has not been on_signal_finished (which should not happen because the last chunk is sent sequentially)
-        int64 amount = progress_chunk * chunk_size ();
+        int64 amount = progress_chunk * this.chunk_size;
 
         sender ().property ("byte_written", sent);
         if (this.jobs.length > 1) {
-            amount -= (this.jobs.length - 1) * chunk_size ();
+            amount -= (this.jobs.length - 1) * this.chunk_size;
             foreach (GLib.Object j in this.jobs) {
                 amount += j.property ("byte_written").to_uLong_long ();
             }

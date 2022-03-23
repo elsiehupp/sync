@@ -51,8 +51,8 @@ public class TestUploadAfterDownload : AbstractTestSyncConflict {
         if (operation == Soup.PutOperation) {
             if (request.raw_header ("OC-Conflict") == "1") {
                 var base_file_id = request.raw_header ("OC-ConflictBaseFileId");
-                var components = request.url.to_string ().split ('/');
-                string conflict_file = components.mid (components.size () - 2).join ('/');
+                var components = request.url.to_string ().split ("/");
+                string conflict_file = components.mid (components.size () - 2).join ("/");
                 conflict_map[base_file_id] = conflict_file;
                 GLib.assert_true (!base_file_id == "");
                 GLib.assert_true (request.raw_header ("OC-ConflictInitialBasePath") == Utility.conflict_file_base_name_from_pattern (conflict_file));

@@ -302,7 +302,7 @@ public class SyncJournalDb : GLib.Object {
                     query.byte_array_value (0), static_cast<PinState> (query.int_value (1))
                 });
             }
-            return result;
+            return new Optional<GLib.List<string>> (result);
         }
     }
 
@@ -430,16 +430,16 @@ public class SyncJournalDb : GLib.Object {
     Returns false on error
     ***********************************************************/
     public static bool maybe_migrate_database (string local_path, string absolute_journal_path) {
-        const string old_database_name = local_path + ".csync_journal.db";
+        string old_database_name = local_path + ".csync_journal.db";
         if (!FileSystem.file_exists (old_database_name)) {
             return true;
         }
-        const string old_database_name_shm = old_database_name + "-shm";
-        const string old_database_name_wal = old_database_name + "-wal";
+        string old_database_name_shm = old_database_name + "-shm";
+        string old_database_name_wal = old_database_name + "-wal";
 
-        const string new_database_name = absolute_journal_path;
-        const string new_database_name_shm = new_database_name + "-shm";
-        const string new_database_name_wal = new_database_name + "-wal";
+        string new_database_name = absolute_journal_path;
+        string new_database_name_shm = new_database_name + "-shm";
+        string new_database_name_wal = new_database_name + "-wal";
 
         // Whenever there is an old database file, migrate it to the new database path.
         // This is done to make switching from older versions to newer versions
@@ -706,13 +706,13 @@ public class SyncJournalDb : GLib.Object {
 
         if (path == "") {
             // Since the path column doesn't store the starting /, the get_files_below_path_query
-            // can't be used for the root path "". It would scan for (path > '/' and path < '0')
+            // can't be used for the root path "". It would scan for (path > "/" and path < '0')
             // and find nothing. So, unfortunately, we have to use a different query for
             // retrieving the whole tree.
 
             PreparedSqlQuery query = this.query_manager.get (
                 PreparedSqlQueryManager.Key.GET_ALL_FILES_QUERY,
-                GET_FILE_RECORD_QUERY + " ORDER BY path||'/' ASC",
+                GET_FILE_RECORD_QUERY + " ORDER BY path||"/" ASC",
                 this.database);
             if (!query) {
                 return false;
@@ -730,7 +730,7 @@ public class SyncJournalDb : GLib.Object {
                 // an ordering like foo, foo-2, foo/file would be returned.
                 // With the trailing /, we get foo-2, foo, foo/file. This property
                 // is used in fill_tree_from_database ().
-                + " ORDER BY path||'/' ASC",
+                + " ORDER BY path||"/" ASC",
                 this.database);
             if (!query) {
                 return false;
@@ -754,7 +754,7 @@ public class SyncJournalDb : GLib.Object {
 
         PreparedSqlQuery query = this.query_manager.get (
             PreparedSqlQueryManager.Key.LIST_FILES_IN_PATH_QUERY,
-            GET_FILE_RECORD_QUERY + " WHERE parent_hash (path) = ?1 ORDER BY path||'/' ASC",
+            GET_FILE_RECORD_QUERY + " WHERE parent_hash (path) = ?1 ORDER BY path||"/" ASC",
             this.database);
         if (!query) {
             return false;
@@ -1202,7 +1202,7 @@ public class SyncJournalDb : GLib.Object {
                 sql_fail ("Deletion of whole blocklist failed", query);
                 return -1;
             }
-            return query.num_rows_affected ();
+            return query.number_of_rows_affected ();
         }
         return -1;
     }
@@ -1316,7 +1316,7 @@ public class SyncJournalDb : GLib.Object {
             return empty_result;
         }
 
-        string[] superfluous_paths;
+        GLib.List<string> superfluous_paths = new GLib.List<string> ();
         GLib.List<SyncJournalDb.DownloadInfo> deleted_entries;
 
         while (query.next ().has_data) {
@@ -1456,7 +1456,7 @@ public class SyncJournalDb : GLib.Object {
             return ids;
         }
 
-        string[] superfluous_paths;
+        GLib.List<string> superfluous_paths = new GLib.List<string> ()
 
         while (query.next ().has_data) {
             const string file = query.string_value (0);
@@ -1521,7 +1521,7 @@ public class SyncJournalDb : GLib.Object {
             return false;
         }
 
-        string[] superfluous_paths;
+        GLib.List<string> superfluous_paths = new GLib.List<string> ()
 
         while (query.next ().has_data) {
             const string file = query.string_value (0);
@@ -1652,8 +1652,8 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     return the specified list from the database
     ***********************************************************/
-    public string[] get_selective_sync_list (SelectiveSyncListType type, bool ok) {
-        string[] result;
+    public GLib.List<string> get_selective_sync_list (SelectiveSyncListType type, bool ok) {
+        GLib.List<string> result = new GLib.List<string> ()
         //  ASSERT (ok);
 
         QMutexLocker locker = new QMutexLocker (this.mutex);
@@ -1683,8 +1683,8 @@ public class SyncJournalDb : GLib.Object {
                 break;
 
             var entry = query.string_value (0);
-            if (!entry.has_suffix ('/')) {
-                entry.append ('/');
+            if (!entry.has_suffix ("/")) {
+                entry.append ("/");
             }
             result.append (entry);
         }
@@ -1758,7 +1758,7 @@ public class SyncJournalDb : GLib.Object {
 
         // Remove trailing slash
         var argument = filename;
-        if (argument.has_suffix ('/'))
+        if (argument.has_suffix ("/"))
             argument.chop (1);
 
         SqlQuery query = new SqlQuery (this.database);
@@ -1770,7 +1770,7 @@ public class SyncJournalDb : GLib.Object {
 
         // Prevent future overwrite of the etags of this folder and all
         // parent folders for this sync
-        argument.append ('/');
+        argument += "/";
         this.etag_storage_filter.append (argument);
     }
 
@@ -1779,7 +1779,7 @@ public class SyncJournalDb : GLib.Object {
     Wipe this.etag_storage_filter. Also done implicitly on close ().
     ***********************************************************/
     public void clear_etag_storage_filter () {
-        this.etag_storage_filter == "";
+        this.etag_storage_filter = new GLib.List<string> ();
     }
 
 
@@ -2007,16 +2007,17 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     Return all paths of files with a conflict tag in the name and records in the database
     ***********************************************************/
-    public QByteArrayList conflict_record_paths () {
+    public GLib.List<string> conflict_record_paths () {
         QMutexLocker locker = new QMutexLocker (this.mutex);
-        if (!check_connect ())
-            return {};
+        if (!check_connect ()) {
+            return new GLib.List<string> ();
+        }
 
         SqlQuery query = new SqlQuery (this.database);
         query.prepare ("SELECT path FROM conflicts");
         //  ASSERT (query.exec ());
 
-        QByteArrayList paths;
+        GLib.List<string> paths = new GLib.List<string> ();
         while (query.next ().has_data)
             paths.append (query.byte_array_value (0));
 
@@ -2167,7 +2168,11 @@ public class SyncJournalDb : GLib.Object {
         while (query.next ().has_data) {
             columns.append (query.byte_array_value (1));
         }
-        GLib.debug ("Columns in the current journal:" + columns.to_string ());
+        string debug_string = "";
+        foreach (string column in columns) {
+            debug_string += "\n" + column;
+        }
+        GLib.debug ("Columns in the current journal: " + debug_string);
         return columns;
     }
 
@@ -2176,11 +2181,11 @@ public class SyncJournalDb : GLib.Object {
     ***********************************************************/
     private bool update_metadata_table_structure () {
 
-        var columns = table_columns ("metadata");
+        GLib.List<string> columns = table_columns ("metadata");
         bool re = true;
 
         // check if the file_id column is there and create it if not
-        if (columns == "") {
+        if (columns.length () == 0) {
             return false;
         }
 
@@ -2297,9 +2302,10 @@ public class SyncJournalDb : GLib.Object {
             commit_internal ("update database structure: add is_e2e_encrypted col");
         }
 
-        var upload_info_columns = table_columns ("uploadinfo");
-        if (upload_info_columns == "")
+        GLib.List<string> upload_info_columns = table_columns ("uploadinfo");
+        if (upload_info_columns.length () == 0) {
             return false;
+        }
         if (!upload_info_columns.contains ("content_checksum")) {
             SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE uploadinfo ADD COLUMN content_checksum TEXT;");
@@ -2310,9 +2316,10 @@ public class SyncJournalDb : GLib.Object {
             commit_internal ("update database structure: add content_checksum col for uploadinfo");
         }
 
-        var conflicts_columns = table_columns ("conflicts");
-        if (conflicts_columns == "")
+        GLib.List<string> conflicts_columns = table_columns ("conflicts");
+        if (conflicts_columns.length () == 0) {
             return false;
+        }
         if (!conflicts_columns.contains ("base_path")) {
             SqlQuery query = new SqlQuery (this.database);
             query.prepare ("ALTER TABLE conflicts ADD COLUMN base_path TEXT;");
@@ -2339,10 +2346,10 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private bool update_error_blocklist_table_structure () {
-        var columns = table_columns ("blocklist");
+        GLib.List<string> columns = table_columns ("blocklist");
         bool re = true;
 
-        if (columns == "") {
+        if (columns.length () == 0) {
             return false;
         }
 
@@ -2544,7 +2551,7 @@ public class SyncJournalDb : GLib.Object {
         //      null,
         //      [] (sqlite3_context context, int, sqlite3_value **argv) {
         //          var text = (const char)sqlite3_value_text (argv[0]);
-        //          const string end = std.strrchr (text, '/');
+        //          const string end = std.strrchr (text, "/");
         //          if (!end) {
         //              end = text;
         //          }
@@ -2884,11 +2891,11 @@ public class SyncJournalDb : GLib.Object {
 
 
     /***********************************************************
-    SQL expression to check whether path.startswith (prefix + '/')
-    Note: '/' + 1 == '0'
+    SQL expression to check whether path.startswith (prefix + "/")
+    Note: "/" + 1 == '0'
     ***********************************************************/
     static string is_prefix_path_of (string prefix, string path) {
-        return " (" + path + " > (" + prefix + "||'/') AND " + path + " < (" + prefix + "||'0'))";
+        return " (" + path + " > (" + prefix + "||"/") AND " + path + " < (" + prefix + "||'0'))";
     }
 
     static string is_prefix_path_or_equal (string prefix, string path) {
@@ -2916,9 +2923,10 @@ public class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    static bool delete_batch (SqlQuery query, string[] entries, string name) {
-        if (entries == "")
+    static bool delete_batch (SqlQuery query, GLib.List<string> entries, string name) {
+        if (entries.length () == 0) {
             return true;
+        }
 
         GLib.debug ("Removing stale" + name + "entries:" + entries.join (", "));
         // FIXME: Was ported from exec_batch, check if correct!

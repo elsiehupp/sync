@@ -398,7 +398,7 @@ public class SettingsDialog : Gtk.Dialog {
         // Hide when the last account is deleted. We want to enter the same
         // state we'd be in the client was started up without an account
         // configured.
-        if (AccountManager.instance.accounts == "") {
+        if (AccountManager.instance.accounts.length () == 0) {
             hide ();
         }
     }

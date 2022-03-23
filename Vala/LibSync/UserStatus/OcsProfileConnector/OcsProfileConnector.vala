@@ -30,8 +30,7 @@ public class OcsProfileConnector : GLib.Object {
             /* emit */ signal_error ();
             return;
         }
-        const string url = "/ocs/v2.php/hovercard/v1/%1".printf (user_id);
-        var json_api_job = new JsonApiJob (this.account, url, this);
+        JsonApiJob json_api_job = new JsonApiJob (this.account, "/ocs/v2.php/hovercard/v1/%1".printf (user_id), this);
         json_api_job.signal_json_received.connect (
             this.on_signal_hovercard_fetched
         );

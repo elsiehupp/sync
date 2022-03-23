@@ -402,28 +402,28 @@ public class OwncloudSetupWizard : GLib.Object {
                     Example: https://cloud.example.com/remote.php/dav//
 
             ***********************************************************/
-            GLib.info ("Sanitize got URL path:" + this.oc_wizard.account.url.to_string () + '/' + this.oc_wizard.account.dav_path + remote_folder);
+            GLib.info ("Sanitize got URL path:" + this.oc_wizard.account.url.to_string () + "/" + this.oc_wizard.account.dav_path + remote_folder);
 
             string new_dav_path = this.oc_wizard.account.dav_path,
                     new_remote_folder = remote_folder;
 
-            while (new_dav_path.has_prefix ('/')) {
+            while (new_dav_path.has_prefix ("/")) {
                 new_dav_path.remove (0, 1);
             }
-            while (new_dav_path.has_suffix ('/')) {
+            while (new_dav_path.has_suffix ("/")) {
                 new_dav_path.chop (1);
             }
 
-            while (new_remote_folder.has_prefix ('/')) {
+            while (new_remote_folder.has_prefix ("/")) {
                 new_remote_folder.remove (0, 1);
             }
-            while (new_remote_folder.has_suffix ('/')) {
+            while (new_remote_folder.has_suffix ("/")) {
                 new_remote_folder.chop (1);
             }
 
-            string new_url_path = new_dav_path + '/' + new_remote_folder;
+            string new_url_path = new_dav_path + "/" + new_remote_folder;
 
-            GLib.info ("Sanitized to URL path:" + this.oc_wizard.account.url.to_string () + '/' + new_url_path);
+            GLib.info ("Sanitized to URL path:" + this.oc_wizard.account.url.to_string () + "/" + new_url_path);
             /***********************************************************
             END - Sanitize URL paths to eliminate double-slashes
             ***********************************************************/
@@ -674,15 +674,15 @@ public class OwncloudSetupWizard : GLib.Object {
         // if its a relative path, prepend with users home directory, otherwise use as absolute path
 
         if (!GLib.Dir (local_folder).is_absolute ()) {
-            local_folder = GLib.Dir.home_path + '/' + local_folder;
+            local_folder = GLib.Dir.home_path + "/" + local_folder;
         }
 
         this.oc_wizard.property ("local_folder", local_folder);
 
         // remember the local folder to compare later if it changed, but clean first
         string lf = GLib.Dir.from_native_separators (local_folder);
-        if (!lf.has_suffix ('/')) {
-            lf.append ('/');
+        if (!lf.has_suffix ("/")) {
+            lf.append ("/");
         }
 
         this.init_local_folder = lf;

@@ -121,7 +121,7 @@ public class SyncFileStatusTracker : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_about_to_propagate (SyncFileItemVector items) {
+    private void on_signal_about_to_propagate (GLib.List<unowned SyncFileItem> items) {
         //  ASSERT (this.sync_count == "");
 
         ProblemsMap old_problems;

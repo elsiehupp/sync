@@ -106,7 +106,7 @@ public class CheckVioExt : GLib.Object {
         assert_non_null (path);
 
         while ( * (p+i) ) {
-            if ( * (p+i) == '/' ) {
+            if ( * (p+i) == "/" ) {
                 p[i] = '\0';
 
                 var mb_dir = mypath;
@@ -115,7 +115,7 @@ public class CheckVioExt : GLib.Object {
                     rc = errno;
                 }
                 GLib.assert_true (rc == 0);
-                p[i] = '/';
+                p[i] = "/";
             }
             i++;
         }

@@ -78,7 +78,7 @@ public class ShareeModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     public override int row_count (QModelIndex parent = QModelIndex ()) {
-        return this.sharees.size ();
+        return this.sharees.length ();
     }
 
 

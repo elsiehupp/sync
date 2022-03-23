@@ -85,7 +85,7 @@ public class Logger : GLib.Object {
             string temporary;
             GLib.OutputStream output = new GLib.OutputStream (temporary);
             foreach (var p in value) {
-                output += p + '\n';
+                output += p + "\n";
             }
             GLib.debug (temporary);
             QLoggingCategory.filter_rules (temporary);
@@ -350,7 +350,7 @@ public class Logger : GLib.Object {
         if (log_file_object.open (GLib.File.WriteOnly)) {
             GLib.OutputStream output = new GLib.OutputStream (&log_file);
             for (int i = 1; i <= CRASH_LOG_SIZE; ++i) {
-                output += this.crash_log[ (this.crash_log_index + i) % CRASH_LOG_SIZE] + '\n';
+                output += this.crash_log[ (this.crash_log_index + i) % CRASH_LOG_SIZE] + "\n";
             }
         }
     }

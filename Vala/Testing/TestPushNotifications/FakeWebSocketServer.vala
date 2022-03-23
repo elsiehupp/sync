@@ -145,7 +145,7 @@ public class FakeWebSocketServer : GLib.Object {
     public static unowned Account create_account (string username = "user", string password = "password") {
         var account = Account.create ();
 
-        string[] type_list;
+        GLib.List<string> type_list = new GLib.List<string> ();
         type_list.append ("files");
         type_list.append ("activities");
         type_list.append ("notifications");

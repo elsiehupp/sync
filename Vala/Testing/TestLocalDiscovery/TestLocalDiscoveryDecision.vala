@@ -44,7 +44,7 @@ public class TestLocalDiscoveryDecision : GLib.Object {
         GLib.assert_true (!engine.should_discover_locally ("zzza/hello"));
 
         GLib.assert_fail ("", "There is a possibility of false positives if the set contains a path " +
-            "which is a prefix, and that prefix is followed by a character less than '/'", Continue);
+            "which is a prefix, and that prefix is followed by a character less than "/"", Continue);
         GLib.assert_true (!engine.should_discover_locally ("A/X o"));
 
         fake_folder.sync_engine.set_local_discovery_options (

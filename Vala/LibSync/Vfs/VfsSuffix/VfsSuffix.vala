@@ -199,7 +199,7 @@ public class VfsSuffix : Common.AbstractVfs {
         // It is unsafe for the database to contain any ".owncloud" file entries
         // that are not marked as a virtual file. These could be real .owncloud
         // files that were synced before vfs was enabled.
-        QByteArrayList to_wipe;
+        GLib.List<string> to_wipe;
         parameters.journal.get_files_below_path (
             "",
             VfsSuffix.record_filter
@@ -210,7 +210,7 @@ public class VfsSuffix : Common.AbstractVfs {
     }
 
 
-    private static void record_filter (QByteArrayList to_wipe, SyncJournalFileRecord record) {
+    private static void record_filter (GLib.List<string> to_wipe, SyncJournalFileRecord record) {
         if (!record.is_virtual_file () && record.path.has_suffix (APPLICATION_DOTVIRTUALFILE_SUFFIX)) {
             to_wipe.append (record.path);
         }

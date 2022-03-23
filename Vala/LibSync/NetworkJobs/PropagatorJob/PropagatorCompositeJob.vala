@@ -15,7 +15,7 @@ all subjobs are finished.
 public class PropagatorCompositeJob : AbstractPropagatorJob {
 
     public GLib.List<AbstractPropagatorJob> jobs_to_do;
-    public SyncFileItemVector tasks_to_do;
+    public GLib.List<unowned SyncFileItem> tasks_to_do;
     public GLib.List<AbstractPropagatorJob> running_jobs;
 
     /***********************************************************

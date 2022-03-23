@@ -29,7 +29,7 @@ public abstract class AbstractPropagateItemJob : AbstractPropagatorJob {
     set a custom restore job message that is used if the restore job succeeded.
     It is displayed in the activity view.
     ***********************************************************/
-    string restore_job_msg {
+    string restore_job_message {
         protected get {
             return this.item.is_restoration ? this.item.error_string: "";
         }
@@ -59,7 +59,7 @@ public abstract class AbstractPropagateItemJob : AbstractPropagatorJob {
         this.item = item;
         this.parallelism = (this.item.is_encrypted || has_encrypted_ancestor ()) ? JobParallelism.WAIT_FOR_FINISHED : JobParallelism.FULL_PARALLELISM;
 
-        this.restore_job_msg = "";
+        this.restore_job_message = "";
     }
 
 
@@ -104,8 +104,8 @@ public abstract class AbstractPropagateItemJob : AbstractPropagatorJob {
     protected void on_signal_restore_job_finished (SyncFileItem.Status status) {
         string message;
         if (this.restore_job != null) {
-            message = this.restore_job.restore_job_msg ();
-            this.restore_job.restore_job_msg ();
+            message = this.restore_job.restore_job_message;
+            this.restore_job.restore_job_message;
         }
 
         if (status == SyncFileItem.Status.SUCCESS || status == SyncFileItem.Status.CONFLICT

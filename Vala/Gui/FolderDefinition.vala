@@ -145,25 +145,25 @@ public class FolderDefinition : GLib.Object {
     ***********************************************************/
     public static string prepare_local_path (string path) {
         string p = GLib.Dir.from_native_separators (path);
-        if (!p.has_suffix ('/')) {
-            p.append ('/');
+        if (!p.has_suffix ("/")) {
+            p.append ("/");
         }
         return p;
     }
 
 
     /***********************************************************
-    Remove ending /, then ensure starting '/' : so "/foo/bar" and "/".
+    Remove ending /, then ensure starting "/" : so "/foo/bar" and "/".
     ***********************************************************/
     public static string prepare_target_path (string path) {
         string p = path;
-        if (p.has_suffix ('/')) {
+        if (p.has_suffix ("/")) {
             p.chop (1);
         }
         // Doing this second ensures the empty string or "/" come
         // out as "/".
-        if (!p.has_prefix ('/')) {
-            p.prepend ('/');
+        if (!p.has_prefix ("/")) {
+            p.prepend ("/");
         }
         return p;
     }

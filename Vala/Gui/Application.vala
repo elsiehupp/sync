@@ -205,7 +205,7 @@ public class Application : Gtk.Application {
             // We need to use the deprecated QDesktopServices.storage_location because of its Qt4
             // behavior of adding "data" to the path
             string old_dir = QDesktopServices.storage_location (QDesktopServices.DataLocation);
-            if (old_dir.has_suffix ('/')) {
+            if (old_dir.has_suffix ("/")) {
                 // macOS 10.11.x does not like trailing slash for rename/move.
                 old_dir.chop (1);
             }
@@ -213,7 +213,7 @@ public class Application : Gtk.Application {
             application_name (this.theme.app_name);
             if (GLib.FileInfo (old_dir).is_dir ()) {
                 var configuration_directory = ConfigFile ().config_path;
-                if (configuration_directory.has_suffix ('/')) {
+                if (configuration_directory.has_suffix ("/")) {
                     // macOS 10.11.x does not like trailing slash for rename/move.
                     configuration_directory.chop (1);
                 }
@@ -488,7 +488,7 @@ public class Application : Gtk.Application {
 
             // If one account is configured : enable autostart
     //  #ifndef QT_DEBUG
-            bool should_auto_start = AccountManager.instance.accounts.length == 1;
+            bool should_auto_start = AccountManager.instance.accounts.length () == 1;
     //  #else
             //  bool should_auto_start = false;
     //  #endif
@@ -644,8 +644,8 @@ public class Application : Gtk.Application {
         foreach (string lang in ui_languages) {
             lang.replace ('-', '_'); // work around QTBUG-25973
             lang = subst_lang (lang);
-            const string tr_path = application_tr_path;
-            const string tr_file = "client_" + lang;
+            string tr_path = application_tr_path;
+            string tr_file = "client_" + lang;
             if (translator.on_signal_load (tr_file, tr_path) || lang.has_prefix ("en")) {
                 // Permissive approach : Qt and keychain translations
                 // may be missing, but Qt translations must be there in order
@@ -655,8 +655,8 @@ public class Application : Gtk.Application {
                 GLib.info ("Using " + lang + " translation");
                 property ("ui_lang", lang);
                 const string qt_tr_path = QLibraryInfo.location (QLibraryInfo.TranslationsPath);
-                const string qt_tr_file = "qt_" + lang;
-                const string qt_base_tr_file = "qtbase_" + lang;
+                string qt_tr_file = "qt_" + lang;
+                string qt_base_tr_file = "qtbase_" + lang;
                 if (!qt_translator.on_signal_load (qt_tr_file, qt_tr_path)) {
                     if (!qt_translator.on_signal_load (qt_tr_file, tr_path)) {
                         if (!qt_translator.on_signal_load (qt_base_tr_file, qt_tr_path)) {
@@ -664,7 +664,7 @@ public class Application : Gtk.Application {
                         }
                     }
                 }
-                const string qtkeychain_tr_file = "qtkeychain_" + lang;
+                string qtkeychain_tr_file = "qtkeychain_" + lang;
                 if (!qtkeychain_translator.on_signal_load (qtkeychain_tr_file, qt_tr_path)) {
                     qtkeychain_translator.on_signal_load (qtkeychain_tr_file, tr_path);
                 }
@@ -743,7 +743,7 @@ public class Application : Gtk.Application {
             }
 
             // Show the main dialog only if there is at least one account configured
-            if (AccountManager.instance.accounts != "") {
+            if (AccountManager.instance.accounts.length () > 0) {
                 this.show_main_dialog ();
             } else {
                 this.gui.on_signal_new_account_wizard ();
@@ -770,7 +770,7 @@ public class Application : Gtk.Application {
             }
         }
 
-        if (AccountManager.instance.accounts == "") {
+        if (AccountManager.instance.accounts.length () == 0) {
             // let gui open the setup wizard
             this.gui.on_signal_open_settings_dialog ();
 
@@ -836,7 +836,7 @@ public class Application : Gtk.Application {
         }
 
         // if there is no more account, show the wizard.
-        if (this.gui != null && AccountManager.instance.accounts == "") {
+        if (this.gui != null && AccountManager.instance.accounts.length () == 0) {
             // allow to add a new account if there is non any more. Always think
             // about single account theming!
             OwncloudSetupWizard.run_wizard (this, SLOT (on_signal_owncloud_wizard_done (int)));
@@ -879,7 +879,8 @@ public class Application : Gtk.Application {
     the config that can't be read.
     ***********************************************************/
     private bool config_version_migration () {
-        string[] delete_keys, ignore_keys;
+        GLib.List<string> delete_keys = new GLib.List<string> ();
+        GLib.List<string> ignore_keys = new GLib.List<string> ();
         AccountManager.backward_migration_settings_keys (delete_keys, ignore_keys);
         FolderManager.backward_migration_settings_keys (delete_keys, ignore_keys);
 

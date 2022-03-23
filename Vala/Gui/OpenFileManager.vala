@@ -108,7 +108,7 @@ public class OpenFileManager : GLib.Object {
     /***********************************************************
     According to the QStandardDir implementation from Qt5
     ***********************************************************/
-    public static string[] xdg_data_dirs () {
+    public static GLib.List<string> xdg_data_dirs () {
         GLib.List<string> dirs = new GLib.List<string> ();
         // http://standards.freedesktop.org/basedir-spec/latest/
         string xdg_data_dirs_env = GLib.File.decode_name (qgetenv ("XDG_DATA_DIRS"));

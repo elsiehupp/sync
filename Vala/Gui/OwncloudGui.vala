@@ -239,14 +239,14 @@ public class OwncloudGui : GLib.Object {
             }
         }
 
-        if (!problem_accounts.empty ()) {
+        if (problem_accounts.length () != 0) {
             this.tray.icon (Theme.folder_offline_icon_for_tray);
             if (all_disconnected) {
                 status_text (_("Disconnected"));
             } else {
                 status_text (_("Disconnected from some accounts"));
             }
-            string[] messages;
+            GLib.List<string> messages = new GLib.List<string> ()
             messages.append (_("Disconnected from accounts:"));
             foreach (unowned AccountState account in problem_accounts) {
                 string message = _("Account %1 : %2").printf (account.account.display_name, account.state_string (account.state));
@@ -432,7 +432,7 @@ public class OwncloudGui : GLib.Object {
             var action = new QAction (action_text, this);
             FolderConnection folder_connection = FolderManager.instance.folder_by_alias (folder_connection);
             if (folder_connection != null) {
-                string full_path = folder_connection.path + '/' + progress.last_completed_item.file;
+                string full_path = folder_connection.path + "/" + progress.last_completed_item.file;
                 if (new GLib.File (full_path).exists ()) {
                     action.triggered.connect (
                         this.on_progress_action_triggered
@@ -441,7 +441,7 @@ public class OwncloudGui : GLib.Object {
                     action.enabled (false);
                 }
             }
-            if (this.recent_items_actions.length > 5) {
+            if (this.recent_items_actions.length () > 5) {
                 this.recent_items_actions.take_first ().delete_later ();
             }
             this.recent_items_actions.append (action);
@@ -592,7 +592,7 @@ public class OwncloudGui : GLib.Object {
     ***********************************************************/
     public void on_signal_open_settings_dialog () {
         // if account is set up, on_signal_start the configuration wizard.
-        if (AccountManager.instance.accounts != "") {
+        if (AccountManager.instance.accounts.length () != 0) {
             if (this.settings_dialog == null || Gtk.Application.active_window () != this.settings_dialog) {
                 on_signal_show_settings ();
             } else {

@@ -18,8 +18,8 @@ public class TestTemporaryDownloadFilenameGeneration : GLib.Object {
         for (int i = 1; i <= 1000; i++) {
             fn+="F";
             string temporary_file_name = create_download_temporary_filename (fn);
-            if (temporary_file_name.contains ('/')) {
-                temporary_file_name = temporary_file_name.mid (temporary_file_name.last_index_of ('/')+1);
+            if (temporary_file_name.contains ("/")) {
+                temporary_file_name = temporary_file_name.mid (temporary_file_name.last_index_of ("/")+1);
             }
             GLib.assert_true ( temporary_file_name.length > 0);
             GLib.assert_true ( temporary_file_name.length <= 254);
@@ -29,8 +29,8 @@ public class TestTemporaryDownloadFilenameGeneration : GLib.Object {
         for (int i = 1; i < 1000; i++) {
             fn+="F";
             string temporary_file_name = create_download_temporary_filename (fn);
-            if (temporary_file_name.contains ('/')) {
-                temporary_file_name = temporary_file_name.mid (temporary_file_name.last_index_of ('/')+1);
+            if (temporary_file_name.contains ("/")) {
+                temporary_file_name = temporary_file_name.mid (temporary_file_name.last_index_of ("/")+1);
             }
             GLib.assert_true ( temporary_file_name.length > 0);
             GLib.assert_true ( temporary_file_name.length <= 254);
@@ -40,8 +40,8 @@ public class TestTemporaryDownloadFilenameGeneration : GLib.Object {
         for (int i = 1; i < 1000; i++) {
             fn+="F";
             string temporary_file_name = create_download_temporary_filename (fn);
-            if (temporary_file_name.contains ('/')) {
-                temporary_file_name = temporary_file_name.mid (temporary_file_name.last_index_of ('/')+1);
+            if (temporary_file_name.contains ("/")) {
+                temporary_file_name = temporary_file_name.mid (temporary_file_name.last_index_of ("/")+1);
             }
             GLib.assert_true ( temporary_file_name.length > 0);
             GLib.assert_true ( temporary_file_name.length <= 254);

@@ -138,7 +138,7 @@ public class ConflictDialog : Gtk.Dialog {
     private void update_widgets () {
         QMimeDatabase mime_database;
 
-        const var local_version = this.solver.local_version_filename;
+        string local_version = this.solver.local_version_filename;
         update_group (local_version,
                     this.instance.local_version_link,
                     _("Open local version"),
@@ -146,7 +146,7 @@ public class ConflictDialog : Gtk.Dialog {
                     this.instance.local_version_size,
                     this.instance.local_version_button);
 
-        const string remote_version = this.solver.remote_version_filename;
+        string remote_version = this.solver.remote_version_filename;
         update_group (remote_version,
                     this.instance.remote_version_link,
                     _("Open server version"),

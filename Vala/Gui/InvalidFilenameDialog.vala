@@ -96,10 +96,10 @@ public class InvalidFilenameDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void on_signal_filename_line_edit_text_changed (string text) {
-        const bool is_new_filename_different = text != this.original_filename;
-        const var illegal_contained_characters = illegal_chars_from_string (text);
-        const var contains_illegal_chars = !illegal_contained_characters.empty () || text.has_suffix ('.');
-        const bool is_text_valid = is_new_filename_different && !contains_illegal_chars;
+        bool is_new_filename_different = text != this.original_filename;
+        string illegal_contained_characters = illegal_chars_from_string (text);
+        bool contains_illegal_chars = !illegal_contained_characters.empty () || text.has_suffix ('.');
+        bool is_text_valid = is_new_filename_different && !contains_illegal_chars;
 
         if (is_text_valid) {
             this.instance.error_label.on_signal_text ("");
@@ -194,7 +194,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
     ***********************************************************/
     private const char[] illegal_characters = {
         '\\',
-        '/',
+        "/",
         ':',
         '?',
         '*',
@@ -223,11 +223,11 @@ public class InvalidFilenameDialog : Gtk.Dialog {
     ***********************************************************/
     private static string illegal_character_list_to_string (GLib.List<char> illegal_characters) {
         string illegal_characters_string;
-        if (illegal_characters.size () > 0) {
+        if (illegal_characters.length () > 0) {
             illegal_characters_string += illegal_characters[0];
         }
 
-        for (int i = 1; i < illegal_characters.length; ++i) {
+        for (int i = 1; i < illegal_characters.length (); ++i) {
             if (illegal_characters_string.contains (illegal_characters[i])) {
                 continue;
             }

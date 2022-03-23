@@ -62,15 +62,15 @@ public class SslErrorDialog : Gtk.Dialog {
     ***********************************************************/
     public bool check_failing_certificates_known (GLib.List<QSslError> errors) {
         // check if unknown certificates caused errors.
-        this.unknown_certificates == "";
+        this.unknown_certificates == null;
 
         string[] error_strings;
 
-        string[] additional_error_strings;
+        GLib.List<string> additional_error_strings = new GLib.List<string> ();
 
         GLib.List<QSslCertificate> trusted_certificates = this.account.approved_certificates ();
 
-        for (int i = 0; i < errors.length; ++i) {
+        for (int i = 0; i < errors.length (); ++i) {
             QSslError error = errors.at (i);
             if (trusted_certificates.contains (error.certificate ()) || this.unknown_certificates.contains (error.certificate ())) {
                 continue;
@@ -112,7 +112,7 @@ public class SslErrorDialog : Gtk.Dialog {
             }
         }
 
-        if (additional_error_strings != "") {
+        if (additional_error_strings.length () != 0) {
             message += QL ("<h4>") + _("Additional errors:") + QL ("</h4>");
 
             foreach (var error_string in additional_error_strings) {

@@ -189,8 +189,7 @@ public class CheckServerJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_redirected (GLib.InputStream input_stream, GLib.Uri target_url, int redirect_count) {
-        string slash_status_php = "/";
-        slash_status_php.append (STATUS_PHP_C);
+        string slash_status_php = "/" + STATUS_PHP_C;
 
         int http_code = input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         string path = target_url.path;

@@ -39,7 +39,7 @@ public class LscolXMLParser : GLib.Object {
         QXmlStreamReader reader = new QXmlStreamReader (xml);
         reader.add_extra_namespace_declaration (QXmlStreamNamespaceDeclaration ("d", "DAV:"));
 
-        string[] folders;
+        GLib.List<string> folders = new GLib.List<string> ();
         string current_href;
         GLib.HashTable<string, string> current_temporary_properties;
         GLib.HashTable<string, string> current_http200Properties;

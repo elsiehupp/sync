@@ -166,7 +166,7 @@ public class OwncloudPropagator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void start (SyncFileItemVector synced_items) {
+    public void start (GLib.List<unowned SyncFileItem> synced_items) {
         GLib.assert (std.is_sorted (synced_items.begin (), synced_items.end ()));
 
         // This builds all the jobs needed for the propagation.
@@ -299,7 +299,7 @@ public class OwncloudPropagator : GLib.Object {
         GLib.List<QPair<string, PropagateDirectory>> directories, // should be a LIFO stack
         GLib.List<AbstractPropagatorJob> directories_to_remove,
         string removed_directory,
-        SyncFileItemVector synced_items) {
+        GLib.List<unowned SyncFileItem> synced_items) {
         var directory_propagation_job = std.make_unique<PropagateDirectory> (this, item);
 
         if (item.instruction == CSync.SyncInstructions.TYPE_CHANGE
@@ -728,8 +728,9 @@ public class OwncloudPropagator : GLib.Object {
     ***********************************************************/
     public static Result<AbstractVfs.ConvertToPlaceholderResult, string> static_update_metadata (
         SyncFileItem item, string local_dir,
-        AbstractVfs vfs, SyncJournalDb journal) {
-        const string fs_path = local_dir + item.destination ();
+        AbstractVfs vfs, SyncJournalDb journal
+    ) {
+        string fs_path = local_dir + item.destination ();
         var result = vfs.convert_to_placeholder (fs_path, item);
         if (!result) {
             return result.error;

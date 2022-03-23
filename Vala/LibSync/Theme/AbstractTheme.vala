@@ -475,7 +475,7 @@ public class Theme : GLib.Object {
                 return "";
             }
             if (!base_url.has_suffix ("/")) {
-                base_url.append ("/");
+                base_url += "/";
             }
             return base_url + "conflicts.html";
         }
@@ -1280,8 +1280,7 @@ public class Theme : GLib.Object {
                 return cached = Gtk.Icon.from_theme (name);
             }
 
-            const string svg_name = Theme.THEME_PREFIX + "%1/%2.svg".printf (flavor).printf (name);
-            QSvgRenderer renderer = new QSvgRenderer (svg_name);
+            QSvgRenderer renderer = new QSvgRenderer (Theme.THEME_PREFIX + "%1/%2.svg".printf (flavor).printf (name));
 
             var use_svg = should_prefer_svg;
             GLib.List<int> sizes = use_svg
@@ -1317,8 +1316,7 @@ public class Theme : GLib.Object {
 
 
     private static Gdk.Pixbuf load_pixmap (string flavor, string name, int size) {
-        const string pixmap_name = Theme.THEME_PREFIX + "%1/%2-%3.png".printf (flavor).printf (name).printf (size);
-        return Gdk.Pixbuf (pixmap_name);
+        return Gdk.Pixbuf (Theme.THEME_PREFIX + "%1/%2-%3.png".printf (flavor).printf (name).printf (size));
     }
 //  #endif
 

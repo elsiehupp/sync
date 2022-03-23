@@ -285,7 +285,7 @@ public class CloudProviderWrapper : GLib.Object {
             string time_str = QTime.current_time ().to_string ("hh:mm");
             string action_text = _("%1 (%2, %3)").printf (progress.last_completed_item.file, kind_str, time_str);
             if (f) {
-                string full_path = f.path + '/' + progress.last_completed_item.file;
+                string full_path = f.path + "/" + progress.last_completed_item.file;
                 if (new GLib.File (full_path).exists ()) {
                     if (this.recently_changed.length > 5) {
                         this.recently_changed.remove_first ();

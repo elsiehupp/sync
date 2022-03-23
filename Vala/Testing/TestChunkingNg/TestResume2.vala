@@ -46,7 +46,7 @@ public class TestResume2 : AbstractTestChunkingNg {
         foreach (var to_delete in chunks_to_delete) {
             bool was_deleted = false;
             foreach (var deleted in deleted_paths) {
-                if (deleted.mid (deleted.last_index_of ('/') + 1) == to_delete) {
+                if (deleted.mid (deleted.last_index_of ("/") + 1) == to_delete) {
                     was_deleted = true;
                     break;
                 }

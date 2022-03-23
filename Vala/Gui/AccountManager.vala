@@ -84,7 +84,7 @@ public class AccountManager : GLib.Object {
     but note that settings not existing is not an error.
     ***********************************************************/
     public bool restore () {
-        string[] skip_settings_keys;
+        GLib.List<string> skip_settings_keys = new GLib.List<string> ();
         backward_migration_settings_keys (skip_settings_keys, skip_settings_keys);
 
         var settings = ConfigFile.settings_with_group (ACCOUNTS_C);
@@ -157,9 +157,9 @@ public class AccountManager : GLib.Object {
     ***********************************************************/
     public void on_signal_shutdown () {
         var accounts_copy = this.accounts;
-        this.accounts == "";
+        this.accounts == new GLib.List<string> ();
         foreach (var acc in accounts_copy) {
-            /* emit */ account_removed (acc);
+            /* emit */ signal_account_removed (acc);
             /* emit */ signal_remove_account_folders (acc);
         }
     }
@@ -226,7 +226,7 @@ public class AccountManager : GLib.Object {
     Returns the list of settings keys that can't be read because
     they are from the future.
     ***********************************************************/
-    public static void backward_migration_settings_keys (string[] delete_keys, string[] ignore_keys) {
+    public static void backward_migration_settings_keys (GLib.List<string> delete_keys, GLib.List<string> ignore_keys) {
         var settings = ConfigFile.settings_with_group (ACCOUNTS_C);
         int accounts_version = settings.value (VERSION_C).to_int ();
         if (accounts_version <= MAX_ACCOUNTS_VERSION) {
@@ -275,7 +275,7 @@ public class AccountManager : GLib.Object {
         GLib.info ("Saving " + acc.approved_certificates ().length + " unknown certificates.");
         string certificates;
         foreach (var cert in acc.approved_certificates ()) {
-            certificates += cert.to_pem () + '\n';
+            certificates += cert.to_pem () + "\n";
         }
         if (certificates != "") {
             settings.value (CA_CERTS_KEY_C, certificates);
@@ -387,8 +387,8 @@ public class AccountManager : GLib.Object {
             // Now try to open the original own_cloud settings to see if they exist.
             string oc_config_file = GLib.Dir.from_native_separators (settings.filename ());
             // replace the last two segments with own_cloud/owncloud.config
-            oc_config_file = oc_config_file.left (oc_config_file.last_index_of ('/'));
-            oc_config_file = oc_config_file.left (oc_config_file.last_index_of ('/'));
+            oc_config_file = oc_config_file.left (oc_config_file.last_index_of ("/"));
+            oc_config_file = oc_config_file.left (oc_config_file.last_index_of ("/"));
             oc_config_file += "/own_cloud/owncloud.config";
 
             GLib.info ("Migrate: checking old config " + oc_config_file);
@@ -401,11 +401,11 @@ public class AccountManager : GLib.Object {
                 // Check the theme url to see if it is the same url that the o_c config was for
                 string override_url = Theme.override_server_url;
                 if (!override_url == "") {
-                    if (override_url.has_suffix ('/')) {
+                    if (override_url.has_suffix ("/")) {
                         override_url.chop (1);
                     }
                     string oc_url = oc_settings.value (URL_C).to_string ();
-                    if (oc_url.has_suffix ('/')) {
+                    if (oc_url.has_suffix ("/")) {
                         oc_url.chop (1);
                     }
 

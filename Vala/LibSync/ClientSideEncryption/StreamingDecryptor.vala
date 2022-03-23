@@ -98,7 +98,7 @@ public class StreamingDecryptor : GLib.Object {
             return "";
         }
 
-        const bool is_last_chunk = this.decrypted_so_far + chunk_size == this.total_size;
+        bool is_last_chunk = this.decrypted_so_far + chunk_size == this.total_size;
 
         // last Constants.E2EE_TAG_SIZE bytes is ALWAYS a e2Ee_tag!!!
         const int64 size = is_last_chunk ? chunk_size - Constants.E2EE_TAG_SIZE : chunk_size;

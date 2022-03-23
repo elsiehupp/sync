@@ -108,7 +108,7 @@ public class FakeFolder : GLib.Object {
 
         AbstractVfs.SetupParameters vfs_params;
         vfs_params.filesystem_path = local_path;
-        vfs_params.remote_path = '/';
+        vfs_params.remote_path = "/";
         vfs_params.account = this.account;
         vfs_params.journal = this.journal_database.get ();
         vfs_params.provider_name = "OC-TEST";
@@ -238,9 +238,9 @@ public class FakeFolder : GLib.Object {
     ***********************************************************/
     public string local_path {
         // SyncEngine wants a trailing slash
-        if (this.temporary_directory.path.has_suffix ('/'))
+        if (this.temporary_directory.path.has_suffix ("/"))
             return this.temporary_directory.path;
-        return this.temporary_directory.path + '/';
+        return this.temporary_directory.path + "/";
     }
 
 

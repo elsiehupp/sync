@@ -123,7 +123,7 @@ public class ConnectionValidator : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private string[] errors;
+    private GLib.List<string> errors;
     private unowned AccountState account_state;
     private unowned Account account;
     private bool is_checking_server_and_auth;

@@ -354,7 +354,7 @@ public class OwncloudSetupPage : QWizardPage {
             if (url.has_suffix (web_dav_path)) {
                 new_url.chop (web_dav_path.length);
             }
-            if (web_dav_path.has_suffix ('/')) {
+            if (web_dav_path.has_suffix ("/")) {
                 web_dav_path.chop (1); // cut off the slash
                 if (url.has_suffix (web_dav_path)) {
                     new_url.chop (web_dav_path.length);
@@ -438,7 +438,7 @@ public class OwncloudSetupPage : QWizardPage {
     /***********************************************************
     ***********************************************************/
     private static string subject_info_helper (QSslCertificate cert, string qa) {
-        return cert.subject_info (qa).join ('/');
+        return cert.subject_info (qa).join ("/");
     }
 
 } // class OwncloudSetupPage

@@ -255,7 +255,7 @@ public class BandwidthManager : GLib.Object {
             return;
         }
 
-        GLib.debug (this.relative_upload_device_list.length.to_string () + "Starting Delay");
+        GLib.debug (this.relative_upload_device_list.length ().to_string () + "Starting Delay");
 
         int64 relative_limit_progress_measured = (this.relative_limit_current_measured_device.read_with_progress
                                                    + this.relative_limit_current_measured_device.read)

@@ -25,7 +25,7 @@ public class ClientProxy : GLib.Object {
         ConfigFile config;
 
         // if there is no config file, default to system proxy.
-        if (config.exists ()) {
+        if (config.exists) {
             return config.proxy_type () == Soup.ProxyResolverDefault.DefaultProxy;
         }
 
@@ -102,7 +102,7 @@ public class ClientProxy : GLib.Object {
         Soup.ProxyResolverDefault proxy;
 
         // if there is no config file, default to system proxy.
-        if (config.exists ()) {
+        if (config.exists) {
             proxy_type = config.proxy_type ();
             proxy = proxy_from_config (config);
         }

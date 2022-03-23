@@ -17,7 +17,7 @@ public class User : GLib.Object {
     ActivityListModel activity_model { public get; private set; }
 
     private UnifiedSearchResultsListModel unified_search_results_model;
-    private ActivityList blocklisted_notifications;
+    private GLib.List<Activity> blocklisted_notifications;
 
     /***********************************************************
     ***********************************************************/
@@ -648,7 +648,7 @@ public class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void on_signal_build_notification_display (ActivityList list) {
+    public void on_signal_build_notification_display (GLib.List<Activity> list) {
         this.activity_model.clear_notifications ();
 
         foreach (var activity in list) {
@@ -813,7 +813,7 @@ public class User : GLib.Object {
             }
         }
 
-        if (this.activity_model.errors_list ().size () == 0) {
+        if (this.activity_model.errors_list ().length () == 0) {
             this.expired_activities_check_timer.stop ();
         }
     }

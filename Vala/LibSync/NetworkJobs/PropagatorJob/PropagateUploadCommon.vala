@@ -358,11 +358,10 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
             this.item.checksum_header = this.transmission_checksum_header;
         }
 
-        const string full_file_path = this.file_to_upload.path;
-        const string original_file_path = this.propagator.full_local_path (this.item.file);
+        string original_file_path = this.propagator.full_local_path (this.item.file);
 
-        if (!FileSystem.file_exists (full_file_path)) {
-            return on_signal_error_start_folder_unlock (SyncFileItem.Status.SOFT_ERROR, _("File Removed (start upload) %1").printf (full_file_path));
+        if (!FileSystem.file_exists (this.file_to_upload.path)) {
+            return on_signal_error_start_folder_unlock (SyncFileItem.Status.SOFT_ERROR, _("File Removed (start upload) %1").printf (this.file_to_upload.path));
         }
         if (this.item.modtime <= 0) {
             on_signal_error_start_folder_unlock (SyncFileItem.Status.NORMAL_ERROR, _("File %1 has invalid modified time. Do not upload to the server.").printf (GLib.Dir.to_native_separators (this.item.file)));
@@ -391,7 +390,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
             return on_signal_error_start_folder_unlock (SyncFileItem.Status.SOFT_ERROR, _("Local file changed during syncing. It will be resumed."));
         }
 
-        this.file_to_upload.size = FileSystem.get_size (full_file_path);
+        this.file_to_upload.size = FileSystem.get_size (this.file_to_upload.path);
         this.item.size = FileSystem.get_size (original_file_path);
 
         // But skip the file if the mtime is too close to 'now'!
@@ -582,7 +581,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
 
         // Abort all running jobs, except for explicitly excluded ones
         foreach (AbstractNetworkJob abstract_job in this.jobs) {
-            var input_stream = abstract_job.input_stream ();
+            var input_stream = abstract_job.input_stream;
             if (!input_stream || !input_stream.is_running ())
                 continue;
 

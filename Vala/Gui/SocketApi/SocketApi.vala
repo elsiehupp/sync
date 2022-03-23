@@ -219,8 +219,8 @@ public class SocketApi : GLib.Object {
             system_path,
             file_status.to_socket_api_string ()
         );
-        //  Q_ASSERT (!system_path.has_suffix ('/'));
-        uint32 directory_hash = q_hash (system_path.left (system_path.last_index_of ('/')));
+        //  Q_ASSERT (!system_path.has_suffix ("/"));
+        uint32 directory_hash = q_hash (system_path.left (system_path.last_index_of ("/")));
         foreach (var listener in this.listeners) {
             listener.send_message_if_directory_monitored (message, directory_hash);
         }
@@ -237,8 +237,8 @@ public class SocketApi : GLib.Object {
 
         GLib.debug ("Sending SocketApi message --> " + message + " to " + socket);
         string local_message = message;
-        if (!local_message.has_suffix ('\n')) {
-            local_message.append ('\n');
+        if (!local_message.has_suffix ("\n")) {
+            local_message += "\n";
         }
 
         string bytes_to_send = local_message.to_utf8 ();
@@ -527,7 +527,7 @@ public class SocketApi : GLib.Object {
             FileData data;
 
             data.local_path = GLib.Dir.clean_path (local_file);
-            if (data.local_path.has_suffix ('/'))
+            if (data.local_path.has_suffix ("/"))
                 data.local_path.chop (1);
 
             data.folder_connection = FolderManager.instance.folder_for_path (data.local_path);
@@ -672,7 +672,7 @@ public class SocketApi : GLib.Object {
         } else {
             // The user probably visited this directory in the file shell.
             // Let the listener know that it should now send status pushes for sibblings of this file.
-            string directory = file_data.local_path.left (file_data.local_path.last_index_of ('/'));
+            string directory = file_data.local_path.left (file_data.local_path.last_index_of ("/"));
             listener.register_monitored_directory (q_hash (directory));
 
             SyncFileStatus file_status = file_data.sync_file_status ();
@@ -783,7 +783,7 @@ public class SocketApi : GLib.Object {
     Context menu action
     ***********************************************************/
     private void command_MAKE_AVAILABLE_LOCALLY (string files_arg, SocketListener listener) {
-        const string[] files = split (files_arg);
+        string[] files = split (files_arg);
 
         foreach (string file in files) {
             var data = FileData.file_data (file);
@@ -807,7 +807,7 @@ public class SocketApi : GLib.Object {
     Go over all the files and replace them by a virtual file
     ***********************************************************/
     private void command_MAKE_ONLINE_ONLY (string files_arg, SocketListener listener) {
-        const string[] files = split (files_arg);
+        string[] files = split (files_arg);
 
         foreach (string file in files) {
             var data = FileData.file_data (file);
@@ -1066,7 +1066,7 @@ public class SocketApi : GLib.Object {
     ***********************************************************/
     private void command_GET_MENU_ITEMS (string argument, SocketListener listener) {
         listener.on_signal_send_message ("GET_MENU_ITEMS:BEGIN");
-        const string[] files = split (argument);
+        string[] files = split (argument);
 
         // Find the common sync folder_connection.
         // sync_folder will be null if files are in different folders.
@@ -1086,7 +1086,7 @@ public class SocketApi : GLib.Object {
         // Sharing actions show for single files only
         if (sync_folder != null && files.size () == 1 && sync_folder.account_state.is_connected) {
             string system_path = GLib.Dir.clean_path (argument);
-            if (system_path.has_suffix ('/')) {
+            if (system_path.has_suffix ("/")) {
                 system_path.truncate (system_path.length - 1);
             }
 
@@ -1588,7 +1588,7 @@ public class SocketApi : GLib.Object {
                 GLib.debug ("WIDGET: " + match.object_name () + match.meta_object ().class_name ());
             }
 
-            if (matches.empty ()) {
+            if (matches.length () == 0) {
                 return null;
             }
             return matches[0];
@@ -1605,7 +1605,7 @@ public class SocketApi : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private static string remove_trailing_slash (string path) {
-        //  Q_ASSERT (path.has_suffix ('/'));
+        //  Q_ASSERT (path.has_suffix ("/"));
         path.truncate (path.length - 1);
         return path;
     }
@@ -1623,7 +1623,7 @@ public class SocketApi : GLib.Object {
         if (path != "") {
             message += ":";
             GLib.FileInfo file_info = new GLib.FileInfo (path);
-            message.append += GLib.Dir.to_native_separators (file_info.absolute_file_path);
+            message += GLib.Dir.to_native_separators (file_info.absolute_file_path);
         }
         return message;
     }

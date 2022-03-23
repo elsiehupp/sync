@@ -33,7 +33,7 @@ public class ExcludedFiles : GLib.Object {
     }
 
     /***********************************************************
-    Our BasePath need to end with '/'
+    Our BasePath need to end with "/"
     ***********************************************************/
     private class BasePathString : GLib.Object {
 
@@ -43,17 +43,17 @@ public class ExcludedFiles : GLib.Object {
             base ();
 
             this.string_value = string_value;
-            //  Q_ASSERT (has_suffix ('/'));
+            //  Q_ASSERT (has_suffix ("/"));
         }
 
 
         public string to_string () {
-            return this.string_value ();
+            return this.string_value;
         }
 
         //  public BasePathString (string other) {
         //      base (other);
-        //      //  Q_ASSERT (has_suffix ('/'));
+        //      //  Q_ASSERT (has_suffix ("/"));
         //  }
     }
 
@@ -218,7 +218,7 @@ public class ExcludedFiles : GLib.Object {
         const var filename = exclude_file_info.filename ();
         const var base_path = filename.compare ("sync-exclude.lst", Qt.CaseInsensitive) == 0
                                                                         ? this.local_path
-                                                                        : left_include_last (path, '/');
+                                                                        : left_include_last (path, "/");
         var exclude_files_local_path = this.exclude_files[base_path];
         if (std.find (exclude_files_local_path.cbegin (), exclude_files_local_path.cend (), path) == exclude_files_local_path.cend ()) {
             exclude_files_local_path.append (path);
@@ -267,7 +267,7 @@ public class ExcludedFiles : GLib.Object {
         }
 
         string relative_path = file_path.mid (base_path.length);
-        if (relative_path.has_suffix ('/')) {
+        if (relative_path.has_suffix ("/")) {
             relative_path.chop (1);
         }
 
@@ -289,7 +289,7 @@ public class ExcludedFiles : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void add_manual_exclude_with_base_path (string expr, string base_path) {
-        //  Q_ASSERT (base_path.has_suffix ('/'));
+        //  Q_ASSERT (base_path.has_suffix ("/"));
 
         var key = base_path;
         this.manual_excludes[key].append (expr);
@@ -348,14 +348,14 @@ public class ExcludedFiles : GLib.Object {
         // Check the bname part of the path to see whether the full
         // regular_expression should be run.
         /* QStringRef */ string bname_str = new /* QStringRef */ string (path);
-        int last_slash = path.last_index_of ('/');
+        int last_slash = path.last_index_of ("/");
         if (last_slash >= 0) {
             bname_str = path.mid_ref (last_slash + 1);
         }
 
         string base_path = this.local_path + path;
         while (base_path.length > this.local_path.length) {
-            base_path = left_include_last (base_path, '/');
+            base_path = left_include_last (base_path, "/");
             QRegularExpressionMatch regular_expression_match;
             if (filetype == ItemType.DIRECTORY
                 && this.bname_traversal_regex_dir.contains (base_path)) {
@@ -379,7 +379,7 @@ public class ExcludedFiles : GLib.Object {
         // third capture: full path matching is triggered
         base_path = this.local_path + path;
         while (base_path.length > this.local_path.length) {
-            base_path = left_include_last (base_path, '/');
+            base_path = left_include_last (base_path, "/");
             QRegularExpressionMatch regular_expression_match;
             if (filetype == ItemType.DIRECTORY
                 && this.full_traversal_regex_dir.contains (base_path)) {
@@ -444,7 +444,7 @@ public class ExcludedFiles : GLib.Object {
     Loads the exclude patterns from file the registered base paths.
     ***********************************************************/
     public void on_signal_load_exclude_file_patterns (string base_path, GLib.File file) {
-        string[] patterns;
+        GLib.List<string> patterns = new GLib.List<string> ();
         while (!file.at_end ()) {
             string line = file.read_line ().trimmed ();
             if (line.has_prefix ("#!version")) {
@@ -483,11 +483,11 @@ public class ExcludedFiles : GLib.Object {
     private bool version_directive_keep_next_line (string directive) {
         if (!directive.has_prefix ("#!version"))
             return true;
-        QByteArrayList args = directive.split (' ');
+        GLib.List<string> args = directive.split (' ');
         if (args.length != 3)
             return true;
         string operation = args[1];
-        QByteArrayList arg_versions = args[2].split ('.');
+        GLib.List<string> arg_versions = args[2].split ('.');
         if (arg_versions.length != 3)
             return true;
 
@@ -530,7 +530,7 @@ public class ExcludedFiles : GLib.Object {
 
         string base_path = this.local_path + path;
         while (base_path.length > this.local_path.length) {
-            base_path = left_include_last (base_path, '/');
+            base_path = left_include_last (base_path, "/");
             QRegularExpressionMatch regular_expression_match;
             if (filetype == ItemType.DIRECTORY
                 && this.full_regex_dir.contains (base_path)) {
@@ -622,14 +622,14 @@ public class ExcludedFiles : GLib.Object {
         string bname_trigger_dir;
 
         foreach (var exclude in this.all_excludes.value (base_path)) {
-            if (exclude[0] == '\n') {
+            if (exclude[0] == "\n") {
                 continue; // empty line
             }
             if (exclude[0] == '\r') {
                 continue; // empty line
             }
 
-            bool match_dir_only = exclude.has_suffix ('/');
+            bool match_dir_only = exclude.has_suffix ("/");
             if (match_dir_only) {
                 exclude = exclude.left (exclude.length - 1);
             }
@@ -639,7 +639,7 @@ public class ExcludedFiles : GLib.Object {
                 exclude = exclude.mid (1);
             }
 
-            bool full_path = exclude.contains ('/');
+            bool full_path = exclude.contains ("/");
 
             /* Use GLib.Regex, append to the right pattern */
             var bname_file_dir = remove_excluded ? bname_file_dir_remove : bname_file_dir_keep;
@@ -783,7 +783,7 @@ public class ExcludedFiles : GLib.Object {
     private static string extract_bname_trigger (string exclude, bool wildcards_match_slash) {
         // We can definitely drop everything to the left of a / - that will never match
         // any bname.
-        string pattern = exclude.mid (exclude.last_index_of ('/') + 1);
+        string pattern = exclude.mid (exclude.last_index_of ("/") + 1);
 
         // Easy case, nothing else can match a slash, so that's it.
         if (!wildcards_match_slash)
@@ -826,10 +826,10 @@ public class ExcludedFiles : GLib.Object {
     ***********************************************************/
     private static string regex_append (string file_dir_pattern, string dir_pattern, string append_me, bool dir_only) {
         string pattern = dir_only ? dir_pattern : file_dir_pattern;
-        if (!pattern == "") {
-            pattern.append ('|');
+        if (pattern != "") {
+            pattern += "|";
         }
-        pattern.append (append_me);
+        pattern += append_me;
 
         return pattern;
     }
@@ -866,7 +866,7 @@ public class ExcludedFiles : GLib.Object {
                 case 'a' : line[o++] = 'a'; break;
                 case 'b' : line[o++] = '\b'; break;
                 case 'f' : line[o++] = '\f'; break;
-                case 'n' : line[o++] = '\n'; break;
+                case 'n' : line[o++] = "\n"; break;
                 case 'r' : line[o++] = '\r'; break;
                 case 't' : line[o++] = '\t'; break;
                 case 'v' : line[o++] = '\v'; break;
@@ -934,7 +934,7 @@ public class ExcludedFiles : GLib.Object {
     private static CSync.ExcludedFiles.Type csync_excluded_common (string path, bool exclude_conflict_files) {
         /* split up the path */
         /* QStringRef */ string bname = new /* QStringRef */ string (path);
-        int last_slash = path.last_index_of ('/');
+        int last_slash = path.last_index_of ("/");
         if (last_slash >= 0) {
             bname = path.mid_ref (last_slash + 1);
         }
@@ -1081,7 +1081,7 @@ public class ExcludedFiles : GLib.Object {
     longer inline.
     ***********************************************************/
     private void flush () {
-        this.regular_expression.append (GLib.Regex.escape (this.exclude.mid (this.iterator - this.chars_to_escape, this.chars_to_escape)));
+        this.regular_expression += GLib.Regex.escape (this.exclude.mid (this.iterator - this.chars_to_escape, this.chars_to_escape));
         this.chars_to_escape = 0;
     }
 

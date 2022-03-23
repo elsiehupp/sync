@@ -12,8 +12,8 @@ public abstract class AbstractTestXmlParse : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected bool success;
-    protected string[] subdirectories;
-    protected string[] items;
+    protected GLib.List<string> subdirectories = new GLib.List<string> ();
+    protected GLib.List<string> items = new GLib.List<string> ()
 
 
     /***********************************************************

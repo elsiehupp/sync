@@ -122,11 +122,10 @@ public class JsonApiJob : AbstractNetworkJob {
         var query = this.additional_params;
         query.add_query_item ("format", "json");
         GLib.Uri url = Utility.concat_url_path (account.url, this.path, query);
-        const string http_verb = this.verb.to_string ();
         if (this.body != "") {
-            send_request (http_verb, url, this.request, this.body);
+            send_request (this.verb.to_string (), url, this.request, this.body);
         } else {
-            send_request (http_verb, url, this.request);
+            send_request (this.verb.to_string (), url, this.request);
         }
         AbstractNetworkJob.start ();
     }

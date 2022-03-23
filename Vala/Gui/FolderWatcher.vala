@@ -134,7 +134,8 @@ public class FolderWatcher : GLib.Object {
     ***********************************************************/
     protected void on_signal_change_detected_for_single_path (string path) {
         GLib.FileInfo file_info = new GLib.FileInfo (path);
-        string[] paths = { path };
+        GLib.List<string> paths = new GLib.List<string> ();
+        paths.append (path);
         if (file_info.is_dir ()) {
             GLib.Dir directory = new GLib.Dir (path);
             append_sub_paths (directory, paths);
@@ -176,7 +177,7 @@ public class FolderWatcher : GLib.Object {
 
             changed_paths.insert (path);
         }
-        if (changed_paths == "") {
+        if (changed_paths.length () == 0) {
             return;
         }
 
@@ -220,8 +221,8 @@ public class FolderWatcher : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void append_sub_paths (GLib.Dir directory, string[] sub_paths) {
-        string[] new_sub_paths = directory.entry_list (GLib.Dir.NoDotAndDotDot | GLib.Dir.Dirs | GLib.Dir.Files);
+    private void append_sub_paths (GLib.Dir directory, GLib.List<string> sub_paths) {
+        GLib.List<string> new_sub_paths = directory.entry_list (GLib.Dir.NoDotAndDotDot | GLib.Dir.Dirs | GLib.Dir.Files);
         for (int i = 0; i < new_sub_paths.size (); i++) {
             string path = directory.path + "/" + new_sub_paths[i];
             GLib.FileInfo file_info = new GLib.FileInfo (path);

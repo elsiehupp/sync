@@ -189,7 +189,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
                 return;
             }
 
-            const string relative_path = directory + '/' + filename;
+            const string relative_path = directory + "/" + filename;
             const var local_files =
                 FolderManager.instance.find_file_in_local_folders (GLib.FileInfo (relative_path).path, this.account_state.account);
 
@@ -581,7 +581,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
         if (!json_api_job) {
             GLib.critical ("Failed to fetch providers.".printf (this.search_term));
-            this.error_string += _("Failed to fetch providers.") + '\n';
+            this.error_string += _("Failed to fetch providers.") + "\n";
             /* emit */ signal_error_string_changed ();
             return;
         }
@@ -595,7 +595,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
             );
             this.error_string +=
                 _("Failed to fetch search providers for '%1'. Error: %2").printf (this.search_term).printf (json_api_job.error_string)
-                + '\n';
+                + "\n";
             /* emit */ signal_error_string_changed ();
             return;
         }
@@ -628,7 +628,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
         if (!json_api_job) {
             GLib.critical ("Search has failed for '%2'.".printf (this.search_term));
-            this.error_string += _("Search has failed for '%2'.").printf (this.search_term) + '\n';
+            this.error_string += _("Search has failed for '%2'.").printf (this.search_term) + "\n";
             /* emit */ signal_error_string_changed ();
             return;
         }
@@ -658,7 +658,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
                 .printf (json_api_job.error_string
             );
             this.error_string +=
-                _("Search has failed for '%1'. Error : %2").printf (this.search_term).printf (json_api_job.error_string) + '\n';
+                _("Search has failed for '%1'. Error : %2").printf (this.search_term).printf (json_api_job.error_string) + "\n";
             /* emit */ signal_error_string_changed ();
             return;
         }
@@ -757,7 +757,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
         var server_url_copy = server_url;
         var thumbnail_url_copy = thumbnail_url;
 
-        if (thumbnail_url_copy.has_prefix ('/') || thumbnail_url_copy.has_prefix ('\\')) {
+        if (thumbnail_url_copy.has_prefix ("/") || thumbnail_url_copy.has_prefix ('\\')) {
             // relative image resource URL, just needs some concatenation with current server URL
             // some icons may contain parameters after (?)
             const string[] thumbnail_url_copy_splitted = thumbnail_url_copy.contains ('?')
@@ -782,7 +782,7 @@ public class UnifiedSearchResultsListModel : QAbstractListModel {
 
         var fallack_icon_copy = fallack_icon;
 
-        if (fallack_icon_copy.has_prefix ('/') || fallack_icon_copy.has_prefix ('\\')) {
+        if (fallack_icon_copy.has_prefix ("/") || fallack_icon_copy.has_prefix ('\\')) {
             // relative image resource URL, just needs some concatenation with current server URL
             // some icons may contain parameters after (?)
             const string[] fallack_icon_path_splitted =

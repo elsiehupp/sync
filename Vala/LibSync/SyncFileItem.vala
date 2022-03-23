@@ -12,9 +12,6 @@ namespace LibSync {
 ***********************************************************/
 public class SyncFileItem : GLib.Object {
 
-    private class SyncFileItemVector : GLib.List<unowned SyncFileItem> { }
-
-
     /***********************************************************
     ***********************************************************/
     public enum Direction {
@@ -360,7 +357,7 @@ public class SyncFileItem : GLib.Object {
     to go through a a SyncFileItem, like PollJob.
     ***********************************************************/
     public static unowned SyncFileItem from_sync_journal_file_record (Common.SyncJournalFileRecord record) {
-        var item = new SyncFileItem ()();
+        var item = new SyncFileItem ();
         item.file = record.path;
         item.inode = record.inode;
         item.modtime = record.modtime;

@@ -309,7 +309,7 @@ public class NSISUpdater : OCUpdater {
             if (url == "") {
                 show_no_url_dialog (info);
             } else {
-                this.target_file = config.config_path + url.mid (url.last_index_of ('/')+1);
+                this.target_file = config.config_path + url.mid (url.last_index_of ("/")+1);
                 if (GLib.File (this.target_file).exists ()) {
                     download_state (DownloadState.DOWNLOAD_COMPLETE);
                 } else {

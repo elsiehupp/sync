@@ -353,7 +353,7 @@ public class ShareManager : GLib.Object {
                 continue;
             }
             var folder_path = folder_connection.remote_path;
-            if (path.has_prefix (folder_path) && (path == folder_path || folder_path.has_suffix ('/') || path[folder_path.size ()] == '/')) {
+            if (path.has_prefix (folder_path) && (path == folder_path || folder_path.has_suffix ("/") || path[folder_path.size ()] == "/")) {
                 // Workaround the fact that the server does not invalidate the etags of parent directories
                 // when something is shared.
                 var relative = path.mid_ref (folder_connection.remote_path_trailing_slash.length);

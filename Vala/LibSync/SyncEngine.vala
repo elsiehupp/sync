@@ -178,7 +178,7 @@ public class SyncEngine : GLib.Object {
     /***********************************************************
     After the above signals. with the items that actually need propagating
     ***********************************************************/
-    internal signal void signal_about_to_propagate (SyncFileItemVector value);
+    internal signal void signal_about_to_propagate (GLib.List<unowned SyncFileItem> value);
 
 
     /***********************************************************
@@ -259,7 +259,7 @@ public class SyncEngine : GLib.Object {
         q_register_meta_type<unowned SyncFileItem> ("unowned SyncFileItem");
         q_register_meta_type<SyncFileItem.Status> ("SyncFileItem.Status");
         q_register_meta_type<SyncFileStatus> ("SyncFileStatus");
-        q_register_meta_type<SyncFileItemVector> ("SyncFileItemVector");
+        q_register_meta_type<GLib.List<unowned SyncFileItem>> ("GLib.List<unowned SyncFileItem>");
         q_register_meta_type<SyncFileItem.Direction> ("SyncFileItem.Direction");
 
         // Everything in the SyncEngine expects a trailing slash for the local_path.
@@ -376,10 +376,10 @@ public class SyncEngine : GLib.Object {
         }
 
         string version_string = "Using Qt ";
-        version_string.append (q_version ());
+        version_string += q_version ();
 
-        version_string.append (" SSL library ").append (QSslSocket.ssl_library_version_string ().to_utf8 ());
-        version_string.append (" on ").append (Common.Utility.platform_name ());
+        version_string += " SSL library " + QSslSocket.ssl_library_version_string ().to_utf8 ();
+        version_string += " on " + Common.Utility.platform_name ();
         GLib.info (version_string);
 
         // This creates the DB if it does not exist yet.
@@ -431,7 +431,7 @@ public class SyncEngine : GLib.Object {
         this.discovery_phase.reset (new DiscoveryPhase ());
         this.discovery_phase.account = this.account;
         this.discovery_phase.excludes = this.excluded_files;
-        const string exclude_file_path = this.local_path + ".sync-exclude.lst";
+        string exclude_file_path = this.local_path + ".sync-exclude.lst";
         if (GLib.File.exists (exclude_file_path)) {
             this.discovery_phase.excludes.add_exclude_file_path (exclude_file_path);
             this.discovery_phase.excludes.on_signal_reload_exclude_files ();
@@ -805,8 +805,7 @@ public class SyncEngine : GLib.Object {
                 if (this.journal.get_file_record (item.file, prev)
                     && prev.is_valid
                     && prev.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_WRITE) != item.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_WRITE)) {
-                    const bool is_read_only = item.remote_permissions != null && !item.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_WRITE);
-                    FileSystem.file_read_only_weak (file_path, is_read_only);
+                    FileSystem.file_read_only_weak (file_path, item.remote_permissions != null && !item.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_WRITE));
                 }
                 var record = item.to_sync_journal_file_record_with_inode (file_path);
                 if (record.checksum_header == "")
@@ -1268,7 +1267,7 @@ public class SyncEngine : GLib.Object {
     Cleans up unnecessary downloadinfo entries in the journal as
     well as their temporary files.
     ***********************************************************/
-    private void delete_stale_download_infos (SyncFileItemVector sync_items) {
+    private void delete_stale_download_infos (GLib.List<unowned SyncFileItem> sync_items) {
         // Find all downloadinfo paths that we want to preserve.
         GLib.List<string> download_file_paths;
         foreach (unowned SyncFileItem it in sync_items) {
@@ -1293,7 +1292,7 @@ public class SyncEngine : GLib.Object {
     /***********************************************************
     Removes stale uploadinfos from the journal.
     ***********************************************************/
-    private void delete_stale_upload_infos (SyncFileItemVector sync_items) {
+    private void delete_stale_upload_infos (GLib.List<unowned SyncFileItem> sync_items) {
         // Find all blocklisted paths that we want to preserve.
         GLib.List<string> upload_file_paths;
         foreach (unowned SyncFileItem it in sync_items) {
@@ -1322,7 +1321,7 @@ public class SyncEngine : GLib.Object {
     /***********************************************************
     Removes stale error blocklist entries from the journal.
     ***********************************************************/
-    private void delete_stale_error_blocklist_entries (SyncFileItemVector sync_items) {
+    private void delete_stale_error_blocklist_entries (GLib.List<unowned SyncFileItem> sync_items) {
         // Find all blocklisted paths that we want to preserve.
         GLib.List<string> blocklist_file_paths;
         foreach (unowned SyncFileItem it in sync_items) {
@@ -1413,7 +1412,7 @@ public class SyncEngine : GLib.Object {
     Check if we are allowed to propagate everything, and if we
     are not, adjust the instructions to recover
     ***********************************************************/
-    private void check_for_permission (SyncFileItemVector sync_items);
+    private void check_for_permission (GLib.List<unowned SyncFileItem> sync_items);
 
 
     private RemotePermissions get_permissions (string file);
@@ -1431,7 +1430,7 @@ public class SyncEngine : GLib.Object {
     we still downloaded the old file in a conflict file just
     in case.
     ***********************************************************/
-    private void restore_old_files (SyncFileItemVector sync_items) {
+    private void restore_old_files (GLib.List<unowned SyncFileItem> sync_items) {
 
         foreach (var sync_item in q_as_const (sync_items)) {
             if (sync_item.direction != SyncFileItem.Direction.DOWN)

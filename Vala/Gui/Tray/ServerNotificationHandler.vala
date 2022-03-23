@@ -19,7 +19,7 @@ public class ServerNotificationHandler : GLib.Object {
     private AccountState account_state;
 
 
-    internal signal void signal_new_notification_list (ActivityList list);
+    internal signal void signal_new_notification_list (GLib.List<Activity> list);
 
 
     /***********************************************************
@@ -85,7 +85,7 @@ public class ServerNotificationHandler : GLib.Object {
 
         var ai = qvariant_cast<AccountState> (sender ().property (PROPERTY_ACCOUNT_STATE));
 
-        ActivityList list;
+        GLib.List<Activity> list;
 
         foreach (var element in notifies) {
             Activity a;

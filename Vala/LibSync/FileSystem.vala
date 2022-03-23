@@ -123,8 +123,8 @@ public class FileSystem : GLib.Object {
     public static bool verify_file_unchanged (string filename,
         int64 previous_size,
         time_t previous_mtime) {
-        const int64 actual_size = get_size (filename);
-        const time_t actual_mtime = get_mod_time (filename);
+        int64 actual_size = get_size (filename);
+        time_t actual_mtime = get_mod_time (filename);
         if ( (actual_size != previous_size && actual_mtime > 0) || (actual_mtime != previous_mtime && previous_mtime > 0 && actual_mtime > 0)) {
             GLib.info ("File " + filename + " has changed: "
                      + "size: " + previous_size.to_string () + " <-> " + actual_size.to_string ()
@@ -149,7 +149,7 @@ public class FileSystem : GLib.Object {
     ***********************************************************/
     public static bool remove_recursively (string path,
         SignalDelegate signal_delegate = null,
-        string[] errors = null) {
+        GLib.List<string> errors = new GLib.List<string> ()) {
         bool all_removed = true;
         QDirIterator dir_iterator = new QDirIterator (path, GLib.Dir.AllEntries | GLib.Dir.Hidden | GLib.Dir.System | GLib.Dir.NoDotAndDotDot);
 

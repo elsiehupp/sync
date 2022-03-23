@@ -431,7 +431,7 @@ public class FolderConnection : GLib.Object {
     public string short_gui_remote_path_or_app_name () {
         if (this.remote_path.length > 0 && this.remote_path != "/") {
             string a = new GLib.File (this.remote_path).filename ();
-            if (a.has_prefix ('/')) {
+            if (a.has_prefix ("/")) {
                 a = a.remove (0, 1);
             }
             return a;
@@ -447,13 +447,13 @@ public class FolderConnection : GLib.Object {
     public string short_gui_local_path {
         string p = this.definition.local_path;
         string home = GLib.Dir.home_path;
-        if (!home.has_suffix ('/')) {
-            home.append ('/');
+        if (!home.has_suffix ("/")) {
+            home.append ("/");
         }
         if (p.has_prefix (home)) {
             p = p.mid (home.length);
         }
-        if (p.length > 1 && p.has_suffix ('/')) {
+        if (p.length > 1 && p.has_suffix ("/")) {
             p.chop (1);
         }
         return GLib.Dir.to_native_separators (p);
@@ -461,7 +461,7 @@ public class FolderConnection : GLib.Object {
 
 
     /***********************************************************
-    Canonical local folder_connection path, always ends with '/'
+    Canonical local folder_connection path, always ends with "/"
     ***********************************************************/
     public string this.path {
         return this.canonical_local_path;
@@ -470,7 +470,7 @@ public class FolderConnection : GLib.Object {
 
     /***********************************************************
     Cleaned canonical folder_connection path, like this.path but never ends
-    with a '/'.
+    with a "/".
 
     Wrapper for GLib.Dir.clean_path (path) except for "Z:/",
     where it returns "Z:" instead of "Z:/".
@@ -486,7 +486,7 @@ public class FolderConnection : GLib.Object {
 
 
     /***********************************************************
-    Remote folder_connection path, usually without trailing '/', exception "/"
+    Remote folder_connection path, usually without trailing "/", exception "/"
     ***********************************************************/
     public string remote_path {
         public get {
@@ -496,13 +496,13 @@ public class FolderConnection : GLib.Object {
 
 
     /***********************************************************
-    Remote folder_connection path, always with a trailing '/'
+    Remote folder_connection path, always with a trailing "/"
     ***********************************************************/
     public string remote_path_trailing_slash {
         public get {
             string result = remote_path;
-            if (!result.has_suffix ('/')) {
-                result.append ('/');
+            if (!result.has_suffix ("/")) {
+                result += "/";
             }
             return result;
         }
@@ -994,7 +994,7 @@ public class FolderConnection : GLib.Object {
         bool periodic_full_local_discovery_now =
             full_local_discovery_interval.length >= 0 // negative means we don't require periodic full runs
             && this.time_since_last_full_local_discovery.has_expired (full_local_discovery_interval.length);
-        if (this.folder_watcher != null && this.folder_watcher.is_reliable ()
+        if (this.folder_watcher != null && this.folder_watcher.is_reliable
             && has_done_full_local_discovery
             && !periodic_full_local_discovery_now) {
             GLib.info ("Allowing local discovery to read from the database.");
@@ -1502,8 +1502,8 @@ public class FolderConnection : GLib.Object {
         var r = this.sync_result;
 
         // If the number of conflicts is too low, adjust it upwards
-        if (conflict_paths.size () > r.num_new_conflict_items () + r.num_old_conflict_items ())
-            r.num_old_conflict_items (conflict_paths.size () - r.num_new_conflict_items ());
+        if (conflict_paths.size () > r.number_of_new_conflict_items () + r.number_of_old_conflict_items ())
+            r.number_of_old_conflict_items (conflict_paths.size () - r.number_of_new_conflict_items ());
     }
 
 
@@ -1613,13 +1613,13 @@ public class FolderConnection : GLib.Object {
     ***********************************************************/
     private void show_sync_result_popup () {
         if (this.sync_result.first_item_new ()) {
-            create_gui_log (this.sync_result.first_item_new ().destination (), LogStatus.NEW, this.sync_result.num_new_items ());
+            create_gui_log (this.sync_result.first_item_new ().destination (), LogStatus.NEW, this.sync_result.number_of_new_items ());
         }
         if (this.sync_result.first_item_deleted ()) {
-            create_gui_log (this.sync_result.first_item_deleted ().destination (), LogStatus.REMOVE, this.sync_result.num_removed_items ());
+            create_gui_log (this.sync_result.first_item_deleted ().destination (), LogStatus.REMOVE, this.sync_result.number_of_removed_items ());
         }
         if (this.sync_result.first_item_updated ()) {
-            create_gui_log (this.sync_result.first_item_updated ().destination (), LogStatus.UPDATED, this.sync_result.num_updated_items ());
+            create_gui_log (this.sync_result.first_item_updated ().destination (), LogStatus.UPDATED, this.sync_result.number_of_updated_items ());
         }
 
         if (this.sync_result.first_item_renamed ()) {
@@ -1631,18 +1631,18 @@ public class FolderConnection : GLib.Object {
                 status = LogStatus.MOVE;
             }
             create_gui_log (this.sync_result.first_item_renamed ().file, status,
-                this.sync_result.num_renamed_items (), this.sync_result.first_item_renamed ().rename_target);
+                this.sync_result.number_of_renamed_items (), this.sync_result.first_item_renamed ().rename_target);
         }
 
         if (this.sync_result.first_new_conflict_item ()) {
-            create_gui_log (this.sync_result.first_new_conflict_item ().destination (), LogStatus.CONFLICT, this.sync_result.num_new_conflict_items ());
+            create_gui_log (this.sync_result.first_new_conflict_item ().destination (), LogStatus.CONFLICT, this.sync_result.number_of_new_conflict_items ());
         }
-        int error_count = this.sync_result.num_error_items ();
+        int error_count = this.sync_result.number_of_error_items ();
         if (error_count > 0) {
             create_gui_log (this.sync_result.first_item_error ().file, LogStatus.ERROR, error_count);
         }
 
-        int locked_count = this.sync_result.num_locked_items ();
+        int locked_count = this.sync_result.number_of_locked_items ();
         if (locked_count > 0) {
             create_gui_log (this.sync_result.first_item_locked ().file, LogStatus.FILE_LOCKED, locked_count);
         }
@@ -1659,8 +1659,8 @@ public class FolderConnection : GLib.Object {
         if (this.canonical_local_path == "") {
             GLib.warning ("Broken symlink: " + this.definition.local_path);
             this.canonical_local_path = this.definition.local_path;
-        } else if (!this.canonical_local_path.has_suffix ('/')) {
-            this.canonical_local_path.append ('/');
+        } else if (!this.canonical_local_path.has_suffix ("/")) {
+            this.canonical_local_path.append ("/");
         }
 
         if (file_info.is_dir () && file_info.is_readable ()) {

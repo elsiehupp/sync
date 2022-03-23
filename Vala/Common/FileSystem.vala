@@ -253,7 +253,7 @@ public class FileSystem : GLib.Object {
                + "\n"
                + "DeletionDate="
                + GLib.DateTime.current_date_time ().to_string (Qt.ISODate)
-               + '\n';
+               + "\n";
         info_file.close ();
 
         // create info file format of trash file----- END

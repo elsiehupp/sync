@@ -113,7 +113,7 @@ public class FolderWatcherPrivate : GLib.Object {
                 || filename.has_prefix (".sync_")) {
                 continue;
             }
-            const string p = this.watch_to_path[event.wd] + '/' + filename;
+            const string p = this.watch_to_path[event.wd] + "/" + filename;
             this.parent.on_signal_change_detected (p);
 
             if ( (event.mask & (IN_MOVED_TO | IN_CREATE))

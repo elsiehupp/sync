@@ -334,7 +334,7 @@ public class AbstractNetworkJob : GLib.Object {
         string verb,
         GLib.Uri url,
         Soup.Request request,
-        QHttpMultiPart request_body) {
+        Soup.Multipart request_body) {
         var input_stream = this.account.send_raw_request (verb, url, request, request_body);
         this.request_body = null;
         adopt_request (input_stream);
@@ -457,8 +457,8 @@ public class AbstractNetworkJob : GLib.Object {
         if (this.input_stream.error == GLib.InputStream.NoError) {
             return "OK";
         } else {
-            string enum_str = QMetaEnum.from_type<GLib.InputStream.NetworkError> ().value_to_key (static_cast<int> (this.input_stream.error));
-            return "%1 %2".printf (enum_str, this.error_string);
+            string enumber_of_str = QMetaEnum.from_type<GLib.InputStream.NetworkError> ().value_to_key (static_cast<int> (this.input_stream.error));
+            return "%1 %2".printf (enumber_of_str, this.error_string);
         }
     }
 
@@ -520,7 +520,7 @@ public class AbstractNetworkJob : GLib.Object {
 
         if (this.input_stream.error != GLib.InputStream.NoError) {
 
-            if (this.account.credentials ().retry_if_needed (this)) {
+            if (this.account.credentials.retry_if_needed (this)) {
                 return;
             }
 
@@ -593,8 +593,7 @@ public class AbstractNetworkJob : GLib.Object {
             }
         }
 
-        AbstractCredentials creds = this.account.credentials ();
-        if (!creds.still_valid (this.input_stream) && !this.ignore_credential_failure) {
+        if (!this.account.credentials.still_valid (this.input_stream) && !this.ignore_credential_failure) {
             this.account.handle_invalid_credentials ();
         }
 

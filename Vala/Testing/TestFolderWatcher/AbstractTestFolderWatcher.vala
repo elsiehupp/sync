@@ -69,7 +69,7 @@ public abstract class AbstractTestFolderWatcher : GLib.Object {
     private static int count_folders (string path) {
         int n = 0;
         foreach (var sub in new GLib.Dir (path).entry_list (GLib.Dir.Dirs | GLib.Dir.NoDotAndDotDot)) {
-            n += 1 + count_folders (path + '/' + sub);
+            n += 1 + count_folders (path + "/" + sub);
         }
         return n;
     }

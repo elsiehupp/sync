@@ -230,7 +230,7 @@ public class ProgressInfo : GLib.Object {
             //
             // In the first few updates we want to go to the correct value quickly.
             // Therefore, smoothing starts at 0 and ramps up to its final value over time.
-            const double smoothing = 0.9 * (1.0 - this.initial_smoothing);
+            double smoothing = 0.9 * (1.0 - this.initial_smoothing);
             this.initial_smoothing *= 0.7; // goes from 1 to 0.03 in 10s
             this.progress_per_sec = smoothing * this.progress_per_sec + (1.0 - smoothing) * static_cast<double> (this.completed - this.prev_completed);
             this.prev_completed = this.completed;
@@ -279,7 +279,7 @@ public class ProgressInfo : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    GLib.HashTable<string, ProgressItem> current_items;
+    GLib.HashTable<string, ProgressItem?> current_items;
 
     /***********************************************************
     ***********************************************************/

@@ -103,7 +103,7 @@ public class UserModel : QAbstractListModel {
     ***********************************************************/
     public User current_user {
         public get {
-            if (this.current_user_id < 0 || this.current_user_id >= this.users.size ()) {
+            if (this.current_user_id < 0 || this.current_user_id >= this.users.length ()) {
                 return null;
             }
 

@@ -268,10 +268,10 @@ public class FileInfo : AbstractFileModifier {
     /***********************************************************
     ***********************************************************/
     public string absolute_path {
-        if (parent_path.has_suffix ('/')) {
+        if (parent_path.has_suffix ("/")) {
             return parent_path + name;
         } else {
-            return parent_path + '/' + name;
+            return parent_path + "/" + name;
         }
     }
 

@@ -300,8 +300,8 @@ public class AccountSettings : Gtk.Widget {
             this.instance.quota_progress_bar.visible (true);
             this.instance.quota_progress_bar.enabled (true);
             // workaround the label only accepting ints (which may be only 32 bit wide)
-            const double percent = used / (double)total * 100;
-            const int percent_int = q_min (q_round (percent), 100);
+            double percent = used / (double)total * 100;
+            int percent_int = q_min (q_round (percent), 100);
             this.instance.quota_progress_bar.value (percent_int);
             string used_str = Utility.octets_to_string (used);
             string total_str = Utility.octets_to_string (total);
@@ -328,7 +328,7 @@ public class AccountSettings : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public void on_signal_account_state_changed () {
-        const AccountState.State state = this.account_state != null ? this.account_state.state : AccountState.State.DISCONNECTED;
+        AccountState.State state = this.account_state != null ? this.account_state.state : AccountState.State.DISCONNECTED;
         if (state != AccountState.State.DISCONNECTED) {
             this.instance.ssl_button.update_account_state (this.account_state);
             unowned Account account = this.account_state.account;
@@ -701,7 +701,7 @@ public class AccountSettings : Gtk.Widget {
             result = this.model.data (selected, DataRole.FOLDER_PATH_ROLE).to_string ();
         }
 
-        if (result.has_suffix ('/')) {
+        if (result.has_suffix ("/")) {
             result.chop (1);
         }
 
@@ -912,7 +912,7 @@ public class AccountSettings : Gtk.Widget {
     ***********************************************************/
     protected void on_signal_sub_folder_availability (FolderConnection folder_connection, string path, PinState state) {
         //  Q_ASSERT (folder_connection && folder_connection.virtual_files_enabled ());
-        //  Q_ASSERT (!path.has_suffix ('/'));
+        //  Q_ASSERT (!path.has_suffix ("/"));
 
         // Update the pin state on all items
         if (!folder_connection.vfs.pin_state (path, state)) {
@@ -1062,7 +1062,7 @@ public class AccountSettings : Gtk.Widget {
                     message += ", ";
                 }
                 string my_folder = item.to_string ();
-                if (my_folder.has_suffix ('/')) {
+                if (my_folder.has_suffix ("/")) {
                     my_folder.chop (1);
                 }
                 if (this.model.index_for_path (folder_connection, my_folder).is_valid) {
@@ -1120,7 +1120,7 @@ public class AccountSettings : Gtk.Widget {
         try {
 
             // FolderConnection info have directory paths in Foo/Bar/ convention...
-            //  Q_ASSERT (!path.has_prefix ('/') && path.has_suffix ('/'));
+            //  Q_ASSERT (!path.has_prefix ("/") && path.has_suffix ("/"));
             // But EncryptFolderJob expects directory path Foo/Bar convention
             var encrypt_folder_job = new EncryptFolderJob (
                 on_signal_accounts_state ().account,
@@ -1196,9 +1196,9 @@ public class AccountSettings : Gtk.Widget {
         if (info.folder_connection && folder_connection.virtual_files_enabled ()) {
             var availability_menu = menu.add_menu (_("Availability"));
 
-            // Has '/' suffix convention for paths here but VFS and
+            // Has "/" suffix convention for paths here but VFS and
             // sync engine expects no such suffix
-            //  Q_ASSERT (info.path.has_suffix ('/'));
+            //  Q_ASSERT (info.path.has_suffix ("/"));
             const var remote_path = info.path.chopped (1);
 
             // It might be an E2EE mangled path, so let's try to demangle it
@@ -1400,11 +1400,11 @@ public class AccountSettings : Gtk.Widget {
     protected void on_signal_link_activated (string link) {
         // Parse folder_connection alias and filename from the link, calculate the index
         // and select it if it exists.
-        const string[] li = link.split ("?folder_connection=");
+        string[] li = link.split ("?folder_connection=");
         if (li.length > 1) {
             string my_folder = li[0];
-            const string alias = li[1];
-            if (my_folder.has_suffix ('/'))
+            string alias = li[1];
+            if (my_folder.has_suffix ("/"))
                 my_folder.chop (1);
 
             // Make sure the folder_connection itself is expanded
@@ -1503,7 +1503,7 @@ public class AccountSettings : Gtk.Widget {
             this.instance.selective_sync_label.show ();
         }
 
-        const bool should_be_visible = this.model.is_dirty;
+        bool should_be_visible = this.model.is_dirty;
         if (should_be_visible) {
             this.instance.selective_sync_status.visible (true);
         }
@@ -1592,7 +1592,7 @@ public class AccountSettings : Gtk.Widget {
     private void open_ignored_files_dialog (string abs_folder_path) {
         //  Q_ASSERT (GLib.FileInfo (abs_folder_path).is_absolute ());
 
-        const string ignore_file = abs_folder_path + ".sync-exclude.lst";
+        string ignore_file = abs_folder_path + ".sync-exclude.lst";
         var layout = new QVBoxLayout ();
         var ignore_list_widget = new IgnoreListTableWidget (this);
         ignore_list_widget.read_ignore_file (ignore_file);

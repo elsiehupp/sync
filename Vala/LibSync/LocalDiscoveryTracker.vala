@@ -74,15 +74,15 @@ public class LocalDiscoveryTracker : GLib.Object {
     ***********************************************************/
     public void start_sync_partial_discovery () {
         if (is_debug_enabled ()) {
-            string[] paths;
+            GLib.List<string> paths = new GLib.List<string> ();
             foreach (var path in this.local_discovery_paths) {
                 paths.append (path);
             }
             GLib.debug ("Partial discovery with paths: " + paths.to_string ());
         }
 
-        this.previous_local_discovery_paths = std.move (this.local_discovery_paths);
-        this.local_discovery_paths == "";
+        this.previous_local_discovery_paths = this.local_discovery_paths;
+        this.local_discovery_paths = null;
     }
 
 

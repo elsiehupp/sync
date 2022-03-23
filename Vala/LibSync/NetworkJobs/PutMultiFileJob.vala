@@ -20,8 +20,8 @@ public class PutMultiFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    private QHttpMultiPart body;
-    private GLib.List<SingleUploadFileData> devices;
+    private Soup.Multipart body;
+    private GLib.List<SingleUploadFileData?> devices;
 
     new string error_string {
         public get {
@@ -41,12 +41,13 @@ public class PutMultiFileJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    public PutMultiFileJob.for_account (Account account, GLib.Uri url,
-        GLib.List<SingleUploadFileData> devices, GLib.Object parent = new GLib.Object ()) {
+    public PutMultiFileJob.for_account (
+        Account account, GLib.Uri url,
+        GLib.List<SingleUploadFileData?> devices, GLib.Object parent = new GLib.Object ()) {
         base (account, {}, parent);
         this.devices = std.move (devices);
         this.url = url;
-        this.body.content_type (QHttpMultiPart.Related_type);
+        this.body.content_type (Soup.Multipart.Related_type);
         foreach (var single_device in this.devices) {
             single_device.device.parent (this);
             this.signal_upload_progress.connect (

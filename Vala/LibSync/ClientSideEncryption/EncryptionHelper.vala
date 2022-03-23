@@ -125,8 +125,8 @@ public class EncryptionHelper : GLib.Object {
 
         string cipher_text2;
         cipher_text2.reserve (clen + Constants.E2EE_TAG_SIZE);
-        cipher_text2.append (cipher_text, clen);
-        cipher_text2.append (e2Ee_tag);
+        cipher_text2 += (cipher_text, clen);
+        cipher_text2 += e2Ee_tag;
 
         string result = cipher_text2.to_base64 ();
         result += '|';
@@ -311,8 +311,8 @@ public class EncryptionHelper : GLib.Object {
 
         string cipher_text2;
         cipher_text2.reserve (clen + Constants.E2EE_TAG_SIZE);
-        cipher_text2.append (cipher_text, clen);
-        cipher_text2.append (e2Ee_tag);
+        cipher_text2 += (cipher_text, clen);
+        cipher_text2 += e2Ee_tag;
 
         string result = cipher_text2.to_base64 ();
         result += '|';

@@ -105,7 +105,7 @@ public class OAuth : GLib.Object {
     ***********************************************************/
     private void on_signal_ready_read (QTcpSocket socket) {
         string peek = socket.peek (q_min (socket.bytes_available (), 4000LL)); //The code should always be within the first 4K
-        if (peek.index_of ('\n') < 0)
+        if (peek.index_of ("\n") < 0)
             return; // wait until we find a \n
         const GLib.Regex regular_expression = new GLib.Regex ("^GET /\\?code= ([a-z_a-Z0-9]+)[& ]"); // Match a  /?code=...  URL
         const var regular_expression_match = regular_expression.match (peek);

@@ -346,13 +346,13 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
             }
 
             // Getting a 404 probably means that the file was deleted on the server.
-            const bool file_not_found = this.item.http_error_code == 404;
+            bool file_not_found = this.item.http_error_code == 404;
             if (file_not_found) {
                 GLib.warning ("Server replied 404, assuming file was deleted.");
             }
 
             // Getting a 423 means that the file is locked
-            const bool file_locked = this.item.http_error_code == 423;
+            bool file_locked = this.item.http_error_code == 423;
             if (file_locked) {
                 GLib.warning ("Server replied 423, file is locked.");
             }
@@ -379,14 +379,14 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
             GLib.InputStream reply = get_file_job.input_stream;
             if (err == GLib.InputStream.OperationCanceledError && reply.property (OWNCLOUD_CUSTOM_SOFT_ERROR_STRING_C).is_valid) {
                 get_file_job.on_signal_error_string (reply.property (OWNCLOUD_CUSTOM_SOFT_ERROR_STRING_C).to_string ());
-                get_file_job.error_status (SyncFileItem.Status.SOFT_ERROR);
+                get_file_job.error_status = SyncFileItem.Status.SOFT_ERROR;
             } else if (bad_range_header) {
                 // Can't do this in classify_error () because 416 without a
                 // Range header should result in NormalError.
-                get_file_job.error_status (SyncFileItem.Status.SOFT_ERROR);
+                get_file_job.error_status = SyncFileItem.Status.SOFT_ERROR;
             } else if (file_not_found) {
                 get_file_job.on_signal_error_string (_("File was deleted from server"));
-                get_file_job.error_status (SyncFileItem.Status.SOFT_ERROR);
+                get_file_job.error_status = SyncFileItem.Status.SOFT_ERROR;
 
                 // As a precaution against bugs that cause our database and the
                 // reality on the server to diverge, rediscover this folder on the
@@ -397,7 +397,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
             string error_body;
             string error_string = this.item.http_error_code >= 400 ? get_file_job.error_string_parsing_body (&error_body)
                                                             : get_file_job.error_string;
-            SyncFileItem.Status status = get_file_job.error_status ();
+            SyncFileItem.Status status = get_file_job.error_status;
             if (status == SyncFileItem.Status.NO_STATUS) {
                 status = classify_error (err, this.item.http_error_code,
                     this.propagator.another_sync_needed, error_body);
@@ -630,9 +630,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
             // phase by comparing size and mtime to the previous values. This
             // is necessary to avoid overwriting user changes that happened between
             // the discovery phase and now.
-            const int64 expected_size = this.item.previous_size;
-            const time_t expected_mtime = this.item.previous_modtime;
-            if (!FileSystem.verify_file_unchanged (fn, expected_size, expected_mtime)) {
+            if (!FileSystem.verify_file_unchanged (fn, this.item.previous_size, this.item.previous_modtime)) {
                 this.propagator.another_sync_needed = true;
                 on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("File has changed since discovery"));
                 return;

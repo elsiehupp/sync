@@ -71,7 +71,7 @@ public class FolderWizardSelectiveSync : QWizardPage {
     ***********************************************************/
     public override void initialize_page () {
         string target_path = wizard ().property ("target_path").to_string ();
-        if (target_path.has_prefix ('/')) {
+        if (target_path.has_prefix ("/")) {
             target_path = target_path.mid (1);
         }
         string alias = GLib.FileInfo (target_path).filename ();

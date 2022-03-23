@@ -23,7 +23,7 @@ public class SocketUploadJob : GLib.Object {
     private QTemporaryFile temporary;
     private SyncJournalDb database;
     private SyncEngine sync_engine;
-    private string[] synced_files;
+    private GLib.List<string> synced_files = new GLib.List<string> ();
 
     /***********************************************************
     ***********************************************************/
@@ -35,8 +35,8 @@ public class SocketUploadJob : GLib.Object {
 
         this.local_path = this.api_job.arguments ()["local_path"].to_string ();
         this.remote_path = this.api_job.arguments ()["remote_path"].to_string ();
-        if (!this.remote_path.has_prefix ('/')) {
-            this.remote_path = '/' + this.remote_path;
+        if (!this.remote_path.has_prefix ("/")) {
+            this.remote_path = "/" + this.remote_path;
         }
 
         this.pattern = socket_api_v2_job.arguments ()["pattern"].to_string ();
@@ -54,7 +54,7 @@ public class SocketUploadJob : GLib.Object {
         }
 
         this.database = new SyncJournalDb (this.temporary.filename (), this);
-        this.sync_engine = new SyncEngine (account.account, this.local_path.has_suffix ('/') ? this.local_path : this.local_path + '/', this.remote_path, this.database);
+        this.sync_engine = new SyncEngine (account.account, this.local_path.has_suffix ("/") ? this.local_path : this.local_path + "/", this.remote_path, this.database);
         this.sync_engine.parent (this.database);
 
         this.sync_engine.signal_item_completed.connect (

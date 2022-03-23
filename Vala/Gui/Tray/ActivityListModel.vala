@@ -50,13 +50,13 @@ public class ActivityListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private ActivityList activity_lists;
-    private ActivityList sync_file_item_lists;
-    private ActivityList notification_lists;
-    private ActivityList list_of_ignored_files;
+    private GLib.List<Activity> activity_lists;
+    private GLib.List<Activity> sync_file_item_lists;
+    private GLib.List<Activity> notification_lists;
+    private GLib.List<Activity> list_of_ignored_files;
     private Activity notification_ignored_files;
-    private ActivityList notification_errors_lists;
-    private ActivityList final_list;
+    private GLib.List<Activity> notification_errors_lists;
+    private GLib.List<Activity> final_list;
     private int current_item = 0;
 
     /***********************************************************
@@ -133,14 +133,14 @@ public class ActivityListModel : QAbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public ActivityList activity_list () {
+    public GLib.List<Activity> activity_list () {
         return this.final_list;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    public ActivityList errors_list () {
+    public GLib.List<Activity> errors_list () {
         return;
     }
 
@@ -158,7 +158,7 @@ public class ActivityListModel : QAbstractListModel {
     ***********************************************************/
     public void clear_notifications () {
         GLib.info ("Clearing the notifications.");
-        this.notification_lists == "";
+        this.notification_lists = null;
         combine_activity_lists ();
     }
 
@@ -188,7 +188,7 @@ public class ActivityListModel : QAbstractListModel {
         GLib.info ("First checking for duplicates then add file to the notification list of ignored files: " + new_activity.file);
 
         bool duplicate = false;
-        if (this.list_of_ignored_files.size () == 0) {
+        if (this.list_of_ignored_files.length () == 0) {
             this.notification_ignored_files = new_activity;
             this.notification_ignored_files.subject = _("Files from the ignore list as well as symbolic links are not synced.");
             this.list_of_ignored_files.append (new_activity);
@@ -269,7 +269,7 @@ public class ActivityListModel : QAbstractListModel {
                 }
                 const var local_files = FolderManager.instance.find_file_in_local_folders (relative_path, ast.account);
                 if (local_files.length > 0) {
-                    if (relative_path.has_prefix ('/') || relative_path.has_prefix ('\\')) {
+                    if (relative_path.has_prefix ("/") || relative_path.has_prefix ('\\')) {
                         return relative_path.remove (0, 1);
                     } else {
                         return relative_path;
@@ -533,7 +533,7 @@ public class ActivityListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     public void on_signal_refresh_activity () {
-        this.activity_lists == "";
+        this.activity_lists = null;
         this.done_fetching = false;
         this.current_item = 0;
         this.total_activities_fetched = 0;
@@ -566,7 +566,7 @@ public class ActivityListModel : QAbstractListModel {
     protected void activities_received (QJsonDocument json, int status_code) {
         var activities = json.object ().value ("ocs").to_object ().value ("data").to_array ();
 
-        ActivityList list;
+        GLib.List<Activity> list;
         var ast = this.account_state;
         if (!ast) {
             return;
@@ -664,26 +664,26 @@ public class ActivityListModel : QAbstractListModel {
     /***********************************************************
     ***********************************************************/
     private void combine_activity_lists () {
-        ActivityList result_list;
+        GLib.List<Activity> result_list;
 
-        if (this.notification_errors_lists.length > 0) {
+        if (this.notification_errors_lists.length () > 0) {
             std.sort (this.notification_errors_lists.begin (), this.notification_errors_lists.end ());
             result_list.append (this.notification_errors_lists);
         }
-        if (this.list_of_ignored_files.size () > 0)
+        if (this.list_of_ignored_files.length () > 0)
             result_list.append (this.notification_ignored_files);
 
-        if (this.notification_lists.length > 0) {
+        if (this.notification_lists.length () > 0) {
             std.sort (this.notification_lists.begin (), this.notification_lists.end ());
             result_list.append (this.notification_lists);
         }
 
-        if (this.sync_file_item_lists.length > 0) {
+        if (this.sync_file_item_lists.length () > 0) {
             std.sort (this.sync_file_item_lists.begin (), this.sync_file_item_lists.end ());
             result_list.append (this.sync_file_item_lists);
         }
 
-        if (this.activity_lists.length > 0) {
+        if (this.activity_lists.length () > 0) {
             std.sort (this.activity_lists.begin (), this.activity_lists.end ());
             result_list.append (this.activity_lists);
 
@@ -705,10 +705,10 @@ public class ActivityListModel : QAbstractListModel {
         }
 
         begin_reset_model ();
-        this.final_list == "";
+        this.final_list = null;
         end_reset_model ();
 
-        if (result_list.length > 0) {
+        if (result_list.length () > 0) {
             begin_insert_rows (QModelIndex (), 0, result_list.length - 1);
             this.final_list = result_list;
             end_insert_rows ();

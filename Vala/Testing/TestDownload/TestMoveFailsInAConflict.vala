@@ -40,7 +40,7 @@ public class TestMoveFailsInAConflict : GLib.Object {
         GLib.assert_true (conflict_file != "");
 
         // restore permissions
-        GLib.File (fake_folder.local_path + "A/").set_permissions (GLib.File.Permissions (0x7777));
+        new GLib.File (fake_folder.local_path + "A/").set_permissions (GLib.File.Permissions (0x7777));
 
         disconnect (trans_progress);
         fake_folder.set_server_override (this.override_delegate_move_fails_in_a_conflict);
@@ -85,7 +85,7 @@ public class TestMoveFailsInAConflict : GLib.Object {
             // Check that the temporary file is still there
             GLib.assert_true (GLib.Dir (fake_folder.local_path + "A/").entry_list ({ "*.~*" }, GLib.Dir.Files | GLib.Dir.Hidden).length == 1);
             // Set the permission to read only on the folder, so the rename of the temporary file will fail
-            GLib.File (fake_folder.local_path + "A/").set_permissions (GLib.File.Permissions (0x5555));
+            new GLib.File (fake_folder.local_path + "A/").set_permissions (GLib.File.Permissions (0x5555));
         }
     }
 

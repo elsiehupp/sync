@@ -76,7 +76,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
     ***********************************************************/
     private bool remove_job_error = false;
 
-    private GLib.HashTable<int64, ServerChunkInfo> server_chunks;
+    private GLib.HashTable<int64?, ServerChunkInfo?> server_chunks;
 
 
     /***********************************************************
@@ -157,7 +157,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         if (this.item.modtime <= 0) {
             GLib.warning ("Invalid modified time" + this.item.file.to_string () + this.item.modtime.to_string ());
         }
-        this.transfer_identifier = uint32 (Utility.rand () ^ uint32 (this.item.modtime) ^ (uint32 (this.file_to_upload.size) << 16) ^ q_hash (this.file_to_upload.file));
+        this.transfer_identifier = ((uint32)Utility.rand ()) ^ ((uint32)this.item.modtime) ^ ((uint32)this.file_to_upload.size << 16) ^ q_hash (this.file_to_upload.file));
         this.sent = 0;
         this.current_chunk = 0;
 
@@ -241,9 +241,8 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
             return;
         }
 
-        const string filename = this.file_to_upload.path;
         var device = std.make_unique<UploadDevice> (
-                filename, this.sent, this.current_chunk_size, this.propagator.bandwidth_manager);
+                this.file_to_upload.path, this.sent, this.current_chunk_size, this.propagator.bandwidth_manager);
         if (!device.open (QIODevice.ReadOnly)) {
             GLib.warning ("Could not prepare upload device: " + device.error_string);
 

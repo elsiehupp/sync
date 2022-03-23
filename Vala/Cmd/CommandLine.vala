@@ -62,7 +62,7 @@ public class CommandLine : GLib.Object {
         EchoDisabler disabler;
         GLib.print ("Password for user " + user + ": ");
         string s;
-        Readline.getc (std.cin, s);
+        Readline.getc (GLib.stdin, s);
         return s;
     }
 
@@ -118,8 +118,7 @@ public class CommandLine : GLib.Object {
 
         if (arg_count < 3) {
             if (arg_count >= 2) {
-                const string option = args[1];
-                if (option == "-v" || option == "--version") {
+                if (args[1] == "-v" || args[1] == "--version") {
                     show_version ();
                 }
             }
@@ -129,8 +128,8 @@ public class CommandLine : GLib.Object {
         options.target_url = args.take_last ();
 
         options.source_dir = args.take_last ();
-        if (!options.source_dir.has_suffix ('/')) {
-            options.source_dir.append ('/');
+        if (!options.source_dir.has_suffix ("/")) {
+            options.source_dir += "/";
         }
         GLib.FileInfo file_info = new GLib.FileInfo (options.source_dir);
         if (!file_info.exists ()) {
@@ -255,7 +254,7 @@ public class CommandLine : GLib.Object {
             return EXIT_FAILURE;
         }
 
-        GLib.Uri host_url = GLib.Uri.from_user_input ( (options.target_url.has_suffix ('/') || options.target_url.has_suffix ('\\')) ? options.target_url.chopped (1) : options.target_url);
+        GLib.Uri host_url = GLib.Uri.from_user_input ( (options.target_url.has_suffix ("/") || options.target_url.has_suffix ('\\')) ? options.target_url.chopped (1) : options.target_url);
 
         // Order of retrieval attempt (later attempts override earlier ones):
         // 1. From URL
@@ -287,7 +286,7 @@ public class CommandLine : GLib.Object {
             if (user == "") {
                 GLib.print ("Please enter user name: ");
                 string s;
-                Readline.getc (std.cin, s);
+                Readline.getc (GLib.stdin, s);
                 user = string.from_std_string (s);
             }
             if (password == "") {
@@ -302,8 +301,6 @@ public class CommandLine : GLib.Object {
         GLib.Uri credential_free_url = host_url;
         credential_free_url.user_name ("");
         credential_free_url.password ("");
-
-        const string folder = options.remote_path;
 
         if (options.proxy != null) {
             string host;
@@ -380,7 +377,7 @@ public class CommandLine : GLib.Object {
                 GLib.critical ("Could not open file containing the list of unsynced folders: " + options.unsynced_folders);
             } else {
                 // filter out empty lines and comments
-                selective_sync_list = f.read_all ().split ('\n').filter (GLib.Regex ("\\S+")).filter (GLib.Regex ("^[^#]"));
+                selective_sync_list = f.read_all ().split ("\n").filter (GLib.Regex ("\\S+")).filter (GLib.Regex ("^[^#]"));
 
                 foreach (var item in selective_sync_list) {
                     if (!item.has_suffix ("/")) {
@@ -391,7 +388,7 @@ public class CommandLine : GLib.Object {
         }
 
         CommandLine cmd;
-        string db_path = options.source_dir + SyncJournalDb.make_database_name (options.source_dir, credential_free_url, folder, user);
+        string db_path = options.source_dir + SyncJournalDb.make_database_name (options.source_dir, credential_free_url, options.remote_path, user);
         SyncJournalDb database = new SyncJournalDb (db_path);
 
         if (!selective_sync_list.empty ()) {
@@ -401,7 +398,7 @@ public class CommandLine : GLib.Object {
         SyncOptions opt;
         opt.fill_from_environment_variables ();
         opt.verify_chunk_sizes ();
-        SyncEngine sync_engine = new SyncEngine (account, options.source_dir, folder, database);
+        SyncEngine sync_engine = new SyncEngine (account, options.source_dir, options.remote_path, database);
         sync_engine.ignore_hidden_files (options.ignore_hidden_files);
         sync_engine.network_limits (options.uplimit, options.downlimit);
         sync_engine.signal_finished.connect (

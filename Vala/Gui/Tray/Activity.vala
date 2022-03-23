@@ -19,16 +19,6 @@ public class Activity : GLib.Object {
     ***********************************************************/
     public class Identifier : Pair<int64, string> { }
 
-
-    /***********************************************************
-    @brief The ActivityList
-    @ingroup gui
-
-    A GLib.List based list of Activities
-    ***********************************************************/
-    public class ActivityList : GLib.List<Activity> { }
-
-
     /***********************************************************
     ***********************************************************/
     public enum Type {

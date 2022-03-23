@@ -142,7 +142,7 @@ public class ConfigFile : GLib.Object {
             string directory = ConfigFile.conf_dir;
 
             if (!directory.has_suffix ("/")) {
-                directory.append ("/");
+                directory += "/";
             }
             return directory;
         }
@@ -321,7 +321,7 @@ public class ConfigFile : GLib.Object {
         }
         GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         settings.begin_group (connection_string);
-        settings.value (REMOTE_POLL_INTERVAL_C, int64 (interval_in_microseconds.length));
+        settings.set_value (REMOTE_POLL_INTERVAL_C, int64 (interval_in_microseconds.length));
         settings.sync ();
     }
 
@@ -391,11 +391,11 @@ public class ConfigFile : GLib.Object {
         public get {
             GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
             bool mono_default = false; // On Mac we want bw by default
-            return settings.value (MONO_ICONS_C, mono_default).to_bool ();
+            return settings.set_value (MONO_ICONS_C, mono_default).to_bool ();
         }
         public set {
             GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-            settings.value (MONO_ICONS_C, use_mono_icons);
+            settings.set_value (MONO_ICONS_C, use_mono_icons);
         }
     }
 
@@ -403,12 +403,12 @@ public class ConfigFile : GLib.Object {
     bool crash_reporter {
         public get {
             GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-            var fallback = settings.value (CRASH_REPORTER_C, true);
+            var fallback = settings.set_value (CRASH_REPORTER_C, true);
             return get_policy_setting (CRASH_REPORTER_C, fallback).to_bool ();
         }
         public set {
             GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-            settings.value (CRASH_REPORTER_C, value);
+            settings.set_value (CRASH_REPORTER_C, value);
         }
     }
 
@@ -416,11 +416,11 @@ public class ConfigFile : GLib.Object {
     bool prompt_delete_files {
         public get {
             GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-            return settings.value (PROMPT_DELETE_C, false).to_bool ();
+            return settings.set_value (PROMPT_DELETE_C, false).to_bool ();
         }
         public set {
             GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-            settings.value (PROMPT_DELETE_C, value);
+            settings.set_value (PROMPT_DELETE_C, value);
         }
     }
 
@@ -428,11 +428,11 @@ public class ConfigFile : GLib.Object {
     bool automatic_log_dir {
         public get {
             GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-            return settings.value (AUTOMATIC_LOG_DIR_C, false).to_bool ();
+            return settings.set_value (AUTOMATIC_LOG_DIR_C, false).to_bool ();
         }
         public set {
             GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-            settings.value (AUTOMATIC_LOG_DIR_C, value);
+            settings.set_value (AUTOMATIC_LOG_DIR_C, value);
         }
     }
 
@@ -440,11 +440,11 @@ public class ConfigFile : GLib.Object {
         public get {
             string default_log_dir = config_path + "/logs";
             GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-            return settings.value (LOG_DIR_C, default_log_dir).to_string ();
+            return settings.set_value (LOG_DIR_C, default_log_dir).to_string ();
         }
         public set {
             GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-            settings.value (LOG_DIR_C, value);
+            settings.set_value (LOG_DIR_C, value);
         }
     }
 
@@ -453,11 +453,11 @@ public class ConfigFile : GLib.Object {
     bool log_debug {
         public get {
             GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-            return settings.value (LOG_DEBUG_C, true).to_bool ();
+            return settings.set_value (LOG_DEBUG_C, true).to_bool ();
         }
         public set {
             GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-            settings.value (LOG_DEBUG_C, value);
+            settings.set_value (LOG_DEBUG_C, value);
         }
     }
 
@@ -467,11 +467,11 @@ public class ConfigFile : GLib.Object {
     int log_expire {
         public get {
             GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-            return settings.value (LOG_EXPIRE_C, 24).to_int ();
+            return settings.set_value (LOG_EXPIRE_C, 24).to_int ();
         }
         public set {
             GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-            settings.value (LOG_EXPIRE_C, value);
+            settings.set_value (LOG_EXPIRE_C, value);
         }
     }
 
@@ -481,11 +481,11 @@ public class ConfigFile : GLib.Object {
     bool log_flush {
         public get {
             GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-            return settings.value (LOG_FLUSH_C, false).to_bool ();
+            return settings.set_value (LOG_FLUSH_C, false).to_bool ();
         }
         public set {
             GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-            settings.value (LOG_FLUSH_C, value);
+            settings.set_value (LOG_FLUSH_C, value);
         }
     }
 
@@ -495,7 +495,7 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     public bool show_experimental_options () {
         GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-        return settings.value (SHOW_EXPERIMENTAL_OPTIONS_C, false).to_bool ();
+        return settings.set_value (SHOW_EXPERIMENTAL_OPTIONS_C, false).to_bool ();
     }
 
 
@@ -511,13 +511,13 @@ public class ConfigFile : GLib.Object {
         string pass = "") {
         GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
 
-        settings.value (PROXY_TYPE_C, proxy_type);
+        settings.set_value (PROXY_TYPE_C, proxy_type);
 
         if (proxy_type == Soup.ProxyResolverDefault.HttpProxy || proxy_type == Soup.ProxyResolverDefault.Socks5Proxy) {
-            settings.value (PROXY_HOST_C, host);
-            settings.value (PROXY_PORT_C, port);
-            settings.value (PROXY_NEEDS_AUTH_C, needs_auth);
-            settings.value (PROXY_USER_C, user);
+            settings.set_value (PROXY_HOST_C, host);
+            settings.set_value (PROXY_PORT_C, port);
+            settings.set_value (PROXY_NEEDS_AUTH_C, needs_auth);
+            settings.set_value (PROXY_USER_C, user);
 
             if (pass == "") {
                 // Security: Don't keep password in config file
@@ -586,7 +586,7 @@ public class ConfigFile : GLib.Object {
         var pass = string.from_utf8 (string.from_base64 (pass_encoded));
         pass_encoded == "";
 
-        var key = KEYCHAIN_PROXY_PASSWORD_KEY ();
+        var key = KEYCHAIN_PROXY_PASSWORD_KEY;
 
         if (!pass == "") {
             // Security : Migrate password from config file to keychain
@@ -627,14 +627,14 @@ public class ConfigFile : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void use_upload_limit_value (int val) {
-        value (USE_UPLOAD_LIMIT_C, val);
+        set_value (USE_UPLOAD_LIMIT_C, val);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void use_download_limit_vlaue (int val) {
-        value (USE_DOWNLOAD_LIMIT_C, val);
+        set_value (USE_DOWNLOAD_LIMIT_C, val);
     }
 
 
@@ -686,8 +686,8 @@ public class ConfigFile : GLib.Object {
             return q_make_pair (use, q_max<int64> (0, value));
         }
         public set {
-            value (NEW_BIG_FOLDER_SIZE_LIMIT_C, value.mbytes);
-            value (USE_NEW_BIG_FOLDER_SIZE_LIMIT_C, value.is_checked);
+            set_value (NEW_BIG_FOLDER_SIZE_LIMIT_C, value.mbytes);
+            set_value (USE_NEW_BIG_FOLDER_SIZE_LIMIT_C, value.is_checked);
         }
     }
 
@@ -700,7 +700,7 @@ public class ConfigFile : GLib.Object {
             return get_policy_setting (CONFIRM_EXTERNAL_STORAGE_C, fallback).to_bool ();
         }
         public set {
-            value (CONFIRM_EXTERNAL_STORAGE_C, value);
+            set_value (CONFIRM_EXTERNAL_STORAGE_C, value);
         }
     }
 
@@ -722,7 +722,7 @@ public class ConfigFile : GLib.Object {
             return get_value (MOVE_TO_TRASH_C, "", false).to_bool ();
         }
         public set {
-            value (MOVE_TO_TRASH_C, value);
+            set_value (MOVE_TO_TRASH_C, value);
         }
     }
 
@@ -756,7 +756,7 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     private static chrono.milliseconds milliseconds_value (GLib.Settings setting, char key,
         chrono.milliseconds default_value) {
-        return chrono.milliseconds (setting.value (key, int64 (default_value.length)).to_long_long ());
+        return chrono.milliseconds (setting.set_value (key, int64 (default_value.length)).to_long_long ());
     }
 
 
@@ -813,11 +813,11 @@ public class ConfigFile : GLib.Object {
     bool optional_server_notifications {
         public get {
             GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-            return settings.value (OPTIONAL_SERVER_NOTIFICATIONS_C, true).to_bool ();
+            return settings.set_value (OPTIONAL_SERVER_NOTIFICATIONS_C, true).to_bool ();
         }
         public set {
             GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-            settings.value (OPTIONAL_SERVER_NOTIFICATIONS_C, value);
+            settings.set_value (OPTIONAL_SERVER_NOTIFICATIONS_C, value);
             settings.sync ();
         }
     }
@@ -829,11 +829,11 @@ public class ConfigFile : GLib.Object {
         public get {
             const bool default_value = false;
             GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-            return settings.value (SHOW_IN_EXPLORER_NAVIGATION_PANE_C, default_value).to_bool ();
+            return settings.set_value (SHOW_IN_EXPLORER_NAVIGATION_PANE_C, default_value).to_bool ();
         }
         public set {
             GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-            settings.value (SHOW_IN_EXPLORER_NAVIGATION_PANE_C, value);
+            settings.set_value (SHOW_IN_EXPLORER_NAVIGATION_PANE_C, value);
             settings.sync ();
         }
     }
@@ -843,7 +843,7 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     public int timeout () {
         GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-        return settings.value (TIMEOUT_C, 300).to_int (); // default to 5 min
+        return settings.set_value (TIMEOUT_C, 300).to_int (); // default to 5 min
     }
 
 
@@ -851,7 +851,7 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     public int64 chunk_size () {
         GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-        return settings.value (CHUNK_SIZE_C, 10 * 1000 * 1000).to_long_long (); // default to 10 MB
+        return settings.set_value (CHUNK_SIZE_C, 10 * 1000 * 1000).to_long_long (); // default to 10 MB
     }
 
 
@@ -859,7 +859,7 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     public int64 max_chunk_size () {
         GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-        return settings.value (MAX_CHUNK_SIZE_C, 1000 * 1000 * 1000).to_long_long (); // default to 1000 MB
+        return settings.set_value (MAX_CHUNK_SIZE_C, 1000 * 1000 * 1000).to_long_long (); // default to 1000 MB
     }
 
 
@@ -867,7 +867,7 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     public int64 min_chunk_size () {
         GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-        return settings.value (MIN_CHUNK_SIZE_C, 1000 * 1000).to_long_long (); // default to 1 MB
+        return settings.set_value (MIN_CHUNK_SIZE_C, 1000 * 1000).to_long_long (); // default to 1 MB
     }
 
 
@@ -889,7 +889,7 @@ public class ConfigFile : GLib.Object {
         //  ASSERT (!w.object_name () == null);
         GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         settings.begin_group (w.object_name ());
-        settings.value (GEOMETRY_C, w.save_geometry ());
+        settings.set_value (GEOMETRY_C, w.save_geometry ());
         settings.sync ();
     // #endif
     }
@@ -915,7 +915,7 @@ public class ConfigFile : GLib.Object {
 
         GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         settings.begin_group (header.object_name ());
-        settings.value (GEOMETRY_C, header.save_state ());
+        settings.set_value (GEOMETRY_C, header.save_state ());
         settings.sync ();
     // #endif
     }
@@ -931,7 +931,7 @@ public class ConfigFile : GLib.Object {
 
         GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         settings.begin_group (header.object_name ());
-        header.restore_state (settings.value (GEOMETRY_C).to_byte_array ());
+        header.restore_state (settings.set_value (GEOMETRY_C).to_byte_array ());
     // #endif
     }
 
@@ -984,7 +984,7 @@ public class ConfigFile : GLib.Object {
         GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         settings.begin_group (connection_string);
 
-        settings.value (SKIP_UPDATE_CHECK_C, GLib.Variant (skip));
+        settings.set_value (SKIP_UPDATE_CHECK_C, GLib.Variant (skip));
         settings.sync ();
     }
 
@@ -1016,7 +1016,7 @@ public class ConfigFile : GLib.Object {
         GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
         settings.begin_group (connection_string);
 
-        settings.value (AUTO_UPDATE_CHECK_C, GLib.Variant (auto_check));
+        settings.set_value (AUTO_UPDATE_CHECK_C, GLib.Variant (auto_check));
         settings.sync ();
     }
 
@@ -1029,13 +1029,13 @@ public class ConfigFile : GLib.Object {
     public int update_segment ();
     int ConfigFile.update_segment () {
         GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-        int segment = settings.value (UPDATE_SEGMENT_C, -1).to_int ();
+        int segment = settings.set_value (UPDATE_SEGMENT_C, -1).to_int ();
 
         // Invalid? (Unset at the very first launch)
         if (segment < 0 || segment > 99) {
             // Save valid segment value, normally has to be done only once.
             segment = Utility.rand () % 99;
-            settings.value (UPDATE_SEGMENT_C, segment);
+            settings.set_value (UPDATE_SEGMENT_C, segment);
         }
 
         return segment;
@@ -1057,11 +1057,11 @@ public class ConfigFile : GLib.Object {
             }
     
             GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-            return settings.value (UPDATE_CHANNEL_C, default_update_channel).to_string ();
+            return settings.set_value (UPDATE_CHANNEL_C, default_update_channel).to_string ();
         }
         public set {
             GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-            settings.value (UPDATE_CHANNEL_C, value);
+            settings.set_value (UPDATE_CHANNEL_C, value);
         }
     }
 
@@ -1077,7 +1077,7 @@ public class ConfigFile : GLib.Object {
         }
         public set {
             GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-            settings.value (CERT_PATH, value);
+            settings.set_value (CERT_PATH, value);
             settings.sync ();
         }
     }
@@ -1091,7 +1091,7 @@ public class ConfigFile : GLib.Object {
         }
         public set {
             GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-            settings.value (CERT_PASSWORD, value);
+            settings.set_value (CERT_PASSWORD, value);
             settings.sync ();
         }
     }
@@ -1104,11 +1104,11 @@ public class ConfigFile : GLib.Object {
     string client_version_string {
         public get {
             GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-            return settings.value (CLIENT_VERSION_C, "").to_string ();
+            return settings.set_value (CLIENT_VERSION_C, "").to_string ();
         }
         public set {
             GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
-            settings.value (CLIENT_VERSION_C, value);
+            settings.set_value (CLIENT_VERSION_C, value);
         }
     }
 
@@ -1164,7 +1164,7 @@ public class ConfigFile : GLib.Object {
                     .printf (APPLICATION_VENDOR, Theme.app_name_gui),
                 GLib.Settings.NativeFormat);
             if (user_policy.contains (setting)) {
-                return user_policy.value (setting);
+                return user_policy.set_value (setting);
             }
 
             GLib.Settings machine_policy = new GLib.Settings (
@@ -1172,7 +1172,7 @@ public class ConfigFile : GLib.Object {
                     .printf (APPLICATION_VENDOR, Theme.app_name_gui),
                 GLib.Settings.NativeFormat);
             if (machine_policy.contains (setting)) {
-                return machine_policy.value (setting);
+                return machine_policy.set_value (setting);
             }
         }
         return default_value;
@@ -1186,7 +1186,7 @@ public class ConfigFile : GLib.Object {
         GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
 
         settings.begin_group (connection_string);
-        settings.value (key, value);
+        settings.set_value (key, value);
         settings.sync ();
     }
 
@@ -1198,7 +1198,7 @@ public class ConfigFile : GLib.Object {
         GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
 
         settings.begin_group (connection_string);
-        return settings.value (key);
+        return settings.set_value (key);
     }
 
 
@@ -1238,13 +1238,13 @@ public class ConfigFile : GLib.Object {
             if (group != "") {
                 system_settings.begin_group (group);
             }
-            system_setting = system_settings.value (param, default_value);
+            system_setting = system_settings.set_value (param, default_value);
         } else if (Utility.is_unix ()) {
             GLib.Settings system_settings = new GLib.Settings (SYSCONFDIR + "/%1/%1.conf".printf (Theme.app_name), GLib.Settings.NativeFormat);
             if (group != "") {
                 system_settings.begin_group (group);
             }
-            system_setting = system_settings.value (param, default_value);
+            system_setting = system_settings.set_value (param, default_value);
         } else { // Windows
             GLib.Settings system_settings = new GLib.Settings (
                 " (HKEY_LOCAL_MACHINE\\Software\\%1\\%2)"
@@ -1253,7 +1253,7 @@ public class ConfigFile : GLib.Object {
             if (group != "") {
                 system_settings.begin_group (group);
             }
-            system_setting = system_settings.value (param, default_value);
+            system_setting = system_settings.set_value (param, default_value);
         }
 
         GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
@@ -1261,16 +1261,16 @@ public class ConfigFile : GLib.Object {
             settings.begin_group (group);
         }
 
-        return settings.value (param, system_setting);
+        return settings.set_value (param, system_setting);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    private void value (string key, GLib.Variant value) {
+    private void set_value (string key, GLib.Variant value) {
         GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
 
-        settings.value (key, value);
+        settings.set_value (key, value);
     }
 
 } // class ConfigFile

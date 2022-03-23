@@ -141,7 +141,7 @@ public class OCUpdater : AbstractUpdater {
         ConfigFile config;
         GLib.Settings settings = new GLib.Settings (config.config_file (), GLib.Settings.IniFormat);
         string update_file = settings.value (update_available_c).to_string ();
-        if (!update_file == "" && GLib.File (update_file).exists ()
+        if (!update_file == "" && new GLib.File (update_file).exists ()
             && !update_succeeded () /* Someone might have run the updater manually between restarts */) {
             const var message_box_start_installer = new Gtk.MessageBox (Gtk.MessageBox.Information,
                 _("New %1 update ready").printf (Theme.app_name_gui),
@@ -174,33 +174,33 @@ public class OCUpdater : AbstractUpdater {
             this.on_signal_version_info_arrived
         );
 
-        download_state (DownloadState.CHECKING_SERVER);
+        this.download_state = DownloadState.CHECKING_SERVER;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public string status_string (UpdateStatusStringFormat format = UpdateStatusStringFormat.PLAIN_TEXT) {
-        string update_version = this.update_info.version_string ();
+        string update_version = this.update_info.version_string;
 
-        switch (download_state ()) {
+        switch (this.download_state) {
         case DownloadState.DOWNLOADING:
             return _("Downloading %1. Please wait …").printf (update_version);
         case DownloadState.DOWNLOAD_COMPLETE:
             return _("%1 available. Restart application to on_signal_start the update.").printf (update_version);
         case DownloadState.DOWNLOAD_FAILED: {
             if (format == UpdateStatusStringFormat.HTML) {
-                return _("Could not download update. Please open <a href='%1'>%1</a> to download the update manually.").printf (this.update_info.web ());
+                return _("Could not download update. Please open <a href='%1'>%1</a> to download the update manually.").printf (this.update_info.web);
             }
-            return _("Could not download update. Please open %1 to download the update manually.").printf (this.update_info.web ());
+            return _("Could not download update. Please open %1 to download the update manually.").printf (this.update_info.web);
         }
         case DownloadState.DOWNLOAD_TIMED_OUT:
             return _("Could not check for new updates.");
         case DownloadState.UIPLOAD_ONLY_AVAILABLE_THROUGH_SYSTEM: {
             if (format == UpdateStatusStringFormat.HTML) {
-                return _("New %1 is available. Please open <a href='%2'>%2</a> to download the update.").printf (update_version, this.update_info.web ());
+                return _("New %1 is available. Please open <a href='%2'>%2</a> to download the update.").printf (update_version, this.update_info.web);
             }
-            return _("New %1 is available. Please open %2 to download the update.").printf (update_version, this.update_info.web ());
+            return _("New %1 is available. Please open %2 to download the update.").printf (update_version, this.update_info.web);
         }
         case DownloadState.CHECKING_SERVER:
             return _("Checking update server …");
@@ -265,10 +265,9 @@ public class OCUpdater : AbstractUpdater {
     /***********************************************************
     ***********************************************************/
     protected override void on_signal_background_check_for_update () {
-        int dl_state = download_state ();
 
         // do the real update check depending on the internal state of updater.
-        switch (dl_state) {
+        switch (this.download_state) {
         case Unknown:
         case DownloadState.UP_TO_DATE:
         case DownloadState.DOWNLOAD_FAILED:
@@ -301,7 +300,7 @@ public class OCUpdater : AbstractUpdater {
         reply.delete_later ();
         if (reply.error != GLib.InputStream.NoError) {
             GLib.warning ("Failed to reach version check url: " + reply.error_string);
-            download_state (DownloadState.DOWNLOAD_TIMED_OUT);
+            this.download_state = DownloadState.DOWNLOAD_TIMED_OUT;
             return;
         }
 
@@ -313,7 +312,7 @@ public class OCUpdater : AbstractUpdater {
             version_info_arrived (this.update_info);
         } else {
             GLib.warning ("Could not parse update information.");
-            download_state (DownloadState.DOWNLOAD_TIMED_OUT);
+            this.download_state = DownloadState.DOWNLOAD_TIMED_OUT;
         }
     }
 
@@ -321,13 +320,13 @@ public class OCUpdater : AbstractUpdater {
     /***********************************************************
     ***********************************************************/
     private void on_signal_timed_out () {
-        download_state (DownloadState.DOWNLOAD_TIMED_OUT);
+        this.download_state = DownloadState.DOWNLOAD_TIMED_OUT;
     }
 
 
     /***********************************************************
     ***********************************************************/
-    protected virtual void version_info_arrived (UpdateInfo info);
+    //  protected virtual void version_info_arrived (UpdateInfo info);
 
 
     /***********************************************************

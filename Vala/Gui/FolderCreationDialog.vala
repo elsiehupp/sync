@@ -37,12 +37,12 @@ public class FolderCreationDialog : Gtk.Dialog {
 
         const string suggested_folder_name_prefix = _("New folder");
 
-        const string new_folder_full_path = this.destination + "/" + suggested_folder_name_prefix;
+        string new_folder_full_path = this.destination + "/" + suggested_folder_name_prefix;
         if (!GLib.Dir (new_folder_full_path).exists ()) {
             instance.new_folder_name_edit.on_signal_text (suggested_folder_name_prefix);
         } else {
             for (uint32 i = 2; i < std.numeric_limits<uint32>.max (); ++i) {
-                const string suggested_postfix = " (%1)".printf (i);
+                string suggested_postfix = " (%1)".printf (i);
 
                 if (!GLib.Dir (new_folder_full_path + suggested_postfix).exists ()) {
                     instance.new_folder_name_edit.on_signal_text (suggested_folder_name_prefix + suggested_postfix);
@@ -64,7 +64,7 @@ public class FolderCreationDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void on_signal_accept () {
-        //  Q_ASSERT (!this.destination.has_suffix ('/'));
+        //  Q_ASSERT (!this.destination.has_suffix ("/"));
 
         if (GLib.Dir (this.destination + "/" + instance.new_folder_name_edit.text ()).exists ()) {
             instance.label_error_message.visible (true);

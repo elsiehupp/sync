@@ -2058,7 +2058,7 @@ public class WordList : GLib.Object {
             "zoo"
         };
 
-        string[] random_words;
+        GLib.List<string> random_words = new GLib.List<string> ()
         while (random_words.size () != nr) {
             string curr_word = word_list.at (get_random_number (word_list.size ()));
             if (!random_words.contains (curr_word)) {

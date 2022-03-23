@@ -396,7 +396,7 @@ public class ShareUserLine : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_refresh_password_options () {
-        const bool is_password_enabled = this.share.share_type == Share.Type.EMAIL && this.password_protect_link_action.is_checked ();
+        bool is_password_enabled = this.share.share_type == Share.Type.EMAIL && this.password_protect_link_action.is_checked ();
 
         this.instance.password_label.visible (is_password_enabled);
         this.instance.line_edit_password.enabled (is_password_enabled);

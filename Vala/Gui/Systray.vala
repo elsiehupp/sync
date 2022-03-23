@@ -236,7 +236,7 @@ public class Systray : QSystemTrayIcon {
     ***********************************************************/
     public void create () {
         if (this.tray_engine != null) {
-            if (AccountManager.instance.accounts != "") {
+            if (AccountManager.instance.accounts.length () != 0) {
                 this.tray_engine.root_context ().context_property ("activity_model", UserModel.instance.current_activity_model);
             }
             this.tray_engine.on_signal_load ("qrc:/qml/src/gui/tray/Window.qml");

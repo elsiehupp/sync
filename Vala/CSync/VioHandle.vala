@@ -53,7 +53,7 @@ public class VioHandle : GLib.Object {
 
         file_stat = FileStat ();
         file_stat.path = GLib.File.decode_name (posix_dirent.d_name).to_utf8 ();
-        string full_path = directory_handle.path % '/' % "" % (string) posix_dirent.d_name;
+        string full_path = directory_handle.path % "/" % "" % (string) posix_dirent.d_name;
         if (file_stat.path == null) {
                 file_stat.original_path = full_path;
                 GLib.warning ("Invalid characters in file/directory name, please rename: " + posix_dirent.d_name.to_string () + directory_handle.path);

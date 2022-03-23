@@ -169,7 +169,7 @@ public class ShareDialog : Gtk.Dialog {
 
 
     override ~ShareDialog () {
-        this.link_widget_list == "";
+        this.link_widget_list = null;
         //  delete this.instance;
     }
 
@@ -242,7 +242,7 @@ public class ShareDialog : Gtk.Dialog {
             this.user_group_widget.enabled (enabled);
         }
 
-        if (this.link_widget_list.size () > 0) {
+        if (this.link_widget_list.length () > 0) {
             foreach (ShareLinkWidget widget in this.link_widget_list) {
                 widget.enabled (state);
             }
@@ -490,7 +490,7 @@ public class ShareDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void init_link_share_widget () {
-        if (this.link_widget_list.size () == 0) {
+        if (this.link_widget_list.length () == 0) {
             this.empty_share_link_widget = new ShareLinkWidget (this.account_state.account, this.share_path, this.local_path, this.max_sharing_permissions, this);
             this.link_widget_list.append (this.empty_share_link_widget);
 

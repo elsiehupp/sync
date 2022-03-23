@@ -519,7 +519,7 @@ public class Account : GLib.Object {
     public GLib.InputStream send_raw_request_for_multipart (
         string verb,
         GLib.Uri url,
-        QHttpMultiPart data,
+        Soup.Multipart data,
         Soup.Request request = Soup.Request ()
     ) {
         request.url (url);
@@ -579,7 +579,7 @@ public class Account : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void add_approved_certificates (GLib.List<GLib.TlsCertificate> certificates) {
-        this.approved_certificates.append (certificates);
+        this.approved_certificates.concat (certificates);
     }
 
 
@@ -589,7 +589,7 @@ public class Account : GLib.Object {
     shown when the next unknown certificate is encountered.
     ***********************************************************/
     public void reset_rejected_certificates () {
-        this.rejected_certificates == "";
+        this.rejected_certificates = new GLib.List<GLib.TlsCertificate> ();
     }
 
 
@@ -598,7 +598,7 @@ public class Account : GLib.Object {
     ***********************************************************/
     public GLib.Variant credential_setting_key (string key) {
         if (this.credentials != null) {
-            string prefix = this.credentials.auth_type_string ();
+            string prefix = this.credentials.auth_type_string;
             GLib.Variant value = this.settings_map.value (prefix + "this." + key);
             if (value == null) {
                 value = this.settings_map.value (key);
@@ -1082,7 +1082,7 @@ public class Account : GLib.Object {
                 return;
             }
 
-            if (approved_certificates != "") {
+            if (approved_certificates.length > 0) {
                 QSslConfiguration.default_configuration ().add_ca_certificates (approved_certificates);
                 add_approved_certificates (approved_certificates);
                 /* emit */ signal_wants_account_saved (this);

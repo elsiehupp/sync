@@ -216,7 +216,7 @@ public class SqlQuery : GLib.Object {
     #endif
                 }
             } else {
-                GLib.debug ("Last exec affected" + num_rows_affected ("rows.";
+                GLib.debug ("Last exec affected" + number_of_rows_affected ("rows.";
             }
             return (this.err_id == SQLITE_DONE); // either SQLITE_ROW or SQLITE_DONE
         }
@@ -297,7 +297,7 @@ public class SqlQuery : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public int num_rows_affected () {
+    public int number_of_rows_affected () {
         return sqlite3_changes (this.database);
     }
 

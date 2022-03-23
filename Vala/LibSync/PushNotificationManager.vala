@@ -284,9 +284,9 @@ public class PushNotificationManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void authenticate_on_signal_web_socket () {
-        var credentials = this.account.credentials ();
-        var username = credentials.user ();
-        var password = credentials.password ();
+        var credentials = this.account.credentials;
+        var username = credentials.user;
+        var password = credentials.password;
 
         // Authenticate
         this.web_socket.send_text_message (username);
