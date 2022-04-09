@@ -13,8 +13,8 @@ public class XAttrWrapper : GLib.Object {
     const string HYDRATE_EXEC_ATTRIBUT_NAME = "user.nextcloud.hydrate_exec";
 
     public static bool has_nextcloud_placeholder_attributes (string path) {
-        var value = xattr_get (path.to_utf8 (), HYDRATE_EXEC_ATTRIBUT_NAME);
-        if (value) {
+        string value = xattr_get (path, HYDRATE_EXEC_ATTRIBUT_NAME);
+        if (value != "") {
             return value == Common.Config.APPLICATION_EXECUTABLE;
         } else {
             return false;
@@ -23,7 +23,7 @@ public class XAttrWrapper : GLib.Object {
 
 
     public static Result<void, string> add_nextcloud_placeholder_attributes (string path) {
-        var on_signal_success = xattr_set (path.to_utf8 (), HYDRATE_EXEC_ATTRIBUT_NAME, Common.Config.APPLICATION_EXECUTABLE);
+        var on_signal_success = xattr_set ((string)path, HYDRATE_EXEC_ATTRIBUT_NAME, Common.Config.APPLICATION_EXECUTABLE);
         if (!on_signal_success) {
             return new Result<void, string> ("Failed to set the extended attribute");
         } else {
@@ -32,7 +32,7 @@ public class XAttrWrapper : GLib.Object {
     }
 
 
-    public static Optional<string> xattr_get (string path, string name) {
+    public static string xattr_get (string path, string name) {
         int BUFFER_SIZE = 256;
         string result;
         result.resize (BUFFER_SIZE);
@@ -41,7 +41,7 @@ public class XAttrWrapper : GLib.Object {
             result.resize ((int)count - 1);
             return result;
         } else {
-            return {};
+            return "";
         }
     }
 

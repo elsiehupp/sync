@@ -27,7 +27,7 @@ public class OwncloudWizard : GLib.Wizard {
     ***********************************************************/
     public enum LogType {
         LOG_PLAIN,
-        LOG_PARAGRAPH
+        LOG_HTML
     }
 
 
@@ -379,7 +379,7 @@ public class OwncloudWizard : GLib.Wizard {
     /***********************************************************
     ***********************************************************/
     public void on_signal_append_to_configuration_log (string message, LogType type) {
-        this.setup_log + message;
+        this.setup_log.append (message);
         GLib.debug ("Setup-Log: " + message);
     }
 

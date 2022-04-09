@@ -261,7 +261,8 @@ public class OwncloudSetupWizard : GLib.Object {
                                                 .printf (Utility.escape (url.to_string ()),
                                                     Utility.escape (Theme.app_name_gui),
                                                     Utility.escape (CheckServerJob.version_string (info)),
-                                                    Utility.escape (server_version)));
+                                                    Utility.escape (server_version)),
+                                                OwncloudWizard.LogType.LOG_HTML);
 
         // Note with newer servers we get the version actually only later in capabilities
         // https://github.com/owncloud/core/pull/27473/files
@@ -357,8 +358,9 @@ public class OwncloudSetupWizard : GLib.Object {
         this.oc_wizard.on_signal_append_to_configuration_log (
             _("Trying to connect to %1 at %2 …")
                 .printf (Theme.app_name_gui)
-                .printf (url)
-            );
+                .printf (url),
+                OwncloudWizard.LogType.LOG_PLAIN
+        );
 
         test_owncloud_connect ();
     }
@@ -378,7 +380,9 @@ public class OwncloudSetupWizard : GLib.Object {
             // own_cloud is newly created.
             this.oc_wizard.on_signal_append_to_configuration_log (
                 _("Local sync folder %1 already exists, setting it up for sync.<br/><br/>")
-                    .printf (Utility.escape (local_folder)));
+                    .printf (Utility.escape (local_folder)),
+                    OwncloudWizard.LogType.LOG_PLAIN
+                );
         } else {
             string res = _("Creating local sync folder %1 …").printf (local_folder);
             if (file_info.mkpath (local_folder)) {
@@ -391,7 +395,7 @@ public class OwncloudSetupWizard : GLib.Object {
                 this.oc_wizard.on_signal_display_error (_("Could not create local folder %1").printf (Utility.escape (local_folder)), false);
                 next_step = false;
             }
-            this.oc_wizard.on_signal_append_to_configuration_log (res);
+            this.oc_wizard.on_signal_append_to_configuration_log (res, OwncloudWizard.LogType.LOG_PLAIN);
         }
         if (next_step) {
             /***********************************************************
@@ -481,11 +485,10 @@ public class OwncloudSetupWizard : GLib.Object {
 
         bool on_signal_success = true;
         if (error == 202) {
-            this.oc_wizard.on_signal_append_to_configuration_log (_("The remote folder %1 already exists. Connecting it for syncing.").printf (this.remote_folder));
+            this.oc_wizard.on_signal_append_to_configuration_log (_("The remote folder %1 already exists. Connecting it for syncing.").printf (this.remote_folder), OwncloudWizard.LogType.LOG_PLAIN);
         } else if (error > 202 && error < 300) {
             this.oc_wizard.on_signal_display_error (_("The folder creation resulted in HTTP error code %1").printf ((int)error), false);
-
-            this.oc_wizard.on_signal_append_to_configuration_log (_("The folder creation resulted in HTTP error code %1").printf ((int)error));
+            this.oc_wizard.on_signal_append_to_configuration_log (_("The folder creation resulted in HTTP error code %1").printf ((int)error), OwncloudWizard.LogType.LOG_PLAIN);
         } else if (error == GLib.InputStream.OperationCanceledError) {
             this.oc_wizard.on_signal_display_error (
                 _("The remote folder creation failed because the provided credentials "
@@ -496,12 +499,13 @@ public class OwncloudSetupWizard : GLib.Object {
             );
             this.oc_wizard.on_signal_append_to_configuration_log (
                 _("<p><font color=\"red\">Remote folder creation failed probably because the provided credentials are wrong.</font>"
-                + "<br/>Please go back and check your credentials.</p>")
+                + "<br/>Please go back and check your credentials.</p>"),
+                OwncloudWizard.LogType.LOG_HTML
             );
             this.remote_folder == "";
             on_signal_success = false;
         } else {
-            this.oc_wizard.on_signal_append_to_configuration_log (_("Remote folder %1 creation failed with error <tt>%2</tt>.").printf (Utility.escape (this.remote_folder)).printf (error));
+            this.oc_wizard.on_signal_append_to_configuration_log (_("Remote folder %1 creation failed with error <tt>%2</tt>.").printf (Utility.escape (this.remote_folder)).printf (error), OwncloudWizard.LogType.LOG_PLAIN);
             this.oc_wizard.on_signal_display_error (_("Remote folder %1 creation failed with error <tt>%2</tt>.").printf (Utility.escape (this.remote_folder)).printf (error), false);
             this.remote_folder == "";
             on_signal_success = false;
@@ -556,7 +560,8 @@ public class OwncloudSetupWizard : GLib.Object {
                     }
                 }
                 this.oc_wizard.on_signal_append_to_configuration_log (
-                    _("<font color=\"green\"><b>Local sync folder %1 successfully created!</b></font>").printf (local_folder)
+                    _("<font color=\"green\"><b>Local sync folder %1 successfully created!</b></font>").printf (local_folder),
+                    OwncloudWizard.LogType.LOG_HTML
                 );
             }
         }
@@ -728,8 +733,9 @@ public class OwncloudSetupWizard : GLib.Object {
     ***********************************************************/
     private void create_remote_folder () {
         this.oc_wizard.on_signal_append_to_configuration_log (
-            _("creating folder on Nextcloud : %1")
-                .printf (this.remote_folder)
+            _("Creating folder on Nextcloud: %1")
+                .printf (this.remote_folder),
+            OwncloudWizard.LogType.LOG_PLAIN
         );
 
         var mkcol_job = new MkColJob (this.oc_wizard.account, this.remote_folder, this);
@@ -746,7 +752,10 @@ public class OwncloudSetupWizard : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_mkcol_job_finished_without_error () {
-        this.oc_wizard.on_signal_append_to_configuration_log (_("Remote folder %1 created successfully.").printf (this.remote_folder));
+        this.oc_wizard.on_signal_append_to_configuration_log (
+            _("Remote folder %1 created successfully.").printf (this.remote_folder),
+            OwncloudWizard.LogType.LOG_PLAIN
+        );
         finalize_setup (true);
     }
 
@@ -759,14 +768,17 @@ public class OwncloudSetupWizard : GLib.Object {
             if (! (local_folder == "" || this.remote_folder == "")) {
                 this.oc_wizard.on_signal_append_to_configuration_log (
                     _("A sync connection from %1 to remote directory %2 was set up.")
-                        .printf (local_folder, this.remote_folder));
+                        .printf (local_folder, this.remote_folder),
+                    OwncloudWizard.LogType.LOG_PLAIN
+                );
             }
-            this.oc_wizard.on_signal_append_to_configuration_log (" ");
+            this.oc_wizard.on_signal_append_to_configuration_log (" ", OwncloudWizard.LogType.LOG_PLAIN);
             this.oc_wizard.on_signal_append_to_configuration_log (
                 "<p><font color=\"green\"><b>"
                 + _("Successfully connected to %1!")
                     .printf (Theme.app_name_gui)
-                + "</b></font></p>");
+                + "</b></font></p>",
+                OwncloudWizard.LogType.LOG_HTML);
             this.oc_wizard.on_signal_successful_step ();
         } else {
             // ### this is not quite true, pass in the real problem as optional parameter
@@ -774,7 +786,8 @@ public class OwncloudSetupWizard : GLib.Object {
                 "<p><font color=\"red\">"
                 + _("Connection to %1 could not be established. Please check again.")
                     .printf (Theme.app_name_gui)
-                + "</font></p>");
+                + "</font></p>",
+                OwncloudWizard.LogType.LOG_HTML);
         }
     }
 
