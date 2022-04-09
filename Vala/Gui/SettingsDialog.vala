@@ -43,7 +43,7 @@ public class SettingsDialog : Gtk.Dialog {
         /***********************************************************
         ***********************************************************/
         public override Gtk.Widget create_widget (Gtk.Widget parent) {
-            var toolbar = qobject_cast<GLib.ToolBar> (parent);
+            var toolbar = (GLib.ToolBar)parent;
             if (!toolbar) {
                 // this means we are in the extention menu, no special action here
                 return null;
@@ -55,7 +55,7 @@ public class SettingsDialog : Gtk.Dialog {
             btn.object_name (object_name);
 
             btn.default_action (this);
-            btn.tool_button_style (Qt.Tool_button_text_under_icon);
+            btn.tool_button_style (GLib.Tool_button_text_under_icon);
             btn.size_policy (GLib.SizePolicy.Fixed, GLib.SizePolicy.Expanding);
             return btn;
         }
@@ -112,10 +112,10 @@ public class SettingsDialog : Gtk.Dialog {
         this.instance.up_ui (this);
         this.tool_bar = new GLib.ToolBar ();
         this.tool_bar.icon_size (Gdk.Rectangle (32, 32));
-        this.tool_bar.tool_button_style (Qt.Tool_button_text_under_icon);
+        this.tool_bar.tool_button_style (GLib.Tool_button_text_under_icon);
         layout ().menu_bar (this.tool_bar);
 
-        // People perceive this as a Window, so also make Ctrl+W work
+        // People perceive this account_settings a Window, so also make Ctrl+W work
         var close_window_action = new GLib.Action (this);
         close_window_action.shortcut (GLib.KeySequence ("Ctrl+W"));
         close_window_action.triggered.connect (
@@ -123,7 +123,7 @@ public class SettingsDialog : Gtk.Dialog {
         );
         add_action (close_window_action);
 
-        object_name ("Settings"); // required as group for save_geometry call
+        object_name ("Settings"); // required account_settings group for save_geometry call
 
         // : This name refers to the application name e.g Nextcloud
         window_title (_("%1 Settings").printf (Theme.app_name_gui));
@@ -181,7 +181,7 @@ public class SettingsDialog : Gtk.Dialog {
         add_action (show_log_window);
 
         var show_log_window2 = new GLib.Action (this);
-        show_log_window2.shortcut (GLib.KeySequence (Qt.CTRL + Qt.Key_L));
+        show_log_window2.shortcut (GLib.KeySequence (GLib.CTRL + GLib.Key_L));
         show_log_window2.triggered.connect (
             gui.on_signal_toggle_log_browser
         );
@@ -193,7 +193,7 @@ public class SettingsDialog : Gtk.Dialog {
 
         customize_style ();
 
-        window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
+        window_flags (window_flags () & ~GLib.WindowContextHelpButtonHint);
         config.restore_geometry (this);
     }
 
@@ -222,7 +222,7 @@ public class SettingsDialog : Gtk.Dialog {
     public void show_first_page () {
         GLib.List<GLib.Action> actions = this.tool_bar.actions ();
         if (!actions.empty ()) {
-            actions.first ().trigger ();
+            actions.nth_data (0).trigger ();
         }
     }
 
@@ -230,8 +230,8 @@ public class SettingsDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     public void on_signal_show_issues_list (AccountState account) {
-        const var user_model = UserModel.instance;
-        const var identifier = user_model.find_identifier_for_account (account);
+        var user_model = UserModel.instance;
+        var identifier = user_model.find_identifier_for_account (account);
         UserModel.instance.switch_current_user (identifier);
         /* emit */ Systray.instance.show_window ();
     }
@@ -240,7 +240,7 @@ public class SettingsDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     public void on_signal_account_avatar_changed () {
-        var account = static_cast<Account> (sender ());
+        var account = (Account)sender ();
         if (account && this.action_for_account.contains (account)) {
             GLib.Action action = this.action_for_account[account];
             if (action) {
@@ -256,14 +256,14 @@ public class SettingsDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     public void on_signal_account_display_name_changed () {
-        var account = static_cast<Account> (sender ());
+        var account = (Account)sender ();
         if (account && this.action_for_account.contains (account)) {
             GLib.Action action = this.action_for_account[account];
             if (action) {
                 string display_name = account.display_name;
                 action.on_signal_text (display_name);
                 var height = this.tool_bar.size_hint ().height ();
-                action.icon_text (short_display_name_for_settings (account, static_cast<int> (height * BUTTON_SIZE_RATIO)));
+                action.icon_text (short_display_name_for_settings (account, (int)(height * BUTTON_SIZE_RATIO)));
             }
         }
     }
@@ -290,17 +290,17 @@ public class SettingsDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    protected override void change_event (GLib.Event e) {
+    protected override void change_event (Gdk.Event e) {
         switch (e.type ()) {
-        case GLib.Event.StyleChange:
-        case GLib.Event.PaletteChange:
-        case GLib.Event.ThemeChange:
+        case Gdk.Event.StyleChange:
+        case Gdk.Event.PaletteChange:
+        case Gdk.Event.ThemeChange:
             customize_style ();
 
             // Notify the other widgets (Dark-/Light-Mode switching)
             /* emit */ signal_style_changed ();
             break;
-        case GLib.Event.ActivationChange:
+        case Gdk.Event.ActivationChange:
             if (is_active_window ())
                 /* emit */ activate ();
             break;
@@ -320,7 +320,7 @@ public class SettingsDialog : Gtk.Dialog {
 
         GLib.Action account_action = null;
         Gtk.Image avatar = account_state.account.avatar ();
-        const string action_text = branding_single_account ? _("Account") : account_state.account.display_name;
+        string action_text = branding_single_account ? _("Account") : account_state.account.display_name;
         if (avatar == null) {
             account_action = create_color_aware_action (":/client/theme/account.svg",
                 action_text);
@@ -331,7 +331,7 @@ public class SettingsDialog : Gtk.Dialog {
 
         if (!branding_single_account) {
             account_action.tool_tip (account_state.account.display_name);
-            account_action.icon_text (short_display_name_for_settings (account_state.account, static_cast<int> (height * BUTTON_SIZE_RATIO)));
+            account_action.icon_text (short_display_name_for_settings (account_state.account, (int)(height * BUTTON_SIZE_RATIO)));
         }
 
         this.tool_bar.insert_action (this.tool_bar.actions ().at (0), account_action);
@@ -373,11 +373,11 @@ public class SettingsDialog : Gtk.Dialog {
     ***********************************************************/
     private void on_signal_account_removed (AccountState account_state) {
         for (var it = this.action_group_widgets.begin (); it != this.action_group_widgets.end (); ++it) {
-            var as = qobject_cast<AccountSettings> (*it);
-            if (!as) {
+            var account_settings = (AccountSettings)it;
+            if (!account_settings) {
                 continue;
             }
-            if (as.on_signal_accounts_state () == account_state) {
+            if (account_settings.on_signal_accounts_state () == account_state) {
                 this.tool_bar.remove_action (it.key ());
 
                 if (this.instance.stack.current_widget () == it.value ()) {
@@ -416,7 +416,7 @@ public class SettingsDialog : Gtk.Dialog {
         foreach (GLib.Action a in this.action_group.actions ()) {
             Gtk.Icon icon = Theme.create_color_aware_icon (a.property ("icon_path").to_string (), palette ());
             a.icon (icon);
-            var btn = qobject_cast<GLib.ToolButton> (this.tool_bar.widget_for_action (a));
+            var btn = (GLib.ToolButton)this.tool_bar.widget_for_action (a);
             if (btn) {
                 btn.icon (icon);
             }
@@ -464,8 +464,8 @@ public class SettingsDialog : Gtk.Dialog {
         if (width > 0) {
             Cairo.FontFace f;
             Cairo.FontOptions font_options = new Cairo.FontOptions (f);
-            host = font_options.elided_text (host, Qt.Elide_middle, width);
-            user = font_options.elided_text (user, Qt.Elide_right, width);
+            host = font_options.elided_text (host, GLib.Elide_middle, width);
+            user = font_options.elided_text (user, GLib.Elide_right, width);
         }
         return "%1\n%2".printf (user, host);
     }

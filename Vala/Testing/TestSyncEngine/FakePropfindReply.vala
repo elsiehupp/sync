@@ -24,16 +24,16 @@ public class FakePropfindReply : FakeReply {
 
         string filename = get_file_path_from_url (request.url);
         GLib.assert_true (!filename == null); // for root, it should be empty
-        const FileInfo file_info = remote_root_file_info.find (filename);
+        FileInfo file_info = remote_root_file_info.find (filename);
         if (!file_info) {
-            GLib.Object.invoke_method (this, "respond_404", Qt.QueuedConnection);
+            GLib.Object.invoke_method (this, "respond_404", GLib.QueuedConnection);
             return;
         }
-        const string prefix = request.url.path.left (request.url.path.size () - filename.size ());
+        string prefix = request.url.path.left (request.url.path.size () - filename.size ());
 
         // Don't care about the request and just return a full propfind
-        const string dav_uri = "DAV:";
-        const string oc_uri = "http://owncloud.org/ns";
+        string dav_uri = "DAV:";
+        string oc_uri = "http://owncloud.org/ns";
         GLib.OutputStream buffer = new GLib.OutputStream (payload);
         buffer.open (GLib.IODevice.WriteOnly);
         GLib.XmlStreamWriter xml = new GLib.XmlStreamWriter (buffer);
@@ -49,7 +49,7 @@ public class FakePropfindReply : FakeReply {
         xml.write_end_element (); // multistatus
         xml.write_end_document ();
 
-        GLib.Object.invoke_method (this, "respond", Qt.QueuedConnection);
+        GLib.Object.invoke_method (this, "respond", GLib.QueuedConnection);
     }
 
 
@@ -60,7 +60,7 @@ public class FakePropfindReply : FakeReply {
         if (!url.has_suffix (char ("/"))) {
             url.append (char ("/"));
         }
-        const string href = Utility.concat_url_path (prefix, url).path;
+        string href = Utility.concat_url_path (prefix, url).path;
         xml.write_text_element (dav_uri, "href", href);
         xml.write_start_element (dav_uri, "propstat");
         xml.write_start_element (dav_uri, "prop");

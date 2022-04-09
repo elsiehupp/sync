@@ -87,9 +87,9 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
             this.on_signal_selective_sync_clicked
         );
 
-        const Theme theme = Theme.instance;
-        const Gtk.Icon app_icon = theme.application_icon;
-        const int app_icon_size = Theme.is_hidpi () ? 128 : 64;
+        Theme theme = Theme.instance;
+        Gtk.Icon app_icon = theme.application_icon;
+        int app_icon_size = Theme.is_hidpi () ? 128 : 64;
 
         this.instance.l_server_icon.pixmap (app_icon.pixmap (app_icon_size));
 
@@ -150,7 +150,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
         // ensure "next" gets the focus, not ob_select_local_folder
         GLib.Timeout.single_shot (0, wizard ().button (GLib.Wizard.FinishButton), Gtk.Widget.focus);
 
-        var acc = static_cast<OwncloudWizard> (wizard ()).account;
+        var acc = ((OwncloudWizard)wizard ()).account;
         var quota_job = new PropfindJob (acc, this.remote_folder, this);
         quota_job.properties (new GLib.List<string> ("http://owncloud.org/ns:size"));
 
@@ -178,7 +178,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
 
         customize_style ();
 
-        var next_button = qobject_cast<GLib.PushButton> (this.oc_wizard.button (GLib.Wizard.NextButton));
+        var next_button = (GLib.PushButton)this.oc_wizard.button (GLib.Wizard.NextButton));
         if (next_button) {
             next_button.default (true);
         }
@@ -199,10 +199,10 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
     ***********************************************************/
     public bool validate_page () {
         if (use_virtual_file_sync ()) {
-            const var availability = AbstractVfs.check_availability (local_folder ());
+            var availability = AbstractVfs.check_availability (local_folder ());
             if (!availability) {
                 var message = new Gtk.MessageBox (Gtk.MessageBox.Warning, _("Virtual files are not available for the selected folder"), availability.error, Gtk.MessageBox.Ok, this);
-                message.attribute (Qt.WA_DeleteOnClose);
+                message.attribute (GLib.WA_DeleteOnClose);
                 message.open ();
                 return false;
             }
@@ -336,7 +336,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
     private void on_signal_selective_sync_clicked () {
         unowned Account acc = ((OwncloudWizard) wizard ()).account;
         var dialog = new SelectiveSyncDialog (acc, this.remote_folder, this.selective_sync_blocklist, this);
-        dialog.attribute (Qt.WA_DeleteOnClose);
+        dialog.attribute (GLib.WA_DeleteOnClose);
 
         dialog.signal_finished.connect (
             this.on_signal_selective_sync_finished
@@ -349,7 +349,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
     /***********************************************************
     ***********************************************************/
     private void on_signal_selective_sync_finished (SelectiveSyncDialog dialog) {
-        const int result = dialog.result ();
+        int result = dialog.result ();
         bool update_blocklist = false;
 
         // We need to update the selective sync blocklist either when the dialog
@@ -464,7 +464,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
     the texts and eventual warnings on the dialog.
     ***********************************************************/
     private void update_status () {
-        const string loc_folder = local_folder ();
+        string loc_folder = local_folder ();
 
         // check if the local folder exists. If so, and if its not empty, show a warning.
         string error_str = FolderManager.instance.check_path_validity_for_new_folder (loc_folder, server_url ());
@@ -488,7 +488,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
                 this.instance.r_sync_everything.on_signal_text (_("Sync the folder \"%1\"").printf (this.remote_folder));
             }
 
-            const bool dir_not_empty = new GLib.Dir (loc_folder).entry_list (GLib.Dir.AllEntries | GLib.Dir.NoDotAndDotDot).length > 0;
+            bool dir_not_empty = new GLib.Dir (loc_folder).entry_list (GLib.Dir.AllEntries | GLib.Dir.NoDotAndDotDot).length > 0;
             if (dir_not_empty) {
                 status_string += _("Warning : The local folder is not empty. Pick a resolution!");
             }
@@ -544,8 +544,8 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
     /***********************************************************
     ***********************************************************/
     private GLib.Uri server_url () {
-        const string url_string = static_cast<OwncloudWizard> (wizard ()).oc_url ();
-        const string user = static_cast<OwncloudWizard> (wizard ()).credentials ().user ();
+        string url_string = ((OwncloudWizard)wizard ()).oc_url ();
+        string user = ((OwncloudWizard)wizard ()).credentials ().user ();
 
         GLib.Uri url = new GLib.Uri (url_string);
         url.user_name (user);
@@ -576,11 +576,11 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
     ***********************************************************/
     private void customize_style () {
         if (this.progress_indicator) {
-            const var is_dark_background = Theme.is_dark_color (palette ().window ().color ());
+            var is_dark_background = Theme.is_dark_color (palette ().window ().color ());
             if (is_dark_background) {
-                this.progress_indicator.on_signal_color (Qt.white);
+                this.progress_indicator.on_signal_color (GLib.white);
             } else {
-                this.progress_indicator.on_signal_color (Qt.block);
+                this.progress_indicator.on_signal_color (GLib.block);
             }
         }
 
@@ -596,7 +596,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
             return;
         }
 
-        const var pretty_url = url.to_string ().mid (url.scheme ().size () + 3); // + 3 because we need to remove ://
+        var pretty_url = url.to_string ().mid (url.scheme ().size () + 3); // + 3 because we need to remove ://
         this.instance.server_address_label.on_signal_text (pretty_url);
     }
 
@@ -604,7 +604,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
     /***********************************************************
     ***********************************************************/
     private void local_folder_push_button_path (string path) {
-        const var home_dir = GLib.Dir.home_path.has_suffix ("/") ? GLib.Dir.home_path : GLib.Dir.home_path + "/";
+        var home_dir = GLib.Dir.home_path.has_suffix ("/") ? GLib.Dir.home_path : GLib.Dir.home_path + "/";
 
         if (!path.has_prefix (home_dir)) {
             this.instance.pb_select_local_folder.on_signal_text (GLib.Dir.to_native_separators (path));
@@ -621,7 +621,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
     /***********************************************************
     ***********************************************************/
     private void style_sync_logo () {
-        const var sync_arrow_icon = Theme.create_color_aware_icon (":/client/theme/sync-arrow.svg", palette ());
+        var sync_arrow_icon = Theme.create_color_aware_icon (":/client/theme/sync-arrow.svg", palette ());
         this.instance.sync_logo_label.pixmap (sync_arrow_icon.pixmap (Gdk.Rectangle (50, 50)));
     }
 
@@ -629,8 +629,8 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
     /***********************************************************
     ***********************************************************/
     private void style_local_folder_label () {
-        const var background_color = palette ().window ().color ();
-        const var folder_icon_filename = Theme.is_branded ? Theme.hidpi_filename ("folder.png", background_color)
+        var background_color = palette ().window ().color ();
+        var folder_icon_filename = Theme.is_branded ? Theme.hidpi_filename ("folder.png", background_color)
                                                                        : Theme.hidpi_filename (":/client/theme/colored/folder.png");
         this.instance.l_local.pixmap (folder_icon_filename);
     }
@@ -665,15 +665,15 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
     ***********************************************************/
     private void fetch_user_avatar () {
         // Reset user avatar
-        const var app_icon = Theme.application_icon;
+        var app_icon = Theme.application_icon;
         this.instance.l_server_icon.pixmap (app_icon.pixmap (48));
         // Fetch user avatar
-        const var account = this.oc_wizard.account;
+        var account = this.oc_wizard.account;
         var avatar_size = 64;
         if (Theme.is_hidpi ()) {
             avatar_size *= 2;
         }
-        const AvatarJob avatar_job = new AvatarJob (account, account.dav_user, avatar_size, this);
+        AvatarJob avatar_job = new AvatarJob (account, account.dav_user, avatar_size, this);
         avatar_job.on_signal_timeout (20 * 1000);
         avatar_job.signal_avatar_pixmap.connect (
             this.on_avatar_job_avatar_pixmap
@@ -688,7 +688,7 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
         if (avatar_image == null) {
             return;
         }
-        const var avatar_pixmap = Gdk.Pixbuf.from_image (AvatarJob.make_circular_avatar (avatar_image));
+        var avatar_pixmap = Gdk.Pixbuf.from_image (AvatarJob.make_circular_avatar (avatar_image));
         this.instance.l_server_icon.pixmap (avatar_pixmap);
     }
 
@@ -696,10 +696,10 @@ public class OwncloudAdvancedSetupPage : GLib.WizardPage {
     /***********************************************************
     ***********************************************************/
     private void user_information () {
-        const var account = this.oc_wizard.account;
-        const var server_url = account.url.to_string ();
+        var account = this.oc_wizard.account;
+        var server_url = account.url.to_string ();
         server_address_label_url (server_url);
-        const var user_name = account.dav_display_name ();
+        var user_name = account.dav_display_name ();
         this.instance.user_name_label.on_signal_text (user_name);
     }
 

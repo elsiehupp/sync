@@ -112,14 +112,14 @@ public class OwncloudSetupPage : GLib.WizardPage {
         this.checking = false;
 
         GLib.AbstractButton next_button = wizard ().button (GLib.Wizard.NextButton);
-        var push_button = qobject_cast<GLib.PushButton> (next_button);
+        var push_button = (GLib.PushButton)next_button;
         if (push_button) {
             push_button.default (true);
         }
 
         this.instance.le_url.focus ();
 
-        const var is_server_url_overridden = !Theme.override_server_url == "";
+        var is_server_url_overridden = !Theme.override_server_url == "";
         if (is_server_url_overridden && !Theme.force_override_server_url) {
             // If the url is overwritten but we don't force to use that url
             // Just focus the next button to let the user navigate quicker
@@ -338,7 +338,7 @@ public class OwncloudSetupPage : GLib.WizardPage {
         // Need to set next button as default button here because
         // otherwise the on OSX the next button does not stay the default
         // button
-        var next_button = qobject_cast<GLib.PushButton> (this.oc_wizard.button (GLib.Wizard.NextButton));
+        var next_button = (GLib.PushButton)this.oc_wizard.button (GLib.Wizard.NextButton);
         if (next_button) {
             next_button.default (true);
         }
@@ -396,8 +396,8 @@ public class OwncloudSetupPage : GLib.WizardPage {
         WizardCommon.set_up_custom_media (variant, this.instance.bottom_label);
 
         var le_url_palette = this.instance.le_url.palette ();
-        le_url_palette.on_signal_color (Gtk.Palette.Text, Qt.black);
-        le_url_palette.on_signal_color (Gtk.Palette.Base, Qt.white);
+        le_url_palette.on_signal_color (Gtk.Palette.Text, GLib.black);
+        le_url_palette.on_signal_color (Gtk.Palette.Base, GLib.white);
         this.instance.le_url.palette (le_url_palette);
     }
 
@@ -415,11 +415,11 @@ public class OwncloudSetupPage : GLib.WizardPage {
         logo ();
 
         if (this.progress_indicator) {
-            const var is_dark_background = Theme.is_dark_color (palette ().window ().color ());
+            var is_dark_background = Theme.is_dark_color (palette ().window ().color ());
             if (is_dark_background) {
-                this.progress_indicator.on_signal_color (Qt.white);
+                this.progress_indicator.on_signal_color (GLib.white);
             } else {
-                this.progress_indicator.on_signal_color (Qt.black);
+                this.progress_indicator.on_signal_color (GLib.black);
             }
         }
 
@@ -430,7 +430,7 @@ public class OwncloudSetupPage : GLib.WizardPage {
     /***********************************************************
     ***********************************************************/
     private void setup_server_address_description_label () {
-        const var app_name = Theme.app_name_gui;
+        var app_name = Theme.app_name_gui;
         this.instance.server_address_description_label.on_signal_text (_("The link to your %1 web interface when you open it in the browser.", "%1 will be replaced with the application name").printf (app_name));
     }
 

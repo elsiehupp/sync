@@ -47,8 +47,8 @@ public class PropagateRemoteDeleteEncrypted : AbstractPropagateRemoteDeleteEncry
 
         GLib.debug (PROPAGATE_REMOVE_ENCRYPTED + "Metadata Received, preparing it for removal of the file");
 
-        const GLib.FileInfo info = GLib.File.new_for_path (this.propagator.full_local_path (this.item.file));
-        const string filename = info.filename ();
+        GLib.FileInfo info = GLib.File.new_for_path (this.propagator.full_local_path (this.item.file));
+        string filename = info.filename ();
 
         // Find existing metadata for this file
         bool found = false;

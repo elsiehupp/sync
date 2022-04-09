@@ -124,7 +124,7 @@ public class Flow2Auth : GLib.Object {
         req.header (Soup.Request.UserAgentHeader, Utility.friendly_user_agent_string ());
 
         var simple_network_job = this.account.send_request ("POST", url, req);
-        simple_network_job.on_signal_timeout (q_min (30 * 1000ll, simple_network_job.timeout_msec ()));
+        simple_network_job.on_signal_timeout (int64.min (30 * 1000ll, simple_network_job.timeout_msec ()));
 
         simple_network_job.signal_finished.connect (
             this.on_network_job_finished
@@ -178,7 +178,7 @@ public class Flow2Auth : GLib.Object {
         this.login_url = login_url;
 
         if (this.account.is_username_prefill_supported) {
-            const var user_name = Utility.current_user_name ();
+            var user_name = Utility.current_user_name ();
             if (!user_name == "") {
                 var query = GLib.UrlQuery (this.login_url);
                 query.add_query_item ("user", user_name);
@@ -282,7 +282,7 @@ public class Flow2Auth : GLib.Object {
         request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
 
         var simple_network_job = this.account.send_request ("POST", this.poll_endpoint, req, request_body);
-        simple_network_job.on_signal_timeout (q_min (30 * 1000ll, simple_network_job.timeout_msec ()));
+        simple_network_job.on_signal_timeout (int64.min (30 * 1000ll, simple_network_job.timeout_msec ()));
 
         simple_network_job.signal_finished.connect (
             this.on_signal_simple_network_job_finished

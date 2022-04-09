@@ -27,9 +27,9 @@ public class EncryptionHelper : GLib.Object {
     public static string generate_password (string wordlist, string salt) {
         GLib.info ("Start encryption key generation!");
 
-        const int iteration_count = 1024;
-        const int key_strength = 256;
-        const int key_length = key_strength/8;
+        int iteration_count = 1024;
+        int key_strength = 256;
+        int key_length = key_strength/8;
 
         string secret_key = new string (key_length, '\0');
 
@@ -159,7 +159,7 @@ public class EncryptionHelper : GLib.Object {
         string cipher_text2 = new string.from_base64 (cipher_t_xT64);
         string initialization_vector = new string.from_base64 (iv_b64);
 
-        const string e2Ee_tag = cipher_text2.right (Constants.E2EE_TAG_SIZE);
+        string e2Ee_tag = cipher_text2.right (Constants.E2EE_TAG_SIZE);
         cipher_text2.chop (Constants.E2EE_TAG_SIZE);
 
         // Init
@@ -343,7 +343,7 @@ public class EncryptionHelper : GLib.Object {
         string cipher_text2 = new string.from_base64 (cipher_t_xT64);
         string initialization_vector = new string.from_base64 (iv_b64);
 
-        const string e2Ee_tag = cipher_text2.right (Constants.E2EE_TAG_SIZE);
+        string e2Ee_tag = cipher_text2.right (Constants.E2EE_TAG_SIZE);
         cipher_text2.chop (Constants.E2EE_TAG_SIZE);
 
         // Init
@@ -460,7 +460,7 @@ public class EncryptionHelper : GLib.Object {
             GLib.info ("Encryption Length: " + out_len.to_string ());
         }
 
-        string output = new string (static_cast<int> (out_len), '\0');
+        string output = new string ((int)out_len), '\0');
         if (EVP_PKEY_encrypt (context, unsigned_data (output), out_len, (uchar *)data.const_data (), data.size ()) != 1) {
             GLib.info ("Could not encrypt key. " + err.to_string ());
             GLib.Application.quit (1);
@@ -521,7 +521,7 @@ public class EncryptionHelper : GLib.Object {
             GLib.info ("Size of data is: " + data.size ().to_string ());
         }
 
-        string output = new string (static_cast<int> (outlen), '\0');
+        string output = new string ((int)outlen, '\0');
 
         if (EVP_PKEY_decrypt (context, unsigned_data (output), outlen, (uchar *)data.const_data (), data.size ()) <= 0) {
             var error = handle_errors ();
@@ -683,7 +683,7 @@ public class EncryptionHelper : GLib.Object {
             output.write (output, len);
         }
 
-        const string e2Ee_tag = input.read (Constants.E2EE_TAG_SIZE);
+        string e2Ee_tag = input.read (Constants.E2EE_TAG_SIZE);
 
         // Set expected e2Ee_tag value. Works in OpenSSL 1.0.1d and later
         if (!EVP_CIPHER_CTX_ctrl (context, EVP_CTRL_GCM_SET_TAG, e2Ee_tag.size (), (uchar *)e2Ee_tag.const_data ())) {

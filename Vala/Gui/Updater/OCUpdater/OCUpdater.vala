@@ -143,7 +143,7 @@ public class OCUpdater : AbstractUpdater {
         string update_file = settings.get_value (update_available_c).to_string ();
         if (!update_file == "" && new GLib.File (update_file).exists ()
             && !update_succeeded () /* Someone might have run the updater manually between restarts */) {
-            const var message_box_start_installer = new Gtk.MessageBox (Gtk.MessageBox.Information,
+            var message_box_start_installer = new Gtk.MessageBox (Gtk.MessageBox.Information,
                 _("New %1 update ready").printf (Theme.app_name_gui),
                 _("A new update for %1 is about to be installed. The updater may ask "
                 + "for additional privileges during the process. Your computer may reboot to complete the installation.")
@@ -151,7 +151,7 @@ public class OCUpdater : AbstractUpdater {
                 Gtk.MessageBox.Ok,
                 null);
 
-            message_box_start_installer.attribute (Qt.WA_DeleteOnClose);
+            message_box_start_installer.attribute (GLib.WA_DeleteOnClose);
 
             message_box_start_installer.signal_finished.connect (
                 this.on_signal_start_installer

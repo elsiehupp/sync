@@ -74,7 +74,7 @@ public class HttpLogger : GLib.Object {
 
 
     public static bool is_text_body (string s) {
-        const GLib.Regex regular_expression = new GLib.Regex ("^ (text/.*| (application/ (xml|json|x-www-form-urlencoded) (;|$)))");
+        GLib.Regex regular_expression = new GLib.Regex ("^ (text/.*| (application/ (xml|json|x-www-form-urlencoded) (;|$)))");
         return regular_expression.match (s).has_match ();
     }
 
@@ -109,7 +109,7 @@ public class HttpLogger : GLib.Object {
         if (content_length > 0) {
             if (is_text_body (content_type)) {
                 if (!device.is_open) {
-                    GLib.assert (dynamic_cast<Soup.Buffer> (device));
+                    GLib.assert ((Soup.Buffer)device);
                     // should we close item again?
                     device.open (GLib.IODevice.ReadOnly);
                 }

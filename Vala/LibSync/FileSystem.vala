@@ -28,7 +28,7 @@ public class FileSystem : GLib.Object {
             return false;
         }
 
-        const int BUFFER_SIZE = 16 * 1024;
+        int BUFFER_SIZE = 16 * 1024;
         string buffer1;
         string buffer2;
         // the files have the same size, compare all of it
@@ -156,7 +156,7 @@ public class FileSystem : GLib.Object {
 
         while (dir_iterator.has_next ()) {
             dir_iterator.next ();
-            const GLib.FileInfo file_info = dir_iterator.file_info ();
+            GLib.FileInfo file_info = dir_iterator.file_info ();
             bool remove_ok = false;
             // The use of is_sym_link here is okay:
             // we never want to go into this branch for .lnk files

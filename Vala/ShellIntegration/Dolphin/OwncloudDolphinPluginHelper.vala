@@ -107,7 +107,7 @@ public class OwncloudDolphinPluginHelper : GLib.Object {
         this.socket.ready_read.connect (
             this.on_signal_ready_to_read
         );
-        this.connect_timer.on_signal_start (45 * 1000, Qt.VeryCoarseTimer, this);
+        this.connect_timer.on_signal_start (45 * 1000, GLib.VeryCoarseTimer, this);
         try_to_connect ();
     }
 

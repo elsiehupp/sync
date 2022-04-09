@@ -142,7 +142,7 @@ public class OcsShareJob : OcsJob {
         append_path (share_id);
         verb ("PUT");
 
-        const string value = public_upload ? "true": "false";
+        string value = public_upload ? "true": "false";
         add_param ("public_upload", value);
         this.value = public_upload;
 

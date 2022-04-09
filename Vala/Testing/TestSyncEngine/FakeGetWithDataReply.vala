@@ -30,15 +30,15 @@ public class FakeGetWithDataReply : FakeReply {
         string filename = get_file_path_from_url (request.url);
         GLib.assert_true (!filename == "");
         file_info = remote_root_file_info.find (filename);
-        GLib.Object.invoke_method (this, "respond", Qt.QueuedConnection);
+        GLib.Object.invoke_method (this, "respond", GLib.QueuedConnection);
 
         if (request.has_raw_header ("Range")) {
-            const string range = request.raw_header ("Range").to_string ();
-            const GLib.Regex bytes_pattern = new GLib.Regex ("bytes= (?<start>\\d+)- (?<end>\\d+)");
-            const GLib.RegularExpressionMatch match = bytes_pattern.match (range);
+            string range = request.raw_header ("Range").to_string ();
+            GLib.Regex bytes_pattern = new GLib.Regex ("bytes= (?<start>\\d+)- (?<end>\\d+)");
+            GLib.RegularExpressionMatch match = bytes_pattern.match (range);
             if (match.has_match ()) {
-                const int on_signal_start = match.captured ("on_signal_start").to_int ();
-                const int end = match.captured ("end").to_int ();
+                int on_signal_start = match.captured ("on_signal_start").to_int ();
+                int end = match.captured ("end").to_int ();
                 payload = payload.mid (on_signal_start, end - on_signal_start + 1);
             }
         }

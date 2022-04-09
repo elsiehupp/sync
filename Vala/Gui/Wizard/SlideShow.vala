@@ -59,12 +59,12 @@ public class SlideShow : Gtk.Widget {
                 this.animation = new GLib.VariantAnimation (this);
                 this.animation.duration (SLIDE_DURATION);
                 this.animation.easing_curve (GLib.Easing_curve.Out_cubic);
-                this.animation.start_value (static_cast<double> (this.current_slide));
+                this.animation.start_value ((double)this.current_slide);
                 this.animation.value_changed.connect (
                     this.update
                 );
             }
-            this.animation.end_value (static_cast<double> (value));
+            this.animation.end_value ((double)value);
             this.animation.on_signal_start (GLib.AbstractAnimation.DeleteWhenStopped);
 
             this.reverse = value < this.current_slide;
@@ -114,12 +114,12 @@ public class SlideShow : Gtk.Widget {
     ***********************************************************/
     public void draw_slide (GLib.Painter painter, int index) {
         string label = this.labels.value (index);
-        GLib.Rect label_rect = this.style.item_text_rect (font_options (), rect (), Qt.Align_bottom | Qt.AlignHCenter, is_enabled (), label);
-        this.style.draw_item_text (painter, label_rect, Qt.AlignCenter, palette (), is_enabled (), label, Gtk.Palette.Window_text);
+        GLib.Rect label_rect = this.style.item_text_rect (font_options (), rect (), GLib.Align_bottom | GLib.AlignHCenter, is_enabled (), label);
+        this.style.draw_item_text (painter, label_rect, GLib.AlignCenter, palette (), is_enabled (), label, Gtk.Palette.Window_text);
 
         Gdk.Pixbuf pixmap = this.pixmaps.value (index);
-        GLib.Rect pixmap_rect = this.style.item_pixmap_rect (GLib.Rect (0, 0, width (), label_rect.top () - SPACING), Qt.AlignCenter, pixmap);
-        this.style.draw_item_pixmap (painter, pixmap_rect, Qt.AlignCenter, pixmap);
+        GLib.Rect pixmap_rect = this.style.item_pixmap_rect (GLib.Rect (0, 0, width (), label_rect.top () - SPACING), GLib.AlignCenter, pixmap);
+        this.style.draw_item_pixmap (painter, pixmap_rect, GLib.AlignCenter, pixmap);
     }
 
 
@@ -210,7 +210,7 @@ public class SlideShow : Gtk.Widget {
         if (this.animation != null) {
             int from = this.animation.start_value ().to_int ();
             int to = this.animation.end_value ().to_int ();
-            double progress = this.animation.easing_curve ().value_for_progress (this.animation.current_time () / static_cast<double> (this.animation.duration ()));
+            double progress = this.animation.easing_curve ().value_for_progress (this.animation.current_time () / (double)this.animation.duration ());
 
             painter.save ();
             painter.opacity (1.0 - progress);

@@ -193,7 +193,7 @@ public class NetworkSettings : Gtk.Widget {
         // on_signal_start the sync.
         FolderManager.instance.dirty_proxy ();
 
-        const var accounts = AccountManager.instance.accounts;
+        var accounts = AccountManager.instance.accounts;
         foreach (var account in accounts) {
             account.fresh_connection_attempt ();
         }
@@ -246,7 +246,7 @@ public class NetworkSettings : Gtk.Widget {
             // Check if at least one account is using localhost, because Qt proxy settings have no
             // effect for localhost (#7169)
             foreach (var account in AccountManager.instance.accounts) {
-                const var host = account.account.url.host ();
+                var host = account.account.url.host ();
                 // Some typical url for localhost
                 if (host == "localhost" || host.has_prefix ("127.") || host == "[.1]") {
                     visible = true;

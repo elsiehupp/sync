@@ -23,7 +23,7 @@ public class FakeMoveReply : FakeReply {
         string dest = get_file_path_from_url (GLib.Uri.from_encoded (request.raw_header ("Destination")));
         GLib.assert_true (!dest == "");
         remote_root_file_info.rename (filename, dest);
-        GLib.Object.invoke_method (this, "respond", Qt.QueuedConnection);
+        GLib.Object.invoke_method (this, "respond", GLib.QueuedConnection);
     }
 
 

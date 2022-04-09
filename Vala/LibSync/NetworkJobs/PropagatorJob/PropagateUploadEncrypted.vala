@@ -192,7 +192,7 @@ public class PropagateUploadEncrypted : GLib.Object {
     private void on_signal_folder_encrypted_id_received (GLib.List<string> list) {
         GLib.debug ("Received identifier of folder; trying to lock it so we can prepare the metadata.");
         var lscol_job = (LscolJob) sender ();
-        var folder_info = lscol_job.folder_infos.value (list.first ());
+        var folder_info = lscol_job.folder_infos.value (list.nth_data (0));
         this.folder_lock_first_try.start ();
         on_signal_try_lock (folder_info.file_identifier);
     }
@@ -284,7 +284,7 @@ public class PropagateUploadEncrypted : GLib.Object {
         this.metadata = new FolderMetadata (this.propagator.account, json.to_json (GLib.JsonDocument.Compact), status_code);
 
         GLib.FileInfo info = GLib.File.new_for_path (this.propagator.full_local_path (this.item.file));
-        const string filename = info.filename ();
+        string filename = info.filename ();
 
         // Find existing metadata for this file
         bool found = false;

@@ -64,14 +64,15 @@ public class TestFetchMoreClicked : AbstractTestUnifiedSearchListmodel {
 
         GLib.assert_true (rows_inserted.length == 1);
 
-        var arguments = rows_inserted.take_first ();
+        var arguments = rows_inserted.nth_data (0);
+        rows_inserted.remove (rows_inserted.nth_data (0));
 
         GLib.assert_true (arguments.size () > 0);
 
         var first = arguments.at (0).to_int ();
         var last = arguments.at (1).to_int ();
 
-        const int number_of_inserted_expected = last - first;
+        int number_of_inserted_expected = last - first;
 
         GLib.assert_true (model.row_count () - number_of_rows_in_mmodel_previous == number_of_inserted_expected);
 

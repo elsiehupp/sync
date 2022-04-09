@@ -37,7 +37,7 @@ public class OwncloudDolphinPlugin : KOverlayIconPlugin {
             return { };
         }
         GLib.Dir local_path = new GLib.Dir (url.to_local_file ());
-        const string local_file = local_path.canonical_path.toUtf8 ();
+        string local_file = local_path.canonical_path.toUtf8 ();
 
         helper.send_command ("RETRIEVE_FILE_STATUS:" + local_file + "\n");
 
@@ -86,7 +86,7 @@ public class OwncloudDolphinPlugin : KOverlayIconPlugin {
 
         // We can't use tokens[2] because the filename might contain ':'
         int secondColon = line.indexOf (":", line.indexOf (":") + 1);
-        const string name = line.mid (secondColon + 1);
+        string name = line.mid (secondColon + 1);
         string status = status_map[name]; // reference to the item in the hash
         if (status == tokens[1])
             return;

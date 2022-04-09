@@ -62,7 +62,7 @@ public class AvatarJob : AbstractNetworkJob {
         int dim = base_avatar.width ();
 
         Gtk.Image avatar = new Gtk.Image (dim, dim, Gtk.Image.FormatARGB32);
-        avatar.fill (Qt.transparent);
+        avatar.fill (GLib.transparent);
 
         GLib.Painter painter = new GLib.Painter (&avatar);
         painter.render_hint (GLib.Painter.Antialiasing);

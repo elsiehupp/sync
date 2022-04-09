@@ -116,15 +116,15 @@ public class ConflictDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private override void on_signal_accept () {
-        const var is_local_picked = this.instance.local_version_radio.is_checked ();
-        const var is_remote_picked = this.instance.remote_version_radio.is_checked ();
+        var is_local_picked = this.instance.local_version_radio.is_checked ();
+        var is_remote_picked = this.instance.remote_version_radio.is_checked ();
 
         //  Q_ASSERT (is_local_picked || is_remote_picked);
         if (!is_local_picked && !is_remote_picked) {
             return;
         }
 
-        const var solution = is_local_picked && is_remote_picked ? ConflictSolver.Solution.KEEP_BOTH_VERSION
+        var solution = is_local_picked && is_remote_picked ? ConflictSolver.Solution.KEEP_BOTH_VERSION
                             : is_local_picked ? ConflictSolver.Solution.KEEP_LOCAL_VERSION
                             : ConflictSolver.Solution.KEEP_REMOTE_VERSION;
         if (this.solver.exec (solution)) {
@@ -156,8 +156,8 @@ public class ConflictDialog : Gtk.Dialog {
             this.instance.remote_version_button
         );
 
-        const Time local_mtime = new GLib.FileInfo (local_version).last_modified ();
-        const Time remote_mtime = new GLib.FileInfo (remote_version).last_modified ();
+        Time local_mtime = new GLib.FileInfo (local_version).last_modified ();
+        Time remote_mtime = new GLib.FileInfo (remote_version).last_modified ();
 
         bold_font (this.instance.local_version_mtime, local_mtime > remote_mtime);
         bold_font (this.instance.remote_version_mtime, remote_mtime > local_mtime);
@@ -167,14 +167,14 @@ public class ConflictDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void update_group (GLib.MimeDatabase mime_database, string filename, Gtk.Label link_label, string link_text, Gtk.Label mtime_label, Gtk.Label size_label, GLib.ToolButton button) {
-        const string file_url = GLib.Uri.from_local_file (filename).to_string ();
+        string file_url = GLib.Uri.from_local_file (filename).to_string ();
         link_label.on_signal_text ("<a href='%1'>%2</a>".printf (file_url).printf (link_text));
 
-        const GLib.FileInfo info = new GLib.FileInfo (filename);
+        GLib.FileInfo info = new GLib.FileInfo (filename);
         mtime_label.on_signal_text (info.last_modified ().to_string ());
         size_label.on_signal_text (locale ().formatted_data_size (info.size ()));
 
-        const string mime = mime_database.mime_type_for_file (filename);
+        string mime = mime_database.mime_type_for_file (filename);
         if (Gtk.Icon.has_theme_icon (mime.icon_name ())) {
             button.icon (Gtk.Icon.from_theme (mime.icon_name ()));
         } else {
@@ -186,11 +186,11 @@ public class ConflictDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void update_button_states () {
-        const var is_local_picked = this.instance.local_version_radio.is_checked ();
-        const var is_remote_picked = this.instance.remote_version_radio.is_checked ();
+        var is_local_picked = this.instance.local_version_radio.is_checked ();
+        var is_remote_picked = this.instance.remote_version_radio.is_checked ();
         this.instance.button_box.button (GLib.DialogButtonBox.Ok).enabled (is_local_picked || is_remote_picked);
 
-        const var text = is_local_picked && is_remote_picked ? _("Keep both versions")
+        var text = is_local_picked && is_remote_picked ? _("Keep both versions")
                         : is_local_picked ? _("Keep local version")
                         : is_remote_picked ? _("Keep server version")
                         : _("Keep selected version");

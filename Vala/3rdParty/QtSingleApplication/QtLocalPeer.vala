@@ -116,7 +116,7 @@ public class QtLocalPeer : GLib.Object {
         }
 
         // Why doesn't Qt have a blocking stream that takes care of this shait???
-        while (socket.bytes_available () < static_cast<int> (sizeof (uint32))) {
+        while (socket.bytes_available () < (int)sizeof (uint32)) {
             if (!socket.is_valid) // stale request
                 return;
             socket.wait_for_ready_read (1000);

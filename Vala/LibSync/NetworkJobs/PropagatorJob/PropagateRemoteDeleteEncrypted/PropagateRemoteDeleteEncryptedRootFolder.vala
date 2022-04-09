@@ -39,7 +39,7 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
     public new void start () {
         GLib.assert (this.item.is_encrypted);
 
-        const bool list_files_result = this.propagator.journal.list_files_in_path (
+        bool list_files_result = this.propagator.journal.list_files_in_path (
             this.item.file.to_utf8 (),
             this.result_list_filter
         );
@@ -101,7 +101,7 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
     /***********************************************************
     ***********************************************************/
     private void on_signal_delete_nested_remote_item_finished () {
-        var delete_job = qobject_cast<KeychainChunkDeleteJob> (GLib.Object.sender ());
+        var delete_job = (KeychainChunkDeleteJob)sender ();
 
         GLib.assert (delete_job);
 
@@ -109,7 +109,7 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
             return;
         }
 
-        const string encrypted_filename = delete_job.property (ENCRYPTED_FILENAME_PROPERTY_KEY).to_string ();
+        string encrypted_filename = delete_job.property (ENCRYPTED_FILENAME_PROPERTY_KEY).to_string ();
 
         if (!encrypted_filename == "") {
             var nested_item = this.nested_items.take (encrypted_filename);
@@ -154,7 +154,7 @@ public class PropagateRemoteDeleteEncryptedRootFolder : AbstractPropagateRemoteD
         if (this.nested_items.size () == 0) {
             // we wait for all this.nested_items' Delete_jobs to finish, and then - fail if any of those jobs has failed
             if (network_error != GLib.InputStream.NetworkError.NoError || this.item.http_error_code != 0) {
-                const int error_code = network_error != GLib.InputStream.NetworkError.NoError ? network_error : this.item.http_error_code;
+                int error_code = network_error != GLib.InputStream.NetworkError.NoError ? network_error : this.item.http_error_code;
                 GLib.critical (PROPAGATE_REMOVE_ENCRYPTED_ROOTFOLDER + "Delete of nested items finished with error " + error_code.to_string () + ". Failing the entire sequence.");
                 on_signal_task_failed ();
                 return;

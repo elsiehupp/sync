@@ -54,7 +54,7 @@ public class CookieJar : Soup.CookieJar {
     /***********************************************************
     ***********************************************************/
     public bool save (string filename) {
-        const GLib.FileInfo info = GLib.File.new_for_path (filename);
+        GLib.FileInfo info = GLib.File.new_for_path (filename);
         if (!info.directory ().exists ()) {
             info.directory ().mkpath (".");
         }
@@ -74,7 +74,7 @@ public class CookieJar : Soup.CookieJar {
     /***********************************************************
     ***********************************************************/
     public bool restore (string filename) {
-        const GLib.FileInfo info = GLib.File.new_for_path (filename);
+        GLib.FileInfo info = GLib.File.new_for_path (filename);
         if (!info.exists ()) {
             return false;
         }

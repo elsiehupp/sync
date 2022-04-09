@@ -62,7 +62,8 @@ public class TestSearchTermResultTickled : AbstractTestUnifiedSearchListmodel {
 
         GLib.assert_true (signal_result_clicked.length == 1);
 
-        var arguments = signal_result_clicked.take_first ();
+        var arguments = signal_result_clicked.nth_data (0);
+        signal_result_clicked.remove (signal_result_clicked.nth_data (0));
 
         var url_open_triggered_via_desktop_services = arguments.at (0).to_string ();
 

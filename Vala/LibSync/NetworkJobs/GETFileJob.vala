@@ -60,7 +60,7 @@ public class GETFileJob : AbstractNetworkJob {
         }
         public set {
             this.bandwidth_limited = value;
-            GLib.Object.invoke_method (this, "on_signal_ready_read", Qt.QueuedConnection);
+            GLib.Object.invoke_method (this, "on_signal_ready_read", GLib.QueuedConnection);
         }
     }
 
@@ -236,7 +236,7 @@ public class GETFileJob : AbstractNetworkJob {
     ***********************************************************/
     public void choked (bool c) {
         this.bandwidth_choked = c;
-        GLib.Object.invoke_method (this, "on_signal_ready_read", Qt.QueuedConnection);
+        GLib.Object.invoke_method (this, "on_signal_ready_read", GLib.QueuedConnection);
     }
 
 
@@ -246,7 +246,7 @@ public class GETFileJob : AbstractNetworkJob {
     public void give_bandwidth_quota (int64 q) {
         this.bandwidth_quota = q;
         GLib.debug ("Got " + q.to_string () + " bytes");
-        GLib.Object.invoke_method (this, "on_signal_ready_read", Qt.QueuedConnection);
+        GLib.Object.invoke_method (this, "on_signal_ready_read", GLib.QueuedConnection);
     }
 
 
@@ -296,10 +296,11 @@ public class GETFileJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_ready_read () {
-        if (!this.input_stream)
+        if (!this.input_stream) {
             return;
-        int buffer_size = q_min (1024 * 8ll, this.input_stream.bytes_available ());
-        string buffer = new string (buffer_size, Qt.Uninitialized);
+        }
+        int buffer_size = int64.min (1024 * 8ll, this.input_stream.bytes_available ());
+        string buffer = new string (buffer_size, GLib.Uninitialized);
 
         while (this.input_stream.bytes_available () > 0 && this.save_body_to_file) {
             if (this.bandwidth_choked) {
@@ -308,7 +309,7 @@ public class GETFileJob : AbstractNetworkJob {
             }
             int64 to_read = buffer_size;
             if (this.bandwidth_limited) {
-                to_read = q_min (int64 (buffer_size), this.bandwidth_quota);
+                to_read = int64.min (int64 (buffer_size), this.bandwidth_quota);
                 if (to_read == 0) {
                     GLib.warning ("Out of quota.");
                     break;
@@ -316,7 +317,7 @@ public class GETFileJob : AbstractNetworkJob {
                 this.bandwidth_quota -= to_read;
             }
 
-            const int64 read_bytes = this.input_stream.read (buffer, to_read);
+            int64 read_bytes = this.input_stream.read (buffer, to_read);
             if (read_bytes < 0) {
                 this.error_string = network_reply_error_string (*this.input_stream);
                 this.error_status = SyncFileItem.Status.NORMAL_ERROR;
@@ -325,7 +326,7 @@ public class GETFileJob : AbstractNetworkJob {
                 return;
             }
 
-            const int64 written_bytes = write_to_device (string.from_raw_data (buffer.const_data (), read_bytes));
+            int64 written_bytes = write_to_device (string.from_raw_data (buffer.const_data (), read_bytes));
             if (written_bytes != read_bytes) {
                 this.error_string = this.device.error_string;
                 this.error_status = SyncFileItem.Status.NORMAL_ERROR;
@@ -420,7 +421,7 @@ public class GETFileJob : AbstractNetworkJob {
         int64 start = 0;
         string ranges = this.input_stream.raw_header ("Content-Range");
         if (!ranges == "") {
-            const GLib.Regex regular_expression = new GLib.Regex ("bytes (\\d+)-");
+            GLib.Regex regular_expression = new GLib.Regex ("bytes (\\d+)-");
             var regular_expression_match = regular_expression.match (ranges);
             if (regular_expression_match.has_match ()) {
                 start = regular_expression_match.captured (1).to_long_long ();

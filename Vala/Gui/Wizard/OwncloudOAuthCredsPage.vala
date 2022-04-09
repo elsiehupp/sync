@@ -72,12 +72,12 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
     /***********************************************************
     ***********************************************************/
     public void initialize_page () {
-        var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
+        var oc_wizard = (OwncloudWizard)wizard ();
         //  Q_ASSERT (oc_wizard);
         oc_wizard.account.credentials (CredentialsFactory.create ("http"));
         this.async_auth.on_signal_reset (new OAuth (oc_wizard.account, this));
         this.async_auth.signal_result.connect (
-            this.on_signal_async_auth_result // Qt.QueuedConnection
+            this.on_signal_async_auth_result // GLib.QueuedConnection
         );
         this.async_auth.on_signal_start ();
 
@@ -128,7 +128,7 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
         switch (result_string) {
         case OAuth.Result.NOT_SUPPORTED: {
             /* OAuth not supported (can't open browser), fallback to HTTP credentials */
-            var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
+            var oc_wizard = (OwncloudWizard)wizard ();
             oc_wizard.back ();
             oc_wizard.on_signal_auth_type (DetermineAuthTypeJob.AuthType.BASIC);
             break;
@@ -142,7 +142,7 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
             this.token = token;
             this.user = user;
             this.refresh_token = refresh_token;
-            var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
+            var oc_wizard = (OwncloudWizard)wizard ();
             //  Q_ASSERT (oc_wizard);
             /* emit */ connect_to_oc_url (oc_wizard.account.url.to_string ());
             break;
@@ -157,7 +157,7 @@ public class OwncloudOAuthCredsPage : AbstractCredentialsWizardPage {
         if (this.instance.error_label)
             this.instance.error_label.hide ();
 
-        qobject_cast<OwncloudWizard> (wizard ()).account.clear_cookie_jar (); // #6574
+        (OwncloudWizard)wizard ().account.clear_cookie_jar (); // #6574
 
         if (this.async_auth)
             this.async_auth.open_browser ();

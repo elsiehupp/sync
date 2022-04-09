@@ -36,9 +36,9 @@ public class SyncRunFileLog : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_start (string folder_path) {
-        const int64 logfile_max_size = 10 * 1024 * 1024; // 10Mi_b
+        int64 logfile_max_size = 10 * 1024 * 1024; // 10Mi_b
 
-        const string logpath = GLib.StandardPaths.writable_location (GLib.StandardPaths.AppDataLocation);
+        string logpath = GLib.StandardPaths.writable_location (GLib.StandardPaths.AppDataLocation);
         if (!new GLib.Dir (logpath).exists ()) {
             new GLib.Dir ().mkdir (logpath);
         }
@@ -54,7 +54,7 @@ public class SyncRunFileLog : GLib.Object {
             file.open (GLib.IODevice.ReadOnly | GLib.IODevice.Text);
             string line = new GLib.OutputStream (file).read_line ();
 
-            if (string.compare (folder_path,line,Qt.CaseSensitive)!=0) {
+            if (string.compare (folder_path,line,GLib.CaseSensitive)!=0) {
                 depth_index++;
                 if (depth_index <= length) {
                     filename_single
@@ -111,14 +111,14 @@ public class SyncRunFileLog : GLib.Object {
         }
         string ts = item.response_time_stamp;
         if (ts.length () > 6) {
-            const GLib.Regex regular_expression = new GLib.Regex (" ( (\d\d:\d\d:\d\d))");
-            const var regular_expression_match = regular_expression.match (ts);
+            GLib.Regex regular_expression = new GLib.Regex (" ( (\d\d:\d\d:\d\d))");
+            var regular_expression_match = regular_expression.match (ts);
             if (regular_expression_match.has_match ()) {
                 ts = regular_expression_match.captured (0);
             }
         }
 
-        const char L = '|';
+        char L = '|';
         this.out + ts + L;
         this.out + L;
         if (item.instruction != CSync.SyncInstructions.RENAME) {
@@ -165,7 +165,7 @@ public class SyncRunFileLog : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private static string date_time_str (GLib.DateTime date_time) {
-        return date_time.to_string (Qt.ISODate);
+        return date_time.to_string (GLib.ISODate);
     }
 
 } // class SyncRunFileLog

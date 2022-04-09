@@ -15,12 +15,12 @@ public class TestCreateFileWithTrailingSpacesLocalAndRemoteTrimmedDoNotExistRena
     private TestCreateFileWithTrailingSpacesLocalAndRemoteTrimmedDoNotExistRenameAndUploadFile () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
-        const string file_with_spaces_1 = " foo";
-        const string file_with_spaces_2 = " bar  ";
-        const string file_with_spaces_3 = "bla ";
-        const string file_with_spaces_4 = "A/ foo";
-        const string file_with_spaces_5 = "A/ bar  ";
-        const string file_with_spaces_6 = "A/bla ";
+        string file_with_spaces_1 = " foo";
+        string file_with_spaces_2 = " bar  ";
+        string file_with_spaces_3 = "bla ";
+        string file_with_spaces_4 = "A/ foo";
+        string file_with_spaces_5 = "A/ bar  ";
+        string file_with_spaces_6 = "A/bla ";
 
         fake_folder.local_modifier.insert (file_with_spaces_1);
         fake_folder.local_modifier.insert (file_with_spaces_2);

@@ -12,13 +12,13 @@ public class TestCtorFetchStatusAndPredefinedStatuses : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private TestCtorFetchStatusAndPredefinedStatuses () {
-        const GLib.DateTime current_date_time = GLib.DateTime.current_date_time ();
+        GLib.DateTime current_date_time = GLib.DateTime.current_date_time ();
 
-        const string user_status_id = "fake-identifier";
-        const string user_status_message = "Some status";
-        const string user_status_icon = "❤";
-        const LibSync.UserStatus.OnlineStatus user_status_state = LibSync.UserStatus.OnlineStatus.DoNotDisturb;
-        const bool user_status_message_predefined = false;
+        string user_status_id = "fake-identifier";
+        string user_status_message = "Some status";
+        string user_status_icon = "❤";
+        LibSync.UserStatus.OnlineStatus user_status_state = LibSync.UserStatus.OnlineStatus.DoNotDisturb;
+        bool user_status_message_predefined = false;
         Optional<ClearAt> user_status_clear_at; {
             ClearAt clear_at;
             clear_at.type = ClearAtType.TIMESTAMP;
@@ -26,7 +26,7 @@ public class TestCtorFetchStatusAndPredefinedStatuses : GLib.Object {
             user_status_clear_at = clear_at;
         }
 
-        const LibSync.UserStatus user_status = new LibSync.UserStatus (user_status_id, user_status_message,
+        LibSync.UserStatus user_status = new LibSync.UserStatus (user_status_id, user_status_message,
             user_status_icon, user_status_state, user_status_message_predefined, user_status_clear_at);
 
         var fake_predefined_statuses = create_fake_predefined_statuses (create_date_time ());

@@ -28,7 +28,7 @@ public class FakeErrorReply : FakeReply {
         open (GLib.IODevice.ReadOnly);
         set_attribute (Soup.Request.HttpStatusCodeAttribute, http_error_code);
         set_error (InternalServerError, "Internal Server Fake Error");
-        GLib.Object.invoke_method (this, &FakeErrorReply.respond, Qt.QueuedConnection);
+        GLib.Object.invoke_method (this, &FakeErrorReply.respond, GLib.QueuedConnection);
     }
 
     /***********************************************************
@@ -54,7 +54,7 @@ public class FakeErrorReply : FakeReply {
     /***********************************************************
     ***********************************************************/
     public override int64 read_data (char *buf, int64 *max) {
-        max = q_min<int64> (max, this.body.size ());
+        max = int64.min (max, this.body.size ());
         memcpy (buf, this.body.const_data (), max);
         this.body = this.body.mid (max);
         return max;

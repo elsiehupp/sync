@@ -78,16 +78,16 @@ public class WelcomePage : GLib.WizardPage {
     /***********************************************************
     ***********************************************************/
     private void style_slide_show () {
-        const var theme = Theme.instance;
-        const var background_color = palette ().window ().color ();
+        var theme = Theme.instance;
+        var background_color = palette ().window ().color ();
 
-        const var wizard_nextcloud_icon_filename = theme.is_branded ? Theme.hidpi_filename ("wizard-nextcloud.png", background_color)
+        var wizard_nextcloud_icon_filename = theme.is_branded ? Theme.hidpi_filename ("wizard-nextcloud.png", background_color)
                                                                     : Theme.hidpi_filename (":/client/theme/colored/wizard-nextcloud.png");
-        const var wizard_files_icon_filename = theme.is_branded ? Theme.hidpi_filename ("wizard-files.png", background_color)
+        var wizard_files_icon_filename = theme.is_branded ? Theme.hidpi_filename ("wizard-files.png", background_color)
                                                                 : Theme.hidpi_filename (":/client/theme/colored/wizard-files.png");
-        const var wizard_groupware_icon_filename = theme.is_branded ? Theme.hidpi_filename ("wizard-groupware.png", background_color)
+        var wizard_groupware_icon_filename = theme.is_branded ? Theme.hidpi_filename ("wizard-groupware.png", background_color)
                                                                     : Theme.hidpi_filename (":/client/theme/colored/wizard-groupware.png");
-        const var wizard_talk_icon_filename = theme.is_branded ? Theme.hidpi_filename ("wizard-talk.png", background_color)
+        var wizard_talk_icon_filename = theme.is_branded ? Theme.hidpi_filename ("wizard-talk.png", background_color)
                                                                : Theme.hidpi_filename (":/client/theme/colored/wizard-talk.png");
 
         this.instance.slide_show.add_slide (wizard_nextcloud_icon_filename, _("Keep your data secure and under your control"));
@@ -95,7 +95,7 @@ public class WelcomePage : GLib.WizardPage {
         this.instance.slide_show.add_slide (wizard_groupware_icon_filename, _("Easy-to-use web mail, calendaring & contacts"));
         this.instance.slide_show.add_slide (wizard_talk_icon_filename, _("Screensharing, online meetings & web conferences"));
 
-        const bool is_dark_background = Theme.is_dark_color (background_color);
+        bool is_dark_background = Theme.is_dark_color (background_color);
         this.instance.slide_show_next_button.icon (theme.ui_theme_icon ("control-next.svg", is_dark_background));
         this.instance.slide_show_previous_button.icon (theme.ui_theme_icon ("control-prev.svg", is_dark_background));
     }
@@ -119,7 +119,7 @@ public class WelcomePage : GLib.WizardPage {
     /***********************************************************
     ***********************************************************/
     private void set_up_login_button () {
-        const string app_name = Theme.app_name_gui;
+        string app_name = Theme.app_name_gui;
 
         this.instance.login_button.on_signal_text (_("Log in to your %1").printf (app_name));
         this.instance.login_button.clicked.connect (
@@ -163,7 +163,7 @@ public class WelcomePage : GLib.WizardPage {
     ***********************************************************/
     private void set_up_host_your_own_server_label () {
         this.instance.host_your_own_server_label.on_signal_text (_("Host your own server"));
-        this.instance.host_your_own_server_label.alignment (Qt.AlignCenter);
+        this.instance.host_your_own_server_label.alignment (GLib.AlignCenter);
         this.instance.host_your_own_server_label.url (GLib.Uri ("https://docs.nextcloud.com/server/latest/admin_manual/installation/#installation"));
     }
 

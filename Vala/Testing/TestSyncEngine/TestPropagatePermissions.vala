@@ -25,7 +25,7 @@ public class TestPropagatePermissions : AbstractTestSyncEngine {
         GLib.assert_true (new FileInfo (fake_folder.local_path + "A/a1").permissions () == perm);
         GLib.assert_true (new FileInfo (fake_folder.local_path + "A/a2").permissions () == perm);
 
-        var conflict_name = fake_folder.sync_journal ().conflict_record (fake_folder.sync_journal ().conflict_record_paths ().first ()).path;
+        var conflict_name = fake_folder.sync_journal ().conflict_record (fake_folder.sync_journal ().conflict_record_paths ().nth_data (0)).path;
         GLib.assert_true (conflict_name.contains ("A/a2"));
         GLib.assert_true (new FileInfo (fake_folder.local_path + conflict_name).permissions () == perm);
     }

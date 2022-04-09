@@ -462,7 +462,7 @@ public class KMessageWidget : Gdk.Frame {
         if (d.icon == null) {
             d.icon_label.hide ();
         } else {
-            const int size = this.style.pixel_metric (GLib.Style.PM_ToolBarIconSize);
+            int size = this.style.pixel_metric (GLib.Style.PM_ToolBarIconSize);
             d.icon_label.set_pixmap (d.icon.pixmap (size));
             d.icon_label.show ();
         }
@@ -483,12 +483,12 @@ public class KMessageWidget : Gdk.Frame {
 
     /***********************************************************
     ***********************************************************/
-    protected override bool event (GLib.Event event) {
-        if (event.type () == GLib.Event.Polish && !d.content.layout ()) {
+    protected override bool event (Gdk.Event event) {
+        if (event.type () == Gdk.Event.Polish && !d.content.layout ()) {
             d.create_layout ();
-        } else if (event.type () == GLib.Event.PaletteChange) {
+        } else if (event.type () == Gdk.Event.PaletteChange) {
             d.apply_style_sheet ();
-        } else if (event.type () == GLib.Event.Show && !d.ignore_show_event_doing_animated_show) {
+        } else if (event.type () == Gdk.Event.Show && !d.ignore_show_event_doing_animated_show) {
             if ( (height () != d.content.height ()) || (d.content.position ().y () != 0)) {
                 d.content.move (0, 0);
                 set_fixed_height (d.content.height ());

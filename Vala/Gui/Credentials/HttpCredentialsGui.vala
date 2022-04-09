@@ -135,7 +135,7 @@ public class HttpCredentialsGui : HttpCredentials {
         }
 
         var dialog = new GLib.InputDialog ();
-        dialog.attribute (Qt.WA_DeleteOnClose, true);
+        dialog.attribute (GLib.WA_DeleteOnClose, true);
         dialog.window_title (_("Enter Password"));
         dialog.label_text (message);
         dialog.text_value (this.previous_password);
@@ -143,7 +143,7 @@ public class HttpCredentialsGui : HttpCredentials {
         var dialog_label = dialog.find_child<Gtk.Label> ();
         if (dialog_label) {
             dialog_label.open_external_links (true);
-            dialog_label.text_format (Qt.RichText);
+            dialog_label.text_format (GLib.RichText);
         }
 
         dialog.open ();

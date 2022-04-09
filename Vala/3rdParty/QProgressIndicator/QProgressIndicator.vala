@@ -26,14 +26,14 @@ public class GLib.ProgressIndicator : Gtk.Widget {
     private int m_timer_id = -1;
     private int m_delay = 40;
     private bool m_displayed_when_stopped = false;
-    private Gdk.RGBA m_color = Qt.black;
+    private Gdk.RGBA m_color = GLib.black;
 
     /***********************************************************
     ***********************************************************/
     public GLib.ProgressIndicator (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         set_size_policy (GLib.SizePolicy.Fixed, GLib.SizePolicy.Fixed);
-        set_focus_policy (Qt.NoFocus);
+        set_focus_policy (GLib.NoFocus);
     }
 
 
@@ -172,7 +172,7 @@ public class GLib.ProgressIndicator : Gtk.Widget {
             return;
         }
 
-        int width = q_min (this.width (), this.height ());
+        int width = int.min (this.width (), this.height ());
 
         GLib.Painter p = new GLib.Painter (this);
         p.set_render_hint (GLib.Painter.Antialiasing);
@@ -186,8 +186,8 @@ public class GLib.ProgressIndicator : Gtk.Widget {
 
         for (int i=0; i<12; i++) {
             Gdk.RGBA color = m_color;
-            color.set_alpha_f (1.0f - (static_cast<float> (i) / 12.0f));
-            p.set_pen (Qt.NoPen);
+            color.set_alpha_f (1.0f - ((float)i / 12.0f));
+            p.set_pen (GLib.NoPen);
             p.set_brush (color);
             p.save ();
             p.translate (rect ().center ());

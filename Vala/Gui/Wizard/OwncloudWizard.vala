@@ -131,7 +131,7 @@ public class OwncloudWizard : GLib.Wizard {
     //  #endif // WITH_WEBENGINE {
         object_name ("owncloud_wizard");
 
-        window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
+        window_flags (window_flags () & ~GLib.WindowContextHelpButtonHint);
         page (WizardCommon.Pages.PAGE_WELCOME, this.welcome_page);
         page (WizardCommon.Pages.PAGE_SERVER_SETUP, this.setup_page);
         page (WizardCommon.Pages.PAGE_HTTP_CREDS, this.http_creds_page);
@@ -288,13 +288,13 @@ public class OwncloudWizard : GLib.Wizard {
     /***********************************************************
     ***********************************************************/
     public void center_window () {
-        const var wizard_window = window ();
-        const var screen = GLib.Application.screen_at (wizard_window.position ())
+        var wizard_window = window ();
+        var screen = GLib.Application.screen_at (wizard_window.position ())
             ? GLib.Application.screen_at (wizard_window.position ())
             : Gdk.Display.get_default ().get_default_screen ().get_primary_monitor ();
-        const var screen_geometry = screen.geometry ();
-        const var window_geometry = wizard_window.geometry ();
-        const var new_window_position = screen_geometry.center () - GLib.Point (window_geometry.width () / 2, window_geometry.height () / 2);
+        var screen_geometry = screen.geometry ();
+        var window_geometry = wizard_window.geometry ();
+        var new_window_position = screen_geometry.center () - GLib.Point (window_geometry.width () / 2, window_geometry.height () / 2);
         wizard_window.move (new_window_position);
     }
 
@@ -308,7 +308,7 @@ public class OwncloudWizard : GLib.Wizard {
     chosen.
     ***********************************************************/
     public static void ask_experimental_virtual_files_feature (Gtk.Widget receiver, CallBack callback) {
-        const var best_vfs_mode = this.best_available_vfs_mode;
+        var best_vfs_mode = this.best_available_vfs_mode;
         Gtk.MessageBox message_box = null;
         GLib.PushButton accept_button = null;
         switch (best_vfs_mode) {
@@ -446,7 +446,7 @@ public class OwncloudWizard : GLib.Wizard {
     /***********************************************************
     ***********************************************************/
     public void on_signal_successful_step () {
-        const int identifier = current_id ();
+        int identifier = current_id ();
 
         switch (identifier) {
         case WizardCommon.Pages.PAGE_HTTP_CREDS:
@@ -488,18 +488,18 @@ public class OwncloudWizard : GLib.Wizard {
 
     /***********************************************************
     ***********************************************************/
-    protected void change_event (GLib.Event event) {
+    protected void change_event (Gdk.Event event) {
         switch (event.type ()) {
 
-        case GLib.Event.StyleChange:
-        case GLib.Event.PaletteChange:
-        case GLib.Event.ThemeChange:
+        case Gdk.Event.StyleChange:
+        case Gdk.Event.PaletteChange:
+        case Gdk.Event.ThemeChange:
             customize_style ();
 
             // Notify the other widgets (Dark-/Light-Mode switching)
             /* emit */ signal_style_changed ();
             break;
-        case GLib.Event.ActivationChange:
+        case Gdk.Event.ActivationChange:
             if (is_active_window ())
                 /* emit */ activate ();
             break;
@@ -518,7 +518,7 @@ public class OwncloudWizard : GLib.Wizard {
 
         // Set background colors
         var wizard_palette = palette ();
-        const var background_color = wizard_palette.color (Gtk.Palette.Window);
+        var background_color = wizard_palette.color (Gtk.Palette.Window);
         wizard_palette.on_signal_color (Gtk.Palette.Base, background_color);
         // Set separator color
         wizard_palette.on_signal_color (Gtk.Palette.Mid, background_color);
@@ -530,8 +530,8 @@ public class OwncloudWizard : GLib.Wizard {
     /***********************************************************
     ***********************************************************/
     private void adjust_wizard_size () {
-        const var page_sizes = calculate_wizard_page_sizes ();
-        const var longest_side = calculate_longest_side_of_wizard_pages (page_sizes);
+        var page_sizes = calculate_wizard_page_sizes ();
+        var longest_side = calculate_longest_side_of_wizard_pages (page_sizes);
 
         resize (Gdk.Rectangle (longest_side, longest_side));
     }
@@ -556,7 +556,7 @@ public class OwncloudWizard : GLib.Wizard {
     ***********************************************************/
     private GLib.List<Gdk.Rectangle> calculate_wizard_page_sizes () {
         GLib.List<Gdk.Rectangle> page_sizes;
-        const var p_ids = page_ids ();
+        var p_ids = page_ids ();
 
         //  std.transform (
         //      p_ids.cbegin (),

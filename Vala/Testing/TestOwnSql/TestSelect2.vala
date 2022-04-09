@@ -15,7 +15,7 @@ public class TestSelect2 : AbstractTestOwnSql {
     private TestSelect2 () {
         base ();
 
-        const string sql = "SELECT * FROM addresses;";
+        string sql = "SELECT * FROM addresses;";
 
         SqlQuery query = new SqlQuery (this.database);
         query.prepare (sql);

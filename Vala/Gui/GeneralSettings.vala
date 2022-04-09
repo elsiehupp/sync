@@ -50,8 +50,8 @@ public class GeneralSettings : Gtk.Widget {
         }
 
         public static ZipEntry sync_folder_to_zip_entry (FolderConnection f) {
-            const var journal_path = f.journal_database ().database_file_path;
-            const var journal_info = GLib.FileInfo (journal_path);
+            var journal_path = f.journal_database ().database_file_path;
+            var journal_info = GLib.FileInfo (journal_path);
             return file_info_to_zip_entry (journal_info);
         }
 
@@ -61,13 +61,13 @@ public class GeneralSettings : Gtk.Widget {
 
             list.append (file_info_to_zip_entry (new GLib.FileInfo (config.config_file ())));
 
-            const var logger = LibSync.Logger.instance;
+            var logger = LibSync.Logger.instance;
 
             if (!logger.log_dir () == "") {
                 list.append ({"", "logs"});
 
                 GLib.Dir directory = new GLib.Dir (logger.log_dir ());
-                const var info_list = directory.entry_info_list (GLib.Dir.Files);
+                var info_list = directory.entry_info_list (GLib.Dir.Files);
                 std.transform (std.cbegin (info_list), std.cend (info_list),
                             std.back_inserter (list),
                             file_info_to_log_zip_entry);
@@ -75,7 +75,7 @@ public class GeneralSettings : Gtk.Widget {
                 list.append (file_info_to_zip_entry (new GLib.FileInfo (logger.log_file ())));
             }
 
-            const var folders = FolderManager.instance.map ().values ();
+            var folders = FolderManager.instance.map ().values ();
             std.transform (std.cbegin (folders), std.cend (folders),
                         std.back_inserter (list),
                         sync_folder_to_zip_entry);
@@ -84,7 +84,7 @@ public class GeneralSettings : Gtk.Widget {
         }
 
         public static void create_debug_archive (string filename) {
-            const var entries = create_file_list ();
+            var entries = create_file_list ();
 
             GLib.ZipWriter zip = new GLib.ZipWriter (filename);
             foreach (var entry in entries) {
@@ -101,7 +101,7 @@ public class GeneralSettings : Gtk.Widget {
 
             zip.add_file ("__nextcloud_client_parameters.txt", GLib.Application.arguments ().join (' ').to_utf8 ());
 
-            const string build_info = Theme.about + "\n\n" + Theme.about_details;
+            string build_info = Theme.about + "\n\n" + Theme.about_details;
             zip.add_file ("__nextcloud_client_buildinfo.txt", build_info.to_utf8 ());
         }
     }
@@ -135,7 +135,7 @@ public class GeneralSettings : Gtk.Widget {
             this.instance.autostart_check_box.disabled (true);
             this.instance.autostart_check_box.tool_tip (_("You cannot disable autostart because system-wide autostart is enabled."));
         } else {
-            const bool has_auto_start = Utility.has_launch_on_signal_startup (Theme.app_name);
+            bool has_auto_start = Utility.has_launch_on_signal_startup (Theme.app_name);
             // make sure the binary location is correctly set
             on_signal_toggle_launch_on_signal_startup (has_auto_start);
             this.instance.autostart_check_box.checked (has_auto_start);
@@ -146,7 +146,7 @@ public class GeneralSettings : Gtk.Widget {
 
         // setup about section
         string about = Theme.about;
-        this.instance.about_label.text_interaction_flags (Qt.Text_selectable_by_mouse | Qt.TextBrowserInteraction);
+        this.instance.about_label.text_interaction_flags (GLib.Text_selectable_by_mouse | GLib.TextBrowserInteraction);
         this.instance.about_label.on_signal_text (about);
         this.instance.about_label.open_external_links (true);
 
@@ -311,7 +311,7 @@ public class GeneralSettings : Gtk.Widget {
         if (this.ignore_editor == null) {
             ConfigFile config_file;
             this.ignore_editor = new IgnoreListEditor (this);
-            this.ignore_editor.attribute (Qt.WA_DeleteOnClose, true);
+            this.ignore_editor.attribute (GLib.WA_DeleteOnClose, true);
             this.ignore_editor.open ();
         } else {
             OwncloudGui.raise_dialog (this.ignore_editor);
@@ -322,7 +322,7 @@ public class GeneralSettings : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_debug_archive_button_clicked () {
-        const var filename = GLib.FileDialog.save_filename (this, _("Create Debug Archive"), "", _("Zip Archives") + " (*.zip)");
+        var filename = GLib.FileDialog.save_filename (this, _("Create Debug Archive"), "", _("Zip Archives") + " (*.zip)");
         if (filename == "") {
             return;
         }
@@ -380,10 +380,10 @@ public class GeneralSettings : Gtk.Widget {
 
         // Note: the sparkle-updater is not an OCUpdater
         AbstractUpdater.instance.signal_download_state_changed.connect (
-            this.on_signal_updater_download_state_changed // Qt.UniqueConnection
+            this.on_signal_updater_download_state_changed // GLib.UniqueConnection
         );
         this.instance.restart_button.clicked.connect (
-            this.on_signal_restart_button_clicked // Qt.UniqueConnection
+            this.on_signal_restart_button_clicked // GLib.UniqueConnection
         );
         this.instance.auto_check_for_updates_check_box.toggled.connect (
             this.on_signal_auto_check_for_updates_check_box_toggled
@@ -418,7 +418,7 @@ public class GeneralSettings : Gtk.Widget {
             ConfigFile ().update_channel == "beta" ? 1 : 0
         );
         this.instance.update_channel.current_text_changed.connect (
-            this.on_signal_update_channel_current_text_changed // Qt.UniqueConnection
+            this.on_signal_update_channel_current_text_changed // GLib.UniqueConnection
         );
     }
 

@@ -33,7 +33,7 @@ public class SingleApplication : GLib.Application {
         this.pid_peer = null;
         this.app_id = app_id;
 
-        const string app_session_id = QtLocalPeer.app_session_id (app_id);
+        string app_session_id = QtLocalPeer.app_session_id (app_id);
 
         // This shared memory holds a zero-terminated array of active (or crashed) instances
         instances = new GLib.Shared_memory (app_session_id, this);
@@ -41,7 +41,7 @@ public class SingleApplication : GLib.Application {
         block = false;
 
         // First instance creates the shared memory, later instances attach to it
-        const bool created = instances.create (INSTANCES_SIZE);
+        bool created = instances.create (INSTANCES_SIZE);
         if (!created) {
             if (!instances.attach ()) {
                 GLib.warning () << "Failed to initialize instances shared memory: "
@@ -52,7 +52,7 @@ public class SingleApplication : GLib.Application {
             }
         }
 
-        var pids = static_cast<int64> (instances);
+        var pids = (int64)instances;
         if (!created) {
             // Find the first instance that it still running
             // The whole list needs to be iterated in order to append to it
@@ -80,7 +80,7 @@ public class SingleApplication : GLib.Application {
         if (!instances) {
             return;
         }
-        const int64 app_pid = GLib.Application.application_pid ();
+        int64 app_pid = GLib.Application.application_pid ();
         // Rewrite array, removing current pid and previously crashed ones
         var pids = (int64) instances;
         int64 newpids = pids;
@@ -94,9 +94,9 @@ public class SingleApplication : GLib.Application {
 
     /***********************************************************
     ***********************************************************/
-    public bool event (GLib.Event event) {
-        if (event.type () == GLib.Event.File_open) {
-            var foe = static_cast<GLib.File_open_event> (event);
+    public bool event (Gdk.Event event) {
+        if (event.type () == Gdk.Event.File_open) {
+            var foe = (GLib.File_open_event)event;
             /* emit */ signal_file_open_request (foe.file ());
             return true;
         }
@@ -177,7 +177,7 @@ public class SingleApplication : GLib.Application {
     ***********************************************************/
     public void on_signal_activate_window () {
         if (act_win) {
-            act_win.set_window_state (act_win.window_state () & ~Qt.Window_minimized);
+            act_win.set_window_state (act_win.window_state () & ~GLib.Window_minimized);
             act_win.raise ();
             act_win.on_signal_activate_window ();
         }

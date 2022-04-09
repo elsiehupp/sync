@@ -654,7 +654,7 @@ public class Application : GLib.Application {
                 // have a translation file provided.
                 GLib.info ("Using " + lang + " translation");
                 property ("ui_lang", lang);
-                const string qt_tr_path = GLib.LibraryInfo.location (GLib.LibraryInfo.TranslationsPath);
+                string qt_tr_path = GLib.LibraryInfo.location (GLib.LibraryInfo.TranslationsPath);
                 string qt_tr_file = "qt_" + lang;
                 string qt_base_tr_file = "qtbase_" + lang;
                 if (!qt_translator.on_signal_load (qt_tr_file, qt_tr_path)) {
@@ -713,7 +713,7 @@ public class Application : GLib.Application {
 
     /***********************************************************
     ***********************************************************/
-    protected override bool event (GLib.Event event) {
+    protected override bool event (Gdk.Event event) {
         return SharedTools.SingleApplication.event (event);
     }
 
@@ -722,7 +722,7 @@ public class Application : GLib.Application {
     ***********************************************************/
     protected void on_signal_parse_message (string message, GLib.Object object) {
         if (message.has_prefix ("MSG_PARSEOPTIONS:")) {
-            const int length_of_msg_prefix = 17;
+            int length_of_msg_prefix = 17;
             GLib.List<string> options = message.mid (length_of_msg_prefix).split ('|');
             this.show_log_window = false;
             parse_options (options);
@@ -852,7 +852,7 @@ public class Application : GLib.Application {
     ***********************************************************/
     protected void on_signal_system_online_configuration_changed (GLib.NetworkConfiguration cnf) {
         if (cnf.state & GLib.NetworkConfiguration.Active) {
-            GLib.Object.invoke_method (this, "on_signal_check_connection", Qt.QueuedConnection);
+            GLib.Object.invoke_method (this, "on_signal_check_connection", GLib.QueuedConnection);
         }
     }
 
@@ -897,7 +897,7 @@ public class Application : GLib.Application {
         if (!version_changed && !warning_message)
             return true;
 
-        const var backup_file = config_file.create_backup ();
+        var backup_file = config_file.create_backup ();
 
         if (warning_message) {
             string bold_message;

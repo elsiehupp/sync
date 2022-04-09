@@ -272,7 +272,7 @@ public class FolderManager : GLib.Object {
         backward_migration_settings_keys (skip_settings_keys, skip_settings_keys);
 
         var settings = ConfigFile.settings_with_group ("Accounts");
-        const var accounts_with_settings = settings.child_groups ();
+        var accounts_with_settings = settings.child_groups ();
         if (accounts_with_settings == "") {
             int r = setup_folders_migration ();
             if (r > 0) {
@@ -284,7 +284,7 @@ public class FolderManager : GLib.Object {
         GLib.info ("Setup folders from settings file.");
 
         foreach (var account in AccountManager.instance.accounts) {
-            const int identifier = account.account.identifier;
+            int identifier = account.account.identifier;
             if (!accounts_with_settings.contains (identifier)) {
                 continue;
             }
@@ -337,7 +337,7 @@ public class FolderManager : GLib.Object {
         GLib.Dir directory = new GLib.Dir (this.folder_config_path);
         //We need to include hidden files just in case the alias starts with '.'
         directory.filter (GLib.Dir.Files | GLib.Dir.Hidden);
-        const var list = directory.entry_list ();
+        var list = directory.entry_list ();
 
         // Normally there should be only one account when migrating.
         AccountState account_state = AccountManager.instance.accounts.value (0);
@@ -379,11 +379,11 @@ public class FolderManager : GLib.Object {
     ***********************************************************/
     private void process_subgroup (var settings, string name) {
         settings.begin_group (name);
-        const int folders_version = settings.get_value (VERSION_C, 1).to_int ();
+        int folders_version = settings.get_value (VERSION_C, 1).to_int ();
         if (folders_version <= MAX_FOLDERS_VERSION) {
             foreach (var folder_alias in settings.child_groups ()) {
                 settings.begin_group (folder_alias);
-                const int folder_version = settings.get_value (VERSION_C, 1).to_int ();
+                int folder_version = settings.get_value (VERSION_C, 1).to_int ();
                 if (folder_version > FolderDefinition.max_settings_version ()) {
                     ignore_keys.append (settings.group ());
                 }
@@ -425,7 +425,7 @@ public class FolderManager : GLib.Object {
 
         // Migration: The first account that's configured for a local folder_connection shall
         // be saved in a backwards-compatible way.
-        const var folder_list = FolderManager.instance.map ();
+        var folder_list = FolderManager.instance.map ();
         int count = 0;
         foreach (var FolderConnection in FolderManager.instance.map ()) {
             if (other != folder_connection && other.clean_path == folder_connection.clean_path) {
@@ -494,7 +494,7 @@ public class FolderManager : GLib.Object {
     ***********************************************************/
     public FolderConnection folder_for_path (string path) {
         foreach (var folder_connection in this.map ().values ()) {
-            if ((GLib.Dir.clean_path (path) + "/").has_prefix (folder_connection.clean_path + "/", (Utility.is_windows () || Utility.is_mac ()) ? Qt.CaseInsensitive : Qt.CaseSensitive)) {
+            if ((GLib.Dir.clean_path (path) + "/").has_prefix (folder_connection.clean_path + "/", (Utility.is_windows () || Utility.is_mac ()) ? GLib.CaseInsensitive : GLib.CaseSensitive)) {
                 return folder_connection;
             }
         }
@@ -586,7 +586,7 @@ public class FolderManager : GLib.Object {
         GLib.List<string> groups = settings.child_groups ();
 
         if (!groups.contains (escaped_alias) && groups.length > 0) {
-            escaped_alias = groups.first ();
+            escaped_alias = groups.nth_data (0);
         }
 
         settings.begin_group (escaped_alias); // read the group with the same name as the file which is the folder_connection alias
@@ -903,8 +903,8 @@ public class FolderManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private bool push_notifications_files_ready (Account account) {
-        const var push_notifications = account.push_notifications ();
-        const var push_files_available = account.capabilities.available_push_notifications () & PushNotificationType.FILES;
+        var push_notifications = account.push_notifications ();
+        var push_files_available = account.capabilities.available_push_notifications () & PushNotificationType.FILES;
 
         return push_files_available && push_notifications && push_notifications.is_ready ();
     }
@@ -935,14 +935,14 @@ public class FolderManager : GLib.Object {
         }
 
         // check if the local directory isn't used yet in another own_cloud sync
-        Qt.CaseSensitivity case_sensitivity = Qt.CaseSensitive;
+        GLib.CaseSensitivity case_sensitivity = GLib.CaseSensitive;
         if (Utility.fs_case_preserving ()) {
-            case_sensitivity = Qt.CaseInsensitive;
+            case_sensitivity = GLib.CaseInsensitive;
         }
 
-        const string user_dir = GLib.Dir.clean_path (canonical_path (path)) + "/";
+        string user_dir = GLib.Dir.clean_path (canonical_path (path)) + "/";
         for (var i = this.folder_map.const_begin (); i != this.folder_map.const_end (); ++i) {
-            var folder_connection = static_cast<FolderConnection> (i.get_value ());
+            var folder_connection = (FolderConnection)i.get_value ();
             string folder_dir = GLib.Dir.clean_path (canonical_path (folder_connection.path)) + "/";
 
             bool different_paths = string.compare (folder_dir, user_dir, case_sensitivity) != 0;
@@ -1002,7 +1002,7 @@ public class FolderManager : GLib.Object {
 
         int attempt = 1;
         while (true) {
-            const bool is_good =
+            bool is_good =
                 !new GLib.FileInfo (folder_connection).exists ()
                 && FolderManager.instance.check_path_validity_for_new_folder (folder_connection, server_url) == "";
             if (is_good) {
@@ -1173,7 +1173,7 @@ public class FolderManager : GLib.Object {
     de-schedules folders of disconnected accounts.
     ***********************************************************/
     public void on_signal_account_state_changed () {
-        var account_state = qobject_cast<AccountState> (sender ());
+        var account_state = (AccountState)sender ();
         if (!account_state) {
             return;
         }
@@ -1230,7 +1230,7 @@ public class FolderManager : GLib.Object {
         GLib.Object.invoke_method (
             this,
             "on_signal_run_one_etag_job",
-            Qt.QueuedConnection
+            GLib.QueuedConnection
         );
         // maybe: add to queue
     }
@@ -1253,7 +1253,7 @@ public class FolderManager : GLib.Object {
 
             GLib.info ("Removing " + folder_connection.alias ());
 
-            const bool folder_connection.is_sync_running () = (this.current_sync_folder == folder_connection);
+            bool folder_connection.is_sync_running () = (this.current_sync_folder == folder_connection);
             if (folder_connection.is_sync_running ()) {
                 // on_signal_abort the sync now
                 this.current_sync_folder.on_signal_terminate_sync ();
@@ -1314,7 +1314,7 @@ public class FolderManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_folder_can_sync_changed () {
-        var folder_connection = qobject_cast<FolderConnection> (sender ());
+        var folder_connection = (FolderConnection)sender ();
          //  ASSERT (folder_connection);
         if (folder_connection.can_sync ()) {
             this.socket_api.on_signal_register_path (folder_connection.alias ());
@@ -1327,7 +1327,7 @@ public class FolderManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_folder_sync_started () {
-        var folder_connection = qobject_cast<FolderConnection> (sender ());
+        var folder_connection = (FolderConnection)sender ();
         //  ASSERT (folder_connection);
         if (!folder_connection)
             return;
@@ -1346,7 +1346,7 @@ public class FolderManager : GLib.Object {
     (that we caused ourselves by syncing) from triggering another spurious sync.
     ***********************************************************/
     private void on_signal_folder_sync_finished (LibSync.SyncResult result) {
-        var folder_connection = qobject_cast<FolderConnection> (sender ());
+        var folder_connection = (FolderConnection)sender ();
         //  ASSERT (folder_connection);
         if (!folder_connection)
             return;
@@ -1397,7 +1397,7 @@ public class FolderManager : GLib.Object {
     private void on_signal_etag_job_destroyed (GLib.Object object) {
         // this.current_etag_job is automatically cleared
         // maybe : remove from queue
-        GLib.Object.invoke_method (this, "on_signal_run_one_etag_job", Qt.QueuedConnection);
+        GLib.Object.invoke_method (this, "on_signal_run_one_etag_job", GLib.QueuedConnection);
     }
 
 
@@ -1605,14 +1605,14 @@ public class FolderManager : GLib.Object {
     ***********************************************************/
     private void on_signal_setup_push_notifications (FolderConnection.Map folder_map) {
         foreach (FolderConnection folder_connection in folder_map) {
-            const Account account = folder_connection.account_state.account;
+            Account account = folder_connection.account_state.account;
 
             // See if the account already provides the PushNotificationManager object and if yes connect to it.
             // If we can't connect at this point, the signals will be connected in on_signal_push_notifications_ready ()
             // after the Push_notification object emitted the ready signal
             on_signal_connect_to_push_notifications (account);
             account.push_notifications_ready.connect (
-                this.on_signal_connect_to_push_notifications // Qt.UniqueConnection
+                this.on_signal_connect_to_push_notifications // GLib.UniqueConnection
             );
         }
     }
@@ -1638,12 +1638,12 @@ public class FolderManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_connect_to_push_notifications (Account account) {
-        const PushNotificationManager push_notifications = account.push_notifications ();
+        PushNotificationManager push_notifications = account.push_notifications ();
 
         if (push_notifications_files_ready (account)) {
             GLib.info ("Push notifications ready.");
             push_notifications.files_changed.connect (
-                this.on_signal_process_files_push_notification // Qt.UniqueConnection
+                this.on_signal_process_files_push_notification // GLib.UniqueConnection
             );
         }
     }
@@ -1784,16 +1784,16 @@ public class FolderManager : GLib.Object {
             //  1min . 12s pause
             //  1h   . 90s pause
             int64 pause = q_sqrt (last_folder.msec_last_sync_duration ().length) / 20.0 * 1000.0;
-            ms_delay = q_max (ms_delay, pause);
+            ms_delay = int64.max (ms_delay, pause);
         }
 
         // Delays beyond one minute seem too big, particularly since there
         // could be things later in the queue that shouldn't be punished by a
         // long delay!
-        ms_delay = q_min (ms_delay, 60 * 1000ll);
+        ms_delay = int64.min (ms_delay, 60 * 1000ll);
 
         // Time since the last sync run counts against the delay
-        ms_delay = q_max (1ll, ms_delay - ms_since_last_sync);
+        ms_delay = int64.max (1ll, ms_delay - ms_since_last_sync);
 
         GLib.info ("Starting the next scheduled sync in " + (ms_delay / 1000).to_string () + " seconds.");
         this.start_scheduled_sync_timer.on_signal_start (ms_delay);
@@ -1849,8 +1849,8 @@ public class FolderManager : GLib.Object {
             GLib.info ("Restarting application NOW, PID " + GLib.Application.application_pid () + " is ending.");
             GLib.Application.quit ();
             GLib.List<string> args = GLib.Application.arguments ();
-            string prg = args.take_first ();
-
+            string prg = args.nth_data (0);
+            args.remove (args.nth_data (0));
             GLib.Process.start_detached (prg, args);
         } else {
             GLib.debug ("On this platform we do not restart.");
@@ -1937,7 +1937,7 @@ public class FolderManager : GLib.Object {
                     SyncJournalDb.maybe_migrate_database (folder_definition.local_path, folder_definition.absolute_journal_path);
                 }
 
-                const var switch_to_vfs = is_switch_to_vfs_needed (folder_definition);
+                var switch_to_vfs = is_switch_to_vfs_needed (folder_definition);
                 if (switch_to_vfs) {
                     folder_definition.virtual_files_mode = this.best_available_vfs_mode;
                 }
@@ -2005,8 +2005,8 @@ public class FolderManager : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void run_etag_job_if_possible (FolderConnection folder_connection) {
-        const ConfigFile config = new ConfigFile ();
-        const var polltime_in_microseconds = config.remote_poll_interval ();
+        ConfigFile config = new ConfigFile ();
+        var polltime_in_microseconds = config.remote_poll_interval ();
 
         GLib.info ("Run etag job on folder_connection " + folder_connection.to_string ());
 
@@ -2037,7 +2037,7 @@ public class FolderManager : GLib.Object {
         GLib.Object.invoke_method (
             folder_connection,
             "on_signal_run_etag_job",
-            Qt.QueuedConnection
+            GLib.QueuedConnection
         );
     }
 
@@ -2049,7 +2049,7 @@ public class FolderManager : GLib.Object {
             return FolderManager._("No valid folder_connection selected!");
         }
 
-        const GLib.FileInfo sel_file = new GLib.FileInfo (path);
+        GLib.FileInfo sel_file = new GLib.FileInfo (path);
 
         if (!sel_file.exists ()) {
             string parent_path = sel_file.directory ().path;
@@ -2077,7 +2077,7 @@ public class FolderManager : GLib.Object {
     private static string canonical_path (string path) {
         GLib.FileInfo sel_file = new GLib.FileInfo (path);
         if (!sel_file.exists ()) {
-            const var parent_path = sel_file.directory ().path;
+            var parent_path = sel_file.directory ().path;
 
             // It's possible for the parent_path to match the path
             // (possibly we've arrived at a non-existant drive root on Windows)

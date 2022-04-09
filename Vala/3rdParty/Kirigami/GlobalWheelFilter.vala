@@ -70,13 +70,13 @@ public class GlobalWheelFilter : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected override bool event_filter (GLib.Object watched, GLib.Event event) {
-        if (event.type () == GLib.Event.Wheel) {
-            var item = qobject_cast<GLib.QuickItem> (watched);
+    protected bool event_filter (GLib.Object watched, Gdk.Event event) {
+        if (event.get_event_type () == Gdk.EventScroll) {
+            var item = (GLib.QuickItem)watched;
             if (!item || !item.is_enabled ()) {
                 return GLib.Object.event_filter (watched, event);
             }
-            var we = static_cast<GLib.WheelEvent> (event);
+            var we = (Gdk.EventScroll)event);
             m_wheel_event.initialize_from_event (we);
 
             bool should_block = false;
@@ -106,7 +106,7 @@ public class GlobalWheelFilter : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected void manage_wheel (GLib.QuickItem target, GLib.WheelEvent wheel) {
+    protected void manage_wheel (GLib.QuickItem target, Gdk.EventScroll wheel) {
         // Duck typing: accept everything that has all the properties we need
         if (target.meta_object ().index_of_property ("content_x") == -1
             || target.meta_object ().index_of_property ("content_y") == -1
@@ -143,7 +143,7 @@ public class GlobalWheelFilter : GLib.Object {
             }
 
             // Scroll one page regardless of delta:
-            if ( (event.modifiers () & Qt.ControlModifier) || (event.modifiers () & Qt.ShiftModifier)) {
+            if ( (event.modifiers () & GLib.ControlModifier) || (event.modifiers () & GLib.ShiftModifier)) {
                 if (y > 0) {
                     y = target.height ();
                 } else if (y < 0) {
@@ -154,7 +154,7 @@ public class GlobalWheelFilter : GLib.Object {
             double min_yExtent = top_margin - origin_y;
             double max_yExtent = target.height () - (content_height + bottom_margin + origin_y);
 
-            target.set_property ("content_y", q_min (-max_yExtent, q_max (-min_yExtent, content_y - y)));
+            target.set_property ("content_y", double.min (-max_yExtent, double.max (-min_yExtent, content_y - y)));
         }
 
         //Scroll X
@@ -173,7 +173,7 @@ public class GlobalWheelFilter : GLib.Object {
             }
 
             // Scroll one page regardless of delta:
-            if ( (event.modifiers () & Qt.ControlModifier) || (event.modifiers () & Qt.ShiftModifier)) {
+            if ( (event.modifiers () & GLib.ControlModifier) || (event.modifiers () & GLib.ShiftModifier)) {
                 if (x > 0) {
                     x = target.width ();
                 } else if (x < 0) {
@@ -184,7 +184,7 @@ public class GlobalWheelFilter : GLib.Object {
             double min_xExtent = left_margin - origin_x;
             double max_xExtent = target.width () - (content_width + right_margin + origin_x);
 
-            target.set_property ("content_x", q_min (-max_xExtent, q_max (-min_xExtent, content_x - x)));
+            target.set_property ("content_x", double.min (-max_xExtent, double.max (-min_xExtent, content_x - x)));
         }
 
         //this is just for making the scrollbar

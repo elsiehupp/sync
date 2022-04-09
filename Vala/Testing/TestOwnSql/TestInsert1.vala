@@ -15,7 +15,7 @@ public class TestInsert1 : AbstractTestOwnSql {
     private TestInsert1 () {
         base ();
 
-        const string sql = "INSERT INTO addresses (identifier, name, address, entered) VALUES "
+        string sql = "INSERT INTO addresses (identifier, name, address, entered) VALUES "
                          + " (1, 'Gonzo Alberto', 'Moriabata 24, Palermo', 1403100844);";
         SqlQuery query = new SqlQuery (this.database);
         query.prepare (sql);

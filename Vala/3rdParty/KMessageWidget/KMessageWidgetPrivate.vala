@@ -54,7 +54,7 @@ public class KMessageWidgetPrivate : GLib.Object {
 
         text_label = new Gtk.Label (content);
         text_label.set_size_policy (GLib.SizePolicy.Expanding, GLib.SizePolicy.Fixed);
-        text_label.set_text_interaction_flags (Qt.TextBrowserInteraction);
+        text_label.set_text_interaction_flags (GLib.TextBrowserInteraction);
         text_label.link_activated.connect (
             widget.link_activated
         );
@@ -92,7 +92,7 @@ public class KMessageWidgetPrivate : GLib.Object {
         foreach (GLib.Action action in widget.actions ()) {
             var button = new GLib.ToolButton (content);
             button.set_default_action (action);
-            button.set_tool_button_style (Qt.ToolButtonTextBesideIcon);
+            button.set_tool_button_style (GLib.ToolButtonTextBesideIcon);
             buttons.append (button);
         }
 
@@ -104,12 +104,12 @@ public class KMessageWidgetPrivate : GLib.Object {
         if (word_wrap) {
             var layout = new GLib.GridLayout (content);
             // Set alignment to make sure icon does not move down if text wraps
-            layout.add_widget (icon_label, 0, 0, 1, 1, Qt.AlignHCenter | Qt.AlignTop);
+            layout.add_widget (icon_label, 0, 0, 1, 1, GLib.AlignHCenter | GLib.AlignTop);
             layout.add_widget (text_label, 0, 1);
 
             if (buttons == "") {
                 // Use top-vertical alignment like the icon does.
-                layout.add_widget (close_button, 0, 2, 1, 1, Qt.AlignHCenter | Qt.AlignTop);
+                layout.add_widget (close_button, 0, 2, 1, 1, GLib.AlignHCenter | GLib.AlignTop);
             } else {
                 // Use an additional layout in row 1 for the buttons.
                 var button_layout = new GLib.HBoxLayout ();
@@ -165,20 +165,20 @@ public class KMessageWidgetPrivate : GLib.Object {
             bg_base_color.set_rgb (218, 68, 83); // Window : ForegroundNegative
             break;
         }
-        const double bg_base_color_alpha = 0.2;
+        double bg_base_color_alpha = 0.2;
         bg_base_color.set_alpha_f (bg_base_color_alpha);
 
-        const Gtk.Palette palette = GLib.Application.palette ();
-        const Gdk.RGBA window_color = palette.window ().color ();
-        const Gdk.RGBA text_color = palette.text ().color ();
-        const Gdk.RGBA border = bg_base_color;
+        Gtk.Palette palette = GLib.Application.palette ();
+        Gdk.RGBA window_color = palette.window ().color ();
+        Gdk.RGBA text_color = palette.text ().color ();
+        Gdk.RGBA border = bg_base_color;
 
         // Generate a final background color from overlaying bg_base_color over window_color
-        const int new_red = q_round (bg_base_color.red () * bg_base_color_alpha) + q_round (window_color.red () * (1 - bg_base_color_alpha));
-        const int new_green = q_round (bg_base_color.green () * bg_base_color_alpha) + q_round (window_color.green () * (1 - bg_base_color_alpha));
-        const int new_blue = q_round (bg_base_color.blue () * bg_base_color_alpha) + q_round (window_color.blue () * (1 - bg_base_color_alpha));
+        int new_red = q_round (bg_base_color.red () * bg_base_color_alpha) + q_round (window_color.red () * (1 - bg_base_color_alpha));
+        int new_green = q_round (bg_base_color.green () * bg_base_color_alpha) + q_round (window_color.green () * (1 - bg_base_color_alpha));
+        int new_blue = q_round (bg_base_color.blue () * bg_base_color_alpha) + q_round (window_color.blue () * (1 - bg_base_color_alpha));
 
-        const Gdk.RGBA bg_final_color = Gdk.RGBA (new_red, new_green, new_blue);
+        Gdk.RGBA bg_final_color = Gdk.RGBA (new_red, new_green, new_blue);
 
         content.set_style_sheet (
             ".Gdk.Frame {"
@@ -211,7 +211,7 @@ public class KMessageWidgetPrivate : GLib.Object {
         // https://bugs.kde.org/show_bug.cgi?id=311336
         content_snap_shot = Gdk.Pixbuf (content.size () * widget.scale_factor);
         content_snap_shot.set_device_pixel_ratio (widget.scale_factor);
-        content_snap_shot.fill (Qt.transparent);
+        content_snap_shot.fill (GLib.transparent);
         content.render (&content_snap_shot, GLib.Point (), GLib.Region (), Gtk.Widget.DrawChildren);
     }
 
@@ -219,7 +219,7 @@ public class KMessageWidgetPrivate : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_time_line_changed (double value) {
-        widget.set_fixed_height (q_min (q_round (value * 2.0), 1) * content.height ());
+        widget.set_fixed_height (double.min (q_round (value * 2.0), 1) * content.height ());
         widget.update ();
     }
 

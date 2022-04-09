@@ -57,7 +57,7 @@ public class UploadDevice : GLib.OutputStream {
         }
         public set {
             this.bandwidth_limited = value;
-            GLib.Object.invoke_method (this, "ready_read", Qt.QueuedConnection);
+            GLib.Object.invoke_method (this, "ready_read", GLib.QueuedConnection);
         }
     }
 
@@ -73,7 +73,7 @@ public class UploadDevice : GLib.OutputStream {
         public set {
             this.choked = value;
             if (!this.choked) {
-                GLib.Object.invoke_method (this, "ready_read", Qt.QueuedConnection);
+                GLib.Object.invoke_method (this, "ready_read", GLib.QueuedConnection);
             }
         }
     }
@@ -150,7 +150,7 @@ public class UploadDevice : GLib.OutputStream {
             }
             return -1;
         }
-        maxlen = q_min (maxlen, this.size - this.read);
+        maxlen = int64.min (maxlen, this.size - this.read);
         if (maxlen <= 0) {
             return 0;
         }
@@ -158,7 +158,7 @@ public class UploadDevice : GLib.OutputStream {
             return 0;
         }
         if (bandwidth_limited ()) {
-            maxlen = q_min (maxlen, this.bandwidth_quota);
+            maxlen = int64.min (maxlen, this.bandwidth_quota);
             if (maxlen <= 0) { // no quota
                 return 0;
             }
@@ -217,7 +217,7 @@ public class UploadDevice : GLib.OutputStream {
     public void give_bandwidth_quota (int64 bwq) {
         if (!at_end ()) {
             this.bandwidth_quota = bwq;
-            GLib.Object.invoke_method (this, "ready_read", Qt.QueuedConnection); // tell GLib.NAM that we have quota
+            GLib.Object.invoke_method (this, "ready_read", GLib.QueuedConnection); // tell GLib.NAM that we have quota
         }
     }
 

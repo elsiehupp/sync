@@ -7,7 +7,7 @@ public class TestContainsDoesContainNotificationReturnsTrue : GLib.Object {
     ***********************************************************/
     private TestContainsDoesContainNotificationReturnsTrue () {
         NotificationCache notification_cache;
-        const NotificationCache.Notification notification = new NotificationCache.Notification ("Title", "message");
+        NotificationCache.Notification notification = new NotificationCache.Notification ("Title", "message");
 
         notification_cache.insert (notification);
 

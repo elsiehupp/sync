@@ -214,9 +214,9 @@ public class ExcludedFiles : GLib.Object {
     Does not load the file. Use on_signal_reload_exclude_files () afterwards.
     ***********************************************************/
     public void add_exclude_file_path (string path) {
-        const GLib.FileInfo exclude_file_info = new GLib.FileInfo (path);
-        const var filename = exclude_file_info.filename ();
-        const var base_path = filename.compare ("sync-exclude.lst", Qt.CaseInsensitive) == 0
+        GLib.FileInfo exclude_file_info = new GLib.FileInfo (path);
+        var filename = exclude_file_info.filename ();
+        var base_path = filename.compare ("sync-exclude.lst", GLib.CaseInsensitive) == 0
                                                                         ? this.local_path
                                                                         : left_include_last (path, "/");
         var exclude_files_local_path = this.exclude_files[base_path];
@@ -238,7 +238,7 @@ public class ExcludedFiles : GLib.Object {
         string file_path,
         string base_path,
         bool exclude_hidden) {
-        if (!file_path.has_prefix (base_path, Utility.fs_case_preserving () ? Qt.CaseInsensitive : Qt.CaseSensitive)) {
+        if (!file_path.has_prefix (base_path, Utility.fs_case_preserving () ? GLib.CaseInsensitive : GLib.CaseSensitive)) {
             // Mark paths we're not responsible for as excluded...
             return true;
         }
@@ -417,7 +417,7 @@ public class ExcludedFiles : GLib.Object {
         this.full_regex_dir == "";
 
         bool on_signal_success = true;
-        const var keys = this.exclude_files.keys ();
+        var keys = this.exclude_files.keys ();
         foreach (var base_path in keys) {
             foreach (var exclude_file in this.exclude_files.value (base_path)) {
                 GLib.File file = GLib.File.new_for_path (exclude_file);
@@ -771,7 +771,7 @@ public class ExcludedFiles : GLib.Object {
         this.full_regex_file == "";
         this.full_regex_dir == "";
 
-        const var keys = this.all_excludes.keys ();
+        var keys = this.all_excludes.keys ();
         foreach (var base_path in keys) {
             prepare (base_path);
         }
@@ -907,7 +907,7 @@ public class ExcludedFiles : GLib.Object {
 
         if (filename.length == 3 || (filename.length > 3 && filename.at (3) == '.')) {
             foreach (string word in win_reserved_words_3) {
-                if (filename.left (3).compare (word, Qt.CaseInsensitive) == 0) {
+                if (filename.left (3).compare (word, GLib.CaseInsensitive) == 0) {
                     return true;
                 }
             }
@@ -915,7 +915,7 @@ public class ExcludedFiles : GLib.Object {
 
         if (filename.length == 4 || (filename.length > 4 && filename.at (4) == '.')) {
             foreach (string word in win_reserved_words_4) {
-                if (filename.left (4).compare (word, Qt.CaseInsensitive) == 0) {
+                if (filename.left (4).compare (word, GLib.CaseInsensitive) == 0) {
                     return true;
                 }
             }
@@ -943,13 +943,13 @@ public class ExcludedFiles : GLib.Object {
         // 9 = strlen (".sync_.db")
         if (blen >= 9 && bname.at (0) == '.') {
             if (bname.contains (".db")) {
-                if (bname.has_prefix (".sync_", Qt.CaseInsensitive)  // ".sync_*.db*"
-                    || bname.has_prefix (".sync_", Qt.CaseInsensitive) // ".sync_*.db*"
-                    || bname.has_prefix (".csync_journal.db", Qt.CaseInsensitive)) { // ".csync_journal.db*"
+                if (bname.has_prefix (".sync_", GLib.CaseInsensitive)  // ".sync_*.db*"
+                    || bname.has_prefix (".sync_", GLib.CaseInsensitive) // ".sync_*.db*"
+                    || bname.has_prefix (".csync_journal.db", GLib.CaseInsensitive)) { // ".csync_journal.db*"
                     return CSync.ExcludedFiles.Type.EXCLUDE_SILENT;
                 }
             }
-            if (bname.has_prefix (".owncloudsync.log", Qt.CaseInsensitive)) { // ".owncloudsync.log*"
+            if (bname.has_prefix (".owncloudsync.log", GLib.CaseInsensitive)) { // ".owncloudsync.log*"
                 return CSync.ExcludedFiles.Type.EXCLUDE_SILENT;
             }
         }
@@ -961,8 +961,8 @@ public class ExcludedFiles : GLib.Object {
         }
 
         /* Do not sync desktop.ini files anywhere in the tree. */
-        const string desktop_ini_file = "desktop.ini";
-        if (blen == static_cast<size_t> (desktop_ini_file.length) && bname.compare (desktop_ini_file, Qt.CaseInsensitive) == 0) {
+        string desktop_ini_file = "desktop.ini";
+        if (blen == (size_t)desktop_ini_file.length && bname.compare (desktop_ini_file, GLib.CaseInsensitive) == 0) {
             return CSync.ExcludedFiles.Type.EXCLUDE_SILENT;
         }
 

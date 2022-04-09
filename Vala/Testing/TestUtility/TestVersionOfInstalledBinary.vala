@@ -22,7 +22,7 @@ public class TestVersionOfInstalledBinary : AbstractTestUtility {
             GLib.debug ("Version of installed Nextcloud: " + version);
             GLib.assert_true (!version == "");
 
-            const GLib.Regex regular_expression = new GLib.Regex (GLib.Regex.anchored_pattern (APPLICATION_SHORTNAME + " ( version \d+\.\d+\.\d+.*)"));
+            GLib.Regex regular_expression = new GLib.Regex (GLib.Regex.anchored_pattern (APPLICATION_SHORTNAME + " ( version \d+\.\d+\.\d+.*)"));
             GLib.assert_true (regular_expression.match (version).has_match ());
         } else {
             GLib.assert_true (version_of_installed_binary () == "");

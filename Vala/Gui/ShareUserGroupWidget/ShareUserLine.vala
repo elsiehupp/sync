@@ -56,7 +56,7 @@ public class ShareUserLine : Gtk.Widget {
         //  Q_ASSERT (this.share);
         this.instance.up_ui (this);
 
-        this.instance.shared_with.elide_mode (Qt.Elide_right);
+        this.instance.shared_with.elide_mode (GLib.Elide_right);
         this.instance.shared_with.on_signal_text (share.share_with ().to_string ());
 
         // adds permissions
@@ -107,7 +107,7 @@ public class ShareUserLine : Gtk.Widget {
 
         show_note_options (false);
 
-        const bool is_note_supported = this.share.share_type != Share.Type.Share.Type.EMAIL && this.share.share_type != Share.Type.Share.Type.ROOM;
+        bool is_note_supported = this.share.share_type != Share.Type.Share.Type.EMAIL && this.share.share_type != Share.Type.Share.Type.ROOM;
 
         if (is_note_supported) {
             this.note_link_action = new GLib.Action (_("Note to recipient"));
@@ -124,7 +124,7 @@ public class ShareUserLine : Gtk.Widget {
 
         show_expire_date_options (false);
 
-        const bool is_expiration_date_supported = this.share.share_type != Share.Type.Share.Type.EMAIL;
+        bool is_expiration_date_supported = this.share.share_type != Share.Type.Share.Type.EMAIL;
 
         if (is_expiration_date_supported) {
             // email shares do not support expiration dates
@@ -134,7 +134,7 @@ public class ShareUserLine : Gtk.Widget {
             this.expiration_date_link_action.triggered.connect (
                 this.toggle_expire_date_options
             );
-            const var on_signal_expire_date = this.share.on_signal_expire_date ().is_valid ? share.on_signal_expire_date () : GLib.Date ();
+            var on_signal_expire_date = this.share.on_signal_expire_date ().is_valid ? share.on_signal_expire_date () : GLib.Date ();
             if (on_signal_expire_date != null) {
                 this.expiration_date_link_action.checked (true);
                 show_expire_date_options (true, on_signal_expire_date);
@@ -238,7 +238,7 @@ public class ShareUserLine : Gtk.Widget {
             this.permission_reshare.visible (false);
         }
 
-        const AvatarEventFilter avatar_event_filter = new AvatarEventFilter (this.instance.avatar);
+        AvatarEventFilter avatar_event_filter = new AvatarEventFilter (this.instance.avatar);
         avatar_event_filter.context_menu.connect (
             this.on_signal_avatar_context_menu
         );
@@ -316,15 +316,15 @@ public class ShareUserLine : Gtk.Widget {
         // Can never manually be set to "partial".
         // This works because the state cycle for clicking is
         // unchecked . partial . checked . unchecked.
-        if (this.instance.permissions_edit.check_state () == Qt.PartiallyChecked) {
-            this.instance.permissions_edit.check_state (Qt.Checked);
+        if (this.instance.permissions_edit.check_state () == GLib.PartiallyChecked) {
+            this.instance.permissions_edit.check_state (GLib.Checked);
         }
 
         Share.Permissions permissions = SharePermissionRead;
 
         //  folders edit = CREATE, READ, UPDATE, DELETE
         //  files edit = READ + UPDATE
-        if (this.instance.permissions_edit.check_state () == Qt.Checked) {
+        if (this.instance.permissions_edit.check_state () == GLib.Checked) {
 
             /***********************************************************
             Files can't have create or delete permisisons
@@ -554,11 +554,11 @@ public class ShareUserLine : Gtk.Widget {
                     perm & Share_permission_create && perm & Share_permission_delete)
                 )
             ) {
-            this.instance.permissions_edit.check_state (Qt.Checked);
+            this.instance.permissions_edit.check_state (GLib.Checked);
         } else if (!this.is_file && perm & (Share_permission_update | Share_permission_create | Share_permission_delete)) {
-            this.instance.permissions_edit.check_state (Qt.PartiallyChecked);
+            this.instance.permissions_edit.check_state (GLib.PartiallyChecked);
         } else if (perm & SharePermissionRead) {
-            this.instance.permissions_edit.check_state (Qt.Unchecked);
+            this.instance.permissions_edit.check_state (GLib.Unchecked);
         }
 
         // Edit is independent of reshare
@@ -577,14 +577,14 @@ public class ShareUserLine : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void load_avatar () {
-        const int avatar_size = 36;
+        int avatar_size = 36;
 
         // Set size of the placeholder
         this.instance.avatar.minimum_height (avatar_size);
         this.instance.avatar.minimum_width (avatar_size);
         this.instance.avatar.maximum_height (avatar_size);
         this.instance.avatar.maximum_width (avatar_size);
-        this.instance.avatar.alignment (Qt.AlignCenter);
+        this.instance.avatar.alignment (GLib.AlignCenter);
 
         default_avatar (avatar_size);
 
@@ -616,8 +616,8 @@ public class ShareUserLine : Gtk.Widget {
     private void default_avatar (int avatar_size) {
 
         // See core/js/placeholder.js for details on colors and styling
-        const var background_color = background_color_for_sharee_type (this.share.share_with ().type ());
-        const string style = """ (* {
+        var background_color = background_color_for_sharee_type (this.share.share_with ().type ());
+        string style = """ (* {
             color : #fff;
             background-color : %1;
             border-radius : %2px;
@@ -627,7 +627,7 @@ public class ShareUserLine : Gtk.Widget {
         })""".printf (background_color.name (), string.number (avatar_size / 2));
         this.instance.avatar.style_sheet (style);
 
-        const var pixmap = pixmap_for_sharee_type (this.share.share_with ().type (), background_color);
+        var pixmap = pixmap_for_sharee_type (this.share.share_with ().type (), background_color);
 
         if (!pixmap == null) {
             this.instance.avatar.pixmap (pixmap);
@@ -687,7 +687,7 @@ public class ShareUserLine : Gtk.Widget {
         this.instance.note_confirm_button.visible (show);
 
         if (show) {
-            const var note = this.share.note;
+            var note = this.share.note;
             this.instance.note_text_edit.on_signal_text (note);
             this.instance.note_text_edit.focus ();
         }
@@ -859,13 +859,13 @@ public class ShareUserLine : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void calculate_background_based_on_signal_text () {
-        const GLib.CryptographicHash hash = GLib.CryptographicHash.hash (this.instance.shared_with.text ().to_utf8 (), GLib.ChecksumType.MD5);
+        GLib.CryptographicHash hash = GLib.CryptographicHash.hash (this.instance.shared_with.text ().to_utf8 (), GLib.ChecksumType.MD5);
         //  Q_ASSERT (hash.size () > 0);
         if (hash.size () == 0) {
             GLib.warning ("Failed to calculate hash color for share: " + this.share.path);
             return Gdk.RGBA ();
         }
-        const double hue = (uint8) (hash[0]) / 255.0;
+        double hue = (uint8) (hash[0]) / 255.0;
         return Gdk.RGBA.from_hsl_f (hue, 0.7, 0.68);
     }
 

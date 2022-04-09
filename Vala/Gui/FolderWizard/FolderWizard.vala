@@ -14,7 +14,7 @@
 //  #include <GLib.WizardPage>
 //  #include <GLib.TreeWidget>
 //  #include <GLib.VBoxLayout>
-//  #include <GLib.Event>
+//  #include <Gdk.Event>
 //  #include <GLib.CheckBox>
 //  #include <Gtk.MessageBox>
 //  #include <cstdlib>
@@ -55,7 +55,7 @@ public class FolderWizard : GLib.Wizard {
         this.folder_wizard_source_page = new FolderWizardLocalPath (account);
         this.folder_wizard_target_page = null;
         this.folder_wizard_selective_sync_page = new FolderWizardSelectiveSync (account);
-        window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
+        window_flags (window_flags () & ~GLib.WindowContextHelpButtonHint);
         page (Page.SOURCE, this.folder_wizard_source_page);
         this.folder_wizard_source_page.install_event_filter (this);
         if (!Theme.single_sync_folder) {
@@ -73,8 +73,8 @@ public class FolderWizard : GLib.Wizard {
 
     /***********************************************************
     ***********************************************************/
-    public override bool event_filter (GLib.Object watched, GLib.Event event) {
-        if (event.type () == GLib.Event.Layout_request) {
+    public override bool event_filter (GLib.Object watched, Gdk.Event event) {
+        if (event.type () == Gdk.Event.Layout_request) {
             // Workaround GLib.TBUG-3396: forces GLib.Wizard_private.update_layout ()
             GLib.Timeout.single_shot (
                 0,

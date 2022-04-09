@@ -52,7 +52,7 @@ public class KeychainChunkReadJob : AbstractKeychainChunkJob {
         this.chunk_buffer == "";
         this.error = Secret.Collection.NoError;
 
-        const string keychain_key = this.account ? AbstractCredentials.keychain_key (
+        string keychain_key = this.account ? AbstractCredentials.keychain_key (
                 this.account.url.to_string (),
                 this.key,
                 this.keychain_migration ? "" : this.account.identifier
@@ -103,7 +103,7 @@ public class KeychainChunkReadJob : AbstractKeychainChunkJob {
     ***********************************************************/
     private void on_signal_read_job_done (Secret.Collection.Job incoming_job) {
         // Errors or next chunk?
-        var read_job = qobject_cast<Secret.Collection.ReadPasswordJob> (incoming_job);
+        var read_job = (Secret.Collection.ReadPasswordJob)incoming_job;
         GLib.assert (read_job);
 
         if (read_job.error == NoError && !read_job.binary_data () == "") {

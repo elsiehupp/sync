@@ -311,9 +311,9 @@ public class ShareManager : GLib.Object {
             data.value ("owner_uid").to_variant ().to_string (),
             data.value ("displayname_owner").to_variant ().to_string (),
             data.value ("path").to_string (),
-            static_cast<Share.Type> (data.value ("share_type").to_int ()),
+            (Share.Type)data.value ("share_type").to_int (),
             !data.value ("password").to_string () == "",
-            static_cast<Share.Permissions> (data.value ("permissions").to_int ()),
+            (Share.Permissions)data.value ("permissions").to_int (),
             sharee,
             expire_date,
             note

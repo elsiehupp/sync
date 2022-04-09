@@ -92,7 +92,7 @@ public class VioHandle : GLib.Object {
         if (vfs == null) {
                 // Directly modifies file_stat.type.
                 // We can ignore the return value since we're done here anyway.
-                const var result = vfs.stat_type_virtual_file (file_stat.get (), directory_handle.path);
+                var result = vfs.stat_type_virtual_file (file_stat.get (), directory_handle.path);
                 //    Q_UNUSED (result)
         }
 

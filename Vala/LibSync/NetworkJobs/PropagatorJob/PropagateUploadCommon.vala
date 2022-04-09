@@ -219,7 +219,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
         }
 
         // Check if we believe that the upload will fail due to remote quota limits
-        const int64 quota_guess = this.propagator.folder_quota.value (
+        int64 quota_guess = this.propagator.folder_quota.value (
             GLib.File.new_for_path (this.file_to_upload.file).path, std.numeric_limits<int64>.max ());
         if (this.file_to_upload.size > quota_guess) {
             // Necessary for blocklisting logic
@@ -273,7 +273,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
             return;
         }
 
-        const string file_path = this.propagator.full_local_path (this.item.file);
+        string file_path = this.propagator.full_local_path (this.item.file);
 
         // remember the modtime before checksumming to be able to detect a file
         // change during the checksum calculation - This goes inside of the this.item.file
@@ -285,7 +285,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
             return;
         }
 
-        const string checksum_type = this.propagator.account.capabilities.preferred_upload_checksum_type;
+        string checksum_type = this.propagator.account.capabilities.preferred_upload_checksum_type;
 
         // Maybe the discovery already computed the checksum?
         // Should I compute the checksum of the original (this.item.file)
@@ -490,7 +490,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_poll_job_finished () {
-        var poll_job = qobject_cast<PollJob> (sender ());
+        var poll_job = (PollJob)sender ();
         //  ASSERT (poll_job);
 
         this.propagator.active_job_list.remove_one (this);
@@ -704,14 +704,18 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
     See #6527, enterprise#2480
     ***********************************************************/
     protected static void adjust_last_job_timeout (AbstractNetworkJob abstract_job, int64 file_size) {
-        const double three_minutes = 3.0 * 60 * 1000;
+        double three_minutes = 3.0 * 60 * 1000;
 
-        abstract_job.on_signal_timeout (q_bound (
-            abstract_job.timeout_msec (),
-            // Calculate 3 minutes for each gigabyte of data
-            q_round64 (three_minutes * file_size / 1e9),
-            // Maximum of 30 minutes
-            static_cast<int64> (30 * 60 * 1000)));
+        abstract_job.on_signal_timeout (
+            int64.max (
+                abstract_job.timeout_msec (),
+                int64.min (
+                    // Calculate 3 minutes for each gigabyte of data
+                    GLib.Math.llrint (three_minutes * file_size / 1e9),
+                    // Maximum of 30 minutes
+                    (int64)(30 * 60 * 1000))
+                )
+            );
     }
 
 

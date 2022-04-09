@@ -101,7 +101,7 @@ public class StreamingDecryptor : GLib.Object {
         bool is_last_chunk = this.decrypted_so_far + chunk_size == this.total_size;
 
         // last Constants.E2EE_TAG_SIZE bytes is ALWAYS a e2Ee_tag!!!
-        const int64 size = is_last_chunk ? chunk_size - Constants.E2EE_TAG_SIZE : chunk_size;
+        int64 size = is_last_chunk ? chunk_size - Constants.E2EE_TAG_SIZE : chunk_size;
 
         // either the size is more than 0 and an e2Ee_tag is at the end of chunk, or, chunk is the e2Ee_tag itself
         GLib.assert (size > 0 || chunk_size == Constants.E2EE_TAG_SIZE);
@@ -117,7 +117,7 @@ public class StreamingDecryptor : GLib.Object {
 
         while (input_pos < size) {
             // read BLOCK_SIZE or less bytes
-            string encrypted_block = new string (input_stream + input_pos, q_min (size - input_pos, BLOCK_SIZE));
+            string encrypted_block = new string (input_stream + input_pos, int64.min (size - input_pos, BLOCK_SIZE));
 
             if (encrypted_block.size () == 0) {
                 GLib.critical ("Could not read data from the input_stream buffer.");
@@ -161,7 +161,7 @@ public class StreamingDecryptor : GLib.Object {
             string e2Ee_tag = new string (input_stream + input_pos, Constants.E2EE_TAG_SIZE);
 
             // Set expected e2Ee_tag value. Works in OpenSSL 1.0.1d and later
-            if (!EVP_CIPHER_CTX_ctrl (this.context, EVP_CTRL_GCM_SET_TAG, e2Ee_tag.size (), reinterpret_cast<uchar> (e2Ee_tag))) {
+            if (!EVP_CIPHER_CTX_ctrl (this.context, EVP_CTRL_GCM_SET_TAG, e2Ee_tag.size (), (uchar)e2Ee_tag)) {
                 GLib.critical ("Could not set expected e2Ee_tag.");
                 return "";
             }

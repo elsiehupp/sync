@@ -33,7 +33,7 @@ public class TestModifyLocalFileWhileUploading : AbstractTestChunkingNg {
         GLib.assert_true (fake_folder.sync_engine.is_another_sync_needed () == ImmediateFollowUp);
 
         GLib.assert_true (fake_folder.upload_state ().children.length == 1); // We did not clean the chunks at this point
-        var chunking_identifier = fake_folder.upload_state ().children.first ().name;
+        var chunking_identifier = fake_folder.upload_state ().children.nth_data (0).name;
 
         // Now we make a new sync which should upload the file for good.
         GLib.assert_true (fake_folder.sync_once ());
@@ -43,7 +43,7 @@ public class TestModifyLocalFileWhileUploading : AbstractTestChunkingNg {
 
         // A different chunk identifier was used, and the previous one is removed
         GLib.assert_true (fake_folder.upload_state ().children.length == 1);
-        GLib.assert_true (fake_folder.upload_state ().children.first ().name != chunking_identifier);
+        GLib.assert_true (fake_folder.upload_state ().children.nth_data (0).name != chunking_identifier);
     }
 
 

@@ -14,14 +14,14 @@ public class TestTimeAgo : AbstractTestUtility {
     ***********************************************************/
     private TestTimeAgo () {
         // Both times in same timezone
-        GLib.DateTime d1 = GLib.DateTime.from_string ("2015-01-24T09:20:30+01:00", Qt.ISODate);
-        GLib.DateTime d2 = GLib.DateTime.from_string ("2015-01-23T09:20:30+01:00", Qt.ISODate);
+        GLib.DateTime d1 = GLib.DateTime.from_string ("2015-01-24T09:20:30+01:00", GLib.ISODate);
+        GLib.DateTime d2 = GLib.DateTime.from_string ("2015-01-23T09:20:30+01:00", GLib.ISODate);
         string test_string = time_ago_in_words (d2, d1);
         GLib.assert_true (test_string == "1 day ago");
 
         // Different timezones
-        GLib.DateTime early_timestamp = GLib.DateTime.from_string ("2015-01-24T09:20:30+01:00", Qt.ISODate);
-        GLib.DateTime later_timestamp = GLib.DateTime.from_string ("2015-01-24T09:20:30-01:00", Qt.ISODate);
+        GLib.DateTime early_timestamp = GLib.DateTime.from_string ("2015-01-24T09:20:30+01:00", GLib.ISODate);
+        GLib.DateTime later_timestamp = GLib.DateTime.from_string ("2015-01-24T09:20:30-01:00", GLib.ISODate);
         test_string = time_ago_in_words (early_timestamp, later_timestamp);
         GLib.assert_true (test_string == "2 hours ago");
 

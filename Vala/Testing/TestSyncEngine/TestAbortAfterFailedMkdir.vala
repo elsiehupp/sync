@@ -23,7 +23,7 @@ public class TestAbortAfterFailedMkdir : AbstractTestSyncEngine {
         fake_folder.local_modifier.insert ("NewFolder/NewFile");
         fake_folder.sync_once ();
         GLib.assert_true (finished_spy.size () == 1);
-        GLib.assert_true (finished_spy.first ().first ().to_bool () == false);
+        GLib.assert_true (finished_spy.nth_data (0).nth_data (0).to_bool () == false);
     }
 
 } // class TestAbortAfterFailedMkdir

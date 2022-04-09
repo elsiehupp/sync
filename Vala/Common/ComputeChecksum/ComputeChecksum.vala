@@ -176,7 +176,7 @@ public class ComputeChecksum : AbstractComputeChecksum {
     private void start_impl (GLib.OutputStream device) {
         this.watcher.signal_finished.connect (
             this.on_signal_calculation_done
-        ); // Qt.UniqueConnection
+        ); // GLib.UniqueConnection
 
         // We'd prefer to move the unique_ptr into the lambda, but that's
         // awkward with the C++ standard we're on
@@ -192,7 +192,7 @@ public class ComputeChecksum : AbstractComputeChecksum {
 
     private static void on_watcher_run (GLib.OutputStream shared_device, string type) {
         if (!shared_device.open (GLib.IODevice.ReadOnly)) {
-            var file = qobject_cast<GLib.File> (shared_device);
+            var file = (GLib.File)shared_device;
             if (file) {
                 GLib.warning ("Could not open file " + file.filename ()
                         + " for reading to compute a checksum " + file.error_string);

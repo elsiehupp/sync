@@ -107,7 +107,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
     public new void do_start_upload () {
         this.propagator.active_job_list.append (this);
 
-        const Common.SyncJournalDb.UploadInfo progress_info = this.propagator.journal.get_upload_info (this.item.file);
+        Common.SyncJournalDb.UploadInfo progress_info = this.propagator.journal.get_upload_info (this.item.file);
         GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
             GLib.warning ("Invalid modified time " + this.item.file.to_string () + this.item.modtime.to_string ());
@@ -196,14 +196,15 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
     /***********************************************************
     ***********************************************************/
     private void on_signal_start_next_chunk () {
-        if (this.propagator.abort_requested)
+        if (this.propagator.abort_requested) {
             return;
+        }
 
         int64 file_size = this.file_to_upload.size;
         //  ENFORCE (file_size >= this.sent, "Sent data exceeds file size");
 
         // prevent situation that chunk size is bigger then required one to send
-        this.current_chunk_size = q_min (this.propagator.chunk_size, file_size - this.sent);
+        this.current_chunk_size = int64.min (this.propagator.chunk_size, file_size - this.sent);
 
         if (this.current_chunk_size == 0) {
             GLib.assert (this.jobs.length () == 0); // There should be no running job anymore
@@ -297,7 +298,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
     /***********************************************************
     ***********************************************************/
     private void on_signal_lscol_job_finished () {
-        var lscol_job = qobject_cast<LscolJob> (sender ());
+        var lscol_job = (LscolJob)sender ();
         on_signal_network_job_destroyed (lscol_job); // remove it from the this.jobs list
         this.propagator.active_job_list.remove_one (this);
 
@@ -355,7 +356,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
     /***********************************************************
     ***********************************************************/
     private void on_signal_lscol_job_finished_with_error () {
-        var lscol_job = qobject_cast<LscolJob> (sender ());
+        var lscol_job = (LscolJob)sender ();
         on_signal_network_job_destroyed (lscol_job); // remove it from the this.jobs list
         GLib.InputStream.NetworkError err = lscol_job.input_stream.error;
         var http_error_code = lscol_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
@@ -390,13 +391,13 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
     /***********************************************************
     ***********************************************************/
     private void on_signal_delete_job_finished () {
-        var delete_job = qobject_cast<KeychainChunkDeleteJob> (sender ());
+        var delete_job = (KeychainChunkDeleteJob)sender ();
         //  ASSERT (delete_job);
         this.jobs.remove (this.jobs.index_of (delete_job));
 
         GLib.InputStream.NetworkError err = delete_job.input_stream.error;
         if (err != GLib.InputStream.NoError && err != GLib.InputStream.ContentNotFoundError) {
-            const int http_status = delete_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+            int http_status = delete_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
             SyncFileItem.Status status = classify_error (err, http_status);
             if (status == SyncFileItem.Status.FATAL_ERROR) {
                 this.item.request_id = delete_job.request_id ();
@@ -424,7 +425,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
     ***********************************************************/
     private void on_signal_mkcol_job_finished () {
         this.propagator.active_job_list.remove_one (this);
-        var mkcol_job = qobject_cast<MkColJob> (sender ());
+        var mkcol_job = (MkColJob)sender ();
         on_signal_network_job_destroyed (mkcol_job); // remove it from the this.jobs list
         GLib.InputStream.NetworkError err = mkcol_job.input_stream.error;
         this.item.http_error_code = mkcol_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
@@ -442,7 +443,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
     /***********************************************************
     ***********************************************************/
     private void on_signal_put_file_job_finished () {
-        var put_file_job = qobject_cast<PUTFileJob> (sender ());
+        var put_file_job = (PUTFileJob)sender ();
         //  ASSERT (put_file_job);
 
         on_signal_network_job_destroyed (put_file_job); // remove it from the this.jobs list
@@ -499,7 +500,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
         this.finished = this.sent == this.item.size;
 
         // Check if the file still exists
-        const string full_file_path = this.propagator.full_local_path (this.item.file);
+        string full_file_path = this.propagator.full_local_path (this.item.file);
         if (!FileSystem.file_exists (full_file_path)) {
             if (!this.finished) {
                 abort_with_error (SyncFileItem.Status.SOFT_ERROR, _("The local file was removed during sync."));
@@ -542,7 +543,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
     ***********************************************************/
     private void on_signal_move_job_finished () {
         this.propagator.active_job_list.remove_one (this);
-        var move_job = qobject_cast<MoveJob> (sender ());
+        var move_job = (MoveJob)sender ();
         on_signal_network_job_destroyed (move_job); // remove it from the this.jobs list
         GLib.InputStream.NetworkError err = move_job.input_stream.error;
         this.item.http_error_code = move_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();

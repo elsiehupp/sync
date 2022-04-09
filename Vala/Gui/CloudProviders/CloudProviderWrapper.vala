@@ -304,7 +304,7 @@ public class CloudProviderWrapper : GLib.Object {
             message =  _("Checking for changes in \"%1\"").printf (progress.current_discovered_remote_folder);
         } else if (progress.total_size () == 0) {
             int64 current_file = progress.current_file ();
-            int64 total_file_count = q_max (progress.total_files (), current_file);
+            int64 total_file_count = int64.max (progress.total_files (), current_file);
             if (progress.trust_eta ()) {
                 message = _("Syncing %1 of %2  (%3 left)")
                         .printf (current_file)
@@ -407,9 +407,9 @@ public class CloudProviderWrapper : GLib.Object {
     ***********************************************************/
     private static void activate_action_open (GLib.SimpleAction action, GLib.Variant parameter, gpointer user_data) {
         //  Q_UNUSED (parameter);
-        const gchar name = g_action_get_name (G_ACTION (action));
-        var self = static_cast<CloudProviderWrapper> (user_data);
-        var gui = dynamic_cast<OwncloudGui> (self.parent ().parent ());
+        gchar name = g_action_get_name (G_ACTION (action));
+        var self = (CloudProviderWrapper)user_data;
+        var gui = (OwncloudGui)self.parent ().parent ();
 
         if (g_str_equal (name, "openhelp")) {
             gui.on_signal_help ();
@@ -428,7 +428,7 @@ public class CloudProviderWrapper : GLib.Object {
         }
 
         if (g_str_equal (name, "showfile")) {
-            const gchar path = g_variant_get_string (parameter, null);
+            gchar path = g_variant_get_string (parameter, null);
             g_print ("showfile => %s\n", path);
             show_in_file_manager (path);
         }
@@ -448,7 +448,7 @@ public class CloudProviderWrapper : GLib.Object {
     private static void activate_action_open_recent_file (GLib.SimpleAction action, GLib.Variant parameter, gpointer user_data) {
         //  Q_UNUSED (action);
         //  Q_UNUSED (parameter);
-        var self = static_cast<CloudProviderWrapper> (user_data);
+        var self = (CloudProviderWrapper)user_data;
         GLib.DesktopServices.open_url (self.folder_connection.account_state.account.url);
     }
 

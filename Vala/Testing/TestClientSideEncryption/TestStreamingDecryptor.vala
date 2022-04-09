@@ -22,7 +22,7 @@ public class TestStreamingDecryptor : AbstractTestClientSideEncryption {
 
         GLib.assert_true (dummy_input_file.write (dummy_file_random_contents) == dummy_file_random_contents.size ());
 
-        const string original_file_hash = hash_from_string (dummy_file_random_contents);
+        string original_file_hash = hash_from_string (dummy_file_random_contents);
 
         GLib.assert_true (original_file_hash != "");
 
@@ -91,7 +91,7 @@ public class TestStreamingDecryptor : AbstractTestClientSideEncryption {
         if (pending_bytes != "") {
             var decrypted_chunk = streaming_decryptor.chunk_decryption (pending_bytes.const_data (), pending_bytes.size ());
 
-            GLib.assert_true (decrypted_chunk.size () == pending_bytes.size () || streaming_decryptor.is_finished ());
+            GLib.assert_true (decrypted_chunk.size () == pending_bytes.length || streaming_decryptor.is_finished ());
 
             chunked_output_decrypted.write (decrypted_chunk);
         }

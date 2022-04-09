@@ -457,7 +457,7 @@ public class AbstractNetworkJob : GLib.Object {
         if (this.input_stream.error == GLib.InputStream.NoError) {
             return "OK";
         } else {
-            string enumber_of_str = GLib.MetaEnum.from_type<GLib.InputStream.NetworkError> ().value_to_key (static_cast<int> (this.input_stream.error));
+            string enumber_of_str = GLib.MetaEnum.from_type<GLib.InputStream.NetworkError> ().value_to_key ((int)this.input_stream.error);
             return "%1 %2".printf (enumber_of_str, this.error_string);
         }
     }

@@ -26,7 +26,7 @@ public class ShareeModel : GLib.AbstractListModel {
     ***********************************************************/
     struct FindShareeHelper {
 
-        const Sharee sharee;
+        Sharee sharee;
 
         bool operator (unowned Sharee s2) {
             return s2.to_string () == sharee.to_string () && s2.display_name == sharee.to_string ();
@@ -96,9 +96,9 @@ public class ShareeModel : GLib.AbstractListModel {
         {
             GLib.List<string> sharee_types {"users", "groups", "emails", "remotes", "circles", "rooms"};
 
-            const var append_sharees = [this, sharee_types] (Json.Object data, GLib.List<unowned Sharee>& out) {
+            var append_sharees = [this, sharee_types] (Json.Object data, GLib.List<unowned Sharee>& out) {
                 for (var sharee_type : sharee_types) {
-                    const var category = data.value (sharee_type).to_array ();
+                    var category = data.value (sharee_type).to_array ();
                     for (var sharee : category) {
                         out.append (parse_sharee (sharee.to_object ()));
                     }
@@ -137,7 +137,7 @@ public class ShareeModel : GLib.AbstractListModel {
     ***********************************************************/
     private void new_sharees (GLib.List<unowned Sharee> new_sharees) {
         layout_about_to_be_changed ();
-        const var persistent = persistent_index_list ();
+        var persistent = persistent_index_list ();
         GLib.List<unowned Sharee> old_persistant_sharee;
         old_persistant_sharee.reserve (persistent.size ());
 
@@ -169,9 +169,9 @@ public class ShareeModel : GLib.AbstractListModel {
     ***********************************************************/
     private unowned Sharee parse_sharee (Json.Object data) {
         string display_name = data.value ("label").to_string ();
-        const string share_with = data.value ("value").to_object ().value ("share_with").to_string ();
+        string share_with = data.value ("value").to_object ().value ("share_with").to_string ();
         Sharee.Type parsed_type = (Sharee.Type)data.value ("value").to_object ().value ("share_type").to_int ();
-        const string additional_info = data.value ("value").to_object ().value ("share_with_additional_info").to_string ();
+        string additional_info = data.value ("value").to_object ().value ("share_with_additional_info").to_string ();
         if (!additional_info == "") {
             display_name = _("%1 (%2)", "sharee (share_with_additional_info)").printf (display_name, additional_info);
         }
@@ -187,18 +187,18 @@ public class ShareeModel : GLib.AbstractListModel {
             return GLib.Variant ();
         }
 
-        const var sharee = this.sharees.at (index.row ());
-        if (role == Qt.Display_role) {
+        var sharee = this.sharees.at (index.row ());
+        if (role == GLib.Display_role) {
             return sharee.to_string ();
 
-        } else if (role == Qt.EditRole) {
+        } else if (role == GLib.EditRole) {
             // This role is used by the completer - it should match
             // the full name and the user name and thus we include both
             // in the output here. But we need to take care this string
             // doesn't leak to the user.
             return sharee.display_name + " (" + sharee.share_with () + ")";
 
-        } else if (role == Qt.USER_ROLE) {
+        } else if (role == GLib.USER_ROLE) {
             return GLib.Variant.from_value (sharee);
         }
 
@@ -221,7 +221,7 @@ public class ShareeModel : GLib.AbstractListModel {
     Helper function for new_sharees (could be a lambda when we can use them)
     ***********************************************************/
     private static unowned Sharee sharee_from_model_index (GLib.ModelIndex index) {
-        return index.data (Qt.USER_ROLE).value<unowned Sharee> ();
+        return index.data (GLib.USER_ROLE).value<unowned Sharee> ();
     }
 
 } // class ShareeModel

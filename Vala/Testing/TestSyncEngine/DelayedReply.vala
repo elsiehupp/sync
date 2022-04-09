@@ -8,7 +8,7 @@ namespace Testing {
 /***********************************************************
 A delayed reply
 ***********************************************************/
-public class DelayedReply : OriginalReply {
+public class DelayedReply<OriginalReply> : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
@@ -25,7 +25,7 @@ public class DelayedReply : OriginalReply {
     /***********************************************************
     ***********************************************************/
     public void respond () {
-        GLib.Timeout.single_shot (this.delay_milliseconds, static_cast<OriginalReply> (this), () => {
+        GLib.Timeout.single_shot (this.delay_milliseconds, (OriginalReply)this, () => {
             // Explicit call to bases's respond ();
             this.OriginalReply.respond ();
         });

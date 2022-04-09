@@ -13,7 +13,7 @@ public class FakeReply : GLib.InputStream {
     ***********************************************************/
     public FakeReply (GLib.Object parent) {
         base (parent);
-        set_raw_header ("Date", GLib.DateTime.current_date_time_utc ().to_string (Qt.RFC2822Date));
+        set_raw_header ("Date", GLib.DateTime.current_date_time_utc ().to_string (GLib.RFC2822Date));
     }
 
 

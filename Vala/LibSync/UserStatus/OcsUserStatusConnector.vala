@@ -275,7 +275,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
         Json.Object data_object;
         data_object.insert ("message_id", user_status.identifier);
         if (user_status.clear_at ()) {
-            data_object.insert ("clear_at", static_cast<int> (clear_at_to_timestamp (user_status.clear_at ())));
+            data_object.insert ("clear_at", (int)clear_at_to_timestamp (user_status.clear_at ()));
         } else {
             data_object.insert ("clear_at", GLib.JsonValue ());
         }
@@ -309,7 +309,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
         data_object.insert ("message", user_status.message ());
         var clear_at = user_status.clear_at ();
         if (clear_at) {
-            data_object.insert ("clear_at", static_cast<int> (clear_at_to_timestamp (*clear_at)));
+            data_object.insert ("clear_at", (int)clear_at_to_timestamp (*clear_at));
         } else {
             data_object.insert ("clear_at", GLib.JsonValue ());
         }
@@ -325,7 +325,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
 
     private static UserStatus.OnlineStatus string_to_user_online_status (string status) {
         // it needs to match the Status enum
-        const GLib.HashTable<string, UserStatus.OnlineStatus> pre_defined_status = {
+        GLib.HashTable<string, UserStatus.OnlineStatus> pre_defined_status = {
             {
                 "online", UserStatus.OnlineStatus.Online
             },
@@ -424,7 +424,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
         if (clear_at.endof == "day") {
             return GLib.Date.current_date ().add_days (1).start_of_day ().to_time_t ();
         } else if (clear_at.endof == "week") {
-            var days = Qt.Sunday - GLib.Date.current_date ().day_of_week ();
+            var days = GLib.Sunday - GLib.Date.current_date ().day_of_week ();
             return GLib.Date.current_date ().add_days (days + 1).start_of_day ().to_time_t ();
         }
         GLib.warning ("Can not handle clear at endof day type " + clear_at.endof);

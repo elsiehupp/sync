@@ -37,7 +37,7 @@ public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
 
         // If any of the url is outside of a sync folder, return an empty menu.
         GLib.List<GLib.Uri> urls = file_item_infos.url_list ();
-        const var paths = helper.paths ();
+        var paths = helper.paths ();
         string files;
         foreach (var url in urls) {
             GLib.Dir local_path = new GLib.Dir (url.to_local_file ());
@@ -113,7 +113,7 @@ public class OwncloudDolphinPluginAction : KAbstractFileItemActionPlugin {
         GLib.List<GLib.Uri> urls = file_item_infos.url_list ();
         if (urls.length != 1)
             return {};
-        GLib.Dir local_path = new GLib.Dir (urls.first ().to_local_file ());
+        GLib.Dir local_path = new GLib.Dir (urls.nth_data (0).to_local_file ());
         var local_file = local_path.canonical_path;
         var helper = OwncloudDolphinPluginHelper.instance;
         var menuaction = new GLib.Action (parentWidget);

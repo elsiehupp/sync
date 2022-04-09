@@ -42,7 +42,7 @@ public class SelectiveSyncTreeViewItem : GLib.TreeWidgetItem {
     //  private bool operator< (GLib.TreeWidgetItem other) override {
     //      int column = tree_widget ().sort_column ();
     //      if (column == 1) {
-    //          return data (1, Qt.USER_ROLE).to_long_long () < other.data (1, Qt.USER_ROLE).to_long_long ();
+    //          return data (1, GLib.USER_ROLE).to_long_long () < other.data (1, GLib.USER_ROLE).to_long_long ();
     //      }
     //      return GLib.TreeWidgetItem.operator< (other);
     //  }

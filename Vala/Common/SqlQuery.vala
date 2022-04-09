@@ -128,7 +128,7 @@ public class SqlQuery : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public string string_value (int index) {
-        return string.from_utf16 (static_cast<const ushort> (sqlite3_column_text16 (this.sqlite_statement, index)));
+        return string.from_utf16 ((const ushort)sqlite3_column_text16 (this.sqlite_statement, index));
     }
 
 
@@ -149,7 +149,7 @@ public class SqlQuery : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public string byte_array_value (int index) {
-        return string (static_cast<const char> (sqlite3_column_blob (this.sqlite_statement, index)),
+        return string ((const char)sqlite3_column_blob (this.sqlite_statement, index),
             sqlite3_column_bytes (this.sqlite_statement, index));
     }
 
@@ -224,7 +224,7 @@ public class SqlQuery : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public NextResult next () {
-        const bool first_step = !Sqlite3StmtBusy (this.sqlite_statement);
+        bool first_step = !Sqlite3StmtBusy (this.sqlite_statement);
 
         int n = 0;
         while (true) {
@@ -252,10 +252,10 @@ public class SqlQuery : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public template<class T, typename std.enable_if<std.is_enum<T>.value, int>.type = 0>
+    //  public template<class T, typename std.enable_if<std.is_enum<T>.value, int>.type = 0>
     public void bind_value (int pos, T value) {
-        GLib.debug ("SQL bind" + pos + value;
-        bind_value_internal (pos, static_cast<int> (value));
+        GLib.debug ("SQL bind" + pos + value);
+        bind_value_internal (pos, (int)value);
     }
 
 
@@ -323,25 +323,25 @@ public class SqlQuery : GLib.Object {
             res = sqlite3_bind_int64 (this.sqlite_statement, pos, value.to_long_long ());
             break;
         case GLib.Variant.Date_time: {
-            const GLib.DateTime date_time = value.to_date_time ();
-            const string string_value = date_time.to_string ("yyyy-MM-dd_thh:mm:ss.zzz");
+            GLib.DateTime date_time = value.to_date_time ();
+            string string_value = date_time.to_string ("yyyy-MM-dd_thh:mm:ss.zzz");
             res = sqlite3_bind_text16 (this.sqlite_statement, pos, string_value.utf16 (),
-                string_value.length * static_cast<int> (sizeof (ushort)), Sqlite.TRANSIENT);
+                string_value.length * (int)sizeof (ushort), Sqlite.TRANSIENT);
             break;
         }
         case GLib.Variant.Time: {
-            const GLib.Time time = value.to_time ();
-            const string string_value = time.to_string ("hh:mm:ss.zzz");
+            GLib.Time time = value.to_time ();
+            string string_value = time.to_string ("hh:mm:ss.zzz");
             res = sqlite3_bind_text16 (this.sqlite_statement, pos, string_value.utf16 (),
-                string_value.length * static_cast<int> (sizeof (ushort)), Sqlite.TRANSIENT);
+                string_value.length * (int)sizeof (ushort), Sqlite.TRANSIENT);
             break;
         }
         case GLib.Variant.String: {
             if (!value.to_string () == null) {
                 // lifetime of string == lifetime of its qvariant
-                const var string_value = static_cast<const string> (value.const_data ());
+                var string_value = (const string)value.const_data ();
                 res = sqlite3_bind_text16 (this.sqlite_statement, pos, string_value.utf16 (),
-                    (string_value.length) * static_cast<int> (sizeof (char)), Sqlite.TRANSIENT);
+                    (string_value.length) * (int)sizeof (char), Sqlite.TRANSIENT);
             } else {
                 res = sqlite3_bind_null (this.sqlite_statement, pos);
             }
@@ -356,7 +356,7 @@ public class SqlQuery : GLib.Object {
             string string_value = value.to_string ();
             // Sqlite.TRANSIENT makes sure that sqlite buffers the data
             res = sqlite3_bind_text16 (this.sqlite_statement, pos, string_value.utf16 (),
-                (string_value.length) * static_cast<int> (sizeof (char)), Sqlite.TRANSIENT);
+                (string_value.length) * (int)sizeof (char), Sqlite.TRANSIENT);
             break;
         }
         }

@@ -389,7 +389,7 @@ public class Capabilities : GLib.Object {
             }
             GLib.List<string> supported = supported_checksum_types;
             if (supported != null) {
-                return supported.first ();
+                return supported.nth_data (0);
             }
             return "";
         }

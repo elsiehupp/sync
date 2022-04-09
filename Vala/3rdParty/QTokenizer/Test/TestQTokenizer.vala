@@ -59,7 +59,7 @@ public class TestTokenizer : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_tokenize_q_string_quoted () {
-        const string multiquote = "\"'Billy - the Kid' is dead!\"";
+        string multiquote = "\"'Billy - the Kid' is dead!\"";
         GLib.StringTokenizer tokenizer = new GLib.StringTokenizer (multiquote, " -");
         tokenizer.set_quote_characters ("\"");
         tokenizer.set_return_quote_characters (true);
@@ -74,7 +74,7 @@ public class TestTokenizer : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_tokenize_q_string_skip_quotes () {
-        const string multiquote = "\"'Billy - the Kid' is dead!\"";
+        string multiquote = "\"'Billy - the Kid' is dead!\"";
         GLib.StringTokenizer tokenizer = new GLib.StringTokenizer (multiquote, " ");
         tokenizer.set_quote_characters ("\"");
         tokenizer.set_return_quote_characters (false);
@@ -90,7 +90,7 @@ public class TestTokenizer : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_tokenize_q_string_with_delims () {
-        const string delims = "I;Insist,On/a-Delimiter";
+        string delims = "I;Insist,On/a-Delimiter";
         GLib.StringTokenizer tokenizer = new GLib.StringTokenizer (delims, ";,/-");
         tokenizer.set_return_delimiters (true);
 

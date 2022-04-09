@@ -83,7 +83,7 @@ public class ServerNotificationHandler : GLib.Object {
 
         var notifies = json.object ().value ("ocs").to_object ().value ("data").to_array ();
 
-        var ai = qvariant_cast<AccountState> (sender ().property (PROPERTY_ACCOUNT_STATE));
+        var account_state = (AccountState)sender ().property (PROPERTY_ACCOUNT_STATE);
 
         GLib.List<Activity> list;
 
@@ -91,7 +91,7 @@ public class ServerNotificationHandler : GLib.Object {
             Activity a;
             var json = element.to_object ();
             a.type = Activity.Type.NOTIFICATION;
-            a.acc_name = ai.account.display_name;
+            a.acc_name = account_state.account.display_name;
             a.id = json.value ("notification_id").to_int ();
 
             // Need to know, specially for remote_share
@@ -105,15 +105,15 @@ public class ServerNotificationHandler : GLib.Object {
             GLib.Uri link = new GLib.Uri (json.value ("link").to_string ());
             if (!link == "") {
                 if (link.host () == "") {
-                    link.scheme (ai.account.url.scheme ());
-                    link.host (ai.account.url.host ());
+                    link.scheme (account_state.account.url.scheme ());
+                    link.host (account_state.account.url.host ());
                 }
                 if (link.port () == -1) {
-                    link.port (ai.account.url.port ());
+                    link.port (account_state.account.url.port ());
                 }
             }
             a.link = link;
-            a.date_time = GLib.DateTime.from_string (json.value ("datetime").to_string (), Qt.ISODate);
+            a.date_time = GLib.DateTime.from_string (json.value ("datetime").to_string (), GLib.ISODate);
 
             var actions = json.value ("actions").to_array ();
             foreach (var action in actions) {
@@ -131,7 +131,7 @@ public class ServerNotificationHandler : GLib.Object {
             // https://github.com/owncloud/notifications/blob/master/docs/ocs-endpoint-v1.md#deleting-a-notification-for-a-user
             ActivityLink activity_link;
             activity_link.label = _("Dismiss");
-            activity_link.link = Utility.concat_url_path (ai.account.url, NOTIFICATIONS_PATH + "/" + string.number (a.id)).to_string ();
+            activity_link.link = Utility.concat_url_path (account_state.account.url, NOTIFICATIONS_PATH + "/" + string.number (a.id)).to_string ();
             activity_link.verb = "DELETE";
             activity_link.primary = false;
             a.links.append (activity_link);
@@ -158,9 +158,9 @@ public class ServerNotificationHandler : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_allow_desktop_notifications_changed (bool is_allowed) {
-        var account = qvariant_cast<AccountState> (sender ().property (PROPERTY_ACCOUNT_STATE));
-        if (account != null) {
-           account.are_desktop_notifications_allowed (is_allowed);
+        var account_state = (AccountState)sender ().property (PROPERTY_ACCOUNT_STATE);
+        if (account_state != null) {
+           account_state.are_desktop_notifications_allowed (is_allowed);
         }
     }
 

@@ -78,11 +78,11 @@ public class AbstractTestUnifiedSearchListmodel : GLib.Object {
         // handle search for provider
         } else if (path.has_prefix ("/ocs/v2.php/search/providers") && !search_term == "") {
             var path_split = path.mid ("/ocs/v2.php/search/providers".size ())
-                                       .split ("/", Qt.SkipEmptyParts);
+                                       .split ("/", GLib.SkipEmptyParts);
 
-            if (!path_split == "" && path.contains (path_split.first ())) {
+            if (!path_split == "" && path.contains (path_split.nth_data (0))) {
                 reply = new FakePayloadReply (operation, request,
-                    FakeSearchResultsStorage.instance.query_provider (path_split.first (), search_term, cursor),
+                    FakeSearchResultsStorage.instance.query_provider (path_split.nth_data (0), search_term, cursor),
                     SEARCH_RESULTS_REPLY_DELAY, fake_access_manager);
             }
         }

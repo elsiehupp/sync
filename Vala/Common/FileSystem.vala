@@ -252,7 +252,7 @@ public class FileSystem : GLib.Object {
                + GLib.Uri.to_percent_encoding (file_info.absolute_file_path, "~this.-./")
                + "\n"
                + "DeletionDate="
-               + GLib.DateTime.current_date_time ().to_string (Qt.ISODate)
+               + GLib.DateTime.current_date_time ().to_string (GLib.ISODate)
                + "\n";
         info_file.close ();
 

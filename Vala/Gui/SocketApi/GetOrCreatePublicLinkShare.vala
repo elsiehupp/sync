@@ -62,10 +62,11 @@ public class GetOrCreatePublicLinkShare : GLib.Object {
         var share_name = SocketApi._("Context menu share");
 
         // If there already is a context menu share, reuse it
-        for (var share : shares) {
-            const var link_share = q_shared_pointer_dynamic_cast<LinkShare> (share);
-            if (!link_share)
+        foreach (var share in shares) {
+            var link_share = (LinkShare)share;
+            if (!link_share) {
                 continue;
+            }
 
             if (link_share.name () == share_name) {
                 GLib.debug ("Found existing share, reusing";

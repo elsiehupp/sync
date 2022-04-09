@@ -35,7 +35,7 @@ public class PropagateLocalRename : AbstractPropagateItemJob {
             this.propagator.report_progress (*this.item, 0);
             GLib.debug ("MOVE " + existing_file + " => " + target_file);
 
-            if (string.compare (this.item.file, this.item.rename_target, Qt.CaseInsensitive) != 0
+            if (string.compare (this.item.file, this.item.rename_target, GLib.CaseInsensitive) != 0
                 && this.propagator.local_filename_clash (this.item.rename_target)) {
                 // Only use local_filename_clash for the destination if we know that the source was not
                 // the one conflicting  (renaming  A.txt . a.txt is OK)

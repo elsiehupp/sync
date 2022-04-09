@@ -41,7 +41,7 @@ public class SocketUploadJob : GLib.Object {
 
         this.pattern = socket_api_v2_job.arguments ()["pattern"].to_string ();
         // TODO: use uuid
-        const var accname = socket_api_v2_job.arguments ()["account"]["name"].to_string ();
+        var accname = socket_api_v2_job.arguments ()["account"]["name"].to_string ();
         var account = AccountManager.instance.account (accname);
 
         if (!new GLib.FileInfo (this.local_path).is_absolute ()) {

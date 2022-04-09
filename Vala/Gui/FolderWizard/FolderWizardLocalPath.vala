@@ -42,7 +42,7 @@ public class FolderWizardLocalPath : FormatWarningsWizardPage {
         this.instance.local_folder_line_edit.on_signal_text (GLib.Dir.to_native_separators (default_path));
         this.instance.local_folder_line_edit.tool_tip (_("Enter the path to the local folder."));
 
-        this.instance.warn_label.text_format (Qt.RichText);
+        this.instance.warn_label.text_format (GLib.RichText);
         this.instance.warn_label.hide ();
     }
 

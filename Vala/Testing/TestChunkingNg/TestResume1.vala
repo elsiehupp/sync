@@ -20,8 +20,8 @@ public class TestResume1 : AbstractTestChunkingNg {
 
         partial_upload (fake_folder, "A/a0", size);
         GLib.assert_true (fake_folder.upload_state ().children.length == 1);
-        var chunking_identifier = fake_folder.upload_state ().children.first ().name;
-        var chunk_map = fake_folder.upload_state ().children.first ().children;
+        var chunking_identifier = fake_folder.upload_state ().children.nth_data (0).name;
+        var chunk_map = fake_folder.upload_state ().children.nth_data (0).children;
         int64 uploaded_size = 0LL;
         foreach (FileInfo chunk in chunk_map) {
             uploaded_size += chunk.size;
@@ -29,7 +29,7 @@ public class TestResume1 : AbstractTestChunkingNg {
         GLib.assert_true (uploaded_size > 2 * 1000 * 1000); // at least 2 MB
 
         // Add a fake chunk to make sure it gets deleted
-        fake_folder.upload_state ().children.first ().insert ("10000", size);
+        fake_folder.upload_state ().children.nth_data (0).insert ("10000", size);
 
         fake_folder.set_server_override (this.override_delegate_resume1);
 
@@ -39,7 +39,7 @@ public class TestResume1 : AbstractTestChunkingNg {
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a0").size == size);
         // The same chunk identifier was re-used
         GLib.assert_true (fake_folder.upload_state ().children.length == 1);
-        GLib.assert_true (fake_folder.upload_state ().children.first ().name == chunking_identifier);
+        GLib.assert_true (fake_folder.upload_state ().children.nth_data (0).name == chunking_identifier);
     }
 
 

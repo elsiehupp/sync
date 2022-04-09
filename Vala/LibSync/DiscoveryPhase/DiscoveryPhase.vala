@@ -217,7 +217,7 @@ public class DiscoveryPhase : GLib.Object {
     /***********************************************************
     ***********************************************************/
     void schedule_more_jobs () {
-        var limit = q_max (1, this.sync_options.parallel_network_jobs);
+        int limit = int.max (1, this.sync_options.parallel_network_jobs);
         if (this.current_root_job && this.currently_active_jobs < limit) {
             this.current_root_job.process_sub_jobs (limit - this.currently_active_jobs);
         }
@@ -370,7 +370,7 @@ public class DiscoveryPhase : GLib.Object {
         string old_etag;
         var it = this.deleted_item.find (original_path);
         if (it != this.deleted_item.end ()) {
-            const CSync.SyncInstructions instruction = (*it).instruction;
+            CSync.SyncInstructions instruction = (*it).instruction;
             if (instruction == CSync.SyncInstructions.IGNORE && (*it).type == ItemType.VIRTUAL_FILE) {
                 // re-creation of virtual files count as a delete
                 // a file might be in an error state and thus gets marked as CSync.SyncInstructions.IGNORE
@@ -485,7 +485,7 @@ public class DiscoveryPhase : GLib.Object {
             if (property == "resourcetype") {
                 result.is_directory = value.contains ("collection");
             } else if (property == "getlastmodified") {
-                var date = GLib.DateTime.from_string (value, Qt.RFC2822Date);
+                var date = GLib.DateTime.from_string (value, GLib.RFC2822Date);
                 GLib.assert (date.is_valid);
                 result.modtime = date.to_time_t ();
             } else if (property == "getcontentlength") {

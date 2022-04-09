@@ -154,7 +154,7 @@ public class VfsOff : AbstractVfs {
 
         GLib.PluginLoader loader = new GLib.PluginLoader (AbstractPluginFactory.plugin_filename ("vfs", name));
 
-        const var base_meta_data = loader.meta_data ();
+        var base_meta_data = loader.meta_data ();
         if (base_meta_data == "" || !base_meta_data.contains ("IID")) {
             GLib.debug ("Plugin " + loader.filename () + " doesn't exist.");
             return false;
@@ -164,7 +164,7 @@ public class VfsOff : AbstractVfs {
             return false;
         }
 
-        const var metadata = base_meta_data["MetaData"].to_object ();
+        var metadata = base_meta_data["MetaData"].to_object ();
         if (metadata["type"].to_string () != "vfs") {
             GLib.warning ("Plugin " + loader.filename () + " metadata type " + metadata["type"] + " is incorrect");
             return false;

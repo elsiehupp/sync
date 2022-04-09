@@ -93,7 +93,7 @@ public class KeychainChunkDeleteJob : AbstractKeychainChunkJob {
     ***********************************************************/
     private void on_signal_delete_job_done (Secret.Collection.Job incoming_job) {
         // Errors or next chunk?
-        var delete_job = qobject_cast<Secret.Collection.DeletePasswordJob> (incoming_job);
+        var delete_job = Secret.Collection.DeletePasswordJob)incoming_job;
         GLib.assert (delete_job);
 
         if (delete_job.error == NoError) {

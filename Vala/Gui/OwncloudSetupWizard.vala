@@ -63,9 +63,9 @@ public class OwncloudSetupWizard : GLib.Object {
         );
         /* basic_setup_finished might be called from a reply from the network.
            on_signal_assistant_finished might destroy the temporary Soup.Context.
-           Therefore Qt.QueuedConnection is required */
+           Therefore GLib.QueuedConnection is required */
         this.oc_wizard.basic_setup_finished.connect (
-            this.on_signal_assistant_finished // Qt.QueuedConnection
+            this.on_signal_assistant_finished // GLib.QueuedConnection
         );
         this.oc_wizard.on_signal_finished.connect (
             this.delete_later
@@ -160,7 +160,7 @@ public class OwncloudSetupWizard : GLib.Object {
             // We want to reset the GLib.NAM proxy so that the global proxy settings are used (via ClientProxy settings)
             account.network_access_manager.proxy (Soup.NetworkProxy (Soup.NetworkProxy.DefaultProxy));
             // use a queued invocation so we're as asynchronous as with the other code path
-            GLib.Object.invoke_method (this, "on_signal_find_server", Qt.QueuedConnection);
+            GLib.Object.invoke_method (this, "on_signal_find_server", GLib.QueuedConnection);
         }
     }
 
@@ -209,7 +209,7 @@ public class OwncloudSetupWizard : GLib.Object {
 
         // Use a significantly reduced timeout for this redirect check:
         // the 5-minute default is inappropriate.
-        redirect_check_job.on_signal_timeout (q_min (2000ll, redirect_check_job.timeout_msec ()));
+        redirect_check_job.on_signal_timeout (int64.min (2000ll, redirect_check_job.timeout_msec ()));
 
         // Grab the chain of permanent redirects and adjust the account url
         // accordingly
@@ -280,7 +280,7 @@ public class OwncloudSetupWizard : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_no_server_found (GLib.InputStream reply) {
-        var check_server_job = qobject_cast<CheckServerJob> (sender ());
+        var check_server_job = (CheckServerJob)sender ();
 
         // Do this early because reply might be deleted in message box event loop
         string message;
@@ -330,7 +330,7 @@ public class OwncloudSetupWizard : GLib.Object {
         GLib.info ("Connect to url: " + url);
         this.oc_wizard.account.credentials = this.oc_wizard.credentials;
 
-        const var fetch_user_name_job = new LibSync.JsonApiJob (this.oc_wizard.account.shared_from_this (), "/ocs/v1.php/cloud/user");
+        var fetch_user_name_job = new LibSync.JsonApiJob (this.oc_wizard.account.shared_from_this (), "/ocs/v1.php/cloud/user");
         fetch_user_name_job.signal_json_received.connect (
             this.on_fetch_user_name_job_json_received
         );
@@ -347,9 +347,9 @@ public class OwncloudSetupWizard : GLib.Object {
 
         sender ().delete_later ();
 
-        const var obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
-        const var user_id = obj_data.value ("identifier").to_string ("");
-        const var display_name = obj_data.value ("display-name").to_string ("");
+        var obj_data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
+        var user_id = obj_data.value ("identifier").to_string ("");
+        var display_name = obj_data.value ("display-name").to_string ("");
         this.oc_wizard.account.dav_user (user_id);
         this.oc_wizard.account.dav_display_name (display_name);
 
@@ -368,7 +368,7 @@ public class OwncloudSetupWizard : GLib.Object {
     ***********************************************************/
     private void on_signal_create_local_and_remote_folders (string local_folder, string remote_folder) {
         GLib.info ("Setup local sync folder for new o_c connection " + local_folder);
-        const GLib.Dir file_info = new GLib.Dir (local_folder);
+        GLib.Dir file_info = new GLib.Dir (local_folder);
 
         bool next_step = true;
         if (file_info.exists ()) {
@@ -444,7 +444,7 @@ public class OwncloudSetupWizard : GLib.Object {
     return gui strings from jobs
     ***********************************************************/
     private void on_signal_remote_folder_exists (GLib.InputStream reply) {
-        var entity_exists_job = qobject_cast<EntityExistsJob> (sender ());
+        var entity_exists_job = (EntityExistsJob)sender ();
         bool ok = true;
         string error;
         GLib.InputStream.NetworkError err_id = reply.error;
@@ -483,9 +483,9 @@ public class OwncloudSetupWizard : GLib.Object {
         if (error == 202) {
             this.oc_wizard.on_signal_append_to_configuration_log (_("The remote folder %1 already exists. Connecting it for syncing.").printf (this.remote_folder));
         } else if (error > 202 && error < 300) {
-            this.oc_wizard.on_signal_display_error (_("The folder creation resulted in HTTP error code %1").printf (static_cast<int> (error)), false);
+            this.oc_wizard.on_signal_display_error (_("The folder creation resulted in HTTP error code %1").printf ((int)error), false);
 
-            this.oc_wizard.on_signal_append_to_configuration_log (_("The folder creation resulted in HTTP error code %1").printf (static_cast<int> (error)));
+            this.oc_wizard.on_signal_append_to_configuration_log (_("The folder creation resulted in HTTP error code %1").printf ((int)error));
         } else if (error == GLib.InputStream.OperationCanceledError) {
             this.oc_wizard.on_signal_display_error (
                 _("The remote folder creation failed because the provided credentials "
@@ -599,7 +599,7 @@ public class OwncloudSetupWizard : GLib.Object {
     private void on_signal_auth_error () {
         string error_msg;
 
-        var propfind_job = qobject_cast<PropfindJob> (sender ());
+        var propfind_job = (PropfindJob)sender ();
         if (!propfind_job) {
             GLib.warning ("Cannot check for authed redirects. This slot should be invoked from PropfindJob!");
             return;
@@ -690,9 +690,9 @@ public class OwncloudSetupWizard : GLib.Object {
         this.oc_wizard.on_signal_remote_folder (this.remote_folder);
 
     //  #ifdef WITH_PROVIDERS
-        const var start_page = WizardCommon.Pages.PAGE_WELCOME;
+        var start_page = WizardCommon.Pages.PAGE_WELCOME;
     //  #else // WITH_PROVIDERS
-        const var start_page = WizardCommon.Pages.PAGE_SERVER_SETUP;
+        var start_page = WizardCommon.Pages.PAGE_SERVER_SETUP;
     //  #endif // WITH_PROVIDERS
         this.oc_wizard.start_id (start_page);
 
@@ -754,7 +754,7 @@ public class OwncloudSetupWizard : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void finalize_setup (bool on_signal_success) {
-        const string local_folder = this.oc_wizard.property ("local_folder").to_string ();
+        string local_folder = this.oc_wizard.property ("local_folder").to_string ();
         if (on_signal_success) {
             if (! (local_folder == "" || this.remote_folder == "")) {
                 this.oc_wizard.on_signal_append_to_configuration_log (

@@ -144,10 +144,10 @@ public class WebViewPage : AbstractCredentialsWizardPage {
     /***********************************************************
     ***********************************************************/
     private bool try_to_wizard_size (int width, int height) {
-        const var window = this.oc_wizard.window ();
-        const var screen_geometry = GLib.Application.screen_at (window.position ()).geometry ();
-        const var window_width = screen_geometry.width ();
-        const var window_height = screen_geometry.height ();
+        var window = this.oc_wizard.window ();
+        var screen_geometry = GLib.Application.screen_at (window.position ()).geometry ();
+        var window_width = screen_geometry.width ();
+        var window_height = screen_geometry.height ();
 
         if (width < window_width && height < window_height) {
             this.oc_wizard.resize (width, height);
@@ -165,7 +165,7 @@ public class WebViewPage : AbstractCredentialsWizardPage {
         var wizard_size_changed = try_to_wizard_size (this.original_wizard_size.width () * 2, this.original_wizard_size.height () * 2);
 
         if (!wizard_size_changed) {
-            wizard_size_changed = try_to_wizard_size (static_cast<int> (this.original_wizard_size.width () * 1.5), static_cast<int> (this.original_wizard_size.height () * 1.5));
+            wizard_size_changed = try_to_wizard_size ((int)(this.original_wizard_size.width () * 1.5), (int)(this.original_wizard_size.height () * 1.5));
         }
 
         if (wizard_size_changed) {

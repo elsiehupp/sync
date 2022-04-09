@@ -138,7 +138,7 @@ public class FileInfo : AbstractFileModifier {
     /***********************************************************
     ***********************************************************/
     public override void remove (string relative_path) {
-        const PathComponents path_components = new PathComponents (relative_path);
+        PathComponents path_components = new PathComponents (relative_path);
         FileInfo parent = find_invalidating_etags (path_components.parent_directory_components ());
         GLib.assert_true (parent);
         foreach (var file_info in parent.children) {
@@ -184,11 +184,11 @@ public class FileInfo : AbstractFileModifier {
     /***********************************************************
     ***********************************************************/
     public override void rename (string old_path, string new_path) {
-        const PathComponents new_path_components = new PathComponents (new_path);
+        PathComponents new_path_components = new PathComponents (new_path);
         FileInfo directory = find_invalidating_etags (new_path_components.parent_directory_components ());
         GLib.assert_true (directory);
         GLib.assert_true (directory.is_directory);
-        const PathComponents path_components = new PathComponents (old_path);
+        PathComponents path_components = new PathComponents (old_path);
         FileInfo parent = find_invalidating_etags (path_components.parent_directory_components ());
         GLib.assert_true (parent);
         FileInfo file_info = parent.children.take (path_components.filename ());
@@ -234,7 +234,7 @@ public class FileInfo : AbstractFileModifier {
     /***********************************************************
     ***********************************************************/
     public FileInfo create_directory (string relative_path) {
-        const PathComponents path_components = new PathComponents (relative_path);
+        PathComponents path_components = new PathComponents (relative_path);
         FileInfo parent = find_invalidating_etags (path_components.parent_directory_components ());
         GLib.assert_true (parent);
         FileInfo child = parent.children[path_components.filename ()] = FileInfo ( path_components.filename ());
@@ -247,7 +247,7 @@ public class FileInfo : AbstractFileModifier {
     /***********************************************************
     ***********************************************************/
     public FileInfo create (string relative_path, int64 size, char content_char) {
-        const PathComponents path_components = new PathComponents (relative_path);
+        PathComponents path_components = new PathComponents (relative_path);
         FileInfo parent = find_invalidating_etags (path_components.parent_directory_components ());
         GLib.assert_true (parent);
         FileInfo child = parent.children[path_components.filename ()] = new FileInfo (path_components.filename (), size);
@@ -334,7 +334,7 @@ public class FileInfo : AbstractFileModifier {
     ***********************************************************/
     FileInfo find_conflict (FileInfo directory, string filename) {
         GLib.FileInfo info = new GLib.FileInfo (filename);
-        const FileInfo parent_directory = directory.find (info.path);
+        FileInfo parent_directory = directory.find (info.path);
         if (!parent_directory)
             return null;
         string on_signal_start = info.base_name () + " (conflicted copy";

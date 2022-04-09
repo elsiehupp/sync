@@ -55,7 +55,7 @@ public class AccessManager : Soup.Session {
         // only enable HTTP2 with Qt 5.9.4 because old Qt have too many bugs (e.g. GLib.TBUG-64359 is fixed in >= Qt 5.9.4)
         if (new_request.url.scheme () == "https") { // Not for "http" : GLib.TBUG-61397
             // http2 seems to cause issues, as with our recommended server setup we don't support http2, disable it by default for now
-            const bool http2_enabled_env = q_environment_variable_int_value ("OWNCLOUD_HTTP2_ENABLED") == 1;
+            bool http2_enabled_env = q_environment_variable_int_value ("OWNCLOUD_HTTP2_ENABLED") == 1;
 
             new_request.attribute (Soup.Request.HTTP2AllowedAttribute, http2_enabled_env);
         }

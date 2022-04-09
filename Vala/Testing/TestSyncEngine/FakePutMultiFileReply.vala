@@ -26,7 +26,7 @@ public class FakePutMultiFileReply : FakeReply {
         set_operation (operation);
         open (GLib.IODevice.ReadOnly);
         this.all_file_info = perform_multi_part (remote_root_file_info, request, put_payload, content_type);
-        GLib.Object.invoke_method (this, "respond", Qt.QueuedConnection);
+        GLib.Object.invoke_method (this, "respond", GLib.QueuedConnection);
     }
 
 
@@ -37,10 +37,10 @@ public class FakePutMultiFileReply : FakeReply {
         GLib.List<FileInfo> result;
 
         var string_put_payload = put_payload;
-        const int boundary_position = "multipart/related; boundary=".size ();
-        const string boundary_value = "--" + content_type.mid (boundary_position, content_type.length - boundary_position - 1) + "\r\n";
+        int boundary_position = "multipart/related; boundary=".size ();
+        string boundary_value = "--" + content_type.mid (boundary_position, content_type.length - boundary_position - 1) + "\r\n";
         var string_put_payload_reference = string_put_payload.left (string_put_payload.size () - 2 - boundary_value.size ());
-        var all_parts = string_put_payload_reference.split (boundary_value, Qt.SkipEmptyParts);
+        var all_parts = string_put_payload_reference.split (boundary_value, GLib.SkipEmptyParts);
         foreach (var one_part in all_parts) {
             var header_end_position = one_part.index_of ("\r\n\r\n");
             var one_part_header_part = one_part.left (header_end_position);

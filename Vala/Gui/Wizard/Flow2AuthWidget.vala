@@ -33,7 +33,7 @@ public class Flow2AuthWidget : Gtk.Widget {
         this.instance.setupUi (this);
 
         WizardCommon.initErrorLabel (this.instance.error_label);
-        this.instance.error_label.setTextFormat (Qt.RichText);
+        this.instance.error_label.setTextFormat (GLib.RichText);
 
         this.instance.open_link_label.clicked.connect (
             this.on_signal_open_browser
@@ -73,7 +73,7 @@ public class Flow2AuthWidget : Gtk.Widget {
 
         this.async_auth.reset (new Flow2Auth (this.account, this));
         this.async_auth.signal_result.connect (
-            this.on_signal_auth_result // Qt.QueuedConnection
+            this.on_signal_auth_result // GLib.QueuedConnection
         );
         this.async_auth.signal_status_changed.connect (
             this.on_signal_status_changed
@@ -233,19 +233,19 @@ public class Flow2AuthWidget : Gtk.Widget {
         logo ();
 
         if (this.progress_indicator != null) {
-            const bool is_dark_background = Theme.is_dark_color (palette ().window ().color ());
+            bool is_dark_background = Theme.is_dark_color (palette ().window ().color ());
             if (this.is_dark_background) {
-                this.progress_indicator.color (Qt.white);
+                this.progress_indicator.color (GLib.white);
             } else {
-                this.progress_indicator.color (Qt.black);
+                this.progress_indicator.color (GLib.black);
             }
         }
 
         this.instance.open_link_label.text (_("Reopen Browser"));
-        this.instance.open_link_label.alignment (Qt.AlignCenter);
+        this.instance.open_link_label.alignment (GLib.AlignCenter);
 
         this.instance.copy_link_label.text (_("Copy Link"));
-        this.instance.copy_link_label.alignment (Qt.AlignCenter);
+        this.instance.copy_link_label.alignment (GLib.AlignCenter);
 
         WizardCommon.customize_hint_label (this.instance.status_label);
     }
@@ -254,8 +254,8 @@ public class Flow2AuthWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void logo () {
-        const var background_color = palette ().window ().color ();
-        const var logo_icon_filename = Theme.is_branded
+        var background_color = palette ().window ().color ();
+        var logo_icon_filename = Theme.is_branded
             ? Theme.hidpi_filename ("external.png", background_color)
             : Theme.hidpi_filename (":/client/theme/colored/external.png");
         this.instance.logo_label.pixmap (logo_icon_filename);

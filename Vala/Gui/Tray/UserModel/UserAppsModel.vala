@@ -7,7 +7,7 @@ public class UserAppsModel : GLib.AbstractListModel {
     /***********************************************************
     ***********************************************************/
     public enum UserAppsRoles {
-        NAME = Qt.USER_ROLE + 1,
+        NAME = GLib.USER_ROLE + 1,
         URL,
         ICON_URL;
 
@@ -58,7 +58,7 @@ public class UserAppsModel : GLib.AbstractListModel {
         }
 
         if (UserModel.instance.app_list.length > 0) {
-            const var talk_app = UserModel.instance.is_current_user ().talk_app ();
+            var talk_app = UserModel.instance.is_current_user ().talk_app ();
             foreach (AccountApp app in UserModel.instance.app_list) {
                 // Filter out Talk because we have a dedicated button for it
                 if (talk_app && app.identifier == talk_app.identifier)

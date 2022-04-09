@@ -17,7 +17,7 @@ namespace Ui {
 public class UserModel : GLib.AbstractListModel {
 
     public enum UserRoles {
-        NAME = Qt.USER_ROLE + 1,
+        NAME = GLib.USER_ROLE + 1,
         SERVER,
         SERVER_HAS_USER_STATUS,
         STATUS_ICON,
@@ -365,7 +365,7 @@ public class UserModel : GLib.AbstractListModel {
             return;
         }
 
-        const var talk_app = this.current_user.talk_app ();
+        var talk_app = this.current_user.talk_app ();
         if (talk_app) {
             OpenExternal.open_browser (talk_app.url);
         } else {
@@ -510,7 +510,7 @@ public class UserModel : GLib.AbstractListModel {
             add_user (user);
         }
         if (this.init) {
-            this.users.first ().is_current_user (true);
+            this.users.nth_data (0).is_current_user (true);
             this.init = false;
         }
     }

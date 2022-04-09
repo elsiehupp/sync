@@ -148,7 +148,7 @@ public class VfsXAttr : Common.AbstractVfs {
             return false;
         }
 
-        var parent_path = static_cast<string> (stat_data);
+        var parent_path = (string)stat_data;
         GLib.assert (!parent_path.has_suffix ("/"));
         GLib.assert (!stat.path.has_prefix ("/"));
 

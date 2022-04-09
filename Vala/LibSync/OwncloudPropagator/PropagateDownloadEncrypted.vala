@@ -81,7 +81,7 @@ public class PropagateDownloadEncrypted : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool decrypt_file (GLib.File temporary_file) {
-            const string temporary_filename = create_download_temporary_filename (this.item.file + "_dec");
+            string temporary_filename = create_download_temporary_filename (this.item.file + "_dec");
             GLib.debug ("Content Checksum Computed starting decryption" + temporary_filename);
 
             temporary_file.close ();
@@ -113,11 +113,11 @@ public class PropagateDownloadEncrypted : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_check_folder_id (GLib.List<string> list) {
-        var lscol_job = qobject_cast<LscolJob> (sender ());
-        const string folder_identifier = list.first ();
+        var lscol_job = (LscolJob)sender ();
+        string folder_identifier = list.nth_data (0);
         GLib.debug ("Received identifier of folder" + folder_identifier);
 
-        const ExtraFolderInfo folder_info = lscol_job.folder_infos.value (folder_identifier);
+        ExtraFolderInfo folder_info = lscol_job.folder_infos.value (folder_identifier);
 
         // Now that we have the folder-identifier we need it's JSON metadata
         var get_metadata_api_job = new GetMetadataApiJob (this.propagator.account, folder_info.file_identifier);
@@ -139,11 +139,11 @@ public class PropagateDownloadEncrypted : GLib.Object {
                    + this.item.instruction
                    + this.item.file
                    + this.item.encrypted_filename);
-        const string filename = this.info.filename ();
+        string filename = this.info.filename ();
         var meta = new FolderMetadata (this.propagator.account, json.to_json (GLib.JsonDocument.Compact));
         GLib.List<EncryptedFile> files = meta.files ();
 
-        const string encrypted_filename = this.item.encrypted_filename.section ("/", -1);
+        string encrypted_filename = this.item.encrypted_filename.section ("/", -1);
         foreach (EncryptedFile file in files) {
             if (encrypted_filename == file.encrypted_filename) {
                 this.encrypted_info = file;

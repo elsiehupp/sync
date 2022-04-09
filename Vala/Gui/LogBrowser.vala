@@ -37,7 +37,7 @@ public class LogBrowser : Gtk.Dialog {
     ***********************************************************/
     public LogBrowser (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
-        window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
+        window_flags (window_flags () & ~GLib.WindowContextHelpButtonHint);
         object_name ("LogBrowser"); // for save/restore_geometry ()
         window_title (_("Log Output"));
         minimum_width (600);
@@ -53,7 +53,7 @@ public class LogBrowser : Gtk.Dialog {
             + "If enabled, logs will be written to %1")
             .printf (LibSync.Logger.instance.temporary_folder_log_dir_path));
         label.word_wrap (true);
-        label.text_interaction_flags (Qt.Text_selectable_by_mouse);
+        label.text_interaction_flags (GLib.Text_selectable_by_mouse);
         label.size_policy (GLib.SizePolicy.Expanding, GLib.SizePolicy.Minimum_expanding);
         main_layout.add_widget (label);
 

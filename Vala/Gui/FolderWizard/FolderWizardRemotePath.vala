@@ -33,7 +33,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
         this.instance.warn_frame.hide ();
 
         this.instance.folder_tree_widget.sorting_enabled (true);
-        this.instance.folder_tree_widget.sort_by_column (0, Qt.AscendingOrder);
+        this.instance.folder_tree_widget.sort_by_column (0, GLib.AscendingOrder);
 
         this.instance.add_folder_button.clicked.connect (
             this.on_signal_add_remote_folder
@@ -70,7 +70,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
                 return false;
 
             GLib.List<string> warn_strings;
-            string directory = this.instance.folder_tree_widget.current_item ().data (0, Qt.USER_ROLE).to_string ();
+            string directory = this.instance.folder_tree_widget.current_item ().data (0, GLib.USER_ROLE).to_string ();
             if (!directory.has_prefix ("/")) {
                 directory.prepend ("/");
             }
@@ -79,7 +79,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
             FolderConnection.Map map = FolderManager.instance.map ();
             FolderConnection.Map.ConstIterator i = map.const_begin ();
             for (i = map.const_begin (); i != map.const_end (); i++) {
-                var f = static_cast<FolderConnection> (i.value ());
+                var f = (FolderConnection)i.value ();
                 if (f.account_state.account != this.account) {
                     continue;
                 }
@@ -133,7 +133,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
 
         string parent = "/";
         if (current) {
-            parent = current.data (0, Qt.USER_ROLE).to_string ();
+            parent = current.data (0, GLib.USER_ROLE).to_string ();
         }
 
         var dialog = new GLib.InputDialog (this);
@@ -142,7 +142,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
         dialog.label_text (_("Enter the name of the new folder to be created below \"%1\":")
                               .printf (parent));
         dialog.open (this, SLOT (on_signal_create_remote_folder (string)));
-        dialog.attribute (Qt.WA_DeleteOnClose);
+        dialog.attribute (GLib.WA_DeleteOnClose);
     }
 
 
@@ -155,7 +155,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
         GLib.TreeWidgetItem current = this.instance.folder_tree_widget.current_item ();
         string full_path;
         if (current) {
-            full_path = current.data (0, Qt.USER_ROLE).to_string ();
+            full_path = current.data (0, GLib.USER_ROLE).to_string ();
         }
         full_path += "/" + folder;
 
@@ -177,7 +177,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
         GLib.debug ("webdav mkdir request on_signal_finished");
         on_signal_show_warning (_("FolderConnection was successfully created on %1.").printf (Theme.app_name_gui));
         on_signal_refresh_folders ();
-        this.instance.folder_entry.on_signal_text (static_cast<MkColJob> (sender ()).path);
+        this.instance.folder_entry.on_signal_text (((MkColJob)sender ()).path);
         on_signal_lscol_folder_entry ();
     }
 
@@ -207,7 +207,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
             on_signal_show_warning (""); // hides the warning pane
             return;
         }
-        var lscol_job = qobject_cast<LscolJob> (sender ());
+        var lscol_job = (LscolJob)sender ();
         //  ASSERT (lscol_job);
         on_signal_show_warning (_("Failed to list a folder. Error : %1")
                      .printf (lscol_job.error_string_parsing_body ()));
@@ -225,7 +225,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
             root.on_signal_text (0, Theme.app_name_gui);
             root.icon (0, Theme.application_icon);
             root.tool_tip (0, _("Choose this to sync the entire account"));
-            root.data (0, Qt.USER_ROLE, "/");
+            root.data (0, GLib.USER_ROLE, "/");
         }
         GLib.List<string> sorted_list = list;
         Utility.sort_filenames (sorted_list);
@@ -254,12 +254,12 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_gather_encrypted_paths (string path, GLib.HashTable<string, string> properties) {
-        const var it = properties.find ("is-encrypted");
+        var it = properties.find ("is-encrypted");
         if (it == properties.cend () || *it != "1") {
             return;
         }
 
-        const var webdav_folder = GLib.Uri (this.account.dav_url ()).path;
+        var webdav_folder = GLib.Uri (this.account.dav_url ()).path;
         //  Q_ASSERT (path.has_prefix (webdav_folder));
         this.encrypted_paths + path.mid (webdav_folder.size ());
     }
@@ -278,7 +278,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     /***********************************************************
     ***********************************************************/
     protected void on_signal_item_expanded (GLib.TreeWidgetItem item) {
-        string directory = item.data (0, Qt.USER_ROLE).to_string ();
+        string directory = item.data (0, GLib.USER_ROLE).to_string ();
         run_lscol_job (directory);
     }
 
@@ -287,10 +287,10 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
     ***********************************************************/
     protected void on_signal_current_item_changed (GLib.TreeWidgetItem item) {
         if (item) {
-            string directory = item.data (0, Qt.USER_ROLE).to_string ();
+            string directory = item.data (0, GLib.USER_ROLE).to_string ();
 
             // We don't want to allow creating subfolders in encrypted folders outside of the sync logic
-            const var encrypted = this.encrypted_paths.contains (directory);
+            var encrypted = this.encrypted_paths.contains (directory);
             this.instance.add_folder_button.enabled (!encrypted);
 
             if (!directory.has_prefix ("/")) {
@@ -374,8 +374,8 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
         if (path_trail == "")
             return;
 
-        const string parent_path = parent.data (0, Qt.USER_ROLE).to_string ();
-        const string folder_name = path_trail.first ();
+        string parent_path = parent.data (0, GLib.USER_ROLE).to_string ();
+        string folder_name = path_trail.nth_data (0);
         string folder_path;
         if (parent_path == "/") {
             folder_path = folder_name;
@@ -389,7 +389,7 @@ public class FolderWizardRemotePath : FormatWarningsWizardPage {
             Gtk.Icon folder_icon = prov.icon (GLib.FileIconProvider.FolderConnection);
             item.icon (0, folder_icon);
             item.on_signal_text (0, folder_name);
-            item.data (0, Qt.USER_ROLE, folder_path);
+            item.data (0, GLib.USER_ROLE, folder_path);
             item.tool_tip (0, folder_path);
             item.child_indicator_policy (GLib.TreeWidgetItem.ShowIndicator);
         }

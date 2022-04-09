@@ -27,7 +27,7 @@ public class ActivityListModel : GLib.AbstractListModel {
     /***********************************************************
     ***********************************************************/
     public enum DataRole {
-        ACTION_ICON = Qt.USER_ROLE + 1,
+        ACTION_ICON = GLib.USER_ROLE + 1,
         USER_ICON,
         ACCOUNT,
         OBJECT_TYPE,
@@ -267,7 +267,7 @@ public class ActivityListModel : GLib.AbstractListModel {
                 if (folder_connection) {
                     relative_path.prepend (folder_connection.remote_path);
                 }
-                const var local_files = FolderManager.instance.find_file_in_local_folders (relative_path, ast.account);
+                var local_files = FolderManager.instance.find_file_in_local_folders (relative_path, ast.account);
                 if (local_files.length > 0) {
                     if (relative_path.has_prefix ("/") || relative_path.has_prefix ('\\')) {
                         return relative_path.remove (0, 1);
@@ -279,7 +279,7 @@ public class ActivityListModel : GLib.AbstractListModel {
             return "";
         case DataRole.PATH:
             if (!activity.file == "") {
-                const var folder_connection = FolderManager.instance.folder_by_alias (activity.folder_connection);
+                var folder_connection = FolderManager.instance.folder_by_alias (activity.folder_connection);
 
                 string relative_path = activity.file;
                 if (folder_connection) {
@@ -287,7 +287,7 @@ public class ActivityListModel : GLib.AbstractListModel {
                 }
 
                 // get relative path to the file so we can open it in the file manager
-                const var local_files = FolderManager.instance.find_file_in_local_folders (GLib.FileInfo (relative_path).path, ast.account);
+                var local_files = FolderManager.instance.find_file_in_local_folders (GLib.FileInfo (relative_path).path, ast.account);
 
                 if (local_files == "") {
                     return "";
@@ -307,13 +307,13 @@ public class ActivityListModel : GLib.AbstractListModel {
             }
             return "";
         case DataRole.ABSOLUTE_PATH: {
-            const var folder_connection = FolderManager.instance.folder_by_alias (activity.folder_connection);
+            var folder_connection = FolderManager.instance.folder_by_alias (activity.folder_connection);
             string relative_path = activity.file;
             if (!activity.file == "") {
                 if (folder_connection) {
                     relative_path.prepend (folder_connection.remote_path);
                 }
-                const var local_files = FolderManager.instance.find_file_in_local_folders (relative_path, ast.account);
+                var local_files = FolderManager.instance.find_file_in_local_folders (relative_path, ast.account);
                 if (!local_files.empty ()) {
                     return local_files.const_first ();
                 } else {
@@ -402,7 +402,7 @@ public class ActivityListModel : GLib.AbstractListModel {
         case DataRole.ACCOUNT:
             return activity.acc_name;
         case DataRole.POINT_IN_TIME:
-            //  return activity.id == -1 ? "" : "%1 - %2".printf (Utility.time_ago_in_words (activity.date_time.to_local_time ()), activity.date_time.to_local_time ().to_string (Qt.Default_locale_short_date));
+            //  return activity.id == -1 ? "" : "%1 - %2".printf (Utility.time_ago_in_words (activity.date_time.to_local_time ()), activity.date_time.to_local_time ().to_string (GLib.Default_locale_short_date));
             return activity.id == -1 ? "" : Utility.time_ago_in_words (activity.date_time.to_local_time ());
         case DataRole.ACCOUNT_CONNECTED:
             return (ast && ast.is_connected);
@@ -425,25 +425,25 @@ public class ActivityListModel : GLib.AbstractListModel {
             return;
         }
 
-        const var model_index = index (activity_index);
-        const var path = data (model_index, DataRole.PATH).to_url ();
+        var model_index = index (activity_index);
+        var path = data (model_index, DataRole.PATH).to_url ();
 
-        const var activity = this.final_list.at (activity_index);
+        var activity = this.final_list.at (activity_index);
         if (activity.status == SyncFileItem.Status.CONFLICT) {
             //  Q_ASSERT (!activity.file == "");
             //  Q_ASSERT (!activity.folder_connection == "");
             //  Q_ASSERT (Utility.is_conflict_file (activity.file));
 
-            const var folder_connection = FolderManager.instance.folder_by_alias (activity.folder_connection);
+            var folder_connection = FolderManager.instance.folder_by_alias (activity.folder_connection);
 
-            const var conflicted_relative_path = activity.file;
-            const var base_relative_path = folder_connection.journal_database ().conflict_file_base_name (conflicted_relative_path.to_utf8 ());
+            var conflicted_relative_path = activity.file;
+            var base_relative_path = folder_connection.journal_database ().conflict_file_base_name (conflicted_relative_path.to_utf8 ());
 
-            const var directory = GLib.Dir (folder_connection.path);
-            const var conflicted_path = directory.file_path (conflicted_relative_path);
-            const var base_path = directory.file_path (base_relative_path);
+            var directory = GLib.Dir (folder_connection.path);
+            var conflicted_path = directory.file_path (conflicted_relative_path);
+            var base_path = directory.file_path (base_relative_path);
 
-            const var base_name = GLib.FileInfo (base_path).filename ();
+            var base_name = GLib.FileInfo (base_path).filename ();
 
             if (!this.current_conflict_dialog == null) {
                 this.current_conflict_dialog.close ();
@@ -452,7 +452,7 @@ public class ActivityListModel : GLib.AbstractListModel {
             this.current_conflict_dialog.on_signal_base_filename (base_name);
             this.current_conflict_dialog.on_signal_local_version_filename (conflicted_path);
             this.current_conflict_dialog.on_signal_remote_version_filename (base_path);
-            this.current_conflict_dialog.attribute (Qt.WA_DeleteOnClose);
+            this.current_conflict_dialog.attribute (GLib.WA_DeleteOnClose);
             this.current_conflict_dialog.accepted.connect (
                 folder_connection,
                 this.on_signal_current_conflict_dialog_accepted
@@ -466,7 +466,7 @@ public class ActivityListModel : GLib.AbstractListModel {
             }
 
             var folder_connection = FolderManager.instance.folder_by_alias (activity.folder_connection);
-            const var folder_dir = GLib.Dir (folder_connection.path);
+            var folder_dir = GLib.Dir (folder_connection.path);
             this.current_invalid_filename_dialog = new InvalidFilenameDialog (
                 this.account_state.account,
                 folder_connection,
@@ -484,7 +484,7 @@ public class ActivityListModel : GLib.AbstractListModel {
         if (path.is_valid) {
             GLib.DesktopServices.open_url (path);
         } else {
-            const var link = data (model_index, DataRole.LINK).to_url ();
+            var link = data (model_index, DataRole.LINK).to_url ();
             OpenExternal.open_browser (link);
         }
     }
@@ -512,14 +512,14 @@ public class ActivityListModel : GLib.AbstractListModel {
             return;
         }
 
-        const var activity = this.final_list[activity_index];
+        var activity = this.final_list[activity_index];
 
         if (action_index < 0 || action_index >= activity.links.size ()) {
             GLib.warning ("Couldn't trigger action at index " + action_index + "/ actions list size: " + activity.links.size ());
             return;
         }
 
-        const var action = activity.links[action_index];
+        var action = activity.links[action_index];
 
         if (action.verb == "WEB") {
             OpenExternal.open_browser (GLib.Uri (action.link));
@@ -594,7 +594,7 @@ public class ActivityListModel : GLib.AbstractListModel {
             activity.message = json.value ("message").to_string ();
             activity.file = json.value ("object_name").to_string ();
             activity.link = GLib.Uri (json.value ("link").to_string ());
-            activity.date_time = GLib.DateTime.from_string (json.value ("datetime").to_string (), Qt.ISODate);
+            activity.date_time = GLib.DateTime.from_string (json.value ("datetime").to_string (), GLib.ISODate);
             activity.icon = json.value ("icon").to_string ();
 
             list.append (activity);

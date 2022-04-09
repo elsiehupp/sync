@@ -31,15 +31,15 @@ public class AccountSettings : Gtk.Widget {
         }
 
 
-        protected override bool event_filter (GLib.Object watched, GLib.Event event) {
-            if (event.type () == GLib.Event.HoverMove) {
-                Qt.CursorShape shape = Qt.ArrowCursor;
+        protected override bool event_filter (GLib.Object watched, Gdk.Event event) {
+            if (event.type () == Gdk.Event.HoverMove) {
+                GLib.CursorShape shape = GLib.ArrowCursor;
                 var position = folder_list.map_from_global (GLib.Cursor.position ());
                 var index = folder_list.index_at (position);
                 if (model.classify (index) == FolderStatusModel.ItemType.ROOT_FOLDER
                     && (FolderStatusDelegate.errors_list_rect (folder_list.visual_rect (index)).contains (position)
                         || FolderStatusDelegate.options_button_rect (folder_list.visual_rect (index),folder_list.layout_direction ()).contains (position))) {
-                    shape = Qt.PointingHandCursor;
+                    shape = GLib.PointingHandCursor;
                 }
                 folder_list.cursor (shape);
             }
@@ -124,7 +124,7 @@ public class AccountSettings : Gtk.Widget {
         mouse_cursor_changer.folder_list = this.instance.folder_list;
         mouse_cursor_changer.model = this.model;
         this.instance.folder_list.mouse_tracking (true);
-        this.instance.folder_list.attribute (Qt.WA_Hover, true);
+        this.instance.folder_list.attribute (GLib.WA_Hover, true);
         this.instance.folder_list.install_event_filter (mouse_cursor_changer);
 
         this.signal_remove_account_folders.connect (
@@ -157,14 +157,14 @@ public class AccountSettings : Gtk.Widget {
         );
 
         var sync_now_action = new GLib.Action (this);
-        sync_now_action.shortcut (GLib.KeySequence (Qt.Key_F6));
+        sync_now_action.shortcut (GLib.KeySequence (GLib.Key_F6));
         sync_now_action.triggered.connect (
             this.on_signal_schedule_current_folder
         );
         add_action (sync_now_action);
 
         var sync_now_with_remote_discovery = new GLib.Action (this);
-        sync_now_with_remote_discovery.shortcut (GLib.KeySequence (Qt.CTRL + Qt.Key_F6));
+        sync_now_with_remote_discovery.shortcut (GLib.KeySequence (GLib.CTRL + GLib.Key_F6));
         sync_now_with_remote_discovery.triggered.connect (
             this.on_signal_schedule_current_folder_force_remote_discovery
         );
@@ -301,7 +301,7 @@ public class AccountSettings : Gtk.Widget {
             this.instance.quota_progress_bar.enabled (true);
             // workaround the label only accepting ints (which may be only 32 bit wide)
             double percent = used / (double)total * 100;
-            int percent_int = q_min (q_round (percent), 100);
+            int percent_int = int.min (q_round (percent), 100);
             this.instance.quota_progress_bar.value (percent_int);
             string used_str = Utility.octets_to_string (used);
             string total_str = Utility.octets_to_string (total);
@@ -338,7 +338,7 @@ public class AccountSettings : Gtk.Widget {
                 this.model.on_signal_update_folder_state (folder_connection);
             }
 
-            const string server = "<a href=\"%1\">%2</a>"
+            string server = "<a href=\"%1\">%2</a>"
                                 .printf (
                                     Utility.escape (account.url.to_string ()),
                                     Utility.escape (safe_url.to_string ())
@@ -376,7 +376,7 @@ public class AccountSettings : Gtk.Widget {
                 if (credentials) {
                     credentials.signal_authorisation_link_changed.connect (
                         this.on_signal_account_state_changed
-                    ); // Qt.UniqueConnection
+                    ); // GLib.UniqueConnection
                     url = credentials.authorisation_link ();
                 }
                 if (url.is_valid) {
@@ -476,7 +476,7 @@ public class AccountSettings : Gtk.Widget {
         FolderManager.instance.sync_enabled = false; // do not on_signal_start more syncs.
 
         var folder_wizard = new FolderWizard (this.account_state.account, this);
-        folder_wizard.attribute (Qt.WA_DeleteOnClose);
+        folder_wizard.attribute (GLib.WA_DeleteOnClose);
 
         folder_wizard.accepted.connect (
             this.on_signal_folder_wizard_accepted
@@ -510,7 +510,7 @@ public class AccountSettings : Gtk.Widget {
                     var msgbox = new Gtk.MessageBox (Gtk.MessageBox.Question, _("Sync Running"),
                         _("The syncing operation is running.<br/>Do you want to terminate it?"),
                         Gtk.MessageBox.Yes | Gtk.MessageBox.No, this);
-                    msgbox.attribute (Qt.WA_DeleteOnClose);
+                    msgbox.attribute (GLib.WA_DeleteOnClose);
                     msgbox.default_button (Gtk.MessageBox.Yes);
                     msgbox.accepted.connect (
                         on_signal_enable_current_folder (true)
@@ -605,7 +605,7 @@ public class AccountSettings : Gtk.Widget {
                     .printf (short_gui_local_path),
                 Gtk.MessageBox.NoButton,
                 this);
-            message_box.attribute (Qt.WA_DeleteOnClose);
+            message_box.attribute (GLib.WA_DeleteOnClose);
             GLib.PushButton yes_button =
                 message_box.add_button (_("Remove FolderConnection Sync Connection"), Gtk.MessageBox.YesRole);
             message_box.add_button (_("Cancel"), Gtk.MessageBox.NoRole);
@@ -685,7 +685,7 @@ public class AccountSettings : Gtk.Widget {
 
         if (this.filename != "") {
             var folder_creation_dialog = new FolderCreationDialog (this.filename, this);
-            folder_creation_dialog.attribute (Qt.WA_DeleteOnClose);
+            folder_creation_dialog.attribute (GLib.WA_DeleteOnClose);
             folder_creation_dialog.open ();
         }
     }
@@ -1009,7 +1009,7 @@ public class AccountSettings : Gtk.Widget {
             this);
         var yes_button = message_box.add_button (_("Remove connection"), Gtk.MessageBox.YesRole);
         message_box.add_button (_("Cancel"), Gtk.MessageBox.NoRole);
-        message_box.attribute (Qt.WA_DeleteOnClose);
+        message_box.attribute (GLib.WA_DeleteOnClose);
         message_box.signal_finished.connect (
             this.signal_finished_for_delete_account
         );
@@ -1099,12 +1099,12 @@ public class AccountSettings : Gtk.Widget {
             return;
         }
 
-        const var folder_connection = folder_info.folder_connection;
+        var folder_connection = folder_info.folder_connection;
         //  Q_ASSERT (folder_connection);
 
-        const var folder_alias = folder_connection.alias ();
-        const var path = folder_info.path;
-        const var file_id = folder_info.file_id;
+        var folder_alias = folder_connection.alias ();
+        var path = folder_info.path;
+        var file_id = folder_info.file_id;
 
         if (folder_connection.virtual_files_enabled ()
             && folder_connection.vfs ().mode () == AbstractVfs.WindowsCfApi) {
@@ -1200,14 +1200,14 @@ public class AccountSettings : Gtk.Widget {
             // Has "/" suffix convention for paths here but VFS and
             // sync engine expects no such suffix
             //  Q_ASSERT (info.path.has_suffix ("/"));
-            const var remote_path = info.path.chopped (1);
+            var remote_path = info.path.chopped (1);
 
             // It might be an E2EE mangled path, so let's try to demangle it
-            const var journal = info.folder_connection.journal_database ();
+            var journal = info.folder_connection.journal_database ();
             SyncJournalFileRecord record;
             journal.file_record_by_e2e_mangled_name (remote_path, record);
 
-            const string path = record.is_valid ? record.path : remote_path;
+            string path = record.is_valid ? record.path : remote_path;
 
             vfs_pin_action = availability_menu.add_action (Utility.vfs_pin_action_text ());
             vfs_pin_action.triggered.connect (
@@ -1251,7 +1251,7 @@ public class AccountSettings : Gtk.Widget {
 
         var menu = new GLib.Menu (tv);
 
-        menu.attribute (Qt.WA_DeleteOnClose);
+        menu.attribute (GLib.WA_DeleteOnClose);
 
         GLib.Action open_folder_action = menu.add_action (_("Open folder_connection"));
         open_folder_action.triggered.connect (
@@ -1352,12 +1352,12 @@ public class AccountSettings : Gtk.Widget {
             if (!actual.contains (position))
                 return;
 
-            if (index.flags () & Qt.ItemIsEnabled) {
+            if (index.flags () & GLib.ItemIsEnabled) {
                 on_signal_add_folder ();
             } else {
                 GLib.ToolTip.show_text (
                     GLib.Cursor.position (),
-                    this.model.data (index, Qt.ToolTipRole).to_string (),
+                    this.model.data (index, GLib.ToolTipRole).to_string (),
                     this);
             }
             return;
@@ -1473,7 +1473,7 @@ public class AccountSettings : Gtk.Widget {
 
         var folder_connection = encrypt_folder_job.property (PROPERTY_FOLDER).value<FolderConnection> ();
         //  Q_ASSERT (folder_connection);
-        const int index = this.model.index_for_path (folder_connection, encrypt_folder_job.property (PROPERTY_PATH).value<string> ());
+        int index = this.model.index_for_path (folder_connection, encrypt_folder_job.property (PROPERTY_PATH).value<string> ());
         //  Q_ASSERT (index.is_valid);
         this.model.reset_and_fetch (index.parent ());
 
@@ -1488,7 +1488,7 @@ public class AccountSettings : Gtk.Widget {
         GLib.ModelIndex bottom_right,
         GLib.List<int> roles) {
         //  Q_UNUSED (bottom_right);
-        if (!roles.contains (Qt.CheckStateRole)) {
+        if (!roles.contains (GLib.CheckStateRole)) {
             return;
         }
 
@@ -1500,7 +1500,7 @@ public class AccountSettings : Gtk.Widget {
         // FIXME: the model is not precise enough to handle extra cases
         // e.g. the user clicked on the same checkbox 2x without applying the change in between.
         // We don't know which checkbox changed to be able to toggle the selective_sync_label display.
-        if (this.model.is_dirty && this.account_state.is_connected && info.checked == Qt.Unchecked) {
+        if (this.model.is_dirty && this.account_state.is_connected && info.checked == GLib.Unchecked) {
             this.instance.selective_sync_label.show ();
         }
 
@@ -1518,7 +1518,7 @@ public class AccountSettings : Gtk.Widget {
                 this.instance.selective_sync_status.maximum_height (0);
             }
 
-            const GLib.PropertyAnimation selective_sync_status_property_animation = new GLib.PropertyAnimation (this.instance.selective_sync_status, "maximum_height", this.instance.selective_sync_status);
+            GLib.PropertyAnimation selective_sync_status_property_animation = new GLib.PropertyAnimation (this.instance.selective_sync_status, "maximum_height", this.instance.selective_sync_status);
             selective_sync_status_property_animation.end_value (this.model.is_dirty ? this.instance.selective_sync_status.size_hint ().height () : 0);
             selective_sync_status_property_animation.on_signal_start (GLib.AbstractAnimation.DeleteWhenStopped);
             selective_sync_status_property_animation.signal_finished.connect (
@@ -1544,7 +1544,7 @@ public class AccountSettings : Gtk.Widget {
         string message,
         GLib.List<string> errors = new GLib.List<string> ()
     ) {
-        const string err_style = "color: #ffffff; background-color: #bb4d4d; padding: 5px;"
+        string err_style = "color: #ffffff; background-color: #bb4d4d; padding: 5px;"
                                + "border-width: 1px; border-style: solid; border-color: #aaaaaa;"
                                + "border-radius: 5px;";
         if (errors.length () == 0) {
@@ -1568,11 +1568,11 @@ public class AccountSettings : Gtk.Widget {
 
     /***********************************************************
     ***********************************************************/
-    private bool event (GLib.Event e) {
-        if (e.type () == GLib.Event.Hide || e.type () == GLib.Event.Show) {
+    private bool event (Gdk.Event e) {
+        if (e.type () == Gdk.Event.Hide || e.type () == Gdk.Event.Show) {
             this.user_info.active = is_visible ();
         }
-        if (e.type () == GLib.Event.Show) {
+        if (e.type () == Gdk.Event.Show) {
             // Expand the folder_connection automatically only if there's only one, see #4283
             // The 2 is 1 folder_connection + 1 'add folder_connection' button
             if (this.model.row_count () <= 2) {
@@ -1655,8 +1655,8 @@ public class AccountSettings : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private static void show_enable_e2ee_with_virtual_files_warning_dialog (OnSignalAccept on_signal_accept) {
-        const var message_box = new Gtk.MessageBox ();
-        message_box.attribute (Qt.WA_DeleteOnClose);
+        var message_box = new Gtk.MessageBox ();
+        message_box.attribute (GLib.WA_DeleteOnClose);
         message_box.text (_("End-to-End Encryption with Virtual Files"));
         message_box.informative_text (_("You seem to have the Virtual Files feature enabled on this folder_connection. "
                                                       + "At the moment, it is not possible to implicitly download virtual files that are "
@@ -1664,10 +1664,10 @@ public class AccountSettings : Gtk.Widget {
                                                       + "End-to-End Encryption, make sure the encrypted folder_connection is marked with "
                                                       + "\"Make always available locally\"."));
         message_box.icon (Gtk.MessageBox.Warning);
-        const Gtk.Button dont_encrypt_button = message_box.add_button (Gtk.MessageBox.StandardButton.Cancel);
+        Gtk.Button dont_encrypt_button = message_box.add_button (Gtk.MessageBox.StandardButton.Cancel);
         //  Q_ASSERT (dont_encrypt_button);
         dont_encrypt_button.text (_("Don't encrypt folder_connection"));
-        const Gtk.Button encrypt_button = message_box.add_button (Gtk.MessageBox.StandardButton.Ok);
+        Gtk.Button encrypt_button = message_box.add_button (Gtk.MessageBox.StandardButton.Ok);
         //  Q_ASSERT (encrypt_button);
         encrypt_button.text (_("Encrypt folder_connection"));
         message_box.accepted.connect (

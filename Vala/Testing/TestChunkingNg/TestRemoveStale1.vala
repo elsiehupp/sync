@@ -22,7 +22,7 @@ public class TestRemoveStale1 : AbstractTestChunkingNg {
 
         partial_upload (fake_folder, "A/a0", size);
         GLib.assert_true (fake_folder.upload_state ().children.length == 1);
-        var chunking_identifier = fake_folder.upload_state ().children.first ().name;
+        var chunking_identifier = fake_folder.upload_state ().children.nth_data (0).name;
 
         fake_folder.local_modifier.set_contents ("A/a0", 'B');
         fake_folder.local_modifier.append_byte ("A/a0");
@@ -33,7 +33,7 @@ public class TestRemoveStale1 : AbstractTestChunkingNg {
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a0").size == size + 1);
         // A different chunk identifier was used, and the previous one is removed
         GLib.assert_true (fake_folder.upload_state ().children.length == 1);
-        GLib.assert_true (fake_folder.upload_state ().children.first ().name != chunking_identifier);
+        GLib.assert_true (fake_folder.upload_state ().children.nth_data (0).name != chunking_identifier);
     }
 
 } // class TestRemoveStale1

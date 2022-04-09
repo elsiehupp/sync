@@ -25,7 +25,7 @@ public class SslErrorDialog : Gtk.Dialog {
         this.all_trusted = false;
         this.instance = new SslErrorDialog ();
         this.account = account;
-        window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
+        window_flags (window_flags () & ~GLib.WindowContextHelpButtonHint);
         this.instance.up_ui (this);
         window_title (_("Untrusted Certificate"));
         GLib.PushButton ok_button =
@@ -142,7 +142,7 @@ public class SslErrorDialog : Gtk.Dialog {
         if (this.all_trusted)
             return true;
 
-        bool stat = (this.instance.cb_trust_connect.check_state () == Qt.Checked);
+        bool stat = (this.instance.cb_trust_connect.check_state () == GLib.Checked);
         GLib.info ("SSL-Connection is trusted: " + stat);
 
         return stat;
@@ -187,7 +187,7 @@ public class SslErrorDialog : Gtk.Dialog {
 
         message += GLib.L ("<p>");
 
-        if (cert.effective_date () < new GLib.DateTime (GLib.Date (2016, 1, 1), GLib.Time (), Qt.UTC)) {
+        if (cert.effective_date () < new GLib.DateTime (GLib.Date (2016, 1, 1), GLib.Time (), GLib.UTC)) {
         string sha1sum = Utility.format_fingerprint (cert.digest (GLib.ChecksumType.SHA1).to_hex ());
             message += _("Fingerprint (SHA1) : <tt>%1</tt>").printf (sha1sum) + GLib.L ("<br/>");
         }

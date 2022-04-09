@@ -15,7 +15,7 @@ public class TestCreate : AbstractTestOwnSql {
     private TestCreate () {
         base ();
 
-        const string sql = "CREATE TABLE addresses ( identifier INTEGER, name VARCHAR (4096), "
+        string sql = "CREATE TABLE addresses ( identifier INTEGER, name VARCHAR (4096), "
                          + "address VARCHAR (4096), entered INTEGER (8), PRIMARY KEY (identifier));";
 
         SqlQuery query = new SqlQuery (this.database);

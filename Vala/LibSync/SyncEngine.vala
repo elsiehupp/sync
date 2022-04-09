@@ -642,19 +642,19 @@ public class SyncEngine : GLib.Object {
         if (it == this.local_discovery_paths.end () || !it.has_prefix (path)) {
             // Maybe a subfolder of something in the list?
             if (it != this.local_discovery_paths.begin () && path.has_prefix (* (--it))) {
-                return it.has_suffix ("/") || (path.size () > it.size () && path.at (it.size ()) <= "/");
+                return it.has_suffix ("/") || (path.length > it.size () && path.at (it.size ()) <= "/");
             }
             return false;
         }
 
         // maybe an exact match or an empty path?
-        if (it.size () == path.size () || path == "")
+        if (it.size () == path.length || path == "")
             return true;
 
         // Maybe a parent folder of something in the list?
         // check for a prefix + / match
         while (true) {
-            if (it.size () > path.size () && it.at (path.size ()) == "/")
+            if (it.size () > path.length && it.at (path.size ()) == "/")
                 return true;
             ++it;
             if (it == this.local_discovery_paths.end () || !it.has_prefix (path))
@@ -987,12 +987,13 @@ public class SyncEngine : GLib.Object {
         // post update phase script : allow to tweak stuff by a custom script in debug mode.
         if (!q_environment_variable_is_empty ("OWNCLOUD_POST_UPDATE_SCRIPT")) {
     // #ifilenamedef NDEBUG
-            const string script = q_environment_variable ("OWNCLOUD_POST_UPDATE_SCRIPT");
+            string script = q_environment_variable ("OWNCLOUD_POST_UPDATE_SCRIPT");
 
             GLib.debug ("Post Update Script: " + script);
-            var script_args = script.split (GLib.Regex ("\\s+"), Qt.SkipEmptyParts);
+            var script_args = script.split (GLib.Regex ("\\s+"), GLib.SkipEmptyParts);
             if (script_args.size () > 0) {
-                var script_executable = script_args.take_first ();
+                var script_executable = script_args.nth_data (0);
+                script_args.remove (script_args.nth_data (0));
                 GLib.Process.execute (script_executable, script_args);
             }
     // #else
@@ -1018,7 +1019,7 @@ public class SyncEngine : GLib.Object {
             this.on_signal_progress
         );
         this.propagator.signal_finished.connect (
-            this.on_signal_propagation_finished // Qt.QueuedConnection
+            this.on_signal_propagation_finished // GLib.QueuedConnection
         );
         this.propagator.signal_seen_locked_file.connect (
             this.on_signal_seen_locked_file
@@ -1283,7 +1284,7 @@ public class SyncEngine : GLib.Object {
         GLib.List<Common.SyncJournalDb.DownloadInfo> deleted_infos =
             this.journal.get_and_delete_stale_download_infos (download_file_paths);
         foreach (Common.SyncJournalDb.DownloadInfo deleted_info in deleted_infos) {
-            const string temporary_path = this.propagator.full_local_path (deleted_info.temporaryfile);
+            string temporary_path = this.propagator.full_local_path (deleted_info.temporaryfile);
             GLib.info ("Deleting stale temporary file: " + temporary_path);
             FileSystem.remove (temporary_path);
         }

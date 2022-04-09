@@ -398,7 +398,7 @@ public class OwncloudGui : GLib.Object {
 
         if (progress.total_size () == 0) {
             int64 current_file = progress.current_file ();
-            int64 total_file_count = q_max (progress.total_files (), current_file);
+            int64 total_file_count = int64.max (progress.total_files (), current_file);
             string message;
             if (progress.trust_eta ()) {
                 message = _("Syncing %1 of %2 (%3 left)")
@@ -442,7 +442,7 @@ public class OwncloudGui : GLib.Object {
                 }
             }
             if (this.recent_items_actions.length () > 5) {
-                this.recent_items_actions.take_first ().delete_later ();
+                this.recent_items_actions.remove (this.recent_items_actions.nth_data (0));
             }
             this.recent_items_actions.append (action);
         }
@@ -522,8 +522,8 @@ public class OwncloudGui : GLib.Object {
     ***********************************************************/
     public void on_signal_show_gui_message (string title, string message) {
         var message_box = new Gtk.MessageBox ();
-        message_box.window_flags (message_box.window_flags () | Qt.Window_stays_on_signal_top_hint);
-        message_box.attribute (Qt.WA_DeleteOnClose);
+        message_box.window_flags (message_box.window_flags () | GLib.Window_stays_on_signal_top_hint);
+        message_box.attribute (GLib.WA_DeleteOnClose);
         message_box.on_signal_text (message);
         message_box.window_title (title);
         message_box.icon (Gtk.MessageBox.Information);
@@ -580,7 +580,7 @@ public class OwncloudGui : GLib.Object {
     public void on_signal_show_settings () {
         if (this.settings_dialog == null) {
             this.settings_dialog = new SettingsDialog (this);
-            this.settings_dialog.attribute (Qt.WA_DeleteOnClose, true);
+            this.settings_dialog.attribute (GLib.WA_DeleteOnClose, true);
             this.settings_dialog.show ();
         }
         raise_dialog (this.settings_dialog);
@@ -664,15 +664,15 @@ public class OwncloudGui : GLib.Object {
     to the folder_connection).
     ***********************************************************/
     private void on_signal_show_share_dialog (string share_path, string local_path, ShareDialogStartPage start_page) {
-        const var folder_connection = FolderManager.instance.folder_for_path (local_path);
+        var folder_connection = FolderManager.instance.folder_for_path (local_path);
         if (!folder_connection) {
             GLib.warning ("Could not open share dialog for " + local_path +  "no responsible folder_connection found.");
             return;
         }
 
-        const var account_state = folder_connection.account_state;
+        var account_state = folder_connection.account_state;
 
-        const string file = local_path.mid (folder_connection.clean_path.length + 1);
+        string file = local_path.mid (folder_connection.clean_path.length + 1);
         SyncJournalFileRecord file_record;
 
         bool resharing_allowed = true; // lets assume the good
@@ -692,7 +692,7 @@ public class OwncloudGui : GLib.Object {
         } else {
             GLib.info ("Opening share dialog " + share_path + local_path + max_sharing_permissions);
             share_dialog = new ShareDialog (account_state, share_path, local_path, max_sharing_permissions, file_record.numeric_file_id (), start_page);
-            share_dialog.attribute (Qt.WA_DeleteOnClose, true);
+            share_dialog.attribute (GLib.WA_DeleteOnClose, true);
 
             this.share_dialogs[local_path] = share_dialog;
             share_dialog.destroyed.connect (

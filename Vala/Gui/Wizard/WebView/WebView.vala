@@ -50,7 +50,7 @@ public class WebView : Gtk.Widget {
         this.interceptor = new WebViewPageUrlRequestInterceptor (this);
         this.scheme_handler = new WebViewPageUrlSchemeHandler (this);
 
-        const string user_agent = Utility.user_agent_string ();
+        string user_agent = Utility.user_agent_string ();
         this.profile.http_user_agent (user_agent);
         GLib.WebEngineProfile.default_profile ().http_user_agent (user_agent);
         this.profile.request_interceptor (this.interceptor);

@@ -41,7 +41,7 @@ public class WebFlowCredentialsDialog : Gtk.Dialog {
     //  #ifdef WITH_WEBENGINE
         this.web_view = null;
     //  #endif // WITH_WEBENGINE
-        window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
+        window_flags (window_flags () & ~GLib.WindowContextHelpButtonHint);
 
         this.layout = new GLib.VBoxLayout (this);
         int spacing = this.layout.spacing ();
@@ -54,7 +54,7 @@ public class WebFlowCredentialsDialog : Gtk.Dialog {
         this.container_layout.margin (margin);
 
         this.info_label = new Gtk.Label ();
-        this.info_label.alignment (Qt.AlignCenter);
+        this.info_label.alignment (GLib.AlignCenter);
         this.container_layout.add_widget (this.info_label);
 
         if (this.use_flow2) {
@@ -87,7 +87,7 @@ public class WebFlowCredentialsDialog : Gtk.Dialog {
     //  #endif // WITH_WEBENGINE
         }
 
-        var app = static_cast<Application> (GLib.Application);
+        var app = (Application)GLib.Application;
         app.signal_is_showing_settings_dialog.connect (
             this.on_signal_show_settings_dialog
         );
@@ -177,17 +177,17 @@ public class WebFlowCredentialsDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    protected override void change_event (GLib.Event e) {
+    protected override void change_event (Gdk.Event e) {
         switch (e.type ()) {
-        case GLib.Event.StyleChange:
-        case GLib.Event.PaletteChange:
-        case GLib.Event.ThemeChange:
+        case Gdk.Event.StyleChange:
+        case Gdk.Event.PaletteChange:
+        case Gdk.Event.ThemeChange:
             customize_style ();
 
             // Notify the other widgets (Dark-/Light-Mode switching)
             /* emit */ signal_style_changed ();
             break;
-        case GLib.Event.ActivationChange:
+        case Gdk.Event.ActivationChange:
             if (is_active_window ())
                 /* emit */ activate ();
             break;

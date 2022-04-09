@@ -15,7 +15,7 @@ public class TestPragma : AbstractTestOwnSql {
     private TestPragma () {
         base ();
 
-        const string sql = "PRAGMA table_info (addresses)";
+        string sql = "PRAGMA table_info (addresses)";
 
         SqlQuery query = new SqlQuery (this.database);
         int rc = query.prepare (sql);

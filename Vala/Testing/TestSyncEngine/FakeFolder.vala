@@ -248,7 +248,7 @@ public class FakeFolder : GLib.Object {
     ***********************************************************/
     public void schedule_sync () {
         // Have to be done async, else, an error before exec () does not terminate the event loop.
-        GLib.Object.invoke_method (this.sync_engine.get (), "start_sync", Qt.QueuedConnection);
+        GLib.Object.invoke_method (this.sync_engine.get (), "start_sync", GLib.QueuedConnection);
     }
 
 

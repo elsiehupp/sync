@@ -24,17 +24,17 @@ public class LinkLabel : Gtk.Label {
 
     /***********************************************************
     ***********************************************************/
-    protected void enter_event (GLib.Event event) {
+    protected void enter_event (Gdk.Event event) {
         font_underline (true);
-        cursor (Qt.PointingHandCursor);
+        cursor (GLib.PointingHandCursor);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    protected void leave_event (GLib.Event event) {
+    protected void leave_event (Gdk.Event event) {
         font_underline (false);
-        cursor (Qt.ArrowCursor);
+        cursor (GLib.ArrowCursor);
     }
 
 

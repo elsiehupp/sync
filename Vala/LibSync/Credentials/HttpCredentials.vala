@@ -264,7 +264,7 @@ public class HttpCredentials : AbstractCredentials {
         // User must be fetched from config file to generate a valid key
         fetch_user ();
 
-        const string keychain_key = keychain_key (this.account.url.to_string (), this.user, this.account.identifier);
+        string keychain_key = keychain_key (this.account.url.to_string (), this.user, this.account.identifier);
         if (keychain_key == "") {
             GLib.warning ("InvalidateToken: User is empty; bailing out!");
             return;
@@ -345,7 +345,7 @@ public class HttpCredentials : AbstractCredentials {
         request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
 
         var simple_network_job = this.account.send_request ("POST", request_token, request, request_body);
-        simple_network_job.on_signal_timeout (q_min (30 * 1000ll, simple_network_job.timeout_msec ()));
+        simple_network_job.on_signal_timeout (int64.min (30 * 1000ll, simple_network_job.timeout_msec ()));
         simple_network_job.signal_finished.connect (
             (input_stream) => {
                 var json_data = input_stream.read_all ();
@@ -439,7 +439,7 @@ public class HttpCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     private void on_signal_read_client_cert_password_job_done (Secret.Collection.Job qkeychain_job) {
-        var read_job = qobject_cast<Secret.Collection.ReadPasswordJob> (qkeychain_job);
+        var read_job = (Secret.Collection.ReadPasswordJob)qkeychain_job;
         if (keychain_unavailable_retry_later (read_job)) {
             return;
         }
@@ -463,7 +463,7 @@ public class HttpCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     private void on_signal_read_client_cert_pem_job_done (Secret.Collection.Job incoming) {
-        var read_job = qobject_cast<Secret.Collection.ReadPasswordJob> (incoming);
+        var read_job = (Secret.Collection.ReadPasswordJob)incoming;
         if (keychain_unavailable_retry_later (read_job))
             return;
 
@@ -476,7 +476,7 @@ public class HttpCredentials : AbstractCredentials {
         }
 
         // Load key too
-        const string keychain_key = keychain_key (
+        string keychain_key = keychain_key (
             this.account.url.to_string (),
             this.user + CLIENT_KEY_PEM_C,
             this.keychain_migration ? "" : this.account.identifier);
@@ -495,7 +495,7 @@ public class HttpCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     private void on_signal_read_client_key_pem_job_done (Secret.Collection.Job incoming) {
-        var read_job = qobject_cast<Secret.Collection.ReadPasswordJob> (incoming);
+        var read_job = (Secret.Collection.ReadPasswordJob)incoming;
         // Store key in memory
 
         if (read_job.error == Secret.Collection.NoError && read_job.binary_data ().length > 0) {
@@ -521,7 +521,7 @@ public class HttpCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     private void on_signal_read_password_from_keychain () {
-        const string keychain_key = keychain_key (
+        string keychain_key = keychain_key (
             this.account.url.to_string (),
             this.user,
             this.keychain_migration ? "" : this.account.identifier);
@@ -592,7 +592,7 @@ public class HttpCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     private void on_signal_read_job_done (Secret.Collection.Job incoming) {
-        var qkeychain_read_password_job = static_cast<Secret.Collection.ReadPasswordJob> (incoming);
+        var qkeychain_read_password_job = (Secret.Collection.ReadPasswordJob)incoming;
         Secret.Collection.Error error = qkeychain_read_password_job.error;
 
         // If we can't find the credentials at the keys that include the account identifier,
@@ -695,7 +695,7 @@ public class HttpCredentials : AbstractCredentials {
         }
 
         // Old case (pre 2.6) : Read client cert and then key from keychain
-        const string keychain_key = keychain_key (
+        string keychain_key = keychain_key (
             this.account.url.to_string (),
             this.user + CLIENT_CERTIFICATE_PEM_C,
             this.keychain_migration ? "" : this.account.identifier);

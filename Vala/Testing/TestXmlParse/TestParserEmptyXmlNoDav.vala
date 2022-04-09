@@ -13,7 +13,7 @@ public class TestParserEmptyXmlNoDav : AbstractTestXmlParse {
     /***********************************************************
     ***********************************************************/
     private TestParserEmptyXmlNoDav () {
-        const string xml_string = "<html><body>I am under construction</body></html>";
+        string xml_string = "<html><body>I am under construction</body></html>";
 
         LscolXMLParser lscol_xml_parser;
 

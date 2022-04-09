@@ -42,7 +42,7 @@ public class PassiveUpdateNotifier : OCUpdater {
         if (Utility.is_linux ()) {
             // on linux, check if the installed binary is still the same version
             // as the one that is running. If not, restart if possible.
-            const string fs_version = Utility.version_of_installed_binary ();
+            string fs_version = Utility.version_of_installed_binary ();
             if (! (fs_version == "" || this.running_app_version == "") && fs_version != this.running_app_version) {
                 /* emit */ signal_request_restart ();
             }

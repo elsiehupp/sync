@@ -661,7 +661,7 @@ public class Theme : GLib.Object {
             }
         // #ifdef APPLICATION_WIZARD_USE_CUSTOM_LOGO
             var use_svg = should_prefer_svg;
-            const string logo_base_path = Theme.THEME_PREFIX + "colored/wizard_logo";
+            string logo_base_path = Theme.THEME_PREFIX + "colored/wizard_logo";
             if (use_svg) {
                 var max_height = Theme.is_hidpi () ? 200 : 100;
                 var max_width = 2 * max_height;
@@ -686,7 +686,7 @@ public class Theme : GLib.Object {
         public get {
         // #ifdef APPLICATION_WIZARD_USE_CUSTOM_LOGO
             var use_svg = should_prefer_svg;
-            const string logo_base_path = Theme.THEME_PREFIX + "colored/wizard_logo";
+            string logo_base_path = Theme.THEME_PREFIX + "colored/wizard_logo";
             if (use_svg) {
                 var max_height = 64;
                 var max_width = 2 * max_height;
@@ -741,9 +741,9 @@ public class Theme : GLib.Object {
         public get {
             string dev_string;
         // #ifdef GIT_SHA1
-            const string github_prefix =
+            string github_prefix =
                 "https://github.com/nextcloud/desktop/commit/";
-            const string git_sha1 = GIT_SHA1;
+            string git_sha1 = GIT_SHA1;
             dev_string = _("nextcloud_theme.about"
                          + "<p><small>Built from Git revision <a href=\"%1\">%2</a>"
                          + " on %3, %4 using Qt %5, %6</small></p>")
@@ -1155,10 +1155,10 @@ public class Theme : GLib.Object {
     public static Gtk.Icon create_color_aware_icon (string name, Gtk.Palette palette = GLib.Application.palette ()) {
         GLib.SvgRenderer renderer = new GLib.SvgRenderer (name);
         Gtk.Image img = new Gtk.Image (64, 64, Gtk.Image.FormatARGB32);
-        img.fill (Qt.GlobalColor.transparent);
+        img.fill (GLib.GlobalColor.transparent);
         GLib.Painter img_painter = new GLib.Painter  (&img);
         Gtk.Image inverted = new Gtk.Image (64, 64, Gtk.Image.FormatARGB32);
-        inverted.fill (Qt.GlobalColor.transparent);
+        inverted.fill (GLib.GlobalColor.transparent);
         GLib.Painter inv_painter = new GLib.Painter (inverted);
 
         renderer.render (&img_painter);
@@ -1296,7 +1296,7 @@ public class Theme : GLib.Object {
                 }
                 // HACK, get rid of it by supporting FDO icon themes, this is really just emulating ubuntu-mono
                 if (qgetenv ("DESKTOP_SESSION") == "ubuntu") {
-                    GLib.Bitmap mask = px.create_mask_from_color (Qt.white, Qt.MaskOutColor);
+                    GLib.Bitmap mask = px.create_mask_from_color (GLib.white, GLib.MaskOutColor);
                     GLib.Painter p = new GLib.Painter (px);
                     p.pen (Gdk.RGBA ("#dfdbd2"));
                     p.draw_pixmap (px.rect (), mask, mask.rect ());
@@ -1311,7 +1311,7 @@ public class Theme : GLib.Object {
 
     private static Gdk.Pixbuf create_pixmap_from_svg (GLib.SvgRenderer renderer, int size) {
         Gtk.Image img = new Gtk.Image (size, size, Gtk.Image.FormatARGB32);
-        img.fill (Qt.GlobalColor.transparent);
+        img.fill (GLib.GlobalColor.transparent);
         GLib.Painter img_painter = new GLib.Painter (img);
         renderer.render (img_painter);
         return Gdk.Pixbuf.from_image (img);
@@ -1337,7 +1337,7 @@ public class Theme : GLib.Object {
         var use_svg = should_prefer_svg;
 
         // branded client may have several sizes of the same icon
-        const string file_path = (use_svg || size <= 0)
+        string file_path = (use_svg || size <= 0)
                 ? Theme.THEME_PREFIX + "%1/%2".printf (flavor).printf (name)
                 : Theme.THEME_PREFIX + "%1/%2-%3".printf (flavor).printf (name).printf (size);
 

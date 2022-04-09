@@ -114,8 +114,8 @@ public class KeychainChunkWriteJob : AbstractKeychainChunkJob {
                 return;
             }
 
-            const string key_with_index = this.key + (index > 0) ? "." + index.to_string () : "";
-            const string keychain_key = this.account ? AbstractCredentials.keychain_key (
+            string key_with_index = this.key + (index > 0) ? "." + index.to_string () : "";
+            string keychain_key = this.account ? AbstractCredentials.keychain_key (
                     this.account.url.to_string (),
                     key_with_index,
                     this.account.identifier

@@ -13,7 +13,7 @@ public class TestParserEmptyXml : AbstractTestXmlParse {
     /***********************************************************
     ***********************************************************/
     private TestParserEmptyXml () {
-        const string xml_string = "";
+        string xml_string = "";
 
         LscolXMLParser lscol_xml_parser;
 

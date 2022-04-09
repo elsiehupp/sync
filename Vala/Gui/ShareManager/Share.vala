@@ -104,7 +104,7 @@ public class Share : GLib.Object {
     In case of a server error the signal_password_error signal is emitted.
     ***********************************************************/
     public void password (string password) {
-        const OcsShareJob ocs_share_job = new OcsShareJob (this.account);
+        OcsShareJob ocs_share_job = new OcsShareJob (this.account);
         ocs_share_job.signal_finished.connect (
             this.on_signal_password_set
         );

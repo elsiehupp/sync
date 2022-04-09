@@ -183,19 +183,19 @@ public class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool check_push_notifications_are_ready () {
-        const var push_notifications = this.account_state.account.push_notifications ();
+        var push_notifications = this.account_state.account.push_notifications ();
 
-        const var push_activities_available = this.account_state.account.capabilities.available_push_notifications () & PushNotificationType.ACTIVITIES;
-        const var push_notifications_available = this.account_state.account.capabilities.available_push_notifications () & PushNotificationType.NOTIFICATIONS;
+        var push_activities_available = this.account_state.account.capabilities.available_push_notifications () & PushNotificationType.ACTIVITIES;
+        var push_notifications_available = this.account_state.account.capabilities.available_push_notifications () & PushNotificationType.NOTIFICATIONS;
 
-        const var push_activities_and_notifications_available = push_activities_available && push_notifications_available;
+        var push_activities_and_notifications_available = push_activities_available && push_notifications_available;
 
         if (push_activities_and_notifications_available && push_notifications && push_notifications.is_ready ()) {
             connect_push_notifications ();
             return true;
         } else {
             this.account_state.account.signal_push_notifications_ready.connect (
-                this.on_signal_push_notifications_ready // Qt.UniqueConnection
+                this.on_signal_push_notifications_ready // GLib.UniqueConnection
             );
             return false;
         }
@@ -422,7 +422,7 @@ public class User : GLib.Object {
                 Activity activity;
                 activity.type = Activity.Type.SYNC_RESULT;
                 activity.status = SyncResult.Status.ERROR;
-                activity.date_time = GLib.DateTime.from_string (GLib.DateTime.current_date_time ().to_string (), Qt.ISODate);
+                activity.date_time = GLib.DateTime.from_string (GLib.DateTime.current_date_time ().to_string (), GLib.ISODate);
                 activity.subject = message;
                 activity.message = folder_connection.short_gui_local_path;
                 activity.link = folder_connection.short_gui_local_path;
@@ -451,7 +451,7 @@ public class User : GLib.Object {
     ***********************************************************/
     public void on_signal_add_error_to_gui (string folder_alias, LibSync.SyncFileItem.Status status, string error_message, string subject) {
         try {
-            const var folder_connection = FolderManager.instance.folder_by_alias (folder_alias);
+            var folder_connection = FolderManager.instance.folder_by_alias (folder_alias);
 
 
             if (folder_connection.account_state == this.account_state) {
@@ -460,8 +460,8 @@ public class User : GLib.Object {
                 Activity activity;
                 activity.type = Activity.Type.SYNC_FILE_ITEM;
                 activity.status = status;
-                const var current_date_time = GLib.DateTime.current_date_time ();
-                activity.date_time = GLib.DateTime.from_string (current_date_time.to_string (), Qt.ISODate);
+                var current_date_time = GLib.DateTime.current_date_time ();
+                activity.date_time = GLib.DateTime.from_string (current_date_time.to_string (), GLib.ISODate);
                 activity.expire_at_msecs = current_date_time.add_m_secs (ACTIVITY_DEFAULT_EXPIRATION_TIME_MSECS).to_m_secs_since_epoch ();
                 activity.subject = !subject == "" ? subject : folder_connection.short_gui_local_path;
                 activity.message = error_message;
@@ -511,7 +511,7 @@ public class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_notify_network_error (GLib.InputStream reply) {
-        var notification_confirm_job = qobject_cast<NotificationConfirmJob> (sender ());
+        var notification_confirm_job = (NotificationConfirmJob)sender ();
         if (!notification_confirm_job) {
             return;
         }
@@ -532,8 +532,8 @@ public class User : GLib.Object {
                 // in cases where a local discovery was done.
                 var folder_connection = FolderManager.instance.folder_by_alias (folder_connection_alias);
 
-                const var engine = folder_connection.sync_engine;
-                const var style = engine.last_local_discovery_style ();
+                var engine = folder_connection.sync_engine;
+                var style = engine.last_local_discovery_style ();
                 foreach (Activity activity in this.activity_model.errors_list ()) {
                     if (activity.expire_at_msecs != -1) {
                         // we process expired activities in a different slot
@@ -636,7 +636,7 @@ public class User : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_notify_server_finished (string reply, int reply_code) {
-        var notification_confirm_job = qobject_cast<NotificationConfirmJob> (sender ());
+        var notification_confirm_job = (NotificationConfirmJob)sender ();
         if (!notification_confirm_job) {
             return;
         }
@@ -656,7 +656,7 @@ public class User : GLib.Object {
                 GLib.info ("Activity in blocklist; skipping.");
                 continue;
             }
-            const var message = AccountManager.instance.accounts.length == 1 ? "" : activity.acc_name;
+            var message = AccountManager.instance.accounts.length == 1 ? "" : activity.acc_name;
             show_desktop_notification (activity.subject, message);
             this.activity_model.add_notification_to_activity_list (activity);
         }
@@ -823,14 +823,14 @@ public class User : GLib.Object {
     ***********************************************************/
     private void connect_push_notifications () {
         this.account_state.account.push_notifications_disabled.connect (
-            this.on_signal_disconnect_push_notifications // Qt.UniqueConnection
+            this.on_signal_disconnect_push_notifications // GLib.UniqueConnection
         );
 
         this.account_state.account.push_notifications.notifications_changed.connect (
-            this.on_signal_received_push_notification // Qt.UniqueConnection
+            this.on_signal_received_push_notification // GLib.UniqueConnection
         );
         this.account_state.account.push_notifications.activities_changed.connect (
-            this.on_signal_received_push_activity // Qt.UniqueConnection
+            this.on_signal_received_push_activity // GLib.UniqueConnection
         );
     }
 
@@ -860,12 +860,12 @@ public class User : GLib.Object {
         }
 
         // after one hour, clear the gui log notification store
-        const int64 clear_gui_log_interval = 60 * 60 * 1000;
+        int64 clear_gui_log_interval = 60 * 60 * 1000;
         if (this.gui_log_timer.elapsed () > clear_gui_log_interval) {
             this.notification_cache = null;
         }
 
-        const NotificationCache.Notification notification = NotificationCache.Notification (
+        NotificationCache.Notification notification = NotificationCache.Notification (
             title,
             message
         );

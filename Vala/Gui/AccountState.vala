@@ -383,7 +383,7 @@ public class AccountState : GLib.Object /*, GLib.SharedData*/ {
         if (account.credentials ().ready ()) {
             account.credentials ().invalidate_token ();
         }
-        var creds = qobject_cast<HttpCredentials> (account.credentials ());
+        var creds = (HttpCredentials)account.credentials ();
         if (creds && creds.refresh_access_token ()) {
             return;
         }
@@ -417,8 +417,8 @@ public class AccountState : GLib.Object /*, GLib.SharedData*/ {
 
         // IF the account is connected the connection check can be skipped
         // if the last successful etag check job is not so long ago.
-        const int polltime = ConfigFile ().remote_poll_interval ().seconds;
-        const int elapsed = this.time_of_last_e_tag_check.secs_to (GLib.DateTime.current_date_time_utc ());
+        int polltime = ConfigFile ().remote_poll_interval ().seconds;
+        int elapsed = this.time_of_last_e_tag_check.secs_to (GLib.DateTime.current_date_time_utc ());
         if (is_connected && this.time_of_last_e_tag_check.is_valid
             && elapsed <= polltime.length) {
             GLib.debug (account.display_name + "The last ETag check succeeded within the last " + polltime.length + "s (" + elapsed + "s). No connection check needed!");
@@ -620,7 +620,7 @@ public class AccountState : GLib.Object /*, GLib.SharedData*/ {
 
                 if (reply != "") {
                     var element = reply.object ().value ("ocs").to_object ().value ("data");
-                    const var nav_links = element.to_array ();
+                    var nav_links = element.to_array ();
 
                     if (nav_links.length > 0) {
                         foreach (GLib.JsonValue value in nav_links) {

@@ -20,8 +20,8 @@ public class TestResume3 : AbstractTestChunkingNg {
 
         partial_upload (fake_folder, "A/a0", size);
         GLib.assert_true (fake_folder.upload_state ().children.length == 1);
-        var chunking_identifier = fake_folder.upload_state ().children.first ().name;
-        var chunk_map = fake_folder.upload_state ().children.first ().children;
+        var chunking_identifier = fake_folder.upload_state ().children.nth_data (0).name;
+        var chunk_map = fake_folder.upload_state ().children.nth_data (0).children;
         int64 uploaded_size = 0LL;
         foreach (FileInfo chunk in chunk_map) {
             uploaded_size += chunk.size;
@@ -29,7 +29,7 @@ public class TestResume3 : AbstractTestChunkingNg {
         GLib.assert_true (uploaded_size > 5 * 1000 * 1000); // at least 5 MB
 
         // Add a chunk that makes the file completely uploaded
-        fake_folder.upload_state ().children.first ().insert (
+        fake_folder.upload_state ().children.nth_data (0).insert (
             string.number (chunk_map.size ()).right_justified (16, '0'), size - uploaded_size);
 
         bool saw_put = false;
@@ -46,7 +46,7 @@ public class TestResume3 : AbstractTestChunkingNg {
         GLib.assert_true (fake_folder.current_remote_state ().find ("A/a0").size == size);
         // The same chunk identifier was re-used
         GLib.assert_true (fake_folder.upload_state ().children.length == 1);
-        GLib.assert_true (fake_folder.upload_state ().children.first ().name == chunking_identifier);
+        GLib.assert_true (fake_folder.upload_state ().children.nth_data (0).name == chunking_identifier);
     }
 
 } // class TestResume3

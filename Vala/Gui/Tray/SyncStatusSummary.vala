@@ -133,7 +133,7 @@ public class SyncStatusSummary : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private LibSync.SyncResult.Status determine_sync_status (LibSync.SyncResult sync_result) {
-        const var status = sync_result.status ();
+        var status = sync_result.status ();
 
         if (status == LibSync.SyncResult.Status.SUCCESS || status == LibSync.SyncResult.Status.PROBLEM) {
             if (sync_result.has_unresolved_conflicts) {
@@ -167,7 +167,7 @@ public class SyncStatusSummary : GLib.Object {
         foreach (FolderConnection folder_connection in folder_map) {
             if (folder_connection.account_state == this.account_state) {
                 folder_connection.signal_progress_info.connect (
-                    this.on_signal_folder_progress_info // Qt.UniqueConnection
+                    this.on_signal_folder_progress_info // GLib.UniqueConnection
                 );
             } else {
                 disconnect (
@@ -191,11 +191,11 @@ public class SyncStatusSummary : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_folder_progress_info (ProgressInfo progress) {
-        const int64 completed_size = progress.completed_size ();
-        const int64 current_file = progress.current_file ();
-        const int64 completed_file = progress.completed_files ();
-        const int64 total_size = q_max (completed_size, progress.total_size ());
-        const int64 total_file_count = q_max (current_file, progress.total_files ());
+        int64 completed_size = progress.completed_size ();
+        int64 current_file = progress.current_file ();
+        int64 completed_file = progress.completed_files ();
+        int64 total_size = int64.max (completed_size, progress.total_size ());
+        int64 total_file_count = int64.max (current_file, progress.total_files ());
 
         this.sync_progress = calculate_overall_percent (total_file_count, completed_file, total_size, completed_size);
 
@@ -249,7 +249,7 @@ public class SyncStatusSummary : GLib.Object {
             return;
         }
 
-        const var state = determine_sync_status (folder_connection.sync_result);
+        var state = determine_sync_status (folder_connection.sync_result);
 
         switch (state) {
         case LibSync.SyncResult.Status.SUCCESS:

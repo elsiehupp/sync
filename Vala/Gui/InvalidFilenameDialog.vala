@@ -49,7 +49,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
         //  Q_ASSERT (this.account);
         //  Q_ASSERT (this.folder_connection);
 
-        const GLib.FileInfo file_path_file_info = GLib.FileInfo (this.file_path);
+        GLib.FileInfo file_path_file_info = GLib.FileInfo (this.file_path);
         this.relative_file_path = file_path_file_info.path + "/";
         this.relative_file_path = this.relative_file_path.replace (folder_connection.path, "");
         this.relative_file_path = this.relative_file_path == "" ? "" : this.relative_file_path + "/";
@@ -82,7 +82,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
     ***********************************************************/
     public override void on_signal_accept () {
         this.new_filename = this.relative_file_path + this.instance.filename_line_edit.text ().trimmed ();
-        const var propfind_job = new PropfindJob (this.account, GLib.Dir.clean_path (this.folder_connection.remote_path + this.new_filename));
+        var propfind_job = new PropfindJob (this.account, GLib.Dir.clean_path (this.folder_connection.remote_path + this.new_filename));
         propfind_job.signal_result.connect (
             this.on_signal_remote_file_already_exists
         );
@@ -116,8 +116,8 @@ public class InvalidFilenameDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void on_signal_move_job_finished () {
-        const var move_job = qobject_cast<MoveJob> (sender ());
-        const var error = move_job.input_stream.error;
+        var move_job = (MoveJob)sender ();
+        var error = move_job.input_stream.error;
 
         if (error != GLib.InputStream.NoError) {
             this.instance.error_label.on_signal_text (_("Could not rename file. Please make sure you are connected to the server."));
@@ -144,9 +144,9 @@ public class InvalidFilenameDialog : Gtk.Dialog {
         //  Q_UNUSED (reply);
 
         // File does not exist. We can rename it.
-        const var remote_source = GLib.Dir.clean_path (this.folder_connection.remote_path + this.original_filename);
-        const var remote_destionation = GLib.Dir.clean_path (this.account.dav_url ().path + this.folder_connection.remote_path + this.new_filename);
-        const var move_job = new MoveJob (
+        var remote_source = GLib.Dir.clean_path (this.folder_connection.remote_path + this.original_filename);
+        var remote_destionation = GLib.Dir.clean_path (this.account.dav_url ().path + this.folder_connection.remote_path + this.new_filename);
+        var move_job = new MoveJob (
             this.account,
             remote_source,
             remote_destionation,
@@ -162,7 +162,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void check_if_allowed_to_rename () {
-        const var propfind_job = new PropfindJob (this.account, GLib.Dir.clean_path (this.folder_connection.remote_path + this.original_filename));
+        var propfind_job = new PropfindJob (this.account, GLib.Dir.clean_path (this.folder_connection.remote_path + this.original_filename));
         propfind_job.properties ({
             "http://owncloud.org/ns:permissions"
         });
@@ -179,7 +179,7 @@ public class InvalidFilenameDialog : Gtk.Dialog {
         if (!values.contains ("permissions")) {
             return;
         }
-        const var remote_permissions = RemotePermissions.from_server_string (values["permissions"].to_string ());
+        var remote_permissions = RemotePermissions.from_server_string (values["permissions"].to_string ());
         if (!remote_permissions.has_permission (remote_permissions.Permissions.CAN_RENAME)
             || !remote_permissions.has_permission (remote_permissions.Permissions.CAN_MOVE)) {
             this.instance.error_label.on_signal_text (

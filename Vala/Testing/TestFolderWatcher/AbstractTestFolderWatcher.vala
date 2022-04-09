@@ -53,7 +53,7 @@ public abstract class AbstractTestFolderWatcher : GLib.Object {
             // Check if it was already reported as changed by the watcher
             for (int i = 0; i < this.path_changed_spy.size (); ++i) {
                 var args = this.path_changed_spy.at (i);
-                if (args.first ().to_string () == path) {
+                if (args.nth_data (0).to_string () == path) {
                     return true;
                 }
             }

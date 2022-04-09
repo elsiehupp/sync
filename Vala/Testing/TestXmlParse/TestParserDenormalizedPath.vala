@@ -13,7 +13,7 @@ public class TestParserDenormalizedPath : AbstractTestXmlParse {
     /***********************************************************
     ***********************************************************/
     private TestParserDenormalizedPath {
-        const string xml_string = "<?xml version='1.0' encoding='utf-8'?>"
+        string xml_string = "<?xml version='1.0' encoding='utf-8'?>"
             + "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             + "<d:response>"
             + "<d:href>/oc/remote.php/dav/sharefolder/</d:href>"

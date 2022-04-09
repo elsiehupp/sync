@@ -70,7 +70,7 @@ public class NSISUpdater : OCUpdater {
     /***********************************************************
     ***********************************************************/
     private void on_signal_download_finished () {
-        var reply = qobject_cast<GLib.InputStream> (sender ());
+        var reply = (GLib.InputStream)sender ();
         reply.delete_later ();
         if (reply.error != GLib.InputStream.NoError) {
             download_state (DownloadState.DOWNLOAD_FAILED);
@@ -101,7 +101,7 @@ public class NSISUpdater : OCUpdater {
     /***********************************************************
     ***********************************************************/
     private void on_signal_write_file () {
-        var reply = qobject_cast<GLib.InputStream> (sender ());
+        var reply = (GLib.InputStream)sender ();
         if (this.file.is_open) {
             this.file.write (reply.read_all ());
         }
@@ -128,8 +128,8 @@ public class NSISUpdater : OCUpdater {
     private void show_no_url_dialog (UpdateInfo info) {
         // if the version tag is set, there is a newer version.
         var message_box = new Gtk.Dialog ();
-        message_box.attribute (Qt.WA_DeleteOnClose);
-        message_box.window_flags (message_box.window_flags () & ~Qt.WindowContextHelpButtonHint);
+        message_box.attribute (GLib.WA_DeleteOnClose);
+        message_box.window_flags (message_box.window_flags () & ~GLib.WindowContextHelpButtonHint);
 
         Gtk.Icon info_icon = message_box.this.style.standard_icon (GLib.Style.SP_Message_box_information);
         int icon_size = message_box.this.style.pixel_metric (GLib.Style.PM_Message_box_icon_size);
@@ -154,7 +154,7 @@ public class NSISUpdater : OCUpdater {
                         );
 
         update_label.on_signal_text (txt);
-        update_label.text_format (Qt.RichText);
+        update_label.text_format (GLib.RichText);
         update_label.word_wrap (true);
 
         hlayout.add_widget (ico);
@@ -192,8 +192,8 @@ public class NSISUpdater : OCUpdater {
     ***********************************************************/
     private void show_update_error_dialog (string target_version) {
         var message_box = new Gtk.Dialog ();
-        message_box.attribute (Qt.WA_DeleteOnClose);
-        message_box.window_flags (message_box.window_flags () & ~Qt.WindowContextHelpButtonHint);
+        message_box.attribute (GLib.WA_DeleteOnClose);
+        message_box.window_flags (message_box.window_flags () & ~GLib.WindowContextHelpButtonHint);
 
         Gtk.Icon info_icon = message_box.this.style.standard_icon (GLib.Style.SP_Message_box_information);
         int icon_size = message_box.this.style.pixel_metric (GLib.Style.PM_Message_box_icon_size);
@@ -218,7 +218,7 @@ public class NSISUpdater : OCUpdater {
                         );
 
         update_label.on_signal_text (txt);
-        update_label.text_format (Qt.RichText);
+        update_label.text_format (GLib.RichText);
         update_label.word_wrap (true);
 
         hlayout.add_widget (ico);

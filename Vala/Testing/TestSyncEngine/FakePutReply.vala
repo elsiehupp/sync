@@ -20,7 +20,7 @@ public class FakePutReply : FakeReply {
         set_operation (operation);
         open (GLib.IODevice.ReadOnly);
         file_info = perform (remote_root_file_info, request, put_payload);
-        GLib.Object.invoke_method (this, "respond", Qt.QueuedConnection);
+        GLib.Object.invoke_method (this, "respond", GLib.QueuedConnection);
     }
 
 

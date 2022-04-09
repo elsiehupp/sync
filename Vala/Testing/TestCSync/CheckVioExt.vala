@@ -193,7 +193,7 @@ public class CheckVioExt : GLib.Object {
     static void check_readdir_shorttree (void **state) {
         var sv = (StateVar*) *state;
 
-        const string t1 = "alibaba/und/die/vierzig/räuber/";
+        string t1 = "alibaba/und/die/vierzig/räuber/";
         create_dirs ( t1 );
         int file_count = 0;
 
@@ -214,7 +214,7 @@ public class CheckVioExt : GLib.Object {
         var sv = (StateVar*) *state;
         int file_count = 0;
 
-        const string t1 = "warum/nur/40/Räuber/";
+        string t1 = "warum/nur/40/Räuber/";
         create_dirs ( t1 );
 
         create_file ( t1, "Räuber Max.txt", "Der Max ist ein schlimmer finger");
@@ -242,10 +242,10 @@ public class CheckVioExt : GLib.Object {
         */
 
         /* create the test tree */
-        const string t1 = "vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH/AND/NE/BOTTLE/VOLL/RUM/undnochmalallezusammen/VierZig/MannaufDesTotenManns/KISTE/ooooooooooooooooooooooooooohhhhhh/und/BESSER/ZWEI/Butteln/VOLL RUM/";
+        string t1 = "vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH/AND/NE/BOTTLE/VOLL/RUM/undnochmalallezusammen/VierZig/MannaufDesTotenManns/KISTE/ooooooooooooooooooooooooooohhhhhh/und/BESSER/ZWEI/Butteln/VOLL RUM/";
         create_dirs ( t1 );
 
-        const string r1 =
+        string r1 =
             ( "<DIR> %1/vierzig"
             + "<DIR> %1/vierzig/mann"
             + "<DIR> %1/vierzig/mann/auf"
@@ -260,7 +260,7 @@ public class CheckVioExt : GLib.Object {
             + "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll"
             + "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum").printf (csync_test_dir ());
 
-        const string r2 =
+        string r2 =
             ( "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und"
             + "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so"
             + "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen"
@@ -274,7 +274,7 @@ public class CheckVioExt : GLib.Object {
             + "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE"
             + "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH").printf (csync_test_dir ());
 
-        const string r3 =
+        string r3 =
             ( "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH/AND"
             + "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH/AND/NE"
             + "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH/AND/NE/BOTTLE"
@@ -292,7 +292,7 @@ public class CheckVioExt : GLib.Object {
             + "<DIR> %1/vierzig/mann/auf/des/toten/Mann/kiste/ooooooooooooooooooooooh/and/ne/bottle/voll/rum/und/so/singen/wir/VIERZIG/MANN/AUF/DES/TOTEN/MANNS/KISTE/OOOOOOOOH/AND/NE/BOTTLE/VOLL/RUM/undnochmalallezusammen/VierZig/MannaufDesTotenManns/KISTE/ooooooooooooooooooooooooooohhhhhh/und/BESSER/ZWEI/Butteln/VOLL RUM").printf (csync_test_dir ());
 
         /* assemble the result string ... */
-        const string result = r1 + r2 + r3;
+        string result = r1 + r2 + r3;
         int file_count = 0;
         traverse_dir (state, csync_test_dir (), file_count);
         GLib.assert_true (file_count == 0);

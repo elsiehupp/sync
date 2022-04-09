@@ -14,7 +14,7 @@ public class MissingPermissionsPropfindReply : FakePropfindReply {
         Soup.Request request, GLib.Object parent) {
         base (remote_root_file_info, operation, request, parent);
         // If the propfind contains a single file without permissions, this is a server error
-        const string to_remove = "<oc:permissions>RDNVCKW</oc:permissions>";
+        string to_remove = "<oc:permissions>RDNVCKW</oc:permissions>";
         var position = payload.index_of (to_remove, payload.size ()/2);
         GLib.assert_true (position > 0);
         payload.remove (position, sizeof (to_remove) - 1);

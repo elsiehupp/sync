@@ -101,7 +101,7 @@ public class SslButton : GLib.ToolButton {
 
             this.menu.add_action (_("Certificate information:")).enabled (false);
 
-            const var system_certificates = GLib.SslConfiguration.system_ca_certificates ();
+            var system_certificates = GLib.SslConfiguration.system_ca_certificates ();
 
             GLib.List<GLib.SslCertificate> temporary_chain;
             foreach (GLib.SslCertificate cert in chain) {
@@ -227,7 +227,7 @@ public class SslButton : GLib.ToolButton {
         // create label first
         var label = new Gtk.Label (parent);
         label.style_sheet ("Gtk.Label { padding : 8px; }");
-        label.text_format (Qt.RichText);
+        label.text_format (GLib.RichText);
         label.on_signal_text (details);
 
         // plug label into widget action

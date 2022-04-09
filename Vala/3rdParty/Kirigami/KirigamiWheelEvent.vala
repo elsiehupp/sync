@@ -15,8 +15,8 @@ public class KirigamiWheelEvent : GLib.Object {
     private double m_y = 0;
     private GLib.PointF m_angle_delta;
     private GLib.PointF m_pixel_delta;
-    private Qt.MouseButtons m_buttons = Qt.NoButton;
-    private Qt.KeyboardModifiers m_modifiers = Qt.NoModifier;
+    private GLib.MouseButtons m_buttons = GLib.NoButton;
+    private GLib.KeyboardModifiers m_modifiers = GLib.NoModifier;
     private bool m_inverted = false;
     private bool m_accepted = false;
 
@@ -55,7 +55,7 @@ public class KirigamiWheelEvent : GLib.Object {
     buttons : int
 
     it contains an OR combination of the buttons that were pressed during the wheel, they can be:
-    Qt.LeftButton, Qt.MiddleButton, Qt.RightButton
+    GLib.LeftButton, GLib.MiddleButton, GLib.RightButton
     ***********************************************************/
     //  Q_PROPERTY (int buttons READ buttons CONSTANT)
 
@@ -63,9 +63,9 @@ public class KirigamiWheelEvent : GLib.Object {
     modifiers : int
 
     Keyboard mobifiers that were pressed
-    Qt.NoModifier (def
-    Qt.ControlModifi
-    Qt.ShiftModifier
+    GLib.NoModifier (def
+    GLib.ControlModifi
+    GLib.ShiftModifier
     ...
     ***********************************************************/
     //  Q_PROPERTY (int modifiers READ modifiers CONSTANT)
@@ -92,7 +92,7 @@ public class KirigamiWheelEvent : GLib.Object {
       block_target_wheel : true
       scroll_flick
       on_wheel: {
-           if (wheel.modifiers & Qt.C
+           if (wheel.modifiers & GLib.C
                wheel.accepted = true;
 
 
@@ -113,7 +113,7 @@ public class KirigamiWheelEvent : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public void initialize_from_event (GLib.WheelEvent event) {
+    public void initialize_from_event (Gdk.EventScroll event) {
         m_x = event.position ().x ();
         m_y = event.position ().y ();
         m_angle_delta = event.angle_delta ();

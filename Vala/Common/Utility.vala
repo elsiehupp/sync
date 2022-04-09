@@ -119,10 +119,10 @@ public class Utility : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static string octets_to_string (int64 octets) {
-        const int THE_FACTOR = 1024;
-        const int64 KB = THE_FACTOR;
-        const int64 MB = THE_FACTOR * KB;
-        const int64 GB = THE_FACTOR * MB;
+        int THE_FACTOR = 1024;
+        int64 KB = THE_FACTOR;
+        int64 MB = THE_FACTOR * KB;
+        int64 GB = THE_FACTOR * MB;
 
         string s;
         double value = octets;
@@ -178,8 +178,8 @@ public class Utility : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public static string friendly_user_agent_string () {
-        const var pattern = "%1 (Desktop Client - %2)";
-        const var user_agent = pattern.printf (GLib.SysInfo.machine_host_name (), platform ());
+        var pattern = "%1 (Desktop Client - %2)";
+        var user_agent = pattern.printf (GLib.SysInfo.machine_host_name (), platform ());
         return user_agent.to_utf8 ();
     }
 
@@ -259,9 +259,9 @@ public class Utility : GLib.Object {
             }
             // When running inside an AppImage, we need to set the path to the
             // AppImage instead of the path to the executable
-            const string app_image_path = q_environment_variable ("APPIMAGE");
-            const bool running_inside_app_image = !app_image_path == null && GLib.File.exists (app_image_path);
-            const string executable_path = running_inside_app_image ? app_image_path : GLib.Application.application_file_path;
+            string app_image_path = q_environment_variable ("APPIMAGE");
+            bool running_inside_app_image = !app_image_path == null && GLib.File.exists (app_image_path);
+            string executable_path = running_inside_app_image ? app_image_path : GLib.Application.application_file_path;
 
             string ts; // = new GLib.OutputStream (&ini_file);
             //  ts.codec ("UTF-8");
@@ -290,22 +290,22 @@ public class Utility : GLib.Object {
 
     ***********************************************************/
     public static uint32 convert_size_to_uint (size_t convert_var) {
-        if (convert_var > UINT_MAX) {
+        if (convert_var > uint.MAX) {
             //throw std.bad_cast ();
-            convert_var = UINT_MAX; // intentionally default to wrong value here to not crash: exception handling TBD
+            convert_var = uint.MAX; // intentionally default to wrong value here to not crash: exception handling TBD
         }
-        return static_cast<uint32> (convert_var);
+        return (uint32)convert_var;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public static int convert_size_to_int (size_t convert_var) {
-        if (convert_var > INT_MAX) {
+        if (convert_var > int.MAX) {
             //throw std.bad_cast ();
-            convert_var = INT_MAX; // intentionally default to wrong value here to not crash : exception handling TBD
+            convert_var = int.MAX; // intentionally default to wrong value here to not crash : exception handling TBD
         }
-        return static_cast<int> (convert_var);
+        return (int)convert_var;
     }
 
 
@@ -681,7 +681,7 @@ public class Utility : GLib.Object {
 
     class StopWatch {
 
-        const string STOPWATCH_END_TAG = "_STOPWATCH_END";
+        string STOPWATCH_END_TAG = "_STOPWATCH_END";
 
         private GLib.HashTable<string, uint64?> lap_times;
         GLib.DateTime start_time { public get; private set; }
@@ -744,7 +744,7 @@ public class Utility : GLib.Object {
     public static void sort_filenames (GLib.List<string> filenames) {
         GLib.Collator collator;
         collator.numeric_mode (true);
-        collator.case_sensitivity (Qt.CaseInsensitive);
+        collator.case_sensitivity (GLib.CaseInsensitive);
         std.sort (filenames.begin (), filenames.end (), collator);
     }
 
@@ -798,7 +798,7 @@ public class Utility : GLib.Object {
 
     ***********************************************************/
     public static string sanitize_for_filename (string name) {
-        const string invalid = " (/?<>:*|\")";
+        string invalid = " (/?<>:*|\")";
         string result;
         result.reserve (name.length);
         foreach (var c in name) {
@@ -906,7 +906,7 @@ public class Utility : GLib.Object {
         }
 
         // The rightmost tag is relevant
-        var tag_start = q_max (start_old, start_new);
+        var tag_start = int.max (start_old, start_new);
         if (tag_start == -1) {
             return "";
         }

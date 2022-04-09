@@ -220,7 +220,7 @@ public class FakeSearchResultsStorage : GLib.Object {
             return results;
         }
 
-        const int n = cursor + page_size > provider.results.size ()
+        int n = cursor + page_size > provider.results.size ()
             ? 0
             : cursor + page_size;
 
@@ -281,7 +281,7 @@ public class FakeSearchResultsStorage : GLib.Object {
 
         var next_cursor = cursor + page_size;
 
-        const GLib.VariantMap data_map = {
+        GLib.VariantMap data_map = {
             {
                 "name", this.search_results_data[provider_id].name
             },

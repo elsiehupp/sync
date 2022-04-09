@@ -163,7 +163,7 @@ public class SyncFileStatusTracker : GLib.Object {
         foreach (var sync_problem in this.sync_problems)
             old_problems.erase (sync_problem.first);
         foreach (var old_problem in old_problems) {
-            const string path = old_problem.first;
+            string path = old_problem.first;
             Common.SyncFileStatus.SyncFileStatusTag severity = old_problem.second;
             if (severity == Common.SyncFileStatus.SyncFileStatusTag.STATUS_ERROR)
                 invalidate_parent_paths (path);
@@ -228,7 +228,7 @@ public class SyncFileStatusTracker : GLib.Object {
     private Common.SyncFileStatus.SyncFileStatusTag lookup_problem (string path_to_match, ProblemsMap problem_map) {
         var lower = problem_map.lower_bound (path_to_match);
         for (var it = lower; it != problem_map.cend (); ++it) {
-            const string problem_path = it.first;
+            string problem_path = it.first;
             Common.SyncFileStatus.SyncFileStatusTag severity = it.second;
 
             if (path_compare (problem_path, path_to_match) == 0) {
@@ -279,7 +279,7 @@ public class SyncFileStatusTracker : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void invalidate_parent_paths (string path) {
-        GLib.List<string> split_path = path.split ("/", Qt.SkipEmptyParts);
+        GLib.List<string> split_path = path.split ("/", GLib.SkipEmptyParts);
         for (int i = 0; i < split_path.size (); ++i) {
             string parent_path = split_path.mid (0, i).join ("/");
             /* emit */ signal_file_status_changed (get_system_destination (parent_path), file_status (parent_path));
@@ -392,14 +392,14 @@ public class SyncFileStatusTracker : GLib.Object {
     ***********************************************************/
     private static int path_compare (string lhs, string rhs) {
         // Should match Utility.fs_case_preserving, we want don't want to pay for the runtime check on every comparison.
-        return lhs.compare (rhs, Qt.CaseSensitive);
+        return lhs.compare (rhs, GLib.CaseSensitive);
     }
 
 
     /***********************************************************
     ***********************************************************/
     private static bool path_starts_with (string lhs, string rhs) {
-        return lhs.has_prefix (rhs, Qt.CaseSensitive);
+        return lhs.has_prefix (rhs, GLib.CaseSensitive);
     }
 
 

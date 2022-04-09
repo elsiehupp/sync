@@ -32,7 +32,7 @@ public class IconJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_finished () {
-        var reply = qobject_cast<GLib.InputStream> (sender ());
+        var reply = (GLib.InputStream)sender ();
         if (!reply) {
             return;
         }

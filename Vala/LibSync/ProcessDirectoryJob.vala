@@ -538,7 +538,7 @@ public class ProcessDirectoryJob : GLib.Object {
             // local stat function.
             // Recall file shall not be ignored (#4420)
             bool is_hidden = e.local_entry.is_hidden || (!f.first == "" && f.first[0] == '.' && f.first != ".sys.admin#recall#");
-            const bool is_server_entry_windows_shortcut = false;
+            bool is_server_entry_windows_shortcut = false;
             if (handle_excluded (path.target, e.local_entry.name,
                     e.local_entry.is_directory || e.server_entry.is_directory, is_hidden,
                     e.local_entry.is_sym_link || is_server_entry_windows_shortcut))
@@ -834,11 +834,11 @@ public class ProcessDirectoryJob : GLib.Object {
 
         // The file is known in the database already
         if (database_entry.is_valid) {
-            const bool is_database_entry_an_e2Ee_placeholder = database_entry.is_virtual_file () && !database_entry.e2e_mangled_name () == "";
+            bool is_database_entry_an_e2Ee_placeholder = database_entry.is_virtual_file () && !database_entry.e2e_mangled_name () == "";
             GLib.assert (!is_database_entry_an_e2Ee_placeholder || server_entry.size >= Constants.E2EE_TAG_SIZE);
-            const bool is_virtual_e2Ee_placeholder = is_database_entry_an_e2Ee_placeholder && server_entry.size >= Constants.E2EE_TAG_SIZE;
-            const int64 size_on_signal_server = is_virtual_e2Ee_placeholder ? server_entry.size - Constants.E2EE_TAG_SIZE : server_entry.size;
-            const bool meta_data_size_needs_update_for_e2Ee_file_placeholder = is_virtual_e2Ee_placeholder && database_entry.file_size == server_entry.size;
+            bool is_virtual_e2Ee_placeholder = is_database_entry_an_e2Ee_placeholder && server_entry.size >= Constants.E2EE_TAG_SIZE;
+            int64 size_on_signal_server = is_virtual_e2Ee_placeholder ? server_entry.size - Constants.E2EE_TAG_SIZE : server_entry.size;
+            bool meta_data_size_needs_update_for_e2Ee_file_placeholder = is_virtual_e2Ee_placeholder && database_entry.file_size == server_entry.size;
 
             if (server_entry.is_directory != database_entry.is_directory ()) {
                 // If the type of the entity changed, it's like NEW, but
@@ -951,7 +951,7 @@ public class ProcessDirectoryJob : GLib.Object {
         ) {
             int64 local_folder_size = 0;
 
-            const bool list_files_succeeded = this.discovery_data.statedatabase.list_files_in_path (database_entry.path.to_utf8 (), list_files_callback);
+            bool list_files_succeeded = this.discovery_data.statedatabase.list_files_in_path (database_entry.path.to_utf8 (), list_files_callback);
 
             if (list_files_succeeded && local_folder_size != 0 && local_folder_size == server_entry.size_of_folder) {
                 GLib.info ("Migration of E2EE folder " + database_entry.path + " from older version to the one, supporting the implicit VFS hydration.");
@@ -1325,7 +1325,7 @@ public class ProcessDirectoryJob : GLib.Object {
 
                 // Checksum comparison at this stage is only enabled for .eml files,
                 // check #4754 #4755
-                bool is_eml_file = path.original.has_suffix (".eml", Qt.CaseInsensitive);
+                bool is_eml_file = path.original.has_suffix (".eml", GLib.CaseInsensitive);
                 if (is_eml_file && database_entry.file_size == local_entry.size && !database_entry.checksum_header == "") {
                     if (compute_local_checksum (database_entry.checksum_header, this.discovery_data.local_dir + path.local, item)
                             && item.checksum_header == database_entry.checksum_header) {
@@ -1625,7 +1625,7 @@ public class ProcessDirectoryJob : GLib.Object {
             // Exception : If the rename changes case only (like "foo" . "Foo") the
             // old filename might still point to the same file.
             && ! (Utility.fs_case_preserving ()
-                    && original_path.compare (path.local, Qt.CaseInsensitive) == 0
+                    && original_path.compare (path.local, GLib.CaseInsensitive) == 0
                     && original_path != path.local)) {
             GLib.info ("Not a move; base_record file still exists at " + original_path);
             return false;
@@ -1963,7 +1963,7 @@ public class ProcessDirectoryJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void sub_job_finished () {
-        var process_directory_job = qobject_cast<ProcessDirectoryJob> (sender ());
+        var process_directory_job = (ProcessDirectoryJob)sender ();
         //  ASSERT (process_directory_job);
 
         this.child_ignored |= process_directory_job.child_ignored;

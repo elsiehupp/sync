@@ -12,7 +12,7 @@ public class TestClearAtClearAtTimestamp : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private TestClearAtClearAtTimestamp () {
-        const GLib.DateTime current_time = create_date_time ();
+        GLib.DateTime current_time = create_date_time ();
         new TestClearAtClearAtTimestamp2 (current_time);
         new TestClearAtClearAtTimestamp3 (current_time);
         new TestClearAtClearAtTimestamp4 (current_time);

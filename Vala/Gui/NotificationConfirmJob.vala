@@ -75,10 +75,10 @@ public class NotificationConfirmJob : AbstractNetworkJob {
     private override bool on_signal_finished () {
         int reply_code = 0;
         // FIXME: check for the reply code!
-        const string reply_str = this.reply.read_all ();
+        string reply_str = this.reply.read_all ();
 
         if (reply_str.contains ("<?xml version=\"1.0\"?>")) {
-            const var rex_match = new GLib.Regex ("<statuscode> (\\d+)</statuscode>").match (reply_str);
+            var rex_match = new GLib.Regex ("<statuscode> (\\d+)</statuscode>").match (reply_str);
             if (rex_match.has_match ()) {
                 // this is a error message coming back from ocs.
                 reply_code = rex_match.captured (1).to_int ();

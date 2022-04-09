@@ -151,7 +151,7 @@ public class PushNotificationManager : GLib.Object {
         GLib.info ("Connected to websocket for account " + this.account.url.to_string ());
 
         this.web_socket.text_message_received.connect (
-            this.on_signal_web_socket_text_message_received // Qt.UniqueConnection
+            this.on_signal_web_socket_text_message_received // GLib.UniqueConnection
         );
 
         authenticate_on_signal_web_socket ();

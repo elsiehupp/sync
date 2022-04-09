@@ -227,14 +227,14 @@ public class UserStatusSelectorModel : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public int predefined_statuses_count () {
-        return static_cast<int> (this.predefined_statuses.size ());
+        return (int)this.predefined_statuses.length ();
     }
 
 
     /***********************************************************
     ***********************************************************/
     public LibSync.UserStatus predefined_status_for_index (int index) {
-        //  Q_ASSERT (0 <= index && index < static_cast<int> (this.predefined_statuses.size ()));
+        //  Q_ASSERT (0 <= index && index < (int)this.predefined_statuses.size ());
         return this.predefined_statuses[index];
     }
 
@@ -249,10 +249,10 @@ public class UserStatusSelectorModel : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void predefined_status (int index) {
-        //  Q_ASSERT (0 <= index && index < static_cast<int> (this.predefined_statuses.size ()));
+        //  Q_ASSERT (0 <= index && index < (int)this.predefined_statuses.size ());
 
         this.user_status.message_predefined (true);
-        const var predefined_status = this.predefined_statuses[index];
+        var predefined_status = this.predefined_statuses[index];
         this.user_status.id (predefined_status.identifier);
         this.user_status.message (predefined_status.message ());
         this.user_status.icon (predefined_status.icon ());
@@ -292,7 +292,7 @@ public class UserStatusSelectorModel : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void clear_at_for_index (int index) {
-        //  Q_ASSERT (0 <= index && index < static_cast<int> (this.clear_stages.size ()));
+        //  Q_ASSERT (0 <= index && index < (int)this.clear_stages.size ());
         this.user_status.clear_at (clear_stage_type_to_date_time (this.clear_stages[index]));
         /* emit */ clear_at_changed ();
     }
@@ -477,7 +477,7 @@ public class UserStatusSelectorModel : GLib.Object {
             }
 
             case ClearAtType.TIMESTAMP: {
-                const int difference = static_cast<int> (clear_at.timestamp - this.date_time_provider.current_date_time ().to_time_t ());
+                int difference = (int)(clear_at.timestamp - this.date_time_provider.current_date_time ().to_time_t ());
                 return time_difference_to_string (difference);
             }
 
@@ -505,21 +505,21 @@ public class UserStatusSelectorModel : GLib.Object {
         if (difference_secs < 60) {
             return _("Less than a minute");
         } else if (difference_secs < 60 * 60) {
-            const var minutes_left = std.ceil (difference_secs / 60.0);
+            var minutes_left = std.ceil (difference_secs / 60.0);
             if (minutes_left == 1) {
                 return _("1 minute");
             } else {
                 return _("%1 minutes").printf (minutes_left);
             }
         } else if (difference_secs < 60 * 60 * 24) {
-            const var hours_left = std.ceil (difference_secs / 60.0 / 60.0);
+            var hours_left = std.ceil (difference_secs / 60.0 / 60.0);
             if (hours_left == 1) {
                 return _("1 hour");
             } else {
                 return _("%1 hours").printf (hours_left);
             }
         } else {
-            const var days_left = std.ceil (difference_secs / 60.0 / 60.0 / 24.0);
+            var days_left = std.ceil (difference_secs / 60.0 / 60.0 / 24.0);
             if (days_left == 1) {
                 return _("1 day");
             } else {

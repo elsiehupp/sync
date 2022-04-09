@@ -29,12 +29,12 @@ public class FileActivityListModel : ActivityListModel {
         }
         account_state (account_state);
 
-        const var folder = FolderManager.instance.folder_for_path (local_path);
+        var folder = FolderManager.instance.folder_for_path (local_path);
         if (!folder) {
             return;
         }
 
-        const var file = folder.file_from_local_path (local_path);
+        var file = folder.file_from_local_path (local_path);
         SyncJournalFileRecord file_record;
         if (!folder.journal_database ().file_record (file, file_record) || !file_record.is_valid) {
             return;
@@ -53,7 +53,7 @@ public class FileActivityListModel : ActivityListModel {
         }
         currently_fetching (true);
 
-        const string url = "ocs/v2.php/apps/activity/api/v2/activity/filter";
+        string url = "ocs/v2.php/apps/activity/api/v2/activity/filter";
         var json_api_job = new LibSync.JsonApiJob (account_state.account, url, this);
         json_api_job.signal_json_received.connect (
             this.activities_received

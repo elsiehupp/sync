@@ -33,12 +33,12 @@ public class XAttrWrapper : GLib.Object {
 
 
     public static Optional<string> xattr_get (string path, string name) {
-        const int BUFFER_SIZE = 256;
+        int BUFFER_SIZE = 256;
         string result;
         result.resize (BUFFER_SIZE);
         var count = getxattr (path.const_data (), name.const_data (), result, BUFFER_SIZE);
         if (count >= 0) {
-            result.resize (static_cast<int> (count) - 1);
+            result.resize ((int)count - 1);
             return result;
         } else {
             return {};

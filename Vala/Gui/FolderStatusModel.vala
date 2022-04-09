@@ -112,7 +112,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
 
         /***********************************************************
         ***********************************************************/
-        Qt.CheckState checked = Qt.Checked;
+        GLib.CheckState checked = GLib.Checked;
 
         /***********************************************************
         Whether this has a ItemType.FETCH_LABEL subrow
@@ -147,7 +147,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    public const int FILE_ID_ROLE = Qt.USER_ROLE + 1;
+    public const int FILE_ID_ROLE = GLib.USER_ROLE + 1;
 
 
     /***********************************************************
@@ -183,10 +183,10 @@ public class FolderStatusModel : GLib.AbstractItemModel {
             this.account_state = value;
 
             FolderManager.instance.signal_folder_sync_state_change.connect (
-                this.on_signal_folder_sync_state_change // Qt.UniqueConnection
+                this.on_signal_folder_sync_state_change // GLib.UniqueConnection
             );
             FolderManager.instance.signal_schedule_queue_changed.connect (
-                this.on_signal_folder_schedule_queue_changed // Qt.UniqueConnection
+                this.on_signal_folder_schedule_queue_changed // GLib.UniqueConnection
             );
 
             var folders = FolderManager.instance.map ();
@@ -201,14 +201,14 @@ public class FolderStatusModel : GLib.AbstractItemModel {
                 info.name = folder_connection.alias ();
                 info.path = "/";
                 info.folder_connection = folder_connection;
-                info.checked = Qt.PartiallyChecked;
+                info.checked = GLib.PartiallyChecked;
                 this.folders + info;
 
                 folder_connection.signal_progress_info.connect (
-                    this.on_signal_folder_progress_info // Qt.UniqueConnection
+                    this.on_signal_folder_progress_info // GLib.UniqueConnection
                 );
                 folder_connection.signal_new_big_folder_discovered.connect (
-                    this.on_signal_new_big_folder_discovered // Qt.UniqueConnection
+                    this.on_signal_new_big_folder_discovered // GLib.UniqueConnection
                 );
             }
 
@@ -262,32 +262,32 @@ public class FolderStatusModel : GLib.AbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    public Qt.ItemFlags flags (GLib.ModelIndex index) {
+    public GLib.ItemFlags flags (GLib.ModelIndex index) {
         if (!this.account_state) {
             return {};
         }
 
-        const var info = info_for_index (index);
-        const var supports_selective_sync = info && info.folder_connection && info.folder_connection.supports_selective_sync;
+        var info = info_for_index (index);
+        var supports_selective_sync = info && info.folder_connection && info.folder_connection.supports_selective_sync;
 
         switch (classify (index)) {
         case ItemType.ADD_BUTTON: {
-            Qt.ItemFlags ret;
-            ret = Qt.ItemNeverHasChildren;
+            GLib.ItemFlags ret;
+            ret = GLib.ItemNeverHasChildren;
             if (!this.account_state.is_connected) {
                 return ret;
             }
-            return Qt.ItemIsEnabled | ret;
+            return GLib.ItemIsEnabled | ret;
         }
         case ItemType.FETCH_LABEL:
-            return Qt.ItemIsEnabled | Qt.ItemNeverHasChildren;
+            return GLib.ItemIsEnabled | GLib.ItemNeverHasChildren;
         case ItemType.ROOT_FOLDER:
-            return Qt.ItemIsEnabled;
+            return GLib.ItemIsEnabled;
         case ItemType.SUBFOLDER:
             if (supports_selective_sync) {
-                return Qt.ItemIsEnabled | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable;
+                return GLib.ItemIsEnabled | GLib.ItemIsUserCheckable | GLib.ItemIsSelectable;
             } else {
-                return Qt.ItemIsEnabled | Qt.ItemIsSelectable;
+                return GLib.ItemIsEnabled | GLib.ItemIsSelectable;
             }
         }
         return {};
@@ -301,7 +301,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
             return GLib.Variant ();
         }
 
-        if (role == Qt.EditRole) {
+        if (role == GLib.EditRole) {
             return GLib.Variant ();
         }
 
@@ -309,7 +309,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
         case ItemType.ADD_BUTTON: {
             if (role == DataRole.ADD_BUTTON) {
                 return GLib.Variant (true);
-            } else if (role == Qt.ToolTipRole) {
+            } else if (role == GLib.ToolTipRole) {
                 if (!this.account_state.is_connected) {
                     return _("You need to be connected to add a folder_connection");
                 }
@@ -318,22 +318,22 @@ public class FolderStatusModel : GLib.AbstractItemModel {
             return GLib.Variant ();
         }
         case ItemType.SUBFOLDER: {
-            const var x = static_cast<SubFolderInfo> (index.internal_pointer ()).subs.at (index.row ());
-            const var supports_selective_sync = x.folder_connection && x.folder_connection.supports_selective_sync;
+            var x = ((SubFolderInfo)index.internal_pointer ()).subs.at (index.row ());
+            var supports_selective_sync = x.folder_connection && x.folder_connection.supports_selective_sync;
 
             switch (role) {
-            case Qt.Display_role:
+            case GLib.Display_role:
                 // : Example text: "File.txt (23KB)"
                 return x.size < 0 ? x.name : _("%1 (%2)").printf (x.name, Utility.octets_to_string (x.size));
-            case Qt.ToolTipRole:
+            case GLib.ToolTipRole:
                 return "<qt>" + Utility.escape (x.size < 0 ? x.name : _("%1 (%2)").printf (x.name, Utility.octets_to_string (x.size))) + "</qt>";
-            case Qt.CheckStateRole:
+            case GLib.CheckStateRole:
                 if (supports_selective_sync) {
                     return x.checked;
                 } else {
                     return GLib.Variant ();
                 }
-            case Qt.Decoration_role: {
+            case GLib.Decoration_role: {
                 if (x.is_encrypted) {
                     return new Gtk.Icon (":/client/theme/lock-https.svg");
                 } else if (x.size > 0 && is_any_ancestor_encrypted (index)) {
@@ -341,9 +341,9 @@ public class FolderStatusModel : GLib.AbstractItemModel {
                 }
                 return GLib.FileIconProvider ().icon (x.is_external ? GLib.FileIconProvider.Network : GLib.FileIconProvider.FolderConnection);
             }
-            case Qt.Foreground_role:
+            case GLib.Foreground_role:
                 if (x.is_undecided) {
-                    return Gdk.RGBA (Qt.red);
+                    return Gdk.RGBA (GLib.red);
                 }
                 break;
             case FILE_ID_ROLE:
@@ -358,9 +358,9 @@ public class FolderStatusModel : GLib.AbstractItemModel {
         }
             return GLib.Variant ();
         case ItemType.FETCH_LABEL: {
-            const var x = static_cast<SubFolderInfo> (index.internal_pointer ());
+            var x = (SubFolderInfo)index.internal_pointer ();
             switch (role) {
-            case Qt.Display_role:
+            case GLib.Display_role:
                 if (x.has_error) {
                     return GLib.Variant (_("Error while loading the list of folders from the server.")
                         + "\n" + x.last_error_string);
@@ -376,13 +376,13 @@ public class FolderStatusModel : GLib.AbstractItemModel {
             break;
         }
 
-        const SubFolderInfo folder_info = this.folders.at (index.row ());
+        SubFolderInfo folder_info = this.folders.at (index.row ());
         var folder_connection = folder_info.folder_connection;
         if (!folder_connection)
             return GLib.Variant ();
 
-        const SubFolderInfo.Progress progress = folder_info.progress;
-        const bool account_connected = this.account_state.is_connected;
+        SubFolderInfo.Progress progress = folder_info.progress;
+        bool account_connected = this.account_state.is_connected;
 
         switch (role) {
         case DataRole.FOLDER_PATH_ROLE:
@@ -411,7 +411,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
             return folder_connection.sync_paused;
         case DataRole.FOLDER_ACCOUNT_CONNECTED:
             return account_connected;
-        case Qt.ToolTipRole: {
+        case GLib.ToolTipRole: {
             string tool_tip;
             if (!progress == null) {
                 return progress.progress_string;
@@ -472,61 +472,61 @@ public class FolderStatusModel : GLib.AbstractItemModel {
 
     /***********************************************************
     ***********************************************************/
-    public bool data_for_index_value_and_role (GLib.ModelIndex index, GLib.Variant value, int role = Qt.EditRole) {
-        if (role == Qt.CheckStateRole) {
+    public bool data_for_index_value_and_role (GLib.ModelIndex index, GLib.Variant value, int role = GLib.EditRole) {
+        if (role == GLib.CheckStateRole) {
             var info = info_for_index (index);
             //  Q_ASSERT (info.folder_connection && info.folder_connection.supports_selective_sync);
-            var checked = static_cast<Qt.CheckState> (value.to_int ());
+            var checked = (GLib.CheckState)value.to_int ();
 
             if (info && info.checked != checked) {
                 info.checked = checked;
-                if (checked == Qt.Checked) {
+                if (checked == GLib.Checked) {
                     // If we are checked, check that we may need to check the parent as well if
                     // all the siblings are also checked
                     GLib.ModelIndex parent = index.parent ();
                     var parent_info = info_for_index (parent);
-                    if (parent_info && parent_info.checked != Qt.Checked) {
+                    if (parent_info && parent_info.checked != GLib.Checked) {
                         bool has_unchecked = false;
                         foreach (var sub in parent_info.subs) {
-                            if (sub.checked != Qt.Checked) {
+                            if (sub.checked != GLib.Checked) {
                                 has_unchecked = true;
                                 break;
                             }
                         }
                         if (!has_unchecked) {
-                            data_for_index_value_and_role (parent, Qt.Checked, Qt.CheckStateRole);
-                        } else if (parent_info.checked == Qt.Unchecked) {
-                            data_for_index_value_and_role (parent, Qt.PartiallyChecked, Qt.CheckStateRole);
+                            data_for_index_value_and_role (parent, GLib.Checked, GLib.CheckStateRole);
+                        } else if (parent_info.checked == GLib.Unchecked) {
+                            data_for_index_value_and_role (parent, GLib.PartiallyChecked, GLib.CheckStateRole);
                         }
                     }
                     // also check all the children
                     for (int i = 0; i < info.subs.length; ++i) {
-                        if (info.subs.at (i).checked != Qt.Checked) {
-                            data_for_index_value_and_role (this.index (i, 0, index), Qt.Checked, Qt.CheckStateRole);
+                        if (info.subs.at (i).checked != GLib.Checked) {
+                            data_for_index_value_and_role (this.index (i, 0, index), GLib.Checked, GLib.CheckStateRole);
                         }
                     }
                 }
 
-                if (checked == Qt.Unchecked) {
+                if (checked == GLib.Unchecked) {
                     GLib.ModelIndex parent = index.parent ();
                     var parent_info = info_for_index (parent);
-                    if (parent_info && parent_info.checked == Qt.Checked) {
-                        data_for_index_value_and_role (parent, Qt.PartiallyChecked, Qt.CheckStateRole);
+                    if (parent_info && parent_info.checked == GLib.Checked) {
+                        data_for_index_value_and_role (parent, GLib.PartiallyChecked, GLib.CheckStateRole);
                     }
 
                     // Uncheck all the children
                     for (int i = 0; i < info.subs.length; ++i) {
-                        if (info.subs.at (i).checked != Qt.Unchecked) {
-                            data_for_index_value_and_role (this.index (i, 0, index), Qt.Unchecked, Qt.CheckStateRole);
+                        if (info.subs.at (i).checked != GLib.Unchecked) {
+                            data_for_index_value_and_role (this.index (i, 0, index), GLib.Unchecked, GLib.CheckStateRole);
                         }
                     }
                 }
 
-                if (checked == Qt.PartiallyChecked) {
+                if (checked == GLib.PartiallyChecked) {
                     GLib.ModelIndex parent = index.parent ();
                     var parent_info = info_for_index (parent);
-                    if (parent_info && parent_info.checked != Qt.PartiallyChecked) {
-                        data_for_index_value_and_role (parent, Qt.PartiallyChecked, Qt.CheckStateRole);
+                    if (parent_info && parent_info.checked != GLib.PartiallyChecked) {
+                        data_for_index_value_and_role (parent, GLib.PartiallyChecked, GLib.CheckStateRole);
                     }
                 }
             }
@@ -578,9 +578,9 @@ public class FolderStatusModel : GLib.AbstractItemModel {
         case ItemType.ROOT_FOLDER:
             if (this.folders.length <= parent.row ())
                 return {}; // should not happen
-            return create_index (row, column, const_cast<SubFolderInfo> (this.folders[parent.row ()]));
+            return create_index (row, column, (SubFolderInfo)this.folders[parent.row ()]);
         case ItemType.SUBFOLDER: {
-            var pinfo = static_cast<SubFolderInfo> (parent.internal_pointer ());
+            var pinfo = (SubFolderInfo)parent.internal_pointer ();
             if (pinfo.subs.length <= parent.row ())
                 return {}; // should not happen
             var info = pinfo.subs[parent.row ()];
@@ -608,20 +608,20 @@ public class FolderStatusModel : GLib.AbstractItemModel {
         case ItemType.FETCH_LABEL:
             break;
         }
-        var path_index = static_cast<SubFolderInfo> (child.internal_pointer ()).path_index;
+        var path_index = ((SubFolderInfo)child.internal_pointer ()).path_index;
         int i = 1;
         //  ASSERT (path_index.at (0) < this.folders.length);
         if (path_index.length == 1) {
             return create_index (path_index.at (0), 0 /*, null*/);
         }
 
-        const SubFolderInfo info = this.folders[path_index.at (0)];
+        SubFolderInfo info = this.folders[path_index.at (0)];
         while (i < path_index.length - 1) {
             //  ASSERT (path_index.at (i) < info.subs.length);
             info = info.subs.at (path_index.at (i));
             ++i;
         }
-        return create_index (path_index.at (i), 0, const_cast<SubFolderInfo> (info));
+        return create_index (path_index.at (i), 0, (SubFolderInfo)info);
     }
 
 
@@ -656,7 +656,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
         string path = info.folder_connection.remote_path_trailing_slash;
 
         // info.path always contains non-mangled name, so we need to use mangled when requesting nested folders for encrypted subfolders as required by LscolJob
-        const string info_path = (info.is_encrypted && !info.e2e_mangled_name == "") ? info.e2e_mangled_name : info.path;
+        string info_path = (info.is_encrypted && !info.e2e_mangled_name == "") ? info.e2e_mangled_name : info.path;
 
         if (info_path != "/") {
             path += info_path;
@@ -766,7 +766,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
                 // ItemType.ADD_BUTTON
                 return null;
             }
-            return const_cast<SubFolderInfo> (this.folders[index.row ()]);
+            return (SubFolderInfo)this.folders[index.row ()];
         }
     }
 
@@ -776,7 +776,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
     public bool is_any_ancestor_encrypted (GLib.ModelIndex index) {
         var parent_index = parent (index);
         while (parent_index.is_valid) {
-            const var info = info_for_index (parent_index);
+            var info = info_for_index (parent_index);
             if (info.is_encrypted) {
                 return true;
             }
@@ -814,7 +814,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
                         return index (i, 0);
                     }
                     for (int j = 0; j < info.subs.size (); ++j) {
-                        const string sub_name = info.subs.at (j).name;
+                        string sub_name = info.subs.at (j).name;
                         if (sub_name == path) {
                             return index (j, 0, index (i));
                         }
@@ -829,7 +829,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
         if (!parent.is_valid)
             return parent;
 
-        if (slash_pos == path.size () - 1) {
+        if (slash_pos == path.length () - 1) {
             // The slash is the last part, we found our index
             return parent;
         }
@@ -869,7 +869,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
                     { });
                 continue;
             }
-            const FolderConnection folder_connection = folder_info.folder_connection;
+            FolderConnection folder_connection = folder_info.folder_connection;
 
             bool ok = false;
             var old_block_list = folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok);
@@ -1032,12 +1032,12 @@ public class FolderStatusModel : GLib.AbstractItemModel {
     /***********************************************************
     ***********************************************************/
     public void on_signal_folder_progress_info (LibSync.ProgressInfo progress) {
-        var par = qobject_cast<Gtk.Widget> (GLib.Object.parent ());
+        var par = (Gtk.Widget)GLib.Object.parent ();
         if (!par.is_visible ()) {
             return; // for https://github.com/owncloud/client/issues/2648#issuecomment-71377909
         }
 
-        var folder_connection = qobject_cast<FolderConnection> (sender ());
+        var folder_connection = (FolderConnection)sender ();
         if (!folder_connection) {
             return;
         }
@@ -1058,7 +1058,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
         GLib.List<int> roles;
         roles += DataRole.SYNC_PROGRESS_ITEM_STRING
                + DataRole.WARNING_COUNT
-               + Qt.ToolTipRole;
+               + GLib.ToolTipRole;
 
         if (progress.status () == LibSync.ProgressInfo.Status.DISCOVERY) {
             if (!progress.current_discovered_remote_folder == "") {
@@ -1161,8 +1161,8 @@ public class FolderStatusModel : GLib.AbstractItemModel {
         int64 completed_size = progress.completed_size ();
         int64 completed_file = progress.completed_files ();
         int64 current_file = progress.current_file ();
-        int64 total_size = q_max (completed_size, progress.total_size ());
-        int64 total_file_count = q_max (current_file, progress.total_files ());
+        int64 total_size = int64.max (completed_size, progress.total_size ());
+        int64 total_file_count = int64.max (current_file, progress.total_files ());
         string overall_sync_string;
         if (total_size > 0) {
             string s1 = Utility.octets_to_string (completed_size);
@@ -1205,7 +1205,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
     private void on_signal_update_directories (GLib.List<string> list) {
         var lscol_job = (LscolJob) sender ());
         //  ASSERT (lscol_job);
-        GLib.ModelIndex index = qvariant_cast<GLib.PersistentModelIndex> (lscol_job.property (PROPERTY_PARENT_INDEX_C));
+        GLib.ModelIndex index = (GLib.PersistentModelIndex)lscol_job.property (PROPERTY_PARENT_INDEX_C);
         var parent_info = info_for_index (index);
         if (!parent_info) {
             return;
@@ -1232,7 +1232,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
         GLib.List<string> selective_sync_block_list;
         bool ok1 = true;
         bool ok2 = true;
-        if (parent_info.checked == Qt.PartiallyChecked) {
+        if (parent_info.checked == GLib.PartiallyChecked) {
             selective_sync_block_list = parent_info.folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_BLOCKLIST, ok1);
         }
         var selective_sync_undecided_list = parent_info.folder_connection.journal_database ().selective_sync_list (SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_UNDECIDEDLIST, ok2);
@@ -1248,8 +1248,8 @@ public class FolderStatusModel : GLib.AbstractItemModel {
                 selective_sync_undecided_set.insert (string_value);
             }
         }
-        const var permission_map = lscol_job.property (PROPERTY_PERMISSION_MAP).to_map ();
-        const var encryption_map = lscol_job.property (PROPERTY_ENCRYPTION_MAP).to_map ();
+        var permission_map = lscol_job.property (PROPERTY_PERMISSION_MAP).to_map ();
+        var encryption_map = lscol_job.property (PROPERTY_ENCRYPTION_MAP).to_map ();
 
         GLib.List<string> sorted_subfolders = list;
         if (!sorted_subfolders == "")
@@ -1291,23 +1291,23 @@ public class FolderStatusModel : GLib.AbstractItemModel {
                 new_info.name = remove_trailing_slash (relative_path).split ("/").last ();
             }
 
-            const var folder_info = lscol_job.folder_infos.value (path);
+            var folder_info = lscol_job.folder_infos.value (path);
             new_info.size = folder_info.size;
             new_info.file_id = folder_info.file_id;
             if (relative_path == "")
                 continue;
 
-            if (parent_info.checked == Qt.Unchecked) {
-                new_info.checked = Qt.Unchecked;
-            } else if (parent_info.checked == Qt.Checked) {
-                new_info.checked = Qt.Checked;
+            if (parent_info.checked == GLib.Unchecked) {
+                new_info.checked = GLib.Unchecked;
+            } else if (parent_info.checked == GLib.Checked) {
+                new_info.checked = GLib.Checked;
             } else {
                 foreach (string string_value in selective_sync_block_list) {
                     if (string_value == relative_path || string_value == "/") {
-                        new_info.checked = Qt.Unchecked;
+                        new_info.checked = GLib.Unchecked;
                         break;
                     } else if (string_value.has_prefix (relative_path)) {
-                        new_info.checked = Qt.PartiallyChecked;
+                        new_info.checked = GLib.PartiallyChecked;
                     }
                 }
             }
@@ -1393,9 +1393,9 @@ public class FolderStatusModel : GLib.AbstractItemModel {
     /***********************************************************
     ***********************************************************/
     private void on_signal_lscol_finished_with_error (GLib.InputStream r) {
-        var lscol_job = qobject_cast<LscolJob> (sender ());
+        var lscol_job = (LscolJob)sender ();
         //  ASSERT (lscol_job);
-        GLib.ModelIndex index = qvariant_cast<GLib.PersistentModelIndex> (lscol_job.property (PROPERTY_PARENT_INDEX_C));
+        GLib.ModelIndex index = (GLib.PersistentModelIndex)lscol_job.property (PROPERTY_PARENT_INDEX_C);
         if (!index.is_valid) {
             return;
         }
@@ -1483,7 +1483,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
     /***********************************************************
     ***********************************************************/
     private void on_signal_new_big_folder_discovered () {
-        var folder_connection = qobject_cast<FolderConnection> (sender ());
+        var folder_connection = (FolderConnection)sender ();
         //  ASSERT (folder_connection);
 
         int folder_index = -1;
@@ -1536,11 +1536,11 @@ public class FolderStatusModel : GLib.AbstractItemModel {
     private GLib.List<string> create_block_list (FolderStatusModel.SubFolderInfo root,
         GLib.List<string> old_block_list) {
         switch (root.checked) {
-        case Qt.Unchecked:
+        case GLib.Unchecked:
             return { root.path };
-        case Qt.Checked:
+        case GLib.Checked:
             return { };
-        case Qt.PartiallyChecked:
+        case GLib.PartiallyChecked:
             break;
         }
 
@@ -1551,7 +1551,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
             }
         } else {
             // We did not load from the server so we re-use the one from the old block list
-            const string path = root.path;
+            string path = root.path;
             foreach (string it in old_block_list) {
                 if (it.has_prefix (path)) {
                     result += it;
@@ -1573,7 +1573,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
     private static bool sort_by_folder_header (FolderStatusModel.SubFolderInfo lhs, FolderStatusModel.SubFolderInfo rhs) {
         return string.compare (lhs.folder_connection.short_gui_remote_path_or_app_name (),
                 rhs.folder_connection.short_gui_remote_path_or_app_name (),
-                Qt.CaseInsensitive)
+                GLib.CaseInsensitive)
             < 0;
     }
 

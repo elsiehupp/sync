@@ -25,7 +25,7 @@ public class FolderStatusDelegate : GLib.StyledItemDelegate {
     /***********************************************************
     ***********************************************************/
     public enum DataRole {
-        FOLDER_ALIAS_ROLE = Qt.USER_ROLE + 100,
+        FOLDER_ALIAS_ROLE = GLib.USER_ROLE + 100,
         HEADER_ROLE,
         FOLDER_PATH_ROLE, // for a ItemType.SUBFOLDER it's the complete path
         FOLDER_SECOND_PATH_ROLE,
@@ -65,13 +65,13 @@ public class FolderStatusDelegate : GLib.StyledItemDelegate {
     /***********************************************************
     ***********************************************************/
     public void paint (GLib.Painter painter, GLib.StyleOptionViewItem option, GLib.ModelIndex index) {
-        if (index.data (ItemType.ADD_BUTTON).to_bool ()) {
+        if (index.data (DataRole.ItemType.ADD_BUTTON).to_bool ()) {
             ((GLib.StyleOptionViewItem) option).show_decoration_selected = false;
         }
 
         GLib.Styled_item_delegate.paint (painter, option, index);
 
-        var text_align = Qt.Align_left;
+        var text_align = GLib.Align_left;
 
         Cairo.FontFace alias_font = make_alias_font (option.font);
         Cairo.FontFace sub_font = option.font;
@@ -87,7 +87,7 @@ public class FolderStatusDelegate : GLib.StyledItemDelegate {
         int alias_margin = alias_font_metrics.height () / 2;
         int margin = sub_font_metrics.height () / 4;
 
-        if (index.data (ItemType.ADD_BUTTON).to_bool ()) {
+        if (index.data (DataRole.ItemType.ADD_BUTTON).to_bool ()) {
             GLib.StyleOptionButton opt = (GLib.StyleOption) option;
             if (opt.state & GLib.Style.State_Enabled && opt.state & GLib.Style.State_Mouse_over && index == this.pressed_index) {
                 opt.state |= GLib.Style.State_Sunken;
@@ -108,21 +108,21 @@ public class FolderStatusDelegate : GLib.StyledItemDelegate {
         }
         painter.save ();
 
-        var status_icon = qvariant_cast<Gtk.Icon> (index.data (Folder_status_icon_role));
-        var alias_text = qvariant_cast<string> (index.data (Header_role));
-        var path_text = qvariant_cast<string> (index.data (FolderPathRole));
-        var remote_path = qvariant_cast<string> (index.data (Folder_second_path_role));
-        var conflict_texts = qvariant_cast<GLib.List<string>> (index.data (Folder_conflict_msg));
-        var error_texts = qvariant_cast<GLib.List<string>> (index.data (Folder_error_msg));
-        var info_texts = qvariant_cast<GLib.List<string>> (index.data (Folder_info_msg));
+        var status_icon = (Gtk.Icon)index.data (DataRole.FOLDER_STATUS_ICON_ROLE);
+        var alias_text = (string)index.data (DataRole.HEADER_ROLE);
+        var path_text = (string)index.data (DataRole.FOLDER_PATH_ROLE);
+        var remote_path = (string)index.data (DataRole.FOLDER_SECOND_PATH_ROLE);
+        var conflict_texts = (GLib.List<string>)index.data (DataRole.FOLDER_CONFLICT_MESSAGE);
+        var error_texts = (GLib.List<string>)index.data (DataRole.FOLDER_ERROR_MESSAGE);
+        var info_texts = (GLib.List<string>)index.data (DataRole.FOLDER_INFO_MESSAGE);
 
-        var overall_percent = qvariant_cast<int> (index.data (Sync_progress_overall_percent));
-        var overall_string = qvariant_cast<string> (index.data (Sync_progress_overall_string));
-        var item_string = qvariant_cast<string> (index.data (Sync_progress_item_string));
-        var warning_count = qvariant_cast<int> (index.data (Warning_count));
-        var sync_ongoing = qvariant_cast<bool> (index.data (Sync_running));
-        var sync_enabled = qvariant_cast<bool> (index.data (FolderAccountConnected));
-        var sync_text = qvariant_cast<string> (index.data (Folder_sync_text));
+        var overall_percent = (int)index.data (DataRole.Sync_progress_overall_percent);
+        var overall_string = (string)index.data (DataRole.Sync_progress_overall_string);
+        var item_string = (string)index.data (DataRole.Sync_progress_item_string);
+        var warning_count = (int)index.data (DataRole.Warning_count);
+        var sync_ongoing = (bool)index.data (DataRole.Sync_running);
+        var sync_enabled = (bool)index.data (DataRole.FolderAccountConnected);
+        var sync_text = (string)index.data (DataRole.Folder_sync_text);
 
         var icon_rect = option.rect;
         var alias_rect = option.rect;
@@ -197,20 +197,20 @@ public class FolderStatusDelegate : GLib.StyledItemDelegate {
         } else {
             painter.pen (palette.color (cg, Gtk.Palette.Text));
         }
-        string elided_alias = alias_font_metrics.elided_text (alias_text, Qt.Elide_right, alias_rect.width ());
+        string elided_alias = alias_font_metrics.elided_text (alias_text, GLib.Elide_right, alias_rect.width ());
         painter.font (alias_font);
         painter.draw_text (GLib.Style.visual_rect (option.direction, option.rect, alias_rect), text_align, elided_alias);
 
-        const bool show_progess = !overall_string == "" || !item_string == "";
+        bool show_progess = !overall_string == "" || !item_string == "";
         if (!show_progess) {
             painter.font (sub_font);
             string elided_remote_path_text = sub_font_metrics.elided_text (
                 sync_text,
-                Qt.Elide_right, remote_path_rect.width ());
+                GLib.Elide_right, remote_path_rect.width ());
             painter.draw_text (GLib.Style.visual_rect (option.direction, option.rect, remote_path_rect),
                 text_align, elided_remote_path_text);
 
-            string elided_path_text = sub_font_metrics.elided_text (path_text, Qt.Elide_middle, local_path_rect.width ());
+            string elided_path_text = sub_font_metrics.elided_text (path_text, GLib.Elide_middle, local_path_rect.width ());
             painter.draw_text (GLib.Style.visual_rect (option.direction, option.rect, local_path_rect),
                 text_align, elided_path_text);
         }
@@ -245,7 +245,7 @@ public class FolderStatusDelegate : GLib.StyledItemDelegate {
             p_bar_opt.minimum = 0;
             p_bar_opt.maximum = 100;
             p_bar_opt.progress = overall_percent;
-            p_bar_opt.orientation = Qt.Horizontal;
+            p_bar_opt.orientation = GLib.Horizontal;
             p_bar_opt.rect = GLib.Style.visual_rect (option.direction, option.rect, p_bRect);
             GLib.Application.this.style.draw_control (GLib.Style.CE_Progress_bar, p_bar_opt, painter, option.widget);
 
@@ -258,7 +258,7 @@ public class FolderStatusDelegate : GLib.StyledItemDelegate {
             painter.font (progress_font);
 
             painter.draw_text (GLib.Style.visual_rect (option.direction, option.rect, overall_progress_rect),
-                Qt.Align_left | Qt.Align_vCenter, overall_string);
+                GLib.Align_left | GLib.Align_vCenter, overall_string);
             // painter.draw_rect (overall_progress_rect);
 
             painter.restore ();
@@ -270,7 +270,7 @@ public class FolderStatusDelegate : GLib.StyledItemDelegate {
             btn_opt.state = option.state;
             btn_opt.state &= ~ (GLib.Style.State_Selected | GLib.Style.State_Has_focus);
             btn_opt.state |= GLib.Style.State_Raised;
-            btn_opt.arrow_type = Qt.No_arrow;
+            btn_opt.arrow_type = GLib.No_arrow;
             btn_opt.sub_controls = GLib.Style.SC_Tool_button;
             btn_opt.rect = options_button_visual_rect;
             btn_opt.icon = this.icon_more;
@@ -299,7 +299,7 @@ public class FolderStatusDelegate : GLib.StyledItemDelegate {
         painter.pen (Gdk.RGBA (0xaa, 0xaa, 0xaa));
         painter.draw_rounded_rect (GLib.Style.visual_rect (option.direction, option.rect, rect),
             4, 4);
-        painter.pen (Qt.white);
+        painter.pen (GLib.white);
         painter.font (error_font);
         GLib.Rect text_rect = new GLib.Rect (
             rect.left () + margin,
@@ -310,7 +310,7 @@ public class FolderStatusDelegate : GLib.StyledItemDelegate {
 
         foreach (string e_text in texts) {
             painter.draw_text (GLib.Style.visual_rect (option.direction, option.rect, text_rect), text_align,
-                sub_font_metrics.elided_text (e_text, Qt.Elide_left, text_rect.width ()));
+                sub_font_metrics.elided_text (e_text, GLib.Elide_left, text_rect.width ()));
             text_rect.translate (0, text_rect.height ());
         }
         // restore previous state
@@ -332,12 +332,12 @@ public class FolderStatusDelegate : GLib.StyledItemDelegate {
 
         var classif = ((FolderStatusModel) index.model ()).classify (index);
         if (classif == FolderStatusModel.ItemType.ADD_BUTTON) {
-            const int margins = alias_font_metrics.height (); // same as 2*alias_margin of paint
+            int margins = alias_font_metrics.height (); // same as 2*alias_margin of paint
             Cairo.FontOptions font_options = new Cairo.FontOptions (GLib.Application.font ("GLib.PushButton"));
             GLib.StyleOptionButton opt = (GLib.StyleOption) option;
             opt.text = add_folder_text ();
             return GLib.Application.this.style.size_from_contents (
-                GLib.Style.CT_Push_button, opt, font_options.size (Qt.Text_single_line, opt.text))
+                GLib.Style.CT_Push_button, opt, font_options.size (GLib.Text_single_line, opt.text))
                     .expanded_to (GLib.Application.global_strut ())
                 + Gdk.Rectangle (0, margins);
         }
@@ -352,8 +352,8 @@ public class FolderStatusDelegate : GLib.StyledItemDelegate {
 
         // add some space for the message boxes.
         int margin = font_options.height () / 4;
-        foreach (var role in {Folder_conflict_msg, Folder_error_msg, Folder_info_msg}) {
-            var msgs = qvariant_cast<GLib.List<string>> (index.data (role));
+        foreach (var role in {FOLDER_CONFLICT_MESSAGE, FOLDER_ERROR_MESSAGE, FOLDER_INFO_MESSAGE}) {
+            var msgs = (GLib.List<string>)index.data (DataRole.role);
             if (!msgs == "") {
                 h += margin + 2 * margin + msgs.length * font_options.height ();
             }
@@ -365,11 +365,11 @@ public class FolderStatusDelegate : GLib.StyledItemDelegate {
 
     /***********************************************************
     ***********************************************************/
-    public bool editor_event (GLib.Event event, GLib.AbstractItemModel model,
+    public bool editor_event (Gdk.Event event, GLib.AbstractItemModel model,
         GLib.StyleOptionViewItem option, GLib.ModelIndex index) {
         switch (event.type ()) {
-        case GLib.Event.Mouse_button_press:
-        case GLib.Event.Mouse_move:
+        case Gdk.Event.Mouse_button_press:
+        case Gdk.Event.Mouse_move:
             var view = (GLib.AbstractItemView) option.widget;
             if (view) {
                 var mouse_event = (GLib.MouseEvent) event;
@@ -383,7 +383,7 @@ public class FolderStatusDelegate : GLib.StyledItemDelegate {
                 }
             }
             break;
-        case GLib.Event.Mouse_button_release:
+        case Gdk.Event.Mouse_button_release:
             this.pressed_index = GLib.ModelIndex ();
             break;
         default:
@@ -396,7 +396,7 @@ public class FolderStatusDelegate : GLib.StyledItemDelegate {
     /***********************************************************
     Return the position of the option button within the item
     ***********************************************************/
-    public static GLib.Rect options_button_rect (GLib.Rect within, Qt.Layout_direction direction) {
+    public static GLib.Rect options_button_rect (GLib.Rect within, GLib.Layout_direction direction) {
         Cairo.FontFace font = new Cairo.FontFace ();
         Cairo.FontFace alias_font = make_alias_font (font);
         Cairo.FontOptions font_options = new Cairo.FontOptions (font);
@@ -420,11 +420,11 @@ public class FolderStatusDelegate : GLib.StyledItemDelegate {
 
     /***********************************************************
     ***********************************************************/
-    public static GLib.Rect add_button_rect (GLib.Rect within, Qt.Layout_direction direction) {
+    public static GLib.Rect add_button_rect (GLib.Rect within, GLib.Layout_direction direction) {
         Cairo.FontOptions font_options = new Cairo.FontOptions (GLib.Application.font ("GLib.PushButton"));
         GLib.StyleOptionButton opt;
         opt.text = add_folder_text ();
-        Gdk.Rectangle size = GLib.Application.this.style.size_from_contents (GLib.Style.CT_Push_button, opt, font_options.size (Qt.Text_single_line, opt.text)).expanded_to (GLib.Application.global_strut ());
+        Gdk.Rectangle size = GLib.Application.this.style.size_from_contents (GLib.Style.CT_Push_button, opt, font_options.size (GLib.Text_single_line, opt.text)).expanded_to (GLib.Application.global_strut ());
         GLib.Rect rectangle = new GLib.Rect (
             GLib.Point (within.left (),
             within.top () + within.height () / 2 - size.height () / 2),
@@ -463,8 +463,8 @@ public class FolderStatusDelegate : GLib.StyledItemDelegate {
     /***********************************************************
     ***********************************************************/
     public static int root_folder_height_without_errors (Cairo.FontOptions font_options, Cairo.FontOptions alias_font_metrics) {
-        const int alias_margin = alias_font_metrics.height () / 2;
-        const int margin = font_options.height () / 4;
+        int alias_margin = alias_font_metrics.height () / 2;
+        int margin = font_options.height () / 4;
 
         int h = alias_margin; // margin to top
         h += alias_font_metrics.height (); // alias

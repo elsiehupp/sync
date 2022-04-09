@@ -296,10 +296,10 @@ public class FolderConnection : GLib.Object {
             this.on_signal_etag_retrieved_from_sync_engine
         );
         this.engine.signa_sync_started.connect (
-            this.on_signal_sync_started // Qt.QueuedConnection
+            this.on_signal_sync_started // GLib.QueuedConnection
         );
         this.engine.signal_sync_finished.connect (
-            this.on_signal_sync_finished // Qt.QueuedConnection
+            this.on_signal_sync_finished // GLib.QueuedConnection
         );
         this.engine.signal_about_to_remove_all_files.connect (
             this.on_signal_about_to_remove_all_files
@@ -910,7 +910,7 @@ public class FolderConnection : GLib.Object {
             return;
         }
 
-        const string message = directory == LibSync.SyncFileItem.Direction.DOWN
+        string message = directory == LibSync.SyncFileItem.Direction.DOWN
             ? _("All files in the sync folder_connection \"%1\" folder_connection were deleted on the server.\n"
               + "These deletes will be synchronized to your local sync folder_connection, making such files "
               + "unavailable unless you have a right to restore. \n"
@@ -925,8 +925,8 @@ public class FolderConnection : GLib.Object {
             message.printf (short_gui_local_path),
             Gtk.MessageBox.NoButton
         );
-        message_box.attribute (Qt.WA_DeleteOnClose);
-        message_box.window_flags (message_box.window_flags () | Qt.Window_stays_on_signal_top_hint);
+        message_box.attribute (GLib.WA_DeleteOnClose);
+        message_box.window_flags (message_box.window_flags () | GLib.Window_stays_on_signal_top_hint);
         message_box.add_button (_("Remove all files"), Gtk.MessageBox.DestructiveRole);
         GLib.PushButton keep_button = message_box.add_button (_("Keep files"), Gtk.MessageBox.AcceptRole);
         bool old_paused = sync_paused;
@@ -944,7 +944,7 @@ public class FolderConnection : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_message_box_finished (Gtk.MessageBox message_box, GLib.PushButton keep_button, Callback callback, bool old_paused) {
-        const bool cancel = message_box.clicked_button () == keep_button;
+        bool cancel = message_box.clicked_button () == keep_button;
         callback (cancel);
         if (cancel) {
             FileSystem.folder_minimum_permissions (path);
@@ -983,7 +983,7 @@ public class FolderConnection : GLib.Object {
 
         if (!reload_excludes ()) {
             on_signal_sync_error (_("Could not read system exclude file"));
-            GLib.Object.invoke_method (this, "on_signal_sync_finished", Qt.QueuedConnection, Q_ARG (bool, false));
+            GLib.Object.invoke_method (this, "on_signal_sync_finished", GLib.QueuedConnection, Q_ARG (bool, false));
             return;
         }
 
@@ -1012,7 +1012,7 @@ public class FolderConnection : GLib.Object {
 
         correct_placeholder_files ();
 
-        GLib.Object.invoke_method (this.engine, "on_signal_start_sync", Qt.QueuedConnection);
+        GLib.Object.invoke_method (this.engine, "on_signal_start_sync", GLib.QueuedConnection);
 
         /* emit */ signal_sync_started ();
     }
@@ -1038,8 +1038,8 @@ public class FolderConnection : GLib.Object {
         if (this.definition.virtual_files_mode == AbstractVfs.Off) {
             return;
         }
-        const string placeholders_corrected_key = "placeholders_corrected";
-        const int placeholders_corrected = this.journal.key_value_store_get_int (placeholders_corrected_key, 0);
+        string placeholders_corrected_key = "placeholders_corrected";
+        int placeholders_corrected = this.journal.key_value_store_get_int (placeholders_corrected_key, 0);
         if (!placeholders_corrected) {
             GLib.debug ("Make sure all virtual files are placeholder files.");
             switch_to_virtual_files ();
@@ -1057,7 +1057,7 @@ public class FolderConnection : GLib.Object {
         GLib.List<SyncJournalDb.DownloadInfo> deleted_infos =
             this.journal.and_delete_stale_download_infos (keep_nothing);
         foreach (var deleted_info in deleted_infos) {
-            const string temporary_path = folderpath.file_path (deleted_info.temporaryfile);
+            string temporary_path = folderpath.file_path (deleted_info.temporaryfile);
             GLib.info ("Deleting temporary file: " + temporary_path);
             FileSystem.remove (temporary_path);
         }
@@ -1190,7 +1190,7 @@ public class FolderConnection : GLib.Object {
 
         // Change the file's pin state if it's contradictory to being hydrated
         // (suffix-virtual file's pin state is stored at the hydrated path)
-        const var pin = this.vfs.pin_state (relative_path);
+        var pin = this.vfs.pin_state (relative_path);
         if (pin && *pin == Common.ItemAvailability.ONLINE_ONLY) {
             if (!this.vfs.pin_state (relative_path, PinState.PinState.UNSPECIFIED)) {
                 GLib.warning ("Could not set pin state of " + relative_path + " to unspecified.");
@@ -1534,7 +1534,7 @@ public class FolderConnection : GLib.Object {
             return;
         }
 
-        const string message = file_info.is_dir ()
+        string message = file_info.is_dir ()
             ? _("The folder_connection %1 was created but was excluded from synchronization previously. "
                 + "Data inside it will not be synchronized.")
                   .printf (file_info.file_path)
@@ -1654,7 +1654,7 @@ public class FolderConnection : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void check_local_path {
-        const GLib.FileInfo file_info = new GLib.FileInfo (this.definition.local_path);
+        GLib.FileInfo file_info = new GLib.FileInfo (this.definition.local_path);
         this.canonical_local_path = file_info.canonical_file_path;
         if (this.canonical_local_path == "") {
             GLib.warning ("Broken symlink: " + this.definition.local_path);

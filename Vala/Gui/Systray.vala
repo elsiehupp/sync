@@ -202,7 +202,7 @@ public class Systray : GLib.SystemTrayIcon {
 
 
     private void on_signal_context_menu_about_to_show () {
-        const var folders = FolderManager.instance.map ();
+        var folders = FolderManager.instance.map ();
 
         GLib.List<FolderConnection> all_paused = new GLib.List<FolderConnection> ();
 
@@ -212,7 +212,7 @@ public class Systray : GLib.SystemTrayIcon {
             }
         }
 
-        const string pause_text = folders.size () > 1 ? _("Pause sync for all") : _("Pause sync");
+        string pause_text = folders.size () > 1 ? _("Pause sync for all") : _("Pause sync");
         pause_action.on_signal_text (pause_text);
         pause_action.visible (!all_paused);
         pause_action.enabled (!all_paused);
@@ -225,7 +225,7 @@ public class Systray : GLib.SystemTrayIcon {
             }
         }
 
-        const string resume_text = folders.size () > 1 ? _("Resume sync for all") : _("Resume sync");
+        string resume_text = folders.size () > 1 ? _("Resume sync for all") : _("Resume sync");
         resume_action.on_signal_text (resume_text);
         resume_action.visible (any_paused);
         resume_action.enabled (any_paused);
@@ -244,7 +244,7 @@ public class Systray : GLib.SystemTrayIcon {
         hide_window ();
         /* emit */ activated (GLib.SystemTrayIcon.Activation_reason.Unknown);
 
-        const var folder_map = FolderManager.instance.map ();
+        var folder_map = FolderManager.instance.map ();
         foreach (var folder_connection in folder_map) {
             if (!folder_connection.sync_paused) {
                 this.sync_is_paused = false;
@@ -257,7 +257,7 @@ public class Systray : GLib.SystemTrayIcon {
     ***********************************************************/
     public void show_message (string title, string message, Message_icon icon) {
         if (GLib.DBusInterface (NOTIFICATIONS_SERVICE, NOTIFICATIONS_PATH, NOTIFICATIONS_IFACE).is_valid) {
-            const GLib.VariantMap hints = {{"desktop-entry", LINUX_APPLICATION_ID}};
+            GLib.VariantMap hints = {{"desktop-entry", LINUX_APPLICATION_ID}};
             GLib.List<GLib.Variant> args = {
                 APPLICATION_NAME,
                 (uint32)0,
@@ -341,7 +341,7 @@ public class Systray : GLib.SystemTrayIcon {
     public void position_window (GLib.Quick_window window) {
         if (!use_normal_window ()) {
             window.screen (current_screen ());
-            const var position = compute_window_position (window.width (), window.height ());
+            var position = compute_window_position (window.width (), window.height ());
             window.position (position);
         }
     }
@@ -388,7 +388,7 @@ public class Systray : GLib.SystemTrayIcon {
     /***********************************************************
     ***********************************************************/
     private void pause_on_signal_all_folders_helper (bool pause) {
-        const var folders = FolderManager.instance.map ();
+        var folders = FolderManager.instance.map ();
         foreach (var folder_connection in folders) {
             if (accounts.contains (folder_connection.account_state)) {
                 folder_connection.sync_paused (pause);
@@ -418,8 +418,8 @@ public class Systray : GLib.SystemTrayIcon {
     /***********************************************************
     ***********************************************************/
     private Gdk.Monitor current_screen () {
-        const var screens = GLib.Application.screens ();
-        const var cursor_pos = GLib.Cursor.position ();
+        var screens = GLib.Application.screens ();
+        var cursor_pos = GLib.Cursor.position ();
 
         foreach (var screen in screens) {
             if (screen.geometry ().contains (cursor_pos)) {
@@ -436,7 +436,7 @@ public class Systray : GLib.SystemTrayIcon {
     /***********************************************************
     ***********************************************************/
     private GLib.Rect current_screen_rect () {
-        const var screen = current_screen ();
+        var screen = current_screen ();
         //  Q_ASSERT (screen);
         return screen.geometry ();
     }
@@ -445,11 +445,11 @@ public class Systray : GLib.SystemTrayIcon {
     /***********************************************************
     ***********************************************************/
     private GLib.Point compute_window_reference_point () {
-        const int spacing = 4;
-        const var tray_icon_center = calc_tray_icon_center ();
-        const var taskbar_rect = taskbar_geometry ();
-        const var taskbar_screen_edge = taskbar_orientation ();
-        const var screen_rect = current_screen_rect ();
+        int spacing = 4;
+        var tray_icon_center = calc_tray_icon_center ();
+        var taskbar_rect = taskbar_geometry ();
+        var taskbar_screen_edge = taskbar_orientation ();
+        var screen_rect = current_screen_rect ();
 
         GLib.debug ("screen_rect: " + screen_rect);
         GLib.debug ("taskbar_rect: " + taskbar_rect);
@@ -493,15 +493,15 @@ public class Systray : GLib.SystemTrayIcon {
     /***********************************************************
     ***********************************************************/
     private TaskBarPosition taskbar_orientation () {
-        const var screen_rect = current_screen_rect ();
-        const var tray_icon_center = calc_tray_icon_center ();
+        var screen_rect = current_screen_rect ();
+        var tray_icon_center = calc_tray_icon_center ();
 
-        const var dist_bottom = screen_rect.bottom () - tray_icon_center.y ();
-        const var dist_right = screen_rect.right () - tray_icon_center.x ();
-        const var dist_left = tray_icon_center.x () - screen_rect.left ();
-        const var dist_top = tray_icon_center.y () - screen_rect.top ();
+        var dist_bottom = screen_rect.bottom () - tray_icon_center.y ();
+        var dist_right = screen_rect.right () - tray_icon_center.x ();
+        var dist_left = tray_icon_center.x () - screen_rect.left ();
+        var dist_top = tray_icon_center.y () - screen_rect.top ();
 
-        const var min_dist = std.min ({dist_right, dist_top, dist_bottom});
+        var min_dist = std.min ({dist_right, dist_top, dist_bottom});
 
         if (min_dist == dist_bottom) {
             return TaskBarPosition.BOTTOM;
@@ -532,12 +532,12 @@ public class Systray : GLib.SystemTrayIcon {
     /***********************************************************
     ***********************************************************/
     private GLib.Point compute_window_position (int width, int height) {
-        const var reference_point = compute_window_reference_point ();
+        var reference_point = compute_window_reference_point ();
 
-        const TaskBarPosition taskbar_screen_edge = taskbar_orientation ();
-        const var screen_rect = current_screen_rect ();
+        TaskBarPosition taskbar_screen_edge = taskbar_orientation ();
+        var screen_rect = current_screen_rect ();
 
-        const GLib.Point bottom_right = top_left (reference_point) + GLib.Point (width, height);
+        GLib.Point bottom_right = top_left (reference_point) + GLib.Point (width, height);
 
         GLib.debug ("taskbar_screen_edge: " + taskbar_screen_edge.to_string ());
         GLib.debug ("screen_rect: " + screen_rect.to_string ());
@@ -580,7 +580,7 @@ public class Systray : GLib.SystemTrayIcon {
 
 
     private static GLib.Rect window_rect (GLib.Rect screen_rect, GLib.Point reference_point, GLib.Point bottom_right) {
-        const GLib.Rect rect = GLib.Rect (top_left (reference_point), bottom_right);
+        GLib.Rect rect = GLib.Rect (top_left (reference_point), bottom_right);
         var offset = GLib.Point ();
 
         if (rect.left () < screen_rect.left ()) {

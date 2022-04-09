@@ -46,13 +46,13 @@ public class WizardCommon : GLib.Object {
         Gdk.Pixbuf pix = variant.value<Gdk.Pixbuf> ();
         if (!pix == null) {
             label.pixmap (pix);
-            label.alignment (Qt.AlignTop | Qt.Align_right);
+            label.alignment (GLib.AlignTop | GLib.Align_right);
             label.visible = true;
         } else {
             string string_value = variant.to_string ();
             if (!string_value == "") {
                 label.on_signal_text (string_value);
-                label.text_format (Qt.RichText);
+                label.text_format (GLib.RichText);
                 label.visible = true;
                 label.open_external_links (true);
             }

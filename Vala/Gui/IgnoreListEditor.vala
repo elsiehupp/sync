@@ -28,7 +28,7 @@ public class IgnoreListEditor : Gtk.Dialog {
     public IgnoreListEditor (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.instance = new IgnoreListEditor ();
-        window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
+        window_flags (window_flags () & ~GLib.WindowContextHelpButtonHint);
         instance.up_ui (this);
 
         ConfigFile config_file;
@@ -38,7 +38,7 @@ public class IgnoreListEditor : Gtk.Dialog {
                               .printf (GLib.Dir.to_native_separators (config_file.exclude_file (ConfigFile.SYSTEM_SCOPE)));
 
         setup_table_read_only_items ();
-        const var user_config = config_file.exclude_file (ConfigFile.Scope.USER_SCOPE);
+        var user_config = config_file.exclude_file (ConfigFile.Scope.USER_SCOPE);
         instance.ignore_table_widget.read_ignore_file (user_config);
 
         this.accepted.connect (

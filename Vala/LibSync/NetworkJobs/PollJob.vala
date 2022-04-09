@@ -44,7 +44,7 @@ public class PollJob : AbstractNetworkJob {
             + (path.has_prefix ("/") ? "" : "/") + this.path);
         send_request ("GET", final_url);
         this.input_stream.download_progress.connect (
-            this.on_signal_reset_timeout // Qt.UniqueConnection
+            this.on_signal_reset_timeout // GLib.UniqueConnection
         );
         base.start ();
     }

@@ -25,7 +25,7 @@ public class ImageProvider : GLib.QuickImageProvider {
             return make_icon (":/client/theme/black/user.svg");
         }
 
-        const int uid = identifier.to_int ();
+        int uid = identifier.to_int ();
         return UserModel.instance.avatar_by_identifier (uid);
     }
 
@@ -34,7 +34,7 @@ public class ImageProvider : GLib.QuickImageProvider {
     ***********************************************************/
     private static Gtk.Image make_icon (string path) {
         Gtk.Image image = new Gtk.Image (128, 128, Gtk.Image.FormatARGB32);
-        image.fill (Qt.GlobalColor.transparent);
+        image.fill (GLib.GlobalColor.transparent);
         GLib.Painter painter = new GLib.Painter (image);
         GLib.SvgRenderer renderer = new GLib.SvgRenderer (path);
         renderer.render (painter);

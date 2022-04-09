@@ -187,10 +187,10 @@ public class ShareLinkWidget : Gtk.Widget {
         );
 
         // Prepare permissions check and create group action
-        const GLib.Date expire_date = this.link_share.expire_date ().is_valid
+        GLib.Date expire_date = this.link_share.expire_date ().is_valid
             ? this.link_share.expire_date ()
             : GLib.Date ();
-        const SharePermissions share_permissions = this.link_share.permissions ();
+        SharePermissions share_permissions = this.link_share.permissions ();
         var checked = false;
         var permissions_group = new GLib.ActionGroup (this);
 
@@ -225,7 +225,7 @@ public class ShareLinkWidget : Gtk.Widget {
         }
 
         this.share_link_elided_label = new ElidedLabel (this);
-        this.share_link_elided_label.elide_mode (Qt.Elide_right);
+        this.share_link_elided_label.elide_mode (GLib.Elide_right);
         display_share_link_label ();
         this.instance.horizontal_layout.insert_widget (2, this.share_link_elided_label);
 
@@ -248,7 +248,7 @@ public class ShareLinkWidget : Gtk.Widget {
             this.on_signal_create_label
         );
         this.share_link_button.icon (Gtk.Icon (":/client/theme/confirm.svg"));
-        this.share_link_button.tool_button_style (Qt.Tool_button_icon_only);
+        this.share_link_button.tool_button_style (GLib.Tool_button_icon_only);
         this.share_link_layout.add_widget (this.share_link_button);
 
         this.share_link_progress_indicator = new GLib.ProgressIndicator (this);
@@ -402,7 +402,7 @@ public class ShareLinkWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public void on_signal_link_context_menu_action_triggered (GLib.Action action) {
-        const var state = action.is_checked ();
+        var state = action.is_checked ();
         SharePermissions share_permissions = SharePermissionRead;
 
         if (action == this.add_another_link_action) {
@@ -526,7 +526,7 @@ public class ShareLinkWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_create_note () {
-        const var note = this.instance.text_edit_note.to_plain_text ();
+        var note = this.instance.text_edit_note.to_plain_text ();
         if (this.link_share == null || this.link_share.note == note || note == "") {
             return;
         }
@@ -658,7 +658,7 @@ public class ShareLinkWidget : Gtk.Widget {
         this.instance.calendar.visible (enable);
         this.instance.confirm_expiration_date.visible (enable);
 
-        const var date = enable ? this.link_share.expire_date () : GLib.Date.current_date ().add_days (1);
+        var date = enable ? this.link_share.expire_date () : GLib.Date.current_date ().add_days (1);
         this.instance.calendar.date (date);
         this.instance.calendar.minimum_date (GLib.Date.current_date ().add_days (1));
         this.instance.calendar.maximum_date (
@@ -675,7 +675,7 @@ public class ShareLinkWidget : Gtk.Widget {
     ***********************************************************/
     private void toggle_button_animation (GLib.ToolButton button, GLib.ProgressIndicator progress_indicator, GLib.Action checked_action) {
         var on_signal_start_animation = false;
-        const var action_is_checked = checked_action.is_checked ();
+        var action_is_checked = checked_action.is_checked ();
         if (!progress_indicator.is_animated () && action_is_checked) {
             progress_indicator.on_signal_start_animation ();
             on_signal_start_animation = true;

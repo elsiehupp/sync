@@ -1161,8 +1161,8 @@ public class Account : GLib.Object {
         foreach (var editor_key in editors.keys ()) {
             var editor = editors.value (editor_key).to_object ();
 
-            const string identifier = editor.value ("identifier").to_string ();
-            const string name = editor.value ("name").to_string ();
+            string identifier = editor.value ("identifier").to_string ();
+            string name = editor.value ("name").to_string ();
 
             if (identifier != "" && name != "") {
                 var mime_types = editor.value ("mimetypes").to_array ();

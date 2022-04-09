@@ -13,7 +13,7 @@ public class TestCookies : GLib.Object {
     ***********************************************************/
     private TestCookies () {
         GLib.TemporaryDir temporary;
-        const string nonexisting_path = temporary.file_path ("some_nonexisting_directory/test.db");
+        string nonexisting_path = temporary.file_path ("some_nonexisting_directory/test.db");
         GLib.NetworkCookie cookie_a = new GLib.NetworkCookie ("foo", "bar");
         // tomorrow rounded
         cookie_a.set_expiration_date (GLib.DateTime.current_date_time_utc ().add_days (1).date ().start_of_day ());

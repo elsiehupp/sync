@@ -139,7 +139,7 @@ public class AbstractPropagatorJob : AbstractNetworkJob {
 
 
     protected OwncloudPropagator this.propagator {
-        return qobject_cast<OwncloudPropagator> (parent ());
+        return (OwncloudPropagator)parent ();
     }
 
 } // class AbstractPropagatorJob

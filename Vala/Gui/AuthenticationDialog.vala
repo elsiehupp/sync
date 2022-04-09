@@ -34,7 +34,7 @@ public class AuthenticationDialog : Gtk.Dialog {
         this.window_title (_("Authentication Required"));
         var vertical_box_layout = new GLib.VBoxLayout (this);
         var label = new Gtk.Label (_("Enter username and password for \"%1\" at %2.").printf (realm, domain));
-        label.text_format (Qt.UpdateStatusStringFormat.PLAIN_TEXT);
+        label.text_format (GLib.UpdateStatusStringFormat.PLAIN_TEXT);
         vertical_box_layout.add_widget (label);
 
         var form = new GLib.FormLayout ();
@@ -43,7 +43,7 @@ public class AuthenticationDialog : Gtk.Dialog {
         vertical_box_layout.add_layout (form);
         this.password.echo_mode (GLib.LineEdit.Password);
 
-        var dialog_button_box = new GLib.DialogButtonBox (GLib.DialogButtonBox.Ok | GLib.DialogButtonBox.Cancel, Qt.Horizontal);
+        var dialog_button_box = new GLib.DialogButtonBox (GLib.DialogButtonBox.Ok | GLib.DialogButtonBox.Cancel, GLib.Horizontal);
         dialog_button_box.accepted.connect (
             this.accept
         );

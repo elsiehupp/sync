@@ -15,7 +15,7 @@ public class TestSelect3 : AbstractTestOwnSql {
     private TestSelect3 () {
         base ();
 
-        const string sql = "SELECT * FROM addresses WHERE identifier=?1";
+        string sql = "SELECT * FROM addresses WHERE identifier=?1";
         SqlQuery query = new SqlQuery (this.database);
         query.prepare (sql);
         query.bind_value (1, 2);

@@ -215,7 +215,7 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_put_finished () {
-        var put_multi_file_job = qobject_cast<PutMultiFileJob> (sender ());
+        var put_multi_file_job = (PutMultiFileJob)sender ();
         GLib.assert (put_multi_file_job);
 
         on_signal_job_destroyed (put_multi_file_job); // remove it from the this.jobs list
@@ -455,14 +455,21 @@ public class BulkPropagatorJob : AbstractPropagatorJob {
     ***********************************************************/
     private void adjust_last_job_timeout (
         AbstractNetworkJob abstract_netowrk_job, int64 file_size) {
-        const double three_minutes = 3.0 * 60 * 1000;
+        double three_minutes = 3.0 * 60 * 1000;
 
-        abstract_netowrk_job.on_signal_timeout (q_bound (
-            abstract_netowrk_job.timeout_msec (),
-            // Calculate 3 minutes for each gigabyte of data
-            q_round64 (three_minutes * static_cast<double> (file_size) / 1e9),
-            // Maximum of 30 minutes
-                            static_cast<int64> (30 * 60 * 1000)));
+        abstract_netowrk_job.on_signal_timeout (
+            int64.max (
+                abstract_netowrk_job.timeout_msec (),
+                // Calculate 3 minutes for each gigabyte of data
+                int64.min (
+                    GLib.Math.llrint (
+                        three_minutes * (double)file_size / 1e9
+                    ),
+                    // Maximum of 30 minutes
+                    (int64)(30 * 60 * 1000)
+                )
+            )
+        );
     }
 
 

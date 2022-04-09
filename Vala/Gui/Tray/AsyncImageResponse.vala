@@ -26,7 +26,7 @@ public class AsyncImageResponse : GLib.QuickImageResponse {
             return;
         }
 
-        this.image_paths = identifier.split (';', Qt.SkipEmptyParts);
+        this.image_paths = identifier.split (';', GLib.SkipEmptyParts);
         this.requested_image_size = requested_size;
 
         if (this.image_paths == "") {
@@ -65,12 +65,12 @@ public class AsyncImageResponse : GLib.QuickImageResponse {
             return;
         }
 
-        const var current_user = UserModel.instance.is_current_user ();
+        var current_user = UserModel.instance.is_current_user ();
         if (current_user && current_user.account) {
-            const GLib.Uri icon_url = new GLib.Uri (this.image_paths.at (this.index));
+            GLib.Uri icon_url = new GLib.Uri (this.image_paths.at (this.index));
             if (icon_url.is_valid && !icon_url.scheme () == "") {
                 // fetch the remote resource
-                const var reply = current_user.account.send_raw_request ("GET", icon_url);
+                var reply = current_user.account.send_raw_request ("GET", icon_url);
                 reply.signal_finished.connect (
                     this.on_signal_process_network_reply
                 );
@@ -86,13 +86,13 @@ public class AsyncImageResponse : GLib.QuickImageResponse {
     /***********************************************************
     ***********************************************************/
     private void on_signal_process_network_input_stream {
-        const var reply = qobject_cast<GLib.InputStream> (sender ());
+        var reply = (GLib.InputStream)sender ();
         if (!reply) {
             image_and_emit_finished ();
             return;
         }
 
-        const string image_data = reply.read_all ();
+        string image_data = reply.read_all ();
         // server returns "[]" for some some file previews (have no idea why), so, we use another image
         // from the list if available
         if (image_data == "" || image_data == "[]") {

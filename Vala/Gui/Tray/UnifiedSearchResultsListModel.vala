@@ -43,7 +43,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
     /***********************************************************
     ***********************************************************/
     public enum DataRole {
-        PROVIDER_NAME = Qt.USER_ROLE + 1,
+        PROVIDER_NAME = GLib.USER_ROLE + 1,
         PROVIDER_IDENTIFIER,
         IMAGE_PLACEHOLDER,
         ICONS,
@@ -179,18 +179,18 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
     /***********************************************************
     ***********************************************************/
     public void result_clicked (string provider_id, GLib.Uri resource_url) {
-        const GLib.UrlQuery url_query = new GLib.UrlQuery (resource_url);
-        const var directory = url_query.query_item_value ("directory", GLib.Uri.Component_formatting_option.Fully_decoded);
-        const var filename =
+        GLib.UrlQuery url_query = new GLib.UrlQuery (resource_url);
+        var directory = url_query.query_item_value ("directory", GLib.Uri.Component_formatting_option.Fully_decoded);
+        var filename =
             url_query.query_item_value ("scrollto", GLib.Uri.Component_formatting_option.Fully_decoded);
 
-        if (provider_id.contains ("file", Qt.CaseInsensitive) && !directory == "" && !filename == "") {
+        if (provider_id.contains ("file", GLib.CaseInsensitive) && !directory == "" && !filename == "") {
             if (!this.account_state || !this.account_state.account) {
                 return;
             }
 
-            const string relative_path = directory + "/" + filename;
-            const var local_files =
+            string relative_path = directory + "/" + filename;
+            var local_files =
                 FolderManager.instance.find_file_in_local_folders (GLib.FileInfo (relative_path).path, this.account_state.account);
 
             if (!local_files == "") {
@@ -210,7 +210,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
             return;
         }
 
-        const var provider_info = this.providers.value (provider_id, {});
+        var provider_info = this.providers.value (provider_id, {});
 
         if (!provider_info.id == "" && provider_info.id == provider_id && provider_info.is_paginated) {
             // Load more items
@@ -266,7 +266,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
         }
         json_api_job.property ("provider_id", provider_id);
         json_api_job.add_query_params (parameters);
-        const var was_search_in_progress = is_search_in_progress ();
+        var was_search_in_progress = is_search_in_progress ();
         this.search_job_connections.insert (provider_id,
             json_api_job.signal_json_received.connect (
                 this.on_signal_search_for_provider_finished
@@ -282,8 +282,8 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
     /***********************************************************
     ***********************************************************/
     private void parse_results_for_provider (Json.Object data, string provider_id, bool fetched_more) {
-        const var cursor = data.value ("cursor").to_int ();
-        const var entries = data.value ("entries").to_variant ().to_list ();
+        var cursor = data.value ("cursor").to_int ();
+        var entries = data.value ("entries").to_variant ().to_list ();
 
         var provider = this.providers[provider_id];
 
@@ -322,7 +322,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
         GLib.List<UnifiedSearchResult> new_entries;
 
         foreach (var entry in entries) {
-            const var entry_map = entry.to_map ();
+            var entry_map = entry.to_map ();
             if (entry_map == "") {
                 continue;
             }
@@ -402,7 +402,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
             }
         }
 
-        const int last = first + results.size () - 1;
+        int last = first + results.size () - 1;
 
         begin_insert_rows ({}, first, last);
         std.copy (
@@ -423,7 +423,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
             return;
         }
 
-        const var provider_id = provider.id;
+        var provider_id = provider.id;
 
         /* we need to find the last result that is not a fetch-more-trigger or category-separator for the current
            provider */
@@ -438,9 +438,9 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
         if (last_result_for_provider_reverse != std.rend (this.results)) {
             // #1 Insert rows
             // convert reverse_iterator to iterator
-            const var it_last_result_for_provider = (it_last_result_for_provider_reverse + 1).base ();
-            const var first = static_cast<int> (std.distance (std.begin (this.results), it_last_result_for_provider + 1));
-            const var last = first + results.size () - 1;
+            var it_last_result_for_provider = (it_last_result_for_provider_reverse + 1).base ();
+            var first = (int)std.distance (std.begin (this.results), it_last_result_for_provider + 1);
+            var last = first + results.size () - 1;
             begin_insert_rows ({}, first, last);
             std.copy (std.begin (results), std.end (results), std.inserter (this.results, it_last_result_for_provider + 1));
             end_insert_rows ();
@@ -468,12 +468,12 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
 
         if (fetch_more_trigger_for_provider_reverse != std.rend (this.results)) {
             // convert reverse_iterator to iterator
-            const var it_fetch_more_trigger_for_provider = (fetch_more_trigger_for_provider_reverse + 1).base ();
+            var it_fetch_more_trigger_for_provider = (fetch_more_trigger_for_provider_reverse + 1).base ();
 
             if (it_fetch_more_trigger_for_provider != std.end (this.results)
                 && it_fetch_more_trigger_for_provider != std.begin (this.results)) {
-                const var erase_index = static_cast<int> (std.distance (std.begin (this.results), it_fetch_more_trigger_for_provider));
-                //  Q_ASSERT (erase_index >= 0 && erase_index < static_cast<int> (this.results.size ()));
+                var erase_index = (int)std.distance (std.begin (this.results), it_fetch_more_trigger_for_provider);
+                //  Q_ASSERT (erase_index >= 0 && erase_index < (int) (this.results.size ());
                 begin_remove_rows ({}, erase_index, erase_index);
                 this.results.erase (it_fetch_more_trigger_for_provider);
                 end_remove_rows ();
@@ -577,7 +577,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
     /***********************************************************
     ***********************************************************/
     private void on_signal_fetch_providers_finished (LibSync.JsonApiJob json_api_job, GLib.JsonDocument json, int status_code) {
-        const var json_api_job = qobject_cast<LibSync.JsonApiJob> (sender ());
+        var json_api_job = (LibSync.JsonApiJob)sender ();
 
         if (!json_api_job) {
             GLib.critical ("Failed to fetch providers.".printf (this.search_term));
@@ -601,9 +601,9 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
         }
 
         foreach (var provider in json.object ().value ("ocs").to_object ().value ("data").to_variant ().to_list ()) {
-            const var provider_map = provider.to_map ();
-            const var identifier = provider_map["identifier"].to_string ();
-            const var name = provider_map["name"].to_string ();
+            var provider_map = provider.to_map ();
+            var identifier = provider_map["identifier"].to_string ();
+            var name = provider_map["name"].to_string ();
             if (!name == "" && identifier != "talk-message-current") {
                 UnifiedSearchProvider new_provider;
                 new_provider.name = name;
@@ -624,7 +624,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
     private void on_signal_search_for_provider_finished (LibSync.JsonApiJob json_api_job, GLib.JsonDocument json, int status_code) {
         //  Q_ASSERT (this.account_state && this.account_state.account);
 
-        const var json_api_job = qobject_cast<LibSync.JsonApiJob> (sender ());
+        var json_api_job = (LibSync.JsonApiJob)sender ();
 
         if (!json_api_job) {
             GLib.critical ("Search has failed for '%2'.".printf (this.search_term));
@@ -633,7 +633,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
             return;
         }
 
-        const var provider_id = json_api_job.property ("provider_id").to_string ();
+        var provider_id = json_api_job.property ("provider_id").to_string ();
 
         if (provider_id == "") {
             return;
@@ -663,7 +663,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
             return;
         }
 
-        const var data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
+        var data = json.object ().value ("ocs").to_object ().value ("data").to_object ();
         if (!data == "") {
             parse_results_for_provider (data, provider_id, json_api_job.property ("append_results").to_bool ());
         }
@@ -673,18 +673,18 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
     /***********************************************************
     ***********************************************************/
     private static string image_placeholder_url_for_provider_id (string provider_id) {
-        if (provider_id.contains ("message", Qt.CaseInsensitive)
-            || provider_id.contains ("talk", Qt.CaseInsensitive)) {
+        if (provider_id.contains ("message", GLib.CaseInsensitive)
+            || provider_id.contains ("talk", GLib.CaseInsensitive)) {
             return "qrc:///client/theme/black/wizard-talk.svg";
-        } else if (provider_id.contains ("file", Qt.CaseInsensitive)) {
+        } else if (provider_id.contains ("file", GLib.CaseInsensitive)) {
             return "qrc:///client/theme/black/edit.svg";
-        } else if (provider_id.contains ("deck", Qt.CaseInsensitive)) {
+        } else if (provider_id.contains ("deck", GLib.CaseInsensitive)) {
             return "qrc:///client/theme/black/deck.svg";
-        } else if (provider_id.contains ("calendar", Qt.CaseInsensitive)) {
+        } else if (provider_id.contains ("calendar", GLib.CaseInsensitive)) {
             return "qrc:///client/theme/black/calendar.svg";
-        } else if (provider_id.contains ("mail", Qt.CaseInsensitive)) {
+        } else if (provider_id.contains ("mail", GLib.CaseInsensitive)) {
             return "qrc:///client/theme/black/email.svg";
-        } else if (provider_id.contains ("comment", Qt.CaseInsensitive)) {
+        } else if (provider_id.contains ("comment", GLib.CaseInsensitive)) {
             return "qrc:///client/theme/black/comment.svg";
         }
 
@@ -695,18 +695,18 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
     /***********************************************************
     ***********************************************************/
     private static string local_icon_path_from_icon_prefix (string icon_name_with_prefix) {
-        if (icon_name_with_prefix.contains ("message", Qt.CaseInsensitive)
-            || icon_name_with_prefix.contains ("talk", Qt.CaseInsensitive)) {
+        if (icon_name_with_prefix.contains ("message", GLib.CaseInsensitive)
+            || icon_name_with_prefix.contains ("talk", GLib.CaseInsensitive)) {
             return ":/client/theme/black/wizard-talk.svg";
-        } else if (icon_name_with_prefix.contains ("folder", Qt.CaseInsensitive)) {
+        } else if (icon_name_with_prefix.contains ("folder", GLib.CaseInsensitive)) {
             return ":/client/theme/black/folder.svg";
-        } else if (icon_name_with_prefix.contains ("deck", Qt.CaseInsensitive)) {
+        } else if (icon_name_with_prefix.contains ("deck", GLib.CaseInsensitive)) {
             return ":/client/theme/black/deck.svg";
-        } else if (icon_name_with_prefix.contains ("contacts", Qt.CaseInsensitive)) {
+        } else if (icon_name_with_prefix.contains ("contacts", GLib.CaseInsensitive)) {
             return ":/client/theme/black/wizard-groupware.svg";
-        } else if (icon_name_with_prefix.contains ("calendar", Qt.CaseInsensitive)) {
+        } else if (icon_name_with_prefix.contains ("calendar", GLib.CaseInsensitive)) {
             return ":/client/theme/black/calendar.svg";
-        } else if (icon_name_with_prefix.contains ("mail", Qt.CaseInsensitive)) {
+        } else if (icon_name_with_prefix.contains ("mail", GLib.CaseInsensitive)) {
             return ":/client/theme/black/email.svg";
         }
 
@@ -717,30 +717,30 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
     /***********************************************************
     ***********************************************************/
     private static string icon_url_for_default_icon_name (string default_icon_name) {
-        const GLib.Uri url_for_icon = new GLib.Uri (default_icon_name);
+        GLib.Uri url_for_icon = new GLib.Uri (default_icon_name);
 
         if (url_for_icon.is_valid && !url_for_icon.scheme () == "") {
             return default_icon_name;
         }
 
         if (default_icon_name.has_prefix ("icon-")) {
-            const var parts = default_icon_name.split ('-');
+            var parts = default_icon_name.split ('-');
 
             if (parts.size () > 1) {
-                const string icon_file_path = ":/client/theme/" + parts[1] + ".svg";
+                string icon_file_path = ":/client/theme/" + parts[1] + ".svg";
 
                 if (GLib.File.exists (icon_file_path)) {
                     return icon_file_path;
                 }
 
-                const string black_icon_file_path = ":/client/theme/black/" + parts[1] + ".svg";
+                string black_icon_file_path = ":/client/theme/black/" + parts[1] + ".svg";
 
                 if (GLib.File.exists (black_icon_file_path)) {
                     return black_icon_file_path;
                 }
             }
 
-            const string icon_name_from_icon_prefix = local_icon_path_from_icon_prefix (default_icon_name);
+            string icon_name_from_icon_prefix = local_icon_path_from_icon_prefix (default_icon_name);
 
             if (icon_name_from_icon_prefix != "") {
                 return icon_name_from_icon_prefix;
@@ -761,7 +761,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
             // relative image resource URL, just needs some concatenation with current server URL
             // some icons may contain parameters after (?)
             GLib.List<string> thumbnail_url_copy_splitted = thumbnail_url_copy.contains ('?')
-                ? thumbnail_url_copy.split ('?', Qt.SkipEmptyParts)
+                ? thumbnail_url_copy.split ('?', GLib.SkipEmptyParts)
                 : { thumbnail_url_copy };
             //  Q_ASSERT (!thumbnail_url_copy_splitted == "");
             server_url_copy.path (thumbnail_url_copy_splitted[0]);
@@ -795,7 +795,7 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
             }
         } else if (!fallack_icon_copy == "") {
             // could be one of names for standard icons (e.g. icon-mail)
-            const var default_icon_url = icon_url_for_default_icon_name (fallack_icon_copy);
+            var default_icon_url = icon_url_for_default_icon_name (fallack_icon_copy);
             if (!default_icon_url == "") {
                 fallack_icon_copy = default_icon_url;
             }
@@ -817,8 +817,8 @@ public class UnifiedSearchResultsListModel : GLib.AbstractListModel {
             return list_images.join (';');
         }
 
-        const var url_for_thumbnail = generate_url_for_thumbnail (thumbnail_url, server_url);
-        const var url_for_fallack_icon = generate_url_for_icon (fallack_icon, server_url);
+        var url_for_thumbnail = generate_url_for_thumbnail (thumbnail_url, server_url);
+        var url_for_fallack_icon = generate_url_for_icon (fallack_icon, server_url);
 
         if (url_for_thumbnail == "" && !url_for_fallack_icon == "") {
             return url_for_fallack_icon;

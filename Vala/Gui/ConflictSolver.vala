@@ -106,7 +106,7 @@ public class ConflictSolver : GLib.Object {
             return false;
         }
 
-        const string message = info.is_dir () ? _("Do you want to delete the directory <i>%1</i> and all its contents permanently?").printf (info.directory ().dir_name ())
+        string message = info.is_dir () ? _("Do you want to delete the directory <i>%1</i> and all its contents permanently?").printf (info.directory ().dir_name ())
                                           : _("Do you want to delete the file <i>%1</i> permanently?").printf (info.filename ());
         if (Gtk.MessageBox.question (this.parent_widget, _("Confirm deletion"), message, Gtk.MessageBox.Yes, Gtk.MessageBox.No) != Gtk.MessageBox.Yes) {
             return false;
@@ -147,7 +147,7 @@ public class ConflictSolver : GLib.Object {
     ***********************************************************/
     private string rename_pattern () {
         string result = Utility.conflict_file_base_name_from_pattern (this.local_version_filename.to_utf8 ());
-        const string dot_index = result.last_index_of ('.');
+        string dot_index = result.last_index_of ('.');
         return result.left (dot_index) + "this.%1" + result.mid (dot_index);
     }
 

@@ -34,7 +34,7 @@ public class OwncloudConnectionMethodDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     public OwncloudConnectionMethodDialog (Gtk.Widget parent = new Gtk.Widget ()) {
-        base (parent, Qt.CustomizeWindowHint | Qt.WindowTitleHint | Qt.WindowCloseButtonHint | Qt.MSWindowsFixedSizeDialogHint);
+        base (parent, GLib.CustomizeWindowHint | GLib.WindowTitleHint | GLib.WindowCloseButtonHint | GLib.MSWindowsFixedSizeDialogHint);
         this.instance = new OwncloudConnectionMethodDialog ();
         instance.up_ui (this);
 

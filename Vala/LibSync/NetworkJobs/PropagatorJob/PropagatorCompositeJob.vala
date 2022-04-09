@@ -88,7 +88,7 @@ public class PropagatorCompositeJob : AbstractPropagatorJob {
         // Now it's our turn, check if we have something left to do.
         // First, convert a task to a job if necessary
         while (this.jobs_to_do == null && this.tasks_to_!= null) {
-            unowned SyncFileItem next_task = this.tasks_to_do.first ();
+            unowned SyncFileItem next_task = this.tasks_to_do.nth_data (0);
             this.tasks_to_do.remove (0);
             AbstractPropagatorJob propagator_job = this.propagator.create_job (next_task);
             if (!propagator_job) {
@@ -100,7 +100,7 @@ public class PropagatorCompositeJob : AbstractPropagatorJob {
         }
         // Then run the next job
         if (this.jobs_to_do != null) {
-            AbstractPropagatorJob next_job = this.jobs_to_do.first ();
+            AbstractPropagatorJob next_job = this.jobs_to_do.nth_data (0);
             this.jobs_to_do.remove (0);
             this.running_jobs.append (next_job);
             return on_signal_possibly_run_next_job (next_job);
@@ -111,7 +111,7 @@ public class PropagatorCompositeJob : AbstractPropagatorJob {
         if (this.jobs_to_do.length () == 0 && this.tasks_to_do.length () == 0 && this.running_jobs.length () == 0) {
             // Our parent jobs are already iterating over their running jobs, post to the event loop
             // to avoid removing ourself from that list while they iterate.
-            GLib.Object.invoke_method (this, "on_signal_finalize", Qt.QueuedConnection);
+            GLib.Object.invoke_method (this, "on_signal_finalize", GLib.QueuedConnection);
         }
         return false;
     }
@@ -191,7 +191,7 @@ public class PropagatorCompositeJob : AbstractPropagatorJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_next_propagator_job_finished (SyncFileItem.Status status) {
-        var sub_job = static_cast<AbstractPropagatorJob> (sender ());
+        var sub_job = (AbstractPropagatorJob)sender ();
         //  ASSERT (sub_job);
 
         // Delete the job and remove it from our list of jobs.

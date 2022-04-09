@@ -105,7 +105,7 @@ public class PropagateRemoteDelete : AbstractPropagateItemJob {
         //  ASSERT (this.delete_job);
 
         GLib.InputStream.NetworkError err = this.delete_job.input_stream.error;
-        const int http_status = this.delete_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
+        int http_status = this.delete_job.input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         this.item.http_error_code = http_status;
         this.item.response_time_stamp = this.delete_job.response_timestamp;
         this.item.request_id = this.delete_job.request_id ();

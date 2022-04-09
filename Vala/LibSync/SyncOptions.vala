@@ -138,8 +138,8 @@ public class SyncOptions : GLib.Object {
     to always include the initial chunk size value.
     ***********************************************************/
     public void verify_chunk_sizes () {
-        this.min_chunk_size = q_min (this.min_chunk_size, this.initial_chunk_size);
-        this.max_chunk_size = q_max (this.max_chunk_size, this.initial_chunk_size);
+        this.min_chunk_size = int64.min (this.min_chunk_size, this.initial_chunk_size);
+        this.max_chunk_size = int64.max (this.max_chunk_size, this.initial_chunk_size);
     }
 
 

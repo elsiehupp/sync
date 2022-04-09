@@ -44,19 +44,19 @@ public class FolderWizardSelectiveSync : GLib.WizardPage {
     /***********************************************************
     ***********************************************************/
     private void on_virtual_files_check_box_state_changed (int state) {
-        this.selective_sync.enabled (state == Qt.Unchecked);
+        this.selective_sync.enabled (state == GLib.Unchecked);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public bool validate_page () {
-        const bool use_virtual_files = this.virtual_files_check_box && this.virtual_files_check_box.is_checked ();
+        bool use_virtual_files = this.virtual_files_check_box && this.virtual_files_check_box.is_checked ();
         if (use_virtual_files) {
-            const var availability = AbstractVfs.check_availability (wizard ().field ("source_folder").to_string ());
+            var availability = AbstractVfs.check_availability (wizard ().field ("source_folder").to_string ());
             if (!availability) {
                 var message = new Gtk.MessageBox (Gtk.MessageBox.Warning, _("Virtual files are not available for the selected folder"), availability.error, Gtk.MessageBox.Ok, this);
-                message.attribute (Qt.WA_DeleteOnClose);
+                message.attribute (GLib.WA_DeleteOnClose);
                 message.open ();
                 return false;
             }

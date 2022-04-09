@@ -35,7 +35,7 @@ public class SystemProxyRunnable : GLib.Object /*, GLib.Runnable*/ {
         if (proxies == "") {
             /* emit */ system_proxy_looked_up (new Soup.ProxyResolverDefault (Soup.ProxyResolverDefault.NoProxy));
         } else {
-            /* emit */ system_proxy_looked_up (proxies.first ());
+            /* emit */ system_proxy_looked_up (proxies.nth_data (0));
             // FIXME Would we really ever return more?
         }
     }

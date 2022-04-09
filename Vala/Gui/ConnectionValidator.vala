@@ -119,7 +119,7 @@ public class ConnectionValidator : GLib.Object {
     get called. This makes sure we get tried often enough
     without "ConnectionValidator already running".
     ***********************************************************/
-    const int64 TIMEOUT_TO_USE_MILLISECONDS = q_max (1000, DEFAULT_CALLING_INTERVAL_MILLISECONDS - 5 * 1000);
+    const int64 TIMEOUT_TO_USE_MILLISECONDS = int64.max (1000, DEFAULT_CALLING_INTERVAL_MILLISECONDS - 5 * 1000);
 
     /***********************************************************
     ***********************************************************/
@@ -164,7 +164,7 @@ public class ConnectionValidator : GLib.Object {
             // We want to reset the GLib.NAM proxy so that the global proxy settings are used (via ClientProxy settings)
             this.account.network_access_manager.proxy (Soup.NetworkProxy (Soup.NetworkProxy.DefaultProxy));
             // use a queued invocation so we're as asynchronous as with the other code path
-            GLib.Object.invoke_method (this, "on_signal_actual_check", Qt.QueuedConnection);
+            GLib.Object.invoke_method (this, "on_signal_actual_check", GLib.QueuedConnection);
         }
     }
 
@@ -278,7 +278,7 @@ public class ConnectionValidator : GLib.Object {
     status.php could not be loaded (network or server issue!).
     ***********************************************************/
     protected void on_signal_no_status_found (GLib.InputStream reply) {
-        var check_server_job = qobject_cast<CheckServerJob> (sender ());
+        var check_server_job = (CheckServerJob)sender ();
         GLib.warning (reply.error + check_server_job.error_string + reply.peek (1024));
         if (reply.error == GLib.InputStream.SslHandshakeFailedError) {
             report_result (SslError);

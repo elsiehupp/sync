@@ -682,8 +682,8 @@ public class ConfigFile : GLib.Object {
             var default_value = Theme.new_big_folder_size_limit;
             var fallback = get_value (NEW_BIG_FOLDER_SIZE_LIMIT_C, "", default_value).to_long_long ();
             var value = get_policy_setting (NEW_BIG_FOLDER_SIZE_LIMIT_C, fallback).to_long_long ();
-            const bool use = value >= 0 && use_new_big_folder_size_limit ();
-            return q_make_pair (use, q_max<int64> (0, value));
+            bool use = value >= 0 && use_new_big_folder_size_limit ();
+            return q_make_pair (use, int64.max (0, value));
         }
         public set {
             set_value (NEW_BIG_FOLDER_SIZE_LIMIT_C, value.mbytes);
@@ -827,7 +827,7 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     bool show_in_explorer_navigation_pane {
         public get {
-            const bool default_value = false;
+            bool default_value = false;
             GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
             return settings.set_value (SHOW_IN_EXPLORER_NAVIGATION_PANE_C, default_value).to_bool ();
         }

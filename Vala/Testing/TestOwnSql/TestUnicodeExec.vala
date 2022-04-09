@@ -15,7 +15,7 @@ public class TestUnicodeExec : AbstractTestOwnSql {
     private TestUnicodeExec () {
         base ();
 
-        const string sql = "INSERT INTO addresses (identifier, name, address, entered) VALUES "
+        string sql = "INSERT INTO addresses (identifier, name, address, entered) VALUES "
                          + " (?1, ?2, ?3, ?4);";
         SqlQuery query = new SqlQuery (this.database);
         query.prepare (sql);

@@ -13,7 +13,7 @@ public class TestCSyncExcludedPerformance2 : AbstractTestCSyncExclude {
     /***********************************************************
     ***********************************************************/
     private TestCSyncExcludedPerformance2 () {
-        const int N = 1000;
+        int N = 1000;
         int total_rc = 0;
 
         //  GLib.BENCHMARK {

@@ -14,14 +14,14 @@ public class PathComponents : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public PathComponents.from_char (char path) {
-        this.components = path.to_string ().split ("/", Qt.SkipEmptyParts);
+        this.components = path.to_string ().split ("/", GLib.SkipEmptyParts);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public PathComponents.from_string (string path) {
-        this.components = path.split ("/", Qt.SkipEmptyParts);
+        this.components = path.split ("/", GLib.SkipEmptyParts);
     }
 
 
@@ -57,7 +57,7 @@ public class PathComponents : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public string path_root () {
-        return first ();
+        return nth_data (0);
     }
 
 

@@ -69,8 +69,8 @@ public class ShareDialog : Gtk.Dialog {
         this.max_sharing_permissions = max_sharing_permissions;
         this.private_link_url = account_state.account.deprecated_private_link_url (numeric_file_id).to_string (GLib.Uri.FullyEncoded);
         this.start_page = start_page;
-        window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
-        attribute (Qt.WA_DeleteOnClose);
+        window_flags (window_flags () & ~GLib.WindowContextHelpButtonHint);
+        attribute (GLib.WA_DeleteOnClose);
         object_name ("Sharing_dialog"); // required as group for save_geometry call
 
         this.instance.up_ui (this);
@@ -186,9 +186,9 @@ public class ShareDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void on_signal_propfind_received (GLib.VariantMap result) {
-        const GLib.Variant received_permissions = result["share-permissions"];
+        GLib.Variant received_permissions = result["share-permissions"];
         if (!received_permissions.to_string () == "") {
-            this.max_sharing_permissions = static_cast<SharePermissions> (received_permissions.to_int ());
+            this.max_sharing_permissions = (SharePermissions)received_permissions.to_int ();
             GLib.info ("Received sharing permissions for " + this.share_path + this.max_sharing_permissions.to_string ());
         }
         var private_link_url = result["privatelink"].to_string ();
@@ -226,7 +226,7 @@ public class ShareDialog : Gtk.Dialog {
 
         Gdk.Pixbuf p;
         p.load_from_data (reply, "PNG");
-        p = p.scaled_to_height (THUMBNAIL_SIZE, Qt.Smooth_transformation);
+        p = p.scaled_to_height (THUMBNAIL_SIZE, GLib.Smooth_transformation);
         this.instance.label_icon.pixmap (p);
         this.instance.label_icon.show ();
     }
@@ -255,14 +255,14 @@ public class ShareDialog : Gtk.Dialog {
     private void on_signal_shares_fetched (GLib.List<unowned Share> shares) {
         /* emit */ signal_toggle_share_link_animation (true);
 
-        const string version_string = this.account_state.account.server_version ();
+        string version_string = this.account_state.account.server_version ();
         GLib.info (version_string + "Fetched" + shares.length + "shares");
         foreach (var share in shares) {
             if (share.share_type != Share.Type.LINK || share.owner_uid != share.account.dav_user) {
                 continue;
             }
 
-            unowned LinkShare link_share = q_shared_pointer_dynamic_cast<LinkShare> (share);
+            unowned LinkShare link_share = (LinkShare)share;
             add_link_share_widget (link_share);
         }
 
@@ -287,7 +287,7 @@ public class ShareDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void on_signal_delete_share () {
-        var sharelink_widget = dynamic_cast<ShareLinkWidget> (sender ());
+        var sharelink_widget = (ShareLinkWidget)sender ();
         sharelink_widget.hide ();
         this.instance.vertical_layout.remove_widget (sharelink_widget);
         this.link_widget_list.remove_all (sharelink_widget);
@@ -299,8 +299,8 @@ public class ShareDialog : Gtk.Dialog {
     ***********************************************************/
     private void on_signal_create_link_share () {
         if (this.share_manager != null) {
-            const bool ask_optional_password = this.account_state.account.capabilities.share_public_link_ask_optional_password ();
-            const string password = ask_optional_password ? create_random_password (): "";
+            bool ask_optional_password = this.account_state.account.capabilities.share_public_link_ask_optional_password ();
+            string password = ask_optional_password ? create_random_password (): "";
             this.share_manager.create_link_share (this.share_path, "", password);
         }
     }
@@ -309,7 +309,7 @@ public class ShareDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void on_signal_create_password_for_link_share (string password) {
-        const var share_link_widget = qobject_cast<ShareLinkWidget> (sender ());
+        var share_link_widget = (ShareLinkWidget)sender ();
         //  Q_ASSERT (share_link_widget);
         if (share_link_widget) {
             this.share_manager.signal_link_share_requires_password.connect (
@@ -328,11 +328,15 @@ public class ShareDialog : Gtk.Dialog {
     /***********************************************************
     ***********************************************************/
     private void on_signal_create_password_for_link_share_processed () {
-        const var share_link_widget = qobject_cast<ShareLinkWidget> (sender ());
+        var share_link_widget = (ShareLinkWidget)sender ();
         //  Q_ASSERT (share_link_widget);
         if (share_link_widget) {
-            disconnect (this.share_manager, ShareManager.on_signal_link_share_requires_password, share_link_widget, ShareLinkWidget.on_signal_create_share_requires_password);
-            disconnect (share_link_widget, ShareLinkWidget.create_password_processed, this, ShareDialog.on_signal_create_password_for_link_share_processed);
+            this.share_manager.signal_link_share_requires_password.disconnect (
+                share_link_widget.on_signal_create_share_requires_password
+            );
+            share_link_widget.create_password_processed.disconnect (
+                this.on_signal_create_password_for_link_share_processed
+            );
         } else {
             GLib.critical ("share_link_widget is not a sender!");
         }
@@ -377,11 +381,11 @@ public class ShareDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    protected override void change_event (GLib.Event e) {
+    protected override void change_event (Gdk.Event e) {
         switch (e.type ()) {
-        case GLib.Event.StyleChange:
-        case GLib.Event.PaletteChange:
-        case GLib.Event.ThemeChange:
+        case Gdk.Event.StyleChange:
+        case Gdk.Event.PaletteChange:
+        case Gdk.Event.ThemeChange:
             // Notify the other widgets (Dark-/Light-Mode switching)
             /* emit */ signal_style_changed ();
             break;

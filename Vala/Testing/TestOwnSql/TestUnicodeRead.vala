@@ -15,7 +15,7 @@ public class TestUnicodeRead : AbstractTestOwnSql {
     private TestUnicodeRead () {
         base ();
 
-        const string sql = "SELECT * FROM addresses WHERE identifier=3;";
+        string sql = "SELECT * FROM addresses WHERE identifier=3;";
         SqlQuery query = new SqlQuery (this.database);
         query.prepare (sql);
 

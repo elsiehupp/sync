@@ -21,7 +21,7 @@ public class FakeAsyncReply : FakeReply {
         set_operation (operation);
         open (GLib.IODevice.ReadOnly);
 
-        GLib.Object.invoke_method (this, "respond", Qt.QueuedConnection);
+        GLib.Object.invoke_method (this, "respond", GLib.QueuedConnection);
     }
 
 

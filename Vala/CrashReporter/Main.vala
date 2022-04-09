@@ -17,7 +17,7 @@ namespace CrashReporter {
 public class CrashReporter {
 
     public CrashReporter (int argc, char argv[]) {
-        GLib.Application.attribute (Qt.AAUseHighDpiPixmaps, true);
+        GLib.Application.attribute (GLib.AAUseHighDpiPixmaps, true);
         GLib.Application app = new GLib.Application (argc, argv);
 
         if (app.arguments ().length != 2) {
@@ -34,7 +34,7 @@ public class CrashReporter {
         reporter.window_title (CRASHREPORTER_PRODUCT_NAME);
         reporter.on_signal_text ("<html><head/><body><p><span style=\" font-weight:600;\">Sorry!</span> " + CRASHREPORTER_PRODUCT_NAME + " crashed. Please tell us about it! " + CRASHREPORTER_PRODUCT_NAME + " has created an error report for you that can help improve the stability in the future. You can now send this report directly to the " + CRASHREPORTER_PRODUCT_NAME + " developers.</p></body></html>");
 
-        const GLib.FileInfo crash_log = new GLib.FileInfo (GLib.Dir.temp_path + "/" + CRASHREPORTER_PRODUCT_NAME + "-crash.log");
+        GLib.FileInfo crash_log = new GLib.FileInfo (GLib.Dir.temp_path + "/" + CRASHREPORTER_PRODUCT_NAME + "-crash.log");
         if (crash_log.exists ()) {
             GLib.File in_file = new GLib.File (crash_log.file_path);
             if (in_file.open (GLib.File.ReadOnly)) {

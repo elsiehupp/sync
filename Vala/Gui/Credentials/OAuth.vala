@@ -104,11 +104,11 @@ public class OAuth : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_ready_read (GLib.TcpSocket socket) {
-        string peek = socket.peek (q_min (socket.bytes_available (), 4000LL)); //The code should always be within the first 4K
+        string peek = socket.peek (int64.min (socket.bytes_available (), 4000LL)); //The code should always be within the first 4K
         if (peek.index_of ("\n") < 0)
             return; // wait until we find a \n
-        const GLib.Regex regular_expression = new GLib.Regex ("^GET /\\?code= ([a-z_a-Z0-9]+)[& ]"); // Match a  /?code=...  URL
-        const var regular_expression_match = regular_expression.match (peek);
+        GLib.Regex regular_expression = new GLib.Regex ("^GET /\\?code= ([a-z_a-Z0-9]+)[& ]"); // Match a  /?code=...  URL
+        var regular_expression_match = regular_expression.match (peek);
         if (!regular_expression_match.has_match ()) {
             http_reply_and_close (socket, "404 Not Found", "<html><head><title>404 Not Found</title></head><body><center><h1>404 Not Found</h1></center></body></html>");
             return;
@@ -135,7 +135,7 @@ public class OAuth : GLib.Object {
         request_body.data (arguments.query (GLib.Uri.FullyEncoded).to_latin1 ());
 
         var simple_network_job = this.account.send_request ("POST", request_token, req, request_body);
-        simple_network_job.on_signal_timeout (q_min (30 * 1000ll, simple_network_job.timeout_msec ()));
+        simple_network_job.on_signal_timeout (int64.min (30 * 1000ll, simple_network_job.timeout_msec ()));
         simple_network_job.signal_finished.connect (
             this.on_signal_simple_network_job_finished
         );
@@ -194,7 +194,7 @@ public class OAuth : GLib.Object {
             // We are still listening on the socket so we will get the new connection
             return;
         }
-        const string login_successfull_html = "<h1>Login Successful</h1><p>You can close this window.</p>";
+        string login_successfull_html = "<h1>Login Successful</h1><p>You can close this window.</p>";
         if (message_url.is_valid) {
             http_reply_and_close (socket, "303 See Other", login_successfull_html,
                 ("Location: " + message_url.to_encoded ()).const_data ());

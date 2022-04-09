@@ -60,11 +60,11 @@ public class FakeDateTimeProvider : AbstractDateTimeProvider {
     static GLib.List<LibSync.UserStatus> create_fake_predefined_statuses (GLib.DateTime current_time) {
         GLib.List<LibSync.UserStatus> statuses;
 
-        const string user_status_id = "fake-identifier";
-        const string user_status_message = "Predefined status";
-        const string user_status_icon = "🏖";
-        const LibSync.UserStatus.OnlineStatus user_status_state = LibSync.UserStatus.OnlineStatus.Online;
-        const bool user_status_message_predefined = true;
+        string user_status_id = "fake-identifier";
+        string user_status_message = "Predefined status";
+        string user_status_icon = "🏖";
+        LibSync.UserStatus.OnlineStatus user_status_state = LibSync.UserStatus.OnlineStatus.Online;
+        bool user_status_message_predefined = true;
         Optional<ClearAt> user_status_clear_at;
         ClearAt clear_at;
         clear_at.type = ClearAtType.TIMESTAMP;

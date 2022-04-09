@@ -64,7 +64,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
             this.on_signal_item_changed
         );
         this.folder_tree.sorting_enabled (true);
-        this.folder_tree.sort_by_column (0, Qt.AscendingOrder);
+        this.folder_tree.sort_by_column (0, GLib.AscendingOrder);
         this.folder_tree.column_count (2);
         this.folder_tree.header ().section_resize_mode (0, GLib.HeaderView.GLib.HeaderView.ResizeToContents);
         this.folder_tree.header ().section_resize_mode (1, GLib.HeaderView.GLib.HeaderView.ResizeToContents);
@@ -89,11 +89,11 @@ public class SelectiveSyncWidget : Gtk.Widget {
             return GLib.List<string> ();
 
         switch (root.check_state (0)) {
-        case Qt.Unchecked:
-            return GLib.List<string> (root.data (0, Qt.USER_ROLE).to_string () + "/");
-        case Qt.Checked:
+        case GLib.Unchecked:
+            return GLib.List<string> (root.data (0, GLib.USER_ROLE).to_string () + "/");
+        case GLib.Checked:
             return GLib.List<string> ();
-        case Qt.PartiallyChecked:
+        case GLib.PartiallyChecked:
             break;
         }
 
@@ -104,7 +104,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
             }
         } else {
             // We did not load from the server so we re-use the one from the old block list
-            string path = root.data (0, Qt.USER_ROLE).to_string ();
+            string path = root.data (0, GLib.USER_ROLE).to_string ();
             foreach (string it, this.old_block_list) {
                 if (it.has_prefix (path))
                     result += it;
@@ -134,11 +134,11 @@ public class SelectiveSyncWidget : Gtk.Widget {
             return -1;
 
         switch (root.check_state (0)) {
-        case Qt.Unchecked:
+        case GLib.Unchecked:
             return 0;
-        case Qt.Checked:
-            return root.data (1, Qt.USER_ROLE).to_long_long ();
-        case Qt.PartiallyChecked:
+        case GLib.Checked:
+            return root.data (1, GLib.USER_ROLE).to_long_long ();
+        case GLib.PartiallyChecked:
             break;
         }
 
@@ -186,11 +186,11 @@ public class SelectiveSyncWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_update_directories (GLib.List<string> list) {
-        var lscol_job = qobject_cast<LscolJob> (sender ());
+        var lscol_job = (LscolJob)sender ();
         GLib.ScopedValueRollback<bool> is_inserting (this.inserting);
         this.inserting = true;
 
-        var root = static_cast<SelectiveSyncTreeViewItem> (this.folder_tree.top_level_item (0));
+        var root = (SelectiveSyncTreeViewItem)this.folder_tree.top_level_item (0);
 
         GLib.Uri url = this.account.dav_url ();
         string path_to_remove = url.path;
@@ -234,12 +234,12 @@ public class SelectiveSyncWidget : Gtk.Widget {
             root = new SelectiveSyncTreeViewItem (this.folder_tree);
             root.on_signal_text (0, this.root_name);
             root.icon (0, Theme.application_icon);
-            root.data (0, Qt.USER_ROLE, "");
-            root.check_state (0, Qt.Checked);
+            root.data (0, GLib.USER_ROLE, "");
+            root.check_state (0, GLib.Checked);
             int64 size = lscol_job ? lscol_job.folder_infos[path_to_remove].size : -1;
             if (size >= 0) {
                 root.on_signal_text (1, Utility.octets_to_string (size));
-                root.data (1, Qt.USER_ROLE, size);
+                root.data (1, GLib.USER_ROLE, size);
             }
         }
 
@@ -249,7 +249,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
             path.remove (path_to_remove);
 
             // Don't allow to select subfolders of encrypted subfolders
-            const var is_any_ancestor_encrypted = std.any_of (std.cbegin (this.encrypted_paths), std.cend (this.encrypted_paths), [=] (string encrypted_path) {
+            var is_any_ancestor_encrypted = std.any_of (std.cbegin (this.encrypted_paths), std.cend (this.encrypted_paths), [=] (string encrypted_path) {
                 return path.size () > encrypted_path.size () && path.has_prefix (encrypted_path);
             });
             if (is_any_ancestor_encrypted) {
@@ -269,9 +269,9 @@ public class SelectiveSyncWidget : Gtk.Widget {
 
         // Root is partially checked if any children are not checked
         for (int i = 0; i < root.child_count (); ++i) {
-            const var child = root.child (i);
-            if (child.check_state (0) != Qt.Checked) {
-                root.check_state (0, Qt.PartiallyChecked);
+            var child = root.child (i);
+            if (child.check_state (0) != GLib.Checked) {
+                root.check_state (0, GLib.PartiallyChecked);
                 break;
             }
         }
@@ -283,7 +283,7 @@ public class SelectiveSyncWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_item_expanded (GLib.TreeWidgetItem item) {
-        string directory = item.data (0, Qt.USER_ROLE).to_string ();
+        string directory = item.data (0, GLib.USER_ROLE).to_string ();
         if (directory == "")
             return;
         string prefix;
@@ -310,55 +310,55 @@ public class SelectiveSyncWidget : Gtk.Widget {
         if (col != 0 || this.inserting)
             return;
 
-        if (item.check_state (0) == Qt.Checked) {
+        if (item.check_state (0) == GLib.Checked) {
             // If we are checked, check that we may need to check the parent as well if
             // all the siblings are also checked
             GLib.TreeWidgetItem parent = item.parent ();
-            if (parent && parent.check_state (0) != Qt.Checked) {
+            if (parent && parent.check_state (0) != GLib.Checked) {
                 bool has_unchecked = false;
                 for (int i = 0; i < parent.child_count (); ++i) {
-                    if (parent.child (i).check_state (0) != Qt.Checked) {
+                    if (parent.child (i).check_state (0) != GLib.Checked) {
                         has_unchecked = true;
                         break;
                     }
                 }
                 if (!has_unchecked) {
-                    parent.check_state (0, Qt.Checked);
-                } else if (parent.check_state (0) == Qt.Unchecked) {
-                    parent.check_state (0, Qt.PartiallyChecked);
+                    parent.check_state (0, GLib.Checked);
+                } else if (parent.check_state (0) == GLib.Unchecked) {
+                    parent.check_state (0, GLib.PartiallyChecked);
                 }
             }
             // also check all the children
             for (int i = 0; i < item.child_count (); ++i) {
-                if (item.child (i).check_state (0) != Qt.Checked) {
-                    item.child (i).check_state (0, Qt.Checked);
+                if (item.child (i).check_state (0) != GLib.Checked) {
+                    item.child (i).check_state (0, GLib.Checked);
                 }
             }
         }
 
-        if (item.check_state (0) == Qt.Unchecked) {
+        if (item.check_state (0) == GLib.Unchecked) {
             GLib.TreeWidgetItem parent = item.parent ();
-            if (parent && parent.check_state (0) == Qt.Checked) {
-                parent.check_state (0, Qt.PartiallyChecked);
+            if (parent && parent.check_state (0) == GLib.Checked) {
+                parent.check_state (0, GLib.PartiallyChecked);
             }
 
             // Uncheck all the children
             for (int i = 0; i < item.child_count (); ++i) {
-                if (item.child (i).check_state (0) != Qt.Unchecked) {
-                    item.child (i).check_state (0, Qt.Unchecked);
+                if (item.child (i).check_state (0) != GLib.Unchecked) {
+                    item.child (i).check_state (0, GLib.Unchecked);
                 }
             }
 
             // Can't uncheck the root.
             if (!parent) {
-                item.check_state (0, Qt.PartiallyChecked);
+                item.check_state (0, GLib.PartiallyChecked);
             }
         }
 
-        if (item.check_state (0) == Qt.PartiallyChecked) {
+        if (item.check_state (0) == GLib.PartiallyChecked) {
             GLib.TreeWidgetItem parent = item.parent ();
-            if (parent && parent.check_state (0) != Qt.PartiallyChecked) {
-                parent.check_state (0, Qt.PartiallyChecked);
+            if (parent && parent.check_state (0) != GLib.PartiallyChecked) {
+                parent.check_state (0, GLib.PartiallyChecked);
             }
         }
     }
@@ -379,12 +379,12 @@ public class SelectiveSyncWidget : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private void on_signal_gather_encrypted_paths (string path, GLib.HashTable<string, string> properties) {
-        const var it = properties.find ("is-encrypted");
+        var it = properties.find ("is-encrypted");
         if (it == properties.cend () || *it != "1") {
             return;
         }
 
-        const var webdav_folder = GLib.Uri (this.account.dav_url ()).path;
+        var webdav_folder = GLib.Uri (this.account.dav_url ()).path;
         //  Q_ASSERT (path.has_prefix (webdav_folder));
         // This dialog use the postfix / convention for folder paths
         this.encrypted_paths + path.mid (webdav_folder.size ()) + "/";
@@ -442,32 +442,32 @@ public class SelectiveSyncWidget : Gtk.Widget {
                 path.chop (1);
             }
             parent.tool_tip (0, path);
-            parent.data (0, Qt.USER_ROLE, path);
+            parent.data (0, GLib.USER_ROLE, path);
         } else {
-            var item = static_cast<SelectiveSyncTreeViewItem> (find_first_child (parent, path_trail.first ()));
+            var item = (SelectiveSyncTreeViewItem)find_first_child (parent, path_trail.nth_data (0));
             if (!item) {
                 item = new SelectiveSyncTreeViewItem (parent);
-                if (parent.check_state (0) == Qt.Checked
-                    || parent.check_state (0) == Qt.PartiallyChecked) {
-                    item.check_state (0, Qt.Checked);
+                if (parent.check_state (0) == GLib.Checked
+                    || parent.check_state (0) == GLib.PartiallyChecked) {
+                    item.check_state (0, GLib.Checked);
                     foreach (string string_value, this.old_block_list) {
                         if (string_value == path || string_value == "/") {
-                            item.check_state (0, Qt.Unchecked);
+                            item.check_state (0, GLib.Unchecked);
                             break;
                         } else if (string_value.has_prefix (path)) {
-                            item.check_state (0, Qt.PartiallyChecked);
+                            item.check_state (0, GLib.PartiallyChecked);
                         }
                     }
-                } else if (parent.check_state (0) == Qt.Unchecked) {
-                    item.check_state (0, Qt.Unchecked);
+                } else if (parent.check_state (0) == GLib.Unchecked) {
+                    item.check_state (0, GLib.Unchecked);
                 }
                 item.icon (0, folder_icon);
-                item.on_signal_text (0, path_trail.first ());
+                item.on_signal_text (0, path_trail.nth_data (0));
                 if (size >= 0) {
                     item.on_signal_text (1, Utility.octets_to_string (size));
-                    item.data (1, Qt.USER_ROLE, size);
+                    item.data (1, GLib.USER_ROLE, size);
                 }
-                //            item.data (0, Qt.USER_ROLE, path_trail.first ());
+                //            item.data (0, GLib.USER_ROLE, path_trail.nth_data (0));
                 item.child_indicator_policy (GLib.TreeWidgetItem.ShowIndicator);
             }
 

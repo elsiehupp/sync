@@ -135,7 +135,7 @@ public class SocketApi : GLib.Object {
         GLib.debug ("dtor");
         this.local_server.close ();
         // All remaining sockets will be destroyed with this.local_server, their parent
-        //  ASSERT (this.listeners == "" || this.listeners.first ().socket.parent () == this.local_server)
+        //  ASSERT (this.listeners == "" || this.listeners.nth_data (0).socket.parent () == this.local_server)
         this.listeners = null;
     }
 
@@ -198,7 +198,7 @@ public class SocketApi : GLib.Object {
         }
 
         try {
-            const string message = build_register_path_message (remove_trailing_slash (FolderManager.instance.folder_by_alias (alias).path));
+            string message = build_register_path_message (remove_trailing_slash (FolderManager.instance.folder_by_alias (alias).path));
             foreach (var listener in this.listeners) {
                 GLib.info ("Trying to send SocketApi Register Path Message --> " + message + " to " + listener.socket);
                 listener.on_signal_send_message (message);
@@ -301,7 +301,7 @@ public class SocketApi : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_socket_destroyed (GLib.Object object) {
-        var socket = static_cast<GLib.IODevice> (object);
+        var socket = (GLib.IODevice)object;
         this.listeners.remove (socket);
     }
 
@@ -309,7 +309,7 @@ public class SocketApi : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_read_socket () {
-        var socket = qobject_cast<GLib.IODevice> (sender ());
+        var socket = (GLib.IODevice)sender ();
         //  ASSERT (socket);
 
         // Find the SocketListener
@@ -319,16 +319,16 @@ public class SocketApi : GLib.Object {
         // valid listener. We execute the handler anyway, but it will work with
         // a SocketListener that doesn't send any messages.
         unowned SocketListener invalid_listener = SocketListener.create (null);
-        const var listener = this.listeners.value (socket, invalid_listener);
+        var listener = this.listeners.value (socket, invalid_listener);
         while (socket.can_read_line ()) {
             // Make sure to normalize the input from the socket to
             // make sure that the path will match, especially on OS X.
-            const string line = string.from_utf8 (socket.read_line ().trimmed ()).normalized (string.Normalization_form_C);
+            string line = string.from_utf8 (socket.read_line ().trimmed ()).normalized (string.Normalization_form_C);
             GLib.info ("Received SocketApi message <-- " + line + " from " + socket);
-            const int arg_pos = line.index_of (':');
-            const string command = line.mid_ref (0, arg_pos).to_utf8 ().to_upper ();
+            int arg_pos = line.index_of (':');
+            string command = line.mid_ref (0, arg_pos).to_utf8 ().to_upper ();
 
-            const var argument = arg_pos != -1 ? line.mid_ref (arg_pos + 1) : /* GLib.StringRef */ string ();
+            var argument = arg_pos != -1 ? line.mid_ref (arg_pos + 1) : /* GLib.StringRef */ string ();
             if (command.has_prefix ("ASYNC_")) {
                 var arguments = argument.split ('|');
                 if (arguments.size () != 2) {
@@ -343,7 +343,7 @@ public class SocketApi : GLib.Object {
                 unowned SocketApiJob socket_api_job = new SocketApiJob (job_id.to_string (), listener, json); //, GLib.Object.delete_later);
                 if (index_of_method (command) != -1) {
                     static_meta_object.method (index_of_method (command))
-                        .invoke (this, Qt.QueuedConnection,
+                        .invoke (this, GLib.QueuedConnection,
                             Q_ARG (SocketApiJob, socket_api_job));
                 } else {
                     GLib.warning (
@@ -353,7 +353,7 @@ public class SocketApi : GLib.Object {
                 }
             } else if (command.has_prefix ("V2/")) {
                 Json.ParserError error;
-                const var json = GLib.JsonDocument.from_json (argument.to_utf8 (), error).object ();
+                var json = GLib.JsonDocument.from_json (argument.to_utf8 (), error).object ();
                 if (error.error != Json.ParserError.NoError) {
                     GLib.warning ("Invalid json " + argument.to_string () + error.error_string);
                     listener.send_error (error.error_string);
@@ -362,7 +362,7 @@ public class SocketApi : GLib.Object {
                 unowned SocketApiJobV2 socket_api_job = SocketApiJobV2.create (listener, command, json);
                 if (index_of_method (command) != -1) {
                     static_meta_object.method (index_of_method (command))
-                        .invoke (this, Qt.QueuedConnection,
+                        .invoke (this, GLib.QueuedConnection,
                             Q_ARG (SocketApiJobV2, socket_api_job));
                 } else {
                     GLib.warning (
@@ -372,10 +372,10 @@ public class SocketApi : GLib.Object {
                 }
             } else {
                 if (index_of_method (command) != -1) {
-                    // to ensure that listener is still valid we need to call it with Qt.Direct_connection
+                    // to ensure that listener is still valid we need to call it with GLib.Direct_connection
                     //  ASSERT (thread () == GLib.Thread.current_thread ())
                     static_meta_object.method (index_of_method (command))
-                        .invoke (this, Qt.Direct_connection, Q_ARG (string, argument.to_string ()),
+                        .invoke (this, GLib.Direct_connection, Q_ARG (string, argument.to_string ()),
                             Q_ARG (SocketListener, listener));
                 }
             }
@@ -393,7 +393,7 @@ public class SocketApi : GLib.Object {
             function_with_arguments += command + " (string,SocketListener*)";
         }
         //  Q_ASSERT (static_qt_meta_object.normalized_signature (function_with_arguments) == function_with_arguments);
-        const var output = static_meta_object.index_of_method (function_with_arguments);
+        var output = static_meta_object.index_of_method (function_with_arguments);
         if (output == -1) {
             listener.send_error ("Function %1 not found".printf (string.from_utf8 (function_with_arguments)));
         }
@@ -606,20 +606,20 @@ public class SocketApi : GLib.Object {
         var file_data = FileData.file_data (local_file);
         var share_folder = file_data.folder_connection;
         if (share_folder == null) {
-            const string message = "SHARE:NOP:" + GLib.Dir.to_native_separators (local_file);
+            string message = "SHARE:NOP:" + GLib.Dir.to_native_separators (local_file);
             // files that are not within a sync folder_connection are not synced.
             listener.on_signal_send_message (message);
         } else if (!share_folder.account_state.is_connected) {
-            const string message = "SHARE:NOTCONNECTED:" + GLib.Dir.to_native_separators (local_file);
+            string message = "SHARE:NOTCONNECTED:" + GLib.Dir.to_native_separators (local_file);
             // if the folder_connection isn't connected, don't open the share dialog
             listener.on_signal_send_message (message);
         } else if (!theme.link_sharing && (!theme.user_group_sharing || share_folder.account_state.account.server_version_int < Account.make_server_version (8, 2, 0))) {
-            const string message = "SHARE:NOP:" + GLib.Dir.to_native_separators (local_file);
+            string message = "SHARE:NOP:" + GLib.Dir.to_native_separators (local_file);
             listener.on_signal_send_message (message);
         } else {
             // If the file doesn't have a journal record, it might not be uploaded yet
             if (!file_data.journal_record ().is_valid) {
-                const string message = "SHARE:NOTSYNCED:" + GLib.Dir.to_native_separators (local_file);
+                string message = "SHARE:NOTSYNCED:" + GLib.Dir.to_native_separators (local_file);
                 listener.on_signal_send_message (message);
                 return;
             }
@@ -628,12 +628,12 @@ public class SocketApi : GLib.Object {
 
             // Can't share root folder_connection
             if (remote_path == "/") {
-                const string message = "SHARE:CANNOTSHAREROOT:" + GLib.Dir.to_native_separators (local_file);
+                string message = "SHARE:CANNOTSHAREROOT:" + GLib.Dir.to_native_separators (local_file);
                 listener.on_signal_send_message (message);
                 return;
             }
 
-            const string message = "SHARE:OK:" + GLib.Dir.to_native_separators (local_file);
+            string message = "SHARE:OK:" + GLib.Dir.to_native_separators (local_file);
             listener.on_signal_send_message (message);
 
             /* emit */ signal_share_command_received (remote_path, file_data.local_path, start_page);
@@ -645,7 +645,7 @@ public class SocketApi : GLib.Object {
     Opens share dialog, sends reply
     ***********************************************************/
     private void process_file_activity_request (string local_file) {
-        const var file_data = FileData.file_data (local_file);
+        var file_data = FileData.file_data (local_file);
         /* emit */ signal_file_activity_command_received (file_data.server_relative_path, file_data.local_path);
     }
 
@@ -830,18 +830,18 @@ public class SocketApi : GLib.Object {
     Context menu action
     ***********************************************************/
     private void command_RESOLVE_CONFLICT (string local_file, SocketListener listener) {
-        const var file_data = FileData.file_data (local_file);
+        var file_data = FileData.file_data (local_file);
         if (!file_data.folder_connection || !Utility.is_conflict_file (file_data.folder_relative_path))
             return; // should not have shown menu item
 
-        const var conflicted_relative_path = file_data.folder_relative_path;
-        const var base_relative_path = file_data.folder_connection.journal_database ().conflict_file_base_name (file_data.folder_relative_path.to_utf8 ());
+        var conflicted_relative_path = file_data.folder_relative_path;
+        var base_relative_path = file_data.folder_connection.journal_database ().conflict_file_base_name (file_data.folder_relative_path.to_utf8 ());
 
-        const var directory = GLib.Dir (file_data.folder_connection.path);
-        const var conflicted_path = directory.file_path (conflicted_relative_path);
-        const var base_path = directory.file_path (base_relative_path);
+        var directory = GLib.Dir (file_data.folder_connection.path);
+        var conflicted_path = directory.file_path (conflicted_relative_path);
+        var base_path = directory.file_path (base_relative_path);
 
-        const var base_name = GLib.FileInfo (base_path).filename ();
+        var base_name = GLib.FileInfo (base_path).filename ();
 
     //  #ifndef OWNCLOUD_TEST
         ConflictDialog dialog;
@@ -869,8 +869,8 @@ public class SocketApi : GLib.Object {
     Context menu action
     ***********************************************************/
     private void command_MOVE_ITEM (string local_file, SocketListener listener) {
-        const var file_data = FileData.file_data (local_file);
-        const var parent_dir = file_data.parent_folder ();
+        var file_data = FileData.file_data (local_file);
+        var parent_dir = file_data.parent_folder ();
         if (!file_data.folder_connection)
             return; // should not have shown menu item
 
@@ -883,7 +883,7 @@ public class SocketApi : GLib.Object {
 
         // If the parent doesn't accept new files, go to the root of the sync folder_connection
         GLib.FileInfo file_info = new GLib.FileInfo (local_file);
-        const var parent_record = parent_dir.journal_record ();
+        var parent_record = parent_dir.journal_record ();
         if ((file_info.is_file () && !parent_record.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_ADD_FILE))
             || (file_info.is_dir () && !parent_record.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_ADD_SUB_DIRECTORIES))) {
             default_dir_and_name = GLib.FileInfo (default_dir_and_name).filename ();
@@ -892,7 +892,7 @@ public class SocketApi : GLib.Object {
         // Add back the folder_connection path
         default_dir_and_name = GLib.Dir (file_data.folder_connection.path).file_path (default_dir_and_name);
 
-        const var target = GLib.FileDialog.save_filename (
+        var target = GLib.FileDialog.save_filename (
             null,
             _("Select new location …"),
             default_dir_and_name,
@@ -1090,12 +1090,12 @@ public class SocketApi : GLib.Object {
             }
 
             FileData file_data = FileData.file_data (argument);
-            const var record = file_data.journal_record ();
-            const bool is_on_signal_the_server = record.is_valid;
-            const var is_e2e_encrypted_path = file_data.journal_record ().is_e2e_encrypted || !file_data.journal_record ().e2e_mangled_name == "";
+            var record = file_data.journal_record ();
+            bool is_on_signal_the_server = record.is_valid;
+            var is_e2e_encrypted_path = file_data.journal_record ().is_e2e_encrypted || !file_data.journal_record ().e2e_mangled_name == "";
             var flag_string = is_on_signal_the_server && !is_e2e_encrypted_path ? "." : ":d:";
 
-            const GLib.FileInfo file_info = new GLib.FileInfo (file_data.local_path);
+            GLib.FileInfo file_info = new GLib.FileInfo (file_data.local_path);
             if (!file_info.is_dir ()) {
                 listener.on_signal_send_message ("MENU_ITEM:ACTIVITY" + flag_string + _("Activity"));
             }
@@ -1114,13 +1114,13 @@ public class SocketApi : GLib.Object {
             bool is_conflict = Utility.is_conflict_file (file_data.folder_relative_path);
             if (is_conflict || !is_on_signal_the_server) {
                 // Check whether this new file is in a read-only directory
-                const var parent_dir = file_data.parent_folder ();
-                const var parent_record = parent_dir.journal_record ();
-                const bool can_add_to_dir =
+                var parent_dir = file_data.parent_folder ();
+                var parent_record = parent_dir.journal_record ();
+                bool can_add_to_dir =
                     !parent_record.is_valid // We're likely at the root of the sync folder_connection, got to assume we can add there
                     || (file_info.is_file () && parent_record.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_ADD_FILE))
                     || (file_info.is_dir () && parent_record.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_ADD_SUB_DIRECTORIES));
-                const bool can_change_file =
+                bool can_change_file =
                     !is_on_signal_the_server
                     || (record.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_DELETE)
                         && record.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_MOVE)
@@ -1293,8 +1293,8 @@ public class SocketApi : GLib.Object {
         var capabilities = file_data.folder_connection.account_state.account.capabilities;
 
         if (file_data.folder_connection != null && file_data.folder_connection.account_state.is_connected) {
-            const var record = file_data.journal_record ();
-            const var mime_match_mode = record.is_virtual_file () ? GLib.MimeDatabase.Match_extension : GLib.MimeDatabase.Match_default;
+            var record = file_data.journal_record ();
+            var mime_match_mode = record.is_virtual_file () ? GLib.MimeDatabase.Match_extension : GLib.MimeDatabase.Match_default;
 
             GLib.MimeDatabase database;
             GLib.MimeType type = database.mime_type_for_file (local_file, mime_match_mode);
@@ -1467,7 +1467,7 @@ public class SocketApi : GLib.Object {
         var utf8 = signal_signature.to_utf8 ();
         var signal_signature_final = utf8.const_data ();
         widget.signal_signature_final.connect (
-            closure.on_signal_closure // Qt.QueuedConnection
+            closure.on_signal_closure // GLib.QueuedConnection
         );
     }
 
@@ -1523,7 +1523,7 @@ public class SocketApi : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private static GLib.List<string> split (string data) {
-        const string RECORD_SEPARATOR = '\x1e';
+        string RECORD_SEPARATOR = '\x1e';
         // TODO: string ref?
         return data.split (RECORD_SEPARATOR);
     }

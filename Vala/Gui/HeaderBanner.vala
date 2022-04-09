@@ -151,8 +151,11 @@ public class HeaderBanner : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     public void setup (
-        string title, Gdk.Pixbuf logo, Gdk.Pixbuf banner,
-        Qt.TextFormat title_format, string style_sheet) {
+        string title,
+        Gdk.Pixbuf logo,
+        Gdk.Pixbuf banner,
+        GLib.TextFormat title_format,
+        string style_sheet) {
         GLib.Style style = parent_widget ().this.style;
         //const int layout_horizontal_spacing = style.pixel_metric (GLib.Style.PM_Layout_horizontal_spacing);
         int top_level_margin_left = style.pixel_metric (GLib.Style.PM_Layout_left_margin, null, parent_widget ());
@@ -192,7 +195,7 @@ public class HeaderBanner : Gtk.Widget {
         painter.draw_pixmap (0, 0, width (), banner_pixmap.height (), banner_pixmap);
         int x = width () - 2;
         int y = height () - 2;
-        const Gtk.Palette pal = GLib.Application.palette ();
+        Gtk.Palette pal = GLib.Application.palette ();
         painter.pen (pal.mid ().color ());
         painter.draw_line (0, y, x, y);
         painter.pen (pal.base ().color ());

@@ -70,7 +70,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
         }
         this.transfer_identifier = ((int32)Utility.rand ()) ^ ((uint32)this.item.modtime) ^ ((uint32)this.file_to_upload.size) << 16);
 
-        const Common.SyncJournalDb.UploadInfo progress_info = this.propagator.journal.get_upload_info (this.item.file);
+        Common.SyncJournalDb.UploadInfo progress_info = this.propagator.journal.get_upload_info (this.item.file);
 
         GLib.assert (this.item.modtime > 0);
         if (this.item.modtime <= 0) {
@@ -260,7 +260,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
     /***********************************************************
     ***********************************************************/
     private void on_signal_put_job_finished () {
-        var put_file_job = qobject_cast<PUTFileJob> (sender ());
+        var put_file_job = (PUTFileJob)sender ();
         //  ASSERT (put_file_job);
 
         on_signal_job_destroyed (put_file_job); // remove it from the this.jobs list
@@ -306,7 +306,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
         this.finished = etag.length > 0;
 
         // Check if the file still exists
-        const string full_file_path = this.propagator.full_local_path (this.item.file);
+        string full_file_path = this.propagator.full_local_path (this.item.file);
         if (!FileSystem.file_exists (full_file_path)) {
             if (!this.finished) {
                 abort_with_error (SyncFileItem.Status.SOFT_ERROR, _("The local file was removed during sync."));

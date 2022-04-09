@@ -75,7 +75,7 @@ public class FolderMetadata : GLib.Object {
             We have to already base64 encode the metadatakey here. This was a misunderstanding in the RFC
             Now we should be compatible with Android and IOS. Maybe we can fix it later.
             ***********************************************************/
-            const string encrypted_key = encrypt_metadata_key (it.value ().to_base64 ());
+            string encrypted_key = encrypt_metadata_key (it.value ().to_base64 ());
             metadata_keys.insert (key.key ().to_string (), encrypted_key);
         }
 

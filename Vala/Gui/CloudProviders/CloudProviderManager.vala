@@ -32,7 +32,7 @@ public class CloudProviderManager : GLib.Object {
     public void on_signal_name_acquired (GDBusConnection connection, gchar name, gpointer user_data) {
         //  Q_UNUSED (name);
         CloudProviderManager self;
-        self = static_cast<CloudProviderManager> (user_data);
+        self = (CloudProviderManager)user_data;
         this.provider_exporter = cloud_providers_provider_exporter_new (connection, LIBCLOUDPROVIDERS_DBUS_BUS_NAME, LIBCLOUDPROVIDERS_DBUS_OBJECT_PATH);
         cloud_providers_provider_exporter_name (this.provider_exporter, APPLICATION_NAME);
         self.register_signals ();

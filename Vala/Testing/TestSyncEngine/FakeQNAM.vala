@@ -64,10 +64,10 @@ public class FakeQNAM : Soup {
         var put_payload = outgoing_data.peek (outgoing_data.bytes_available ());
         outgoing_data.on_signal_reset ();
         string string_put_payload = put_payload;
-        const int boundary_position = "multipart/related; boundary=".size ();
-        const string boundary_value = "--" + content_type.mid (boundary_position, content_type.length - boundary_position - 1) + "\r\n";
+        int boundary_position = "multipart/related; boundary=".length;
+        string boundary_value = "--" + content_type.mid (boundary_position, content_type.length - boundary_position - 1) + "\r\n";
         var string_put_payload_reference = string_put_payload.left (string_put_payload.size () - 2 - boundary_value.size ());
-        var all_parts = string_put_payload_reference.split (boundary_value, Qt.SkipEmptyParts);
+        var all_parts = string_put_payload_reference.split (boundary_value, GLib.SkipEmptyParts);
         foreach (var one_part in all_parts) {
             var header_end_position = one_part.index_of ("\r\n\r\n");
             var one_part_header_part = one_part.left (header_end_position);
@@ -121,7 +121,7 @@ public class FakeQNAM : Soup {
             reply = override_reply_with_error (get_file_path_from_url (new_request.url), operation, new_request);
         }
         if (!reply) {
-            const bool is_upload = new_request.url.path.has_prefix (s_upload_url.path);
+            bool is_upload = new_request.url.path.has_prefix (s_upload_url.path);
             FileInfo info = is_upload ? this.upload_file_info : this.remote_root_file_info;
 
             var verb = new_request.attribute (Soup.Request.CustomVerbAttribute);

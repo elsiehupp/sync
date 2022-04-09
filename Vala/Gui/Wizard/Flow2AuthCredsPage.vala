@@ -73,7 +73,7 @@ public class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
     /***********************************************************
     ***********************************************************/
     public void initialize_page () {
-        var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
+        var oc_wizard = (OwncloudWizard)wizard ();
         //  Q_ASSERT (oc_wizard);
         oc_wizard.account.credentials (CredentialsFactory.create ("http"));
 
@@ -113,7 +113,7 @@ public class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
     /***********************************************************
     ***********************************************************/
     public void connected () {
-        var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
+        var oc_wizard = (OwncloudWizard)wizard ();
         //  Q_ASSERT (oc_wizard);
 
         // bring wizard to top
@@ -141,7 +141,7 @@ public class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
                 wizard ().show ();
 
                 /* Don't fallback to HTTP credentials */
-                /*OwncloudWizard oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
+                /*OwncloudWizard oc_wizard = (OwncloudWizard)wizard ();
                 oc_wizard.back ();
                 oc_wizard.on_signal_auth_type (DetermineAuthTypeJob.AuthType.BASIC);*/
                 break;
@@ -153,7 +153,7 @@ public class Flow2AuthCredsPage : AbstractCredentialsWizardPage {
             case Flow2Auth.Result.LOGGED_IN: {
                 this.user = user;
                 this.app_password = app_password;
-                var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
+                var oc_wizard = (OwncloudWizard)wizard ();
                 //  Q_ASSERT (oc_wizard);
 
                 /* emit */ connect_to_oc_url (oc_wizard.account.url.to_string ());

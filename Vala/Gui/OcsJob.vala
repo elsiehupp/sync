@@ -192,7 +192,7 @@ public class OcsJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private override bool on_signal_finished () {
-        const string reply_data = this.reply.read_all ();
+        string reply_data = this.reply.read_all ();
 
         Json.ParserError error;
         string message;

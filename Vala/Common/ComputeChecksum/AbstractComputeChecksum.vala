@@ -42,11 +42,11 @@ abstract class AbstractComputeChecksum : GLib.Object {
         }
         int i = 0;
         // The order of the searches here defines the preference ordering.
-        if (-1 != (i = checksums.index_of ("SHA3-256:", 0, Qt.CaseInsensitive))
-            || -1 != (i = checksums.index_of ("SHA256:", 0, Qt.CaseInsensitive))
-            || -1 != (i = checksums.index_of ("SHA1:", 0, Qt.CaseInsensitive))
-            || -1 != (i = checksums.index_of ("MD5:", 0, Qt.CaseInsensitive))
-            || -1 != (i = checksums.index_of ("ADLER32:", 0, Qt.CaseInsensitive))) {
+        if (-1 != (i = checksums.index_of ("SHA3-256:", 0, GLib.CaseInsensitive))
+            || -1 != (i = checksums.index_of ("SHA256:", 0, GLib.CaseInsensitive))
+            || -1 != (i = checksums.index_of ("SHA1:", 0, GLib.CaseInsensitive))
+            || -1 != (i = checksums.index_of ("MD5:", 0, GLib.CaseInsensitive))
+            || -1 != (i = checksums.index_of ("ADLER32:", 0, GLib.CaseInsensitive))) {
             // Now i is the on_signal_start of the best checksum
             // Grab it until the next space or end of xml or end of string.
             int end = checksums.index_of (' ', i);
@@ -85,7 +85,7 @@ abstract class AbstractComputeChecksum : GLib.Object {
             return true;
         }
 
-        const var index = header.index_of (':');
+        var index = header.index_of (':');
         if (index < 0) {
             return false;
         }
@@ -100,7 +100,7 @@ abstract class AbstractComputeChecksum : GLib.Object {
     Convenience for getting the type from a checksum header, null if none
     ***********************************************************/
     string parse_checksum_header_type (string header) {
-        const var index = header.index_of (':');
+        var index = header.index_of (':');
         if (index < 0) {
             return "";
         }
@@ -143,7 +143,7 @@ abstract class AbstractComputeChecksum : GLib.Object {
         if (device.length == 0) {
             return "";
         }
-        string buf = new string (BUFSIZE, Qt.Uninitialized);
+        string buf = new string (BUFSIZE, GLib.Uninitialized);
 
         uint32 adler = adler32 (0L, Z_NULL, 0);
         int64 size = 0;

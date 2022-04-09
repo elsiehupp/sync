@@ -181,8 +181,8 @@ public class ProgressInfo : GLib.Object {
             this.prev_completed and this.total.
             ***********************************************************/
             private set {
-                this.completed = q_min (value, this.total);
-                this.prev_completed = q_min (this.prev_completed, this.completed);
+                this.completed = int64.min (value, this.total);
+                this.prev_completed = int64.min (this.prev_completed, this.completed);
             }
         }
 
@@ -199,7 +199,7 @@ public class ProgressInfo : GLib.Object {
                 Estimates est;
                 est.estimated_bandwidth = (int64)this.progress_per_sec;
                 if (this.progress_per_sec != 0) {
-                    est.estimated_eta = q_round64 (static_cast<double> (this.total - this.completed) / this.progress_per_sec) * 1000;
+                    est.estimated_eta = GLib.Math.llrint ((double)(this.total - this.completed) / this.progress_per_sec) * 1000;
                 } else {
                     est.estimated_eta = 0; // looks better than int64 max
                 }
@@ -232,7 +232,7 @@ public class ProgressInfo : GLib.Object {
             // Therefore, smoothing starts at 0 and ramps up to its final value over time.
             double smoothing = 0.9 * (1.0 - this.initial_smoothing);
             this.initial_smoothing *= 0.7; // goes from 1 to 0.03 in 10s
-            this.progress_per_sec = smoothing * this.progress_per_sec + (1.0 - smoothing) * static_cast<double> (this.completed - this.prev_completed);
+            this.progress_per_sec = smoothing * this.progress_per_sec + (1.0 - smoothing) * (double) (this.completed - this.prev_completed);
             this.prev_completed = this.completed;
         }
 
@@ -569,9 +569,9 @@ public class ProgressInfo : GLib.Object {
             it.value ().progress.update ();
         }
 
-        this.max_files_per_second = q_max (this.file_progress.progress_per_sec,
+        this.max_files_per_second = double.max (this.file_progress.progress_per_sec,
             this.max_files_per_second);
-        this.max_bytes_per_second = q_max (this.size_progress.progress_per_sec,
+        this.max_bytes_per_second = double.max (this.size_progress.progress_per_sec,
             this.max_bytes_per_second);
     }
 

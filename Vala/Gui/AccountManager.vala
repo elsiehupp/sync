@@ -116,7 +116,7 @@ public class AccountManager : GLib.Object {
                     acc.id = account_id;
                     var acc_state = AccountState.load_from_settings (acc, settings);
                     if (acc_state) {
-                        var jar = qobject_cast<CookieJar> (acc.am.cookie_jar ());
+                        var jar = (Soup.CookieJar)acc.am.cookie_jar ();
                         //  ASSERT (jar);
                         if (jar) {
                             jar.restore (acc.cookie_jar_path);
@@ -284,7 +284,7 @@ public class AccountManager : GLib.Object {
 
         // Save cookies.
         if (acc.am) {
-            var jar = qobject_cast<CookieJar> (acc.am.cookie_jar ());
+            var jar = (Soup.CookieJar)acc.am.cookie_jar ();
             if (jar) {
                 GLib.info ("Saving cookies to " + acc.cookie_jar_path);
                 if (!jar.save (acc.cookie_jar_path)) {
@@ -363,7 +363,7 @@ public class AccountManager : GLib.Object {
 
         // now the server cert, it is in the general group
         settings.begin_group ("General");
-        const var certificates = GLib.SslCertificate.from_data (settings.get_value (CA_CERTS_KEY_C).to_byte_array ());
+        var certificates = GLib.SslCertificate.from_data (settings.get_value (CA_CERTS_KEY_C).to_byte_array ());
         GLib.info ("Restored: " + certificates.length + " unknown certificates.");
         acc.approved_certificates (certificates);
         settings.end_group ();
@@ -524,7 +524,7 @@ public class AccountManager : GLib.Object {
         instance.text_edit.on_signal_text (mnemonic);
         instance.text_edit.focus_widget ();
         instance.text_edit.select_all ();
-        instance.text_edit.alignment (Qt.AlignCenter);
+        instance.text_edit.alignment (GLib.AlignCenter);
         widget.exec ();
         widget.resize (widget.size_hint ());
     }

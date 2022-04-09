@@ -50,7 +50,7 @@ public class CleanupPollsJob : GLib.Object {
             return;
         }
 
-        var info = this.poll_infos.first ();
+        var info = this.poll_infos.nth_data (0);
         this.poll_infos.pop_front ();
         SyncFileItem item = new SyncFileItem ();
         item.file = info.file;
@@ -67,7 +67,7 @@ public class CleanupPollsJob : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_poll_finished () {
-        var poll_job = qobject_cast<PollJob> (sender ());
+        var poll_job = PollJob)sender ();
         //  ASSERT (poll_job);
         if (poll_job.item.status == SyncFileItem.Status.FATAL_ERROR) {
             /* emit */ aborted (poll_job.item.error_string);

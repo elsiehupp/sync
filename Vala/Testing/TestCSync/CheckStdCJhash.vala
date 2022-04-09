@@ -343,7 +343,7 @@ class CheckStdCJhash : GLib.Object {
     /***********************************************************
     ***********************************************************/
     int torture_run_tests (void) {
-        const struct CMUnitTest tests[] = {
+        struct CMUnitTest tests[] = {
                 cmocka_unit_test (check_c_jhash_trials),
                 cmocka_unit_test (check_c_jhash_alignment_problems),
                 cmocka_unit_test (check_c_jhash_null_strings),

@@ -54,7 +54,7 @@ public class TestCheckPathValidityForNewFolder : AbstractTestFolderMan {
 
         // There are folders configured in those folders, url needs to be taken into account : . ERROR
         GLib.Uri url2 = new GLib.Uri (url);
-        const string user = account.credentials ().user ();
+        string user = account.credentials ().user ();
         url2.set_user_name (user);
         //  url  ??? mangled line?
         // The following both fail because they refer to the same account (user and url)

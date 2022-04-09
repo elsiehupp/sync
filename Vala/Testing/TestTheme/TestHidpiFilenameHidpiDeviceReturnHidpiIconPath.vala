@@ -15,8 +15,8 @@ public class TestHidpiFilenameHidpiDeviceReturnHidpiIconPath : AbstractTestTheme
     private TestHidpiFilenameHidpiDeviceReturnHidpiIconPath () {
         FakePaintDevice paint_device;
         paint_device.set_hidpi (true);
-        const Gdk.RGBA background_color = Gdk.RGBA ("#000000");
-        const string icon_name = "wizard-files";
+        Gdk.RGBA background_color = Gdk.RGBA ("#000000");
+        string icon_name = "wizard-files";
 
         var icon_path = Theme.hidpi_filename (icon_name + ".png", background_color, paint_device);
 

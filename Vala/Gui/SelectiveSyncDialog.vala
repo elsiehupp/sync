@@ -39,7 +39,7 @@ public class SelectiveSyncDialog : Gtk.Dialog {
     /***********************************************************
     Dialog for a specific folder_connection (used from the account settings button)
     ***********************************************************/
-    public SelectiveSyncDialog.for_folder (unowned Account account, FolderConnection folder_connection, Gtk.Widget parent = null, Qt.WindowFlags window_flags = {}) {
+    public SelectiveSyncDialog.for_folder (unowned Account account, FolderConnection folder_connection, Gtk.Widget parent = null, GLib.WindowFlags window_flags = {}) {
         base (parent, window_flags);
         this.folder_connection = folder_connection;
         this.ok_button = null; // defined in on_signal_init ()
@@ -61,7 +61,7 @@ public class SelectiveSyncDialog : Gtk.Dialog {
     /***********************************************************
     Dialog for the whole account (Used from the wizard)
     ***********************************************************/
-    public SelectiveSyncDialog.for_path (unowned Account account, string folder_connection, GLib.List<string> blocklist, Gtk.Widget parent = null, Qt.WindowFlags window_flags = {}) {
+    public SelectiveSyncDialog.for_path (unowned Account account, string folder_connection, GLib.List<string> blocklist, Gtk.Widget parent = null, GLib.WindowFlags window_flags = {}) {
         base (parent, window_flags);
         this.folder_connection = null;
         on_signal_init (account);
@@ -130,7 +130,7 @@ public class SelectiveSyncDialog : Gtk.Dialog {
         var layout = new GLib.VBoxLayout (this);
         this.selective_sync = new SelectiveSyncWidget (account, this);
         layout.add_widget (this.selective_sync);
-        var button_box = new GLib.DialogButtonBox (Qt.Horizontal);
+        var button_box = new GLib.DialogButtonBox (GLib.Horizontal);
         this.ok_button = button_box.add_button (GLib.DialogButtonBox.Ok);
         this.ok_button.clicked.connect (
             this.accept

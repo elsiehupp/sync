@@ -96,7 +96,7 @@ public class EmojiCategoriesModel : GLib.AbstractListModel {
     ***********************************************************/
     public override int row_count (GLib.ModelIndex parent = GLib.ModelIndex ()) {
         //  Q_UNUSED (parent);
-        return static_cast<int> (CATEGORIES.size ());
+        return (int)CATEGORIES.size ();
     }
 
 

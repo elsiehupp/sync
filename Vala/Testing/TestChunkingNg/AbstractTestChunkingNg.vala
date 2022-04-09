@@ -32,7 +32,7 @@ public abstract class AbstractTestChunkingNg : GLib.Object {
         GLib.assert_true (size_when_abort < size);
 
         GLib.assert_true (fake_folder.upload_state ().children.length == 1); // the transfer was done with chunking
-        var up_state_children = fake_folder.upload_state ().children.first ().children;
+        var up_state_children = fake_folder.upload_state ().children.nth_data (0).children;
 
         int64 cumulative_size = 0;
         foreach (FileInfo child in up_state_children) {

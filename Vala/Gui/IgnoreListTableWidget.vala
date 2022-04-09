@@ -24,7 +24,7 @@ public class IgnoreListTableWidget : Gtk.Widget {
     public IgnoreListTableWidget (Gtk.Widget parent = new Gtk.Widget ()) {
         base (parent);
         this.instance = new IgnoreListTableWidget ();
-        window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
+        window_flags (window_flags () & ~GLib.WindowContextHelpButtonHint);
         instance.up_ui (this);
 
         instance.description_label.on_signal_text (
@@ -90,14 +90,14 @@ public class IgnoreListTableWidget : Gtk.Widget {
         instance.table_widget.item (new_row, pattern_col, pattern_item);
 
         var deletable_item = new GLib.TableWidgetItem ();
-        deletable_item.flags (Qt.ItemIsUserCheckable | Qt.ItemIsEnabled);
-        deletable_item.check_state (deletable ? Qt.Checked : Qt.Unchecked);
+        deletable_item.flags (GLib.ItemIsUserCheckable | GLib.ItemIsEnabled);
+        deletable_item.check_state (deletable ? GLib.Checked : GLib.Unchecked);
         instance.table_widget.item (new_row, deletable_col, deletable_item);
 
         if (read_only) {
-            pattern_item.flags (pattern_item.flags () ^ Qt.ItemIsEnabled);
+            pattern_item.flags (pattern_item.flags () ^ GLib.ItemIsEnabled);
             pattern_item.tool_tip (read_only_tooltip);
-            deletable_item.flags (deletable_item.flags () ^ Qt.ItemIsEnabled);
+            deletable_item.flags (deletable_item.flags () ^ GLib.ItemIsEnabled);
         }
 
         instance.remove_all_push_button.enabled (true);
@@ -123,9 +123,9 @@ public class IgnoreListTableWidget : Gtk.Widget {
             for (int row = 0; row < instance.table_widget.row_count (); ++row) {
                 GLib.TableWidgetItem pattern_item = instance.table_widget.item (row, pattern_col);
                 GLib.TableWidgetItem deletable_item = instance.table_widget.item (row, deletable_col);
-                if (pattern_item.flags () & Qt.ItemIsEnabled) {
+                if (pattern_item.flags () & GLib.ItemIsEnabled) {
                     string prepend;
-                    if (deletable_item.check_state () == Qt.Checked) {
+                    if (deletable_item.check_state () == GLib.Checked) {
                         prepend = "]";
                     } else if (pattern_item.text ().has_prefix ('#')) {
                         prepend = "\\";
@@ -160,7 +160,7 @@ public class IgnoreListTableWidget : Gtk.Widget {
             return;
         }
 
-        bool enable = item.flags () & Qt.ItemIsEnabled;
+        bool enable = item.flags () & GLib.ItemIsEnabled;
         instance.remove_push_button.enabled (enable);
     }
 

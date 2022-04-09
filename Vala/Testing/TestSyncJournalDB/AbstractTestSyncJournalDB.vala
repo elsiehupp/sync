@@ -23,7 +23,7 @@ public abstract class AbstractTestSyncJournalDB : GLib.Object {
     /***********************************************************
     ***********************************************************/
     ~AbstractTestSyncJournalDB () {
-        const string file = this.database.database_file_path;
+        string file = this.database.database_file_path;
         GLib.File.remove (file);
     }
 

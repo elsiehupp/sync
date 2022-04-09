@@ -43,7 +43,7 @@ public class IconUtils : GLib.Object {
     public static Gdk.Pixbuf pixmap_for_background (string filename, Gdk.RGBA background_color) {
         //  Q_ASSERT (!filename == "");
 
-        const var pixmap_color = background_color.is_valid && !Theme.is_dark_color (background_color)
+        var pixmap_color = background_color.is_valid && !Theme.is_dark_color (background_color)
             ? GLib.Color_constants.Svg.black
             : GLib.Color_constants.Svg.white;
         ;
@@ -82,7 +82,7 @@ public class IconUtils : GLib.Object {
 
 
         // find the first matching svg file
-        const var source_svg = find_svg_file_path (filename, icon_base_colors);
+        var source_svg = find_svg_file_path (filename, icon_base_colors);
 
         //  Q_ASSERT (!source_svg == "");
         if (source_svg == "") {
@@ -123,9 +123,9 @@ public class IconUtils : GLib.Object {
     public static Gdk.Pixbuf create_svg_pixmap_with_custom_color_cached (string filename, Gdk.RGBA custom_color, Gdk.Rectangle original_size = null, Gdk.Rectangle requested_size = {}) {
         Gdk.Pixbuf cached_pixmap;
 
-        const var custom_color_name = custom_color.name ();
+        var custom_color_name = custom_color.name ();
 
-        const string cache_key = filename + "," + custom_color_name.to_string ();
+        string cache_key = filename + "," + custom_color_name.to_string ();
 
         // check for existing Gdk.Pixbuf in cache
         if (GLib.PixmapCache.find (cache_key, cached_pixmap)) {
@@ -155,7 +155,7 @@ public class IconUtils : GLib.Object {
             return {};
         }
 
-        const var req_size = requested_size.is_valid ? requested_size : svg_renderer.default_size ();
+        var req_size = requested_size.is_valid ? requested_size : svg_renderer.default_size ();
 
         if (original_size != null) {
             *original_size = svg_renderer.default_size ();
@@ -164,7 +164,7 @@ public class IconUtils : GLib.Object {
         // render source image
         Gtk.Image svg_image = new Gtk.Image (req_size, Gtk.Image.FormatARGB32); {
             GLib.Painter svg_image_painter = new GLib.Painter (svg_image);
-            svg_image.fill (Qt.GlobalColor.transparent);
+            svg_image.fill (GLib.GlobalColor.transparent);
             svg_renderer.render (svg_image_painter);
         }
 

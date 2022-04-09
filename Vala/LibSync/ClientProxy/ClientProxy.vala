@@ -120,7 +120,7 @@ public class ClientProxy : GLib.Object {
                     query.protocol_tag ("http");
                     query.query_type (GLib.NetworkProxyQuery.TcpSocket);
                     var proxies = Soup.NetworkProxyFactory.proxy_for_query (query);
-                    proxy = proxies.first ();
+                    proxy = proxies.nth_data (0);
                 }
                 Soup.NetworkProxyFactory.use_system_configuration (false);
                 Soup.ProxyResolverDefault.application_proxy (proxy);

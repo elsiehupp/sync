@@ -98,7 +98,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         this.max_sharing_permissions = max_sharing_permissions;
         this.private_link_url = private_link_url;
         this.disable_completer_activated = false;
-        attribute (Qt.WA_DeleteOnClose);
+        attribute (GLib.WA_DeleteOnClose);
         object_name ("Sharing_dialog_uG"); // required as group for save_geometry call
 
         this.instance.up_ui (this);
@@ -121,7 +121,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
         );
 
         this.completer.model (this.completer_model);
-        this.completer.case_sensitivity (Qt.CaseInsensitive);
+        this.completer.case_sensitivity (GLib.CaseInsensitive);
         this.completer.completion_mode (GLib.Completer.Unfiltered_popup_completion);
         this.instance.sharee_line_edit.completer (this.completer);
 
@@ -160,15 +160,15 @@ public class ShareUserGroupWidget : Gtk.Widget {
         // By making the next two Queued_connections we can override
         // the strings the completer sets on the line edit.
         this.completer.activated.connect (
-            this.on_signal_completer_activated // Qt.QueuedConnection
+            this.on_signal_completer_activated // GLib.QueuedConnection
         );
         this.completer.highlighted.connect (
-            this.on_signal_completer_highlighted // Qt.QueuedConnection
+            this.on_signal_completer_highlighted // GLib.QueuedConnection
         );
 
         // Queued connection so this signal is recieved after text_changed
         this.instance.sharee_line_edit.text_edited.connect (
-            this.on_signal_sharee_line_edit_text_edited // Qt.QueuedConnection
+            this.on_signal_sharee_line_edit_text_edited // GLib.QueuedConnection
         );
         this.instance.sharee_line_edit.install_event_filter (this);
         this.completion_timer.timeout.connect (
@@ -263,7 +263,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
             }
 
             //  Q_ASSERT (Share.is_share_type_user_group_email_room_or_remote (share.share_type));
-            var user_group_share = q_shared_pointer_dynamic_cast<UserGroupShare> (share);
+            var user_group_share = (UserGroupShare)share;
             var share_user_line = new ShareUserLine (this.account, user_group_share, this.max_sharing_permissions, this.is_file, this.parent_scroll_area);
             share_user_line.resize_requested.connect (
                 this.on_signal_adjust_scroll_widget_size
@@ -374,9 +374,9 @@ public class ShareUserGroupWidget : Gtk.Widget {
     private void on_signal_line_edit_return () {
         this.disable_completer_activated = false;
         // did the user type in one of the options?
-        const var text = this.instance.sharee_line_edit.text ();
+        var text = this.instance.sharee_line_edit.text ();
         for (int i = 0; i < this.completer_model.row_count (); ++i) {
-            const var sharee = this.completer_model.sharee (i);
+            var sharee = this.completer_model.sharee (i);
             if (sharee.to_string () == text
                 || sharee.display_name == text
                 || sharee.share_with () == text) {
@@ -400,7 +400,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
             return;
         // The index is an index from the GLib.Completion model which is itelf a proxy
         // model proxying the this.completer_model
-        var sharee = qvariant_cast<unowned Sharee> (index.data (Qt.USER_ROLE));
+        var sharee = (unowned Sharee)index.data (GLib.USER_ROLE);
         if (sharee == null) {
             return;
         }
@@ -460,7 +460,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
     private void on_signal_completer_highlighted (GLib.ModelIndex index) {
         // By default the completer would set the text to EditRole,
         // override that here.
-        this.instance.sharee_line_edit.on_signal_text (index.data (Qt.Display_role).to_string ());
+        this.instance.sharee_line_edit.on_signal_text (index.data (GLib.Display_role).to_string ());
     }
 
 
@@ -483,14 +483,14 @@ public class ShareUserGroupWidget : Gtk.Widget {
     ***********************************************************/
     private void on_signal_adjust_scroll_widget_size () {
         GLib.Scroll_area scroll_area = this.parent_scroll_area;
-        const ShareUserLine share_user_line_childs = scroll_area.find_children<ShareUserLine> ();
+        ShareUserLine share_user_line_childs = scroll_area.find_children<ShareUserLine> ();
 
         // Ask the child widgets to calculate their size
         foreach (var share_user_line_child in share_user_line_childs) {
             share_user_line_child.adjust_size ();
         }
 
-        const int share_user_line_childs_count = share_user_line_childs.length;
+        int share_user_line_childs_count = share_user_line_childs.length;
         scroll_area.visible (share_user_line_childs_count > 0);
         if (share_user_line_childs_count > 0 && share_user_line_childs_count <= 3) {
             scroll_area.fixed_height (scroll_area.widget ().size_hint ().height ());
@@ -503,7 +503,7 @@ public class ShareUserGroupWidget : Gtk.Widget {
     ***********************************************************/
     private void on_signal_private_link_share () {
         var menu = new GLib.Menu (this);
-        menu.attribute (Qt.WA_DeleteOnClose);
+        menu.attribute (GLib.WA_DeleteOnClose);
 
         // this icon is not handled by on_signal_style_changed () . customize_style but we can live with that
         menu.add_action (

@@ -147,13 +147,13 @@ public class Logger : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void do_log (QtMsgType type, GLib.MessageLogContext context, string message) {
-        const string message = q_format_log_message (type, context, message);
+        string message = q_format_log_message (type, context, message);
         {
             GLib.MutexLocker lock = new GLib.MutexLocker (this.mutex);
             this.crash_log_index = (this.crash_log_index + 1) % CRASH_LOG_SIZE;
             this.crash_log[this.crash_log_index] = message;
             if (this.logstream != null) {
-                (*this.logstream) + message + Qt.endl;
+                (*this.logstream) + message + GLib.endl;
                 if (this.do_file_flush) {
                     this.logstream.flush ();
                 }
@@ -279,7 +279,7 @@ public class Logger : GLib.Object {
             // Expire old log files and deal with conflicts
             GLib.List<string> files = directory.entry_list (GLib.List<string> ("*owncloud.log.*"),
                 GLib.Dir.Files, GLib.Dir.Name);
-            const GLib.Regex regular_expression = new GLib.Regex (GLib.Regex.anchored_pattern (" (.*owncloud\.log\. (\d+).*)"));
+            GLib.Regex regular_expression = new GLib.Regex (GLib.Regex.anchored_pattern (" (.*owncloud\.log\. (\d+).*)"));
             int max_number = -1;
             foreach (string s in files) {
                 if (this.log_expire > 0) {
@@ -290,7 +290,7 @@ public class Logger : GLib.Object {
                 }
                 var regular_expression_match = regular_expression.match (s);
                 if (s.has_prefix (new_log_name) && regular_expression_match.has_match ()) {
-                    max_number = q_max (max_number, regular_expression_match.captured (1).to_int ());
+                    max_number = int.max (max_number, regular_expression_match.captured (1).to_int ());
                 }
             }
             new_log_name.append ("." + string.number (max_number + 1));

@@ -182,7 +182,7 @@ public class WebFlowCredentials : AbstractCredentials {
 
         this.account.delete_app_password ();
 
-        const string keychain_key = keychain_key (this.account.url.to_string (), this.user, this.account.identifier);
+        string keychain_key = keychain_key (this.account.url.to_string (), this.user, this.account.identifier);
         if (keychain_key == "") {
             GLib.debug ("InvalidateToken: User is empty, bailing out!");
             return;
@@ -371,7 +371,7 @@ public class WebFlowCredentials : AbstractCredentials {
         }
 
         // Now fetch the actual server password
-        const string keychain_key = keychain_key (
+        string keychain_key = keychain_key (
             this.account.url.to_string (),
             this.user,
             this.keychain_migration ? "" : this.account.identifier
@@ -393,7 +393,7 @@ public class WebFlowCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     private void on_signal_read_password_job_finished (Secret.Collection.Job incoming_job) {
-        var read_password_job = qobject_cast<ReadPasswordJob> (incoming_job);
+        var read_password_job = (ReadPasswordJob)incoming_job;
         Secret.Collection.Error error = read_password_job.error;
 
         // If we could not find the entry try the old entries
@@ -671,7 +671,7 @@ public class WebFlowCredentials : AbstractCredentials {
 
         // Compare the re-entered username case-insensitive and save the new value (avoid breaking the account)
         // See issue : https://github.com/nextcloud/desktop/issues/1741
-        if (string.compare (this.user, user, Qt.CaseInsensitive) == 0) {
+        if (string.compare (this.user, user, GLib.CaseInsensitive) == 0) {
             this.user = user;
         } else {
             GLib.info ("Authed with the wrong user!");

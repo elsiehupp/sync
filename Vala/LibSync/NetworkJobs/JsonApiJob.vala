@@ -148,7 +148,7 @@ public class JsonApiJob : AbstractNetworkJob {
 
         string json_str = string.from_utf8 (this.reply.read_all ());
         if (json_str.contains ("<?xml version=\"1.0\"?>")) {
-            const GLib.Regex regular_expression = new GLib.Regex ("<statuscode> (\\d+)</statuscode>");
+            GLib.Regex regular_expression = new GLib.Regex ("<statuscode> (\\d+)</statuscode>");
             var rex_match = regular_expression.match (json_str);
             if (rex_match.has_match ()) {
                 // this is a error message coming back from ocs.
@@ -158,7 +158,7 @@ public class JsonApiJob : AbstractNetworkJob {
             GLib.warning ("Nothing changed so nothing to retrieve - status code: " + http_status_code);
             status_code = http_status_code;
         } else {
-            const GLib.Regex regular_expression = new GLib.Regex (" (\"statuscode\" : (\\d+))");
+            GLib.Regex regular_expression = new GLib.Regex (" (\"statuscode\" : (\\d+))");
             // example: "{"ocs":{"meta":{"status":"ok","statuscode":100,"message":null},"data":{"version":{"major":8,"minor":"... (504)
             var regular_expression_match = regular_expression.match (json_str);
             if (regular_expression_match.has_match ()) {

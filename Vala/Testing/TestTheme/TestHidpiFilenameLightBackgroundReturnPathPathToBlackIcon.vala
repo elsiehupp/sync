@@ -14,8 +14,8 @@ public class TestHidpiFilenameLightBackgroundReturnPathPathToBlackIcon : Abstrac
     ***********************************************************/
     private TestHidpiFilenameLightBackgroundReturnPathPathToBlackIcon () {
         FakePaintDevice paint_device;
-        const Gdk.RGBA background_color = Gdk.RGBA ("#ffffff");
-        const string icon_name = "icon-name";
+        Gdk.RGBA background_color = Gdk.RGBA ("#ffffff");
+        string icon_name = "icon-name";
 
         var icon_path = Theme.hidpi_filename (icon_name + ".png", background_color, paint_device);
 

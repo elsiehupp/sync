@@ -13,8 +13,8 @@ public class TestMovedWithError : AbstractTestSyncMove {
     ***********************************************************/
     private TestMovedWithError () {
         GLib.FETCH (VfsMode, vfs_mode);
-        const string src = "folder/folder_a/file.txt";
-        const string dest = "folder/folder_b/file.txt";
+        string src = "folder/folder_a/file.txt";
+        string dest = "folder/folder_b/file.txt";
         FakeFolder fake_folder = new FakeFolder (
             new FileInfo (
                 "", {

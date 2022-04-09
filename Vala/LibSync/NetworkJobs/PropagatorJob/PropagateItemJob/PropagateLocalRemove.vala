@@ -33,7 +33,7 @@ public class PropagateLocalRemove : AbstractPropagateItemJob {
         if (this.propagator.abort_requested)
             return;
 
-        const string filename = this.propagator.full_local_path (this.item.file);
+        string filename = this.propagator.full_local_path (this.item.file);
         GLib.info ("Going to delete:" + filename);
 
         if (this.propagator.local_filename_clash (this.item.file)) {

@@ -21,8 +21,8 @@ public class TestSetUserStatusEmojiPredefinedStatusWasSetUserStatusSetCorrect : 
             UserStatusSelectorModel.on_signal_finished
         );
 
-        const string user_status_icon = "❤";
-        const LibSync.UserStatus.OnlineStatus user_status_state = LibSync.UserStatus.OnlineStatus.Online;
+        string user_status_icon = "❤";
+        LibSync.UserStatus.OnlineStatus user_status_state = LibSync.UserStatus.OnlineStatus.Online;
 
         model.set_online_status (user_status_state);
         model.set_user_status_emoji (user_status_icon);

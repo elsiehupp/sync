@@ -14,10 +14,10 @@ public class TestHidpiFilenameDarkBackgroundReturnPathPathToWhiteIcon : Abstract
     ***********************************************************/
     private TestHidpiFilenameDarkBackgroundReturnPathPathToWhiteIcon () {
         FakePaintDevice paint_device;
-        const Gdk.RGBA background_color = Gdk.RGBA ("#000000");
-        const string icon_name = "icon-name";
+        Gdk.RGBA background_color = Gdk.RGBA ("#000000");
+        string icon_name = "icon-name";
 
-        const string icon_path = Theme.hidpi_filename (icon_name + ".png", background_color, paint_device);
+        string icon_path = Theme.hidpi_filename (icon_name + ".png", background_color, paint_device);
 
         GLib.assert_true (icon_path == ":/client/theme/white/" + icon_name + ".png");
     }

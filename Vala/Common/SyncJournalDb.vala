@@ -123,13 +123,15 @@ public class SyncJournalDb : GLib.Object {
             query.exec ();
 
             var next = query.next ();
-            if (!next.ok)
+            if (!next.ok) {
                 return {};
+            }
             // no-entry means PinState.INHERITED
-            if (!next.has_data)
+            if (!next.has_data) {
                 return PinState.PinState.INHERITED;
+            }
 
-            return static_cast<PinState> (query.int_value (0));
+            return (PinState)query.int_value (0);
         }
 
 
@@ -169,10 +171,11 @@ public class SyncJournalDb : GLib.Object {
             if (!next.ok)
                 return {};
             // If the root path has no setting, assume PinState.ALWAYS_LOCAL
-            if (!next.has_data)
-                return PinState.PinState.ALWAYS_LOCAL;
+            if (!next.has_data) {
+                return PinState.ALWAYS_LOCAL;
+            }
 
-            return static_cast<PinState> (query.int_value (0));
+            return (PinState)query.int_value (0);
         }
 
 
@@ -218,7 +221,7 @@ public class SyncJournalDb : GLib.Object {
                     return {};
                 if (!next.has_data)
                     break;
-                PreparedSqlQuery sub_pin = static_cast<PinState> (query.int_value (0));
+                PreparedSqlQuery sub_pin = (PinState)query.int_value (0);
                 if (sub_pin != *base_pin)
                     return PinState.PinState.INHERITED;
             }
@@ -299,7 +302,7 @@ public class SyncJournalDb : GLib.Object {
                 if (!next.has_data)
                     break;
                 result.append ({
-                    query.byte_array_value (0), static_cast<PinState> (query.int_value (1))
+                    query.byte_array_value (0), (PinState)query.int_value (1)
                 });
             }
             return new Optional<GLib.List<string>> (result);
@@ -810,7 +813,7 @@ public class SyncJournalDb : GLib.Object {
             + "file_size:" + record.file_size + "checksum:" + record.checksum_header
             + "e2e_mangled_name:" + record.e2e_mangled_name ("is_e2e_encrypted:") + record.is_e2e_encrypted);
 
-        const int64 phash = get_pHash (record.path);
+        int64 phash = get_pHash (record.path);
         if (check_connect ()) {
             int plen = record.path.length;
 
@@ -941,7 +944,7 @@ public class SyncJournalDb : GLib.Object {
                     return false;
                 }
 
-                const int64 phash = get_pHash (filename.to_utf8 ());
+                int64 phash = get_pHash (filename.to_utf8 ());
                 query.bind_value (1, phash);
 
                 if (!query.exec ()) {
@@ -978,7 +981,7 @@ public class SyncJournalDb : GLib.Object {
 
         GLib.info ("Updating file checksum" + filename + content_checksum + content_checksum_type);
 
-        const int64 phash = get_pHash (filename.to_utf8 ());
+        int64 phash = get_pHash (filename.to_utf8 ());
         if (!check_connect ()) {
             GLib.warning ("Failed to connect database.");
             return false;
@@ -1010,7 +1013,7 @@ public class SyncJournalDb : GLib.Object {
 
         GLib.info ("Updating local metadata for:" + filename + modtime.to_string () + size.to_string () + inode.to_string ());
 
-        const int64 phash = get_pHash (filename.to_utf8 ());
+        int64 phash = get_pHash (filename.to_utf8 ());
         if (!check_connect ()) {
             GLib.warning ("Failed to connect database.");
             return false;
@@ -1062,7 +1065,7 @@ public class SyncJournalDb : GLib.Object {
                 return {};
             if (!next.has_data)
                 break;
-            var type = static_cast<ItemType> (query.int_value (0));
+            var type = (ItemType)query.int_value (0);
             if (type == ItemType.FILE || type == ItemType.VIRTUAL_FILE_DEHYDRATION)
                 result.has_hydrated = true;
             if (type == ItemType.VIRTUAL_FILE || type == ItemType.VIRTUAL_FILE_DOWNLOAD)
@@ -1321,7 +1324,7 @@ public class SyncJournalDb : GLib.Object {
         GLib.List<SyncJournalDb.DownloadInfo> deleted_entries;
 
         while (query.next ().has_data) {
-            const string file = query.string_value (3); // path
+            string file = query.string_value (3); // path
             if (!keep.contains (file)) {
                 superfluous_paths.append (file);
                 DownloadInfo info;
@@ -1460,7 +1463,7 @@ public class SyncJournalDb : GLib.Object {
         GLib.List<string> superfluous_paths = new GLib.List<string> ()
 
         while (query.next ().has_data) {
-            const string file = query.string_value (0);
+            string file = query.string_value (0);
             if (!keep.contains (file)) {
                 superfluous_paths.append (file);
                 ids.append (query.int_value (1));
@@ -1494,8 +1497,7 @@ public class SyncJournalDb : GLib.Object {
                     entry.last_try_time = query.int64_value (4);
                     entry.ignore_duration = query.int64_value (5);
                     entry.rename_target = query.string_value (6);
-                    entry.error_category = static_cast<SyncJournalErrorBlocklistRecord.Category> (
-                        query.int_value (7));
+                    entry.error_category = (SyncJournalErrorBlocklistRecord.Category)query.int_value (7);
                     entry.request_id = query.byte_array_value (8);
                     entry.file = file;
                 }
@@ -1525,7 +1527,7 @@ public class SyncJournalDb : GLib.Object {
         GLib.List<string> superfluous_paths = new GLib.List<string> ()
 
         while (query.next ().has_data) {
-            const string file = query.string_value (0);
+            string file = query.string_value (0);
             if (!keep.contains (file)) {
                 superfluous_paths.append (file);
             }
@@ -2552,7 +2554,7 @@ public class SyncJournalDb : GLib.Object {
         //      null,
         //      [] (sqlite3_context context, int, sqlite3_value **argv) {
         //          var text = (const char)sqlite3_value_text (argv[0]);
-        //          const string end = std.strrchr (text, "/");
+        //          string end = std.strrchr (text, "/");
         //          if (!end) {
         //              end = text;
         //          }
@@ -2910,7 +2912,7 @@ public class SyncJournalDb : GLib.Object {
         record.path = query.byte_array_value (0);
         record.inode = query.int64_value (1);
         record.modtime = query.int64_value (2);
-        record.type = static_cast<ItemType> (query.int_value (3));
+        record.type = (ItemType)query.int_value (3);
         record.etag = query.byte_array_value (4);
         record.file_id = query.byte_array_value (5);
         record.remote_permissions = RemotePermissions.from_database_value (query.byte_array_value (6));

@@ -15,7 +15,7 @@ public class TestUserStatusSupportsEmoji_SupportsEmojiAvailableReturnTrue : GLib
         GLib.VariantMap capabilities_map;
         capabilities_map["user_status"] = user_status_map;
 
-        const Capabilities capabilities = new Capabilities (capabilities_map);
+        Capabilities capabilities = new Capabilities (capabilities_map);
 
         GLib.assert_true (capabilities.user_status ());
     }

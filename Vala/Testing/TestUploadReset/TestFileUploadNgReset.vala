@@ -29,7 +29,7 @@ public class TestFileUploadNgReset : GLib.Object {
             }
         });
 
-        const int size = 100 * 1000 * 1000; // 100 MB
+        int size = 100 * 1000 * 1000; // 100 MB
         fake_folder.local_modifier.insert ("A/a0", size);
         GLib.DateTime modification_time = GLib.DateTime.current_date_time ();
         fake_folder.local_modifier.set_modification_time ("A/a0", modification_time);

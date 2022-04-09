@@ -198,7 +198,7 @@ public class UserInfo : GLib.Object {
         if (can_get_info ()) {
             // Obviously assumes there will never be more than thousand of hours between last info
             // received and now, hence why we static_cast
-            var elapsed = static_cast<int> (this.last_info_received.msecs_to (GLib.DateTime.current_date_time ()));
+            var elapsed = (int)this.last_info_received.msecs_to (GLib.DateTime.current_date_time ());
             if (this.last_info_received == null || elapsed >= DEFAULT_INTERVAL_T) {
                 on_signal_fetch_info ();
             } else {

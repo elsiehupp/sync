@@ -226,7 +226,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
 
         string temporary_filename;
         string expected_etag_for_resume;
-        const Common.SyncJournalDb.DownloadInfo progress_info = this.propagator.journal.get_download_info (this.item.file);
+        Common.SyncJournalDb.DownloadInfo progress_info = this.propagator.journal.get_download_info (this.item.file);
         if (progress_info.valid) {
             // if the etag has changed meanwhile, remove the already downloaded part.
             if (progress_info.etag != this.item.etag) {
@@ -339,7 +339,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
         if (err != GLib.InputStream.NoError) {
             // If we sent a 'Range' header and get 416 back, we want to retry
             // without the header.
-            const bool bad_range_header = get_file_job.resume_start () > 0 && this.item.http_error_code == 416;
+            bool bad_range_header = get_file_job.resume_start () > 0 && this.item.http_error_code == 416;
             if (bad_range_header) {
                 GLib.warning ("Server replied 416 to our range request, trying again without.");
                 this.propagator.another_sync_needed = true;
@@ -513,7 +513,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
     Called when the download's checksum header was signal_validated
     ***********************************************************/
     private void on_signal_validate_checksum_header_validated (string checksum_type, string checksum) {
-        const string the_content_checksum_type = this.propagator.account.capabilities.preferred_upload_checksum_type;
+        string the_content_checksum_type = this.propagator.account.capabilities.preferred_upload_checksum_type;
 
         // Reuse transmission checksum as content checksum.
         //
@@ -701,7 +701,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
     Called when it's time to update the database metadata
     ***********************************************************/
     private void update_metadata (bool is_conflict) {
-        const string fn = this.propagator.full_local_path (this.item.file);
+        string fn = this.propagator.full_local_path (this.item.file);
         var result = this.propagator.update_metadata (*this.item);
         if (!result) {
             on_signal_done (SyncFileItem.Status.FATAL_ERROR, _("Error updating metadata : %1").printf (result.error));
@@ -897,7 +897,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
             temporary_path = previous.left (slash_pos);
         }
         int overhead = 1 + 1 + 2 + 8; // slash dot dot-tilde ffffffff"
-        int space_for_filename = q_min (254, temporary_filename.length + overhead) - overhead;
+        int space_for_filename = int.min (254, temporary_filename.length + overhead) - overhead;
         if (temporary_path.length > 0) {
             return temporary_path + "/" + "." + temporary_filename.left (space_for_filename) + ".~" + (string.number (uint32 (Utility.rand () % 0x_f_f_f_f_f_f_f_f), 16));
         } else {

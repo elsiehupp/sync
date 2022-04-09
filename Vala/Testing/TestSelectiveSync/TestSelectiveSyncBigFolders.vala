@@ -44,8 +44,8 @@ public class TestSelectiveSyncBigFolders : GLib.Object {
         GLib.assert_true (fake_folder.sync_once ());
 
         GLib.assert_true (signal_new_big_folder.length == 1);
-        GLib.assert_true (signal_new_big_folder.first ()[0].to_string () == "A/new_big_dir");
-        GLib.assert_true (signal_new_big_folder.first ()[1].to_bool () == false);
+        GLib.assert_true (signal_new_big_folder.nth_data (0)[0].to_string () == "A/new_big_dir");
+        GLib.assert_true (signal_new_big_folder.nth_data (0)[1].to_bool () == false);
         signal_new_big_folder == "";
 
         GLib.assert_true (size_requests.length == 2); // "A/new_big_dir" and "B/new_small_dir";

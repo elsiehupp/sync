@@ -206,7 +206,7 @@ public class OwncloudPropagator : GLib.Object {
         foreach (unowned SyncFileItem item in synced_items) {
             if (!removed_directory == "" && item.file.has_prefix (removed_directory)) {
                 // this is an item in a directory which is going to be removed.
-                var del_dir_job = qobject_cast<PropagateDirectory> (directories_to_remove.first ());
+                var del_dir_job = (PropagateDirectory)directories_to_remove.nth_data (0);
 
                 var is_new_directory = item.is_directory () &&
                         (item.instruction == CSync.SyncInstructions.NEW || item.instruction == CSync.SyncInstructions.TYPE_CHANGE);
@@ -391,7 +391,7 @@ public class OwncloudPropagator : GLib.Object {
     chunk-upload duration set.
     ***********************************************************/
     public int64 small_file_size () {
-        const int64 small_file_size = 100 * 1024; //default to 1 MB. Not dynamic right now.
+        int64 small_file_size = 100 * 1024; //default to 1 MB. Not dynamic right now.
         return small_file_size;
     }
 
@@ -412,7 +412,7 @@ public class OwncloudPropagator : GLib.Object {
     in filesystems that are only case-preserving.
     ***********************************************************/
     public bool local_filename_clash (string relfile) {
-        const string file = this.local_dir + rel_file;
+        string file = this.local_dir + rel_file;
         GLib.assert (!file == "");
 
         if (!file == "" && Utility.fs_case_preserving ()) {
@@ -420,7 +420,7 @@ public class OwncloudPropagator : GLib.Object {
             // On Linux, the file system is case sensitive, but this code is useful for testing.
             // Just check that there is no other file with the same name and different casing.
             GLib.FileInfo file_info = GLib.File.new_for_path (file);
-            const string fn = file_info.filename ();
+            string fn = file_info.filename ();
             GLib.List<string> list = file_info.directory ().entry_list ({
                 fn
             });
@@ -570,7 +570,7 @@ public class OwncloudPropagator : GLib.Object {
             );
 
             // Use Queued Connection because we're possibly already in an item's on_signal_finished stack
-            GLib.Object.invoke_method (this.propagate_root_directory_job, "abort", Qt.QueuedConnection,
+            GLib.Object.invoke_method (this.propagate_root_directory_job, "abort", GLib.QueuedConnection,
                                       Q_ARG (AbstractPropagatorJob.AbortType, AbstractPropagatorJob.AbortType.ASYNCHRONOUS));
 
             // Give asynchronous abort 5000 msec to finish on its own
@@ -598,7 +598,7 @@ public class OwncloudPropagator : GLib.Object {
     all jobs that are currently running.
     ***********************************************************/
     public DiskSpaceResult disk_space_check () {
-        const int64 free_bytes = Utility.free_disk_space (this.local_dir);
+        int64 free_bytes = Utility.free_disk_space (this.local_dir);
         if (free_bytes < 0) {
             return DiskSpaceResult.OK;
         }
@@ -922,7 +922,7 @@ public class OwncloudPropagator : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private static int64 get_min_blocklist_time () {
-        return q_max (q_environment_variable_int_value ("OWNCLOUD_BLOCKLIST_TIME_MIN"),
+        return int64.max (q_environment_variable_int_value ("OWNCLOUD_BLOCKLIST_TIME_MIN"),
             25); // 25 seconds
     }
 
@@ -956,14 +956,14 @@ public class OwncloudPropagator : GLib.Object {
         entry.request_id = item.request_id;
 
         OwncloudPropagator.min_blocklist_time = get_min_blocklist_time ();
-        OwncloudPropagator.max_blocklist_time = q_max (get_max_blocklist_time (), min_blocklist_time);
+        OwncloudPropagator.max_blocklist_time = int64.max (get_max_blocklist_time (), min_blocklist_time);
 
         // The factor of 5 feels natural : 25s, 2 min, 10 min, ~1h, ~5h, ~24h
         entry.ignore_duration = old.ignore_duration * 5;
 
         if (item.http_error_code == 403) {
             GLib.warning ("Probably firewall error: " + item.http_error_code.to_string () + ", blocklisting up to 1h only.");
-            entry.ignore_duration = q_min (entry.ignore_duration, int64 (60 * 60));
+            entry.ignore_duration = int64.min (entry.ignore_duration, int64 (60 * 60));
 
         } else if (item.http_error_code == 413 || item.http_error_code == 415) {
             GLib.warning ("Fatal Error condition " + item.http_error_code.to_string () + ", maximum blocklist ignore time!");
@@ -1051,7 +1051,7 @@ public class OwncloudPropagator : GLib.Object {
     ***********************************************************/
     public static bool file_is_still_changing (SyncFileItem item) {
         var modtime = Utility.q_date_time_from_time_t (item.modtime);
-        const int64 ms_since_mod = modtime.msecs_to (GLib.DateTime.current_date_time_utc ());
+        int64 ms_since_mod = modtime.msecs_to (GLib.DateTime.current_date_time_utc ());
 
         return GLib.TimeSpan (ms_since_mod) < SyncEngine.minimum_file_age_for_upload
             // if the mtime is too much in the future we do* upload the file

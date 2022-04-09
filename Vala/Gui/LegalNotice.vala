@@ -56,11 +56,11 @@ public class LegalNotice : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    protected override void change_event (GLib.Event e) {
+    protected override void change_event (Gdk.Event e) {
         switch (e.type ()) {
-        case GLib.Event.StyleChange:
-        case GLib.Event.PaletteChange:
-        case GLib.Event.ThemeChange:
+        case Gdk.Event.StyleChange:
+        case Gdk.Event.PaletteChange:
+        case Gdk.Event.ThemeChange:
             customize_style ();
             break;
         default:
@@ -84,7 +84,7 @@ public class LegalNotice : Gtk.Dialog {
 
         Theme.replace_link_color_string_background_aware (notice);
 
-        this.instance.notice.text_interaction_flags (Qt.Text_selectable_by_mouse | Qt.TextBrowserInteraction);
+        this.instance.notice.text_interaction_flags (GLib.Text_selectable_by_mouse | GLib.TextBrowserInteraction);
         this.instance.notice.on_signal_text (notice);
         this.instance.notice.word_wrap (true);
         this.instance.notice.open_external_links (true);

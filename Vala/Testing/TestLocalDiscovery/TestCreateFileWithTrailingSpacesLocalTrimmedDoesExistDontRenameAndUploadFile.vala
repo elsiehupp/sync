@@ -15,8 +15,8 @@ public class TestCreateFileWithTrailingSpacesLocalTrimmedDoesExistDontRenameAndU
     private TestCreateFileWithTrailingSpacesLocalTrimmedDoesExistDontRenameAndUploadFile () {
         FakeFolder fake_folder = new FakeFolder (FileInfo.A12_B12_C12_S12 ());
         GLib.assert_true (fake_folder.current_local_state () == fake_folder.current_remote_state ());
-        const string file_with_spaces = " foo";
-        const string file_trimmed = "foo";
+        string file_with_spaces = " foo";
+        string file_trimmed = "foo";
 
         fake_folder.local_modifier.insert (file_trimmed);
         GLib.assert_true (fake_folder.sync_once ());

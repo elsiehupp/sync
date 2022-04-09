@@ -13,7 +13,7 @@ public class TestParserBogusHref2 : AbstractTestXmlParse {
     /***********************************************************
     ***********************************************************/
     private TestParserBogusHref2 () {
-        const string xml_string = "<?xml version='1.0' encoding='utf-8'?>"
+        string xml_string = "<?xml version='1.0' encoding='utf-8'?>"
             + "<d:multistatus xmlns:d=\"DAV:\" xmlns:s=\"http://sabredav.org/ns\" xmlns:oc=\"http://owncloud.org/ns\">"
             + "<d:response>"
             + "<d:href>/sharefolder</d:href>"

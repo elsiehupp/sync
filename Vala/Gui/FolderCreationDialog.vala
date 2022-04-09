@@ -29,13 +29,13 @@ public class FolderCreationDialog : Gtk.Dialog {
 
         instance.label_error_message.visible (false);
 
-        window_flags (window_flags () & ~Qt.WindowContextHelpButtonHint);
+        window_flags (window_flags () & ~GLib.WindowContextHelpButtonHint);
 
         instance.new_folder_name_edit.text_changed.connect (
             this.on_signal_new_folder_name_edit_text_edited
         );
 
-        const string suggested_folder_name_prefix = _("New folder");
+        string suggested_folder_name_prefix = _("New folder");
 
         string new_folder_full_path = this.destination + "/" + suggested_folder_name_prefix;
         if (!new GLib.Dir (new_folder_full_path).exists ()) {

@@ -87,7 +87,7 @@ public class ClientSideEncryption : GLib.Object {
     ***********************************************************/
     private void generate_key_pair (Account account) {
         GLib.info ("No public key, generating a pair.");
-        const int rsa_key_len = 2048;
+        int rsa_key_len = 2048;
 
         // Init RSA
         PrivateKeyContext context = new PrivateKeyContext (EVP_PKEY_RSA);
@@ -271,7 +271,7 @@ public class ClientSideEncryption : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_public_key_fetched (Job incoming) {
-        var read_job = static_cast<ReadPasswordJob> (incoming);
+        var read_job = (ReadPasswordJob)incoming;
         var account = read_job.property (ACCOUNT_PROPERTY).value<unowned Account> ();
         GLib.assert (account);
 
@@ -292,7 +292,7 @@ public class ClientSideEncryption : GLib.Object {
 
         GLib.info ("Public key fetched from keychain.");
 
-        const string keychain_key = AbstractCredentials.keychain_key (
+        string keychain_key = AbstractCredentials.keychain_key (
             account.url.to_string (),
             account.credentials.user + E2E_PRIVATE,
             account.identifier
@@ -312,7 +312,7 @@ public class ClientSideEncryption : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_private_key_fetched (Secret.Collection.Job incoming) {
-        var read_job = static_cast<ReadPasswordJob> (incoming);
+        var read_job = (ReadPasswordJob)incoming;
         var account = read_job.property (ACCOUNT_PROPERTY).value<unowned Account> ();
         GLib.assert (account);
 
@@ -334,7 +334,7 @@ public class ClientSideEncryption : GLib.Object {
 
         GLib.info ("Private key fetched from keychain.");
 
-        const string keychain_key = AbstractCredentials.keychain_key (
+        string keychain_key = AbstractCredentials.keychain_key (
                     account.url.to_string (),
                     account.credentials.user + E2E_MNEMONIC,
                     account.identifier
@@ -354,7 +354,7 @@ public class ClientSideEncryption : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_mnemonic_key_fetched (Secret.Collection.Job incoming) {
-        var read_job = static_cast<ReadPasswordJob> (incoming);
+        var read_job = (ReadPasswordJob)incoming;
         var account = read_job.property (ACCOUNT_PROPERTY).value<unowned Account> ();
         GLib.assert (account);
 

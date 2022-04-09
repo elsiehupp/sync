@@ -104,8 +104,8 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : AbstractNetworkJo
     ***********************************************************/
     protected void on_signal_folder_encrypted_id_received (GLib.List<string> list) {
         GLib.debug (ABSTRACT_PROPAGATE_REMOVE_ENCRYPTED + "Received identifier of folder, trying to lock it so we can prepare the metadata");
-        var lscol_job = qobject_cast<LscolJob> (sender ());
-        const ExtraFolderInfo folder_info = lscol_job.folder_infos.value (list.first ());
+        var lscol_job = (LscolJob)sender ();
+        ExtraFolderInfo folder_info = lscol_job.folder_infos.value (list.nth_data (0));
         on_signal_try_lock (folder_info.file_identifier);
     }
 
@@ -161,7 +161,7 @@ public abstract class AbstractPropagateRemoteDeleteEncrypted : AbstractNetworkJo
     /***********************************************************
     ***********************************************************/
     protected void on_signal_delete_remote_item_finished () {
-        var delete_job = qobject_cast<KeychainChunkDeleteJob> (GLib.Object.sender ());
+        var delete_job = (KeychainChunkDeleteJob)sender ();
 
         GLib.assert (delete_job);
 

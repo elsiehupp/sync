@@ -23,8 +23,8 @@ public class TestT7pl : AbstractTestPermissions {
         sync_opts.parallel_network_jobs = 1;
         fake_folder.sync_engine.set_sync_options (sync_opts);
 
-        const int cannot_be_modified_size = 133;
-        const int can_be_modified_size = 144;
+        int cannot_be_modified_size = 133;
+        int can_be_modified_size = 144;
 
         // Put them in some directories
         fake_folder.remote_modifier ().mkdir ("normal_directory_PERM_CKDNV_");

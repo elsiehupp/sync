@@ -30,7 +30,7 @@ public class TestBlocklist : GLib.Object {
         var modifier = remote ? fake_folder.remote_modifier () : fake_folder.local_modifier;
 
         int counter = 0;
-        const string test_filename = "A/new";
+        string test_filename = "A/new";
         string request_identifier;
         fake_folder.set_server_override (this.override_delegate);
 

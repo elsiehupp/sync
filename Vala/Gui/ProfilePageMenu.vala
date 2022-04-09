@@ -66,10 +66,10 @@ public class ProfilePageMenu : Gtk.Widget {
         GLib.List<HovercardAction> hovercard_actions = this.profile_connector.current_hovercard.actions;
         var menu_actions = this.menu.actions ();
         if (hovercard_action_index >= hovercard_actions.size ()
-            || hovercard_action_index >= static_cast<size_t> (menu_actions.size ())) {
+            || hovercard_action_index >= (size_t)menu_actions.size ()) {
             return;
         }
-        var menu_action = menu_actions[static_cast<int> (hovercard_action_index)];
+        var menu_action = menu_actions[(int)hovercard_action_index];
         menu_action.icon (hovercard_actions[hovercard_action_index].icon);
     }
 

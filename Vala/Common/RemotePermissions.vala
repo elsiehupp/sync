@@ -30,7 +30,7 @@ public class RemotePermissions : GLib.Object {
         if (remote_permissions == null)
             return;
         for (int i; i < remote_permissions.length; i++) {
-            var res = std.strchr (LETTERS, static_cast<char> (remote_permissions[i]));
+            var res = std.strchr (LETTERS, (char)remote_permissions[i]);
             if (res) {
                 this.value |= (1 << (res - LETTERS));
             }
@@ -121,21 +121,21 @@ public class RemotePermissions : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool has_permission (Permissions permissions) {
-        return this.value & (1 << static_cast<int> (permissions));
+        return this.value & (1 << (int)permissions);
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void permission (Permissions permissions) {
-        this.value |= (1 << static_cast<int> (permissions)) | not_null_mask;
+        this.value |= (1 << (int)permissions) | not_null_mask;
     }
 
 
     /***********************************************************
     ***********************************************************/
     public void unset_permission (Permissions permissions) {
-        this.value &= ~ (1 << static_cast<int> (permissions));
+        this.value &= ~ (1 << (int)permissions);
     }
 
 

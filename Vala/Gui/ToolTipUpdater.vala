@@ -22,7 +22,7 @@ need to make sure
 as it changes.
 
 To accomplish that, the event_filter () stores the tooltip's position
-and the on_signal_data_changed () slot updates the tooltip if Qt.ToolTipRole
+and the on_signal_data_changed () slot updates the tooltip if GLib.ToolTipRole
 gets updated while a tooltip is shown.
 ***********************************************************/
 public class ToolTipUpdater : GLib.Object {
@@ -46,9 +46,9 @@ public class ToolTipUpdater : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected override bool event_filter (GLib.Object object, GLib.Event ev) {
-        if (ev.type () == GLib.Event.Tool_tip) {
-            var help_event = static_cast<GLib.Help_event> (ev);
+    protected override bool event_filter (GLib.Object object, Gdk.Event event) {
+        if (event.type () == Gdk.Event.Tool_tip) {
+            var help_event = (GLib.Help_event)event;
             this.tool_tip_pos = help_event.global_pos ();
         }
         return false;
@@ -58,7 +58,7 @@ public class ToolTipUpdater : GLib.Object {
     /***********************************************************
     ***********************************************************/
     private void on_signal_data_changed (GLib.ModelIndex top_left, GLib.ModelIndex bottom_right, GLib.List<int> roles) {
-        if (!GLib.ToolTip.is_visible () || !roles.contains (Qt.ToolTipRole) || this.tool_tip_pos == null) {
+        if (!GLib.ToolTip.is_visible () || !roles.contains (GLib.ToolTipRole) || this.tool_tip_pos == null) {
             return;
         }
 
@@ -69,7 +69,7 @@ public class ToolTipUpdater : GLib.Object {
         }
 
         // Update the currently active tooltip
-        GLib.ToolTip.show_text (this.tool_tip_pos, this.tree_view.model ().data (index, Qt.ToolTipRole).to_string ());
+        GLib.ToolTip.show_text (this.tool_tip_pos, this.tree_view.model ().data (index, GLib.ToolTipRole).to_string ());
     }
 
 } // class ToolTipUpdater

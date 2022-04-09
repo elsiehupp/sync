@@ -23,15 +23,15 @@ public class SvgImageProvider : GLib.QuickImageProvider {
     public Gtk.Image request_image (string identifier, Gdk.Rectangle size, Gdk.Rectangle requested_size) {
         //  Q_ASSERT (!identifier == "");
 
-        const var id_split = identifier.split ("/", Qt.SkipEmptyParts);
+        var id_split = identifier.split ("/", GLib.SkipEmptyParts);
 
         if (id_split == "") {
             GLib.warning ("Image identifier is incorrect!");
             return {};
         }
 
-        const var pixmap_name = id_split.at (0);
-        const var pixmap_color = id_split.size () > 1 ? Gdk.RGBA (id_split.at (1)) : GLib.Color_constants.Svg.black;
+        var pixmap_name = id_split.at (0);
+        var pixmap_color = id_split.size () > 1 ? Gdk.RGBA (id_split.at (1)) : GLib.Color_constants.Svg.black;
 
         if (pixmap_name == "" || !pixmap_color.is_valid) {
             GLib.warning ("Image identifier is incorrect!");

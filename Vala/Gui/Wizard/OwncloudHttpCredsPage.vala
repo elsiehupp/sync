@@ -34,7 +34,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
         this.instance.up_ui (this);
 
         if (parent) {
-            this.oc_wizard = qobject_cast<OwncloudWizard> (parent);
+            this.oc_wizard = (OwncloudWizard)parent;
         }
 
         register_field ("OCUser*", this.instance.le_username);
@@ -79,11 +79,11 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
     public void initialize_page () {
         WizardCommon.init_error_label (this.instance.error_label);
 
-        var oc_wizard = (OwncloudWizard) wizard ();
+        var oc_wizard = (OwncloudWizard)wizard ();
         AbstractCredentials credentials = oc_wizard.account.credentials;
-        var http_creds = qobject_cast<HttpCredentials> (credentials);
+        var http_creds = (HttpCredentials)credentials;
         if (http_creds) {
-            const string user = http_creds.fetch_user ();
+            string user = http_creds.fetch_user ();
             if (!user == "") {
                 this.instance.le_username.on_signal_text (user);
             }
@@ -97,8 +97,8 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
                 url = oc_wizard.oc_url ();
             }
 
-            const string user = url.user_name ();
-            const string password = url.password ();
+            string user = url.user_name ();
+            string password = url.password ();
 
             if (!user == "") {
                 this.instance.le_username.on_signal_text (user);
@@ -133,7 +133,7 @@ public class OwncloudHttpCredsPage : AbstractCredentialsWizardPage {
             on_signal_start_spinner ();
 
             // Reset cookies to ensure the username / password is actually used
-            var oc_wizard = qobject_cast<OwncloudWizard> (wizard ());
+            var oc_wizard = (OwncloudWizard)wizard ();
             oc_wizard.account.clear_cookie_jar ();
 
             /* emit */ complete_changed ();

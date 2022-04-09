@@ -28,7 +28,7 @@ public class ElidedLabel : Gtk.Label {
     }
 
 
-    Qt.TextElideMode elide_mode {
+    GLib.TextElideMode elide_mode {
         public get {
             return this.elide_mode;
         }
@@ -41,7 +41,7 @@ public class ElidedLabel : Gtk.Label {
 
     /***********************************************************
     ***********************************************************/
-    public ElidedLabel (string text = "", Qt.TextElideMode elide_mode = Qt.ElideNone, Gtk.Widget parent) {
+    public ElidedLabel (string text = "", GLib.TextElideMode elide_mode = GLib.ElideNone, Gtk.Widget parent) {
         base (text, parent);
         this.elide_mode = elide_mode;
         this.text = text;
