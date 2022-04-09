@@ -130,7 +130,7 @@ public class OCUpdater : AbstractUpdater {
         base ();
         this.update_url = url;
         this.state = Unknown;
-        this.soup_context = new AccessManager (this);
+        this.soup_context = new Soup.ClientContext (this);
         this.timeout_watchdog = new GLib.Timeout (this);
     }
 

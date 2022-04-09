@@ -95,7 +95,7 @@ public class ValidateChecksumHeader : AbstractComputeChecksum {
         }
 
         var calculator = new ComputeChecksum (this);
-        calculator.checksum_type (this.expected_checksum_type);
+        calculator.checksum_type = this.expected_checksum_type;
         calculator.done.connect (
             this.on_signal_checksum_calculated
         );

@@ -44,8 +44,8 @@ public abstract class AbstractTestXmlParse : GLib.Object {
     protected void on_signal_init () {
         GLib.debug (Q_FUNC_INFO);
         this.success = false;
-        delete (this.subdirectories);
-        delete (this.items);
+        this.subdirectories = null;
+        this.items = null;
     }
 
 

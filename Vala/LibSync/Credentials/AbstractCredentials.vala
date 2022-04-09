@@ -26,7 +26,7 @@ public abstract class AbstractCredentials : GLib.Object {
     /***********************************************************
     Whether fetch_from_keychain () was called before.
     ***********************************************************/
-    bool was_fetched { public get; protected set; }
+    public bool was_fetched { public get; protected set; }
 
     /***********************************************************
     ***********************************************************/

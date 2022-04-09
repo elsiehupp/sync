@@ -4,8 +4,8 @@ srcs = files([
     'Test/TestQTokenizer.vala',
 ])
 
-executable(
-    meson.project_name(),
+library(
+    'QTokenizer',
     srcs,
 #     dependencies: deps,
     install: false

@@ -81,7 +81,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
             this.start_chunk = progress_info.chunk;
             this.transfer_identifier = progress_info.transferid;
             GLib.info (this.item.file.to_string () + ": Resuming from chunk " + this.start_chunk.to_string ());
-        } else if (this.chunk_count <= 1 && !this.item.checksum_header == "") {
+        } else if (this.chunk_count <= 1 && this.item.checksum_header != "") {
             // If there is only one chunk, write the checksum in the database, so if the PUT is sent
             // to the server, but the connection drops before we get the etag, we can check the checksum
             // in reconcile (issue #5106)
@@ -135,10 +135,11 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
     /***********************************************************
     ***********************************************************/
     private void on_signal_start_next_chunk () {
-        if (this.propagator.abort_requested)
+        if (this.propagator.abort_requested) {
             return;
+        }
 
-        if (!this.jobs == "" && this.current_chunk + this.start_chunk >= this.chunk_count - 1) {
+        if (this.jobs != "" && this.current_chunk + this.start_chunk >= this.chunk_count - 1) {
             // Don't do parallel upload of chunk if this might be the last chunk because the server cannot handle that
             // https://github.com/owncloud/core/issues/11106
             // We return now and when the this.jobs are on_signal_finished we will proceed with the last chunk
@@ -180,7 +181,7 @@ public class PropagateUploadFileV1 : PropagateUploadFileCommon {
         }
         GLib.debug (this.chunk_count.to_string () + is_final_chunk.to_string () + chunk_start.to_string () + current_chunk_size.to_string ());
 
-        if (is_final_chunk && !this.transmission_checksum_header == "") {
+        if (is_final_chunk && this.transmission_checksum_header != "") {
             GLib.info (this.propagator.full_remote_path (path) + this.transmission_checksum_header);
             headers[CHECK_SUM_HEADER_C] = this.transmission_checksum_header;
         }

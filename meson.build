@@ -7,9 +7,22 @@ srcs = files([
 
 subdir('Vala')
 
+libraries = [
+    # '3rdParty',
+    cmd,
+    common,
+    # 'CrashReporter',
+    csync,
+    # 'Gui',
+    lib_sync,
+    # 'ShellIntegration',
+    # 'Testing',
+]
+
 executable(
     meson.project_name(),
     srcs,
 #     dependencies: deps,
-    install: false
+    install: false,
+    link_with: libraries
 )

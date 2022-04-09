@@ -36,7 +36,7 @@ public class JsonApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    string body {
+    public string body {
         private get {
             return this.body;
         }
@@ -54,7 +54,7 @@ public class JsonApiJob : AbstractNetworkJob {
 
     /***********************************************************
     ***********************************************************/
-    Verb verb { private get; public set; }
+    public Verb verb { private get; public set; }
 
     public JsonApiJob () {
         base ();

@@ -2,7 +2,7 @@
 namespace Occ {
 namespace Ui {
 
-public class WebFlowCredentialsAccessManager : LibSync.AccessManager {
+public class WebFlowCredentialsAccessManager : LibSync.Soup.ClientContext {
 
     private const string USER_C = "user";
     private const string CLIENT_CERTIFICATE_PEM_C = "this.client_certificate_pem";
@@ -48,7 +48,7 @@ public class WebFlowCredentialsAccessManager : LibSync.AccessManager {
             req.ssl_configuration (ssl_configuration);
         }
 
-        return LibSync.AccessManager.create_request (operation, req, outgoing_data);
+        return LibSync.Soup.ClientContext.create_request (operation, req, outgoing_data);
     }
 
 

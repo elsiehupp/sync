@@ -21,8 +21,8 @@ deps = [
     # dependency('libsoup-2.4'),
 ]
 
-executable(
-    meson.project_name(),
+crash_reporter = library(
+    'CrashReporter',
     srcs,
     dependencies: deps,
     install: false

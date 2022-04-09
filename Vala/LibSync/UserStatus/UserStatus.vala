@@ -23,33 +23,33 @@ public class UserStatus : GLib.Object {
     /***********************************************************
     Q_REQUIRED_RESULT
     ***********************************************************/
-    string identifier { public get; public set; }
+    public string identifier { public get; public set; }
 
     /***********************************************************
     Q_REQUIRED_RESULT
     ***********************************************************/
-    string message { public get; public set; }
+    public string message { public get; public set; }
 
     /***********************************************************
     Q_REQUIRED_RESULT
     ***********************************************************/
-    string icon { public get; public set; }
+    public string icon { public get; public set; }
 
     /***********************************************************
     Q_REQUIRED_RESULT
     ***********************************************************/
-    OnlineStatus state { public get; public set; }
+    public OnlineStatus state { public get; public set; }
 
     /***********************************************************
     Q_REQUIRED_RESULT
     ***********************************************************/
-    bool message_predefined { public get; public set; }
+    public bool message_predefined { public get; public set; }
 
     /***********************************************************
     Optional<ClearAt> date_time
     Q_REQUIRED_RESULT
     ***********************************************************/
-    Optional<ClearAt> clear_at { public get; public set; }
+    public Optional<ClearAt> clear_at { public get; public set; }
 
     /***********************************************************
     ***********************************************************/

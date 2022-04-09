@@ -20,8 +20,8 @@ deps = [
     meson.get_compiler('vala').find_library('readline'),
 ]
 
-executable(
-    meson.project_name(),
+cmd = library(
+    'Cmd',
     srcs,
     dependencies: deps,
     install: false

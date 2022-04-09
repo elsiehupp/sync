@@ -19,8 +19,8 @@ deps = [
     # dependency('libsoup-2.4'),
 ]
 
-executable(
-    meson.project_name(),
+library(
+    'Kirigami',
     srcs,
 #     dependencies: deps,
     install: false

@@ -221,7 +221,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
             if (!if_match == "") {
                 headers["If"] = "<" + GLib.Uri.to_percent_encoding (destination, "/") + "> ([" + if_match + "])";
             }
-            if (!this.transmission_checksum_header == "") {
+            if (this.transmission_checksum_header != "") {
                 GLib.info (destination + this.transmission_checksum_header);
                 headers[CHECK_SUM_HEADER_C] = this.transmission_checksum_header;
             }
@@ -292,7 +292,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
     /***********************************************************
     ***********************************************************/
     private static bool abort_filter (AbstractPropagatorJob.AbortType abort_type, AbstractNetworkJob abstract_job) {
-        return abort_type != AbstractPropagatorJob.AbortType.ASYNCHRONOUS || !(MoveJob) abstract_job;
+        return abort_type != AbstractPropagatorJob.AbortType.ASYNCHRONOUS || (MoveJob)abstract_job == null;
     }
 
     /***********************************************************
@@ -330,7 +330,7 @@ public class PropagateUploadFileNG : PropagateUploadFileCommon {
 
         GLib.info ("Resuming " + this.item.file.to_string () + " from chunk " + this.current_chunk.to_string () + "; sent =" + this.sent.to_string ());
 
-        if (!this.server_chunks == "") {
+        if (this.server_chunks != "") {
             GLib.info ("To Delete " + this.server_chunks.keys ());
             this.propagator.active_job_list.append (this);
             this.remove_job_error = false;

@@ -39,7 +39,7 @@ public class DiscoveryPhase : GLib.Object {
     can be changed. See find_and_cancel_deleted_job (). Note that
     signal_item_discovered () will already have been emitted for the item.
     ***********************************************************/
-    GLib.HashTable<string, unowned SyncFileItem> deleted_item;
+    internal GLib.HashTable<string, unowned SyncFileItem> deleted_item;
 
 
     /***********************************************************
@@ -53,17 +53,17 @@ public class DiscoveryPhase : GLib.Object {
 
     See find_and_cancel_deleted_job ().
     ***********************************************************/
-    GLib.HashTable<string, ProcessDirectoryJob> queued_deleted_directories;
+    internal GLib.HashTable<string, ProcessDirectoryJob> queued_deleted_directories;
 
     /***********************************************************
     Map source (original path)
     ***********************************************************/
-    GLib.HashTable<string, string> renamed_items_remote;
+    internal GLib.HashTable<string, string> renamed_items_remote;
 
     /***********************************************************
     Map destinations (current server or local path)
     ***********************************************************/
-    GLib.HashTable<string, string> renamed_items_local;
+    internal GLib.HashTable<string, string> renamed_items_local;
 
     /***********************************************************
     Set of paths that should not be removed even though they are
@@ -76,7 +76,7 @@ public class DiscoveryPhase : GLib.Object {
 
     The value of this map doesn't matter.
     ***********************************************************/
-    GLib.HashTable<string, bool> forbidden_deletes;
+    internal GLib.HashTable<string, bool> forbidden_deletes;
 
     /***********************************************************
     Input
@@ -209,7 +209,7 @@ public class DiscoveryPhase : GLib.Object {
     Useful for avoiding processing of items that have already been claimed in
     a rename (would otherwise be discovered as deletions).
     ***********************************************************/
-    bool is_renamed (string p) {
+    internal bool is_renamed (string p) {
         return this.renamed_items_local.contains (p) || this.renamed_items_remote.contains (p);
     }
 
@@ -249,7 +249,7 @@ public class DiscoveryPhase : GLib.Object {
     May be async. "Return" via the callback, true if the item
     is blocklisted.
     ***********************************************************/
-    void check_selective_sync_new_folder (
+    internal void check_selective_sync_new_folder (
         string path,
         RemotePermissions remote_permissions,
         Callback callback) {
@@ -340,8 +340,8 @@ public class DiscoveryPhase : GLib.Object {
 
     Implementation of DiscoveryPhase.adjust_renamed_path
     ***********************************************************/
-    string adjust_renamed_path (GLib.HashTable<string, string> renamed_items, string original) {
-        int slash_pos = original.size ();
+    internal string adjust_renamed_path (GLib.HashTable<string, string> renamed_items, string original) {
+        int slash_pos = original.length;
         while ( (slash_pos = original.last_index_of ("/", slash_pos - 1)) > 0) {
             var it = renamed_items.const_find (original.left (slash_pos));
             if (it != renamed_items.const_end ()) {

@@ -1902,8 +1902,14 @@ public class ProcessDirectoryJob : GLib.Object {
     ***********************************************************/
     private MovePermissionResult check_move_permissions (RemotePermissions src_perm, string src_path, bool is_directory) {
         //  . MovePermissionResult {
-        var dest_perms = !this.root_permissions == null ? this.root_permissions
-                                                    : this.dir_item ? this.dir_item.remote_permissions : this.root_permissions;
+        RemotePermissions dest_perms;
+        if (this.root_permissions != null) {
+            dest_perms = this.root_permissions;
+        } else if (this.dir_item) {
+            dest_perms = this.dir_item.remote_permissions;
+        } else {
+            dest_perms = this.root_permissions;
+        }
         var file_perms = src_perm;
         //true when it is just a rename in the same directory. (not a move)
         bool is_rename = src_path.has_prefix (this.current_folder.original)

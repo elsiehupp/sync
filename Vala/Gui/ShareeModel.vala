@@ -208,12 +208,12 @@ public class ShareeModel : GLib.AbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private unowned Sharee sharee (int at) {
-        if (at < 0 || at > this.sharees.size ()) {
-            return unowned Sharee (null);
+    internal unowned Sharee sharee (int at) {
+        if (at < 0 || at > this.sharees.length ()) {
+            return new unowned Sharee (null);
         }
 
-        return this.sharees.at (at);
+        return this.sharees.nth_data (at);
     }
 
 

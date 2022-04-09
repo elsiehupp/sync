@@ -829,7 +829,7 @@ public class FolderStatusModel : GLib.AbstractItemModel {
         if (!parent.is_valid)
             return parent;
 
-        if (slash_pos == path.length () - 1) {
+        if (slash_pos == path.length - 1) {
             // The slash is the last part, we found our index
             return parent;
         }

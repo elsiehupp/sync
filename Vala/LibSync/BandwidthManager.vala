@@ -276,12 +276,12 @@ public class BandwidthManager : GLib.Object {
 
         int64 upload_limit_percent = -this.current_upload_limit;
         // don't use too extreme values
-        upload_limit_percent = int64.min (upload_limit_percent, int64 (90));
-        upload_limit_percent = int64.max (int64 (10), upload_limit_percent);
-        int64 whole_time_msec = (100.0 / upload_limit_percent) * relative_limit_measuring_timer_interval_msec;
+        upload_limit_percent = int64.min (upload_limit_percent, (int64)90);
+        upload_limit_percent = int64.max ((int64)10, upload_limit_percent);
+        int64 whole_time_msec = GLib.Math.llrint (100.0 / upload_limit_percent) * relative_limit_measuring_timer_interval_msec;
         int64 wait_time_msec = whole_time_msec - relative_limit_measuring_timer_interval_msec;
         int64 real_wait_time_msec = wait_time_msec + whole_time_msec;
-        GLib.debug (wait_time_msec + " - " + real_wait_time_msec + " msec for " + upload_limit_percent + "%");
+        GLib.debug (wait_time_msec.to_string () + " - " + real_wait_time_msec.to_string () + " msec for " + upload_limit_percent.to_string () + "%");
 
         // We want to wait twice as long since we want to give all
         // devices the same quota we used now since we don't want
@@ -445,9 +445,9 @@ public class BandwidthManager : GLib.Object {
 
         int64 download_limit_percent = -this.current_download_limit;
         // don't use too extreme values
-        download_limit_percent = int64.min (download_limit_percent, int64 (90));
-        download_limit_percent = int64.max (int64 (10), download_limit_percent);
-        int64 whole_time_msec = (100.0 / download_limit_percent) * relative_limit_measuring_timer_interval_msec;
+        download_limit_percent = int64.min (download_limit_percent, (int64)90);
+        download_limit_percent = int64.max ((int64)10, download_limit_percent);
+        int64 whole_time_msec = GLib.Math.llrint (100.0 / download_limit_percent) * relative_limit_measuring_timer_interval_msec;
         int64 wait_time_msec = whole_time_msec - relative_limit_measuring_timer_interval_msec;
         int64 real_wait_time_msec = wait_time_msec + whole_time_msec;
         GLib.debug (wait_time_msec + " - " + real_wait_time_msec + " msec for " + download_limit_percent + "%");

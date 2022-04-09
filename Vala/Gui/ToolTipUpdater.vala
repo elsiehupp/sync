@@ -47,7 +47,7 @@ public class ToolTipUpdater : GLib.Object {
     /***********************************************************
     ***********************************************************/
     protected override bool event_filter (GLib.Object object, Gdk.Event event) {
-        if (event.type () == Gdk.Event.Tool_tip) {
+        if (event.type == Gdk.Event.Tool_tip) {
             var help_event = (GLib.Help_event)event;
             this.tool_tip_pos = help_event.global_pos ();
         }

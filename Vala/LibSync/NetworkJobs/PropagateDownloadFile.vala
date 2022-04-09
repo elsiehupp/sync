@@ -311,7 +311,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
                 url,
                 this.temporary_file, headers, expected_etag_for_resume, this.resume_start, this);
         }
-        this.get_file_job.bandwidth_manager (&this.propagator.bandwidth_manager);
+        this.get_file_job.bandwidth_manager = this.propagator.bandwidth_manager;
         this.get_file_job.signal_finished.connect (
             this.on_signal_get_file_job_finished
         );
@@ -339,7 +339,7 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
         if (err != GLib.InputStream.NoError) {
             // If we sent a 'Range' header and get 416 back, we want to retry
             // without the header.
-            bool bad_range_header = get_file_job.resume_start () > 0 && this.item.http_error_code == 416;
+            bool bad_range_header = get_file_job.resume_start > 0 && this.item.http_error_code == 416;
             if (bad_range_header) {
                 GLib.warning ("Server replied 416 to our range request, trying again without.");
                 this.propagator.another_sync_needed = true;
@@ -409,15 +409,15 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
 
         this.item.response_time_stamp = get_file_job.response_timestamp;
 
-        if (!get_file_job.etag () == "") {
+        if (get_file_job.etag != "") {
             // The etag will be empty if we used a direct download URL.
             // (If it was really empty by the server, the GETFileJob will have errored
             this.item.etag = parse_etag (get_file_job.etag ());
         }
-        if (get_file_job.last_modified ()) {
+        if (get_file_job.last_modified) {
             // It is possible that the file was modified on the server since we did the discovery phase
             // so make sure we have the up-to-date time
-            this.item.modtime = get_file_job.last_modified ();
+            this.item.modtime = get_file_job.last_modified;
             GLib.assert (this.item.modtime > 0);
             if (this.item.modtime <= 0) {
                 GLib.warning ("Invalid modified time: " + this.item.file.to_string () + this.item.modtime.to_string ());
@@ -449,14 +449,14 @@ public class PropagateDownloadFile : AbstractPropagateItemJob {
         if (has_size_header && this.temporary_file.size () > 0 && body_size == 0) {
             // Strange bug with broken webserver or webfirewall https://github.com/owncloud/client/issues/3373#issuecomment-122672322
             // This happened when trying to resume a file. The Content-Range header was files, Content-Length was == 0
-            GLib.debug (body_size + this.item.size + this.temporary_file.size () + get_file_job.resume_start ());
+            GLib.debug (body_size + this.item.size + this.temporary_file.size () + get_file_job.resume_start);
             FileSystem.remove (this.temporary_file.filename ());
             on_signal_done (SyncFileItem.Status.SOFT_ERROR, "Broken webserver returning empty content length for non-empty file on resume");
             return;
         }
 
-        if (body_size > 0 && body_size != this.temporary_file.size () - get_file_job.resume_start ()) {
-            GLib.debug (body_size + this.temporary_file.size () + get_file_job.resume_start ());
+        if (body_size > 0 && body_size != this.temporary_file.size () - get_file_job.resume_start) {
+            GLib.debug (body_size + this.temporary_file.size () + get_file_job.resume_start);
             this.propagator.another_sync_needed = true;
             on_signal_done (SyncFileItem.Status.SOFT_ERROR, _("The file could not be downloaded completely."));
             return;

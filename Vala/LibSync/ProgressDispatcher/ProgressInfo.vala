@@ -180,7 +180,7 @@ public class ProgressInfo : GLib.Object {
             Changes the this.completed value and does sanity checks on
             this.prev_completed and this.total.
             ***********************************************************/
-            private set {
+            internal set {
                 this.completed = int64.min (value, this.total);
                 this.prev_completed = int64.min (this.prev_completed, this.completed);
             }

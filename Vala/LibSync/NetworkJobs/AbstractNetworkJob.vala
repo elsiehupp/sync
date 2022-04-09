@@ -283,7 +283,7 @@ public class AbstractNetworkJob : GLib.Object {
         if (this.request_body != null) {
             this.request_body.seek (0);
         }
-        // The cookie will be added automatically, we don't want AccessManager.create_request to duplicate them
+        // The cookie will be added automatically, we don't want Soup.ClientContext.create_request to duplicate them
         request.raw_header ("cookie", "");
         send_request (verb, requested_url, request, this.request_body);
     }
@@ -660,7 +660,7 @@ public class AbstractNetworkJob : GLib.Object {
 
     This function produces clearer error messages for HTTP errors.
     ***********************************************************/
-    private static string network_reply_error_string (GLib.InputStream input_stream) {
+    internal static string network_reply_error_string (GLib.InputStream input_stream) {
         string base_string = input_stream.error_string;
         int http_status = input_stream.attribute (Soup.Request.HttpStatusCodeAttribute).to_int ();
         string http_reason = input_stream.attribute (Soup.Request.HttpReasonPhraseAttribute).to_string ();

@@ -54,10 +54,11 @@ deps = [
     # dependency('libsoup-2.4'),
     # libsqlite3-dev
     dependency('sqlite3'),
+    dependency('zlib'),
 ]
 
-executable(
-    meson.project_name(),
+common = library(
+    'Common',
     srcs,
     dependencies: deps,
     install: false

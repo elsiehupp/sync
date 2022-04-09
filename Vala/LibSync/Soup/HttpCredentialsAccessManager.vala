@@ -9,7 +9,7 @@ namespace LibSync {
 
 @copyright GPLv3 or Later
 ***********************************************************/
-public class HttpCredentialsAccessManager : AccessManager {
+public class HttpCredentialsAccessManager : Soup.ClientContext {
 
     /***********************************************************
     The credentials object dies along with the account, while
@@ -50,7 +50,7 @@ public class HttpCredentialsAccessManager : AccessManager {
             request.ssl_configuration (ssl_configuration);
         }
 
-        var reply = AccessManager.create_request (operation, request, outgoing_data);
+        var reply = Soup.ClientContext.create_request (operation, request, outgoing_data);
 
         if (this.credentials.is_renewing_oauth_token) {
             // We know this is going to fail, but we have no way to queue it there, so we will

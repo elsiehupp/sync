@@ -1085,8 +1085,8 @@ public class Theme : GLib.Object {
     ***********************************************************/
     public static bool is_dark_color (Gdk.RGBA color) {
         // account for different sensitivity of the human eye to certain colors
-        double treshold = 1.0 - (0.299 * color.red () + 0.587 * color.green () + 0.114 * color.blue ()) / 255.0;
-        return treshold > 0.5;
+        double threshold = 1.0 - (0.299 * color.red + 0.587 * color.green + 0.114 * color.blue) / 255.0;
+        return threshold > 0.5;
     }
 
 

@@ -32,7 +32,7 @@ public class AccountSettings : Gtk.Widget {
 
 
         protected override bool event_filter (GLib.Object watched, Gdk.Event event) {
-            if (event.type () == Gdk.Event.HoverMove) {
+            if (event.type == Gdk.Event.HoverMove) {
                 GLib.CursorShape shape = GLib.ArrowCursor;
                 var position = folder_list.map_from_global (GLib.Cursor.position ());
                 var index = folder_list.index_at (position);
@@ -379,7 +379,7 @@ public class AccountSettings : Gtk.Widget {
                     ); // GLib.UniqueConnection
                     url = credentials.authorisation_link ();
                 }
-                if (url.is_valid) {
+                if (GLib.Uri.is_valid (url)) {
                     show_connection_label (_("Obtaining authorization from the browser. "
                                            + "<a href='%1'>Click here</a> to re-open the browser.")
                                             .printf (url.to_string (GLib.Uri.FullyEncoded)));
@@ -389,14 +389,22 @@ public class AccountSettings : Gtk.Widget {
                 break;
             }
             case AccountState.State.NETWORK_ERROR:
-                show_connection_label (_("No connection to %1 at %2.")
-                                        .printf (Utility.escape (Theme.app_name_gui), server),
-                    this.account_state.connection_errors ());
+                show_connection_label (
+                    _("No connection to %1 at %2.")
+                        .printf (
+                            Utility.escape (Theme.app_name_gui),
+                            server
+                        ),
+                    this.account_state.connection_errors);
                 break;
             case AccountState.State.CONFIGURATION_ERROR:
-                show_connection_label (_("Server configuration error : %1 at %2.")
-                                        .printf (Utility.escape (Theme.app_name_gui), server),
-                    this.account_state.connection_errors ());
+                show_connection_label (
+                    _("Server configuration error : %1 at %2.")
+                        .printf (
+                            Utility.escape (Theme.app_name_gui),
+                            server
+                        ),
+                    this.account_state.connection_errors);
                 break;
             case AccountState.State.DISCONNECTED:
                 // we can't end up here as the whole block is ifdeffed
@@ -1106,8 +1114,8 @@ public class AccountSettings : Gtk.Widget {
         var path = folder_info.path;
         var file_id = folder_info.file_id;
 
-        if (folder_connection.virtual_files_enabled ()
-            && folder_connection.vfs ().mode () == AbstractVfs.WindowsCfApi) {
+        if (folder_connection.virtual_files_enabled
+            && folder_connection.vfs.mode () == AbstractVfs.WindowsCfApi) {
             show_enable_e2ee_with_virtual_files_warning_dialog (encrypt_folder);
             return;
         }
@@ -1437,7 +1445,7 @@ public class AccountSettings : Gtk.Widget {
     Encryption Related Stuff
     ***********************************************************/
     protected void on_signal_show_mnemonic (string mnemonic) {
-        AccountManager.instance.on_signal_display_mnemonic (mnemonic);
+        AccountManager.on_signal_display_mnemonic (mnemonic);
     }
 
 
@@ -1569,10 +1577,10 @@ public class AccountSettings : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private bool event (Gdk.Event e) {
-        if (e.type () == Gdk.Event.Hide || e.type () == Gdk.Event.Show) {
+        if (e.type == Gdk.Event.Hide || e.type == Gdk.Event.Show) {
             this.user_info.active = is_visible ();
         }
-        if (e.type () == Gdk.Event.Show) {
+        if (e.type == Gdk.Event.Show) {
             // Expand the folder_connection automatically only if there's only one, see #4283
             // The 2 is 1 folder_connection + 1 'add folder_connection' button
             if (this.model.row_count () <= 2) {

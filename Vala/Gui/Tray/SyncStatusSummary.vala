@@ -150,14 +150,12 @@ public class SyncStatusSummary : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void on_signal_load () {
-        var current_user = UserModel.instance.is_current_user ();
-        if (!current_user) {
-            return;
+        if (UserModel.current_user != null) {
+            UserModel.account_state = UserModel.current_user.account_state;
+            UserModel.clear_folder_errors ();
+            UserModel.connect_to_folders_progress (FolderManager.instance.map ());
+            UserModel.init_sync_state ();
         }
-        this.account_state = current_user.account_state;
-        this.clear_folder_errors ();
-        this.connect_to_folders_progress (FolderManager.instance.map ());
-        this.init_sync_state ();
     }
 
 

@@ -184,7 +184,7 @@ public class Account : GLib.Object {
     capabilities have been received.
     ***********************************************************/
     public string server_version {
-        private get {
+        internal get {
             return this.server_version;
         }
         public set {

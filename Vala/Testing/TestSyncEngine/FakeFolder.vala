@@ -15,12 +15,12 @@ public class FakeFolder : GLib.Object {
 
         FakeQNAM soup_context;
 
-        void append (string path, int error = 500) {
+        public void append (string path, int error = 500) {
             this.soup_context.error_paths ().insert (path, error);
         }
 
-        void clear () {
-            this.soup_context.error_paths () == "";
+        public void clear () {
+            this.soup_context.error_paths = "";
         }
     }
 

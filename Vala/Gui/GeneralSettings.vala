@@ -51,7 +51,7 @@ public class GeneralSettings : Gtk.Widget {
 
         public static ZipEntry sync_folder_to_zip_entry (FolderConnection f) {
             var journal_path = f.journal_database ().database_file_path;
-            var journal_info = GLib.FileInfo (journal_path);
+            var journal_info = new GLib.FileInfo (journal_path);
             return file_info_to_zip_entry (journal_info);
         }
 

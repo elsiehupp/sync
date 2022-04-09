@@ -31,9 +31,9 @@ public class Sharee : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    string share_with { public get; private set; }
-    string display_name { public get; private set; }
-    Type type { public get; private set; }
+    public string share_with { public get; internal set; }
+    public string display_name { public get; internal set; }
+    public Type type { public get; internal set; }
 
 
     /***********************************************************

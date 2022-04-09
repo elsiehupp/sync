@@ -32,7 +32,7 @@ public class FolderWatcher : GLib.Object {
     For example, this can happen on linux if the inotify user limit from
     /proc/sys/fs/inotify/max_user_watches is exceeded.
     ***********************************************************/
-    public bool is_reliable { public get; private set; }
+    public bool is_reliable { public get; public set; }
 
     /***********************************************************
     Path of the expected test notification

@@ -142,7 +142,7 @@ public class RemotePermissions : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public bool is_null () {
-        return ! (this.value & not_null_mask);
+        return (this.value & not_null_mask) != 0;
     }
 
 

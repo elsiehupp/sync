@@ -61,7 +61,7 @@ public class ShareUserLine : Gtk.Widget {
 
         // adds permissions
         // can edit permission
-        bool enabled = (max_sharing_permissions & Share_permission_update);
+        bool enabled = max_sharing_permissions & Share_permission_update;
         if (!this.is_file) {
             enabled = enabled && (
                 max_sharing_permissions & Share_permission_create
@@ -99,7 +99,7 @@ public class ShareUserLine : Gtk.Widget {
         var menu = new GLib.Menu (this);
         this.permission_reshare= new GLib.Action (_("Can reshare"), this);
         this.permission_reshare.checkable (true);
-        this.permission_reshare.enabled (max_sharing_permissions & Share_permission_share);
+        this.permission_reshare.enabled = max_sharing_permissions & Share_permission_share;
         menu.add_action (this.permission_reshare);
         this.permission_reshare.triggered.connect (
             this.on_signal_permissions_changed
@@ -107,7 +107,7 @@ public class ShareUserLine : Gtk.Widget {
 
         show_note_options (false);
 
-        bool is_note_supported = this.share.share_type != Share.Type.Share.Type.EMAIL && this.share.share_type != Share.Type.Share.Type.ROOM;
+        bool is_note_supported = this.share.share_type != Share.Type.EMAIL && this.share.share_type != Share.Type.ROOM;
 
         if (is_note_supported) {
             this.note_link_action = new GLib.Action (_("Note to recipient"));
@@ -124,7 +124,7 @@ public class ShareUserLine : Gtk.Widget {
 
         show_expire_date_options (false);
 
-        bool is_expiration_date_supported = this.share.share_type != Share.Type.Share.Type.EMAIL;
+        bool is_expiration_date_supported = this.share.share_type != Share.Type.EMAIL;
 
         if (is_expiration_date_supported) {
             // email shares do not support expiration dates
@@ -158,7 +158,7 @@ public class ShareUserLine : Gtk.Widget {
         if (!this.is_file) {
             this.permission_create = new GLib.Action (_("Can create"), this);
             this.permission_create.checkable (true);
-            this.permission_create.enabled (max_sharing_permissions & Share_permission_create);
+            this.permission_create.enabled = max_sharing_permissions & Share_permission_create;
             menu.add_action (this.permission_create);
             this.permission_create.triggered.connect (
                 this.on_signal_permissions_changed
@@ -166,7 +166,7 @@ public class ShareUserLine : Gtk.Widget {
 
             this.permission_change = new GLib.Action (_("Can change"), this);
             this.permission_change.checkable (true);
-            this.permission_change.enabled (max_sharing_permissions & Share_permission_update);
+            this.permission_change.enabled max_sharing_permissions & Share_permission_update;
             menu.add_action (this.permission_change);
             this.permission_change.triggered.connect (
                 this.on_signal_permissions_changed
@@ -174,7 +174,7 @@ public class ShareUserLine : Gtk.Widget {
 
             this.permission_delete = new GLib.Action (_("Can delete"), this);
             this.permission_delete.checkable (true);
-            this.permission_delete.enabled (max_sharing_permissions & Share_permission_delete);
+            this.permission_delete.enabled = max_sharing_permissions & Share_permission_delete;
             menu.add_action (this.permission_delete);
             this.permission_delete.triggered.connect (
                 this.on_signal_permissions_changed
@@ -427,7 +427,7 @@ public class ShareUserLine : Gtk.Widget {
 
         this.instance.line_edit_password.on_signal_text ("");
 
-        this.password_protect_link_action.enabled (!this.share.password_is_set || !this.account.capabilities.share_email_password_enforced ());
+        this.password_protect_link_action.enabled = !this.share.password_is_set || !this.account.capabilities.share_email_password_enforced ();
 
         on_signal_refresh_password_line_edit_placeholder ();
 
@@ -616,7 +616,7 @@ public class ShareUserLine : Gtk.Widget {
     private void default_avatar (int avatar_size) {
 
         // See core/js/placeholder.js for details on colors and styling
-        var background_color = background_color_for_sharee_type (this.share.share_with ().type ());
+        var background_color = background_color_for_sharee_type (this.share.share_with.type);
         string style = """ (* {
             color : #fff;
             background-color : %1;
@@ -627,7 +627,7 @@ public class ShareUserLine : Gtk.Widget {
         })""".printf (background_color.name (), string.number (avatar_size / 2));
         this.instance.avatar.style_sheet (style);
 
-        var pixmap = pixmap_for_sharee_type (this.share.share_with ().type (), background_color);
+        var pixmap = pixmap_for_sharee_type (this.share.share_with.type, background_color);
 
         if (!pixmap == null) {
             this.instance.avatar.pixmap (pixmap);
@@ -757,7 +757,7 @@ public class ShareUserLine : Gtk.Widget {
             if (enforce_expiration_date_for_share (this.share.share_type)) {
                 this.instance.calendar.maximum_date (max_expiration_date_for_share (this.share.share_type, this.instance.calendar.maximum_date ()));
                 this.expiration_date_link_action.checked (true);
-                this.expiration_date_link_action.enabled (false);
+                this.expiration_date_link_action.enabled = false;
             }
         }
 
@@ -806,9 +806,9 @@ public class ShareUserLine : Gtk.Widget {
     ***********************************************************/
     private GLib.Date max_expiration_date_for_share (Share.Type type, GLib.Date fallback_date) {
         var days_to_expire = 0;
-        if (type == Share.Type.Share.Type.REMOTE) {
+        if (type == Share.Type.REMOTE) {
             days_to_expire = this.account.capabilities.share_remote_expire_date_days ();
-        } else if (type == Share.Type.Share.Type.EMAIL) {
+        } else if (type == Share.Type.EMAIL) {
            days_to_expire = this.account.capabilities.share_public_link_expire_date_days ();
         } else {
             days_to_expire = this.account.capabilities.share_internal_expire_date_days ();
@@ -825,9 +825,9 @@ public class ShareUserLine : Gtk.Widget {
     /***********************************************************
     ***********************************************************/
     private bool enforce_expiration_date_for_share (Share.Type type) {
-        if (type == Share.Type.Share.Type.REMOTE) {
+        if (type == Share.Type.REMOTE) {
             return this.account.capabilities.share_remote_enforce_expire_date ();
-        } else if (type == Share.Type.Share.Type.EMAIL) {
+        } else if (type == Share.Type.EMAIL) {
             return this.account.capabilities.share_public_link_enforce_expire_date ();
         }
 

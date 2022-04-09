@@ -10,8 +10,6 @@ namespace Ui {
 ***********************************************************/
 public class AccountState : GLib.Object /*, GLib.SharedData*/ {
 
-    class AccountAppList : GLib.List<AccountApp> { }
-
     /***********************************************************
     ***********************************************************/
     public enum State {
@@ -152,7 +150,7 @@ public class AccountState : GLib.Object /*, GLib.SharedData*/ {
     /***********************************************************
     Holds the App names and URLs available on the server
     ***********************************************************/
-    public AccountAppList app_list { public get; private set; }
+    public GLib.List<AccountApp> app_list { public get; private set; }
 
     public bool are_desktop_notifications_allowed {
         /***********************************************************

@@ -42,7 +42,7 @@ public class GETEncryptedFileJob : GETFileJob {
 
 
     protected new int64 write_to_device (string data) {
-        if (!this.decryptor) {
+        if (this.decryptor == null) {
             // only initialize the decryptor once, because, according to Qt documentation, metadata might get changed during the processing of the data sometimes
             // https://doc.qt.io/qt-5/qnetworkreply.html#meta_data_changed
             this.decryptor.reset (new EncryptionHelper.StreamingDecryptor (this.encrypted_file_info.encryption_key, this.encrypted_file_info.initialization_vector, this.content_length));
@@ -66,7 +66,7 @@ public class GETEncryptedFileJob : GETFileJob {
             }
         }
 
-        if (!this.pending_bytes == "") {
+        if (this.pending_bytes != "") {
             var decrypted_chunk = this.decryptor.chunk_decryption (this.pending_bytes.const_data (), this.pending_bytes.size ());
 
             if (decrypted_chunk == "") {

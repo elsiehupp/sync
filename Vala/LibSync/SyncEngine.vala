@@ -423,7 +423,7 @@ public class SyncEngine : GLib.Object {
         /* emit */ signal_transmission_progress (*this.progress_info);
 
         GLib.info ("#### Discovery start ####################################################");
-        GLib.info ("Server" + account.server_version ()
+        GLib.info ("Server" + account.server_version
                          + (account.is_http2Supported () ? "Using HTTP/2": ""));
         this.progress_info.status = ProgressInfo.Status.DISCOVERY;
         /* emit */ signal_transmission_progress (*this.progress_info);
@@ -445,8 +445,8 @@ public class SyncEngine : GLib.Object {
             this.discovery_phase.remote_folder+="/";
         this.discovery_phase.sync_options = this.sync_options;
         this.discovery_phase.local_discovery_delegate = this.local_discovery_delegate;
-        this.discovery_phase.selective_sync_block_list (selective_sync_block_list);
-        this.discovery_phase.selective_sync_allow_list (this.journal.get_selective_sync_list (Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, ok));
+        this.discovery_phase.selective_sync_block_list = selective_sync_block_list;
+        this.discovery_phase.selective_sync_allow_list = this.journal.get_selective_sync_list (Common.SyncJournalDb.SelectiveSyncListType.SELECTIVE_SYNC_ALLOWLIST, ok);
         if (!ok) {
             GLib.warning ("Unable to read selective sync list; aborting.");
             /* Q_EMIT */ signal_sync_error (_("Unable to read from the sync journal."));
@@ -1127,8 +1127,9 @@ public class SyncEngine : GLib.Object {
         // Iterate from the oldest and remove anything older than 15 seconds.
         while (true) {
             var first = this.touched_files.begin ();
-            if (first == this.touched_files.end ())
+            if (first == this.touched_files.end ()) {
                 break;
+            }
             // Compare to our new GLib.Timer instead of using elapsed ().
             // This avoids querying the current time from the OS for every loop.
             var elapsed = GLib.TimeSpan (

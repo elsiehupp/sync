@@ -86,7 +86,7 @@ public class WebFlowCredentials : AbstractCredentials {
     ***********************************************************/
     public override Soup.Context create_access_manager () {
         GLib.info ("Getting GLib.NAM");
-        AccessManager soup_context = new WebFlowCredentialsAccessManager (this);
+        Soup.ClientContext soup_context = new WebFlowCredentialsAccessManager (this);
 
         soup_context.signal_authentication_required.connect (
             this.on_signal_authentication

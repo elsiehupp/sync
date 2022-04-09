@@ -224,7 +224,7 @@ public class Application : GLib.Application {
 
                     // Try to move the files one by one
                     if (new GLib.FileInfo (configuration_directory).is_dir () || new GLib.Dir ().mkdir (configuration_directory)) {
-                        GLib.List<string> files_list = GLib.Dir (old_dir).entry_list (GLib.Dir.Files);
+                        GLib.List<string> files_list = new GLib.Dir (old_dir).entry_list (GLib.Dir.Files);
                         GLib.info ("Will move the individual files " + files_list);
                         foreach (var name in files_list) {
                             if (!GLib.File.rename (old_dir + "/" + name, configuration_directory + "/" + name)) {
@@ -731,7 +731,7 @@ public class Application : GLib.Application {
                 this.gui.on_signal_toggle_log_browser (); // this.show_log_window is set in parse_options.
             }
             if (this.quit_instance) {
-                GLib.Application.quit ();
+                this.quit ();
             }
 
         } else if (message.has_prefix ("MSG_SHOWMAINDIALOG")) {

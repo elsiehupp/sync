@@ -30,6 +30,6 @@ public class GLib.StringTokenizer : GLib.Tokenizer<string> {
             begin++;
             end -= 2;
         }
-        return /* GLib.StringRef */ string (&d.string, begin, end);
+        return /* GLib.StringRef */ new string (&d.string, begin, end);
     }
 }

@@ -177,8 +177,8 @@ public class WebFlowCredentialsDialog : Gtk.Dialog {
 
     /***********************************************************
     ***********************************************************/
-    protected override void change_event (Gdk.Event e) {
-        switch (e.type ()) {
+    protected void change_event (Gdk.Event e) {
+        switch (e.type) {
         case Gdk.Event.StyleChange:
         case Gdk.Event.PaletteChange:
         case Gdk.Event.ThemeChange:

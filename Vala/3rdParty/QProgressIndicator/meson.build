@@ -2,8 +2,8 @@ srcs = files([
     'QProgressIndicator.vala',
 ])
 
-executable(
-    meson.project_name(),
+library(
+    'QProgressIndicator',
     srcs,
 #     dependencies: deps,
     install: false

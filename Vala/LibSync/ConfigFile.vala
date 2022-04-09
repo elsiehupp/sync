@@ -909,8 +909,9 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     void ConfigFile.save_geometry_header (GLib.HeaderView header) {
     // #ifndef TOKEN_AUTH_ONLY
-        if (!header)
+        if (header == null) {
             return;
+        }
         //  ASSERT (!header.object_name () == "");
 
         GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);
@@ -925,8 +926,9 @@ public class ConfigFile : GLib.Object {
     ***********************************************************/
     void ConfigFile.restore_geometry_header (GLib.HeaderView header) {
     // #ifndef TOKEN_AUTH_ONLY
-        if (!header)
+        if (header == null) {
             return;
+        }
         //  ASSERT (!header.object_name () == null);
 
         GLib.Settings settings = new GLib.Settings (ConfigFile.config_file, GLib.Settings.IniFormat);

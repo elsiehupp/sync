@@ -31,8 +31,8 @@ deps = [
     # dependency('libsoup-2.4'),
 ]
 
-executable(
-    meson.project_name(),
+csync = library(
+    'CSync',
     srcs,
     dependencies: deps,
     install: false

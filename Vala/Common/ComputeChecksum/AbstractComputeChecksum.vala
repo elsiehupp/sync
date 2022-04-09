@@ -1,3 +1,5 @@
+using ZLib;
+
 namespace Occ {
 namespace Common {
 
@@ -8,24 +10,25 @@ namespace Common {
 
 @copyright LGPLv2.1 or later
 ***********************************************************/
-abstract class AbstractComputeChecksum : GLib.Object {
-
-    using ZLib;
+public abstract class AbstractComputeChecksum : GLib.Object {
 
     /***********************************************************
     Tags for checksum headers values.
     They are here for being shared between Upload- and Download Job
     ***********************************************************/
-    const string CHECKSUM_MD5C = "MD5";
-    const string CHECKSUM_SHA1C = "SHA1";
-    const string CHECKSUM_SHA2C = "SHA256";
-    const string CHECKSUM_SHA3C = "SHA3-256";
-    const string CHECKSUM_ADLER_C = "Adler32";
+    protected const string CHECKSUM_MD5C = "MD5";
+    protected const string CHECKSUM_SHA1C = "SHA1";
+    protected const string CHECKSUM_SHA2C = "SHA256";
+    protected const string CHECKSUM_SHA3C = "SHA3-256";
+    protected const string CHECKSUM_ADLER_C = "Adler32";
 
+    protected const int64 BUFSIZE = 500 * 1024; // 500 KiB
 
-    const int64 BUFSIZE = 500 * 1024; // 500 KiB
+    protected static bool enabled;
 
-    private static bool enabled;
+    protected AbstractComputeChecksum (GLib.Object parent = new GLib.Object ()) {
+        base (parent);
+    }
 
     /***********************************************************
     Returns the highest-quality checksum in a 'checksums'
@@ -36,7 +39,7 @@ abstract class AbstractComputeChecksum : GLib.Object {
 
 
     ***********************************************************/
-    string find_best_checksum (string checksums) {
+    protected static string find_best_checksum (string checksums) {
         if (checksums == "") {
             return "";
         }
@@ -64,7 +67,7 @@ abstract class AbstractComputeChecksum : GLib.Object {
     /***********************************************************
     Creates a checksum header from type and value.
     ***********************************************************/
-    string make_checksum_header (string checksum_type, string checksum_string) {
+    protected static string make_checksum_header (string checksum_type, string checksum_string) {
         if (checksum_type == "" || checksum_string == "") {
             return "";
         }
@@ -78,14 +81,14 @@ abstract class AbstractComputeChecksum : GLib.Object {
     /***********************************************************
     Parses a checksum header
     ***********************************************************/
-    bool parse_checksum_header (string header, string type, string checksum_string) {
+    protected static bool parse_checksum_header (string header, string type, string checksum_string) {
         if (header == "") {
             type == "";
             checksum_string == "";
             return true;
         }
 
-        var index = header.index_of (':');
+        var index = header.index_of (":");
         if (index < 0) {
             return false;
         }
@@ -99,8 +102,8 @@ abstract class AbstractComputeChecksum : GLib.Object {
     /***********************************************************
     Convenience for getting the type from a checksum header, null if none
     ***********************************************************/
-    string parse_checksum_header_type (string header) {
-        var index = header.index_of (':');
+    protected static string parse_checksum_header_type (string header) {
+        var index = header.index_of (":");
         if (index < 0) {
             return "";
         }
@@ -111,8 +114,10 @@ abstract class AbstractComputeChecksum : GLib.Object {
     /***********************************************************
     Checks OWNCLOUD_DISABLE_CHECKSUM_UPLOAD
     ***********************************************************/
-    bool upload_checksum_enabled () {
-        AbstractComputeChecksum.enabled = q_environment_variable_is_empty ("OWNCLOUD_DISABLE_CHECKSUM_UPLOAD");
+    protected static bool upload_checksum_enabled () {
+        string[]? envp;
+        GLib.Environ.get_variable (envp, "OWNCLOUD_DISABLE_CHECKSUM_UPLOAD");
+        AbstractComputeChecksum.enabled = envp.length == 0;
         return AbstractComputeChecksum.enabled;
     }
 
@@ -125,21 +130,21 @@ abstract class AbstractComputeChecksum : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    string calc_md5 (GLib.OutputStream device) {
+    protected static string calc_md5 (GLib.OutputStream device) {
         return calc_crypto_hash (device, GLib.ChecksumType.MD5);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    string calc_sha1 (GLib.OutputStream device) {
+    protected static string calc_sha1 (GLib.OutputStream device) {
         return calc_crypto_hash (device, GLib.ChecksumType.SHA1);
     }
 
 
     /***********************************************************
     ***********************************************************/
-    string calc_adler32 (GLib.OutputStream device) {
+    protected static string calc_adler32 (GLib.OutputStream device) {
         if (device.length == 0) {
             return "";
         }
@@ -159,7 +164,7 @@ abstract class AbstractComputeChecksum : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    static string calc_crypto_hash (GLib.OutputStream device, GLib.ChecksumType checksum_type) {
+    protected static string calc_crypto_hash (GLib.OutputStream device, GLib.ChecksumType checksum_type) {
         string arr;
         GLib.Checksum checksum = new GLib.Checksum (checksum_type);
 
@@ -172,8 +177,10 @@ abstract class AbstractComputeChecksum : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    static bool checksum_computation_enabled () {
-        AbstractComputeChecksum.enabled = q_environment_variable_is_empty ("OWNCLOUD_DISABLE_CHECKSUM_COMPUTATIONS");
+    protected static bool checksum_computation_enabled () {
+        string[]? envp;
+        GLib.Environ.get_variable (envp, "OWNCLOUD_DISABLE_CHECKSUM_UPLOAD");
+        AbstractComputeChecksum.enabled = envp.length == 0;
         return AbstractComputeChecksum.enabled;
     }
 

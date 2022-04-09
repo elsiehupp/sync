@@ -5,7 +5,7 @@ namespace LibSync {
 /***********************************************************
 @class TokenCredentialsAccessManager
 ***********************************************************/
-public class TokenCredentialsAccessManager : AccessManager {
+public class TokenCredentialsAccessManager : Soup.ClientContext {
 
     private const TokenCredentials credentials;
 
@@ -33,7 +33,7 @@ public class TokenCredentialsAccessManager : AccessManager {
             raw_cookie (token, request.url);
         }
 
-        return AccessManager.create_request (operation, request, outgoing_data);
+        return Soup.ClientContext.create_request (operation, request, outgoing_data);
     }
 
 } // class TokenCredentialsAccessManager

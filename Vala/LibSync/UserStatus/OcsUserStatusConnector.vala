@@ -95,7 +95,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
     ***********************************************************/
     public void clear_message () {
         this.clear_message_job = new JsonApiJob (this.account, USER_STATUS_BASE_URL + "/message");
-        this.clear_message_job.verb (JsonApiJob.Verb.DELETE);
+        this.clear_message_job.verb = JsonApiJob.Verb.DELETE;
         this.clear_message_job.signal_json_received.connect (
             this.on_signal_message_cleared
         );
@@ -236,13 +236,13 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
             USER_STATUS_BASE_URL + "/status",
             this
         );
-        this.online_status_job.verb (JsonApiJob.Verb.PUT);
+        this.online_status_job.verb = JsonApiJob.Verb.PUT;
         // Set body
         Json.Object data_object;
         data_object.insert ("status_type", online_status_to_string (online_status));
         GLib.JsonDocument body;
         body.object (data_object);
-        this.online_status_job.body (body);
+        this.online_status_job.body = body;
         this.online_status_job.signal_json_received.connect (
             this.on_signal_user_status_online_status_set
         );
@@ -253,8 +253,8 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
     /***********************************************************
     ***********************************************************/
     private void user_status_message (UserStatus user_status) {
-        if (user_status.message_predefined ()) {
-            user_status_message_predefined (user_status);
+        if (user_status.message_predefined) {
+            user_status_message_predefined = user_status;
             return;
         }
         user_status_message_custom (user_status);
@@ -264,24 +264,24 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
     /***********************************************************
     ***********************************************************/
     private void user_status_message_predefined (UserStatus user_status) {
-        GLib.assert (user_status.message_predefined ());
-        if (!user_status.message_predefined ()) {
+        GLib.assert (user_status.message_predefined);
+        if (!user_status.message_predefined) {
             return;
         }
 
         this.message_job = new JsonApiJob (this.account, USER_STATUS_BASE_URL + "/message/predefined", this);
-        this.message_job.verb (JsonApiJob.Verb.PUT);
+        this.message_job.verb = JsonApiJob.Verb.PUT;
         // Set body
         Json.Object data_object;
         data_object.insert ("message_id", user_status.identifier);
-        if (user_status.clear_at ()) {
+        if (user_status.clear_at) {
             data_object.insert ("clear_at", (int)clear_at_to_timestamp (user_status.clear_at ()));
         } else {
             data_object.insert ("clear_at", GLib.JsonValue ());
         }
         GLib.JsonDocument body;
         body.object (data_object);
-        this.message_job.body (body);
+        this.message_job.body = body;
         this.message_job.signal_json_received.connect (
             this.on_signal_user_status_message_set
         );
@@ -292,8 +292,8 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
     /***********************************************************
     ***********************************************************/
     private void user_status_message_custom (UserStatus user_status) {
-        GLib.assert (!user_status.message_predefined ());
-        if (user_status.message_predefined ()) {
+        GLib.assert (!user_status.message_predefined);
+        if (user_status.message_predefined) {
             return;
         }
 
@@ -302,12 +302,12 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
             return;
         }
         this.message_job = new JsonApiJob (this.account, USER_STATUS_BASE_URL + "/message/custom", this);
-        this.message_job.verb (JsonApiJob.Verb.PUT);
+        this.message_job.verb = JsonApiJob.Verb.PUT;
         // Set body
         Json.Object data_object;
         data_object.insert ("status_icon", user_status.icon ());
         data_object.insert ("message", user_status.message ());
-        var clear_at = user_status.clear_at ();
+        var clear_at = user_status.clear_at;
         if (clear_at) {
             data_object.insert ("clear_at", (int)clear_at_to_timestamp (*clear_at));
         } else {
@@ -315,7 +315,7 @@ public class OcsUserStatusConnector : AbstractUserStatusConnector {
         }
         GLib.JsonDocument body;
         body.object (data_object);
-        this.message_job.body (body);
+        this.message_job.body = body;
         this.message_job.signal_json_received.connect (
             this.on_signal_user_status_message_set
         );

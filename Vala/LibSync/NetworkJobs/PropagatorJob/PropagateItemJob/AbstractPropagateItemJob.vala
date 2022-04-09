@@ -19,7 +19,7 @@ public abstract class AbstractPropagateItemJob : AbstractPropagatorJob {
     /***********************************************************
     ***********************************************************/
     private AbstractPropagateItemJob restore_job;
-    new JobParallelism parallelism { public get; private set; }
+    public new JobParallelism parallelism { public get; private set; }
 
     /***********************************************************
     ***********************************************************/

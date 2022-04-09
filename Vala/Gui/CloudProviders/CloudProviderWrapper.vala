@@ -94,13 +94,12 @@ public class CloudProviderWrapper : GLib.Object {
 
     GLib.SimpleActionGroup action_group {
         public get {
-            GLib.Object.clear (action_group);
             action_group = new GLib.SimpleActionGroup ();
-            GLib.ActionMap.add_action_entries (G_ACTION_MAP (action_group), actions, G_N_ELEMENTS (actions), this);
+            action_group.add_action_entries (actions, this);
             bool state = this.folder_connection.sync_paused;
-            GLib.Action pause = GLib.ActionMap.lookup_action (G_ACTION_MAP (action_group), "pause");
+            GLib.Action pause = action_group.lookup_action ("pause");
             pause.set_state (GLib.Variant.boolean (state));
-            return G_ACTION_GROUP (g_object_ref (action_group));
+            return action_group;
         }
         private set {
             this.action_group = value;
@@ -233,7 +232,7 @@ public class CloudProviderWrapper : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void update_status_text (string status_text) {
-        string status = "%1 - %2".printf (this.folder_connection.account_state.state_string (this.folder_connection.account_state.state), status_text);
+        string status = "%1 - %2".printf (AccountState.state_string (this.folder_connection.account_state.state), status_text);
         cloud_providers_account_exporter_status_details (this.cloud_provider_account, status.to_utf8 ());
     }
 
@@ -354,8 +353,8 @@ public class CloudProviderWrapper : GLib.Object {
     public void on_signal_sync_paused_changed (FolderConnection folder_connection, bool state) {
         //  Q_UNUSED (folder_connection);
         this.paused = state;
-        GLib.Action pause = GLib.ActionMap.lookup_action (G_ACTION_MAP (action_group), "pause");
-        GLib.SimpleAction.set_state (G_SIMPLE_ACTION (pause), GLib.Variant.boolean (state));
+        GLib.Action pause = action_group.lookup_action ("pause");
+        pause.set_state (GLib.Variant.boolean (state));
         update_pause_status ();
     }
 
@@ -405,40 +404,40 @@ public class CloudProviderWrapper : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private static void activate_action_open (GLib.SimpleAction action, GLib.Variant parameter, gpointer user_data) {
+    private void activate_action_open (GLib.SimpleAction action, GLib.Variant parameter, gpointer user_data) {
         //  Q_UNUSED (parameter);
-        gchar name = g_action_get_name (G_ACTION (action));
+        string name = action.get_name ();
         var self = (CloudProviderWrapper)user_data;
         var gui = (OwncloudGui)self.parent ().parent ();
 
-        if (g_str_equal (name, "openhelp")) {
+        if (name == "openhelp") {
             gui.on_signal_help ();
         }
 
-        if (g_str_equal (name, "opensettings")) {
+        if (name == "opensettings") {
             gui.on_signal_show_settings ();
         }
 
-        if (g_str_equal (name, "openwebsite")) {
+        if (name == "openwebsite") {
             GLib.DesktopServices.open_url (self.folder_connection.account_state.account.url);
         }
 
-        if (g_str_equal (name, "openfolder")) {
+        if (name == "openfolder") {
             show_in_file_manager (self.folder_connection.clean_path);
         }
 
-        if (g_str_equal (name, "showfile")) {
+        if (name == "showfile") {
             gchar path = g_variant_get_string (parameter, null);
             g_print ("showfile => %s\n", path);
             show_in_file_manager (path);
         }
 
-        if (g_str_equal (name, "log_out")) {
+        if (name == "log_out") {
             self.folder_connection.account_state.sign_out_by_ui ();
         }
 
-        if (g_str_equal (name, "quit")) {
-            GLib.Application.quit ();
+        if (name == "quit") {
+            this.quit ();
         }
     }
 

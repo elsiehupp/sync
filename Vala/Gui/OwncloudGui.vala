@@ -249,7 +249,7 @@ public class OwncloudGui : GLib.Object {
             GLib.List<string> messages = new GLib.List<string> ()
             messages.append (_("Disconnected from accounts:"));
             foreach (unowned AccountState account in problem_accounts) {
-                string message = _("Account %1 : %2").printf (account.account.display_name, account.state_string (account.state));
+                string message = _("Account %1 : %2").printf (account.account.display_name, AccountState.state_string (account.state));
                 if (!account.connection_errors.empty ()) {
                     message += "\n";
                     message += account.connection_errors ().join ("\n");
@@ -716,7 +716,7 @@ public class OwncloudGui : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private void on_signal_new_account_wizard () {
+    public void on_signal_new_account_wizard () {
         OwncloudSetupWizard.run_wizard (
             GLib.Application,
             on_signal_owncloud_wizard_done (int)

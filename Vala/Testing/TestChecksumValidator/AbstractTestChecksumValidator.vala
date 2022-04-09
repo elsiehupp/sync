@@ -9,13 +9,13 @@ namespace Testing {
 
 public abstract class AbstractTestChecksumValidator : GLib.Object {
 
-    private GLib.TemporaryDir root;
-    private string testfile;
-    private string expected_error;
-    private string expected;
-    private string expected_type;
-    private bool success_down;
-    private bool error_seen;
+    protected GLib.TemporaryDir root;
+    protected string testfile;
+    protected string expected_error;
+    protected string expected;
+    protected string expected_type;
+    protected bool success_down;
+    protected bool error_seen;
 
     /***********************************************************
     ***********************************************************/

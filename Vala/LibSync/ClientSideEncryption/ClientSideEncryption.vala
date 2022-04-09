@@ -181,7 +181,7 @@ public class ClientSideEncryption : GLib.Object {
         GLib.info (output);
 
         var sign_public_key_api_job = new SignPublicKeyApiJob (account, E2EE_BASE_URL + "public-key", this);
-        sign_public_key_api_job.csr (output);
+        sign_public_key_api_job.csr = output;
 
         SignPublicKeyApiJob.signal_json_received.connect (
             (sign_public_key_api_job, json, return_code) => {
@@ -217,7 +217,7 @@ public class ClientSideEncryption : GLib.Object {
 
         // Send private key to the server
         var store_private_key_api_job = new StorePrivateKeyApiJob (account, E2EE_BASE_URL + "private-key", this);
-        store_private_key_api_job.private_key (crypted_text);
+        store_private_key_api_job.private_key = crypted_text;
         StorePrivateKeyApiJob.signal_json_received.connect (
             (store_private_key_api_job, doc, return_code) => {
                 //  Q_UNUSED (doc);

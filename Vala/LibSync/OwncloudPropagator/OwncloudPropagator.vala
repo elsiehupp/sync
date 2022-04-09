@@ -204,7 +204,7 @@ public class OwncloudPropagator : GLib.Object {
         string removed_directory;
         string maybe_conflict_directory;
         foreach (unowned SyncFileItem item in synced_items) {
-            if (!removed_directory == "" && item.file.has_prefix (removed_directory)) {
+            if (removed_directory != "" && item.file.has_prefix (removed_directory)) {
                 // this is an item in a directory which is going to be removed.
                 var del_dir_job = (PropagateDirectory)directories_to_remove.nth_data (0);
 
@@ -238,7 +238,7 @@ public class OwncloudPropagator : GLib.Object {
             // If a CONFLICT item contains files these can't be processed because
             // the conflict handling is likely to rename the directory. This can happen
             // when there's a new local directory at the same time as a remote file.
-            if (!maybe_conflict_directory == "") {
+            if (maybe_conflict_directory != "") {
                 if (item.destination ().has_prefix (maybe_conflict_directory)) {
                     GLib.info (
                         "Skipping job inside CONFLICT directory "

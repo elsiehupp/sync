@@ -325,7 +325,7 @@ public class ExcludedFiles : GLib.Object {
     or directory pointed to is hidden (or whether it even exists).
     ***********************************************************/
     public CSync.ExcludedFiles.Type traversal_pattern_match (string path, ItemType filetype) {
-        var match = this.csync_excluded_common (path, this.exclude_conflict_files);
+        var match = csync_excluded_common (path, this.exclude_conflict_files);
         if (match != CSync.ExcludedFiles.Type.NOT_EXCLUDED)
             return match;
         if (this.all_excludes == "")
@@ -515,7 +515,7 @@ public class ExcludedFiles : GLib.Object {
     or directory pointed to is hidden (or whether it even exists).
     ***********************************************************/
     private CSync.ExcludedFiles.Type full_pattern_match (string path, ItemType filetype) {
-        var match = this.csync_excluded_common (p, this.exclude_conflict_files);
+        var match = csync_excluded_common (p, this.exclude_conflict_files);
         if (match != CSync.ExcludedFiles.Type.NOT_EXCLUDED)
             return match;
         if (this.all_excludes == "")

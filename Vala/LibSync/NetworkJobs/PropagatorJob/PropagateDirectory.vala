@@ -87,7 +87,7 @@ public class PropagateDirectory : AbstractPropagatorJob {
     ***********************************************************/
     public new JobParallelism parallelism () {
         // If any of the non-on_signal_finished sub jobs is not parallel, we have to wait
-        if (this.first_job != null && this.first_job.parallelism () != JobParallelism.FULL_PARALLELISM) {
+        if (this.first_job != null && this.first_job.parallelism != JobParallelism.FULL_PARALLELISM) {
             return JobParallelism.WAIT_FOR_FINISHED;
         }
         if (this.sub_jobs.parallelism () != JobParallelism.FULL_PARALLELISM) {

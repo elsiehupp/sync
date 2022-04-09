@@ -187,10 +187,13 @@ public class ShareLinkWidget : Gtk.Widget {
         );
 
         // Prepare permissions check and create group action
-        GLib.Date expire_date = this.link_share.expire_date ().is_valid
-            ? this.link_share.expire_date ()
-            : GLib.Date ();
-        SharePermissions share_permissions = this.link_share.permissions ();
+        GLib.Date expire_date;
+        if (this.link_share.expire_date.is_valid) {
+            expire_date = this.link_share.expire_date;
+        } else {
+            expire_date = GLib.Date ();
+        }
+        SharePermissions share_permissions = this.link_share.permissions;
         var checked = false;
         var permissions_group = new GLib.ActionGroup (this);
 
@@ -296,7 +299,7 @@ public class ShareLinkWidget : Gtk.Widget {
         if (this.account.capabilities.share_public_link_enforce_password ()) {
             if (this.link_share.password_is_set) {
                 this.password_protect_link_action.checked (true);
-                this.password_protect_link_action.enabled (false);
+                this.password_protect_link_action.enabled = false;
             }
             this.password_required = true;
         }
@@ -321,7 +324,7 @@ public class ShareLinkWidget : Gtk.Widget {
             this.instance.calendar.maximum_date (GLib.Date.current_date ().add_days (
                 this.account.capabilities.share_public_link_expire_date_days ()));
             this.expiration_date_link_action.checked (true);
-            this.expiration_date_link_action.enabled (false);
+            this.expiration_date_link_action.enabled = false;
             this.expiry_required = true;
         }
 
@@ -658,7 +661,7 @@ public class ShareLinkWidget : Gtk.Widget {
         this.instance.calendar.visible (enable);
         this.instance.confirm_expiration_date.visible (enable);
 
-        var date = enable ? this.link_share.expire_date () : GLib.Date.current_date ().add_days (1);
+        var date = enable ? this.link_share.expire_date : GLib.Date.current_date ().add_days (1);
         this.instance.calendar.date (date);
         this.instance.calendar.minimum_date (GLib.Date.current_date ().add_days (1));
         this.instance.calendar.maximum_date (
@@ -724,16 +727,16 @@ public class ShareLinkWidget : Gtk.Widget {
     /***********************************************************
     Retrieve a share's name, accounting for this.names_supported
     ***********************************************************/
-    private static string share_name {
+    private string share_name {
         private get {
-            string name = ShareLinkWidget.link_share.name ();
+            string name = this.link_share.name;
             if (!name == "") {
                 return name;
             }
-            if (!ShareLinkWidge.names_supported) {
+            if (!ShareLinkWidget.names_supported) {
                 return _("Public link");
             }
-            return ShareLinkWidget.link_share.token ();
+            return this.link_share.token;
         }
     }
 

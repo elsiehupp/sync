@@ -38,7 +38,7 @@ public class UserAppsModel : GLib.AbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    private AccountAppList apps;
+    private GLib.List<AccountApp> apps;
 
 
     /***********************************************************

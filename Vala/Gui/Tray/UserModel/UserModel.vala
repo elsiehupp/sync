@@ -101,13 +101,13 @@ public class UserModel : GLib.AbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public User current_user {
+    public static User current_user {
         public get {
-            if (this.current_user_id < 0 || this.current_user_id >= this.users.length ()) {
+            if (UserModel.current_user_id < 0 || UserModel.current_user_id >= UserModel.users.length ()) {
                 return null;
             }
 
-            return this.users[this.current_user_id];
+            return UserModel.users[this.current_user_id];
         }
     }
 
@@ -491,7 +491,7 @@ public class UserModel : GLib.AbstractListModel {
 
     /***********************************************************
     ***********************************************************/
-    public AccountAppList app_list {
+    public GLib.List<AccountApp> app_list {
         public get {
             if (this.current_user_id < 0 || this.current_user_id >= this.users.size ()) {
                 return {};

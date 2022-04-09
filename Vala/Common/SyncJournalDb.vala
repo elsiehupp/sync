@@ -318,7 +318,7 @@ public class SyncJournalDb : GLib.Object {
     /***********************************************************
     Public functions are protected with the mutex.
     ***********************************************************/
-    private GLib.RecursiveMutex mutex;
+    internal GLib.RecursiveMutex mutex;
 
     private GLib.HashTable<string, int> checksym_type_cache;
     private int transaction;
@@ -354,7 +354,7 @@ public class SyncJournalDb : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    private PreparedSqlQueryManager query_manager;
+    internal PreparedSqlQueryManager query_manager;
 
 
     /***********************************************************
@@ -634,7 +634,7 @@ public class SyncJournalDb : GLib.Object {
     }
 
 
-    delegate void RowCallback (SyncJournalFileRecord record);
+    public delegate void RowCallback (SyncJournalFileRecord record);
 
     /***********************************************************
     ***********************************************************/
@@ -1043,10 +1043,10 @@ public class SyncJournalDb : GLib.Object {
     public Optional<HasHydratedDehydrated> has_hydrated_or_dehydrated_files (string filename) {
         GLib.MutexLocker locker = new GLib.MutexLocker (SyncJournalDb.mutex);
         if (!check_connect ()) {
-            return {};
+            return null;
         }
 
-        PreparedSqlQuery query = SyncJournalDb.query_manager.get (
+        PreparedSqlQuery query = this.query_manager.get (
             PreparedSqlQueryManager.Key.COUNT_DEHYDRATED_FILES_QUERY,
             "SELECT DISTINCT type FROM metadata"
             + " WHERE (" + is_prefix_path_or_equal ("?1", "path") + " OR ?1 == '');",

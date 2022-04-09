@@ -154,10 +154,10 @@ public class UploadDevice : GLib.OutputStream {
         if (maxlen <= 0) {
             return 0;
         }
-        if (choked ()) {
+        if (choked) {
             return 0;
         }
-        if (bandwidth_limited ()) {
+        if (bandwidth_limited) {
             maxlen = int64.min (maxlen, this.bandwidth_quota);
             if (maxlen <= 0) { // no quota
                 return 0;

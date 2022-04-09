@@ -170,8 +170,8 @@ deps = [
     dependency('libsoup-2.4'),
 ]
 
-executable(
-    meson.project_name(),
+lib_sync = library(
+    'LibSync',
     srcs,
     dependencies: deps,
     install: false

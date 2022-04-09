@@ -58,7 +58,7 @@ public class GlobalWheelFilter : GLib.Object {
     /***********************************************************
     ***********************************************************/
     public void remove_item_handler_association (GLib.QuickItem item, WheelHandler handler) {
-        if (!item || !handler) {
+        if (item == null || handler == null) {
             return;
         }
         m_handlers_for_item.remove (item, handler);

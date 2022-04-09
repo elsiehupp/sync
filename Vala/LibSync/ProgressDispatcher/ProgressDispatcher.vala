@@ -25,7 +25,7 @@ public class ProgressDispatcher : GLib.Object {
     private GLib.Timer timer;
     static ProgressDispatcher instance {
         public get {
-            if (!ProgressDispatcher.instance) {
+            if (ProgressDispatcher.instance == null) {
                 ProgressDispatcher.instance = new ProgressDispatcher ();
             }
             return ProgressDispatcher.instance;

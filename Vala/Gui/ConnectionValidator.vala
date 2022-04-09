@@ -455,7 +455,7 @@ public class ConnectionValidator : GLib.Object {
 
     //  #if GLib.T_VERSION >= GLib.T_VERSION_CHECK (5, 9, 0)
         // Record that the server supports HTTP/2
-        // Actual decision if we should use HTTP/2 is done in AccessManager.create_request
+        // Actual decision if we should use HTTP/2 is done in Soup.ClientContext.create_request
         var abstract_network_job = (AbstractNetworkJob) sender ();
         if (abstract_network_job) {
             if (abstract_network_job.input_stream) {

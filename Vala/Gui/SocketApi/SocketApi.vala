@@ -328,7 +328,7 @@ public class SocketApi : GLib.Object {
             int arg_pos = line.index_of (':');
             string command = line.mid_ref (0, arg_pos).to_utf8 ().to_upper ();
 
-            var argument = arg_pos != -1 ? line.mid_ref (arg_pos + 1) : /* GLib.StringRef */ string ();
+            var argument = arg_pos != -1 ? line.mid_ref (arg_pos + 1) : /* GLib.StringRef */ new string ();
             if (command.has_prefix ("ASYNC_")) {
                 var arguments = argument.split ('|');
                 if (arguments.size () != 2) {
@@ -568,7 +568,7 @@ public class SocketApi : GLib.Object {
 
         /***********************************************************
         ***********************************************************/
-        FileData parent_folder () {
+        internal FileData parent_folder () {
             return FileData.file_data (new GLib.FileInfo (local_path).directory ().path.to_utf8 ());
         }
 
@@ -786,11 +786,12 @@ public class SocketApi : GLib.Object {
 
         foreach (string file in files) {
             var data = FileData.file_data (file);
-            if (!data.folder_connection)
+            if (data.folder_connection == null) {
                 continue;
+            }
 
             // Update the pin state on all items
-            if (!data.folder_connection.vfs ().pin_state (data.folder_relative_path, PinState.PinState.ALWAYS_LOCAL)) {
+            if (!data.folder_connection.vfs.pin_state (data.folder_relative_path, PinState.PinState.ALWAYS_LOCAL)) {
                 GLib.warning ("Could not set pin state of " + data.folder_relative_path + " to always local.");
             }
 
@@ -810,12 +811,12 @@ public class SocketApi : GLib.Object {
 
         foreach (string file in files) {
             var data = FileData.file_data (file);
-            if (!data.folder_connection) {
+            if (data.folder_connection == null) {
                 continue;
             }
 
             // Update the pin state on all items
-            if (!data.folder_connection.vfs ().pin_state (data.folder_relative_path, Common.ItemAvailability.ONLINE_ONLY)) {
+            if (!data.folder_connection.vfs.pin_state (data.folder_relative_path, Common.ItemAvailability.ONLINE_ONLY)) {
                 GLib.warning ("Could not set pin state of " + data.folder_relative_path + " to online only.");
             }
 
@@ -831,17 +832,18 @@ public class SocketApi : GLib.Object {
     ***********************************************************/
     private void command_RESOLVE_CONFLICT (string local_file, SocketListener listener) {
         var file_data = FileData.file_data (local_file);
-        if (!file_data.folder_connection || !Utility.is_conflict_file (file_data.folder_relative_path))
+        if (file_data.folder_connection == null || !Utility.is_conflict_file (file_data.folder_relative_path)) {
             return; // should not have shown menu item
+        }
 
         var conflicted_relative_path = file_data.folder_relative_path;
         var base_relative_path = file_data.folder_connection.journal_database ().conflict_file_base_name (file_data.folder_relative_path.to_utf8 ());
 
-        var directory = GLib.Dir (file_data.folder_connection.path);
+        var directory = new GLib.Dir (file_data.folder_connection.path);
         var conflicted_path = directory.file_path (conflicted_relative_path);
         var base_path = directory.file_path (base_relative_path);
 
-        var base_name = GLib.FileInfo (base_path).filename ();
+        var base_name = new GLib.FileInfo (base_path).filename ();
 
     //  #ifndef OWNCLOUD_TEST
         ConflictDialog dialog;
@@ -871,8 +873,9 @@ public class SocketApi : GLib.Object {
     private void command_MOVE_ITEM (string local_file, SocketListener listener) {
         var file_data = FileData.file_data (local_file);
         var parent_dir = file_data.parent_folder ();
-        if (!file_data.folder_connection)
+        if (file_data.folder_connection == null) {
             return; // should not have shown menu item
+        }
 
         string default_dir_and_name = file_data.folder_relative_path;
 
@@ -886,17 +889,18 @@ public class SocketApi : GLib.Object {
         var parent_record = parent_dir.journal_record ();
         if ((file_info.is_file () && !parent_record.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_ADD_FILE))
             || (file_info.is_dir () && !parent_record.remote_permissions.has_permission (RemotePermissions.Permissions.CAN_ADD_SUB_DIRECTORIES))) {
-            default_dir_and_name = GLib.FileInfo (default_dir_and_name).filename ();
+            default_dir_and_name = new GLib.FileInfo (default_dir_and_name).filename ();
         }
 
         // Add back the folder_connection path
-        default_dir_and_name = GLib.Dir (file_data.folder_connection.path).file_path (default_dir_and_name);
+        default_dir_and_name = new GLib.Dir (file_data.folder_connection.path).file_path (default_dir_and_name);
 
         var target = GLib.FileDialog.save_filename (
             null,
             _("Select new location …"),
             default_dir_and_name,
-            "", null, GLib.FileDialog.Hide_name_filter_details);
+            "", null, GLib.FileDialog.Hide_name_filter_details
+        );
         if (target == "") {
             return;
         }
@@ -1073,7 +1077,7 @@ public class SocketApi : GLib.Object {
         foreach (var file in files) {
             var folder_connection = FolderManager.instance.folder_for_path (file);
             if (folder_connection != sync_folder) {
-                if (!sync_folder) {
+                if (sync_folder == null) {
                     sync_folder = folder_connection;
                 } else {
                     sync_folder = null;
@@ -1159,7 +1163,7 @@ public class SocketApi : GLib.Object {
             var combined = new Optional<Common.ItemAvailability> ();
             foreach (var file in files) {
                 var file_data = FileData.file_data (file);
-                var availability = sync_folder.vfs ().availability (file_data.folder_relative_path);
+                var availability = sync_folder.vfs.availability (file_data.folder_relative_path);
                 if (!availability) {
                     if (availability.error == AbstractVfs.AvailabilityError.DATABASE_ERROR) {
                         availability = Common.ItemAvailability.MIXED;

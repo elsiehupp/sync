@@ -27,7 +27,7 @@ public class StorePrivateKeyApiJob : AbstractNetworkJob {
     This function needs to be called before start () obviously.
     ***********************************************************/
     public Soup.Buffer private_key {
-        private get {
+        internal get {
             return this.private_key;
         }
         public set {

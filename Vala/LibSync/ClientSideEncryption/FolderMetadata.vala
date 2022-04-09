@@ -8,7 +8,7 @@ public class FolderMetadata : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    GLib.List<EncryptedFile> files { public get; private set; }
+    public GLib.List<EncryptedFile> files { public get; private set; }
 
     private GLib.HashTable<int, string> metadata_keys;
     private unowned Account account;

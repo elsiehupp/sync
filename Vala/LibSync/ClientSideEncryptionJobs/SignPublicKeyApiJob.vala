@@ -27,7 +27,7 @@ public class SignPublicKeyApiJob : AbstractNetworkJob {
     This function needs to be called before start () obviously.
     ***********************************************************/
     public Soup.Buffer csr {
-        private get {
+        internal get {
             return this.csr;
         }
         public set {

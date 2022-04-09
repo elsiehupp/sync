@@ -135,7 +135,7 @@ public class ComputeChecksum : AbstractComputeChecksum {
         }
     //  #endif
         // for an unknown checksum or no checksum, we're done right now
-        if (!checksum_type == "") {
+        if (checksum_type != "") {
             GLib.warning ("Unknown checksum type: " + checksum_type);
         }
         return "";
@@ -180,7 +180,7 @@ public class ComputeChecksum : AbstractComputeChecksum {
 
         // We'd prefer to move the unique_ptr into the lambda, but that's
         // awkward with the C++ standard we're on
-        var shared_device = unowned GLib.OutputStream  (device.release ());
+        var shared_device = new unowned GLib.OutputStream  (device.release ());
 
         // Bug: The thread will keep running even if ComputeChecksum is deleted.
         string type = this.checksum_type;

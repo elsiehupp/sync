@@ -130,7 +130,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
         var slash_position = path.last_index_of ("/");
         var parent_path = slash_position >= 0 ? path.left (slash_position): "";
 
-        if (!this.item.rename_target == "" && this.item.file != this.item.rename_target) {
+        if (this.item.rename_target != "" && this.item.file != this.item.rename_target) {
             // Try to rename the file
             var original_file_path_absolute = this.propagator.full_local_path (this.item.file);
             var new_file_path_absolute = this.propagator.full_local_path (this.item.rename_target);
@@ -504,8 +504,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
     }
 
 
-
-    void on_signal_finalize () {
+    internal void on_signal_finalize () {
         // Update the quota, if known
         var quota_it = this.propagator.folder_quota.find (GLib.File.new_for_path (this.item.file).path);
         if (quota_it != this.propagator.folder_quota.end ())
@@ -582,8 +581,9 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
         // Abort all running jobs, except for explicitly excluded ones
         foreach (AbstractNetworkJob abstract_job in this.jobs) {
             var input_stream = abstract_job.input_stream;
-            if (!input_stream || !input_stream.is_running ())
+            if (input_stream == null || !input_stream.is_running ()) {
                 continue;
+            }
 
             (*running_count)++;
 
@@ -744,7 +744,7 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
             headers["OC-Tag"] = ".sys.admin#recall#";
         }
 
-        if (!this.item.etag == "" && this.item.etag != "empty_etag"
+        if (this.item.etag != "" && this.item.etag != "empty_etag"
             && this.item.instruction != CSync.SyncInstructions.NEW // On new files never send a If-Match
             && this.item.instruction != CSync.SyncInstructions.TYPE_CHANGE
             && !this.delete_existing) {
@@ -767,8 +767,8 @@ public class PropagateUploadFileCommon : AbstractPropagateItemJob {
                 headers["OC-ConflictBaseEtag"] = conflict_record.base_etag;
         }
 
-        if (this.upload_encrypted_helper && !this.upload_encrypted_helper.folder_token () == "") {
-            headers.insert ("e2e-token", this.upload_encrypted_helper.folder_token ());
+        if (this.upload_encrypted_helper != null && this.upload_encrypted_helper.folder_token != "") {
+            headers.insert ("e2e-token", this.upload_encrypted_helper.folder_token);
         }
 
         return headers;

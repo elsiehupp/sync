@@ -2,7 +2,7 @@ namespace Occ {
 namespace LibSync {
 
 /***********************************************************
-@brief The AccessManager class
+@brief The Soup.ClientContext class
 
 @author Krzesimir Nowak <krzesimir@endocode.com>
 
@@ -66,7 +66,7 @@ public class AccessManager : Soup.Session {
         return reply;
     }
 
-} // class AccessManager
+} // class Soup.ClientContext
 
 } // namespace LibSync
 } // namespace Occ

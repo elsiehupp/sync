@@ -14,12 +14,12 @@ public class GETFileJob : AbstractNetworkJob {
 
     GLib.OutputStream device;
     GLib.HashTable<string, string> headers;
-    string error_string {
+    public new string error_string {
         public get {
-            if (!this.error_string == "") {
+            if (this.error_string != "") {
                 return this.error_string;
             }
-            return AbstractNetworkJob.error_string;
+            return base.error_string;
         }
         private set {
             this.error_string = value;
@@ -37,7 +37,7 @@ public class GETFileJob : AbstractNetworkJob {
     }
 
 
-    int64 resume_start {
+    public int64 resume_start {
         public get {
             return -1;
         }
@@ -49,7 +49,7 @@ public class GETFileJob : AbstractNetworkJob {
     public SyncFileItem.Status error_status;
 
     GLib.Uri direct_download_url;
-    string etag { public get; private set; }
+    public string etag { public get; private set; }
 
     /***********************************************************
     If this.bandwidth_quota will be used
@@ -70,16 +70,16 @@ public class GETFileJob : AbstractNetworkJob {
     bool bandwidth_choked;
     int64 bandwidth_quota;
 
-    BandwidthManager bandwidth_manager { private get; public set; }
+    public BandwidthManager bandwidth_manager { private get; public set; }
     bool has_emitted_finished_signal;
-    time_t last_modified { public get; private set; }
+    public time_t last_modified { public get; private set; }
 
     /***********************************************************
     Will be set to true once we've seen a 2xx response header
     ***********************************************************/
     bool save_body_to_file = false;
 
-    int64 content_length { public get; protected set; }
+    public int64 content_length { public get; protected set; }
 
 
     internal signal void signal_finished ();
@@ -296,7 +296,7 @@ public class GETFileJob : AbstractNetworkJob {
     /***********************************************************
     ***********************************************************/
     private void on_signal_ready_read () {
-        if (!this.input_stream) {
+        if (this.input_stream == null) {
             return;
         }
         int buffer_size = int64.min (1024 * 8ll, this.input_stream.bytes_available ());
@@ -387,10 +387,10 @@ public class GETFileJob : AbstractNetworkJob {
         }
         this.etag = get_etag_from_reply (this.input_stream);
 
-        if (!this.direct_download_url == "" && !this.etag == "") {
+        if (this.direct_download_url != null && this.etag != "") {
             GLib.info ("Direct download used, ignoring server ETag " + this.etag);
             this.etag = ""; // reset received ETag
-        } else if (!this.direct_download_url == "") {
+        } else if (this.direct_download_url != null) {
             // All fine, ETag empty and direct_download_url used
         } else if (this.etag == "") {
             GLib.warning ("No E-Tag input_stream by server, considering it invalid.");
@@ -398,7 +398,7 @@ public class GETFileJob : AbstractNetworkJob {
             this.error_status = SyncFileItem.Status.NORMAL_ERROR;
             this.input_stream.abort ();
             return;
-        } else if (!this.expected_etag_for_resume == "" && this.expected_etag_for_resume != this.etag) {
+        } else if (this.expected_etag_for_resume != "" && this.expected_etag_for_resume != this.etag) {
             GLib.warning ("We received a different E-Tag for resuming!"
                         + this.expected_etag_for_resume + " vs " + this.etag);
             this.error_string = _("We received a different E-Tag for resuming. Retrying next time.");

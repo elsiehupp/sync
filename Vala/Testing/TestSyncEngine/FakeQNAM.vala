@@ -109,7 +109,7 @@ public class FakeQNAM : Soup {
         GLib.OutputStream outgoing_data = null) {
         GLib.InputStream reply = null;
         var new_request = request;
-        new_request.set_raw_header ("X-Request-ID", AccessManager.generate_request_identifier ());
+        new_request.set_raw_header ("X-Request-ID", Soup.ClientContext.generate_request_identifier ());
         var content_type = request.header (Soup.Request.ContentTypeHeader).to_string ();
         if (this.override_value) {
             var reply_override = this.override_value (operation, new_request, outgoing_data);

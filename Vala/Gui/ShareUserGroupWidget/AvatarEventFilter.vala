@@ -21,8 +21,8 @@ public class AvatarEventFilter : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    protected override bool event_filter (GLib.Object object, Gdk.Event event) {
-        if (event.type () == Gdk.Event.Context_menu) {
+    protected bool event_filter (GLib.Object object, Gdk.Event event) {
+        if (event.type == Gdk.Event.Context_menu) {
             var context_menu_event = (GLib.Context_menu_event)event;
             if (!context_menu_event) {
                 return false;

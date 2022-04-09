@@ -129,12 +129,12 @@ public class SlideShow : Gtk.Widget {
         Cairo.FontOptions font_options = font_options ();
         Gdk.Rectangle label_size = Gdk.Rectangle (0, font_options.height ());
         foreach (string label in this.labels) {
-            label_size.width (std.max (font_options.horizontal_advance (label), label_size.width ()));
+            label_size.width = int.max (font_options.horizontal_advance (label), label_size.width);
         }
         Gdk.Rectangle pixmap_size;
         foreach (Gdk.Pixbuf pixmap in this.pixmaps) {
-            pixmap_size.width (std.max (pixmap.width (), pixmap_size.width ()));
-            pixmap_size.height (std.max (pixmap.height (), pixmap_size.height ()));
+            pixmap_size.width = int.max (pixmap.width, pixmap_size.width);
+            pixmap_size.height = int.max (pixmap.height, pixmap_size.height);
         }
         return Gdk.Rectangle (
             std.max (label_size.width (), pixmap_size.width ()),

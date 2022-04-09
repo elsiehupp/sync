@@ -34,7 +34,7 @@ public class User : GLib.Object {
     Number of currently running notification requests. If non
     zero, no query for notifications is started.
     ***********************************************************/
-    private int notification_requests_running;
+    internal int notification_requests_running;
 
 
     internal signal void signal_gui_log (string value1, string value2);
@@ -131,7 +131,7 @@ public class User : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    public AccountAppList app_list {
+    public GLib.List<AccountApp> app_list {
         return this.account_state.app_list;
     }
 

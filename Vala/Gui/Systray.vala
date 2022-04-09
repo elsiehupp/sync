@@ -36,7 +36,7 @@ public class Systray : GLib.SystemTrayIcon {
     const string NOTIFICATIONS_PATH = "/org/freedesktop/Notifications";
     const string NOTIFICATIONS_IFACE = "org.freedesktop.Notifications";
 
-    class AccessManagerFactory : GLib.QmlNetworkAccessManagerFactory {
+    class AccessManagerFactory : Soup.Factory {
 
         /***********************************************************
         ***********************************************************/
@@ -47,7 +47,7 @@ public class Systray : GLib.SystemTrayIcon {
         /***********************************************************
         ***********************************************************/
         public override Soup.Context create (GLib.Object parent) {
-            return new AccessManager (parent);
+            return new Soup.ClientContext (parent);
         }
     }
 

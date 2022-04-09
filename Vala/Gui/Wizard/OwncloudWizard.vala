@@ -299,7 +299,7 @@ public class OwncloudWizard : GLib.Wizard {
     }
 
 
-    private delegate void CallBack (bool enable);
+    public delegate void CallBack (bool enable);
 
 
     /***********************************************************

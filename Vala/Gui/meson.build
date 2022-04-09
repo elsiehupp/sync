@@ -154,7 +154,7 @@ deps = [
     dependency('libsoup-2.4'),
 ]
 
-executable(
+gui = executable(
     meson.project_name(),
     srcs,
     dependencies: deps,

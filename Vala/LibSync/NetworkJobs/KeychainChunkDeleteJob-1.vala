@@ -44,11 +44,11 @@ public class KeychainChunkDeleteJob2 : AbstractNetworkJob {
     ***********************************************************/
     public new void start () {
         Soup.Request request = new Soup.Request ();
-        if (!this.folder_token == "") {
+        if (this.folder_token != "") {
             request.raw_header ("e2e-token", this.folder_token);
         }
 
-        if (this.url.is_valid) {
+        if (GLib.Uri.is_valid (this.url)) {
             send_request ("DELETE", this.url, request);
         } else {
             send_request ("DELETE", make_dav_url (path), request);

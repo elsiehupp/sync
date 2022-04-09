@@ -83,7 +83,7 @@ public class OwncloudSetupWizard : GLib.Object {
     }
 
 
-    delegate void WizardDoneDelegate ();
+    public delegate void WizardDoneDelegate ();
 
 
     /***********************************************************

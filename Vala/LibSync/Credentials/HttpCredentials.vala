@@ -152,7 +152,7 @@ public class HttpCredentials : AbstractCredentials {
     /***********************************************************
     ***********************************************************/
     public Soup.Session create_access_manager () {
-        AccessManager soup_context = new HttpCredentialsAccessManager (this);
+        Soup.ClientContext soup_context = new HttpCredentialsAccessManager (this);
 
         soup_context.signal_authentication_required.connect (
             this.on_signal_authentication
@@ -166,7 +166,7 @@ public class HttpCredentials : AbstractCredentials {
 
     /***********************************************************
     ***********************************************************/
-    public void fetch_from_keychain () {
+    public new void fetch_from_keychain () {
         this.was_fetched = true;
 
         // User must be fetched from config file

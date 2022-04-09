@@ -24,7 +24,7 @@ public class PropagateUploadEncrypted : GLib.Object {
 
     /***********************************************************
     ***********************************************************/
-    string folder_token { public get; private set; }
+    public string folder_token { public get; private set; }
 
     /***********************************************************
     ***********************************************************/
@@ -289,7 +289,7 @@ public class PropagateUploadEncrypted : GLib.Object {
         // Find existing metadata for this file
         bool found = false;
         EncryptedFile encrypted_file;
-        GLib.List<EncryptedFile> files = this.metadata.files ();
+        GLib.List<EncryptedFile> files = this.metadata.files;
 
         foreach (EncryptedFile file in files) {
             if (file.original_filename == filename) {
